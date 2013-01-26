@@ -1,0 +1,5 @@
+
+MODULE_COMMUTATION_DIRS += predriver
+
+XCC_FLAGS += -fsubword-select
+OPTIONAL_HEADERS += dsc_config.h refclk.h
