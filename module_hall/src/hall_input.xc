@@ -32,8 +32,8 @@ void run_hall( chanend c_hall, port in p_hall)
   unsigned pin_state_last;
   unsigned new1,new2;
   unsigned uHallNext,uHallPrevious;
-  int xreadings=0;
-  int iPosAbsolut;
+  int xreadings  =0;
+  int iPosAbsolut=0;
 
   int iHallError=0;
   int dir=0;
@@ -89,6 +89,8 @@ void run_hall( chanend c_hall, port in p_hall)
 					iHallActualSpeed = 60000000/iPeriodMicroSeconds;    // period in µsec
 					iHallActualSpeed /= POLE_PAIRS; //Pole pairs
 	    		}
+	    		iHallActualSpeed &= 0x00FFFFFF;
+	    		iHallActualSpeed |= 0xAA000000;
 	    	}
 
 	    if(dir == -1)
@@ -103,6 +105,8 @@ void run_hall( chanend c_hall, port in p_hall)
 					iHallActualSpeed /= POLE_PAIRS;
 					iHallActualSpeed = -iHallActualSpeed;
 	    		}
+	    		iHallActualSpeed &= 0x00FFFFFF;
+	    		iHallActualSpeed |= 0xAA000000;
 	    	}
 
 	   iTimeSaveOneTransition  = iTimeCountOneTransition;
@@ -117,7 +121,7 @@ void run_hall( chanend c_hall, port in p_hall)
 	#define defPeriodMax 1000000  //1000msec
 		if(iCountMicroSeconds > defPeriodMax)
 			{iCountMicroSeconds = defPeriodMax;
-			 iHallActualSpeed=0;
+			 iHallActualSpeed   = 0xAA000000;
 			 }
 
 
@@ -142,7 +146,7 @@ void run_hall( chanend c_hall, port in p_hall)
 			case c_hall :> cmd:
 
 				  if  (cmd == 1) { c_hall <: angle2; }
-			 else if  (cmd == 2) { c_hall <: iHallActualSpeed;  }
+			 else if  (cmd == 2) { c_hall <: iHallActualSpeed;   iHallActualSpeed &= 0x00FFFFFF; }
 			 else if  (cmd == 3) { c_hall <: iPosAbsolut;  }
 			 else if  (cmd == 4) { c_hall <: iHallError;   }
 			break;
