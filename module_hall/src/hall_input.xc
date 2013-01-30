@@ -126,7 +126,10 @@ void run_hall( chanend c_hall, port in p_hall)
 
 
  		if(iTimeCountOneTransition)
+ 			if(iTimeSaveOneTransition)
 		delta_angle = (682 *iTimeCountOneTransition)/iTimeSaveOneTransition;
+
+
 	  if(delta_angle >= 680) delta_angle = 680;
 
 	  if(iTimeCountOneTransition > 50000) dir = 0;
