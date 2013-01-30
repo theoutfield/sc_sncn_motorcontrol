@@ -324,7 +324,7 @@ void adc_ad7949_triggered( chanend c_adc,
 				{
 					t :> ts;
 					t when timerafter(ts + 6200) :> ts;  // was 4000  now set to 6200 so that even in the worst case the trigger pulse stays in low side of the pwm
-					p_ifm_ext_d3 <: 1;  // set to one
+//					p_ifm_ext_d3 <: 1;  // set to one
 					adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
 				}
 				break;
@@ -337,7 +337,7 @@ void adc_ad7949_triggered( chanend c_adc,
 				break;
 		}// end select
 
-		p_ifm_ext_d3 <: 0;
+//		p_ifm_ext_d3 <: 0;
 	}//end while 1
 }// end of 	adc_ad7949_triggered
 
