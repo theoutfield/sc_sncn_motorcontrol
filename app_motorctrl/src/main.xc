@@ -55,22 +55,18 @@ int main(void)
      * CORE 1
      ************************************************************/
     on stdcore[1]: {
-	//	#ifdef USE_XSCOPE
-    	/*
-			  	  	 xscope_register(7,
-					 XSCOPE_CONTINUOUS, "0 iPhase1", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "1 iPhase2", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "2 uCurVector", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "3 iAngleCur", XSCOPE_UINT, "n",
-					 XSCOPE_CONTINUOUS, "4 position1", XSCOPE_UINT, "n",
-					 XSCOPE_CONTINUOUS, "5 iIdfiltered", XSCOPE_UINT, "n",
-					 XSCOPE_CONTINUOUS, "6 iIqfiltered", XSCOPE_UINT, "n"
-					);
-		*/
 
+    	  	 	 	xscope_register(7,
+    	  			XSCOPE_CONTINUOUS, "0 a1RMS", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "3 iUmotIntegrator", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "4 iUmotMotor", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "5 iTemp4", XSCOPE_UINT, "n",
+    	  			XSCOPE_CONTINUOUS, "6 iIqPeriod2", XSCOPE_UINT, "n"
+    	  			);
 
-
- 	  	 	 	 	 xscope_register(7,
+ 	  	 	 /*	 	 xscope_register(7,
 					 XSCOPE_CONTINUOUS, "0 a2", XSCOPE_INT, "n",
 					 XSCOPE_CONTINUOUS, "1 phase2", XSCOPE_INT, "n",
 					 XSCOPE_CONTINUOUS, "2 iAngleInvPark", XSCOPE_INT, "n",
@@ -79,11 +75,9 @@ int main(void)
 					 XSCOPE_CONTINUOUS, "5 iAngleDiffPeriod", XSCOPE_UINT, "n",
 					 XSCOPE_CONTINUOUS, "6 iIqfiltered", XSCOPE_UINT, "n"
 					);
+			*/
+ 	  	 	 	 	xscope_config_io(XSCOPE_IO_BASIC);
 
-		//			 XSCOPE_CONTINUOUS, "2 iRampAccValue", XSCOPE_INT, "n",
-		//			 XSCOPE_CONTINUOUS, "3 iRampDecValue", XSCOPE_INT, "n",
-			  xscope_config_io(XSCOPE_IO_BASIC);
-//		#endif}
     }
     /************************************************************
      * CORE 2             communication with the Motor
@@ -95,6 +89,9 @@ int main(void)
 			  timer t;
 			  unsigned time;
               int iIndex;
+
+              send_cmd.varx=0;
+              send_cmd.var1=0;
 
 
 			  t when timerafter(time+1*SEC_FAST) :> time;
@@ -128,6 +125,7 @@ int main(void)
 				  if(valid == 1)				// if valid send command to motor
 				  {
 					  c_commutation <:1;	  c_commutation <:send_cmd.iPwmOnOff;			//ON OFF PWM
+					  c_commutation <:2;	  c_commutation <:send_cmd.iHoldingTorque;
 					  c_commutation <:4;	  c_commutation <:send_cmd.iSetValueSpeedRpm;	//Speed RPM
 				  }// end valid
 			  }//end while 1
@@ -144,7 +142,7 @@ int main(void)
     			//do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, ADC_SYNC_PORT, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
     			do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
-    			run_hall( c_hall, p_ifm_hall);
+    			run_hall( c_hall, p_ifm_hall, p_ifm_encoder);
     			commutation(c_adc, c_commutation, c_hall, c_pwm_ctrl );
       	  }
     }// end stdcore[IFM_CORE]

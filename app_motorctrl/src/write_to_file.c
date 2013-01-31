@@ -14,10 +14,15 @@
 
 int iSetValueSpeedRpm=   0;
 int iPwmOnOff        =   1;
+int iHoldingTorque   =   0;
+
 int iIndex =   1;
 float fa1RMS,fa2RMS,fa3RMS;
 int iFlag=1;
 int iTemp;
+
+
+
 
 char cxInfo[32][20]={\
 "iUmotSquare:",
@@ -32,9 +37,9 @@ char cxInfo[32][20]={\
 ":",
 "iStep:",
 "PositionAbs:",
-":",
-":",
-":",
+"iPosEncoder:",
+"PinStateHall:",
+"PinStateEncoder:",
 "field__per:",
 "torque_per:",
 "AngleDiffPer:",
@@ -111,7 +116,7 @@ int xx;
 	            }
 	}
 
-	if( c->varx == 1)
+	if(c->varx == 1)
 	{
 		c->varx = 0;
 		iFlag   = 0;
@@ -158,9 +163,10 @@ int xx;
 
 	if(iFlag)
 	{
-	printf("\nChoose to set:  pxx=parameter v=view parameter \n");
+	printf("\n Choose to set:  pxx=parameter v=view parameter \n");
+	printf(" h ->holding torque 0-800\n");
 	printf(" +/-RPM Speed RPM 0-4000 Speed: %d \n",iSetValueSpeedRpm);
-	printf(" I info Motor: 0(null):STOP\n");
+	printf(" ENTER=info Motor: 0(null):STOP\n");
 	}
     iFlag=1;
 
@@ -168,13 +174,15 @@ int xx;
 	{
     scanf("%c", &cInput);
 
+ //   printf("key=%02X",cInput);
 	switch(cInput)
 	{
-		case 'i':
-		case 'I':
-	    	c->varx = 1;
-			return(0);
-			break;
+	case 0x0A:
+	  	c->varx = 1;   // view infos
+	  	iFlag=0;
+		return(0);
+		break;
+
 		case 'v':			// view all parameter
 		case 'V':
 			c->varx = 2;
@@ -183,41 +191,57 @@ int xx;
 
 		case  '0':
 			iSetValueSpeedRpm = 0;
-			c->iSetValueSpeedRpm = iSetValueSpeedRpm;
-			c->iPwmOnOff = iPwmOnOff;
+			c->iHoldingTorque       = iHoldingTorque;
+			c->iSetValueSpeedRpm 	= iSetValueSpeedRpm;
+			c->iPwmOnOff 			= iPwmOnOff;
 			return(1);
 			break;
 
+
+		case 'h':
+		case 'H':
+			scanf("%d",&iHoldingTorque);
+			c->iHoldingTorque       = iHoldingTorque;
+			c->iSetValueSpeedRpm    = iSetValueSpeedRpm;
+			c->iPwmOnOff 			= iPwmOnOff;
+			return(1);
+			break;
+
+
 		case '+':
 			scanf("%d",&iSetValueSpeedRpm);
-			c->iSetValueSpeedRpm        = iSetValueSpeedRpm;
-			c->iPwmOnOff = iPwmOnOff;
+			c->iHoldingTorque       = iHoldingTorque;
+			c->iSetValueSpeedRpm    = iSetValueSpeedRpm;
+			c->iPwmOnOff 			= iPwmOnOff;
 			return(1);
 			break;
 
 		case '-':
 			scanf("%d",&iSetValueSpeedRpm);
 			iSetValueSpeedRpm    = -iSetValueSpeedRpm;
+			c->iHoldingTorque       = iHoldingTorque;
 			c->iSetValueSpeedRpm = iSetValueSpeedRpm;
 			c->iPwmOnOff = iPwmOnOff;
 			return(1);
 			break;
 
-		case 'x':
+		case 'x':			// PWM OFF
 		case 'X':
 		    iPwmOnOff = 0;
 		    iSetValueSpeedRpm = 0;
-			c->iSetValueSpeedRpm = iSetValueSpeedRpm;
-			c->iPwmOnOff = iPwmOnOff;
+			c->iHoldingTorque       = iHoldingTorque;
+			c->iSetValueSpeedRpm 	= iSetValueSpeedRpm;
+			c->iPwmOnOff 			= iPwmOnOff;
 			return(1);
 			break;
 
-		case 'z':
+		case 'z':		// PWM ON
 		case 'Z':
 		    iPwmOnOff = 1;
 		    iSetValueSpeedRpm = 0;
-			c->iSetValueSpeedRpm = iSetValueSpeedRpm;
-			c->iPwmOnOff = iPwmOnOff;
+			c->iHoldingTorque       = iHoldingTorque;
+			c->iSetValueSpeedRpm 	= iSetValueSpeedRpm;
+			c->iPwmOnOff 			= iPwmOnOff;
 			return(1);
 			break;
 
@@ -237,7 +261,8 @@ int xx;
 			break;
 
 		default:
-			printf("\n");
+
+
 			break;
 	}
  }// end while 1
