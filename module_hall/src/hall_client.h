@@ -32,4 +32,11 @@ unsigned get_hall_absolute_pos(chanend c_hall);
 
 int32_t get_hall_angle(chanend c_hall);
 
+unsigned get_hall_pinstate(chanend c_hall);
+
+unsigned get_encoder_pinstate(chanend c_hall);
+
+int32_t  get_encoder_position(chanend c_hall);
+
 inline void hall_encoder(chanend pos_ctrl, chanend pos_data);
+

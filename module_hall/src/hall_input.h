@@ -31,7 +31,7 @@ enum hall_commands { HALL_CMD_GETSPEED, HALL_CMD_GETPOS };
  *  \param c_hall the control channel for reading hall position
  *  \param p_hall the port for reading the hall sensor data
  */
-void run_hall( chanend c_hall, port in p_hall );
+void run_hall( chanend c_hall, port in p_hall, port in p_encoder );
 //void run_hall_el( chanend c_hall, port in p_hall );
 
 /** \brief A hall encoder server that also calculates motor speed

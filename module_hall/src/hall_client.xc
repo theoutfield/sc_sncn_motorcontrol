@@ -23,6 +23,34 @@
 #include "refclk.h"
 #include "dc_motor_config.h"
 
+int32_t get_encoder_position(chanend c_hall)
+{
+	int32_t pos;
+	  c_hall <: 7;
+	  c_hall :> pos;
+
+	  return pos;
+}
+
+
+unsigned get_encoder_pinstate(chanend c_hall)
+{
+  unsigned pinstate;
+  c_hall <: 6;
+  c_hall :> pinstate;
+
+  return pinstate;
+}
+
+unsigned get_hall_pinstate(chanend c_hall)
+{
+  unsigned pinstate;
+  c_hall <: 5;
+  c_hall :> pinstate;
+
+  return pinstate;
+}
+
 unsigned get_hall_absolute_pos(chanend c_hall)
 {
   unsigned pos;
