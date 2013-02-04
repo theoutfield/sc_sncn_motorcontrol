@@ -18,7 +18,7 @@ unsigned root_function(unsigned uSquareValue);
 
 #define DC900
 
-static t_pwm_control pwm_ctrl;
+//static t_pwm_control pwm_ctrl;
 
 extern short sine_third[];
 extern short arctg_table[];
@@ -35,19 +35,19 @@ extern out port testport;
 #define defParAngleUser 		 300
 #define defParAngleFromRPM 		 150
 #define defParUmotBoost  		 100
-#define defParUmotStart 		 150
-#define defParSpeedKneeUmot 	3000
+#define defParUmotStart 		 120
+#define defParSpeedKneeUmot 	3500
 #define defParAngleCorrVal         1
 #define defParAngleCorrMax		 300
 
 
-#define defParRmsLimit			3000  // 66*4 = 264Bits/A
-#define defParRmsMaxPwmOff      1500
+#define defParRmsLimit			1500  // 66*4 = 264Bits/A
+#define defParRmsMaxPwmOff      4000
 
 
 #define defParHysteresisPercent	    5
 #define defParDiffSpeedMax		  150
-#define defParUmotIntegralLimit	  512
+#define defParUmotIntegralLimit	 2048
 #define defParPropGain			   64
 #define defParIntegralGain		   64
 
