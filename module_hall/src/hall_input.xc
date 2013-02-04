@@ -170,7 +170,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	      	  	   break;
 	      case 6:  if(iPeriodMicroSeconds > 1786)    iNrHallPulses = 2;
 	      	       break;
-	      default: iNrHallPulses=1;
+	      default: iNrHallPulses=1; break;
 	      }
 
 /*
