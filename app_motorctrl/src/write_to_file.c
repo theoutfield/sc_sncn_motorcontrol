@@ -86,11 +86,11 @@ char cxParameter[32][32]={\
 "22",
 "23",
 "24",
-"25",
-"26",
-"27",
-"28",
-"29",
+"25 test1",
+"26 test2",
+"27 test3",
+"28 test4",
+"29 test5",
 "30",
 "31",
 };
@@ -157,6 +157,13 @@ int xx;
 		xx=14; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
 		xx=19; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
 		printf("a2RMS: a3RMS:     %4.2fA  %4.2fA",fa2RMS,fa3RMS);
+		printf("\n");
+
+		xx=25; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
+		xx=26; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
+		xx=27; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
+		xx=28; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
+		xx=29; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
 		printf("\n");
 	}
 
@@ -256,7 +263,7 @@ int xx;
 			c->iMotPar[iIndex] = iTemp;
 			iFlag=0;
 			c->var1 = c->iMotPar[iIndex];
-			return(iIndex+32);
+			return(iIndex+96);
 			}
 			break;
 

@@ -57,18 +57,21 @@ int main(void)
     on stdcore[1]: {
 
     	  	 	 	xscope_register(7,
-    	  			XSCOPE_CONTINUOUS, "0 a1RMS", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "0 a1", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "1 a2", XSCOPE_INT, "n",
     	  			XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "3 iUmotIntegrator", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "4 iUmotMotor", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "5 iTemp4", XSCOPE_UINT, "n",
-    	  			XSCOPE_CONTINUOUS, "6 iIqPeriod2", XSCOPE_UINT, "n"
+    	  			XSCOPE_CONTINUOUS, "3 iAngleFromHall", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "4 iAngleCur", XSCOPE_INT, "n",
+    	  			XSCOPE_CONTINUOUS, "5 iUmotMotor", XSCOPE_UINT, "n",
+    	  			XSCOPE_CONTINUOUS, "6 iIq", XSCOPE_UINT, "n"
     	  			);
+
+
+
 
  	  	 	 /*	 	 xscope_register(7,
 					 XSCOPE_CONTINUOUS, "0 a2", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "1 phase2", XSCOPE_INT, "n",
+					 XSCOPE_CONTINUOUS, "1 ", XSCOPE_INT, "n",
 					 XSCOPE_CONTINUOUS, "2 iAngleInvPark", XSCOPE_INT, "n",
 					 XSCOPE_CONTINUOUS, "3 iAngleFromHall", XSCOPE_INT, "n",
 					 XSCOPE_CONTINUOUS, "4 iAngleCur", XSCOPE_INT, "n",
@@ -82,6 +85,7 @@ int main(void)
     /************************************************************
      * CORE 2             communication with the Motor
      ************************************************************/
+
     on stdcore[2]:par{
     	{
 			  cmd_data send_cmd;
@@ -94,23 +98,33 @@ int main(void)
               send_cmd.var1=0;
 
 
+
+
 			  t when timerafter(time+1*SEC_FAST) :> time;
 
 			  while(1)
 			  {
 				  valid = input_cmd(send_cmd);   // valid command entered
 
-				  if(send_cmd.varx == 1)  // readout motor values
+				  if(valid == 1)				// if valid send command to motor ( cmd from 0 to 31 )
 				  {
-					  iIndex =8;
-					  while(iIndex < 32)
+					  c_commutation <:1;	  c_commutation <:send_cmd.iPwmOnOff;			//ON OFF PWM
+					  c_commutation <:2;	  c_commutation <:send_cmd.iHoldingTorque;
+					  c_commutation <:4;	  c_commutation <:send_cmd.iSetValueSpeedRpm;	//Speed RPM
+				  }
+
+
+				  if(send_cmd.varx == 1)  // readout motor values (cmd from 32 to 63 )
+				  {
+					  iIndex = 32;
+					  while(iIndex < 64)
 					  {
-					  c_commutation <: iIndex; 	c_commutation :> send_cmd.iMotValues[iIndex-8];
+					  c_commutation <: iIndex; 	c_commutation :> send_cmd.iMotValues[iIndex-32];
 					  iIndex++;
 					  }
 				  }
 
-				  if(send_cmd.varx == 2)  // readout parameters
+				  if(send_cmd.varx == 2)  	// readout  parameters (cmd from 64 to 97 )
 				  {
 					  iIndex =64;
 					  while(iIndex < 96) {
@@ -119,15 +133,10 @@ int main(void)
 					  }
 				  }
 
-				  if(valid >= 32){  c_commutation <: valid;	  c_commutation <: send_cmd.var1;  } // send actual parameter
+				  if(valid >= 96 && valid < 128)  // send actual parameter
+				  {  c_commutation <: valid;	  c_commutation <: send_cmd.var1;  }
 
 
-				  if(valid == 1)				// if valid send command to motor
-				  {
-					  c_commutation <:1;	  c_commutation <:send_cmd.iPwmOnOff;			//ON OFF PWM
-					  c_commutation <:2;	  c_commutation <:send_cmd.iHoldingTorque;
-					  c_commutation <:4;	  c_commutation <:send_cmd.iSetValueSpeedRpm;	//Speed RPM
-				  }// end valid
 			  }//end while 1
     	}
     }// end on stdcore[2]
