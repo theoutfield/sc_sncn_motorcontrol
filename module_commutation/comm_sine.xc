@@ -581,7 +581,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iTemp1 *= iTemp1;
 		iTemp1 /= iParDiffSpeedMax;
 
-		idiffSpeed2 -= iTemp1;
+		idiffSpeed2 = -iTemp1;
 		}
 
 
