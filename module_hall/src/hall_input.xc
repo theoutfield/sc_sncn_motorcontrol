@@ -34,7 +34,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   int xreadings  =0;
   int iPosAbsolut=0;
   int iHallError=0;
-  int dir=0;
+  int iHalldirection=0;
   int iNrHallPulses    = 1;
   int iCountHallPulses = 0;
 //=========== encoder =======================
@@ -125,19 +125,27 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
       if(iHallStateNew != iHallStateNew_last)
       {
- 	      if(iHallStateNew == uHallNext)    {iPosAbsolut++; dir = 1;  }
-	      if(iHallStateNew == uHallPrevious){iPosAbsolut--; dir =-1;  }
+ 	      if(iHallStateNew == uHallNext)    {iPosAbsolut++; iHalldirection = 1;  }
+	      if(iHallStateNew == uHallPrevious){iPosAbsolut--; iHalldirection =-1;  }
 
-	      //if(dir >= 0) // CW  3 2 6 4 5 1
+	      //if(iHalldirection >= 0) // CW  3 2 6 4 5 1
+
+#define defHallState0 3
+#define defHallState1 2
+#define defHallState2 6
+#define defHallState3 4
+#define defHallState4 5
+#define defHallState5 1
+
 
 	      switch(iHallStateNew)
 	  	  {
-			  case 3: angle1 =     0;  uHallNext=2; uHallPrevious=1;  break;
-			  case 2: angle1 =   682;  uHallNext=6; uHallPrevious=3;  break;   //  60
-			  case 6: angle1 =  1365;  uHallNext=4; uHallPrevious=2;  break;
-			  case 4: angle1 =  2048;  uHallNext=5; uHallPrevious=6;  break;   // 180
-			  case 5: angle1 =  2730;  uHallNext=1; uHallPrevious=4;  break;
-			  case 1: angle1 =  3413;  uHallNext=3; uHallPrevious=5;  break;   // 300 degree
+			  case defHallState0: angle1 =     0;  uHallNext=defHallState1; uHallPrevious=defHallState5;  break;
+			  case defHallState1: angle1 =   682;  uHallNext=defHallState2; uHallPrevious=defHallState0;  break;   //  60
+			  case defHallState2: angle1 =  1365;  uHallNext=defHallState3; uHallPrevious=defHallState1;  break;
+			  case defHallState3: angle1 =  2048;  uHallNext=defHallState4; uHallPrevious=defHallState2;  break;   // 180
+			  case defHallState4: angle1 =  2730;  uHallNext=defHallState5; uHallPrevious=defHallState3;  break;
+			  case defHallState5: angle1 =  3413;  uHallNext=defHallState0; uHallPrevious=defHallState4;  break;   // 300 degree
 			  default: iHallError++; break;
 	  	  }
 
@@ -145,7 +153,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	      iCountHallPulses++;
 	      if(iCountHallPulses >= iNrHallPulses)
 	      {
-	    	  iCountHallPulses = 0;
+	    	  iCountHallPulses 		  = 0;
 	    	  iPeriodMicroSeconds     = iCountMicroSeconds;
 	    	  iCountMicroSeconds      = 0;
 	    	  iHallActualSpeed        = 0;
@@ -153,10 +161,10 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	    	  {
 	    	  iHallActualSpeed  = 10000000;
 	    	  iHallActualSpeed *= iNrHallPulses;
-	    	  iHallActualSpeed /= iPeriodMicroSeconds;    // period in µsec
-	    	  iHallActualSpeed /= POLE_PAIRS; //Pole pairs
+	    	  iHallActualSpeed /= iPeriodMicroSeconds;    	// period in µsec
+	    	  iHallActualSpeed /= POLE_PAIRS; 				// pole pairs
 	    	  }
-	    	  if(dir == -1) iHallActualSpeed -= iHallActualSpeed;
+	    	  if(iHalldirection == -1) iHallActualSpeed = -iHallActualSpeed;
 
 	    	  iHallActualSpeed &= 0x00FFFFFF;
 	    	  iHallActualSpeed |= 0xAA000000;
@@ -173,44 +181,10 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	      default: iNrHallPulses=1; break;
 	      }
 
-/*
-	    if(dir == 1)
-	    	if(iHallStateNew_last==1 && iHallStateNew==3) // transition to NULL
-	    	{
-				 iPeriodMicroSeconds     = iCountMicroSeconds;
-				 iCountMicroSeconds      = 0;
-				 iHallActualSpeed        = 0;
-	    		if(iPeriodMicroSeconds)
-	    		{
-					iHallActualSpeed = 60000000/iPeriodMicroSeconds;    // period in µsec
-					iHallActualSpeed /= POLE_PAIRS; //Pole pairs
-	    		}
-	    		iHallActualSpeed &= 0x00FFFFFF;
-	    		iHallActualSpeed |= 0xAA000000;
-	    	}
-
-
-
-	    if(dir == -1)
-	    	if(iHallStateNew_last==3 && iHallStateNew==1)
-	    	{
-				iPeriodMicroSeconds     = iCountMicroSeconds;
-				iCountMicroSeconds      = 0;
-				iHallActualSpeed        = 0;
-	    		if(iPeriodMicroSeconds)
-	    		{
-					iHallActualSpeed = 60000000/iPeriodMicroSeconds;
-					iHallActualSpeed /= POLE_PAIRS;
-					iHallActualSpeed = -iHallActualSpeed;
-	    		}
-	    		iHallActualSpeed &= 0x00FFFFFF;
-	    		iHallActualSpeed |= 0xAA000000;
-	    	}
-*/
 	   iTimeSaveOneTransition  = iTimeCountOneTransition;
 	   iTimeCountOneTransition = 0;
        delta_angle             = 0;
-       iHallStateNew_last  = iHallStateNew;
+       iHallStateNew_last  	   = iHallStateNew;
 
       }// end (iHallStateNew != iHallStateNew_last
      //===============================================================
@@ -230,12 +204,12 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
 	  if(delta_angle >= 680) delta_angle = 680;
 
-	  if(iTimeCountOneTransition > 50000) dir = 0;
+	  if(iTimeCountOneTransition > 50000) iHalldirection = 0;
 
 	  angle2 = angle1;
-      if(dir == 1)  angle2 += delta_angle;
+      if(iHalldirection == 1)  angle2 += delta_angle;
 
-      if(dir == -1) angle2 -= delta_angle;
+      if(iHalldirection == -1) angle2 -= delta_angle;
 
       angle2 &= 0x0FFF;    // 4095
 
