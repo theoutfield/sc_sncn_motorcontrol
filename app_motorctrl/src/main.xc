@@ -55,7 +55,7 @@ int main(void)
      * CORE 1
      ************************************************************/
     on stdcore[1]: {
-
+/*
     	  	 	 	xscope_register(7,
     	  			XSCOPE_CONTINUOUS, "0 a1", XSCOPE_INT, "n",
     	  			XSCOPE_CONTINUOUS, "1 a2", XSCOPE_INT, "n",
@@ -65,20 +65,17 @@ int main(void)
     	  			XSCOPE_CONTINUOUS, "5 iUmotMotor", XSCOPE_UINT, "n",
     	  			XSCOPE_CONTINUOUS, "6 iIq", XSCOPE_UINT, "n"
     	  			);
+*/
 
-
-
-
- 	  	 	 /*	 	 xscope_register(7,
-					 XSCOPE_CONTINUOUS, "0 a2", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "1 ", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "2 iAngleInvPark", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "3 iAngleFromHall", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "4 iAngleCur", XSCOPE_INT, "n",
+ 	  	 	 	 	 xscope_register(7,
+					 XSCOPE_CONTINUOUS, "0 a1RMS", XSCOPE_INT, "n",
+					 XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
+					 XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
+					 XSCOPE_CONTINUOUS, "3 iUmotIntegrator", XSCOPE_INT, "n",
+					 XSCOPE_CONTINUOUS, "4 iUmotMotor", XSCOPE_INT, "n",
 					 XSCOPE_CONTINUOUS, "5 iAngleDiffPeriod", XSCOPE_UINT, "n",
-					 XSCOPE_CONTINUOUS, "6 iIqfiltered", XSCOPE_UINT, "n"
+					 XSCOPE_CONTINUOUS, "6 iIqPeriod2", XSCOPE_UINT, "n"
 					);
-			*/
  	  	 	 	 	xscope_config_io(XSCOPE_IO_BASIC);
 
     }
