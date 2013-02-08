@@ -65,7 +65,7 @@ int main(void)
     	  			XSCOPE_CONTINUOUS, "5 iUmotMotor", XSCOPE_UINT, "n",
     	  			XSCOPE_CONTINUOUS, "6 iIq", XSCOPE_UINT, "n"
     	  			);
-*/
+
 
  	  	 	 	 	 xscope_register(7,
 					 XSCOPE_CONTINUOUS, "0 a1RMS", XSCOPE_INT, "n",
@@ -76,7 +76,23 @@ int main(void)
 					 XSCOPE_CONTINUOUS, "5 iAngleDiffPeriod", XSCOPE_UINT, "n",
 					 XSCOPE_CONTINUOUS, "6 iIqPeriod2", XSCOPE_UINT, "n"
 					);
- 	  	 	 	 	xscope_config_io(XSCOPE_IO_BASIC);
+ */
+
+
+	 	 xscope_register(11,
+		 XSCOPE_CONTINUOUS, "0 iPhase1", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "1 iAngleCurrent", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "2 iAnglePWM", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "3 iAngleFromHall",XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "4 iAngleInvPark", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "5 iAngleDiffFOC", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "6 iAnglePWMFromHall", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "7 iAnglePWMFromFOC", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "8 iVectorInvPark",XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "9 iDiffAngleHall", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "10 iAngleXXX",XSCOPE_INT, "n"
+		);
+
 
     }
     /************************************************************
@@ -95,8 +111,6 @@ int main(void)
               send_cmd.var1=0;
 
 
-
-
 			  t when timerafter(time+1*SEC_FAST) :> time;
 
 			  while(1)
@@ -107,7 +121,9 @@ int main(void)
 				  {
 					  c_commutation <:1;	  c_commutation <:send_cmd.iPwmOnOff;			//ON OFF PWM
 					  c_commutation <:2;	  c_commutation <:send_cmd.iHoldingTorque;
+					  c_commutation <:3;	  c_commutation <:send_cmd.iTorqueSetValue;
 					  c_commutation <:4;	  c_commutation <:send_cmd.iSetValueSpeedRpm;	//Speed RPM
+					  c_commutation <:5;	  c_commutation <:send_cmd.iControlFOCcmd;
 				  }
 
 

@@ -12,52 +12,57 @@
 #include "set_cmd.h"
 
 
-int iSetValueSpeedRpm=   0;
-int iPwmOnOff        =   1;
-int iHoldingTorque   =   0;
-
+int iSetValueSpeedRpm=    0;
+int iPwmOnOff        =    1;
+int iHoldingTorque   =    0;
+int iTorqueSetValue  =    0;
+int iControlFOCcmd   =    0;
 int iIndex =   1;
 float fa1RMS,fa2RMS,fa3RMS;
 int iFlag=1;
 int iTemp;
 
 
-
-
 char cxInfo[32][20]={\
-"iUmotSquare:",
-"iUmotLinear:",
-"iUmotIntegrator:",
-"iUmotProp:",
-"iUmotMotor:",
-"iSetSpeed:",
-"iActualSpeed:",
-"idiffSpeed:",
+"UmotProfile:",
+"UmotIntegrator:",
+"UmotProp:",
+"UmotMotor:",
+"ActualSpeed:",
+"iStep1:",
+//----
+"FOC:",
+"SetUserSpeed:",
+"SetSpeed:",
+"idiffSpeed1:",
 "idiffSpeed2:",
+"HoldingTorq:",
+//-----
+"AngleFromHall:",
+"AnglePWM:",
 ":",
-"iStep:",
-"PositionAbs:",
-"iPosEncoder:",
-"PinStateHall:",
-"PinStateEncoder:",
-"field__per:",
-"torque_per:",
+":",
 "AngleDiffPer:",
-"AngleCorrect:",
-":",
-"ia1RMS:",
-"ia2RMS:",
-"ia3RMS:",
-":",
-":",
-":",
-":",
-":",
-":",
-":",
+"MotDirection:",
+//--------------
+"Field_Set:",				//15
+"Field_Actual:",
+"Field_Diff:",
+"Torque_Set:",
+"Torque_Actual:",
+"Torque_Diff:",
+//------
+"a1RMS_adc:",
+"a2RMS_adc:",
+"VectorCurr:",
+"VectorInvPark:",
+"PinStateEnc.:",
+"PinStateHall:",
+//--
 ":",
 ":"
 };
+
 
 
 char cxParameter[32][32]={\
@@ -96,6 +101,17 @@ char cxParameter[32][32]={\
 };
 
 
+void SetMotorValue(cmd_data *c)
+{
+    c->iControlFOCcmd          = iControlFOCcmd;
+    c->iTorqueSetValue      = iTorqueSetValue;
+	c->iHoldingTorque       = iHoldingTorque;
+	c->iSetValueSpeedRpm    = iSetValueSpeedRpm;
+	c->iPwmOnOff 			= iPwmOnOff;
+}
+
+
+
 int input_cmd(cmd_data *c )
 {
 unsigned char cInput=0;
@@ -110,9 +126,9 @@ int xx;
 	            while(iTemp < 32)
 	            {
 				printf(" p%-2d: %5d  ",iTemp,c->iMotPar[iTemp]); iTemp++;
-				printf(" p%2d: %5d  ",iTemp,c->iMotPar[iTemp]); iTemp++;
-				printf(" p%2d: %5d  ",iTemp,c->iMotPar[iTemp]); iTemp++;
-				printf(" p%2d: %5d\n",iTemp,c->iMotPar[iTemp]); iTemp++;
+				printf(" p%2d: %5d  ",iTemp,c->iMotPar[iTemp]);  iTemp++;
+				printf(" p%2d: %5d  ",iTemp,c->iMotPar[iTemp]);  iTemp++;
+				printf(" p%2d: %5d\n",iTemp,c->iMotPar[iTemp]);  iTemp++;
 	            }
 	}
 
@@ -120,50 +136,29 @@ int xx;
 	{
 		c->varx = 0;
 		iFlag   = 0;
-		 fa1RMS = c->iMotValues[20]; fa1RMS/=264;
-		 fa2RMS = c->iMotValues[21]; fa2RMS/=264;
-		 fa3RMS = c->iMotValues[22]; fa3RMS/=264;
+		 fa1RMS = c->iMotValues[24]; fa1RMS/=264;
+		 fa2RMS = c->iMotValues[25]; fa2RMS/=264;
 
-		xx=0;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=5;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=10; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=15; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=20; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  // RMS
+		xx=0; while(xx < 24){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
+		xx=24; printf("%-15s%5d    %4.2fA",cxInfo[xx],c->iMotValues[xx],fa1RMS);  // RMS
 		printf("\n");
 
-		xx=1;   printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=6;   printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=11;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=16;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=21;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]); // RMS
+		xx=1; while(xx < 25){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
+		xx=25;  printf("%-15s%5d    %4.2fA",cxInfo[xx],c->iMotValues[xx],fa2RMS);  // RMS
 		printf("\n");
 
-		xx=2;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=7;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=12; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=17; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=22; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  // RMS
+		xx=2; while(xx <= 26){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
 		printf("\n");
 
-		xx=3;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=8;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=13; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=18; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		printf("a1RMS:            %4.2fA",fa1RMS);
+		xx=3; while(xx <= 27){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
 		printf("\n");
 
-		xx=4;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=9;  printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=14; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		xx=19; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);
-		printf("a2RMS: a3RMS:     %4.2fA  %4.2fA",fa2RMS,fa3RMS);
+		xx=4; while(xx < 28){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
+		xx=28; printf("%-15s%5d  %8d",cxInfo[xx],c->iMotValues[xx],c->iMotValues[30]);
 		printf("\n");
 
-		xx=25; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
-		xx=26; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
-		xx=27; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
-		xx=28; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
-		xx=29; printf("%-16s%6d  ",cxInfo[xx],c->iMotValues[xx]);  //
+		xx=5; while(xx < 29){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
+		xx=29; printf("%-15s%5d  %8d",cxInfo[xx],c->iMotValues[xx],c->iMotValues[31]);
 		printf("\n");
 	}
 
@@ -181,7 +176,6 @@ int xx;
 	{
     scanf("%c", &cInput);
 
- //   printf("key=%02X",cInput);
 	switch(cInput)
 	{
 	case 0x0A:
@@ -190,7 +184,7 @@ int xx;
 		return(0);
 		break;
 
-		case 'v':			// view all parameter
+		case 'v':		// view all parameter
 		case 'V':
 			c->varx = 2;
 			return(0);
@@ -198,37 +192,29 @@ int xx;
 
 		case  '0':
 			iSetValueSpeedRpm = 0;
-			c->iHoldingTorque       = iHoldingTorque;
-			c->iSetValueSpeedRpm 	= iSetValueSpeedRpm;
-			c->iPwmOnOff 			= iPwmOnOff;
-			return(1);
+			SetMotorValue(c);
+	    	return(1);
 			break;
 
 
 		case 'h':
 		case 'H':
 			scanf("%d",&iHoldingTorque);
-			c->iHoldingTorque       = iHoldingTorque;
-			c->iSetValueSpeedRpm    = iSetValueSpeedRpm;
-			c->iPwmOnOff 			= iPwmOnOff;
+			SetMotorValue(c);
 			return(1);
 			break;
 
 
 		case '+':
 			scanf("%d",&iSetValueSpeedRpm);
-			c->iHoldingTorque       = iHoldingTorque;
-			c->iSetValueSpeedRpm    = iSetValueSpeedRpm;
-			c->iPwmOnOff 			= iPwmOnOff;
+			SetMotorValue(c);
 			return(1);
 			break;
 
 		case '-':
 			scanf("%d",&iSetValueSpeedRpm);
 			iSetValueSpeedRpm    = -iSetValueSpeedRpm;
-			c->iHoldingTorque       = iHoldingTorque;
-			c->iSetValueSpeedRpm = iSetValueSpeedRpm;
-			c->iPwmOnOff = iPwmOnOff;
+			SetMotorValue(c);
 			return(1);
 			break;
 
@@ -236,9 +222,7 @@ int xx;
 		case 'X':
 		    iPwmOnOff = 0;
 		    iSetValueSpeedRpm = 0;
-			c->iHoldingTorque       = iHoldingTorque;
-			c->iSetValueSpeedRpm 	= iSetValueSpeedRpm;
-			c->iPwmOnOff 			= iPwmOnOff;
+			SetMotorValue(c);
 			return(1);
 			break;
 
@@ -246,9 +230,23 @@ int xx;
 		case 'Z':
 		    iPwmOnOff = 1;
 		    iSetValueSpeedRpm = 0;
-			c->iHoldingTorque       = iHoldingTorque;
-			c->iSetValueSpeedRpm 	= iSetValueSpeedRpm;
-			c->iPwmOnOff 			= iPwmOnOff;
+			SetMotorValue(c);
+			return(1);
+			break;
+
+		case 't':			// set torque value
+		case 'T':
+		    scanf("%d",&iTemp);
+		    iTorqueSetValue 		= iTemp;
+			SetMotorValue(c);
+			return(1);
+			break;
+
+		case 'f':			// set torque value
+		case 'F':
+		    scanf("%d",&iTemp);
+		    iControlFOCcmd 			= iTemp;
+			SetMotorValue(c);
 			return(1);
 			break;
 
@@ -266,9 +264,7 @@ int xx;
 			return(iIndex+96);
 			}
 			break;
-
 		default:
-
 
 			break;
 	}
