@@ -12,21 +12,32 @@
 #include "refclk.h"
 #include "dc_motor_config.h"
 
+extern out port p_ifm_ext_d3;
+
 void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
  {
   timer tx;
   unsigned ts;					// newest timestamp
   unsigned cmd;
+  int iTemp;
 
   unsigned angle1;		        // newest angle (base angle on hall state transition)
   unsigned delta_angle;
   unsigned angle2;
 
+
   unsigned iCountMicroSeconds;
   int iHallActualSpeed=0;
   unsigned iPeriodMicroSeconds;
-  unsigned iTimeCountOneTransition=0;
-  unsigned iTimeSaveOneTransition=0;
+
+  int iCountTransitionSum;
+  int iCountTransitionNew;
+  int iCountTransitionFiltered;
+  int iCountTransitionEstimated;
+  int iTimeCountOneTransition=0;
+  int iTimeSaveOneTransition=0;
+
+
   unsigned iHallStateNew;			// newest hall state
   unsigned iHallStateNew_last;
   unsigned new1,new2;
@@ -34,9 +45,12 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   int xreadings  =0;
   int iPosAbsolut=0;
   int iHallError=0;
-  int iHalldirection=0;
-  int iNrHallPulses    = 1;
-  int iCountHallPulses = 0;
+  int iHalldirection    = 0;
+  int iNrHallPulses     = 1;
+  int iCountHallPulses  = 0;
+  int iAngleDeltaSum 	= 0;
+  int iAngleDeltaValue  = 682;
+
 //=========== encoder =======================
   int iStepEncoder		=0;
   int iEncState1		=0;
@@ -50,7 +64,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   int iEncoderDirection =0;
   int iEncoderNext=0;
   int iEncoderPrevious=0;
-
+unsigned char cFlagX=0;
 
   tx :> ts;  // first value
 
@@ -61,6 +75,8 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   //********************* LOOP 1µsec ****************************
   while(1) {
 
+	  cFlagX ^= 0x01;
+	  p_ifm_ext_d3 <: cFlagX;
 	  switch(xreadings)
 	  {
 		  case 0: p_hall :> new1; new1 &= 0x07; xreadings++;
@@ -76,6 +92,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	  }
 
 	  //==================================== encoder ===================================
+
 	  switch(iStepEncoder)
 	  {
 		  case 0: p_encoder :> iEncState1; iEncState1 &= 0x07; iStepEncoder++;
@@ -120,8 +137,9 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
 
 
-	  iCountMicroSeconds++;   // period in µsec
+	  iCountMicroSeconds++;   		// period in µsec
 	  iTimeCountOneTransition++;
+	  iAngleDeltaSum += iAngleDeltaValue;
 
       if(iHallStateNew != iHallStateNew_last)
       {
@@ -182,10 +200,11 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	      }
 
 	   iTimeSaveOneTransition  = iTimeCountOneTransition;
+	   iCountTransitionNew     = iTimeCountOneTransition;
 	   iTimeCountOneTransition = 0;
        delta_angle             = 0;
+       iAngleDeltaSum          = 0;
        iHallStateNew_last  	   = iHallStateNew;
-
       }// end (iHallStateNew != iHallStateNew_last
      //===============================================================
 
@@ -198,8 +217,26 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
 
  		if(iTimeCountOneTransition)
- 			if(iTimeSaveOneTransition)
-		delta_angle = (682 *iTimeCountOneTransition)/iTimeSaveOneTransition;
+ 		{
+ 		if(iTimeCountOneTransition == 1)
+ 		{
+ 			iCountTransitionSum      -= iCountTransitionFiltered;
+ 			iCountTransitionSum      += iCountTransitionNew;
+ 			iCountTransitionFiltered  = iCountTransitionSum/4;
+ 			iCountTransitionEstimated = (iCountTransitionFiltered*3)/4 + iCountTransitionNew/4;
+ 			iTemp = iCountTransitionNew - iCountTransitionFiltered;
+ 			iTemp *= 682;
+ 			iTemp /= iCountTransitionFiltered;
+ 			iAngleDeltaSum = 682 + iTemp;
+ 		}
+
+// 		if(iCountTransitionEstimated)
+//		delta_angle = (682 *iTimeCountOneTransition)/iCountTransitionEstimated; //iTimeSaveOneTransition;
+
+		if(iCountTransitionEstimated)
+		delta_angle = iAngleDeltaSum/iCountTransitionEstimated; //iTimeSaveOneTransition;
+ 		}
+
 
 
 	  if(delta_angle >= 680) delta_angle = 680;
@@ -208,22 +245,21 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
 	  angle2 = angle1;
       if(iHalldirection == 1)  angle2 += delta_angle;
-
       if(iHalldirection == -1) angle2 -= delta_angle;
-
       angle2 &= 0x0FFF;    // 4095
 
 //	  tx :> ts;
  	  tx when timerafter(ts + 250) :> ts;
 
 	#pragma ordered
+
  	    select {
 			case c_hall :> cmd:
 				  if  (cmd == 1) { c_hall <: angle2; }
 			 else if  (cmd == 2) { c_hall <: iHallActualSpeed;   iHallActualSpeed &= 0x00FFFFFF; }
 			 else if  (cmd == 3) { c_hall <: iPosAbsolut;  		}
 			 else if  (cmd == 4) { c_hall <: iHallError;   		}
-			 else if  (cmd == 5) { c_hall <: iHallStateNew;   		}
+			 else if  (cmd == 5) { c_hall <: iHallStateNew;   	}
 			 else if  (cmd == 6) { c_hall <: iEncoderPinState;  }
 			 else if  (cmd == 7) { c_hall <: iPosEncoder;   	}
 			break;
