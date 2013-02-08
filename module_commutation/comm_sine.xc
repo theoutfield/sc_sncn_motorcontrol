@@ -19,7 +19,10 @@ extern out port p_ifm_ext_d0;
 extern out port p_ifm_ext_d1;
 extern out port p_ifm_ext_d2;
 // extern out port p_ifm_ext_d3;
+extern out port p_ifm_shared_leds_wden;  // XS1_PORT_4B; /* BlueGreenRed_Green */
 #endif
+
+unsigned char cLeds;
 
 int iDiffAngleHall;
 int iAngleXXX;
@@ -100,17 +103,14 @@ int iPositionEncoder;
 int iPinStateHall;
 int iPinStateEncoder=0;
 
-
 int iRampIntegrator;
 
-int iSetValueSpeed=    0;
-int iSetInternSpeed=   0;
-int iSetInternSpeed2 = 0;
-int iSetSpeedRamp  =   0;
-int iMotDirection  =   0;
-
-
-int iControlFOC   = 0;
+int iSetValueSpeed	=  0;
+int iSetInternSpeed	=  0;
+int iSetInternSpeed2=  0;
+int iSetSpeedRamp  	=  0;
+int iMotDirection  	=  0;
+int iControlFOC   	=  0;
 //=======================================================
 int iCountx;
 int iStepRamp=0;
@@ -127,8 +127,6 @@ int iAngleFromRpm   = 0;
 int iAnglePWM;
 int iAnglePWMFromHall;
 int iAnglePWMFromFOC;
-
-
 
 int iAngleDiffSum;
 int iAngleDiff;
@@ -148,22 +146,17 @@ int iPhase2Sum	=0;
 
 int iAlpha,iBeta;
 int iAngleCurrent;
-
 int iId;
 int iIdPeriod;
 int iIq;
 int iIqPeriod;
-
 int VsdRef1,VsqRef1;		// invers park
 int VsdRef2,VsqRef2;		// invers park
 int VsaRef,VsbRef;
-
 int iAngleInvPark;
 int iVectorInvPark;
-
 int sinx,cosx;
 unsigned theta;  // angle
-
 unsigned iVectorCurrent;
 int iAngleDiffFOC;
 
@@ -260,7 +253,7 @@ void SaveValueToArray()
 
 	iMotValue[12] = iAngleFromHall;
 	iMotValue[13] = iAnglePWM;
-	iMotValue[14] = iAngleDiffFOC;
+	iMotValue[14] = 0;
 	iMotValue[15] = 0;
 	iMotValue[16] = iAngleDiffPeriod;
 	iMotValue[17] = iMotDirection;
@@ -303,10 +296,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	int iLoopCount=0;
 	int iCountDivFactor;
 
-
-
 	char cTriggerPeriod=0;  // one complete hall period
-
 	int iPwmOnOff 		= 1;
 	int iSpeedValueNew	=  0;  // if speed from hall is a new value
 
@@ -483,7 +473,6 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 					 if(iTorqueSet == 0)iStep1 = 0;
 				     break;
 
-
 			default: printstr("error\n"); iStep1 = 0; break;
 		}
 
@@ -600,13 +589,15 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	 		iFieldDiffSum += iFieldDiff1;
 	 		iFieldDiff2    = iFieldDiffSum/2;
 
-
-	 		//------------- set limits -----------------
+	 		//------------- calc hysteresis and set limit -----------------
 	 		iTemp1 = iTorqueDiff1;
-	 		if(iTemp1 < 0) iTemp1 = -iTemp1;
-	 		if(iTemp1 > 100) iTemp1 = 100;
+	 		if(iTemp1 < 0) iTemp1   = -iTemp1;
+	 		if(iTemp1 < 20) iTemp1=0;		// hys
+
+	 		if(iTemp1 > 100) iTemp1 = 100;	// limit
 	 		if(iTorqueDiff1 < 0)iTorqueDiff1 = -iTemp1;
 	 		else iTorqueDiff1 = iTemp1;
+
 
 	 		iTorqueDiffSum -= iTorqueDiff2;
 	 		iTorqueDiffSum += iTorqueDiff1;
@@ -622,7 +613,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	 		        VsqRef1 = iTorqueSet * 32;
 	 				break;
 	 		case 1:   								 // Speed with angle_correction from field
-		            VsqRef1 = iTorqueSet * 32;
+		            VsqRef1 = iIqPeriod2 * 32;       //
  				    break;
 	 		case 2:									// FOC torque-control
  				    break;
@@ -702,12 +693,11 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	if(iUmotResult > iUmotMotor) iUmotMotor++;
 	if(iUmotResult < iUmotMotor) iUmotMotor--;
 
-	//====== aa angle correction ================================================
+	//====== aa angle correction ======================================================
 	iAngleFromRpm = iActualSpeed;
 	if(iAngleFromRpm < 0)iAngleFromRpm = -iAngleFromRpm;  // absolut value
 	iAngleFromRpm *= iParAngleFromRPM;
 	iAngleFromRpm /= 4000;
-
 
 	//=========== calculate iAngleDiffPeriod  only for view ============================
 	iAngleDiff = 0;
@@ -732,8 +722,11 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	    	 iCountAngle      = 0;
 		 }
 	 }//end if(cTriggerPeriod
+   //============================================================================================
 
 
+
+	//============================= set angle for pwm ===========================================
 	if (iMotDirection > 0)
 	{
 		iAngleCorrection =0;
@@ -744,21 +737,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iAnglePWMFromFOC  = iAngleInvPark + (4096 - iAngleDiffFOC) + iParAngleUser;
 		iAnglePWMFromFOC  &= 0x0FFF;
 		iAngleXXX = iAnglePWMFromFOC - iAnglePWMFromHall;
-
-		if((iControlFOC) == 0)
-		{
-			iAnglePWM = iAnglePWMFromHall;
-
-			if(iAngleInvPark > iAngleFromHall)
-			     iAngleDiffFOC =  iAngleInvPark - iAngleFromHall;
-			else iAngleDiffFOC = (4096 + iAngleInvPark) - iAngleFromHall;
-		}
-		else
-		{
-			iAnglePWM = iAnglePWMFromFOC;			// ffff
-		}
-	}//end if iSetLoopSpeed >= 0
-
+	}//end if iMotDirection > 0
 	if (iMotDirection <  0)
 	{
 		iAnglePWMFromHall = iAngleFromHall + iParAngleUser - iAngleFromRpm  + iAngleCorrection/4  + 2240;
@@ -766,18 +745,15 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iAnglePWMFromFOC  = iAngleInvPark - iAngleDiffFOC + iParAngleUser + 2360;
 		iAnglePWMFromFOC  &= 0x0FFF;
 
-			if((iControlFOC) == 0)
-				{
-				iAnglePWM = iAnglePWMFromHall;
-					if(iAngleInvPark > iAngleFromHall)
-					     iAngleDiffFOC =  iAngleInvPark - iAngleFromHall;
-					else iAngleDiffFOC = (4096 + iAngleInvPark) - iAngleFromHall;
-				}
-				else
-				{
-				iAnglePWM = iAnglePWMFromFOC;
-				}
-	}//end if iSetLoopSpeed < 0
+	}//end if iMotDirection < 0
+
+	if((iControlFOC) == 0)
+		iAnglePWM = iAnglePWMFromHall;
+		else
+		iAnglePWM = iAnglePWMFromFOC;
+   //======================================================================================
+
+
 
 
 		if(iStep1 == 0 )
@@ -821,13 +797,9 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	 xscope_probe_data(2,iAnglePWM);
 	 xscope_probe_data(3,iAngleFromHall);
 	 xscope_probe_data(4,iAngleInvPark);
-	 xscope_probe_data(5,iAngleDiffFOC);
- 	 xscope_probe_data(6,iAnglePWMFromHall);
- 	 xscope_probe_data(7,iAnglePWMFromFOC);
- 	 xscope_probe_data(8,iVectorInvPark);
- 	 xscope_probe_data(9,iDiffAngleHall);
- 	 xscope_probe_data(10,iAngleXXX);
-
+	 xscope_probe_data(5,iAnglePWMFromHall);
+ 	 xscope_probe_data(6,iVectorCurrent);
+ 	 xscope_probe_data(7,iVectorInvPark);
 
 
 	   	// pwm 13889 * 4 nsec = 55,556µsec  18Khz
@@ -841,6 +813,20 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		if(pwm[0] < PWM_MIN_LIMIT)      pwm[0] = 0;
 		if(pwm[1] < PWM_MIN_LIMIT)      pwm[1] = 0;
 		if(pwm[2] < PWM_MIN_LIMIT)      pwm[2] = 0;
+
+		cLeds = 0;
+#define defpp1  0
+#define defpp2  64
+#define defpp3  128
+#define defpp4  192
+
+		if(iIndexPWM > defpp1   && iIndexPWM < (defpp1+8)) cLeds = 0x01;
+		if(iIndexPWM > defpp2   && iIndexPWM < (defpp2+8)) cLeds = 0x02;
+		if(iIndexPWM > defpp3   && iIndexPWM < (defpp3+8)) cLeds = 0x04;
+		if(iIndexPWM > defpp4   && iIndexPWM < (defpp4+8)) cLeds = 0x08;
+        cLeds ^= 0xFF;
+		p_ifm_shared_leds_wden <: cLeds;
+
 
 		p_ifm_ext_d0 <: 0; // yellow
 	#ifdef DC900
