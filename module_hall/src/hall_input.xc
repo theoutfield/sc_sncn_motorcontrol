@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "refclk.h"
 #include "dc_motor_config.h"
+#include <xscope.h>
 
 extern out port p_ifm_ext_d3;
 
@@ -21,10 +22,11 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   unsigned cmd;
   int iTemp;
 
-  unsigned angle1;		        // newest angle (base angle on hall state transition)
-  unsigned delta_angle;
-  unsigned angle2;
-
+  int angle1;		        // newest angle (base angle on hall state transition)
+  int angle2;
+  int delta_angle;
+  int iAngleLast;
+  int iAngleDiff;
 
   unsigned iCountMicroSeconds;
   int iHallActualSpeed=0;
@@ -203,36 +205,48 @@ unsigned char cFlagX=0;
 	   iCountTransitionNew     = iTimeCountOneTransition;
 	   iTimeCountOneTransition = 0;
        delta_angle             = 0;
-       iAngleDeltaSum          = 0;
        iHallStateNew_last  	   = iHallStateNew;
+
+        if(iHalldirection==1){
+    	if(angle1 < 1024 && iAngleLast > 3072)
+    		iAngleDiff  = (angle1 + 4096) - iAngleLast;
+    	else
+    		iAngleDiff  = angle1 - iAngleLast;
+       }
       }// end (iHallStateNew != iHallStateNew_last
-     //===============================================================
+     //==================================================================
 
 
 	#define defPeriodMax 1000000  //1000msec
 		if(iCountMicroSeconds > defPeriodMax)
-			{iCountMicroSeconds = defPeriodMax;
-			 iHallActualSpeed   = 0xAA000000;
-			 }
+			{
+			iCountMicroSeconds = defPeriodMax;
+			iHallActualSpeed   = 0xAA000000;
+			}
 
 
  		if(iTimeCountOneTransition)
  		{
+
  		if(iTimeCountOneTransition == 1)
  		{
  			iCountTransitionSum      -= iCountTransitionFiltered;
  			iCountTransitionSum      += iCountTransitionNew;
  			iCountTransitionFiltered  = iCountTransitionSum/4;
  			iCountTransitionEstimated = (iCountTransitionFiltered*3)/4 + iCountTransitionNew/4;
+
  			iTemp = iCountTransitionNew - iCountTransitionFiltered;
  			iTemp *= 682;
  			iTemp /= iCountTransitionFiltered;
- 			iAngleDeltaSum = 682 + iTemp;
+ 			iAngleDeltaSum += iTemp;
+ 			if(iAngleDeltaSum > 692) iAngleDeltaSum = 692;
+			if(iAngleDeltaSum < 672) iAngleDeltaSum = 672;
+ 			 xscope_probe_data(8,iCountTransitionNew);
+ 		 	 xscope_probe_data(9,iAngleDiff);
+ 		 	 xscope_probe_data(10,iAngleDeltaSum);
  		}
-
 // 		if(iCountTransitionEstimated)
 //		delta_angle = (682 *iTimeCountOneTransition)/iCountTransitionEstimated; //iTimeSaveOneTransition;
-
 		if(iCountTransitionEstimated)
 		delta_angle = iAngleDeltaSum/iCountTransitionEstimated; //iTimeSaveOneTransition;
  		}
@@ -247,6 +261,9 @@ unsigned char cFlagX=0;
       if(iHalldirection == 1)  angle2 += delta_angle;
       if(iHalldirection == -1) angle2 -= delta_angle;
       angle2 &= 0x0FFF;    // 4095
+      iAngleLast  = angle2;
+
+
 
 //	  tx :> ts;
  	  tx when timerafter(ts + 250) :> ts;
