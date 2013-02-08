@@ -32,7 +32,7 @@ extern out port testport;
 #define defParRpmMotorMax		3742
 #define defParDefSpeedMax		4000
 #define defParRPMreference		4000
-#define defParAngleUser 		 300
+#define defParAngleUser 		 560
 #define defParAngleFromRPM 		 150
 #define defParUmotBoost  		 100
 #define defParUmotStart 		 120
@@ -50,5 +50,10 @@ extern out port testport;
 #define defParUmotIntegralLimit	 2048
 #define defParPropGain			   64
 #define defParIntegralGain		   64
+
+#define defParTorquePropGain	   64
+#define defParTorqueIntegralGain   64
+
+
 
 

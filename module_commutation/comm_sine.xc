@@ -18,8 +18,16 @@ static t_pwm_control pwm_ctrl;
 extern out port p_ifm_ext_d0;
 extern out port p_ifm_ext_d1;
 extern out port p_ifm_ext_d2;
-extern out port p_ifm_ext_d3;
+// extern out port p_ifm_ext_d3;
 #endif
+
+int iDiffAngleHall;
+int iAngleXXX;
+int iUmotSquare;
+int iUmotLinear;
+int iRampAccValue=16;
+int iRampDecValue=16;
+
 
 int iMotPar[32];
 int iMotValue[32];
@@ -45,19 +53,39 @@ int iParRMS_PwmOff;
 
 
 int iUpdateFlag=0;
+
+
+
 //=========== motor values ===================================
-int iUmotSquare;
-int iUmotLinear;
+int iUmotProfile;
 int iUmotIntegrator=0;
 int iUmotP;
-int iUmotMotor = 0;   // follows iUmotResult
+int iUmotMotor = 0;   	// follows iUmotResult
+
+int iTorqueIntegrator=0;
+int iTorqueP;
+int iTorqueResult;
+int iTorqueIntegralValue;
+int iTorquePValue;
+int iTorqueDiff1;
+int iTorqueDiff2;
+int iTorqueDiffSum;
+
+int iTorqueSet=200;
+
+int iFieldDiff1;
+int iFieldDiff2;
+int iFieldDiffSum;
+int iFieldSet=0;
+
 int iPositionAbsolut=0;
 unsigned a1RMS,a2RMS,a3RMS;
+
 int ia1RMSMax=0;
 int iSetLoopSpeed=0;
 int iActualSpeed=0;
 int idiffSpeed;
-int idiffSpeed2;  // idiffSpeed with hyteresis
+int idiffSpeed2;  	// idiffSpeed with hyteresis
 int iIdPeriod2=0;
 int iIqPeriod2=0;
 int iAngleDiffPeriod;
@@ -72,11 +100,6 @@ int iPositionEncoder;
 int iPinStateHall;
 int iPinStateEncoder=0;
 
-int iTest1=0;
-int iTest2=0;
-int iTest3=0;
-int iTest4=0;
-int iTest5=0;
 
 int iRampIntegrator;
 
@@ -85,6 +108,66 @@ int iSetInternSpeed=   0;
 int iSetInternSpeed2 = 0;
 int iSetSpeedRamp  =   0;
 int iMotDirection  =   0;
+
+
+int iControlFOC   = 0;
+//=======================================================
+int iCountx;
+int iStepRamp=0;
+
+int iUmotBoost  = 0;
+int iUmotResult = 0;
+int iUmotLast   = 0;
+int iRampBlock  = 0;
+
+int iIndexPWM, iAngleFromHallOld=0;
+int iAngleFromHall  = 0;
+
+int iAngleFromRpm   = 0;
+int iAnglePWM;
+int iAnglePWMFromHall;
+int iAnglePWMFromFOC;
+
+
+
+int iAngleDiffSum;
+int iAngleDiff;
+int iIntegralGain;
+
+int iCountRMS  =0;
+int iTriggerRMS=0;
+int iCountAngle=0;
+unsigned a1Square=0,a2Square=0;
+unsigned a1SquareMean=0,a2SquareMean=0;
+int a1=0, a2=0;
+int iPhase1		=0;
+int iPhase2		=0;
+int iPhase1Sum	=0;
+int iPhase2Sum	=0;
+
+
+int iAlpha,iBeta;
+int iAngleCurrent;
+
+int iId;
+int iIdPeriod;
+int iIq;
+int iIqPeriod;
+
+int VsdRef1,VsqRef1;		// invers park
+int VsdRef2,VsqRef2;		// invers park
+int VsaRef,VsbRef;
+
+int iAngleInvPark;
+int iVectorInvPark;
+
+int sinx,cosx;
+unsigned theta;  // angle
+
+unsigned iVectorCurrent;
+int iAngleDiffFOC;
+
+
 
 void SetParameterValue()
 {
@@ -161,118 +244,79 @@ void InitParameter(){
 
 void SaveValueToArray()
 {
-	iMotValue[0]  = iUmotSquare;
-	iMotValue[1]  = iUmotLinear;
-	iMotValue[2]  = iUmotIntegrator/256;
-	iMotValue[3]  = iUmotP;
-	iMotValue[4]  = iUmotMotor;
-	iMotValue[5]  = iSetLoopSpeed;
-	iMotValue[6]  = iActualSpeed;
-	iMotValue[7]  = idiffSpeed;
-	iMotValue[8]  = idiffSpeed2;
-	iMotValue[9]  = iMotHoldingTorque;
-	iMotValue[10] = iStep1;
-	iMotValue[11] = iPositionAbsolut;
-	iMotValue[12] = iPositionEncoder;
-	iMotValue[13] = iPinStateHall;
-	iMotValue[14] = iPinStateEncoder;
-	iMotValue[15] = iIdPeriod2;
-	iMotValue[16] = iIqPeriod2;
-	iMotValue[17] = iAngleDiffPeriod;
-	iMotValue[18] = iAngleCorrection;
-	iMotValue[19] = iMotDirection;
-	iMotValue[20] = a1RMS;
-	iMotValue[21] = a2RMS;
-	iMotValue[22] = a3RMS;
-	iMotValue[23] = 0;
-	iMotValue[24] = 0;
-	iMotValue[25] = iTest1;
-	iMotValue[26] = iSetInternSpeed/65536;
-	iMotValue[27] = iTest3;
-	iMotValue[28] = iTest4;
-	iMotValue[29] = iTest5;
-	iMotValue[30] = 0;
-	iMotValue[31] = 0;
+	iMotValue[0]  = iUmotProfile;
+	iMotValue[1]  = iUmotIntegrator/256;
+	iMotValue[2]  = iUmotP;
+	iMotValue[3]  = iUmotMotor;
+	iMotValue[4]  = iActualSpeed;
+	iMotValue[5]  = iStep1;
+
+	iMotValue[6]  = iControlFOC;
+	iMotValue[7]  = iSetInternSpeed/65536;
+	iMotValue[8]  = iSetLoopSpeed;
+	iMotValue[9]  = idiffSpeed;
+	iMotValue[10] = idiffSpeed2;
+	iMotValue[11] = iMotHoldingTorque;
+
+	iMotValue[12] = iAngleFromHall;
+	iMotValue[13] = iAnglePWM;
+	iMotValue[14] = iAngleDiffFOC;
+	iMotValue[15] = 0;
+	iMotValue[16] = iAngleDiffPeriod;
+	iMotValue[17] = iMotDirection;
+
+ 	iMotValue[18] = iFieldSet;
+	iMotValue[19] = iIdPeriod2;
+	iMotValue[20] = iFieldDiff2;
+	iMotValue[21] = iTorqueSet;
+	iMotValue[22] = iIqPeriod2;
+	iMotValue[23] = iTorqueDiff2;
+
+	iMotValue[24] = a1RMS;
+	iMotValue[25] = a2RMS;
+	iMotValue[26] = iVectorCurrent;
+	iMotValue[27] = iVectorInvPark;
+	iMotValue[28] = iPinStateEncoder;
+	iMotValue[29] = iPinStateHall;
+
+	iMotValue[30] = iPositionEncoder;
+	iMotValue[31] = iPositionAbsolut;
 }
+
 
 
 
 #define defRampMax 8192		//ramp
 #define defRampMin 64
-
-
+void SpeedControl();
+void CalcUmotForSpeed();
+void CalcRampForSpeed();
 
 void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl)
 {
 	unsigned cmd;
 	unsigned pwm[3] = { 0, 0, 0 };
 	int iTemp,iTemp1=0;
-	int iTemp2,iTemp3,iTemp4;
-	int iCountx;
+//	int iTemp2,iTemp3,iTemp4;
 	unsigned char cFlag=0;
-	int iStepRamp=0;
-	int iUmotBoost  = 0;
-	int iUmotResult = 0;
-	int iUmotLast   = 0;
-	int iRampBlock  = 0;
 
-	int iIndexPWM, iPosFromHallOld=0;
-	int iAngleFromHall  = 0;
-
-	int iAngleFromRpm   = 0;
-	int iAnglePWM;
-
-    int iAngleDiffSum;
-    int iAngleDiff;
-    int iIntegralGain;
-
-    int iCountRMS  =0;
-    int iTriggerRMS=0;
-    int iCountAngle=0;
-	unsigned a1Square=0,a2Square=0;
-	int a1=0, a2=0;
-	int iPhase1		=0;
-	int iPhase2		=0;
-	int iPhase1Sum	=0;
-	int iPhase2Sum	=0;
-
-
-	int iAlpha,iBeta;
-	int iAngleCur;
-
-	int iId;
-	int iIdPeriod;
-	int iIq;
-	int iIqPeriod;
-
+	int iLoopCount=0;
 	int iCountDivFactor;
 
-	int VsdRef,VsqRef;		// invers park
-	int VsaRef,VsbRef;
-	int iAngleInvPark,iVectorInvPark;
 
-	int sinx,cosx;
-	unsigned theta;  // angle
-
-	unsigned uCurVector;
-
-	int iRampAccValue=16;
-	int iRampDecValue=16;
 
 	char cTriggerPeriod=0;  // one complete hall period
 
-    int iHysteresis;
-	int iPwmOnOff = 1;
+	int iPwmOnOff 		= 1;
 	int iSpeedValueNew	=  0;  // if speed from hall is a new value
-
 
     //-------------- init values --------------
    	iCountRMS=0;
 
-	 InitParameter();
-	 SetParameterValue();
+	InitParameter();
+	SetParameterValue();
 
-
+	 //================== pwmloop ========================
 	while (1)
 	{
     cFlag |= 1;
@@ -281,13 +325,25 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		p_ifm_ext_d0 <: cFlag;  // set to one
 #endif
 
+
 		//============= rotor position  from hall ===============================
-		iPositionAbsolut = get_hall_absolute_pos(c_hall);
+		iLoopCount++;
+		iLoopCount &= 0x0F;
+		switch(iLoopCount & 0x03)
+		{
+		case 0: iPositionAbsolut = get_hall_absolute_pos(c_hall);
+				break;
+		case 1: iPinStateHall    = get_hall_pinstate(c_hall);
+				break;
+		case 2: iPinStateEncoder = get_encoder_pinstate(c_hall);
+		        break;
+		case 3: iPositionEncoder = get_encoder_position(c_hall);
+				break;
+		}
 		iActualSpeed     = get_hall_speed(c_hall);
 		iAngleFromHall   = get_hall_angle(c_hall);
-		iPinStateHall    = get_hall_pinstate(c_hall);
-		iPinStateEncoder = get_encoder_pinstate(c_hall);
-		iPositionEncoder = get_encoder_position(c_hall);
+		iAngleFromHall  &= 0x0FFF;
+
 
 		iSpeedValueNew  = iActualSpeed & 0xFF000000;   				// extract info if SpeedValue is new
 		iActualSpeed    &= 0x00FFFFFF;
@@ -296,38 +352,52 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 		if(iActualSpeed > 0)
 		{
-		if(iPosFromHallOld > 2048  && iAngleFromHall < 2048) cTriggerPeriod=0xFF;
+		if(iAngleFromHallOld > 2048  && iAngleFromHall < 2048) cTriggerPeriod=0xFF;
 		}
 		if(iActualSpeed < 0)
 		{
-		if(iPosFromHallOld < 2048  && iAngleFromHall > 2048) cTriggerPeriod=0x7F;
+		if(iAngleFromHallOld < 2048  && iAngleFromHall > 2048) cTriggerPeriod=0x7F;
 		}
-		iPosFromHallOld = iAngleFromHall;
+
+		if(iAngleFromHall != iAngleFromHallOld)
+		{
+		if(iAngleFromHall > iAngleFromHallOld)
+		iDiffAngleHall = iAngleFromHall - iAngleFromHallOld;
+		else iDiffAngleHall = (iAngleFromHall +4096) - iAngleFromHallOld;
+		}
+
+		iAngleFromHallOld = iAngleFromHall;
 
 
 	//***************** steps ********************************************************
 
 
-		 switch(iStep1)	//controller steps
+		 switch(iStep1)
 		{
-			case 0: iPwmOnOff = 0;
-					if(iSetInternSpeed > 0){iMotDirection = 1;   iStep1= 1; }
-					if(iSetInternSpeed < 0){iMotDirection = -1;  iStep1= 1; }
-
+			case 0: iPwmOnOff 		 = 0;
 					iIntegralGain    = 0;
+					iUmotProfile     = 0;
 					iUmotResult      = 0;
 					iStepRamp        = 1;
 					iSetSpeedRamp    = 0;
 					iAngleCorrection = 0;
-
-					ia1RMSMax        = 0;
-					iTest1=0;
-					iTest2=0;
-					iTest3=0;
+					iAngleDiffFOC    = 1020;
+					switch(iControlFOC)
+					{
+					case 0:
+					case 1:
+					if(iSetInternSpeed > 0){iMotDirection =  1;   iStep1= 1; }
+					if(iSetInternSpeed < 0){iMotDirection = -1;   iStep1= 1; }
+					break;
+					case 2:
+					if(iTorqueSet > 0){iMotDirection =  1;  iStep1 = 50;}
+					if(iTorqueSet < 0){iMotDirection =  -1; iStep1 = 50;}
+					break;
+					}
 					break;
 
 			case 1:  iUmotBoost = iParUmotBoost * 32;
-			         iUmotMotor=iParUmotStart;
+			         iUmotMotor = iParUmotStart;
 				     iStepRamp       = 1;
 					 iPwmOnOff		 = 1;
 					 iRampIntegrator = 0;
@@ -363,8 +433,8 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 					   if(iStep1==10)
 					   if(iSetSpeedRamp != iSetInternSpeed)   iStep1 = 5;
 					 }
+			         if(iControlFOC > 1) iStep1=50;
 					 break;
-
 
 			case 11: iCountx = 0;
 			         iStep1++;
@@ -393,51 +463,35 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			         iStep1 = 0;
 			         break;
 
-
-
+			//--------------- overcurrent --------------------------
 			case 30:  iPwmOnOff		  = 0;			// error motor stop
 					  iStep1++;
 					  break;
 
-			case 31:  iPwmOnOff		  = 0;
-					  if(iSetLoopSpeed==0)iStep1=0;     // motor is stopping
-					  break;
+			case 31:  iPwmOnOff		  =  0;
+			 	 	  if(iControlFOC > 1){
+			 	 	  if(iTorqueSet == 0 ) iStep1=0;
+			 	 	  }
+			 	 	  else
+			 	 	  {
+					  if(iSetLoopSpeed== 0)iStep1=0;     // motor is stopping
+			 	 	  }
+			 	 	  break;
+
+			//==========================================
+			case 50: iPwmOnOff 		 = 1;
+					 if(iTorqueSet == 0)iStep1 = 0;
+				     break;
+
 
 			default: printstr("error\n"); iStep1 = 0; break;
 		}
 
 
 		 //===========================================================
-
+	        CalcRampForSpeed();
 		 //============================== ramp calculation ===========
-		 iTemp1 = iSetSpeedRamp;  	if(iTemp1 < 0) iTemp1 = -iTemp1;
-		 iTemp2 = iSetInternSpeed;  if(iTemp2 < 0) iTemp2 = -iTemp2;
-		 iTemp3 = iActualSpeed;     if(iTemp3 < 0) iTemp3 = -iTemp3;
 
-		 if(iTemp1 < iTemp2)  // acceleration +/-
-		 {
-		 iTemp4 = iTemp1/65536 - iTemp3;
-		      if(iTemp4 > 200) iRampBlock = 1;
-
-		      if(iRampBlock==0)
-		      iTemp1 += iRampAccValue;
-		      if(iTemp1 > iTemp2) iTemp1 = iTemp2;
-
-		      if(iRampAccValue < defRampMax) iRampAccValue+=8;
-		 }
-
-		 if(iTemp1 > iTemp2)  // deceleration +/-
-		 {
-		      iTemp1 -= iRampDecValue;
-		      if(iTemp1 < iTemp2) iTemp1 = iTemp2;
-
-		      if(iRampDecValue < defRampMax) iRampDecValue += 8;
-		 }
-
-
-		 if(iMotDirection < 0) iSetSpeedRamp = -iTemp1; else iSetSpeedRamp = iTemp1;
-		 iSetLoopSpeed = iSetSpeedRamp/65536;
-		 iRampBlock = 0;
 
 	 //== cc ====== current low pass filter =============================
 	 // 66mV/A    16384 = 4.096Volt   2,5V = 16384/4,096 * 2,5 = 10000  16384/4096 * 66 = 264 bits/Ampere
@@ -469,11 +523,8 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
          if(iTriggerRMS > 1)
 		 if(iCountRMS)
 		 {
-		 a1RMS = a1Square/iCountRMS;
-		 a2RMS = a2Square/iCountRMS;
-		 a1RMS = root_function(a1RMS);
-		 a2RMS = root_function(a2RMS);
-		 a3RMS = (a1RMS + a2RMS)/ 2;  // mean value
+		 a1SquareMean = a1Square/iCountRMS;
+		 a2SquareMean = a2Square/iCountRMS;
 		 a1Square  = 0;
 		 a2Square  = 0;
 		 iCountRMS = 0;
@@ -481,15 +532,13 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		 else iTriggerRMS--;
 		 }
 
-    	 if(a1RMS > iParRMS_PwmOff) {/*ia1RMSMax = a1;*/ iStep1=30; } // Motor stop
-    //	 if(a2RMS > iParRMS_PwmOff) iStep1=30;  // Motor stop
+    	 if(iVectorCurrent > iParRMS_PwmOff)   iStep1=30;  // Motor stop
+    	 if(iVectorCurrent > iParRMS_PwmOff)   iStep1=30;  // Motor stop
 
-    	 if(iPhase1 > ia1RMSMax)
+    	 if(iPhase1 > ia1RMSMax)   // save last max value
     	 ia1RMSMax = iPhase1;
 
-
-
-	 //============== clarke transformation ===================
+	 //============== clarke transformation ====================
 	 iAlpha = iPhase1;
 	 iBeta  = (iPhase1 + 2*iPhase2);   // iBeta = (a1 + 2*a2)/1.732 0.57736 --> invers from 1.732
 	 iBeta *= 37838;
@@ -497,16 +546,16 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	 iBeta = -iBeta;
 
 	 //================== angle = arctg(iBeta/iAlpha) ===========
+	 iAngleCurrent     = arctg1(iAlpha,iBeta);
 
-	 iAngleCur  = arctg1(iAlpha,iBeta);
-	 uCurVector = iAlpha * iAlpha + iBeta * iBeta;
+
 	 if(iStep1 == 0)
 	 {
-		 iAngleCur        = 0;
-		 uCurVector       = 0;
+	 iAngleCurrent        = 0;
+	 iVectorCurrent       = 0;
 	 }
 
-	 //============= park transform ==qq=========================
+	 //============= park transform ==qq==========================
 	theta = iAngleFromHall/16;
 	theta &= 0xFF;
 	sinx  = sine_table[theta];      // sine( theta );
@@ -514,117 +563,119 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	theta &= 0xFF;
 	cosx  = sine_table[theta];      // values from 0 to +/- 16384
 	iId = (((iAlpha * cosx ) /16384) + ((iBeta * sinx ) /16384));
-	iIq = (((iBeta * cosx ) /16384) - ((iAlpha * sinx ) /16384));
+	iIq = (((iBeta  * cosx )  /16384) - ((iAlpha * sinx ) /16384));
 
 	iIdPeriod += iId;
 	iIqPeriod += iIq;
 	iCountDivFactor++;
-
-	 if(cTriggerPeriod & 0x01  || iCountDivFactor > 18000)  // timeout 100 msec
-	 {
+	if(cTriggerPeriod & 0x01  || iCountDivFactor > 36000)  // timeout
+	{
 		  cTriggerPeriod &= 0x01^0xFF;
 		  iIqPeriod2 = iIqPeriod/iCountDivFactor;
 		  iIdPeriod2 = iIdPeriod/iCountDivFactor;
 		  iIqPeriod  = 0;
 		  iIdPeriod  = 0;
 		  iCountDivFactor=0;
-	 }
+	}
 
-	 //================ field and torque control =================
-
-	 		 VsdRef = iId - 20;  //Period2;  // field
-
-	 		 VsqRef = iIq;      // Period2;   // torque
-
-	 //================= invers park transformation ==============
-
-	 		VsaRef = VsdRef * cosx/16384   - VsqRef * sinx/16384;
-
-	 		VsbRef = VsdRef * sinx/16384   + VsqRef * cosx/16384;
-
-	 		iAngleInvPark  = arctg1(VsaRef,VsbRef);
-	 		iVectorInvPark = VsaRef * VsaRef + VsbRef * VsbRef;
-	 		iVectorInvPark = root_function(iVectorInvPark);
-
-
-    //**************************************************************
-	//===dd============= speed-control =============================
-
-	if(iSpeedValueNew)
-	{
-	idiffSpeed  = iSetLoopSpeed - iActualSpeed;
-	idiffSpeed2 = idiffSpeed;
-
-	iHysteresis  = iSetLoopSpeed;
-	if(iHysteresis < 0) iHysteresis = -iHysteresis; // absolut value
-	iHysteresis *= iParHysteresisPercent;
-	iHysteresis /= 100;
-
-		if(idiffSpeed > 0)
+	 //================ffqq field and torque control =================
+		if(iStep1==0)
 		{
-		if(idiffSpeed < iHysteresis)  idiffSpeed2=0;  					   // Hysteresis
-		if(idiffSpeed2 > iParDiffSpeedMax) idiffSpeed2 = iParDiffSpeedMax; // Limit
-
-		idiffSpeed2 *= idiffSpeed2;       // square
-		idiffSpeed2 /= iParDiffSpeedMax;
-		}
-
-		if(idiffSpeed < 0)
-		{
-		if(idiffSpeed > -iHysteresis)  idiffSpeed2=0;
-		if(idiffSpeed2 < -iParDiffSpeedMax) idiffSpeed2 = -iParDiffSpeedMax;
-
-		iTemp1 = -idiffSpeed2;
-		iTemp1 *= iTemp1;
-		iTemp1 /= iParDiffSpeedMax;
-		idiffSpeed2 = -iTemp1;
-
+			VsdRef1 = 0;
+			VsqRef1 = 0;
+			iFieldDiffSum  = 0;
+			iTorqueDiffSum = 0;
 		}
 
 
-	if(iSetLoopSpeed < 0) idiffSpeed2 = -idiffSpeed2;  			// invert if speed negativ
-	if(iIntegralGain < (iParIntegralGain * 64)) iIntegralGain++;
+	 		iFieldDiff1     = iFieldSet  - iId;
+	 		iTorqueDiff1    = iTorqueSet - iIq;
 
-	iUmotIntegrator += idiffSpeed2 * iIntegralGain / 512;
-	iUmotP           = idiffSpeed2 * iParPropGain  /  32;
+	 		if(iMotDirection < 0){
+	 			iFieldDiff1   = -iFieldDiff1;
+	 			iTorqueDiff1  = -iTorqueDiff1;
+	 		}
 
-	//-------------- set limits -----------------------------------
-	if(iUmotIntegrator > 0)
-	if(iUmotIntegrator > (iParUmotIntegralLimit * 256))  iUmotIntegrator = (iParUmotIntegralLimit * 256);
-
-	if(iUmotIntegrator < 0)
-	if(iUmotIntegrator < -(iParUmotIntegralLimit * 256)) iUmotIntegrator = -(iParUmotIntegralLimit * 256);
-
-	}// end if iSpeedValueNew
-	//********************************************************************************************
-	// end close loop
-	//********************************************************************************************
+	 		iFieldDiffSum -= iFieldDiff2;
+	 		iFieldDiffSum += iFieldDiff1;
+	 		iFieldDiff2    = iFieldDiffSum/2;
 
 
-	 //==================== uu  === umot calculation =================
-	 iTemp = iSetLoopSpeed;
-	 if(iTemp < 0) iTemp = -iTemp;
+	 		//------------- set limits -----------------
+	 		iTemp1 = iTorqueDiff1;
+	 		if(iTemp1 < 0) iTemp1 = -iTemp1;
+	 		if(iTemp1 > 100) iTemp1 = 100;
+	 		if(iTorqueDiff1 < 0)iTorqueDiff1 = -iTemp1;
+	 		else iTorqueDiff1 = iTemp1;
 
-	 if(iTemp > iParSpeedKneeUmot) iTemp = iParSpeedKneeUmot; // set limit
-	 iUmotSquare  = iTemp * iTemp;
-	 iUmotSquare /= iParSpeedKneeUmot;
-	 iUmotSquare *= 4096;
-	 iUmotSquare /= iParSpeedKneeUmot;
-	 iUmotSquare += iParUmotSocket;
+	 		iTorqueDiffSum -= iTorqueDiff2;
+	 		iTorqueDiffSum += iTorqueDiff1;
+	 		iTorqueDiff2    = iTorqueDiffSum/2;
 
-	 iUmotLinear = iTemp * 4096;
-	 iUmotLinear /= iParSpeedKneeUmot;
-	 iUmotResult = iUmotLinear;
+	 		VsdRef1 += iFieldDiff2  /32;
+	 		VsqRef1 += iTorqueDiff2 /32;
 
-	 if(iUmotSquare > iUmotLinear) iUmotResult = iUmotSquare;
-	 if(iUmotResult > 4096)   iUmotResult 	= 4096;
-	//----------------------------------------------------
-	 iUmotResult += iUmotIntegrator/256;
-	 iUmotResult += iUmotP/256;
-	 iUmotResult += (iUmotBoost / 32);
 
-	 if(iUmotResult > 4096)   iUmotResult 	= 4096;
-	 if(iUmotResult < 0 )     iUmotResult 	= 0;
+	 		switch(iControlFOC)
+	 		{
+	 		case 0: VsdRef1 = 0;					// only Speed Control
+	 		        VsqRef1 = iTorqueSet * 32;
+	 				break;
+	 		case 1:   								 // Speed with angle_correction from field
+		            VsqRef1 = iTorqueSet * 32;
+ 				    break;
+	 		case 2:									// FOC torque-control
+ 				    break;
+	 		default: iControlFOC = 0; break;
+	 		}
+
+
+
+	 		VsdRef2 = VsdRef1/ 32;
+	 		VsqRef2 = VsqRef1/ 32;
+
+	 //================= invers park transformation =====================
+	 		VsaRef = VsdRef2 * cosx/16384   - VsqRef2 * sinx/16384;
+	 		VsbRef = VsdRef2 * sinx/16384   + VsqRef2 * cosx/16384;
+	 		iAngleInvPark  = arctg1(VsaRef,VsbRef);           			// from 0 - 4095
+
+
+	 		p_ifm_ext_d1 <: 1;
+	 		switch(iLoopCount & 0x03)
+	 		{
+	 		case 0:  iVectorInvPark = VsaRef * VsaRef + VsbRef * VsbRef;
+	 				 iVectorInvPark = root_function(iVectorInvPark);
+	 				 break;
+	 		case 1:  iVectorCurrent = iAlpha * iAlpha + iBeta * iBeta;
+	 			     iVectorCurrent = root_function(iVectorCurrent);
+	 		         break;
+	 		case 2:  if(a1SquareMean)
+	 			     a1RMS = root_function(a1SquareMean);
+	 				 a1SquareMean = 0;
+	 		         break;
+	 		case 3:  if(a2SquareMean)
+	 				 a2RMS = root_function(a2SquareMean);
+	 		 	 	 a2SquareMean = 0;
+	 				 break;
+	 		}
+	 		p_ifm_ext_d1 <: 0;
+
+
+    //****** mm0 ********************************************************
+
+	 			switch(iControlFOC)
+		 		{
+		 		case 0:
+		 		case 1: if(iSpeedValueNew)
+		 					SpeedControl();
+		 				CalcUmotForSpeed();
+	 				    break;
+		 		case 2:	 iUmotResult = iVectorInvPark/4;								// FOC torque-control
+	 				    break;
+		 		default: iControlFOC = 0; break;
+		 		}
+
+
 
 
 	//===========  if a1RMS > Limit block Umot and ramp ==============
@@ -657,12 +708,22 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	iAngleFromRpm *= iParAngleFromRPM;
 	iAngleFromRpm /= 4000;
 
-	 iAngleDiff     = iAngleCur - iAngleFromHall;
-	 iAngleDiff    &= 0x0FFF;
-	 iAngleDiffSum += iAngleDiff;
-	 iCountAngle++;
 
-	 if(cTriggerPeriod & 0x04)
+	//=========== calculate iAngleDiffPeriod  only for view ============================
+	iAngleDiff = 0;
+	if(iMotDirection == 1)
+	{
+		iAngleDiff = iAngleCurrent - iAngleFromHall;
+		if(iAngleDiff < 0)iAngleDiff += 4096;
+	}
+	if(iMotDirection == -1)
+	{
+		iAngleDiff = iAngleFromHall - iAngleCurrent;
+		if(iAngleDiff < 0)iAngleDiff += 4096;
+	}
+	iAngleDiffSum += iAngleDiff;
+	iCountAngle++;
+	 if(cTriggerPeriod & 0x04 || iCountAngle > 36000)
 	 {
 		 cTriggerPeriod &= 0x04^0xFF;
 		 if(iCountAngle){
@@ -670,47 +731,65 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	    	 iAngleDiffSum    = 0;
 	    	 iCountAngle      = 0;
 		 }
-	 }
+	 }//end if(cTriggerPeriod
 
 
-	if (iSetLoopSpeed >= 0)
+	if (iMotDirection > 0)
 	{
-		    if(iStep1 == 10)
-		    if(a1RMS > 350)
-		    {
-		    if(iAngleDiffPeriod > (1024+16)) iAngleCorrection += iParAngleCorrVal;
-		    if(iAngleDiffPeriod < (1024-16)) iAngleCorrection -= iParAngleCorrVal;
-		    if(iAngleCorrection > iParAngleCorrMax )  iAngleCorrection =  iParAngleCorrMax;
-		    if(iAngleCorrection < -iParAngleCorrMax)  iAngleCorrection = -iParAngleCorrMax;
-		    }
+		iAngleCorrection =0;
+		iAngleFromRpm    =0;
 
-			iAnglePWM = iAngleFromHall + iParAngleUser + iAngleFromRpm - iAngleCorrection/4 + 260;
-	}
+		iAnglePWMFromHall = iAngleFromHall + iParAngleUser    + iAngleFromRpm - iAngleCorrection/4;
+		iAnglePWMFromHall &= 0x0FFF;
+		iAnglePWMFromFOC  = iAngleInvPark + (4096 - iAngleDiffFOC) + iParAngleUser;
+		iAnglePWMFromFOC  &= 0x0FFF;
+		iAngleXXX = iAnglePWMFromFOC - iAnglePWMFromHall;
 
+		if((iControlFOC) == 0)
+		{
+			iAnglePWM = iAnglePWMFromHall;
 
-	if (iSetLoopSpeed <  0)
+			if(iAngleInvPark > iAngleFromHall)
+			     iAngleDiffFOC =  iAngleInvPark - iAngleFromHall;
+			else iAngleDiffFOC = (4096 + iAngleInvPark) - iAngleFromHall;
+		}
+		else
+		{
+			iAnglePWM = iAnglePWMFromFOC;			// ffff
+		}
+	}//end if iSetLoopSpeed >= 0
+
+	if (iMotDirection <  0)
 	{
-					if(iStep1 == 10)
-				    if(a1RMS > 350)
-				    {
-				    if(iAngleDiffPeriod > (4096-1024+16)) 	  iAngleCorrection -= iParAngleCorrVal;
-				    if(iAngleDiffPeriod < (4096-1024-16)) 	  iAngleCorrection += iParAngleCorrVal;
-				    if(iAngleCorrection > iParAngleCorrMax )  iAngleCorrection =  iParAngleCorrMax;
-				    if(iAngleCorrection < -iParAngleCorrMax)  iAngleCorrection = -iParAngleCorrMax;
-				    }
+		iAnglePWMFromHall = iAngleFromHall + iParAngleUser - iAngleFromRpm  + iAngleCorrection/4  + 2240;
+		iAnglePWMFromHall &= 0x0FFF;
+		iAnglePWMFromFOC  = iAngleInvPark - iAngleDiffFOC + iParAngleUser + 2360;
+		iAnglePWMFromFOC  &= 0x0FFF;
 
-			iAnglePWM = iAngleFromHall + iParAngleUser - iAngleFromRpm  + iAngleCorrection/4  + 2500;
-	}
+			if((iControlFOC) == 0)
+				{
+				iAnglePWM = iAnglePWMFromHall;
+					if(iAngleInvPark > iAngleFromHall)
+					     iAngleDiffFOC =  iAngleInvPark - iAngleFromHall;
+					else iAngleDiffFOC = (4096 + iAngleInvPark) - iAngleFromHall;
+				}
+				else
+				{
+				iAnglePWM = iAnglePWMFromFOC;
+				}
+	}//end if iSetLoopSpeed < 0
 
 
-	if(iStep1 == 0 )
+		if(iStep1 == 0 )
 		if(iMotHoldingTorque)
 		{
-			iAnglePWM = iAngleFromHall + iParAngleUser - 600;
+		iAnglePWM = iAngleFromHall + iParAngleUser - 600;
 		}
 
-	iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
-	//=================================================================================================
+		iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
+
+	//======================================================================================================
+	//======================================================================================================
 
 	if(iStep1 == 0)
 	{
@@ -718,17 +797,15 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	  iUmotP			=0;
 	  iIqPeriod2		=0;
 	  iIdPeriod2		=0;
-	  iAngleDiffPeriod	=0;
 	}
 /*
 	 	 xscope_probe_data(0,iPhase1);
 	 	 xscope_probe_data(1,a1RMS);
 	 	 xscope_probe_data(2,iSetLoopSpeed);
 	 	 xscope_probe_data(3,iAngleFromHall);
-	 	 xscope_probe_data(4,iAngleCur);
+	 	 xscope_probe_data(4,iAngleCurrent);
 	   	 xscope_probe_data(5,iUmotMotor);
 	   	 xscope_probe_data(6,a1Square/1000);
-*/
 
 	 xscope_probe_data(0,iPhase1);
 	 xscope_probe_data(1,iActualSpeed);
@@ -737,6 +814,19 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	 xscope_probe_data(4,iUmotMotor);
   	 xscope_probe_data(5,iAngleDiffPeriod);
   	 xscope_probe_data(6,iIqPeriod2);
+*/
+
+	 xscope_probe_data(0,iPhase1);
+	 xscope_probe_data(1,iAngleCurrent);
+	 xscope_probe_data(2,iAnglePWM);
+	 xscope_probe_data(3,iAngleFromHall);
+	 xscope_probe_data(4,iAngleInvPark);
+	 xscope_probe_data(5,iAngleDiffFOC);
+ 	 xscope_probe_data(6,iAnglePWMFromHall);
+ 	 xscope_probe_data(7,iAnglePWMFromFOC);
+ 	 xscope_probe_data(8,iVectorInvPark);
+ 	 xscope_probe_data(9,iDiffAngleHall);
+ 	 xscope_probe_data(10,iAngleXXX);
 
 
 
@@ -752,11 +842,11 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		if(pwm[1] < PWM_MIN_LIMIT)      pwm[1] = 0;
 		if(pwm[2] < PWM_MIN_LIMIT)      pwm[2] = 0;
 
-
-	#ifdef DC900
-		if(sine_third[iIndexPWM] > 0) p_ifm_ext_d1 <: 1;
-		else p_ifm_ext_d1 <: 0;
 		p_ifm_ext_d0 <: 0; // yellow
+	#ifdef DC900
+//		if(sine_third[iIndexPWM] > 0) p_ifm_ext_d1 <: 1;
+//		else p_ifm_ext_d1 <: 0;
+
 		 {a1 , a2}  = get_adc_vals_calibrated_int16_ad7949(adc); //get_adc_vals_raw_ad7949(adc);
 		 a1 = -a1;
 		 a2 = -a2;
@@ -788,10 +878,11 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	select
 	{
 		case c_commutation :> cmd:
-		  p_ifm_ext_d3 <: 1;  // set to one
+	//	  p_ifm_ext_d3 <: 1;  // set to one
 
 		  if     (cmd == 1)      { c_commutation :> iPwmOnOff;         }
 		  else if(cmd == 2)      { c_commutation :> iMotHoldingTorque; }
+		  else if(cmd == 3)      { c_commutation :> iTorqueSet;   }     // milliNewtonTorque
 		  else if(cmd == 4)      { c_commutation :> iSetValueSpeed;
 		  	  	  	  	  	  	  if(iParDefSpeedMax > 0)
 		  	  	  	  	  	  	  { iSetValueSpeed *= iParRPMreference;
@@ -799,7 +890,8 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		  	  	  	  	  	  	  }
 		  	  	  	  	  	  	  if(iSetValueSpeed > iParRpmMotorMax) iSetValueSpeed = iParRpmMotorMax;
 		  	  	  	  	  	  	  iSetInternSpeed = iSetValueSpeed * 65536;
-		  	  	  	  	  	     }
+		  	  	  	  	  	  	  }
+		  else if(cmd == 5)       { c_commutation :> iControlFOC; }
 
 		  else if(cmd >= 32 && cmd < 64)  { iTemp = (int) cmd; c_commutation <: iMotValue[iTemp-32]; 	}
 		  else if(cmd >= 64 && cmd < 96)  { iTemp = (int) cmd; c_commutation <: iMotPar[iTemp-64]; 	}
@@ -812,7 +904,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 		if(iUpdateFlag) { iUpdateFlag=0; SetParameterValue(); }
 
-	    p_ifm_ext_d3 <: 0;
+	//    p_ifm_ext_d3 <: 0;
 
 	}// end while(1)
 }// end function
@@ -847,4 +939,131 @@ void commutation(chanend c_adc, chanend  c_commutation,  chanend c_hall, chanend
 	  do_adc_calibration_ad7949(c_adc);
 	  comm_sine(c_adc, c_commutation, c_hall, c_pwm_ctrl);
 }
+//=========================== utilities ========================================
+/*
+int FunctionCalcDiff(int iValue1, int iValue2)
+{
+		if(iValue1 < 1024 && iValue2 >= 3072) iValue1 += 4096;
+ 		if(iValue2 < 1024 && iValue1 >= 3072) iValue2 += 4096;
+ 		iValue1 -= iValue2;
+
+ 		return(iValue1);
+}
+*/
+
+
+//======================== SPEED --- CONTROL ====================================
+void SpeedControl(){
+int iTemp1;
+int iHysteresis;
+
+	idiffSpeed  = iSetLoopSpeed - iActualSpeed;
+	idiffSpeed2 = idiffSpeed;
+
+	iHysteresis  = iSetLoopSpeed;
+	if(iHysteresis < 0) iHysteresis = -iHysteresis; // absolut value
+	iHysteresis *= iParHysteresisPercent;
+	iHysteresis /= 100;
+
+		if(idiffSpeed > 0)
+		{
+		if(idiffSpeed < iHysteresis)  idiffSpeed2=0;  					   // Hysteresis
+		if(idiffSpeed2 > iParDiffSpeedMax) idiffSpeed2 = iParDiffSpeedMax; // Limit
+
+		idiffSpeed2 *= idiffSpeed2;       // square
+		idiffSpeed2 /= iParDiffSpeedMax;
+		}
+
+		if(idiffSpeed < 0)
+		{
+		if(idiffSpeed > -iHysteresis)  idiffSpeed2=0;
+		if(idiffSpeed2 < -iParDiffSpeedMax) idiffSpeed2 = -iParDiffSpeedMax;
+
+		iTemp1 = -idiffSpeed2;
+		iTemp1 *= iTemp1;
+		iTemp1 /= iParDiffSpeedMax;
+		idiffSpeed2 = -iTemp1;
+		}
+
+		if(iSetLoopSpeed < 0) idiffSpeed2 = -idiffSpeed2;  			// invert if speed negativ
+			if(iIntegralGain < (iParIntegralGain * 64)) iIntegralGain++;
+
+			iUmotIntegrator += idiffSpeed2 * iIntegralGain / 512;
+			iUmotP           = idiffSpeed2 * iParPropGain  /  32;
+
+			//-------------- set limits -----------------------------------
+			if(iUmotIntegrator > 0)
+			if(iUmotIntegrator > (iParUmotIntegralLimit * 256))  iUmotIntegrator = (iParUmotIntegralLimit * 256);
+
+			if(iUmotIntegrator < 0)
+			if(iUmotIntegrator < -(iParUmotIntegralLimit * 256)) iUmotIntegrator = -(iParUmotIntegralLimit * 256);
+}
+
+
+void CalcUmotForSpeed()
+{
+int iTemp;
+
+	//==================== uu  === umot calculation =================
+		 iTemp = iSetLoopSpeed;
+		 if(iTemp < 0) iTemp = -iTemp;
+
+		 if(iTemp > iParSpeedKneeUmot) iTemp = iParSpeedKneeUmot; // set limit
+		 iUmotSquare  = iTemp * iTemp;
+		 iUmotSquare /= iParSpeedKneeUmot;
+		 iUmotSquare *= 4096;
+		 iUmotSquare /= iParSpeedKneeUmot;
+		 iUmotSquare += iParUmotSocket;
+
+		 iUmotLinear = iTemp * 4096;
+		 iUmotLinear /= iParSpeedKneeUmot;
+		 iUmotProfile = iUmotLinear;
+
+		 if(iUmotSquare > iUmotLinear) iUmotProfile = iUmotSquare;
+		 if(iUmotProfile > 4096)        iUmotProfile = 4096;
+		//----------------------------------------------------------------
+		 iUmotResult  = iUmotProfile +  iUmotIntegrator/256  + iUmotP/256 ;
+		 iUmotResult += (iUmotBoost / 32);
+
+		 if(iUmotResult > 4096)   iUmotResult 	= 4096;
+		 if(iUmotResult < 0 )     iUmotResult 	= 0;
+}
+
+void CalcRampForSpeed(){
+int iTemp1,iTemp2;
+int iTemp3,iTemp4;
+
+
+	 	 	 iTemp1 = iSetSpeedRamp;  	if(iTemp1 < 0) iTemp1 = -iTemp1;
+			 iTemp2 = iSetInternSpeed;  if(iTemp2 < 0) iTemp2 = -iTemp2;
+			 iTemp3 = iActualSpeed;     if(iTemp3 < 0) iTemp3 = -iTemp3;
+
+			 if(iTemp1 < iTemp2)  // acceleration +/-
+			 {
+			 iTemp4 = iTemp1/65536 - iTemp3;
+			      if(iTemp4 > 200) iRampBlock = 1;
+
+			      if(iRampBlock==0)
+			      iTemp1 += iRampAccValue;
+			      if(iTemp1 > iTemp2) iTemp1 = iTemp2;
+
+			      if(iRampAccValue < defRampMax) iRampAccValue+=8;
+			 }
+
+			 if(iTemp1 > iTemp2)  // deceleration +/-
+			 {
+			      iTemp1 -= iRampDecValue;
+			      if(iTemp1 < iTemp2) iTemp1 = iTemp2;
+
+			      if(iRampDecValue < defRampMax) iRampDecValue += 8;
+			 }
+
+			 if(iMotDirection < 0) iSetSpeedRamp = -iTemp1; else iSetSpeedRamp = iTemp1;
+			 iSetLoopSpeed = iSetSpeedRamp/65536;
+			 iRampBlock = 0;
+
+}//end CalcRampForSpeed
+
+
+
 
