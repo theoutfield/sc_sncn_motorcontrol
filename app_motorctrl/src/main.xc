@@ -85,12 +85,12 @@ int main(void)
 		 XSCOPE_CONTINUOUS, "2 iAnglePWM", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "3 iAngleFromHall",XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "4 iAngleInvPark", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "5 iAngleDiffFOC", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "6 iAnglePWMFromHall", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "7 iAnglePWMFromFOC", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "8 iVectorInvPark",XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "5 iAnglePWMFromHall", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "6 iVectorCurrent", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "7 iVectorInvPark", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "8 xxx",XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "9 iDiffAngleHall", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "10 iAngleXXX",XSCOPE_INT, "n"
+		 XSCOPE_CONTINUOUS, "10 XXX",XSCOPE_INT, "n"
 		);
 
 
