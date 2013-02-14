@@ -241,9 +241,9 @@ unsigned char cFlagX=0;
  			iAngleDeltaSum += iTemp;
  			if(iAngleDeltaSum > 692) iAngleDeltaSum = 692;
 			if(iAngleDeltaSum < 672) iAngleDeltaSum = 672;
- 			 xscope_probe_data(8,iCountTransitionNew);
+ 		/*	 xscope_probe_data(8,iCountTransitionNew);
  		 	 xscope_probe_data(9,iAngleDiff);
- 		 	 xscope_probe_data(10,iAngleDeltaSum);
+ 		 	 xscope_probe_data(10,iAngleDeltaSum);*/
  		}
 // 		if(iCountTransitionEstimated)
 //		delta_angle = (682 *iTimeCountOneTransition)/iCountTransitionEstimated; //iTimeSaveOneTransition;

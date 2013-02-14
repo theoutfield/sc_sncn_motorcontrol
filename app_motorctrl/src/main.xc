@@ -20,7 +20,7 @@
 #include "refclk.h"
 #include "pwm_service_inv.h"
 #include "xmos_pm.h"
-#include "comm_sine.h"
+#include "comm_loop.h"
 #include "adc_ad7949.h"
 #include "set_cmd.h"
 #include "hall_input.h"
@@ -56,50 +56,46 @@ int main(void)
      ************************************************************/
     on stdcore[1]: {
 /*
-    	  	 	 	xscope_register(7,
-    	  			XSCOPE_CONTINUOUS, "0 a1", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "1 a2", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "3 iAngleFromHall", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "4 iAngleCur", XSCOPE_INT, "n",
-    	  			XSCOPE_CONTINUOUS, "5 iUmotMotor", XSCOPE_UINT, "n",
-    	  			XSCOPE_CONTINUOUS, "6 iIq", XSCOPE_UINT, "n"
-    	  			);
+			xscope_register(7,
+			XSCOPE_CONTINUOUS, "0 a1", XSCOPE_INT, "n",
+			XSCOPE_CONTINUOUS, "1 a2", XSCOPE_INT, "n",
+			XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
+			XSCOPE_CONTINUOUS, "3 iAngleFromHall", XSCOPE_INT, "n",
+			XSCOPE_CONTINUOUS, "4 iAngleCur", XSCOPE_INT, "n",
+			XSCOPE_CONTINUOUS, "5 iUmotMotor", XSCOPE_UINT, "n",
+			XSCOPE_CONTINUOUS, "6 iIq", XSCOPE_UINT, "n"
+			);
 
 
- 	  	 	 	 	 xscope_register(7,
-					 XSCOPE_CONTINUOUS, "0 a1RMS", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "3 iUmotIntegrator", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "4 iUmotMotor", XSCOPE_INT, "n",
-					 XSCOPE_CONTINUOUS, "5 iAngleDiffPeriod", XSCOPE_UINT, "n",
-					 XSCOPE_CONTINUOUS, "6 iIqPeriod2", XSCOPE_UINT, "n"
-					);
+			 xscope_register(7,
+			 XSCOPE_CONTINUOUS, "0 a1RMS", XSCOPE_INT, "n",
+			 XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
+			 XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
+			 XSCOPE_CONTINUOUS, "3 iUmotIntegrator", XSCOPE_INT, "n",
+			 XSCOPE_CONTINUOUS, "4 iUmotMotor", XSCOPE_INT, "n",
+			 XSCOPE_CONTINUOUS, "5 iAngleDiffPeriod", XSCOPE_UINT, "n",
+			 XSCOPE_CONTINUOUS, "6 iIqPeriod2", XSCOPE_UINT, "n"
+			);
  */
 
 
-	 	 xscope_register(11,
+	 	 xscope_register(9,
 		 XSCOPE_CONTINUOUS, "0 iPhase1", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "1 iAngleCurrent", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "2 iAnglePWM", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "3 iAngleFromHall",XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "4 iAngleInvPark", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "5 iAnglePWMFromHall", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "6 iVectorCurrent", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "7 iVectorInvPark", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "8 xxx",XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "9 iDiffAngleHall", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "10 XXX",XSCOPE_INT, "n"
+		 XSCOPE_CONTINUOUS, "6 iAnglePWMFromFOC", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "7 iVectorCurrent", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "8 iVectorInvPark", XSCOPE_INT, "n"
 		);
-
-
     }
     /************************************************************
      * CORE 2             communication with the Motor
      ************************************************************/
 
-    on stdcore[2]:par{
+     on stdcore[2]:par{
     	{
 			  cmd_data send_cmd;
 			  int valid = 0;
