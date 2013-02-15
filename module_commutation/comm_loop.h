@@ -27,7 +27,7 @@ void sine_pwm( int iIndexPWM, int iUmotMotor, int iMotHoldingTorque , t_pwm_cont
 
 extern short sine_third[];
 extern short arctg_table[];
-
+extern short SPACE_TABLE[];
 #ifdef DC100
 extern out port testport;
 #endif

@@ -657,12 +657,13 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		 xscope_probe_data(6,iAnglePWMFromFOC);
 		 xscope_probe_data(7,iVectorCurrent);
 		 xscope_probe_data(8,iVectorInvPark);
+		 xscope_probe_data(9,iPhase2);
 
 	#endif
 
 
 		// pwm 13889 * 4 nsec = 55,556µsec  18Khz
-		iIndexPWM = iAnglePWM >> 4;
+		iIndexPWM = iAnglePWM >> 2;  // >> 4;
 		sine_pwm( iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );
 
 		#ifdef DEBUG_commutation

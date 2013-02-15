@@ -79,7 +79,7 @@ int main(void)
  */
 
 
-	 	 xscope_register(9,
+	 	 xscope_register(10,
 		 XSCOPE_CONTINUOUS, "0 iPhase1", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "1 iAngleCurrent", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "2 iAnglePWM", XSCOPE_INT, "n",
@@ -88,7 +88,8 @@ int main(void)
 		 XSCOPE_CONTINUOUS, "5 iAnglePWMFromHall", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "6 iAnglePWMFromFOC", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "7 iVectorCurrent", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "8 iVectorInvPark", XSCOPE_INT, "n"
+		 XSCOPE_CONTINUOUS, "8 iVectorInvPark", XSCOPE_INT, "n",
+		 XSCOPE_CONTINUOUS, "9 iPhase2", XSCOPE_INT, "n"
 		);
     }
     /************************************************************
