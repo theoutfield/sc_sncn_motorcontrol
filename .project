@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>sw_motor_control</name>
+	<name>sc_sncn_motorctrl</name>
 	<comment></comment>
 	<projects>
 		<project>sc_pwm</project>
