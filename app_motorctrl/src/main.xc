@@ -29,8 +29,9 @@
 #define COM_CORE 0
 #define IFM_CORE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+//on stdcore[IFM_CORE]: clock clk_uart = XS1_CLKBLK_REF;
+on stdcore[IFM_CORE]: clock clk_adc  = XS1_CLKBLK_1;
+on stdcore[IFM_CORE]: clock clk_pwm  = XS1_CLKBLK_REF;
 
 
 int main(void)
@@ -40,7 +41,7 @@ int main(void)
   chan c_hall;
   chan c_pwm_ctrl;
   chan c_commutation;
-
+  chan c_motvalue;
 
   par
   {
@@ -100,15 +101,16 @@ int main(void)
     	{
 			  cmd_data send_cmd;
 			  int valid = 0;
-			  timer t;
-			  unsigned time;
+			  timer tx;
+			  unsigned ts;
               int iIndex;
 
               send_cmd.varx=0;
               send_cmd.var1=0;
 
+              tx :> ts;  // first value
+			  tx when timerafter(ts+1*SEC_FAST) :> ts;
 
-			  t when timerafter(time+1*SEC_FAST) :> time;
 
 			  while(1)
 			  {
@@ -162,7 +164,10 @@ int main(void)
     			do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
     			run_hall( c_hall, p_ifm_hall, p_ifm_encoder);
-    			commutation(c_adc, c_commutation, c_hall, c_pwm_ctrl );
+    			commutation(c_adc, c_commutation, c_hall, c_pwm_ctrl, c_motvalue );
+
+    			run_uart(c_motvalue, clk_pwm);
+
       	  }
     }// end stdcore[IFM_CORE]
 
