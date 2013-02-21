@@ -13,9 +13,9 @@
 
 void comm_sine_init(chanend c_pwm_ctrl);
 
-void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl);
+void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue);
 
-void commutation(chanend c_adc, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl);
+void commutation(chanend c_adc, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl,chanend c_motvalue);
 
 unsigned root_function(unsigned uSquareValue);
 

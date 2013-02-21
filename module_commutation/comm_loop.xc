@@ -14,8 +14,7 @@ static t_pwm_control pwm_ctrl;
 
 #ifdef DEBUG_commutation
 	#include <print.h>
-	extern out port p_ifm_ext_d0;
-	extern out port p_ifm_ext_d1;
+
 	extern out port p_ifm_ext_d2;
 	extern out port p_ifm_shared_leds_wden;  // XS1_PORT_4B; /* BlueGreenRed_Green */
 #endif
@@ -71,9 +70,10 @@ unsigned iVectorCurrent;int iAngleDiffFOC;
 #define defRampMin 64
 void SpeedControl(); void CalcUmotForSpeed(); void CalcRampForSpeed(); void SaveValueToArray(); void SetParameterValue(); void InitParameter();
 
-void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl)
+void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue)
 {
-	unsigned cmd;
+	unsigned cmd1;
+	unsigned cmd2;
 	int iTemp,iTemp1=0;
 	unsigned char cFlag=0;
 
@@ -84,6 +84,10 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	int iPwmOnOff 		= 1;
 	int iSpeedValueNew	=  0;  // if speed from hall is a new value
 	int iTorqueF0=0;
+	//============================================
+	int iPwmAddValue,iPwmIndexHigh;
+
+
     //-------------- init values --------------
    	iCountRMS=0;
 	InitParameter();
@@ -95,7 +99,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		#ifdef DEBUG_commutation
 			cFlag |= 1;
 			#ifdef DC900
-				p_ifm_ext_d0 <: cFlag;  // set to one
+	//			p_ifm_ext_d0 <: cFlag;  // set to one
 			#endif
 		#endif
 
@@ -172,7 +176,15 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 					if(iTorqueSet > 0){iMotDirection =   1; VsqRef1 = 4096;  iStep1 = 50;}
 					if(iTorqueSet < 0){iMotDirection =  -1; VsqRef1 =-4096;  iStep1 = 50;}
 					break;
-					}
+
+
+					case 3:
+					if(iSetInternSpeed > 0){iMotDirection =  1;  VsqRef1=  1024; VsdRef1 = 512; iTorqueF0 =  500;  iStep1= 80; }
+					iPwmAddValue  = 65536;
+					iPwmIndexHigh = 0;
+					break;
+					}// end switch iControlFOC
+
 
 					break;
 
@@ -264,6 +276,13 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			case 50: iPwmOnOff 		 = 1;
 					 if(iTorqueSet == 0)iStep1 = 0;
 					 if(iControlFOC ==0)iStep1 = 0;
+				     break;
+
+
+		   //===========================================
+			case 80:  iUmotResult = iSetInternSpeed/65536;
+			         if(iSetInternSpeed==0)iStep1=0;
+				     if(iControlFOC ==0)iStep1 = 0;
 				     break;
 
 
@@ -389,6 +408,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		case 2: iFieldDiff1     = iFieldSet  - iId;
 				iTorqueDiff1    = iTorqueSet - iIq;  // <<<=== iTorqueSet
 				break;
+		case 3: break;
 		default: iControlFOC = 0; break;
 		}
 
@@ -436,6 +456,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		case 2:	VsdRef1 += iFieldDiff2  /16;
 				VsqRef1 += iTorqueDiff2 /4;								// FOC torque-control
 				break;
+		case 3: break;
 		default: iControlFOC = 0; break;
 		}
 
@@ -451,9 +472,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		VsbRef = VsdRef2 * sinx/16384   + VsqRef2 * cosx/16384;
 		iAngleInvPark  = arctg1(VsaRef,VsbRef);           			// from 0 - 4095
 
-		#ifdef DEBUG_commutation
-			p_ifm_ext_d1 <: 1;
-		#endif
+
 
 		switch(iLoopCount & 0x03)
 		{
@@ -478,9 +497,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 					break;
 		}
 
-		#ifdef DEBUG_commutation
-			p_ifm_ext_d1 <: 0;
-		#endif
+
 
     //****** mm0 ********************************************************
 
@@ -496,7 +513,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			case 2:
 					iUmotResult = iVectorInvPark/2;		// FOC torque-control
 					break;
-
+			case 3: break;
 			default:
 				iControlFOC = 0;
 				break;
@@ -662,7 +679,17 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	#endif
 
 
+
+
 		// pwm 13889 * 4 nsec = 55,556µsec  18Khz
+
+		if(iControlFOC==3){
+		iPwmIndexHigh += iPwmAddValue;
+		iPwmIndexHigh &= 0x0FFFFFFF;
+		iAnglePWM	   = iPwmIndexHigh/65536;
+		}
+
+
 		iIndexPWM = iAnglePWM >> 2;  // >> 4;
 		sine_pwm( iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );
 
@@ -680,7 +707,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			cLeds ^= 0xFF;
 			p_ifm_shared_leds_wden <: cLeds;
 
-			p_ifm_ext_d0 <: 0; // yellow
+	//		p_ifm_ext_d0 <: 0; // yellow
 		#endif
 
 
@@ -713,19 +740,55 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 		SaveValueToArray();
 
+
+
+		select
+				{
+					case c_motvalue :> cmd2:
+						 if(cmd2 == 4){
+							 c_motvalue :> iSetValueSpeed;
+								if(iParDefSpeedMax > 0)
+								{
+									iSetValueSpeed *= iParRPMreference;
+									iSetValueSpeed /= iParDefSpeedMax;
+								}
+								if(iSetValueSpeed > iParRpmMotorMax)
+									iSetValueSpeed = iParRpmMotorMax;
+									iSetInternSpeed = iSetValueSpeed * 65536;
+							}
+
+
+						 	else if(cmd2 >= 32 && cmd2 < 64)
+							{  	c_motvalue <: iMotValue[cmd2-32];
+								c_motvalue <: iMotValue[cmd2-31];
+								c_motvalue <: iMotValue[cmd2-30];
+								c_motvalue <: iMotValue[cmd2-29];
+						    }
+
+
+						else if(cmd2 >= 64 && cmd2 < 96)  { iTemp = (int) cmd2; c_motvalue <: iMotPar[iTemp-64]; 	}
+						else if(cmd2 >= 96 && cmd2 < 128) { iTemp = (int) cmd2; c_motvalue :> iTemp1;  iMotPar[iTemp-96] = iTemp1; iUpdateFlag=1;}
+						break;
+
+					default:
+						break;
+				}// end select
+
+
+
 		select
 		{
-			case c_commutation :> cmd:
-				if(cmd == 1){
+			case c_commutation :> cmd1:
+				if(cmd1 == 1){
 					c_commutation :> iPwmOnOff;
 				}
-				else if(cmd == 2){
+				else if(cmd1 == 2){
 					c_commutation :> iMotHoldingTorque;
 				}
-				else if(cmd == 3){
+				else if(cmd1 == 3){
 					c_commutation :> iTorqueSet;
 				}     // milliNewtonTorque
-				else if(cmd == 4){
+				else if(cmd1 == 4){
 					c_commutation :> iSetValueSpeed;
 					if(iParDefSpeedMax > 0)
 					{
@@ -736,13 +799,13 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 						iSetValueSpeed = iParRpmMotorMax;
 						iSetInternSpeed = iSetValueSpeed * 65536;
 				}
-				else if(cmd == 5)
+				else if(cmd1 == 5)
 				{
 					c_commutation :> iControlFOC;
 				}
-				else if(cmd >= 32 && cmd < 64)  { iTemp = (int) cmd; c_commutation <: iMotValue[iTemp-32]; 	}
-				else if(cmd >= 64 && cmd < 96)  { iTemp = (int) cmd; c_commutation <: iMotPar[iTemp-64]; 	}
-				else if(cmd >= 96 && cmd < 128) { iTemp = (int) cmd; c_commutation :> iTemp1;  iMotPar[iTemp-96] = iTemp1; iUpdateFlag=1;}
+				else if(cmd1 >= 32 && cmd1 < 64)  { iTemp = (int) cmd1; c_commutation <: iMotValue[iTemp-32]; 	}
+				else if(cmd1 >= 64 && cmd1 < 96)  { iTemp = (int) cmd1; c_commutation <: iMotPar[iTemp-64]; 	}
+				else if(cmd1 >= 96 && cmd1 < 128) { iTemp = (int) cmd1; c_commutation :> iTemp1;  iMotPar[iTemp-96] = iTemp1; iUpdateFlag=1;}
 				break;
 
 			default:
@@ -770,7 +833,7 @@ void comm_sine_init(chanend c_pwm_ctrl)
 
 
 
-void commutation(chanend c_adc, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl)
+void commutation(chanend c_adc, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue)
 {  //init sine-commutation and set up a4935
 
 	  const unsigned t_delay = 300*USEC_FAST;
@@ -784,19 +847,8 @@ void commutation(chanend c_adc, chanend  c_commutation,  chanend c_hall, chanend
 	  t when timerafter (ts + t_delay) :> ts;
 
 	  do_adc_calibration_ad7949(c_adc);
-	  comm_sine(c_adc, c_commutation, c_hall, c_pwm_ctrl);
+	  comm_sine(c_adc, c_commutation, c_hall, c_pwm_ctrl, c_motvalue);
 }
-//=========================== utilities ========================================
-/*
-int FunctionCalcDiff(int iValue1, int iValue2)
-{
-		if(iValue1 < 1024 && iValue2 >= 3072) iValue1 += 4096;
- 		if(iValue2 < 1024 && iValue1 >= 3072) iValue2 += 4096;
- 		iValue1 -= iValue2;
-
- 		return(iValue1);
-}
-*/
 
 
 //======================== SPEED --- CONTROL ====================================
