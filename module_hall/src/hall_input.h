@@ -21,6 +21,8 @@
 
 #include <xs1.h>
 
+void run_uart(chanend c_motvalue, clock clk1);
+
 // Define client request commands
 enum hall_commands { HALL_CMD_GETSPEED, HALL_CMD_GETPOS };
 
