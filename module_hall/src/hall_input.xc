@@ -124,14 +124,22 @@ tx :> ts;  // first value
               iStep=7;
               break;
 
-     case 7:  switch(cxRxBuf[1])
+     case 7:  CRC1 = cxRxBuf[0];
+     	 	  CRC2 = cxRxBuf[0];
+     	 	  iIndex1 = 1;
+     	 	  while(iIndex1 < (cxRxBuf[2]-2))
+     	 	  {
+     	 		 CRC1 ^= cxRxBuf[iIndex1];
+     	 		 CRC2 += cxRxBuf[iIndex1];
+     	 		 iIndex1++;
+     	 	  }
+     	 	  CRC2 += cxRxBuf[iIndex1];
+    	      switch(cxRxBuf[1])
               {
               case 'V': iStep = 40; break;    // read motor values from XMOS ==> PC
-              case 'C': iStep = 10; break;    // write commands from PC => XMOS
+              case 'C': iStep = 10; break;    // write motor commands from PC => XMOS and readout motor values
               case 'P': iStep = 20; break;    // read parameter from XMOS ==> PC
               case 'X': iStep = 30; break;    // write parameter to XMOS
-
-              case '0': iStep = 12; break;
               default: iStep=0; break;
               }
               break;
@@ -141,29 +149,34 @@ tx :> ts;  // first value
  	            iIndex2=4;
  	            while(iIndex1 < 16)
  	            {
- 	            uTemp =  cxRxBuf[iIndex2+0];  uTemp = uTemp << 8;
- 	            uTemp += cxRxBuf[iIndex2+1];  uTemp = uTemp << 8;
- 	            uTemp += cxRxBuf[iIndex2+2];  uTemp = uTemp << 8;
- 	            uTemp += cxRxBuf[iIndex2+3];
+ 	            uTemp =  cxRxBuf[iIndex2++];  uTemp = uTemp << 8;
+ 	            uTemp += cxRxBuf[iIndex2++];  uTemp = uTemp << 8;
+ 	            uTemp += cxRxBuf[iIndex2++];  uTemp = uTemp << 8;
+ 	            uTemp += cxRxBuf[iIndex2++];
  	            uMotorCommand[iIndex1++] = uTemp;
  	            }
- 		        c_motvalue <:4;	  c_motvalue <: uMotorCommand[0];
- 	            iStep=40;  // next step readout motor values
+ 	            iStep++;
  	            break;
 
 
- 	  case 11:  c_motvalue <:4;	  c_motvalue <: -300;
- 	            iStep=0;
+ 	  case 11:  iIndex1=0;
+ 	  	  	  	uMotorCommand[15] = 1;
+ 	            while(iIndex1 <= 12)
+ 	            {
+ 		        c_motvalue <:iIndex1;
+ 	  	  	  	c_motvalue <: uMotorCommand[iIndex1];
+ 	  	  	  	c_motvalue <: uMotorCommand[iIndex1+1];
+ 	  	  	  	c_motvalue <: uMotorCommand[iIndex1+2];
+ 	  	  	  	c_motvalue <: uMotorCommand[iIndex1+3];
+ 	  	  	  	iIndex1 += 4;
+ 	            }
+           	   	iStep=40;  // next step readout motor values
  	            break;
- 	  case 12:  c_motvalue <:4;	  c_motvalue <: 0;
- 	            iStep=0;
- 	            break;
-
  /*
 						else if(cmd2 >= 32 && cmd2 < 64)  { iTemp = (int) cmd2; c_motvalue <: iMotValue[iTemp-32]; 	}
 						else if(cmd2 >= 64 && cmd2 < 96)  { iTemp = (int) cmd2; c_motvalue <: iMotPar[iTemp-64]; 	}
 						else if(cmd2 >= 96 && cmd2 < 128) { iTemp = (int) cmd2; c_motvalue :> iTemp1;  iMotPar[iTemp-96] = iTemp1; iUpdateFlag=1;}
-  */
+*/
 
  	  case 20:	iIndex1 =  0;                 // read parameter from XMOS ==> PC
  	            while(iIndex1 < 32)
