@@ -103,8 +103,11 @@ int main(void)
 			  int valid = 0;
 			  timer tx;
 			  unsigned ts;
-              int iIndex;
+              int iIndex1;
 
+              iIndex1=0; while(iIndex1 < 32)send_cmd.iMotValues[iIndex1++] =0;
+              iIndex1=0; while(iIndex1 < 32)send_cmd.iMotPar[iIndex1++]	=0;
+              iIndex1=0; while(iIndex1 < 16)send_cmd.iMotCommand[iIndex1++]=0;
               send_cmd.varx=0;
               send_cmd.var1=0;
 
@@ -115,33 +118,38 @@ int main(void)
 			  while(1)
 			  {
 				  valid = input_cmd(send_cmd);   // valid command entered
-
-				  if(valid == 1)				// if valid send command to motor ( cmd from 0 to 31 )
+				  if(valid == 1)				 // if valid send command to motor ( cmd from 0 to 31 )
 				  {
-					  c_commutation <:1;	  c_commutation <:send_cmd.iPwmOnOff;			//ON OFF PWM
-					  c_commutation <:2;	  c_commutation <:send_cmd.iHoldingTorque;
-					  c_commutation <:3;	  c_commutation <:send_cmd.iTorqueSetValue;
-					  c_commutation <:4;	  c_commutation <:send_cmd.iSetValueSpeedRpm;	//Speed RPM
-					  c_commutation <:5;	  c_commutation <:send_cmd.iControlFOCcmd;
-				  }
+					  send_cmd.iMotCommand[15]=1;
+					  iIndex1=0;
+					  while(iIndex1 <= 12)
+					  {
+		 	    	  c_commutation <:iIndex1;
+		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1];
+		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1+1];
+		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1+2];
+		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1+3];
+		 	  	  	  iIndex1 += 4;
+					  }
+				  }// end if valid == 1
 
 
 				  if(send_cmd.varx == 1)  // readout motor values (cmd from 32 to 63 )
 				  {
-					  iIndex = 32;
-					  while(iIndex < 64)
+					  iIndex1 = 32;
+					  while(iIndex1 < 64)
 					  {
-					  c_commutation <: iIndex; 	c_commutation :> send_cmd.iMotValues[iIndex-32];
-					  iIndex++;
+					  c_commutation <: iIndex1; 	c_commutation :> send_cmd.iMotValues[iIndex1-32];
+					  iIndex1++;
 					  }
 				  }
 
 				  if(send_cmd.varx == 2)  	// readout  parameters (cmd from 64 to 97 )
 				  {
-					  iIndex =64;
-					  while(iIndex < 96) {
-						  c_commutation <: iIndex; 	c_commutation :> send_cmd.iMotPar[iIndex-64];
-						  iIndex++;
+					  iIndex1 =64;
+					  while(iIndex1 < 96) {
+						  c_commutation <: iIndex1; 	c_commutation :> send_cmd.iMotPar[iIndex1-64];
+						  iIndex1++;
 					  }
 				  }
 

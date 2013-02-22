@@ -3,11 +3,7 @@
 typedef struct S_CMD_VAR {
 	int iMotPar[32];
 	int iMotValues[32];
-	int iSetValueSpeedRpm;
-	int iPwmOnOff;
-	int iHoldingTorque;
-	int iTorqueSetValue;
-	int iControlFOCcmd;
+	int iMotCommand[16];
 	int varx;
 	int var1;
 } cmd_data;

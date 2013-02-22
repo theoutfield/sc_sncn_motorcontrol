@@ -12,11 +12,7 @@
 #include "set_cmd.h"
 
 
-int iSetValueSpeedRpm=    0;
-int iPwmOnOff        =    1;
-int iHoldingTorque   =    0;
-int iTorqueSetValue  =    0;
-int iControlFOCcmd   =    0;
+
 int iIndex =   1;
 float fa1RMS,fa2RMS,fa3RMS;
 int iFlag=1;
@@ -101,15 +97,6 @@ char cxParameter[32][32]={\
 };
 
 
-void SetMotorValue(cmd_data *c)
-{
-    c->iControlFOCcmd          = iControlFOCcmd;
-    c->iTorqueSetValue      = iTorqueSetValue;
-	c->iHoldingTorque       = iHoldingTorque;
-	c->iSetValueSpeedRpm    = iSetValueSpeedRpm;
-	c->iPwmOnOff 			= iPwmOnOff;
-}
-
 
 
 int input_cmd(cmd_data *c )
@@ -167,7 +154,7 @@ int xx;
 	{
 	printf("\n Choose to set:  pxx=parameter v=view parameter \n");
 	printf(" h ->holding torque 0-800\n");
-	printf(" +/-RPM Speed RPM 0-4000 Speed: %d \n",iSetValueSpeedRpm);
+	printf(" +/-RPM Speed RPM 0-4000 Speed: %d \n",c->iMotCommand[0]);
 	printf(" ENTER=info Motor: 0(null):STOP\n");
 	}
     iFlag=1;
@@ -191,64 +178,52 @@ int xx;
 			break;
 
 		case  '0':
-			iSetValueSpeedRpm = 0;
-			SetMotorValue(c);
+			c->iMotCommand[0]=0;
 	    	return(1);
 			break;
 
 
-		case 'h':
+		case 'h':		// holding torque
 		case 'H':
-			scanf("%d",&iHoldingTorque);
-			SetMotorValue(c);
+			scanf("%d",&iTemp);
+		    c->iMotCommand[7]=iTemp;
 			return(1);
 			break;
 
-
-		case '+':
-			scanf("%d",&iSetValueSpeedRpm);
-			SetMotorValue(c);
-			return(1);
-			break;
-
-		case '-':
-			scanf("%d",&iSetValueSpeedRpm);
-			iSetValueSpeedRpm    = -iSetValueSpeedRpm;
-			SetMotorValue(c);
-			return(1);
-			break;
-
-		case 'x':			// PWM OFF
-		case 'X':
-		    iPwmOnOff = 0;
-		    iSetValueSpeedRpm = 0;
-			SetMotorValue(c);
-			return(1);
-			break;
-
-		case 'z':		// PWM ON
-		case 'Z':
-		    iPwmOnOff = 1;
-		    iSetValueSpeedRpm = 0;
-			SetMotorValue(c);
+		case 'm':
+		case 'M':
+			scanf("%d",&iTemp);
+		    c->iMotCommand[10]=iTemp;
 			return(1);
 			break;
 
 		case 't':			// set torque value
 		case 'T':
 		    scanf("%d",&iTemp);
-		    iTorqueSetValue 		= iTemp;
-			SetMotorValue(c);
+		    c->iMotCommand[10]=iTemp;
 			return(1);
 			break;
 
-		case 'f':			// set torque value
+		case 'f':			// set iControlFOC
 		case 'F':
 		    scanf("%d",&iTemp);
-		    iControlFOCcmd 			= iTemp;
-			SetMotorValue(c);
+		    c->iMotCommand[1]=iTemp;
 			return(1);
 			break;
+
+		case '+':
+		    scanf("%d",&iTemp);
+		    c->iMotCommand[0]=iTemp;
+			return(1);
+			break;
+
+		case '-':
+		    scanf("%d",&iTemp);
+		    if(iTemp > 0)iTemp = -iTemp;
+		    c->iMotCommand[0]=iTemp;
+			return(1);
+			break;
+
 
 		case 'p':
 		case 'P':
