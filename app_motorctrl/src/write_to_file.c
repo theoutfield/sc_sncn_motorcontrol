@@ -19,27 +19,33 @@ int iFlag=1;
 int iTemp;
 
 
-char cxInfo[32][20]={\
+char cxInfo[64][20]={\
 "UmotProfile:",
-"UmotIntegrator:",
-"UmotProp:",
+"UmotBoost:",
+"UmotIntegral:",
+"UmotProport:",
 "UmotMotor:",
-"ActualSpeed:",
-"iStep1:",
-//----
-"FOC:",
-"SetUserSpeed:",
-"SetSpeed:",
+"HoldingTorq:",
+"Step:",
+":",
+//----------
+"SetSpeedUser:",
+"SetSpeedRamp:",
+"SpeedActual:",
+":",
 "idiffSpeed1:",
 "idiffSpeed2:",
-"HoldingTorq:",
-//-----
+":",
+":",
+//------------
 "AngleFromHall:",
 "AnglePWM:",
 ":",
 ":",
 "AngleDiffPer:",
 "MotDirection:",
+":",
+":",
 //--------------
 "Field_Set:",				//15
 "Field_Actual:",
@@ -47,16 +53,17 @@ char cxInfo[32][20]={\
 "Torque_Set:",
 "Torque_Actual:",
 "Torque_Diff:",
+":",
+":",
 //------
 "a1RMS_adc:",
 "a2RMS_adc:",
 "VectorCurr:",
 "VectorInvPark:",
+":",
 "PinStateEnc.:",
 "PinStateHall:",
-//--
 ":",
-":"
 };
 
 
@@ -96,14 +103,14 @@ char cxParameter[32][32]={\
 "31",
 };
 
-
+char cxText[512];
 
 
 int input_cmd(cmd_data *c )
 {
 unsigned char cInput=0;
 int xx;
-
+char cxText2[64];
 
 	if( c->varx == 2)
 	{
@@ -123,31 +130,154 @@ int xx;
 	{
 		c->varx = 0;
 		iFlag   = 0;
-		 fa1RMS = c->iMotValues[24]; fa1RMS/=264;
-		 fa2RMS = c->iMotValues[25]; fa2RMS/=264;
 
-		xx=0; while(xx < 24){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
-		xx=24; printf("%-15s%5d    %4.2fA",cxInfo[xx],c->iMotValues[xx],fa1RMS);  // RMS
-		printf("\n");
+		xx=0;
+		c->iMotInfo[xx+0] = c->iMotValues[0] / 65536;
+		c->iMotInfo[xx+1] = c->iMotValues[0] & 0xFFFF;
+		c->iMotInfo[xx+2] = c->iMotValues[1];   			//iUmotBoost
+		c->iMotInfo[xx+3] = c->iMotValues[2];
+		c->iMotInfo[xx+4] = c->iMotValues[3];
+		c->iMotInfo[xx+5] = c->iMotValues[4];
+		c->iMotInfo[xx+6] = c->iMotValues[5] / 256;  // iStep
+		c->iMotInfo[xx+7] = 0;
 
-		xx=1; while(xx < 25){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
-		xx=25;  printf("%-15s%5d    %4.2fA",cxInfo[xx],c->iMotValues[xx],fa2RMS);  // RMS
-		printf("\n");
+		xx=8;
+		c->iMotInfo[xx+0] = c->iMotValues[6]/65536;
+		c->iMotInfo[xx+1] = c->iMotValues[6] & 0xFFFF;
+		c->iMotInfo[xx+2] = c->iMotValues[7];
+		c->iMotInfo[xx+3] = c->iMotValues[8];
+		c->iMotInfo[xx+4] = c->iMotValues[9];
+		c->iMotInfo[xx+5] = c->iMotValues[10];
+		c->iMotInfo[xx+6] = c->iMotValues[11];
+		c->iMotInfo[xx+7] = 0;
 
-		xx=2; while(xx <= 26){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
-		printf("\n");
+		xx=16;
+		c->iMotInfo[xx+0] = c->iMotValues[12] /65536;		// AngleFromHall
+		c->iMotInfo[xx+1] = c->iMotValues[12] & 0xFFFF;     // AnglePWM
+		c->iMotInfo[xx+2] = c->iMotValues[14];
+		c->iMotInfo[xx+3] = c->iMotValues[15];
+		c->iMotInfo[xx+4] = c->iMotValues[16];		//AngleDiffPer
+		c->iMotInfo[xx+5] = c->iMotValues[17];		// MotDirection
+		c->iMotInfo[xx+6] = 0;
+		c->iMotInfo[xx+7] = 0;
 
-		xx=3; while(xx <= 27){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
-		printf("\n");
+		xx=24;
+		c->iMotInfo[xx+0] = c->iMotValues[18];  //Field_Set
+		c->iMotInfo[xx+1] = c->iMotValues[19];  //Field_Actual
+		c->iMotInfo[xx+2] = c->iMotValues[20];  //Field_Diff
+		c->iMotInfo[xx+3] = c->iMotValues[21];
+		c->iMotInfo[xx+4] = c->iMotValues[22];
+		c->iMotInfo[xx+5] = c->iMotValues[23];
+		c->iMotInfo[xx+6] = c->iMotValues[23];
+		c->iMotInfo[xx+7] = 0;
 
-		xx=4; while(xx < 28){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
-		xx=28; printf("%-15s%5d  %8d",cxInfo[xx],c->iMotValues[xx],c->iMotValues[30]);
-		printf("\n");
+		xx=32;
+		c->iMotInfo[xx+0] = c->iMotValues[24]; //a1RMS_adc
+		c->iMotInfo[xx+1] = c->iMotValues[25]; //a2RMS_adc
+		c->iMotInfo[xx+2] = c->iMotValues[26]; //VectorCurr
+		c->iMotInfo[xx+3] = c->iMotValues[27]; //VectorInvPark
+		c->iMotInfo[xx+4] = 0;
+		c->iMotInfo[xx+5] = c->iMotValues[29] / 256;  // PinStateHall
+		c->iMotInfo[xx+6] = c->iMotValues[29] & 0xFF; // PinStateEnc
+		c->iMotInfo[xx+7] = 0;
 
-		xx=5; while(xx < 29){	 printf("%-15s%5d    ",cxInfo[xx],c->iMotValues[xx]); xx += 6; }
-		xx=29; printf("%-15s%5d  %8d",cxInfo[xx],c->iMotValues[xx],c->iMotValues[31]);
-		printf("\n");
+
+
+		c->iMotInfo[40] = c->iMotValues[30];  //iPositionEncoder
+		c->iMotInfo[41] = c->iMotValues[31];  //iHallPositionAbsolut
+
+
+
+
+		 	 	fa1RMS = c->iMotInfo[24]; fa1RMS/=264;
+		 	 	fa2RMS = c->iMotInfo[25]; fa2RMS/=264;
+
+		 	 	xx = c->iMotValues[17] & 0xFF;
+		 	 	if(xx==0) sprintf(cxText2,"motor stop");
+		 	 	if(xx==1) sprintf(cxText2,"motor CCW speed: %d RPM",c->iMotValues[7]);
+		 	 	if(xx==-1)sprintf(cxText2,"motor  CW speed: %d RPM",c->iMotValues[7]);
+
+		 	 	xx = c->iMotValues[5] & 0xFF;
+		 	 	if(xx <= 1) 	sprintf(cxText,"-----------------------                 SPEED Control      ---- +/- RPM  ----- %s ---------------------------",cxText2);
+		 	 	if(xx == 2)		sprintf(cxText,"-----------------------                 TORQUE Control     ---- t+200----------------------------------------");
+		 	 	if(xx == 3)		sprintf(cxText,"-----------------------                 POSITION Control   ---- m+500 ----------------------------------------");
+		 	 	printf("%s\n",cxText);
+
+		 	 	xx=0;
+		    	sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %4.2fA",
+				cxInfo[xx+0],c->iMotInfo[xx+0],
+				cxInfo[xx+8],c->iMotInfo[xx+8],
+				cxInfo[xx+16],c->iMotInfo[xx+16],
+				cxInfo[xx+24],c->iMotInfo[xx+24],
+				cxInfo[xx+32],c->iMotInfo[xx+32],fa1RMS);  // RMS
+		    	printf("%s\n",cxText);
+
+		 	 	xx=1;
+		    	sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %4.2fA",
+				cxInfo[xx+0],c->iMotInfo[xx+0],
+				cxInfo[xx+8],c->iMotInfo[xx+8],
+				cxInfo[xx+16],c->iMotInfo[xx+16],
+				cxInfo[xx+24],c->iMotInfo[xx+24],
+				cxInfo[xx+32],c->iMotInfo[xx+32],fa2RMS);  // RMS
+		    	printf("%s\n",cxText);
+
+		 	 	xx=2;
+			    sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d",
+				cxInfo[xx+0],c->iMotInfo[xx+0],
+				cxInfo[xx+8],c->iMotInfo[xx+8],
+				cxInfo[xx+16],c->iMotInfo[xx+16],
+				cxInfo[xx+24],c->iMotInfo[xx+24],
+				cxInfo[xx+32],c->iMotInfo[xx+32]);
+			    printf("%s\n",cxText);
+
+		 	 	xx=3;
+			    sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d",
+				cxInfo[xx+0],c->iMotInfo[xx+0],
+				cxInfo[xx+8],c->iMotInfo[xx+8],
+				cxInfo[xx+16],c->iMotInfo[xx+16],
+				cxInfo[xx+24],c->iMotInfo[xx+24],
+				cxInfo[xx+32],c->iMotInfo[xx+32]);
+			    printf("%s\n",cxText);
+
+		 	 	xx=4;
+			    sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d",
+				cxInfo[xx+0],c->iMotInfo[xx+0],
+				cxInfo[xx+8],c->iMotInfo[xx+8],
+				cxInfo[xx+16],c->iMotInfo[xx+16],
+				cxInfo[xx+24],c->iMotInfo[xx+24],
+				cxInfo[xx+32],c->iMotInfo[xx+32]);
+			    printf("%s\n",cxText);
+
+		 	 	xx=5;
+			    sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d   %8d",
+				cxInfo[xx+0],c->iMotInfo[xx+0],
+				cxInfo[xx+8],c->iMotInfo[xx+8],
+				cxInfo[xx+16],c->iMotInfo[xx+16],
+				cxInfo[xx+24],c->iMotInfo[xx+24],
+				cxInfo[xx+32],c->iMotInfo[xx+32],c->iMotInfo[40]);
+			    printf("%s\n",cxText);
+
+		 	 	xx=6;
+			    sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d   %8d",
+				cxInfo[xx+0],c->iMotInfo[xx+0],
+				cxInfo[xx+8],c->iMotInfo[xx+8],
+				cxInfo[xx+16],c->iMotInfo[xx+16],
+				cxInfo[xx+24],c->iMotInfo[xx+24],
+				cxInfo[xx+32],c->iMotInfo[xx+32],c->iMotInfo[41]);
+			    printf("%s\n",cxText);
+
+/*
+		 	 	xx=7;   // reserve
+			    sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d  %8d",
+				cxInfo[xx+0],c->iMotInfo[xx+0],
+				cxInfo[xx+8],c->iMotInfo[xx+8],
+				cxInfo[xx+16],c->iMotInfo[xx+16],
+				cxInfo[xx+24],c->iMotInfo[xx+24],
+				cxInfo[xx+32],c->iMotInfo[xx+32],);
+			    printf("%s\n",cxText);
+*/
 	}
+
 
 
 	if(iFlag)
@@ -200,7 +330,7 @@ int xx;
 		case 't':			// set torque value
 		case 'T':
 		    scanf("%d",&iTemp);
-		    c->iMotCommand[10]=iTemp;
+		    c->iMotCommand[6]=iTemp;
 			return(1);
 			break;
 

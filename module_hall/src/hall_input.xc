@@ -20,20 +20,15 @@ extern  port p_ifm_ext_d0;
 // 32  32Bit Werte = 128Bytes -> 5,568msec
 
 
-
 void run_uart(chanend c_motvalue, clock clk1)
 {
-
 timer tx;
 unsigned ts;					// newest timestamp
-unsigned countx=0;
 int iStep=0,iStepReturn;
-
 
 unsigned uMotorValues[32];
 unsigned uMotorCommand[16];
 unsigned uMotorParameter[32];
-
 
 unsigned uSendValue;
 unsigned uTemp;
@@ -300,15 +295,6 @@ tx :> ts;  // first value
 
      default: iStep=0; break;
      }
-
-
-
-	 countx++;
-	 if(countx >= 100000){
-	 countx = 0;
-//	 iStep=50;
-	 }
-
 	}// end while 1
 }
 
