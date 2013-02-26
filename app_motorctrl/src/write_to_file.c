@@ -111,20 +111,24 @@ int input_cmd(cmd_data *c )
 unsigned char cInput=0;
 int xx;
 char cxText2[64];
+int iIndex;
 
 	if( c->varx == 2)
 	{
 		c->varx = 0;
 		iFlag   = 0;
-				iTemp=0;
-	            while(iTemp < 32)
-	            {
-				printf(" p%-2d: %5d  ",iTemp,c->iMotPar[iTemp]); iTemp++;
-				printf(" p%2d: %5d  ",iTemp,c->iMotPar[iTemp]);  iTemp++;
-				printf(" p%2d: %5d  ",iTemp,c->iMotPar[iTemp]);  iTemp++;
-				printf(" p%2d: %5d\n",iTemp,c->iMotPar[iTemp]);  iTemp++;
-	            }
-	}
+
+        printf("-----------  parameter 0-63 ----- to change: example: p01 enter --------- \n");
+			iIndex=0;
+            while(iIndex < 16)
+            {
+            	sprintf(cxText,"%2d %-17s %6d   %2d %-17s %6d",
+        		iIndex,cxParameter[iIndex],c->iMotPar[iIndex],
+        		iIndex,cxParameter[iIndex+16],c->iMotPar[iIndex+16]);
+            	printf("%s\n",cxText);
+        		iIndex++;
+            }
+	}// end view parameter
 
 	if(c->varx == 1)
 	{
@@ -185,8 +189,6 @@ char cxText2[64];
 
 		c->iMotInfo[40] = c->iMotValues[30];  //iPositionEncoder
 		c->iMotInfo[41] = c->iMotValues[31];  //iHallPositionAbsolut
-
-
 
 
 		 	 	fa1RMS = c->iMotInfo[24]; fa1RMS/=264;
@@ -301,11 +303,7 @@ char cxText2[64];
 		return(0);
 		break;
 
-		case 'v':		// view all parameter
-		case 'V':
-			c->varx = 2;
-			return(0);
-			break;
+
 
 		case  '0':
 			c->iMotCommand[0]=0;
@@ -354,6 +352,13 @@ char cxText2[64];
 			return(1);
 			break;
 
+   //------------------ parameter -----------------------
+		case 'v':		// view all parameter
+		case 'V':
+			scanf("%c",&iTemp);
+			c->varx = 2;
+			return(0);
+			break;
 
 		case 'p':
 		case 'P':
@@ -366,11 +371,12 @@ char cxText2[64];
 			c->iMotPar[iIndex] = iTemp;
 			iFlag=0;
 			c->var1 = c->iMotPar[iIndex];
-			return(iIndex+96);
+			c->varx = 2;
+			return(iIndex+96);     // send to motor
 			}
 			break;
-		default:
 
+		default:
 			break;
 	}
  }// end while 1

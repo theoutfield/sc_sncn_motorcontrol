@@ -144,6 +144,9 @@ int main(void)
 					  }
 				  }
 
+				  if(valid >= 96 && valid < 128)  // send actual parameter
+				  {  c_commutation <: valid;	  c_commutation <: send_cmd.var1;  }
+
 				  if(send_cmd.varx == 2)  	// readout  parameters (cmd from 64 to 97 )
 				  {
 					  iIndex1 =64;
@@ -152,10 +155,6 @@ int main(void)
 						  iIndex1++;
 					  }
 				  }
-
-				  if(valid >= 96 && valid < 128)  // send actual parameter
-				  {  c_commutation <: valid;	  c_commutation <: send_cmd.var1;  }
-
 
 			  }//end while 1
     	}
