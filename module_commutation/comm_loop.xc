@@ -50,7 +50,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iLoopCount &= 0x0F;
 		switch(iLoopCount & 0x03)
 		{
-			case 0: iHallPositionAbsolut = get_hall_absolute_pos(c_hall);
+			case 0: iPositionAbsolut = get_hall_absolute_pos(c_hall);
 					break;
 			case 1: iPinStateHall    = get_hall_pinstate(c_hall);
 					break;
@@ -59,10 +59,11 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			case 3: iPositionEncoder = get_encoder_position(c_hall);
 					break;
 		}
+
+
 		iActualSpeed     =  get_hall_speed(c_hall);
 		iAngleFromHall   = 	get_hall_angle(c_hall);
 		iAngleFromHall  &=  0x0FFF;
-
 
 		iSpeedValueNew   = iActualSpeed & 0xFF000000;   				// extract info if SpeedValue is new
 		iActualSpeed    &= 0x00FFFFFF;
@@ -93,8 +94,8 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iAngleFromHallOld = iAngleFromHall;
 
 
-
 		CalcCurrentValues();
+
 
 		//***************** steps ***********************************************************
 
@@ -114,13 +115,11 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 		switch(iLoopCount & 0x03)
 		{
-			case 0:
-					iVectorInvPark = VsaRef * VsaRef + VsbRef * VsbRef;
+			case 0:	iVectorInvPark = VsaRef * VsaRef + VsbRef * VsbRef;
 					iVectorInvPark = root_function(iVectorInvPark);
 					break;
 
-			case 1:
-					iVectorCurrent = iAlpha * iAlpha + iBeta * iBeta;
+			case 1:	iVectorCurrent = iAlpha * iAlpha + iBeta * iBeta;
 					iVectorCurrent = root_function(iVectorCurrent);
 					break;
 
@@ -137,7 +136,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 
 
-    //**************************************************************
+    //********************************************************************
 
 		iPowerMotor = 6863 * iIqPeriod2;
 		iPowerMotor /= 65536;
@@ -199,7 +198,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 	//============================================================================================
 
-	//============================= set angle for pwm ===========================================
+	//============================= set angle for pwm ============================================
 		if (iMotDirection !=  0)
 		{
 			iAnglePWMFromHall = iAngleFromHall + iParAngleUser ;
@@ -209,33 +208,17 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			iAngleXXX = iAnglePWMFromFOC - iAnglePWMFromHall;
 			iAnglePWM = iAnglePWMFromFOC;
 		}
-/*
-		if((iControlFOC) == 0)
-		{
-			if (iMotDirection <  0)
-			{
-				iAnglePWMFromHall = iAngleFromHall + iParAngleUser - iAngleFromRpm   + 2240;
-				iAnglePWMFromHall &= 0x0FFF;
-			}
-			else if (iMotDirection >  0)
-			{
-				iAngleFromRpm    =0;
-				iAnglePWMFromHall = iAngleFromHall + iParAngleUser    + iAngleFromRpm;
-				iAnglePWMFromHall &= 0x0FFF;
-				iAnglePWMFromFOC  = iAngleInvPark + (4096 - 1020) + iParAngleUser;
-				iAnglePWMFromFOC  &= 0x0FFF;
-				iAngleXXX = iAnglePWMFromFOC - iAnglePWMFromHall;
-			}
-			iAnglePWM = iAnglePWMFromHall;
-		}
-*/
-	   //======================================================================================
-		if(iStep1 == 0 )
+
+
+
+	   //================== Holding Torque if motor stopped ====================================================
+
 		if(iMotHoldingTorque)
 		{
-			iAnglePWM = iAngleFromHall + iParAngleUser - 600;
+			if(iStep1 != 0) iAngleLast = iAnglePWM;
+			if(iStep1 == 0 )
+			iAnglePWM = iAngleLast; //  + iAngleFromHall  - 600;
 		}
-
 		iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
 
 		//======================================================================================================
@@ -398,7 +381,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			}
 			iTorqueSet  		    = iMotCommand[6];
 			iMotHoldingTorque       = iMotCommand[7];
-			iHallPositionAbsolutNew = iMotCommand[10];
+			iPositionAbsolutNew     = iMotCommand[10];
 		}
 
 		if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }

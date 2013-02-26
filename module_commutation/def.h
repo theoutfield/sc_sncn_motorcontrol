@@ -36,6 +36,7 @@ void FOC_InversPark();
 #define defParTorqueIntegralGain   64
 
 //-------------------------------------
-#define defRampMax 8192		//ramp
-#define defRampMin 64
+#define defRampMax 8192*2		//ramp
+#define defRampMin 256
+
 

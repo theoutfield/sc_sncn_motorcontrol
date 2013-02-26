@@ -61,7 +61,7 @@ void    function_SpeedControl()
 			     if(iSetSpeedRamp==0)  iStep1++;
 		         break;
 		case 22: iSetInternSpeed = 0;
-			     if(iCountx++ > 5000)  iStep1++;  // wait 50msec
+			     if(iCountx++ > 500)  iStep1++;  // wait 27 msec
 		         break;
 		case 23: iSetInternSpeed = iSetInternSpeed2;
 		         iStep1 = 0;
@@ -202,8 +202,6 @@ void CalcUmotForSpeed()
 }
 
 void CalcRampForSpeed(){
-
-
 
 	int iTemp1,iTemp2;
 	int iTemp3,iTemp4;

@@ -86,6 +86,7 @@ int iAnglePWMFromHall;
 int iAnglePWMFromFOC;
 int iAngleDiffSum;
 int iAngleDiff;
+int iAngleLast;
 int iIntegralGain;
 
 int iCountRMS  =0;
@@ -129,7 +130,10 @@ int iTorqueF0=0;
 int iPwmAddValue,iPwmIndexHigh;
 int iHallNullPosition=0;
 int iEncoderNullPosition=0;
-int iHallPositionAbsolut=0;
-int iHallPositionAbsolutNew;
-int iHallPositionReferenz=0;
-int iHallPulsCountAcc;
+
+int iPositionAbsolut=0;
+int iPositionReferenz=0;
+int iPulsCountAcc;
+int iPositionAbsolutNew;
+int iPositionAcc;
+int iPositionDec;

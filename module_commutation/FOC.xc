@@ -225,13 +225,13 @@ void SaveValueToArray()
 	iMotValue[4]  = iMotHoldingTorque;
 	iMotValue[5]  = (iStep1 * 256) + iControlFOC;
 
-
 	iMotValue[6]  = (iSetInternSpeed & 0xFFFF0000) + (iSetSpeedRamp/65536);
 	iMotValue[7]  = iActualSpeed;
-	iMotValue[8]  = 0;
-	iMotValue[9]  = idiffSpeed;
-	iMotValue[10] = idiffSpeed2;
-	iMotValue[11] = iHallPulsCountAcc;
+	iMotValue[8]  = idiffSpeed*65536 + idiffSpeed2;
+	iMotValue[9]  = iPositionAbsolutNew;
+	iMotValue[10] = iPositionDec;
+	iMotValue[11] = iPulsCountAcc;
+
 
 	iMotValue[12] = (iAngleFromHall*65536) + iAnglePWM;
 	iMotValue[13] = 0;
@@ -255,6 +255,13 @@ void SaveValueToArray()
 
 	iMotValue[29] = (iPinStateHall*256)  + (iPinStateEncoder & 0xFF);
 	iMotValue[30] = iPositionEncoder;
-	iMotValue[31] = iHallPositionAbsolut;
+	iMotValue[31] = iPositionAbsolut;
 }
 
+/*
+ *
+ *
+int iHallPositionAbsolutNew;
+int iPositionAcc;
+int iPositionDec;
+*/

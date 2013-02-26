@@ -18,10 +18,11 @@ void    function_TorqueControl()
 
 				//==========================================
 		case 10: iPwmOnOff 		 = 1;
-				 if(iTorqueSet == 0)iStep1 = 0;
-				 if(iControlFOC ==0)iStep1 = 0;
+				 if(iTorqueSet  ==0)iStep1++;
 				 break;
 
+		case 11: if(iActualSpeed == 0)iStep1=0;
+		         break;
 		//--------------- overcurrent --------------------------
 		case 30:  iPwmOnOff		  = 0;			// error motor stop
 				  iStep1++;
@@ -36,18 +37,10 @@ void    function_TorqueControl()
 				  if(iSetLoopSpeed== 0)iStep1=0;     // motor is stopping
 		 	 	  }
 		 	 	  break;
-		default:
-				#ifdef DEBUG_commutation
-					printstr("error\n");
-				#endif
-				iStep1 = 0;
+		default:iStep1 = 0;
 				break;
 	}// end iStep1
 
-
-	//===========================================================
-	//	CalcRampForSpeed();
-	//============================== ramp calculation ===========
 
 		FOC_ClarkeAndPark();
 
