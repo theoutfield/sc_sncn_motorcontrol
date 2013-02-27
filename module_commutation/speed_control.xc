@@ -31,8 +31,8 @@ void    function_SpeedControl()
 				 if(iSetInternSpeed == 0) iStep1=11;  // motor stops
 				 else
 				 {
-			     if(iSetInternSpeed < 0 && iSetSpeedRamp > 0)iStep1=20;	 // change direction from plus to minus
-				 if(iSetInternSpeed > 0 && iSetSpeedRamp < 0)iStep1=20;  // change direction from minus to plus
+			     if(iSetInternSpeed < 0 && iSetSpeedRamp > 0) iStep1=20;  // change direction from plus to minus
+				 if(iSetInternSpeed > 0 && iSetSpeedRamp < 0) iStep1=20;  // change direction from minus to plus
 				 }
 				 break;
 
@@ -220,7 +220,7 @@ void CalcRampForSpeed(){
 			iRampAccValue  = defRampMin;
 			iStepRamp++;
 			break;
-	case 2: if(iRampAccValue < defRampMax) iRampAccValue+=8;
+	case 2: if(iRampAccValue < defRampMax) iRampAccValue+=defRampPlus;
 			else iStepRamp++;
 			break;
 	case 3: iSpeedSmoothed = iTemp1 - iSpeedSmoothed;
@@ -228,14 +228,14 @@ void CalcRampForSpeed(){
 	        break;
 	case 4: if((iTemp2 - iTemp1) < iSpeedSmoothed) iStepRamp++;
 			break;
-	case 5: if(iRampAccValue > defRampMin) iRampAccValue-=8;
+	case 5: if(iRampAccValue > defRampMin) iRampAccValue-=defRampPlus;
 	        break;
 	//------------ deceleration ----------------------------
 	case 11: iSpeedSmoothed = iTemp1;
 	         iRampDecValue = defRampMin;
 	         iStepRamp++;
 	         break;
-	case 12: if(iRampDecValue < defRampMax) iRampDecValue += 8;
+	case 12: if(iRampDecValue < defRampMax) iRampDecValue += defRampPlus;
 			 else iStepRamp++;
 	         break;
 	case 13: iSpeedSmoothed = iSpeedSmoothed - iTemp1;
@@ -243,7 +243,7 @@ void CalcRampForSpeed(){
 	         break;
 	case 14: if((iTemp1 - iTemp2) < iSpeedSmoothed) iStepRamp++;
 			 break;
-	case 15: if(iRampDecValue > defRampMin) iRampDecValue-=8;
+	case 15: if(iRampDecValue > defRampMin) iRampDecValue-=defRampPlus;
 	         break;
 	}
 

@@ -22,7 +22,7 @@ extern out port p_ifm_shared_leds_wden;  // XS1_PORT_4B; /* BlueGreenRed_Green *
 #endif
 
 unsigned char cLeds;
-
+int iPositionZero=0;
 
 void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue)
 {
@@ -50,7 +50,8 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iLoopCount &= 0x0F;
 		switch(iLoopCount & 0x03)
 		{
-			case 0: iPositionAbsolut = get_hall_absolute_pos(c_hall);
+			case 0: iPositionAbsolut  = get_hall_absolute_pos(c_hall);
+			        iPositionAbsolut -= iPositionZero;
 					break;
 			case 1: iPinStateHall    = get_hall_pinstate(c_hall);
 					break;
@@ -209,8 +210,6 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			iAnglePWM = iAnglePWMFromFOC;
 		}
 
-
-
 	   //================== Holding Torque if motor stopped ====================================================
 
 		if(iMotHoldingTorque)
@@ -241,17 +240,18 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	 	 xscope_probe_data(4,iAngleCurrent);
 	   	 xscope_probe_data(5,iUmotMotor);
 	   	 xscope_probe_data(6,a1Square/1000);
-
-		 xscope_probe_data(0,iPhase1);
-		 xscope_probe_data(1,iActualSpeed);
-		 xscope_probe_data(2,iSetLoopSpeed);
-		 xscope_probe_data(3,iUmotIntegrator/256);
-		 xscope_probe_data(4,iUmotMotor);
-		 xscope_probe_data(5,iAngleDiffPeriod);
-		 xscope_probe_data(6,iIqPeriod2);
 */
+		 xscope_probe_data(0,iActualSpeed);
+		 xscope_probe_data(1,iSetLoopSpeed);
+		 xscope_probe_data(2,iUmotIntegrator/256);
+		 xscope_probe_data(3,iUmotMotor);
+		 xscope_probe_data(4,iAngleDiffPeriod);
+		 xscope_probe_data(5,iVectorInvPark);
+		 xscope_probe_data(6,iVectorCurrent);
+		 xscope_probe_data(7,iIdPeriod2);
+		 xscope_probe_data(8,iIqPeriod2);
 
-		 xscope_probe_data(0,iPhase1);
+/*		 xscope_probe_data(0,iPhase1);
 		 xscope_probe_data(1,iAngleCurrent);
 		 xscope_probe_data(2,iAnglePWM);
 		 xscope_probe_data(3,iAngleFromHall);
@@ -261,7 +261,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		 xscope_probe_data(7,iVectorCurrent);
 		 xscope_probe_data(8,iVectorInvPark);
 		 xscope_probe_data(9,iPhase2);
-
+*/
 	#endif
 		// pwm 13889 * 4 nsec = 55,556µsec  18Khz
 /*
@@ -376,12 +376,13 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			CalcSetInternSpeed(iMotCommand[0]);
 			if(iControlFOC != iMotCommand[1])
 			{
-			iStep1 =0;
+			iStep1 = 0;
 			iControlFOC = iMotCommand[1];
 			}
 			iTorqueSet  		    = iMotCommand[6];
 			iMotHoldingTorque       = iMotCommand[7];
 			iPositionAbsolutNew     = iMotCommand[10];
+			iPositionZero           = iMotCommand[11];
 		}
 
 		if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }

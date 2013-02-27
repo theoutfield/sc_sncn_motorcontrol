@@ -61,7 +61,7 @@ int iTemp1;
 
 	iFieldDiffSum -= iFieldDiff2;
 	iFieldDiffSum += iFieldDiff1;
-	iFieldDiff2    = iFieldDiffSum/2;
+	iFieldDiff2    = iFieldDiffSum/4;
 
 	//------------- calc hysteresis and set limit -----------------
 	iTemp1 = iTorqueDiff1;
@@ -75,8 +75,8 @@ int iTemp1;
 	iTorqueDiffSum -= iTorqueDiff2;
 	iTorqueDiffSum += iTorqueDiff1;
 	iTorqueDiff2    = iTorqueDiffSum/2;
-
 }
+
 
 void FOC_InversPark()
 {
@@ -237,8 +237,8 @@ void SaveValueToArray()
 	iMotValue[13] = iAngleDiffPeriod;
 	iMotValue[14] = iRampAccValue;
 	iMotValue[15] = 0;
-	iMotValue[16] = 0;
-	iMotValue[17] = 0;
+	iMotValue[16] = VsqRef1;
+	iMotValue[17] = VsdRef1;
 
  	iMotValue[18] = iFieldSet;
 	iMotValue[19] = iIdPeriod2;

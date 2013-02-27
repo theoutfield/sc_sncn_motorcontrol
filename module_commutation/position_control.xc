@@ -67,9 +67,9 @@ void function_PositionControl()
 			    iUmotBoost      = iParUmotBoost * 32;
 				iMotDirection   = 1;  VsqRef1=  1024; VsdRef1 = 512; iTorqueF0 =  500;
 		        iUmotMotor      = iParUmotStart;
-				iPwmOnOff	     = 1;
+				iPwmOnOff	    = 1;
 				iRampIntegrator = 0;
-				iPulsCountAcc = iPositionAbsolut;
+				iPulsCountAcc   = iPositionAbsolut;
 				iStep1++;
 				break;
 

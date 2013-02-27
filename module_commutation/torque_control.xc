@@ -51,13 +51,26 @@ void    function_TorqueControl()
 		FOC_FilterDiffValue();
 
 		VsdRef1 += iFieldDiff2  /16;
-		VsqRef1 += iTorqueDiff2 /4;								// FOC torque-control
+		VsqRef1 += iTorqueDiff2 /4;					// FOC torque-control
+
+#define defVsqRef1Max 220000
+
+		if(VsqRef1 > 0)
+		{
+        if(VsqRef1 > defVsqRef1Max)VsqRef1 = defVsqRef1Max;         // Limit
+		}
+
+		if(VsqRef1 < 0)
+		{
+        if(VsqRef1 < -defVsqRef1Max)VsqRef1 = -defVsqRef1Max;         // Limit
+		}
 
 
 		FOC_InversPark();
 
 
 		iUmotResult = iVectorInvPark/2;		// FOC torque-control
+		if(iUmotResult > 4096) iUmotResult = 4096;
 
 
 }
