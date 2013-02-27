@@ -32,18 +32,18 @@ char cxInfo[64][20]={\
 "SetSpeedUser:",
 "SetSpeedRamp:",
 "SpeedActual:",
+"diffSpeed1:",
+"diffSpeed2:",
 ":",
-"idiffSpeed1:",
-"idiffSpeed2:",
 ":",
 ":",
 //------------
 "AngleFromHall:",
 "AnglePWM:",
-":",
-":",
 "AngleDiffPer:",
-"MotDirection:",
+":",
+":",
+":",
 ":",
 ":",
 //--------------
@@ -105,13 +105,31 @@ char cxParameter[32][32]={\
 
 char cxText[512];
 
+int ReadMotorValue(cmd_data *cc,int iIndex, int iModus)
+{
+int iValue;
+
+    iValue = cc->iMotValues[iIndex];
+	if(iModus==1)	iValue /= 65536;	// Highword
+	else iValue &= 0xFFFF;				// LowWord
+
+	if(iValue  > 32768) iValue |= 0xFFFF0000;
+	return(iValue);
+}
+
 
 int input_cmd(cmd_data *c )
 {
 unsigned char cInput=0;
 int xx;
 char cxText2[64];
+char chx;
 int iIndex;
+
+int iStep1;
+int iControlFOC;
+int iMotDirection;
+int iStepRamp;
 
 	if( c->varx == 2)
 	{
@@ -135,33 +153,41 @@ int iIndex;
 		c->varx = 0;
 		iFlag   = 0;
 
+		iMotDirection = ReadMotorValue(c,5,1);
+		iStepRamp     = iMotDirection/256;
+		iMotDirection &= 0xFF;
+
+		iStep1        = ReadMotorValue(c,5,0);
+		iControlFOC   = iStep1 & 0xFF;
+		iStep1        /= 256;
+
 		xx=0;
-		c->iMotInfo[xx+0] = c->iMotValues[0] / 65536;
-		c->iMotInfo[xx+1] = c->iMotValues[0] & 0xFFFF;
-		c->iMotInfo[xx+2] = c->iMotValues[1];   			//iUmotBoost
+		c->iMotInfo[xx+0] = ReadMotorValue(c,0,1);
+		c->iMotInfo[xx+1] = ReadMotorValue(c,0,0);
+		c->iMotInfo[xx+2] = c->iMotValues[1];   	//iUmotBoost
 		c->iMotInfo[xx+3] = c->iMotValues[2];
 		c->iMotInfo[xx+4] = c->iMotValues[3];
 		c->iMotInfo[xx+5] = c->iMotValues[4];
-		c->iMotInfo[xx+6] = c->iMotValues[5] / 256;  // iStep
+		c->iMotInfo[xx+6] = iStep1;
 		c->iMotInfo[xx+7] = 0;
 
 		xx=8;
-		c->iMotInfo[xx+0] = c->iMotValues[6]/65536;
-		c->iMotInfo[xx+1] = c->iMotValues[6] & 0xFFFF;
-		c->iMotInfo[xx+2] = c->iMotValues[7];
-		c->iMotInfo[xx+3] = c->iMotValues[8];
-		c->iMotInfo[xx+4] = c->iMotValues[9];
-		c->iMotInfo[xx+5] = c->iMotValues[10];
-		c->iMotInfo[xx+6] = c->iMotValues[11];
+		c->iMotInfo[xx+0] = ReadMotorValue(c,6,1);	//SetSpeedUser
+		c->iMotInfo[xx+1] = ReadMotorValue(c,6,0);  //SetSpeedRamp
+		c->iMotInfo[xx+2] = c->iMotValues[7];       //SpeedActual
+		c->iMotInfo[xx+3] = ReadMotorValue(c,8,1);	//diffSpeed1
+		c->iMotInfo[xx+4] = ReadMotorValue(c,8,0);	//diffSpeed2
+		c->iMotInfo[xx+5] = c->iMotValues[10];		//iPositionDec
+		c->iMotInfo[xx+6] = c->iMotValues[11];		//iPulsCountAcc
 		c->iMotInfo[xx+7] = 0;
 
 		xx=16;
-		c->iMotInfo[xx+0] = c->iMotValues[12] /65536;		// AngleFromHall
-		c->iMotInfo[xx+1] = c->iMotValues[12] & 0xFFFF;     // AnglePWM
-		c->iMotInfo[xx+2] = c->iMotValues[14];
-		c->iMotInfo[xx+3] = c->iMotValues[15];
-		c->iMotInfo[xx+4] = c->iMotValues[16];		//AngleDiffPer
-		c->iMotInfo[xx+5] = c->iMotValues[17];		// MotDirection
+		c->iMotInfo[xx+0] = ReadMotorValue(c,12,1);   //  AngleFromHall
+		c->iMotInfo[xx+1] = ReadMotorValue(c,12,0);   //  AnglePWM
+		c->iMotInfo[xx+2] = c->iMotValues[13];		  //  AngleDiffPer
+		c->iMotInfo[xx+3] = c->iMotValues[14];		  //  RampAccValue
+		c->iMotInfo[xx+4] = 0;
+		c->iMotInfo[xx+5] = 0;
 		c->iMotInfo[xx+6] = 0;
 		c->iMotInfo[xx+7] = 0;
 
@@ -172,7 +198,7 @@ int iIndex;
 		c->iMotInfo[xx+3] = c->iMotValues[21];
 		c->iMotInfo[xx+4] = c->iMotValues[22];
 		c->iMotInfo[xx+5] = c->iMotValues[23];
-		c->iMotInfo[xx+6] = c->iMotValues[23];
+		c->iMotInfo[xx+6] = 0;
 		c->iMotInfo[xx+7] = 0;
 
 		xx=32;
@@ -191,22 +217,21 @@ int iIndex;
 		c->iMotInfo[41] = c->iMotValues[31];  //iHallPositionAbsolut
 
 
-		 	 	fa1RMS = c->iMotInfo[24]; fa1RMS/=264;
-		 	 	fa2RMS = c->iMotInfo[25]; fa2RMS/=264;
+		 	 	fa1RMS = c->iMotInfo[32]; fa1RMS/=264;
+		 	 	fa2RMS = c->iMotInfo[33]; fa2RMS/=264;
 
-		 	 	xx = c->iMotValues[17] & 0xFF;
-		 	 	if(xx==0) sprintf(cxText2,"motor stop");
-		 	 	if(xx==1) sprintf(cxText2,"motor CCW speed: %d RPM",c->iMotValues[7]);
-		 	 	if(xx==-1)sprintf(cxText2,"motor  CW speed: %d RPM",c->iMotValues[7]);
 
-		 	 	xx = c->iMotValues[5] & 0xFF;
-		 	 	if(xx <= 1) 	sprintf(cxText,"-----------------------                 SPEED Control      ---- +/- RPM  ----- %s ---------------------------",cxText2);
-		 	 	if(xx == 2)		sprintf(cxText,"-----------------------                 TORQUE Control     ---- t+200----------------------------------------");
-		 	 	if(xx == 3)		sprintf(cxText,"-----------------------                 POSITION Control   ---- m+500 ----------------------------------------");
+		 	 	if(iMotDirection == 0) sprintf(cxText2,"motor stop");
+		 	 	if(iMotDirection == 1) sprintf(cxText2,"motor CCW speed: %d RPM",c->iMotValues[7]);
+		 	 	if(iMotDirection ==0xFF)sprintf(cxText2,"motor  CW speed: %d RPM",c->iMotValues[7]);
+
+		 	 	if(iControlFOC <= 1) 	sprintf(cxText,"-----------------------                 SPEED Control      ---- +/- RPM  ----- %s ---------------------------",cxText2);
+		 	 	if(iControlFOC == 2)	sprintf(cxText,"-----------------------                 TORQUE Control     ---- t+200----------------------------------------");
+		 	 	if(iControlFOC == 3)	sprintf(cxText,"-----------------------                 POSITION Control   ---- m+500 ----------------------------------------");
 		 	 	printf("%s\n",cxText);
 
 		 	 	xx=0;
-		    	sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %4.2fA",
+		    	sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d     %5.2fA",
 				cxInfo[xx+0],c->iMotInfo[xx+0],
 				cxInfo[xx+8],c->iMotInfo[xx+8],
 				cxInfo[xx+16],c->iMotInfo[xx+16],
@@ -215,7 +240,7 @@ int iIndex;
 		    	printf("%s\n",cxText);
 
 		 	 	xx=1;
-		    	sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %4.2fA",
+		    	sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d     %5.2fA",
 				cxInfo[xx+0],c->iMotInfo[xx+0],
 				cxInfo[xx+8],c->iMotInfo[xx+8],
 				cxInfo[xx+16],c->iMotInfo[xx+16],
@@ -260,7 +285,7 @@ int iIndex;
 			    printf("%s\n",cxText);
 
 		 	 	xx=6;
-			    sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d   %8d",
+			    sprintf(cxText,"%-15s%5d    %-10s%10d    %-10s%10d    %-10s%10d    %-15s%5d   %8d",
 				cxInfo[xx+0],c->iMotInfo[xx+0],
 				cxInfo[xx+8],c->iMotInfo[xx+8],
 				cxInfo[xx+16],c->iMotInfo[xx+16],
@@ -355,7 +380,7 @@ int iIndex;
    //------------------ parameter -----------------------
 		case 'v':		// view all parameter
 		case 'V':
-			scanf("%c",&iTemp);
+			scanf("%c",&chx);
 			c->varx = 2;
 			return(0);
 			break;
