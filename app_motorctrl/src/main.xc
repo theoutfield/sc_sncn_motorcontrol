@@ -67,19 +67,20 @@ int main(void)
 			XSCOPE_CONTINUOUS, "6 iIq", XSCOPE_UINT, "n"
 			);
 
-
-			 xscope_register(7,
-			 XSCOPE_CONTINUOUS, "0 a1RMS", XSCOPE_INT, "n",
+*/
+			 xscope_register(9,
 			 XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
 			 XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
 			 XSCOPE_CONTINUOUS, "3 iUmotIntegrator", XSCOPE_INT, "n",
 			 XSCOPE_CONTINUOUS, "4 iUmotMotor", XSCOPE_INT, "n",
 			 XSCOPE_CONTINUOUS, "5 iAngleDiffPeriod", XSCOPE_UINT, "n",
-			 XSCOPE_CONTINUOUS, "6 iIqPeriod2", XSCOPE_UINT, "n"
+			 XSCOPE_CONTINUOUS, "6 iVectorInvPark", XSCOPE_UINT, "n",
+			 XSCOPE_CONTINUOUS, "7 iVectorCurrent", XSCOPE_UINT, "n",
+			 XSCOPE_CONTINUOUS, "8 iIdPeriod2", XSCOPE_UINT, "n",
+			 XSCOPE_CONTINUOUS, "9 iIqPeriod2", XSCOPE_UINT, "n"
 			);
- */
 
-
+/*
 	 	 xscope_register(10,
 		 XSCOPE_CONTINUOUS, "0 iPhase1", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "1 iAngleCurrent", XSCOPE_INT, "n",
@@ -92,6 +93,7 @@ int main(void)
 		 XSCOPE_CONTINUOUS, "8 iVectorInvPark", XSCOPE_INT, "n",
 		 XSCOPE_CONTINUOUS, "9 iPhase2", XSCOPE_INT, "n"
 		);
+*/
     }
     /************************************************************
      * CORE 2             communication with the Motor
