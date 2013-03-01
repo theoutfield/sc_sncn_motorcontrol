@@ -44,26 +44,14 @@ void    function_TorqueControl()
 
 		FOC_ClarkeAndPark();
 
-
 		iFieldDiff1     = iFieldSet  - iId;
 		iTorqueDiff1    = iTorqueSet - iIq;  // <<<=== iTorqueSet
 
 		FOC_FilterDiffValue();
 
-		VsdRef1 += iFieldDiff2  /16;
-		VsqRef1 += iTorqueDiff2 /4;					// FOC torque-control
 
-#define defVsqRef1Max 220000
-
-		if(VsqRef1 > 0)
-		{
-        if(VsqRef1 > defVsqRef1Max)VsqRef1 = defVsqRef1Max;         // Limit
-		}
-
-		if(VsqRef1 < 0)
-		{
-        if(VsqRef1 < -defVsqRef1Max)VsqRef1 = -defVsqRef1Max;         // Limit
-		}
+		VsdRef1 += iFieldDiff2  /8;
+		VsqRef1 += iTorqueDiff2 /8;					// FOC torque-control
 
 
 		FOC_InversPark();

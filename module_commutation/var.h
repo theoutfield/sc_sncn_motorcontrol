@@ -62,7 +62,7 @@ int iParAngleCorrMax;
 int iPositionEncoder;
 int iPinStateHall;
 int iPinStateEncoder=0;
-int iRampIntegrator;
+//----------------------------
 int iSetValueSpeed	=  0;
 int iSetInternSpeed	=  0;
 int iSetInternSpeed2=  0;
@@ -112,6 +112,7 @@ int iIqPeriod;
 int VsdRef1, VsqRef1;		// invers park
 int VsdRef2, VsqRef2;		// invers park
 int VsaRef, VsbRef;
+int iIqProportional;
 int iAngleInvPark;
 int iVectorInvPark;
 int sinx,cosx;

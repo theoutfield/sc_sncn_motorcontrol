@@ -20,25 +20,17 @@ int iTemp1;
 
 	if(iTemp1 > 0 )
 	{
-	iSetInternSpeed2 = iTemp1 *65536;
-	if(iSetInternSpeed2 > defSpeedMax) iSetInternSpeed2= defSpeedMax;
-	if(iSetInternSpeed2 < defSpeedMin) iSetInternSpeed2= defSpeedMin;
 
 	iPositionAcc     = iPositionReferenz   + iTemp1/3;
 
 	iTemp1 /= 3;
 	if(iTemp1 > 150) iTemp1 = 150;
 	iPositionDec     = iPositionAbsolutNew - iTemp1;
-
-
 	return(1);
 	}
 
 	if(iTemp1 < 0 )
 	{
-	iSetInternSpeed2 = iTemp1 *65536;
-	if(iSetInternSpeed2 < -defSpeedMax) iSetInternSpeed2=-defSpeedMax;
-	if(iSetInternSpeed2 > -defSpeedMin) iSetInternSpeed2=-defSpeedMin;
 	//iTemp1 = -iTemp1;
 	iPositionDec     = iPositionAbsolutNew - iTemp1;
 
@@ -47,6 +39,33 @@ int iTemp1;
 
 return(0);
 }
+
+
+int CalcSpeedForPosition()
+{
+int iTemp1;
+int iSpeed;
+
+	iTemp1 = iPositionAbsolutNew - iPositionAbsolut;
+	if(iTemp1 == 0) return(0);
+
+	if(iTemp1 > 0)
+	{
+	iSpeed = iTemp1 *65536;
+	if(iSpeed > defSpeedMax) iSpeed= defSpeedMax;
+	if(iSpeed < defSpeedMin) iSpeed= defSpeedMin;
+	}
+
+	if(iTemp1 < 0)
+	{
+	iSpeed = iTemp1 *65536;
+	if(iSpeed < -defSpeedMax) iSpeed= -defSpeedMax;
+	if(iSpeed > -defSpeedMin) iSpeed= -defSpeedMin;
+	}
+
+return (iSpeed);
+}
+
 
 
 void function_PositionControl()
@@ -63,46 +82,28 @@ void function_PositionControl()
 				iStep1 = CheckIfNewPosition();
 				break;
 
-		case 1:	iSetInternSpeed = iSetInternSpeed2;
+		case 1:	iSetInternSpeed = CalcSpeedForPosition();
 			    iUmotBoost      = iParUmotBoost * 32;
-				iMotDirection   = 1;  VsqRef1=  1024; VsdRef1 = 512; iTorqueF0 =  500;
+				iMotDirection   = 1;     VsqRef1=  1024;  iTorqueF0 =  500;
 		        iUmotMotor      = iParUmotStart;
 				iPwmOnOff	    = 1;
-				iRampIntegrator = 0;
 				iPulsCountAcc   = iPositionAbsolut;
 				iStep1++;
 				break;
 
-		case 2: iStep1++;
-				iSetInternSpeed = iSetInternSpeed2;
-			    break;
-
-		case 3:	if(iUmotBoost > 0)iUmotBoost--;
-		        iSetInternSpeed = iSetInternSpeed2;
-
-		        if(iActualSpeed >= iSetLoopSpeed)
-		        {
-		       	iPulsCountAcc = iPositionAbsolut;
-		       	iStep1++;
-		        }
+		case 2:	if(iUmotBoost > 0)iUmotBoost--;
+		        iSetInternSpeed = CalcSpeedForPosition();
 		        if(iPositionAbsolut > (iPositionAbsolutNew-10)) iStep1++;
 		        break;
 
-		case 4: iSetInternSpeed = iSetInternSpeed2;
-			    if(iPositionAbsolut > (iPositionAbsolutNew-10)) iStep1++;
-				if(iPositionAbsolut > iPositionDec) iStep1++;
-				break;
-
-		case 5: iSetInternSpeed =	defSpeedMin;
-			    if(iPositionAbsolut > (iPositionAbsolutNew-10)) iStep1++;
-		        break;
-
-		case 6:	iSetInternSpeed = 0;
+		case 3:	iSetInternSpeed = 0;
 			    iCountx 		= 1000;
-				iStep1++;
+				iStep1=6;
 			    break;
 
-		case 7:  if(--iCountx <= 0)
+
+	 //--------------------------------------------------
+		case 6:  if(--iCountx <= 0)
 				 {
 				 iPositionReferenz = iPositionAbsolutNew;
 				 iStep1=0;
@@ -110,28 +111,24 @@ void function_PositionControl()
 				 break;
 
 //----------------------------------------------------------
-		case 10: if(iSetInternSpeed2 < -defSpeedMax)  iSetInternSpeed2= -defSpeedMax;
-				 if(iSetInternSpeed2 > defSpeedMin)   iSetInternSpeed2= -defSpeedMin;
-				 iSetInternSpeed = iSetInternSpeed2;
-
+		case 10: iSetInternSpeed = CalcSpeedForPosition();
 				 iUmotBoost = iParUmotBoost * 32;
 				 iMotDirection = -1;  VsqRef1= -1024; VsdRef1 = 512; iTorqueF0 = -500;
 		         iUmotMotor = iParUmotStart;
 				 iPwmOnOff	= 1;
-				 iRampIntegrator = 0;
 				 iStep1++;
 				 break;
 
 		case 11: if(iUmotBoost > 0)iUmotBoost--;
-		         iSetInternSpeed = iSetInternSpeed2;
+        		 iSetInternSpeed = CalcSpeedForPosition();
 		         if(iPositionAbsolutNew >= iPositionAbsolut) iStep1++;
 		         break;
 
 		case 12: iSetInternSpeed = 0;
-		         iStep1=3;
+		         iStep1=6;
 			     break;
 		//--------------- overcurrent --------------------------
-		case 30:  iPwmOnOff		  = 0;			// error motor stop
+		case 30:  iPwmOnOff		  = 0;					// error motor stop
 				  iStep1++;
 				  break;
 
@@ -141,7 +138,7 @@ void function_PositionControl()
 		 	 	  }
 		 	 	  else
 		 	 	  {
-				  if(iSetLoopSpeed== 0)iStep1=0;     // motor is stopping
+				  if(iSetLoopSpeed== 0)iStep1=0;     	// motor is stopping
 		 	 	  }
 		 	 	  break;
 

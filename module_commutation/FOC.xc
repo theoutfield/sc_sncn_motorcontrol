@@ -46,10 +46,10 @@ void FOC_ClarkeAndPark()
 
 			if(iStep1==0)
 			{
-				VsdRef1 = 0;
-				VsqRef1 = 0;
-				iFieldDiffSum  = 0;
-				iTorqueDiffSum = 0;
+				VsdRef1 		= 0;
+				VsqRef1 		= 0;
+				iFieldDiffSum   = 0;
+				iTorqueDiffSum  = 0;
 			}
 }// end FOC_ClarkeAndPark
 
@@ -78,10 +78,25 @@ int iTemp1;
 }
 
 
+
+
 void FOC_InversPark()
 {
-	VsdRef2 = VsdRef1/ 32;
-	VsqRef2 = VsqRef1/ 32;
+
+#define defVsqRef1Max 180000
+
+		if(VsqRef1 > 0)
+		{
+        if(VsqRef1 > defVsqRef1Max)VsqRef1 = defVsqRef1Max;         // Limit
+		}
+
+		if(VsqRef1 < 0)
+		{
+        if(VsqRef1 < -defVsqRef1Max)VsqRef1 = -defVsqRef1Max;         // Limit
+		}
+
+	VsdRef2 = VsdRef1/ 16;
+	VsqRef2 = VsqRef1/ 16;
 
  //================= invers park transformation =====================
 		VsaRef = VsdRef2 * cosx/16384   - VsqRef2 * sinx/16384;
@@ -218,7 +233,7 @@ void InitParameter(){
 
 void SaveValueToArray()
 {
-	iMotValue[0]  = iUmotProfile*65536 + (iUmotIntegrator/256);
+	iMotValue[0]  = iUmotProfile*65536 + ((iUmotIntegrator/256)& 0xFFFF);
 	iMotValue[1]  = iUmotBoost/256;
 	iMotValue[2]  = iUmotP;
 	iMotValue[3]  = iUmotMotor;

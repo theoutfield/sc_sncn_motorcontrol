@@ -151,24 +151,13 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			if(iUmotResult > iUmotLast) iUmotResult = iUmotLast;
 			iRampBlocked = 1;
 		}
-		if(iStep1 == 0)
-		{
-			iUmotResult = 0;
-			if(iMotHoldingTorque)
-			{
-				iUmotResult = iMotHoldingTorque;
-			}
-		}
 
 
 		if(iActualSpeed >= iParRpmMotorMax)  // Limit Max Speed  +/- vvvvv
 		{
 			if(iUmotResult > iUmotLast) iUmotResult = iUmotLast;
 		}
-		//------------ iUmotMotor follows iUmotResult -----------
-		iUmotLast = iUmotResult;
-		if(iUmotResult > iUmotMotor) iUmotMotor++;
-		if(iUmotResult < iUmotMotor) iUmotMotor--;
+
 
 
 		//=========== calculate iAngleDiffPeriod  only for view ============================
@@ -209,8 +198,19 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			iAngleXXX = iAnglePWMFromFOC - iAnglePWMFromHall;
 			iAnglePWM = iAnglePWMFromFOC;
 		}
+		iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
+
+		if(iStep1 == 0)
+		{
+			iUmotIntegrator = 0;
+			iUmotP			= 0;
+			iUmotResult     = 0;
+			iIqPeriod2		= 0;
+			iIdPeriod2		= 0;
+		}
 
 	   //================== Holding Torque if motor stopped ====================================================
+        if(iUmotResult < iMotHoldingTorque)iUmotResult = iMotHoldingTorque;
 
 		if(iMotHoldingTorque)
 		{
@@ -218,18 +218,18 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			if(iStep1 == 0 )
 			iAnglePWM = iAngleLast; //  + iAngleFromHall  - 600;
 		}
-		iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
 
 		//======================================================================================================
 		//======================================================================================================
 
-		if(iStep1 == 0)
-		{
-			iUmotIntegrator = 0;
-			iUmotP			= 0;
-			iIqPeriod2		= 0;
-			iIdPeriod2		= 0;
-		}
+
+
+		//------------ iUmotMotor follows iUmotResult -----------
+		iUmotLast = iUmotResult;
+		if(iUmotResult > iUmotMotor) iUmotMotor++;
+		if(iUmotResult < iUmotMotor) iUmotMotor--;
+
+
 
 	#ifdef DEBUG_commutation
 /*
