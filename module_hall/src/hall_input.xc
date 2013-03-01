@@ -503,7 +503,7 @@ unsigned char cFlagX=0;
      //==================================================================
 
 
-	#define defPeriodMax 1000000  //1000msec
+	#define defPeriodMax 500000  //500msec
 		if(iCountMicroSeconds > defPeriodMax)
 			{
 			iCountMicroSeconds = defPeriodMax;
