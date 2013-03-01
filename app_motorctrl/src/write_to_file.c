@@ -103,7 +103,8 @@ char cxParameter[32][32]={\
 "31",
 };
 
-char cxText[512];
+char cxText[256];
+
 
 int ReadMotorValue(cmd_data *cc,int iIndex, int iModus)
 {
@@ -122,7 +123,7 @@ int input_cmd(cmd_data *c )
 {
 unsigned char cInput=0;
 int xx;
-char cxText2[64];
+char cxText2[256];
 char chx;
 int iIndex;
 
@@ -162,56 +163,54 @@ int iStepRamp;
 		iStep1        /= 256;
 
 		xx=0;
-		c->iMotInfo[xx+0] = ReadMotorValue(c,0,1);
-		c->iMotInfo[xx+1] = ReadMotorValue(c,0,0);
-		c->iMotInfo[xx+2] = c->iMotValues[1];   	//iUmotBoost
-		c->iMotInfo[xx+3] = c->iMotValues[2];
-		c->iMotInfo[xx+4] = c->iMotValues[3];
-		c->iMotInfo[xx+5] = c->iMotValues[4];
-		c->iMotInfo[xx+6] = iStep1;
-		c->iMotInfo[xx+7] = 0;
+		c->iMotInfo[0] = ReadMotorValue(c,0,1);
+		c->iMotInfo[1] = c->iMotValues[1];   		//iUmotBoost
+		c->iMotInfo[2] = ReadMotorValue(c,0,0);
+		c->iMotInfo[3] = c->iMotValues[2];
+		c->iMotInfo[4] = c->iMotValues[3];
+		c->iMotInfo[5] = c->iMotValues[4];
+		c->iMotInfo[6] = iStep1;
+		c->iMotInfo[7] = 0;
 
 		xx=8;
-		c->iMotInfo[xx+0] = ReadMotorValue(c,6,1);	//SetSpeedUser
-		c->iMotInfo[xx+1] = ReadMotorValue(c,6,0);  //SetSpeedRamp
-		c->iMotInfo[xx+2] = c->iMotValues[7];       //SpeedActual
-		c->iMotInfo[xx+3] = ReadMotorValue(c,8,1);	//diffSpeed1
-		c->iMotInfo[xx+4] = ReadMotorValue(c,8,0);	//diffSpeed2
-		c->iMotInfo[xx+5] = c->iMotValues[10];		//iPositionDec
-		c->iMotInfo[xx+6] = c->iMotValues[11];		//iPulsCountAcc
-		c->iMotInfo[xx+7] = 0;
+		c->iMotInfo[8] = ReadMotorValue(c,6,1);		//SetSpeedUser
+		c->iMotInfo[9] = ReadMotorValue(c,6,0);  	//SetSpeedRamp
+		c->iMotInfo[10] = c->iMotValues[7];       	//SpeedActual
+		c->iMotInfo[11] = ReadMotorValue(c,8,1);	//diffSpeed1
+		c->iMotInfo[12] = ReadMotorValue(c,8,0);	//diffSpeed2
+		c->iMotInfo[13] = c->iMotValues[10];		//iPositionDec
+		c->iMotInfo[14] = c->iMotValues[11];		//iPulsCountAcc
+		c->iMotInfo[15] = 0;
 
 		xx=16;
 		c->iMotInfo[xx+0] = ReadMotorValue(c,12,1);   //  AngleFromHall
 		c->iMotInfo[xx+1] = ReadMotorValue(c,12,0);   //  AnglePWM
 		c->iMotInfo[xx+2] = c->iMotValues[13];		  //  AngleDiffPer
 		c->iMotInfo[xx+3] = c->iMotValues[14];		  //  RampAccValue
-		c->iMotInfo[xx+4] = 0;
+		c->iMotInfo[xx+4] = iStepRamp;
 		c->iMotInfo[xx+5] = 0;
-		c->iMotInfo[xx+6] = 0;
+		c->iMotInfo[xx+6] = c->iMotValues[17];        // VsdRef1
 		c->iMotInfo[xx+7] = 0;
 
 		xx=24;
 		c->iMotInfo[xx+0] = c->iMotValues[18];  //Field_Set
 		c->iMotInfo[xx+1] = c->iMotValues[19];  //Field_Actual
 		c->iMotInfo[xx+2] = c->iMotValues[20];  //Field_Diff
-		c->iMotInfo[xx+3] = c->iMotValues[21];
-		c->iMotInfo[xx+4] = c->iMotValues[22];
-		c->iMotInfo[xx+5] = c->iMotValues[23];
-		c->iMotInfo[xx+6] = 0;
+		c->iMotInfo[xx+3] = c->iMotValues[21];	//TorqueSet
+		c->iMotInfo[xx+4] = c->iMotValues[22];  //Iqperiod2
+		c->iMotInfo[xx+5] = c->iMotValues[23];  //ITorqueDiff2
+		c->iMotInfo[xx+6] = c->iMotValues[16];  // VsqRef1
 		c->iMotInfo[xx+7] = 0;
 
 		xx=32;
-		c->iMotInfo[xx+0] = c->iMotValues[24]; //a1RMS_adc
-		c->iMotInfo[xx+1] = c->iMotValues[25]; //a2RMS_adc
-		c->iMotInfo[xx+2] = c->iMotValues[26]; //VectorCurr
-		c->iMotInfo[xx+3] = c->iMotValues[27]; //VectorInvPark
-		c->iMotInfo[xx+4] = 0;
-		c->iMotInfo[xx+5] = c->iMotValues[29] / 256;  // PinStateHall
-		c->iMotInfo[xx+6] = c->iMotValues[29] & 0xFF; // PinStateEnc
-		c->iMotInfo[xx+7] = 0;
-
-
+		c->iMotInfo[32] = c->iMotValues[24]; //a1RMS_adc
+		c->iMotInfo[33] = c->iMotValues[25]; //a2RMS_adc
+		c->iMotInfo[34] = c->iMotValues[26]; //VectorCurr
+		c->iMotInfo[35] = c->iMotValues[27]; //VectorInvPark
+		c->iMotInfo[36] = 0;
+		c->iMotInfo[37] = c->iMotValues[29] & 0xFF; // PinStateEnc
+		c->iMotInfo[38] = c->iMotValues[29] / 256;  // PinStateHall
+		c->iMotInfo[39] = 0;
 
 		c->iMotInfo[40] = c->iMotValues[30];  //iPositionEncoder
 		c->iMotInfo[41] = c->iMotValues[31];  //iHallPositionAbsolut
