@@ -17,12 +17,12 @@ void    function_SpeedControl()
 				if(iSetInternSpeed != 0) iStep1++;
 				break;
 
-		case 1: // start motor
-			    iStep1++;
-			    if(iSetInternSpeed > 0){iMotDirection =  1; VsdRef1=0; VsqRef1 =  4096;  iTorqueF0 =  500;   }
-				if(iSetInternSpeed < 0){iMotDirection = -1; VsdRef1=0; VsqRef1 = -4096;  iTorqueF0 = -500;   }
-				iPwmOnOff	= 1;
-				break;
+		case 1:  // start motor
+			     iStep1++;
+			     if(iSetInternSpeed > 0){iMotDirection =  1; VsdRef1=0; VsqRef1 =  4096;  iTorqueF0 =  500;   }
+				 if(iSetInternSpeed < 0){iMotDirection = -1; VsdRef1=0; VsqRef1 = -4096;  iTorqueF0 = -500;   }
+				 iPwmOnOff	= 1;
+				 break;
 
 		case 2:  iUmotBoost = iParUmotBoost * 32;
 		         iUmotMotor = iParUmotStart;
@@ -37,7 +37,7 @@ void    function_SpeedControl()
 				 else
 				 {
 			     if(iSetInternSpeed < 0 && iSetSpeedRamp > 0) iStep1=20;  // change direction from plus to minus
-				 if(iSetInternSpeed > 0 && iSetSpeedRamp < 0) iStep1=20;  // change direction from minus to plus
+				 if(iSetInternSpeed > 0 && iSetSpeedRamp < 0) iStep1=25;  // change direction from minus to plus
 				 }
 				 break;
 
@@ -50,7 +50,6 @@ void    function_SpeedControl()
 		case 12: iSetInternSpeed = 0;
 			     if(iSetSpeedRamp == 0 && iCountx++ > 5000) iStep1=0;
 		         break;
-
 		//----------------------------change direction  -----------------------
 		case 20: iTorqueF0 		  =	0;
 			     iSetInternSpeed  = 0;
@@ -59,17 +58,42 @@ void    function_SpeedControl()
                  break;
 		case 21: iSetInternSpeed = 0;
 			     if(iSetSpeedRamp==0)  iStep1++;
+			 	 if(VsqRef1 < 4096) VsqRef1 = 4096;
 		         break;
 		case 22: iSetInternSpeed = 0;
 		 	 	 iUmotIntegrator = 0;
-			     if(iCountx++ > 5000)  iStep1++;  // wait 27 msec
+			     if(iCountx++ > 5000)  iStep1 = 23;  // wait 27 msec
+			 	 if(VsqRef1 < 4096) VsqRef1 = 4096;
+			 	 if(iActualSpeed < 50) iStep1 = 23;
 		         break;
+
+
 		case 23: iIntegralGain    = 0;
 				 iUmotProfile     = 0;
 			     CalcSetInternSpeed(iMotCommand[0]);
 				 iStep1 = 1;		// restart motor
 				 break;
 		//---------------------------------------------------------
+		case 25: iTorqueF0 		  =	0;
+			     iSetInternSpeed  = 0;
+				 iCountx = 0;
+                 iStep1++;
+                 break;
+		case 26: iSetInternSpeed = 0;
+			     if(iSetSpeedRamp==0)  iStep1++;
+			 	 if(VsqRef1 > -4096) VsqRef1 = -4096;
+		         break;
+		case 27: iSetInternSpeed = 0;
+		 	 	 iUmotIntegrator = 0;
+			     if(iCountx++ > 5000)  iStep1=28;  // wait 27 msec
+			     if(VsqRef1 > -4096) VsqRef1 = -4096;
+			     if(iActualSpeed > -50) iStep1 = 28;
+		         break;
+		case 28: iIntegralGain    = 0;
+				 iUmotProfile     = 0;
+			     CalcSetInternSpeed(iMotCommand[0]);
+				 iStep1 = 1;		// restart motor
+				 break;
 
 		//--------------- overcurrent -----------------------------
 		case 30:  iPwmOnOff		  = 0;			// error motor stop
@@ -85,8 +109,8 @@ void    function_SpeedControl()
 				  if(iSetLoopSpeed== 0)iStep1=0;     // motor is stopping
 		 	 	  }
 		 	 	  break;
-		default: iStep1 = 0;
-				break;
+		default:  iStep1 = 0;
+				  break;
 	}
 
 		//===========================================================
@@ -103,17 +127,15 @@ void    function_SpeedControl()
 
 		FOC_FilterDiffValue();
 
-		VsdRef1 += iFieldDiff2  /64;
-		VsqRef1 += iTorqueDiff2 /64;
+		VsdRef1 += iFieldDiff2  /128;
+		VsqRef1 += iTorqueDiff2 /128;
+
 
 		FOC_InversPark();
-
 
 		if(iSpeedValueNew) SpeedControl();
 
 		CalcUmotForSpeed();
-
-
 
 }// end function SpeedControl
 
@@ -202,18 +224,14 @@ void CalcUmotForSpeed()
 
 void CalcRampForSpeed(){
 
+if(iRampBlocked==0)
+{
+  if(iSetInternSpeed >  iSetSpeedRamp) { iSetSpeedRamp += iMotPar[24];  if(iSetSpeedRamp > iSetInternSpeed)  iSetSpeedRamp = iSetInternSpeed;}
 
+  if(iSetInternSpeed <  iSetSpeedRamp) { iSetSpeedRamp -= iMotPar[25];  if(iSetSpeedRamp < iSetInternSpeed)  iSetSpeedRamp = iSetInternSpeed;}
+}
+iRampBlocked = 0;
 
-  //if(iSetInternSpeed == iSetSpeedRamp)	{  return;}
-
-
-  if(iSetInternSpeed >  iSetSpeedRamp)
-      { iSetSpeedRamp += iMotPar[24];
-      if(iSetSpeedRamp > iSetInternSpeed) iSetSpeedRamp = iSetInternSpeed;
-      }
-
-
-if(iSetInternSpeed <  iSetSpeedRamp)  { iSetSpeedRamp -= iMotPar[25];  if(iSetSpeedRamp < iSetInternSpeed) iSetSpeedRamp = iSetInternSpeed; }
 
 iSetSpeedSum -= iSetSpeedNew;
 iSetSpeedSum += iSetSpeedRamp;
@@ -222,13 +240,6 @@ iSetSpeedNew = iSetSpeedSum;
 if(iMotPar[26])
 iSetSpeedNew /= iMotPar[26];   // smoothing factor
 
-
-  iSetLoopSpeed = iSetSpeedNew/65536;
-  iRampBlocked = 0;
-
-  return;
-
-
-
+ iSetLoopSpeed = iSetSpeedNew/65536;
 
 }//end CalcRampForSpeed

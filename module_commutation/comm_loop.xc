@@ -51,7 +51,9 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		{iActualSpeedEncoder, iAngleFromEncoder, iEncoderPositionAbsolut, iPinStateEncoder} = get_encoder_values(c_hall);
 
 		iHallPositionAbsolut -= iHallPositionZero;
-		iPositionAbsolut = iHallPositionAbsolut;
+		iPositionAbsolut      = iHallPositionAbsolut;
+
+		iEncoderPositionAbsolut -= iEncoderPositionZero;
 
 
 		iAngleRotor  = iAngleFromHall & 0x0FFF;
@@ -84,9 +86,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		}
 		iAngleRotorOld = iAngleRotor;
 
-
 		CalcCurrentValues();
-
 
 		//***************** steps ***********************************************************
 
@@ -231,7 +231,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	   	 xscope_probe_data(5,iUmotMotor);
 	   	 xscope_probe_data(6,a1Square/1000);
 */
-		 xscope_probe_data(0,iActualSpeed);
+/*		 xscope_probe_data(0,iActualSpeed);
 		 xscope_probe_data(1,iSetLoopSpeed);
 		 xscope_probe_data(2,iUmotIntegrator/256);
 		 xscope_probe_data(3,iUmotMotor);
@@ -241,17 +241,17 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		 xscope_probe_data(7,iIdPeriod2);
 		 xscope_probe_data(8,iIqPeriod2);
 
-/*		 xscope_probe_data(0,iPhase1);
+*/		 xscope_probe_data(0,iPhase1);
 		 xscope_probe_data(1,iAngleCurrent);
 		 xscope_probe_data(2,iAnglePWM);
 		 xscope_probe_data(3,iAngleRotor);
-		 xscope_probe_data(4,iAngleInvPark);
+		 xscope_probe_data(4,iAngleFromEncoder);
 		 xscope_probe_data(5,iAnglePWMFromHall);
 		 xscope_probe_data(6,iAnglePWMFromFOC);
 		 xscope_probe_data(7,iVectorCurrent);
 		 xscope_probe_data(8,iVectorInvPark);
 		 xscope_probe_data(9,iPhase2);
-*/
+
 	#endif
 		// pwm 13889 * 4 nsec = 55,556µsec  18Khz
 /*
@@ -373,6 +373,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			iMotHoldingTorque       = iMotCommand[7];
 			iPositionAbsolutNew     = iMotCommand[10];
 			iHallPositionZero       = iMotCommand[11];
+			iEncoderPositionZero    = iMotCommand[12];
 		}
 
 		if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }

@@ -2,8 +2,7 @@ int iDiffAngleHall;
 int iAngleXXX;
 int iUmotSquare;
 int iUmotLinear;
-//int iRampAccValue=16;
-//int iRampDecValue=16;
+
 
 int iMotPar[32];
 int iMotValue[32];
@@ -68,6 +67,7 @@ int iPinStateHall;
 int iActualSpeedEncoder;
 int iAngleFromEncoder;
 int iEncoderPositionAbsolut;
+int iEncoderPositionZero=0;
 int iPinStateEncoder;
 //----------------------------
 int iSetValueSpeed	=  0;

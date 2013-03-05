@@ -1,8 +1,7 @@
 #include "varext.h"
 #include "def.h"
 
-#define defSpeedMax  1000*65536
-#define defSpeedMin   150*65536
+
 
 int CheckIfNewPosition();
 void CalcRampForPosition();
@@ -20,20 +19,11 @@ int iTemp1;
 
 	if(iTemp1 > 0 )
 	{
-
-	iPositionAcc     = iPositionReferenz   + iTemp1/3;
-
-	iTemp1 /= 3;
-	if(iTemp1 > 150) iTemp1 = 150;
-	iPositionDec     = iPositionAbsolutNew - iTemp1;
 	return(5);
 	}
 
 	if(iTemp1 < 0 )
 	{
-	//iTemp1 = -iTemp1;
-	iPositionDec     = iPositionAbsolutNew - iTemp1;
-
 	return(10);
 	}
 
@@ -51,19 +41,20 @@ int iSpeed;
 
 	if(iTemp1 > 0)
 	{
-	iSpeed = iTemp1 *65536;
-	if(iSpeed > defSpeedMax) iSpeed= defSpeedMax;
-	if(iSpeed < defSpeedMin) iSpeed= defSpeedMin;
+	iSpeed = iTemp1;
+	if(iSpeed > iMotPar[29])  iSpeed = iMotPar[28];
+//	if(iSpeed > iMotPar[28]) iSpeed= iMotPar[28];       // defParPositionSpeedMax
+	if(iSpeed < iMotPar[29]) iSpeed= iMotPar[29];       // defParPositionSpeedMin
 	}
 
 	if(iTemp1 < 0)
 	{
-	iSpeed = iTemp1 *65536;
-	if(iSpeed < -defSpeedMax) iSpeed= -defSpeedMax;
-	if(iSpeed > -defSpeedMin) iSpeed= -defSpeedMin;
+	iSpeed = iTemp1;
+	if(iSpeed < -iMotPar[28]) iSpeed= -iMotPar[28];
+	if(iSpeed > -iMotPar[29]) iSpeed= -iMotPar[29];
 	}
 
-return (iSpeed);
+return (iSpeed*65536);
 }
 
 
@@ -83,21 +74,20 @@ void function_PositionControl()
 				iStep1++;
 				break;
 
-		case 1: 				iUmotResult      = 0;
-		iSetSpeedRamp    = 0;
-		iSetInternSpeed  = 0;
-		iMotDirection    = 0;
+		case 1: iUmotResult      = 0;
+				iSetSpeedRamp    = 0;
+				iSetInternSpeed  = 0;
+				iMotDirection    = 0;
 			    iStep1 = CheckIfNewPosition();
 		        break;
 
-		case 2:  if(--iCountx <= 0)
-					 {
-					 iPositionReferenz = iPositionAbsolutNew;
-					 iStep1=1;
-					 }
-					 break;
+		case 2: if(--iCountx <= 0)
+				{
+				iPositionReferenz = iPositionAbsolutNew;
+				iStep1=1;
+				}
+				break;
 //-------------------------------------------------------
-
 
 
 
@@ -168,7 +158,7 @@ void function_PositionControl()
 
 
 		//===========================================================
-		CalcRampForSpeed();
+		CalcRampForPosition();
 		//============================== ramp calculation ===========
 
 		FOC_ClarkeAndPark();
@@ -192,3 +182,27 @@ void function_PositionControl()
 		CalcUmotForSpeed();
 
 }
+
+
+
+void CalcRampForPosition(){
+
+if(iRampBlocked==0)
+{
+  if(iSetInternSpeed >  iSetSpeedRamp) { iSetSpeedRamp += iMotPar[24]/4;  if(iSetSpeedRamp > iSetInternSpeed)  iSetSpeedRamp = iSetInternSpeed;}
+
+  if(iSetInternSpeed <  iSetSpeedRamp) { iSetSpeedRamp -= iMotPar[25]/4;  if(iSetSpeedRamp < iSetInternSpeed)  iSetSpeedRamp = iSetInternSpeed;}
+}
+iRampBlocked = 0;
+
+
+iSetSpeedSum -= iSetSpeedNew;
+iSetSpeedSum += iSetSpeedRamp;
+
+iSetSpeedNew = iSetSpeedSum;
+if(iMotPar[26])
+iSetSpeedNew /= iMotPar[26];   // smoothing factor
+
+ iSetLoopSpeed = iSetSpeedNew/65536;
+
+}//end CalcRampForSpeed

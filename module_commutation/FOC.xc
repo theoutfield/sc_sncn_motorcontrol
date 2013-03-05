@@ -101,7 +101,6 @@ void FOC_InversPark()
 		VsaRef = VsdRef2 * cosx/16384   - VsqRef2 * sinx/16384;
 		VsbRef = VsdRef2 * sinx/16384   + VsqRef2 * cosx/16384;
 		iAngleInvPark  = arctg1(VsaRef,VsbRef);           			// from 0 - 4095
-
 }
 
 
@@ -163,18 +162,14 @@ void SetParameterValue()
 	iParDefSpeedMax		=	iMotPar[1];
 	iParRPMreference	=	iMotPar[2];
 	iParAngleUser		=	iMotPar[3];
-	iParAngleFromRPM	=	iMotPar[4];
+
 	iParUmotBoost		=	iMotPar[5];
 	iParUmotStart		=	iMotPar[6];
 	iParSpeedKneeUmot	=	iMotPar[7];
-	iMotPar[8]	= 0;
-	iMotPar[9]  = 0;
+
 	iParRMS_RampLimit  	=   iMotPar[10];
 	iParRMS_PwmOff      =   iMotPar[11];
-	iMotPar[12] = 0;
-	iMotPar[13] = 0;
-	iMotPar[14] = 0;
-	iMotPar[15] = 0;
+
 	iParHysteresisPercent	=	iMotPar[16];
 	iParDiffSpeedMax		=	iMotPar[17];
 	iParUmotIntegralLimit	=	iMotPar[18];
@@ -188,34 +183,26 @@ void InitParameter(){
 	iMotPar[1]  = defParDefSpeedMax;
 	iMotPar[2]  = defParRPMreference;
 	iMotPar[3]  = defParAngleUser;
-	iMotPar[4]  = defParAngleFromRPM;
+
 	iMotPar[5]  = defParUmotBoost;
 	iMotPar[6]  = defParUmotStart;
 	iMotPar[7]  = defParSpeedKneeUmot;
-	iMotPar[8]  = 0;
-	iMotPar[9]  = 0;
+
 	iMotPar[10] = defParRmsLimit;				// ramp control
 	iMotPar[11] = defParRmsMaxPwmOff;
-	iMotPar[12] = 0;
-	iMotPar[13] = 0;
-	iMotPar[14] = 0;
-	iMotPar[15] = 0;
+
 	iMotPar[16] = defParHysteresisPercent;
 	iMotPar[17] = defParDiffSpeedMax;
 	iMotPar[18] = defParUmotIntegralLimit;
 	iMotPar[19] = defParPropGain;
 	iMotPar[20] = defParIntegralGain;
-	iMotPar[21] = 0;
-	iMotPar[22] = 0;
-	iMotPar[23] = 0;
+
 	iMotPar[24] = defRampAcc;
 	iMotPar[25] = defRampDec;
 	iMotPar[26] = defRampSmoothFactor;
-	iMotPar[27] = 0;
-	iMotPar[28] = 0;
-	iMotPar[29] = 0;
-	iMotPar[30] = 0;
-	iMotPar[31] = 0;
+
+	iMotPar[28] = defParPositionSpeedMax;
+	iMotPar[29] = defParPositionSpeedMin;
 }
 
 
@@ -261,10 +248,4 @@ void SaveValueToArray()
 	iMotValue[31] = iHallPositionAbsolut;
 }
 
-/*
- *
- *
-int iHallPositionAbsolutNew;
-int iPositionAcc;
-int iPositionDec;
-*/
+
