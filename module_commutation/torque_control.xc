@@ -49,15 +49,23 @@ void    function_TorqueControl()
 
 		FOC_FilterDiffValue();
 
+		iFieldIntegral += iFieldDiff2  /16;
+		iFieldProp      = iFieldDiff2  /64;
 
-		VsdRef1 += iFieldDiff2  /8;
-		VsqRef1 += iTorqueDiff2 /8;					// FOC torque-control
+		VsdRef1 = iFieldIntegral + iFieldProp;
 
+		iTorqIntegral += iTorqueDiff2 / 16;
+		iTorqProp      = iTorqueDiff2 / 64;
+
+		VsqRef1 = iTorqIntegral + iTorqProp;
+
+
+	//	VsdRef1 += iFieldDiff2  /32;
+	//	VsqRef1 += iTorqueDiff2 /32;					// FOC torque-control
 
 		FOC_InversPark();
 
-
-		iUmotResult = iVectorInvPark/2;		// FOC torque-control
+		iUmotResult = iVectorInvPark/4;		 // FOC torque-control
 		if(iUmotResult > 4096) iUmotResult = 4096;
 
 

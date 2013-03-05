@@ -22,13 +22,12 @@ extern out port p_ifm_shared_leds_wden;  // XS1_PORT_4B; /* BlueGreenRed_Green *
 #endif
 
 unsigned char cLeds;
-int iPositionZero=0;
+int iHallPositionZero=0;
 
 void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue)
 {
 	unsigned cmd1;
 	unsigned cmd2;
-	int iTemp,iTemp1=0;
 	unsigned char cFlag=0;
 
     //-------------- init values --------------
@@ -36,8 +35,8 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	SetParameterValue();
 
 	 //================== pwmloop ========================
-	while (1)
-	{
+		while (1)
+		{
 		#ifdef DEBUG_commutation
 			cFlag |= 1;
 			#ifdef DC900
@@ -45,54 +44,45 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			#endif
 		#endif
 
-		//============= rotor position  from hall ===============================
-		iLoopCount++;
-		iLoopCount &= 0x0F;
-		switch(iLoopCount & 0x03)
-		{
-			case 0: iPositionAbsolut  = get_hall_absolute_pos(c_hall);
-			        iPositionAbsolut -= iPositionZero;
-					break;
-			case 1: iPinStateHall    = get_hall_pinstate(c_hall);
-					break;
-			case 2: iPinStateEncoder = get_encoder_pinstate(c_hall);
-					break;
-			case 3: iPositionEncoder = get_encoder_position(c_hall);
-					break;
-		}
+		//============================== rotor position  from hall ================================================
+
+		{iActualSpeedHall, iAngleFromHall, iHallPositionAbsolut, iPinStateHall}             = get_hall_values(c_hall);
+
+		{iActualSpeedEncoder, iAngleFromEncoder, iEncoderPositionAbsolut, iPinStateEncoder} = get_encoder_values(c_hall);
+
+		iHallPositionAbsolut -= iHallPositionZero;
+		iPositionAbsolut = iHallPositionAbsolut;
 
 
-		iActualSpeed     =  get_hall_speed(c_hall);
-		iAngleFromHall   = 	get_hall_angle(c_hall);
-		iAngleFromHall  &=  0x0FFF;
+		iAngleRotor  = iAngleFromHall & 0x0FFF;
+		iActualSpeed = iActualSpeedHall;
 
 		iSpeedValueNew   = iActualSpeed & 0xFF000000;   				// extract info if SpeedValue is new
 		iActualSpeed    &= 0x00FFFFFF;
-		if(iActualSpeed & 0x00FF0000)
+		if(iActualSpeed  & 0x00FF0000)
 			iActualSpeed |= 0xFFFF0000;   							    // expand value if negativ
 
 
 		if(iActualSpeed > 0)
 		{
-			if(iAngleFromHallOld > 2048  && iAngleFromHall < 2048)
+			if(iAngleRotorOld > 2048  && iAngleRotor < 2048)
 			cTriggerPeriod = 0xFF;
 		}
 		if(iActualSpeed < 0)
 		{
-			if(iAngleFromHallOld < 2048  && iAngleFromHall > 2048)
+			if(iAngleRotorOld < 2048  && iAngleRotor > 2048)
 			cTriggerPeriod = 0x7F;
 		}
 
 
-		if(iAngleFromHall != iAngleFromHallOld)
+		if(iAngleRotor != iAngleRotorOld)
 		{
-			if(iAngleFromHall > iAngleFromHallOld)
-				iDiffAngleHall = iAngleFromHall - iAngleFromHallOld;
+			if(iAngleRotor > iAngleRotorOld)
+				iDiffAngleHall = iAngleRotor - iAngleRotorOld;
 			else
-				iDiffAngleHall = (iAngleFromHall +4096) - iAngleFromHallOld;
+				iDiffAngleHall = (iAngleRotor +4096) - iAngleRotorOld;
 		}
-
-		iAngleFromHallOld = iAngleFromHall;
+		iAngleRotorOld = iAngleRotor;
 
 
 		CalcCurrentValues();
@@ -112,9 +102,9 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		default: iControlFOC=0; break;
 		}
 
-
-
-		switch(iLoopCount & 0x03)
+		iLoopCount++;
+		iLoopCount &= 0x03;
+		switch(iLoopCount)
 		{
 			case 0:	iVectorInvPark = VsaRef * VsaRef + VsbRef * VsbRef;
 					iVectorInvPark = root_function(iVectorInvPark);
@@ -165,12 +155,12 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iAngleDiff = 0;
 		if(iActualSpeed > 0)
 		{
-			iAngleDiff = iAngleCurrent - iAngleFromHall;
+			iAngleDiff = iAngleCurrent - iAngleRotor;
 			if(iAngleDiff < 0)iAngleDiff += 4096;
 		}
 		if(iActualSpeed < 0)
 		{
-			iAngleDiff = iAngleFromHall - iAngleCurrent;
+			iAngleDiff = iAngleRotor - iAngleCurrent;
 			if(iAngleDiff < 0)iAngleDiff += 4096;
 		}
 		iAngleDiffSum += iAngleDiff;
@@ -191,7 +181,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	//============================= set angle for pwm ============================================
 		if (iMotDirection !=  0)
 		{
-			iAnglePWMFromHall = iAngleFromHall + iParAngleUser ;
+			iAnglePWMFromHall = iAngleRotor + iParAngleUser ;
 			iAnglePWMFromHall &= 0x0FFF;
 			iAnglePWMFromFOC  = iAngleInvPark + (4096 - 1020) + iParAngleUser;
 			iAnglePWMFromFOC  &= 0x0FFF;
@@ -216,7 +206,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		{
 			if(iStep1 != 0) iAngleLast = iAnglePWM;
 			if(iStep1 == 0 )
-			iAnglePWM = iAngleLast; //  + iAngleFromHall  - 600;
+			iAnglePWM = iAngleLast; //  + iAngleRotor  - 600;
 		}
 
 		//======================================================================================================
@@ -236,7 +226,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	 	 xscope_probe_data(0,iPhase1);
 	 	 xscope_probe_data(1,a1RMS);
 	 	 xscope_probe_data(2,iSetLoopSpeed);
-	 	 xscope_probe_data(3,iAngleFromHall);
+	 	 xscope_probe_data(3,iAngleRotor);
 	 	 xscope_probe_data(4,iAngleCurrent);
 	   	 xscope_probe_data(5,iUmotMotor);
 	   	 xscope_probe_data(6,a1Square/1000);
@@ -254,7 +244,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 /*		 xscope_probe_data(0,iPhase1);
 		 xscope_probe_data(1,iAngleCurrent);
 		 xscope_probe_data(2,iAnglePWM);
-		 xscope_probe_data(3,iAngleFromHall);
+		 xscope_probe_data(3,iAngleRotor);
 		 xscope_probe_data(4,iAngleInvPark);
 		 xscope_probe_data(5,iAnglePWMFromHall);
 		 xscope_probe_data(6,iAnglePWMFromFOC);
@@ -344,7 +334,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 					    }
 
 				else if(cmd2 >= 64 && cmd2 < 96)  { c_motvalue <: iMotPar[cmd2-64]; 	}
-				else if(cmd2 >= 96 && cmd2 < 128) { c_motvalue :> iMotPar[iTemp-96]; iUpdateFlag=1;}
+				else if(cmd2 >= 96 && cmd2 < 128) { c_motvalue :> iMotPar[cmd2-96]; iUpdateFlag=1;}
 				break;
 				default:	break;
 		}// end select
@@ -362,9 +352,9 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		    		c_commutation :> iMotCommand[cmd1+2];
 		    		c_commutation :> iMotCommand[cmd1+3];
 					}
-				else if(cmd1 >= 32 && cmd1 < 64)  { iTemp = (int) cmd1; c_commutation <: iMotValue[iTemp-32]; 	}
-				else if(cmd1 >= 64 && cmd1 < 96)  { iTemp = (int) cmd1; c_commutation <: iMotPar[iTemp-64]; 	}
-				else if(cmd1 >= 96 && cmd1 < 128) { iTemp = (int) cmd1; c_commutation :> iTemp1;  iMotPar[iTemp-96] = iTemp1; iUpdateFlag=1;}
+				else if(cmd1 >= 32 && cmd1 < 64)  {  c_commutation <: iMotValue[cmd1-32]; 	}
+				else if(cmd1 >= 64 && cmd1 < 96)  {  c_commutation <: iMotPar[cmd1-64]; 	}
+				else if(cmd1 >= 96 && cmd1 < 128) {  c_commutation :> iMotPar[cmd1-96]; iUpdateFlag=1;}
 				break;
 			default: break;
 		}// end select
@@ -382,7 +372,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			iTorqueSet  		    = iMotCommand[6];
 			iMotHoldingTorque       = iMotCommand[7];
 			iPositionAbsolutNew     = iMotCommand[10];
-			iPositionZero           = iMotCommand[11];
+			iHallPositionZero       = iMotCommand[11];
 		}
 
 		if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }

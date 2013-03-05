@@ -2,8 +2,8 @@ int iDiffAngleHall;
 int iAngleXXX;
 int iUmotSquare;
 int iUmotLinear;
-int iRampAccValue=16;
-int iRampDecValue=16;
+//int iRampAccValue=16;
+//int iRampDecValue=16;
 
 int iMotPar[32];
 int iMotValue[32];
@@ -56,31 +56,40 @@ int iAngleDiffPeriod;
 int iPowerMotor = 0;
 int iStep1 =0;
 int iMotHoldingTorque=0;
-int iParAngleCorrVal;
-int iParAngleCorrMax;
-
-int iPositionEncoder;
+int iAngleRotor;
+//int iParAngleCorrVal;
+//int iParAngleCorrMax;
+//------------- values from hall_input.xc ---------
+int iActualSpeedHall;
+int iAngleFromHall;
+int iHallPositionAbsolut;
 int iPinStateHall;
-int iPinStateEncoder=0;
+
+int iActualSpeedEncoder;
+int iAngleFromEncoder;
+int iEncoderPositionAbsolut;
+int iPinStateEncoder;
 //----------------------------
 int iSetValueSpeed	=  0;
 int iSetInternSpeed	=  0;
 int iSetInternSpeed2=  0;
 int iSetSpeedRamp  	=  0;
+int iSetSpeedSum    =  0;
+int iSetSpeedNew    = 0;
 int iMotDirection  	=  0;
 int iControlFOC   	=  1;
 //=======================================================
 int iCountx;
-int iStepRamp=0;
-int iSpeedSmoothed;
+//int iStepRamp=0;
+
 
 int iUmotBoost  = 0;
 int iUmotResult = 0;
 int iUmotLast   = 0;
 int iRampBlocked  = 0;
-int iIndexPWM, iAngleFromHallOld=0;
-int iAngleFromHall  = 0;
-int iAngleFromRpm   = 0;
+int iIndexPWM;
+int iAngleRotorOld=0;
+
 int iAnglePWM;
 int iAnglePWMFromHall;
 int iAnglePWMFromFOC;
@@ -109,6 +118,9 @@ int iId;
 int iIdPeriod;
 int iIq;
 int iIqPeriod;
+int iFieldIntegral,iFieldProp;
+int iTorqIntegral,iTorqProp;
+
 int VsdRef1, VsqRef1;		// invers park
 int VsdRef2, VsqRef2;		// invers park
 int VsaRef, VsbRef;

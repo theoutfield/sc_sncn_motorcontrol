@@ -82,7 +82,6 @@ int iTemp1;
 
 void FOC_InversPark()
 {
-
 #define defVsqRef1Max 180000
 
 		if(VsqRef1 > 0)
@@ -95,8 +94,8 @@ void FOC_InversPark()
         if(VsqRef1 < -defVsqRef1Max)VsqRef1 = -defVsqRef1Max;         // Limit
 		}
 
-	VsdRef2 = VsdRef1/ 16;
-	VsqRef2 = VsqRef1/ 16;
+	VsdRef2 = VsdRef1/ 8;
+	VsqRef2 = VsqRef1/ 8;
 
  //================= invers park transformation =====================
 		VsaRef = VsdRef2 * cosx/16384   - VsqRef2 * sinx/16384;
@@ -168,8 +167,8 @@ void SetParameterValue()
 	iParUmotBoost		=	iMotPar[5];
 	iParUmotStart		=	iMotPar[6];
 	iParSpeedKneeUmot	=	iMotPar[7];
-	iParAngleCorrVal   	=   iMotPar[8];
-	iParAngleCorrMax    =	iMotPar[9];
+	iMotPar[8]	= 0;
+	iMotPar[9]  = 0;
 	iParRMS_RampLimit  	=   iMotPar[10];
 	iParRMS_PwmOff      =   iMotPar[11];
 	iMotPar[12] = 0;
@@ -181,17 +180,6 @@ void SetParameterValue()
 	iParUmotIntegralLimit	=	iMotPar[18];
 	iParPropGain			= 	iMotPar[19];
 	iParIntegralGain		=  	iMotPar[20];
-	iMotPar[21] = 0;
-	iMotPar[22] = 0;
-	iMotPar[23] = 0;
-	iMotPar[24] = 0;
-	iMotPar[25] = 0;
-	iMotPar[26] = 0;
-	iMotPar[27] = 0;
-	iMotPar[28] = 0;
-	iMotPar[29] = 0;
-	iMotPar[30] = 0;
-	iMotPar[31] = 0;
 }
 
 //=================== default value =====================
@@ -199,14 +187,13 @@ void InitParameter(){
 	iMotPar[0]  = defParRpmMotorMax;
 	iMotPar[1]  = defParDefSpeedMax;
 	iMotPar[2]  = defParRPMreference;
-
 	iMotPar[3]  = defParAngleUser;
 	iMotPar[4]  = defParAngleFromRPM;
 	iMotPar[5]  = defParUmotBoost;
 	iMotPar[6]  = defParUmotStart;
 	iMotPar[7]  = defParSpeedKneeUmot;
-	iMotPar[8]  = defParAngleCorrVal;
-	iMotPar[9]  = defParAngleCorrMax;
+	iMotPar[8]  = 0;
+	iMotPar[9]  = 0;
 	iMotPar[10] = defParRmsLimit;				// ramp control
 	iMotPar[11] = defParRmsMaxPwmOff;
 	iMotPar[12] = 0;
@@ -218,18 +205,19 @@ void InitParameter(){
 	iMotPar[18] = defParUmotIntegralLimit;
 	iMotPar[19] = defParPropGain;
 	iMotPar[20] = defParIntegralGain;
-	iMotPar[21] = 0;  	//
-	iMotPar[22] = 0;  	//
-	iMotPar[23] = 0;  	//
-	iMotPar[24] = 0;  	//
-	iMotPar[25] = 0;  	//
-	iMotPar[26] = 0;  	//
-	iMotPar[27] = 0;  	//
-	iMotPar[28] = 0;  	//
-	iMotPar[29] = 0;  	//
-	iMotPar[30] = 0;  	//
+	iMotPar[21] = 0;
+	iMotPar[22] = 0;
+	iMotPar[23] = 0;
+	iMotPar[24] = defRampAcc;
+	iMotPar[25] = defRampDec;
+	iMotPar[26] = defRampSmoothFactor;
+	iMotPar[27] = 0;
+	iMotPar[28] = 0;
+	iMotPar[29] = 0;
+	iMotPar[30] = 0;
 	iMotPar[31] = 0;
 }
+
 
 void SaveValueToArray()
 {
@@ -238,9 +226,9 @@ void SaveValueToArray()
 	iMotValue[2]  = iUmotP;
 	iMotValue[3]  = iUmotMotor;
 	iMotValue[4]  = iMotHoldingTorque;
-	iMotValue[5]  = iControlFOC  + (iStep1 * 256)  + ((iMotDirection & 0xFF) + iStepRamp*256) *65536;
+	iMotValue[5]  = iControlFOC  + (iStep1 * 256)  + ((iMotDirection & 0xFF)) *65536;
 
-	iMotValue[6]  = (iSetInternSpeed & 0xFFFF0000) + (iSetSpeedRamp/65536);
+	iMotValue[6]  = (iSetInternSpeed & 0xFFFF0000) + iSetLoopSpeed;  //(iSetSpeedRamp/65536);
 	iMotValue[7]  = iActualSpeed;
 	iMotValue[8]  = idiffSpeed*65536 + (idiffSpeed2 & 0xFFFF);
 	iMotValue[9]  = iPositionAbsolutNew;
@@ -248,9 +236,9 @@ void SaveValueToArray()
 	iMotValue[11] = iPulsCountAcc;
 
 
-	iMotValue[12] = (iAngleFromHall*65536) + iAnglePWM;
+	iMotValue[12] = (iAngleRotor*65536) + iAnglePWM;
 	iMotValue[13] = iAngleDiffPeriod;
-	iMotValue[14] = iRampAccValue;
+	iMotValue[14] = 0;
 	iMotValue[15] = 0;
 	iMotValue[16] = VsqRef1;
 	iMotValue[17] = VsdRef1;
@@ -269,8 +257,8 @@ void SaveValueToArray()
 	iMotValue[28] = 0;
 
 	iMotValue[29] = (iPinStateHall*256)  + (iPinStateEncoder & 0xFF);
-	iMotValue[30] = iPositionEncoder;
-	iMotValue[31] = iPositionAbsolut;
+	iMotValue[30] = iEncoderPositionAbsolut;
+	iMotValue[31] = iHallPositionAbsolut;
 }
 
 /*
