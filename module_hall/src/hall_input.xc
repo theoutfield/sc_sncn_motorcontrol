@@ -355,7 +355,6 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   int iTimeCountOneTransition=0;
   int iTimeSaveOneTransition=0;
 
-
   unsigned iHallStateNew;			// newest hall state
   unsigned iHallStateNew_last;
   unsigned new1,new2;
@@ -382,7 +381,8 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   int iEncoderDirection =0;
   int iEncoderNext=0;
   int iEncoderPrevious=0;
-unsigned char cFlagX=0;
+  int iEncoderAngle = 0;
+  unsigned char cFlagX=0;
 
   tx :> ts;  // first value
 
@@ -437,9 +437,10 @@ unsigned char cFlagX=0;
 
 	 if(iEncoderStateOld != iEncoderStateNew)
 	 {
-
-		 if(iEncoderStateNew == iEncoderNext)    {iEncoderPosAbsolut++; iEncoderDirection =  1;  }
-	     if(iEncoderStateNew == iEncoderPrevious){iEncoderPosAbsolut--; iEncoderDirection = -1;  }
+		 if(iEncoderStateNew == iEncoderNext)    {iEncoderPosAbsolut--; iEncoderAngle-= POLE_PAIRS; iEncoderDirection =  -1;  }
+	     if(iEncoderStateNew == iEncoderPrevious){iEncoderPosAbsolut++; iEncoderAngle+= POLE_PAIRS; iEncoderDirection =  +1;  }
+         if(iEncoderReferenz)iEncoderAngle=0;
+         iEncoderAngle &= 0x0FFF;
 
 	      switch(iEncoderStateNew)
 	  	  {
@@ -452,8 +453,6 @@ unsigned char cFlagX=0;
 	  	  }
 	      iEncoderStateOld = iEncoderStateNew;
 	 }
-
-
 
 	  iCountMicroSeconds++;   		// period in µsec
 	  iTimeCountOneTransition++;
@@ -603,7 +602,7 @@ unsigned char cFlagX=0;
 			 	 	 	 	 	 }
 			 else if  (cmd == 9) {
 				 	 	 	 	  c_hall <: iHallActualSpeed;   iHallActualSpeed &= 0x00FFFFFF;
-				 			 	  c_hall <: iHallAngle2;
+				 			 	  c_hall <: iEncoderAngle;
 				 			 	  c_hall <: iEncoderPosAbsolut;
 				 			 	  c_hall <: iEncoderPinState + iEncoderReferenz*10;
 			 	 	 	 	 	 }
