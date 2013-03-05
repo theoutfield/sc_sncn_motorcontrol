@@ -24,7 +24,11 @@
  *
  *  \param c_hall the channel for communicating with the hall server
  */
-//{unsigned, unsigned, unsigned} get_hall_pos_speed_delta( chanend c_hall );
+
+{int, int, int, int} get_hall_values(chanend c_hall);
+
+{int, int, int, int} get_encoder_values(chanend c_hall);
+
 
 int32_t get_hall_speed(chanend c_hall);
 
@@ -39,4 +43,8 @@ unsigned get_encoder_pinstate(chanend c_hall);
 int32_t  get_encoder_position(chanend c_hall);
 
 inline void hall_encoder(chanend pos_ctrl, chanend pos_data);
+
+
+
+
 

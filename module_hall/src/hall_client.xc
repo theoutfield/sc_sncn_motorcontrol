@@ -23,6 +23,40 @@
 #include "refclk.h"
 #include "dc_motor_config.h"
 
+{int, int, int, int} get_hall_values(chanend c_hall)
+{
+int speed;
+int angle;
+int position;
+int pinstate;
+
+c_hall <: 8;
+c_hall :> speed;
+c_hall :> angle;
+c_hall :> position;
+c_hall :> pinstate;
+
+return { speed, angle, position, pinstate };
+}
+
+
+{int, int, int, int} get_encoder_values(chanend c_hall)
+{
+	int speed;
+	int angle;
+	int position;
+	int pinstate;
+
+	c_hall <: 9;
+	c_hall :> speed;
+	c_hall :> angle;
+	c_hall :> position;
+	c_hall :> pinstate;
+
+	return { speed, angle, position, pinstate };
+}
+
+
 int32_t get_encoder_position(chanend c_hall)
 {
 	int32_t pos;
@@ -59,6 +93,8 @@ unsigned get_hall_absolute_pos(chanend c_hall)
 
   return pos;
 }
+
+
 
 int32_t get_hall_speed(chanend c_hall)
 {

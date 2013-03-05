@@ -140,6 +140,7 @@ tx :> ts;  // first value
               break;
 
 
+//======================== write commands to xmos =================================
  	  case 10:  iIndex1=0;
  	            iIndex2=4;
  	            while(iIndex1 < 16)
@@ -182,6 +183,35 @@ tx :> ts;  // first value
  	            cTxFlag = 'P';
  		        iStep=51;
  		        break;
+
+
+
+ // =============00 'X'  write parameter to xmos 	=========================
+	  case 30:  iIndex1=0;
+ 	            iIndex2=4;
+ 	            while(iIndex1 < 32)
+ 	            {
+ 	            uTemp =  cxRxBuf[iIndex2++];  uTemp = uTemp << 8;
+ 	            uTemp += cxRxBuf[iIndex2++];  uTemp = uTemp << 8;
+ 	            uTemp += cxRxBuf[iIndex2++];  uTemp = uTemp << 8;
+ 	            uTemp += cxRxBuf[iIndex2++];
+ 	            uMotorParameter[iIndex1++] = uTemp;
+ 	            }
+ 	            iStep++;
+ 	            break;
+
+ 	  case 31:  iIndex1=0;
+ 	  	  	  	while(iIndex1 < 32)
+ 	            {
+ 		        c_motvalue <: (iIndex1+96);
+ 	  	  	  	c_motvalue <: uMotorParameter[iIndex1];
+ 	  	  	  	iIndex1++;
+ 	            }
+           	   	iStep=20;  // next step readout parameter
+ 	            break;
+ //========================================================================
+
+
 
      case 40:	iIndex1 =  0;				// read motor values from XMOS ==> PC
      	 	 	while(iIndex1 < 32)
@@ -308,8 +338,8 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   unsigned cmd;
   int iTemp;
 
-  int angle1;		        // newest angle (base angle on hall state transition)
-  int angle2;
+  int iHallAngle1;		        // newest angle (base angle on hall state transition)
+  int iHallAngle2;
   int delta_angle;
   int iAngleLast;
   int iAngleDiff;
@@ -331,7 +361,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   unsigned new1,new2;
   unsigned uHallNext,uHallPrevious;
   int xreadings  =0;
-  int iPosAbsolut=0;
+  int iHallPosAbsolut=0;
   int iHallError=0;
   int iHalldirection    = 0;
   int iNrHallPulses     = 1;
@@ -348,7 +378,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   int iEncoderStateNew;
   int iEncoderStateOld;
   int iEncoderError		=0;
-  int iPosEncoder		=0;
+  int iEncoderPosAbsolut		=0;
   int iEncoderDirection =0;
   int iEncoderNext=0;
   int iEncoderPrevious=0;
@@ -408,8 +438,8 @@ unsigned char cFlagX=0;
 	 if(iEncoderStateOld != iEncoderStateNew)
 	 {
 
-		 if(iEncoderStateNew == iEncoderNext)    {iPosEncoder++; iEncoderDirection =  1;  }
-	     if(iEncoderStateNew == iEncoderPrevious){iPosEncoder--; iEncoderDirection = -1;  }
+		 if(iEncoderStateNew == iEncoderNext)    {iEncoderPosAbsolut++; iEncoderDirection =  1;  }
+	     if(iEncoderStateNew == iEncoderPrevious){iEncoderPosAbsolut--; iEncoderDirection = -1;  }
 
 	      switch(iEncoderStateNew)
 	  	  {
@@ -431,8 +461,8 @@ unsigned char cFlagX=0;
 
       if(iHallStateNew != iHallStateNew_last)
       {
- 	      if(iHallStateNew == uHallNext)    {iPosAbsolut++; iHalldirection = 1;  }
-	      if(iHallStateNew == uHallPrevious){iPosAbsolut--; iHalldirection =-1;  }
+ 	      if(iHallStateNew == uHallNext)    {iHallPosAbsolut++; iHalldirection = 1;  }
+	      if(iHallStateNew == uHallPrevious){iHallPosAbsolut--; iHalldirection =-1;  }
 
 	      //if(iHalldirection >= 0) // CW  3 2 6 4 5 1
 
@@ -446,12 +476,12 @@ unsigned char cFlagX=0;
 
 	      switch(iHallStateNew)
 	  	  {
-			  case defHallState0: angle1 =     0;  uHallNext=defHallState1; uHallPrevious=defHallState5;  break;
-			  case defHallState1: angle1 =   682;  uHallNext=defHallState2; uHallPrevious=defHallState0;  break;   //  60
-			  case defHallState2: angle1 =  1365;  uHallNext=defHallState3; uHallPrevious=defHallState1;  break;
-			  case defHallState3: angle1 =  2048;  uHallNext=defHallState4; uHallPrevious=defHallState2;  break;   // 180
-			  case defHallState4: angle1 =  2730;  uHallNext=defHallState5; uHallPrevious=defHallState3;  break;
-			  case defHallState5: angle1 =  3413;  uHallNext=defHallState0; uHallPrevious=defHallState4;  break;   // 300 degree
+			  case defHallState0: iHallAngle1 =     0;  uHallNext=defHallState1; uHallPrevious=defHallState5;  break;
+			  case defHallState1: iHallAngle1 =   682;  uHallNext=defHallState2; uHallPrevious=defHallState0;  break;   //  60
+			  case defHallState2: iHallAngle1 =  1365;  uHallNext=defHallState3; uHallPrevious=defHallState1;  break;
+			  case defHallState3: iHallAngle1 =  2048;  uHallNext=defHallState4; uHallPrevious=defHallState2;  break;   // 180
+			  case defHallState4: iHallAngle1 =  2730;  uHallNext=defHallState5; uHallPrevious=defHallState3;  break;
+			  case defHallState5: iHallAngle1 =  3413;  uHallNext=defHallState0; uHallPrevious=defHallState4;  break;   // 300 degree
 			  default: iHallError++; break;
 	  	  }
 
@@ -494,10 +524,10 @@ unsigned char cFlagX=0;
        iHallStateNew_last  	   = iHallStateNew;
 
         if(iHalldirection==1){
-    	if(angle1 < 1024 && iAngleLast > 3072)
-    		iAngleDiff  = (angle1 + 4096) - iAngleLast;
+    	if(iHallAngle1 < 1024 && iAngleLast > 3072)
+    		iAngleDiff  = (iHallAngle1 + 4096) - iAngleLast;
     	else
-    		iAngleDiff  = angle1 - iAngleLast;
+    		iAngleDiff  = iHallAngle1 - iAngleLast;
        }
       }// end (iHallStateNew != iHallStateNew_last
      //==================================================================
@@ -543,11 +573,11 @@ unsigned char cFlagX=0;
 
 	  if(iTimeCountOneTransition > 50000) iHalldirection = 0;
 
-	  angle2 = angle1;
-      if(iHalldirection == 1)  angle2 += delta_angle;
-      if(iHalldirection == -1) angle2 -= delta_angle;
-      angle2 &= 0x0FFF;    // 4095
-      iAngleLast  = angle2;
+	  iHallAngle2 = iHallAngle1;
+      if(iHalldirection == 1)  iHallAngle2 += delta_angle;
+      if(iHalldirection == -1) iHallAngle2 -= delta_angle;
+      iHallAngle2 &= 0x0FFF;    // 4095
+      iAngleLast  = iHallAngle2;
 
 
 
@@ -558,13 +588,25 @@ unsigned char cFlagX=0;
 
  	    select {
 			case c_hall :> cmd:
-				  if  (cmd == 1) { c_hall <: angle2; }
+				  if  (cmd == 1) { c_hall <: iHallAngle2; }
 			 else if  (cmd == 2) { c_hall <: iHallActualSpeed;   iHallActualSpeed &= 0x00FFFFFF; }
-			 else if  (cmd == 3) { c_hall <: iPosAbsolut;  		}
+			 else if  (cmd == 3) { c_hall <: iHallPosAbsolut;  		}
 			 else if  (cmd == 4) { c_hall <: iHallError;   		}
 			 else if  (cmd == 5) { c_hall <: iHallStateNew;   	}
-			 else if  (cmd == 6) { c_hall <: iEncoderPinState;  }
-			 else if  (cmd == 7) { c_hall <: iPosEncoder;   	}
+			 else if  (cmd == 6) { c_hall <: iEncoderPinState + iEncoderReferenz*10; }
+			 else if  (cmd == 7) { c_hall <: iEncoderPosAbsolut;   	}
+
+			 else if  (cmd == 8) { c_hall <: iHallActualSpeed;   iHallActualSpeed &= 0x00FFFFFF;
+			 	 	 	 	 	   c_hall <: iHallAngle2;
+			 	 	 	 	 	   c_hall <: iHallPosAbsolut;
+			 	 	 	 	 	   c_hall <: iHallStateNew;
+			 	 	 	 	 	 }
+			 else if  (cmd == 9) {
+				 	 	 	 	  c_hall <: iHallActualSpeed;   iHallActualSpeed &= 0x00FFFFFF;
+				 			 	  c_hall <: iHallAngle2;
+				 			 	  c_hall <: iEncoderPosAbsolut;
+				 			 	  c_hall <: iEncoderPinState + iEncoderReferenz*10;
+			 	 	 	 	 	 }
 			break;
 			default:
 			  break;
