@@ -331,8 +331,16 @@ void adc_ad7949_triggered( chanend c_adc,
 
 			case c_adc :> cmd:
 				master {
-					c_adc <: adc_data_a[4]; 		//- ia_calibr;
-					c_adc <: adc_data_b[4]; 		// - ib_calibr;
+					c_adc <: adc_data_a[4]; 		//  - ia_calibr;
+					c_adc <: adc_data_b[4]; 		//  - ib_calibr;
+					c_adc <: adc_data_a[0]; 		//
+					c_adc <: adc_data_a[1]; 		//
+					c_adc <: adc_data_a[2]; 		//
+					c_adc <: adc_data_a[3]; 		//
+					c_adc <: adc_data_b[0]; 		//
+					c_adc <: adc_data_b[1]; 		//
+					c_adc <: adc_data_b[2]; 		//
+					c_adc <: adc_data_b[3]; 		//
 				}
 				break;
 		}// end select
