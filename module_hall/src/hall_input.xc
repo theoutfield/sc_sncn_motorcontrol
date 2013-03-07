@@ -437,8 +437,8 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
 	 if(iEncoderStateOld != iEncoderStateNew)
 	 {
-		 if(iEncoderStateNew == iEncoderNext)    {iEncoderPosAbsolut--; iEncoderAngle-= POLE_PAIRS; iEncoderDirection =  -1;  }
-	     if(iEncoderStateNew == iEncoderPrevious){iEncoderPosAbsolut++; iEncoderAngle+= POLE_PAIRS; iEncoderDirection =  +1;  }
+		 if(iEncoderStateNew == iEncoderNext)    {iEncoderPosAbsolut--; iEncoderAngle--; iEncoderDirection =  -1;  }
+	     if(iEncoderStateNew == iEncoderPrevious){iEncoderPosAbsolut++; iEncoderAngle++; iEncoderDirection =  +1;  }
          if(iEncoderReferenz)iEncoderAngle=0;
          iEncoderAngle &= 0x0FFF;
 
