@@ -54,37 +54,53 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iPositionAbsolut      = iHallPositionAbsolut;
 
 		iEncoderPositionAbsolut -= iEncoderPositionZero;
+		iAngleFromEncoder *= 7;
+		iAngleFromEncoder  = iAngleFromEncoder % 4096;
+		iAngleFromEncoder -= iMotPar[23]; 					// defParEncoderZeroPoint
+		iAngleFromEncoder &= 0x0FFF;
 
-
+		if(iMotPar[21]==0)
+		{
 		iAngleRotor  = iAngleFromHall & 0x0FFF;
 		iActualSpeed = iActualSpeedHall;
+		}
+		else
+		{
+		iAngleRotor  = iAngleFromEncoder & 0x0FFF;
+		iActualSpeed = iActualSpeedHall;
+		}
+
 
 		iSpeedValueNew   = iActualSpeed & 0xFF000000;   				// extract info if SpeedValue is new
 		iActualSpeed    &= 0x00FFFFFF;
 		if(iActualSpeed  & 0x00FF0000)
 			iActualSpeed |= 0xFFFF0000;   							    // expand value if negativ
 
-
+		iDiffAngleHall = iAngleRotor - iAngleRotorOld;
 		if(iActualSpeed > 0)
 		{
 			if(iAngleRotorOld > 2048  && iAngleRotor < 2048)
 			cTriggerPeriod = 0xFF;
+			if(iDiffAngleHall < 0) iDiffAngleHall += 4096;
 		}
 		if(iActualSpeed < 0)
 		{
 			if(iAngleRotorOld < 2048  && iAngleRotor > 2048)
 			cTriggerPeriod = 0x7F;
+			if(iDiffAngleHall > 0) iDiffAngleHall -= 4096;
 		}
 
+		// electrical: RefPeriod = 4096 * (1/18000)  = 227,56msec RefFreq= 4,394Hz => 263.67RPM
+		// motor mechanical: 1000RPM  electrical 7000RPM => 7000/RefRPM = 26,548
+		// gear 1:156    500RPM ca.20sec one rotation
+		// RPM:mechanical 1000 iDiffAngle=ca. 50
 
-		if(iAngleRotor != iAngleRotorOld)
-		{
-			if(iAngleRotor > iAngleRotorOld)
-				iDiffAngleHall = iAngleRotor - iAngleRotorOld;
-			else
-				iDiffAngleHall = (iAngleRotor +4096) - iAngleRotorOld;
-		}
+
+
 		iAngleRotorOld = iAngleRotor;
+
+
+		//===================================================================================
 
 		CalcCurrentValues();
 
@@ -98,6 +114,8 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		case 2:  function_TorqueControl();
 		         break;
 		case 3:  function_PositionControl();
+		         break;
+		case 4:  function_SensorLessControl();
 		         break;
 		default: iControlFOC=0; break;
 		}
@@ -124,7 +142,6 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 						a2SquareMean = 0;
 					break;
 		}
-
 
 
     //********************************************************************
@@ -250,18 +267,11 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		 xscope_probe_data(6,iAnglePWMFromFOC);
 		 xscope_probe_data(7,iVectorCurrent);
 		 xscope_probe_data(8,iVectorInvPark);
-		 xscope_probe_data(9,iPhase2);
+		 xscope_probe_data(9,iDiffAngleHall);
 
 	#endif
-		// pwm 13889 * 4 nsec = 55,556µsec  18Khz
-/*
-		if(iControlFOC==xxx){
-		iPwmIndexHigh += iPwmAddValue;
-		iPwmIndexHigh &= 0x0FFFFFFF;
-		iAnglePWM	   = iPwmIndexHigh/65536;
-		}
-*/
 
+        if(iControlFOC == 4) iAnglePWM = iAngleSensorLessPWM;
 		iIndexPWM = iAnglePWM >> 2;  // from 0-4095 to LUT 0-1023
 		sine_pwm( iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );
 
@@ -287,7 +297,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 	//======================== read current ============================
 		#ifdef DC900
-		{a1 , a2}  = get_adc_vals_calibrated_int16_ad7949(adc); //get_adc_vals_raw_ad7949(adc);
+		{a1,a2,adc_a1,adc_a2,adc_a3, adc_a4,adc_b1,adc_b2,adc_b3,adc_b4}  = get_adc_vals_calibrated_int16_ad7949(adc); //get_adc_vals_raw_ad7949(adc);
 		#endif
 		 a1 = -a1;
 		 a2 = -a2;

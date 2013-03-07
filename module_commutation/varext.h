@@ -2,8 +2,6 @@ extern int iDiffAngleHall;
 extern int iAngleXXX;
 extern int iUmotSquare;
 extern int iUmotLinear;
-//int iRampAccValue=16;
-//int iRampDecValue=16;
 extern int iMotPar[32];
 extern int iMotValue[32];
 extern int iMotCommand[16];
@@ -38,6 +36,8 @@ extern int iFieldDiff1;
 extern int iFieldDiff2;
 extern int iFieldDiffSum;
 extern int iFieldSet;
+extern int adc_a1,adc_a2,adc_a3,adc_a4;
+extern int adc_b1,adc_b2,adc_b3,adc_b4;
 extern unsigned a1RMS,a2RMS,a3RMS;
 extern int ia1RMSMax;
 extern int iSetLoopSpeed;
@@ -51,8 +51,6 @@ extern int iPowerMotor ;
 extern int iStep1 ;
 extern int iMotHoldingTorque;
 extern int iAngleRotor;
-//int iParAngleCorrVal;
-//int iParAngleCorrMax;
 //------------- values from hall_input.xc ---------
 extern int iActualSpeedHall;
 extern int iAngleFromHall;
@@ -61,6 +59,7 @@ extern int iPinStateHall;
 extern int iActualSpeedEncoder;
 extern int iAngleFromEncoder;
 extern int iEncoderPositionAbsolut;
+extern int iEncoderPositionZero;
 extern int iPinStateEncoder;
 //----------------------------
 extern int iSetValueSpeed	;
@@ -117,7 +116,7 @@ extern int iVectorInvPark;
 extern int sinx,cosx;
 extern unsigned theta;  // angle
 extern unsigned iVectorCurrent;
-//-----------------------------------------------
+//----------------------------------------------
 extern int iLoopCount;
 extern int iCountDivFactor;
 extern char cTriggerPeriod;
@@ -125,7 +124,10 @@ extern int iPwmOnOff 		;
 extern int iSpeedValueNew	;
 extern int iTorqueF0;
 //============================================
-extern int iPwmAddValue,iPwmIndexHigh;
+extern int iPwmAddValue;
+extern int iPwmIndexHigh;
+extern int iAngleSensorLessPWM;
+//============================================
 extern int iHallNullPosition;
 extern int iEncoderNullPosition;
 extern int iPositionAbsolut;

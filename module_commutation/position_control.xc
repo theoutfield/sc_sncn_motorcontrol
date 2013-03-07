@@ -17,17 +17,10 @@ int iTemp1;
 
 	iTemp1 = iPositionAbsolutNew - iPositionReferenz;
 
-	if(iTemp1 > 0 )
-	{
-	return(5);
-	}
-
-	if(iTemp1 < 0 )
-	{
+	if(iPositionAbsolutNew < iPositionAbsolut)
 	return(10);
-	}
-
-return(0);
+	else
+	return(5);
 }
 
 
@@ -35,24 +28,21 @@ int CalcSpeedForPosition()
 {
 int iTemp1;
 int iSpeed;
+int iDirection;
 
-	iTemp1 = iPositionAbsolutNew - iPositionAbsolut;
+	if(iPositionAbsolutNew < iPositionAbsolut)	iDirection=-1;
+	else iDirection=1;
+
+    iTemp1 = iPositionAbsolutNew - 	iPositionAbsolut;
 	if(iTemp1 == 0) return(0);
 
-	if(iTemp1 > 0)
-	{
-	iSpeed = iTemp1;
-	if(iSpeed > iMotPar[29])  iSpeed = iMotPar[28];
-//	if(iSpeed > iMotPar[28]) iSpeed= iMotPar[28];       // defParPositionSpeedMax
-	if(iSpeed < iMotPar[29]) iSpeed= iMotPar[29];       // defParPositionSpeedMin
-	}
+	if(iTemp1 < 0) iTemp1 = -iTemp1;
 
-	if(iTemp1 < 0)
-	{
 	iSpeed = iTemp1;
-	if(iSpeed < -iMotPar[28]) iSpeed= -iMotPar[28];
-	if(iSpeed > -iMotPar[29]) iSpeed= -iMotPar[29];
-	}
+	if(iSpeed > iMotPar[29])  iSpeed = iMotPar[28];       // defParPositionSpeedMax
+	if(iSpeed < iMotPar[29])  iSpeed = iMotPar[29];       // defParPositionSpeedMin
+
+	if(iDirection < 0)	iSpeed = -iSpeed;
 
 return (iSpeed*65536);
 }
@@ -124,7 +114,7 @@ void function_PositionControl()
 
 		case 11: if(iUmotBoost > 0)iUmotBoost--;
         		 iSetInternSpeed = CalcSpeedForPosition();
-		         if(iPositionAbsolutNew >= iPositionAbsolut) iStep1++;
+		         if(iPositionAbsolut  < (iPositionAbsolutNew+10)) iStep1++;
 		         break;
 
 		case 12: iSetInternSpeed = 0;
@@ -189,9 +179,9 @@ void CalcRampForPosition(){
 
 if(iRampBlocked==0)
 {
-  if(iSetInternSpeed >  iSetSpeedRamp) { iSetSpeedRamp += iMotPar[24]/4;  if(iSetSpeedRamp > iSetInternSpeed)  iSetSpeedRamp = iSetInternSpeed;}
+  if(iSetInternSpeed >  iSetSpeedRamp) { iSetSpeedRamp += iMotPar[24]/8;  if(iSetSpeedRamp > iSetInternSpeed)  iSetSpeedRamp = iSetInternSpeed;}
 
-  if(iSetInternSpeed <  iSetSpeedRamp) { iSetSpeedRamp -= iMotPar[25]/4;  if(iSetSpeedRamp < iSetInternSpeed)  iSetSpeedRamp = iSetInternSpeed;}
+  if(iSetInternSpeed <  iSetSpeedRamp) { iSetSpeedRamp -= iMotPar[25]/8;  if(iSetSpeedRamp < iSetInternSpeed)  iSetSpeedRamp = iSetInternSpeed;}
 }
 iRampBlocked = 0;
 

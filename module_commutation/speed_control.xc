@@ -17,7 +17,7 @@ void    function_SpeedControl()
 				if(iSetInternSpeed != 0) iStep1++;
 				break;
 
-		case 1:  // start motor
+		case 1:  //======================== start motor ====================
 			     iStep1++;
 			     if(iSetInternSpeed > 0){iMotDirection =  1; VsdRef1=0; VsqRef1 =  4096;  iTorqueF0 =  500;   }
 				 if(iSetInternSpeed < 0){iMotDirection = -1; VsdRef1=0; VsqRef1 = -4096;  iTorqueF0 = -500;   }
@@ -36,8 +36,8 @@ void    function_SpeedControl()
 				 if(iSetInternSpeed == 0) iStep1=11;  // motor stops
 				 else
 				 {
-			     if(iSetInternSpeed < 0 && iSetSpeedRamp > 0) iStep1=20;  // change direction from plus to minus
-				 if(iSetInternSpeed > 0 && iSetSpeedRamp < 0) iStep1=25;  // change direction from minus to plus
+			     if(iSetInternSpeed < 0 && iSetSpeedRamp > 0) iStep1=15;  // change direction from plus to minus
+				 if(iSetInternSpeed > 0 && iSetSpeedRamp < 0) iStep1=18;  // change direction from minus to plus
 				 }
 				 break;
 
@@ -50,65 +50,23 @@ void    function_SpeedControl()
 		case 12: iSetInternSpeed = 0;
 			     if(iSetSpeedRamp == 0 && iCountx++ > 5000) iStep1=0;
 		         break;
-		//----------------------------change direction  -----------------------
-		case 20: iTorqueF0 		  =	0;
-			     iSetInternSpeed  = 0;
-				 iCountx = 0;
-                 iStep1++;
-                 break;
-		case 21: iSetInternSpeed = 0;
-			     if(iSetSpeedRamp==0)  iStep1++;
-			 	 if(VsqRef1 < 4096) VsqRef1 = 4096;
+		//---------------------------------------------------------------------
+		case 15: if(iSetSpeedRamp < 0) iStep1++;
 		         break;
-		case 22: iSetInternSpeed = 0;
-		 	 	 iUmotIntegrator = 0;
-			     if(iCountx++ > 5000)  iStep1 = 23;  // wait 27 msec
-			 	 if(VsqRef1 < 4096) VsqRef1 = 4096;
-			 	 if(iActualSpeed < 50) iStep1 = 23;
+		case 16: iMotDirection = -1; VsdRef1=0; VsqRef1 = -4096;  iTorqueF0 = -500;
+		         iStep1=2;
 		         break;
 
-
-		case 23: iIntegralGain    = 0;
-				 iUmotProfile     = 0;
-			     CalcSetInternSpeed(iMotCommand[0]);
-				 iStep1 = 1;		// restart motor
-				 break;
-		//---------------------------------------------------------
-		case 25: iTorqueF0 		  =	0;
-			     iSetInternSpeed  = 0;
-				 iCountx = 0;
-                 iStep1++;
-                 break;
-		case 26: iSetInternSpeed = 0;
-			     if(iSetSpeedRamp==0)  iStep1++;
-			 	 if(VsqRef1 > -4096) VsqRef1 = -4096;
+		case 18: if(iSetSpeedRamp > 0) iStep1++;
 		         break;
-		case 27: iSetInternSpeed = 0;
-		 	 	 iUmotIntegrator = 0;
-			     if(iCountx++ > 5000)  iStep1=28;  // wait 27 msec
-			     if(VsqRef1 > -4096) VsqRef1 = -4096;
-			     if(iActualSpeed > -50) iStep1 = 28;
+		case 19: iMotDirection = 1; VsdRef1=0; VsqRef1 = 4096;  iTorqueF0 = +500;
+		         iStep1=2;
 		         break;
-		case 28: iIntegralGain    = 0;
-				 iUmotProfile     = 0;
-			     CalcSetInternSpeed(iMotCommand[0]);
-				 iStep1 = 1;		// restart motor
-				 break;
-
-		//--------------- overcurrent -----------------------------
-		case 30:  iPwmOnOff		  = 0;			// error motor stop
-				  iStep1++;
+		//--------------- overcurrent ----------------------------------
+		case 30:  iPwmOnOff		  = 0;			     // error motor stop
+				  if(iSetLoopSpeed== 0)iStep1=0;
 				  break;
 
-		case 31:  iPwmOnOff		  =  0;
-		 	 	  if(iControlFOC > 1){
-		 	 	  if(iTorqueSet == 0 ) iStep1=0;
-		 	 	  }
-		 	 	  else
-		 	 	  {
-				  if(iSetLoopSpeed== 0)iStep1=0;     // motor is stopping
-		 	 	  }
-		 	 	  break;
 		default:  iStep1 = 0;
 				  break;
 	}
@@ -243,3 +201,88 @@ iSetSpeedNew /= iMotPar[26];   // smoothing factor
  iSetLoopSpeed = iSetSpeedNew/65536;
 
 }//end CalcRampForSpeed
+
+
+
+
+void    function_SensorLessControl()
+{
+	switch(iStep1)
+		{
+			case 0: iPwmOnOff 		 = 0;				// motor stop
+					iIntegralGain    = 0;
+					iUmotProfile     = 0;
+					iUmotResult      = 0;
+					iSetSpeedRamp    = 0;
+					iMotDirection    = 0;
+					if(iSetInternSpeed != 0) iStep1++;
+					break;
+
+			case 1:  // start motor
+				     iStep1++;
+				     if(iSetInternSpeed > 0){iMotDirection =  1; VsdRef1=0; VsqRef1 =  4096;  iTorqueF0 =  500;   }
+					 if(iSetInternSpeed < 0){iMotDirection = -1; VsdRef1=0; VsqRef1 = -4096;  iTorqueF0 = -500;   }
+					 iPwmOnOff	= 1;
+					 break;
+
+			case 2:  iUmotBoost = iParUmotBoost * 32;
+			         iUmotMotor = iParUmotStart;
+					 iPwmOnOff	= 1;
+					 iStep1++;
+					 break;
+
+			case 3:  iStep1++; break;
+			case 4:  iStep1++; break;
+			case 5:  if(iUmotBoost > 0)iUmotBoost--;
+					 if(iSetInternSpeed == 0) iStep1=11;  // motor stops
+					 break;
+
+			case 11: iCountx = 0;						// motor is stopping
+					 iTorqueF0 		  =	0;
+					 iSetInternSpeed  = 0;
+			         iStep1++;
+			         break;
+
+			case 12: iSetInternSpeed = 0;
+				     if(iSetSpeedRamp == 0 && iCountx++ > 5000) iStep1=0;
+			         break;
+			//--------------- overcurrent ----------------------------------
+			case 30:  iPwmOnOff		  = 0;			     // error motor stop
+					  if(iSetLoopSpeed== 0)iStep1=0;
+					  break;
+
+			default:  iStep1 = 0;
+					  break;
+		}
+
+			//===========================================================
+			CalcRampForSpeed();
+			//============================== ramp calculation ===========
+
+			// pwm 13889 * 4 nsec = 55,556µsec  18Khz
+			// 1024 sin LUT 1024 * 55 = 56320µsec period => 17.775Hz => 1065
+			// 1065 /6 = 177,5
+
+			// electrical: RefPeriod = 4096 * (1/18000)  = 227,56msec RefFreq= 4,394Hz => 263.67RPM
+			// motor mechanical: 1000RPM  electrical 7000RPM => 7000/RefRPM = 26,548
+			// gear 1:156    500RPM ca.20sec one rotation
+
+			iPwmAddValue  = 65536 * iSetLoopSpeed;
+			iPwmAddValue /= 26;
+
+			iPwmIndexHigh += iPwmAddValue;
+			iPwmIndexHigh &= 0x0FFFFFFF;  // normalize to 0x0FFF 0-4095
+
+			iAngleSensorLessPWM	   = iPwmIndexHigh/65536;
+
+		//	if(iSpeedValueNew) SpeedControl();
+
+			CalcUmotForSpeed();
+
+}// end of funcion_SensorLessControl
+
+
+
+
+
+

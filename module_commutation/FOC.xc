@@ -192,14 +192,18 @@ void InitParameter(){
 	iMotPar[11] = defParRmsMaxPwmOff;
 
 	iMotPar[16] = defParHysteresisPercent;
-	iMotPar[17] = defParDiffSpeedMax;
+	iMotPar[17] = defParDiffSpeedMax;			// SpeedControl
 	iMotPar[18] = defParUmotIntegralLimit;
 	iMotPar[19] = defParPropGain;
 	iMotPar[20] = defParIntegralGain;
 
-	iMotPar[24] = defRampAcc;
-	iMotPar[25] = defRampDec;
-	iMotPar[26] = defRampSmoothFactor;
+	iMotPar[21] = defParHallEncoder;
+	iMotPar[22] = defParEncoderResolution;
+	iMotPar[23] = defParEncoderZeroPoint;
+
+	iMotPar[24] = defParRampAcc;
+	iMotPar[25] = defParRampDec;
+	iMotPar[26] = defParRampSmoothFactor;
 
 	iMotPar[28] = defParPositionSpeedMax;
 	iMotPar[29] = defParPositionSpeedMin;
@@ -225,17 +229,17 @@ void SaveValueToArray()
 
 	iMotValue[12] = (iAngleRotor*65536) + iAnglePWM;
 	iMotValue[13] = iAngleDiffPeriod;
-	iMotValue[14] = 0;
-	iMotValue[15] = 0;
-	iMotValue[16] = VsqRef1;
-	iMotValue[17] = VsdRef1;
+	iMotValue[14] = iAngleFromEncoder;
+	iMotValue[15] = iDiffAngleHall;
+	iMotValue[16] = adc_b3; //VsqRef1;
+	iMotValue[17] = adc_b4; //VsdRef1;
 
- 	iMotValue[18] = iFieldSet;
-	iMotValue[19] = iIdPeriod2;
-	iMotValue[20] = iFieldDiff2;
-	iMotValue[21] = iTorqueSet;
-	iMotValue[22] = iIqPeriod2;
-	iMotValue[23] = iTorqueDiff2;
+ 	iMotValue[18] = adc_a1; //iFieldSet;
+	iMotValue[19] = adc_a2; //iIdPeriod2;
+	iMotValue[20] = adc_a3; //iFieldDiff2;
+	iMotValue[21] = adc_a4; //iTorqueSet;
+	iMotValue[22] = adc_b1; //iIqPeriod2;
+	iMotValue[23] = adc_b2; //iTorqueDiff2;
 
 	iMotValue[24] = a1RMS;
 	iMotValue[25] = a2RMS;

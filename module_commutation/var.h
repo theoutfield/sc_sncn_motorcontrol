@@ -43,6 +43,9 @@ int iFieldDiff2;
 int iFieldDiffSum;
 int iFieldSet=0;
 
+int adc_a1,adc_a2,adc_a3,adc_a4;
+int adc_b1,adc_b2,adc_b3,adc_b4;
+
 unsigned a1RMS,a2RMS,a3RMS;
 int ia1RMSMax=0;
 int iSetLoopSpeed=0;
@@ -56,8 +59,7 @@ int iPowerMotor = 0;
 int iStep1 =0;
 int iMotHoldingTorque=0;
 int iAngleRotor;
-//int iParAngleCorrVal;
-//int iParAngleCorrMax;
+
 //------------- values from hall_input.xc ---------
 int iActualSpeedHall;
 int iAngleFromHall;
@@ -130,20 +132,22 @@ int iVectorInvPark;
 int sinx,cosx;
 unsigned theta;  // angle
 unsigned iVectorCurrent;
-//-----------------------------------------------
+//----------------------------------------------
 int iLoopCount=0;
 int iCountDivFactor;
 
 char cTriggerPeriod=0;  // one complete hall period
-int iPwmOnOff 		= 1;
+int iPwmOnOff 		=  1;
 int iSpeedValueNew	=  0;  // if speed from hall is a new value
 int iTorqueF0=0;
 
 //============================================
-int iPwmAddValue,iPwmIndexHigh;
+int iPwmAddValue;
+int iPwmIndexHigh;
+int iAngleSensorLessPWM;
+//============================================
 int iHallNullPosition=0;
 int iEncoderNullPosition=0;
-
 int iPositionAbsolut=0;
 int iPositionReferenz=0;
 int iPulsCountAcc;
