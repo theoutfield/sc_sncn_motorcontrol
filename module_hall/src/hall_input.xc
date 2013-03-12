@@ -19,7 +19,7 @@ extern  port p_ifm_ext_d0;
 // uart 115200 Baud 1 Bit = 8.6µsec iByte 87µsec
 // 32  32Bit Werte = 128Bytes -> 5,568msec
 
-
+#ifdef DEBUG
 void run_uart(chanend c_motvalue, clock clk1)
 {
 timer tx;
@@ -167,11 +167,7 @@ tx :> ts;  // first value
  	            }
            	   	iStep=40;  // next step readout motor values
  	            break;
- /*
-						else if(cmd2 >= 32 && cmd2 < 64)  { iTemp = (int) cmd2; c_motvalue <: iMotValue[iTemp-32]; 	}
-						else if(cmd2 >= 64 && cmd2 < 96)  { iTemp = (int) cmd2; c_motvalue <: iMotPar[iTemp-64]; 	}
-						else if(cmd2 >= 96 && cmd2 < 128) { iTemp = (int) cmd2; c_motvalue :> iTemp1;  iMotPar[iTemp-96] = iTemp1; iUpdateFlag=1;}
-*/
+
 
  	  case 20:	iIndex1 =  0;                 // read parameter from XMOS ==> PC
  	            while(iIndex1 < 32)
@@ -297,8 +293,7 @@ tx :> ts;  // first value
      }
 	}// end while 1
 }
-
-
+#endif
 
 
 void run_hall( chanend c_hall, port in p_hall, port in p_encoder)

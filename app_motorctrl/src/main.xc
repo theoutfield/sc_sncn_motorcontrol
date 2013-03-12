@@ -56,18 +56,6 @@ int main(void)
      * CORE 1
      ************************************************************/
     on stdcore[1]: {
-/*
-			xscope_register(7,
-			XSCOPE_CONTINUOUS, "0 a1", XSCOPE_INT, "n",
-			XSCOPE_CONTINUOUS, "1 a2", XSCOPE_INT, "n",
-			XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
-			XSCOPE_CONTINUOUS, "3 iAngleFromHall", XSCOPE_INT, "n",
-			XSCOPE_CONTINUOUS, "4 iAngleCur", XSCOPE_INT, "n",
-			XSCOPE_CONTINUOUS, "5 iUmotMotor", XSCOPE_UINT, "n",
-			XSCOPE_CONTINUOUS, "6 iIq", XSCOPE_UINT, "n"
-			);
-
-*/
 			 xscope_register(9,
 			 XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
 			 XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
@@ -80,25 +68,11 @@ int main(void)
 			 XSCOPE_CONTINUOUS, "9 iIqPeriod2", XSCOPE_UINT, "n"
 			);
 
-/*
-	 	 xscope_register(10,
-		 XSCOPE_CONTINUOUS, "0 iPhase1", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "1 iAngleCurrent", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "2 iAnglePWM", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "3 iAngleFromHall",XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "4 iAngleInvPark", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "5 iAnglePWMFromHall", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "6 iAnglePWMFromFOC", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "7 iVectorCurrent", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "8 iVectorInvPark", XSCOPE_INT, "n",
-		 XSCOPE_CONTINUOUS, "9 iPhase2", XSCOPE_INT, "n"
-		);
-*/
     }
     /************************************************************
      * CORE 2             communication with the Motor
      ************************************************************/
-
+#ifdef DEBUG
      on stdcore[2]:par{
     	{
 			  cmd_data send_cmd;
@@ -161,6 +135,7 @@ int main(void)
 			  }//end while 1
     	}
     }// end on stdcore[2]
+#endif
     
     /************************************************************
      * IFM_CORE
@@ -173,9 +148,11 @@ int main(void)
     			do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
     			run_hall( c_hall, p_ifm_hall, p_ifm_encoder);
-    			commutation(c_adc, c_commutation, c_hall, c_pwm_ctrl, c_motvalue );
 
+    			commutation(c_adc, c_commutation, c_hall, c_pwm_ctrl, c_motvalue );
+				#ifdef DEBUG
     			run_uart(c_motvalue, clk_pwm);
+				#endif
 
       	  }
     }// end stdcore[IFM_CORE]
