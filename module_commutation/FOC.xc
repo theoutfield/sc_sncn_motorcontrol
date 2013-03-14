@@ -21,7 +21,7 @@ void FOC_ClarkeAndPark()
 			}
 
 			 //============= park transform ==qq==========================
-			theta = iAngleFromHall/16;
+			theta = iAngleRotor/16;
 			theta &= 0xFF;
 			sinx  = sine_table[theta];      // sine( theta );
 			theta = (64 - theta);  		    // 90-theta
@@ -159,13 +159,11 @@ int iTemp;
 void SetParameterValue()
 {
 	iParRpmMotorMax 	=	iMotPar[0];
-	iParDefSpeedMax		=	iMotPar[1];
-	iParRPMreference	=	iMotPar[2];
-	iParAngleUser		=	iMotPar[3];
+	iParRpmUmotMax		=	iMotPar[1];
+	iParUmotStart		=	iMotPar[2];
+	iParUmotBoost		=	iMotPar[3];
 
-	iParUmotBoost		=	iMotPar[5];
-	iParUmotStart		=	iMotPar[6];
-	iParSpeedKneeUmot	=	iMotPar[7];
+	iParAngleUser		=	iMotPar[5];
 
 	iParRMS_RampLimit  	=   iMotPar[10];
 	iParRMS_PwmOff      =   iMotPar[11];
@@ -180,13 +178,14 @@ void SetParameterValue()
 //=================== default value =====================
 void InitParameter(){
 	iMotPar[0]  = defParRpmMotorMax;
-	iMotPar[1]  = defParDefSpeedMax;
-	iMotPar[2]  = defParRPMreference;
-	iMotPar[3]  = defParAngleUser;
+	iMotPar[1]  = defParRpmUmotMax;
+	iMotPar[2]  = defParUmotStart;
+	iMotPar[3]  = defParUmotBoost;
 
-	iMotPar[5]  = defParUmotBoost;
-	iMotPar[6]  = defParUmotStart;
-	iMotPar[7]  = defParSpeedKneeUmot;
+	iMotPar[5]  = defParAngleUser;
+
+	iMotPar[7] = defParEncoderResolution;
+	iMotPar[8] = defParEncoderZeroPoint;
 
 	iMotPar[10] = defParRmsLimit;				// ramp control
 	iMotPar[11] = defParRmsMaxPwmOff;
@@ -197,9 +196,7 @@ void InitParameter(){
 	iMotPar[19] = defParPropGain;
 	iMotPar[20] = defParIntegralGain;
 
-	iMotPar[21] = defParHallEncoder;
-	iMotPar[22] = defParEncoderResolution;
-	iMotPar[23] = defParEncoderZeroPoint;
+
 
 	iMotPar[24] = defParRampAcc;
 	iMotPar[25] = defParRampDec;
@@ -223,15 +220,15 @@ void SaveValueToArray()
 	iMotValue[7]  = iActualSpeed;
 	iMotValue[8]  = idiffSpeed*65536 + (idiffSpeed2 & 0xFFFF);
 	iMotValue[9]  = iPositionAbsolutNew;
-	iMotValue[10] = iPositionDec;
-	iMotValue[11] = iPulsCountAcc;
+	iMotValue[10] = iEncoderActualSpeed;
+	iMotValue[11] = 0;
 
 
 	iMotValue[12] = (iAngleRotor*65536) + iAnglePWM;
 	iMotValue[13] = iAngleDiffPeriod;
-	iMotValue[14] = iAngleFromEncoder;
-	iMotValue[15] = iDiffAngleHall;
-	iMotValue[16] = adc_b3; //VsqRef1;
+	iMotValue[14] = iEncoderAngle;
+	iMotValue[15] = 0;
+	iMotValue[16] = adc_b3; //VsqRef1; iAngleRotorDiffCalculated
 	iMotValue[17] = adc_b4; //VsdRef1;
 
  	iMotValue[18] = adc_a1; //iFieldSet;
@@ -247,7 +244,7 @@ void SaveValueToArray()
 	iMotValue[27] = iVectorInvPark;
 	iMotValue[28] = 0;
 
-	iMotValue[29] = (iPinStateHall*256)  + (iPinStateEncoder & 0xFF);
+	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF);
 	iMotValue[30] = iEncoderPositionAbsolut;
 	iMotValue[31] = iHallPositionAbsolut;
 }

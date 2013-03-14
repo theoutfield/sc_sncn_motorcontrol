@@ -86,7 +86,6 @@ void function_PositionControl()
 				iMotDirection   = 1;     VsqRef1=  1024;  iTorqueF0 =  500;
 		        iUmotMotor      = iParUmotStart;
 				iPwmOnOff	    = 1;
-				iPulsCountAcc   = iPositionAbsolut;
 				iStep1++;
 				break;
 
@@ -167,7 +166,7 @@ void function_PositionControl()
 
 		FOC_InversPark();
 
-		if(iSpeedValueNew)SpeedControl();
+		if(iSpeedValueIsNew)SpeedControl();
 
 		CalcUmotForSpeed();
 

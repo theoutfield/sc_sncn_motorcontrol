@@ -1,18 +1,37 @@
-int iDiffAngleHall;
-int iAngleXXX;
+
 int iUmotSquare;
 int iUmotLinear;
 
 
+
+//------------- values from hall_input.xc ---------
+int iHallActualSpeed,iHallAngle,iHallPositionAbsolut,iHallPinState;
+int iHallSpeedValueIsNew;
+int iHallActualSpeed;
+int iHallPositionAbsolut;
+
+
+int iEncoderActualSpeed,iEncoderAngle,iEncoderPositionAbsolut,iEncoderPinState;
+int iEncoderSpeedValueIsNew;
+int iEncoderActualSpeed;
+int iEncoderPositionAbsolut;
+
+int iActualSpeed;
+int iSpeedValueIsNew	=  0;  // if speed from hall is a new value
+int iDiffAngleRotor;
+
+//-----------------------------------------------------------
 int iMotPar[32];
 int iMotValue[32];
 int iMotCommand[16];
 
+
 //--------- parameters ---------------------------------------
 int iParRpmMotorMax;
-int iParDefSpeedMax;
-int iParRPMreference;
-int iParSpeedKneeUmot;
+int iParRpmUmotMax;
+int iParUmotStart;
+int iParUmotBoost;
+
 int iParAngleUser;
 int iParHysteresisPercent;
 int iParDiffSpeedMax;
@@ -21,10 +40,9 @@ int iParUmotIntegralLimit;
 int iParPropGain;
 int iParIntegralGain;
 int iParUmotSocket;
-int iParUmotBoost;
-int iParUmotStart;
 int iParRMS_RampLimit;
 int iParRMS_PwmOff;
+
 int iUpdateFlag=0;
 
 //=========== motor values ===================================
@@ -45,6 +63,10 @@ int iFieldSet=0;
 
 int adc_a1,adc_a2,adc_a3,adc_a4;
 int adc_b1,adc_b2,adc_b3,adc_b4;
+int iAngleRotorDiffNew;
+int iAngleRotorDiffOld;
+int iAngleRotorDiffCalculated;
+
 
 unsigned a1RMS,a2RMS,a3RMS;
 int ia1RMSMax=0;
@@ -60,17 +82,7 @@ int iStep1 =0;
 int iMotHoldingTorque=0;
 int iAngleRotor;
 
-//------------- values from hall_input.xc ---------
-int iActualSpeedHall;
-int iAngleFromHall;
-int iHallPositionAbsolut;
-int iPinStateHall;
 
-int iActualSpeedEncoder;
-int iAngleFromEncoder;
-int iEncoderPositionAbsolut;
-int iEncoderPositionZero=0;
-int iPinStateEncoder;
 //----------------------------
 int iSetValueSpeed	=  0;
 int iSetInternSpeed	=  0;
@@ -80,6 +92,7 @@ int iSetSpeedSum    =  0;
 int iSetSpeedNew    = 0;
 int iMotDirection  	=  0;
 int iControlFOC   	=  1;
+int iEncoderOnOff   =  0;
 //=======================================================
 int iCountx;
 //int iStepRamp=0;
@@ -138,7 +151,6 @@ int iCountDivFactor;
 
 char cTriggerPeriod=0;  // one complete hall period
 int iPwmOnOff 		=  1;
-int iSpeedValueNew	=  0;  // if speed from hall is a new value
 int iTorqueF0=0;
 
 //============================================
@@ -146,11 +158,11 @@ int iPwmAddValue;
 int iPwmIndexHigh;
 int iAngleSensorLessPWM;
 //============================================
-int iHallNullPosition=0;
-int iEncoderNullPosition=0;
+
 int iPositionAbsolut=0;
 int iPositionReferenz=0;
-int iPulsCountAcc;
+//int iPulsCountAcc;
 int iPositionAbsolutNew;
-int iPositionAcc;
-int iPositionDec;
+
+//int iPositionAcc;
+//int iPositionDec;

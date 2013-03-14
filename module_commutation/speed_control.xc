@@ -88,13 +88,11 @@ void    function_SpeedControl()
 		VsdRef1 += iFieldDiff2  /128;
 		VsqRef1 += iTorqueDiff2 /128;
 
-
 		FOC_InversPark();
 
-		if(iSpeedValueNew) SpeedControl();
+		if(iSpeedValueIsNew) SpeedControl();
 
 		CalcUmotForSpeed();
-
 }// end function SpeedControl
 
 
@@ -156,15 +154,15 @@ void CalcUmotForSpeed()
 	iTemp = iSetLoopSpeed;
 	if(iTemp < 0) iTemp = -iTemp;
 
-	if(iTemp > iParSpeedKneeUmot) iTemp = iParSpeedKneeUmot; // set limit
+	if(iTemp > iParRpmUmotMax) iTemp = iParRpmUmotMax; // set limit
 	iUmotSquare  = iTemp * iTemp;
-	iUmotSquare /= iParSpeedKneeUmot;
+	iUmotSquare /= iParRpmUmotMax;
 	iUmotSquare *= 4096;
-	iUmotSquare /= iParSpeedKneeUmot;
+	iUmotSquare /= iParRpmUmotMax;
 	iUmotSquare += iParUmotSocket;
 
 	iUmotLinear = iTemp * 4096;
-	iUmotLinear /= iParSpeedKneeUmot;
+	iUmotLinear /= iParRpmUmotMax;
 	iUmotProfile = iUmotLinear;
 
 	if(iUmotSquare > iUmotLinear)  iUmotProfile = iUmotSquare;
@@ -181,6 +179,7 @@ void CalcUmotForSpeed()
 
 
 void CalcRampForSpeed(){
+
 
 if(iRampBlocked==0)
 {
@@ -203,7 +202,9 @@ iSetSpeedNew /= iMotPar[26];   // smoothing factor
 }//end CalcRampForSpeed
 
 
-
+int iAngleStart=0;
+int iCountGo;
+int iEncoderStart;
 
 void    function_SensorLessControl()
 {
@@ -216,6 +217,8 @@ void    function_SensorLessControl()
 					iSetSpeedRamp    = 0;
 					iMotDirection    = 0;
 					if(iSetInternSpeed != 0) iStep1++;
+					iPwmIndexHigh   = 0;
+					iEncoderStart= iEncoderPositionAbsolut;
 					break;
 
 			case 1:  // start motor
@@ -233,9 +236,31 @@ void    function_SensorLessControl()
 
 			case 3:  iStep1++; break;
 			case 4:  iStep1++; break;
-			case 5:  if(iUmotBoost > 0)iUmotBoost--;
+			case 5:  //if(iUmotBoost > 0)iUmotBoost--;
 					 if(iSetInternSpeed == 0) iStep1=11;  // motor stops
+					 iCountGo++;
+					 if(iCountGo > 100000) iStep1++; // 5.500.000 halbe Sekunde
 					 break;
+
+			case 6:  iCountGo=0;
+					 if(iEncoderPositionAbsolut > (iEncoderStart+50))iStep1=10;
+					 else iStep1=7;
+					 break;
+
+			case 7:  iPwmOnOff 		 = 0;
+					 iCountGo++;
+					 if(iCountGo > 100000) iStep1++; // halbe Sekunde
+					 break;
+
+			case 8:   iEncoderStart   = iEncoderPositionAbsolut;
+					  iAngleStart    += 512;
+					  iPwmIndexHigh   = 0;
+					  iCountGo = 0;
+					  iStep1=0;
+					  break;
+
+			case 10: if(iSetInternSpeed == 0) iStep1=11;  // motor stops
+			         break;
 
 			case 11: iCountx = 0;						// motor is stopping
 					 iTorqueF0 		  =	0;
@@ -260,20 +285,24 @@ void    function_SensorLessControl()
 			//============================== ramp calculation ===========
 
 			// pwm 13889 * 4 nsec = 55,556µsec  18Khz
-			// 1024 sin LUT 1024 * 55 = 56320µsec period => 17.775Hz => 1065
-			// 1065 /6 = 177,5
-
 			// electrical: RefPeriod = 4096 * (1/18000)  = 227,56msec RefFreq= 4,394Hz => 263.67RPM
 			// motor mechanical: 1000RPM  electrical 7000RPM => 7000/RefRPM = 26,548
-			// gear 1:156    500RPM ca.20sec one rotation
 
-			iPwmAddValue  = 65536 * iSetLoopSpeed;
-			iPwmAddValue /= 26;
+			//iAngleRotorDiffCalculated  = iActualSpeed * 700;
+			//	iAngleRotorDiffCalculated /= 26367;
+
+
+			iPwmAddValue  = iSetLoopSpeed * 700;
+			iPwmAddValue *= 256;
+			iPwmAddValue /= 26367;
+			iPwmAddValue *= 256;
 
 			iPwmIndexHigh += iPwmAddValue;
-			iPwmIndexHigh &= 0x0FFFFFFF;  // normalize to 0x0FFF 0-4095
+			iPwmIndexHigh &= 0x0FFFFFFF;  // normalize to 0x0FFF FFFF 0-4095
 
 			iAngleSensorLessPWM	   = iPwmIndexHigh/65536;
+			iAngleSensorLessPWM   += iAngleStart;
+			iAngleSensorLessPWM &= 0x0FFF;
 
 		//	if(iSpeedValueNew) SpeedControl();
 

@@ -1,15 +1,26 @@
-extern int iDiffAngleHall;
-extern int iAngleXXX;
 extern int iUmotSquare;
 extern int iUmotLinear;
+//------------- values from hall_input.xc ---------
+extern int iHallActualSpeed,iHallAngle,iHallPositionAbsolut,iHallPinState;
+extern int iHallSpeedValueIsNew;
+extern int iHallActualSpeed;
+extern int iHallPositionAbsolut;
+extern int iEncoderActualSpeed,iEncoderAngle,iEncoderPositionAbsolut,iEncoderPinState;
+extern int iEncoderSpeedValueIsNew;
+extern int iEncoderActualSpeed;
+extern int iEncoderPositionAbsolut;
+extern int iActualSpeed;
+extern int iSpeedValueIsNew	;
+extern int iDiffAngleRotor;
+//-----------------------------------------------------------
 extern int iMotPar[32];
 extern int iMotValue[32];
 extern int iMotCommand[16];
 //--------- parameters ---------------------------------------
 extern int iParRpmMotorMax;
-extern int iParDefSpeedMax;
-extern int iParRPMreference;
-extern int iParSpeedKneeUmot;
+extern int iParRpmUmotMax;
+extern int iParUmotStart;
+extern int iParUmotBoost;
 extern int iParAngleUser;
 extern int iParHysteresisPercent;
 extern int iParDiffSpeedMax;
@@ -18,8 +29,6 @@ extern int iParUmotIntegralLimit;
 extern int iParPropGain;
 extern int iParIntegralGain;
 extern int iParUmotSocket;
-extern int iParUmotBoost;
-extern int iParUmotStart;
 extern int iParRMS_RampLimit;
 extern int iParRMS_PwmOff;
 extern int iUpdateFlag;
@@ -38,6 +47,9 @@ extern int iFieldDiffSum;
 extern int iFieldSet;
 extern int adc_a1,adc_a2,adc_a3,adc_a4;
 extern int adc_b1,adc_b2,adc_b3,adc_b4;
+extern int iAngleRotorDiffNew;
+extern int iAngleRotorDiffOld;
+extern int iAngleRotorDiffCalculated;
 extern unsigned a1RMS,a2RMS,a3RMS;
 extern int ia1RMSMax;
 extern int iSetLoopSpeed;
@@ -51,16 +63,6 @@ extern int iPowerMotor ;
 extern int iStep1 ;
 extern int iMotHoldingTorque;
 extern int iAngleRotor;
-//------------- values from hall_input.xc ---------
-extern int iActualSpeedHall;
-extern int iAngleFromHall;
-extern int iHallPositionAbsolut;
-extern int iPinStateHall;
-extern int iActualSpeedEncoder;
-extern int iAngleFromEncoder;
-extern int iEncoderPositionAbsolut;
-extern int iEncoderPositionZero;
-extern int iPinStateEncoder;
 //----------------------------
 extern int iSetValueSpeed	;
 extern int iSetInternSpeed	;
@@ -121,19 +123,16 @@ extern int iLoopCount;
 extern int iCountDivFactor;
 extern char cTriggerPeriod;
 extern int iPwmOnOff 		;
-extern int iSpeedValueNew	;
 extern int iTorqueF0;
 //============================================
 extern int iPwmAddValue;
 extern int iPwmIndexHigh;
 extern int iAngleSensorLessPWM;
 //============================================
-extern int iHallNullPosition;
-extern int iEncoderNullPosition;
 extern int iPositionAbsolut;
 extern int iPositionReferenz;
-extern int iPulsCountAcc;
+//int iPulsCountAcc;
 extern int iPositionAbsolutNew;
-extern int iPositionAcc;
-extern int iPositionDec;
+//int iPositionAcc;
+//int iPositionDec;
 
