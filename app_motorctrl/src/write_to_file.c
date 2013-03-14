@@ -227,6 +227,9 @@ int iStepRamp;
 		 	 	if(iControlFOC <= 1) 	sprintf(cxText,"-----------------------                 SPEED Control      ---- +/- RPM  ----- %s ---------------------------",cxText2);
 		 	 	if(iControlFOC == 2)	sprintf(cxText,"-----------------------                 TORQUE Control     ---- t+200----------------------------------------");
 		 	 	if(iControlFOC == 3)	sprintf(cxText,"-----------------------                 POSITION Control   ---- m+500 ----------------------------------------");
+		 	 	if(iControlFOC == 4)	sprintf(cxText,"-----------------------            Sensorless Control   ---- +/- RPM ----------------------------------------");
+
+
 		 	 	printf("%s\n",cxText);
 
 		 	 	xx=0;
@@ -327,8 +330,6 @@ int iStepRamp;
 		return(0);
 		break;
 
-
-
 		case  '0':
 			c->iMotCommand[0]=0;
 	    	return(1);
@@ -338,7 +339,7 @@ int iStepRamp;
 		case 'h':		// holding torque
 		case 'H':
 			scanf("%d",&iTemp);
-		    c->iMotCommand[7]=iTemp;
+		    c->iMotCommand[3]=iTemp;
 			return(1);
 			break;
 
@@ -352,7 +353,7 @@ int iStepRamp;
 		case 't':			// set torque value
 		case 'T':
 		    scanf("%d",&iTemp);
-		    c->iMotCommand[6]=iTemp;
+		    c->iMotCommand[2]=iTemp;
 			return(1);
 			break;
 

@@ -16,7 +16,7 @@
 
 // Define the motor specs
 // needed by module_ctrl_loops
-#define POLE_PAIRS	7
+#define POLE_PAIRS	8
 
 #define GEAR_RATIO	156
 

@@ -125,9 +125,9 @@ int main(void)
 				  valid = input_cmd(send_cmd);   // valid command entered
 				  if(valid == 1)				 // if valid send command to motor ( cmd from 0 to 31 )
 				  {
-					  send_cmd.iMotCommand[15]=1;
+					  send_cmd.iMotCommand[7]=1;
 					  iIndex1=0;
-					  while(iIndex1 <= 12)
+					  while(iIndex1 <= 4)
 					  {
 		 	    	  c_commutation <:iIndex1;
 		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1];
