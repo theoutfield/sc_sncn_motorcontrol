@@ -389,6 +389,33 @@ void CalcHallSpeed()
 	  iHallPeriodNext /= 230;
 }
 
+int function_EncoderReadout(port in p_encoder){
+
+int   iEncoderCountx=0;
+int	  iStepEncoder  =0;
+int	  iEncoderOk    =0;
+int   iEncState1	=0;
+int   iEncState2	=0;
+
+	while(iEncoderCountx < 20)
+	  {
+	  switch(iStepEncoder)
+	  {
+		  case 0: p_encoder :> iEncState1; iEncState1 &= 0x07; iStepEncoder++;
+		          iEncoderOk++;
+		  	  	  break;
+		  case 1: p_encoder :> iEncState2; iEncState2 &= 0x07;
+				  if(iEncState2 != iEncState1) iStepEncoder=0;
+				  else iEncoderOk++;
+				  break;
+	  }
+	  iEncoderCountx++;
+	  }// end countx
+
+	  if(iEncoderOk >= 10) return(iEncState1);
+	  else return(-1);
+}
+
 
 void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
  {
@@ -426,10 +453,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
 //=========== encoder =======================
   int iEncoderCountx;
-  int iEncoderOk;
-  int iStepEncoder		=0;
-  int iEncState1		=0;
-  int iEncState2		=0;
+
   int iEncoderPinState;
   int iEncoderReferenz;
   int iEncoderStateNew;
@@ -439,7 +463,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
   int iEncoderNext=0;
   int iEncoderPrevious=0;
-  int iEncoderAngle = 0;
+  int iEncoderAngle = 1024;
 
   tx :> ts;  // first value
 
@@ -447,8 +471,17 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   iHallStateNew      = iHallState1;
   iHallStateOld = iHallState1;
 
-  p_encoder :> iEncState1;
-  iEncoderStateNew  = iEncState1;
+
+  iEncoderPinState =  0;
+  iEncoderCountx   = 32;
+  while(iEncoderCountx > 0){
+  iTemp = function_EncoderReadout(p_encoder);
+  if(iTemp != -1) { iEncoderPinState = iTemp; iEncoderCountx=0;}
+  }
+
+
+  iEncoderStateNew = iEncoderPinState & 0x03;
+  iEncoderStateOld = iEncoderStateNew;
 
   //********************* LOOP 1µsec ****************************
   while(1) {
@@ -464,40 +497,9 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 #define defEncoderPeriodMax	  200000  //200msec
 
 	  iEncoderCountMicroSeconds++;   		// period in µsec
-/*
- switch(iStepEncoder)
-	  {
-		  case 0: p_encoder :> iEncState1; iEncState1 &= 0x07; iStepEncoder++;
-		  	  	  break;
-		  case 1: p_encoder :> iEncState2; iEncState2 &= 0x07;
-				  if(iEncState2 == iEncState1) iStepEncoder++;
-				  else iStepEncoder=0;
-				  break;
-		  case 2: p_encoder :> iEncState2; iEncState2 &= 0x07;
-				  if(iEncState2 == iEncState1) iEncoderPinState = iEncState2;
-				  else iStepEncoder=0;
-				  break;
-	  }
- */
-	  iEncoderCountx=0;
-	  iStepEncoder = 0;
-	  iEncoderOk   = 0;
-	  while(iEncoderCountx < 20)
-	  {
-	  switch(iStepEncoder)
-	  {
-		  case 0: p_encoder :> iEncState1; iEncState1 &= 0x07; iStepEncoder++;
-		          iEncoderOk++;
-		  	  	  break;
-		  case 1: p_encoder :> iEncState2; iEncState2 &= 0x07;
-				  if(iEncState2 != iEncState1) iStepEncoder=0;
-				  else iEncoderOk++;
-				  break;
-	  }
-	  iEncoderCountx++;
-	  }// end countx
 
-	  if(iEncoderOk >= 10) iEncoderPinState = iEncState1;
+	  iTemp = function_EncoderReadout(p_encoder);
+	  if(iTemp != -1)iEncoderPinState = iTemp;
 
 	  iEncoderReferenz = iEncoderPinState & 0x04;
 	  iEncoderStateNew = iEncoderPinState & 0x03;
@@ -506,8 +508,8 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	 {
 		 if(iEncoderStateNew == iEncoderNext)    {iEncoderPosAbsolut++; iEncoderAngle++; iEncoderDirection++; iEncoderDirection &= 0x03;  }
 	     if(iEncoderStateNew == iEncoderPrevious){iEncoderPosAbsolut--; iEncoderAngle--; iEncoderDirection--; if(iEncoderDirection< -3) iEncoderDirection=-3;  }
-         if(iEncoderReferenz)iEncoderAngle=0;
-         iEncoderAngle &= 0x0FFF;
+         iEncoderAngle &= 0xFFFF;   					// max 65535/rotation
+         if(iEncoderReferenz)iEncoderAngle=0xAA000000;  // info about null reference
 
 	      switch(iEncoderStateNew)
 	  	  {
@@ -707,7 +709,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 			 	 	 	 	 	 }
 			  else if  (cmd == 9) {
 				 	 	 	 	  c_hall <: iEncoderSpeed;   iEncoderSpeed &= 0x00FFFFFF;
-				 			 	  c_hall <: iEncoderAngle;
+				 			 	  c_hall <: iEncoderAngle;   iEncoderAngle &= 0xFFFF;  // send and clear info about null reference
 				 			 	  c_hall <: iEncoderPosAbsolut;
 				 			 	  c_hall <: iEncoderPinState + iEncoderReferenz*10;
 			 	 	 	 	 	 }
