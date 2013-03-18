@@ -15,6 +15,7 @@ int iEncoderActualSpeed,iEncoderAngle,iEncoderPositionAbsolut,iEncoderPinState;
 int iEncoderSpeedValueIsNew;
 int iEncoderActualSpeed;
 int iEncoderPositionAbsolut;
+int iEncoderNullReference = 0;
 
 int iActualSpeed;
 int iSpeedValueIsNew	=  0;  // if speed from hall is a new value
@@ -39,7 +40,6 @@ int iParAngleFromRPM;
 int iParUmotIntegralLimit;
 int iParPropGain;
 int iParIntegralGain;
-int iParUmotSocket;
 int iParRMS_RampLimit;
 int iParRMS_PwmOff;
 
@@ -49,6 +49,7 @@ int iUpdateFlag=0;
 int iUmotProfile;
 int iUmotIntegrator=0;
 int iUmotP;
+int iUmotRpmLimit;
 int iUmotMotor = 0;   	// follows iUmotResult
 
 int iTorqueDiff1;
@@ -84,6 +85,7 @@ int iAngleRotor;
 
 
 //----------------------------
+int iFilterSumSpeed = 0;
 int iSetValueSpeed	=  0;
 int iSetInternSpeed	=  0;
 int iSetInternSpeed2=  0;
@@ -95,7 +97,7 @@ int iControlFOC   	=  1;
 int iEncoderOnOff   =  0;
 //=======================================================
 int iCountx;
-//int iStepRamp=0;
+
 
 
 int iUmotBoost  = 0;

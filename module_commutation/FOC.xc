@@ -1,6 +1,7 @@
 #include "varext.h"
 #include "def.h"
 #include "sine_lookup.h"
+#include "dc_motor_config.h"
 
 void FOC_ClarkeAndPark()
 {
@@ -93,6 +94,8 @@ void FOC_InversPark()
 		{
         if(VsqRef1 < -defVsqRef1Max)VsqRef1 = -defVsqRef1Max;         // Limit
 		}
+
+	if(VsqRef1 > 32000) VsqRef1 = 32000;
 
 	VsdRef2 = VsdRef1/ 8;
 	VsqRef2 = VsqRef1/ 8;
@@ -196,8 +199,6 @@ void InitParameter(){
 	iMotPar[19] = defParPropGain;
 	iMotPar[20] = defParIntegralGain;
 
-
-
 	iMotPar[24] = defParRampAcc;
 	iMotPar[25] = defParRampDec;
 	iMotPar[26] = defParRampSmoothFactor;
@@ -223,18 +224,17 @@ void SaveValueToArray()
 	iMotValue[10] = iEncoderActualSpeed;
 	iMotValue[11] = 0;
 
-
-	iMotValue[12] = (iAngleRotor*65536) + iAnglePWM;
-	iMotValue[13] = iAngleDiffPeriod;
-	iMotValue[14] = iEncoderAngle;
+	iMotValue[12] = (iHallAngle *65536) + iEncoderAngle;
+	iMotValue[13] = (iAngleRotor*65536) + iAnglePWM;
+	iMotValue[14] = iAngleRotorDiffCalculated;
 	iMotValue[15] = 0;
-	iMotValue[16] = adc_b3; //VsqRef1; iAngleRotorDiffCalculated
+	iMotValue[16] = adc_b3; //VsqRef1;
 	iMotValue[17] = adc_b4; //VsdRef1;
 
- 	iMotValue[18] = adc_a1; //iFieldSet;
-	iMotValue[19] = adc_a2; //iIdPeriod2;
-	iMotValue[20] = adc_a3; //iFieldDiff2;
-	iMotValue[21] = adc_a4; //iTorqueSet;
+ 	iMotValue[18] = VsdRef1;   //adc_a1; //iFieldSet;
+	iMotValue[19] = VsdRef2;   //adc_a2; //iIdPeriod2;
+	iMotValue[20] = VsqRef1;   //adc_a3; //iFieldDiff2;
+	iMotValue[21] = VsqRef2;   //adc_a4; //iTorqueSet;
 	iMotValue[22] = adc_b1; //iIqPeriod2;
 	iMotValue[23] = adc_b2; //iTorqueDiff2;
 
