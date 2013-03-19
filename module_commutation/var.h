@@ -57,6 +57,7 @@ int iTorqueDiff2;
 int iTorqueDiffSum;
 int iTorqueSet=200;
 
+
 int iFieldDiff1;
 int iFieldDiff2;
 int iFieldDiffSum;
@@ -136,7 +137,8 @@ int iIdPeriod;
 int iIq;
 int iIqPeriod;
 int iFieldIntegral,iFieldProp;
-int iTorqIntegral,iTorqProp;
+int iTorqueIntegral,iTorqueProp;
+int iTorqueLimit;
 
 int VsdRef1, VsqRef1;		// invers park
 int VsdRef2, VsqRef2;		// invers park
@@ -154,7 +156,8 @@ int iCountDivFactor;
 char cTriggerPeriod=0;  // one complete hall period
 int iPwmOnOff 		=  1;
 int iTorqueF0=0;
-
+int iTorqueUser=0;
+int iCountx;
 //============================================
 int iPwmAddValue;
 int iPwmIndexHigh;
@@ -163,8 +166,5 @@ int iAngleSensorLessPWM;
 
 int iPositionAbsolut=0;
 int iPositionReferenz=0;
-//int iPulsCountAcc;
 int iPositionAbsolutNew;
 
-//int iPositionAcc;
-//int iPositionDec;

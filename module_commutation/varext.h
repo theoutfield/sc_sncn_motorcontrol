@@ -77,7 +77,6 @@ extern int iControlFOC   	;
 extern int iEncoderOnOff   ;
 //=======================================================
 extern int iCountx;
-//int iStepRamp=0;
 extern int iUmotBoost  ;
 extern int iUmotResult ;
 extern int iUmotLast   ;
@@ -111,7 +110,8 @@ extern int iIdPeriod;
 extern int iIq;
 extern int iIqPeriod;
 extern int iFieldIntegral,iFieldProp;
-extern int iTorqIntegral,iTorqProp;
+extern int iTorqueIntegral,iTorqueProp;
+extern int iTorqueLimit;
 extern int VsdRef1, VsqRef1;		// invers park
 extern int VsdRef2, VsqRef2;		// invers park
 extern int VsaRef, VsbRef;
@@ -127,6 +127,8 @@ extern int iCountDivFactor;
 extern char cTriggerPeriod;
 extern int iPwmOnOff 		;
 extern int iTorqueF0;
+extern int iTorqueUser;
+extern int iCountx;
 //============================================
 extern int iPwmAddValue;
 extern int iPwmIndexHigh;
@@ -134,8 +136,5 @@ extern int iAngleSensorLessPWM;
 //============================================
 extern int iPositionAbsolut;
 extern int iPositionReferenz;
-//int iPulsCountAcc;
 extern int iPositionAbsolutNew;
-//int iPositionAcc;
-//int iPositionDec;
 

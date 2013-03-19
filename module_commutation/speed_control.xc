@@ -1,5 +1,6 @@
 #include "varext.h"
 #include "def.h"
+#include "dc_motor_config.h"
 
 
 void    function_SpeedControl()
@@ -77,22 +78,26 @@ void    function_SpeedControl()
 
 		FOC_ClarkeAndPark();
 
+		if(iSetInternSpeed < 0) iTorqueF0 = -500;
+		if(iSetInternSpeed > 0) iTorqueF0 =  500;
 
 		iTorqueSet = iTorqueF0;
 
+
+
+		//------------   diff = set - actual --------------
 		iFieldDiff1     = iFieldSet  - iId;
 		iTorqueDiff1    = iTorqueF0  - iIq;  // <<<=== iTorqueF0
 
 		FOC_FilterDiffValue();
+       //-------------------------------------------------
 
-		VsdRef1 += iFieldDiff2  /128;
-		VsqRef1 += iTorqueDiff2 /128;
+
+		FOC_Integrator();
 
 
 
 		FOC_InversPark();
-
-
 
 		if(iSpeedValueIsNew) SpeedControl();
 
@@ -183,14 +188,35 @@ void CalcUmotForSpeed()
 	iUmotResult  = iUmotProfile +  iUmotIntegrator/256  + iUmotP/256 ;
 	iUmotResult += (iUmotBoost / 256);
 
+	//--------------- umot limit ---------------------------------
 
+	//================== speed limit =========================================
+	if(iActualSpeed > 0)
+	{
+	if(iActualSpeed > (defParRpmMotorMax+100))      if(iUmotRpmLimit > iUmotResult) iUmotRpmLimit = iUmotResult;
+	if(iActualSpeed < (defParRpmMotorMax-200))      iUmotRpmLimit += 16;
+	}
+	if(iActualSpeed < 0)
+	{
+	if(iActualSpeed < (-defParRpmMotorMax-100))     if(iUmotRpmLimit > iUmotResult) iUmotRpmLimit = iUmotResult;
+	if(iActualSpeed > (-defParRpmMotorMax+200))     iUmotRpmLimit += 64;
+	}
+	if(iUmotRpmLimit > UMOT_MAX) iUmotRpmLimit = UMOT_MAX;
+    //========================================================================
 
+	if(iUmotResult > iUmotRpmLimit)iUmotResult = iUmotRpmLimit;
+    if(iStep1 == 0)
+    {
+    	iUmotRpmLimit = 4096;
+    }
+   /*
 	iTemp = iActualSpeed;	if(iTemp < 0) iTemp = -iTemp;
 	if(iTemp > iParRpmMotorMax) iUmotRpmLimit++;
 	else
 	{if(iUmotRpmLimit > 0) iUmotRpmLimit--;}
 
 	iUmotResult -=  iUmotRpmLimit;
+	*/
 
 	if(iUmotResult > 4096)   iUmotResult 	= 4096;
 	if(iUmotResult < 0 )     iUmotResult 	= 0;

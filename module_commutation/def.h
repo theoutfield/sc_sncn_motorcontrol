@@ -12,6 +12,7 @@ void 	CalcCurrentValues();
 
 void FOC_ClarkeAndPark();
 void FOC_FilterDiffValue();
+void FOC_Integrator();
 void FOC_InversPark();
 
 

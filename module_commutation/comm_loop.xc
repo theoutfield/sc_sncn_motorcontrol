@@ -90,10 +90,12 @@ int iTemp1;
 		}
 		else
 		{
-//		if(iActualSpeed >= 0)
+		if(iSetLoopSpeed > 0)
 		iAngleRotor  	 = iEncoderAngle - iMotPar[8];
-//		if(iSetLoopSpeed < 0)
-//		iAngleRotor  	 = iEncoderAngle - 1970;
+		else
+		iAngleRotor  	 = iEncoderAngle - iMotPar[9];
+
+
 		iAngleRotor      &= 0x0FFF;
 
 		iTemp1 	 		 = iEncoderActualSpeed;
@@ -103,7 +105,7 @@ int iTemp1;
 
 		iFilterSumSpeed -= iActualSpeed;
 		iFilterSumSpeed += iTemp1;
-		iActualSpeed = iFilterSumSpeed/4;
+		iActualSpeed = iFilterSumSpeed/8;
 
 
 		iDiffAngleRotor = iAngleRotor - iAngleRotorOld;
@@ -314,7 +316,7 @@ int iTemp1;
 
 	#endif
 
-        if(iControlFOC >= 4 & iControlFOC < 8) iAnglePWM = iAngleSensorLessPWM;
+        if(iControlFOC >= 4 && iControlFOC < 8) iAnglePWM = iAngleSensorLessPWM;
 
         if(iControlFOC == 8) {
         	iAnglePWM   = iMotCommand[6]/65536;
@@ -428,7 +430,7 @@ int iTemp1;
 			CalcSetInternSpeed(iMotCommand[0]);
 			iControlFOC 			= iMotCommand[1] & 0x07;
 		//	iEncoderOnOff           = iMotCommand[1] & 0x08;
-			iTorqueSet  		    = iMotCommand[2];
+			iTorqueUser  		    = iMotCommand[2];
 			iMotHoldingTorque       = iMotCommand[3];
 			iPositionAbsolutNew     = iMotCommand[5];
 			// [6] iUmot and iAngle
