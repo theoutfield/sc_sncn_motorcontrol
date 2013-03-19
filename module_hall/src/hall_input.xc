@@ -20,11 +20,11 @@ extern  port p_ifm_ext_d0;
 // 32  32Bit Werte = 128Bytes -> 5,568msec
 
 //========== global variables for encoder ==========
-int iEncoderDirection 		=0;
-int iCountEncoderPulses		=0;
-int iNrEncoderPulses		=400;
-int iEncoderCountMicroSeconds=0;
-int iEncoderPeriodMicroSeconds=0;
+int iEncoderDirection 			= 0;
+int iCountEncoderPulses			= 0;
+int iNrEncoderPulses			=400;
+int iEncoderCountMicroSeconds	= 0;
+int iEncoderPeriodMicroSeconds	= 0;
 int iEncoderPeriodNext;
 int iEncoderSpeed=0;
 
@@ -347,6 +347,7 @@ tx :> ts;  // first value
 	}// end while 1
 }
 
+// iEncoderSpeed = (60 * 1.000.000) / periodeµsec
 void CalcEncoderSpeed()
 {
 	  iEncoderPeriodMicroSeconds  = iEncoderCountMicroSeconds;
@@ -527,7 +528,20 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	    	  CalcEncoderSpeed();
 	    	  iCountEncoderPulses	         = 0;
 	    	  iEncoderCountMicroSeconds      = 0;
-	    	  }
+
+	    	  //========== one pwm revolution equal 400 encoder pulses =============
+	    	/*
+		      switch(iNrEncoderPulses)
+		      {
+		      case 40:  if(iEncoderPeriodMicroSeconds < 4000)    iNrEncoderPulses = 100;  //
+		    	  	     break;
+
+		      case 100:  if(iEncoderPeriodMicroSeconds > 9000)   iNrEncoderPulses = 40;
+		      	  	     break;
+		      default: iNrEncoderPulses=40; break;
+		      }
+*/
+	    	  }// end if(iCountEncoderPulses >= iNrEncoderPulses)
 
 
        }// ======== end of NewState =====================
@@ -542,19 +556,9 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 			}
 
 
-	      /*
-	      switch(iNrEncoderPulses)
-	      {
-	      case 10:  if(iEncoderPeriodMicroSeconds < 7143)    iNrEncoderPulses = 20;
-	    	  	   break;
-	      case 20:  if(iEncoderPeriodMicroSeconds > 9000)    iNrEncoderPulses = 10;
-	      	  	   if(iEncoderPeriodMicroSeconds < 1429)     iNrEncoderPulses = 60;
-	      	  	   break;
-	      case 60:  if(iEncoderPeriodMicroSeconds > 1786)    iNrEncoderPulses = 20;
-	      	       break;
-	      default: iNrEncoderPulses=1; break;
-	      }
-	      */
+
+
+
 
 
 //========================================== end encoder ===============================================
@@ -702,15 +706,15 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	#pragma ordered
  	    select {
 			case c_hall :> cmd:
-			    if  (cmd == 8) { c_hall <: iHallSpeed;   iHallSpeed &= 0x00FFFFFF;
+			    if  (cmd == 8) {   c_hall <: iHallSpeed;   iHallSpeed &= 0x00FFFFFF;
 			 	 	 	 	 	   c_hall <: iHallAngle2;
-			 	 	 	 	 	   c_hall <: iHallPosAbsolut;
+			 	 	 	 	 	   c_hall <: iNrEncoderPulses; //iHallPosAbsolut;
 			 	 	 	 	 	   c_hall <: iHallStateNew;
 			 	 	 	 	 	 }
 			  else if  (cmd == 9) {
 				 	 	 	 	  c_hall <: iEncoderSpeed;   iEncoderSpeed &= 0x00FFFFFF;
 				 			 	  c_hall <: iEncoderAngle;   iEncoderAngle &= 0xFFFF;  // send and clear info about null reference
-				 			 	  c_hall <: iEncoderPosAbsolut;
+				 			 	  c_hall <: iEncoderPeriodMicroSeconds; //iEncoderPosAbsolut;
 				 			 	  c_hall <: iEncoderPinState + iEncoderReferenz*10;
 			 	 	 	 	 	 }
 			break;
