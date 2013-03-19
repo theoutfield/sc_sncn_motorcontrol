@@ -13,19 +13,27 @@
 #define _DC_MOTOR_CONFIG__H_
 #pragma once
 
+#define UMOT_MAX 4096
+#define TORQUE_INTEGRATOR_MAX  UMOT_MAX*16
 
-#define MAXON_EC45
-//#define MAXON_EC60
+
+
+//=========================================================
+#define MOTOR_MAXON_EC45
+//#define MOTOR_MAXON_EC60
 
 //==========================================================
-#ifdef  MAXON_EC45
+#ifdef  MOTOR_MAXON_EC45
+
 #define MOTOR_POWER 50
 #define POLE_PAIRS	8
 #define GEAR_RATIO	26
 #define MAX_NOMINAL_SPEED  4000   // in 1/min
 #define MAX_NOMINAL_CURRENT  5    // in A
-#define defENCODER
-//#define defHALL
+
+//#define defENCODER
+#define defHALL
+
 
 #define defParRpmMotorMax		 6500
 #define defParRpmUmotMax	 	11500
@@ -45,8 +53,9 @@
 #define defParTorquePropGain	   64
 #define defParTorqueIntegralGain   64
 //-------------------------------------
-#define defParEncoderResolution  4000
-#define defParEncoderZeroPoint   1000
+#define defParEncoderResolution       4000
+#define defParEncoderZeroPointPlus     640
+#define defParEncoderZeroPointMinus   1100
 //-------------------------------------
 #define defParRampAcc  			65536/2		 // change to RPM/sec
 #define defParRampDec  			65536/2         //
@@ -58,7 +67,7 @@
 //=====================================================================
 
 
-#ifdef  MAXON_EC60
+#ifdef  MOTOR_MAXON_EC60
 #define MOTOR_POWER 100
 #define POLE_PAIRS	7
 #define GEAR_RATIO	156

@@ -38,22 +38,22 @@ char cxInfo[64][20]={\
 ":",
 ":",
 //------------
-"AngleFromHall:",
-"AnglePWM:",
-"AngleDiffPer:",
+"AngleHall",
+"AngleEncoder",
+"AngleRotor",
+"AnglePWM",
+"DiffCalculated",
 ":",
-":",
-":",
-":",
+"iIq:",
 ":",
 //--------------
-"Field_Set:",				//15
-"Field_Actual:",
-"Field_Diff:",
-"Torque_Set:",
-"Torque_Actual:",
-"Torque_Diff:",
-":",
+"iIq:",				//15
+"iIqperiod2:",
+"VsqRef2:",
+"TorqueSet",
+"iTorqueDiff2:",
+"iTorqueIntegral",
+"",
 ":",
 //------
 "a1RMS_adc:",
@@ -185,28 +185,28 @@ int iStepRamp;
 		xx=16;
 		c->iMotInfo[xx+0] = ReadMotorValue(c,12,1);   //  AngleFromHall
 		c->iMotInfo[xx+1] = ReadMotorValue(c,12,0);   //  AnglePWM
-		c->iMotInfo[xx+2] = c->iMotValues[13];		  //  AngleDiffPer
-		c->iMotInfo[xx+3] = c->iMotValues[14];		  //  RampAccValue
-		c->iMotInfo[xx+4] = iStepRamp;
-		c->iMotInfo[xx+5] = 0;
+		c->iMotInfo[xx+2] = ReadMotorValue(c,13,1);   //c->iMotValues[13];		  //  AngleDiffPer
+		c->iMotInfo[xx+3] = ReadMotorValue(c,13,0);   //c->iMotValues[14];		  //  RampAccValue
+		c->iMotInfo[xx+4] = c->iMotValues[14];
+		c->iMotInfo[xx+5] = c->iMotValues[16];
 		c->iMotInfo[xx+6] = c->iMotValues[17];        // VsdRef1
 		c->iMotInfo[xx+7] = 0;
 
 		xx=24;
-		c->iMotInfo[xx+0] = c->iMotValues[18];  //Field_Set
-		c->iMotInfo[xx+1] = c->iMotValues[19];  //Field_Actual
-		c->iMotInfo[xx+2] = c->iMotValues[20];  //Field_Diff
-		c->iMotInfo[xx+3] = c->iMotValues[21];	//TorqueSet
-		c->iMotInfo[xx+4] = c->iMotValues[22];  //Iqperiod2
-		c->iMotInfo[xx+5] = c->iMotValues[23];  //ITorqueDiff2
-		c->iMotInfo[xx+6] = c->iMotValues[16];  // VsqRef1
+		c->iMotInfo[xx+0] = c->iMotValues[18];
+		c->iMotInfo[xx+1] = c->iMotValues[19];
+		c->iMotInfo[xx+2] = c->iMotValues[20];
+		c->iMotInfo[xx+3] = c->iMotValues[21];
+		c->iMotInfo[xx+4] = c->iMotValues[22];
+		c->iMotInfo[xx+5] = c->iMotValues[23];
+		c->iMotInfo[xx+6] = c->iMotValues[16];
 		c->iMotInfo[xx+7] = 0;
 
 		xx=32;
-		c->iMotInfo[32] = c->iMotValues[24]; //a1RMS_adc
-		c->iMotInfo[33] = c->iMotValues[25]; //a2RMS_adc
-		c->iMotInfo[34] = c->iMotValues[26]; //VectorCurr
-		c->iMotInfo[35] = c->iMotValues[27]; //VectorInvPark
+		c->iMotInfo[32] = c->iMotValues[24];
+		c->iMotInfo[33] = c->iMotValues[25];
+		c->iMotInfo[34] = c->iMotValues[26];
+		c->iMotInfo[35] = c->iMotValues[27];
 		c->iMotInfo[36] = 0;
 		c->iMotInfo[37] = c->iMotValues[29] & 0xFF; // PinStateEnc
 		c->iMotInfo[38] = c->iMotValues[29] / 256;  // PinStateHall
@@ -225,7 +225,7 @@ int iStepRamp;
 		 	 	if(iMotDirection ==0xFF)sprintf(cxText2,"motor  CW speed: %d RPM",c->iMotValues[7]);
 
 		 	 	if(iControlFOC <= 1) 	sprintf(cxText,"-----------------------                 SPEED Control      ---- +/- RPM  ----- %s ---------------------------",cxText2);
-		 	 	if(iControlFOC == 2)	sprintf(cxText,"-----------------------                 TORQUE Control     ---- t+200----------------------------------------");
+		 	 	if(iControlFOC == 2)	sprintf(cxText,"-----------------------    Speed and  TORQUE Control     ---- t+200----------------------------------------");
 		 	 	if(iControlFOC == 3)	sprintf(cxText,"-----------------------                 POSITION Control   ---- m+500 ----------------------------------------");
 		 	 	if(iControlFOC == 4)	sprintf(cxText,"-----------------------            Sensorless Control   ---- +/- RPM ----------------------------------------");
 

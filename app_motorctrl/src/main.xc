@@ -113,6 +113,7 @@ int main(void)
               iIndex1=0; while(iIndex1 < 32)send_cmd.iMotValues[iIndex1++] =0;
               iIndex1=0; while(iIndex1 < 32)send_cmd.iMotPar[iIndex1++]	=0;
               iIndex1=0; while(iIndex1 < 16)send_cmd.iMotCommand[iIndex1++]=0;
+              send_cmd.iMotCommand[1]=2;
               send_cmd.varx=0;
               send_cmd.var1=0;
 
