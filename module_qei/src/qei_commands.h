@@ -1,7 +1,4 @@
 /**
- * Module:  module_dsc_qei
- * Version: 1v0alpha0
- * Build:   5436fb1843bebb6a68cd194ba182e8ad9506e264
  * File:    qei_commands.h
  *
  * The copyrights, all other intellectual and industrial 

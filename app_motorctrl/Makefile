@@ -21,15 +21,14 @@ APP_NAME =
 # xcc for the final link (mapping) stage.
 
 XCC_FLAGS = -O3 -g -report -Wno-timing -lxscope
-#XCC_FLAGS = -O3 -g -Wno-timing -lxscope
-#XCC_FLAGS = -g -Wno-timing -lxscope
-
 
 # The USED_MODULES variable lists other module used by the application. 
 
-USED_MODULES = module_adc module_commutation module_hall module_blocks module_ctrl_loops
-USED_MODULES += module_pwm_symmetrical module_pwm_common sc_sncn_ethercat/module_ethercat
-USED_MODULES += sc_somanet-base/module_powermgmt sc_somanet-base/module_nodeconfig sc_somanet-base/module_fwupdate
+USED_MODULES = module_adc sc_somanet-base/module_powermgmt  module_commutation module_hall
+USED_MODULES += module_pwm_symmetrical module_pwm_common module_blocks module_ctrl_loops
+USED_MODULES += sc_somanet-base/module_nodeconfig sc_somanet-base/module_fwupdate 
+USED_MODULES += module_ethercat sc_sncn_ctrlproto/module_ctrlproto_xmos module_qei
+
 
 #USE_XTCP_MAC_CUSTOM_FILTER = 1
 

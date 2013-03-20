@@ -17,20 +17,6 @@
 #ifndef __ADC_COMMON_H__
 #define __ADC_COMMON_H__
 
-#ifdef __dsc_config_h_exists__
-#include <dsc_config.h>
-#endif
-
-#ifndef NUMBER_OF_MOTORS
-#define NUMBER_OF_MOTORS 1
-#endif
-
-// The number of trigger channels coming from PWM units
-#define ADC_NUMBER_OF_TRIGGERS NUMBER_OF_MOTORS
-
-// Count of the number of elements in the ADC filter array
-#define ADC_FILT_SAMPLE_COUNT 31
-
 typedef struct calibration {
 	int Ia_calib;
 	int Ib_calib;

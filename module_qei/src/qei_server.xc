@@ -19,10 +19,6 @@
 #include "qei_commands.h"
 #include <stdio.h>
 
-#ifndef NUMBER_OF_MOTORS
-#define NUMBER_OF_MOTORS 1
-#endif
-
 // This is the loop time for 4000RPM on a 1024 count QEI
 #pragma xta command "analyze loop qei_main_loop"
 #pragma xta command "set required - 14.64 us"
@@ -119,50 +115,6 @@ void do_qei ( streaming chanend c_qei, port in pQEI )
 	}
 }
 
-#pragma unsafe arrays
-void do_multiple_qei ( streaming chanend c_qei[], port in pQEI[] )
-{
-	unsigned pos[NUMBER_OF_MOTORS], v, ts1[NUMBER_OF_MOTORS], ts2[NUMBER_OF_MOTORS];
-	unsigned ok[NUMBER_OF_MOTORS], old_pins[NUMBER_OF_MOTORS], new_pins[NUMBER_OF_MOTORS];
-	timer t;
 
-	for (int q=0; q<NUMBER_OF_MOTORS; ++q) {
-		old_pins[q] = 0;
-		pQEI[q] :> new_pins[q];
-		t :> ts1[q];
-		pos[q] = 0;
-		ok[q] = 0;
-	}
-
-	while (1) {
-#pragma xta endpoint "qei_main_loop"
-		select {
-			case (int q=0; q<NUMBER_OF_MOTORS; ++q) pQEI[q] when pinsneq(new_pins[q]) :> new_pins[q] :
-			{
-				if ((new_pins[q] & 0x3) != old_pins[q]) {
-					ts2[q] = ts1[q];
-					t :> ts1[q];
-				}
-				v = lookup[new_pins[q]][old_pins[q]];
-				if (!v) {
-					pos[q] = 0;
-					ok[q] = 1;
-				} else {
-					{ v, pos[q] } = lmul(1, pos[q], v, -5);
-				}
-				old_pins[q] = new_pins[q] & 0x3;
-			}
-			break;
-			case (int q=0; q<NUMBER_OF_MOTORS; ++q) c_qei[q] :> int :
-			{
-				c_qei[q] <: pos[q];
-				c_qei[q] <: ts1[q];
-				c_qei[q] <: ts2[q];
-				c_qei[q] <: ok[q];
-			}
-			break;
-		}
-	}
-}
 
 

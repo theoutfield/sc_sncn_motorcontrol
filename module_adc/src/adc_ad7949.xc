@@ -203,44 +203,33 @@ static inline unsigned convert(unsigned raw)
 
 
 
-
+const unsigned adc_config_imot    =   0b000000110000110000001111111100;   		/* Motor current (ADC Channel 0), unipolar, referenced to GND */
+const unsigned adc_config_other[] = { 0b000000110000110000001111001100,   		/* Temperature */
+									  0b000000110000110011001111111100, 		/* ADC Channel 2, unipolar, referenced to GND */
+									  0b000000110000111100000000111100,   		/* ADC Channel 4, unipolar, differential pair */
+									  0b000000110000111111111111111100 }; 		/* ADC Channel 7, unipolar, referenced to GND */
+const unsigned clk_signal = 0x2aaaaaa8;
+const unsigned delay_conv = (15*USEC_FAST) / 5; // 2.2 us /* FIXME: why does this result in a delay of 3.2us?! */
+const unsigned delay_acq =   (9*USEC_FAST) / 5; // 1.8 us
+timer t;
+unsigned ts;
+unsigned data_raw_a, data_raw_b;
+/* Reading/Writing after conversion (RAC)
+  Read previous conversion result
+  Write CFG for next conversion */
+#define SPI_IDLE   configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0100)
+#define SPI_SELECT configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0000)
 #pragma unsafe arrays
 static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosia,
 		   	   	   	   	   	   	   	   	   	   in buffered port:32 p_data_a,
 		   	   	   	   	   	   	   	   	   	   in buffered port:32 p_data_b,
 		   	   	   	   	   	   	   	   	   	    	   	   	   	   clock clk )
 {
-		/*                                    0bRB    <REF >  <INx ><INCC>  00 */
-		const unsigned adc_config_imot    =   0b000000110000110000001111111100;   		/* Motor current (ADC Channel 0), unipolar, referenced to GND */
-		const unsigned adc_config_other[] = { 0b000000110000110000001111001100,   		/* Temperature */
-											  0b000000110000110011001111111100, 		/* ADC Channel 2, unipolar, referenced to GND */
-											  0b000000110000111100000000111100,   		/* ADC Channel 4, unipolar, differential pair */
-											  0b000000110000111111111111111100 }; 		/* ADC Channel 7, unipolar, referenced to GND */
-		const unsigned clk_signal = 0x2aaaaaa8;
-		//const unsigned clk_signal[2]  = { 0xaaaaaaa8, 0x02aaaaaa };
-		//const unsigned adc_trigcnv[2] = { 0x00000000, 0xf8000000 };
-
-		const unsigned delay_conv = (15*USEC_FAST) / 5; // 2.2 us /* FIXME: why does this result in a delay of 3.2us?! */
-		const unsigned delay_acq =   (9*USEC_FAST) / 5; // 1.8 us
-		timer t;
-		unsigned ts;
-
-		//  int cmd;
-		//  unsigned char ct;
-		unsigned data_raw_a, data_raw_b;
-
-		/* Reading/Writing after conversion (RAC)
-		  Read previous conversion result
-		  Write CFG for next conversion */
-		#define SPI_IDLE   configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0100)
-		#define SPI_SELECT configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0000)
-
-		//   #define WAIT		case t when timerafter(ts) :> ts:
 
 	  	SPI_IDLE;
 		t :> ts;
-		ts += delay_conv;
-		t when timerafter(ts) :> ts;  // WAIT;
+		//ts += delay_conv;
+		t when timerafter(ts+delay_conv) :> ts;  // WAIT;
 
 		//case ACQ_OTHER_SPI:
 		outputWordsZipped(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_imot, adc_config_imot, 0, clk_signal);
@@ -252,13 +241,13 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 		p_data_b :> data_raw_b;
 		adc_data_b[4] = convert(data_raw_b);
 
-		ts += delay_acq;
-		t when timerafter(ts) :> ts;
+		//ts += delay_acq;
+		t when timerafter(ts+delay_acq) :> ts;
 
 		SPI_IDLE;
-		ts += delay_conv;
+		//ts += delay_conv;
 		//WAIT;
-		t when timerafter(ts) :> ts;
+		t when timerafter(ts+delay_conv) :> ts;
 
 
 		//case ACQ_MOTOR_SPI:
@@ -286,33 +275,13 @@ void adc_ad7949_triggered( chanend c_adc,
 			   	   	   	   in buffered port:32 p_data_a,
 			   	   	   	   in buffered port:32 p_data_b )
 {
-	  timer t;
-	  unsigned ts;
+	  timer time;
+	  unsigned ts1;
 	  int cmd;
 	  unsigned char ct;
-
 	  //set_thread_fast_mode_on();
 
 	  configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
-
-	  //ii=4;
-	  //while(ii-- > 0)adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
-
-	 // ia_calibr=0;
-	 // ib_calibr=0;
-	 // ii = 32;
-	 /* while(ii > 0)
-	  {
-		  adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
-		  ia_calibr += adc_data_a[4];
-		  ib_calibr += adc_data_b[4];
-		  ii--;
-	  }
-	  ia_calibr /= 32;
-	  ib_calibr /= 32;
-	  printstr("ia_calibration ");   printint(ia_calibr); printstr("\n");
-	  printstr("ib_calibration ");   printint(ib_calibr); printstr("\n");
-	  */
 
 	while (1)
 	{
@@ -322,8 +291,8 @@ void adc_ad7949_triggered( chanend c_adc,
 			case inct_byref(c_trig, ct):
 				if (ct == XS1_CT_END)
 				{
-					t :> ts;
-					t when timerafter(ts + 6200) :> ts;  // was 4000  now set to 6200 so that even in the worst case the trigger pulse stays in low side of the pwm
+					time :> ts1;
+					time when timerafter(ts1 + 6200) :> ts1;  // was 4000  now set to 6200 so that even in the worst case the trigger pulse stays in low side of the pwm
 //					p_ifm_ext_d3 <: 1;  // set to one
 					adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
 				}

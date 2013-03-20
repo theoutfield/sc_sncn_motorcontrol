@@ -1,4 +1,4 @@
-#include <print.h>
+//#include <print.h>
 #include <adc_ad7949.h>
 
 #define ADC_CALIB_POINTS 64
@@ -31,8 +31,8 @@ void do_adc_calibration_ad7949( chanend c_adc )
 	I_calib.Ia_calib = (I_calib.Ia_calib >> Factor);
 	I_calib.Ib_calib = (I_calib.Ib_calib >> Factor);
 
-	printstr("ia_calibration ");   printint(I_calib.Ia_calib); printstr("\n");
-	printstr("ib_calibration ");   printint(I_calib.Ib_calib); printstr("\n");
+	/*printstr("ia_calibration ");   printint(I_calib.Ia_calib); printstr("\n");
+	printstr("ib_calibration ");   printint(I_calib.Ib_calib); printstr("\n");*/
 
 }
 
