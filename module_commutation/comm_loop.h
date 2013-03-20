@@ -11,6 +11,8 @@
 #include "pwm_cli_inv.h"
 #include "sine_lookup.h"
 
+#define SPACE_VECTOR
+
 void comm_sine_init(chanend c_pwm_ctrl);
 
 void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue);
@@ -25,12 +27,13 @@ void sine_pwm( int iIndexPWM, int iUmotMotor, int iMotHoldingTorque , t_pwm_cont
 
 //static t_pwm_control pwm_ctrl;
 
-extern short sine_third[];
-extern short arctg_table[];
-extern short SPACE_TABLE[];
-#ifdef DC100
-extern out port testport;
+#ifndef SPACE_VECTOR
+	extern short sine_third[];
+#else
+	extern short SPACE_TABLE[];
 #endif
+extern short arctg_table[];
+
 
 
 
