@@ -109,11 +109,12 @@ extern int iId;
 extern int iIdPeriod;
 extern int iIq;
 extern int iIqPeriod;
-extern int iFieldIntegral,iFieldProp;
-extern int iTorqueIntegral,iTorqueProp;
+extern int iFieldIntegrator,iFieldProp;
+extern int iTorqueUmotIntegrator,iTorqueProp;
 extern int iTorqueLimit;
-extern int VsdRef1, VsqRef1;		// invers park
-extern int VsdRef2, VsqRef2;		// invers park
+extern int iTorqueF0;
+extern int iTorqueUser;
+extern int iTorqueReferenz,iFieldReferenz; // invers park
 extern int VsaRef, VsbRef;
 extern int iIqProportional;
 extern int iAngleInvPark;
@@ -126,8 +127,6 @@ extern int iLoopCount;
 extern int iCountDivFactor;
 extern char cTriggerPeriod;
 extern int iPwmOnOff 		;
-extern int iTorqueF0;
-extern int iTorqueUser;
 extern int iCountx;
 //============================================
 extern int iPwmAddValue;

@@ -31,8 +31,8 @@ void FOC_ClarkeAndPark()
 			iId = (((iAlpha * cosx )  /16384) + ((iBeta * sinx ) /16384));
 			iIq = (((iBeta  * cosx )  /16384) - ((iAlpha * sinx ) /16384));
 
-			iId *= 4;
-			iIq *= 4;
+			iId *= defCurrentFactor;   // 1 or 4
+			iIq *= defCurrentFactor;
 
 
 			iIdPeriod += iId;
@@ -49,13 +49,7 @@ void FOC_ClarkeAndPark()
 				iCountDivFactor=0;
 			}
 
-			if(iStep1==0)
-			{
-				VsdRef1 		= 0;
-				VsqRef1 		= 0;
-				iFieldDiffSum   = 0;
-				iTorqueDiffSum  = 0;
-			}
+
 }// end FOC_ClarkeAndPark
 
 
@@ -80,6 +74,12 @@ int iTemp1;
 	iTorqueDiffSum -= iTorqueDiff2;
 	iTorqueDiffSum += iTorqueDiff1;
 	iTorqueDiff2    = iTorqueDiffSum/4;
+
+	if(iStep1==0)
+		{
+			iFieldDiffSum   = 0;
+			iTorqueDiffSum  = 0;
+		}
 }
 
 
@@ -88,71 +88,65 @@ int iTemp1;
 
 void FOC_Integrator(){
 int iTemp1;
+#define defReferenzFactor  64
 
 	//---------------- field --------------------------
 
 
-	iFieldIntegral += iFieldDiff2  /16;
+	iFieldIntegrator += iFieldDiff2  /8;
 
-	iFieldProp      = iFieldDiff2  /16;
+	iFieldProp      = iFieldDiff2;
 
-	if(iFieldIntegral >  16000)  iFieldIntegral =  16000;
-	if(iFieldIntegral < -16000)  iFieldIntegral = -16000;
+	if(iFieldIntegrator >  16000)  iFieldIntegrator =  16000;
+	if(iFieldIntegrator < -16000)  iFieldIntegrator = -16000;
 
-	VsdRef1 = iFieldIntegral + iFieldProp;
-	//-------------------------------------------------
+	iFieldReferenz = (iFieldIntegrator + iFieldProp) /defReferenzFactor;
+	//-------------------------------------------------------------------
 
 
-	//-------------- torque ---------------------------
+	//-------------- torque ---------------------------------------------
 	iTemp1 = iTorqueDiff2;
 
+	if(iSetLoopSpeed > 0)
+	{
     if(iActualSpeed > iSetLoopSpeed)
     	if(iTemp1 > 0) iTemp1=0;
+    iTorqueUmotIntegrator += idiffSpeed2/32;
+	}
 
-    iTorqueIntegral += idiffSpeed2/64;
 
-	iTorqueIntegral += iTemp1 / 16;
-	iTorqueProp      = iTemp1 /  8;
+    if(iSetLoopSpeed < 0)
+    {
+       if(iActualSpeed < iSetLoopSpeed)
+    	    	if(iTemp1 < 0) iTemp1=0;
+       iTorqueUmotIntegrator += idiffSpeed2/32;
+    }
 
-	VsqRef1 = iTorqueIntegral + iTorqueProp;
+	iTorqueUmotIntegrator += iTemp1;
 
-	if(iTorqueIntegral >  iTorqueLimit)  iTorqueIntegral =  iTorqueLimit;
-	if(iTorqueIntegral < -iTorqueLimit)  iTorqueIntegral = -iTorqueLimit;
+
+	iTorqueProp      = iTemp1 * 8;
+	iTorqueReferenz = (iTorqueUmotIntegrator + iTorqueProp) / defReferenzFactor;
+
+	if(iTorqueUmotIntegrator >  iTorqueLimit)  iTorqueUmotIntegrator =  iTorqueLimit;
+	if(iTorqueUmotIntegrator < -iTorqueLimit)  iTorqueUmotIntegrator = -iTorqueLimit;
 	//-------------------------------------------------
-
 
 
 	if(iStep1==0)
 	{
-		iTorqueLimit 	 = TORQUE_INTEGRATOR_MAX;
-		iFieldIntegral   = 0;
-		iTorqueIntegral  = 0;
+		iTorqueLimit 	 		= TORQUE_INTEGRATOR_MAX * 4;
+		iFieldIntegrator   		= 0;
+		iTorqueUmotIntegrator   = 0;
 	}
 }
 
 
 void FOC_InversPark()
 {
-#define defVsqRef1Max 180000
-
-		if(VsqRef1 > 0)
-		{
-        if(VsqRef1 > defVsqRef1Max)VsqRef1 = defVsqRef1Max;         // Limit
-		}
-
-		if(VsqRef1 < 0)
-		{
-        if(VsqRef1 < -defVsqRef1Max)VsqRef1 = -defVsqRef1Max;         // Limit
-		}
-
-
-
-	VsdRef2 = VsdRef1/ 16;
-	VsqRef2 = VsqRef1/ 16;
-
  //================= invers park transformation =====================
-		VsaRef = (VsdRef2 * cosx)/16384   - (VsqRef2 * sinx)/16384;
-		VsbRef = (VsdRef2 * sinx)/16384   + (VsqRef2 * cosx)/16384;
+		VsaRef = (iFieldReferenz * cosx)/16384   - (iTorqueReferenz * sinx)/16384;
+		VsbRef = (iFieldReferenz * sinx)/16384   + (iTorqueReferenz * cosx)/16384;
 		iAngleInvPark  = arctg1(VsaRef,VsbRef);           			// from 0 - 4095
 }
 
@@ -281,20 +275,20 @@ void SaveValueToArray()
 	iMotValue[14] = iAngleRotorDiffCalculated;
 	iMotValue[15] = 0;
 	iMotValue[16] = 0;
-	iMotValue[17] = iTorqueLimit; // adc_b4; //VsdRef1;
+	iMotValue[17] = iTorqueLimit/defReferenzFactor; // adc_b4; //VsdRef1;
 
- 	iMotValue[18] = iIq;   //adc_a1; //iFieldSet;
-	iMotValue[19] = iIqPeriod2;   //adc_a2; //iIdPeriod2;
-	iMotValue[20] = VsqRef2;   //adc_a3; //iFieldDiff2;
-	iMotValue[21] = iTorqueSet;   //adc_a4; //iTorqueSet;
-	iMotValue[22] = iTorqueDiff2;  // adc_b1; //;
-	iMotValue[23] = iTorqueIntegral;  //adc_b2; //iTorqueDiff2;
+ 	iMotValue[18] = iTorqueSet;
+	iMotValue[19] = iIq;
+	iMotValue[20] = iIqPeriod2;
+	iMotValue[21] = iTorqueDiff1;
+	iMotValue[22] = iTorqueProp;
+	iMotValue[23] = iTorqueReferenz;
 
 	iMotValue[24] = a1RMS;
 	iMotValue[25] = a2RMS;
 	iMotValue[26] = iVectorCurrent;
 	iMotValue[27] = iVectorInvPark;
-	iMotValue[28] = iTorqueProp;
+	iMotValue[28] = iTorqueDiff2;
 
 	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF);
 	iMotValue[30] = iEncoderPositionAbsolut;
@@ -302,4 +296,44 @@ void SaveValueToArray()
 }
 
 
+void SaveInfosToArray()
+{
+	iMotValue[0]  = iUmotProfile*65536 + ((iUmotIntegrator/256)& 0xFFFF);
+	iMotValue[1]  = iUmotBoost/256;
+	iMotValue[2]  = iUmotP;
+	iMotValue[3]  = iUmotMotor;
+	iMotValue[4]  = iMotHoldingTorque;
+	iMotValue[5]  = iControlFOC  + (iStep1 * 256)  + ((iMotDirection & 0xFF)) *65536;
+
+	iMotValue[6]  = (iSetInternSpeed & 0xFFFF0000) + iSetLoopSpeed;  //(iSetSpeedRamp/65536);
+	iMotValue[7]  = iActualSpeed;
+	iMotValue[8]  = idiffSpeed*65536 + (idiffSpeed2 & 0xFFFF);
+	iMotValue[9]  = iPositionAbsolutNew;
+	iMotValue[10] = iEncoderActualSpeed;
+	iMotValue[11] = 0;
+
+	iMotValue[12] = (iHallAngle *65536) + iEncoderAngle;
+	iMotValue[13] = (iAngleRotor*65536) + iAnglePWM;
+	iMotValue[14] = a1;
+	iMotValue[15] = a2;
+	iMotValue[16] = adc_a1;
+	iMotValue[17] = adc_a2;
+
+ 	iMotValue[18] = adc_a3;
+	iMotValue[19] = adc_a4;
+	iMotValue[20] = adc_b1;
+	iMotValue[21] = adc_b2;
+	iMotValue[22] = adc_b3;
+	iMotValue[23] = adc_b4;
+
+	iMotValue[24] = a1RMS;
+	iMotValue[25] = a2RMS;
+	iMotValue[26] = iVectorCurrent;
+	iMotValue[27] = iVectorInvPark;
+	iMotValue[28] = iTorqueDiff2;
+
+	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF);
+	iMotValue[30] = iEncoderPositionAbsolut;
+	iMotValue[31] = iHallPositionAbsolut;
+}
 

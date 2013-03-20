@@ -13,8 +13,9 @@ void    function_TorqueControl()
 				iUmotResult      = 0;
 				iSetSpeedRamp    = 0;
 				iMotDirection    = 0;
-				if(iSetInternSpeed > 0   && iTorqueUser != 0){iMotDirection =   1; VsqRef1 = 4096;  iStep1 = 10;}
-				if(iSetInternSpeed < 0   && iTorqueUser != 0){iMotDirection =  -1; VsqRef1 =-4096;  iStep1 = 10;}
+				iFieldIntegrator   = 0;
+				if(iSetInternSpeed > 0   && iTorqueUser != 0){iMotDirection =   1; iTorqueUmotIntegrator = 4096;  iStep1 = 10;}
+				if(iSetInternSpeed < 0   && iTorqueUser != 0){iMotDirection =  -1; iTorqueUmotIntegrator =-4096;  iStep1 = 10;}
 				break;
 
 				//==========================================
@@ -24,9 +25,9 @@ void    function_TorqueControl()
 				 iCountx =0;
 				 break;
 
-		case 11: iSetInternSpeed = 0;
+		case 11: iSetInternSpeed   = 0;
 			     if(iActualSpeed == 0)iStep1=0;
-			     if(iCountx++ > 9000) iStep1=0;
+			     if(iCountx++ > 18000) iStep1=0;
 		         break;
 		//--------------- overcurrent --------------------------
 		case 30:  iPwmOnOff		  = 0;			// error motor stop
@@ -46,7 +47,6 @@ void    function_TorqueControl()
 				break;
 	}// end iStep1
 
-	    CalcRampForSpeed();
 
 		FOC_ClarkeAndPark();
 
@@ -64,6 +64,7 @@ void    function_TorqueControl()
 		FOC_FilterDiffValue();
         //-------------------------------------------------
 
+		/*
 		//================== speed limit =========================================
 		if(iActualSpeed > 0)
 		{
@@ -81,19 +82,19 @@ void    function_TorqueControl()
 		if(iTorqueLimit > TORQUE_INTEGRATOR_MAX) iTorqueLimit = TORQUE_INTEGRATOR_MAX;
 		}
         //========================================================================
+		*/
 
-		FOC_Integrator();
-
-
-		FOC_InversPark();
+	    CalcRampForSpeed();
+	    iUmotProfile = CalcUmotProfile();
 
 		if(iSpeedValueIsNew) SpeedControl();
 
-		iUmotResult = iVectorInvPark;		 // FOC torque-control
+		FOC_Integrator();
 
-		//----------------------------------------------------------------
-	//	iUmotResult  = iVectorInvPark +  iUmotIntegrator/256  + iUmotP/256 ;
-	//	iUmotResult += (iUmotBoost / 256);
+		FOC_InversPark();
+
+
+		iUmotResult = iVectorInvPark/4;		 // FOC torque-control
 
 		if(iUmotResult > 4096) iUmotResult = 4096;
 

@@ -378,8 +378,6 @@ int iTemp1;
 		#endif
 
 
-		SaveValueToArray();
-
 		//================== uart connection with one pin =============================================
 		select
 		{
@@ -392,7 +390,8 @@ int iTemp1;
 					c_motvalue :> iMotCommand[cmd2+3];
 					}
 			 	else if(cmd2 >= 32 && cmd2 < 64)
-						{  	c_motvalue <: iMotValue[cmd2-32];
+						{  	if(cmd2 == 32)SaveValueToArray();
+			 		        c_motvalue <: iMotValue[cmd2-32];
 							c_motvalue <: iMotValue[cmd2-31];
 							c_motvalue <: iMotValue[cmd2-30];
 							c_motvalue <: iMotValue[cmd2-29];
@@ -400,6 +399,15 @@ int iTemp1;
 
 				else if(cmd2 >= 64 && cmd2 < 96)  { c_motvalue <: iMotPar[cmd2-64]; 	}
 				else if(cmd2 >= 96 && cmd2 < 128) { c_motvalue :> iMotPar[cmd2-96]; iUpdateFlag=1;}
+
+				else if(cmd2 >= 128 && cmd2 < 160) {
+					                   if(cmd2==128) SaveInfosToArray();
+				                       c_motvalue <: iMotValue[cmd2-128];
+				                       c_motvalue <: iMotValue[cmd2-127];
+				                       c_motvalue <: iMotValue[cmd2-126];
+				                       c_motvalue <: iMotValue[cmd2-125];
+				                     }
+
 				break;
 				default:	break;
 		}// end select

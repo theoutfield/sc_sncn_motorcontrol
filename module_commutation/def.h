@@ -1,5 +1,5 @@
 
-void SaveValueToArray(); void SetParameterValue(); void InitParameter();
+void SaveValueToArray(); void SaveInfosToArray(); void SetParameterValue(); void InitParameter();
 
 void    function_SpeedControl();
 void    function_TorqueControl();
@@ -9,6 +9,7 @@ void    function_SensorLessControl();
 void 	SpeedControl(); void CalcUmotForSpeed(); void CalcRampForSpeed();
 void 	CalcSetInternSpeed(int iSpeedValue);
 void 	CalcCurrentValues();
+int 	CalcUmotProfile();
 
 void FOC_ClarkeAndPark();
 void FOC_FilterDiffValue();

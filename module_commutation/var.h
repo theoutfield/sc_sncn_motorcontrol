@@ -136,12 +136,16 @@ int iId;
 int iIdPeriod;
 int iIq;
 int iIqPeriod;
-int iFieldIntegral,iFieldProp;
-int iTorqueIntegral,iTorqueProp;
+int iFieldIntegrator,iFieldProp;
+int iTorqueUmotIntegrator,iTorqueProp;
 int iTorqueLimit;
+int iTorqueF0=0;
+int iTorqueUser=0;
+int iTorqueReferenz,iFieldReferenz; // invers park
 
-int VsdRef1, VsqRef1;		// invers park
-int VsdRef2, VsqRef2;		// invers park
+
+
+
 int VsaRef, VsbRef;
 int iIqProportional;
 int iAngleInvPark;
@@ -155,8 +159,7 @@ int iCountDivFactor;
 
 char cTriggerPeriod=0;  // one complete hall period
 int iPwmOnOff 		=  1;
-int iTorqueF0=0;
-int iTorqueUser=0;
+
 int iCountx;
 //============================================
 int iPwmAddValue;
