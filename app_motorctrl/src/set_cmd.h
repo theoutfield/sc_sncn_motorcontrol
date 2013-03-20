@@ -9,6 +9,14 @@ typedef struct S_CMD_VAR {
 	int var1;
 } cmd_data;
 
+
+
+typedef struct S_C_Var {
+	int var1;
+} tor_data;
+
+
 #ifdef __XC__
 int input_cmd( cmd_data &d );
+int input_tor_cmd( tor_data &d );
 #endif

@@ -117,7 +117,14 @@ int iValue;
 	return(iValue);
 }
 
-
+int input_tor_cmd( tor_data *d )
+{
+	int tm;
+	printf("enter torq\n");
+	scanf("%d",&tm);
+	d->var1 = tm;
+	return 1;
+}
 int input_cmd(cmd_data *c )
 {
 unsigned char cInput=0;

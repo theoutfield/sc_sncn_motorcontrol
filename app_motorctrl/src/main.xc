@@ -1,15 +1,16 @@
-/*
+/**
+ * \file main.xc
+ *	Motor Control mainfile
  *
- * \Motor Control file
- * \brief Main project file
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors:  Pavan Kanajar <pkanajar@synapticon.com> ,Ludwig Orgler <orgler@tin.it> & Martin Schwarz <mschwarz@synapticon.com>
  *
- * Port declarations, etc.
- * 
- * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 0.1 (2012-11-23 1850)
- * \
-*/
-
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
@@ -20,6 +21,7 @@
 #include "refclk.h"
 #include "pwm_service_inv.h"
 #include "xmos_pm.h"
+#include "flash_Somanet.h"
 #include "comm_loop.h"
 #include "adc_ad7949.h"
 #include "set_cmd.h"
@@ -40,101 +42,56 @@ int main(void)
   chan c_hall;
   chan c_pwm_ctrl;
   chan c_commutation;
-  chan c_motvalue;
+  chan dummy, c_hall_1, input, c_value, sig;
 
   par
   {
-	/*************************************************************
-     * COM_CORE
-     *************************************************************/
-    on stdcore[COM_CORE]: {
-      enableAEC(500);
-    }
+		/*************************************************************
+	     * COM_CORE
+	     *************************************************************/
+	    on stdcore[COM_CORE]: {
+	      enableAEC(500);
+	    }
 
-    /************************************************************
-     * CORE 1
-     ************************************************************/
-    on stdcore[1]: {
-			 xscope_register(9,
-			 XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
-			 XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
-			 XSCOPE_CONTINUOUS, "3 iUmotIntegrator", XSCOPE_INT, "n",
-			 XSCOPE_CONTINUOUS, "4 iUmotMotor", XSCOPE_INT, "n",
-			 XSCOPE_CONTINUOUS, "5 iAngleDiffPeriod", XSCOPE_UINT, "n",
-			 XSCOPE_CONTINUOUS, "6 iVectorInvPark", XSCOPE_UINT, "n",
-			 XSCOPE_CONTINUOUS, "7 iVectorCurrent", XSCOPE_UINT, "n",
-			 XSCOPE_CONTINUOUS, "8 iIdPeriod2", XSCOPE_UINT, "n",
-			 XSCOPE_CONTINUOUS, "9 iIqPeriod2", XSCOPE_UINT, "n"
-			);
+	    /************************************************************
+	     * CORE 1
+	     ************************************************************/
+	    on stdcore[1]: {
+				 xscope_register(9,
+				 XSCOPE_CONTINUOUS, "1 iActualSpeed", XSCOPE_INT, "n",
+				 XSCOPE_CONTINUOUS, "2 iSetLoopSpeed", XSCOPE_INT, "n",
+				 XSCOPE_CONTINUOUS, "3 iUmotIntegrator", XSCOPE_INT, "n",
+				 XSCOPE_CONTINUOUS, "4 iUmotMotor", XSCOPE_INT, "n",
+				 XSCOPE_CONTINUOUS, "5 iAngleDiffPeriod", XSCOPE_UINT, "n",
+				 XSCOPE_CONTINUOUS, "6 iVectorInvPark", XSCOPE_UINT, "n",
+				 XSCOPE_CONTINUOUS, "7 iVectorCurrent", XSCOPE_UINT, "n",
+				 XSCOPE_CONTINUOUS, "8 iIdPeriod2", XSCOPE_UINT, "n",
+				 XSCOPE_CONTINUOUS, "9 iIqPeriod2", XSCOPE_UINT, "n"
+				);
 
-    }
+	    }
+
     /************************************************************
      * CORE 2             communication with the Motor
      ************************************************************/
-#ifdef DEBUG
-     on stdcore[2]:par{
-    	{
-			  cmd_data send_cmd;
-			  int valid = 0;
-			  timer tx;
-			  unsigned ts;
-              int iIndex1;
+    on stdcore[2]:par{
+        	{
+        		tor_data send;
+        		timer tx;unsigned  ts;int valid=0;
+        		int torq;
+        		 tx :> ts;  // first value
+        					  tx when timerafter(ts+4*SEC_FAST) :> ts;
+        		while(1)
+        		{
+        			valid = input_tor_cmd(send );
+        			printintln( send.var1);
+        			torq = send.var1;
+        			input <: 20;
+        			input <: torq;
+        		}
+        	}
+    }
 
-              iIndex1=0; while(iIndex1 < 32)send_cmd.iMotValues[iIndex1++] =0;
-              iIndex1=0; while(iIndex1 < 32)send_cmd.iMotPar[iIndex1++]	=0;
-              iIndex1=0; while(iIndex1 < 16)send_cmd.iMotCommand[iIndex1++]=0;
-              send_cmd.varx=0;
-              send_cmd.var1=0;
-
-              tx :> ts;  // first value
-			  tx when timerafter(ts+1*SEC_FAST) :> ts;
-
-
-			  while(1)
-			  {
-				  valid = input_cmd(send_cmd);   // valid command entered
-				  if(valid == 1)				 // if valid send command to motor ( cmd from 0 to 31 )
-				  {
-					  send_cmd.iMotCommand[15]=1;
-					  iIndex1=0;
-					  while(iIndex1 <= 12)
-					  {
-		 	    	  c_commutation <:iIndex1;
-		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1];
-		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1+1];
-		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1+2];
-		 	    	  c_commutation <: send_cmd.iMotCommand[iIndex1+3];
-		 	  	  	  iIndex1 += 4;
-					  }
-				  }// end if valid == 1
-
-
-				  if(send_cmd.varx == 1)  // readout motor values (cmd from 32 to 63 )
-				  {
-					  iIndex1 = 32;
-					  while(iIndex1 < 64)
-					  {
-					  c_commutation <: iIndex1; 	c_commutation :> send_cmd.iMotValues[iIndex1-32];
-					  iIndex1++;
-					  }
-				  }
-
-				  if(valid >= 96 && valid < 128)  // send actual parameter
-				  {  c_commutation <: valid;	  c_commutation <: send_cmd.var1;  }
-
-				  if(send_cmd.varx == 2)  	// readout  parameters (cmd from 64 to 97 )
-				  {
-					  iIndex1 =64;
-					  while(iIndex1 < 96) {
-						  c_commutation <: iIndex1; 	c_commutation :> send_cmd.iMotPar[iIndex1-64];
-						  iIndex1++;
-					  }
-				  }
-
-			  }//end while 1
-    	}
-    }// end on stdcore[2]
-#endif
     
     /************************************************************
      * IFM_CORE
@@ -143,19 +100,19 @@ int main(void)
     	par {
     			adc_ad7949_triggered( c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob);
 
-    			//do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, ADC_SYNC_PORT, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
     			do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
     			run_hall( c_hall, p_ifm_hall, p_ifm_encoder);
 
-    			commutation(c_value, c_pwm_ctrl, sig);
+    			commutation(c_commutation, c_value, c_pwm_ctrl, sig);
 
-
+    			foc_loop(sig, input, c_adc, c_hall, c_value);
       	  }
     }// end stdcore[IFM_CORE]
 
   }// end par main
   return 0;
 }
+
 
 

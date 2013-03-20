@@ -28,7 +28,7 @@ XCC_FLAGS = -O3 -g -report -Wno-timing -lxscope
 # The USED_MODULES variable lists other module used by the application. 
 
 USED_MODULES = module_adc module_commutation module_hall module_blocks module_ctrl_loops
-USED_MODULES += module_pwm_symmetrical module_pwm_common 
+USED_MODULES += module_pwm_symmetrical module_pwm_common sc_sncn_ethercat/module_ethercat
 USED_MODULES += sc_somanet-base/module_powermgmt sc_somanet-base/module_nodeconfig sc_somanet-base/module_fwupdate
 
 #USE_XTCP_MAC_CUSTOM_FILTER = 1
