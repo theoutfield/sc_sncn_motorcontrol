@@ -1,9 +1,23 @@
+/**
+ * \file a4935.xc
+ *
+ *	Driver file for motor
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Martin Schwarz <mschwarz@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
+
+
 #include <xs1.h>
-#include <print.h> // FIXME remove after debug
 #include "platform.h"
 #include "ioports.h"
 #include "a4935.h"
-
 
 static unsigned cur_state_ff1, cur_state_ff2;
 
@@ -45,16 +59,16 @@ void a4935_init(unsigned configuration)
 select a4935_check_fault_select(void)
 {
   case p_ifm_ff1 when pinsneq(cur_state_ff1) :> cur_state_ff1:
-    printstr("FF1, FF2 = ");
-    printuint(cur_state_ff1);
-    printstr(", ");
-    printuintln(cur_state_ff2);
+   // printstr("FF1, FF2 = ");
+   // printuint(cur_state_ff1);
+   // printstr(", ");
+   // printuintln(cur_state_ff2);
     break;
 
   case p_ifm_ff2 when pinsneq(cur_state_ff2) :> cur_state_ff2:
-    printstr("FF1, FF2 = ");
-    printuint(cur_state_ff1);
-    printstr(", ");
-    printuintln(cur_state_ff2);
+   // printstr("FF1, FF2 = ");
+   // printuint(cur_state_ff1);
+   // printstr(", ");
+   // printuintln(cur_state_ff2);
     break;
 }

@@ -1,10 +1,9 @@
 /**
- * The copyrights, all other intellectual and industrial
- * property rights are retained by XMOS and/or its licensors.
- * Terms and conditions covering the use of this code can
- * be found in the Xmos End User License Agreement.
+ * \file sine_table_big.xc
+ *	Sine Lookup Table
  *
- * Copyright XMOS Ltd 2011
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors:  Martin Schwarz <mschwarz@synapticon.com> & Ludwig Orgler <orgler@tin.it>
  *
  * In the case where this code is a modification of existing code
  * under a separate license, the separate license terms are shown
@@ -12,6 +11,7 @@
  * copyright notice above.
  *
  **/
+
 #include "sine_table_big.h"
 
 short arctg_table[1024+6]={//

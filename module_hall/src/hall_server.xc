@@ -1,11 +1,24 @@
 /**
- * Module:  module_hall
- * Version: 1v0alpha2
-
- * orgler@tin.it synapticon 01/2013
-  *
- **/                                   
-#include "hall_input.h"
+ * \file hall_server.xc
+ *
+ *	Hall Sensor Server
+ *
+ * The copyrights, all other intellectual and industrial
+ * property rights are retained by XMOS and Synapticon GmbH.
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright 2013, Synapticon GmbH & XMOS Ltd. All rights reserved.
+ * Authors: Martin Schwarz <mschwarz@synapticon.com>
+ *
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code arse still covered by the
+ * copyright notice above.
+ *
+ **/
+#include "hall_server.h"
 #include <stdlib.h>
 #include <print.h>
 #include <stdint.h>

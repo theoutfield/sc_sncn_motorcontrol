@@ -1,10 +1,19 @@
 
-/*
+/**
+ * \file mot_profile.c
  *
+ * Motion Profile file used to generate motion profiles for position control rountine
+ * Based on Linear Function with Parabolic Blends
  *
- *  Created on: Oct 2, 2012
- *      Author: Pavan Kanajar <pkanajar@synapticon.com>
-*/
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,17 +29,29 @@ unsigned root_function(unsigned uSquareValue)
 	return (uResult);
 }
 
-struct pos_params{
-float max;
-float vi, qi, qf; //user input variables
-float dist, d_cruise, t_cruise, tb, tf, t_int, t, ts; //motion profile params
-float ai, bi, ci, di, ei, fi, gi; //motion profile constants
-float qid, qfd;
-float q, qd, q2d;
-float samp; float len;
-int dirn;
+struct pos_params
+{
+	float max;												// shaft output speed in deg/s
+	float vi, qi, qf; 										// user input variables
+	float dist, d_cruise, t_cruise, tb, tf, t_int, t, ts; 	// motion profile params
+	float ai, bi, ci, di, ei, fi, gi; 						// motion profile constants
+	float qid, qfd;
+	float q, qd, q2d;
+	float samp; float len;
+	int dirn;
 } pos_params_t;
 
+/*
+ * initialization function for the position control routine
+ * 	with parameters
+ *
+ * 		vel 	: 	velocity
+ * 		pos_i 	: 	start position 	 (current position)
+ * 		pos_f   :   final position 	 (desired position)
+ *
+ * 	returns the total no of samples based on positon control frequency param pos_ctrl_freq  defined in dc_motor_config.h
+ *
+ */
 int init(int vel, int pos_i, int pos_f)
 {
 	int sample;
@@ -70,6 +91,16 @@ int init(int vel, int pos_i, int pos_f)
 	return sample;
 }
 
+
+/*
+ * 	Motion profile generator : position function
+ *
+ * 	  i : time sample varying from 0 to Sample count returned from init function above.
+ *
+ * 	  returns the position at the time stamp i.
+ *
+ */
+
 int mot_q(int i)
 {
 	int Q;
@@ -91,6 +122,14 @@ int mot_q(int i)
 	return Q;
 }
 
+/*
+ * 	Motion profile generator : velocity function
+ *
+ * 	  i : time sample varying from 0 to Sample count returned from init function above.
+ *
+ * 	  returns the velocity at the time stamp i.
+ *
+ */
 
 int mot_qd(int i)
 {
@@ -114,6 +153,16 @@ int mot_qd(int i)
 	return Qd;
 
 }
+
+/*
+ * 	Motion profile generator : acceleration function
+ *
+ * 	  i : time sample varying from 0 to Sample count returned from init function above.
+ *
+ * 	  returns the acceleration at the time stamp i.
+ *
+ */
+
 int mot_q2d(int i)
 {
 	int Q2d;

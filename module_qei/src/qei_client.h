@@ -24,7 +24,6 @@
 
 
 /**
- *
  *  \param c_qei The control channel for the QEI server
  *  \return the speed, position and valid state
  */

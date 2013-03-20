@@ -1,7 +1,7 @@
 /**
  * \file adc_ad7949.xc
  *
- * Copyright 2012, Synapticon GmbH. All rights reserved.
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Author: Martin Schwarz <mschwarz@synapticon.com>
  *
  * In the case where this code is a modification of existing code

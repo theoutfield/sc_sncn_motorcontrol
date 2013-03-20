@@ -1,18 +1,21 @@
-/**
+/**************************************************************************
+ * \file dc_motor_config.h
+ *	PWM config file
  *
- * The copyrights, all other intellectual and industrial 
- * property rights are retained by XMOS and/or its licensors. 
- * Terms and conditions covering the use of this code can
- * be found in the Xmos End User License Agreement.
  *
- * Copyright XMOS Ltd 2010
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors:  Martin Schwarz <mschwarz@synapticon.com>
+ *
+ * All code contained in this package under Synapticon copyright must be
+ * licensing for any use from Synapticon. Please contact support@synapticon.com for
+ * details of licensing.
  *
  * In the case where this code is a modification of existing code
  * under a separate license, the separate license terms are shown
- * below. The modifications to the code are still covered by the 
+ * below. The modifications to the code are still covered by the
  * copyright notice above.
  *
- **/                                   
+ **************************************************************************/
 #pragma once
 
 // Define dead time period in 10ns period, i.e. dead time = PWM_DEAD_TIME * 10ns

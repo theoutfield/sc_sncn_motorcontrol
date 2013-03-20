@@ -27,7 +27,7 @@ XCC_FLAGS = -O3 -g -report -Wno-timing -lxscope
 USED_MODULES = module_adc sc_somanet-base/module_powermgmt  module_commutation module_hall
 USED_MODULES += module_pwm_symmetrical module_pwm_common module_blocks module_ctrl_loops
 USED_MODULES += sc_somanet-base/module_nodeconfig sc_somanet-base/module_fwupdate 
-USED_MODULES += module_ethercat sc_sncn_ctrlproto/module_ctrlproto_xmos module_qei
+USED_MODULES += sc_sncn_ethercat/module_ethercat sc_sncn_ctrlproto/module_ctrlproto_xmos module_qei
 
 
 #USE_XTCP_MAC_CUSTOM_FILTER = 1

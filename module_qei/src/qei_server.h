@@ -13,7 +13,9 @@
  * below. The modifications to the code are still covered by the 
  * copyright notice above.
  *
- */                                   
+ */
+
+
 #ifndef __QEI_SERVER_H__
 #define __QEI_SERVER_H__
 #include <xs1.h>

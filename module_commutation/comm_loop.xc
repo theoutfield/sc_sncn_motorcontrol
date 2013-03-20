@@ -1,3 +1,21 @@
+
+/**
+ * \file comm_loop.xc
+ *
+ *	Commutation rountine based on Space Vector PWM method
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>, Ludwig Orgler <orgler@tin.it>
+ * 			& Martin Schwarz <mschwarz@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
+
+
 #include <xs1.h>
 #include <stdint.h>
 #include <xscope.h>

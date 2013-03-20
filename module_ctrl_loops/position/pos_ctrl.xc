@@ -1,3 +1,17 @@
+/**
+ * \file pos_ctrl.xc
+ *
+ *	Position control rountine based on Computed Torque control method
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
 
 #include "pos_ctrl.h"
 #include "refclk.h"

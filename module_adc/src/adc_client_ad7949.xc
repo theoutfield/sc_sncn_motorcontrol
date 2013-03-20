@@ -1,4 +1,17 @@
-//#include <print.h>
+
+/**
+ * \file adc_client_ad7949.xc
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Author: Martin Schwarz <mschwarz@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
+
 #include <adc_ad7949.h>
 
 #define ADC_CALIB_POINTS 64
