@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <xscope.h>
-#include "somanet/ioports.h"
+#include "ioports.h"
 #include "refclk.h"
 #include "pwm_service_inv.h"
 #include "xmos_pm.h"
@@ -29,7 +29,6 @@
 #define COM_CORE 0
 #define IFM_CORE 3
 
-//on stdcore[IFM_CORE]: clock clk_uart = XS1_CLKBLK_REF;
 on stdcore[IFM_CORE]: clock clk_adc  = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm  = XS1_CLKBLK_REF;
 

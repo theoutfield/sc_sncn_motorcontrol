@@ -5,7 +5,6 @@
 CONFIG ?= Debug
 
 TARGET = C22-ComECAT-IfmBLDC-XScope
-#TARGET = C22-IFBLDC
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to 
@@ -28,10 +27,9 @@ XCC_FLAGS = -O3 -g -report -Wno-timing -lxscope
 
 # The USED_MODULES variable lists other module used by the application. 
 
-USED_MODULES = module_adc module_xmos_pm  module_commutation module_hall
-USED_MODULES += module_pwm_symmetrical module_pwm_common module_blocks module_ctrl_loops
-# module_dsc_display module_dsc_blocks
-#USED_MODULES += module_dsc_comms
+USED_MODULES = module_adc module_commutation module_hall module_blocks module_ctrl_loops
+USED_MODULES += module_pwm_symmetrical module_pwm_common 
+USED_MODULES += sc_somanet-base/module_powermgmt sc_somanet-base/module_nodeconfig sc_somanet-base/module_fwupdate
 
 #USE_XTCP_MAC_CUSTOM_FILTER = 1
 
