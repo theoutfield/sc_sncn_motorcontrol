@@ -148,10 +148,8 @@ int main(void)
 
     			run_hall( c_hall, p_ifm_hall, p_ifm_encoder);
 
-    			commutation(c_adc, c_commutation, c_hall, c_pwm_ctrl, c_motvalue );
-				#ifdef DEBUG
-    			run_uart(c_motvalue, clk_pwm);
-				#endif
+    			commutation(c_value, c_pwm_ctrl, sig);
+
 
       	  }
     }// end stdcore[IFM_CORE]
