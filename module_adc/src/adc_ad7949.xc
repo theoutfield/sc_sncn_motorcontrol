@@ -212,10 +212,15 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 {
 		/*                                    0bRB    <REF >  <INx ><INCC>  00 */
 		const unsigned adc_config_imot    =   0b000000110000110000001111111100;   		/* Motor current (ADC Channel 0), unipolar, referenced to GND */
+
 		const unsigned adc_config_other[] = { 0b000000110000110000001111001100,   		/* Temperature */
 											  0b000000110000110011001111111100, 		/* ADC Channel 2, unipolar, referenced to GND */
-											  0b000000110000111100000000111100,   		/* ADC Channel 4, unipolar, differential pair */
-											  0b000000110000111111111111111100 }; 		/* ADC Channel 7, unipolar, referenced to GND */
+											  0b000000110000111100111111111100,   		/* ADC Channel 4, unipolar, referenced to GND  */
+											  0b000000110000111100111111111100,   		/* ADC Channel 5, unipolar, referenced to GND  */
+
+											//0b000000110000111100000000111100,   		/* ADC Channel 4, unipolar, differential pair */
+											//0b000000110000111111111111111100,
+		}; 		/* ADC Channel 7, unipolar, referenced to GND */
 		const unsigned clk_signal = 0x2aaaaaa8;
 		//const unsigned clk_signal[2]  = { 0xaaaaaaa8, 0x02aaaaaa };
 		//const unsigned adc_trigcnv[2] = { 0x00000000, 0xf8000000 };
