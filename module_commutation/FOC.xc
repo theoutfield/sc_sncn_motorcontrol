@@ -1,5 +1,6 @@
 #include "varext.h"
 #include "def.h"
+#include "sine_table_big.h"
 #include "sine_lookup.h"
 
 void FOC_ClarkeAndPark()

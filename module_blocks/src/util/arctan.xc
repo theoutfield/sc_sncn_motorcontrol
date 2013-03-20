@@ -1,5 +1,4 @@
-#include "sine_lookup.h"
-extern short arctg_table[];
+#include "sine_table_big.h"
 
 int arctg1(int iReell, int iImm)
 {

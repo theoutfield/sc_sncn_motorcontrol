@@ -15,8 +15,6 @@
 #ifndef __SINE_LOOKUP_H__
 #define __SINE_LOOKUP_H__
 
-extern short sine_table[];
-
 /** \brief Look up the fixed point sine value
  *
  * This looks up the sine of a value. The value is the index into the

@@ -9,9 +9,8 @@
 
 #include <pwm_config.h>
 #include "pwm_cli_inv.h"
+#include "sine_table_big.h"
 #include "sine_lookup.h"
-
-#define SPACE_VECTOR
 
 void comm_sine_init(chanend c_pwm_ctrl);
 
@@ -26,13 +25,6 @@ void sine_pwm( int iIndexPWM, int iUmotMotor, int iMotHoldingTorque , t_pwm_cont
 #define DC900
 
 //static t_pwm_control pwm_ctrl;
-
-#ifndef SPACE_VECTOR
-	extern short sine_third[];
-#else
-	extern short SPACE_TABLE[];
-#endif
-extern short arctg_table[];
 
 
 
