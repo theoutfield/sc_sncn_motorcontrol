@@ -3,9 +3,12 @@
  *	Motor Control config file
  *
  * Please define your the motor specifications here
+ *
  * All these initialisation functions :init_params_struct_all, init_hall and init_qei
- * need to be called to set up the variables for control modules "else operation is not guaranteed"
- * You still need to tune the control params for your motor individually
+ * need to be called to set up the variables for control module, hall sensor and quadrature
+ * sensor modules "else operation is not guaranteed"
+ *
+ * You still need to tune the PI torque control params for your motor individually
  *
  * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Authors:  Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
