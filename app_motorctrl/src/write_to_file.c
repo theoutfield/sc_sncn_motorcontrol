@@ -44,16 +44,16 @@ char cxInfo[64][20]={\
 "AnglePWM",
 "DiffCalculated",
 ":",
-"iIq:",
+"TorqueProp",
 ":",
 //--------------
+"TorqueSet",
 "iIq:",				//15
 "iIqperiod2:",
-"VsqRef2:",
-"TorqueSet",
-"iTorqueDiff2:",
-"iTorqueIntegral",
-"",
+"iTorqueDiff1",
+"iTorqueDiff2",
+"TorqueIntegr.",
+"TorqueLimit",
 ":",
 //------
 "a1RMS_adc:",

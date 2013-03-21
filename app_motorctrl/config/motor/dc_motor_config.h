@@ -95,15 +95,14 @@
 #define defParIntegralGain		    8
 #define defCurrentFactor            1
 
-
 #define defParTorquePropGain	   64
 #define defParTorqueIntegralGain   64
 //-------------------------------------
 #define defParEncoderResolution 4000
 #define defParEncoderZeroPoint   570
 //-------------------------------------
-#define defParRampAcc  65536		 //  change to RPM/sec
-#define defParRampDec  65536
+#define defParRampAcc  65536/8		 //  change to RPM/sec
+#define defParRampDec  65536/8
 #define defParRampSmoothFactor 4
 
 #define defParPositionSpeedMax   800   // RPM
