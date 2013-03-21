@@ -431,7 +431,6 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   int iHallAngle2;
   int delta_angle;
   int iAngleLast;
-  int iAngleDiff;
 
 
   int iCountTransitionSum;
@@ -624,17 +623,22 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	    	  iCountHallPulses 		  = 0;
 	    	  iHallCountMicroSeconds  = 0;
 
-	      switch(iNrHallPulses)
-	      {
-	      case 1:  if(iHallPeriodMicroSeconds < 7143)    iNrHallPulses = 2;
-	    	  	   break;
-	      case 2:  if(iHallPeriodMicroSeconds > 9000)    iNrHallPulses = 1;
-	      	  	   if(iHallPeriodMicroSeconds < 1429)    iNrHallPulses = 6;
-	      	  	   break;
-	      case 6:  if(iHallPeriodMicroSeconds > 1786)    iNrHallPulses = 2;
-	      	       break;
-	      default: iNrHallPulses=1; break;
-	      }
+	    	  switch(iNrHallPulses)
+	    	  {
+	    	  case 1: if(iHallPeriodMicroSeconds < 7143)    iNrHallPulses = 2;
+	    	  	      break;
+
+	    	  case 2:  if(iHallPeriodMicroSeconds > 9000)    iNrHallPulses = 1;
+	      	  	       if(iHallPeriodMicroSeconds < 1500)    iNrHallPulses = 4;
+	      	  	       break;
+
+	    	  case 4:  if(iHallPeriodMicroSeconds > 3000)    iNrHallPulses = 2;
+	    	  	  	   if(iHallPeriodMicroSeconds < 1500)    iNrHallPulses = 6;
+
+	    	  case 6:  if(iHallPeriodMicroSeconds > 3000)    iNrHallPulses = 4;
+	      	           break;
+	    	  default: iNrHallPulses=1; break;
+	    	  }
 	      }
 
 
@@ -701,9 +705,6 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
 
 
-
-
-
    tx when timerafter(ts + 250) :> ts;   // 250 => 1µsec 125= 0,5µsec
 
 	#pragma ordered
@@ -717,8 +718,8 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 			  else if  (cmd == 9) {
 				 	 	 	 	  c_hall <: iEncoderSpeed;   iEncoderSpeed &= 0x00FFFFFF;
 				 			 	  c_hall <: iEncoderAngle;   iEncoderAngle &= 0xFFFF;  // send and clear info about null reference
-				 			 	  c_hall <: iEncoderPeriodMicroSeconds; //iEncoderPosAbsolut;
-				 			 	  c_hall <: iEncoderPinState + iEncoderReferenz*10;
+				 			 	  c_hall <: iHallPeriodMicroSeconds;  //  iEncoderPeriodMicroSeconds; //iEncoderPosAbsolut;
+				 			 	  c_hall <: iNrHallPulses;  //iEncoderPinState + iEncoderReferenz*10;
 			 	 	 	 	 	 }
 			break;
 			default:  break;
