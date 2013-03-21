@@ -14,18 +14,18 @@ void    function_TorqueControl()
 				iSetSpeedRamp    = 0;
 				iMotDirection    = 0;
 				iFieldIntegrator   = 0;
-				if(iSetInternSpeed > 0   && iTorqueUser != 0){iMotDirection =   1; iTorqueUmotIntegrator = 4096;  iStep1 = 10;}
-				if(iSetInternSpeed < 0   && iTorqueUser != 0){iMotDirection =  -1; iTorqueUmotIntegrator =-4096;  iStep1 = 10;}
+				if(iSetUserSpeed > 0   && iTorqueUser != 0){iMotDirection =   1; iTorqueUmotIntegrator = 4096;  iStep1 = 10;}
+				if(iSetUserSpeed < 0   && iTorqueUser != 0){iMotDirection =  -1; iTorqueUmotIntegrator =-4096;  iStep1 = 10;}
 				break;
 
 				//==========================================
 		case 10: iPwmOnOff 		 = 1;
 				 if(iTorqueUser  ==0)     iStep1++;
-				 if(iSetInternSpeed == 0) iStep1++;
+				 if(iSetUserSpeed == 0) iStep1++;
 				 iCountx =0;
 				 break;
 
-		case 11: iSetInternSpeed   = 0;
+		case 11: iSetUserSpeed   = 0;
 			     if(iActualSpeed == 0)iStep1=0;
 			     if(iCountx++ > 18000) iStep1=0;
 		         break;
@@ -40,7 +40,7 @@ void    function_TorqueControl()
 		 	 	  }
 		 	 	  else
 		 	 	  {
-				  if(iSetLoopSpeed== 0)iStep1=0;     // motor is stopping
+				  if(iSetSpeed== 0)iStep1=0;     // motor is stopping
 		 	 	  }
 		 	 	  break;
 		default:iStep1 = 0;
@@ -53,8 +53,8 @@ void    function_TorqueControl()
 		iTorqueSet = iTorqueUser;
 		if(iTorqueSet < 0) iTorqueSet = -iTorqueSet;
 
-		if(iSetInternSpeed < 0) iTorqueSet = -iTorqueSet;
-		if(iSetInternSpeed == 0) iTorqueSet=0;
+		if(iSetUserSpeed < 0)  iTorqueSet = -iTorqueSet;
+		if(iSetUserSpeed == 0) iTorqueSet=0;
 
 
 		//------------   diff = set - actual --------------
@@ -85,9 +85,8 @@ void    function_TorqueControl()
 		*/
 
 	    CalcRampForSpeed();
-	    iUmotProfile = CalcUmotProfile();
-
-		if(iSpeedValueIsNew) SpeedControl();
+	    iUmotProfile  = CalcUmotProfile();
+		if(iSpeedValueIsNew) CalcDiffSpeed();
 
 		FOC_Integrator();
 

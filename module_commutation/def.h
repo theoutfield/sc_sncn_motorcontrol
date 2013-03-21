@@ -7,7 +7,8 @@ void 	function_PositionControl();
 void    function_SensorLessControl();
 
 void 	SpeedControl(); void CalcUmotForSpeed(); void CalcRampForSpeed();
-void 	CalcSetInternSpeed(int iSpeedValue);
+void 	CalcSetUserSpeed(int iSpeedValue);
+void 	CalcDiffSpeed();
 void 	CalcCurrentValues();
 int 	CalcUmotProfile();
 

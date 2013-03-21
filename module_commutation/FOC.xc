@@ -88,7 +88,7 @@ int iTemp1;
 
 void FOC_Integrator(){
 int iTemp1;
-#define defReferenzFactor  64
+#define defREFERENZFACTOR  64
 
 	//---------------- field --------------------------
 
@@ -100,36 +100,37 @@ int iTemp1;
 	if(iFieldIntegrator >  16000)  iFieldIntegrator =  16000;
 	if(iFieldIntegrator < -16000)  iFieldIntegrator = -16000;
 
-	iFieldReferenz = (iFieldIntegrator + iFieldProp) /defReferenzFactor;
+	iFieldReferenz = (iFieldIntegrator + iFieldProp) /defREFERENZFACTOR;
 	//-------------------------------------------------------------------
 
 
 	//-------------- torque ---------------------------------------------
 	iTemp1 = iTorqueDiff2;
 
-	if(iSetLoopSpeed > 0)
+	if(iSetSpeed > 0)
 	{
-    if(iActualSpeed > iSetLoopSpeed)
+    if(iActualSpeed > iSetSpeed)
     	if(iTemp1 > 0) iTemp1=0;
-    iTorqueUmotIntegrator += idiffSpeed2/32;
+    if(iSpeedValueIsNew) iTorqueUmotIntegrator += idiffSpeed2;
 	}
 
 
-    if(iSetLoopSpeed < 0)
+    if(iSetSpeed < 0)
     {
-       if(iActualSpeed < iSetLoopSpeed)
+       if(iActualSpeed < iSetSpeed)
     	    	if(iTemp1 < 0) iTemp1=0;
-       iTorqueUmotIntegrator += idiffSpeed2/32;
+       if(iSpeedValueIsNew) iTorqueUmotIntegrator += idiffSpeed2;
     }
 
 	iTorqueUmotIntegrator += iTemp1;
 
-
 	iTorqueProp      = iTemp1 * 8;
-	iTorqueReferenz = (iTorqueUmotIntegrator + iTorqueProp) / defReferenzFactor;
+
 
 	if(iTorqueUmotIntegrator >  iTorqueLimit)  iTorqueUmotIntegrator =  iTorqueLimit;
 	if(iTorqueUmotIntegrator < -iTorqueLimit)  iTorqueUmotIntegrator = -iTorqueLimit;
+
+	iTorqueReferenz = (iTorqueUmotIntegrator + iTorqueProp) / defREFERENZFACTOR;
 	//-------------------------------------------------
 
 
@@ -149,6 +150,16 @@ void FOC_InversPark()
 		VsbRef = (iFieldReferenz * sinx)/16384   + (iTorqueReferenz * cosx)/16384;
 		iAngleInvPark  = arctg1(VsaRef,VsbRef);           			// from 0 - 4095
 }
+
+
+
+//=======================================================================================
+//
+//=======================================================================================
+//=======================================================================================
+
+
+
 
 
 
@@ -263,9 +274,9 @@ void SaveValueToArray()
 	iMotValue[4]  = iMotHoldingTorque;
 	iMotValue[5]  = iControlFOC  + (iStep1 * 256)  + ((iMotDirection & 0xFF)) *65536;
 
-	iMotValue[6]  = (iSetInternSpeed & 0xFFFF0000) + iSetLoopSpeed;  //(iSetSpeedRamp/65536);
+	iMotValue[6]  = (iSetUserSpeed & 0xFFFF0000) + iSetSpeed;  //(iSetSpeedRamp/65536);
 	iMotValue[7]  = iActualSpeed;
-	iMotValue[8]  = idiffSpeed*65536 + (idiffSpeed2 & 0xFFFF);
+	iMotValue[8]  = idiffSpeed1*65536 + (idiffSpeed2 & 0xFFFF);
 	iMotValue[9]  = iPositionAbsolutNew;
 	iMotValue[10] = iEncoderActualSpeed;
 	iMotValue[11] = 0;
@@ -275,20 +286,20 @@ void SaveValueToArray()
 	iMotValue[14] = iAngleRotorDiffCalculated;
 	iMotValue[15] = 0;
 	iMotValue[16] = 0;
-	iMotValue[17] = iTorqueLimit/defReferenzFactor; // adc_b4; //VsdRef1;
+	iMotValue[17] = iTorqueLimit/defREFERENZFACTOR; // adc_b4; //VsdRef1;
 
  	iMotValue[18] = iTorqueSet;
 	iMotValue[19] = iIq;
 	iMotValue[20] = iIqPeriod2;
 	iMotValue[21] = iTorqueDiff1;
-	iMotValue[22] = iTorqueProp;
+	iMotValue[22] = iTorqueDiff2;
 	iMotValue[23] = iTorqueReferenz;
 
 	iMotValue[24] = a1RMS;
 	iMotValue[25] = a2RMS;
 	iMotValue[26] = iVectorCurrent;
 	iMotValue[27] = iVectorInvPark;
-	iMotValue[28] = iTorqueDiff2;
+	iMotValue[28] = 0;
 
 	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF);
 	iMotValue[30] = iEncoderPositionAbsolut;
@@ -305,9 +316,9 @@ void SaveInfosToArray()
 	iMotValue[4]  = iMotHoldingTorque;
 	iMotValue[5]  = iControlFOC  + (iStep1 * 256)  + ((iMotDirection & 0xFF)) *65536;
 
-	iMotValue[6]  = (iSetInternSpeed & 0xFFFF0000) + iSetLoopSpeed;  //(iSetSpeedRamp/65536);
+	iMotValue[6]  = (iSetUserSpeed & 0xFFFF0000) + iSetSpeed;  //(iSetSpeedRamp/65536);
 	iMotValue[7]  = iActualSpeed;
-	iMotValue[8]  = idiffSpeed*65536 + (idiffSpeed2 & 0xFFFF);
+	iMotValue[8]  = idiffSpeed1*65536 + (idiffSpeed2 & 0xFFFF);
 	iMotValue[9]  = iPositionAbsolutNew;
 	iMotValue[10] = iEncoderActualSpeed;
 	iMotValue[11] = 0;
