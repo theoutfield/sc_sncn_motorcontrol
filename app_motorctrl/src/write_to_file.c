@@ -60,7 +60,7 @@ char cxInfo[64][20]={\
 "a2RMS_adc:",
 "VectorCurr:",
 "VectorInvPark:",
-":",
+"PositionAbs.",
 "PinStateEnc.:",
 "PinStateHall:",
 ":",
@@ -188,8 +188,8 @@ int iStepRamp;
 		c->iMotInfo[xx+2] = ReadMotorValue(c,13,1);   //c->iMotValues[13];		  //  AngleDiffPer
 		c->iMotInfo[xx+3] = ReadMotorValue(c,13,0);   //c->iMotValues[14];		  //  RampAccValue
 		c->iMotInfo[xx+4] = c->iMotValues[14];
-		c->iMotInfo[xx+5] = c->iMotValues[16];
-		c->iMotInfo[xx+6] = c->iMotValues[17];        // VsdRef1
+		c->iMotInfo[xx+5] = c->iMotValues[15];
+		c->iMotInfo[xx+6] = c->iMotValues[17];        // TorqueLimit
 		c->iMotInfo[xx+7] = 0;
 
 		xx=24;
@@ -207,7 +207,7 @@ int iStepRamp;
 		c->iMotInfo[33] = c->iMotValues[25];
 		c->iMotInfo[34] = c->iMotValues[26];
 		c->iMotInfo[35] = c->iMotValues[27];
-		c->iMotInfo[36] = 0;
+		c->iMotInfo[36] = c->iMotValues[28];
 		c->iMotInfo[37] = c->iMotValues[29] & 0xFF; // PinStateEnc
 		c->iMotInfo[38] = c->iMotValues[29] / 256;  // PinStateHall
 		c->iMotInfo[39] = 0;
@@ -287,24 +287,13 @@ int iStepRamp;
 			    printf("%s\n",cxText);
 
 		 	 	xx=6;
-			    sprintf(cxText,"%-15s%5d    %-10s%10d    %-10s%10d    %-10s%10d    %-15s%5d   %8d",
+			    sprintf(cxText,"%-15s%5d    %-10s%10d    %-12s%8d    %-12s%8d    %-15s%5d   %8d",
 				cxInfo[xx+0],c->iMotInfo[xx+0],
 				cxInfo[xx+8],c->iMotInfo[xx+8],
 				cxInfo[xx+16],c->iMotInfo[xx+16],
 				cxInfo[xx+24],c->iMotInfo[xx+24],
 				cxInfo[xx+32],c->iMotInfo[xx+32],c->iMotInfo[41]);
 			    printf("%s\n",cxText);
-
-/*
-		 	 	xx=7;   // reserve
-			    sprintf(cxText,"%-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d    %-15s%5d  %8d",
-				cxInfo[xx+0],c->iMotInfo[xx+0],
-				cxInfo[xx+8],c->iMotInfo[xx+8],
-				cxInfo[xx+16],c->iMotInfo[xx+16],
-				cxInfo[xx+24],c->iMotInfo[xx+24],
-				cxInfo[xx+32],c->iMotInfo[xx+32],);
-			    printf("%s\n",cxText);
-*/
 	}
 
 

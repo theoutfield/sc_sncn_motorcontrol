@@ -20,8 +20,8 @@
 #define defHALL
 
 //=========================================================
-//#define MOTOR_MAXON_EC45
-#define MOTOR_MAXON_EC60
+#define MOTOR_MAXON_EC45
+//#define MOTOR_MAXON_EC60
 
 //==========================================================
 #ifdef  MOTOR_MAXON_EC45

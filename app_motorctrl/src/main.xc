@@ -29,7 +29,7 @@
 #define COM_CORE 0
 #define IFM_CORE 3
 
-//on stdcore[IFM_CORE]: clock clk_uart = XS1_CLKBLK_REF;
+
 on stdcore[IFM_CORE]: clock clk_adc  = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm  = XS1_CLKBLK_REF;
 
@@ -37,7 +37,6 @@ on stdcore[IFM_CORE]: clock clk_pwm  = XS1_CLKBLK_REF;
 int main(void)
 {
   chan c_adc;
-  chan c_adctrig;
   chan c_hall;
   chan c_pwm_ctrl;
   chan c_commutation;
@@ -171,12 +170,15 @@ int main(void)
      ************************************************************/
     on stdcore[IFM_CORE]: {
     	par {
-    			adc_ad7949_triggered( c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob);
+    			adc_ad7949_triggered( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob);
 
     			//do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, ADC_SYNC_PORT, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
-    			do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+    			//do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+
+    			do_pwm_inv(c_pwm_ctrl,   p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
     			run_hall( c_hall, p_ifm_hall, p_ifm_encoder);
+
     			commutation(c_adc, c_commutation, c_hall, c_pwm_ctrl, c_motvalue );
 
     			run_uart(c_motvalue, clk_pwm);
