@@ -30,7 +30,7 @@ int angle;
 int position;
 int pinstate;
 
-c_hall <: 8;
+c_hall <: 1;
 c_hall :> speed;
 c_hall :> angle;
 c_hall :> position;
@@ -47,7 +47,7 @@ return { speed, angle, position, pinstate };
 	int position;
 	int pinstate;
 
-	c_hall <: 9;
+	c_hall <: 2;
 	c_hall :> speed;
 	c_hall :> angle;
 	c_hall :> position;
@@ -57,64 +57,25 @@ return { speed, angle, position, pinstate };
 }
 
 
-int32_t get_encoder_position(chanend c_hall)
+{int, int, int, int, int, int, int, int, int, int} get_info_hall_input(chanend c_hall)
 {
-	int32_t pos;
-	  c_hall <: 7;
-	  c_hall :> pos;
+	int a1,a2,a3,a4,a5,a6,a7,a8,a9,a10;
 
-	  return pos;
+	c_hall <: 3;
+	c_hall :> a1;
+	c_hall :> a2;
+	c_hall :> a3;
+	c_hall :> a4;
+	c_hall :> a5;
+	c_hall :> a6;
+	c_hall :> a7;
+	c_hall :> a8;
+	c_hall :> a9;
+	c_hall :> a10;
+
+
+	return {a1,a2,a3,a4,a5,a6,a7,a8,a9,a10};
 }
 
-
-unsigned get_encoder_pinstate(chanend c_hall)
-{
-  unsigned pinstate;
-  c_hall <: 6;
-  c_hall :> pinstate;
-
-  return pinstate;
-}
-
-unsigned get_hall_pinstate(chanend c_hall)
-{
-  unsigned pinstate;
-  c_hall <: 5;
-  c_hall :> pinstate;
-
-  return pinstate;
-}
-
-unsigned get_hall_absolute_pos(chanend c_hall)
-{
-  unsigned pos;
-  c_hall <: 3;
-  c_hall :> pos; 				// position with dirn
-
-  return pos;
-}
-
-
-
-int32_t get_hall_speed(chanend c_hall)
-{
-  int32_t speed;
-  c_hall <: 2;
-  c_hall :> speed;  			// speed
-  
-  return speed;
-}
-
-int32_t get_hall_angle(chanend c_hall)
-{
-  int32_t pos;
-  c_hall <: 1;
-  c_hall :> pos;  				// 6 steps angle
-
-  return pos;
-}
-
-
-int hall_enc_const = POLE_PAIRS * GEAR_RATIO * 3600;
 
 

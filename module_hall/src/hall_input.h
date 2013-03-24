@@ -90,5 +90,5 @@ void do_hall( unsigned &hall_state, unsigned &cur_pin_state, port in p_hall );
  *   \param cur_pin_state the last value read from the hall encoder port
  *   \param p_hall the hall port
  */
-select do_hall_select( unsigned &hall_state, unsigned &cur_pin_state, port in p_hall );
+//select do_hall_select( unsigned &hall_state, unsigned &cur_pin_state, port in p_hall );
 
