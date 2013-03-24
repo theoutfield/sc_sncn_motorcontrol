@@ -32,14 +32,19 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	unsigned cmd1;
 	unsigned cmd2;
 	unsigned char cFlag=0;
-int iTemp1;
+    int iTemp1;
 
     //-------------- init values --------------
 	InitParameter();
 	SetParameterValue();
 
-	 //================== pwmloop ========================
-		while (1)
+//================== pwmloop ========================
+
+//===================================================
+
+
+
+	while (1)
 		{
 		#ifdef DEBUG_commutation
 			cFlag |= 1;
@@ -48,20 +53,51 @@ int iTemp1;
 			#endif
 		#endif
 
+#ifdef DC900
+{a1,a2,adc_a1,adc_a2,adc_a3, adc_a4,adc_b1,adc_b2,adc_b3,adc_b4}  = get_adc_calibrated_ad7949(adc, iPwmOnOff); //get_adc_vals_raw_ad7949(adc);
+#endif
+ a1 = -a1;
+ a2 = -a2;
+// a3 = -a1 -a2;
+
+
+	//======================== read current ============================
+			#ifdef DC100
+			 {a1, a2, a3}  = get_adc_vals_calibrated_int16_ltc1408( adc );
+				#ifdef DEBUG_commutation
+			 	 cFlag |= 0x02; testport <: cFlag;  // oszi green C4
+				#endif
+			#endif
+
+	/*		#ifdef DEBUG_commutation
+				#ifdef DC900
+			 	 	 p_ifm_ext_d2 <: 0;
+				#endif
+			#endif*/
+//======================== end current =========================================================================
+
+
 
 		//============================== rotor position  from hall ================================================
+#ifndef	defENCODER
 		{iHallActualSpeed, iHallAngle, iHallPositionAbsolut, iHallPinState}  = get_hall_values(c_hall);
 
 		iHallSpeedValueIsNew   = iHallActualSpeed & 0xFF000000;   		// extract info if SpeedValue is new
 		iHallActualSpeed    &= 0x00FFFFFF;
 		if(iHallActualSpeed  & 0x00FF0000)
-			iHallActualSpeed |= 0xFFFF0000;   						    // expand value if negativ
-	    //==========================================================================================================
+		iHallActualSpeed |= 0xFFFF0000;   						        // expand value if negativ
 
+		iAngleRotor      = iHallAngle & 0x0FFF;
+		iTemp1		     = iHallActualSpeed;
+		iSpeedValueIsNew = iHallSpeedValueIsNew;
+		iPositionAbsolut = iHallPositionAbsolut;
+	    //==========================================================================================================
+#endif
 
 
 
 		//------------------- encoder values-------------------------------------------------------------------------
+#ifdef defENCODER
 		{iEncoderActualSpeed, iEncoderAngle, iEncoderPositionAbsolut, iEncoderPinState} = get_encoder_values(c_hall);
 
 		if(iEncoderAngle & 0xFF000000) iEncoderNullReference++;
@@ -75,32 +111,23 @@ int iTemp1;
 		iEncoderSpeedValueIsNew   = iEncoderActualSpeed & 0xFF000000;   		// extract info if SpeedValue is new
 		iEncoderActualSpeed    &= 0x00FFFFFF;
 		if(iEncoderActualSpeed  & 0x00FF0000)
-			iEncoderActualSpeed |= 0xFFFF0000;   						        // expand value if negativ
+		iEncoderActualSpeed |= 0xFFFF0000;   						        // expand value if negativ
 
-		//-----------------------------------------------------------------------------------------------------------
-	//	iEncoderOnOff=0;
-#ifdef		defENCODER
-		iEncoderOnOff=1;
-#endif
-
-		if(iEncoderOnOff==0)  // 0=Hall 1=Encoder
-		{
-		iAngleRotor      = iHallAngle & 0x0FFF;
-		iTemp1		     = iHallActualSpeed;
-		iSpeedValueIsNew = iHallSpeedValueIsNew;
-		iPositionAbsolut = iHallPositionAbsolut;
-		}
-		else
-		{
 		if(iSetSpeed > 0)
-		iAngleRotor  	 = iEncoderAngle - iMotPar[8];
-		else
-		iAngleRotor  	 = iEncoderAngle - iMotPar[9];
-		iAngleRotor      &= 0x0FFF;
-		iTemp1 	 		 = iEncoderActualSpeed;
-		iSpeedValueIsNew = iEncoderSpeedValueIsNew;
-		iPositionAbsolut = iEncoderPositionAbsolut;
-		}
+			iAngleRotor  	 = iEncoderAngle - iMotPar[8];
+			else
+			iAngleRotor  	 = iEncoderAngle - iMotPar[9];
+			iAngleRotor      &= 0x0FFF;
+			iTemp1 	 		 = iEncoderActualSpeed;
+			iSpeedValueIsNew = iEncoderSpeedValueIsNew;
+			iPositionAbsolut = iEncoderPositionAbsolut;
+
+	//	iEncoderOnOff=0;
+	//	iEncoderOnOff=1;
+#endif
+		//-----------------------------------------------------------------------------------------------------------
+
+
 
         if(iSpeedValueIsNew)
         {
@@ -110,7 +137,9 @@ int iTemp1;
         }
 
 
-        if(iDiffBlocked) {        	iAngleRotor = iAngleRotorOld + iAngleRotorDiffCalculated; // only for test
+        if(iDiffBlocked)
+        {
+        iAngleRotor = iAngleRotorOld + iAngleRotorDiffCalculated; // only for test
         iAngleRotor &= 0x0FFF;
         }
 
@@ -265,7 +294,7 @@ int iTemp1;
 		{
 			if(iStep1 != 0) iAngleLast = iAnglePWM;
 			if(iStep1 == 0 )
-			iAnglePWM = iAngleLast; //  + iAngleRotor  - 600;
+			iAnglePWM = iAngleLast;
 		}
 
 		//======================================================================================================
@@ -281,6 +310,8 @@ int iTemp1;
 		if(iUmotResult > iUmotMotor) iUmotMotor++;
 		if(iUmotResult < iUmotMotor) iUmotMotor--;
 		p_ifm_ext_d1 <: 0; // yellow
+
+
 
 
 	#ifdef DEBUG_commutation
@@ -329,35 +360,6 @@ int iTemp1;
 		iIndexPWM = iAnglePWM >> 2;  // from 0-4095 to LUT 0-1023
 
 
-		//======================== read current ============================
-				#ifdef DC900
-				{a1,a2,adc_a1,adc_a2,adc_a3, adc_a4,adc_b1,adc_b2,adc_b3,adc_b4}  = get_adc_vals_calibrated_int16_ad7949(adc); //get_adc_vals_raw_ad7949(adc);
-				#endif
-				 a1 = -a1;
-				 a2 = -a2;
-				// a3 = -a1 -a2;
-
-				#ifdef DEBUG_commutation
-					p_ifm_ext_d2 <: 1;
-				#endif
-
-
-
-				#ifdef DC100
-				 {a1, a2, a3}  = get_adc_vals_calibrated_int16_ltc1408( adc );
-					#ifdef DEBUG_commutation
-				 	 cFlag |= 0x02; testport <: cFlag;  // oszi green C4
-					#endif
-				#endif
-
-				#ifdef DEBUG_commutation
-					#ifdef DC900
-				 	 	 p_ifm_ext_d2 <: 0;
-					#endif
-				#endif
-//======================== end current ===============================================0000
-
-
 
 		sine_pwm( iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );
 
@@ -379,71 +381,74 @@ int iTemp1;
 		#endif
 
 
-		//================== uart connection with one pin =============================================
-		select
-		{
-		case c_motvalue :> cmd2:
-		    	if(cmd2 >= 0 && cmd2 <= 12)
-						{
-						c_motvalue :> iMotCommand[cmd2];
-						c_motvalue :> iMotCommand[cmd2+1];
-						c_motvalue :> iMotCommand[cmd2+2];
-						c_motvalue :> iMotCommand[cmd2+3];
-						}
-			 	else if(cmd2 >= 32 && cmd2 < 64)
-						{	if(cmd2 == 32)SaveValueToArray();
-			 		        c_motvalue <: iMotValue[cmd2-32];
-							c_motvalue <: iMotValue[cmd2-31];
-							c_motvalue <: iMotValue[cmd2-30];
-							c_motvalue <: iMotValue[cmd2-29];
-					    }
-				else if(cmd2 >= 64 && cmd2 < 96)  { c_motvalue <: iMotPar[cmd2-64]; 	}
-				else if(cmd2 >= 96 && cmd2 < 128) { c_motvalue :> iMotPar[cmd2-96]; iUpdateFlag=1;}
-				else if(cmd2 >= 128 && cmd2 < 160)
-						{   if(cmd2==128) SaveInfosToArray();
-				            c_motvalue <: iMotValue[cmd2-128];
-				            c_motvalue <: iMotValue[cmd2-127];
-				            c_motvalue <: iMotValue[cmd2-126];
-				            c_motvalue <: iMotValue[cmd2-125];
-				         }
-				break;
-				default:	break;
-		}// end select
+			//================== uart connection over one pin like LIN =============================================
+				select
+				{
+				case c_motvalue :> cmd2:
+				    	if(cmd2 >= 0 && cmd2 <= 12)
+								{
+								c_motvalue :> iMotCommand[cmd2];
+								c_motvalue :> iMotCommand[cmd2+1];
+								c_motvalue :> iMotCommand[cmd2+2];
+								c_motvalue :> iMotCommand[cmd2+3];
+								}
+					 	else if(cmd2 >= 32 && cmd2 < 64)
+								{	if(cmd2 == 32)SaveValueToArray();
+					 		        c_motvalue <: iMotValue[cmd2-32];
+									c_motvalue <: iMotValue[cmd2-31];
+									c_motvalue <: iMotValue[cmd2-30];
+									c_motvalue <: iMotValue[cmd2-29];
+							    }
+						else if(cmd2 >= 64 && cmd2 < 96)  { c_motvalue <: iMotPar[cmd2-64]; 	}
+						else if(cmd2 >= 96 && cmd2 < 128) { c_motvalue :> iMotPar[cmd2-96]; iUpdateFlag=1;}
+						else if(cmd2 >= 128 && cmd2 < 160)
+								{    if(cmd2==128){
+									 {hx1,hx2,hx3,hx4,hx5,hx6,hx7,hx8,hx9,hx10}= get_info_hall_input(c_hall);
+									 SaveInfosToArray();
+								     }
+						            c_motvalue <: iMotValue[cmd2-128];
+						            c_motvalue <: iMotValue[cmd2-127];
+						            c_motvalue <: iMotValue[cmd2-126];
+						            c_motvalue <: iMotValue[cmd2-125];
+						         }
+						break;
+						default:	break;
+				}// end select
 
-		//=================================================================================
-		select
-		{
-			case c_commutation :> cmd1:
-		    	if(cmd1 >= 0 && cmd1 <= 12)
-					{
-		    		c_commutation :> iMotCommand[cmd1];
-		    		c_commutation :> iMotCommand[cmd1+1];
-		    		c_commutation :> iMotCommand[cmd1+2];
-		    		c_commutation :> iMotCommand[cmd1+3];
-					}
-				else if(cmd1 >= 32 && cmd1 < 64)  { if(cmd1==32)SaveValueToArray();
-					                                 c_commutation <: iMotValue[cmd1-32]; 	}
-				else if(cmd1 >= 64 && cmd1 < 96)  {  c_commutation <: iMotPar[cmd1-64]; 	}
-				else if(cmd1 >= 96 && cmd1 < 128) {  c_commutation :> iMotPar[cmd1-96]; iUpdateFlag=1;}
-				break;
-			default: break;
-		}// end select
-//--------------------------------------------------------------------------
-		 if(iMotCommand[7]==1)
-		 {
-		  iMotCommand[7] = 0;
-			CalcSetUserSpeed(iMotCommand[0]);
-			iControlFOC 			= iMotCommand[1] & 0x07;
-			iEncoderOnOff           = iMotCommand[1] & 0x08;  // only for test
-		//	iUmotBlocked            = iMotCommand[1] & 0x10;  // only for test
-			iDiffBlocked            = iMotCommand[1] & 0x10;  // only for test
+				//=================================================================================
+				select
+				{
+					case c_commutation :> cmd1:
+				    	if(cmd1 >= 0 && cmd1 <= 12)
+							{
+				    		c_commutation :> iMotCommand[cmd1];
+				    		c_commutation :> iMotCommand[cmd1+1];
+				    		c_commutation :> iMotCommand[cmd1+2];
+				    		c_commutation :> iMotCommand[cmd1+3];
+							}
+						else if(cmd1 >= 32 && cmd1 < 64)  { if(cmd1==32)SaveValueToArray();
+							                                 c_commutation <: iMotValue[cmd1-32]; 	}
+						else if(cmd1 >= 64 && cmd1 < 96)  {  c_commutation <: iMotPar[cmd1-64]; 	}
+						else if(cmd1 >= 96 && cmd1 < 128) {  c_commutation :> iMotPar[cmd1-96]; iUpdateFlag=1;}
+						break;
+					default: break;
+				}// end select
+		//--------------------------------------------------------------------------
+				 if(iMotCommand[7]==1)
+				 {
+				  iMotCommand[7] = 0;
+					CalcSetUserSpeed(iMotCommand[0]);
+					iControlFOC 			= iMotCommand[1] & 0x07;
+					iEncoderOnOff           = iMotCommand[1] & 0x08;  // only for test
+					iUmotBlocked            = iMotCommand[1] & 0x10;  // only for test
+				//	iDiffBlocked            = iMotCommand[1] & 0x10;  // only for test
 
-			iTorqueUser  		    = iMotCommand[2];
-			iMotHoldingTorque       = iMotCommand[3];
-			iPositionAbsolutNew     = iMotCommand[5];
-			// [6] iUmot and iAngle
-		}
-		if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }
+					iTorqueUser  		    = iMotCommand[2];
+					iMotHoldingTorque       = iMotCommand[3];
+					iPositionAbsolutNew     = iMotCommand[5];
+					// [6] iUmot and iAngle
+				}
+				if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }
 
 	}// end while(1)
 }// end function
@@ -461,23 +466,25 @@ void comm_sine_init(chanend c_pwm_ctrl)
 
 
 void commutation(chanend c_adc, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue)
-{  //init sine-commutation and set up a4935
-
+{
 	  const unsigned t_delay = 300*USEC_FAST;
 	  timer t;
 	  unsigned ts;
 
+	  t :> ts;
 	  comm_sine_init(c_pwm_ctrl);
 	  t when timerafter (ts + t_delay) :> ts;
 
 	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
 	  t when timerafter (ts + t_delay) :> ts;
 
-	  do_adc_calibration_ad7949(c_adc);
 	  comm_sine(c_adc, c_commutation, c_hall, c_pwm_ctrl, c_motvalue);
 }
-//===============================  utilities ===================================
 
+
+
+
+//===============================  utilities ===================================
 void CalcSetUserSpeed(int iSpeedValue)
 {
 

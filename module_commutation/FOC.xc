@@ -284,7 +284,7 @@ void SaveValueToArray()
 	iMotValue[12] = (iHallAngle *65536) + iEncoderAngle;
 	iMotValue[13] = (iAngleRotor*65536) + iAnglePWM;
 	iMotValue[14] = iAngleRotorDiffCalculated;
-	iMotValue[15] = 0;
+	iMotValue[15] = iDiffAngleRotor;
 	iMotValue[16] = 0;
 	iMotValue[17] = iTorqueLimit/defREFERENZFACTOR; // adc_b4; //VsdRef1;
 
@@ -299,7 +299,7 @@ void SaveValueToArray()
 	iMotValue[25] = a2RMS;
 	iMotValue[26] = iVectorCurrent;
 	iMotValue[27] = iVectorInvPark;
-	iMotValue[28] = 0;
+	iMotValue[28] = adc_a4;
 
 	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF);
 	iMotValue[30] = iEncoderPositionAbsolut;
@@ -309,41 +309,40 @@ void SaveValueToArray()
 
 void SaveInfosToArray()
 {
-	iMotValue[0]  = iUmotProfile*65536 + ((iUmotIntegrator/256)& 0xFFFF);
-	iMotValue[1]  = iUmotBoost/256;
-	iMotValue[2]  = iUmotP;
-	iMotValue[3]  = iUmotMotor;
-	iMotValue[4]  = iMotHoldingTorque;
-	iMotValue[5]  = iControlFOC  + (iStep1 * 256)  + ((iMotDirection & 0xFF)) *65536;
+	iMotValue[0]  = hx1;
+	iMotValue[1]  = hx2;
+	iMotValue[2]  = hx3;
+	iMotValue[3]  = hx4;
+	iMotValue[4]  = hx5;
+	iMotValue[5]  = hx6;
+	iMotValue[6]  = hx7;
 
-	iMotValue[6]  = (iSetUserSpeed & 0xFFFF0000) + iSetSpeed;  //(iSetSpeedRamp/65536);
-	iMotValue[7]  = iActualSpeed;
-	iMotValue[8]  = idiffSpeed1*65536 + (idiffSpeed2 & 0xFFFF);
-	iMotValue[9]  = iPositionAbsolutNew;
+	iMotValue[7]  = hx8;
+	iMotValue[8]  = hx9;
+	iMotValue[9]  = hx10;
 	iMotValue[10] = iEncoderActualSpeed;
-	iMotValue[11] = 0;
+	iMotValue[11] = iAngleRotor;
+	iMotValue[12] = iHallAngle;
+	iMotValue[13] = iEncoderAngle;
 
-	iMotValue[12] = (iHallAngle *65536) + iEncoderAngle;
-	iMotValue[13] = (iAngleRotor*65536) + iAnglePWM;
 	iMotValue[14] = a1;
 	iMotValue[15] = a2;
 	iMotValue[16] = adc_a1;
 	iMotValue[17] = adc_a2;
-
  	iMotValue[18] = adc_a3;
 	iMotValue[19] = adc_a4;
 	iMotValue[20] = adc_b1;
+
 	iMotValue[21] = adc_b2;
 	iMotValue[22] = adc_b3;
 	iMotValue[23] = adc_b4;
-
 	iMotValue[24] = a1RMS;
 	iMotValue[25] = a2RMS;
 	iMotValue[26] = iVectorCurrent;
+
 	iMotValue[27] = iVectorInvPark;
 	iMotValue[28] = iTorqueDiff2;
-
-	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF);
+	iMotValue[29] = 0;
 	iMotValue[30] = iEncoderPositionAbsolut;
 	iMotValue[31] = iHallPositionAbsolut;
 }

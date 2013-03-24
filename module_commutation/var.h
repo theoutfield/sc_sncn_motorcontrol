@@ -1,6 +1,5 @@
-
-
-
+//=================
+int hx1,hx2,hx3,hx4,hx5,hx6,hx7,hx8,hx9,hx10;
 
 //------------- values from hall_input.xc ---------
 int iHallActualSpeed,iHallAngle,iHallPositionAbsolut,iHallPinState;
