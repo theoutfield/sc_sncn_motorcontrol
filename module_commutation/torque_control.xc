@@ -20,7 +20,7 @@ void    function_TorqueControl()
 
 				//==========================================
 		case 10: iPwmOnOff 		 = 1;
-				 if(iTorqueUser  ==0)     iStep1++;
+				// if(iTorqueUser  ==0)     iStep1++;
 				 if(iSetUserSpeed == 0) iStep1++;
 				 iCountx =0;
 				 break;
@@ -35,13 +35,7 @@ void    function_TorqueControl()
 				  break;
 
 		case 31:  iPwmOnOff		  =  0;
-		 	 	  if(iControlFOC > 1){
-		 	 	  if(iTorqueUser == 0 ) iStep1=0;
-		 	 	  }
-		 	 	  else
-		 	 	  {
 				  if(iSetSpeed== 0)iStep1=0;     // motor is stopping
-		 	 	  }
 		 	 	  break;
 		default:iStep1 = 0;
 				break;
@@ -64,8 +58,9 @@ void    function_TorqueControl()
 		FOC_FilterDiffValue();
         //-------------------------------------------------
 
-		/*
+
 		//================== speed limit =========================================
+		/*
 		if(iActualSpeed > 0)
 		{
 		if(iActualSpeed > (defParRpmMotorMax+100))      iTorqueLimit = iTorqueIntegral;
@@ -81,20 +76,32 @@ void    function_TorqueControl()
 		if(iActualSpeed > (-defParRpmMotorMax+200))     iTorqueLimit += 64;
 		if(iTorqueLimit > TORQUE_INTEGRATOR_MAX) iTorqueLimit = TORQUE_INTEGRATOR_MAX;
 		}
-        //========================================================================
 		*/
+        //========================================================================
+
 
 	    CalcRampForSpeed();
+
 	    iUmotProfile  = CalcUmotProfile();
-		if(iSpeedValueIsNew) CalcDiffSpeed();
+
+	    if(iSpeedValueIsNew) CalcDiffSpeed();
 
 		FOC_Integrator();
 
 		FOC_InversPark();
 
-
-		iUmotResult = iVectorInvPark/4;		 // FOC torque-control
+		iUmotResult = iVectorInvPark/2;		 // FOC torque-control
 
 		if(iUmotResult > 4096) iUmotResult = 4096;
+
+
+		//============================= set angle for pwm ============================================
+			if (iMotDirection !=  0)
+			{
+				iAnglePWMFromFOC  = iAngleInvPark + (3076 + iParAngleUser);
+				iAnglePWMFromFOC  &= 0x0FFF;
+				iAnglePWM         = iAnglePWMFromFOC;
+			}
+
 
 }

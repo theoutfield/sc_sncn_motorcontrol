@@ -1,6 +1,7 @@
 
 void SaveValueToArray(); void SaveInfosToArray(); void SetParameterValue(); void InitParameter();
 
+void    function_UmotControl();
 void    function_SpeedControl();
 void    function_TorqueControl();
 void 	function_PositionControl();

@@ -127,6 +127,7 @@ int iTemp1;
 	iTorqueProp      = iTemp1 * 8;
 
 
+
 	if(iTorqueUmotIntegrator >  iTorqueLimit)  iTorqueUmotIntegrator =  iTorqueLimit;
 	if(iTorqueUmotIntegrator < -iTorqueLimit)  iTorqueUmotIntegrator = -iTorqueLimit;
 
@@ -205,7 +206,6 @@ int iTemp;
 					else iTriggerRMS--;
 				}
 
-			if(iVectorCurrent > iParRMS_PwmOff)   iStep1=30;  // Motor stop
 			if(iVectorCurrent > iParRMS_PwmOff)   iStep1=30;  // Motor stop
 
 			if(iPhase1 > ia1RMSMax)   // save last max value

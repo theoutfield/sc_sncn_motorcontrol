@@ -26,6 +26,8 @@ unsigned char cLeds;
 int iHallPositionZero=0;
 int iUmotBlocked=0; 		//only for test
 int iDiffBlocked=0; 		//only for test
+int iTestAngle;				//only for test
+
 
 void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue)
 {
@@ -38,12 +40,12 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	InitParameter();
 	SetParameterValue();
 
-//================== pwmloop ========================
-
-//===================================================
 
 
 
+//================== pwmloop ==============================================================================================================
+//
+//=========================================================================================================================================
 	while (1)
 		{
 		#ifdef DEBUG_commutation
@@ -60,6 +62,8 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
  a2 = -a2;
 // a3 = -a1 -a2;
 
+
+ p_ifm_ext_d1 <: 0; // yellow
 
 	//======================== read current ============================
 			#ifdef DC100
@@ -78,8 +82,9 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 
 
-		//============================== rotor position  from hall ================================================
-#ifndef	defENCODER
+//============================== rotor position  from hall ================================================
+if(iEncoderOnOff==0)
+{
 		{iHallActualSpeed, iHallAngle, iHallPositionAbsolut, iHallPinState}  = get_hall_values(c_hall);
 
 		iHallSpeedValueIsNew   = iHallActualSpeed & 0xFF000000;   		// extract info if SpeedValue is new
@@ -87,17 +92,16 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		if(iHallActualSpeed  & 0x00FF0000)
 		iHallActualSpeed |= 0xFFFF0000;   						        // expand value if negativ
 
-		iAngleRotor      = iHallAngle & 0x0FFF;
-		iTemp1		     = iHallActualSpeed;
-		iSpeedValueIsNew = iHallSpeedValueIsNew;
-		iPositionAbsolut = iHallPositionAbsolut;
-	    //==========================================================================================================
-#endif
+
+}
+//==========================================================================================================
 
 
 
-		//------------------- encoder values-------------------------------------------------------------------------
-#ifdef defENCODER
+
+//------------------- encoder values-------------------------------------------------------------------------
+ //if(iEncoderOnOff==1)
+ {
 		{iEncoderActualSpeed, iEncoderAngle, iEncoderPositionAbsolut, iEncoderPinState} = get_encoder_values(c_hall);
 
 		if(iEncoderAngle & 0xFF000000) iEncoderNullReference++;
@@ -111,8 +115,21 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iEncoderSpeedValueIsNew   = iEncoderActualSpeed & 0xFF000000;   		// extract info if SpeedValue is new
 		iEncoderActualSpeed    &= 0x00FFFFFF;
 		if(iEncoderActualSpeed  & 0x00FF0000)
-		iEncoderActualSpeed |= 0xFFFF0000;   						        // expand value if negativ
+		iEncoderActualSpeed |= 0xFFFF0000;   						            // expand value if negativ
 
+ }// end if iEncoderOnOff
+
+		//-----------------------------------------------------------------------------------------------------------
+
+ 	 	if(iEncoderOnOff==0)
+ 	 	{
+		iAngleRotor      = iHallAngle & 0x0FFF;
+		iTemp1		     = iHallActualSpeed;
+		iSpeedValueIsNew = iHallSpeedValueIsNew;
+		iPositionAbsolut = iHallPositionAbsolut;
+ 	 	}
+ 	 	else
+ 	 	{
 		if(iSetSpeed > 0)
 			iAngleRotor  	 = iEncoderAngle - iMotPar[8];
 			else
@@ -121,13 +138,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 			iTemp1 	 		 = iEncoderActualSpeed;
 			iSpeedValueIsNew = iEncoderSpeedValueIsNew;
 			iPositionAbsolut = iEncoderPositionAbsolut;
-
-	//	iEncoderOnOff=0;
-	//	iEncoderOnOff=1;
-#endif
-		//-----------------------------------------------------------------------------------------------------------
-
-
+ 	 	}
 
         if(iSpeedValueIsNew)
         {
@@ -162,7 +173,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		}
 
         if(iSpeedValueIsNew){
-		iAngleRotorDiffCalculated  = iActualSpeed * 700;
+		iAngleRotorDiffCalculated  = iSetSpeed * 700;
 		iAngleRotorDiffCalculated /= 26367;
         }
 		iAngleRotorOld = iAngleRotor;
@@ -174,13 +185,19 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 		//***************** steps ***********************************************************
 		iControlFOC &= 0x03;
-#ifdef defENCODER
-	if (iEncoderNullReference < 2) 	iControlFOC |= 0x04;
-#endif
+
+		if(iEncoderOnOff==1)
+		{
+			if (iEncoderNullReference < 2) 	iControlFOC |= 0x04;
+		}
 
 		switch(iControlFOC)
 		{
 		case 0:
+
+		         function_UmotControl();   // speed_contro.xc
+			     break;
+
 		case 1:  function_SpeedControl();
 		         break;
 		case 2:  function_TorqueControl();
@@ -240,8 +257,6 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		}
 
 
-
-
 		//=========== calculate iAngleDiffPeriod  only for view ============================
 	#ifdef DEBUG_commutation
 		iAngleDiff = 0;
@@ -270,14 +285,12 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 	//============================================================================================
 
-	//============================= set angle for pwm ============================================
-		if (iMotDirection !=  0)
-		{
-			iAnglePWMFromFOC  = iAngleInvPark + (3076 + iParAngleUser);
-			iAnglePWMFromFOC  &= 0x0FFF;
-			iAnglePWM         = iAnglePWMFromFOC;
-		}
-		iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
+
+
+
+
+		iAnglePWM += iTestAngle;
+        iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
 
 		if(iStep1 == 0)
 		{
@@ -300,8 +313,6 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		//======================================================================================================
 		//======================================================================================================
 
-
-
 		//------------ iUmotMotor follows iUmotResult -----------
 		if(iStep1==0)iUmotBlocked = 0;
 		if(iUmotBlocked) iUmotResult = iUmotLast;
@@ -309,9 +320,21 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		iUmotLast = iUmotResult;
 		if(iUmotResult > iUmotMotor) iUmotMotor++;
 		if(iUmotResult < iUmotMotor) iUmotMotor--;
-		p_ifm_ext_d1 <: 0; // yellow
 
 
+
+	      if(iControlFOC >= 4 && iControlFOC < 8) iAnglePWM = iAngleSensorLessPWM;
+
+	        if(iControlFOC == 8)  // only for test
+	        {
+	        	iAnglePWM   = iMotCommand[6]/65536;
+	        	iAnglePWM &= 0x0FFF;
+	        	iUmotMotor  = iMotCommand[6] & 0xFFFF;
+	        	iPwmOnOff = 1;
+	        }
+
+
+			iIndexPWM = iAnglePWM >> 2;  // from 0-4095 to LUT 0-1023
 
 
 	#ifdef DEBUG_commutation
@@ -346,23 +369,6 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 		 xscope_probe_data(9,iDiffAngleRotor);
 
 	#endif
-
-        if(iControlFOC >= 4 && iControlFOC < 8) iAnglePWM = iAngleSensorLessPWM;
-
-        if(iControlFOC == 8)  // only for test
-        {
-        	iAnglePWM   = iMotCommand[6]/65536;
-        	iAnglePWM &= 0x0FFF;
-        	iUmotMotor  = iMotCommand[6] & 0xFFFF;
-        	iPwmOnOff = 1;
-        }
-
-		iIndexPWM = iAnglePWM >> 2;  // from 0-4095 to LUT 0-1023
-
-
-
-		sine_pwm( iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );
-
 
 
 		#ifdef DEBUG_commutation
@@ -441,14 +447,20 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 					iControlFOC 			= iMotCommand[1] & 0x07;
 					iEncoderOnOff           = iMotCommand[1] & 0x08;  // only for test
 					iUmotBlocked            = iMotCommand[1] & 0x10;  // only for test
-				//	iDiffBlocked            = iMotCommand[1] & 0x10;  // only for test
+					iDiffBlocked            = iMotCommand[1] & 0x20;  // only for test
 
 					iTorqueUser  		    = iMotCommand[2];
 					iMotHoldingTorque       = iMotCommand[3];
+					iTestAngle              = iMotCommand[4];
 					iPositionAbsolutNew     = iMotCommand[5];
 					// [6] iUmot and iAngle
 				}
 				if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }
+
+
+
+
+				sine_pwm(iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );
 
 	}// end while(1)
 }// end function

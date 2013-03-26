@@ -3,6 +3,43 @@
 #include "dc_motor_config.h"
 void FOC_Speed_Integrator();
 
+
+
+
+
+
+void    function_UmotControl() {
+
+
+       	switch(iStep1)
+		 {
+		  case 0: iPwmOnOff 	 = 0;				// motor stop
+		  		iIntegralGain    = 0;
+		  		iUmotProfile     = 0;
+		 		iUmotResult      = 0;
+		 		iSetSpeedRamp    = 0;
+		 		iMotDirection    = 0;
+		 		iTorqueF0        = 0;
+		 		if(iSetUserSpeed != 0) iStep1++;
+		        break;
+
+		  case 1: iPwmOnOff 		 = 1;
+			    if(iUmotResult == 0) iStep1=0;
+                break;
+		 }// end switch
+
+
+        if(iSetUserSpeed > 0)  	 iAnglePWM= iAngleRotor + iParAngleUser;
+        if(iSetUserSpeed < 0)  	 iAnglePWM= iAngleRotor + iParAngleUser + 2048;
+
+        iUmotResult = iMotCommand[0];		// umot control
+        if(iUmotResult < 0) iUmotResult = -iUmotResult;
+
+}//==== end  function_UmotControl
+
+
+
+
 void    function_SpeedControl()
 {
 	switch(iStep1)
@@ -99,7 +136,20 @@ void    function_SpeedControl()
 		if(iSpeedValueIsNew) SpeedControl();
 
 		CalcUmotForSpeed();
+
+		//============================= set angle for pwm ============================================
+		if (iMotDirection !=  0)
+		{
+		iAnglePWMFromFOC  = iAngleInvPark + (3076 + iParAngleUser);
+		iAnglePWMFromFOC  &= 0x0FFF;
+		iAnglePWM         = iAnglePWMFromFOC;
+		}
+
 }// end function SpeedControl
+
+
+
+
 
 
 void FOC_Speed_Integrator(){
@@ -242,6 +292,7 @@ void CalcUmotForSpeed()
 	//--------------- umot limit ---------------------------------
 
 	//================== speed limit =========================================
+	/*
 	if(iActualSpeed > 0)
 	{
 	if(iActualSpeed > (defParRpmMotorMax+100))      if(iUmotRpmLimit > iUmotResult) iUmotRpmLimit = iUmotResult;
@@ -256,7 +307,9 @@ void CalcUmotForSpeed()
     //========================================================================
 
 	if(iUmotResult > iUmotRpmLimit)iUmotResult = iUmotRpmLimit;
-    if(iStep1 == 0)
+    */
+
+	if(iStep1 == 0)
     {
     	iUmotRpmLimit = 4096;
     }
