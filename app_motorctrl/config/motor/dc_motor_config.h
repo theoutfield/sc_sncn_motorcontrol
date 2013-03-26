@@ -44,8 +44,10 @@
 #define defParHysteresisPercent	    5
 #define defParDiffSpeedMax		  150
 #define defParUmotIntegralLimit	 2048
-#define defParPropGain			    0
-#define defParIntegralGain		    0
+
+#define defParPropGain			   32
+#define defParIntegralGain		   32
+
 #define defCurrentFactor            4
 
 #define defParTorquePropGain	   64
