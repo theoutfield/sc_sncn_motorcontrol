@@ -25,6 +25,13 @@
 #include<print.h>
 // = QEI_COUNT_MAX;
 
+
+void init_qei(qei_par &q_max)
+{
+	q_max.max_count = QEI_COUNT_MAX;
+	return;
+}
+
 {unsigned, unsigned, unsigned } get_qei_data( streaming chanend c_qei, qei_par &q_max)
 {
 	unsigned p, s, ts1, ts2, v, qei_count_m = q_max.max_count;

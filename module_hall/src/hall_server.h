@@ -25,6 +25,8 @@
 enum hall_commands { HALL_CMD_GETSPEED, HALL_CMD_GETPOS };
 
 
+void init_hall(hall_par &h_pole);
+
 /** \brief A basic hall encoder server
  *
  *  This implements the basic hall sensor server

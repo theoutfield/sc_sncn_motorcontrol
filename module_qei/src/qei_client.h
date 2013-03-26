@@ -23,6 +23,8 @@
 #include<dc_motor_config.h>
 
 
+void init_qei(qei_par &q_max);
+
 /**
  *  \param c_qei The control channel for the QEI server
  *  \return the speed, position and valid state

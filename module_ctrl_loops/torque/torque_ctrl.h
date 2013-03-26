@@ -17,6 +17,8 @@
 #include <comm_loop.h>
 #include <dc_motor_config.h>
 
+void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop);
+
 /* initialize PI torque controller parameter*/
 void init_torque_pars(torq_par &d);
 

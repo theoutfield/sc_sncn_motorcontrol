@@ -28,6 +28,27 @@ torq_par t_param;
 field_par f_param;
 loop_par l_param;
 int flag_field = 0;
+
+void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop)
+{
+	tor.Kp_n = Torque_Kp_n;
+	tor.Kp_d = Torque_Kp_d;
+	tor.Ki_n = Torque_Ki_n;
+	tor.Ki_d = Torque_Ki_d;
+	tor.Integral_limit = Torque_Integral_limit;
+
+	tor.Max_torque = Max_torque_out;
+
+	field.Kp_n = Field_Kp_n;
+	field.Kp_d = Field_Kp_d;
+	field.Ki_n = Field_Ki_n;
+	field.Ki_d = Field_Ki_d ;
+	field.Integral_limit = Field_Integral_limit;
+
+	loop.delay = loop_timing;
+
+	return;
+}
 void init_torque_pars(torq_par &d)
 {
 	t_param.Kp_n = d.Kp_n;
