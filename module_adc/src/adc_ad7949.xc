@@ -294,67 +294,48 @@ void adc_ad7949_triggered( chanend c_adc,
 	  unsigned ts;
 	  int cmd;
 	  int xCount=100;
-	  unsigned char iFlag=0;
+//	  unsigned char iFlag=0;
 
 	  //set_thread_fast_mode_on();
 
 	  configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
 
-	  //ii=4;
-	  //while(ii-- > 0)adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
-
-	 // ia_calibr=0;
-	 // ib_calibr=0;
-	 // ii = 32;
-	 /* while(ii > 0)
-	  {
-		  adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
-		  ia_calibr += adc_data_a[4];
-		  ib_calibr += adc_data_b[4];
-		  ii--;
-	  }
-	  ia_calibr /= 32;
-	  ib_calibr /= 32;
-	  printstr("ia_calibration ");   printint(ia_calibr); printstr("\n");
-	  printstr("ib_calibration ");   printint(ib_calibr); printstr("\n");
-	  */
 	  tx :> ts;
-
 
 	while (1)
 	{
-		tx when timerafter(ts + 250) :> ts;   	// 250 => 1탎ec 125= 0,5탎ec
-
+		tx when timerafter(ts + 125) :> ts;   	// 250 => 1탎ec 125= 0,5탎ec
 //		iFlag ^= 0x01;    p_ifm_ext_d2 <: iFlag;
-
 	    xCount--;
 		if(xCount==0){
 		p_ifm_ext_d3 <: 1;
 		adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
-		xCount = 55;
+		xCount = 100;
 		tx :> ts;
 		}
 
 #pragma ordered
 	    select {
-		case c_adc :> cmd:
-		    if(cmd == 0) {
-		    				c_adc <: adc_data_a[4]; 		//  - ia_calibr;
-		    				c_adc <: adc_data_b[4]; 		//  - ib_calibr;
-		    				c_adc <: adc_data_a[0]; 		//
-		    				c_adc <: adc_data_a[1]; 		//
-		    				c_adc <: adc_data_a[2]; 		//
-		    				c_adc <: adc_data_a[3]; 		//
-		    				c_adc <: adc_data_b[0]; 		//
-		    				c_adc <: adc_data_b[1]; 		//
-		    				c_adc <: adc_data_b[2]; 		//
-		    				c_adc <: adc_data_b[3];
-		    				xCount = 25;
-		 	 	 	 	  }
-		break;
+	    	case c_adc :> cmd:
+	    		master
+				{
+	    		c_adc <: adc_data_a[4]; 		//  - ia_calibr;
+				c_adc <: adc_data_b[4]; 		//  - ib_calibr;
+				c_adc <: adc_data_a[0]; 		//
+				c_adc <: adc_data_a[1]; 		//
+				c_adc <: adc_data_a[2]; 		//
+				c_adc <: adc_data_a[3]; 		//
+				c_adc <: adc_data_b[0]; 		//
+				c_adc <: adc_data_b[1]; 		//
+				c_adc <: adc_data_b[2]; 		//
+				c_adc <: adc_data_b[3];
+				xCount = 56;
+				tx :> ts;
+				}
+	    	break;
+
 		default:  break;
 	    }// end of select
-
 
 		p_ifm_ext_d3 <: 0;
 	}// end while 1

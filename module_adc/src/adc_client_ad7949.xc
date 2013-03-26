@@ -19,20 +19,19 @@ int iFilterSUM_Ib;
   int adc_a1, adc_a2, adc_a3, adc_a4;
   int adc_b1, adc_b2, adc_b3, adc_b4;
 
-
-  	c_adc <: 0;
-
-    c_adc :> current_a;
-    c_adc :> current_b;
-    c_adc :> adc_a1;
-    c_adc :> adc_a2;
-    c_adc :> adc_a3;
-    c_adc :> adc_a4;
-    c_adc :> adc_b1;
-    c_adc :> adc_b2;
-    c_adc :> adc_b3;
-    c_adc :> adc_b4;
-
+  c_adc <: 0;
+   slave {
+	    c_adc :> current_a;
+	    c_adc :> current_b;
+	    c_adc :> adc_a1;
+	    c_adc :> adc_a2;
+	    c_adc :> adc_a3;
+	    c_adc :> adc_a4;
+	    c_adc :> adc_b1;
+	    c_adc :> adc_b2;
+	    c_adc :> adc_b3;
+	    c_adc :> adc_b4;
+   }
 
   if(iAdcNrReadings < 5){
 	  iFilterSUM_Ia = current_a * 256;
