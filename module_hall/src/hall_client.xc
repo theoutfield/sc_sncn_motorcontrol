@@ -30,11 +30,14 @@ int angle;
 int position;
 int pinstate;
 
-c_hall <: 1;
-c_hall :> speed;
-c_hall :> angle;
-c_hall :> position;
-c_hall :> pinstate;
+	c_hall <: 1;
+	slave
+	{
+	c_hall :> speed;
+	c_hall :> angle;
+	c_hall :> position;
+	c_hall :> pinstate;
+	}
 
 return { speed, angle, position, pinstate };
 }
@@ -48,11 +51,13 @@ return { speed, angle, position, pinstate };
 	int pinstate;
 
 	c_hall <: 2;
+	slave
+	{
 	c_hall :> speed;
 	c_hall :> angle;
 	c_hall :> position;
 	c_hall :> pinstate;
-
+	}
 	return { speed, angle, position, pinstate };
 }
 
@@ -62,6 +67,8 @@ return { speed, angle, position, pinstate };
 	int a1,a2,a3,a4,a5,a6,a7,a8,a9,a10;
 
 	c_hall <: 3;
+	slave
+	{
 	c_hall :> a1;
 	c_hall :> a2;
 	c_hall :> a3;
@@ -72,7 +79,7 @@ return { speed, angle, position, pinstate };
 	c_hall :> a8;
 	c_hall :> a9;
 	c_hall :> a10;
-
+	}
 
 	return {a1,a2,a3,a4,a5,a6,a7,a8,a9,a10};
 }
