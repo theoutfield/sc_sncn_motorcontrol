@@ -86,7 +86,10 @@ void    function_TorqueControl()
 
 	    if(iSpeedValueIsNew) CalcDiffSpeed();
 
+
 		FOC_Integrator();
+
+
 
 		FOC_InversPark();
 

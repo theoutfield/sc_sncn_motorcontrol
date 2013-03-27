@@ -3,6 +3,8 @@
 #include "sine_lookup.h"
 #include "dc_motor_config.h"
 
+unsigned root_function(unsigned uSquareValue);
+
 void FOC_ClarkeAndPark()
 {
 	//============== clarke transformation ====================
@@ -123,8 +125,7 @@ int iTemp1;
     }
 
 	iTorqueUmotIntegrator += iTemp1;
-
-	iTorqueProp      = iTemp1 * 8;
+	iTorqueProp            = iTemp1 * 4;
 
 
 
@@ -150,6 +151,9 @@ void FOC_InversPark()
 		VsaRef = (iFieldReferenz * cosx)/16384   - (iTorqueReferenz * sinx)/16384;
 		VsbRef = (iFieldReferenz * sinx)/16384   + (iTorqueReferenz * cosx)/16384;
 		iAngleInvPark  = arctg1(VsaRef,VsbRef);           			// from 0 - 4095
+
+		iVectorInvPark = VsaRef * VsaRef + VsbRef * VsbRef;
+		iVectorInvPark = root_function(iVectorInvPark);
 }
 
 
@@ -210,6 +214,9 @@ int iTemp;
 
 			if(iPhase1 > ia1RMSMax)   // save last max value
 				ia1RMSMax = iPhase1;
+
+
+
 }
 
 
@@ -301,7 +308,7 @@ void SaveValueToArray()
 	iMotValue[27] = iVectorInvPark;
 	iMotValue[28] = adc_a4;
 
-	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF);
+	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF) + iEncoderNullReference *65536;
 	iMotValue[30] = iEncoderPositionAbsolut;
 	iMotValue[31] = iHallPositionAbsolut;
 }

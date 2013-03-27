@@ -31,6 +31,8 @@ void    function_UmotControl() {
 
         if(iSetUserSpeed > 0)  	 iAnglePWM= iAngleRotor + iParAngleUser;
         if(iSetUserSpeed < 0)  	 iAnglePWM= iAngleRotor + iParAngleUser + 2048;
+        if(iSetUserSpeed == 0)   iAnglePWM= iAngleLast;
+
 
         iUmotResult = iMotCommand[0];		// umot control
         if(iUmotResult < 0) iUmotResult = -iUmotResult;
@@ -286,7 +288,7 @@ void CalcUmotForSpeed()
 
 	if(iUmotProfile > 4096)        iUmotProfile = 4096;
 	//----------------------------------------------------------------
-	iUmotResult  = iUmotProfile +  iUmotIntegrator/256  + iUmotP/256 ;
+	iUmotResult  = iUmotProfile; // +  iUmotIntegrator/256  + iUmotP/256 ;
 	iUmotResult += (iUmotBoost / 256);
 
 	//--------------- umot limit ---------------------------------

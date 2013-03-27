@@ -224,10 +224,12 @@ int iStepRamp;
 		 	 	if(iMotDirection == 1) sprintf(cxText2,"motor CCW speed: %d RPM",c->iMotValues[7]);
 		 	 	if(iMotDirection ==0xFF)sprintf(cxText2,"motor  CW speed: %d RPM",c->iMotValues[7]);
 
-		 	 	if(iControlFOC <= 1) 	sprintf(cxText,"-----------------------                 SPEED Control      ---- +/- RPM  ----- %s ---------------------------",cxText2);
-		 	 	if(iControlFOC == 2)	sprintf(cxText,"-----------------------    Speed and  TORQUE Control     ---- t+200----------------------------------------");
+		 	 	if(iControlFOC == 0) 	sprintf(cxText,"-----------------------              F0:   Umot Control   ----------------------------------------------------");
+		 	 	if(iControlFOC == 1) 	sprintf(cxText,"-----------------------                 SPEED Control      ---- +/- RPM  ------ %s ---------------------------",cxText2);
+		 	 	if(iControlFOC == 2)	sprintf(cxText,"-----------------------    Speed and  TORQUE Control     ---- t+200 +RPM -------------------------------------");
 		 	 	if(iControlFOC == 3)	sprintf(cxText,"-----------------------                 POSITION Control   ---- m+500 ----------------------------------------");
-		 	 	if(iControlFOC == 4)	sprintf(cxText,"-----------------------            Sensorless Control   ---- +/- RPM ----------------------------------------");
+		 	 	if(iControlFOC == 4)	sprintf(cxText,"-----------------------            Sensorless Control   ------------------------------------------------------");
+		 	 	if(iControlFOC > 4) 	sprintf(cxText,"-----------------------            F%d:  iControlFOC  ------------------------------------------------------",iControlFOC);
 
 
 		 	 	printf("%s\n",cxText);

@@ -40,7 +40,9 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 	InitParameter();
 	SetParameterValue();
 
-
+#ifdef defENCODER
+iEncoderOnOff = 1;
+#endif
 
 
 //================== pwmloop ==============================================================================================================
@@ -63,7 +65,7 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 // a3 = -a1 -a2;
 
 
- p_ifm_ext_d1 <: 0; // yellow
+
 
 	//======================== read current ============================
 			#ifdef DC100
@@ -83,25 +85,18 @@ void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm
 
 
 //============================== rotor position  from hall ================================================
-if(iEncoderOnOff==0)
-{
 		{iHallActualSpeed, iHallAngle, iHallPositionAbsolut, iHallPinState}  = get_hall_values(c_hall);
 
 		iHallSpeedValueIsNew   = iHallActualSpeed & 0xFF000000;   		// extract info if SpeedValue is new
 		iHallActualSpeed    &= 0x00FFFFFF;
 		if(iHallActualSpeed  & 0x00FF0000)
 		iHallActualSpeed |= 0xFFFF0000;   						        // expand value if negativ
-
-
-}
 //==========================================================================================================
 
 
 
 
 //------------------- encoder values-------------------------------------------------------------------------
- //if(iEncoderOnOff==1)
- {
 		{iEncoderActualSpeed, iEncoderAngle, iEncoderPositionAbsolut, iEncoderPinState} = get_encoder_values(c_hall);
 
 		if(iEncoderAngle & 0xFF000000) iEncoderNullReference++;
@@ -116,9 +111,6 @@ if(iEncoderOnOff==0)
 		iEncoderActualSpeed    &= 0x00FFFFFF;
 		if(iEncoderActualSpeed  & 0x00FF0000)
 		iEncoderActualSpeed |= 0xFFFF0000;   						            // expand value if negativ
-
- }// end if iEncoderOnOff
-
 		//-----------------------------------------------------------------------------------------------------------
 
  	 	if(iEncoderOnOff==0)
@@ -130,7 +122,7 @@ if(iEncoderOnOff==0)
  	 	}
  	 	else
  	 	{
-		if(iSetSpeed > 0)
+		    if(iSetSpeed >= 0)
 			iAngleRotor  	 = iEncoderAngle - iMotPar[8];
 			else
 			iAngleRotor  	 = iEncoderAngle - iMotPar[9];
@@ -148,9 +140,10 @@ if(iEncoderOnOff==0)
         }
 
 
-        if(iDiffBlocked)
+        if(iDiffBlocked)// only for test
         {
-        iAngleRotor = iAngleRotorOld + iAngleRotorDiffCalculated; // only for test
+        iDiffBlocked--;
+        iAngleRotor = iAngleRotorOld + iAngleRotorDiffCalculated;
         iAngleRotor &= 0x0FFF;
         }
 
@@ -183,58 +176,48 @@ if(iEncoderOnOff==0)
 
 		CalcCurrentValues();
 
+		iVectorCurrent = iAlpha * iAlpha + iBeta * iBeta;
+		iVectorCurrent = root_funjction(iVectorCurrent);
+
 		//***************** steps ***********************************************************
-		iControlFOC &= 0x03;
+	    iTemp1 = iControlFOC & 0x03;
 
 		if(iEncoderOnOff==1)
 		{
-			if (iEncoderNullReference < 2) 	iControlFOC |= 0x04;
+			if (iEncoderNullReference < 2) 	iTemp1 = 4;
 		}
 
-		switch(iControlFOC)
+		switch(iTemp1)
 		{
-		case 0:
-
-		         function_UmotControl();   // speed_contro.xc
+		case 0:  function_UmotControl();   // speed_contro.xc
 			     break;
-
 		case 1:  function_SpeedControl();
 		         break;
 		case 2:  function_TorqueControl();
 		         break;
 		case 3:  function_PositionControl();
 		         break;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-				 function_SensorLessControl();
+		case 4:	 function_SensorLessControl();
 		         break;
-
-
-
-		default: iControlFOC=0; break;
+		case 5:  break;
+		case 8: break;
+		default: iControlFOC=2; break;
 		}
 
+
+
+
+
 		iLoopCount++;
-		iLoopCount &= 0x03;
+		iLoopCount &= 0x01;
 		switch(iLoopCount)
 		{
-			case 0:	iVectorInvPark = VsaRef * VsaRef + VsbRef * VsbRef;
-					iVectorInvPark = root_function(iVectorInvPark);
-					break;
-
-			case 1:	iVectorCurrent = iAlpha * iAlpha + iBeta * iBeta;
-					iVectorCurrent = root_function(iVectorCurrent);
-					break;
-
-			case 2: if(a1SquareMean)
+			case 0: if(a1SquareMean)
 						a1RMS = root_function(a1SquareMean);
 						a1SquareMean = 0;
 					break;
 
-			case 3: if(a2SquareMean)
+			case 1: if(a2SquareMean)
 						a2RMS = root_function(a2SquareMean);
 						a2SquareMean = 0;
 					break;
@@ -285,12 +268,8 @@ if(iEncoderOnOff==0)
 
 	//============================================================================================
 
-
-
-
-
-		iAnglePWM += iTestAngle;
-        iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
+		iAnglePWM += iTestAngle;		// only for test
+        iAnglePWM &= 0x0FFF; 			// 0 - 4095  -> 0x0000 - 0x0fff
 
 		if(iStep1 == 0)
 		{
@@ -301,14 +280,10 @@ if(iEncoderOnOff==0)
 		}
 
 	   //================== Holding Torque if motor stopped ====================================================
-        if(iUmotResult < iMotHoldingTorque)iUmotResult = iMotHoldingTorque;
+            if(iUmotResult < iMotHoldingTorque)iUmotResult = iMotHoldingTorque;
 
-		if(iMotHoldingTorque)
-		{
 			if(iStep1 != 0) iAngleLast = iAnglePWM;
-			if(iStep1 == 0 )
-			iAnglePWM = iAngleLast;
-		}
+			if(iStep1 == 0 )iAnglePWM  = iAngleLast;
 
 		//======================================================================================================
 		//======================================================================================================
@@ -323,18 +298,16 @@ if(iEncoderOnOff==0)
 
 
 
-	      if(iControlFOC >= 4 && iControlFOC < 8) iAnglePWM = iAngleSensorLessPWM;
+	    if(iControlFOC == 4) iAnglePWM = iAngleSensorLessPWM;  // to start with encoder
 
-	        if(iControlFOC == 8)  // only for test
-	        {
-	        	iAnglePWM   = iMotCommand[6]/65536;
-	        	iAnglePWM &= 0x0FFF;
-	        	iUmotMotor  = iMotCommand[6] & 0xFFFF;
-	        	iPwmOnOff = 1;
-	        }
+	    if(iControlFOC == 5)  // only for test
+	    {
+	    iAnglePWM   = iMotCommand[6]/65536;
+	    iAnglePWM &= 0x0FFF;
+	    iUmotMotor  = iMotCommand[6] & 0xFFFF;
+	    iPwmOnOff = 1;
+	    }
 
-
-			iIndexPWM = iAnglePWM >> 2;  // from 0-4095 to LUT 0-1023
 
 
 	#ifdef DEBUG_commutation
@@ -444,10 +417,10 @@ if(iEncoderOnOff==0)
 				 {
 				  iMotCommand[7] = 0;
 					CalcSetUserSpeed(iMotCommand[0]);
-					iControlFOC 			= iMotCommand[1] & 0x07;
-					iEncoderOnOff           = iMotCommand[1] & 0x08;  // only for test
-					iUmotBlocked            = iMotCommand[1] & 0x10;  // only for test
-					iDiffBlocked            = iMotCommand[1] & 0x20;  // only for test
+					iControlFOC 			= iMotCommand[1] & 0x0F;
+					iEncoderOnOff           = iMotCommand[1] & 0x10;  // only for test
+					iUmotBlocked            = iMotCommand[1] & 0x20;  // only for test
+					iDiffBlocked            = iMotCommand[1] & 0x40;  // only for test
 
 					iTorqueUser  		    = iMotCommand[2];
 					iMotHoldingTorque       = iMotCommand[3];
@@ -458,9 +431,11 @@ if(iEncoderOnOff==0)
 				if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }
 
 
+				iAnglePWM &= 0x0FFF;
+				iIndexPWM = iAnglePWM >> 2;  // from 0-4095 to LUT 0-1023
 
-
-				sine_pwm(iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );
+				p_ifm_ext_d1 <: 0; // yellow
+				sine_pwm(iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );  // last
 
 	}// end while(1)
 }// end function

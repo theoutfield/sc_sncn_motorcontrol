@@ -339,36 +339,9 @@ tx :> ts;  // first value
 
 // iEncoderSpeed = (60 * 1.000.000) / periodeµsec
 // 60.000.000 / 400 = 150.000   / 4= 37500
-/*
-void CalcEncoderSpeed()
-{
-	  iEncoderPeriodMicroSeconds  = iEncoderCountMicroSeconds;
-
-	  iEncoderSpeed   = 0xAA000000;
-	  if(iEncoderPeriodMicroSeconds)
-	  {
-	  iEncoderSpeed  = 75000;
-   	  iEncoderSpeed *= iNrEncoderPulses;
-	  iEncoderSpeed /= iEncoderPeriodMicroSeconds;  // period in µsec
-   	  iEncoderSpeed /= POLE_PAIRS; 					// pole pairs
-	  }
-	  if(iEncoderDirection < 0) iEncoderSpeed = -iEncoderSpeed;
-
-	  iEncoderSpeed &= 0x00FFFFFF;
-	  iEncoderSpeed |= 0xAA000000;
-
-	  iEncoderPeriodNext = iEncoderPeriodMicroSeconds * 256;    // add 10%
-	  iEncoderPeriodNext /= 230;
-}
-*/
 //=========RPM_PWM   1.000.000 * 60 / Periode
 //  RPM_Motor = RPM_PWM/POLE_PAIRS
 //  60.000.000 /Periode 8314/2*6
-
-void CalcHallSpeed()
-{
-
-}
 
 
 
@@ -791,7 +764,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 					 	 	c_hall <: iEncoderSpeed;   iEncoderSpeed &= 0x00FFFFFF;
 						 	c_hall <: iEncoderAngle;   iEncoderAngle &= 0xFFFF;  // send and clear info about null reference
 						 	c_hall <: iEncoderPosAbsolut;
-						 	c_hall <: iEncoderPinState + iEncoderReferenz*10;
+						 	c_hall <: iEncoderPinState;   // + iEncoderReferenz*10;
 			  }
 			  else if  (cmd == 3)
 			  master

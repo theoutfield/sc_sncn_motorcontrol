@@ -18,10 +18,9 @@
 #include <xscope.h>
 //#include "zip.h"
 #include "refclk.h"
-//int trigger=0;
+
 static unsigned adc_data_a[5];
 static unsigned adc_data_b[5];
-//static unsigned ia_calibr,ib_calibr;
 
 extern out port p_ifm_ext_d2;
 extern out port p_ifm_ext_d3;
@@ -229,9 +228,6 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 		const unsigned delay_acq =   (9*USEC_FAST) / 5; // 1.8 us
 		timer t;
 		unsigned ts;
-
-		//  int cmd;
-		//  unsigned char ct;
 		unsigned data_raw_a, data_raw_b;
 
 		/* Reading/Writing after conversion (RAC)
@@ -240,12 +236,10 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 		#define SPI_IDLE   configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0100)
 		#define SPI_SELECT configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0000)
 
-		//   #define WAIT		case t when timerafter(ts) :> ts:
-
 	  	SPI_IDLE;
 		t :> ts;
-		ts += delay_conv;
-		t when timerafter(ts) :> ts;  // WAIT;
+	//	ts += delay_conv;
+		t when timerafter(ts + delay_conv) :> ts;  // WAIT;
 
 		//case ACQ_OTHER_SPI:
 		outputWordsZipped(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_imot, adc_config_imot, 0, clk_signal);
@@ -257,19 +251,16 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 		p_data_b :> data_raw_b;
 		adc_data_b[4] = convert(data_raw_b);
 
-		ts += delay_acq;
-		t when timerafter(ts) :> ts;
+		t when timerafter(ts+delay_acq) :> ts;
 
 		SPI_IDLE;
-		ts += delay_conv;
 		//WAIT;
-		t when timerafter(ts) :> ts;
+		t when timerafter(ts + delay_conv) :> ts;
 
 
 		//case ACQ_MOTOR_SPI:
 		outputWordsZipped(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_other[iIndexADC], adc_config_other[iIndexADC], 0, clk_signal);
 
-		ts += delay_acq;
 		SPI_SELECT;
 
 		p_data_a :> data_raw_a;
@@ -302,6 +293,10 @@ void adc_ad7949_triggered( chanend c_adc,
 
 	  tx :> ts;
 
+
+
+
+
 	while (1)
 	{
 		tx when timerafter(ts + 125) :> ts;   	// 250 => 1탎ec 125= 0,5탎ec
@@ -329,7 +324,7 @@ void adc_ad7949_triggered( chanend c_adc,
 				c_adc <: adc_data_b[1]; 		//
 				c_adc <: adc_data_b[2]; 		//
 				c_adc <: adc_data_b[3];
-				xCount = 56;
+				xCount = 58;               // ===>> tirgger for next adc conversion 58 * 0,5탎ec = 29탎ec
 				tx :> ts;
 				}
 	    	break;
