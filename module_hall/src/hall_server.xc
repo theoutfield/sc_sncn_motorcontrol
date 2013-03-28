@@ -156,7 +156,7 @@ void run_hall( chanend c_hall, chanend sensor_output, port in p_hall, hall_par &
 			}
 
 
- 		if(iTimeCountOneTransition)
+ 		if(iTimeSaveOneTransition)
 		delta_angle = (682 *iTimeCountOneTransition)/iTimeSaveOneTransition;
 	  if(delta_angle >= 680) delta_angle = 680;
 
