@@ -70,17 +70,17 @@ char cxInfo[64][20]={\
 
 char cxParameter[32][32]={\
 "RpmMotorMax",
-"DefSpeedMax",
-"RPMreference",
-"AngleUser",
-"AngleFromRPM",
-"UmotBoost",
+"RpmUmotMax",
 "UmotStart",
-"SpeedKneeUmot",
-"AngleCorrVal",
-"AngleCorrMax",
+"UmotBoost",
+"4:",
+"AngleUser",
+"",
+"Encoder resolution",
+"Encoder zero",
+"9:",
 "RmsLimit",
-"11",
+"RmsMaxPwmOff",
 "12",
 "13",
 "14",
@@ -93,12 +93,12 @@ char cxParameter[32][32]={\
 "21",
 "22",
 "23",
-"24",
-"test1",
-"test2",
-"test3",
-"test4",
-"test5",
+"ramp acc",
+"ramp dec",
+"RampSmoothFactor",
+"27:",
+"PositionSpeedMax",
+"PositionSpeedMin",
 "30",
 "31",
 };
@@ -141,9 +141,9 @@ int iStepRamp;
 			iIndex=0;
             while(iIndex < 16)
             {
-            	sprintf(cxText,"%2d %-17s %6d   %2d %-17s %6d",
+            	sprintf(cxText,"%2d %-20s %6d      %2d %-20s %6d",
         		iIndex,cxParameter[iIndex],c->iMotPar[iIndex],
-        		iIndex,cxParameter[iIndex+16],c->iMotPar[iIndex+16]);
+        		iIndex+16,cxParameter[iIndex+16],c->iMotPar[iIndex+16]);
             	printf("%s\n",cxText);
         		iIndex++;
             }
@@ -220,16 +220,16 @@ int iStepRamp;
 		 	 	fa2RMS = c->iMotInfo[33]; fa2RMS/=264;
 
 
-		 	 	if(iMotDirection == 0) sprintf(cxText2,"motor stop");
-		 	 	if(iMotDirection == 1) sprintf(cxText2,"motor CCW speed: %d RPM",c->iMotValues[7]);
+		 	 	if(iMotDirection == 0)  sprintf(cxText2,"motor stop");
+		 	 	if(iMotDirection == 1)  sprintf(cxText2,"motor CCW speed: %d RPM",c->iMotValues[7]);
 		 	 	if(iMotDirection ==0xFF)sprintf(cxText2,"motor  CW speed: %d RPM",c->iMotValues[7]);
 
-		 	 	if(iControlFOC == 0) 	sprintf(cxText,"-----------------------              F0:   Umot Control   ----------------------------------------------------");
-		 	 	if(iControlFOC == 1) 	sprintf(cxText,"-----------------------                 SPEED Control      ---- +/- RPM  ------ %s ---------------------------",cxText2);
-		 	 	if(iControlFOC == 2)	sprintf(cxText,"-----------------------    Speed and  TORQUE Control     ---- t+200 +RPM -------------------------------------");
-		 	 	if(iControlFOC == 3)	sprintf(cxText,"-----------------------                 POSITION Control   ---- m+500 ----------------------------------------");
-		 	 	if(iControlFOC == 4)	sprintf(cxText,"-----------------------            Sensorless Control   ------------------------------------------------------");
-		 	 	if(iControlFOC > 4) 	sprintf(cxText,"-----------------------            F%d:  iControlFOC  ------------------------------------------------------",iControlFOC);
+		 	 	if(iControlFOC == 0) 	sprintf(cxText,"--------------------------------------- F0:   Umot Control   ----------------------------------------------------");
+		 	 	if(iControlFOC == 1) 	sprintf(cxText,"--------------------------------------- F1:   SPEED Control      ---- +/- RPM  ------ %s ---------------------------",cxText2);
+		 	 	if(iControlFOC == 2)	sprintf(cxText,"--------------------------------------- F2: Speed and  TORQUE Control     ---- t+200 +RPM -------------------------------------");
+		 	 	if(iControlFOC == 3)	sprintf(cxText,"--------------------------------------- F3: POSITION Control ------ m+500 ----------------------------------------");
+		 	 	if(iControlFOC == 4)	sprintf(cxText,"--------------------------------------- F4: Sensorless Control --------------------------------------------------------");
+		 	 	if(iControlFOC > 4) 	sprintf(cxText,"--------------------------------------  F%d:  iControlFOC  ------------------------------------------------------",iControlFOC);
 
 
 		 	 	printf("%s\n",cxText);

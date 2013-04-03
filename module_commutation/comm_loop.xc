@@ -29,6 +29,7 @@ int iDiffBlocked=0; 		//only for test
 int iTestAngle;				//only for test
 
 
+
 void comm_sine(chanend adc, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_motvalue)
 {
 	unsigned cmd1;
@@ -84,45 +85,45 @@ iEncoderOnOff = 1;
 
 
 
-//============================== rotor position  from hall ================================================
+//============================== rotor position  from hall =====================================================
 		{iHallActualSpeed, iHallAngle, iHallPositionAbsolut, iHallPinState}  = get_hall_values(c_hall);
 
-		iHallSpeedValueIsNew   = iHallActualSpeed & 0xFF000000;   		// extract info if SpeedValue is new
-		iHallActualSpeed    &= 0x00FFFFFF;
-		if(iHallActualSpeed  & 0x00FF0000)
-		iHallActualSpeed |= 0xFFFF0000;   						        // expand value if negativ
-//==========================================================================================================
+		iHallSpeedValueIsNew   = iHallActualSpeed & 0xFF000000;   	    	// extract info if SpeedValue is new
+		iHallActualSpeed      &= 0x00FFFFFF;
+		if(iHallActualSpeed    & 0x00FF0000)
+		iHallActualSpeed      |= 0xFFFF0000;   						        // expand value if negativ
+//==============================================================================================================
 
 
 
 
-//------------------- encoder values-------------------------------------------------------------------------
-		{iEncoderActualSpeed, iEncoderAngle, iEncoderPositionAbsolut, iEncoderPinState} = get_encoder_values(c_hall);
+//------------------- encoder values----------------------------------------------------------------------------------
+		{iEncoderActualSpeed, iEncoderAbsolut, iEncoderPositionAbsolut, iEncoderPinState} = get_encoder_values(c_hall);
 
-		if(iEncoderAngle & 0xFF000000) iEncoderNullReference++;
-		iEncoderAngle *= POLE_PAIRS;
+		if(iEncoderAbsolut & 0xFF000000) iEncoderNullReference++;
+		if(iEncoderNullReference > 512) iEncoderNullReference = 256;
+		iEncoderAbsolut &= 0x0FFF;
+		iEncoderAngle = iEncoderAbsolut * POLE_PAIRS;
 		iEncoderAngle *= 4096;
-		iEncoderAngle /= iMotPar[7];  					// encoder steps per resolution
+		iEncoderAngle /= iMotPar[7];  					// encoder steps per revolution
 		iEncoderAngle  = iEncoderAngle % 4096;      	// modulo value
 		iEncoderAngle &= 0x0FFF;
 
+		iEncoderSpeedValueIsNew   = iEncoderActualSpeed & 0xFF000000;   		    // extract info if SpeedValue is new
+		iEncoderActualSpeed      &= 0x00FFFFFF;
+		if(iEncoderActualSpeed    & 0x00FF0000)	iEncoderActualSpeed  |= 0xFFFF0000; // expand value if negativ
+		//------------------------------------------------------------------------------------------------------------
 
-		iEncoderSpeedValueIsNew   = iEncoderActualSpeed & 0xFF000000;   		// extract info if SpeedValue is new
-		iEncoderActualSpeed    &= 0x00FFFFFF;
-		if(iEncoderActualSpeed  & 0x00FF0000)
-		iEncoderActualSpeed |= 0xFFFF0000;   						            // expand value if negativ
-		//-----------------------------------------------------------------------------------------------------------
-
- 	 	if(iEncoderOnOff==0)
- 	 	{
-		iAngleRotor      = iHallAngle & 0x0FFF;
-		iTemp1		     = iHallActualSpeed;
-		iSpeedValueIsNew = iHallSpeedValueIsNew;
-		iPositionAbsolut = iHallPositionAbsolut;
- 	 	}
- 	 	else
- 	 	{
-		    if(iSetSpeed >= 0)
+ 	 		if(iEncoderOnOff==0)
+ 	 		{
+ 	 		iAngleRotor      = iHallAngle & 0x0FFF;
+ 	 		iTemp1		     = iHallActualSpeed;
+ 	 		iSpeedValueIsNew = iHallSpeedValueIsNew;
+ 	 		iPositionAbsolut = iHallPositionAbsolut;
+ 	 		}
+ 	 		else
+ 	 		{
+		    if(iSpeedIntegrator >= 0)
 			iAngleRotor  	 = iEncoderAngle - iMotPar[8];
 			else
 			iAngleRotor  	 = iEncoderAngle - iMotPar[9];
@@ -130,14 +131,14 @@ iEncoderOnOff = 1;
 			iTemp1 	 		 = iEncoderActualSpeed;
 			iSpeedValueIsNew = iEncoderSpeedValueIsNew;
 			iPositionAbsolut = iEncoderPositionAbsolut;
- 	 	}
+ 	 		}
 
-        if(iSpeedValueIsNew)
-        {
-		iFilterSumSpeed -= iActualSpeed;
-		iFilterSumSpeed += iTemp1;
-		iActualSpeed = iFilterSumSpeed/8;
-        }
+        	if(iSpeedValueIsNew)
+        	{
+        	iFilterSumSpeed -= iActualSpeed;
+        	iFilterSumSpeed += iTemp1;
+        	iActualSpeed = iFilterSumSpeed/8;
+        	}
 
 
         if(iDiffBlocked)// only for test
@@ -166,7 +167,7 @@ iEncoderOnOff = 1;
 		}
 
         if(iSpeedValueIsNew){
-		iAngleRotorDiffCalculated  = iSetSpeed * 700;
+		iAngleRotorDiffCalculated  = (iSpeedIntegrator/65536) * 700;
 		iAngleRotorDiffCalculated /= 26367;
         }
 		iAngleRotorOld = iAngleRotor;
@@ -177,21 +178,27 @@ iEncoderOnOff = 1;
 		CalcCurrentValues();
 
 		iVectorCurrent = iAlpha * iAlpha + iBeta * iBeta;
-		iVectorCurrent = root_funjction(iVectorCurrent);
+		iVectorCurrent = root_function(iVectorCurrent);
+
+
 
 		//***************** steps ***********************************************************
-	    iTemp1 = iControlFOC & 0x03;
 
+
+	    iControlActual = iControlUser;
 		if(iEncoderOnOff==1)
 		{
-			if (iEncoderNullReference < 2) 	iTemp1 = 4;
+			if (iEncoderNullReference < 2) iControlActual = 4;
 		}
 
-		switch(iTemp1)
+		if(iControlActual != iControlLast)iStep1 = 0;
+		iControlLast = iControlActual;
+
+		switch(iControlActual)
 		{
-		case 0:  function_UmotControl();   // speed_contro.xc
+		case 0:  function_UmotControl();   // speed_control.xc
 			     break;
-		case 1:  function_SpeedControl();
+		case 1:  function_SpeedControl_F1();
 		         break;
 		case 2:  function_TorqueControl();
 		         break;
@@ -201,31 +208,11 @@ iEncoderOnOff = 1;
 		         break;
 		case 5:  break;
 		case 8: break;
-		default: iControlFOC=2; break;
-		}
-
-
-
-
-
-		iLoopCount++;
-		iLoopCount &= 0x01;
-		switch(iLoopCount)
-		{
-			case 0: if(a1SquareMean)
-						a1RMS = root_function(a1SquareMean);
-						a1SquareMean = 0;
-					break;
-
-			case 1: if(a2SquareMean)
-						a2RMS = root_function(a2SquareMean);
-						a2SquareMean = 0;
-					break;
+		default: iControlUser=2; break;
 		}
 
 
     //********************************************************************
-
 		iPowerMotor = 6863 * iIqPeriod2;
 		iPowerMotor /= 65536;
 		iPowerMotor *= iActualSpeed;
@@ -273,6 +260,8 @@ iEncoderOnOff = 1;
 
 		if(iStep1 == 0)
 		{
+			iUmotBoost      = 0;
+			iUmotResult     = 0;
 			iUmotIntegrator = 0;
 			iUmotP			= 0;
 			iIqPeriod2		= 0;
@@ -298,9 +287,9 @@ iEncoderOnOff = 1;
 
 
 
-	    if(iControlFOC == 4) iAnglePWM = iAngleSensorLessPWM;  // to start with encoder
+	    if(iControlActual == 4) iAnglePWM = iAngleSensorLessPWM;  // to start with encoder
 
-	    if(iControlFOC == 5)  // only for test
+	    if(iControlActual == 5)  // only for test
 	    {
 	    iAnglePWM   = iMotCommand[6]/65536;
 	    iAnglePWM &= 0x0FFF;
@@ -314,14 +303,14 @@ iEncoderOnOff = 1;
 /*
 	 	 xscope_probe_data(0,iPhase1);
 	 	 xscope_probe_data(1,a1RMS);
-	 	 xscope_probe_data(2,iSetSpeed);
+	 	 xscope_probe_data(2,iSpeedIntegrator);
 	 	 xscope_probe_data(3,iAngleRotor);
 	 	 xscope_probe_data(4,iAngleCurrent);
 	   	 xscope_probe_data(5,iUmotMotor);
 	   	 xscope_probe_data(6,a1Square/1000);
 */
 /*		 xscope_probe_data(0,iActualSpeed);
-		 xscope_probe_data(1,iSetSpeed);
+		 xscope_probe_data(1,iSpeedIntegrator);
 		 xscope_probe_data(2,iUmotIntegrator/256);
 		 xscope_probe_data(3,iUmotMotor);
 		 xscope_probe_data(4,iAngleDiffPeriod);
@@ -360,7 +349,7 @@ iEncoderOnOff = 1;
 		#endif
 
 
-			//================== uart connection over one pin like LIN =============================================
+//================================ uart connection over one pin like LIN =============================================
 				select
 				{
 				case c_motvalue :> cmd2:
@@ -417,11 +406,11 @@ iEncoderOnOff = 1;
 				 {
 				  iMotCommand[7] = 0;
 					CalcSetUserSpeed(iMotCommand[0]);
-					iControlFOC 			= iMotCommand[1] & 0x0F;
+					iControlUser 			= iMotCommand[1] & 0x0F;
 					iEncoderOnOff           = iMotCommand[1] & 0x10;  // only for test
 					iUmotBlocked            = iMotCommand[1] & 0x20;  // only for test
 					iDiffBlocked            = iMotCommand[1] & 0x40;  // only for test
-
+					if(iMotCommand[1] & 0x80) iEncoderNullReference=0; //only for test
 					iTorqueUser  		    = iMotCommand[2];
 					iMotHoldingTorque       = iMotCommand[3];
 					iTestAngle              = iMotCommand[4];
@@ -429,6 +418,10 @@ iEncoderOnOff = 1;
 					// [6] iUmot and iAngle
 				}
 				if(iUpdateFlag)	{ iUpdateFlag=0; SetParameterValue(); }
+#ifdef defENCODER
+iEncoderOnOff = 1;
+#endif
+
 
 
 				iAnglePWM &= 0x0FFF;
@@ -476,7 +469,7 @@ void CalcSetUserSpeed(int iSpeedValue)
 {
 
 	if(iSpeedValue > iParRpmMotorMax)	iSpeedValue = iParRpmMotorMax;
-	iSetUserSpeed = iSpeedValue * 65536;
+	iSpeedSetUser = iSpeedValue * 65536;
 }
 
 

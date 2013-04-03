@@ -1,9 +1,6 @@
 #include <print.h>
 #include <adc_ad7949.h>
 
-#define ADC_CALIB_POINTS 64
-#define Factor 6
-
 calib_data I_calib;
 int iAdcNrReadings=0;
 int iFilterSUM_Ia;
@@ -37,7 +34,7 @@ int iFilterSUM_Ib;
 	  iFilterSUM_Ia = current_a * 256;
 	  iFilterSUM_Ib = current_b * 256;
   }
-  if(iAdcNrReadings++ > 256) iAdcNrReadings=256;
+  if(iAdcNrReadings++ > 512) iAdcNrReadings=256;
 
   if(iPwmOnOff==0)
   {

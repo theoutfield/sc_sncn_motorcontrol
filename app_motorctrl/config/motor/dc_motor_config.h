@@ -14,10 +14,10 @@
 #pragma once
 
 #define UMOT_MAX 4096
-#define TORQUE_INTEGRATOR_MAX  UMOT_MAX*32
+#define TORQUE_INTEGRATOR_MAX  UMOT_MAX*64
 
-//#define defENCODER
-#define defHALL
+#define defENCODER
+//#define defHALL
 
 //=========================================================
 #define MOTOR_MAXON_EC45
@@ -36,13 +36,13 @@
 #define defParRpmUmotMax	 	11500
 #define defParUmotBoost  		   60
 #define defParUmotStart 		   70
-#define defParAngleUser 		  640
+#define defParAngleUser 		    0
 //======== current limits ===============
 #define defParRmsLimit			  750  // 66*4 = 264Bits/A
 #define defParRmsMaxPwmOff       2000  //
 //============ speed_control ============
 #define defParHysteresisPercent	    5
-#define defParDiffSpeedMax		  150
+#define defParDiffSpeedMax		   20
 #define defParUmotIntegralLimit	 2048
 
 #define defParPropGain			   32
@@ -55,10 +55,10 @@
 //-------------------------------------
 #define defParEncoderResolution       4000
 #define defParEncoderZeroPointPlus     640
-#define defParEncoderZeroPointMinus   1100
+#define defParEncoderZeroPointMinus   1600
 //-------------------------------------
 #define defParRampAcc  			65536/2		 // change to RPM/sec
-#define defParRampDec  			65536/2         //
+#define defParRampDec  			65536         //
 #define defParRampSmoothFactor 		4     //
 
 #define defParPositionSpeedMax    800   // RPM
@@ -79,7 +79,7 @@
 #define defParRpmUmotMax	 	4000
 #define defParUmotBoost  		 120
 #define defParUmotStart 		 150
-#define defParAngleUser 		 640
+#define defParAngleUser 		   0
 //======== current limits ===============
 #define defParRmsLimit			750   // 66*4 = 264Bits/A
 #define defParRmsMaxPwmOff      2000  //
@@ -90,21 +90,21 @@
 #define defParEncoderZeroPointMinus   1100
 //-------------------------------------
 
-#define defParHysteresisPercent	    5
-#define defParDiffSpeedMax		  150
+#define defParHysteresisPercent	    5		// percent
+#define defParDiffSpeedMax		   20		// percent
 #define defParUmotIntegralLimit	 2048
 #define defParPropGain			    8
 #define defParIntegralGain		    8
 #define defCurrentFactor            1
 
-#define defParTorquePropGain	   64
-#define defParTorqueIntegralGain   64
+#define defParTorquePropGain	   32
+#define defParTorqueIntegralGain   32
 //-------------------------------------
 #define defParEncoderResolution 4000
 #define defParEncoderZeroPoint   570
 //-------------------------------------
-#define defParRampAcc  65536/8		 //  change to RPM/sec
-#define defParRampDec  65536/8
+#define defParRampAcc  		      8192 		 //  change to RPM/sec
+#define defParRampDec  			  8192*2
 #define defParRampSmoothFactor 4
 
 #define defParPositionSpeedMax   800   // RPM

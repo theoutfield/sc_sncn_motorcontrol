@@ -60,20 +60,15 @@ void CalcRampForPosition(){
 
 if(iRampBlocked==0)
 {
-  if(iSetUserSpeed >  iSetSpeedRamp) { iSetSpeedRamp += iMotPar[24]/8;  if(iSetSpeedRamp > iSetUserSpeed)  iSetSpeedRamp = iSetUserSpeed;}
+  if(iSpeedSetUser >  iSpeedIntegrator) { iSpeedIntegrator += iMotPar[24]/8;  if(iSpeedIntegrator > iSpeedSetUser)  iSpeedIntegrator = iSpeedSetUser;}
 
-  if(iSetUserSpeed <  iSetSpeedRamp) { iSetSpeedRamp -= iMotPar[25]/8;  if(iSetSpeedRamp < iSetUserSpeed)  iSetSpeedRamp = iSetUserSpeed;}
+  if(iSpeedSetUser <  iSpeedIntegrator) { iSpeedIntegrator -= iMotPar[25]/8;  if(iSpeedIntegrator < iSpeedSetUser)  iSpeedIntegrator = iSpeedSetUser;}
 }
 iRampBlocked = 0;
 
 
-iSetSpeedSum -= iSetSpeedNew;
-iSetSpeedSum += iSetSpeedRamp;
 
-iSetSpeedNew = iSetSpeedSum;
-if(iMotPar[26])
-iSetSpeedNew /= iMotPar[26];   // smoothing factor
 
- iSetSpeed = iSetSpeedNew/65536;
+
 
 }//end CalcRampForSpeed

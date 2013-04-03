@@ -5,11 +5,12 @@ extern int iHallActualSpeed,iHallAngle,iHallPositionAbsolut,iHallPinState;
 extern int iHallSpeedValueIsNew;
 extern int iHallActualSpeed;
 extern int iHallPositionAbsolut;
-extern int iEncoderActualSpeed,iEncoderAngle,iEncoderPositionAbsolut,iEncoderPinState;
+extern int iEncoderActualSpeed,iEncoderAbsolut,iEncoderPositionAbsolut,iEncoderPinState;
 extern int iEncoderSpeedValueIsNew;
 extern int iEncoderActualSpeed;
 extern int iEncoderPositionAbsolut;
 extern int iEncoderNullReference ;
+extern int iEncoderAngle;
 extern int iActualSpeed;
 extern int iSpeedValueIsNew	;
 extern int iDiffAngleRotor;
@@ -51,20 +52,17 @@ extern int ia1RMSMax;
 extern int iPowerMotor ;
 extern int iStep1 ;
 extern int iMotDirection  	;
-extern int iControlFOC   	;
+extern int iControlUser   	;
+extern int iControlActual 	;
+extern int iControlLast    ;
 extern int iEncoderOnOff   ;
 //----------------------------
-extern int iSetSpeed;
+extern int iFilterSumSpeed 	;
+extern int iSpeedSetUser		;
+extern int iSpeedIntegrator  	;
 extern int iActualSpeed;
 extern int idiffSpeed1;
-extern int idiffSpeed2; /* idiffSpeed1 with hyteresis*/
-extern int iFilterSumSpeed ;
-//int iSetValueSpeed	=  0;
-extern int iSetUserSpeed	;
-//int iSetUserSpeed2=  0;
-extern int iSetSpeedRamp  	;
-extern int iSetSpeedSum    ;
-extern int iSetSpeedNew    ;
+extern int idiffSpeed2; 		// idiffSpeed1 with hyteresis
 //=======================================================
 extern int iLoopCount;
 extern int iCountDivFactor;

@@ -17,6 +17,7 @@ void FOC_ClarkeAndPark()
 			//================== angle = arctg(iBeta/iAlpha) ===========
 			iAngleCurrent = arctg1(iAlpha,iBeta);
 
+
 			if(iStep1 == 0)
 			{
 				iAngleCurrent        = 0;
@@ -33,8 +34,8 @@ void FOC_ClarkeAndPark()
 			iId = (((iAlpha * cosx )  /16384) + ((iBeta * sinx ) /16384));
 			iIq = (((iBeta  * cosx )  /16384) - ((iAlpha * sinx ) /16384));
 
-			iId *= defCurrentFactor;   // 1 or 4
-			iIq *= defCurrentFactor;
+	//		iId *= defCurrentFactor;   // 1 or 4
+	//		iIq *= defCurrentFactor;
 
 
 			iIdPeriod += iId;
@@ -50,7 +51,6 @@ void FOC_ClarkeAndPark()
 				iIdPeriod  = 0;
 				iCountDivFactor=0;
 			}
-
 
 }// end FOC_ClarkeAndPark
 
@@ -90,12 +90,12 @@ int iTemp1;
 
 void FOC_Integrator(){
 int iTemp1;
-#define defREFERENZFACTOR  64
+#define defREFERENZFACTOR  512
 
 	//---------------- field --------------------------
 
 
-	iFieldIntegrator += iFieldDiff2  /8;
+	iFieldIntegrator += iFieldDiff2 /4;
 
 	iFieldProp      = iFieldDiff2;
 
@@ -109,25 +109,27 @@ int iTemp1;
 	//-------------- torque ---------------------------------------------
 	iTemp1 = iTorqueDiff2;
 
-	if(iSetSpeed > 0)
+
+/*
+	if(iSpeedIntegrator > 0)
 	{
-    if(iActualSpeed > iSetSpeed)
+    if(iActualSpeed > iSpeedIntegrator/65536)
     	if(iTemp1 > 0) iTemp1=0;
     if(iSpeedValueIsNew) iTorqueUmotIntegrator += idiffSpeed2;
 	}
-
-
-    if(iSetSpeed < 0)
+    if(iSpeedIntegrator < 0)
     {
-       if(iActualSpeed < iSetSpeed)
+       if(iActualSpeed < iSpeedIntegrator/65536)
     	    	if(iTemp1 < 0) iTemp1=0;
        if(iSpeedValueIsNew) iTorqueUmotIntegrator += idiffSpeed2;
     }
+*/
+
 
 	iTorqueUmotIntegrator += iTemp1;
+	iTorqueUmotIntegrator += idiffSpeed2;
+
 	iTorqueProp            = iTemp1 * 4;
-
-
 
 	if(iTorqueUmotIntegrator >  iTorqueLimit)  iTorqueUmotIntegrator =  iTorqueLimit;
 	if(iTorqueUmotIntegrator < -iTorqueLimit)  iTorqueUmotIntegrator = -iTorqueLimit;
@@ -135,10 +137,8 @@ int iTemp1;
 	iTorqueReferenz = (iTorqueUmotIntegrator + iTorqueProp) / defREFERENZFACTOR;
 	//-------------------------------------------------
 
-
 	if(iStep1==0)
 	{
-		iTorqueLimit 	 		= TORQUE_INTEGRATOR_MAX * 4;
 		iFieldIntegrator   		= 0;
 		iTorqueUmotIntegrator   = 0;
 	}
@@ -215,6 +215,22 @@ int iTemp;
 			if(iPhase1 > ia1RMSMax)   // save last max value
 				ia1RMSMax = iPhase1;
 
+			iLoopCount++;
+			iLoopCount &= 0x01;
+			switch(iLoopCount)
+			{
+				case 0: if(a1SquareMean)
+							a1RMS = root_function(a1SquareMean);
+							a1SquareMean = 0;
+						break;
+
+				case 1: if(a2SquareMean)
+							a2RMS = root_function(a2SquareMean);
+							a2SquareMean = 0;
+						break;
+			}
+
+
 
 
 }
@@ -279,20 +295,20 @@ void SaveValueToArray()
 	iMotValue[2]  = iUmotP;
 	iMotValue[3]  = iUmotMotor;
 	iMotValue[4]  = iMotHoldingTorque;
-	iMotValue[5]  = iControlFOC  + (iStep1 * 256)  + ((iMotDirection & 0xFF)) *65536;
+	iMotValue[5]  = iControlActual  + (iStep1 * 256)  + ((iMotDirection & 0xFF)) *65536;
 
-	iMotValue[6]  = (iSetUserSpeed & 0xFFFF0000) + iSetSpeed;  //(iSetSpeedRamp/65536);
-	iMotValue[7]  = iActualSpeed;
-	iMotValue[8]  = idiffSpeed1*65536 + (idiffSpeed2 & 0xFFFF);
-	iMotValue[9]  = iPositionAbsolutNew;
-	iMotValue[10] = iEncoderActualSpeed;
-	iMotValue[11] = 0;
+	iMotValue[6]  = iSpeedSetUser/65536;
+	iMotValue[7]  = iSpeedIntegrator/65536;
+	iMotValue[8]  = iActualSpeed;
+	iMotValue[9]  = idiffSpeed1;
+	iMotValue[10] = idiffSpeed2;
+	iMotValue[11] = iAngleDiffPeriod;
 
 	iMotValue[12] = (iHallAngle *65536) + iEncoderAngle;
 	iMotValue[13] = (iAngleRotor*65536) + iAnglePWM;
 	iMotValue[14] = iAngleRotorDiffCalculated;
 	iMotValue[15] = iDiffAngleRotor;
-	iMotValue[16] = 0;
+	iMotValue[16] = iAngleInvPark;
 	iMotValue[17] = iTorqueLimit/defREFERENZFACTOR; // adc_b4; //VsdRef1;
 
  	iMotValue[18] = iTorqueSet;
@@ -306,7 +322,7 @@ void SaveValueToArray()
 	iMotValue[25] = a2RMS;
 	iMotValue[26] = iVectorCurrent;
 	iMotValue[27] = iVectorInvPark;
-	iMotValue[28] = adc_a4;
+	iMotValue[28] = iEncoderAbsolut;
 
 	iMotValue[29] = (iHallPinState*256)  + (iEncoderPinState & 0xFF) + iEncoderNullReference *65536;
 	iMotValue[30] = iEncoderPositionAbsolut;

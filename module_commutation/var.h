@@ -8,11 +8,12 @@ int iHallActualSpeed;
 int iHallPositionAbsolut;
 
 
-int iEncoderActualSpeed,iEncoderAngle,iEncoderPositionAbsolut,iEncoderPinState;
+int iEncoderActualSpeed,iEncoderAbsolut,iEncoderPositionAbsolut,iEncoderPinState;
 int iEncoderSpeedValueIsNew;
 int iEncoderActualSpeed;
 int iEncoderPositionAbsolut;
 int iEncoderNullReference = 0;
+int iEncoderAngle;
 
 int iActualSpeed;
 int iSpeedValueIsNew	=  0;  // if speed from hall is a new value
@@ -42,7 +43,7 @@ int iParRMS_PwmOff;
 int iUpdateFlag=0;
 //=========== motor values ===================================
 int iUmotProfile;
-int iUmotIntegrator=0;
+int iUmotIntegrator;
 int iUmotP;
 int iUmotRpmLimit;
 int iUmotMotor = 0;   	// follows iUmotResult
@@ -63,22 +64,20 @@ int ia1RMSMax=0;
 int iPowerMotor = 0;
 int iStep1 =0;
 int iMotDirection  	=  0;
-int iControlFOC   	=  1;
+int iControlUser   	=  2;
+int iControlActual 	=  2;
+int iControlLast    =  0;
+
 int iEncoderOnOff   =  0;
 
 //----------------------------
-int iSetSpeed=0;
+
+int iFilterSumSpeed 	=  0;
+int iSpeedSetUser		=  0;
+int iSpeedIntegrator  	=  0;
 int iActualSpeed=0;
 int idiffSpeed1;
-int idiffSpeed2; /* idiffSpeed1 with hyteresis*/
-int iFilterSumSpeed =  0;
-//int iSetValueSpeed	=  0;
-int iSetUserSpeed	=  0;
-//int iSetUserSpeed2=  0;
-int iSetSpeedRamp  	=  0;
-
-int iSetSpeedSum    =  0;  // smoothed ramp
-int iSetSpeedNew    =  0;
+int idiffSpeed2; 		// idiffSpeed1 with hyteresis
 
 //=======================================================
 
