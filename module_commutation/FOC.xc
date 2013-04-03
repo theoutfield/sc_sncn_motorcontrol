@@ -1,6 +1,6 @@
 #include "varext.h"
 #include "def.h"
-#include "sine_lookup.h"
+#include "comm_loop.h"
 #include "dc_motor_config.h"
 
 unsigned root_function(unsigned uSquareValue);

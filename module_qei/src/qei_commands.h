@@ -1,7 +1,4 @@
 /**
- * Module:  module_dsc_qei
- * Version: 1v0alpha0
- * Build:   5436fb1843bebb6a68cd194ba182e8ad9506e264
  * File:    qei_commands.h
  *
  * The copyrights, all other intellectual and industrial 
@@ -9,7 +6,7 @@
  * Terms and conditions covering the use of this code can
  * be found in the Xmos End User License Agreement.
  *
- * Copyright XMOS Ltd 2010
+ * Copyright XMOS Ltd 2013
  *
  * In the case where this code is a modification of existing code
  * under a separate license, the separate license terms are shown

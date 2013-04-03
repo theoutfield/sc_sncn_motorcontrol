@@ -17,8 +17,8 @@ static t_pwm_control pwm_ctrl;
 
 #ifdef DEBUG_commutation
 	#include <print.h>
-extern out port p_ifm_ext_d1;
-extern out port p_ifm_ext_d2;
+//extern out port p_ifm_ext_d1;
+//extern out port p_ifm_ext_d2;
 extern out port p_ifm_shared_leds_wden;  // XS1_PORT_4B; /* BlueGreenRed_Green */
 #endif
 
@@ -54,7 +54,7 @@ iEncoderOnOff = 1;
 		#ifdef DEBUG_commutation
 			cFlag |= 1;
 			#ifdef DC900
-				p_ifm_ext_d1 <: cFlag;  // set to one
+				//p_ifm_ext_d1 <: cFlag;  // set to one
 			#endif
 		#endif
 
@@ -427,8 +427,8 @@ iEncoderOnOff = 1;
 				iAnglePWM &= 0x0FFF;
 				iIndexPWM = iAnglePWM >> 2;  // from 0-4095 to LUT 0-1023
 
-				p_ifm_ext_d1 <: 0; // yellow
-				sine_pwm(iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );  // last
+				//p_ifm_ext_d1 <: 0; // yellow
+				space_vector_pwm(iIndexPWM, iUmotMotor, iMotHoldingTorque , pwm_ctrl, c_pwm_ctrl, iPwmOnOff );  // last
 
 	}// end while(1)
 }// end function
@@ -471,7 +471,6 @@ void CalcSetUserSpeed(int iSpeedValue)
 	if(iSpeedValue > iParRpmMotorMax)	iSpeedValue = iParRpmMotorMax;
 	iSpeedSetUser = iSpeedValue * 65536;
 }
-
 
 
 

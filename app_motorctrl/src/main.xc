@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <xscope.h>
-#include "somanet/ioports.h"
+#include "ioports.h"
 #include "refclk.h"
 #include "pwm_service_inv.h"
 #include "xmos_pm.h"
@@ -189,5 +189,4 @@ int main(void)
   }// end par main
   return 0;
 }
-
 

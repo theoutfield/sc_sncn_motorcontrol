@@ -32,6 +32,12 @@
 {int, int, int, int, int, int, int, int, int, int} get_info_hall_input(chanend c_hall);
 
 
+//NEW!
 
+/* Get speed in rpm*/
+int32_t get_hall_speed(chanend c_hall);
 
+/* Get angle in range 0 - 4095 maps to 0 - 360 degrees*/
+int32_t get_hall_angle(chanend c_hall);
 
+//end NEW!

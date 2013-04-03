@@ -1,5 +1,3 @@
-
-
 typedef struct S_CMD_VAR {
 	int iMotPar[32];
 	int iMotValues[32];

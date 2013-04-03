@@ -4,18 +4,17 @@
  * Terms and conditions covering the use of this code can
  * be found in the Xmos End User License Agreement.
  *
- * Copyright XMOS Ltd 2011
+ * Copyright XMOS Ltd 2013
  *
  * In the case where this code is a modification of existing code
  * under a separate license, the separate license terms are shown
  * below. The modifications to the code are still covered by the 
  * copyright notice above.
  *
- **/                                   
+ **/
+
 #ifndef __SINE_LOOKUP_H__
 #define __SINE_LOOKUP_H__
-
-extern short sine_table[];
 
 /** \brief Look up the fixed point sine value
  *

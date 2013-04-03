@@ -84,5 +84,26 @@ return { speed, angle, position, pinstate };
 	return {a1,a2,a3,a4,a5,a6,a7,a8,a9,a10};
 }
 
+//NEW!
+
+int32_t get_hall_speed(chanend c_hall)
+{
+  int32_t speed;
+  c_hall <: 2;
+  c_hall :> speed;  			// speed
+
+  return speed;
+}
+
+int32_t get_hall_angle(chanend c_hall)
+{
+  int32_t pos;
+  c_hall <: 1;
+  c_hall :> pos;  				// 6 steps angle
+
+  return pos;
+}
+
+//end NEW!
 
 

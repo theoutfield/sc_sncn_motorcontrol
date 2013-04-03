@@ -13,11 +13,11 @@
 #include "dc_motor_config.h"
 #include <xscope.h>
 
-extern  out port p_ifm_ext_d2;
-extern  out port p_ifm_ext_d3;
+//extern  out port p_ifm_ext_d2;
+//extern  out port p_ifm_ext_d3;
 extern  port p_ifm_ext_d0;
 
-// uart 115200 Baud 1 Bit = 8.6µsec iByte 87µsec
+// uart 115200 Baud 1 Bit = 8.6ï¿½sec iByte 87ï¿½sec
 // 32  32Bit Werte = 128Bytes -> 5,568msec
 
 //========== global variables for encoder ==========
@@ -337,7 +337,7 @@ tx :> ts;  // first value
 	}// end while 1
 }
 
-// iEncoderSpeed = (60 * 1.000.000) / periodeµsec
+// iEncoderSpeed = (60 * 1.000.000) / periodeï¿½sec
 // 60.000.000 / 400 = 150.000   / 4= 37500
 //=========RPM_PWM   1.000.000 * 60 / Periode
 //  RPM_Motor = RPM_PWM/POLE_PAIRS
@@ -443,7 +443,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
   iEncoderDividend /= POLE_PAIRS;
 
 
-//******************************************** LOOP 1µsec **************************************************
+//******************************************** LOOP 1ï¿½sec **************************************************
   while(1) {
 
 
@@ -457,11 +457,11 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 #define defEncoderPeriodMax	  200000  		// 200msec
 
 
-	  iEncoderCountMicroSeconds++;   		// period in µsec
+	  iEncoderCountMicroSeconds++;   		// period in ï¿½sec
       iEncoderCountPeriodeRef++;
       iEncoderCountOneTransition++;
 
-      p_ifm_ext_d2 <: 1;
+//      p_ifm_ext_d2 <: 1;
       iEncOk  = 0;
       p_encoder :> iEncState1;
       iEncState1 &= 0x07;
@@ -477,7 +477,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
           }
       }
       if(iEncOk > 4 ) iEncoderPinState = iEncState2;
-      p_ifm_ext_d2 <: 0;
+//      p_ifm_ext_d2 <: 0;
 
 
 	  if(iEncoderCalcFlag)
@@ -486,7 +486,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
     	  iEncoderSpeed    = 0xAA000000;
     	  if(iEncoderPeriodMicroSeconds)
     	  {
-    	  iEncoderSpeed = iEncoderDividend / iEncoderPeriodMicroSeconds;    // period in µsec
+    	  iEncoderSpeed = iEncoderDividend / iEncoderPeriodMicroSeconds;    // period in ï¿½sec
     	  }
     	  if(iEncoderDirection < 0) iEncoderSpeed = -iEncoderSpeed;
 
@@ -591,7 +591,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 #define defHallState5 1
 #define defPeriodMax 200000  //200msec
 
-	  iHallCountMicroSeconds++;   		// period in µsec
+	  iHallCountMicroSeconds++;   		// period in ï¿½sec
 	  iHallCountOneTransition++;
 	  iHallCountPeriodeRef++;
 	  iHallAngleDeltaSum += iHallAngleDeltaValue;
@@ -620,7 +620,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 		  iHallSpeed   = 0xAA000000;
 		  if(iHallPeriodMicroSeconds)
 		  {
-		  iHallSpeed = iHallDividend / iHallPeriodMicroSeconds;  // period in µsec
+		  iHallSpeed = iHallDividend / iHallPeriodMicroSeconds;  // period in ï¿½sec
 		  }
 		  if(iHallDirection < 0) iHallSpeed = -iHallSpeed;
 
@@ -744,7 +744,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
    if(iDeltaTime > iDeltaTimeMax) iDeltaTimeMax = iDeltaTime;
    if(iDeltaTime < iDeltaTimeMin) iDeltaTimeMin = iDeltaTime;
 
-   tx when timerafter(ts + 500) :> ts;   // 250 => 1µsec
+   tx when timerafter(ts + 500) :> ts;   // 250 => 1ï¿½sec
 
 
 

@@ -1,5 +1,18 @@
-#include "sine_lookup.h"
-extern short arctg_table[];
+/**
+ * \file arctan.xc
+ *	Arc tangent calculations
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors:  Ludwig Orgler <orgler@tin.it> & Martin Schwarz <mschwarz@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
+
+#include "sine_table_big.h"
 
 int arctg1(int iReell, int iImm)
 {

@@ -1,16 +1,23 @@
 
-/*
+/**
+ * \file mot_profile.c
  *
+ * Motion Profile file used to generate motion profiles for position control rountine
+ * Based on Linear Function with Parabolic Blends
  *
- *  Created on: Oct 2, 2012
- *      Author: Pavan Kanajar <pkanajar@synapticon.com>
- */
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
-
 
 unsigned root_function(unsigned uSquareValue)
 {
@@ -22,110 +29,160 @@ unsigned root_function(unsigned uSquareValue)
 	return (uResult);
 }
 
-float max = 1000;
-float vi, qi, qf; //user input variables
-float dist, d_cruise, t_cruise, tb, tf, t_int, t, ts=0; //motion profile params
-float ai, bi, ci, di, ei, fi, gi; //motion profile constants
-float qid=0.0, qfd=0.0;
-float q, qd, q2d;
-float samp; float len;
-int dirn = 1;
+struct pos_params
+{
+	float max;												// shaft output speed in deg/s
+	float vi, qi, qf; 										// user input variables
+	float dist, d_cruise, t_cruise, tb, tf, t_int, t, ts; 	// motion profile params
+	float ai, bi, ci, di, ei, fi, gi; 						// motion profile constants
+	float qid, qfd;
+	float q, qd, q2d;
+	float samp; float len;
+	int dirn;
+} pos_params_t;
 
+/*
+ * initialization function for the position control routine
+ * 	with parameters
+ *
+ * 		vel 	: 	velocity
+ * 		pos_i 	: 	start position 	 (current position)
+ * 		pos_f   :   final position 	 (desired position)
+ *
+ * 	returns the total no of samples based on positon control frequency param pos_ctrl_freq  defined in dc_motor_config.h
+ *
+ */
 int init(int vel, int pos_i, int pos_f)
 {
-	 vi =  (float) vel;  //5200*360/60;
-	 qi = (float) pos_i; qf = (float) pos_f;
+	int sample;
+	pos_params_t.vi =  (float) vel;  //5200*360/60;
+	pos_params_t.qi = (float) pos_i; pos_params_t.qf = (float) pos_f;
 
-	 dist= qf-qi;
+	pos_params_t.dist= pos_params_t.qf-pos_params_t.qi;
+	pos_params_t.dirn = 1;
 
-	 dirn = 1;
-	 if(dist < 0)
-	 {
-		 dist = - dist;
-		 dirn = -1;
-	 }
+	if(pos_params_t.dist < 0)
+	{
+		pos_params_t.dist = - pos_params_t.dist;
+		pos_params_t.dirn = -1;
+	}
 
+	pos_params_t.d_cruise=.7*pos_params_t.dist;
+	pos_params_t.t_cruise = (pos_params_t.d_cruise)/pos_params_t.vi;
+	pos_params_t.tb = (pos_params_t.dist - pos_params_t.d_cruise)/pos_params_t.vi;
+	pos_params_t.tf = 2*pos_params_t.tb + pos_params_t.t_cruise;
 
-	 d_cruise=.7*dist;
-	 t_cruise = (d_cruise)/vi;
-	 tb = (dist - d_cruise)/vi;
-	 tf = 2*tb + t_cruise;
+	if(pos_params_t.dirn == -1)
+	{
+	 pos_params_t.vi = -pos_params_t.vi;
+	}
 
-	 if(dirn == -1)
-	 {
-	    vi = -vi;
-	 }
+	pos_params_t.ai = pos_params_t.qi;
+	pos_params_t.bi = pos_params_t.qid;
+	pos_params_t.ci = (pos_params_t.vi - pos_params_t.qid)/(pos_params_t.tb+pos_params_t.tb);
+	pos_params_t.di = (pos_params_t.qi+pos_params_t.qf-pos_params_t.vi*pos_params_t.tf)/2;
+	pos_params_t.ei = pos_params_t.qf;
+	pos_params_t.fi = pos_params_t.qfd;
+	pos_params_t.gi = -pos_params_t.ci;
+	pos_params_t.samp = pos_params_t.tf/2.0e-3;
+	pos_params_t.t_int = pos_params_t.tf/pos_params_t.samp;
+	sample = (int)  round(pos_params_t.samp);
 
-
-	 ai = qi;
-	 bi = qid;
-	 ci = (vi - qid)/(tb+tb);
-	 di = (qi+qf-vi*tf)/2;
-	 ei = qf;
-	 fi = qfd;
-	 gi = -ci;
-
-	 samp = tf/2.0e-3;
-	 t_int = tf/samp;
-	 return (int)  round((samp));
+	return sample;
 }
+
+
+/*
+ * 	Motion profile generator : position function
+ *
+ * 	  i : time sample varying from 0 to Sample count returned from init function above.
+ *
+ * 	  returns the position at the time stamp i.
+ *
+ */
 
 int mot_q(int i)
 {
+	int Q;
+	pos_params_t.ts =pos_params_t.t_int*i;
 
-    ts =t_int*i;
-
-	  	  if ( ts < tb)
-	      {
-		          q= ai + ts*bi + ci*ts*ts;
-	      }
-	      else if (tb <= ts && ts < tf-tb)
-	      {
-		          q = di+vi*ts;
-	      }
-	      else if ( tf-tb <= ts && ts <= tf)
-	      {
-		          q = ei + (ts-tf)*fi + (ts-tf)*(ts-tf)*gi;
-	      }
-
-	  return (int) round(q*1000);
+	if ( pos_params_t.ts < pos_params_t.tb)
+	{
+		pos_params_t.q= pos_params_t.ai + pos_params_t.ts*pos_params_t.bi + pos_params_t.ci*pos_params_t.ts*pos_params_t.ts;
+	}
+	else if (pos_params_t.tb <= pos_params_t.ts && pos_params_t.ts < pos_params_t.tf-pos_params_t.tb)
+	{
+		pos_params_t.q = pos_params_t.di+pos_params_t.vi*pos_params_t.ts;
+	}
+	else if ( pos_params_t.tf-pos_params_t.tb <= pos_params_t.ts && pos_params_t.ts <= pos_params_t.tf)
+	{
+		pos_params_t.q = pos_params_t.ei + (pos_params_t.ts-pos_params_t.tf)*pos_params_t.fi + (pos_params_t.ts-pos_params_t.tf)*(pos_params_t.ts-pos_params_t.tf)*pos_params_t.gi;
+	}
+	Q = (int) round(pos_params_t.q*1000);
+	return Q;
 }
+
+/*
+ * 	Motion profile generator : velocity function
+ *
+ * 	  i : time sample varying from 0 to Sample count returned from init function above.
+ *
+ * 	  returns the velocity at the time stamp i.
+ *
+ */
+
 int mot_qd(int i)
 {
-	 ts =t_int*i;
-	  	  if ( ts < tb)
-	      {
-	              qd= bi + 2*ts*ci;
-	      }
-	      else if (tb <= ts && ts < tf-tb)
-	      {
-	            qd = vi;
-	      }
-	      else if ( tf-tb <= ts && ts <= tf)
-	      {
-	              qd = fi + 2*(ts-tf)*gi;
-	      }
+	int Qd;
+	pos_params_t.ts =pos_params_t.t_int*i;
 
-	  return (int) round(qd);
+	if ( pos_params_t.ts < pos_params_t.tb)
+	{
+		pos_params_t.qd= pos_params_t.bi + 2*pos_params_t.ts*pos_params_t.ci;
+	}
+	else if (pos_params_t.tb <= pos_params_t.ts && pos_params_t.ts < pos_params_t.tf-pos_params_t.tb)
+	{
+		pos_params_t.qd = pos_params_t.vi;
+	}
+	else if ( pos_params_t.tf-pos_params_t.tb <= pos_params_t.ts && pos_params_t.ts <= pos_params_t.tf)
+	{
+		pos_params_t.qd = pos_params_t.fi + 2*(pos_params_t.ts-pos_params_t.tf)*pos_params_t.gi;
+	}
+
+	Qd = (int) round(pos_params_t.qd);
+	return Qd;
 
 }
+
+/*
+ * 	Motion profile generator : acceleration function
+ *
+ * 	  i : time sample varying from 0 to Sample count returned from init function above.
+ *
+ * 	  returns the acceleration at the time stamp i.
+ *
+ */
+
 int mot_q2d(int i)
 {
-	 ts =t_int*i;
+	int Q2d;
+	pos_params_t.ts =pos_params_t.t_int*i;
 
-	  	  if ( ts < tb)
-	      {
-		      q2d=2*ci;
-	      }
-	      else if (tb <= ts && ts < tf-tb)
-	      {
-		        q2d=0;
-	      }
-	      else if ( tf-tb <= ts && ts <= tf)
-	      {
-		        q2d=   2*gi;
-	      }
-	  return (int) q2d;
+	if ( pos_params_t.ts < pos_params_t.tb)
+	{
+		pos_params_t.q2d=2*pos_params_t.ci;
+	}
+	else if (pos_params_t.tb <= pos_params_t.ts && pos_params_t.ts < pos_params_t.tf-pos_params_t.tb)
+	{
+		pos_params_t.q2d=0;
+	}
+	else if ( pos_params_t.tf-pos_params_t.tb <= pos_params_t.ts && pos_params_t.ts <= pos_params_t.tf)
+	{
+		pos_params_t.q2d =   2*pos_params_t.gi;
+	}
+	Q2d = (int) pos_params_t.q2d;
+
+	return Q2d;
 
 }
 

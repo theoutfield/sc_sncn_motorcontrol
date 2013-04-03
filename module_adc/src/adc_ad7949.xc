@@ -1,7 +1,7 @@
 /**
  * \file adc_ad7949.xc
  *
- * Copyright 2012, Synapticon GmbH. All rights reserved.
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Author: Martin Schwarz <mschwarz@synapticon.com>
  *
  * In the case where this code is a modification of existing code
@@ -16,13 +16,14 @@
 #include <print.h>
 #include <xclib.h>
 #include <xscope.h>
+//#include "zip.h"
 #include "refclk.h"
 
 static unsigned adc_data_a[5];
 static unsigned adc_data_b[5];
 
-extern out port p_ifm_ext_d2;
-extern out port p_ifm_ext_d3;
+//extern out port p_ifm_ext_d2;
+//extern out port p_ifm_ext_d3;
 
 unsigned short iIndexADC = 0;
 
@@ -155,7 +156,8 @@ static void configure_adc_ports(clock clk,
 				in buffered port:32 p_data_a,
 				in buffered port:32 p_data_b)
 {
-	  /* SCLK period >= 22ns (45.45 MHz) clk needs to be configured twice as fast as the required SCLK frequency */
+	  /* SCLK period >= 22ns (45.45 MHz)
+		 clk needs to be configured twice as fast as the required SCLK frequency */
 	  configure_clock_rate_at_most(clk, 250, 5); // 83.3  --  < (2*45.45)
 
 	  /* when idle, keep clk and mosi low, conv high */
@@ -202,39 +204,40 @@ static inline unsigned convert(unsigned raw)
 
 #pragma unsafe arrays
 static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosia,
-		   	   	   	   	   	   	   	 in buffered port:32 p_data_a,in buffered port:32 p_data_b,clock clk )
+		   	   	   	   	   	   	   	   	   	   in buffered port:32 p_data_a,
+		   	   	   	   	   	   	   	   	   	   in buffered port:32 p_data_b,
+		   	   	   	   	   	   	   	   	   	    	   	   	   	   clock clk )
 {
 		/*                                    0bRB    <REF >  <INx ><INCC>  00 */
 		const unsigned adc_config_imot    =   0b000000110000110000001111111100;   		/* Motor current (ADC Channel 0), unipolar, referenced to GND */
-
 		const unsigned adc_config_other[] = { 0b000000110000110000001111001100,   		/* Temperature */
 											  0b000000110000110011001111111100, 		/* ADC Channel 2, unipolar, referenced to GND */
-											  0b000000110000111100111111111100,   		/* ADC Channel 4, unipolar, referenced to GND  */
-											  0b000000110000111100111111111100,   		/* ADC Channel 5, unipolar, referenced to GND  */
-											//0b000000110000111100000000111100,   		/* ADC Channel 4, unipolar, differential pair */
-											//0b000000110000111111111111111100,
-		}; 		/* ADC Channel 7, unipolar, referenced to GND */
+											  0b000000110000111100000000111100,   		/* ADC Channel 4, unipolar, differential pair */
+											  0b000000110000111111111111111100 }; 		/* ADC Channel 7, unipolar, referenced to GND */
 		const unsigned clk_signal = 0x2aaaaaa8;
 		//const unsigned clk_signal[2]  = { 0xaaaaaaa8, 0x02aaaaaa };
 		//const unsigned adc_trigcnv[2] = { 0x00000000, 0xf8000000 };
 
-		const unsigned delay_conv = (11*USEC_FAST) / 5; // 2.2 us
+		const unsigned delay_conv = (15*USEC_FAST) / 5; // 2.2 us /* FIXME: why does this result in a delay of 3.2us?! */
 		const unsigned delay_acq =   (9*USEC_FAST) / 5; // 1.8 us
 		timer t;
 		unsigned ts;
+
+		//  int cmd;
+		//  unsigned char ct;
 		unsigned data_raw_a, data_raw_b;
 
-		/*Reading/Writing after conversion (RAC)
+		/* Reading/Writing after conversion (RAC)
 		  Read previous conversion result
 		  Write CFG for next conversion */
 		#define SPI_IDLE   configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0100)
 		#define SPI_SELECT configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0000)
 
-		// CONGIG__other_n1     CFG_Imotx_x1       |CONGIG__other_n2     CFG_Imotx_x2     |CONGIG__other_n3     CFG_Imotx_x3       |
-		// CONVERT_null         CONVERT_other_n1   |CONVERT_Imot_x1      CONVERT_other_n2 |CONVERT_Imot_x2      CONVERT_other_n3   |
-		// READOUT_null         READOUT_other_null |READOUT_other_n1     READOUT_Imot_x1  |READOUT_other_n2     READOUT_Imot_x2    |
-	  	SPI_SELECT;
+		//   #define WAIT		case t when timerafter(ts) :> ts:
+
+	  	SPI_IDLE;
 		t :> ts;
+	
 		outputWordsZipped(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_other[iIndexADC], adc_config_other[iIndexADC], 0, clk_signal);
 		p_data_a :> data_raw_a;
 		adc_data_a[iIndexADC] = convert(data_raw_a);
@@ -267,7 +270,6 @@ void adc_ad7949_triggered( chanend c_adc,
 	  unsigned ts;
 	  int cmd;
 	  int xCount=100;
-  //set_thread_fast_mode_on();
 
 	  configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
 	  tx :> ts;
@@ -275,11 +277,11 @@ void adc_ad7949_triggered( chanend c_adc,
 
 	while (1)
 	{
-		tx when timerafter(ts + 125) :> ts;   	// 250 => 1µsec 125= 0,5µsec
+		tx when timerafter(ts + 125) :> ts;   	// 250 => 1Âµsec 125= 0,5Âµsec
 //		iFlag ^= 0x01;    p_ifm_ext_d2 <: iFlag;
 	    xCount--;
 		if(xCount==0){
-		p_ifm_ext_d3 <: 1;
+//		p_ifm_ext_d3 <: 1;
 		adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
 		xCount = 100;
 		tx :> ts;
@@ -300,7 +302,7 @@ void adc_ad7949_triggered( chanend c_adc,
 				c_adc <: adc_data_b[1]; 		//
 				c_adc <: adc_data_b[2]; 		//
 				c_adc <: adc_data_b[3];
-				xCount = 58;               // ===>> tirgger for next adc conversion 54 * 0,5µsec = 27µsec
+				xCount = 58;               // ===>> tirgger for next adc conversion 54 * 0,5Âµsec = 27Âµsec
 				tx :> ts;
 				}
 	    	break;
@@ -308,11 +310,15 @@ void adc_ad7949_triggered( chanend c_adc,
 		default:  break;
 	    }// end of select
 
-		p_ifm_ext_d3 <: 0;
+//		p_ifm_ext_d3 <: 0;
 	}// end while 1
 }
 
+
+
+
   /* serialization -- LSB first */
+
   /* adc_config: !! reverse bit-order compared to AD7949 datasheet !!
      Bit    Name  Description
      32:14  0     unused

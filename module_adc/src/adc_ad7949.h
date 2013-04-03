@@ -1,7 +1,7 @@
 /**
  * \file adc_ad7949.h
  *
- * Copyright 2012, Synapticon GmbH. All rights reserved.
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Author: Martin Schwarz <mschwarz@synapticon.com>
  *
  * In the case where this code is a modification of existing code
@@ -16,7 +16,6 @@
 
 #include <xs1.h>
 #include <xclib.h>
-
 #include "adc_common.h"
 
 /** \brief Execute the triggered ADC server

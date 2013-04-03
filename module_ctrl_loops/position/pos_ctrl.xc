@@ -1,3 +1,18 @@
+/**
+ * \file pos_ctrl.xc
+ *
+ *	Position control rountine based on Computed Torque control method
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
+
 #include "pos_ctrl.h"
 #include "refclk.h"
 #include <xs1.h>
@@ -10,6 +25,8 @@ extern inline int mot_q(int i);
 extern inline int mot_qd(int i);
 extern inline int mot_q2d(int i);
 int hold_load = 1;
+
+
 int move(int cur_p,int d_pos, int vi, chanend c_commutation, chanend pos_data)
 {
 		  // max vi  126 forw  126 revr
@@ -33,12 +50,7 @@ int move(int cur_p,int d_pos, int vi, chanend c_commutation, chanend pos_data)
 			  dirn = -1;
 		  }
 
-		  /*for(i=0;i<samp;i++)
-		  {
-				Q[i]   =   mot_q(i);
-				Qd[i]  =   (mot_qd(i)*60*ge)/360 ;
-		  }
-		  */
+
 
 		  if(hold_load==1)
 		  {
@@ -158,4 +170,5 @@ int move(int cur_p,int d_pos, int vi, chanend c_commutation, chanend pos_data)
 
 		  return 0;
 }
+
 
