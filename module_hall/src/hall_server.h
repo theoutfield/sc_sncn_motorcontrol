@@ -19,12 +19,12 @@
  *
  **/
 
-#ifdef new
+
 #pragma once
 
 #include <xs1.h>
 #include <dc_motor_config.h>
-enum hall_commands { HALL_CMD_GETSPEED, HALL_CMD_GETPOS };
+//enum hall_commands { HALL_CMD_GETSPEED, HALL_CMD_GETPOS };
 
 
 void init_hall(hall_par &h_pole);
@@ -36,7 +36,7 @@ void init_hall(hall_par &h_pole);
  *  \param c_hall the control channel for sending out hall position information
  *  \param p_hall the port for reading the hall sensor data
  */
-void run_hall( chanend c_hall, chanend sensor_output, port in p_hall, hall_par &h_pole);
+void run_hall_new( chanend c_hall, chanend sensor_output, port in p_hall, hall_par &h_pole);
 
 
 /** \brief A selectable read of the hall pins
@@ -47,6 +47,6 @@ void run_hall( chanend c_hall, chanend sensor_output, port in p_hall, hall_par &
  *   \param cur_pin_state the last value read from the hall encoder port
  *   \param p_hall the hall port
  */
-select do_hall_select( unsigned &hall_state, unsigned &cur_pin_state, port in p_hall );
+//select do_hall_select( unsigned &hall_state, unsigned &cur_pin_state, port in p_hall );
 
-#endif
+

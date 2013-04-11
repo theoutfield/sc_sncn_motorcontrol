@@ -36,7 +36,7 @@ int move(int cur_p,int d_pos, int vi, chanend c_commutation, chanend pos_data)
 		  unsigned ts_scheduled_ctrl;
 		  int speed = 0;
 		  unsigned i = 0;
-		  signed new;
+		  int new1;
 		  int ge = GEAR_RATIO;
 		  int enc_div = POLE_PAIRS * GEAR_RATIO;
 		  // 2ms samp
@@ -101,8 +101,8 @@ int move(int cur_p,int d_pos, int vi, chanend c_commutation, chanend pos_data)
 				c_commutation <: Po;
 
 				pos_data <: 1;
-				pos_data :> new;
-				cur_p = (new*100)/ (enc_div);   //*1000 (new*300)/3276;
+				pos_data :> new1;
+				cur_p = (new1*100)/ (enc_div);   //*1000 (new*300)/3276;
 				c_commutation <: 1;
 				c_commutation :> speed;
 				cur_v = speed/POLE_PAIRS;   //pole pairs

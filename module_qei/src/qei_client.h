@@ -26,6 +26,7 @@ typedef struct S_QEI {
 	unsigned max_count;
 } qei_par;
 
+/* initialize QEI sensor */
 void init_qei(qei_par &q_max);
 
 /**

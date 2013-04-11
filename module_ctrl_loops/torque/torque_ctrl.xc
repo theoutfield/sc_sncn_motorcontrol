@@ -29,7 +29,7 @@ field_par f_param;
 loop_par l_param;
 int flag_field = 0;
 
-#ifdef new
+
 void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop)
 {
 	tor.Kp_n = Torque_Kp_n;
@@ -50,7 +50,7 @@ void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop)
 
 	return;
 }
-#endif
+
 void init_torque_pars(torq_par &d)
 {
 	t_param.Kp_n = d.Kp_n;
@@ -107,7 +107,7 @@ void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend
 		f_param.Integral_limit = 10000;
 	}
 
-/*	 while(1)
+	 while(1)
 	 {
 		  unsigned cmd, found = 0;
 		  select
@@ -124,7 +124,7 @@ void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend
 		  }
 	 }
 	 sig <: 1;
-*/
+
 	ts :> time;
 	ts :> t1;
 
@@ -132,7 +132,7 @@ void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend
 	{
 		do
 		{
-			{a1 , a2}  = get_adc_calibrated_cur_ad7949(adc);
+			{a1 , a2}  = get_adc_vals_calibrated_int16_ad7949(adc);
 			value_0[fil_cnt] = a1;
 			value_1[fil_cnt] = a2;
 

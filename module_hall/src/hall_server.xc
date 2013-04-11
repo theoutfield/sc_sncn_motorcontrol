@@ -18,13 +18,13 @@
  * copyright notice above.
  *
  **/
-#ifdef new
+
 #include "hall_server.h"
 #include <stdlib.h>
 #include <print.h>
 #include <stdint.h>
 #include "refclk.h"
-#include "dc_motor_config.h"sine_lookup
+#include "dc_motor_config.h"
 
 void init_hall(hall_par &h_pole)
 {
@@ -32,7 +32,7 @@ void init_hall(hall_par &h_pole)
 	return;
 }
 
-void run_hall( chanend c_hall, chanend sensor_output, port in p_hall, hall_par &h_pole)
+void run_hall_new( chanend c_hall, chanend sensor_output, port in p_hall, hall_par &h_pole)
  {
   timer tx;
   unsigned ts;					// newest timestamp
@@ -232,7 +232,7 @@ void run_hall( chanend c_hall, chanend sensor_output, port in p_hall, hall_par &
   }// end while 1
 }
 
-#endif
+
 
 
 

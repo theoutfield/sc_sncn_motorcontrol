@@ -24,8 +24,10 @@
  *
  **************************************************************************/
 
-#ifndef __DC_MOTOR_CONFIG__H__
-#define __DC_MOTOR_CONFIG__H__
+#ifndef __DC_MOTOR_CONFIG__H__test
+#define __DC_MOTOR_CONFIG__H__test
+
+#define new
 
 #pragma once
 
@@ -64,13 +66,4 @@ typedef struct S_Hall {
 } hall_par;
 
 
-
-/* initialize control loop parameter struct*/
-void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop);
-
-/* initialize hall sensor */
-void init_hall(hall_par &h_pole);
-
-/* initialize QEI sensor */
-void init_qei(qei_par &q_max);
 #endif

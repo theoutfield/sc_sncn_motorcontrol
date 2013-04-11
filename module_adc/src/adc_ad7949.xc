@@ -260,7 +260,7 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 
 
 
-void adc_ad7949_triggered( chanend c_adc,
+void adc_ad7949( chanend c_adc,
 			   	   	   	   clock clk,
 			   	   	   	   buffered out port:32 p_sclk_conv_mosib_mosia,
 			   	   	   	   in buffered port:32 p_data_a,
@@ -286,6 +286,8 @@ void adc_ad7949_triggered( chanend c_adc,
 		xCount = 100;
 		tx :> ts;
 		}
+
+
 
 #pragma ordered
 	    select {
@@ -314,6 +316,48 @@ void adc_ad7949_triggered( chanend c_adc,
 	}// end while 1
 }
 
+
+void adc_ad7949_triggered( chanend c_adc,
+			   	   	   	   chanend c_trig,
+			   	   	   	   clock clk,
+			   	   	   	   buffered out port:32 p_sclk_conv_mosib_mosia,
+			   	   	   	   in buffered port:32 p_data_a,
+			   	   	   	   in buffered port:32 p_data_b )
+{
+	  timer time;
+	  unsigned ts1;
+	  int cmd;
+	  unsigned char ct;
+	  //set_thread_fast_mode_on();
+
+	  configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
+
+	while (1)
+	{
+		#pragma ordered
+		select
+		{
+			case inct_byref(c_trig, ct):
+				if (ct == XS1_CT_END)
+				{
+					time :> ts1;
+					time when timerafter(ts1 + 6200) :> ts1;  // was 4000  now set to 6200 so that even in the worst case the trigger pulse stays in low side of the pwm
+//					p_ifm_ext_d3 <: 1;  // set to one
+					adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
+				}
+				break;
+
+			case c_adc :> cmd:
+				master {
+					c_adc <: adc_data_a[4]; 		//- ia_calibr;
+					c_adc <: adc_data_b[4]; 		// - ib_calibr;
+				}
+				break;
+		}// end select
+
+//		p_ifm_ext_d3 <: 0;
+	}//end while 1
+}// end of 	adc_ad7949_triggered
 
 
 

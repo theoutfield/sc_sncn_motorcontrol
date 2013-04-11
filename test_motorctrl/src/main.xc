@@ -22,7 +22,7 @@
 #include <refclk.h>
 #include <print.h>
 #include <flash_Somanet.h>
-#include <ethercat_handlers.h>
+#include <ethercat.h>
 #include <ctrlproto.h>
 #include <dc_motor_config.h>
 #include <pwm_service_inv.h>
@@ -72,7 +72,7 @@ int main(void)
 	 **********************************************************************/
 	par{
 
-			on stdcore[0] : {
+		/*	on stdcore[0] : {
 				ecat_init();
 				ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);  // ethercat Communication handlers
 			}
@@ -80,14 +80,14 @@ int main(void)
 			on stdcore[0] : {
 				check_file(foe_out, foe_in, sig_1); 														// firmware update over ethercat thread
 			}
-
+		*/
 	/**********************************************************************
 	 * CORE 2          Communication with the Motor Control
 	 **********************************************************************/
 		on stdcore[2]:par
 		{
 			{
-				int torque_set;
+				int torque_set=50;
 				#ifdef Quadrature_Encoder_used
 					unsigned position_read = 0, speed_read = 0, v=0;
 				#else
@@ -102,8 +102,8 @@ int main(void)
 				init_ctrl_proto(InOut);
 				while(1)
 				{
-					ctrlproto_protocol_handler_function(pdo_out,pdo_in,InOut);			// read the incoming EtherCAT messages
-					torque_set = InOut.in_torque;
+					//ctrlproto_protocol_handler_function(pdo_out,pdo_in,InOut);			// read the incoming EtherCAT messages
+					//torque_set = InOut.in_torque;
 					input_torque <: 20;         	  									// torque control token
 					input_torque <: torque_set;											// torque input
 
@@ -141,11 +141,11 @@ int main(void)
 					/*********************************Hall Server*************************************/
 					{
 						init_hall(h_pole);										// initialize hall sensor
-						run_hall(c_hall, sensor_output, p_ifm_hall, h_pole);	// start Hall Server
+						run_hall_new(c_hall, sensor_output, p_ifm_hall, h_pole);	// start Hall Server
 					}
 
 					/****************************Motor Commutation loop*******************************/
-					commutation(c_value, c_pwm_ctrl, sig);						// while(1) commutation loop
+					commutation_new(c_value, c_pwm_ctrl, sig);						// while(1) commutation loop
 
 					/*******************************Torque Controller Loop****************************/
 					{

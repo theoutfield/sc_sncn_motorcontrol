@@ -30,9 +30,19 @@
  * \param p_data_a 1-bit port, ADC data channel 0
  * \param p_data_b 1-bit port, ADC data channel 1
  */
-void adc_ad7949_triggered( chanend c_adc,
+void adc_ad7949( chanend c_adc,
 			   clock clk,
 			   buffered out port:32 p_sclk_conv_mosib_mosia,
 			   in buffered port:32 p_data_a,
 			   in buffered port:32 p_data_b );
 
+
+/**
+ * old adc triggered function
+ */
+void adc_ad7949_triggered( chanend c_adc,
+			   	   	   	   chanend c_trig,
+			   	   	   	   clock clk,
+			   	   	   	   buffered out port:32 p_sclk_conv_mosib_mosia,
+			   	   	   	   in buffered port:32 p_data_a,
+			   	   	   	   in buffered port:32 p_data_b );

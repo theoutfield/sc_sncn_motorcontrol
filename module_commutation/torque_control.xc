@@ -1,6 +1,7 @@
 #include "varext.h"
 #include "def.h"
 #include "dc_motor_config.h"
+#ifndef new
 
 void    function_TorqueControl()
 {
@@ -83,5 +84,5 @@ void    function_TorqueControl()
 			}
 }
 
-
+#endif
 

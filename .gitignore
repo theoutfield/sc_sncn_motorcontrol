@@ -8,5 +8,10 @@
 *.swp
 *.out
 
+## build files and bins
+.build_Debug/
+.build_Release/
+bin/
+
 ## ignore KDE files
 .directory

@@ -1,6 +1,7 @@
 #include "varext.h"
 #include "def.h"
 #include "dc_motor_config.h"
+#ifndef new
 
 void FOC_Speed_Integrator();
 void RampAccPlus();
@@ -603,5 +604,5 @@ void    function_SensorLessControl()
 
 
 
-
+#endif
 

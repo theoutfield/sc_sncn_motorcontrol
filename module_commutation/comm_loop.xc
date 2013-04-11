@@ -10,7 +10,7 @@
 #include "var.h"
 #include "def.h"
 #include "dc_motor_config.h"
-
+#ifndef new
 #define DEBUG_commutation
 
 static t_pwm_control pwm_ctrl;
@@ -475,7 +475,7 @@ void CalcSetUserSpeed(int iSpeedValue)
 
 
 
-
+#endif
 
 
 

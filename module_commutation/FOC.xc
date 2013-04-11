@@ -2,6 +2,7 @@
 #include "def.h"
 #include "comm_loop.h"
 #include "dc_motor_config.h"
+#ifndef new
 
 unsigned root_function(unsigned uSquareValue);
 
@@ -370,3 +371,5 @@ void SaveInfosToArray()
 	iMotValue[31] = iHallPositionAbsolut;
 }
 
+
+#endif
