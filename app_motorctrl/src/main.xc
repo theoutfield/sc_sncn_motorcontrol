@@ -170,7 +170,7 @@ int main(void)
      ************************************************************/
     on stdcore[IFM_CORE]: {
     	par {
-    			adc_ad7949_triggered( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob);
+    			adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob);
 
     			//do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, ADC_SYNC_PORT, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
     			//do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);

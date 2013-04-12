@@ -17,7 +17,7 @@
 #include <refclk.h>
 #include <xscope.h>
 #include<print.h>
-
+#ifdef new
 #define defParAngleUser 560
 #define filter_length 30
 #define filter_dc 160
@@ -382,3 +382,4 @@ void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend
 	//output is iUmotResult & iAngleInvPark
 
 }
+#endif

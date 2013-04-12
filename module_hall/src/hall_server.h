@@ -26,6 +26,10 @@
 #include <dc_motor_config.h>
 //enum hall_commands { HALL_CMD_GETSPEED, HALL_CMD_GETPOS };
 
+typedef struct S_Hall {
+	int pole_pairs;
+} hall_par;
+
 
 void init_hall(hall_par &h_pole);
 

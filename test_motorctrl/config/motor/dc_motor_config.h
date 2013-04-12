@@ -61,9 +61,5 @@
 
 
 
-typedef struct S_Hall {
-	int pole_pairs;
-} hall_par;
-
 
 #endif
