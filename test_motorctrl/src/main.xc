@@ -72,7 +72,7 @@ int main(void)
 	 **********************************************************************/
 	par{
 
-		/*	on stdcore[0] : {
+			on stdcore[0] : {
 				ecat_init();
 				ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);  // ethercat Communication handlers
 			}
@@ -80,7 +80,7 @@ int main(void)
 			on stdcore[0] : {
 				check_file(foe_out, foe_in, sig_1); 														// firmware update over ethercat thread
 			}
-		*/
+
 	/**********************************************************************
 	 * CORE 2          Communication with the Motor Control
 	 **********************************************************************/
