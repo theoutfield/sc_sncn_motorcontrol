@@ -483,15 +483,15 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	  if(iEncoderCalcFlag)
     	  {
     	  iEncoderCalcFlag = 0;
-    	  iEncoderSpeed    = 0xAA000000;
+    	  iEncoderSpeed    = 0;
     	  if(iEncoderPeriodMicroSeconds)
     	  {
     	  iEncoderSpeed = iEncoderDividend / iEncoderPeriodMicroSeconds;    // period in �sec
     	  }
     	  if(iEncoderDirection < 0) iEncoderSpeed = -iEncoderSpeed;
 
-    	  iEncoderSpeed &= 0x00FFFFFF;
-    	  iEncoderSpeed |= 0xAA000000;
+    	  //iEncoderSpeed &= 0x00FFFFFF;
+    	 // iEncoderSpeed |= 0xAA000000;
 
     	  iEncoderPeriodNext = iEncoderPeriodMicroSeconds * 256;      // add 10%
     	  iEncoderPeriodNext /= 230;
@@ -509,7 +509,7 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 
 		 if(iEncoderStateNew == iEncoderNext)    {iEncoderPosAbsolut++; iEncoderAngle++; iEncoderDirection++; if(iEncoderDirection > +3) iEncoderDirection=+3;  }
 	     if(iEncoderStateNew == iEncoderPrevious){iEncoderPosAbsolut--; iEncoderAngle--; iEncoderDirection--; if(iEncoderDirection < -3) iEncoderDirection=-3;  }
-         iEncoderAngle &= 0xFFFF;   					// max 65535/rotation
+         iEncoderAngle &= 0x0FFF;   					// max 65535/rotation
 
 
          if(iEncoderReferenz)
@@ -543,34 +543,24 @@ void run_hall( chanend c_hall, port in p_hall, port in p_encoder)
 	    	  //========== one pwm revolution equal 400 encoder pulses =============
 
 
-	    	/*
-		      switch(iNrEncoderPulses)
-		      {
-		      case 40:  if(iEncoderPeriodMicroSeconds < 4000)    iNrEncoderPulses = 100;  //
-		    	  	     break;
 
-		      case 100:  if(iEncoderPeriodMicroSeconds > 9000)   iNrEncoderPulses = 40;
-		      	  	     break;
-		      default: iNrEncoderPulses=40; break;
-		      }
-*/
 	    	  }// end if(iCountEncoderPulses >= iNrEncoderPulses)
 
 
        }// ======== end of NewState =====================
 
 
-       if(iEncoderCountMicroSeconds > iEncoderPeriodNext)
+  /*     if(iEncoderCountMicroSeconds > iEncoderPeriodNext)
        {
     	   iEncoderPeriodMicroSeconds  = iEncoderCountMicroSeconds;
     	   iEncoderCalcFlag = 1;
        }
-
+  */
 
 		if(iEncoderCountMicroSeconds > defEncoderPeriodMax)
 			{
 			iEncoderCountMicroSeconds = defEncoderPeriodMax;
-			iEncoderSpeed   = 0xAA000000;
+			iEncoderSpeed   = 0;
 			}
 
 //========================================== end encoder ===============================================
