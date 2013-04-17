@@ -1,10 +1,3 @@
-/**
- * Module:  module_hall
- * Version: 1v0alpha2
-
- * orgler@tin.it synapticon 01/2013
-  *
- **/                                   
 #include "hall_input.h"
 #include <stdlib.h>
 #include <print.h>
