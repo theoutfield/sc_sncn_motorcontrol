@@ -49,9 +49,6 @@
 /*define control closing time the controller*/
 #define loop_timing 88 					//in USEC_FAST
 
-
-
-
 /*optional PI controller parameters for field control*/
 #define Field_Kp_n 25                    // Kp = Kp_n/Kp_d
 #define Field_Kp_d 10
@@ -59,7 +56,43 @@
 #define Field_Ki_d 100
 #define Field_Integral_limit 10000
 
+/* Struct definitions for the torque controller*/
+typedef struct S_Torque {
+	int Kp_n, Kp_d;    					//Kp = Kp_n/Kp_d
+	int Ki_n, Ki_d;						//Ki = Ki_n/Ki_d
+	int Integral_limit;
+	int Max_torque;
+} torq_par;
 
+/* struct definitation for control loop time*/
+typedef struct S_Loop_time {
+	int delay;
+} loop_par;
 
+/* Struct definitions for the field controller*/
+typedef struct S_Field{
+	int Kp_n, Kp_d;						//Kp = Kp_n/Kp_d
+	int Ki_n, Ki_d;						//Ki = Ki_n/Ki_d
+	int Integral_limit;
+} field_par;
+
+/* struct definitation for quadrature sensor*/
+typedef struct S_QEI {
+	unsigned max_count;
+} qei_par;
+
+/* struct definitation for hall sensor*/
+typedef struct S_Hall {
+	int pole_pairs;
+} hall_par;
+
+/* initialize QEI sensor */
+void init_qei(qei_par &q_max);
+
+/* initialize hall sensor */
+void init_hall(hall_par &h_pole);
+
+/* initialize the torque, field and loop time struct variable with control parameter definitions */
+void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop);
 
 #endif

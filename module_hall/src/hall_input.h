@@ -27,11 +27,6 @@
  */
 void run_uart(chanend c_motvalue, clock clk1);
 
-/* struct definitation for hall sensor*/
-typedef struct S_Hall {
-	int pole_pairs;
-} hall_par;
-
 /** \brief Hall Encoder Server
  *
  *  This implements the basic hall sensor server

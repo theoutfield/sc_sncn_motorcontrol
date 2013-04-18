@@ -17,63 +17,15 @@
 #include <refclk.h>
 #include <xscope.h>
 #include<print.h>
-#ifdef new
+
 #define defParAngleUser 560
 #define filter_length 30
 #define filter_dc 160
 
 //output is iUmotResult & iAnglePWM
 
-torq_par t_param;
-field_par f_param;
-loop_par l_param;
-int flag_field = 0;
 
-
-void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop)
-{
-	tor.Kp_n = Torque_Kp_n;
-	tor.Kp_d = Torque_Kp_d;
-	tor.Ki_n = Torque_Ki_n;
-	tor.Ki_d = Torque_Ki_d;
-	tor.Integral_limit = Torque_Integral_limit;
-
-	tor.Max_torque = Max_torque_out;
-
-	field.Kp_n = Field_Kp_n;
-	field.Kp_d = Field_Kp_d;
-	field.Ki_n = Field_Ki_n;
-	field.Ki_d = Field_Ki_d ;
-	field.Integral_limit = Field_Integral_limit;
-
-	loop.delay = loop_timing;
-
-	return;
-}
-
-void init_torque_pars(torq_par &d)
-{
-	t_param.Kp_n = d.Kp_n;
-	t_param.Kp_d = d.Kp_d;
-	t_param.Ki_n = d.Ki_n;
-	t_param.Ki_d = d.Ki_d;
-	t_param.Integral_limit = d.Integral_limit;
-	t_param.Max_torque = d.Max_torque;
-}
-void init_field_pars(field_par &d) //optional
-{
-	f_param.Kp_n = d.Kp_n;
-	f_param.Kp_d = d.Kp_d;
-	f_param.Ki_n = d.Ki_n;
-	f_param.Ki_d = d.Ki_d;
-	f_param.Integral_limit = d.Integral_limit;
-	flag_field = 1;
-}
-void init_loop_pars(loop_par &d)
-{
-	l_param.delay = d.delay;
-}
-void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend c_value)
+void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend c_value, torq_par &t_param, field_par &f_param, loop_par &l_param)
 {
 	int iAngleFromHallOld=0, iAnglePWM, iAnglePWMFromHall, iAnglePWMFromFOC;
 	int iTemp; int a1=0, a2=0; int sinx, cosx, iTorqueSet = 0, iAlpha, iBeta, a1SquareMean=0, a2SquareMean=0, a1RMS, a2RMS;
@@ -82,8 +34,8 @@ void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend
 	int iActualSpeed, iAngleFromHall, iUmot = 0; int iSpeedValueNew;
 	int iPhase1Sum=0, iPhase2Sum=0, iPhase1=0, iPhase2=0, iCountRMS =0, iTriggerRMS=0, ia1RMSMax;	unsigned a1Square=0,a2Square=0;
 	int iCountDivFactor, iVectorInvPark, cmd; unsigned iVectorCurrent; int iFieldSet = 0;
-	int value_0[filter_length]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, value_1[filter_length]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int value_d[filter_dc]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, value_q[filter_dc]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int value_0[filter_length], value_1[filter_length];
+	int value_d[filter_dc], value_q[filter_dc];
 	timer ts; int time, time1;
 	int t1, t2, t3, t4 , t5;
 	int e_d = 0, e_di = 0;
@@ -98,15 +50,17 @@ void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend
 	int iq_fi=0, id_fi=0 , fdc = filter_dc, fil_cnt_dc = 0; int flc =filter_length; int mod, fldc = filter_dc ;
 	VsdRef1 = 0; VsqRef1 = 0;
 
-	if(flag_field == 0)
-	{
-		f_param.Kp_n = 25;
-		f_param.Kp_d = 10;
-		f_param.Ki_n = 2;
-		f_param.Ki_d = 100;
-		f_param.Integral_limit = 10000;
-	}
 
+	for(i = 0; i < filter_length; i++)
+	{
+		value_0[i] = 0;
+		value_1[i] = 0;
+	}
+	for(i = 0; i < filter_dc; i++)
+	{
+		value_d[i] = 0;
+		value_q[i] = 0;
+	}
 	 while(1)
 	 {
 		  unsigned cmd, found = 0;
@@ -382,4 +336,4 @@ void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend
 	//output is iUmotResult & iAngleInvPark
 
 }
-#endif
+

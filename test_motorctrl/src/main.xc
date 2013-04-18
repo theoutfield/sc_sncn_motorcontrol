@@ -43,7 +43,7 @@ on stdcore[IFM_CORE]: clock clk_pwm  = XS1_CLKBLK_REF;
 
 torq_par t_params;
 field_par f_params;
-loop_par loop;
+loop_par loop_params;
 hall_par h_pole;
 qei_par q_max;
 
@@ -149,10 +149,10 @@ int main(void)
 
 					/*******************************Torque Controller Loop****************************/
 					{
-						init_params_struct_all(t_params, f_params, loop);		// initialize controller parameter struct
-						init_loop_pars(loop);									// initialize loop time
-						init_torque_pars(t_params);								// initialize the torque controller loop
-						foc_loop(sig, input_torque, c_adc, c_hall, c_value);    // while(1) torque control loop
+						init_params_struct_all(t_params, f_params, loop_params);	// initialize controller parameter struct
+		//				init_loop_pars(loop);										// initialize loop time
+			//			init_torque_pars(t_params);									// initialize the torque controller loop
+						foc_loop(sig, input_torque, c_adc, c_hall, c_value, t_params, f_params, loop_params);    // while(1) torque control loop
 					}
 
 					/**********************************QEI Server************************************/

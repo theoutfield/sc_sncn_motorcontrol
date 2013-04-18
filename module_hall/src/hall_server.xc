@@ -24,13 +24,6 @@
 #include <print.h>
 #include <stdint.h>
 #include "refclk.h"
-#include "dc_motor_config.h"
-
-void init_hall(hall_par &h_pole)
-{
-	h_pole.pole_pairs = POLE_PAIRS;
-	return;
-}
 
 void run_hall_new( chanend c_hall, chanend sensor_output, port in p_hall, hall_par &h_pole)
  {

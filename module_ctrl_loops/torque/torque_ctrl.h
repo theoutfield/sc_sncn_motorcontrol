@@ -16,36 +16,6 @@
 
 #include <comm_loop.h>
 #include <dc_motor_config.h>
-/* Struct definitions for the Parameters*/
-typedef struct S_Torque {
-	int Kp_n, Kp_d;    					//Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d;						//Ki = Ki_n/Ki_d
-	int Integral_limit;
-	int Max_torque;
-} torq_par;
-
-typedef struct S_Loop_time {
-	int delay;
-} loop_par;
-
-//optional control parameters
-typedef struct S_Field{
-	int Kp_n, Kp_d;						//Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d;						//Ki = Ki_n/Ki_d
-	int Integral_limit;
-} field_par;
-
-
-void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop);
-
-/* initialize PI torque controller parameter*/
-void init_torque_pars(torq_par &d);
-
-/* initialize PI torque controller loop closing time parameter*/
-void init_loop_pars(loop_par &d);
-
-/* initialize PI field controller loop parameter*/
-void init_field_pars(field_par &d); //optional
 
 /* 	torque controller loop
  *
@@ -56,10 +26,8 @@ void init_field_pars(field_par &d); //optional
  *    c_value:  control value out to commutation loop
  *	  sig:      signal to start adc after initialization
  *
- * */
-void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend c_value);
-
-
+ */
+void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend c_value, torq_par &t_param, field_par &f_param, loop_par &l_param);
 
 
 

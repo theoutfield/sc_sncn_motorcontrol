@@ -22,13 +22,6 @@
 
 #include<dc_motor_config.h>
 
-typedef struct S_QEI {
-	unsigned max_count;
-} qei_par;
-
-/* initialize QEI sensor */
-void init_qei(qei_par &q_max);
-
 /**
  *  \param c_qei The control channel for the QEI server
  *  \return the speed, position and valid state
