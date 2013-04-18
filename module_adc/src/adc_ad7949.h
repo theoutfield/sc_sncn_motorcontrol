@@ -1,6 +1,8 @@
 /**
  * \file adc_ad7949.h
  *
+ *  ADC Server for DC 900
+ *
  * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Author: Martin Schwarz <mschwarz@synapticon.com>
  *
@@ -11,24 +13,25 @@
  *
  **/
 
-
 #pragma once
-
 #include <xs1.h>
 #include <xclib.h>
 #include "adc_common.h"
 
-/** \brief Execute the triggered ADC server
+/** Non triggered ADC server
  *
  * This is the interface to AD7949 ADC devices. It controls two devices
  * so that two channels can be sampled simultaneously.
  *
- * \param c_adc the array of ADC control channels
- * \param c_trig the array of channels to receive triggers from the PWM modules
- * \param clk the clock for the ADC device serial port
- * \param p_sclk_conv_mosib_mosia 4-bit port, ADC control interface
- * \param p_data_a 1-bit port, ADC data channel 0
- * \param p_data_b 1-bit port, ADC data channel 1
+ * \channels:
+ * 				c_adc  -	channel to receive ADC output
+ * \clocks:
+ * 				clk    - 	clock for the ADC device serial port
+ * \ports:
+ *        		p_sclk_conv_mosib_mosia -	4-bit port, ADC control interface
+ * 		  	 	p_data_a 				-	1-bit port, ADC data channel 0
+ * 				p_data_b 				-	1-bit port, ADC data channel 1
+ *
  */
 void adc_ad7949( chanend c_adc,
 			   clock clk,
@@ -37,8 +40,21 @@ void adc_ad7949( chanend c_adc,
 			   in buffered port:32 p_data_b );
 
 
-/**
- * old adc triggered function
+/** Triggered ADC server
+ *
+ * This is the interface to AD7949 ADC devices. It controls two devices
+ * so that two channels can be sampled simultaneously.
+ *
+ * \channels:
+ * 				c_adc  -	channel to receive ADC output
+ * 				c_trig - 	channel to trigger adc from the PWM modules
+ * \clocks:
+ * 				clk    - 	clock for the ADC device serial port
+ * \ports:
+ *        		p_sclk_conv_mosib_mosia -	4-bit port, ADC control interface
+ * 		  	 	p_data_a 				-	1-bit port, ADC data channel 0
+ * 				p_data_b 				-	1-bit port, ADC data channel 1
+ *
  */
 void adc_ad7949_triggered( chanend c_adc,
 			   	   	   	   chanend c_trig,

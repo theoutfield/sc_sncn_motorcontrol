@@ -1,6 +1,8 @@
 /**
  * \file adc_ltc1408.h
  *
+ * ADC Server for DC 100
+ *
  * The copyrights, all other intellectual and industrial 
  * property rights are retained by XMOS and/or its licensors. 
  * Terms and conditions covering the use of this code can
@@ -13,21 +15,25 @@
  * below. The modifications to the code are still covered by the 
  * copyright notice above.
  *
- **/                                   
+ **/
+
 #include <xs1.h>
 #include <xclib.h>
-
 #include "adc_common.h"
 
-/** \brief Execute the triggered ADC server
+/** Triggered ADC server
  *
  * This is the server thread implementation for the LTC1408 ADC device.
  *
- * \param c_adc the array of ADC control channels
- * \param c_trig the array of channels to receive triggers from the PWM modules
- * \param clk the clock for the ADC device serial port
- * \param SCLK the port which feeds the ADC serial clock
- * \param CNVST the ADC convert strobe
- * \param DATA the ADC data port
+ * \channels:
+ * 				c_adc  	-	channel to receive ADC output
+ * 				c_trig 	- 	channel to trigger adc from the PWM modules
+ * \clocks:
+ * 				clk		- 	clock for the ADC device serial port
+ * \ports:
+ *        		SCLK 	-	port which feeds the ADC serial clock
+ * 		  	 	CNVST 	-	ADC convert strobe
+ * 				DATA 	-	ADC data port
+ *
  */
 void adc_ltc1408_triggered( chanend c_adc, chanend c_trig, clock clk, port out SCLK, buffered out port:32 CNVST, in buffered port:32 DATA);

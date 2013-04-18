@@ -1,29 +1,11 @@
-/**
- * \file adc_ad7949.xc
- *
- * Copyright 2013, Synapticon GmbH. All rights reserved.
- * Author: Martin Schwarz <mschwarz@synapticon.com>
- *
- * In the case where this code is a modification of existing code
- * under a separate license, the separate license terms are shown
- * below. The modifications to the code are still covered by the 
- * copyright notice above.
- *
- **/
 
 #include <xs1.h>
 #include <stdint.h>
-#include <print.h>
 #include <xclib.h>
-#include <xscope.h>
-//#include "zip.h"
 #include "refclk.h"
 
 static unsigned adc_data_a[5];
 static unsigned adc_data_b[5];
-
-//extern out port p_ifm_ext_d2;
-//extern out port p_ifm_ext_d3;
 
 unsigned short iIndexADC = 0;
 
@@ -261,10 +243,10 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 
 
 void adc_ad7949( chanend c_adc,
-			   	   	   	   clock clk,
-			   	   	   	   buffered out port:32 p_sclk_conv_mosib_mosia,
-			   	   	   	   in buffered port:32 p_data_a,
-			   	   	   	   in buffered port:32 p_data_b )
+			   clock clk,
+			   buffered out port:32 p_sclk_conv_mosib_mosia,
+			   in buffered port:32 p_data_a,
+			   in buffered port:32 p_data_b )
 {
 	  timer tx;
 	  unsigned ts;

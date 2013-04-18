@@ -23,7 +23,8 @@
 /**
  * The client library function for hall sensor server
  *
- * \param: c_hall the channel for communicating with the hall server
+ * \channels:
+ * 			c_hall -	the channel for communicating with the hall server
  */
 
 /* function returns the speed in rpm from Hall Sensor*/

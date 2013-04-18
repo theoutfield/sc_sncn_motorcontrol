@@ -36,9 +36,11 @@ typedef struct S_Hall {
  *
  *  This implements the basic hall sensor server
  *
- *  \channel param: c_hall the control channel for sending out hall position
- *  \port param   : p_hall the port for reading the hall sensor data
- *  		        p_encoder the port for reading the quadrature encoder data
+ *  \channels:
+ * 				c_hall 		- 	the control channel for sending out hall position
+ *  \ports:
+ *  			p_hall 		-	port for reading the hall sensor data
+ *  		    p_encoder 	-	port for reading the quadrature encoder data
  */
 void run_hall(chanend c_hall, port in p_hall, port in p_encoder);
 

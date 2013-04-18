@@ -17,18 +17,23 @@
  * copyright notice above.
  *
  **/                                   
-#ifndef __ADC_CLIENT_LTC1408_H__
-#define __ADC_CLIENT_LTC1408_H__
+
+#pragma once
+
+/**
+ * The client library function for adc server
+ *
+ * \channels:
+ * 			c_adc -	the channel for communicating with the adc server
+ */
 
 /* ADC calibration sequence */
 void do_adc_calibration_ltc1408( chanend c_adc );
 
-/* get raw values in whatever format the ADC delivers them in */
+/* get raw three phase current values in whatever format the ADC delivers them in */
 {unsigned, unsigned, unsigned} get_adc_vals_raw_ltc1408( chanend c_adc );
 
-/* get values converted from 14 bit unsigned to 16 bit signed and calibrated */
+/* get calibrated three phase current from the adc*/
 {int, int, int} get_adc_vals_calibrated_int16_ltc1408( chanend c_adc );
 
 
-
-#endif /* __ADC_CLIENT_LTC1408_H__ */
