@@ -22,11 +22,6 @@
 #include <xs1.h>
 #include <dc_motor_config.h>
 
-/*
- * debug uart function
- */
-void run_uart(chanend c_motvalue, clock clk1);
-
 /** \brief Hall Encoder Server
  *
  *  This implements the basic hall sensor server

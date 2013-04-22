@@ -36,9 +36,4 @@ int32_t get_hall_angle(chanend c_hall);
 /* function returns the speed, angle, position, pinstate respectively from the Hall Sensor*/
 {int, int, int, int} get_hall_values(chanend c_hall);
 
-/* function returns the speed, angle, position, pinstate respectively from the Quadrature Encoder (QEI)*/
-{int, int, int, int} get_encoder_values(chanend c_hall);
-
-/* debug function */
-{int, int, int, int, int, int, int, int, int, int} get_info_hall_input(chanend c_hall);
 
