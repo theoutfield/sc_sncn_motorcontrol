@@ -26,7 +26,10 @@
 
 static t_pwm_control pwm_ctrl;
 
-void comm_sine_new(chanend c_value, chanend c_pwm_ctrl)
+
+void space_vector_pwm( int iIndexPWM, int iUmotMotor, int iMotHoldingTorque , t_pwm_control& pwm_ctrl, chanend c_pwm_ctrl, int iPwmOnOff );
+
+void comm_sine(chanend c_value, chanend c_pwm_ctrl)
 {
 	int cmd, iPwmOnOff = 1;
 	int iIndexPWM=0, iUmotMotor = 0, iMotHoldingTorque = 0;
@@ -60,7 +63,7 @@ void comm_sine_new(chanend c_value, chanend c_pwm_ctrl)
 
 
 
-void comm_sine_init_new(chanend c_pwm_ctrl)
+void comm_sine_init(chanend c_pwm_ctrl)
 {
 	unsigned pwm[3] = {0, 0, 0};  // PWM OFF
 	pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
@@ -69,14 +72,14 @@ void comm_sine_init_new(chanend c_pwm_ctrl)
 
 
 
-void commutation_new(chanend c_value, chanend c_pwm_ctrl, chanend sig)
+void commutation(chanend c_value, chanend c_pwm_ctrl, chanend sig)
 {  //init sine-commutation and set up a4935
 
 	  const unsigned t_delay = 300*USEC_FAST;
 	  timer t;
 	  unsigned ts;
 
-	  comm_sine_init_new(c_pwm_ctrl);
+	  comm_sine_init(c_pwm_ctrl);
 	  t when timerafter (ts + t_delay) :> ts;
 
 	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
@@ -97,5 +100,5 @@ void commutation_new(chanend c_value, chanend c_pwm_ctrl, chanend sig)
 		  if(found == 1)
 			  break;
 	  }
-	  comm_sine_new(c_value, c_pwm_ctrl);
+	  comm_sine(c_value, c_pwm_ctrl);
 }

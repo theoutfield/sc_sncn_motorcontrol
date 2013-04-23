@@ -24,10 +24,9 @@
  * \param d_pos the final position (desired position) in degree
  * \param vi velocity in deg/s
  *
- * 	\channel pos_data communication channel to receive position data from the encoders/hall sensors
+ * \channel pos_data communication channel to receive position data from the encoders/hall sensors
  *
  * output parameters
- *
  * \channel c_commutation communication channel to send motor power output value
  *
  */

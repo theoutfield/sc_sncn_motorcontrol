@@ -145,13 +145,13 @@ int main(void)
 					}
 
 					/****************************Motor Commutation loop*******************************/
-					commutation_new(c_value, c_pwm_ctrl, sig);						// while(1) commutation loop
+					commutation(c_value, c_pwm_ctrl, sig);						// while(1) commutation loop
 
 					/*******************************Torque Controller Loop****************************/
 					{
 						init_params_struct_all(t_params, f_params, loop_params);	// initialize controller parameter struct
-		//				init_loop_pars(loop);										// initialize loop time
-			//			init_torque_pars(t_params);									// initialize the torque controller loop
+						//				init_loop_pars(loop);										// initialize loop time
+						//			init_torque_pars(t_params);									// initialize the torque controller loop
 						foc_loop(sig, input_torque, c_adc, c_hall, c_value, t_params, f_params, loop_params);    // while(1) torque control loop
 					}
 

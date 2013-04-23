@@ -16,14 +16,14 @@
 #include "torque_ctrl.h"
 #include <refclk.h>
 #include <xscope.h>
-#include<print.h>
+#include <print.h>
 
 #define defParAngleUser 560
 #define filter_length 30
 #define filter_dc 160
 
 //output is iUmotResult & iAnglePWM
-
+unsigned root_function(unsigned uSquareValue);
 
 void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall, chanend c_value, torq_par &t_param, field_par &f_param, loop_par &l_param)
 {
