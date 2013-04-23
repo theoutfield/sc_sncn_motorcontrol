@@ -25,7 +25,7 @@
 //output is iUmotResult & iAnglePWM
 
 
-void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend c_value, torq_par &t_param, field_par &f_param, loop_par &l_param)
+void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall, chanend c_value, torq_par &t_param, field_par &f_param, loop_par &l_param)
 {
 	int iAngleFromHallOld=0, iAnglePWM, iAnglePWMFromHall, iAnglePWMFromFOC;
 	int iTemp; int a1=0, a2=0; int sinx, cosx, iTorqueSet = 0, iAlpha, iBeta, a1SquareMean=0, a2SquareMean=0, a1RMS, a2RMS;
@@ -105,8 +105,8 @@ void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend
 			ia_f /= flc;
 			ib_f /= flc;
 
-			iActualSpeed     =  get_hall_speed(c_hall_1);
-			iAngleFromHall   = 	get_hall_angle(c_hall_1) & 0x0FFF;
+			iActualSpeed     =  get_hall_speed(c_hall);
+			iAngleFromHall   = 	get_hall_angle(c_hall) & 0x0FFF;
 
 			iActualSpeed    &= 0x00FFFFFF;
 			if(iActualSpeed & 0x00FF0000)

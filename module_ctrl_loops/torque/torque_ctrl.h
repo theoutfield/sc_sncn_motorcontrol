@@ -19,15 +19,17 @@
 
 /* 	torque controller loop
  *
- * channel:
- *    input:  	torque input command
- *    adc:    	current sensor input
- *    c_hall_1: hall sensor input
- *    c_value:  control value out to commutation loop
- *	  sig:      signal to start adc after initialization
+ * \channel  input channel for setting torque input command
+ * \channel  adc channel for current sensor input
+ * \channel  c_hall channel for hall sensor input
+ * \channel  c_value channel to send motor power output value
+ * \channel  sig channel for signaling to start adc after initialization
  *
+ * \param t_param sets the torque PI controller parameters
+ * \param f_param sets the field PI controller parameters
+ * \param l_param sets the control loop time
  */
-void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chanend c_value, torq_par &t_param, field_par &f_param, loop_par &l_param);
+void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall, chanend c_value, torq_par &t_param, field_par &f_param, loop_par &l_param);
 
 
 

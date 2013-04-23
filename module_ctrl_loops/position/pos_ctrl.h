@@ -19,17 +19,16 @@
 /*
  * Move command for position control
  *
- * input params
- * 		cur_p 			: start position 	 (current position)
- * 		d_pos 			: final position 	 (desired position)
- * 		vi    			: velocity
+ * input paramters
+ * \param cur_p the current position in degree
+ * \param d_pos the final position (desired position) in degree
+ * \param vi velocity in deg/s
  *
- * 		channel type varibles
- * 		pos_data		: communication channel to receive position data from the encoders/hall sensors
+ * 	\channel pos_data communication channel to receive position data from the encoders/hall sensors
  *
- * output params
- * 		channel type varibles
- * 		c_commutation 	: communication channel to send out voltage to the PWM routine to run the motor
+ * output parameters
+ *
+ * \channel c_commutation communication channel to send motor power output value
  *
  */
 
