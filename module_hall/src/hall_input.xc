@@ -82,7 +82,7 @@ void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole)
 	iHallDividend /= pole_pairs;
 
 
-	//******************************************** LOOP 1 Usec **************************************************
+	//******************************************** LOOP 1 usec **************************************************
 	while(1) {
 
 		iHallCountMicroSeconds++; // period in µsec

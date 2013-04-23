@@ -64,7 +64,7 @@ typedef struct S_Torque {
 	int Max_torque;
 } torq_par;
 
-/* struct definitation for control loop time*/
+/* struct definition for control loop time*/
 typedef struct S_Loop_time {
 	int delay;
 } loop_par;
@@ -76,12 +76,12 @@ typedef struct S_Field{
 	int Integral_limit;
 } field_par;
 
-/* struct definitation for quadrature sensor*/
+/* struct definition for quadrature sensor*/
 typedef struct S_QEI {
 	unsigned max_count;
 } qei_par;
 
-/* struct definitation for hall sensor*/
+/* struct definition for hall sensor*/
 typedef struct S_Hall {
 	int pole_pairs;
 	int gear_ratio;

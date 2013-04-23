@@ -22,15 +22,18 @@
 #include <xs1.h>
 #include <dc_motor_config.h>
 
-/** \brief Hall Encoder Server
+/**
+ * \brief Hall Encoder Server
  *
- *  This implements the basic hall sensor server
+ * This implements the basic hall sensor server
  *
- *  \channels:
- * 				c_hall 		- 	the control channel for sending out hall position
- *  \ports:
- *  			p_hall 		-	port for reading the hall sensor data
- *  		    p_encoder 	-	port for reading the quadrature encoder data
+ * \channel c_hall the control channel for sending out hall position
+ *
+ * \port p_hall port for reading the hall sensor data
+ *
+ * \param h_pole defines the pole-pairs for the hall sensor
  */
 void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole);
+
+
 
