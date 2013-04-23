@@ -84,6 +84,7 @@ typedef struct S_QEI {
 /* struct definitation for hall sensor*/
 typedef struct S_Hall {
 	int pole_pairs;
+	int gear_ratio;
 } hall_par;
 
 /* initialize QEI sensor */

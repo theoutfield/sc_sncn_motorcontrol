@@ -32,5 +32,5 @@
  *  			p_hall 		-	port for reading the hall sensor data
  *  		    p_encoder 	-	port for reading the quadrature encoder data
  */
-void run_hall(chanend c_hall, port in p_hall, port in p_encoder);
+void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole);
 

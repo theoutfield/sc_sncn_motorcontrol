@@ -28,7 +28,7 @@
 #include <pwm_service_inv.h>
 #include <comm_loop.h>
 #include <adc_ad7949.h>
-#include <hall_server.h>
+#include <hall_input.h>
 #include <torque_ctrl.h>
 
 #ifdef Quadrature_Encoder_used
@@ -140,8 +140,8 @@ int main(void)
 
 					/*********************************Hall Server*************************************/
 					{
-						init_hall(h_pole);										// initialize hall sensor
-						run_hall_new(c_hall, sensor_output, p_ifm_hall, h_pole);	// start Hall Server
+						//init_hall(h_pole);										// initialize hall sensor
+						//run_hall_new(c_hall, sensor_output, p_ifm_hall, h_pole);	// start Hall Server
 					}
 
 					/****************************Motor Commutation loop*******************************/

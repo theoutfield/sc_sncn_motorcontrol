@@ -28,12 +28,12 @@
  */
 
 /* function returns the speed in rpm from Hall Sensor*/
-int32_t get_hall_speed(chanend c_hall);
+int get_hall_speed(chanend c_hall);
 
 /* function returns the angle in range [0 - 4095] which maps to [0 - 359] degrees*/
-int32_t get_hall_angle(chanend c_hall);
+int get_hall_angle(chanend c_hall);
 
-/* function returns the speed, angle, position, pinstate respectively from the Hall Sensor*/
-{int, int, int, int} get_hall_values(chanend c_hall);
+/* function returns the angle and speed respectively from the Hall Sensor*/
+{int, int} get_hall_values(chanend c_hall);
 
 
