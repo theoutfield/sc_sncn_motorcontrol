@@ -14,6 +14,8 @@
 
 //extern short arctg_table[1024+6];
 
+int arctg1(int Real, int Imag);
+
 extern short arctg_table[];
 
 extern short sine_table[256];
@@ -21,6 +23,5 @@ extern short sine_table[256];
 extern short sine_third[256];
 
 //** space vector table with 1024 base points ** Umax = 6944
-//extern short SPACE_TABLE[1024];
 extern short SPACE_TABLE[1024];
 

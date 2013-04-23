@@ -19,7 +19,6 @@
 
 #include <pwm_config.h>
 #include "pwm_cli_inv.h"
-#include "sine_lookup.h"
 #include "predriver/a4935.h"
 #include "sine_table_big.h"
 #include "adc_client_ad7949.h"

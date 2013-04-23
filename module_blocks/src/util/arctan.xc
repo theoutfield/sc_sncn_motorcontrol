@@ -14,15 +14,15 @@
 
 #include "sine_table_big.h"
 
-int arctg1(int iReell, int iImm)
+int arctg1(int Real, int Imag)
 {
 	int iAngleResult;
 	int AbsX,AbsY;
 	unsigned char cFlagOver45;
 	int Mag;
 
-	AbsX = iReell;
-	AbsY = iImm;
+	AbsX = Real;
+	AbsY = Imag;
 
 	if(AbsX <0)  AbsX = -AbsX;
 	if(AbsY <0)  AbsY = -AbsY;
@@ -57,14 +57,14 @@ int arctg1(int iReell, int iImm)
 
 	if(cFlagOver45) iAngleResult = 1024 - iAngleResult;
 
-	if(iReell >= 0)
+	if(Real >= 0)
 	{                                                   		// 1. or 4. quadrant
-		if(iImm  <  0)  iAngleResult = 4096 - iAngleResult;     // 4. quadrant
+		if(Imag  <  0)  iAngleResult = 4096 - iAngleResult;     // 4. quadrant
 																// if 1.quadrant all okay
 	}
 	else
 	{      // if negativ 2. or 3. quadrant
-		if(iImm < 0)    iAngleResult += 2048;                   // 3. Q
+		if(Imag < 0)    iAngleResult += 2048;                   // 3. Q
 		else            iAngleResult  = 2048 - iAngleResult;    // 2. Quadrant
 	}
 	return  iAngleResult;

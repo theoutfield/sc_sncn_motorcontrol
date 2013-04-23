@@ -140,8 +140,8 @@ int main(void)
 
 					/*********************************Hall Server*************************************/
 					{
-						//init_hall(h_pole);										// initialize hall sensor
-						//run_hall_new(c_hall, sensor_output, p_ifm_hall, h_pole);	// start Hall Server
+						init_hall(h_pole);										// initialize hall sensor
+						run_hall(c_hall, p_ifm_hall, h_pole);	// start Hall Server
 					}
 
 					/****************************Motor Commutation loop*******************************/
