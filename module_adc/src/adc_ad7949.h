@@ -18,19 +18,19 @@
 #include <xclib.h>
 #include "adc_common.h"
 
-/** Non triggered ADC server
+/**
+ * \brief Non triggered ADC server
  *
  * This is the interface to AD7949 ADC devices. It controls two devices
  * so that two channels can be sampled simultaneously.
  *
- * \channels:
- * 				c_adc  -	channel to receive ADC output
- * \clocks:
- * 				clk    - 	clock for the ADC device serial port
- * \ports:
- *        		p_sclk_conv_mosib_mosia -	4-bit port, ADC control interface
- * 		  	 	p_data_a 				-	1-bit port, ADC data channel 0
- * 				p_data_b 				-	1-bit port, ADC data channel 1
+ * \channel c_adc channel to receive ADC output
+ *
+ * \clock clk clock for the ADC device serial port
+ *
+ * \port p_sclk_conv_mosib_mosia 4-bit port for ADC control interface
+ * \port p_data_a 1-bit port for ADC data channel 0
+ * \port p_data_b 1-bit port for ADC data channel 1
  *
  */
 void adc_ad7949( chanend c_adc,
@@ -40,20 +40,20 @@ void adc_ad7949( chanend c_adc,
 			   in buffered port:32 p_data_b );
 
 
-/** Triggered ADC server
+/**
+ * \brief Triggered ADC server
  *
  * This is the interface to AD7949 ADC devices. It controls two devices
  * so that two channels can be sampled simultaneously.
  *
- * \channels:
- * 				c_adc  -	channel to receive ADC output
- * 				c_trig - 	channel to trigger adc from the PWM modules
- * \clocks:
- * 				clk    - 	clock for the ADC device serial port
- * \ports:
- *        		p_sclk_conv_mosib_mosia -	4-bit port, ADC control interface
- * 		  	 	p_data_a 				-	1-bit port, ADC data channel 0
- * 				p_data_b 				-	1-bit port, ADC data channel 1
+ * \channel	c_adc channel to receive ADC output
+ * \channel	c_trig channel to trigger adc from the PWM modules
+ *
+ * \clock clk clock for the ADC device serial port
+ *
+ * \port p_sclk_conv_mosib_mosia 4-bit port for ADC control interface
+ * \port p_data_a 1-bit port for ADC data channel 0
+ * \port p_data_b 1-bit port for ADC data channel 1
  *
  */
 void adc_ad7949_triggered( chanend c_adc,

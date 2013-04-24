@@ -23,8 +23,12 @@
 #include<dc_motor_config.h>
 
 /**
- *  \param c_qei The control channel for the QEI server
- *  \return the speed, position and valid state
+ * \param c_qei The control channel for the QEI server
+ * \param q_max parameter defines Max quadrature encoder counts
+ *
+ * \return speed in rpm
+ * \return position
+ * \return validity state
  */
 { unsigned, unsigned, unsigned } get_qei_data( streaming chanend c_qei, qei_par &q_max);
 

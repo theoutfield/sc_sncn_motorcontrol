@@ -21,19 +21,18 @@
 #include <xclib.h>
 #include "adc_common.h"
 
-/** Triggered ADC server
+/**
+ * \brief Triggered ADC server
  *
  * This is the server thread implementation for the LTC1408 ADC device.
  *
- * \channels:
- * 				c_adc  	-	channel to receive ADC output
- * 				c_trig 	- 	channel to trigger adc from the PWM modules
- * \clocks:
- * 				clk		- 	clock for the ADC device serial port
- * \ports:
- *        		SCLK 	-	port which feeds the ADC serial clock
- * 		  	 	CNVST 	-	ADC convert strobe
- * 				DATA 	-	ADC data port
+ * \channel	c_adc channel to receive ADC output
+ * \channel c_trig channel to trigger adc from the PWM modules
+ * \clock clk clock for the ADC device serial port
+ *
+ * \port SCLK port which feeds the ADC serial clock
+ * \port CNVST port for ADC convert strobe
+ * \port DATA port for ADC data
  *
  */
 void adc_ltc1408_triggered( chanend c_adc, chanend c_trig, clock clk, port out SCLK, buffered out port:32 CNVST, in buffered port:32 DATA);

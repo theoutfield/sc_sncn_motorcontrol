@@ -16,19 +16,19 @@
 
 
 
-/*
- * Move command for position control
+/**
+ * \brief Move command for position control
  *
- * input paramters
+ * Input paramters
  * \param cur_p the current position in degree
  * \param d_pos the final position (desired position) in degree
  * \param vi velocity in deg/s
  *
  * \channel pos_data communication channel to receive position data from the encoders/hall sensors
  *
- * output parameters
+ * Output parameters
  * \channel c_commutation communication channel to send motor power output value
  *
+ * \return some integer TODO What does the return parameter contain?
  */
-
 int move(int cur_p,int d_pos, int vi, chanend c_commutation, chanend pos_data);

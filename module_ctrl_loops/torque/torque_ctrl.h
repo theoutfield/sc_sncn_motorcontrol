@@ -17,7 +17,8 @@
 #include <comm_loop.h>
 #include <dc_motor_config.h>
 
-/* 	torque controller loop
+/**
+ * \brief Torque controller loop
  *
  * \channel  input channel for setting torque input command
  * \channel  adc channel for current sensor input

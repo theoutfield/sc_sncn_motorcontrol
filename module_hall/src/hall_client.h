@@ -21,7 +21,7 @@
 #include <stdint.h>
 
 /**
- * \breif Client library function for Hall Sensor
+ * \brief Client library function for Hall Sensor
  *
  * \channel c_hall for communicating with the Hall Server
  *
@@ -30,12 +30,17 @@
 int get_hall_speed(chanend c_hall);
 
 /**
+ * \channel c_hall for communicating with the Hall Server
+ *
  * \return the angle in range [0 - 4095] which maps to [0 - 359] degree
  */
 int get_hall_angle(chanend c_hall);
 
 /**
- * \return the angle in range [0 - 4095] which maps to [0 - 359] degree and speed in rpm
+ * \channel c_hall for communicating with the Hall Server
+ *
+ * \return the angle in range [0 - 4095] which maps to [0 - 359] degree
+ * \return speed in rpm
  */
 {int, int} get_hall_values(chanend c_hall);
 

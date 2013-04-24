@@ -21,19 +21,37 @@
 #pragma once
 
 /**
- * The client library function for adc server
+ * \brief ADC calibration sequence
  *
- * \channels:
- * 			c_adc -	the channel for communicating with the adc server
+ * \channel c_adc the channel for communicating with the adc server
+ *
  */
-
-/* ADC calibration sequence */
 void do_adc_calibration_ltc1408( chanend c_adc );
 
-/* get raw three phase current values in whatever format the ADC delivers them in */
+/**
+ * \brief Client functions for triggered adc server
+ *
+ * \channel c_adc the channel for communicating with the adc server
+ *
+ * \return Ia phase current value (raw) in whatever format the ADC delivers them in
+ * \return Ib phase current value (raw) in whatever format the ADC delivers them in
+ * \return Ic phase current value (raw) in whatever format the ADC delivers them in
+ *
+ */
 {unsigned, unsigned, unsigned} get_adc_vals_raw_ltc1408( chanend c_adc );
 
 /* get calibrated three phase current from the adc*/
+
+/**
+ * \brief Calibrated current for three phases from the adc
+ *
+ * \channel c_adc the channel for communicating with the adc server
+ *
+ * \return Ia calibrated phase current value
+ * \return Ib calibrated phase current value
+ * \return Ic calibrated phase current value
+ *
+ */
 {int, int, int} get_adc_vals_calibrated_int16_ltc1408( chanend c_adc );
 
 

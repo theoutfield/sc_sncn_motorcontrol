@@ -15,39 +15,54 @@
 
 #pragma once
 
+
 /**
- * The client library function for adc server
+ * \brief Client functions for non triggered adc server
  *
- * \channels:
- * 			c_adc -	the channel for communicating with the adc server
+ * \channel c_adc the channel for communicating with the adc server
+ *
+ * \return Ia phase current value (raw) in whatever format the ADC delivers them in
+ * \return Ib phase current value (raw) in whatever format the ADC delivers them in
  */
-
-/*
- * client functions for non triggered adc
- */
-
-/* get raw two phase current values in whatever format the ADC delivers them in */
 {unsigned, unsigned} get_adc_vals_raw_ad7949( chanend c_adc );
 
-/*
+/**
+ * \brief Calibrated Phase currents from the non triggered ADC server
  *
- *	function returns the following parameters respectively
+ * \channel c_adc the channel for communicating with the adc server
  *
- *	phase currents				: 	Ia and Ib
- *	phase calibration values	: 	I_calib.Ia_calib and I_calib.Ib_calib
- *	Temperature values			:  	adc_Temperature1, adc_Temperature2
- *					  			: 	adc_VoltageSupply, adc_Dummy
- *  External Sensor				: 	ExternalPot1, ExternalPot2
+ * \return Ia calibrated phase current value
+ * \return Ib calibrated phase current value
+ * \return Calibration constant for phase current Ia
+ * \return Calibration constant for phase current Ib
+ * \return ADC temperature sensor 1 value
+ * \return ADC temperature sensor 2 value
+ * \return ADC Voltage Supply value
+ * \return ADC dummy value
+ * \return External input 1 value
+ * \return External input 2 value
  */
 {int, int, int, int, int, int, int, int, int, int} get_adc_calibrated_ad7949( chanend c_adc, int iPwmOnOff);
 
 
-/*
- * client functions for triggered adc
- */
 
-/* get calibrated current for two phases from the adc*/
+/**
+ * \brief ADC calibration sequence for Triggered ADC server
+ *
+ * \channel c_adc the channel for communicating with the adc server
+ *
+ */
+void do_adc_calibration_ad7949( chanend c_adc );
+
+/**
+ * \brief Calibrated current for two phases from the Triggered ADC server
+ *
+ * \channel c_adc the channel for communicating with the adc server
+ *
+ * \return Ia calibrated phase current value
+ * \return Ib calibrated phase current value
+ *
+ */
 {int, int} get_adc_vals_calibrated_int16_ad7949( chanend c_adc );
 
-/* ADC calibration sequence */
-void do_adc_calibration_ad7949( chanend c_adc );
+

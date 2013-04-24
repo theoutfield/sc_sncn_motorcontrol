@@ -20,10 +20,11 @@
 #define __QEI_SERVER_H__
 #include <xs1.h>
 
-/** \brief Implementation of the QEI server thread
+/**
+ * \brief Implementation of the QEI server thread
  *
- *  \param c_qei The control channel used by the client
- *  \param p_qei The hardware port where the quadrature encoder is located
+ * \param c_qei The control channel used by the client
+ * \param p_qei The hardware port where the quadrature encoder is located
  */
 void do_qei ( streaming chanend c_qei, port in p_qei );
 
