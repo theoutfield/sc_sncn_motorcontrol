@@ -112,7 +112,7 @@ typedef struct S_Hall {
  *
  * \param q_max struct defines the max count for quadrature encoder (QEI)
  */
-void init_qei(qei_par &q_max);
+void init_qei(qei_par &qei_max);
 
 /**
  * \brief initialize hall sensor
@@ -129,6 +129,6 @@ void init_hall(hall_par &h_pole);
  * \param loop initializes the control loop time
  *
  */
-void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop);
+void init_params_struct_all(torq_par &torque, field_par &field, loop_par &loop);
 
 #endif

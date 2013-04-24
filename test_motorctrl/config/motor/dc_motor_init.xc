@@ -3,18 +3,19 @@
 void init_hall(hall_par &h_pole)
 {
 	h_pole.pole_pairs = POLE_PAIRS;
+	h_pole.gear_ratio = GEAR_RATIO;
 	return;
 }
 
-void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop)
+void init_params_struct_all(torq_par &torque, field_par &field, loop_par &loop)
 {
-	tor.Kp_n = Torque_Kp_n;
-	tor.Kp_d = Torque_Kp_d;
-	tor.Ki_n = Torque_Ki_n;
-	tor.Ki_d = Torque_Ki_d;
-	tor.Integral_limit = Torque_Integral_limit;
+	torque.Kp_n = Torque_Kp_n;
+	torque.Kp_d = Torque_Kp_d;
+	torque.Ki_n = Torque_Ki_n;
+	torque.Ki_d = Torque_Ki_d;
+	torque.Integral_limit = Torque_Integral_limit;
 
-	tor.Max_torque = Max_torque_out;
+	torque.Max_torque = Max_torque_out;
 
 	field.Kp_n = Field_Kp_n;
 	field.Kp_d = Field_Kp_d;
@@ -27,8 +28,8 @@ void init_params_struct_all(torq_par &tor, field_par &field, loop_par &loop)
 	return;
 }
 
-void init_qei(qei_par &q_max)
+void init_qei(qei_par &qei_max)
 {
-	q_max.max_count = QEI_COUNT_MAX;
+	qei_max.max_count = QEI_COUNT_MAX;
 	return;
 }
