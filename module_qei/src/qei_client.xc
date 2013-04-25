@@ -26,6 +26,24 @@
 // = QEI_COUNT_MAX;
 
 
+//only pos and valid
+{unsigned, unsigned} get_qei_pos(chanend c_qei )
+{
+	unsigned p, ts1, ts2, v;
+
+
+	c_qei <: QEI_CMD_POS_REQ;
+	master {
+		c_qei :> p;
+		c_qei :> ts1;
+		c_qei :> ts2;
+		c_qei :> v;
+	}
+	p &= (QEI_COUNT_MAX-1);
+
+	return {p, v};
+}
+
 {unsigned, unsigned, unsigned } get_qei_data( streaming chanend c_qei, qei_par &q_max)
 {
 	unsigned p, s, ts1, ts2, v, qei_count_m = q_max.max_count;
