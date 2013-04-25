@@ -12,7 +12,7 @@
  * copyright notice above.
  *
  **************************************************************************/
-#define Quadrature_Encoder_used
+//#define Quadrature_Encoder_used
 
 #include <xs1.h>
 #include <platform.h>
