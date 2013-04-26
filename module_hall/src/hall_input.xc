@@ -22,7 +22,7 @@
 #define defPeriodMax 200000  //200msec
 #define defHallPeriodMax	  200000  		// 200msec
 
-void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole)
+void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole, chanend c_hall1)
 {
 	timer tx;
 	unsigned ts; // newest timestamp
@@ -80,6 +80,8 @@ void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole)
 	iHallStateOld = -1;
 	iHallDividend = 60000000/2;
 	iHallDividend /= pole_pairs;
+
+
 
 
 	//******************************************** LOOP 1 usec **************************************************
@@ -248,23 +250,45 @@ void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole)
 		select {
 			case c_hall :> cmd:
 				if (cmd == 1)
-					master
+
 					{
 						c_hall <: iHallAngle2;
 					}
 				else if(cmd == 2)
-					master
+
 					{
 						c_hall <: iHallSpeed;
 					}
 				else if(cmd == 3)
-					master
+
 					{
 						c_hall <: iHallAngle2;
 						c_hall <: iHallSpeed;
 					}
 
 				break;
+
+
+			case c_hall1 :> cmd:
+				if (cmd == 1)
+
+					{
+						c_hall <: iHallAngle2;
+					}
+				else if(cmd == 2)
+
+					{
+						c_hall <: iHallSpeed;
+					}
+				else if(cmd == 3)
+
+					{
+						c_hall <: iHallAngle2;
+						c_hall <: iHallSpeed;
+					}
+
+				break;
+
 
 			default: break;
 		}// end of select

@@ -3,12 +3,14 @@
 #include <print.h>
 #include <xscope.h>
 #include "pwm_cli_inv.h"
-#include "sine_table_big.h"
+
 #include "refclk.h"
 #include "predriver/a4935.h"
 #include "adc_client_ad7949.h"
 #include "adc_client_ltc1408.h"
 #include "hall_client.h"
+#include "sine_table_big.h"
+
 //extern void cur_function(int a ,int b, int c);
 #define DC900
 
@@ -16,9 +18,9 @@ static t_pwm_control pwm_ctrl;
 
 
 
-
+unsigned root_function(unsigned uSquareValue);
 int max_31 =  2147483647;
-void comm_sine_init_test(chanend c_pwm_ctrl)
+void comm_sine_init(chanend c_pwm_ctrl)
 {
 	unsigned pwm[3] = { 0, 0, 0 };  // PWM OFF
 	pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
@@ -30,9 +32,15 @@ void comm_sine_init_test(chanend c_pwm_ctrl)
 #define defRampMax 8192*2			//ramp params
 #define defRampMin 32
 
+int get_sync(chanend c_sync)
+{
+	int pos;
+	c_sync <: 20;
+	c_sync :> pos;
+	return pos;
+}
 
-
-void comm_sine_test( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_adc)
+void comm_sine( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_adc)
 {
 	unsigned cmd;
 	unsigned pwm[3] = { 0, 0, 0 };
@@ -51,38 +59,27 @@ void comm_sine_test( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, 
 	int tt , tp;
 	timer t; int ts, ts1;
 	unsigned t2,t1, time;
- int dummy;
-	/*while(1)
-	{
-		t:>ts;
-		t when timerafter(ts+15000 ) :> void;
-		xscope_probe_data(0, ts );
+	int dummy;
 
-	}*/
 	t:>time;
 	while (1)
 	{
-
-		//{a1,a2,adc_a1,adc_a2,adc_a3, adc_a4,adc_b1,adc_b2,adc_b3,adc_b4}  = get_adc_calibrated_ad7949(c_adc, 1);
-
-	 	// xscope_probe_data(0,a1);
-	 	// xscope_probe_data(1,a2);
-
 		//============= rotor position ===============================
 		if(stop!=1)
 		{
-			//iPositionAbsolut = get_hall_absolute_pos(c_hall);
-		//	iActualSpeed = get_hall_speed(c_hall);
-		//	iAngleFromHall = get_hall_angle(c_hall);
+			//iActualSpeed = get_hall_speed(c_hall);       // hall based input
+			//iAngleFromHall = get_hall_angle(c_hall);
 
-			{iAngleFromHall,iActualSpeed }=get_hall_values(c_hall);
-			//{iActualSpeed, iAngleFromHall, iPositionAbsolut, dummy  } = get_hall_values(c_hall);
+			iAngleFromHall = get_sync(c_hall);			   //sync based input
+			iAngleFromHall = (iAngleFromHall<<12)/500;
+
+
 		}
 		else
 		{
 
-			iActualSpeed = get_hall_speed(c_hall);
-			//{iActualSpeed, iAngleFromHall, iPositionAbsolut, dummy  } = get_hall_values(c_hall);
+			//iActualSpeed = get_hall_speed(c_hall);
+
 			iAngleFromHall=30;
 			umot1=2000;
 			if(set>limit)
@@ -182,14 +179,14 @@ void comm_sine_test( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, 
 
 
 
-void commutation_test(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend c_adc)
+void commutation(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend c_adc)
 {  //init sine-commutation and set up a4935
 
 	  const unsigned t_delay = 300*USEC_FAST;
 	  timer t;
 	  unsigned ts;
 
-	  comm_sine_init_test(c_pwm_ctrl);
+	  comm_sine_init(c_pwm_ctrl);
 	  t when timerafter (ts + t_delay) :> ts;
 
 	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
@@ -197,6 +194,6 @@ void commutation_test(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctr
 
 
 	 // do_adc_calibration_ad7949(c_adc);
-	  comm_sine_test( c_commutation, c_hall, c_pwm_ctrl, c_adc);
+	  comm_sine( c_commutation, c_hall, c_pwm_ctrl, c_adc);
 }
 

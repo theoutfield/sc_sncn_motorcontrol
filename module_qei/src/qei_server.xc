@@ -105,6 +105,7 @@ void do_qei ( chanend c_qei, port in pQEI )
 			}
 			break;
 			case c_qei :> int :
+			slave
 			{
 				c_qei <: pos;
 				c_qei <: ts1;

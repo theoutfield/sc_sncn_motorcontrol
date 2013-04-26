@@ -24,8 +24,8 @@
  *
  **************************************************************************/
 
-#ifndef __DC_MOTOR_CONFIG__H__test
-#define __DC_MOTOR_CONFIG__H__test
+#ifndef __DC_MOTOR_CONFIG__H__test1
+#define __DC_MOTOR_CONFIG__H__test1
 
 #define new
 
