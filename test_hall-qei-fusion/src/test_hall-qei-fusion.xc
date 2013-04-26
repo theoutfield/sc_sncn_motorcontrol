@@ -55,18 +55,6 @@ int main(void)
 	chan speed_out, stop, str, info, r_hall;
 	chan enco_1, output;
 
-	//etherCat Comm channels
-	chan coe_in; ///< CAN from module_ethercat to consumer
-	chan coe_out; ///< CAN from consumer to module_ethercat
-	chan eoe_in; ///< Ethernet from module_ethercat to consumer
-	chan eoe_out; ///< Ethernet from consumer to module_ethercat
-	chan eoe_sig;
-	chan foe_in; ///< File from module_ethercat to consumer
-	chan foe_out; ///< File from consumer to module_ethercat
-	chan pdo_in;
-	chan pdo_out;
-	chan sig_1;
-	//
 	par
 	{
 		on stdcore[1]:
@@ -266,7 +254,7 @@ int main(void)
 
 				//commutation(c_commutation, c_hall, c_pwm_ctrl, c_adc);  only hall based
 
-				commutation(c_commutation, output, c_pwm_ctrl, c_adc);  //sync input based
+				commutation_test(c_commutation, output, c_pwm_ctrl, c_adc);  //sync input based
 
 
 				{

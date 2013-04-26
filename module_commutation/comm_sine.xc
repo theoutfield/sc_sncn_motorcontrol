@@ -20,7 +20,7 @@ static t_pwm_control pwm_ctrl;
 
 unsigned root_function(unsigned uSquareValue);
 int max_31 =  2147483647;
-void comm_sine_init(chanend c_pwm_ctrl)
+void comm_sine_init_test(chanend c_pwm_ctrl)
 {
 	unsigned pwm[3] = { 0, 0, 0 };  // PWM OFF
 	pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
@@ -40,7 +40,7 @@ int get_sync(chanend c_sync)
 	return pos;
 }
 
-void comm_sine( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_adc)
+void comm_sine_test( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_adc)
 {
 	unsigned cmd;
 	unsigned pwm[3] = { 0, 0, 0 };
@@ -179,14 +179,14 @@ void comm_sine( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chane
 
 
 
-void commutation(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend c_adc)
+void commutation_test(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend c_adc)
 {  //init sine-commutation and set up a4935
 
 	  const unsigned t_delay = 300*USEC_FAST;
 	  timer t;
 	  unsigned ts;
 
-	  comm_sine_init(c_pwm_ctrl);
+	  comm_sine_init_test(c_pwm_ctrl);
 	  t when timerafter (ts + t_delay) :> ts;
 
 	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
@@ -194,6 +194,6 @@ void commutation(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, ch
 
 
 	 // do_adc_calibration_ad7949(c_adc);
-	  comm_sine( c_commutation, c_hall, c_pwm_ctrl, c_adc);
+	  comm_sine_test( c_commutation, c_hall, c_pwm_ctrl, c_adc);
 }
 
