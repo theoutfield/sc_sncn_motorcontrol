@@ -76,11 +76,11 @@ int main(void)
 			xscope_config_io(XSCOPE_IO_BASIC);
 		}
 
-		 on stdcore[2]:
-		{
-			 {
+		on stdcore[2]:
+		{ //state for current
+			{
 				int hall_pos, qei_pos; // input
-				int sync_pos;          // output
+				int sync_pos; // output
 
 				int speed, v;
 
@@ -88,157 +88,197 @@ int main(void)
 				unsigned int t1, t2;
 				timer t_qei, t_hall;
 
-				signed pos, spos, prev = 0, count = 0, co12 = 0, first = 1,	set = 0;
-				int max_count = QEI_COUNTS/POLE_PAIRS;//GEAR_RATIO * QEI_COUNTS;
+				signed pos, spos, prev = 0, count = 0, co12 = 0, first = 1,
+						set = 0;
+				int max_count = QEI_COUNTS / POLE_PAIRS;//GEAR_RATIO * QEI_COUNTS;
 				int enc_div = POLE_PAIRS * GEAR_RATIO;
 				int hall_p;
 				int diffi, count1, cmd;
 
-				int forw_ratio= 4096/max_count;
+				int forw_ratio = 4096 / max_count;
 				int angle_qei, diff_angle_qei, diff_angle;
 
-				int gaurd =45;
+				int gaurd = 7;
+
+				int s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0;
 
 				int not_synced = 0;
-				t_qei:> t1; t_hall :> t2;
+				t_qei				:> t1; t_hall :> t2;
 				t_qei when timerafter(t1+ 7*SEC_STD) :> t1;
 				while(1)
 				{
 					select
 					{
-						case t_qei  when timerafter(t1 + 700) :> t1:
-								{qei_pos, v} = get_qei_pos(c_qei); //acq     //{speed, qei_pos, v} = get_qei_data(c_qei);
-								qei_pos = max - qei_pos;
+						case t_qei when timerafter(t1 + 300) :> t1:
+						{	qei_pos, v}= get_qei_pos(c_qei); //acq     //{speed, qei_pos, v} = get_qei_data(c_qei);
+						qei_pos = max - qei_pos;
 
-
-								if(first==1 )
+						if(first==1 )
+						{
+							prev = qei_pos; first=0; set = prev;
+						}
+						if(prev!= qei_pos )
+						{
+							spos=qei_pos;
+							diffi = spos-prev;
+							if( diffi > 3000)
+							{
+								count = count - 1;
+							}
+							else if(diffi < -3000)
+							{
+								count = count + 1;
+							}
+							else if( diffi < 10 && diffi >0)
+							{
+								count = count + diffi;
+							}
+							else if( diffi < 0 && diffi > -10)
+							{
+								count = count + diffi;
+								if(count < 0)
 								{
-									prev = qei_pos; first=0; set = prev;
+									count = max_count + count;
 								}
-								if(prev!= qei_pos  )
-								{
-									spos=qei_pos;
-									diffi = spos-prev;
-									if( diffi > 3000)
-									{
-										count = count - 1;
-									}
-									else if(diffi < -3000)
-									{
-										count = count + 1;
-									}
-									else if( diffi < 10 && diffi >0)
-									{
-										count = count + diffi;
-									}
-									else if( diffi < 0 && diffi > -10)
-									{
-										count = count + diffi;
-										if(count < 0)
-										{
-											count = max_count + count;
-										}
-									}
-									prev=spos;
-									if(prev==set)
-									co12++;
-								}
-								if(count >= max_count)
-								{
-									co12=0;count=0;
-								}
+							}
+							prev=spos;
+							if(prev==set)
+							co12++;
+						}
+						if(count >= max_count)
+						{
+							co12=0;count=0;
+						}
 
+						xscope_probe_data(1, count);
+						break;
 
-								xscope_probe_data(1, count);
-							break;
+						case t_hall when timerafter(t2 + 4000) :> t2: //4khz  20000 14000
+						hall_pos = get_hall_angle(c_hall1);
+						xscope_probe_data(0, hall_pos);
 
-						case t_hall when timerafter(t2 + 7000) :> t2: //4khz  20000
-								hall_pos = get_hall_angle(c_hall1);
-								xscope_probe_data(0, hall_pos);
+						if( hall_pos >= 681 && hall_pos < 682+gaurd )
+						{
+							s1++; s6 = 0; s2 = 0;
 
+							if(s1 < 3 || not_synced <= 4 )
+							{
+								angle_qei = (count<<12)/500;
+								diff_angle = hall_pos - angle_qei;
 
+								diff_angle_qei = (diff_angle*500)>>12;
 
+								count = (diff_angle_qei + count);
 
-								if( hall_pos > 682-gaurd && hall_pos < 682+gaurd  )
-								{
-									angle_qei = (count*4096)/500;
-									diff_angle = hall_pos - angle_qei;
+								if(count <0 )
+								count = max_count + count;
 
-									diff_angle_qei = (diff_angle*500)/4096;
+								if(not_synced <= 4)
+								not_synced++;
+							}
 
-									count = (diff_angle_qei + count)&500;
-									if(not_synced <= 4)
-										not_synced++;
+						}
+						else if( hall_pos >= 1364 && hall_pos < 1365+gaurd )
+						{
+							s2++; s1 = 0; s3 = 0;
 
-								}
-								else if( hall_pos > 1365-gaurd && hall_pos < 1365+gaurd )
-								{
-									angle_qei = (count*4096)/500;
-									diff_angle = hall_pos - angle_qei;
+							if(s2 < 3 || not_synced <= 4) {
 
-									diff_angle_qei = (diff_angle*500)/4096;
+								angle_qei = (count<<12)/500;
+								diff_angle = hall_pos - angle_qei;
 
-									count = (diff_angle_qei + count)&500;
-									if(not_synced <= 4)
-																not_synced++;
-								}
-								else if( hall_pos > 2048-gaurd && hall_pos < 2048+gaurd )
-								{
-									angle_qei = (count*4096)/500;
-									diff_angle = hall_pos - angle_qei;
+								diff_angle_qei = (diff_angle*500)>>12;
 
-									diff_angle_qei = (diff_angle*500)/4096;
+								count = (diff_angle_qei + count);
+								if(count <0 )
+								count = max_count + count;
+								if(not_synced <= 4)
+								not_synced++;
+							}
+						}
+						else if( hall_pos >= 2047 && hall_pos < 2048+gaurd )
+						{
+							s3++; s2 = 0; s4 = 0;
+							if(s3<3 || not_synced <= 4) {
 
-									count = (diff_angle_qei + count)&500;
-									if(not_synced <= 4)
-																not_synced++;
-								}
-								else if( hall_pos > 2730-gaurd && hall_pos < 2730+gaurd )
-								{
-									angle_qei = (count*4096)/500;
-									diff_angle = hall_pos - angle_qei;
+								angle_qei = (count<<12)/500;
+								diff_angle = hall_pos - angle_qei;
 
-									diff_angle_qei = (diff_angle*500)/4096;
+								diff_angle_qei = (diff_angle*500)>>12;
 
-									count = (diff_angle_qei + count)&500;
-									if(not_synced <= 4)
-																not_synced++;
-								}
-								else if( hall_pos > 3413-gaurd && hall_pos < 3413+gaurd )
-								{
-									angle_qei = (count*4096)/500;
-									diff_angle = hall_pos - angle_qei;
+								count = (diff_angle_qei + count);
+								if(count <0 )
+								count = max_count + count;
+								if(not_synced <= 4)
+								not_synced++;
+							}
+						}
+						else if( hall_pos >= 2729 && hall_pos < 2730+gaurd )
+						{
+							s4++; s3 = 0; s5 = 0;
 
-									diff_angle_qei = (diff_angle*500)/4096;
+							if(s4< 3 || not_synced <= 4) {
+								angle_qei = (count<<12)/500;
+								diff_angle = hall_pos - angle_qei;
 
-									count = (diff_angle_qei + count)&500;
-									if(not_synced <= 4)
-																not_synced++;
-								}
-								else if( hall_pos > 4096-gaurd && hall_pos < 4096+gaurd )
-								{
-									angle_qei = (count*4096)/500;
-									diff_angle = hall_pos - angle_qei;
+								diff_angle_qei = (diff_angle*500)>>12;
 
-									diff_angle_qei = (diff_angle*500)/4096;
+								count = (diff_angle_qei + count);
+								if(count <0 )
+								count = max_count + count;
+								if(not_synced <= 4)
+								not_synced++;
+							}
+						}
+						else if( hall_pos >= 3414 && hall_pos < 3413+gaurd )
+						{
+							s5++; s4 = 0; s6 = 0;
+							if(s5<3 || not_synced <= 4) {
+								angle_qei = (count<<12)/500;
+								diff_angle = hall_pos - angle_qei;
 
-									count = (diff_angle_qei + count)&500;
-									if(not_synced <= 4)
-																not_synced++;
-								}
-							break;
+								diff_angle_qei = (diff_angle*500)>>12;
+
+								count = (diff_angle_qei + count);
+								if(count <0 )
+								count = max_count + count;
+								if(not_synced <= 4)
+								not_synced++;
+							}
+						}
+						else if( hall_pos >= 4090 ) //( hall_pos >= 4095 || hall_pos < gaurd )
+						{
+							s6++; s5 =0; s1= 0;
+							if(s6<3 || not_synced <= 4) {
+								angle_qei = (count<<12)/500;
+								diff_angle = hall_pos - angle_qei;
+
+								diff_angle_qei = (diff_angle*500)>>12;
+
+								count = (diff_angle_qei + count);
+								if(count <0 )
+								count = max_count + count;
+								if(not_synced <= 4)
+								not_synced++;
+							}
+						}
+
+						break;
 
 						case output :> cmd:
-							if(cmd == 20)
+						if(cmd == 20)
+						{
+							if(not_synced<3)
+							output<:hall_pos;
+							else
 							{
-								if(not_synced<3)
-									output<:hall_pos;
-								else
 								output <: count;
+
 							}
+
+						}
 						break;
 					}
-
 					// add a counter for qei acq
 				}
 			}
