@@ -5,7 +5,9 @@
 #include "xscope.h"
 
 /**
- * \brief S
+ * \brief Sincronizes 3 times at given step
+ *
+ * TODO: Get rid of this sync stuff in general
  *
  * \param s Array of sync steps
  * \param si Current sync step
@@ -13,7 +15,7 @@
  * \param hall_position
  * \param not_synced
  * \param max_count
- * \return syncronised speed
+ * \return syncronised position
  */
 {int, int} sync_it(int s[], int si, int sync_position, int hall_position,
 		int not_synced, int max_count) {
