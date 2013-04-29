@@ -87,7 +87,7 @@ int main(void)
 		on stdcore[2]:par
 		{
 			{
-				int torque_set=50;
+				int torque_set=150;
 				#ifdef Quadrature_Encoder_used
 					unsigned position_read = 0, speed_read = 0, v=0;
 				#else

@@ -34,12 +34,12 @@
 /*
  * define Motor Specific Constants
  */
-#define POLE_PAIRS	8
-#define GEAR_RATIO	156
-#define MAX_NOMINAL_SPEED  4000   // in 1/min
-#define MAX_NOMINAL_CURRENT  5    // in A
-#define QEI_COUNT_MAX (1024 * 4)  // Max count of Quadrature Encoder
-#define QEI_COUNTS 4000
+#define POLE_PAIRS  8
+#define GEAR_RATIO  156
+#define MAX_NOMINAL_SPEED  4000		// in 1/min
+#define MAX_NOMINAL_CURRENT  5		// in A
+#define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
+#define QEI_COUNT_MAX (1024 * 4)	// Max count of Quadrature Encoder as multiple of 2
 
 /*
  * define control parameters for PI TORQUE controller
@@ -50,12 +50,10 @@
 #define Torque_Ki_d 120
 #define Torque_Integral_limit 10000
 #define Max_torque_out 1200              // Max_Torque_out = Max Continuous torque * 264 / torque constant
-
 /*
  * define control closing time the controller
  */
 #define loop_timing 88 					//in USEC_FAST
-
 /*
  * define optional PI controller parameters for field control
  */
@@ -69,8 +67,8 @@
  * \brief Struct definitions for the torque controller
  */
 typedef struct S_Torque {
-	int Kp_n, Kp_d;    					//Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d;						//Ki = Ki_n/Ki_d
+	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
+	int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
 	int Integral_limit;
 	int Max_torque;
 } torq_par;
@@ -85,9 +83,9 @@ typedef struct S_Loop_time {
 /**
  * \brief Struct definitions for the field controller
  */
-typedef struct S_Field{
-	int Kp_n, Kp_d;						//Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d;						//Ki = Ki_n/Ki_d
+typedef struct S_Field {
+	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
+	int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
 	int Integral_limit;
 } field_par;
 

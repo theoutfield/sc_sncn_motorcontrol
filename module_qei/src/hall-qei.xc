@@ -4,7 +4,6 @@
 #include "hall_client.h"
 #include "xscope.h"
 
-
 /**
  * \brief S
  *
@@ -73,7 +72,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 
 	int previous_position = 0;
 
-	int max_count = QEI_COUNTS / POLE_PAIRS;
+	int max_count = QEI_COUNT_MAX_REAL / POLE_PAIRS;
 
 	int diffi;
 

@@ -36,6 +36,6 @@
  *
  * \param h_pole defines the pole-pairs for the hall sensor
  */
-void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole, chanend c_hall1);
+void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole);
 
 

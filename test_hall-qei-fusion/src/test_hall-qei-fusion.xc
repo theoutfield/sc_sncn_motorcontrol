@@ -115,14 +115,8 @@ int main(void)
 					t:>time;
 					t when timerafter(time+7*SEC_FAST) :> time;
 					c_commutation <: 2;
-					c_commutation <: 1500;
+					c_commutation <: 2500;
 
-					while(1)
-					{
-						// c_commutation <: 1;
-						// c_commutation :> speed;
-						// xscope_probe_data(1,speed);
-					}
 				}
 
 
