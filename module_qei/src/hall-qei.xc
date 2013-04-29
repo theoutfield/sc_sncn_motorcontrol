@@ -27,7 +27,7 @@
 	}
 
 
-	s[si] = s[si]+1;
+	s[si] = s[si] + 1;
 
 	if (s[si] < 3 || not_synced <= 4) {
 		angle_qei = (sync_position << 12) / 500;
