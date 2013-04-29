@@ -342,7 +342,7 @@ void commutation_test(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctr
 
 
 	 // do_adc_calibration_ad7949(c_adc);
-	  //  comm_sine_test( c_commutation, c_hall, c_pwm_ctrl, c_adc);
+	 //   comm_sine_test( c_commutation, c_hall, c_pwm_ctrl, c_adc);
 	  comm_sine_new( c_commutation, c_hall, c_pwm_ctrl, c_adc);
 }
 

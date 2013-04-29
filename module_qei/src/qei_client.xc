@@ -27,7 +27,7 @@
 
 
 //only pos and valid
-{unsigned, unsigned} get_qei_pos(chanend c_qei )
+{unsigned, unsigned} get_qei_position(chanend c_qei )
 {
 	unsigned p, ts1, ts2, v;
 

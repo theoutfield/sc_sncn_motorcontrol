@@ -1,6 +1,8 @@
 /**
  * \file hall_input.h
  *
+ * TODO: Rename to hall_server.h
+ *
  *	Hall Sensor Server
  *
  * The copyrights, all other intellectual and industrial 
@@ -14,6 +16,7 @@
  * under a separate license, the separate license terms are shown
  * below. The modifications to the code arse still covered by the
  * copyright notice above.
+
  *
  **/
 

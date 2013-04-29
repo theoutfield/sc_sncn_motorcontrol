@@ -99,7 +99,7 @@ int main(void)
 			par {
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
-				//	commutation_test(c_commutation, c_hall, c_pwm_ctrl, c_adc);  // hall based
+			//		commutation_test(c_commutation, c_hall, c_pwm_ctrl, c_adc);  // hall based
 
 				commutation_test(c_commutation, sync_output, c_pwm_ctrl, r_hall);  //new sync input based
 

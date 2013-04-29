@@ -1,3 +1,5 @@
+// TODO: Rename to hall_server.xc
+
 #include "hall_input.h"
 #include <stdlib.h>
 #include <print.h>
