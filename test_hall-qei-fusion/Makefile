@@ -10,7 +10,7 @@ APP_NAME = test_hall-qei-fusion
 
 # The USED_MODULES variable lists other module used by the application.
 
-USED_MODULES = module_adc module_blocks module_commutation module_hall module_pwm_common module_pwm_symmetrical module_qei sc_somanet-base/module_nodeconfig
+USED_MODULES = module_adc module_blocks module_commutation module_pwm_common module_pwm_symmetrical module_qei sc_somanet-base/module_nodeconfig
 
 
 
