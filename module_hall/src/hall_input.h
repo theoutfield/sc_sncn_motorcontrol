@@ -1,6 +1,8 @@
 /**
  * \file hall_input.h
  *
+ * TODO: Rename to hall_server.h
+ *
  *	Hall Sensor Server
  *
  * The copyrights, all other intellectual and industrial 
@@ -14,6 +16,7 @@
  * under a separate license, the separate license terms are shown
  * below. The modifications to the code arse still covered by the
  * copyright notice above.
+
  *
  **/
 
@@ -33,7 +36,6 @@
  *
  * \param h_pole defines the pole-pairs for the hall sensor
  */
-void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole);
-
+void run_hall(chanend c_hall, port in p_hall, hall_par &h_pole, chanend c_hall1);
 
 

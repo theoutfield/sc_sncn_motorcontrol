@@ -25,8 +25,9 @@
  *
  * \param c_qei The control channel used by the client
  * \param p_qei The hardware port where the quadrature encoder is located
+ *
+ * TODO: Rename to run_qui or rename run_hall to do_halll
  */
-void do_qei ( streaming chanend c_qei, port in p_qei );
-
+void do_qei (  chanend c_qei, port in p_qei );
 
 #endif /*__QEI_SERVER_H__ */

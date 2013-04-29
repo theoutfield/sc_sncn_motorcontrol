@@ -22,6 +22,9 @@
 
 #include<dc_motor_config.h>
 
+
+{unsigned, unsigned} get_qei_position(chanend c_qei );
+
 /**
  * \param c_qei The control channel for the QEI server
  * \param q_max parameter defines Max quadrature encoder counts

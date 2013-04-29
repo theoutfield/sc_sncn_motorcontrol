@@ -21,8 +21,8 @@
 #include <stdio.h>
 
 // This is the loop time for 4000RPM on a 1024 count QEI
-#pragma xta command "analyze loop qei_main_loop"
-#pragma xta command "set required - 14.64 us"
+
+
 
 // Order is 00 -> 10 -> 11 -> 01
 // Bit 3 = Index
@@ -70,7 +70,7 @@ static const unsigned char lookup[16][4] = {
 #endif
 
 #pragma unsafe arrays
-void do_qei ( streaming chanend c_qei, port in pQEI )
+void do_qei ( chanend c_qei, port in pQEI )
 {
 	unsigned pos = 0, v, ts1, ts2, ok=0, old_pins=0, new_pins;
 	timer t;
@@ -79,7 +79,7 @@ void do_qei ( streaming chanend c_qei, port in pQEI )
 	t :> ts1;
 
 	while (1) {
-#pragma xta endpoint "qei_main_loop"
+#pragma ordered
 		select {
 			case pQEI when pinsneq(new_pins) :> new_pins :
 			{
@@ -105,6 +105,7 @@ void do_qei ( streaming chanend c_qei, port in pQEI )
 			}
 			break;
 			case c_qei :> int :
+			slave
 			{
 				c_qei <: pos;
 				c_qei <: ts1;
