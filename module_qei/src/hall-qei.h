@@ -15,4 +15,6 @@
  */
 void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output);
 
+
+int get_sync_position ( chanend sync_output );
 #endif /* HALL_QEI_H_ */

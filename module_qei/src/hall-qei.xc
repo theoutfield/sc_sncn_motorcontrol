@@ -49,6 +49,16 @@
 	return {sync_position, not_synced};
 }
 
+
+int get_sync_position ( chanend sync_output )
+{
+	int sync_position;
+
+	sync_output <: 20;
+	sync_output :> sync_position;
+
+	return sync_position;
+}
 /**
  * \brief Calculates a synchronised position out of hall and qei
  *
@@ -96,8 +106,23 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 		 * 				reading hall at 10 micro second with case timer t_hall
 		 * sends out synchronized output over channel sync_output
 		 */
+#pragma ordered
 		select
 		{
+
+			case sync_output :> cmd:
+			if(cmd == 20)
+			{
+				if(not_synced<3)
+				sync_output <: (hall_position * 500) >> 12;
+				else
+				{
+					sync_output <: sync_position;
+
+				}
+			}
+			break;
+
 			case t_qei when timerafter(time_qei + 300) :> time_qei:
 			{	qei_position, qei_valid}= get_qei_position( c_qei); //aquisition
 			qei_position = hall_max_position - qei_position;
@@ -138,66 +163,55 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 				sync_position=0;
 			}
 
-			//xscope_probe_data(1, sync_position);
+		//	xscope_probe_data(0, sync_position);
 			break;
 
 			case t_hall when timerafter(time_hall + 1000) :> time_hall: //4khz  20000 14000
 			hall_position = get_hall_angle( c_hall1);
-			//xscope_probe_data(0, hall_position);
+		//	xscope_probe_data(1, hall_position);
 
 
 
 			if( hall_position >= 681 && hall_position < 682+gaurd )
 			{
 
-				{sync_position, not_synced} = sync_it(s, 0, sync_position, hall_position, not_synced, max_count);
+			//	{sync_position, not_synced} = sync_it(s, 0, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 1364 && hall_position < 1365+gaurd )
 			{
 
-				{sync_position, not_synced} = sync_it(s, 1, sync_position, hall_position, not_synced, max_count);
+			//	{sync_position, not_synced} = sync_it(s, 1, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 2047 && hall_position < 2048+gaurd )
 			{
 
-				{sync_position, not_synced} = sync_it(s, 2, sync_position, hall_position, not_synced, max_count);
+			//	{sync_position, not_synced} = sync_it(s, 2, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 2729 && hall_position < 2730+gaurd )
 			{
 
-				{sync_position, not_synced} = sync_it(s, 3, sync_position, hall_position, not_synced, max_count);
+			//	{sync_position, not_synced} = sync_it(s, 3, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 3414 && hall_position < 3413+gaurd )
 			{
 
-				{sync_position, not_synced} = sync_it(s, 4, sync_position, hall_position, not_synced, max_count);
+			//	{sync_position, not_synced} = sync_it(s, 4, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 4093 || hall_position < gaurd )
 			{
 
-				{sync_position, not_synced} = sync_it(s, 5, sync_position, hall_position, not_synced, max_count);
+			//	{sync_position, not_synced} = sync_it(s, 5, sync_position, hall_position, not_synced, max_count);
 
 			}
 
 			break;
 
-			case sync_output :> cmd:
-			if(cmd == 20)
-			{
-				if(not_synced<3)
-				sync_output <: hall_position;
-				else
-				{
-					sync_output <: sync_position;
 
-				}
-			}
-			break;
 		}
 	}
 }
