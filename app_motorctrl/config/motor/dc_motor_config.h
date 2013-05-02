@@ -16,8 +16,6 @@
 #define UMOT_MAX 4096
 #define TORQUE_INTEGRATOR_MAX  UMOT_MAX*64
 
-#define defENCODER
-//#define defHALL
 
 //=========================================================
 #define MOTOR_MAXON_EC45
@@ -25,6 +23,9 @@
 
 //==========================================================
 #ifdef  MOTOR_MAXON_EC45
+
+#define defENCODER
+#define defHALL
 
 #define MOTOR_POWER 50
 #define POLE_PAIRS	8
@@ -68,6 +69,9 @@
 
 //==================================================================
 #ifdef  MOTOR_MAXON_EC60
+
+
+#define defHALL
 
 #define MOTOR_POWER 100
 #define POLE_PAIRS	7
