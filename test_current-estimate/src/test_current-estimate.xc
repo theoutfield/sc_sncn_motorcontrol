@@ -74,10 +74,18 @@ void filter_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chan
 	int prev_v=0, dirn = 1;
 	int am_new, ph1_new; int new_ia, new_ib;int th1, th2, am_fil; int flag =0;
 
+	int max_count = QEI_COUNT_MAX_REAL / POLE_PAIRS;
+	int zero_cross_count_min;
+
 	int sync_position;
 	int mod_speed;
 	int zero_crossing = 0;
+	int sign_p = 1, sign_c = 1;
+	int cal_a1=0, cal_a2=0, cal_cnt = 0, cali_a1_cor=0;
 	VsdRef1 = 0; VsqRef1 = 0;
+
+
+	zero_cross_count_min = (max_count*4)/10;
 
 	 while(1)
 	 {
@@ -144,25 +152,68 @@ void filter_loop(chanend sig, chanend input, chanend adc, chanend c_hall_1, chan
 		}
 		ia_f /= flc;
 		ib_f /= flc;
+
+		//post filter calib
+      /*  cal_a1 += ia_f;
+        cal_cnt++;
+        if(cal_cnt > 1000)
+        {
+        	cali_a1_cor = cal_a1/cal_cnt;
+        	cal_cnt = 0;cal_a1 = 0;
+        }
+        ia_f = ia_f - cali_a1_cor; */
 		xscope_probe_data(0, a1);
 		xscope_probe_data(1, a2);
 		xscope_probe_data(2, ia_f);
 				xscope_probe_data(3, ib_f);
+
+		if(ia_f < 0)
+		{
+			sign_c = -1;
+		}
+		else if(ia_f >= 0)
+		{
+			sign_c = 1;
+		}
+
+		if(sign_c > sign_p)
+		{
+
+			zero_crossing = 1;
+		}
+		else if(sign_c < sign_p)
+		{
+			zero_crossing = -1;
+		}
+		else
+		{
+			zero_crossing = 0;
+		}
+		sign_p = sign_c;
+
 			//	arctg1(int Real, int Imag)
-				zero_crossing = 0;
+
+			/*	zero_crossing = 0;
 				if(ia_f ==0)
-					zero_crossing = 1;
+					zero_crossing = 1;*/
 				xscope_probe_data(4, zero_crossing);
+
+
+
 		iActualSpeed     = get_speed_cal(c_hall_1);;
 			//iAngleFromHall   = 	get_hall_angle(c_hall_1) & 0x0FFF;
 
 
 			mod_speed = iActualSpeed;
-if(iActualSpeed<0)
-	mod_speed = 0 - iActualSpeed;
+			if(iActualSpeed<0)
+				mod_speed = 0 - iActualSpeed;
 						if(mod_speed<370)
-						{	flc  = 10;
+						{	flc  = 20;
 						//	fldc = 80;
+						}
+						if(mod_speed < 100)
+						{
+							flc = 50;
 						}
 					/*	if(mod_speed>=370)
 							{flc  = 30;
@@ -473,6 +524,7 @@ int main(void)
 
 			par{
 
+
 				filter_loop(signal_adc, input, c_adc, r_hall, c_value, sync_output);
 
 				hall_qei_sync(c_qei, c_hall1, sync_output);
@@ -515,7 +567,7 @@ int main(void)
 
 
 					c_commutation <: 2;
-					c_commutation <: 13500;
+					c_commutation <: 10500;
 
 				}
 
