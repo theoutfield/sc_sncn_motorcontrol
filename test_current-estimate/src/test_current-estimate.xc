@@ -41,24 +41,23 @@ unsigned root_function(unsigned uSquareValue);
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-#define PHASE_CORRECTION_REQUEST 30
-#define SYNC_PHASE_POSITION_REQUEST 20
+
+
 #define FILTER_CURRENT_REQUEST 10
 
-
 #define filter_length 30
-
-
 #define filter_length_cur_est 300
 
-void set_phase_position ( chanend sync_output, int  phase_position)
+{int, int}  get_filter_current(chanend c_filter_current)
 {
-	sync_output <: PHASE_CORRECTION_REQUEST;
-	sync_output <: phase_position;
+	int filterCurrentA, filterCurrentB;
 
-	return;
+	c_filter_current <: FILTER_CURRENT_REQUEST;
+	c_filter_current :> filterCurrentA;
+	c_filter_current :> filterCurrentB;
+
+	return {filterCurrentA, filterCurrentB};
 }
-
 void filter_loop(chanend sig, chanend adc, chanend c_hall_1,
 		chanend sync_output, chanend c_filter_current) {
 	int a1 = 0, a2 = 0;
@@ -70,7 +69,7 @@ void filter_loop(chanend sig, chanend adc, chanend c_hall_1,
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	timer ts;
-	int time, time1;
+	int time;
 	int prev = 0;
 	int fil_cnt = 0;
 	int ia_f = 0, ib_f = 0;
@@ -80,50 +79,18 @@ void filter_loop(chanend sig, chanend adc, chanend c_hall_1,
 	int flc = 3;
 	int mod;
 	int prev_v = 0, dirn = 1;
-	int am_new, ph1_new;
-
 	int mod_speed;
-
-	int max_count = QEI_COUNT_MAX_REAL / POLE_PAIRS;
-	int zero_cross_count_min;
-	int sync_position;
-	int zero_crossing = 0;
-	int sign_p = 1, sign_c = 1;
-	int z_count = 0, diffe = 0, u_cur = 0, previous = 0, first1 = 1;
-	int phase_offset = 0;
-	int phase_corrected_position = 0;
-
-	int cal_a1 = 0, cal_a2 = 0, cal_cnt = 0, cali_a1_cor = 0;
-
-
-
-	timer ts1;
-	unsigned int tim_est;
 	int filter_count = 0;
-	int currentEstimate = 0;
-
-	int currentEstimate_f = 0;
-	int filter_array[filter_length_cur_est];
-	int filter_index=0;
-	int filter_cur_est_length = 25;
-	int filter_var = filter_cur_est_length;
-	int i1=0, j1=0, mod1;
-
-	zero_cross_count_min = (max_count * 40) / 100;  // atleast 80 percent of 180 deg
-
-
-	for(i=0;i<filter_length_cur_est;i++)
-		filter_array[i] = 0;
 
 	while (1) {
 		unsigned cmd, found = 0;
 		select
 		{
-case			sig :> cmd:
-			do_adc_calibration_ad7949(adc); found =1;
-			break;
+			case sig :> cmd:
+				do_adc_calibration_ad7949(adc); found =1;
+				break;
 			default:
-			break;
+				break;
 		}
 		if(found == 1)
 		{
@@ -132,18 +99,18 @@ case			sig :> cmd:
 	}
 	sig <: 1;
 	ts :> time;
-    ts1 :> tim_est;
+
 
 	while(1)
 	{
-#pragma ordered
+		#pragma ordered
 		select
 		{
 
 
-			case ts when timerafter(time+5556) :> time:				// .05 ms
+			case ts when timerafter(time+5556) :> time:					  // .05 ms
 
-				{	a1 , a2 }= get_adc_vals_calibrated_int16_ad7949(adc); //get_adc_vals_raw_ad7949(adc);
+				{	a1 , a2 }= get_adc_vals_calibrated_int16_ad7949(adc);
 
 				value_0[fil_cnt] = a1;
 				value_1[fil_cnt] = a2;
@@ -163,85 +130,9 @@ case			sig :> cmd:
 				ia_f /= flc;
 				ib_f /= flc;
 
-				//post filter calib
-				/*  cal_a1 += ia_f;
-				 cal_cnt++;
-				 if(cal_cnt > 1000)
-				 {
-				 cali_a1_cor = cal_a1/cal_cnt;
-				 cal_cnt = 0;cal_a1 = 0;
-				 }
-				 ia_f = ia_f - cali_a1_cor; */
-			//	xscope_probe_data(0, a1);
-			//	xscope_probe_data(1, a2);
-			//	xscope_probe_data(2, ia_f);
 
-
-
-				//xscope_probe_data(5, sync_position);
-
-				//xscope_probe_data(3, z_count);
-				/*need zerocrossing
-				if(ia_f < 0)
-				{
-					sign_c = -1;
-				}
-				else if(ia_f >= 0)
-				{
-					sign_c = 1;
-				}
-
-
-				if(sign_c > sign_p)
-				{
-					zero_crossing = 1;
-				 	sync_position = get_sync_position ( sync_output );  //0
-					// add it as phase correction
-					set_phase_position ( sync_output, sync_position);
-
-				//	phase_offset = sync_position;
-					//z_count = 0;
-					//previous = sync_position;
-									//reset z_count after approval of crossing
-				}
-				else if(sign_c < sign_p)
-				{
-					//phase_offset = sync_position;
-						zero_crossing = -1;
-						//z_count = 0;
-						//previous = sync_position;
-										//reset z_count after approval of crossing
-				}
-				else
-				{
-					zero_crossing = 0;
-
-				}
-				sign_p = sign_c;
-				*/
-
-
-			//	xscope_probe_data(3, zero_crossing);
-				//sync_position = get_sync_position ( sync_output );
-			//	xscope_probe_data(4, sync_position);
-				//currentEstimate = (ia_f*newsine_table[sync_position])/16384;
 				xscope_probe_data(0, ia_f);
-				//xscope_probe_data(1, currentEstimate);
 				xscope_probe_data(1, ib_f);
-
-
-			/*	filter_var = filter_cur_est_length;
-				filter_array[filter_index] = currentEstimate;
-				filter_index = (filter_index+1)%filter_cur_est_length;
-*/
-			/*	if((phase_corrected_position>=50&&phase_corrected_position<=200)  )
-				{
-					am_new= (ia_f*16384)/newsine_table[phase_corrected_position];
-					prev_v =am_new;
-					flag =0;
-				}
-				xscope_probe_data(6, am_new);
-		*/
 
 				filter_count++;
 				if(filter_count == 10)
@@ -253,75 +144,29 @@ case			sig :> cmd:
 					if(iActualSpeed<0)
 					mod_speed = 0 - iActualSpeed;
 					if(mod_speed<370)
-					{	flc = 20;
-					//filter_var = 200;
-						//	fldc = 80;
+					{
+						flc = 20;
 					}
 					if(mod_speed < 100)
 					{
 						flc = 50;
-					//	filter_var = 300;
 					}
 					if(mod_speed>800)
 						flc = 3;
 				}
 				break;
 
-
-
-		/*	case ts1 when timerafter(tim_est+20556) :> tim_est:
-
-					currentEstimate_f = 0;
-					j1=0;
-					for(i1=0; i1<filter_var; i1++)
-					{
-						mod1 = (filter_index - 1 - j1)%filter_cur_est_length;
-						if(mod1<0)
-							mod1 = filter_cur_est_length + mod1;
-						currentEstimate_f += filter_array[mod1];
-
-						j1++;
-					}
-					currentEstimate_f /= filter_var;
-
-					xscope_probe_data(2, currentEstimate_f);
-
-
-				break;*/
 			case c_filter_current :> cmd:						// < 3-5 KHz ~ 0.2 ms
 				if(cmd == FILTER_CURRENT_REQUEST)
 				{
-					c_filter_current <: ia_f;  // send out only single phase
-					c_filter_current <: ib_f;  // send both phase
+					c_filter_current <: ia_f;  		// send out only single phase
+					c_filter_current <: ib_f;  		// send both phase
 				}
 				break;
-
-
-
 		}
 
 	}
 
-}
-{int, int}  get_filter_current(chanend c_filter_current)
-{
-	int filterCurrentA, filterCurrentB;
-
-	c_filter_current <: FILTER_CURRENT_REQUEST;
-	c_filter_current :> filterCurrentA;
-	c_filter_current :> filterCurrentB;
-
-	return {filterCurrentA, filterCurrentB};
-}
-
-int get_phase_position ( chanend c_phase_position )
-{
-	int phasePosition;
-
-	c_phase_position <: SYNC_PHASE_POSITION_REQUEST;
-	c_phase_position :> phasePosition;
-
-	return phasePosition;
 }
 
 
@@ -554,11 +399,9 @@ int main(void) {
 		}
 
 		on stdcore[2]:
-		{ //state for current
-
-
-			par {
-
+		{
+			par
+			{
 				filter_loop(signal_adc, c_adc, r_hall, phase_sync, c_filter_current);
 
 				hall_qei_sync(c_qei, c_hall1, sync_output);
@@ -567,22 +410,7 @@ int main(void) {
 			}
 		}
 
-		on stdcore[1]:
-		{
-		/*	{
-				while(1)
-				{
-					int filterCurrent;
-					int phasePosition;
-					filterCurrent = get_filter_current(c_filter_current);
-					phasePosition = get_phase_position(c_phase_position);
 
-
-
-
-				}
-			}*/
-		}
 
 		/************************************************************
 		 * IFM_CORE
@@ -615,7 +443,7 @@ int main(void) {
 					unsigned time = 0;
 					int speed;
 					timer t;
-t					:>time;
+					t :> time;
 					t when timerafter(time+7*SEC_FAST) :> time;
 
 					c_commutation <: 2;
@@ -630,99 +458,3 @@ t					:>time;
 
 	return 0;
 }
-
-/* needed zero crossing{
-
-					int cmd; // Command token
-
-					int hall_position; // Hall input
-					int qei_position; // Qei input
-					int sync_position = 0; // output
-
-					int qei_valid; // qei validity (0 or 1)
-
-					int hall_max_position = 4095;
-
-					timer t_qei;
-					unsigned int time_qei;
-					int init=1, diffi = 0;
-					int phase_correct = 0;
-					int previous_position = 0;
-
-					int max_count = QEI_COUNT_MAX_REAL / POLE_PAIRS;
-
-					while(1)
-					{
-						#pragma ordered
-						select
-						{
-							case t_qei when timerafter(time_qei + 300) :> time_qei:
-								{	qei_position, qei_valid}= get_qei_position( c_qei); //aquisition
-								//if(qei_valid){
-								qei_position = hall_max_position - qei_position;
-
-								if(init == 1)
-								{
-									previous_position = qei_position;
-									init=0;
-								}
-								if(previous_position!= qei_position )
-								{
-									diffi = qei_position - previous_position;
-									if( diffi > 3000)
-									{
-										sync_position = sync_position - 1;
-									}
-									else if(diffi < -3000)
-									{
-										sync_position = sync_position + 1;
-									}
-									else if( diffi < 10 && diffi >0)
-									{
-										sync_position = sync_position + diffi;
-									}
-									else if( diffi < 0 && diffi > -10)
-									{
-										sync_position = sync_position - diffi;
-										if(sync_position < 0)
-										{
-											sync_position = max_count + sync_position;
-										}
-									}
-									previous_position=qei_position;
-								}
-								if(sync_position >= max_count)
-								{
-									sync_position = 0;
-								}
-
-								//
-								//xscope_probe_data(4, sync_position);
-								//}
-								break;
-
-
-
-							case phase_sync :> cmd:
-								if(cmd == SYNC_PHASE_POSITION_REQUEST)  	//corrected position out
-								{
-									phase_sync <: sync_position;
-								}
-								else if ( cmd == PHASE_CORRECTION_REQUEST)	//correction in
-								{
-									phase_sync :> phase_correct;
-									sync_position = 0;   //only correction on one side
-
-								}
-								break;
-
-							case c_phase_position :> cmd:
-								if(cmd == SYNC_PHASE_POSITION_REQUEST)  	//corrected position out
-								{
-									c_phase_position <: sync_position;
-								}
-								break;
-
-						}
-					}
-				}*/
