@@ -1,3 +1,4 @@
+
 #include <xs1.h>
 #include <stdint.h>
 #include <print.h>
@@ -197,13 +198,7 @@ void comm_sine_new( chanend c_commutation, chanend c_sync, chanend c_pwm_ctrl, c
 	timer t; int ts, ts1;
 	unsigned t2,t1, time;
  int dummy;
-	/*while(1)
-	{
-		t:>ts;
-		t when timerafter(ts+15000 ) :> void;
-		xscope_probe_data(0, ts );
 
-	}*/
 	t:>time;
 	while (1)
 	{

@@ -13,7 +13,7 @@
 #include "dc_motor_config.h"
 #include <xscope.h>
 
-void run_hall( chanend c_hall, port in p_hall, chanend c_hall1, chanend r_hall)
+void run_hall( chanend c_hall, port in p_hall, chanend c_hall1, chanend r_hall, chanend r_hall1)
  {
   timer tx;
   unsigned ts;					// newest timestamp
@@ -217,6 +217,14 @@ void run_hall( chanend c_hall, port in p_hall, chanend c_hall1, chanend r_hall)
 			 else if  (cmd == 3) { r_hall <: count;  }
 			 else if  (cmd == 4) { r_hall <: iHallError;   }
 			break;
+
+			case r_hall1 :> cmd:
+				  if  (cmd == 1) { r_hall1 <: angle2; }
+			 else if  (cmd == 2) { r_hall1 <: iHallActualSpeed;  }
+			 else if  (cmd == 3) { r_hall1 <: count;  }
+			 else if  (cmd == 4) { r_hall1 <: iHallError;   }
+			break;
+
 			default:
 			  break;
  	    }// end of select
