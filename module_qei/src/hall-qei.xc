@@ -175,37 +175,37 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 			if( hall_position >= 681 && hall_position < 682+gaurd )
 			{
 
-			//	{sync_position, not_synced} = sync_it(s, 0, sync_position, hall_position, not_synced, max_count);
+				{sync_position, not_synced} = sync_it(s, 0, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 1364 && hall_position < 1365+gaurd )
 			{
 
-			//	{sync_position, not_synced} = sync_it(s, 1, sync_position, hall_position, not_synced, max_count);
+				{sync_position, not_synced} = sync_it(s, 1, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 2047 && hall_position < 2048+gaurd )
 			{
 
-			//	{sync_position, not_synced} = sync_it(s, 2, sync_position, hall_position, not_synced, max_count);
+				{sync_position, not_synced} = sync_it(s, 2, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 2729 && hall_position < 2730+gaurd )
 			{
 
-			//	{sync_position, not_synced} = sync_it(s, 3, sync_position, hall_position, not_synced, max_count);
+				{sync_position, not_synced} = sync_it(s, 3, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 3414 && hall_position < 3413+gaurd )
 			{
 
-			//	{sync_position, not_synced} = sync_it(s, 4, sync_position, hall_position, not_synced, max_count);
+				{sync_position, not_synced} = sync_it(s, 4, sync_position, hall_position, not_synced, max_count);
 
 			}
 			else if( hall_position >= 4093 || hall_position < gaurd )
 			{
 
-			//	{sync_position, not_synced} = sync_it(s, 5, sync_position, hall_position, not_synced, max_count);
+				{sync_position, not_synced} = sync_it(s, 5, sync_position, hall_position, not_synced, max_count);
 
 			}
 
