@@ -6,7 +6,7 @@ TARGET = C22-ComECAT-IfmBLDC-XScope
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = test_hall-current-estimate
+APP_NAME = test_current-estimate
 
 # The USED_MODULES variable lists other module used by the application.
 
