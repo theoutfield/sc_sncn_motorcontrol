@@ -449,8 +449,21 @@ case			sig :> cmd:
 
 }
 
+int get_torque(chanend c_torque)
+{
+	int torque;
+	c_torque <: 3;
+	c_torque :> torque;
+	return torque;
+}
 
-void set_torque(chanend c_torque) {
+void set_torque(chanend c_torque, int torque)
+{
+	c_torque <: 2;
+	c_torque <: torque;
+	return;
+}
+void set_torque_test(chanend c_torque) {
 	int torque;
 	in_data d;
 	while (1) {
@@ -459,8 +472,12 @@ void set_torque(chanend c_torque) {
 
 		c_torque <: 2;
 		c_torque <: d.set_torque;
+
 	}
 }
+
+
+
 int main(void) {
 	chan c_adc, adc_d, dirn;
 	chan c_adctrig;
@@ -500,7 +517,7 @@ int main(void) {
 
 		on stdcore[0]:
 		{
-			set_torque(c_torque);
+			set_torque_test(c_torque);
 		}
 
 		on stdcore[1]:
