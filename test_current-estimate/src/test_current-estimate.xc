@@ -21,7 +21,7 @@
 #include "hall_client.h"
 #include "pwm_service_inv.h"
 #include "adc_ad7949.h"
-#include "set_cmd.h"
+#include "test.h"
 #include "pwm_config.h"
 #include "comm_sine.h"
 #include "comm_loop.h"
@@ -167,7 +167,7 @@ case			sig :> cmd:
 #define filter_dc 160
 #define defParAngleUser 560
 
-void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
+void foc_torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 		chanend sync_output, chanend c_filter_current, chanend c_value) {
 	int a1 = 0, a2 = 0;
 	int iActualSpeed;
@@ -215,7 +215,7 @@ void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 	int prev_q = 0, prev_d = 0, e_dv = 0, e_qv = 0;
 	int Kp1 = 40, Kv1 = 0, Ki1 = 4;
 	int Kp2 = 40, Kv2 = 0, Ki2 = 4;
-
+	int t_actual = 0;
 	int wait = SEC_STD;
 
 	int taninv;
@@ -343,8 +343,8 @@ case			sig :> cmd:
 			id_fi /= fldc;
 			iq_fi /= fldc;
 
-			taninv = root_function(iq_fi*iq_fi+id_fi*id_fi);
-			xscope_probe_data(0, taninv);
+			t_actual = root_function(iq_fi*iq_fi+id_fi*id_fi);
+			xscope_probe_data(0, t_actual);
 			xscope_probe_data(1, iTorqueSet);
 
 			xscope_probe_data(2, id_fi);
@@ -543,9 +543,9 @@ int main(void) {
 			par
 			{
 				//filter_loop(signal_adc, c_adc, r_hall, dummy2, c_filter_current);
-				//torque_ctrl_loop(signal_adc, c_adc, r_hall1, sync_output, c_filter_current, c_value);
+				//foc_torque_ctrl_loop(signal_adc, c_adc, r_hall1, sync_output, c_filter_current, c_value);
 
-				modified_torque_ctrl_loop(signal_adc, c_adc, r_hall1,
+				torque_ctrl_loop(signal_adc, c_adc, r_hall1,
 						sync_output, c_filter_current, c_commutation, c_torque);
 
 				hall_qei_sync(c_qei, c_hall1, sync_output);

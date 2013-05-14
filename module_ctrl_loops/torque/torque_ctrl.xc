@@ -26,7 +26,7 @@
 unsigned root_function(unsigned uSquareValue);
 
 
-void modified_torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
+void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 		chanend sync_output, chanend c_filter_current, chanend c_commutation,
 		chanend c_torque) {
 	int a1 = 0, a2 = 0;
@@ -197,8 +197,8 @@ void modified_torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 				iq_fi /= fldc;
 
 				torque_actual = root_function(iq_fi*iq_fi+id_fi*id_fi);
-				//xscope_probe_data(0, torque_actual);
-				xscope_probe_data(0, torque_target);
+				xscope_probe_data(0, torque_actual);
+				xscope_probe_data(1, torque_target);
 
 				Speed = get_speed_cal(c_hall_1);
 
