@@ -26,7 +26,7 @@
 unsigned root_function(unsigned uSquareValue);
 
 
-void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
+void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 		chanend sync_output, chanend c_filter_current, chanend c_commutation,
 		chanend c_torque) {
 	int a1 = 0, a2 = 0;
@@ -37,8 +37,8 @@ void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 			value_1[filter_length] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	timer ts;
-	int time;
+	timer ts , ts1;
+	int time, time2;
 	int fil_cnt = 0;
 	int ia_f = 0, ib_f = 0;
 	int i = 0;
@@ -67,7 +67,7 @@ void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 	int iq_fi = 0, id_fi = 0, fdc = filter_dc, fil_cnt_dc = 0;
 	int fldc = filter_dc, Speed = 0;
 
-	int wait = SEC_STD;
+	int wait = 21000;
 
 	int torque_target = 0;
 	int torque_actual;
@@ -106,7 +106,7 @@ void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 	sig <: 1;
 	ts :> time;
 	tc :> time1;
-
+	ts1 :> time2;
 	while(1)
 	{
 	#pragma ordered
@@ -153,6 +153,7 @@ void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 					flc = 3;
 				}
 			break;
+
 
 			case tc when timerafter(time1+wait) :> time1:
 				wait = 21000;
@@ -202,75 +203,165 @@ void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 
 				Speed = get_speed_cal(c_hall_1);
 
+				if(Speed<0)
+					Speed = 0 -Speed;
 				if(Speed<370)
 				{
-					fldc = 160;
+					fldc = 27; //40
 				}
+
 				else if( Speed > 370 && Speed <1000)
 				{
-					fldc = 70;
+					fldc = 27; //30
 				}
 				else
 				{
-					fldc = 25;
+					fldc = 20;
 				}
 
 
-				Kp = 25; Kd = 5; Ki = 11;
 
-				torque_error = torque_target - torque_actual;
-				torque_error_integral = torque_error_integral + torque_error;
-				torque_error_derivative = torque_error - torque_error_previous;
+				/*
 
-				xscope_probe_data(2, torque_error);
-
-				if(torque_error_integral > TORQUE_INTEGRAL_MAX)
+				if(torque_actual > 450)
 				{
-					torque_error_integral = TORQUE_INTEGRAL_MAX;
-				}
-				else if(torque_error_integral < -TORQUE_INTEGRAL_MAX)
-				{
-					torque_error_integral = 0 - TORQUE_INTEGRAL_MAX;
-				}
+					Kp = 25; Kd = 0; Ki = 11;
 
-				if(torque_error_integral == 0) torque_error_integral = 1;
+					torque_error = 400 - torque_actual;
+					torque_error_integral = torque_error_integral + torque_error;
+					torque_error_derivative = torque_error - torque_error_previous;
 
-				proportional_member = (Kp * torque_error)/10;
-				integral_member = (Ki * torque_error_integral)/110;
-				derivative_member = (Kd * torque_error_derivative)/10;
+					xscope_probe_data(2, torque_error);
 
-				torque_control_output = proportional_member + integral_member + derivative_member;
-
-				xscope_probe_data(3, integral_member);
-				xscope_probe_data(4, torque_control_output);
-
-				torque_error_previous = torque_error;
-
-				/* Check if torque is within the limits */
-				if(torque_target >=0)
-				{
-					if(torque_control_output >= TORQUE_OUTPUT_MAX) {
-						torque_control_output = TORQUE_OUTPUT_MAX;
+					if(torque_error_integral > TORQUE_INTEGRAL_MAX)
+					{
+						torque_error_integral = TORQUE_INTEGRAL_MAX;
 					}
-					else if(torque_control_output < 0){
-						torque_control_output = 0;
+					else if(torque_error_integral < 0)
+					{
+						torque_error_integral = 0 ;
 					}
+
+					if(torque_error_integral == 0) torque_error_integral = 1;
+
+					proportional_member = (Kp * torque_error)/10;
+					integral_member = (Ki * torque_error_integral)/110;
+					derivative_member = (Kd * torque_error_derivative)/10;
+
+					torque_control_output = proportional_member + integral_member + derivative_member;
+
+					xscope_probe_data(3, integral_member);
+					xscope_probe_data(4, torque_control_output);
+
+					torque_error_previous = torque_error;
+
+					/* Check if torque is within the limits *
+					if(torque_target >=0)
+					{
+						if(torque_control_output >= TORQUE_OUTPUT_MAX) {
+							torque_control_output = TORQUE_OUTPUT_MAX;
+						}
+						else if(torque_control_output < 0){
+							torque_control_output = 0;
+						}
+					}
+					else
+					{
+						if(torque_control_output <= -TORQUE_OUTPUT_MAX) {
+							torque_control_output = 0 - TORQUE_OUTPUT_MAX;
+						}
+						else if(torque_control_output > 0){
+							torque_control_output = 0;
+						}
+					}
+
+
+
+					/* Feed commutation *
+					c_commutation <: 2;
+					c_commutation <: torque_control_output;
+					torque_target = torque_control_output;
 				}
 				else
 				{
-					if(torque_control_output <= -TORQUE_OUTPUT_MAX) {
-						torque_control_output = 0 - TORQUE_OUTPUT_MAX;
-					}
-					else if(torque_control_output > 0){
-						torque_control_output = 0;
-					}
+					c_commutation <: 2;
+					c_commutation <: torque_target;
+					torque_error_integral = (torque_target*110)/Ki;
 				}
+				*/
+				break;
 
-				/* Feed commutation */
-				c_commutation <: 2;
-				c_commutation <: torque_control_output;
+			case ts1 when timerafter(time2+7700) :> time2:
+
+				if(torque_actual > 450)
+				{
+					Kp = 15; Kd = 1; Ki = 11;
+
+					torque_error = 400 - torque_actual;
+					torque_error_integral = torque_error_integral + torque_error;
+					torque_error_derivative = torque_error - torque_error_previous;
+
+
+					//xscope_probe_data(2, torque_error);
+
+					if(torque_error_integral > TORQUE_INTEGRAL_MAX)
+					{
+						torque_error_integral = TORQUE_INTEGRAL_MAX;
+					}
+					else if(torque_error_integral < 0)
+					{
+						torque_error_integral = 0 ;
+					}
+
+					if(torque_error_integral == 0) torque_error_integral = 1;
+
+					proportional_member = (Kp * torque_error)/10;
+					integral_member = (Ki * torque_error_integral)/110;
+					derivative_member = (Kd * torque_error_derivative)/10;
+
+					torque_control_output = proportional_member + integral_member + derivative_member;
+
+					//xscope_probe_data(3, integral_member);
+					//xscope_probe_data(4, torque_control_output);
+
+					torque_error_previous = torque_error;
+
+
+					if(torque_target >=0)
+					{
+						if(torque_control_output >= TORQUE_OUTPUT_MAX) {
+							torque_control_output = TORQUE_OUTPUT_MAX;
+						}
+						else if(torque_control_output < 0){
+							torque_control_output = 0;
+						}
+					}
+					else
+					{
+						if(torque_control_output <= -TORQUE_OUTPUT_MAX) {
+							torque_control_output = 0 - TORQUE_OUTPUT_MAX;
+						}
+						else if(torque_control_output > 0){
+							torque_control_output = 0;
+						}
+					}
+
+
+
+
+					c_commutation <: 2;
+					c_commutation <: torque_control_output;
+					torque_target = torque_control_output;
+				}
+				else
+				{
+					c_commutation <: 2;
+					c_commutation <: torque_target;
+					torque_error_integral = (torque_target*110)/Ki;
+				}
 
 				break;
+
 
 		}
 
@@ -280,8 +371,8 @@ void torque_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 				if(cmd == 2)
 				{
 					c_torque :> torque_target;
-					if(torque_target > 1000)
-						torque_target = 1000;
+					//if(torque_target > 1000)  //range 13700
+					//	torque_target = 1000;
 
 				}
 				if(cmd == 3)
