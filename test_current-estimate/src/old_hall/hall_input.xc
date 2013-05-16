@@ -13,7 +13,7 @@
 #include "dc_motor_config.h"
 #include <xscope.h>
 
-void run_hall( chanend c_hall, port in p_hall, chanend c_hall1, chanend r_hall, chanend r_hall1)
+void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4)
  {
   timer tx;
   unsigned ts;					// newest timestamp
@@ -196,33 +196,33 @@ void run_hall( chanend c_hall, port in p_hall, chanend c_hall1, chanend r_hall, 
 	//xscope_probe_data(1,iHallActualSpeed);
 	#pragma ordered
  	    select {
-			case c_hall1 :> cmd:
+			case c_hall_p1 :> cmd:
 
-				  if  (cmd == 1) { c_hall1 <: angle2; }
-			 else if  (cmd == 2) { c_hall1 <: speed_calc;  }
-			 else if  (cmd == 3) { c_hall1 <: count;  }
-			 else if  (cmd == 4) { c_hall1 <: iHallError;   }
+				  if  (cmd == 1) { c_hall_p1 <: angle2; }
+			 else if  (cmd == 2) { c_hall_p1 <: speed_calc;  }
+			 else if  (cmd == 3) { c_hall_p1 <: count;  }
+			 else if  (cmd == 4) { c_hall_p1 <: iHallError;   }
 			break;
-			case c_hall :> cmd:
+			case c_hall_p2 :> cmd:
 
-				  if  (cmd == 1) { c_hall <: angle2; }
-			 else if  (cmd == 2) { c_hall <: speed_calc;  }
-			 else if  (cmd == 3) { c_hall <: count;  }
-			 else if  (cmd == 4) { c_hall <: iHallError;   }
-			break;
-
-			case r_hall :> cmd:
-				  if  (cmd == 1) { r_hall <: angle2; }
-			 else if  (cmd == 2) { r_hall <: iHallActualSpeed;  }
-			 else if  (cmd == 3) { r_hall <: count;  }
-			 else if  (cmd == 4) { r_hall <: iHallError;   }
+				  if  (cmd == 1) { c_hall_p2 <: angle2; }
+			 else if  (cmd == 2) { c_hall_p2 <: speed_calc;  }
+			 else if  (cmd == 3) { c_hall_p2 <: count;  }
+			 else if  (cmd == 4) { c_hall_p2 <: iHallError;   }
 			break;
 
-			case r_hall1 :> cmd:
-				  if  (cmd == 1) { r_hall1 <: angle2; }
-			 else if  (cmd == 2) { r_hall1 <: iHallActualSpeed;  }
-			 else if  (cmd == 3) { r_hall1 <: count;  }
-			 else if  (cmd == 4) { r_hall1 <: iHallError;   }
+			case c_hall_p3 :> cmd:
+				  if  (cmd == 1) { c_hall_p3 <: angle2; }
+			 else if  (cmd == 2) { c_hall_p3 <: iHallActualSpeed;  }
+			 else if  (cmd == 3) { c_hall_p3 <: count;  }
+			 else if  (cmd == 4) { c_hall_p3 <: iHallError;   }
+			break;
+
+			case c_hall_p4 :> cmd:
+				  if  (cmd == 1) { c_hall_p4 <: angle2; }
+			 else if  (cmd == 2) { c_hall_p4 <: iHallActualSpeed;  }
+			 else if  (cmd == 3) { c_hall_p4 <: count;  }
+			 else if  (cmd == 4) { c_hall_p4 <: iHallError;   }
 			break;
 
 			default:

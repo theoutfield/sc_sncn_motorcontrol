@@ -37,9 +37,11 @@
 #define POLE_PAIRS  8
 #define GEAR_RATIO  156
 #define MAX_NOMINAL_SPEED  4000		// in 1/min
-#define MAX_NOMINAL_CURRENT  5		// in A
+#define MAX_NOMINAL_CURRENT  2		// in A
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
 #define QEI_COUNT_MAX (1024 * 4)	// Max count of Quadrature Encoder as multiple of 2
+
+
 
 /*
  * define control parameters for PI TORQUE controller
@@ -105,6 +107,7 @@ typedef struct S_Hall {
 	int gear_ratio;
 } hall_par;
 
+
 /**
  * \brief initialize QEI sensor
  *
@@ -128,5 +131,6 @@ void init_hall(hall_par &h_pole);
  *
  */
 void init_params_struct_all(torq_par &torque, field_par &field, loop_par &loop);
+
 
 #endif

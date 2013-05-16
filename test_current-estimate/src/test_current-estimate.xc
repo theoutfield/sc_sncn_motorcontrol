@@ -35,6 +35,7 @@
 #include "pos_ctrl.h"
 #include "print.h"
 #include "torque_ctrl.h"
+#include "dc_motor.h"
 #define COM_CORE 0
 #define IFM_CORE 3
 unsigned root_function(unsigned uSquareValue);
@@ -45,7 +46,6 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 #define FILTER_CURRENT_REQUEST 10
 #define filter_length 30
-#define filter_length_cur_est 300
 
 {	int, int} get_filter_current(chanend c_filter_current) {
 	int filterCurrentA, filterCurrentB;
@@ -463,6 +463,8 @@ void set_torque(chanend c_torque, int torque)
 	c_torque <: torque;
 	return;
 }
+
+
 void set_torque_test(chanend c_torque) {
 	int torque;
 	in_data d;
@@ -476,20 +478,101 @@ void set_torque_test(chanend c_torque) {
 	}
 }
 
+void torque_control(chanend c_hall_p4)
+{
+	/*variable declaration*/
+	int J;
+	int B;
+	int coef_prec = 16; //2^16
+	int var_prec = 5;   //2^5
+
+	coeff c;
+
+	int speed = 0, acc = 0, prev_speed = 0;
+	timer ts;
+	unsigned int time;
+	int joint_torque_actual;
+	int	joint_torque_set = 8000;
+	int error_joint_torque;
+	int error_joint_torque_I = 0;
+	int error_joint_torque_D = 0;
+	int error_joint_torque_previous = 0;
+	int joint_torque_control_out = 0;
+
+	int Kp, Ki, Kd;
+	int TORQUE_INTEGRAL_MAX;
+	int TORQUE_OUTPUT_MAX = 13700; //PWM max
+
+	TORQUE_INTEGRAL_MAX = TORQUE_OUTPUT_MAX/Ki;
+	/*compute motor constants from c function call*/
+
+	c.prec = coef_prec;
+	coeffient_prec(c);
+	J = c.J;
+	B = c.B;
+	printintln(B);	printintln(J);
+
+	ts :> time;
+	//while(1)
+	{
+		//ts when timerafter(time+33333) :> time; //3khz
+		/* computed current torque */
+		speed = (5000*201)/60;  //rpm to rad with prec  //get_speed_cal(c_hall_p4)
+		acc = (speed - prev_speed)*333; 			// already in rad/s2 with prec
+
+		joint_torque_actual = (J*acc + B*speed)>>var_prec;  // in coef_prec only
+
+		prev_speed = acc;
+		printintln(speed);	printintln(acc);
+		printintln(joint_torque_actual);
+
+		/* control torque set point*/
+		joint_torque_set = (joint_torque_set << coef_prec)/1000; // in coef_prec only
+		printintln(joint_torque_set);
+
+
+		/* torque controller*/
+		error_joint_torque = joint_torque_set - joint_torque_actual;
+		error_joint_torque_I = error_joint_torque_I + error_joint_torque;
+		error_joint_torque_D = error_joint_torque - error_joint_torque_previous;
+
+		if(error_joint_torque_I > TORQUE_INTEGRAL_MAX)
+		{
+			error_joint_torque_I = TORQUE_INTEGRAL_MAX;
+		}
+		else if(error_joint_torque_I < 0)
+		{
+			error_joint_torque_I = 0 ;
+		}
+
+		joint_torque_control_out = Kp * error_joint_torque + Ki * error_joint_torque_I + Kd * error_joint_torque_D;
+
+		if(joint_torque_control_out >= TORQUE_OUTPUT_MAX) {
+			joint_torque_control_out = TORQUE_OUTPUT_MAX;
+		}
+		else if(joint_torque_control_out < 0){
+			joint_torque_control_out = 0;
+		}
+
+		error_joint_torque_previous = error_joint_torque;
+	}
+
+}
+
 
 
 int main(void) {
 	chan c_adc, adc_d, dirn;
 	chan c_adctrig;
 	chan c_qei;
-	chan c_hall, c_hall1;
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
 	chan c_pwm_ctrl;
 	chan c_commutation;
 	chan speed_read;
 	chan enco, dummy, dummy1, dummy2;
 	chan pos_ctrl;
 	chan pos_data;
-	chan speed_out, stop, str, info, r_hall, r_hall1;
+	chan speed_out, stop, str, info;
 	chan enco_1, sync_output;
 	chan signal_adc, c_value, input;
 
@@ -517,7 +600,8 @@ int main(void) {
 
 		on stdcore[0]:
 		{
-			set_torque_test(c_torque);
+			//set_torque_test(c_torque);
+
 		}
 
 		on stdcore[1]:
@@ -545,10 +629,14 @@ int main(void) {
 				//filter_loop(signal_adc, c_adc, r_hall, dummy2, c_filter_current);
 				//foc_torque_ctrl_loop(signal_adc, c_adc, r_hall1, sync_output, c_filter_current, c_value);
 
-				torque_ctrl_loop(signal_adc, c_adc, r_hall1,
+			/*	current_ctrl_loop(signal_adc, c_adc, c_hall_p3,
 						sync_output, c_filter_current, c_commutation, c_torque);
 
-				hall_qei_sync(c_qei, c_hall1, sync_output);
+				hall_qei_sync(c_qei, c_hall_p2, sync_output);
+*/
+
+				torque_control(c_hall_p4);
+
 
 				//torque_ctrl( c_value, c_filter_current, sync_output, r_hall1);
 			}
@@ -568,13 +656,13 @@ int main(void) {
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
-				commutation_test(c_commutation, c_hall, c_pwm_ctrl, signal_adc); // hall based
+				commutation_test(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc); // hall based
 
 				//commutation_test(c_commutation, sync_output, c_pwm_ctrl, r_hall);  //new sync input based
 
 				//commutation(c_value, c_pwm_ctrl, signal_adc);	 //
 
-				run_hall(c_hall, p_ifm_hall, c_hall1, r_hall, r_hall1);
+				run_hall(c_hall_p1, p_ifm_hall, c_hall_p2, c_hall_p3, c_hall_p4);  // channel priority 1,2..4
 
 				do_qei(c_qei, p_ifm_encoder);
 
