@@ -70,9 +70,9 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 
 	int cmd; // Command token
 
-	int hall_position; // Hall input
-	int qei_position; // Qei input
-	int sync_position; // output
+	int hall_position=0; // Hall input
+	int qei_position=0; // Qei input
+	int sync_position=0; // output
 
 	int qei_valid; // qei validity (0 or 1)
 
@@ -163,7 +163,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 				sync_position=0;
 			}
 
-		//	xscope_probe_data(0, sync_position);
+			//xscope_probe_data(0, sync_position);
 			break;
 
 			case t_hall when timerafter(time_hall + 1000) :> time_hall: //4khz  20000 14000
