@@ -78,16 +78,18 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 	int torque_control_output = 0;
 	const int TORQUE_INTEGRAL_MAX = 137000;
 
+	int flag1= 0;
 	/* PID Controller variables */
 	int Kp;							// Proportional gain
 	int Ki;							// Integral gain
 	int Kd;							// Derivative gain
+
 	int proportional_member = 0;
 	int integral_member = 0;
 	int derivative_member = 0;
 
 	int TORQUE_OUTPUT_MAX = 13700;
-
+	Kp = 15; Kd = 1; Ki = 11;
 	while (1) {
 		unsigned found = 0;
 		select
@@ -137,7 +139,7 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 				{
 					filter_count = 0;
 					iActualSpeed = get_speed_cal(c_hall_1);
-
+				//	xscope_probe_data(0, iActualSpeed);
 					mod_speed = iActualSpeed;
 					if(iActualSpeed<0)
 					mod_speed = 0 - iActualSpeed;
@@ -201,7 +203,7 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 				xscope_probe_data(0, torque_actual);
 				xscope_probe_data(1, torque_target);
 
-				Speed = get_speed_cal(c_hall_1);
+				Speed = iActualSpeed;
 
 				if(Speed<0)
 					Speed = 0 -Speed;
@@ -219,85 +221,15 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 					fldc = 20;
 				}
 
-
-
-				/*
-
-				if(torque_actual > 450)
-				{
-					Kp = 25; Kd = 0; Ki = 11;
-
-					torque_error = 400 - torque_actual;
-					torque_error_integral = torque_error_integral + torque_error;
-					torque_error_derivative = torque_error - torque_error_previous;
-
-					xscope_probe_data(2, torque_error);
-
-					if(torque_error_integral > TORQUE_INTEGRAL_MAX)
-					{
-						torque_error_integral = TORQUE_INTEGRAL_MAX;
-					}
-					else if(torque_error_integral < 0)
-					{
-						torque_error_integral = 0 ;
-					}
-
-					if(torque_error_integral == 0) torque_error_integral = 1;
-
-					proportional_member = (Kp * torque_error)/10;
-					integral_member = (Ki * torque_error_integral)/110;
-					derivative_member = (Kd * torque_error_derivative)/10;
-
-					torque_control_output = proportional_member + integral_member + derivative_member;
-
-					xscope_probe_data(3, integral_member);
-					xscope_probe_data(4, torque_control_output);
-
-					torque_error_previous = torque_error;
-
-					/* Check if torque is within the limits *
-					if(torque_target >=0)
-					{
-						if(torque_control_output >= TORQUE_OUTPUT_MAX) {
-							torque_control_output = TORQUE_OUTPUT_MAX;
-						}
-						else if(torque_control_output < 0){
-							torque_control_output = 0;
-						}
-					}
-					else
-					{
-						if(torque_control_output <= -TORQUE_OUTPUT_MAX) {
-							torque_control_output = 0 - TORQUE_OUTPUT_MAX;
-						}
-						else if(torque_control_output > 0){
-							torque_control_output = 0;
-						}
-					}
-
-
-
-					/* Feed commutation *
-					c_commutation <: 2;
-					c_commutation <: torque_control_output;
-					torque_target = torque_control_output;
-				}
-				else
-				{
-					c_commutation <: 2;
-					c_commutation <: torque_target;
-					torque_error_integral = (torque_target*110)/Ki;
-				}
-				*/
 				break;
 
 			case ts1 when timerafter(time2+7700) :> time2:
 
-				if(torque_actual > 450)
+				if(torque_actual > 400)
 				{
 					Kp = 15; Kd = 1; Ki = 11;
 
-					torque_error = 400 - torque_actual;
+					torque_error = 350 - torque_actual;
 					torque_error_integral = torque_error_integral + torque_error;
 					torque_error_derivative = torque_error - torque_error_previous;
 
@@ -347,17 +279,21 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 					}
 
 
-
-
+					flag1=1;
 					c_commutation <: 2;
 					c_commutation <: torque_control_output;
 					torque_target = torque_control_output;
 				}
 				else
 				{
+					//if(flag1==0)
+					{
+
+
 					c_commutation <: 2;
 					c_commutation <: torque_target;
 					torque_error_integral = (torque_target*110)/Ki;
+					}
 				}
 
 				break;

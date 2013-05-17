@@ -477,22 +477,23 @@ void set_torque_test(chanend c_torque) {
 
 	}
 }
+//printintln(speed);	printintln(acc); printintln(joint_torque_actual); printintln(B);	printintln(J); printintln(joint_torque_set);
 
-void torque_control(chanend c_hall_p4)
+void torque_control(chanend c_hall_p4,chanend c_torque)
 {
 	/*variable declaration*/
 	int J;
 	int B;
-	int coef_prec = 16; //2^16
+	int coef_prec = 15; //2^16
 	int var_prec = 5;   //2^5
 
 	coeff c;
-
+	pd_data p;
 	int speed = 0, acc = 0, prev_speed = 0;
 	timer ts;
-	unsigned int time;
+	unsigned int time, time1;
 	int joint_torque_actual;
-	int	joint_torque_set = 8000;
+	int	joint_torque_set = 13;
 	int error_joint_torque;
 	int error_joint_torque_I = 0;
 	int error_joint_torque_D = 0;
@@ -503,49 +504,45 @@ void torque_control(chanend c_hall_p4)
 	int TORQUE_INTEGRAL_MAX;
 	int TORQUE_OUTPUT_MAX = 13700; //PWM max
 
-	TORQUE_INTEGRAL_MAX = TORQUE_OUTPUT_MAX/Ki;
+//	TORQUE_INTEGRAL_MAX = TORQUE_OUTPUT_MAX/Ki;
 	/*compute motor constants from c function call*/
 
-	c.prec = coef_prec;
-	coeffient_prec(c);
-	J = c.J;
-	B = c.B;
-	printintln(B);	printintln(J);
+	c.coef_prec = coef_prec;
+	c.var_prec = var_prec;
+
+	init_constants(c);
+
+
+	/*ts :> time;
+	p.speed = 5000;
+	p.prev_speed = 5200;
+	p.joint_torque_set = 13700;
+	p.previous_error = 5200;
+	pd_control(p);
+	ts:> time1;
+	printintln(time1-time); //33khz comput time*/
 
 	ts :> time;
-	//while(1)
+	while(1)
 	{
-		//ts when timerafter(time+33333) :> time; //3khz
+		ts when timerafter(time+33333) :> time; //3khz
+
 		/* computed current torque */
-		speed = (5000*201)/60;  //rpm to rad with prec  //get_speed_cal(c_hall_p4)
-		acc = (speed - prev_speed)*333; 			// already in rad/s2 with prec
+		speed = get_speed_cal(c_hall_p4);
+		//xscope_probe_data(0,speed);
 
-		joint_torque_actual = (J*acc + B*speed)>>var_prec;  // in coef_prec only
+		p.speed = speed;
+		p.prev_speed = prev_speed;
 
-		prev_speed = acc;
-		printintln(speed);	printintln(acc);
-		printintln(joint_torque_actual);
+		// control torque set point
+		joint_torque_set = 1300; 		// in coef_prec only
+		p.joint_torque_set = joint_torque_set;
+		p.previous_error = error_joint_torque_previous;
 
-		/* control torque set point*/
-		joint_torque_set = (joint_torque_set << coef_prec)/1000; // in coef_prec only
-		printintln(joint_torque_set);
+		// torque controller call c function
+		pd_control(p);
 
-
-		/* torque controller*/
-		error_joint_torque = joint_torque_set - joint_torque_actual;
-		error_joint_torque_I = error_joint_torque_I + error_joint_torque;
-		error_joint_torque_D = error_joint_torque - error_joint_torque_previous;
-
-		if(error_joint_torque_I > TORQUE_INTEGRAL_MAX)
-		{
-			error_joint_torque_I = TORQUE_INTEGRAL_MAX;
-		}
-		else if(error_joint_torque_I < 0)
-		{
-			error_joint_torque_I = 0 ;
-		}
-
-		joint_torque_control_out = Kp * error_joint_torque + Ki * error_joint_torque_I + Kd * error_joint_torque_D;
+		joint_torque_control_out = p.joint_torque_control_out;
 
 		if(joint_torque_control_out >= TORQUE_OUTPUT_MAX) {
 			joint_torque_control_out = TORQUE_OUTPUT_MAX;
@@ -554,7 +551,13 @@ void torque_control(chanend c_hall_p4)
 			joint_torque_control_out = 0;
 		}
 
-		error_joint_torque_previous = error_joint_torque;
+		//set_torque(c_torque, joint_torque_control_out);
+
+		set_torque(c_torque, 10000);
+		xscope_probe_data(0,p.joint_torque_actual);
+
+		error_joint_torque_previous = p.error;
+		prev_speed = speed;
 	}
 
 }
@@ -628,14 +631,14 @@ int main(void) {
 			{
 				//filter_loop(signal_adc, c_adc, r_hall, dummy2, c_filter_current);
 				//foc_torque_ctrl_loop(signal_adc, c_adc, r_hall1, sync_output, c_filter_current, c_value);
-
-			/*	current_ctrl_loop(signal_adc, c_adc, c_hall_p3,
-						sync_output, c_filter_current, c_commutation, c_torque);
+                /*in order of priority*/
 
 				hall_qei_sync(c_qei, c_hall_p2, sync_output);
-*/
 
-				torque_control(c_hall_p4);
+				current_ctrl_loop(signal_adc, c_adc, c_hall_p3,
+						sync_output, c_filter_current, c_commutation, c_torque);
+
+				torque_control(c_hall_p4, c_torque);
 
 
 				//torque_ctrl( c_value, c_filter_current, sync_output, r_hall1);
@@ -664,6 +667,9 @@ int main(void) {
 
 				run_hall(c_hall_p1, p_ifm_hall, c_hall_p2, c_hall_p3, c_hall_p4);  // channel priority 1,2..4
 
+				//torque_control(c_hall_p4);
+
+
 				do_qei(c_qei, p_ifm_encoder);
 
 			}
@@ -674,4 +680,6 @@ int main(void) {
 	return 0;
 }
 
-
+/*
+ *
+ */
