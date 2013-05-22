@@ -36,6 +36,7 @@
 #include "print.h"
 #include "torque_ctrl.h"
 #include "dc_motor.h"
+#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 unsigned root_function(unsigned uSquareValue);
@@ -44,7 +45,367 @@ unsigned root_function(unsigned uSquareValue);
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-#define FILTER_CURRENT_REQUEST 10
+/* fixed length digital filter (moving average filter)*/
+void init_filter(int filter_buffer[], int index[], int filter_length)
+{
+	int i;
+	for(i=0; i<filter_length; i++)
+	{
+		filter_buffer[i] = 0;
+	}
+	index[0] = 0;
+}
+int filter(int filter_buffer[], int index[], int filter_length, int input)
+{
+	int i, j = 0, mod, filter_output =0;
+	filter_buffer[index[0]] = input;
+	index[0] = (index[0]+1)%(filter_length);
+
+	for(i=0; i<filter_length; i++)
+	{
+		mod = (index[0] - 1 - j)%filter_length;
+		if(mod<0)
+			mod = filter_length + mod;
+		filter_output += filter_buffer[mod];
+		j++;
+	}
+	filter_output = filter_output/ filter_length;
+	return filter_output;
+}
+
+int get_torque(chanend c_torque)
+{
+	int torque;
+	c_torque <: 3;
+	c_torque :> torque;
+	return torque;
+}
+void set_commutation(chanend c_commutation, int input)
+{
+	c_commutation <: 2;
+	c_commutation <: input;
+	return;
+}
+void set_torque(chanend c_torque, int torque)
+{
+	c_torque <: 2;
+	c_torque <: torque;
+	return;
+}
+
+
+void set_torque_test(chanend c_torque) {
+	int torque;
+	in_data d;
+	while (1) {
+		input_cmd(d);
+		printintln(d.set_torque);
+
+		c_torque <: 2;
+		c_torque <: d.set_torque;
+
+	}
+}
+//printintln(speed);	printintln(acc); printintln(joint_torque_actual); printintln(B);	printintln(J); printintln(joint_torque_set);
+
+void torque_control(chanend c_torque, chanend c_hall_p4)
+{
+	/*variable declaration*/
+	int J;
+	int B;
+	int coef_prec = 15; //2^16
+	int var_prec = 5;   //2^5
+
+	coeff c;
+	pd_data p;
+	int speed = 0, acc = 0, prev_speed = 0;
+	timer ts;
+	unsigned int time, time1;
+	int joint_torque_actual;
+	int	joint_torque_set = 13;
+	int error_joint_torque;
+	int error_joint_torque_I = 0;
+	int error_joint_torque_D = 0;
+	int error_joint_torque_previous = 0;
+	int joint_torque_control_out = 0;
+
+	int Kp, Ki, Kd;
+	int TORQUE_INTEGRAL_MAX;
+	int TORQUE_OUTPUT_MAX = 13700; //PWM max
+int sp1;
+
+
+	#define filter_length1 1
+	int filter_buffer[filter_length1];
+	int index[] = {0}, filter_output;
+
+	init_filter(filter_buffer, index, filter_length1);
+
+
+
+//	TORQUE_INTEGRAL_MAX = TORQUE_OUTPUT_MAX/Ki;
+	/*compute motor constants from c function call*/
+
+	c.coef_prec = coef_prec;
+	c.var_prec = var_prec;
+
+	init_constants(c);
+
+
+	/*ts :> time;
+	p.speed = 5000;
+	p.prev_speed = 5200;
+	p.joint_torque_set = 13700;
+	p.previous_error = 5200;
+	pd_control(p);
+	ts:> time1;
+	printintln(time1-time); //33khz comput time*/
+
+	ts :> time;
+	 //set_torque(c_torque, 10000);
+	while(1)
+	{set_torque(c_torque, 10000);
+		ts when timerafter(time+33333) :> time; //3khz
+
+		/* computed current torque */
+		//c_torque<:4;
+		//c_torque:>speed;
+		speed = get_speed_cal(c_hall_p4);
+
+#ifdef ENABLE_xscope_main
+		//xscope_probe_data(0,speed);
+		xscope_probe_data(0, acc/1024);
+		xscope_probe_data(1, speed);
+		//xscope_probe_data(2,joint_torque_actual);
+#endif
+
+		acc = ((((speed - prev_speed)*3000)/60)*201)/32;
+		//filter_output = filter(filter_buffer, index, filter_length1, acc);
+		sp1= (speed*201)/(60*32);
+		joint_torque_actual = acc+speed;
+	/*	p.speed = speed;
+		p.prev_speed = prev_speed;
+
+		// control torque set point
+		joint_torque_set = 1300; 		// in coef_prec only
+		p.joint_torque_set = joint_torque_set;
+		p.previous_error = error_joint_torque_previous;
+
+		// torque controller call c function
+		pd_control(p);
+
+		joint_torque_control_out = p.joint_torque_control_out;
+
+		if(joint_torque_control_out >= TORQUE_OUTPUT_MAX) {
+			joint_torque_control_out = TORQUE_OUTPUT_MAX;
+		}
+		else if(joint_torque_control_out < 0){
+			joint_torque_control_out = 0;
+		}
+		set_torque(c_torque, 10000);
+		//set_torque(c_torque, joint_torque_control_out);
+*/
+#ifdef ENABLE_xscope_main
+		//xscope_probe_data(0,p.joint_torque_actual);
+#endif
+	//	error_joint_torque_previous = p.error;
+		prev_speed = speed;
+	}
+
+}
+
+
+
+
+
+
+void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
+{
+	int actual_speed = 0;
+	timer ts;
+	unsigned int time;
+	int error_speed = 0;
+	int error_speed_D = 0;
+	int error_speed_I = 0;
+	int previous_error = 0;
+	int speed_control_out = 0;
+	int Kp = 25, Kd = 0, Ki = 15;
+ int max_integral = (13739*100)/Ki;
+	int target_speed = 500;
+
+ /* while(1)
+  {
+	  unsigned cmd, found =0;
+	  select
+	  {
+		case signal2 :> cmd:
+			found = 1;
+			break;
+		default:
+			break;
+	  }
+	  if(found == 1)
+		  break;
+  }*/
+	//int cal_speed, pos , prev =0;
+	ts:> time;
+	ts when timerafter(time+3*SEC_FAST) :> time;
+	//set_commutation(c_torque, 1500);
+	while(1)
+	{
+		ts when timerafter(time+100000) :> time; //1khz
+
+	/*	pos = get_hall_angle(c_hall_p4);
+		cal_speed = (pos - prev)*1000;
+		xscope_probe_data(0, cal_speed);
+		prev = pos;*/
+		actual_speed = get_speed_cal(c_hall_p4);
+
+		error_speed = (target_speed - actual_speed)*1000;
+
+		error_speed_I = error_speed_I + error_speed;
+		error_speed_D = error_speed - previous_error;
+
+		if(error_speed_I>max_integral*1000)
+			error_speed_I = max_integral*1000;
+
+		speed_control_out = (Kp*error_speed)/10000 + (Ki*error_speed_I)/100000 + (Kd*error_speed_D)/1000;
+
+		if(speed_control_out > 13739)
+			speed_control_out = 13739;
+
+		//set_torque(c_torque, speed_control_out);
+		set_commutation(c_torque, speed_control_out);
+
+		#ifdef ENABLE_xscope_main
+		xscope_probe_data(0, actual_speed);
+		xscope_probe_data(1, target_speed);
+		#endif
+
+		previous_error = error_speed;
+
+	}
+
+}
+
+int main(void) {
+	chan c_adc, adc_d, dirn;
+	chan c_adctrig;
+	chan c_qei;
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
+	chan c_pwm_ctrl;
+	chan c_commutation;
+	chan speed_read;
+	chan enco, dummy, dummy1, dummy2;
+	chan pos_ctrl;
+	chan pos_data;
+	chan speed_out, stop, str, info;
+	chan enco_1, sync_output;
+	chan signal_adc, c_value, input;
+
+	chan c_filter_current;
+	chan c_phase_position;
+
+	chan phase_sync;
+
+	chan c_torque;
+
+	//etherCat Comm channels
+	chan coe_in; ///< CAN from module_ethercat to consumer
+	chan coe_out; ///< CAN from consumer to module_ethercat
+	chan eoe_in; ///< Ethernet from module_ethercat to consumer
+	chan eoe_out; ///< Ethernet from consumer to module_ethercat
+	chan eoe_sig;
+	chan foe_in; ///< File from module_ethercat to consumer
+	chan foe_out; ///< File from consumer to module_ethercat
+	chan pdo_in;
+	chan pdo_out;
+	chan sig_1, signal_ctrl;
+	//
+	par
+	{
+
+		on stdcore[0]:
+		{
+			//set_torque_test(c_torque);
+			//torque_control( c_torque, c_hall_p4);
+
+		}
+
+		on stdcore[1]:
+		{
+			xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
+					"n", XSCOPE_CONTINUOUS, "1 qei", XSCOPE_INT, "n",
+					XSCOPE_CONTINUOUS, "2 pos", XSCOPE_INT, "n",
+					XSCOPE_DISCRETE, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
+					"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
+					XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "6 vel_d", XSCOPE_INT,
+					"n", XSCOPE_CONTINUOUS, "7 speed", XSCOPE_INT, "n",
+					XSCOPE_CONTINUOUS, "8 sinepos_a", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "9 sinepos_b", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "10 sinepos_c", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "11 sine_a", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
+			xscope_config_io(XSCOPE_IO_BASIC);
+		}
+
+		on stdcore[2]:
+		{
+			par
+			{
+				//filter_loop(signal_adc, c_adc, r_hall, dummy2, c_filter_current);
+				//foc_torque_ctrl_loop(signal_adc, c_adc, r_hall1, sync_output, c_filter_current, c_value);
+                /*in order of priority*/
+
+			/*	hall_qei_sync(c_qei, c_hall_p2, sync_output);
+
+				current_ctrl_loop(signal_adc, signal_ctrl, c_adc, c_hall_p3,
+						sync_output, c_commutation, c_torque);
+			 */
+				//
+				speed_control(c_commutation, c_hall_p4, signal_ctrl);
+
+				//torque_ctrl( c_value, c_filter_current, sync_output, r_hall1);
+			}
+		}
+
+		/************************************************************
+		 * IFM_CORE
+		 ************************************************************/
+		on stdcore[IFM_CORE]:
+		{
+			par {
+
+				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
+						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
+						p_ifm_adc_misob);
+
+				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
+						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+
+				commutation_test(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc); // hall based
+
+				//commutation_test(c_commutation, sync_output, c_pwm_ctrl, r_hall);  //new sync input based
+
+				//commutation(c_value, c_pwm_ctrl, signal_adc);	 //
+
+				run_hall(c_hall_p1, p_ifm_hall, c_hall_p2, c_hall_p3, c_hall_p4);  // channel priority 1,2..4
+
+				//torque_control(c_hall_p4);
+
+				do_qei(c_qei, p_ifm_encoder);
+
+			}
+		}
+
+	}
+
+	return 0;
+}
+
+/*
+ *#define FILTER_CURRENT_REQUEST 10
 #define filter_length 30
 
 {	int, int} get_filter_current(chanend c_filter_current) {
@@ -126,8 +487,8 @@ case			sig :> cmd:
 			ia_f /= flc;
 			ib_f /= flc;
 
-			xscope_probe_data(0, ia_f);
-			xscope_probe_data(1, ib_f);
+		//	xscope_probe_data(0, ia_f);
+		//	xscope_probe_data(1, ib_f);
 
 			filter_count++;
 			if(filter_count == 10)
@@ -344,11 +705,11 @@ case			sig :> cmd:
 			iq_fi /= fldc;
 
 			t_actual = root_function(iq_fi*iq_fi+id_fi*id_fi);
-			xscope_probe_data(0, t_actual);
-			xscope_probe_data(1, iTorqueSet);
+		//	xscope_probe_data(0, t_actual);
+		//	xscope_probe_data(1, iTorqueSet);
 
-			xscope_probe_data(2, id_fi);
-			xscope_probe_data(3, iq_fi); //torque
+		//	xscope_probe_data(2, id_fi);
+		//	xscope_probe_data(3, iq_fi); //torque
 
 			Speed = get_speed_cal(c_hall_1);
 
@@ -448,238 +809,5 @@ case			sig :> cmd:
 	}
 
 }
-
-int get_torque(chanend c_torque)
-{
-	int torque;
-	c_torque <: 3;
-	c_torque :> torque;
-	return torque;
-}
-
-void set_torque(chanend c_torque, int torque)
-{
-	c_torque <: 2;
-	c_torque <: torque;
-	return;
-}
-
-
-void set_torque_test(chanend c_torque) {
-	int torque;
-	in_data d;
-	while (1) {
-		input_cmd(d);
-		printintln(d.set_torque);
-
-		c_torque <: 2;
-		c_torque <: d.set_torque;
-
-	}
-}
-//printintln(speed);	printintln(acc); printintln(joint_torque_actual); printintln(B);	printintln(J); printintln(joint_torque_set);
-
-void torque_control(chanend c_hall_p4,chanend c_torque)
-{
-	/*variable declaration*/
-	int J;
-	int B;
-	int coef_prec = 15; //2^16
-	int var_prec = 5;   //2^5
-
-	coeff c;
-	pd_data p;
-	int speed = 0, acc = 0, prev_speed = 0;
-	timer ts;
-	unsigned int time, time1;
-	int joint_torque_actual;
-	int	joint_torque_set = 13;
-	int error_joint_torque;
-	int error_joint_torque_I = 0;
-	int error_joint_torque_D = 0;
-	int error_joint_torque_previous = 0;
-	int joint_torque_control_out = 0;
-
-	int Kp, Ki, Kd;
-	int TORQUE_INTEGRAL_MAX;
-	int TORQUE_OUTPUT_MAX = 13700; //PWM max
-
-//	TORQUE_INTEGRAL_MAX = TORQUE_OUTPUT_MAX/Ki;
-	/*compute motor constants from c function call*/
-
-	c.coef_prec = coef_prec;
-	c.var_prec = var_prec;
-
-	init_constants(c);
-
-
-	/*ts :> time;
-	p.speed = 5000;
-	p.prev_speed = 5200;
-	p.joint_torque_set = 13700;
-	p.previous_error = 5200;
-	pd_control(p);
-	ts:> time1;
-	printintln(time1-time); //33khz comput time*/
-
-	ts :> time;
-	while(1)
-	{
-		ts when timerafter(time+33333) :> time; //3khz
-
-		/* computed current torque */
-		speed = get_speed_cal(c_hall_p4);
-		//xscope_probe_data(0,speed);
-
-		p.speed = speed;
-		p.prev_speed = prev_speed;
-
-		// control torque set point
-		joint_torque_set = 1300; 		// in coef_prec only
-		p.joint_torque_set = joint_torque_set;
-		p.previous_error = error_joint_torque_previous;
-
-		// torque controller call c function
-		pd_control(p);
-
-		joint_torque_control_out = p.joint_torque_control_out;
-
-		if(joint_torque_control_out >= TORQUE_OUTPUT_MAX) {
-			joint_torque_control_out = TORQUE_OUTPUT_MAX;
-		}
-		else if(joint_torque_control_out < 0){
-			joint_torque_control_out = 0;
-		}
-
-		//set_torque(c_torque, joint_torque_control_out);
-
-		set_torque(c_torque, 10000);
-		xscope_probe_data(0,p.joint_torque_actual);
-
-		error_joint_torque_previous = p.error;
-		prev_speed = speed;
-	}
-
-}
-
-
-
-int main(void) {
-	chan c_adc, adc_d, dirn;
-	chan c_adctrig;
-	chan c_qei;
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
-	chan c_pwm_ctrl;
-	chan c_commutation;
-	chan speed_read;
-	chan enco, dummy, dummy1, dummy2;
-	chan pos_ctrl;
-	chan pos_data;
-	chan speed_out, stop, str, info;
-	chan enco_1, sync_output;
-	chan signal_adc, c_value, input;
-
-	chan c_filter_current;
-	chan c_phase_position;
-
-	chan phase_sync;
-
-	chan c_torque;
-
-	//etherCat Comm channels
-	chan coe_in; ///< CAN from module_ethercat to consumer
-	chan coe_out; ///< CAN from consumer to module_ethercat
-	chan eoe_in; ///< Ethernet from module_ethercat to consumer
-	chan eoe_out; ///< Ethernet from consumer to module_ethercat
-	chan eoe_sig;
-	chan foe_in; ///< File from module_ethercat to consumer
-	chan foe_out; ///< File from consumer to module_ethercat
-	chan pdo_in;
-	chan pdo_out;
-	chan sig_1;
-	//
-	par
-	{
-
-		on stdcore[0]:
-		{
-			//set_torque_test(c_torque);
-
-		}
-
-		on stdcore[1]:
-		{
-			xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
-					"n", XSCOPE_CONTINUOUS, "1 qei", XSCOPE_INT, "n",
-					XSCOPE_CONTINUOUS, "2 pos", XSCOPE_INT, "n",
-					XSCOPE_DISCRETE, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
-					"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
-					XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "6 vel_d", XSCOPE_INT,
-					"n", XSCOPE_CONTINUOUS, "7 speed", XSCOPE_INT, "n",
-					XSCOPE_CONTINUOUS, "8 sinepos_a", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "9 sinepos_b", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "10 sinepos_c", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "11 sine_a", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
-			xscope_config_io(XSCOPE_IO_BASIC);
-		}
-
-		on stdcore[2]:
-		{
-			par
-			{
-				//filter_loop(signal_adc, c_adc, r_hall, dummy2, c_filter_current);
-				//foc_torque_ctrl_loop(signal_adc, c_adc, r_hall1, sync_output, c_filter_current, c_value);
-                /*in order of priority*/
-
-				hall_qei_sync(c_qei, c_hall_p2, sync_output);
-
-				current_ctrl_loop(signal_adc, c_adc, c_hall_p3,
-						sync_output, c_filter_current, c_commutation, c_torque);
-
-				torque_control(c_hall_p4, c_torque);
-
-
-				//torque_ctrl( c_value, c_filter_current, sync_output, r_hall1);
-			}
-		}
-
-		/************************************************************
-		 * IFM_CORE
-		 ************************************************************/
-		on stdcore[IFM_CORE]:
-		{
-			par {
-
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
-						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
-						p_ifm_adc_misob);
-
-				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
-						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
-
-				commutation_test(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc); // hall based
-
-				//commutation_test(c_commutation, sync_output, c_pwm_ctrl, r_hall);  //new sync input based
-
-				//commutation(c_value, c_pwm_ctrl, signal_adc);	 //
-
-				run_hall(c_hall_p1, p_ifm_hall, c_hall_p2, c_hall_p3, c_hall_p4);  // channel priority 1,2..4
-
-				//torque_control(c_hall_p4);
-
-
-				do_qei(c_qei, p_ifm_encoder);
-
-			}
-		}
-
-	}
-
-	return 0;
-}
-
-/*
  *
  */

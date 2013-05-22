@@ -97,7 +97,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 	int not_synced = 0;
 	t_qei	:> time_qei;
 	t_hall :> time_hall;
-	t_qei when timerafter(time_qei+ 7*SEC_STD) :> time_qei;
+	//t_qei when timerafter(time_qei+ 7*SEC_STD) :> time_qei;
 
 	while(1)
 	{

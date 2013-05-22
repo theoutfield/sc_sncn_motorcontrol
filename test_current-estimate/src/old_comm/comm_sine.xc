@@ -335,7 +335,7 @@ void commutation_test(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctr
 
 
 
-	  signal_adc <: 1;
+	 /* signal_adc <: 1;
 	  while(1)
 	  {
 		  unsigned cmd, found =0;
@@ -350,7 +350,7 @@ void commutation_test(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctr
 		  if(found == 1)
 			  break;
 	  }
-
+*/
 	 // do_adc_calibration_ad7949(c_adc);
 	  comm_sine_test( c_commutation, c_hall, c_pwm_ctrl, signal_adc);
 	  //comm_sine_new( c_commutation, c_hall, c_pwm_ctrl, c_adc);

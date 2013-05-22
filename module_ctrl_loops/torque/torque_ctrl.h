@@ -33,8 +33,8 @@
 void foc_loop(chanend sig, chanend input, chanend adc, chanend c_hall, chanend c_value, torq_par &t_param, field_par &f_param, loop_par &l_param);
 
 
-void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
-		chanend sync_output, chanend c_filter_current, chanend c_commutation,
+void current_ctrl_loop(chanend sig, chanend signal2, chanend adc, chanend c_hall_1,
+		chanend sync_output, chanend c_commutation,
 		chanend c_torque);
 
 

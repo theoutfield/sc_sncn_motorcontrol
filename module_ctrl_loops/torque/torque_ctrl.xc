@@ -18,7 +18,7 @@
 #include <xscope.h>
 #include <print.h>
 #include "hall-qei.h"
-
+//#define ENABLE_xscope_torq
 #define defParAngleUser 560
 #define filter_length 30
 #define filter_dc 160
@@ -26,8 +26,8 @@
 unsigned root_function(unsigned uSquareValue);
 
 
-void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
-		chanend sync_output, chanend c_filter_current, chanend c_commutation,
+void current_ctrl_loop(chanend sig, chanend signal2, chanend adc, chanend c_hall_1,
+		chanend sync_output, chanend c_commutation,
 		chanend c_torque) {
 	int a1 = 0, a2 = 0;
 	int iActualSpeed;
@@ -49,8 +49,6 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 	int prev_v = 0, dirn = 1;
 	int mod_speed;
 	int filter_count = 0;
-
-	int asd;
 
 	/* Torque control variables */
 	int i_hall_angle;
@@ -77,8 +75,9 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 	int torque_error_previous = 0;
 	int torque_control_output = 0;
 	const int TORQUE_INTEGRAL_MAX = 137000;
+	int input_torque;
 
-	int flag1= 0;
+	int flag1= 0; int count_cur = 0;
 	/* PID Controller variables */
 	int Kp;							// Proportional gain
 	int Ki;							// Integral gain
@@ -88,7 +87,7 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 	int integral_member = 0;
 	int derivative_member = 0;
 
-	int TORQUE_OUTPUT_MAX = 13700;
+	int TORQUE_OUTPUT_MAX = 13739;
 	Kp = 15; Kd = 1; Ki = 11;
 	while (1) {
 		unsigned found = 0;
@@ -106,9 +105,11 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 		}
 	}
 	sig <: 1;
+	signal2 <: 1;
 	ts :> time;
 	tc :> time1;
 	ts1 :> time2;
+
 	while(1)
 	{
 	#pragma ordered
@@ -133,6 +134,8 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 				}
 				ia_f /= flc;
 				ib_f /= flc;
+			//	xscope_probe_data(0, ia_f);
+			//	xscope_probe_data(1, ib_f);
 
 				filter_count++;
 				if(filter_count == 10)
@@ -200,8 +203,11 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 				iq_fi /= fldc;
 
 				torque_actual = root_function(iq_fi*iq_fi+id_fi*id_fi);
+
+				#ifdef ENABLE_xscope_torq
 				xscope_probe_data(0, torque_actual);
 				xscope_probe_data(1, torque_target);
+				#endif
 
 				Speed = iActualSpeed;
 
@@ -233,8 +239,9 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 					torque_error_integral = torque_error_integral + torque_error;
 					torque_error_derivative = torque_error - torque_error_previous;
 
-
+#ifdef ENABLE_xscope_torq
 					//xscope_probe_data(2, torque_error);
+#endif
 
 					if(torque_error_integral > TORQUE_INTEGRAL_MAX)
 					{
@@ -253,9 +260,10 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 
 					torque_control_output = proportional_member + integral_member + derivative_member;
 
+#ifdef ENABLE_xscope_torq
 					//xscope_probe_data(3, integral_member);
 					//xscope_probe_data(4, torque_control_output);
-
+#endif
 					torque_error_previous = torque_error;
 
 
@@ -289,7 +297,7 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 					//if(flag1==0)
 					{
 
-
+flag1=0;
 					c_commutation <: 2;
 					c_commutation <: torque_target;
 					torque_error_integral = (torque_target*110)/Ki;
@@ -306,7 +314,25 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 			case c_torque:> cmd:
 				if(cmd == 2)
 				{
-					c_torque :> torque_target;
+					c_torque :> input_torque;
+					if(input_torque>13739)
+					{
+						input_torque = 13739;
+					}
+					if(flag1 == 1)
+					{
+						count_cur = count_cur+1;
+						if(count_cur>9004)
+						{
+							count_cur = 0;
+							torque_target = input_torque;
+						}
+					}
+					else if(flag1==0)
+					{
+						torque_target = input_torque;
+					}
+
 					//if(torque_target > 1000)  //range 13700
 					//	torque_target = 1000;
 
@@ -314,6 +340,10 @@ void current_ctrl_loop(chanend sig, chanend adc, chanend c_hall_1,
 				if(cmd == 3)
 				{
 					c_torque <: torque_actual;
+				}
+				if(cmd==4)
+				{
+					c_torque<:iActualSpeed;
 				}
 				break;
 			default:
