@@ -22,3 +22,12 @@ int input_cmd(in_data *d )
 }
 
 
+int input_pos(in_data *d)
+{
+	int position;
+	printf("enter position\n");
+	scanf("%d", &position);
+	d->set_position = position;
+	return 1;
+}
+

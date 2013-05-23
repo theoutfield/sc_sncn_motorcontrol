@@ -35,7 +35,7 @@
  * define Motor Specific Constants
  */
 #define POLE_PAIRS  8
-#define GEAR_RATIO  156
+#define GEAR_RATIO  26
 #define MAX_NOMINAL_SPEED  4000		// in 1/min
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder

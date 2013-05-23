@@ -154,11 +154,11 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
 
 //	  tx :> ts;
 
- /*     if(first == 1)
-      {
+     if(first == 1)
+     {
 		prev = angle2;
 		first =0;  set = prev;
-      }
+     }
 
 	if( prev != angle2)
 	{
@@ -190,7 +190,7 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
 		//printint( count);printstrln(" one");
 		count=0;
 	}
-*/
+
 
 
 	//xscope_probe_data(1,iHallActualSpeed);

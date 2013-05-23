@@ -106,6 +106,33 @@ void set_torque_test(chanend c_torque) {
 
 	}
 }
+
+void set_position_test(chanend c_position_ctrl) {
+	int position = 0;
+	in_data d;
+	timer ts;
+	unsigned time;
+	int increment = 50;
+
+	ts:>time;
+
+
+	while (1) {
+		//input_pos(d);
+		//printintln(d.set_position);
+
+		ts when timerafter(time+100000) :> time;
+
+		position +=increment;
+		c_position_ctrl <: 2;
+		c_position_ctrl <: position;
+		if(position>300000)
+			increment *= -1;
+		if(position<0)
+			increment *= -1;
+
+	}
+}
 //printintln(speed);	printintln(acc); printintln(joint_torque_actual); printintln(B);	printintln(J); printintln(joint_torque_set);
 
 void torque_control(chanend c_torque, chanend c_hall_p4)
@@ -215,9 +242,71 @@ int sp1;
 }
 
 
+void position_control(chanend c_torque, chanend c_hall_p4, chanend c_position_ctrl)
+{
+	int actual_position = 0;
+	timer ts;
+	unsigned int time;
+	int error_position = 0;
+	int error_position_D = 0;
+	int error_position_I = 0;
+	int previous_error = 0;
+	int position_control_out = 0;
+	int Kp = 6, Kd = 0, Ki = 0;
+	int max_integral = (13739)/1;
+	int target_position = 0;
+	int in_cmd;
+	//get_hall_absolute_pos(chanend c_hall)
 
+	ts:> time;
+	ts when timerafter(time+3*SEC_FAST) :> time;
+	//set_commutation(c_torque, 1000);
+	while(1)
+	{
+		select{
+			case c_position_ctrl :> in_cmd:
+				c_position_ctrl :> target_position;
+				break;
+			default:
+				break;
+		}
 
+		ts when timerafter(time+100000) :> time; //1khz
 
+		actual_position = get_hall_absolute_pos(c_hall_p4);
+
+		//xscope_probe_data(0, actual_position);
+
+		error_position = (target_position - actual_position)*1000;
+		error_position_I = error_position_I + error_position;
+		error_position_D = error_position - previous_error;
+
+		if(error_position_I > max_integral*1000)
+			error_position_I = max_integral*1000;
+		else if(error_position_I < -max_integral*1000)
+			error_position_I = 0 - max_integral*1000;
+
+		position_control_out = (Kp*error_position)/10000 + (Ki*error_position_I) + (Kd*error_position_D);
+
+		if(position_control_out > 13739)
+			position_control_out = 13739;
+		else if(position_control_out < -13739)
+			position_control_out = 0-13739;
+
+		//set_torque(c_torque, speed_control_out);
+		set_commutation(c_torque, position_control_out);
+
+		#ifdef ENABLE_xscope_main
+		xscope_probe_data(0, actual_position);
+		xscope_probe_data(1, target_position);
+		#endif
+
+		previous_error = error_position;
+
+	}
+}
+
+#define test_sensor_filter
 
 void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
 {
@@ -231,7 +320,7 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
 	int speed_control_out = 0;
 	int Kp = 25, Kd = 0, Ki = 15;
  int max_integral = (13739*100)/Ki;
-	int target_speed = 500;
+	int target_speed = 1500;
 
  /* while(1)
   {
@@ -247,18 +336,48 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
 	  if(found == 1)
 		  break;
   }*/
-	//int cal_speed, pos , prev =0;
+#ifdef test_sensor_filter
+	int cal_speed, pos , prev =0, diff = 0, old = 0;
+	int init=0;
+#endif
+
 	ts:> time;
 	ts when timerafter(time+3*SEC_FAST) :> time;
-	//set_commutation(c_torque, 1500);
+
 	while(1)
 	{
 		ts when timerafter(time+100000) :> time; //1khz
-
-	/*	pos = get_hall_angle(c_hall_p4);
-		cal_speed = (pos - prev)*1000;
-		xscope_probe_data(0, cal_speed);
-		prev = pos;*/
+#ifdef test_sensor_filter
+		pos = get_hall_absolute_pos(c_hall_p4);
+		if(init==0)
+		{
+			if(pos>5000)
+			{
+				init=1;
+				prev = 5000;
+			}
+			if(pos < -5000)
+			{
+				init=1;
+				prev = -5000;
+			}
+		}
+		if(init==1)
+		{
+			diff = pos - prev;
+			if(diff > 50000) diff = old;
+			if(diff < -50000) diff = old;
+			cal_speed = (diff)*1000;
+			//if(cal_speed == 0) init=0;
+			xscope_probe_data(0, cal_speed/(4095));
+			actual_speed = get_speed_cal(c_hall_p4);
+			xscope_probe_data(1, actual_speed);
+			xscope_probe_data(2, pos);
+			prev = pos;
+			old =diff;
+		}
+		set_commutation(c_torque, -2000);
+#else
 		actual_speed = get_speed_cal(c_hall_p4);
 
 		error_speed = (target_speed - actual_speed)*1000;
@@ -283,6 +402,7 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
 		#endif
 
 		previous_error = error_speed;
+#endif
 
 	}
 
@@ -321,6 +441,7 @@ int main(void) {
 	chan pdo_in;
 	chan pdo_out;
 	chan sig_1, signal_ctrl;
+	chan c_position_ctrl;
 	//
 	par
 	{
@@ -329,13 +450,14 @@ int main(void) {
 		{
 			//set_torque_test(c_torque);
 			//torque_control( c_torque, c_hall_p4);
+			 set_position_test(c_position_ctrl);
 
 		}
 
 		on stdcore[1]:
 		{
 			xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
-					"n", XSCOPE_CONTINUOUS, "1 qei", XSCOPE_INT, "n",
+					"n", XSCOPE_CONTINUOUS, "1 actualspeed", XSCOPE_INT, "n",
 					XSCOPE_CONTINUOUS, "2 pos", XSCOPE_INT, "n",
 					XSCOPE_DISCRETE, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
 					"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
@@ -364,7 +486,9 @@ int main(void) {
 						sync_output, c_commutation, c_torque);
 			 */
 				//
-				speed_control(c_commutation, c_hall_p4, signal_ctrl);
+				//speed_control(c_commutation, c_hall_p4, signal_ctrl);
+
+				position_control(c_commutation, c_hall_p2, c_position_ctrl);
 
 				//torque_ctrl( c_value, c_filter_current, sync_output, r_hall1);
 			}
