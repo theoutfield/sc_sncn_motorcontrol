@@ -44,7 +44,7 @@
 	return {p, v};
 }
 
-{unsigned, unsigned, unsigned } get_qei_data( streaming chanend c_qei, qei_par &q_max)
+{unsigned, unsigned, unsigned } get_qei_data( chanend c_qei, qei_par &q_max)
 {
 	unsigned p, s, ts1, ts2, v, qei_count_m = q_max.max_count;
 	c_qei <: QEI_CMD_POS_REQ;

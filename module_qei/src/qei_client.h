@@ -33,7 +33,7 @@
  * \return position
  * \return validity state
  */
-{ unsigned, unsigned, unsigned } get_qei_data( streaming chanend c_qei, qei_par &q_max);
+{ unsigned, unsigned, unsigned } get_qei_data(chanend c_qei, qei_par &q_max);
 
 
 

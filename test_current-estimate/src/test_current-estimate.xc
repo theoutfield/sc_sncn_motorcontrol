@@ -254,7 +254,7 @@ void position_control(chanend c_torque, chanend c_hall_p4, chanend c_position_ct
 	int position_control_out = 0;
 	int Kp = 6, Kd = 0, Ki = 0;
 	int max_integral = (13739)/1;
-	int target_position = 0;
+	int target_position = 15000;
 	int in_cmd;
 	//get_hall_absolute_pos(chanend c_hall)
 
@@ -306,9 +306,33 @@ void position_control(chanend c_torque, chanend c_hall_p4, chanend c_position_ct
 	}
 }
 
-#define test_sensor_filter
 
-void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
+int get_enc_pos(chanend enco)
+{
+	int pos;
+	enco <: 1;
+	enco :> pos;
+	return pos;
+}
+
+{int, int} get_pos_count(chanend c_qei)
+{
+	int pos, dirn; // clkwise +ve  cclkwise -ve
+	c_qei <: 2;
+	master {
+		c_qei :> pos;
+		c_qei :> dirn;
+	}
+	//if(pos < 0)
+	//	pos = 0 - pos;  not good idea works for only speed
+	//pos = dirn*pos;
+	return {pos, dirn};
+}
+//#define test_sensor_filter
+//#define speedcontrol
+#define test_sensor_qei_filter
+
+void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2, chanend c_qei)
 {
 	int actual_speed = 0;
 	timer ts;
@@ -318,9 +342,19 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
 	int error_speed_I = 0;
 	int previous_error = 0;
 	int speed_control_out = 0;
-	int Kp = 25, Kd = 0, Ki = 15;
+	int Kp = 25, Kd = 1, Ki = 15;
  int max_integral = (13739*100)/Ki;
-	int target_speed = 1500;
+	int target_speed = 700;
+
+
+
+
+
+#define filter_length2 8
+	int filter_buffer[filter_length2];
+	int index[] = {0}, filter_output;
+
+int acc = 0; int old_fil = 0;
 
  /* while(1)
   {
@@ -340,6 +374,14 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
 	int cal_speed, pos , prev =0, diff = 0, old = 0;
 	int init=0;
 #endif
+#ifdef test_sensor_qei_filter
+	int cal_speed, pos , prev =0, diff = 0, old = 0;
+	int init=0; int v = 0;
+	int dirn;
+	//length 8
+#endif
+
+	init_filter(filter_buffer, index, filter_length2);
 
 	ts:> time;
 	ts when timerafter(time+3*SEC_FAST) :> time;
@@ -347,37 +389,91 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
 	while(1)
 	{
 		ts when timerafter(time+100000) :> time; //1khz
+#ifdef test_sensor_qei_filter
+		//{pos, v} = get_qei_position(c_qei);
+		{pos, dirn} = get_pos_count(c_qei);
+		diff = pos - prev;
+		if(diff > 3080) diff = old;
+		if(diff < -3080) diff = old;
+		if(diff<0)
+			diff = 0-diff;
+		cal_speed = (diff*1000*60)/4000;
+
+		filter_output = filter(filter_buffer, index, filter_length2, cal_speed);
+
+		set_commutation(c_torque, 13090);
+		xscope_probe_data(0, pos);
+		xscope_probe_data(1, cal_speed*dirn);
+		xscope_probe_data(2, dirn);
+		prev = pos;
+		old = diff;
+#endif
 #ifdef test_sensor_filter
 		pos = get_hall_absolute_pos(c_hall_p4);
 		if(init==0)
 		{
-			if(pos>5000)
+			if(pos>2049)
 			{
 				init=1;
-				prev = 5000;
+				prev = 2049;
 			}
-			if(pos < -5000)
+			if(pos < -2049)
 			{
 				init=1;
-				prev = -5000;
+				prev = -2049;
 			}
+			cal_speed = 0;
+			//xscope_probe_data(0, (cal_speed*60)/(8*4095));
 		}
 		if(init==1)
 		{
 			diff = pos - prev;
 			if(diff > 50000) diff = old;
 			if(diff < -50000) diff = old;
-			cal_speed = (diff)*1000;
+			cal_speed = ((diff)*1000*60)/(8*4095);
 			//if(cal_speed == 0) init=0;
-			xscope_probe_data(0, cal_speed/(4095));
+			/*xscope_probe_data(0, cal_speed);
 			actual_speed = get_speed_cal(c_hall_p4);
 			xscope_probe_data(1, actual_speed);
-			xscope_probe_data(2, pos);
+			xscope_probe_data(2, pos);*/
 			prev = pos;
 			old =diff;
 		}
-		set_commutation(c_torque, -2000);
-#else
+
+		filter_output = filter(filter_buffer, index, filter_length2, cal_speed);
+
+		acc = filter_output - old_fil;
+		old_fil= filter_output;
+		xscope_probe_data(0, filter_output);
+		xscope_probe_data(1, acc*1000);
+
+		//set_commutation(c_torque, 1339);
+
+
+		error_speed = (target_speed - cal_speed)*1000;
+
+		error_speed_I = error_speed_I + error_speed;
+		error_speed_D = error_speed - previous_error;
+
+		if(error_speed_I>max_integral*1000)
+			error_speed_I = max_integral*1000;
+
+		speed_control_out = (Kp*error_speed)/10000 + (Ki*error_speed_I)/100000 + (Kd*error_speed_D)/1000;
+
+		if(speed_control_out > 13739)
+			speed_control_out = 13739;
+
+		//set_torque(c_torque, speed_control_out);
+		set_commutation(c_torque, speed_control_out);
+
+		#ifdef ENABLE_xscope_main
+		//xscope_probe_data(0, cal_speed);
+		//xscope_probe_data(1, target_speed);
+		#endif
+
+		previous_error = error_speed;
+#endif
+#ifdef speedcontrol
 		actual_speed = get_speed_cal(c_hall_p4);
 
 		error_speed = (target_speed - actual_speed)*1000;
@@ -407,7 +503,82 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2)
 	}
 
 }
+void encoder(chanend enco, chanend c_qei, qei_par &q_max)
+{
+	  unsigned pos_cmd;
+	  unsigned uvalue[3];
+	  signed pos, spos, prev=0, count=0, co12=0,first=1,set=0;
+	  int max_count = 26 * 4000;
+	  int hall_p;
+	  int diffi, count1;
+	  unsigned time = 0;
+	  timer t; t:>time;
+	  init_qei(q_max);
+	  while(1)
+	  {
+			// data acquisition loop
+			select
+			{
+				case enco:>pos_cmd:
+					if(pos_cmd==1)
+					{
+						enco <: count;
+					}
+				 break;
 
+				default:
+				 break;
+			} // data send loop
+
+
+			//start encoder acquisition , qei_par &q_max)
+			{uvalue[0], uvalue[1], uvalue[2]} = get_qei_data(c_qei, q_max);
+			 t when timerafter(time+6250) :> time;
+			if(first==1 )
+			{
+				if (uvalue[2]==1)
+				{
+					prev=uvalue[1]; first=0; set=prev;
+				}
+			}
+
+			if(prev!= uvalue[1] && uvalue[2]==1 )
+			{
+				spos=uvalue[1];
+
+				diffi = spos-prev;
+				  if( diffi > 3000)
+				  {
+				      count = count - 1;
+				  }
+				  else if(diffi < -3000)
+				  {
+					  count = count + 1;
+				  }
+				  else if( diffi < 10 && diffi >0)
+				  {
+					  count = count + diffi;
+				  }
+				  else if( diffi < 0 && diffi > -10)
+				  {
+					  count = count + diffi;
+				  }
+
+				prev=spos;
+				if(prev==set)
+					co12++;
+			}
+
+
+			if(count >= max_count || count <= -max_count)
+			{
+				co12=0;count=0;
+
+			}
+
+
+	  }
+}
 int main(void) {
 	chan c_adc, adc_d, dirn;
 	chan c_adctrig;
@@ -450,7 +621,7 @@ int main(void) {
 		{
 			//set_torque_test(c_torque);
 			//torque_control( c_torque, c_hall_p4);
-			 set_position_test(c_position_ctrl);
+			// set_position_test(c_position_ctrl);
 
 		}
 
@@ -486,9 +657,10 @@ int main(void) {
 						sync_output, c_commutation, c_torque);
 			 */
 				//
-				//speed_control(c_commutation, c_hall_p4, signal_ctrl);
+				speed_control(c_commutation, c_hall_p4, signal_ctrl, c_qei);
 
-				position_control(c_commutation, c_hall_p2, c_position_ctrl);
+
+			//	position_control(c_commutation, c_hall_p2, c_position_ctrl);
 
 				//torque_ctrl( c_value, c_filter_current, sync_output, r_hall1);
 			}
@@ -500,6 +672,8 @@ int main(void) {
 		on stdcore[IFM_CORE]:
 		{
 			par {
+
+
 
 				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
 						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
