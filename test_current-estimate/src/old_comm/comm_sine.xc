@@ -1,4 +1,4 @@
-
+/*
 #include <xs1.h>
 #include <stdint.h>
 #include <print.h>
@@ -178,6 +178,14 @@ int get_sync(chanend c_sync)
 	c_sync :> pos;
 	return pos;
 }
+
+void set_commutation(chanend c_commutation, int input)
+{
+	c_commutation <: 2;
+	c_commutation <: input;
+	return;
+}
+
 void comm_sine_new( chanend c_commutation, chanend c_sync, chanend c_pwm_ctrl, chanend c_hall)
 {
 	unsigned cmd;
@@ -212,6 +220,7 @@ void comm_sine_new( chanend c_commutation, chanend c_sync, chanend c_pwm_ctrl, c
 			//iAngleFromHall = get_hall_angle(c_sync);  // hall based
 
 			iAngleFromHall = get_sync(c_sync);			 //sync based
+
 			iAngleFromHall = (iAngleFromHall<<12)/500;
 
 
@@ -350,9 +359,9 @@ void commutation_test(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctr
 		  if(found == 1)
 			  break;
 	  }
-*/
+*
 	 // do_adc_calibration_ad7949(c_adc);
 	  comm_sine_test( c_commutation, c_hall, c_pwm_ctrl, signal_adc);
-	  //comm_sine_new( c_commutation, c_hall, c_pwm_ctrl, c_adc);
+	  //comm_sine_new( c_commutation, c_hall, c_pwm_ctrl, signal_adc);
 }
-
+*/

@@ -10,4 +10,5 @@ typedef struct S_CMD {
 #ifdef __XC__
 int input_cmd( in_data &d );
 int input_pos(in_data &d);
+void set_torque_test(chanend c_torque) ;
 #endif

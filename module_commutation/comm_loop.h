@@ -25,11 +25,30 @@
 #include "hall_client.h"
 
 /**
- * \brief Commutation Loop
+ * \brief FOC based Commutation Loop
  *
- * \channel c_value channel to receive motor power input value
+ * \channel c_value channel to receive motor voltage input value
  * \channel c_pwm_ctrl channel to set pwm level output
  * \channel sig channel for signaling to start adc after initialization
  *
  */
 void commutation(chanend c_value, chanend c_pwm_ctrl, chanend sig);
+
+
+/**
+ * \brief Sinusoidal based Commutation Loop
+ *
+ * \channel c_commutation channel to receive motor voltage input value
+ * \channel c_hall channel to receive position information
+ * \channel c_pwm_ctrl channel to set pwm level output
+ * \channel signal_adc channel for signaling to start adc after initialization
+ */
+void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc);
+
+/**
+ *  \brief Set Input voltage for commutation loop
+ *
+ * 	\channel c_commutation channel to send out motor voltage input value
+ * 	\param input is motor voltage input value (range allowed -13739 to 13739)
+ */
+void set_commutation_sinusoidal(chanend c_commutation, int input);

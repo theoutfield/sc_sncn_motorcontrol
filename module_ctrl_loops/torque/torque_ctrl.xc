@@ -24,7 +24,20 @@
 #define filter_dc 160
 
 unsigned root_function(unsigned uSquareValue);
+int get_torque(chanend c_torque)
+{
+	int torque;
+	c_torque <: 3;
+	c_torque :> torque;
+	return torque;
+}
 
+void set_torque(chanend c_torque, int torque)
+{
+	c_torque <: 2;
+	c_torque <: torque;
+	return;
+}
 
 void current_ctrl_loop(chanend sig, chanend signal2, chanend adc, chanend c_hall_1,
 		chanend sync_output, chanend c_commutation,

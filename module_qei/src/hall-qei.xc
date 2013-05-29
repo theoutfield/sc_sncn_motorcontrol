@@ -70,9 +70,9 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 
 	int cmd; // Command token
 
-	int hall_position=0; // Hall input
-	int qei_position=0; // Qei input
-	int sync_position=0; // output
+	int hall_position = 0; // Hall input
+	int qei_position = 0; // Qei input
+	int sync_position = 0; // output
 
 	int qei_valid; // qei validity (0 or 1)
 
@@ -95,9 +95,11 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 	int init = 1;
 
 	int not_synced = 0;
+
+	int not_calibrated = 1;
 	t_qei	:> time_qei;
 	t_hall :> time_hall;
-	//t_qei when timerafter(time_qei+ 7*SEC_STD) :> time_qei;
+//	t_qei when timerafter(time_qei+ 7*SEC_STD) :> time_qei;
 
 	while(1)
 	{
@@ -113,8 +115,8 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 			case sync_output :> cmd:
 			if(cmd == 20)
 			{
-				if(not_synced<3)
-				sync_output <: (hall_position * 500) >> 12;
+				if(not_synced<4)
+					sync_output <: (hall_position * 500) >> 12;
 				else
 				{
 					sync_output <: sync_position;
@@ -123,50 +125,54 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 			}
 			break;
 
-			case t_qei when timerafter(time_qei + 300) :> time_qei:
+			case t_qei when timerafter(time_qei + 500) :> time_qei:
 			{	qei_position, qei_valid}= get_qei_position( c_qei); //aquisition
 			qei_position = hall_max_position - qei_position;
 
-			/* Runs only once*/
-			if(init == 1)
+			if(qei_valid==1)
 			{
-				previous_position = qei_position;
-				init=0;
-			}
-			if(previous_position!= qei_position )
-			{
-				diffi = qei_position - previous_position;
-				if( diffi > 3000)
+				/* Runs only once*/
+				not_calibrated = 0;
+				if(init == 1)
 				{
-					sync_position = sync_position - 1;
+					previous_position = qei_position;
+					init=0;
 				}
-				else if(diffi < -3000)
+				if(previous_position!= qei_position )
 				{
-					sync_position = sync_position + 1;
-				}
-				else if( diffi < 10 && diffi >0)
-				{
-					sync_position = sync_position + diffi;
-				}
-				else if( diffi < 0 && diffi > -10)
-				{
-					sync_position = sync_position + diffi;
-					if(sync_position < 0)
+					diffi = qei_position - previous_position;
+					if( diffi > 3000)
 					{
-						sync_position = max_count + sync_position;
+						sync_position = sync_position - 1;
 					}
+					else if(diffi < -3000)
+					{
+						sync_position = sync_position + 1;
+					}
+					else if( diffi < 10 && diffi >0)
+					{
+						sync_position = sync_position + diffi;
+					}
+					else if( diffi < 0 && diffi > -10)
+					{
+						sync_position = sync_position + diffi;
+						if(sync_position < 0)
+						{
+							sync_position = max_count + sync_position;
+						}
+					}
+					previous_position=qei_position;
 				}
-				previous_position=qei_position;
-			}
-			if(sync_position >= max_count)
-			{
-				sync_position=0;
+				if(sync_position >= max_count)
+				{
+					sync_position=0;
+				}
+				xscope_probe_data(0, sync_position);
 			}
 
-			//xscope_probe_data(0, sync_position);
 			break;
 
-			case t_hall when timerafter(time_hall + 1000) :> time_hall: //4khz  20000 14000
+			case t_hall when timerafter(time_hall + 5000) :> time_hall: //4khz  20000 14000
 			hall_position = get_hall_angle( c_hall1);
 		//	xscope_probe_data(1, hall_position);
 
