@@ -31,7 +31,7 @@
 
 	s[si] = s[si] + 1;
 
-	if (s[si] < 3 || not_synced <= 4) {
+	if (s[si] < 3 || not_synced <= 50) {
 		angle_qei = (sync_position << 12) / 500;
 		diff_angle = hall_position - angle_qei;
 
@@ -42,7 +42,7 @@
 		if (sync_position < 0)
 			sync_position = max_count + sync_position;
 
-		if (not_synced <= 4)
+		if (not_synced <= 50)
 			not_synced++;
 	}
 
@@ -115,7 +115,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 			case sync_output :> cmd:
 			if(cmd == 20)
 			{
-				if(not_synced<4)
+				if(not_calibrated == 1)
 					sync_output <: (hall_position * 500) >> 12;
 				else
 				{
@@ -132,7 +132,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 			if(qei_valid==1)
 			{
 				/* Runs only once*/
-				not_calibrated = 0;
+
 				if(init == 1)
 				{
 					previous_position = qei_position;
@@ -143,11 +143,13 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 					diffi = qei_position - previous_position;
 					if( diffi > 3000)
 					{
-						sync_position = sync_position - 1;
+						sync_position = 125;// sync_position - 1;
+						not_calibrated = 1;
 					}
 					else if(diffi < -3000)
 					{
-						sync_position = sync_position + 1;
+						sync_position = 125;//sync_position + 1;
+						not_calibrated = 1;
 					}
 					else if( diffi < 10 && diffi >0)
 					{
@@ -176,8 +178,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 			hall_position = get_hall_angle( c_hall1);
 		//	xscope_probe_data(1, hall_position);
 
-
-
+/*
 			if( hall_position >= 681 && hall_position < 682+gaurd )
 			{
 
@@ -214,7 +215,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 				{sync_position, not_synced} = sync_it(s, 5, sync_position, hall_position, not_synced, max_count);
 
 			}
-
+*/
 			break;
 
 
