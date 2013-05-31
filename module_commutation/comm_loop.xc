@@ -105,7 +105,7 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 {
 	unsigned cmd;
 	unsigned pwm[3] = { 0, 0, 0 };
-	int iIndexPWM, iPosFromHallOld=0;
+	int iIndexPWM;
 	int iAngleFromHall  = 0;
 	int iAngleUser      = 300;
 	int iAngleFromRpm   = 0;

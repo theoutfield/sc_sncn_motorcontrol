@@ -69,7 +69,6 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2, chanend
 
 
 
-
 #define filter_length2 8
 	int filter_buffer[filter_length2];
 	int index = 0, filter_output;
@@ -107,7 +106,7 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2, chanend
 
 		filter_output = filter(filter_buffer, index, filter_length2, cal_speed);
 
-		set_commutation_sinusoidal(c_torque, 10339);
+		set_commutation_sinusoidal(c_torque, 3739);
 	//	xscope_probe_data(0, pos);
 	//	xscope_probe_data(1, cal_speed*dirn);
 	//	xscope_probe_data(2, dirn);
@@ -209,22 +208,19 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2, chanend
 	}
 
 }
-
+void init_velocity_control(ctrl_par &velocity_ctrl_par);
 int main(void) {
-	chan c_adc, adc_d, dirn;
-	chan c_adctrig;
+	chan c_adc, c_adctrig;
 	chan c_qei;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
-	chan c_pwm_ctrl;
-	chan c_commutation;
-	chan speed_read;
-	chan enco, dummy, dummy1, dummy2;
-	chan pos_ctrl;
-	chan pos_data;
+	chan c_pwm_ctrl, c_commutation;
+	chan dummy, dummy1, dummy2;
 	chan speed_out, stop, str, info;
 	chan enco_1, sync_output;
 	chan signal_adc, c_value, input;
 	chan c_torque;
+	chan sig_1, signal_ctrl;
+	chan c_position_ctrl;
 	//etherCat Comm channels
 	chan coe_in; ///< CAN from module_ethercat to consumer
 	chan coe_out; ///< CAN from consumer to module_ethercat
@@ -235,8 +231,7 @@ int main(void) {
 	chan foe_out; ///< File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
-	chan sig_1, signal_ctrl;
-	chan c_position_ctrl;
+
 	//
 	par
 	{
@@ -246,6 +241,22 @@ int main(void) {
 			//torque_control( c_torque, c_hall_p4);
 			// set_position_test(c_position_ctrl);
 
+		/*	{//test
+
+				ctrl_par velocity_ctrl_par;
+				init_velocity_control(velocity_ctrl_par);
+				printintln(velocity_ctrl_par.Kp_n);
+				printintln(velocity_ctrl_par.Kp_d);
+				printintln(velocity_ctrl_par.Ki_n);
+				printintln(velocity_ctrl_par.Ki_d);
+				printintln(velocity_ctrl_par.Kd_n);
+				printintln(velocity_ctrl_par.Kd_d);
+				printintln(velocity_ctrl_par.Loop_time);
+
+				printintln(velocity_ctrl_par.Integral_limit);
+				printintln(velocity_ctrl_par.Control_limit);
+
+			}*/
 		}
 
 		on stdcore[1]:
@@ -270,7 +281,10 @@ int main(void) {
 		{
 			par
 			{
-				speed_control(c_commutation, c_hall_p2, signal_ctrl, dummy);
+				speed_control(c_commutation, c_hall_p3, signal_ctrl, dummy);
+
+				hall_qei_sync(c_qei, c_hall_p2, sync_output);
+
 			}
 		}
 
@@ -279,8 +293,7 @@ int main(void) {
 		 ************************************************************/
 		on stdcore[IFM_CORE]:
 		{
-			par {
-
+  		par {
 
 
 				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
@@ -291,6 +304,8 @@ int main(void) {
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				commutation_sinusoidal(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc); 	// hall based sinus commutation
+
+				//commutation_test(c_commutation, sync_output, c_pwm_ctrl, c_hall_p1);
 
 				run_hall(c_hall_p1, p_ifm_hall, c_hall_p2, c_hall_p3, c_hall_p4);  		// channel priority 1,2..4
 

@@ -65,6 +65,22 @@
 #define Field_Ki_d 100
 #define Field_Integral_limit 10000
 
+
+typedef struct S_Control
+{
+	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
+	int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
+	int Kd_n, Kd_d; //Kd = Kd_n/Kd_d
+	int Integral_limit;
+	int Control_limit;
+	int Loop_time;
+} ctrl_par;
+
+typedef struct S_Filter_length
+{
+	int filter_length;
+} filt_par;
+
 /**
  * \brief Struct definitions for the torque controller
  */

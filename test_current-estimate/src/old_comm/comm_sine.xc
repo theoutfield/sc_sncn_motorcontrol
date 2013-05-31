@@ -194,7 +194,7 @@ void comm_sine_new( chanend c_commutation, chanend c_sync, chanend c_pwm_ctrl, c
 	int iAngleFromHall  = 0;
 	int iAngleUser      = 300;
 	int iAngleFromRpm   = 0;
-	int iAnglePWM, iActualSpeed;
+	int iAnglePWM, iActualSpeed =0;
 	int iPositionAbsolut=0;	int i;
 
 	int a1,a2,adc_a1,adc_a2,adc_a3, adc_a4,adc_b1,adc_b2,adc_b3,adc_b4;
@@ -361,7 +361,8 @@ void commutation_test(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctr
 	  }
 *
 	 // do_adc_calibration_ad7949(c_adc);
-	  comm_sine_test( c_commutation, c_hall, c_pwm_ctrl, signal_adc);
-	  //comm_sine_new( c_commutation, c_hall, c_pwm_ctrl, signal_adc);
+	//  comm_sine_test( c_commutation, c_hall, c_pwm_ctrl, signal_adc);
+	  comm_sine_new( c_commutation, c_hall, c_pwm_ctrl, signal_adc);
 }
+
 */
