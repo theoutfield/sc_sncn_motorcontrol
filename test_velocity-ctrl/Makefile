@@ -6,11 +6,11 @@ TARGET = C22-ComECAT-IfmBLDC-XScope
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = test_current-estimate
+APP_NAME = 
 
 # The USED_MODULES variable lists other module used by the application.
 
-USED_MODULES = module_adc module_blocks module_commutation module_ctrl_loops module_pwm_common module_pwm_symmetrical module_qei sc_somanet-base/module_nodeconfig
+USED_MODULES = module_adc module_blocks module_commutation module_ctrl_loops module_hall module_pwm_common module_pwm_symmetrical module_qei sc_somanet-base/module_nodeconfig
 
 
 

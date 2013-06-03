@@ -1,11 +1,4 @@
-/**
- * Module:  module_hall
- * Version: 1v0alpha2
-
- * orgler@tin.it synapticon 01/2013
-  *
- **/                                   
-#include "hall_input.h"
+#include "hall_server.h"
 #include <stdlib.h>
 #include <print.h>
 #include <stdint.h>
@@ -13,7 +6,7 @@
 #include "dc_motor_config.h"
 #include <xscope.h>
 
-void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4)
+void run_hall( port in p_hall, chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4)
  {
   timer tx;
   unsigned ts;					// newest timestamp
@@ -41,7 +34,7 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
 
 
   unsigned uvalue, pos_cmd;
-  signed spos, prev=0, count=0, co12=0,first=1,set=0;
+  int spos, prev=0, count=0, co12=0,first=1,set=0;
   int hall_enc_count =  POLE_PAIRS * GEAR_RATIO * 4095;
   int speed_calc;
   tx :> ts;  // first value
@@ -69,12 +62,10 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
       {
  	      if(pin_state == uHallNext)
  	      {
- 	    	//  iPosAbsolut =  iPosAbsolut+60)%360;
  	    	  dir = 1;
  	      }
 	      if(pin_state == uHallPrevious)
 	      {
-	    	 // iPosAbsolut = (iPosAbsolut-60)%360;
 	    	  dir =-1;
 	      }
 
@@ -101,8 +92,6 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
 	    		if(iPeriodMicroSeconds)
 	    		{
 	    			speed_calc = iPeriodMicroSeconds;
-	    		//	iHallActualSpeed = (60000000/iPeriodMicroSeconds)/POLE_PAIRS;    // period in µsec
-					//iHallActualSpeed /= POLE_PAIRS; //Pole pairs
 	    		}
 	    	}
 
@@ -115,10 +104,6 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
 	    		if(iPeriodMicroSeconds)
 	    		{
 	    			speed_calc =0-iPeriodMicroSeconds;
-	    		//	iHallActualSpeed = 0 - (60000000/iPeriodMicroSeconds)/POLE_PAIRS;
-	    			//iHallActualSpeed = 60000000/iPeriodMicroSeconds;   	// transition 60 * 1000000 (sec multiplier) / time in Usec
-					//iHallActualSpeed /= POLE_PAIRS;						// pole correction for speed
-					//iHallActualSpeed = -iHallActualSpeed;
 	    		}
 	    	}
 
@@ -152,8 +137,6 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
 
       angle2 &= 0x0FFF;    // 4095
 
-//	  tx :> ts;
-
      if(first == 1)
      {
 		prev = angle2;
@@ -164,21 +147,18 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
 	{
 
 		spos=angle2;
-		if(spos-prev <= -1800){
-
+		if(spos-prev <= -1800)
+		{
 				count = count + (4095 + spos-prev);
-			   // c=c+1;
-		          //forw
+
 		}
 
-		else if(spos-prev >= 1800){
-					count = count + (-4095 + spos-prev);
-			   // c=c-1;
-		            // revr
+		else if(spos-prev >= 1800)
+		{
+				count = count + (-4095 + spos-prev);
 		}
-
-		else{
-
+		else
+		{
 			count = count + spos-prev;
 		}
 		prev=angle2;
@@ -187,13 +167,10 @@ void run_hall( chanend c_hall_p1, port in p_hall, chanend c_hall_p2, chanend c_h
 
 	if(count>hall_enc_count || count< -hall_enc_count)
 	{
-		//printint( count);printstrln(" one");
 		count=0;
 	}
 
 
-
-	//xscope_probe_data(1,iHallActualSpeed);
 	#pragma ordered
  	    select {
 			case c_hall_p1 :> cmd:

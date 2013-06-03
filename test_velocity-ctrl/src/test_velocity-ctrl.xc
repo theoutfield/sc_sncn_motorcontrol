@@ -17,14 +17,13 @@
 #include <stdint.h>
 #include "ioports.h"
 #include "hall-qei.h"
-#include "hall_input.h"
+#include "hall_server.h"
 #include "hall_client.h"
 #include "qei_client.h"
 #include "pwm_service_inv.h"
 #include "adc_ad7949.h"
 #include "test.h"
 #include "pwm_config.h"
-#include "comm_sine.h"
 #include "comm_loop.h"
 #include "refclk.h"
 #include "velocity_ctrl.h"
@@ -327,7 +326,7 @@ int main(void) {
 
 				//commutation_test(c_commutation, sync_output, c_pwm_ctrl, c_hall_p1);
 
-				run_hall(c_hall_p1, p_ifm_hall, c_hall_p2, c_hall_p3, c_hall_p4);  		// channel priority 1,2..4
+				run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4);  		// channel priority 1,2..4
 
 				do_qei(c_qei, p_ifm_encoder);
 
