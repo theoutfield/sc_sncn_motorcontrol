@@ -25,17 +25,6 @@
 #include "hall_client.h"
 
 /**
- * \brief FOC based Commutation Loop
- *
- * \channel c_value channel to receive motor voltage input value
- * \channel c_pwm_ctrl channel to set pwm level output
- * \channel sig channel for signaling to start adc after initialization
- *
- */
-void commutation(chanend c_value, chanend c_pwm_ctrl, chanend sig);
-
-
-/**
  * \brief Sinusoidal based Commutation Loop
  *
  * \channel c_commutation channel to receive motor voltage input value
