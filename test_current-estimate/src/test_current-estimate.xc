@@ -27,6 +27,7 @@
 #include "comm_sine.h"
 #include "comm_loop.h"
 #include "refclk.h"
+#include "velocity_ctrl.h"
 #include <xscope.h>
 #include "qei_client.h"
 #include "qei_server.h"
@@ -96,7 +97,7 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2, chanend
 		ts when timerafter(time+100000) :> time; //1khz
 #ifdef test_sensor_qei_filter
 		//{pos, v} = get_qei_position(c_qei);
-//		{pos, dirn} = get_qei_position_count(c_qei);
+		{pos, dirn} = get_qei_position_count(c_qei);
 		diff = pos - prev;
 		if(diff > 3080) diff = old;
 		if(diff < -3080) diff = old;
@@ -208,7 +209,7 @@ void speed_control(chanend c_torque, chanend c_hall_p4, chanend signal2, chanend
 	}
 
 }
-void init_velocity_control(ctrl_par &velocity_ctrl_par);
+
 int main(void) {
 	chan c_adc, c_adctrig;
 	chan c_qei;
@@ -279,11 +280,30 @@ int main(void) {
 
 		on stdcore[2]:
 		{
-			par
+			//par
 			{
-				speed_control(c_commutation, c_hall_p3, signal_ctrl, dummy);
+			//	speed_control(c_commutation, c_hall_p3, signal_ctrl, dummy);
 
-				hall_qei_sync(c_qei, c_hall_p2, sync_output);
+			//	hall_qei_sync(c_qei, c_hall_p2, sync_output);
+
+
+			}
+
+			par{
+
+				{
+					ctrl_par velocity_ctrl_params;
+					filt_par sensor_filter_params;
+					hall_par hall_params;
+					qei_par qei_params;
+
+					init_velocity_control(velocity_ctrl_params);
+					init_sensor_filter(sensor_filter_params);
+					init_hall(hall_params);
+					init_qei(qei_params);
+
+					velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, qei_params, 2, c_hall_p2, c_qei, c_commutation);
+				}
 
 			}
 		}
@@ -293,8 +313,8 @@ int main(void) {
 		 ************************************************************/
 		on stdcore[IFM_CORE]:
 		{
-  		par {
-
+			par
+			{
 
 				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
 						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
@@ -310,8 +330,6 @@ int main(void) {
 				run_hall(c_hall_p1, p_ifm_hall, c_hall_p2, c_hall_p3, c_hall_p4);  		// channel priority 1,2..4
 
 				do_qei(c_qei, p_ifm_encoder);
-
-
 
 			}
 		}

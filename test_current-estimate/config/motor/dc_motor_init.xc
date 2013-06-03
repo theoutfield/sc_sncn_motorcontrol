@@ -28,8 +28,9 @@ void init_params_struct_all(torq_par &torque, field_par &field, loop_par &loop)
 	return;
 }
 
-void init_qei(qei_par &qei_max)
+void init_qei(qei_par &qei_params)
 {
-	qei_max.max_count = QEI_COUNT_MAX;
+	qei_params.max_count = QEI_COUNT_MAX;
+	qei_params.real_counts = QEI_COUNT_MAX_REAL;
 	return;
 }

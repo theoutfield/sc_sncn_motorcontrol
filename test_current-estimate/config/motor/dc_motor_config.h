@@ -112,6 +112,7 @@ typedef struct S_Field {
  */
 typedef struct S_QEI {
 	unsigned max_count;
+	unsigned real_counts;
 } qei_par;
 
 /**
