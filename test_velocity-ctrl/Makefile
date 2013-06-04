@@ -12,7 +12,7 @@ APP_NAME =
 
 USED_MODULES = module_adc module_blocks module_commutation module_ctrl_loops module_hall module_pwm_common module_pwm_symmetrical module_qei sc_somanet-base/module_nodeconfig
 
-
+#
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

@@ -52,7 +52,8 @@ void init_sensor_filter(filt_par &sensor_filter_par) //optional for user to chan
 	return;
 }
 
-void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, int sensor_used, chanend c_hall, chanend c_qei, chanend c_commutation)
+void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
+		 	 	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_commutation)
 {
 	/* Controller declarations */
 	int actual_velocity = 0;
@@ -82,9 +83,10 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 	int dirn = 0;
 	int old;
 	int cal_speed_n = 1000*60; // constant
-	int cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD); //variable pole_pairs  core 2/1/0 only
-	int cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
+	int cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs  core 2/1/0 only
+	int cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);		  // variable qei_real_max  core 2/1/0 only
 
+	int cmd;
 
 	init_filter(filter_buffer, index, filter_length);
 
@@ -94,86 +96,94 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 	while(1)
 	{
-		ts when timerafter(time + velocity_ctrl_params.Loop_time) :> time;
-
-		set_commutation_sinusoidal(c_commutation, 3739);
-
-		/* acq actual velocity hall/qei with filter*/
-		if(sensor_used == HALL)
+		select
 		{
-			pos = get_hall_absolute_pos(c_hall);
-			if(init == 0)
-			{
-				if(pos > 2049)
+			case ts when timerafter(time + velocity_ctrl_params.Loop_time) :> time:
+
+				//set_commutation_sinusoidal(c_commutation, 3739);
+
+				/* acq actual velocity hall/qei with filter*/
+				if(sensor_used == HALL)
 				{
-					init = 1;
-					prev = 2049;
+					pos = get_hall_absolute_pos(c_hall);
+					if(init == 0)
+					{
+						if(pos > 2049)
+						{
+							init = 1;
+							prev = 2049;
+						}
+						else if(pos < -2049)
+						{
+							init = 1;
+							prev = -2049;
+						}
+						cal_speed = 0;
+					}
+					if(init == 1)
+					{
+						diff = pos - prev;
+						if(diff > 50000) diff = old;
+						else if(diff < -50000) diff = old;
+						cal_speed = (diff*cal_speed_n)/cal_speed_d_hall;
+		#ifdef Debug_velocity_ctrl
+						xscope_probe_data(0, cal_speed);
+		#endif
+						prev = pos;
+						old = diff;
+					}
 				}
-				else if(pos < -2049)
+				else if(sensor_used == QEI)
 				{
-					init = 1;
-					prev = -2049;
+					{pos, dirn} = get_qei_position_count(c_qei);
+					diff = pos - prev;
+					if(diff > 3080) diff = old;
+					if(diff < -3080) diff = old;
+					cal_speed = (diff*cal_speed_n)/cal_speed_d_qei;
+
+		#ifdef Debug_velocity_ctrl
+					xscope_probe_data(0, cal_speed);
+		#endif
+
+					prev = pos;
+					old = diff;
 				}
-				cal_speed = 0;
-			}
-			if(init == 1)
-			{
-				diff = pos - prev;
-				if(diff > 50000) diff = old;
-				else if(diff < -50000) diff = old;
-				cal_speed = (diff*cal_speed_n)/cal_speed_d_hall;
-#ifdef Debug_velocity_ctrl
-				xscope_probe_data(0, cal_speed);
-#endif
-				prev = pos;
-				old = diff;
-			}
-		}
-		else if(sensor_used == QEI)
-		{
-			{pos, dirn} = get_qei_position_count(c_qei);
-			diff = pos - prev;
-			if(diff > 3080) diff = old;
-			if(diff < -3080) diff = old;
-			cal_speed = (diff*cal_speed_n)/cal_speed_d_qei;
 
-#ifdef Debug_velocity_ctrl
-			xscope_probe_data(0, cal_speed);
-#endif
+				actual_velocity = filter(filter_buffer, index, filter_length, cal_speed);
+		#ifdef Debug_velocity_ctrl
+				xscope_probe_data(1, actual_velocity);
+		#endif
 
-			prev = pos;
-			old = diff;
-		}
+				/* Controller */
+				error_velocity   = (target_velocity - actual_velocity)*1000;
+				error_velocity_I = error_velocity_I + error_velocity;
+				error_velocity_D = error_velocity - previous_error;
 
-		actual_velocity = filter(filter_buffer, index, filter_length, cal_speed);
-#ifdef Debug_velocity_ctrl
-		xscope_probe_data(1, actual_velocity);
-#endif
-
-
-		error_velocity   = (target_velocity - actual_velocity)*1000;
-		error_velocity_I = error_velocity_I + error_velocity;
-		error_velocity_D = error_velocity - previous_error;
-
-		if(error_velocity_I > (velocity_ctrl_params.Integral_limit)*1000)
-			error_velocity_I = (velocity_ctrl_params.Integral_limit)*1000;
-		else if(error_velocity_I < -(velocity_ctrl_params.Integral_limit)*1000)
-			error_velocity_I = 0 -(velocity_ctrl_params.Integral_limit)*1000;
+				if(error_velocity_I > (velocity_ctrl_params.Integral_limit)*1000)
+					error_velocity_I = (velocity_ctrl_params.Integral_limit)*1000;
+				else if(error_velocity_I < -(velocity_ctrl_params.Integral_limit)*1000)
+					error_velocity_I = 0 -(velocity_ctrl_params.Integral_limit)*1000;
 
 velocity_control_out = (velocity_ctrl_params.Kp_n*error_velocity)/(1000*velocity_ctrl_params.Kp_d) + (velocity_ctrl_params.Ki_n*error_velocity_I)/(1000 * velocity_ctrl_params.Ki_d) \
-								+ (velocity_ctrl_params.Kd_n*error_velocity_D)/(1000 * velocity_ctrl_params.Kd_d);
+										+ (velocity_ctrl_params.Kd_n*error_velocity_D)/(1000 * velocity_ctrl_params.Kd_d);
 
-		if(velocity_control_out > velocity_ctrl_params.Control_limit)
-			velocity_control_out = velocity_ctrl_params.Control_limit;
-		else if(velocity_control_out < -velocity_ctrl_params.Control_limit)
-			velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
+				if(velocity_control_out > velocity_ctrl_params.Control_limit)
+					velocity_control_out = velocity_ctrl_params.Control_limit;
+				else if(velocity_control_out < -velocity_ctrl_params.Control_limit)
+					velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
 
-	//	set_commutation_sinusoidal(c_commutation, velocity_control_out);
+				set_commutation_sinusoidal(c_commutation, velocity_control_out);
 
-		previous_error = error_velocity;
+				previous_error = error_velocity;
 
+				break;
+
+
+
+		}
 
 		/* acq target velocity etherCAT */
+
 	}
 
 
