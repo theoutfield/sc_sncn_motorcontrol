@@ -1,0 +1,8 @@
+
+MODULE_PROFILE_DIRS += profile_velocity_mode
+
+SOURCE_DIRS += $(MODULE_PROFILE_DIRS)
+INCLUDE_DIRS += $(MODULE_PROFILE_DIRS)
+
+XCC_FLAGS += -fsubword-select
+OPTIONAL_HEADERS += dc_motor_config.h refclk.h
