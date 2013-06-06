@@ -1,6 +1,7 @@
 /*Profile Velocity Quick Stop*/
 
 #include <stdio.h>
+#include <math.h>
 
 int i;
 float samp, T;
@@ -16,11 +17,11 @@ struct QUICK_STOP_VELOCITY_PARAM
 	float u, a_d, t; 										// user input variables
 	float T;
 	float samp;
-	int length;
 } qstop_vel_params;
 
-void init(int actual_velocity, int quick_stop_deceleration)
+int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceleration)
 {
+
 	qstop_vel_params.u = (float) actual_velocity;
 
 	if(quick_stop_deceleration < 0)
@@ -36,10 +37,9 @@ void init(int actual_velocity, int quick_stop_deceleration)
     if(qstop_vel_params.T<0)
     	qstop_vel_params.T = 0 - qstop_vel_params.T;
 
-    qstop_vel_params.length = (int) round (qstop_vel_params.T);
     qstop_vel_params.samp = qstop_vel_params.t/qstop_vel_params.T;
 
-	return;
+	return (int) round (qstop_vel_params.T);
 }
 //t_stamp = 0;
  //  for(i = 1; i < length; i++)
