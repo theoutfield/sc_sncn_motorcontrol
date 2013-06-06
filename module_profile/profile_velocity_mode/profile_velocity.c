@@ -3,106 +3,112 @@
 #include <stdio.h>
 #include <math.h>
 
-int i;
-float samp, T;
-float t, t_stamp;
-float vel, acc, u, dec;
-float v_d, a_d;
-int v_ramp[20000];
-int length;
-int oldst =  -2;
+struct PROFILE_VELOCITY_PARAM
+{
+	float max_acceleration, max_deceleration;	// max allowed acceleration & deceleration
+	float acc, dec;								// acceleration & deceleration input
+	float u;									// initial velocity
+	float v_d;									// desired velocity
+	float a_d;									// desired acceleration
+	float t; 									// time
+	float T;									// total of Samples
+	float s_time;								// sampling time
+	int oldst;									// old state of acc/dec
+} profile_vel_params;
 
 int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration)
 {
-	u = (float) actual_velocity;
-	vel = (float) target_velocity;
-	acc = (float) acceleration;
-	dec = (float) deceleration;
+	profile_vel_params.u = (float) actual_velocity;
+	profile_vel_params.v_d = (float) target_velocity;
+	profile_vel_params.acc = (float) acceleration;
+	profile_vel_params.dec = (float) deceleration;
 
-	v_d = vel;
-
-    if(u>=0 && v_d >=0)
+	/*both initial and desired velocity - positive case*/
+    if(profile_vel_params.u>=0 && profile_vel_params.v_d >=0)
     {
-    	if(v_d >= u)
+    	if(profile_vel_params.v_d >= profile_vel_params.u)
     	{
-    		a_d = acc;
-    		oldst= 1;
+    		profile_vel_params.a_d = profile_vel_params.acc;
+    		profile_vel_params.oldst= 1;
     	}
-    	else if(v_d < u)
+    	else if(profile_vel_params.v_d < profile_vel_params.u)
     	{
-    		a_d = dec;
-    		oldst= 2;
+    		profile_vel_params.a_d = profile_vel_params.dec;
+    		profile_vel_params.oldst= 2;
     	}
     }
-    else if(u<=0 && v_d <=0)
+    /*both initial and desired velocity - negative case*/
+    else if(profile_vel_params.u<=0 && profile_vel_params.v_d <=0)
     {
-    	if(u==0)
+    	if(profile_vel_params.u==0)
     	{
-    		a_d = acc;
-    		oldst= -1;
+    		profile_vel_params.a_d = profile_vel_params.acc;
+    		profile_vel_params.oldst= -1;
     	}
-    	else if(v_d==0)
+    	else if(profile_vel_params.v_d==0)
     	{
-    		a_d = -dec;
-    		oldst= -2;
+    		profile_vel_params.a_d = -profile_vel_params.dec;
+    		profile_vel_params.oldst= -2;
     	}
     	else
     	{
-    		if(v_d < u)
+    		if(profile_vel_params.v_d < profile_vel_params.u)
     		{
-    			a_d = -acc;
-    			oldst= -1;
+    			profile_vel_params.a_d = -profile_vel_params.acc;
+    			profile_vel_params.oldst= -1;
     		}
-    		else if(v_d > u)
+    		else if(profile_vel_params.v_d > profile_vel_params.u)
     		{
-    			a_d = -dec;
-    			oldst= -2;
+    			profile_vel_params.a_d = -profile_vel_params.dec;
+    			profile_vel_params.oldst= -2;
     		}
     	}
     }
-    else if(u>0 && v_d<0)
+    /*initial and desired velocity - transition from +ve to -ve case*/
+    else if(profile_vel_params.u>0 && profile_vel_params.v_d<0)
     {
-    	if(oldst==2 || oldst==-2)
+    	if(profile_vel_params.oldst==2 || profile_vel_params.oldst==-2)
     	{
-    		a_d = acc;
-    		oldst= 1;
+    		profile_vel_params.a_d = profile_vel_params.acc;
+    		profile_vel_params.oldst= 1;
     	}
     	else
     	{
-    		a_d = dec;
-    		oldst= 2;
+    		profile_vel_params.a_d = profile_vel_params.dec;
+    		profile_vel_params.oldst= 2;
     	}
     }
-    else if(u<0 && v_d>0)
+    /*initial and desired velocity - transition from -ve to +ve case*/
+    else if(profile_vel_params.u<0 && profile_vel_params.v_d>0)
     {
-    	if(oldst==-1)
+    	if(profile_vel_params.oldst==-1)
     	{
-    		a_d = -dec;
-    		oldst=-2;
+    		profile_vel_params.a_d = -profile_vel_params.dec;
+    		profile_vel_params.oldst=-2;
     	}
     	else
     	{
-    		a_d = -acc;
-    		oldst= -1;
+    		profile_vel_params.a_d = -profile_vel_params.acc;
+    		profile_vel_params.oldst= -1;
     	}
     }
 
     // compute time needed
-    t = (v_d - u)/a_d;
+    profile_vel_params.t = (profile_vel_params.v_d - profile_vel_params.u)/profile_vel_params.a_d;
 
-    T = t/samp;
+    profile_vel_params.T = profile_vel_params.t/profile_vel_params.s_time;
 
-	if(T<0)
-	   T = -T;
+	if(profile_vel_params.T<0)
+		profile_vel_params.T = -profile_vel_params.T;
 
 	//length = (int) round (T);
-	samp = t/T;
+	profile_vel_params.s_time = profile_vel_params.t/profile_vel_params.T;
 
-	return (int) round (T);
+	return (int) round (profile_vel_params.T);
 }
 
 int velocity_profile_generate(int step)
 {
-   return (int) round( u + a_d * samp * step);
+   return (int) round( profile_vel_params.u + profile_vel_params.a_d * profile_vel_params.s_time * step);
 }
 

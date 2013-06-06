@@ -7,10 +7,12 @@
 
 struct QUICK_STOP_VELOCITY_PARAM
 {
-	float max_deceleration;									// max allowed deceleration
-	float u, a_d, t; 										// user input variables
-	float T;
-	float samp;
+	float max_deceleration;		// max allowed deceleration
+	float u;					// initial velocity
+	float a_d;					// desired acceleration
+	float t; 					// time
+	float T;					// total of Samples
+	float s_time;				// sampling time
 } qstop_vel_params;
 
 int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceleration)
@@ -25,13 +27,13 @@ int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceler
 
 	qstop_vel_params.t = 0 - qstop_vel_params.u/qstop_vel_params.a_d;		//default reduce velocity to zero  (v_d - u)/a_d;
 
-	qstop_vel_params.samp = 0.001; 											//
-	qstop_vel_params.T = qstop_vel_params.t/qstop_vel_params.samp;
+	qstop_vel_params.s_time = 0.001; 											//
+	qstop_vel_params.T = qstop_vel_params.t/qstop_vel_params.s_time;
 
     if(qstop_vel_params.T<0)
     	qstop_vel_params.T = 0 - qstop_vel_params.T;
 
-    qstop_vel_params.samp = qstop_vel_params.t/qstop_vel_params.T;
+    qstop_vel_params.s_time = qstop_vel_params.t/qstop_vel_params.T;
 
 	return (int) round (qstop_vel_params.T);
 }
@@ -40,5 +42,5 @@ int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceler
 
 int quick_stop_velocity_profile_generate(int step)
 {
-   return (int) round( qstop_vel_params.u + qstop_vel_params.a_d * qstop_vel_params.samp * step);
+   return (int) round( qstop_vel_params.u + qstop_vel_params.a_d * qstop_vel_params.s_time * step);
 }
