@@ -3,12 +3,6 @@
 #include <stdio.h>
 #include <math.h>
 
-int i;
-float samp, T;
-float t, t_stamp;
-float v_d = 0, a_d, u;
-int v_ramp[2000];
-int length;
 
 
 struct QUICK_STOP_VELOCITY_PARAM
