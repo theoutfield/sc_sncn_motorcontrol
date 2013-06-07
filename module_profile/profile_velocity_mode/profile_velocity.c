@@ -11,7 +11,7 @@ struct PROFILE_VELOCITY_PARAM
 	float v_d;									// desired velocity
 	float a_d;									// desired acceleration
 	float t; 									// time
-	float T;									// total of Samples
+	float T;									// total no. of Samples
 	float s_time;								// sampling time
 	int oldst;									// old state of acc/dec
 } profile_vel_params;
@@ -92,6 +92,8 @@ int init_velocity_profile(int target_velocity, int actual_velocity, int accelera
     		profile_vel_params.oldst= -1;
     	}
     }
+
+    profile_vel_params.s_time = .001;
 
     // compute time needed
     profile_vel_params.t = (profile_vel_params.v_d - profile_vel_params.u)/profile_vel_params.a_d;
