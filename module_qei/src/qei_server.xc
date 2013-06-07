@@ -42,7 +42,7 @@ static const unsigned char lookup[16][4] = {
 };
 
 #pragma unsafe arrays
-void do_qei ( chanend c_qei, port in pQEI )
+void run_qei ( chanend c_qei, port in pQEI )
 {
 	unsigned pos = 0, v, ts1, ts2, ok=0, old_pins=0, new_pins;
 	timer t;

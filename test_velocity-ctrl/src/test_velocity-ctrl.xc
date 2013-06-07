@@ -141,7 +141,7 @@ int main(void) {
 
 				run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4);  		// channel priority 1,2..4
 
-				do_qei(c_qei, p_ifm_encoder);
+				run_qei(c_qei, p_ifm_encoder);
 
 			}
 		}
