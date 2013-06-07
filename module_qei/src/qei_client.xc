@@ -44,7 +44,21 @@
 	return {p, v};
 }
 
-{unsigned, unsigned, unsigned } get_qei_data( streaming chanend c_qei, qei_par &q_max)
+//counted up position
+{int, int} get_qei_position_count(chanend c_qei)
+{
+	int pos;
+	int dirn; 				// clockwise +1  counterclockwise -1
+	c_qei <: 2;
+	master
+	{
+		c_qei :> pos;
+		c_qei :> dirn;
+	}
+	return {pos, dirn};
+}
+
+{unsigned, unsigned, unsigned } get_qei_data( chanend c_qei, qei_par &q_max)
 {
 	unsigned p, s, ts1, ts2, v, qei_count_m = q_max.max_count;
 	c_qei <: QEI_CMD_POS_REQ;

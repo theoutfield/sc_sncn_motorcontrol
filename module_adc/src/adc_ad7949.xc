@@ -86,7 +86,7 @@ static unsigned zipLookup[256] = {
     0x11111100, 0x11111101, 0x11111110, 0x11111111,
 };
 
-void outputWordsZipped(clock clk,
+void output_words_zipped(clock clk,
 		       in buffered port:32 p_data_a,
 		       in buffered port:32 p_data_b,
 		       buffered out port:32 p, int d, int c, int b, int a) {
@@ -182,7 +182,24 @@ static inline unsigned convert(unsigned raw)
   return data;
 }
 
-
+/*
+ * ADC CONFIGURAION HOWTO
+ *
+ * Serialization: LSB first
+ *
+ * adc_config: !! reverse bit-order compared to AD7949 datasheet !!
+ * Bit    Name  Description
+ * 32:14  0     unused
+ * 13     RB    Read back CFG reg       (  1 => no)
+ * 12:11  SEQ   Sequencer               ( 00 => disable)
+ * 10:8   REF   Reference selection     (100 => internal)
+ * 7      BW    LPF bandwidth           (  1 => full)
+ * 6:4    INx   Input channel selection (000 => CH0)
+ * 3:1    INCC  Input channel config    (111 => unipolar, referenced to GND)
+ * 0      CFG   Config update           (  1 => overwrite cfg reg)
+ * -1     --PADDING-- (delay 1 clk cycle)
+ * => adc_config = 0b100100100011110
+*/
 
 #pragma unsafe arrays
 static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosia,
@@ -220,7 +237,7 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 	  	SPI_IDLE;
 		t :> ts;
 	
-		outputWordsZipped(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_other[iIndexADC], adc_config_other[iIndexADC], 0, clk_signal);
+		output_words_zipped(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_other[iIndexADC], adc_config_other[iIndexADC], 0, clk_signal);
 		p_data_a :> data_raw_a;
 		adc_data_a[iIndexADC] = convert(data_raw_a);
 		p_data_b :> data_raw_b;
@@ -232,7 +249,7 @@ static void adc_ad7949_singleshot(   buffered out port:32 p_sclk_conv_mosib_mosi
 
 	  	SPI_SELECT;
 		t :> ts;
-		outputWordsZipped(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_imot, adc_config_imot, 0, clk_signal);
+		output_words_zipped(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_imot, adc_config_imot, 0, clk_signal);
 		p_data_a :> data_raw_a;
 		adc_data_a[4] = convert(data_raw_a);
 		p_data_b :> data_raw_b;
@@ -340,22 +357,4 @@ void adc_ad7949_triggered( chanend c_adc,
 //		p_ifm_ext_d3 <: 0;
 	}//end while 1
 }// end of 	adc_ad7949_triggered
-
-
-
-  /* serialization -- LSB first */
-
-  /* adc_config: !! reverse bit-order compared to AD7949 datasheet !!
-     Bit    Name  Description
-     32:14  0     unused
-     13     RB    Read back CFG reg       (  1 => no)
-     12:11  SEQ   Sequencer               ( 00 => disable)
-     10:8   REF   Reference selection     (100 => internal)
-     7      BW    LPF bandwidth           (  1 => full)
-     6:4    INx   Input channel selection (000 => CH0)
-     3:1    INCC  Input channel config    (111 => unipolar, referenced to GND)
-     0      CFG   Config update           (  1 => overwrite cfg reg)
-     -1     --PADDING-- (delay 1 clk cycle)
-     => adc_config = 0b100100100011110
-  */
 

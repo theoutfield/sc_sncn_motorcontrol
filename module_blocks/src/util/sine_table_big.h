@@ -25,3 +25,6 @@ extern short sine_third[256];
 //** space vector table with 1024 base points ** Umax = 6944
 extern short SPACE_TABLE[1024];
 
+//extern short newsine_table[360];
+
+extern short newsine_table[500];

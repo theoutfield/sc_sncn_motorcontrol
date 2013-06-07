@@ -25,6 +25,8 @@
 
 {unsigned, unsigned} get_qei_position(chanend c_qei );
 
+{int, int} get_qei_position_count(chanend c_qei);
+
 /**
  * \param c_qei The control channel for the QEI server
  * \param q_max parameter defines Max quadrature encoder counts
@@ -33,7 +35,7 @@
  * \return position
  * \return validity state
  */
-{ unsigned, unsigned, unsigned } get_qei_data( streaming chanend c_qei, qei_par &q_max);
+{ unsigned, unsigned, unsigned } get_qei_data(chanend c_qei, qei_par &q_max);
 
 
 
