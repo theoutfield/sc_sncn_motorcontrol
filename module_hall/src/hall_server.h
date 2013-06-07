@@ -1,7 +1,8 @@
 /**
- * \file hall_client.h
+ * \file hall_server.h
  *
- *	Hall Sensor Client
+ *
+ *	Hall Sensor Server
  *
  * The copyrights, all other intellectual and industrial 
  * property rights are retained by XMOS and Synapticon GmbH.
@@ -14,28 +15,23 @@
  * under a separate license, the separate license terms are shown
  * below. The modifications to the code arse still covered by the
  * copyright notice above.
+
  *
  **/
 
 #pragma once
-#include <stdint.h>
+
+#include <xs1.h>
+#include <dc_motor_config.h>
 
 
-/**
- * \channel c_hall for communicating with the Hall Server
+
+/** \brief A basic hall encoder server
  *
- * \return the angle in range [0 - 4095] which maps to [0 - 359] degree
+ *  This implements the basic hall sensor server
+ *
+ *  \param c_hall the control channel for reading hall position
+ *  \param h_pole defines the pole-pairs for the hall sensor
+ *  \param p_hall the port for reading the hall sensor data
  */
-int get_hall_angle(chanend c_hall);
-
-
-int get_hall_absolute_pos(chanend c_hall);
-
-/**
- * \brief Client library function for Hall Sensor
- *
- * \channel c_hall for communicating with the Hall Server
- *
- * \return the speed in rpm from Hall Sensor
- */
-int get_speed_cal(chanend c_hall);
+void run_hall( port in p_hall, chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4);

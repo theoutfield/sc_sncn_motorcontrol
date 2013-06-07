@@ -33,72 +33,6 @@ void commutation_init(chanend c_pwm_ctrl)
 	update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-
-/* FOC based commutation functions */
-void space_vector_pwm( int iIndexPWM, int iUmotMotor, int iMotHoldingTorque , t_pwm_control& pwm_ctrl, chanend c_pwm_ctrl, int iPwmOnOff );
-
-void commutation_loop(chanend c_value, chanend c_pwm_ctrl)  //advanced for foc based commutation
-{
-	int cmd, iPwmOnOff = 1;
-	int iIndexPWM=0, iUmotMotor = 0, iMotHoldingTorque = 0;
-
-	 //================== pwmloop ========================
-	while (1)
-	{
-		select
-		{
-			case c_value :> cmd:     		// loop or user cmd token 40
-				if(cmd == 40)
-				{
-					c_value :> cmd;   		// from user or other external loops
-					iUmotMotor = cmd;      	// also can be done but regulated angle
-					c_value :> cmd;
-					iIndexPWM = cmd;
-				}
-				break;
-			default:
-				break;
-
-		}
-
-		space_vector_pwm( iIndexPWM, iUmotMotor, iMotHoldingTorque, pwm_ctrl, c_pwm_ctrl, iPwmOnOff );
-
-	}
-
-}
-
-void commutation(chanend c_value, chanend c_pwm_ctrl, chanend sig)
-{  //init sine-commutation and set up a4935
-
-	  const unsigned t_delay = 300*USEC_FAST;
-	  timer t;
-	  unsigned ts;
-
-	  commutation_init(c_pwm_ctrl);
-	  t when timerafter (ts + t_delay) :> ts;
-
-	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
-	  t when timerafter (ts + t_delay) :> ts;
-
-	  sig <: 1;
-	  while(1)
-	  {
-		  unsigned cmd, found =0;
-		  select
-		  {
-			case sig :> cmd:
-				found = 1;
-				break;
-			default:
-				break;
-		  }
-		  if(found == 1)
-			  break;
-	  }
-	  commutation_loop(c_value, c_pwm_ctrl);
-}
-
-
 /* Sinusoidal based commutation functions */
 
 void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl)
@@ -152,7 +86,7 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 
 		if (dir == 1)
 		{
-			iAnglePWM = iAngleFromHall + iAngleUser + iAngleFromRpm  + 180;//100 M3  //100 M1
+			iAnglePWM = iAngleFromHall + iAngleUser + iAngleFromRpm  + 180;//100 M3  //100 M1 //180
 			iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
 			iIndexPWM = iAnglePWM >> 4;
 			pwm[0] = ((sine_third[iIndexPWM])*umot1)/13889  + PWM_MAX_VALUE/2;
@@ -165,7 +99,7 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 
 		if (dir == -1)
 		{
-			iAnglePWM = iAngleFromHall + iAngleUser - iAngleFromRpm + 2700;  //2700 M3  //  2550 M1
+			iAnglePWM = iAngleFromHall + iAngleUser - iAngleFromRpm + 2700;  //2700 M3  //  2550 M1 //2700
 			iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
 			iIndexPWM = iAnglePWM >> 4;
 			pwm[0] = ((sine_third[iIndexPWM])*-umot1)/13889   + PWM_MAX_VALUE/2;
