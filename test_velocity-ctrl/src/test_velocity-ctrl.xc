@@ -34,6 +34,9 @@
 #include "sine_table_big.h"
 #include "print.h"
 #include "filter_blocks.h"
+#include "profile.h"
+
+#include "profile_test.h"
 
 #define ENABLE_xscope_main
 #define COM_CORE 0
@@ -41,6 +44,7 @@
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+
 
 
 int main(void) {
@@ -68,9 +72,14 @@ int main(void) {
 	//
 	par
 	{
-		on stdcore[0]:
+		on stdcore[2]:
 		{
+			par
+			{
+				// test_stop(); //profile only
 
+				//test_profile_velocity();
+			}
 		}
 
 		on stdcore[1]:
@@ -110,6 +119,7 @@ int main(void) {
 				}
 
 			}
+
 		}
 
 		/************************************************************

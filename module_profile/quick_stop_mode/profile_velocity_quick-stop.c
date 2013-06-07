@@ -11,7 +11,7 @@ struct QUICK_STOP_VELOCITY_PARAM
 	float u;					// initial velocity
 	float a_d;					// desired acceleration
 	float t; 					// time
-	float T;					// total of Samples
+	float T;					// total no. of Samples
 	float s_time;				// sampling time
 } qstop_vel_params;
 

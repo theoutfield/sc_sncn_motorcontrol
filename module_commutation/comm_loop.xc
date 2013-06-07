@@ -86,7 +86,7 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 
 		if (dir == 1)
 		{
-			iAnglePWM = iAngleFromHall + iAngleUser + iAngleFromRpm  + 180;//100 M3  //100 M1
+			iAnglePWM = iAngleFromHall + iAngleUser + iAngleFromRpm  + 180;//100 M3  //100 M1 //180
 			iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
 			iIndexPWM = iAnglePWM >> 4;
 			pwm[0] = ((sine_third[iIndexPWM])*umot1)/13889  + PWM_MAX_VALUE/2;
@@ -99,7 +99,7 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 
 		if (dir == -1)
 		{
-			iAnglePWM = iAngleFromHall + iAngleUser - iAngleFromRpm + 2700;  //2700 M3  //  2550 M1
+			iAnglePWM = iAngleFromHall + iAngleUser - iAngleFromRpm + 2700;  //2700 M3  //  2550 M1 //2700
 			iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
 			iIndexPWM = iAnglePWM >> 4;
 			pwm[0] = ((sine_third[iIndexPWM])*-umot1)/13889   + PWM_MAX_VALUE/2;

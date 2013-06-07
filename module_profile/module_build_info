@@ -1,4 +1,5 @@
 
+MODULE_PROFILE_DIRS += include
 MODULE_PROFILE_DIRS += profile_velocity_mode
 MODULE_PROFILE_DIRS += quick_stop_mode
 
