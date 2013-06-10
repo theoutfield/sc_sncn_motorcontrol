@@ -40,30 +40,7 @@
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
 #define QEI_COUNT_MAX (1024 * 4)	// Max count of Quadrature Encoder as multiple of 2
-
-
-
-/*
- * define control parameters for PI TORQUE controller
- */
-#define Torque_Kp_n 40                   // Kp = Kp_n/Kp_d
-#define Torque_Kp_d 10
-#define Torque_Ki_n 4					 // Ki = Ki_n/Ki_d
-#define Torque_Ki_d 120
-#define Torque_Integral_limit 10000
-#define Max_torque_out 1200              // Max_Torque_out = Max Continuous torque * 264 / torque constant
-/*
- * define control closing time the controller
- */
-#define loop_timing 88 					//in USEC_FAST
-/*
- * define optional PI controller parameters for field control
- */
-#define Field_Kp_n 25                    // Kp = Kp_n/Kp_d
-#define Field_Kp_d 10
-#define Field_Ki_n 2					 // Ki = Ki_n/Ki_d
-#define Field_Ki_d 100
-#define Field_Integral_limit 10000
+#define POLARITY 1					// 1 / -1
 
 
 typedef struct S_Control
@@ -81,31 +58,6 @@ typedef struct S_Filter_length
 	int filter_length;
 } filt_par;
 
-/**
- * \brief Struct definitions for the torque controller
- */
-typedef struct S_Torque {
-	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
-	int Integral_limit;
-	int Max_torque;
-} torq_par;
-
-/**
- * \brief struct definition for control loop time
- */
-typedef struct S_Loop_time {
-	int delay;
-} loop_par;
-
-/**
- * \brief Struct definitions for the field controller
- */
-typedef struct S_Field {
-	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
-	int Integral_limit;
-} field_par;
 
 /**
  * \brief struct definition for quadrature sensor
@@ -115,9 +67,9 @@ typedef struct S_QEI {
 	unsigned real_counts;
 } qei_par;
 
+
 /**
  * \brief struct definition for hall sensor
- *
  */
 typedef struct S_Hall {
 	int pole_pairs;
@@ -139,15 +91,21 @@ void init_qei(qei_par &qei_max);
  */
 void init_hall(hall_par &h_pole);
 
-/**
- * \brief Initialize Struct for Controller parameter
- *
- * \param tor initializes the torque PI controller parameters
- * \param field initializes the field PI controller parameters
- * \param loop initializes the control loop time
- *
- */
-void init_params_struct_all(torq_par &torque, field_par &field, loop_par &loop);
+
+
+#define SET_VELOCITY_TOKEN 50
+#define GET_VELOCITY_TOKEN 60
+
+
+typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
+{
+	int max_motor_speed; // max motor speed
+	int nominal_current;
+	int motor_torque_constant;
+	int polarity;
+} csv_par;
+
+int init_csv(csv_par &csv_params);
 
 
 #endif

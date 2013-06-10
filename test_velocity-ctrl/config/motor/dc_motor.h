@@ -3,7 +3,7 @@
  *
  *  Created on: May 16, 2013
  *      Author: pkanajar
- */
+ *
 
 #ifndef DC_MOTOR_H_
 #define DC_MOTOR_H_

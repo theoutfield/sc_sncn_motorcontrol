@@ -3,7 +3,7 @@
  *
  *  Created on: May 16, 2013
  *      Author: pkanajar
- */
+ *
 #include <dc_motor.h>
 #include <math.h>
 void coeffient_prec(coeff *d)
@@ -85,7 +85,7 @@ float joint_torque_control_out = 0;
 void pd_control(pd_data *p)
 {
 
-	/* computed current torque */
+	/* computed current torque *
 	speed = (float) p->speed;
 	prev_speed = (float) p->prev_speed;
 	joint_torque_set = (float) p->joint_torque_set;
@@ -101,7 +101,7 @@ if(joint_torque_actual <0)
 	joint_torque_actual = p->joint_torque_actual;
 if(joint_torque_actual - p->joint_torque_actual > 2000)
 	joint_torque_actual = p->joint_torque_actual;
-	/* torque controller*/
+	/* torque controller*
 	error_joint_torque = joint_torque_set - joint_torque_actual;
 
 	error_joint_torque_D = (error_joint_torque - error_joint_torque_previous);
@@ -126,3 +126,4 @@ if(joint_torque_actual - p->joint_torque_actual > 2000)
 
 	return;
 }
+*/

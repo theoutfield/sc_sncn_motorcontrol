@@ -42,7 +42,7 @@ static const unsigned char lookup[16][4] = {
 };
 
 #pragma unsafe arrays
-void run_qei ( chanend c_qei, port in pQEI )
+void run_qei ( chanend c_qei, port in p_qei )
 {
 	unsigned pos = 0, v, ts1, ts2, ok=0, old_pins=0, new_pins;
 	timer t;
@@ -53,13 +53,13 @@ void run_qei ( chanend c_qei, port in pQEI )
 	int difference = 0, dirn = 0;
 	int QEI_COUNT_MAX = 4096;
 
-	pQEI :> new_pins;
+	p_qei :> new_pins;
 	t :> ts1;
 
 	while (1) {
 	#pragma ordered
 		select {
-			case pQEI when pinsneq(new_pins) :> new_pins :
+			case p_qei when pinsneq(new_pins) :> new_pins :
 				{
 				  if ((new_pins & 0x3) != old_pins) {
 					ts2 = ts1;

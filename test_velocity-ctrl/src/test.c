@@ -12,7 +12,7 @@
 #include "test.h"
 
 
-int input_cmd(in_data *d )
+int input_torq(in_data *d )
 {
 	int torque;
 	printf("enter torque\n");
@@ -28,6 +28,14 @@ int input_pos(in_data *d)
 	printf("enter position\n");
 	scanf("%d", &position);
 	d->set_position = position;
+	return 1;
+}
+int input_vel(in_data *d)
+{
+	int velocity;
+	printf("enter velocity\n");
+	scanf("%d", &velocity);
+	d->set_velocity = velocity;
 	return 1;
 }
 

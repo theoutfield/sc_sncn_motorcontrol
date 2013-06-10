@@ -49,6 +49,9 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 	int umot =0, umot1 = 0, dir = 0, speed = 0, stop = 0, set = 0,limit=20;
 
 
+	c_commutation <: 1; //initialisation done
+
+
 	//t:>time;
 	while (1)
 	{

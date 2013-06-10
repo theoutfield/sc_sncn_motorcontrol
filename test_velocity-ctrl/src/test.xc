@@ -7,7 +7,7 @@ void set_torque_test(chanend c_torque) {
 	int torque;
 	in_data d;
 	while (1) {
-		input_cmd(d);
+		input_torq(d);
 		//printintln(d.set_torque);
 
 		c_torque <: 2;
@@ -15,3 +15,4 @@ void set_torque_test(chanend c_torque) {
 
 	}
 }
+
