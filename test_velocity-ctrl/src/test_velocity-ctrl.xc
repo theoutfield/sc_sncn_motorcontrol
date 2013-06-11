@@ -36,7 +36,7 @@
 #include "filter_blocks.h"
 #include "profile.h"
 
-#include "param_list.h"
+
 #include "profile_test.h"
 
 #define ENABLE_xscope_main
@@ -135,11 +135,12 @@ int main(void) {
 				// test_stop(); //profile only
 
 				//test_profile_velocity();
-				vel_test(c_velocity_ctrl);
+			//	vel_test(c_velocity_ctrl);
+
 				//ethercat local test
-			/*	{
+				{
 					int i;
-					int u = 0, v_d = 2000, acc = 1000, dec =1050;
+					int u = 0, v_d = 2000, acc = 8000, dec =1050;
 					int steps = 0, v_ramp;
 					timer t; int time;
 					csv_par csv_params;
@@ -193,6 +194,20 @@ int main(void) {
 					//	xscope_probe_data(3, set_velocity_csv(csv_params, v_ramp, 0, 0, c_velocity_ctrl));
 					}
 
+					t when timerafter(time + 4*SEC_STD) :> time;
+
+					u = get_velocity(c_velocity_ctrl);
+					steps = init_quick_stop_velocity_profile(u*csv_params.polarity, dec);
+
+					for(i = 1; i < steps; i++)
+					{
+						t when timerafter(time + 1*MSEC_STD) :> time;
+						v_ramp = quick_stop_velocity_profile_generate(i);
+					//	set_velocity(v_ramp, c_velocity_ctrl);
+						set_velocity_csv(csv_params, v_ramp, 0, 0, c_velocity_ctrl);
+						xscope_probe_data(2, v_ramp);
+					//	xscope_probe_data(3, set_velocity_csv(csv_params, v_ramp, 0, 0, c_velocity_ctrl));
+					}
 
 				//	printstrln("end");
 					while(1)
@@ -200,7 +215,7 @@ int main(void) {
 						//set_velocity(v_ramp, c_velocity_ctrl);
 						set_velocity_csv(csv_params, v_ramp, 0, 0, c_velocity_ctrl);
 					}
-				}*/
+				}
 
 			}
 		}

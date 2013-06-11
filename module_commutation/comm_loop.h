@@ -23,6 +23,7 @@
 #include "sine_table_big.h"
 #include "adc_client_ad7949.h"
 #include "hall_client.h"
+#include "dc_motor_config.h"
 
 /**
  * \brief Sinusoidal based Commutation Loop
