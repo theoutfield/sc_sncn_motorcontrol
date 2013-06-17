@@ -35,6 +35,9 @@
 #include "print.h"
 #include "filter_blocks.h"
 #include "profile.h"
+#include <flash_Somanet.h>
+#include <internal_config.h>
+#include <ctrlproto.h>
 
 
 #include "profile_test.h"
@@ -102,6 +105,64 @@ void vel_test(chanend c_velocity_ctrl)
 		set_velocity(d.set_velocity, c_velocity_ctrl);
 	}
 }
+
+
+void ether_comm(chanend pdo_out,chanend pdo_in)
+{
+	ctrl_proto_values_t InOut;
+
+	int i = 0;
+	int vel = 0;
+
+	timer t, t1;
+	  unsigned time, time1 , time2;
+	  unsigned ts;
+	  int iIndex1;
+
+
+		  init_ctrl_proto(InOut);
+		  t:>time;
+		  t1:>time2;
+		while(1)
+		{
+
+
+			ctrlproto_protocol_handler_function( pdo_out, pdo_in, InOut);
+
+
+			switch(InOut.ctrl_motor)
+			{
+
+
+				case CSV: //csv mode index
+
+					//printstrln("vel");
+					//InOut.out_speed = i;
+					//i= i+1;
+					vel = InOut.in_speed;
+				//	xscope_probe_data(0, vel);
+					t:>time1;
+					xscope_probe_data(0, time1-time);
+
+					t:>time;
+					break;
+
+
+			}//eof switch
+			select
+			{
+				case t1 when timerafter(time2 + MSEC_STD) :> time2:
+
+				xscope_probe_data(1,  InOut.in_speed);
+
+				break;
+
+
+
+			}
+
+		}
+	}
 int main(void) {
 	chan c_adc, c_adctrig;
 	chan c_qei;
@@ -128,6 +189,14 @@ int main(void) {
 	//
 	par
 	{
+		on stdcore[0] : {
+			ecat_init();
+			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);
+		}
+
+		on stdcore[0] : {
+			 ether_comm(pdo_out, pdo_in);
+		}
 		on stdcore[1]:
 		{
 			par
@@ -138,7 +207,7 @@ int main(void) {
 			//	vel_test(c_velocity_ctrl);
 
 				//ethercat local test
-				{
+			/*	{
 					int i;
 					int u = 0, v_d = 2000, acc = 8000, dec =1050;
 					int steps = 0, v_ramp;
@@ -215,7 +284,7 @@ int main(void) {
 						//set_velocity(v_ramp, c_velocity_ctrl);
 						set_velocity_csv(csv_params, v_ramp, 0, 0, c_velocity_ctrl);
 					}
-				}
+				}*/
 
 			}
 		}
@@ -243,7 +312,7 @@ int main(void) {
 			par
 			{
 
-				{
+			/*	{
 					ctrl_par velocity_ctrl_params;
 					filt_par sensor_filter_params;
 					hall_par hall_params;
@@ -259,7 +328,7 @@ int main(void) {
 				//	set_commutation_sinusoidal(c_commutation, 1500);
 
 					velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, qei_params, 2, c_hall_p2, c_qei, c_velocity_ctrl, c_commutation);
-				}
+				}*/
 
 			}
 
