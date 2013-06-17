@@ -205,14 +205,6 @@ velocity_control_out = (velocity_ctrl_params.Kp_n*error_velocity)/(velocity_ctrl
 
 				set_commutation_sinusoidal(c_commutation, velocity_control_out);
 
-if(actual_velocity == 0)
-{
-//	set_commutation_sinusoidal(c_commutation, velocity_control_out)
-	c_commutation<:3;
-	c_commutation <: 30;
-	ts when timerafter(time + velocity_ctrl_params.Loop_time/2) :> time;
-}
-
 				previous_error = error_velocity;
 
 
