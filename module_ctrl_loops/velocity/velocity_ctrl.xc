@@ -129,28 +129,28 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 	 while(1)
 	 {
-		unsigned cmd, found =0;
+		unsigned command, received_command = UNSET;
 		select
 		{
-			case VELOCITY_CTRL_READ(cmd):
-				if(cmd == 1)
+			case VELOCITY_CTRL_READ(command):
+				if(command == SET)
 				{
-					activate = 1;
+					activate = SET;
 					 printstrln("vel activated");
 				}
-				else if(cmd == 0)
+				else if(command == UNSET)
 				{
-					activate = 0;
+					activate = UNSET;
 					printstrln("vel disabled");
 				}
-				found = 1;
+				received_command = SET;
 				break;
 			default:
 				break;
 		}
-		if(found == 1)
+		if(received_command == SET)
 		{
-			VELOCITY_CTRL_WRITE(found);
+			VELOCITY_CTRL_WRITE(received_command);
 			break;
 		}
 	 }

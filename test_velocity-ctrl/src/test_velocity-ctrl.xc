@@ -83,16 +83,16 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_vel
 
 	//check init signal from commutation level
 	while (1) {
-		unsigned cmd, found = 0;
+		unsigned command, received_command = 0;
 		select
 		{
-			case			c_signal :> cmd:
-			found = 1;
+			case c_signal :> command:
+				received_command = 1;
 			break;
 			default:
 			break;
 		}
-		if(found == 1)
+		if(received_command == 1)
 		{
 			printstrln(" init commutation");
 			break;
@@ -101,19 +101,19 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_vel
 
 	VELOCITY_CTRL_ENABLE(); 	//activate vel ctrl
 
-	 // init check
+	 // init check from velocity control loop
 	 while(1)
 	 {
-		unsigned cmd, found =0;
+		unsigned command, received_command =0;
 		select
 		{
-			case VELOCITY_CTRL_READ(cmd):
-				found = 1;
+			case VELOCITY_CTRL_READ(command):
+				received_command = 1;
 				break;
 			default:
 				break;
 		}
-		if(found == 1)
+		if(received_command == 1)
 		{
 		  printstrln("vel intialised");
 		  break;
