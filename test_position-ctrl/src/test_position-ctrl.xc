@@ -82,8 +82,8 @@ void set_position_test(chanend c_position_ctrl)
 
 //internal
 void set_position(int target_position, chanend c_position_ctrl) {
-	c_position_ctrl <: SET_POSITION_TOKEN;
-	c_position_ctrl <: target_position;
+	c_position_ctrl <: SET_POSITION_TOKEN;	//	POSITION_CTRL_WRITE(SET_POSITION_TOKEN);
+	c_position_ctrl <: target_position;  	//	POSITION_CTRL_WRITE(target_position);
 }
 
 int position_limit(int position, int max_position_limit, int min_position_limit) {
@@ -128,7 +128,7 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 		unsigned received_command = 0;
 		select
 		{
-			case c_signal :> command:
+			case c_signal :> command: 			//SIGNAL_READ(command):
 				received_command = 1;
 			break;
 			default:
@@ -147,10 +147,11 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 	while(1)
 	{
 		select{
-			case c_position_ctrl :> command:
+			case c_position_ctrl :> command:			//  POSITION_CTRL_READ(command);
 				if(command == SET_POSITION_TOKEN)
 				{
-					c_position_ctrl :> target_position;
+					c_position_ctrl :> target_position;  //	POSITION_CTRL_READ(target_position);
+
 				}
 				break;
 			default:

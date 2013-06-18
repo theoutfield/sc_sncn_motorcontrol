@@ -8,6 +8,10 @@
 #define POSITION_CTRL_READ(x)		c_position_ctrl :> x
 #define POSITION_CTRL_WRITE(x)		c_position_ctrl <: x
 
+#define SIGNAL_READ(x) 				c_signal :> x
+#define SIGNAL_WRITE(x)				c_signal <: x
+
+
 #define SET    1
 #define UNSET  0
 
