@@ -120,16 +120,16 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 	int cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs    core 2/1/0 only
 	int cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);		  // variable qei_real_max  core 2/1/0 only
 
-	int cmd;
+	int command;
 
 	int activate = 0;
 
 	init_filter(filter_buffer, index, filter_length);
 
 
-	 while(1)
-	 {
-		unsigned command, received_command = UNSET;
+	while(1)
+	{
+		unsigned received_command = UNSET;
 		select
 		{
 			case VELOCITY_CTRL_READ(command):
@@ -153,7 +153,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 			VELOCITY_CTRL_WRITE(received_command);
 			break;
 		}
-	 }
+	}
 
 	//printstrln("start vel");
 	ts :> time;
@@ -260,11 +260,11 @@ velocity_control_out = (velocity_ctrl_params.Kp_n*error_velocity)/(velocity_ctrl
 				break;
 
 				/* acq target velocity etherCAT */
-			case VELOCITY_CTRL_READ(cmd):
-				if(cmd == SET_VELOCITY_TOKEN)
+			case VELOCITY_CTRL_READ(command):
+				if(command == SET_VELOCITY_TOKEN)
 					VELOCITY_CTRL_READ(target_velocity);
 
-				else if(cmd == GET_VELOCITY_TOKEN)
+				else if(command == GET_VELOCITY_TOKEN)
 					VELOCITY_CTRL_WRITE(actual_velocity);
 				break;
 

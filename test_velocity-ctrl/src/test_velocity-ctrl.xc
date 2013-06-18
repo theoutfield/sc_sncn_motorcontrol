@@ -83,7 +83,7 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_vel
 
 	//check init signal from commutation level
 	while (1) {
-		unsigned command, received_command = 0;
+		unsigned command, received_command = 0; //FIXME put declarations outside the loop
 		select
 		{
 			case c_signal :> command:
@@ -104,7 +104,7 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_vel
 	 // init check from velocity control loop
 	 while(1)
 	 {
-		unsigned command, received_command =0;
+		unsigned command, received_command =0; //FIXME put declarations outside the loop
 		select
 		{
 			case VELOCITY_CTRL_READ(command):
