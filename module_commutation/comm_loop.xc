@@ -23,6 +23,7 @@
 #include "adc_client_ad7949.h"
 #include "hall_client.h"
 #include "comm_loop.h"
+#include "print.h"
 
 static t_pwm_control pwm_ctrl;
 
@@ -47,9 +48,6 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 	int i;
 
 	int umot =0, umot1 = 0, dir = 0, speed = 0, stop = 0, set = 0,limit=20;
-
-
-	c_commutation <: 1; //initialisation done
 
 
 	//t:>time;
@@ -153,7 +151,7 @@ void set_commutation_sinusoidal(chanend c_commutation, int input)
 	return;
 }
 
-void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc)
+void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc, chanend c_signal)
 {
 	  const unsigned t_delay = 300*USEC_FAST;
 	  timer t;
@@ -165,6 +163,8 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
 	  t when timerafter (ts + t_delay) :> ts;
 
+	  printstrln("start");
+	  c_signal <: 1; //driver init done.
 	 /* signal_adc <: 1;
 	  while(1)
 	  {

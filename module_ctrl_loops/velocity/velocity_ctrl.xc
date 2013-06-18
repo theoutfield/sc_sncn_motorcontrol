@@ -5,9 +5,10 @@
 #include "comm_loop.h"
 #include "filter_blocks.h"
 #include <xscope.h>
+#include <internal_config.h>
 #include "print.h"
 
-#define Debug_velocity_ctrl
+//#define Debug_velocity_ctrl
 //default runs on CORE 2/CORE 1/CORE 0
 #define HALL 1
 #define QEI 2
@@ -89,31 +90,45 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 	int cmd;
 
+	int activate = 0;
+
 	init_filter(filter_buffer, index, filter_length);
 
 
-	while(1)
-	{
-	  unsigned cmd, found =0;
-	  select
-	  {
-		case c_commutation :> cmd:
-			found = 1;
+	 while(1)
+	 {
+		unsigned cmd, found =0;
+		select
+		{
+			case VELOCITY_CTRL_READ(cmd):
+				if(cmd == 1)
+				{
+					activate = 1;
+					 printstrln("vel activated");
+				}
+				else if(cmd == 0)
+				{
+					activate = 0;
+					printstrln("vel disabled");
+				}
+				found = 1;
+				break;
+			default:
+				break;
+		}
+		if(found == 1)
+		{
+			VELOCITY_CTRL_WRITE(found);
 			break;
-		default:
-			break;
-	  }
-	  if(found == 1)
+		}
+	 }
 
-		  break;
-	}
-
-	printstrln("start vel");
+	//printstrln("start vel");
 	ts :> time;
-	ts when timerafter(time+1*SEC_FAST) :> time;
+	//ts when timerafter(time+1*SEC_FAST) :> time;
 
 
-	while(1)
+	while(activate)
 	{
 		#pragma ordered
 		select
@@ -213,12 +228,12 @@ velocity_control_out = (velocity_ctrl_params.Kp_n*error_velocity)/(velocity_ctrl
 				break;
 
 				/* acq target velocity etherCAT */
-			case c_velocity_ctrl :> cmd:
+			case VELOCITY_CTRL_READ(cmd):
 				if(cmd == SET_VELOCITY_TOKEN)
-					c_velocity_ctrl :> target_velocity;
+					VELOCITY_CTRL_READ(target_velocity);
 
 				else if(cmd == GET_VELOCITY_TOKEN)
-					c_velocity_ctrl <: actual_velocity;
+					VELOCITY_CTRL_WRITE(actual_velocity);
 				break;
 
 		}
