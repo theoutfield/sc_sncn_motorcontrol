@@ -47,36 +47,8 @@
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
-//internal
-void set_velocity(int target_velocity, chanend c_velocity_ctrl) {
-c_velocity_ctrl	<: SET_VELOCITY_TOKEN;
-	c_velocity_ctrl <: target_velocity;
-}
-int get_velocity(chanend c_velocity_ctrl) {
-	int velocity;
-c_velocity_ctrl	<: GET_VELOCITY_TOKEN;
-	c_velocity_ctrl :> velocity;
-	return velocity;
-}
-int max_speed_limit(int velocity, int max_speed) {
-	if (velocity > max_speed) {
-		velocity = max_speed;
-		return velocity;
-	} else if (velocity < -max_speed) {
-		velocity = -max_speed;
-		return velocity;
-	} else if (velocity > -max_speed && velocity < max_speed) {
-		return velocity;
-	}
-}
-//csv mode function
-void set_velocity_csv(csv_par &csv_params, int target_velocity,
-		int velocity_offset, int torque_offset, chanend c_velocity_ctrl) {
-	set_velocity(
-			max_speed_limit(
-					(target_velocity + velocity_offset) * csv_params.polarity,
-					csv_params.max_motor_speed), c_velocity_ctrl);
-}
+
+
 
 //basic velocity ctrl test
 void vel_test(chanend c_velocity_ctrl) {
@@ -238,7 +210,7 @@ par		{
 			//	vel_test(c_velocity_ctrl);
 
 			//ethercat local test
-			/*	{
+		/*		{
 			 int i;
 			 int u = 0, v_d = 2000, acc = 8000, dec =1050;
 			 int steps = 0, v_ramp;
@@ -246,6 +218,44 @@ par		{
 			 csv_par csv_params;
 			 init_csv(csv_params);
 
+				//check init signal from commutation level
+				while (1) {
+					unsigned cmd, found = 0;
+					select
+					{
+						case			c_signal :> cmd:
+						found = 1;
+						break;
+						default:
+						break;
+					}
+					if(found == 1)
+					{
+						printstrln(" init commutation");
+						break;
+					}
+				}
+
+				VELOCITY_CTRL_ENABLE(); 	//activate vel ctrl
+
+				 // init check
+				 while(1)
+				 {
+					unsigned cmd, found =0;
+					select
+					{
+						case VELOCITY_CTRL_READ(cmd):
+							found = 1;
+							break;
+						default:
+							break;
+					}
+					if(found == 1)
+					{
+					  printstrln("vel intialised");
+					  break;
+					}
+				 }
 			 steps = init_velocity_profile(v_d, u*csv_params.polarity, acc, dec);
 			 printintln(steps);
 
