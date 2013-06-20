@@ -35,6 +35,7 @@
 #include "print.h"
 #include "filter_blocks.h"
 #include "profile.h"
+
 #include <flash_Somanet.h>
 #include <internal_config.h>
 #include <ctrlproto.h>
@@ -46,38 +47,11 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
+extern inline int init(int vel, int pos_i, int pos_f);
+extern inline int mot_q(int i);
 
 #define SET_POSITION_TOKEN 40
 
-//basic position ctrl test
-void set_position_test(chanend c_position_ctrl)
-{
-	int position = 0;
-	in_data d;
-	timer ts;
-	unsigned time;
-	int increment = 50;
-
-	ts:>time;
-
-	ts when timerafter(time+10*SEC_STD) :> time;
-
-	while (1) {
-		//input_pos(d);
-		//printintln(d.set_position);
-
-		ts when timerafter(time+100000) :> time;
-
-		position +=increment;
-		c_position_ctrl <: 2;
-		c_position_ctrl <: position;
-		if(position>300000)
-			increment *= -1;
-		if(position<0)
-			increment *= -1;
-
-	}
-}
 
 
 //internal
@@ -105,7 +79,112 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 void set_position_csv(csp_par &csp_params, int target_position,
 		int position_offset, int velocity_offset, int torque_offset, chanend c_position_ctrl)
 {
-	set_position( position_limit(	(target_position + position_offset) * csp_params.base.polarity, csp_params.max_position_limit, csp_params.min_position_limit  ), c_position_ctrl );
+	set_position(position_limit( (target_position + position_offset) * csp_params.base.polarity , csp_params.max_position_limit*1000, csp_params.min_position_limit*1000), c_position_ctrl);
+}
+
+
+
+//basic position ctrl test
+void set_position_test(chanend c_position_ctrl)
+{
+	int position = 0;
+	in_data d;
+	timer ts;
+	unsigned time;
+	int increment = 50;
+
+	int pos_m;
+	csp_par csp_params;
+
+	init_csp(csp_params);
+
+
+	//ts when timerafter(time+10*SEC_STD) :> time;
+	//check init
+	while (1) {
+		unsigned command, received_command = 0;
+		select
+		{
+			case c_position_ctrl :> command: 			//SIGNAL_READ(command):
+				received_command = 1;
+			break;
+			default:
+			break;
+		}
+		if(received_command == 1)
+		{
+			printstrln(" init posctrl ");
+			break;
+		}
+	}
+
+	ts:>time;
+	while (1) {
+		//input_pos(d);
+		//printintln(d.set_position);
+
+		ts when timerafter(time+100000) :> time;
+
+		position +=increment;
+		//set_position(position, c_position_ctrl);
+		//xscope_probe_data(0, position);
+		xscope_probe_data(1, position);
+		set_position_csv(csp_params, position, 0, 0, 0, c_position_ctrl);
+
+		//xscope_probe_data(1, pos_m);
+		if(position>300000)
+			increment *= -1;
+		if(position<0)
+			increment *= -1;
+
+	}
+}
+void profile_pos(chanend c_position_ctrl)
+{
+	int samp;
+	int v = 450, i =1;
+	int cur_p = 0, d_pos = 750;
+	int p_ramp;
+	timer ts;
+	unsigned time;
+	csp_par csp_params;
+	init_csp(csp_params);
+
+	//check init
+	while (1) {
+		unsigned command, received_command = 0;
+		select
+		{
+			case c_position_ctrl :> command: 			//SIGNAL_READ(command):
+				received_command = 1;
+			break;
+			default:
+			break;
+		}
+		if(received_command == 1)
+		{
+			printstrln(" init posctrl ");
+			break;
+		}
+	}
+
+	samp = init(v, cur_p, d_pos);
+
+	ts:>time;
+	while(i<samp)
+	{
+		ts when timerafter(time+100000) :> time;
+		p_ramp = mot_q(i);
+		i++;
+		xscope_probe_data(1, p_ramp);
+		set_position_csv(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
+	}
+	while(1)
+	{
+		ts when timerafter(time+100000) :> time;
+		xscope_probe_data(1, p_ramp);
+		set_position_csv(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
+	}
 }
 
 void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, chanend c_position_ctrl)
@@ -118,9 +197,9 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 	int error_position_I = 0;
 	int previous_error = 0;
 	int position_control_out = 0;
-	int Kp = 6, Kd = 0, Ki = 0;
-	int max_integral = (13739)/1;
-	int target_position = 15000;
+	int Kp = 8, Kd = 3, Ki = 1;
+	int max_integral = (13739*3500)/1;
+	int target_position = 0;
 	int command;
 
 	//check init signal from commutation level
@@ -143,6 +222,9 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 
 	ts:> time;
 	ts when timerafter(time+3*SEC_FAST) :> time;
+
+	c_position_ctrl <: 1; //start
+
 	//set_commutation_sinusoidal(c_commutation, 1000);
 	while(1)
 	{
@@ -164,16 +246,16 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 
 		//xscope_probe_data(0, actual_position);
 
-		error_position = (target_position - actual_position)*1000;
+		error_position = (target_position - actual_position);
 		error_position_I = error_position_I + error_position;
 		error_position_D = error_position - previous_error;
 
-		if(error_position_I > max_integral*1000)
-			error_position_I = max_integral*1000;
-		else if(error_position_I < -max_integral*1000)
-			error_position_I = 0 - max_integral*1000;
+		if(error_position_I > max_integral)
+			error_position_I = max_integral;
+		else if(error_position_I < -max_integral)
+			error_position_I = 0 - max_integral;
 
-		position_control_out = (Kp*error_position)/10000 + (Ki*error_position_I) + (Kd*error_position_D);
+		position_control_out = (Kp*error_position)/20 + (Ki*error_position_I)/3500 + (Kd*error_position_D)/13;
 
 		if(position_control_out > 13739)
 			position_control_out = 13739;
@@ -185,7 +267,7 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 
 		#ifdef ENABLE_xscope_main
 		xscope_probe_data(0, actual_position);
-		xscope_probe_data(1, target_position);
+		//xscope_probe_data(1, target_position);
 		#endif
 
 		previous_error = error_position;
@@ -231,66 +313,102 @@ int main(void) {
 		}*/
 		on stdcore[1]:
 		{
-par		{
+			par
+			{
 
-			set_position_test(c_position_ctrl);
-
+				//set_position_test(c_position_ctrl);
+				//profile_pos(c_position_ctrl);
+			}
 		}
-	}
 
-	on stdcore[1]:
-	{
-		xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
-				"n", XSCOPE_CONTINUOUS, "1 actualspeed", XSCOPE_INT, "n",
-				XSCOPE_CONTINUOUS, "2 ramp", XSCOPE_INT, "n",
-				XSCOPE_CONTINUOUS, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
-				"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
-				XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "6 vel_d", XSCOPE_INT,
-				"n", XSCOPE_CONTINUOUS, "7 speed", XSCOPE_INT, "n",
-				XSCOPE_CONTINUOUS, "8 sinepos_a", XSCOPE_UINT, "n",
-				XSCOPE_CONTINUOUS, "9 sinepos_b", XSCOPE_UINT, "n",
-				XSCOPE_CONTINUOUS, "10 sinepos_c", XSCOPE_UINT, "n",
-				XSCOPE_CONTINUOUS, "11 sine_a", XSCOPE_UINT, "n",
-				XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
-				XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
-		xscope_config_io(XSCOPE_IO_BASIC);
-	}
-
-	on stdcore[2]:
-	{
-		par
+		on stdcore[1]:
 		{
-			position_control( c_hall_p2, c_signal, c_commutation, c_position_ctrl);
+			xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
+					"n", XSCOPE_CONTINUOUS, "1 actualspeed", XSCOPE_INT, "n",
+					XSCOPE_CONTINUOUS, "2 ramp", XSCOPE_INT, "n",
+					XSCOPE_CONTINUOUS, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
+					"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
+					XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "6 vel_d", XSCOPE_INT,
+					"n", XSCOPE_CONTINUOUS, "7 speed", XSCOPE_INT, "n",
+					XSCOPE_CONTINUOUS, "8 sinepos_a", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "9 sinepos_b", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "10 sinepos_c", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "11 sine_a", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
+					XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
+			xscope_config_io(XSCOPE_IO_BASIC);
 		}
 
-	}
-
-	/************************************************************
-	 * IFM_CORE
-	 ************************************************************/
-	on stdcore[IFM_CORE]:
-	{
-		par
+		on stdcore[2]:
 		{
+			par
+			{
+				//position_control( c_hall_p2, c_signal, c_commutation, c_position_ctrl);
+				{
 
-			adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
-					p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
-					p_ifm_adc_misob);
+					{
+						int i = 0;
+						timer ts;
+						unsigned int time , command;
+						ts:> time;
 
-			do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
-					p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+						while (1) {
+								unsigned received_command = 0;
+								select
+								{
+									case c_signal :> command: 			//SIGNAL_READ(command):
+										received_command = 1;
+									break;
+									default:
+									break;
+								}
+								if(received_command == 1)
+								{
+									printstrln(" init commutation");
+									break;
+								}
+							}
+						while(1)
+						{
+							i = i-5;
+							if(i<-13739)
+								i = -13739;
+							ts when timerafter(time+3*MSEC_STD) :> time;
+							set_commutation_sinusoidal(c_commutation, i);
+						}
 
-			commutation_sinusoidal(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
-
-
-			run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
-
-			run_qei(c_qei, p_ifm_encoder);
+					}
+				}
+			}
 
 		}
+
+		/************************************************************
+		 * IFM_CORE
+		 ************************************************************/
+		on stdcore[IFM_CORE]:
+		{
+			par
+			{
+
+				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
+						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
+						p_ifm_adc_misob);
+
+				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
+						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+
+				commutation_sinusoidal(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
+
+
+				run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+
+				run_qei(c_qei, p_ifm_encoder);
+
+			}
+		}
+
 	}
 
-}
-
-return 0;
+	return 0;
 }

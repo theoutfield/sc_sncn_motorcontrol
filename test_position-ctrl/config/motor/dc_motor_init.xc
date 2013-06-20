@@ -35,6 +35,13 @@ int init_csp(csp_par &csp_params)
 	csp_params.max_position_limit = MAX_POSITION_LIMIT;
 	csp_params.min_position_limit = MIN_POSITION_LIMIT;
 
+/*	printintln(csp_params.base.max_motor_speed);
+	printintln(csp_params.base.polarity);
+	printintln(csp_params.max_following_error);
+	printintln(csp_params.max_position_limit);
+	printintln(csp_params.min_position_limit);
+*/
+
 	return 1;  //
 
 }

@@ -26,8 +26,8 @@
 
 #ifndef __DC_MOTOR_CONFIG__H__test1
 #define __DC_MOTOR_CONFIG__H__test1
+#include <print.h>
 
-#define new
 
 #pragma once
 
@@ -40,11 +40,11 @@
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
 #define QEI_COUNT_MAX (1024 * 4)	// Max count of Quadrature Encoder as multiple of 2
-#define POLARITY 1					// 1 / -1
+#define POLARITY -1					// 1 / -1
 
 #define MAX_FOLLOWING_ERROR 0
-#define MAX_POSITION_LIMIT 359
-#define MIN_POSITION_LIMIT -359
+#define MAX_POSITION_LIMIT 3590
+#define MIN_POSITION_LIMIT -3590
 
 typedef struct S_Control
 {
