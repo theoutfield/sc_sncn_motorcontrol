@@ -38,16 +38,14 @@ void commutation_init(chanend c_pwm_ctrl)
 
 void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl)
 {
-	unsigned cmd;
+	unsigned command;
 	unsigned pwm[3] = { 0, 0, 0 };
-	int iIndexPWM;
-	int iAngleFromHall  = 0;
-	int iAngleUser      = 300;
-	int iAngleFromRpm   = 0;
-	int iAnglePWM, iActualSpeed = 0;
-	int i;
+	int angle_pwm;
+	int angle;
+	int angle_rpm   = 0;
+	int speed = 0;
 
-	int umot =0, umot1 = 0, dir = 0, speed = 0, stop = 0, set = 0,limit=20;
+	int voltage = 0, direction = 0, stop = 0, set = 0, limit=20;
 
 
 	//t:>time;
@@ -56,58 +54,60 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 		//============= rotor position ===============================
 		if(stop!=1)
 		{
-			iActualSpeed = get_speed_cal(c_hall);
-			iAngleFromHall = get_hall_angle(c_hall);
+			speed = get_speed_cal(c_hall);
+			angle = get_hall_angle(c_hall);
 		}
 		else
 		{
-			iActualSpeed = get_speed_cal(c_hall);
-			iAngleFromHall = 30;
-			umot1 = 2000;
+			speed = get_speed_cal(c_hall);
+			angle = 30;
+			voltage = 2000;
 			if(set>limit)
 			{
 				set=limit;
 			}
-			umot1=set*100;
+			voltage=set*100;
 
 		}
 
 
-		iAngleFromRpm = iActualSpeed;
-		if(iAngleFromRpm < 0)iAngleFromRpm = -iAngleFromRpm;
-		iAngleFromRpm *= 150;
-		iAngleFromRpm /= 4000;
+		angle_rpm = speed;
+		if(angle_rpm < 0)
+			angle_rpm = -angle_rpm;
+
+		angle_rpm *= 150;	// fixed variation
+		angle_rpm /= 6780; // settable should equal to max_rpm
 
 
-		if(umot1<0)
-			dir = -1;
-		if(umot1 >= 0)
-			dir = 1;
+		if(voltage<0)
+			direction = -1;
+		if(voltage >= 0)
+			direction = 1;
 
 
-		if (dir == 1)
+		if (direction == 1)
 		{
-			iAnglePWM = iAngleFromHall + iAngleUser + iAngleFromRpm  + 180;//100 M3  //100 M1 //180
-			iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
-			iIndexPWM = iAnglePWM >> 4;
-			pwm[0] = ((sine_third[iIndexPWM])*umot1)/13889  + PWM_MAX_VALUE/2;
-			iIndexPWM = (iIndexPWM +85) & 0xff;
-			pwm[1] = ((sine_third[iIndexPWM])*umot1)/13889   + PWM_MAX_VALUE/2;
-			iIndexPWM = (iIndexPWM + 86) & 0xff;
-			pwm[2] = ((sine_third[iIndexPWM])*umot1)/13889   + PWM_MAX_VALUE/2;
+			angle_pwm = angle + angle_rpm  + 480;//100 M3  //100 M1 //180
+			angle_pwm &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
+			angle_pwm = angle_pwm >> 4;
+			pwm[0] = ((sine_third[angle_pwm])*voltage)/13889  + PWM_MAX_VALUE/2;
+			angle_pwm = (angle_pwm +85) & 0xff;
+			pwm[1] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
+			angle_pwm = (angle_pwm + 86) & 0xff;
+			pwm[2] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
 
 		}
 
-		if (dir == -1)
+		if (direction == -1)
 		{
-			iAnglePWM = iAngleFromHall + iAngleUser - iAngleFromRpm + 2700;  //2700 M3  //  2550 M1 //2700
-			iAnglePWM &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
-			iIndexPWM = iAnglePWM >> 4;
-			pwm[0] = ((sine_third[iIndexPWM])*-umot1)/13889   + PWM_MAX_VALUE/2;
-			iIndexPWM = (iIndexPWM +85) & 0xff;
-			pwm[1] = ((sine_third[iIndexPWM])*-umot1)/13889   + PWM_MAX_VALUE/2;
-			iIndexPWM = (iIndexPWM + 86) & 0xff;
-			pwm[2] = ((sine_third[iIndexPWM])*-umot1)/13889   + PWM_MAX_VALUE/2;
+			angle_pwm = angle - angle_rpm + 3000;  //2700 M3  //  2550 M1 //2700
+			angle_pwm &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
+			angle_pwm = angle_pwm >> 4;
+			pwm[0] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
+			angle_pwm = (angle_pwm +85) & 0xff;
+			pwm[1] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
+			angle_pwm = (angle_pwm + 86) & 0xff;
+			pwm[2] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
 
 		}
 
@@ -118,20 +118,20 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
    		update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
 		select {
-			case c_commutation :> cmd:
-			  if(cmd==3)
+			case c_commutation :> command:
+			  if(command==3)
 			  {
 				  stop=1;
 				  c_commutation :> set;
 			  }
-			  else if(cmd==2){ 	// set Umot
+			  else if(command==2){ 	// set Umot
 				  stop=0;
-				  c_commutation :> umot1;
+				  c_commutation :> voltage;
 			  }
-			  else if(cmd == 4) // set Direction
+			  else if(command == 4) // set Direction
 			  {
 				  stop=0;
-				  c_commutation :> dir;
+				  c_commutation :> direction;
 			  }
 			  break;
 			default:
@@ -168,10 +168,10 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 	 /* signal_adc <: 1;
 	  while(1)
 	  {
-		  unsigned cmd, found =0;
+		  unsigned command, found =0;
 		  select
 		  {
-			case signal_adc :> cmd:
+			case signal_adc :> command:
 				found = 1;
 				break;
 			default:
