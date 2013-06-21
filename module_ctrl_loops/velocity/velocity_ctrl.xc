@@ -240,8 +240,9 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 				else if(error_velocity_I < -(velocity_ctrl_params.Integral_limit))
 					error_velocity_I = 0 -(velocity_ctrl_params.Integral_limit);
 
-velocity_control_out = (velocity_ctrl_params.Kp_n*error_velocity)/(velocity_ctrl_params.Kp_d) + (velocity_ctrl_params.Ki_n*error_velocity_I)/(velocity_ctrl_params.Ki_d) \
-										+ (velocity_ctrl_params.Kd_n*error_velocity_D)/(velocity_ctrl_params.Kd_d);
+				velocity_control_out = (velocity_ctrl_params.Kp_n*error_velocity)/(velocity_ctrl_params.Kp_d)   \
+									 + (velocity_ctrl_params.Ki_n*error_velocity_I)/(velocity_ctrl_params.Ki_d) \
+									 + (velocity_ctrl_params.Kd_n*error_velocity_D)/(velocity_ctrl_params.Kd_d);
 
 				if(velocity_control_out > velocity_ctrl_params.Control_limit)
 					velocity_control_out = velocity_ctrl_params.Control_limit;

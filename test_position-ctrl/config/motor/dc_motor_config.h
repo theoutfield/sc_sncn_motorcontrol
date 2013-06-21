@@ -46,6 +46,8 @@
 #define MAX_POSITION_LIMIT 3590
 #define MIN_POSITION_LIMIT -3590
 
+
+
 typedef struct S_Control
 {
 	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d

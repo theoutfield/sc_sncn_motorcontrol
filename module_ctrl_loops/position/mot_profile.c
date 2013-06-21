@@ -45,7 +45,7 @@ int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor
 	}
 	else if(sensor_used == HALL)
 	{
-		factor = (3600000.0 * 2)/ (gear * poles);      //1 bit precision; (HALL)
+		factor = (3600000.0 * 2)/ (gear * poles);      //1 bit precision (HALL)
 	}
 	return (int)  round(factor);
 }
