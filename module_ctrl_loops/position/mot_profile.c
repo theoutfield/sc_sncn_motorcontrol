@@ -19,6 +19,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define HALL 1
+#define QEI 2
+
 unsigned root_function(unsigned uSquareValue)
 {
 	unsigned uResult;
@@ -27,6 +30,24 @@ unsigned root_function(unsigned uSquareValue)
 	fx = sqrt(fx);
 	uResult = (unsigned)fx;
 	return (uResult);
+}
+
+int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used)
+{
+	double gear = (double) gear_ratio;
+	double qei_max = (double) qei_max_real;
+	double poles = (double) pole_pairs;
+	double factor;
+
+	if(sensor_used == QEI)
+	{
+		factor = (3600000.0/ (gear * qei_max))* 512;   //9 bit precision (QEI)
+	}
+	else if(sensor_used == HALL)
+	{
+		factor = (3600000.0 * 2)/ (gear * poles);      //1 bit precision; (HALL)
+	}
+	return (int)  round(factor);
 }
 
 struct pos_params
@@ -118,7 +139,7 @@ int mot_q(int i)
 	{
 		pos_params_t.q = pos_params_t.ei + (pos_params_t.ts-pos_params_t.tf)*pos_params_t.fi + (pos_params_t.ts-pos_params_t.tf)*(pos_params_t.ts-pos_params_t.tf)*pos_params_t.gi;
 	}
-	Q = (int) round(pos_params_t.q*1000);
+	Q = (int) round(pos_params_t.q*10000);
 	return Q;
 }
 

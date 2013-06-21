@@ -47,12 +47,16 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-extern inline int init(int vel, int pos_i, int pos_f);
-extern inline int mot_q(int i);
+extern int init(int vel, int pos_i, int pos_f);
+extern int mot_q(int i);
+extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 #define SET_POSITION_TOKEN 40
+#define HALL 1
+#define QEI 2
 
-
+#define HALL_PRECISION		2
+#define QEI_PRECISION		512
 
 //internal
 void set_position(int target_position, chanend c_position_ctrl) {
@@ -75,8 +79,8 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 	}
 }
 
-//csv mode function
-void set_position_csv(csp_par &csp_params, int target_position,
+//csp mode function
+void set_position_csp(csp_par &csp_params, int target_position,
 		int position_offset, int velocity_offset, int torque_offset, chanend c_position_ctrl)
 {
 	set_position(position_limit( (target_position + position_offset) * csp_params.base.polarity , csp_params.max_position_limit*1000, csp_params.min_position_limit*1000), c_position_ctrl);
@@ -129,7 +133,7 @@ void set_position_test(chanend c_position_ctrl)
 		//set_position(position, c_position_ctrl);
 		//xscope_probe_data(0, position);
 		xscope_probe_data(1, position);
-		set_position_csv(csp_params, position, 0, 0, 0, c_position_ctrl);
+		set_position_csp(csp_params, position, 0, 0, 0, c_position_ctrl);
 
 		//xscope_probe_data(1, pos_m);
 		if(position>300000)
@@ -142,8 +146,8 @@ void set_position_test(chanend c_position_ctrl)
 void profile_pos(chanend c_position_ctrl)
 {
 	int samp;
-	int v = 450, i =1;
-	int cur_p = 0, d_pos = 750;
+	int v = 440, i =1;
+	int cur_p = 0, d_pos = 270;
 	int p_ramp;
 	timer ts;
 	unsigned time;
@@ -177,41 +181,52 @@ void profile_pos(chanend c_position_ctrl)
 		p_ramp = mot_q(i);
 		i++;
 		xscope_probe_data(1, p_ramp);
-		set_position_csv(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
+		set_position_csp(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
 	}
 	while(1)
 	{
 		ts when timerafter(time+100000) :> time;
 		xscope_probe_data(1, p_ramp);
-		set_position_csv(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
+		set_position_csp(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
 	}
 }
 
-void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, chanend c_position_ctrl)
+
+
+void position_control(hall_par hall_params, qei_par qei_params, chanend c_hall, chanend c_qei, chanend c_signal, chanend c_commutation, chanend c_position_ctrl, int sensor_used)
 {
 	int actual_position = 0;
-	timer ts;
-	unsigned int time;
+	int target_position = 0;
+
 	int error_position = 0;
 	int error_position_D = 0;
 	int error_position_I = 0;
 	int previous_error = 0;
 	int position_control_out = 0;
-	int Kp = 8, Kd = 3, Ki = 1;
-	int max_integral = (13739*3500)/1;
-	int target_position = 0;
+
+	int Kp = 10, Kd = 0, Ki = 0;
+	int max_integral = (13739*102000)/1;
+
+	timer ts;
+	unsigned int time;
+
 	int command;
+	int direction = 0;
+
+	int precision;
+	int precision_factor;
 
 	//check init signal from commutation level
-	while (1) {
+	while (1)
+	{
 		unsigned received_command = 0;
 		select
 		{
 			case c_signal :> command: 			//SIGNAL_READ(command):
 				received_command = 1;
-			break;
+				break;
 			default:
-			break;
+				break;
 		}
 		if(received_command == 1)
 		{
@@ -221,9 +236,21 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 	}
 
 	ts:> time;
-	ts when timerafter(time+3*SEC_FAST) :> time;
+	ts when timerafter(time+SEC_STD) :> time;
 
 	c_position_ctrl <: 1; //start
+
+
+	if(sensor_used == HALL)
+	{
+		precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
+		precision = HALL_PRECISION;
+	}
+	else if(sensor_used == QEI)
+	{
+		precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
+		precision = QEI_PRECISION;
+	}
 
 	//set_commutation_sinusoidal(c_commutation, 1000);
 	while(1)
@@ -240,10 +267,17 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 				break;
 		}
 
-		ts when timerafter(time+100000) :> time; //1khz
+		ts when timerafter(time + MSEC_STD) :> time; //1khz
 
-		actual_position = get_hall_absolute_pos(c_hall);
-
+		if(sensor_used == HALL)
+		{
+			actual_position = ( ( ( (get_hall_absolute_pos(c_hall)/500) * precision_factor)/precision )/819 )*100;   // 100/(500*819) ~ 1/4095 appr (hall)
+		}
+		else if(sensor_used == QEI)
+		{
+			{actual_position, direction} =  get_qei_position_count(c_qei);
+			actual_position = (actual_position * precision_factor)/precision;
+		}
 		//xscope_probe_data(0, actual_position);
 
 		error_position = (target_position - actual_position);
@@ -255,7 +289,7 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 		else if(error_position_I < -max_integral)
 			error_position_I = 0 - max_integral;
 
-		position_control_out = (Kp*error_position)/20 + (Ki*error_position_I)/3500 + (Kd*error_position_D)/13;
+		position_control_out = (Kp*error_position)/2000 + (Ki*error_position_I)/102000 + (Kd*error_position_D)/10000;
 
 		if(position_control_out > 13739)
 			position_control_out = 13739;
@@ -274,6 +308,7 @@ void position_control(chanend c_hall, chanend c_signal, chanend c_commutation, c
 
 	}
 }
+
 int main(void) {
 	chan c_adc, c_adctrig;
 	chan c_qei;
@@ -317,7 +352,14 @@ int main(void) {
 			{
 
 				//set_position_test(c_position_ctrl);
-				//profile_pos(c_position_ctrl);
+				profile_pos(c_position_ctrl);
+				/*{
+					int gear = 2634, poles = 8, qei_max = 4000;
+					int factor;
+					factor = position_factor(gear, qei_max, poles, HALL);
+					printintln(factor);
+
+				}*/
 			}
 		}
 
@@ -343,42 +385,19 @@ int main(void) {
 		{
 			par
 			{
-				//position_control( c_hall_p2, c_signal, c_commutation, c_position_ctrl);
 				{
+					 //ctrl_par position_ctrl_params;
+					 hall_par hall_params;
+					 qei_par qei_params;
 
-					{
-						int i = 0;
-						timer ts;
-						unsigned int time , command;
-						ts:> time;
+					 //init_position_control(position_ctrl_params);
 
-						while (1) {
-								unsigned received_command = 0;
-								select
-								{
-									case c_signal :> command: 			//SIGNAL_READ(command):
-										received_command = 1;
-									break;
-									default:
-									break;
-								}
-								if(received_command == 1)
-								{
-									printstrln(" init commutation");
-									break;
-								}
-							}
-						while(1)
-						{
-							i = i-5;
-							if(i<-13739)
-								i = -13739;
-							ts when timerafter(time+3*MSEC_STD) :> time;
-							set_commutation_sinusoidal(c_commutation, i);
-						}
+					 init_hall(hall_params);
+					 init_qei(qei_params);
 
-					}
+					 position_control(hall_params, qei_params, c_hall_p2, c_qei, c_signal, c_commutation, c_position_ctrl, QEI);
 				}
+
 			}
 
 		}

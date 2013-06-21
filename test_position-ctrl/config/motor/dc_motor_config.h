@@ -40,7 +40,7 @@
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
 #define QEI_COUNT_MAX (1024 * 4)	// Max count of Quadrature Encoder as multiple of 2
-#define POLARITY -1					// 1 / -1
+#define POLARITY 1					// 1 / -1
 
 #define MAX_FOLLOWING_ERROR 0
 #define MAX_POSITION_LIMIT 3590
@@ -66,8 +66,9 @@ typedef struct S_Filter_length
  * \brief struct definition for quadrature sensor
  */
 typedef struct S_QEI {
-	unsigned max_count;
-	unsigned real_counts;
+	int max_count;
+	int real_counts;
+	int gear_ratio;
 } qei_par;
 
 

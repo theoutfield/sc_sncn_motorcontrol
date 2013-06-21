@@ -11,6 +11,7 @@ void init_qei(qei_par &qei_params)
 {
 	qei_params.max_count = QEI_COUNT_MAX;
 	qei_params.real_counts = QEI_COUNT_MAX_REAL;
+	qei_params.gear_ratio = GEAR_RATIO;
 	return;
 }
 
