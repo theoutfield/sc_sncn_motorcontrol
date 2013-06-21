@@ -25,6 +25,8 @@
 #include "comm_loop.h"
 #include "print.h"
 
+#define SET_VOLTAGE    2
+
 static t_pwm_control pwm_ctrl;
 
 void commutation_init(chanend c_pwm_ctrl)
@@ -45,64 +47,49 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 	int angle_rpm   = 0;
 	int speed = 0;
 
-	int voltage = 0, direction = 0, stop = 0, set = 0, limit=20;
+	int voltage = 0;
+	int direction = 0;
 
+	unsigned time;
+	timer t;
 
-	//t:>time;
+	t :> time;
 	while (1)
 	{
-		//============= rotor position ===============================
-		if(stop!=1)
-		{
-			speed = get_speed_cal(c_hall);
-			angle = get_hall_angle(c_hall);
-		}
-		else
-		{
-			speed = get_speed_cal(c_hall);
-			angle = 30;
-			voltage = 2000;
-			if(set>limit)
-			{
-				set=limit;
-			}
-			voltage=set*100;
 
-		}
+		speed = get_speed_cal(c_hall);
+		angle = get_hall_angle(c_hall);
 
 
 		angle_rpm = speed;
 		if(angle_rpm < 0)
 			angle_rpm = -angle_rpm;
 
-		angle_rpm *= 150;	// fixed variation
-		angle_rpm /= 6780; // settable should equal to max_rpm
+		angle_rpm *= 150;		// fixed variation range
+		angle_rpm /= 6780; 		// TODO should be settable (equal to max_rpm)
 
 
 		if(voltage<0)
 			direction = -1;
-		if(voltage >= 0)
+		else if(voltage >= 0)
 			direction = 1;
 
 
 		if (direction == 1)
 		{
-			angle_pwm = angle + angle_rpm  + 480;//100 M3  //100 M1 //180
-			angle_pwm &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
-			angle_pwm = angle_pwm >> 4;
-			pwm[0] = ((sine_third[angle_pwm])*voltage)/13889  + PWM_MAX_VALUE/2;
+			angle_pwm = ((angle + angle_rpm  + 480) & 0x0fff) >> 4;					//100 M3  //100 M1 //180         TODO parameter
+																					// 0 - 4095  -> 0x0000 - 0x0fff
+			pwm[0] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
 			angle_pwm = (angle_pwm +85) & 0xff;
 			pwm[1] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
 			angle_pwm = (angle_pwm + 86) & 0xff;
 			pwm[2] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
 
 		}
-
-		if (direction == -1)
+		else if (direction == -1)
 		{
-			angle_pwm = angle - angle_rpm + 3000;  //2700 M3  //  2550 M1 //2700
-			angle_pwm &= 0x0FFF; // 0 - 4095  -> 0x0000 - 0x0fff
-			angle_pwm = angle_pwm >> 4;
+			angle_pwm = ((angle - angle_rpm + 3000) & 0x0fff) >> 4;  				//2700 M3  //  2550 M1 //2700     TODO parameter
+																					// 0 - 4095  -> 0x0000 - 0x0fff
 			pwm[0] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
 			angle_pwm = (angle_pwm +85) & 0xff;
 			pwm[1] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
@@ -119,35 +106,27 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 
 		select {
 			case c_commutation :> command:
-			  if(command==3)
-			  {
-				  stop=1;
-				  c_commutation :> set;
-			  }
-			  else if(command==2){ 	// set Umot
-				  stop=0;
-				  c_commutation :> voltage;
-			  }
-			  else if(command == 4) // set Direction
-			  {
-				  stop=0;
-				  c_commutation :> direction;
-			  }
-			  break;
+				if(command == SET_VOLTAGE)				// set voltage
+				{
+					c_commutation :> voltage;
+				}
+				break;
+
 			default:
-			  break;
+				break;
 		}
 
+		t when timerafter( time + 13889 ) :> time;
 	}
 
 }
 
 
 /* MAX Input value 13739 */
-void set_commutation_sinusoidal(chanend c_commutation, int input)
+void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 {
 	c_commutation <: 2;
-	c_commutation <: input;
+	c_commutation <: input_voltage;
 	return;
 }
 
@@ -164,20 +143,21 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 	  t when timerafter (ts + t_delay) :> ts;
 
 	  printstrln("start");
-	  c_signal <: 1; //driver init done.
+	  c_signal <: 1; 			//signal commutation init done.
+
 	 /* signal_adc <: 1;
 	  while(1)
 	  {
-		  unsigned command, found =0;
+		  unsigned command, received_command = 0;
 		  select
 		  {
 			case signal_adc :> command:
-				found = 1;
+				received_command = 1;
 				break;
 			default:
 				break;
 		  }
-		  if(found == 1)
+		  if(received_command == 1)
 			  break;
 	  }
 */
