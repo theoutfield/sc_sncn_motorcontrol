@@ -8,3 +8,7 @@ extern int quick_stop_velocity_profile_generate(int step);
 extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration);
 extern int velocity_profile_generate(int step);
 
+/*Profile Position Mode*/
+extern int init_position_profile(int target_position, int actual_position,	int velocity, int acceleration, \
+        						 int deceleration);
+extern int position_profile_generate(int step);
