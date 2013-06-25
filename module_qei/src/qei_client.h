@@ -22,9 +22,10 @@
 
 #include<dc_motor_config.h>
 
-
+//raw position
 {unsigned, unsigned} get_qei_position(chanend c_qei );
 
+//counted up position
 {int, int} get_qei_position_count(chanend c_qei);
 
 /**
