@@ -93,7 +93,7 @@ int init_velocity_profile(int target_velocity, int actual_velocity, int accelera
     	}
     }
 
-    profile_vel_params.s_time = .001;
+    profile_vel_params.s_time = .001f;
 
     // compute time needed
     profile_vel_params.t = (profile_vel_params.v_d - profile_vel_params.u)/profile_vel_params.a_d;

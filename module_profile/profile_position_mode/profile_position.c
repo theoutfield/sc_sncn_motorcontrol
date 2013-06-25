@@ -190,7 +190,7 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 
 	profile_pos_params.T = profile_pos_params.tf / 1e-3;           // 1 KHz
 
-	profile_pos_params.s_time = 0.001;								// 1 KHz
+	profile_pos_params.s_time = 0.001f;								// 1 KHz
 
 	return (int) round(profile_pos_params.T);
 }
