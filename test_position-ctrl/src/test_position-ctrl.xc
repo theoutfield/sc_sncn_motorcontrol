@@ -158,6 +158,34 @@ void profile_pos(chanend c_position_ctrl)
 	}
 }
 
+void profile()
+{
+	int samp;
+	int i = 0;
+	int acc, dec, velocity, actual_position, target_position;
+	timer ts;
+	unsigned time;
+	int p_ramp;
+
+	acc = 45;
+	dec = 220;
+	velocity = 99;
+	actual_position = 0;
+	target_position = 159;
+
+	set_position_profile_limits(1200, 1000);
+
+	samp = init_position_profile( target_position, actual_position, velocity, acc, dec);
+	ts:>time;
+	for(i = 0; i < samp; i++)
+	{
+		ts when timerafter(time+200000) :> time;
+		p_ramp = position_profile_generate(i);
+		xscope_probe_data(0, p_ramp);
+	}
+	printstrln(" recorded ");
+	while(1);
+}
 
 
 int main(void) {
@@ -201,9 +229,9 @@ int main(void) {
 		{
 			par
 			{
-
+				//profile();
 				//set_position_test(c_position_ctrl);
-				profile_pos(c_position_ctrl);
+				//profile_pos(c_position_ctrl);
 				/*{
 					int gear = 2634, poles = 8, qei_max = 4000;
 					int factor;
@@ -236,7 +264,7 @@ int main(void) {
 		{
 			par
 			{
-				{
+			/*	{
 					 ctrl_par position_ctrl_params;
 					 hall_par hall_params;
 					 qei_par qei_params;
@@ -248,6 +276,8 @@ int main(void) {
 					 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p2, c_qei, c_signal, c_position_ctrl, c_commutation);
 
 				}
+			*/
+
 
 			}
 

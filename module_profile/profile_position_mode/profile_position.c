@@ -1,22 +1,20 @@
-//Profile Position Mode
-#include "stdbool.h"
 #include <math.h>
 #include <stdio.h>
 
-struct PROFILE_POSITION_PARAM {
+struct PROFILE_POSITION_PARAM
+{
 	float max_acceleration;     // max acceleration
-	float max_deceleration; 	// max deceleration
+	float max_velocity;
 
 	/*User Inputs*/
-	float acc;					// deceleration
-	float dec; 					// acceleration
+	float acc;					// acceleration
+	float dec; 					// deceleration
 	float vi;					// velocity
 	float qi;					// initial position
 	float qf; 				    // final position
 
 	/*Profile time*/
 	float T;    				// total no. of Samples
-	int length; 				// total samples in int
 	float s_time; 				// sampling time
 
 	int direction;
@@ -47,8 +45,13 @@ struct PROFILE_POSITION_PARAM {
 	float t_cruise;				// time for cruise velocity profile
 	float ts;					// variable to hold current sample time
 
-}profile_pos_params;
+} 	profile_pos_params;
 
+void set_position_profile_limits(int max_acceleration, int max_velocity)
+{
+	profile_pos_params.max_acceleration = max_acceleration;
+	profile_pos_params.max_velocity = max_velocity;
+}
 int init_position_profile(int target_position, int actual_position,	int velocity, int acceleration, \
 		                  int deceleration)
 {
@@ -187,11 +190,9 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 
 	profile_pos_params.T = profile_pos_params.tf / 1e-3;           // 1 KHz
 
-	profile_pos_params.length = (int) round(profile_pos_params.T);
-
 	profile_pos_params.s_time = 0.001;								// 1 KHz
 
-	return profile_pos_params.length;
+	return (int) round(profile_pos_params.T);
 }
 
 int position_profile_generate(int step)

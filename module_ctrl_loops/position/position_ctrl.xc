@@ -24,8 +24,8 @@ extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int
 //internal functions
 void set_position(int target_position, chanend c_position_ctrl)
 {
-	POSITION_CTRL_WRITE(SET_POSITION_TOKEN); //c_position_ctrl <: SET_POSITION_TOKEN;	//
-	POSITION_CTRL_WRITE(target_position);     //c_position_ctrl <: target_position;  	//
+	POSITION_CTRL_WRITE(SET_POSITION_TOKEN);
+	POSITION_CTRL_WRITE(target_position);
 }
 
 int position_limit(int position, int max_position_limit, int min_position_limit)
