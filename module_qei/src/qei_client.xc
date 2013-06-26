@@ -23,10 +23,9 @@
 #include "qei_commands.h"
 #include "qei_client.h"
 #include<print.h>
-// = QEI_COUNT_MAX;
 
 
-//only pos and valid
+//only position and valid
 {unsigned, unsigned} get_qei_position(chanend c_qei )
 {
 	unsigned p, ts1, ts2, v;
@@ -44,7 +43,7 @@
 	return {p, v};
 }
 
-//counted up position
+//counted up position with gear ratio
 {int, int} get_qei_position_count(chanend c_qei)
 {
 	int pos;
@@ -56,33 +55,4 @@
 		c_qei :> dirn;
 	}
 	return {pos, dirn};
-}
-
-{unsigned, unsigned, unsigned } get_qei_data( chanend c_qei, qei_par &q_max)
-{
-	unsigned p, s, ts1, ts2, v, qei_count_m = q_max.max_count;
-	c_qei <: QEI_CMD_POS_REQ;
-	c_qei :> p;
-	c_qei :> ts1;
-	c_qei :> ts2;
-	c_qei :> v;
-
-	p &= (qei_count_m-1);// qei_count_m
-
-	// Calculate the speed
-	if (ts1 == ts2)
-		s = 0;
-	else {
-#if PLATFORM_REFERENCE_MHZ == 100
-		// 6000000000 = 10ns -> 1min (100 MHz ports)
-		s = 3000000000 / ((ts1 - ts2) * qei_count_m);
-		s <<= 1;
-#else
-		// 15000000000 = 4ns -> 1min (250 MHz ports)
-		s = 1875000000 / ((ts1 - ts2) * qei_count_m);
-		s <<= 3;
-#endif
-	}
-
-	return {s, p, v};
 }

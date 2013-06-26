@@ -22,21 +22,12 @@
 
 #include<dc_motor_config.h>
 
-//raw position
+///only position and valid
 {unsigned, unsigned} get_qei_position(chanend c_qei );
 
-//counted up position
+//counted up position and direction
 {int, int} get_qei_position_count(chanend c_qei);
 
-/**
- * \param c_qei The control channel for the QEI server
- * \param q_max parameter defines Max quadrature encoder counts
- *
- * \return speed in rpm
- * \return position
- * \return validity state
- */
-{ unsigned, unsigned, unsigned } get_qei_data(chanend c_qei, qei_par &q_max);
 
 
 
