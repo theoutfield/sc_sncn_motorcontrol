@@ -9,7 +9,6 @@
 #define HALL_PRECISION		2
 #define QEI_PRECISION		512
 
-//180, Kd = 100, Ki = 50; //  (Kp*error_position)/2000 + (Ki*error_position_I)/102000 + (Kd*error_position_D)/10000;
 #define POSITION_Kp_NUMERATOR 	 	180
 #define POSITION_Kp_DENOMINATOR  	2000
 #define POSITION_Ki_NUMERATOR    	50
@@ -85,8 +84,6 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 	int error_position_I = 0;
 	int previous_error = 0;
 	int position_control_out = 0;
-
-	//int Kp = 180, Kd = 100, Ki = 50;int max_integral = (13739*102000)/Ki;  (Kp*error_position)/2000 + (Ki*error_position_I)/102000 + (Kd*error_position_D)/10000;
 
 	timer ts;
 	unsigned int time;

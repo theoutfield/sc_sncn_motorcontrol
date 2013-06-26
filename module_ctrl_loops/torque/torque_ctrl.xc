@@ -23,7 +23,7 @@
 #define filter_length 30
 #define filter_dc 160
 
-unsigned root_function(unsigned uSquareValue);
+int root_function(int arg);
 int get_torque(chanend c_torque)
 {
 	int torque;
