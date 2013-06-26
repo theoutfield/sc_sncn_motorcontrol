@@ -60,20 +60,15 @@ void set_position_test(chanend c_position_ctrl)
 	timer ts;
 	unsigned time;
 	int increment = 50;
-
-	int pos_m;
 	csp_par csp_params;
-
 	init_csp(csp_params);
 
-
-	//ts when timerafter(time+10*SEC_STD) :> time;
 	//check init
 	while (1) {
 		unsigned command, received_command = 0;
 		select
 		{
-			case c_position_ctrl :> command: 			//SIGNAL_READ(command):
+			case c_position_ctrl :> command:
 				received_command = 1;
 			break;
 			default:
@@ -89,37 +84,35 @@ void set_position_test(chanend c_position_ctrl)
 	ts:>time;
 	while (1) {
 		//input_pos(d);
-		//printintln(d.set_position);
-
 		ts when timerafter(time+100000) :> time;
-
 		position +=increment;
-		//set_position(position, c_position_ctrl);
-		//xscope_probe_data(0, position);
 		xscope_probe_data(1, position);
 		set_position_csp(csp_params, position, 0, 0, 0, c_position_ctrl);
 
-		//xscope_probe_data(1, pos_m);
 		if(position>300000)
 			increment *= -1;
 		if(position<0)
 			increment *= -1;
-
 	}
 }
 
 
-void profile_test(chanend c_position_ctrl)
+void position_profile_test(chanend c_position_ctrl)
 {
 	int samp;
 	int i = 0;
-	int acc, dec, velocity, actual_position, target_position;
 	timer ts;
 	unsigned time;
 	int position_ramp;
-
 	qei_par qei_params;
 	csp_par csp_params;
+
+	int acc = 5200;				// rpm/s
+	int dec = 5200;     		// rpm/s
+	int velocity = 1516;		// rpm
+	int actual_position = 0;	// degree
+	int target_position = 300;	// degree
+
 	init_csp(csp_params);
 	init_qei(qei_params);
 
@@ -128,7 +121,7 @@ void profile_test(chanend c_position_ctrl)
 		unsigned command, received_command = 0;
 		select
 		{
-			case c_position_ctrl :> command: 			//SIGNAL_READ(command):
+			case c_position_ctrl :> command:
 				received_command = 1;
 			break;
 			default:
@@ -141,16 +134,12 @@ void profile_test(chanend c_position_ctrl)
 		}
 	}
 
-	acc = 5200;				// rpm/s
-	dec = 5200;     		// rpm/s
-	velocity = 1516;		// rpm
-	actual_position = 0;	// degree
-	target_position = 300;	// degree
-
 	init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, MAX_NOMINAL_SPEED);
 
 	samp = init_position_profile(target_position, actual_position, velocity, acc, dec);
+
 	ts:>time;
+
 	for(i = 1; i < samp; i++)
 	{
 		ts when timerafter(time+100000) :> time;
@@ -173,20 +162,19 @@ int main(void) {
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
 	chan c_pwm_ctrl, c_commutation;
 	chan dummy, dummy1, dummy2;
-	chan speed_out, stop, str, info;
 	chan enco_1, sync_output;
-	chan signal_adc, c_value, input;
-	chan c_torque;
+	chan signal_adc;
 	chan sig_1, c_signal;
 	chan c_velocity_ctrl, c_position_ctrl;
+
 	//etherCat Comm channels
-	chan coe_in; ///< CAN from module_ethercat to consumer
-	chan coe_out; ///< CAN from consumer to module_ethercat
-	chan eoe_in; ///< Ethernet from module_ethercat to consumer
-	chan eoe_out; ///< Ethernet from consumer to module_ethercat
+	chan coe_in; 	///< CAN from module_ethercat to consumer
+	chan coe_out; 	///< CAN from consumer to module_ethercat
+	chan eoe_in; 	///< Ethernet from module_ethercat to consumer
+	chan eoe_out; 	///< Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; ///< File from module_ethercat to consumer
-	chan foe_out; ///< File from consumer to module_ethercat
+	chan foe_in; 	///< File from module_ethercat to consumer
+	chan foe_out; 	///< File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
 
@@ -202,22 +190,15 @@ int main(void) {
 
 		on stdcore[0] :
 		{
-			ether_comm(pdo_out, pdo_in, c_signal, c_velocity_ctrl);
+			ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);
 		}*/
 		on stdcore[1]:
 		{
 			par
 			{
-				profile_test(c_position_ctrl);
-				//set_position_test(c_position_ctrl);
-				//profile_pos(c_position_ctrl);
-				/*{
-					int gear = 2634, poles = 8, qei_max = 4000;
-					int factor;
-					factor = position_factor(gear, qei_max, poles, HALL);
-					printintln(factor);
+				position_profile_test(c_position_ctrl);
 
-				}*/
+				//set_position_test(c_position_ctrl);
 			}
 		}
 
@@ -255,9 +236,6 @@ int main(void) {
 					 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p2, c_qei, c_signal, c_position_ctrl, c_commutation);
 
 				}
-
-
-
 			}
 
 		}
