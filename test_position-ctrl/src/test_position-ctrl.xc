@@ -116,7 +116,7 @@ void profile_test(chanend c_position_ctrl)
 	int acc, dec, velocity, actual_position, target_position;
 	timer ts;
 	unsigned time;
-	int p_ramp;
+	int position_ramp;
 
 	csp_par csp_params;
 	init_csp(csp_params);
@@ -152,15 +152,15 @@ void profile_test(chanend c_position_ctrl)
 	for(i = 1; i < samp; i++)
 	{
 		ts when timerafter(time+100000) :> time;
-		p_ramp = position_profile_generate(i);
-		xscope_probe_data(1, p_ramp);
-		set_position_csp(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
+		position_ramp = position_profile_generate(i);
+		xscope_probe_data(1, position_ramp);
+		set_position_csp(csp_params, position_ramp, 0, 0, 0, c_position_ctrl);
 	}
 	while(1)
 	{
 		ts when timerafter(time+100000) :> time;
-		xscope_probe_data(1, p_ramp);
-		set_position_csp(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
+		xscope_probe_data(1, position_ramp);
+		set_position_csp(csp_params, position_ramp, 0, 0, 0, c_position_ctrl);
 	}
 }
 

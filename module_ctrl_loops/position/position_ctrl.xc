@@ -47,8 +47,9 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 void set_position_csp(csp_par &csp_params, int target_position, int position_offset, int velocity_offset,\
 		              int torque_offset, chanend c_position_ctrl)
 {
-	set_position(position_limit( (target_position + position_offset) * csp_params.base.polarity , \
-								  csp_params.max_position_limit*1000, csp_params.min_position_limit*1000), c_position_ctrl);
+	set_position( position_limit( (target_position + position_offset) * csp_params.base.polarity ,	\
+								   csp_params.max_position_limit * 10000  , 						\
+								   csp_params.min_position_limit * 10000) , c_position_ctrl);
 }
 
 
@@ -61,14 +62,18 @@ void init_position_control(ctrl_par &position_ctrl_params)
 	position_ctrl_params.Ki_d = POSITION_Ki_DENOMINATOR;
 	position_ctrl_params.Kd_n = POSITION_Kd_NUMERATOR;
 	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
-	position_ctrl_params.Loop_time = POSITION_CONTROL_LOOP_TIME * MSEC_STD;  //units - core timer value //CORE 2/1/0
+	position_ctrl_params.Loop_time = POSITION_CONTROL_LOOP_TIME * MSEC_STD;  // units - for CORE 2/1/0 only
 
-	position_ctrl_params.Control_limit = 13739; 							 //default do not change
+	position_ctrl_params.Control_limit = 13739; 							 // default do not change
 
-	if(position_ctrl_params.Ki_n != 0)    									 //auto calculated using control_limit
+	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
+	{
 		position_ctrl_params.Integral_limit = (position_ctrl_params.Control_limit * position_ctrl_params.Ki_d)/position_ctrl_params.Ki_n ;
+	}
 	else
+	{
 		position_ctrl_params.Integral_limit = 0;
+	}
 
 	return;
 }
@@ -136,7 +141,7 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 		#pragma ordered
 		select
 		{
-			case ts when timerafter(time + position_ctrl_params.Loop_time) :> time: //1khz
+			case ts when timerafter(time + position_ctrl_params.Loop_time) :> time: // 1 ms
 
 				/* acq actual position hall/qei */
 
@@ -157,18 +162,26 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 				error_position_D = error_position - previous_error;
 
 				if(error_position_I > position_ctrl_params.Integral_limit)
+				{
 					error_position_I = position_ctrl_params.Integral_limit;
+				}
 				else if(error_position_I < -position_ctrl_params.Integral_limit)
+				{
 					error_position_I = 0 - position_ctrl_params.Integral_limit;
+				}
 
 				position_control_out = (position_ctrl_params.Kp_n * error_position)/position_ctrl_params.Kp_d   \
 									 + (position_ctrl_params.Ki_n * error_position_I)/position_ctrl_params.Ki_d \
 									 + (position_ctrl_params.Kd_n * error_position_D)/position_ctrl_params.Kd_d;
 
 				if(position_control_out > position_ctrl_params.Control_limit)
+				{
 					position_control_out = position_ctrl_params.Control_limit;
+				}
 				else if(position_control_out < -position_ctrl_params.Control_limit)
-					position_control_out = 0-position_ctrl_params.Control_limit;
+				{
+					position_control_out = 0 - position_ctrl_params.Control_limit;
+				}
 
 
 				set_commutation_sinusoidal(c_commutation, position_control_out);
@@ -184,6 +197,7 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 				/* acq target position from etherCAT */
 
 			case POSITION_CTRL_READ(command):
+
 				if(command == SET_POSITION_TOKEN)
 				{
 					POSITION_CTRL_READ(target_position);

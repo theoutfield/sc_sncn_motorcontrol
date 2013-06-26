@@ -267,16 +267,16 @@ int position_profile_generate(int step)
 	if (profile_pos_params.ts < profile_pos_params.tb_acc)
 	{
 		profile_pos_params.q = profile_pos_params.ai + profile_pos_params.ts * profile_pos_params.bi 	\
-			   + profile_pos_params.ci * profile_pos_params.ts * profile_pos_params.ts;
+							 + profile_pos_params.ci * profile_pos_params.ts * profile_pos_params.ts;
 	}
 
-	else if (profile_pos_params.tb_acc <= profile_pos_params.ts 	\
+	else if (profile_pos_params.tb_acc <= profile_pos_params.ts 										\
 			 &&  profile_pos_params.ts < (profile_pos_params.tf - profile_pos_params.tb_dec) )
 	{
 		profile_pos_params.q = profile_pos_params.di + profile_pos_params.vi * profile_pos_params.ts;
 	}
 
-	else if ( (profile_pos_params.tf - profile_pos_params.tb_dec) <= profile_pos_params.ts	\
+	else if ( (profile_pos_params.tf - profile_pos_params.tb_dec) <= profile_pos_params.ts				\
 			                             && profile_pos_params.ts <= profile_pos_params.tf)
 	{
 		profile_pos_params.q = profile_pos_params.ei + (profile_pos_params.ts - profile_pos_params.tf)	\
