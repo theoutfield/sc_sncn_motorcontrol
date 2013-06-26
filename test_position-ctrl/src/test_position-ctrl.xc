@@ -48,9 +48,6 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-extern int init(int vel, int pos_i, int pos_f);
-extern int mot_q(int i);
-//extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 #define HALL 1
 #define QEI 2
@@ -110,14 +107,17 @@ void set_position_test(chanend c_position_ctrl)
 
 	}
 }
-void profile_pos(chanend c_position_ctrl)
+
+
+void profile_test(chanend c_position_ctrl)
 {
 	int samp;
-	int v = 240, i =1;
-	int cur_p = 0, d_pos = 329;
-	int p_ramp;
+	int i = 0;
+	int acc, dec, velocity, actual_position, target_position;
 	timer ts;
 	unsigned time;
+	int p_ramp;
+
 	csp_par csp_params;
 	init_csp(csp_params);
 
@@ -139,14 +139,20 @@ void profile_pos(chanend c_position_ctrl)
 		}
 	}
 
-	samp = init(v, cur_p, d_pos);
+	acc = 1200;
+	dec = 1200;
+	velocity = 350;
+	actual_position = 0;
+	target_position = 300;
 
+	set_position_profile_limits(1200, 1000);
+
+	samp = init_position_profile( target_position, actual_position, velocity, acc, dec);
 	ts:>time;
-	while(i<samp)
+	for(i = 1; i < samp; i++)
 	{
 		ts when timerafter(time+100000) :> time;
-		p_ramp = mot_q(i);
-		i++;
+		p_ramp = position_profile_generate(i);
 		xscope_probe_data(1, p_ramp);
 		set_position_csp(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
 	}
@@ -156,35 +162,6 @@ void profile_pos(chanend c_position_ctrl)
 		xscope_probe_data(1, p_ramp);
 		set_position_csp(csp_params, p_ramp, 0, 0, 0, c_position_ctrl);
 	}
-}
-
-void profile()
-{
-	int samp;
-	int i = 0;
-	int acc, dec, velocity, actual_position, target_position;
-	timer ts;
-	unsigned time;
-	int p_ramp;
-
-	acc = 45;
-	dec = 220;
-	velocity = 99;
-	actual_position = 0;
-	target_position = 159;
-
-	set_position_profile_limits(1200, 1000);
-
-	samp = init_position_profile( target_position, actual_position, velocity, acc, dec);
-	ts:>time;
-	for(i = 0; i < samp; i++)
-	{
-		ts when timerafter(time+200000) :> time;
-		p_ramp = position_profile_generate(i);
-		xscope_probe_data(0, p_ramp);
-	}
-	printstrln(" recorded ");
-	while(1);
 }
 
 
@@ -229,7 +206,7 @@ int main(void) {
 		{
 			par
 			{
-				//profile();
+				profile_test(c_position_ctrl);
 				//set_position_test(c_position_ctrl);
 				//profile_pos(c_position_ctrl);
 				/*{
@@ -264,7 +241,7 @@ int main(void) {
 		{
 			par
 			{
-			/*	{
+				{
 					 ctrl_par position_ctrl_params;
 					 hall_par hall_params;
 					 qei_par qei_params;
@@ -276,7 +253,7 @@ int main(void) {
 					 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p2, c_qei, c_signal, c_position_ctrl, c_commutation);
 
 				}
-			*/
+
 
 
 			}
