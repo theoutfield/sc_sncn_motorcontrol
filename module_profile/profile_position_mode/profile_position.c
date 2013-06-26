@@ -52,12 +52,15 @@ struct PROFILE_POSITION_PARAM
 
 	float q;					// position profile
 
+	float gear_ratio;
+
 } 	profile_pos_params;
 
-void set_position_profile_limits(int max_acceleration, int max_velocity)
+void init_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity)
 {
-	profile_pos_params.max_acceleration = max_acceleration;
-	profile_pos_params.max_velocity = max_velocity;
+	profile_pos_params.max_acceleration = (max_acceleration * 6)/ gear_ratio;
+	profile_pos_params.max_velocity = (max_velocity * 6)/ gear_ratio ;
+	profile_pos_params.gear_ratio = (float) gear_ratio;
 }
 
 int init_position_profile(int target_position, int actual_position,	int velocity, int acceleration, \
@@ -67,11 +70,11 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 
 	profile_pos_params.qi = (float) actual_position;
 
-	profile_pos_params.vi = (float) velocity;
+	profile_pos_params.vi = (float) (velocity * 6)/profile_pos_params.gear_ratio;
 
-	profile_pos_params.acc = (float) acceleration;
+	profile_pos_params.acc = (float) (acceleration * 6)/profile_pos_params.gear_ratio;
 
-	profile_pos_params.dec = (float) deceleration;
+	profile_pos_params.dec = (float) (deceleration * 6)/profile_pos_params.gear_ratio;
 
 
 	if(profile_pos_params.acc > profile_pos_params.max_acceleration)

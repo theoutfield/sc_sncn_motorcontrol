@@ -235,6 +235,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -274,6 +276,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.c.compiler.base.11111" name="com.xmos.cdt.c.compiler.base" superClass="com.xmos.cdt.c.compiler.base">
@@ -315,6 +319,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -354,6 +360,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.cpp.compiler.base.11111" name="com.xmos.cdt.cpp.compiler.base" superClass="com.xmos.cdt.cpp.compiler.base">
@@ -395,6 +403,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -434,6 +444,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.core.assembler.base.11111" name="com.xmos.cdt.core.assembler.base" superClass="com.xmos.cdt.core.assembler.base">
@@ -475,6 +487,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -514,6 +528,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                             </tool>
                         </toolChain>
@@ -924,6 +940,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -963,6 +981,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.c.compiler.base.11111" name="com.xmos.cdt.c.compiler.base" superClass="com.xmos.cdt.c.compiler.base">
@@ -1004,6 +1024,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -1043,6 +1065,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.cpp.compiler.base.11111" name="com.xmos.cdt.cpp.compiler.base" superClass="com.xmos.cdt.cpp.compiler.base">
@@ -1084,6 +1108,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -1123,6 +1149,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.core.assembler.base.11111" name="com.xmos.cdt.core.assembler.base" superClass="com.xmos.cdt.core.assembler.base">
@@ -1164,6 +1192,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -1203,6 +1233,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_powermgmt}&quot;' />
                                 </option>
                             </tool>
                         </toolChain>

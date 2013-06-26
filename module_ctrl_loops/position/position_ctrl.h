@@ -12,6 +12,7 @@ void set_position(int target_position, chanend c_position_ctrl);
 
 int position_limit(int position, int max_position_limit, int min_position_limit);
 
+
 void set_position_csp(csp_par &csp_params, int target_position, int position_offset, int velocity_offset,\
 		              int torque_offset, chanend c_position_ctrl);
 

@@ -1,4 +1,5 @@
 #include "refclk.h"
+#include <dc_motor_config.h>
 
 /*Profile Velocity Quick Stop*/
 
@@ -14,9 +15,9 @@ extern int velocity_profile_generate(int step);
 
 /*Profile Position Mode*/
 
+extern void init_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity);
+
 extern int init_position_profile(int target_position, int actual_position,	int velocity, int acceleration, \
         						 int deceleration);
-
-extern void set_position_profile_limits(int max_acceleration, int max_velocity);
 
 extern int position_profile_generate(int step);

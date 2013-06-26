@@ -118,8 +118,10 @@ void profile_test(chanend c_position_ctrl)
 	unsigned time;
 	int position_ramp;
 
+	qei_par qei_params;
 	csp_par csp_params;
 	init_csp(csp_params);
+	init_qei(qei_params);
 
 	//check init
 	while (1) {
@@ -139,15 +141,15 @@ void profile_test(chanend c_position_ctrl)
 		}
 	}
 
-	acc = 1200;
-	dec = 1200;
-	velocity = 350;
-	actual_position = 0;
-	target_position = 300;
+	acc = 5200;				// rpm/s
+	dec = 5200;     		// rpm/s
+	velocity = 1516;		// rpm
+	actual_position = 0;	// degree
+	target_position = 300;	// degree
 
-	set_position_profile_limits(1200, 1000);
+	init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, MAX_NOMINAL_SPEED);
 
-	samp = init_position_profile( target_position, actual_position, velocity, acc, dec);
+	samp = init_position_profile(target_position, actual_position, velocity, acc, dec);
 	ts:>time;
 	for(i = 1; i < samp; i++)
 	{

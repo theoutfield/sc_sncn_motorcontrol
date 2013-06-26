@@ -1,5 +1,6 @@
 #include <position_ctrl.h>
 #include <xscope.h>
+#include <print.h>
 
 #define DEBUG
 

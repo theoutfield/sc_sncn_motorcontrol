@@ -42,6 +42,9 @@
 #define QEI_COUNT_MAX (1024 * 4)	// Max count of Quadrature Encoder as multiple of 2
 #define POLARITY 1					// 1 / -1
 
+#define MAX_FOLLOWING_ERROR 0
+#define MAX_POSITION_LIMIT 	359
+#define MIN_POSITION_LIMIT -359
 
 typedef struct S_Control
 {
@@ -63,8 +66,9 @@ typedef struct S_Filter_length
  * \brief struct definition for quadrature sensor
  */
 typedef struct S_QEI {
-	unsigned max_count;
-	unsigned real_counts;
+	int max_count;
+	int real_counts;
+	int gear_ratio;
 } qei_par;
 
 
@@ -107,5 +111,14 @@ typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 
 int init_csv(csv_par &csv_params);
 
+typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
+{
+	csv_par base;
+	int max_following_error;
+	int max_position_limit;
+	int min_position_limit;
+} csp_par;
+
+int init_csp(csp_par &csp_params);
 
 #endif
