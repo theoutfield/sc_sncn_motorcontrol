@@ -52,52 +52,7 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 #define HALL 1
 #define QEI 2
 
-//basic position ctrl test
-void set_position_test(chanend c_position_ctrl)
-{
-	int position = 0;
-	in_data d;
-	timer ts;
-	unsigned time;
-	int increment = 50;
-	csp_par csp_params;
-	init_csp(csp_params);
-
-	//check init
-	while (1) {
-		unsigned command, received_command = 0;
-		select
-		{
-			case c_position_ctrl :> command:
-				received_command = 1;
-			break;
-			default:
-			break;
-		}
-		if(received_command == 1)
-		{
-			printstrln(" init posctrl ");
-			break;
-		}
-	}
-
-	ts:>time;
-	while (1) {
-		//input_pos(d);
-		ts when timerafter(time+100000) :> time;
-		position +=increment;
-		xscope_probe_data(1, position);
-		set_position_csp(csp_params, position, 0, 0, 0, c_position_ctrl);
-
-		if(position>300000)
-			increment *= -1;
-		if(position<0)
-			increment *= -1;
-	}
-}
-
-
-void position_profile_test(chanend c_position_ctrl)
+void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 {
 	int samp;
 	int i = 0;
@@ -107,21 +62,21 @@ void position_profile_test(chanend c_position_ctrl)
 	qei_par qei_params;
 	csp_par csp_params;
 
-	int acc = 5200;				// rpm/s
-	int dec = 5200;     		// rpm/s
-	int velocity = 1516;		// rpm
+	int acc = 350;				// rpm/s
+	int dec = 350;     			// rpm/s
+	int velocity = 350;			// rpm
 	int actual_position = 0;	// degree
-	int target_position = 300;	// degree
+	int target_position = 350;	// degree
 
 	init_csp(csp_params);
 	init_qei(qei_params);
 
-	//check init
+	//check init signal from commutation level
 	while (1) {
-		unsigned command, received_command = 0;
+		unsigned command, received_command = 0; //FIXME put declarations outside the loop
 		select
 		{
-			case c_position_ctrl :> command:
+			case c_signal :> command:
 				received_command = 1;
 			break;
 			default:
@@ -129,10 +84,31 @@ void position_profile_test(chanend c_position_ctrl)
 		}
 		if(received_command == 1)
 		{
-			printstrln(" init posctrl ");
+			printstrln(" init commutation");
 			break;
 		}
 	}
+
+	POSITION_CTRL_ENABLE(); 	//activate position ctrl
+
+	 // init check from position control loop
+	 while(1)
+	 {
+		unsigned command, received_command =0; //FIXME put declarations outside the loop
+		select
+		{
+			case POSITION_CTRL_READ(command):
+				received_command = 1;
+				break;
+			default:
+				break;
+		}
+		if(received_command == 1)
+		{
+		  printstrln("pos intialised");
+		  break;
+		}
+	 }
 
 	init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, MAX_NOMINAL_SPEED);
 
@@ -156,13 +132,106 @@ void position_profile_test(chanend c_position_ctrl)
 }
 
 
-int main(void) {
+
+void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_position_ctrl)
+{
+	ctrl_proto_values_t InOut;
+
+	int i = 0;
+	int mode = 0;
+	int actual_position = 0;
+
+	timer t, t1;
+	unsigned time, time1, time2;
+	unsigned ts;
+	int target_position;
+	csp_par csp_params;
+
+	init_csp(csp_params);
+	init_ctrl_proto(InOut);
+
+	//check init signal from commutation level
+	while (1) {
+		unsigned command, received_command = 0; //FIXME put declarations outside the loop
+		select
+		{
+			case c_signal :> command:
+				received_command = 1;
+			break;
+			default:
+			break;
+		}
+		if(received_command == 1)
+		{
+			printstrln(" init commutation");
+			break;
+		}
+	}
+
+	POSITION_CTRL_ENABLE(); 	//activate position ctrl
+
+	 // init check from position control loop
+	 while(1)
+	 {
+		unsigned command, received_command =0; //FIXME put declarations outside the loop
+		select
+		{
+			case POSITION_CTRL_READ(command):
+				received_command = 1;
+				break;
+			default:
+				break;
+		}
+		if(received_command == 1)
+		{
+		  printstrln("pos intialised");
+		  break;
+		}
+	 }
+
+	//test only csp
+
+	t :> time;
+
+	while(1)
+	{
+
+		ctrlproto_protocol_handler_function( pdo_out, pdo_in, InOut);
+
+		switch(InOut.ctrl_motor)
+		{
+
+			case CSP: //csp mode index
+				mode = CSP;
+				target_position = InOut.in_position;
+				break;
+
+		}
+
+		select
+		{
+			case t when timerafter(time + MSEC_STD) :> time:
+				if(mode == CSP)
+				{
+					set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
+					actual_position = get_position(c_position_ctrl);
+					InOut.out_position = actual_position;
+					xscope_probe_data(1, target_position);
+				}
+				break;
+
+		}
+
+	}
+}
+
+int main(void)
+{
 	chan c_adc, c_adctrig;
 	chan c_qei;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
 	chan c_pwm_ctrl, c_commutation;
 	chan dummy, dummy1, dummy2;
-	chan enco_1, sync_output;
 	chan signal_adc;
 	chan sig_1, c_signal;
 	chan c_velocity_ctrl, c_position_ctrl;
@@ -181,31 +250,26 @@ int main(void) {
 	//
 	par
 	{
-/*		on stdcore[0] :
+		on stdcore[0] :
 		{
 			ecat_init();
-			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,
-					foe_in, pdo_out, pdo_in);
+
+			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);
 		}
 
 		on stdcore[0] :
 		{
-			ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);
-		}*/
+			ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);  // test CSP over ethercat with PPM on master side
+		}
 		on stdcore[1]:
 		{
-			par
-			{
-				position_profile_test(c_position_ctrl);
-
-				//set_position_test(c_position_ctrl);
-			}
+			//position_profile_test(c_position_ctrl, c_signal);		  // test PPM on slave side
 		}
 
 		on stdcore[1]:
 		{
-			xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
-					"n", XSCOPE_CONTINUOUS, "1 actualspeed", XSCOPE_INT, "n",
+			xscope_register(14, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,
+					"n", XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n",
 					XSCOPE_CONTINUOUS, "2 ramp", XSCOPE_INT, "n",
 					XSCOPE_CONTINUOUS, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
 					"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
@@ -222,20 +286,18 @@ int main(void) {
 
 		on stdcore[2]:
 		{
-			par
+
 			{
-				{
-					 ctrl_par position_ctrl_params;
-					 hall_par hall_params;
-					 qei_par qei_params;
+				 ctrl_par position_ctrl_params;
+				 hall_par hall_params;
+				 qei_par qei_params;
 
-					 init_position_control(position_ctrl_params);
-					 init_hall(hall_params);
-					 init_qei(qei_params);
+				 init_position_control(position_ctrl_params);
+				 init_hall(hall_params);
+				 init_qei(qei_params);
 
-					 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p2, c_qei, c_signal, c_position_ctrl, c_commutation);
-
-				}
+				 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p2,\
+								  c_qei, c_position_ctrl, c_commutation);
 			}
 
 		}

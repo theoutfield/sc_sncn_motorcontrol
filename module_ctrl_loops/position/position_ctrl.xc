@@ -5,6 +5,7 @@
 #define DEBUG
 
 #define SET_POSITION_TOKEN 40
+#define GET_POSITION_TOKEN 41
 #define HALL 1
 #define QEI 2
 #define HALL_PRECISION		2
@@ -26,6 +27,15 @@ void set_position(int target_position, chanend c_position_ctrl)
 {
 	POSITION_CTRL_WRITE(SET_POSITION_TOKEN);
 	POSITION_CTRL_WRITE(target_position);
+}
+
+
+int get_position(chanend c_position_ctrl)
+{
+	int position;
+	POSITION_CTRL_WRITE(GET_POSITION_TOKEN);
+	POSITION_CTRL_READ(position);
+	return position;
 }
 
 int position_limit(int position, int max_position_limit, int min_position_limit)
@@ -80,7 +90,7 @@ void init_position_control(ctrl_par &position_ctrl_params)
 }
 
 void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_par qei_params, int sensor_used, \
-		              chanend c_hall, chanend c_qei, chanend c_signal, chanend c_position_ctrl, chanend c_commutation)
+		              chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation)
 {
 	int actual_position = 0;
 	int target_position = 0;
@@ -95,34 +105,45 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 	unsigned int time;
 
 	int command;
+	int activate = 0;
 	int direction = 0;
 
 	int precision;
 	int precision_factor;
 
-	//check init signal from commutation level
-	while (1)
+	while(1)
 	{
-		unsigned received_command = 0;
+		unsigned received_command = UNSET;
 		select
 		{
-			case c_signal :> command: 			//SIGNAL_READ(command):
-				received_command = 1;
+			case POSITION_CTRL_READ(command):
+				if(command == SET)
+				{
+					activate = SET;
+					 printstrln("pos activated");
+				}
+				else if(command == UNSET)
+				{
+					activate = UNSET;
+					printstrln("pos disabled");
+				}
+				received_command = SET;
 				break;
 			default:
 				break;
 		}
-		if(received_command == 1)
+		if(received_command == SET)
 		{
-			printstrln(" init commutation");
+			POSITION_CTRL_WRITE(received_command);
 			break;
 		}
 	}
 
+	//printstrln("start vel");
+
 	ts:> time;
 	ts when timerafter(time+SEC_STD) :> time;
 
-	POSITION_CTRL_ENABLE();						 //start
 
 
 	if(sensor_used == HALL)
@@ -202,6 +223,10 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 				if(command == SET_POSITION_TOKEN)
 				{
 					POSITION_CTRL_READ(target_position);
+				}
+				else if(command == GET_POSITION_TOKEN)
+				{
+					POSITION_CTRL_WRITE(actual_position);
 				}
 				break;
 		}

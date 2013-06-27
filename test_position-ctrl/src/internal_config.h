@@ -12,9 +12,10 @@
 #define SIGNAL_WRITE(x)				c_signal <: x
 
 
-#define SET    1
-#define UNSET  0
+#define SET    	1
+#define UNSET  	0
 
 #define SUCCESS 1
 #define ERROR   0 //based on timeout for success
-#define CSV 9
+#define CSV 	9
+#define CSP 	8
