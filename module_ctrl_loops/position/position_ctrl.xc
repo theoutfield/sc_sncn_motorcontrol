@@ -22,6 +22,46 @@
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 
+void wait_ms(int milliseconds, int core_id, timer t)
+{
+	unsigned time;
+	t :> time;
+	if(core_id == 3)
+	{
+		t when timerafter(time + milliseconds * MSEC_FAST) :> time;
+	}
+	else
+	{
+		t when timerafter(time + milliseconds * MSEC_STD) :> time;
+	}
+	return;
+}
+
+int init_position_control(chanend c_position_ctrl)
+{
+	unsigned command, received_command =0;
+
+	POSITION_CTRL_ENABLE(); 					//signal position ctrl loop
+
+	// init check from position control loop
+	while(1)
+	{
+		select
+		{
+			case POSITION_CTRL_READ(command):
+				received_command = SUCCESS;
+				break;
+			default:
+				break;
+		}
+		if(received_command == SUCCESS)
+		{
+			break;
+		}
+	}
+	return received_command;
+}
+
 //internal functions
 void set_position(int target_position, chanend c_position_ctrl)
 {
@@ -64,7 +104,7 @@ void set_position_csp(csp_par &csp_params, int target_position, int position_off
 }
 
 
-void init_position_control(ctrl_par &position_ctrl_params)
+void init_position_control_param(ctrl_par &position_ctrl_params)
 {
 
 	position_ctrl_params.Kp_n = POSITION_Kp_NUMERATOR;
@@ -120,14 +160,14 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 				if(command == SET)
 				{
 					activate = SET;
-					 printstrln("pos activated");
+					// printstrln("pos activated");
 				}
 				else if(command == UNSET)
 				{
 					activate = UNSET;
-					printstrln("pos disabled");
+					//printstrln("pos disabled");
 				}
-				received_command = SET;
+				received_command = SUCCESS;
 				break;
 			default:
 				break;
@@ -139,12 +179,9 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 		}
 	}
 
-	//printstrln("start vel");
+	//printstrln("start pos");
 
 	ts:> time;
-	ts when timerafter(time+SEC_STD) :> time;
-
-
 
 	if(sensor_used == HALL)
 	{

@@ -23,13 +23,37 @@
 #include "adc_client_ad7949.h"
 #include "hall_client.h"
 #include "comm_loop.h"
+#include <internal_config.h>
 #include "print.h"
 
 #define SET_VOLTAGE    2
 
 static t_pwm_control pwm_ctrl;
 
-void commutation_init(chanend c_pwm_ctrl)
+int init_commutation(chanend c_signal)
+{
+	unsigned command, received_command = 0;
+
+	// init check from commutation loop
+	while (1)
+	{
+		select
+		{
+			case SIGNAL_READ(command):
+				received_command = SUCCESS;
+				break;
+			default:
+				break;
+		}
+		if(received_command == SUCCESS)
+		{
+			break;
+		}
+	}
+	return received_command;
+}
+
+void commutation_init_to_zero(chanend c_pwm_ctrl)
 {
 	unsigned pwm[3] = {0, 0, 0};  // PWM OFF
 	pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
@@ -136,7 +160,7 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 	  timer t;
 	  unsigned ts;
 
-	  commutation_init(c_pwm_ctrl);
+	  commutation_init_to_zero(c_pwm_ctrl);
 	  t when timerafter (ts + t_delay) :> ts;
 
 	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);

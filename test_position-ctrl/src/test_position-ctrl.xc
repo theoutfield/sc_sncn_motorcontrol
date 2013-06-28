@@ -48,19 +48,24 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-
 #define HALL 1
 #define QEI 2
 
+ctrl_proto_values_t InOut;
+
 void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 {
-	int samp;
+	int core_id = 1;
 	int i = 0;
-	timer ts;
-	unsigned time;
+	timer t;
+
+	int steps;
 	int position_ramp;
+
 	qei_par qei_params;
 	csp_par csp_params;
+
+	int init = 0;
 
 	int acc = 350;				// rpm/s
 	int dec = 350;     			// rpm/s
@@ -68,77 +73,64 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 	int actual_position = 0;	// degree
 	int target_position = 350;	// degree
 
-	init_csp(csp_params);
-	init_qei(qei_params);
+	init_csp_param(csp_params);
+	init_qei_param(qei_params);
 
 	//check init signal from commutation level
-	while (1) {
-		unsigned command, received_command = 0; //FIXME put declarations outside the loop
-		select
-		{
-			case c_signal :> command:
-				received_command = 1;
-			break;
-			default:
-			break;
-		}
-		if(received_command == 1)
-		{
-			printstrln(" init commutation");
-			break;
-		}
-	}
+	init = init_commutation(c_signal);
+	if(init == 1)
+		printstrln("initialized commutation");
+	else
+		printstrln(" initialize commutation failed");
 
-	POSITION_CTRL_ENABLE(); 	//activate position ctrl
 
-	 // init check from position control loop
-	 while(1)
-	 {
-		unsigned command, received_command =0; //FIXME put declarations outside the loop
-		select
-		{
-			case POSITION_CTRL_READ(command):
-				received_command = 1;
-				break;
-			default:
-				break;
-		}
-		if(received_command == 1)
-		{
-		  printstrln("pos intialised");
-		  break;
-		}
-	 }
+	init = 0;
+	init = init_position_control(c_position_ctrl);
+	if(init == 1)
+		printstrln("position control intialized");
+	else
+		printstrln("intialize position control failed");
 
-	init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, MAX_NOMINAL_SPEED);
 
-	samp = init_position_profile(target_position, actual_position, velocity, acc, dec);
-
-	ts:>time;
-
-	for(i = 1; i < samp; i++)
+	if(init == 1)
 	{
-		ts when timerafter(time+100000) :> time;
-		position_ramp = position_profile_generate(i);
-		xscope_probe_data(1, position_ramp);
-		set_position_csp(csp_params, position_ramp, 0, 0, 0, c_position_ctrl);
-	}
-	while(1)
-	{
-		ts when timerafter(time+100000) :> time;
-		xscope_probe_data(1, position_ramp);
-		set_position_csp(csp_params, position_ramp, 0, 0, 0, c_position_ctrl);
+		init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, MAX_NOMINAL_SPEED);
+
+		steps = init_position_profile(target_position, actual_position, velocity, acc, dec);
+
+		for(i = 1; i < steps; i++)
+		{
+			wait_ms(1, core_id, t);
+			position_ramp = position_profile_generate(i);
+			set_position(position_ramp, c_position_ctrl);
+
+			xscope_probe_data(1, position_ramp);
+		}
+		while(1)
+		{
+			wait_ms(1, core_id, t);
+			set_position(position_ramp, c_position_ctrl);
+
+			xscope_probe_data(1, position_ramp);
+		}
 	}
 }
 
 
 
+int get_target_position()
+{
+	return InOut.in_position;
+}
+void send_actual_position(int actual_position)
+{
+	InOut.out_position = actual_position;
+}
 void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_position_ctrl)
 {
-	ctrl_proto_values_t InOut;
-
 	int i = 0;
 	int mode = 0;
+	int core_id = 0;
 	int actual_position = 0;
 
 	timer t, t1;
@@ -146,82 +138,51 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_pos
 	unsigned ts;
 	int target_position;
 	csp_par csp_params;
+	int init = 0;
 
-	init_csp(csp_params);
+	init_csp_param(csp_params);
 	init_ctrl_proto(InOut);
 
 	//check init signal from commutation level
-	while (1) {
-		unsigned command, received_command = 0; //FIXME put declarations outside the loop
-		select
-		{
-			case c_signal :> command:
-				received_command = 1;
-			break;
-			default:
-			break;
-		}
-		if(received_command == 1)
-		{
-			printstrln(" init commutation");
-			break;
-		}
-	}
+	init = init_commutation(c_signal);
+	if(init == 1)
+		printstrln("initialized commutation");
+	else
+		printstrln(" initialize commutation failed");
 
-	POSITION_CTRL_ENABLE(); 	//activate position ctrl
 
-	 // init check from position control loop
-	 while(1)
-	 {
-		unsigned command, received_command =0; //FIXME put declarations outside the loop
-		select
-		{
-			case POSITION_CTRL_READ(command):
-				received_command = 1;
-				break;
-			default:
-				break;
-		}
-		if(received_command == 1)
-		{
-		  printstrln("pos intialised");
-		  break;
-		}
-	 }
+	init = 0;
+	init = init_position_control(c_position_ctrl);
+	if(init == 1)
+		printstrln("position control intialized");
+	else
+		printstrln("intialize position control failed");
 
-	//test only csp
-
-	t :> time;
-
-	while(1)
+	if(init == 1)
 	{
-
-		ctrlproto_protocol_handler_function( pdo_out, pdo_in, InOut);
-
-		switch(InOut.ctrl_motor)
+		//test only csp
+		while(1)
 		{
 
-			case CSP: //csp mode index
-				mode = CSP;
-				target_position = InOut.in_position;
-				break;
+			ctrlproto_protocol_handler_function( pdo_out, pdo_in, InOut);
 
-		}
+			switch(InOut.ctrl_motor)
+			{
+				case CSP: //csp mode index
 
-		select
-		{
-			case t when timerafter(time + MSEC_STD) :> time:
-				if(mode == CSP)
-				{
+					target_position = get_target_position();
 					set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
+
+
 					actual_position = get_position(c_position_ctrl);
-					InOut.out_position = actual_position;
+					send_actual_position(actual_position);
+
 					xscope_probe_data(1, target_position);
-				}
-				break;
+					break;
+			}
 
+			wait_ms(1, core_id, t);
 		}
-
 	}
 }
 
@@ -259,11 +220,11 @@ int main(void)
 
 		on stdcore[0] :
 		{
-			ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);  // test CSP over ethercat with PPM on master side
+			//ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);  // test CSP over ethercat with PPM on master side
 		}
 		on stdcore[1]:
 		{
-			//position_profile_test(c_position_ctrl, c_signal);		  // test PPM on slave side
+			position_profile_test(c_position_ctrl, c_signal);		  // test PPM on slave side
 		}
 
 		on stdcore[1]:
@@ -292,9 +253,9 @@ int main(void)
 				 hall_par hall_params;
 				 qei_par qei_params;
 
-				 init_position_control(position_ctrl_params);
-				 init_hall(hall_params);
-				 init_qei(qei_params);
+				 init_position_control_param(position_ctrl_params);
+				 init_hall_param(hall_params);
+				 init_qei_param(qei_params);
 
 				 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p2,\
 								  c_qei, c_position_ctrl, c_commutation);

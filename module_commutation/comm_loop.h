@@ -25,6 +25,9 @@
 #include "hall_client.h"
 #include "dc_motor_config.h"
 
+
+int init_commutation(chanend c_signal);
+
 /**
  * \brief Sinusoidal based Commutation Loop
  *

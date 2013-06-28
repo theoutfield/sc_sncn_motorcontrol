@@ -5,8 +5,11 @@
 #include "hall_client.h"
 #include "comm_loop.h"
 
+void wait_ms(int milliseconds, int core_id, timer t);
 
-void init_position_control(ctrl_par &position_ctrl_params);
+int init_position_control(chanend c_position_ctrl);
+
+void init_position_control_param(ctrl_par &position_ctrl_params);
 
 void set_position(int target_position, chanend c_position_ctrl);
 
