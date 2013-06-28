@@ -86,14 +86,14 @@ typedef struct S_Hall {
  *
  * \param q_max struct defines the max count for quadrature encoder (QEI)
  */
-void init_qei(qei_par &qei_max);
+void init_qei_param(qei_par &qei_max);
 
 /**
  * \brief initialize hall sensor
  *
  * \param h_pole struct defines the pole-pairs and gear ratio
  */
-void init_hall(hall_par &h_pole);
+void init_hall_param(hall_par &h_pole);
 
 
 
@@ -109,7 +109,7 @@ typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 	int polarity;
 } csv_par;
 
-int init_csv(csv_par &csv_params);
+int init_csv_param(csv_par &csv_params);
 
 typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 {
@@ -119,6 +119,6 @@ typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 	int min_position_limit;
 } csp_par;
 
-int init_csp(csp_par &csp_params);
+int init_csp_param(csp_par &csp_params);
 
 #endif

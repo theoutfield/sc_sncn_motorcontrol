@@ -21,22 +21,6 @@
 
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
-
-void wait_ms(int milliseconds, int core_id, timer t)
-{
-	unsigned time;
-	t :> time;
-	if(core_id == 3)
-	{
-		t when timerafter(time + milliseconds * MSEC_FAST) :> time;
-	}
-	else
-	{
-		t when timerafter(time + milliseconds * MSEC_STD) :> time;
-	}
-	return;
-}
-
 int init_position_control(chanend c_position_ctrl)
 {
 	unsigned command, received_command =0;

@@ -28,7 +28,7 @@
 #define SET_VELOCITY_TOKEN 50
 #define GET_VELOCITY_TOKEN 60
 
-void init_velocity_control(ctrl_par &velocity_ctrl_params)
+void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 {
 	velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;
 	velocity_ctrl_params.Kp_d = VELOCITY_Kp_DENOMINATOR;
@@ -48,7 +48,33 @@ void init_velocity_control(ctrl_par &velocity_ctrl_params)
 	return;
 }
 
-void init_sensor_filter(filt_par &sensor_filter_par) //optional for user to change
+int init_velocity_control(chanend c_velocity_ctrl)
+{
+	unsigned command, received_command =0; //FIXME put declarations outside the loop
+
+	VELOCITY_CTRL_ENABLE(); 	//activate velocity ctrl loop
+
+	 // init check from velocity control loop
+	 while(1)
+	 {
+
+		select
+		{
+			case VELOCITY_CTRL_READ(command):
+				received_command = SUCCESS;
+				break;
+			default:
+				break;
+		}
+		if(received_command == SUCCESS)
+		{
+			break;
+		}
+	 }
+	 return received_command;
+}
+
+void init_sensor_filter_param(filt_par &sensor_filter_par) //optional for user to change
 {
 	sensor_filter_par.filter_length = FILTER_SIZE;
 	return;
@@ -136,12 +162,12 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 				if(command == SET)
 				{
 					activate = SET;
-					 printstrln("vel activated");
+					// printstrln("vel activated");
 				}
 				else if(command == UNSET)
 				{
 					activate = UNSET;
-					printstrln("vel disabled");
+					//printstrln("vel disabled");
 				}
 				received_command = SET;
 				break;

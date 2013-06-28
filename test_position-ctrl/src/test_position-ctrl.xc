@@ -83,13 +83,15 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 	else
 		printstrln(" initialize commutation failed");
 
-
-	init = 0;
-	init = init_position_control(c_position_ctrl);
 	if(init == 1)
-		printstrln("position control intialized");
-	else
-		printstrln("intialize position control failed");
+	{
+		init = 0;
+		init = init_position_control(c_position_ctrl);
+		if(init == 1)
+			printstrln("position control intialized");
+		else
+			printstrln("intialize position control failed");
+	}
 
 
 	if(init == 1)
@@ -150,13 +152,15 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_pos
 	else
 		printstrln(" initialize commutation failed");
 
-
-	init = 0;
-	init = init_position_control(c_position_ctrl);
 	if(init == 1)
-		printstrln("position control intialized");
-	else
-		printstrln("intialize position control failed");
+	{
+		init = 0;
+		init = init_position_control(c_position_ctrl);
+		if(init == 1)
+			printstrln("position control intialized");
+		else
+			printstrln("intialize position control failed");
+	}
 
 	if(init == 1)
 	{
@@ -220,28 +224,18 @@ int main(void)
 
 		on stdcore[0] :
 		{
-			//ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);  // test CSP over ethercat with PPM on master side
+			ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);   	// test CSP over ethercat with PPM on master side
 		}
 		on stdcore[1]:
 		{
-			position_profile_test(c_position_ctrl, c_signal);		  // test PPM on slave side
+			//position_profile_test(c_position_ctrl, c_signal);		  	// test PPM on slave side
 		}
 
 		on stdcore[1]:
 		{
-			xscope_register(14, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,
-					"n", XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n",
-					XSCOPE_CONTINUOUS, "2 ramp", XSCOPE_INT, "n",
-					XSCOPE_CONTINUOUS, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
-					"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
-					XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "6 vel_d", XSCOPE_INT,
-					"n", XSCOPE_CONTINUOUS, "7 speed", XSCOPE_INT, "n",
-					XSCOPE_CONTINUOUS, "8 sinepos_a", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "9 sinepos_b", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "10 sinepos_c", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "11 sine_a", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
+			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
+								XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
+
 			xscope_config_io(XSCOPE_IO_BASIC);
 		}
 

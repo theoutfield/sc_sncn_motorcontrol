@@ -9,9 +9,11 @@
 #define VELOCITY_CTRL_H_
 #include "dc_motor_config.h"
 
-void init_velocity_control(ctrl_par &velocity_ctrl_par);
+void init_velocity_control_param(ctrl_par &velocity_ctrl_par);
 
-void init_sensor_filter(filt_par &sensor_filter_par);
+int init_velocity_control(chanend c_velocity_ctrl);
+
+void init_sensor_filter_param(filt_par &sensor_filter_par);
 
 
 //internal
