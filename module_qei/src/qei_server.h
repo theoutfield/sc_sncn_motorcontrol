@@ -21,7 +21,7 @@
 #include <xs1.h>
 
 /**
- * \brief Implementation of the QEI server thread
+ * \brief Implementation of the QEI server thread (with index)
  *
  * \param c_qei The control channel used by the client
  * \param p_qei The hardware port where the quadrature encoder is located
@@ -29,5 +29,15 @@
  *
  */
 void run_qei (  chanend c_qei, port in p_qei );
+
+/**
+ * \brief Implementation of the QEI server thread (no index)
+ *
+ * \param c_qei The control channel used by the client
+ * \param p_qei The hardware port where the quadrature encoder is located
+ *
+ *
+ */
+void run_qei_no_index ( chanend c_qei, port in p_qei );
 
 #endif /*__QEI_SERVER_H__ */

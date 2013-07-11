@@ -138,5 +138,95 @@ void run_qei ( chanend c_qei, port in p_qei )
 }
 
 
+#pragma unsafe arrays
+void run_qei_no_index ( chanend c_qei, port in p_qei )
+{
+	unsigned pos = 0, v, ts1, ts2, ok=0, old_pins=0, new_pins;
+	timer t;
 
+	int cmd;
+	int c_pos = 0, prev = 0, count = 0, first = 1;
+	int max_count = 26 * 4000;
+	int difference = 0, dirn = 0;
+	int QEI_COUNT_MAX = 4096;
+
+	p_qei :> new_pins;
+	t :> ts1;
+
+	while (1) {
+	#pragma ordered
+		select {
+			case p_qei when pinsneq(new_pins) :> new_pins :
+				{
+					if ((new_pins & 0x3) != old_pins)
+					{
+						ts2 = ts1;
+						t :> ts1;
+					}
+					v = lookup[new_pins][old_pins];
+					{ v, pos } = lmul(1, pos, v, -5);
+					old_pins = new_pins & 0x3;
+				}
+				break;
+			case c_qei :> cmd :
+				if(cmd == 1)
+				{
+					slave
+					{
+						c_qei <: pos;
+						c_qei <: ts1;
+						c_qei <: ts2;
+						c_qei <: ok;
+					}
+				}
+				else if(cmd == 2)
+				{
+					slave
+					{
+						c_qei <: count;
+						c_qei <: dirn;
+					}
+				}
+				break;
+
+			default:
+				if(first == 1)
+				{
+					prev = pos & (QEI_COUNT_MAX-1);
+					first = 0;
+				}
+				c_pos =  pos & (QEI_COUNT_MAX-1);
+				if(prev != c_pos )
+				{
+					difference = c_pos - prev;
+					if( difference > 3000)
+					{
+						count = count + 1;
+						dirn = 1;
+					}
+					else if(difference < -3000)
+					{
+						count = count - 1;
+						dirn = -1;
+					}
+					else if( difference < 10 && difference >0)
+					{
+						count = count - difference;
+						dirn = -1;
+					}
+					else if( difference < 0 && difference > -10)
+					{
+						count = count - difference;
+						dirn = 1;
+					}
+					prev = c_pos;
+				}
+				if(count >= max_count || count <= -max_count)
+				{
+					count=0;
+				}
+				break;
+		}
+	}
+}
 
