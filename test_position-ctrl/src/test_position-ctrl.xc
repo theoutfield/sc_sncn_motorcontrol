@@ -224,6 +224,11 @@ int main(void)
 
 		on stdcore[0] :
 		{
+			firmware_update(foe_out, foe_in, sig_1); // firmware update
+		}
+
+		on stdcore[1] :
+		{
 			ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);   	// test CSP over ethercat with PPM on master side
 		}
 		on stdcore[1]:
