@@ -37,7 +37,7 @@
 #include "profile.h"
 #include <position_ctrl.h>
 
-#include <flash_Somanet.h>
+#include <flash_somanet.h>
 #include <internal_config.h>
 #include <ctrlproto.h>
 

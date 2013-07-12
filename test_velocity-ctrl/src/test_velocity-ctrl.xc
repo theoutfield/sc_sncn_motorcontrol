@@ -35,7 +35,7 @@
 #include "print.h"
 #include "filter_blocks.h"
 #include "profile.h"
-#include <flash_Somanet.h>
+#include <flash_somanet.h>
 #include <internal_config.h>
 #include <ctrlproto.h>
 
