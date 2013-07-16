@@ -72,5 +72,13 @@
 #define target_reached_or_reserved_state	0x400
 #define internal_limit_active_state			0x800
 #define operation_mode_specific_state		0x1000	// 12 csp/csv/cst  13
-#define manufacturer_specific_state   		0x4000	// 14-15
-#endif
+#define manufacturer_specific_states   		0x4000	// 14-15
+
+
+
+extern int update_statusword(int current_status, int state_reached);
+
+extern int get_next_values(int in_state, int check, int ctrl_input, int fault);
+
+#endif /*__DRIVE_CONFIG__H__*/
+

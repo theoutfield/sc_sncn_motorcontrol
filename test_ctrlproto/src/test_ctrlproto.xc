@@ -27,12 +27,13 @@
 #include <flash_somanet.h>
 #include <ctrlproto.h>
 
+#include <drive_config.h>
 #include <internal_config.h>
 #include <dc_motor_config.h>
 
 #include <xscope.h>
 #include <print.h>
-
+#include <test.h>
 
 
 
@@ -89,11 +90,28 @@ int main(void)
 		on stdcore[1]:
 		{
 			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
-								XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
+							    XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
 
 			xscope_config_io(XSCOPE_IO_BASIC);
 		}
 
+		on stdcore[2]:
+		{
+			int current_state = 0;
+			int sw;   // =  update_statusword(current_state, 1);
+
+			in_data d;
+			while(1)
+			{
+				input_new_state(d);
+				printstr("state ");
+				printintln(d.set_state);
+				sw = update_statusword(current_state, d.set_state);
+				printstr("updated state ");
+				printhexln(sw);
+				current_state = sw;
+			}
+		}
 
 		/************************************************************
 		 * IFM_CORE
@@ -103,7 +121,7 @@ int main(void)
 			par
 			{
 
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
+		/*		adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
 						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
 						p_ifm_adc_misob);
 
@@ -116,7 +134,7 @@ int main(void)
 				run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
 
 				run_qei(c_qei, p_ifm_encoder);
-
+		 */
 			}
 		}
 
