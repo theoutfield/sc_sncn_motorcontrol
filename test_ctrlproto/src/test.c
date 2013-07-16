@@ -19,6 +19,13 @@ int input_new_state(in_data *d )
 	d->set_state = state;
 	return 1;
 }
+int test_get_next_state(in_data *d)
+{
+	int in_state, check, ctrl_input;
+	printf("enter in_state check ctrl_input \n");
+	scanf("%d %d %d",&d->set_state, &d->check, &d->ctrl_input);
+	return 0;
+}
 
 int input_torq(in_data *d )
 {

@@ -74,7 +74,7 @@
 #define operation_mode_specific_state		0x1000	// 12 csp/csv/cst  13
 #define manufacturer_specific_states   		0x4000	// 14-15
 
-
+extern int init_state(void);
 
 extern int update_statusword(int current_status, int state_reached);
 

@@ -97,19 +97,24 @@ int main(void)
 
 		on stdcore[2]:
 		{
-			int current_state = 0;
-			int sw;   // =  update_statusword(current_state, 1);
+			int in_state;
+			int check, ctrl_input;
+			int out_state;
 
 			in_data d;
+
+			in_state = init_state(); //init state
 			while(1)
 			{
-				input_new_state(d);
-				printstr("state ");
-				printintln(d.set_state);
-				sw = update_statusword(current_state, d.set_state);
+				test_get_next_state(d);
+				printstr(" check ");
+				printint(d.check);
+				printstr(" ctrl_input ");
+				printintln(d.ctrl_input);
+				out_state = get_next_values(in_state, d.check, d.ctrl_input, 0);
 				printstr("updated state ");
-				printhexln(sw);
-				current_state = sw;
+				printhexln(out_state);
+				in_state = out_state;
 			}
 		}
 

@@ -16,6 +16,24 @@ void set_torque_test(chanend c_torque) {
 	}
 }
 
+/*//test statusword update
+{
+	int current_state = 0;
+	int sw;   // =  update_statusword(current_state, 1);
+
+	in_data d;
+	while(1)
+	{
+		input_new_state(d);
+		printstr("state ");
+		printintln(d.set_state);
+		sw = update_statusword(current_state, d.set_state);
+		printstr("updated state ");
+		printhexln(sw);
+		current_state = sw;
+	}
+}*/
+
 /*{
 	int voltage = 1500;
 	//check init signal from commutation level

@@ -4,6 +4,8 @@ typedef struct S_CMD {
 	int set_position;
 	int set_velocity;
 	int set_state;
+	int check;
+	int ctrl_input;
 } in_data;
 
 
@@ -13,5 +15,6 @@ int input_torq( in_data &d );
 int input_pos(in_data &d);
 int input_vel(in_data &d);
 int input_new_state(in_data &d);
+int test_get_next_state(in_data &d);
 void set_torque_test(chanend c_torque) ;
 #endif
