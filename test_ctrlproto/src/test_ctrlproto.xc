@@ -28,6 +28,7 @@
 #include <ctrlproto.h>
 
 #include <drive_config.h>
+#include <drive_ctrl.h>
 #include <internal_config.h>
 #include <dc_motor_config.h>
 
@@ -97,26 +98,45 @@ int main(void)
 
 		on stdcore[2]:
 		{
-			int in_state;
-			int check, ctrl_input;
-			int out_state;
+			int current_state = 0;
+			int sw;   // =  update_statusword(current_state, 1);
 
 			in_data d;
-
-			in_state = init_state(); //init state
 			while(1)
 			{
-				test_get_next_state(d);
-				printstr(" check ");
-				printint(d.check);
-				printstr(" ctrl_input ");
-				printintln(d.ctrl_input);
-				out_state = get_next_values(in_state, d.check, d.ctrl_input, 0);
+				input_new_state(d);
+				printstr("state ");
+				printintln(d.set_state);
+				sw = update_statusword(current_state, d.set_state);
 				printstr("updated state ");
-				printhexln(out_state);
-				in_state = out_state;
+				printhexln(sw);
+				current_state = sw;
 			}
 		}
+//		{
+//			int in_state;
+//			int check, ctrl_input;
+//			int out_state;
+//
+//			in_data d;
+//
+//			in_state = init_state(); //init state
+//			while(1)
+//			{
+//				test_get_next_state(d);
+//				printstr(" check ");
+//				printint(d.check);
+//				printstr(" ctrl_input ");
+//				printint(d.ctrl_input);
+//				printstr(" fault ");
+//				printintln(d.fault);
+//				out_state = get_next_values(in_state, d.check, d.ctrl_input, d.fault);
+//				printstr("updated state ");
+//				printhexln(out_state);
+//				in_state = out_state;
+//			}
+//		}
+
 
 		/************************************************************
 		 * IFM_CORE

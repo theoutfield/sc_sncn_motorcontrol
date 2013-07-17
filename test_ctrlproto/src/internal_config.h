@@ -1,3 +1,6 @@
+#ifndef INTERNAL_CONFIG_H_
+#define INTERNAL_CONFIG_H_
+
 #define VELOCITY_CTRL_ENABLE()   	c_velocity_ctrl <: 1
 #define VELOCITY_CTRL_DISABLE()  	c_velocity_ctrl <: 0
 #define VELOCITY_CTRL_READ(x)		c_velocity_ctrl :> x
@@ -21,3 +24,5 @@
 #define ERROR   0 //based on timeout for success
 #define CSV 	9
 #define CSP 	8
+
+#endif /* INTERNAL_CONFIG_H_ */

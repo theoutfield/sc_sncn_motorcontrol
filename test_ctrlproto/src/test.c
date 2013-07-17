@@ -22,8 +22,8 @@ int input_new_state(in_data *d )
 int test_get_next_state(in_data *d)
 {
 	int in_state, check, ctrl_input;
-	printf("enter in_state check ctrl_input \n");
-	scanf("%d %d %d",&d->set_state, &d->check, &d->ctrl_input);
+	printf("enter in_state, check, ctrl_input, fault\n");
+	scanf("%d %d %d %d",&d->set_state, &d->check, &d->ctrl_input, &d->fault);
 	return 0;
 }
 

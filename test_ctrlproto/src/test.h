@@ -6,6 +6,7 @@ typedef struct S_CMD {
 	int set_state;
 	int check;
 	int ctrl_input;
+	int fault;
 } in_data;
 
 
