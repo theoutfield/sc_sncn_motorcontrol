@@ -7,6 +7,19 @@
 
 #include <drive_config.h>
 
+int read_controlword_switch_on(int control_word) {
+	return (control_word & SWITCH_ON_CONTROL);
+}
+int read_controlword_quick_stop(int control_word) {
+	return (~((control_word & QUICK_STOP_CONTROL) >> 2) & 0x1);
+}
+int read_controlword_enable_op(int control_word) {
+	return (control_word & ENABLE_OPERATION_CONTROL) >> 3;
+}
+int read_controlword_fault_reset(int control_word) {
+	return (control_word & FAULT_RESET_CONTROL) >> 7;
+}
+
 int init_state(void) {
 	return 1;
 }

@@ -58,6 +58,18 @@
 /* Profile Velocity Mode */
 #define TARGET_VELOCITY_REACHED 0x0400
 
+/*Controlword Bits*/
+#define SWITCH_ON_CONTROL					0x1
+#define ENABLE_VOLTAGE_CONTROL				0x2
+#define QUICK_STOP_CONTROL					0x4
+#define ENABLE_OPERATION_CONTROL			0x8
+#define OPERATION_MODES_SPECIFIC_CONTROL	0x70  /*3 bits*/
+#define FAULT_RESET_CONTROL					0x80
+#define HALT_CONTROL						0x100
+#define OPERATION_MODE_SPECIFIC_CONTROL		0x200
+#define RESERVED_CONTROL					0x400
+#define MANUFACTURER_SPECIFIC_CONTROL		0xf800
+
 /*Statusword Bits*/
 #define READY_TO_SWITCH_ON_STATE	  		0X1
 #define SWITCHED_ON_STATE					0X2
@@ -72,13 +84,21 @@
 #define TARGET_REACHED_OR_RESERVED_STATE	0X400
 #define INTERNAL_LIMIT_ACTIVE_STATE			0X800
 #define OPERATION_MODE_SPECIFIC_STATE		0X1000	// 12 CSP/CSV/CST  13
-#define MANUFACTURER_SPECIFIC_STATES   		0X4000	// 14-15
+#define MANUFACTURER_SPECIFIC_STATES   		0XC000	// 14-15
 
 extern int init_state(void);
 
 extern int update_statusword(int current_status, int state_reached);
 
 extern int get_next_values(int in_state, int check_init, int ctrl_input, int fault);
+
+extern int read_controlword_switch_on(int control_word);
+
+extern int read_controlword_quick_stop(int control_word);
+
+extern int read_controlword_enable_op(int control_word);
+
+extern int read_controlword_fault_reset(int control_word);
 
 #endif /* DRIVE_CONFIG_H_*/
 
