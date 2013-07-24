@@ -74,10 +74,6 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 	int voltage = 0;
 	int direction = 0;
 
-	unsigned time;
-	timer t;
-
-	t :> time;
 	while (1)
 	{
 
@@ -140,7 +136,6 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 				break;
 		}
 
-		t when timerafter( time + 13889 ) :> time;
 	}
 
 }
@@ -157,6 +152,7 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc, chanend c_signal)
 {
 	  const unsigned t_delay = 300*USEC_FAST;
+	  const unsigned timeout = 2*SEC_FAST;
 	  timer t;
 	  unsigned ts;
 
@@ -167,16 +163,25 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 	  t when timerafter (ts + t_delay) :> ts;
 
 	  printstrln("start");
+
+
 	  c_signal <: 1; 			//signal commutation init done.
 
-	 /* signal_adc <: 1;
+	  t :> ts;
 	  while(1)
 	  {
 		  unsigned command, received_command = 0;
+		  #pragma ordered
 		  select
 		  {
 			case signal_adc :> command:
 				received_command = 1;
+				printstrln("received signal from torque ctrl");
+				signal_adc <: 1;
+				break;
+			case t when timerafter(ts + timeout) :> void:
+				received_command = 1;
+				printstrln("timed out");
 				break;
 			default:
 				break;
@@ -184,7 +189,9 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 		  if(received_command == 1)
 			  break;
 	  }
-*/
+
+	  printstrln("start commutation");
+
 	  commutation_sinusoidal_loop( c_commutation, c_hall, c_pwm_ctrl);
 
 }
