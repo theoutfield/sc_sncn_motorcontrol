@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>sc_sncn_motorctrl</name>
+	<name>sc_sncn_motorctrl_sin</name>
 	<comment></comment>
 	<projects>
 		<project>sc_pwm</project>
