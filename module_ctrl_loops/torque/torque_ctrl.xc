@@ -292,11 +292,11 @@ void current_ctrl_loop(chanend c_signal, chanend signal_adc, chanend c_adc, chan
 
 			case ts1 when timerafter(time2+7700) :> time2:
 
-				if(torque_actual > 400)
+				if(torque_actual > MAX_NOMINAL_CURRENT * DC900_RESOLUTION) //400
 				{
 					Kp = 15; Kd = 1; Ki = 11;
 
-					torque_error = 350 - torque_actual;
+					torque_error = MAX_NOMINAL_CURRENT * DC900_RESOLUTION - torque_actual; //350
 					torque_error_integral = torque_error_integral + torque_error;
 					torque_error_derivative = torque_error - torque_error_previous;
 

@@ -47,7 +47,8 @@
 #define MAX_POSITION_LIMIT 	359
 #define MIN_POSITION_LIMIT -359
 
-
+#define DC100_RESOLUTION 	741		// bits/A
+#define DC900_RESOLUTION	264		// bits/A
 
 typedef struct S_Control
 {
