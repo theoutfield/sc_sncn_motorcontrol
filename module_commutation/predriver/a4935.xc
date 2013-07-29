@@ -19,10 +19,9 @@
 #include "ioports.h"
 #include "a4935.h"
 
-static unsigned cur_state_ff1, cur_state_ff2;
 
 //void a4935_init(port out p_esf_rstn_pwml_pwmh, port out p_coastn, unsigned configuration)
-void a4935_init(unsigned configuration)
+void a4935_init(int configuration)
 {
   timer timer1;
   unsigned time1;
@@ -55,20 +54,3 @@ void a4935_init(unsigned configuration)
 
 
 
-//select a4935_check_fault_select(port p_ff1, port p_ff2)
-select a4935_check_fault_select(void)
-{
-  case p_ifm_ff1 when pinsneq(cur_state_ff1) :> cur_state_ff1:
-   // printstr("FF1, FF2 = ");
-   // printuint(cur_state_ff1);
-   // printstr(", ");
-   // printuintln(cur_state_ff2);
-    break;
-
-  case p_ifm_ff2 when pinsneq(cur_state_ff2) :> cur_state_ff2:
-   // printstr("FF1, FF2 = ");
-   // printuint(cur_state_ff1);
-   // printstr(", ");
-   // printuintln(cur_state_ff2);
-    break;
-}
