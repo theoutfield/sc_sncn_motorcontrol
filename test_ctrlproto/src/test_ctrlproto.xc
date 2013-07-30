@@ -28,7 +28,6 @@
 #include <ctrlproto.h>
 
 #include <drive_config.h>
-#include <drive_ctrl.h>
 #include <internal_config.h>
 #include <dc_motor_config.h>
 
@@ -47,86 +46,10 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 #define HALL 1
 #define QEI 2
 
+#define print_slave
+
 ctrl_proto_values_t InOut;
 
-int get_statusword(chanend info)
-{
-	int statusword;
-	info <: 1;
-	info :> statusword;
-	return statusword;
-}
-
-void set_controlword(int controlword, chanend info)
-{
-	info <: 2;
-	info <: controlword;
-}
-
-void run_drive(chanend info) {
-	int ready = 0;
-	int switch_enable = 0;
-	int status_word = 0;
-	int switch_on_state = 0;
-	int op_enable_state = 0;
-	int control_word;
-
-	while(!ready)
-	{
-		//check ready
-		status_word = get_statusword(info);
-		ready = check_ready(status_word);
-	}
-#ifndef print_slave
-	printstrln("ready");
-#endif
-
-	while(!switch_enable)
-	{
-		//check switch
-		status_word = get_statusword(info);
-		switch_enable = check_switch_enable(status_word);
-	}
-#ifndef print_slave
-	printstrln("switch_enable");
-#endif
-
-	//out CW for S ON
-	control_word = SWITCH_ON_CONTROL;
-	set_controlword(control_word, info);
-
-
-	while(!switch_on_state)
-	{
-		set_controlword(control_word, info);
-		printintln(control_word);
-		//check switch_on_state
-		status_word = get_statusword(info);
-		switch_on_state = check_switch_on(status_word);
-	}
-
-#ifndef print_slave
-	printstrln("switch_on_state");
-#endif
-	//out CW for En OP
-	control_word = ENABLE_OPERATION_CONTROL;
-	set_controlword(control_word, info);
-
-	while(!op_enable_state)
-	{
-		//check op_enable_state
-		status_word = get_statusword(info);
-		op_enable_state = check_op_enable(status_word);
-	}
-
-#ifndef print_slave
-	printstrln("op_enable_state");
-#endif
-
-
-
-
-}
 
 int read_fault()
 {
@@ -172,24 +95,26 @@ int main(void)
 
 		on stdcore[0] :
 		{
-			firmware_update(foe_out, foe_in, sig_1); // firmware update
+			//firmware_update(foe_out, foe_in, sig_1); // firmware update
 		}
 
-		on stdcore[1]:
+		/*on stdcore[1]:
 		{
 			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
 							    XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
 
 			xscope_config_io(XSCOPE_IO_BASIC);
-		}
+		}*/
 
 		on stdcore[1]:
 		{
-			run_drive(info);
+			//run_drive(info);
 		}
 
-		on stdcore[2]:
+		on stdcore[0]:
 		{
+			timer t;
+			unsigned int time;
 			int state;
 			int check;
 			int ctrl_input;
@@ -201,18 +126,15 @@ int main(void)
 
 			state = init_state(); //init state
 
+			t :> time;
 			while(1)
 			{
-				select
-				{
-					case info :> cmd:
-						if (cmd == 1)
-							info <: statusword;
-						else if (cmd == 2)
-							info :> controlword;
-					break;
-				}
 
+				ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
+				t when timerafter(time + MSEC_STD) :> time;
+				controlword = InOut.control_word;
+
+				printintln(controlword);
 				switch(state)
 				{
 					case 1:
@@ -220,6 +142,7 @@ int main(void)
 						fault = read_fault();
 						state = get_next_values(state, check, 0, fault);
 #ifdef print_slave
+						printstrln("1");
 						printstr("updated state ");
 						printhexln(state);
 #endif
@@ -230,6 +153,7 @@ int main(void)
 						fault = read_fault();
 						state = get_next_values(state, check, 0, fault);
 #ifdef print_slave
+						printstrln("2");
 						printstr("updated state ");
 						printhexln(state);
 #endif
@@ -242,6 +166,7 @@ int main(void)
 						fault = read_fault();
 						state = get_next_values(state, check, ctrl_input, fault);
 #ifdef print_slave
+						printstrln("7");
 						printstr("updated state ");
 						printhexln(state);
 #endif
@@ -253,6 +178,7 @@ int main(void)
 						fault = read_fault();
 						state = get_next_values(state, check, ctrl_input, fault);
 #ifdef print_slave
+						printstrln("3");
 						printstr("updated state ");
 						printhexln(state);
 #endif
@@ -260,10 +186,11 @@ int main(void)
 
 					case 4:
 						check = 1;//read_check();
-						ctrl_input = read_controlword_quick_stop(controlword); /*quick stop*/
+						ctrl_input = read_controlword_quick_stop(controlword); //quick stop
 						fault = read_fault();
 						state = get_next_values(state, check, ctrl_input, fault);
 #ifdef print_slave
+						printstrln("4");
 						printstr("updated state ");
 						printhexln(state);
 #endif
@@ -275,6 +202,7 @@ int main(void)
 						fault = read_fault();
 						state = get_next_values(state, check, ctrl_input, fault);
 #ifdef print_slave
+						printstrln("5");
 						printstr("updated state ");
 						printhexln(state);
 #endif
@@ -284,6 +212,7 @@ int main(void)
 						break;
 				}
 				statusword = update_statusword(statusword, state);
+				InOut.status_word = statusword;
 			}
 		}
 
