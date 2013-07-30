@@ -20,6 +20,7 @@
 #pragma once
 #include <stdint.h>
 
+#define RPM_CONST 60000000  // 60 s/ 1us
 
 /**
  * \channel c_hall for communicating with the Hall Server
@@ -38,4 +39,4 @@ int get_hall_absolute_pos(chanend c_hall);
  *
  * \return the speed in rpm from Hall Sensor
  */
-int get_speed_cal(chanend c_hall);
+int get_speed(chanend c_hall);

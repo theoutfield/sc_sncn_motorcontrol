@@ -32,12 +32,12 @@ int get_hall_speed(chanend c_hall)
   return speed;
 }
 
-int get_speed_cal(chanend c_hall)
+int get_speed(chanend c_hall)
 {
 	int speed = 0, time;
 	time = get_hall_speed(c_hall);
 	if(time)
-		speed = (60000000/time)/POLE_PAIRS ;
+		speed = (RPM_CONST/time)/POLE_PAIRS ;
 
 	return speed;
 

@@ -77,7 +77,7 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 	while (1)
 	{
 
-		speed = get_speed_cal(c_hall);
+		speed = get_speed(c_hall);
 		angle = get_hall_angle(c_hall);
 
 

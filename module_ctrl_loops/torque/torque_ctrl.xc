@@ -199,7 +199,7 @@ void current_ctrl_loop(chanend c_signal, chanend signal_adc, chanend c_adc, chan
 				if(filter_count == 10)
 				{
 					filter_count = 0;
-					actual_speed = get_speed_cal(c_hall);
+					actual_speed = get_speed(c_hall);
 				//	xscope_probe_data(0, actual_speed);
 					mod_speed = actual_speed;
 					if(actual_speed<0)
