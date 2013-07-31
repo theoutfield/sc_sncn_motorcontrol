@@ -86,6 +86,35 @@
 #define OPERATION_MODE_SPECIFIC_STATE		0X1000	// 12 CSP/CSV/CST  13
 #define MANUFACTURER_SPECIFIC_STATES   		0XC000	// 14-15
 
+typedef int bool;
+enum { false, true };
+
+typedef struct S_Check_list
+{
+	bool ready;
+	bool switch_on;
+	bool operation_enable;
+	bool mode_op;
+
+	bool _commutation_init;
+	bool _hall_init;
+	bool _qei_init;
+	bool _adc_init;
+	bool _torque_init;
+	bool _velocity_init;
+	bool _position_init;
+
+	bool _fault;
+}check_list;
+
+int __check_commutation_init();
+int __check_hall_init();
+int __check_qei_init();
+int __check_adc_init();
+int __check_torque_init();
+int __check_velocity_init();
+int __check_position_init();
+
 extern int init_state(void);
 
 extern int update_statusword(int current_status, int state_reached);
@@ -102,4 +131,3 @@ extern int read_controlword_enable_op(int control_word);
 extern int read_controlword_fault_reset(int control_word);
 
 #endif /* DRIVE_CONFIG_H_*/
-

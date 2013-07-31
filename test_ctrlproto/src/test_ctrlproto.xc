@@ -134,6 +134,7 @@ int main(void)
 				t when timerafter(time + MSEC_STD) :> time;
 				controlword = InOut.control_word;
 
+				//update_checklist(checklist);
 				printintln(controlword);
 				switch(state)
 				{

@@ -10,14 +10,69 @@
 int read_controlword_switch_on(int control_word) {
 	return (control_word & SWITCH_ON_CONTROL);
 }
+
 int read_controlword_quick_stop(int control_word) {
 	return (~((control_word & QUICK_STOP_CONTROL) >> 2) & 0x1);
 }
+
 int read_controlword_enable_op(int control_word) {
 	return (control_word & ENABLE_OPERATION_CONTROL) >> 3;
 }
+
 int read_controlword_fault_reset(int control_word) {
 	return (control_word & FAULT_RESET_CONTROL) >> 7;
+}
+
+void update_checklist(check_list *check_list_param) {
+	bool check;
+	bool skip = false;
+	int mode;
+	check = check_list_param->_adc_init & check_list_param->_commutation_init // & check_list_param->_fault
+			& check_list_param->_hall_init & check_list_param->_qei_init;
+	switch(check)
+	{
+		case false:
+			if(~check_list_param->_commutation_init)
+			{
+				check_list_param->_commutation_init = __check_commutation_init();
+				skip = true;
+			}
+			if(~skip & ~check_list_param->_adc_init)
+			{
+				check_list_param->_adc_init = __check_adc_init();
+			}
+			if(~skip & ~check_list_param->_hall_init)
+			{
+				check_list_param->_hall_init = __check_hall_init();
+			}
+			if(~skip & ~check_list_param->_qei_init)
+			{
+				check_list_param->_qei_init = __check_qei_init();
+			}
+			break;
+		case true:
+			if(~check_list_param->_torque_init & mode == 1)
+			{
+				check_list_param->_torque_init = __check_torque_init();
+				skip = true;
+			}
+			if(~skip)
+			{
+				if(~check_list_param->_velocity_init & mode == 2)
+				{
+					check_list_param->_velocity_init = __check_velocity_init();
+					break;
+				}
+				if(~check_list_param->_position_init & mode == 3)
+				{
+					check_list_param->_position_init = __check_position_init();
+				}
+			}
+
+			break;
+	}
+
+
 }
 
 int init_state(void) {
