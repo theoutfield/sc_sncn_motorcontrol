@@ -73,6 +73,7 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 
 	int voltage = 0;
 	int direction = 0;
+	int init_state = INIT;
 
 	while (1)
 	{
@@ -130,6 +131,10 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 				{
 					c_commutation :> voltage;
 				}
+				else if(command == CHECK_BUSY)			// init signal
+				{
+					c_commutation <: init_state;
+				}
 				break;
 
 			default:
@@ -155,6 +160,8 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 	  const unsigned timeout = 2*SEC_FAST;
 	  timer t;
 	  unsigned ts;
+	  int init_state = INIT_BUSY;
+
 
 	  commutation_init_to_zero(c_pwm_ctrl);
 	  t when timerafter (ts + t_delay) :> ts;
@@ -165,7 +172,7 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 	  printstrln("start");
 
 
-	  c_signal <: 1; 			//signal commutation init done.
+	//  c_signal <: 1; 			//signal commutation init done.
 
 	  t :> ts;
 	  while(1)
@@ -182,6 +189,10 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 			case t when timerafter(ts + timeout) :> void:
 				received_command = 1;
 				printstrln("timed out");
+				break;
+			case c_commutation :> command:  //
+				if(command == CHECK_BUSY)
+					c_commutation <: init_state;
 				break;
 			default:
 				break;

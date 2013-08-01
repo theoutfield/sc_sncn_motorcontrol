@@ -63,13 +63,13 @@ int read_fault()
 int main(void)
 {
 	chan c_adc, c_adctrig;
-	chan c_qei;
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
 	chan c_pwm_ctrl, c_commutation;
 	chan dummy, dummy1, dummy2;
 	chan signal_adc;
 	chan sig_1, c_signal;
-	chan c_velocity_ctrl, c_position_ctrl;
+	chan c_velocity_ctrl, c_position_ctrl , c_torque_ctrl;
 
 	//etherCat Comm channels
 	chan coe_in; 	///< CAN from module_ethercat to consumer
@@ -98,13 +98,13 @@ int main(void)
 			//firmware_update(foe_out, foe_in, sig_1); // firmware update
 		}
 
-		/*on stdcore[1]:
+		on stdcore[1]:
 		{
 			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
 							    XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
 
 			xscope_config_io(XSCOPE_IO_BASIC);
-		}*/
+		}
 
 		on stdcore[1]:
 		{
@@ -123,11 +123,24 @@ int main(void)
 			int statusword;
 			int controlword;
 			int cmd;
-
+			check_list checklist;
 			state = init_state(); //init state
 
+			init_checklist(checklist);
 			t :> time;
+
+
 			while(1)
+			{
+				update_checklist(checklist, c_commutation, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+				printstr("comm ");printintln(checklist._commutation_init);
+				printstr("hall ");printintln(checklist._hall_init);
+				printstr("qei ");printintln(checklist._qei_init);
+				//printintln(__check_hall_init(c_hall_p4));
+			}
+			//update_checklist(checklist, c_commutation);
+
+/*			while(1)
 			{
 
 				ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
@@ -214,7 +227,8 @@ int main(void)
 				}
 				statusword = update_statusword(statusword, state);
 				InOut.status_word = statusword;
-			}
+			}*/
+
 		}
 
 
@@ -226,7 +240,7 @@ int main(void)
 			par
 			{
 
-		/*		adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
+				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
 						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
 						p_ifm_adc_misob);
 
@@ -235,11 +249,18 @@ int main(void)
 
 				commutation_sinusoidal(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
 
+				{
+					hall_par hall_params;
+					init_hall_param(hall_params);
+					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+				}
 
-				run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+				{
+					qei_par qei_params;
+					init_qei_param(qei_params);
+					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3 , c_qei_p4);  // channel priority 1,2..4
+				}
 
-				run_qei(c_qei, p_ifm_encoder);
-		 */
 			}
 		}
 

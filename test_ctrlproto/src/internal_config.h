@@ -18,6 +18,10 @@
 #define SET    	1
 #define UNSET  	0
 
+#define INIT_BUSY 	1
+#define INIT		0
+#define CHECK_BUSY  10
+
 #define SUCCESS 1
 #define ERROR   0 //based on timeout for success
 

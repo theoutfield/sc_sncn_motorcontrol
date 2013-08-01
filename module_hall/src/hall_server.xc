@@ -4,10 +4,11 @@
 #include <stdint.h>
 #include "refclk.h"
 #include "dc_motor_config.h"
+#include <internal_config.h>
 #include <xscope.h>
 
-void run_hall( port in p_hall, chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4)
- {
+void run_hall( port in p_hall, hall_par hall_params, chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4)
+{
   timer tx;
   unsigned ts;					// newest timestamp
   unsigned cmd;
@@ -35,8 +36,9 @@ void run_hall( port in p_hall, chanend c_hall_p1, chanend c_hall_p2, chanend c_h
 
   unsigned uvalue, pos_cmd;
   int spos, prev=0, count=0, co12=0,first=1,set=0;
-  int hall_enc_count =  POLE_PAIRS * GEAR_RATIO * 4095;
+  int hall_enc_count = hall_params.pole_pairs * hall_params.gear_ratio * 4095;
   int speed_calc;
+  int init_state = INIT;
   tx :> ts;  // first value
 
   while(1) {
@@ -55,7 +57,7 @@ void run_hall( port in p_hall, chanend c_hall_p1, chanend c_hall_p2, chanend c_h
 				  break;
 	  }
 
-	  iCountMicroSeconds++;   // period in µsec
+	  iCountMicroSeconds++;   // period in usec
 	  iTimeCountOneTransition++;
 
       if(pin_state != pin_state_last)
@@ -178,28 +180,25 @@ void run_hall( port in p_hall, chanend c_hall_p1, chanend c_hall_p2, chanend c_h
 				  if  (cmd == 1) { c_hall_p1 <: angle2; }
 			 else if  (cmd == 2) { c_hall_p1 <: speed_calc;  }
 			 else if  (cmd == 3) { c_hall_p1 <: count;  }
-			 else if  (cmd == 4) { c_hall_p1 <: iHallError;   }
 			break;
 			case c_hall_p2 :> cmd:
 
 				  if  (cmd == 1) { c_hall_p2 <: angle2; }
 			 else if  (cmd == 2) { c_hall_p2 <: speed_calc;  }
 			 else if  (cmd == 3) { c_hall_p2 <: count;  }
-			 else if  (cmd == 4) { c_hall_p2 <: iHallError;   }
 			break;
 
 			case c_hall_p3 :> cmd:
 				  if  (cmd == 1) { c_hall_p3 <: angle2; }
 			 else if  (cmd == 2) { c_hall_p3 <: speed_calc;  }
 			 else if  (cmd == 3) { c_hall_p3 <: count;  }
-			 else if  (cmd == 4) { c_hall_p3 <: iHallError;   }
 			break;
 
 			case c_hall_p4 :> cmd:
 				  if  (cmd == 1) { c_hall_p4 <: angle2; }
 			 else if  (cmd == 2) { c_hall_p4 <: speed_calc;  }
 			 else if  (cmd == 3) { c_hall_p4 <: count;  }
-			 else if  (cmd == 4) { c_hall_p4 <: iHallError;   }
+			 else if  (cmd == CHECK_BUSY) { c_hall_p4 <: init_state;   }
 			break;
 
 			default:
