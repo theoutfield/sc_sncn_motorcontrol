@@ -66,7 +66,7 @@ int get_sync_position ( chanend sync_output )
  * \channel c_hall1 hall position data
  * \channel sync_output synchronised data from hall and qei
  */
-void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
+void hall_qei_sync(qei_par qei_params, hall_par hall_params, chanend c_qei, chanend c_hall, chanend sync_output) {
 
 	int cmd; // Command token
 
@@ -84,7 +84,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 
 	int previous_position = 0;
 
-	int max_count = QEI_COUNT_MAX_REAL / POLE_PAIRS;
+	int max_count = qei_params.real_counts / hall_params.pole_pairs ;
 
 	int diffi;
 
@@ -126,7 +126,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 			break;
 
 			case t_qei when timerafter(time_qei + 500) :> time_qei:
-			{	qei_position, qei_valid}= get_qei_position( c_qei); //aquisition
+			{	qei_position, qei_valid}= get_qei_position(c_qei, qei_params); //aquisition
 			qei_position = hall_max_position - qei_position;
 
 			if(qei_valid==1)
@@ -175,7 +175,7 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 			break;
 
 			case t_hall when timerafter(time_hall + 5000) :> time_hall: //4khz  20000 14000
-			hall_position = get_hall_angle( c_hall1);
+			hall_position = get_hall_angle( c_hall);
 			//	xscope_probe_data(1, hall_position);
 
 
@@ -185,3 +185,4 @@ void hall_qei_sync(chanend c_qei, chanend c_hall1, chanend sync_output) {
 		}
 	}
 }
+

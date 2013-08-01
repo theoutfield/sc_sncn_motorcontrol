@@ -23,7 +23,7 @@
 #include<dc_motor_config.h>
 
 ///only position and valid
-{unsigned, unsigned} get_qei_position(chanend c_qei );
+{unsigned, unsigned} get_qei_position(chanend c_qei, qei_par &qei_params);
 
 //counted up position and direction
 {int, int} get_qei_position_count(chanend c_qei);

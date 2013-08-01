@@ -22,11 +22,12 @@
 #include <stdio.h>
 #include "qei_commands.h"
 #include "qei_client.h"
-#include<print.h>
+#include <dc_motor_config.h>
+#include <print.h>
 
 
-//only position and valid
-{unsigned, unsigned} get_qei_position(chanend c_qei )
+//get position and valid from qei directly
+{unsigned, unsigned} get_qei_position(chanend c_qei, qei_par &qei_params)
 {
 	unsigned p, ts1, ts2, v;
 
@@ -38,12 +39,12 @@
 		c_qei :> ts2;
 		c_qei :> v;
 	}
-	p &= (QEI_COUNT_MAX-1);
+	p &= (qei_params.max_count - 1);
 
 	return {p, v};
 }
 
-//counted up position with gear ratio
+//counted up position from qei with gear ratio
 {int, int} get_qei_position_count(chanend c_qei)
 {
 	int pos;
