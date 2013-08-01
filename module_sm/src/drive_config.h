@@ -104,18 +104,24 @@ typedef struct S_Check_list
 	bool _velocity_init;
 	bool _position_init;
 
-	bool _fault;
+	bool fault;
 }check_list;
 
-int __check_commutation_init();
-int __check_hall_init();
-int __check_qei_init();
-int __check_adc_init();
-int __check_torque_init();
-int __check_velocity_init();
-int __check_position_init();
+
+bool __check_commutation_init(chanend c_commutation);
+bool __check_hall_init(chanend c_hall);
+bool __check_qei_init(chanend c_qei);
+bool __check_adc_init();
+bool __check_torque_init(chanend c_torque_ctrl);
+bool __check_velocity_init(chanend c_velocity_ctrl);
+bool __check_position_init(chanend c_position_ctrl);
 
 extern int init_state(void);
+
+void init_checklist(check_list &check_list_param);
+
+extern void update_checklist(check_list &check_list_param, chanend c_commutation, chanend c_hall, chanend c_qei,
+		chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
 extern int update_statusword(int current_status, int state_reached);
 
@@ -129,5 +135,6 @@ extern int read_controlword_quick_stop(int control_word);
 extern int read_controlword_enable_op(int control_word);
 
 extern int read_controlword_fault_reset(int control_word);
+
 
 #endif /* DRIVE_CONFIG_H_*/
