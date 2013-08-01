@@ -19,6 +19,7 @@
 
 #pragma once
 #include <stdint.h>
+#include "dc_motor_config.h"
 
 #define RPM_CONST 60000000  // 60 s/ 1us
 
@@ -39,4 +40,4 @@ int get_hall_absolute_pos(chanend c_hall);
  *
  * \return the speed in rpm from Hall Sensor
  */
-int get_speed(chanend c_hall);
+int get_hall_speed(chanend c_hall, hall_par &hall_params);

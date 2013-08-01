@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include "hall_client.h"
 #include "refclk.h"
-#include "dc_motor_config.h"
 
 
 int get_hall_angle(chanend c_hall)
@@ -23,7 +22,7 @@ int get_hall_absolute_pos(chanend c_hall)
   return pos;
 }
 
-int get_hall_speed(chanend c_hall)
+int get_hall_speed_cal(chanend c_hall)
 {
   int32_t speed;
   c_hall <: 2;
@@ -32,12 +31,12 @@ int get_hall_speed(chanend c_hall)
   return speed;
 }
 
-int get_speed(chanend c_hall)
+int get_hall_speed(chanend c_hall, hall_par &hall_params)
 {
 	int speed = 0, time;
-	time = get_hall_speed(c_hall);
+	time = get_hall_speed_cal(c_hall);
 	if(time)
-		speed = (RPM_CONST/time)/POLE_PAIRS ;
+		speed = (RPM_CONST/time)/ hall_params.pole_pairs;
 
 	return speed;
 
