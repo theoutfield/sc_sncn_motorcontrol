@@ -108,7 +108,7 @@ typedef struct S_Check_list
 }check_list;
 
 
-bool __check_commutation_init(chanend c_commutation);
+bool __check_commutation_init(chanend c_signal);
 bool __check_hall_init(chanend c_hall);
 bool __check_qei_init(chanend c_qei);
 bool __check_adc_init();

@@ -18,6 +18,7 @@
 #include <xscope.h>
 #include <print.h>
 #include "hall-qei.h"
+#include <drive_config.h>
 //#define ENABLE_xscope_torq
 #define defParAngleUser 560
 #define filter_length 30
@@ -48,9 +49,9 @@ void init_buffer(int buffer[], int length)
 	}
 	return;
 }
-void current_ctrl_loop(chanend c_signal, chanend signal_adc, chanend c_adc, chanend c_hall,
-		chanend sync_output, chanend c_commutation,
-		chanend c_torque) {
+
+void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
+		chanend c_hall, chanend sync_output, chanend c_commutation,	chanend c_torque) {
 
 	int phase_a_raw = 0;
 	int phase_b_raw = 0;
@@ -124,15 +125,17 @@ void current_ctrl_loop(chanend c_signal, chanend signal_adc, chanend c_adc, chan
 	int derivative_member = 0;
 
 	int TORQUE_OUTPUT_MAX = 13739;
+
+	int init_comm = 1;
 	Kp = 15; Kd = 1; Ki = 11;
 
 
-	init = init_commutation(c_signal);
+/*	init = init_commutation(c_signal);
 	if(init == 1)
 		printstrln("initialized commutation");
 	else
 		printstrln(" initialize commutation failed");
-
+*/
 	signal_adc <: 1;
 
 	while (1) {
@@ -148,7 +151,7 @@ void current_ctrl_loop(chanend c_signal, chanend signal_adc, chanend c_adc, chan
 		}
 		if(received_command == 1)
 		{
-			printstrln("adc calibrated");
+			//printstrln("adc calibrated");
 			break;
 		}
 	}
@@ -199,7 +202,7 @@ void current_ctrl_loop(chanend c_signal, chanend signal_adc, chanend c_adc, chan
 				if(filter_count == 10)
 				{
 					filter_count = 0;
-					actual_speed = get_speed(c_hall);
+					actual_speed = get_hall_speed(c_hall, hall_params);
 				//	xscope_probe_data(0, actual_speed);
 					mod_speed = actual_speed;
 					if(actual_speed<0)

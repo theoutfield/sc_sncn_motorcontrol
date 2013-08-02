@@ -24,11 +24,11 @@ int read_controlword_fault_reset(int control_word) {
 	return (control_word & FAULT_RESET_CONTROL) >> 7;
 }
 
-bool __check_commutation_init(chanend c_commutation)
+bool __check_commutation_init(chanend c_signal)
 {
 	bool init;
-	c_commutation <: CHECK_BUSY;
-	c_commutation :> init;
+	c_signal <: CHECK_BUSY;
+	c_signal :> init;
 	return init;
 }
 

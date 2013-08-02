@@ -113,7 +113,39 @@ int main(void)
 
 		on stdcore[0]:
 		{
-			timer t;
+			{
+				int voltage = 10500;
+				//check init signal from commutation level
+				/*while (1)
+				{
+					unsigned received_command = 0 , command;
+					select
+					{
+						case c_signal :> command: 			//SIGNAL_READ(command):
+							received_command = 1;
+							break;
+						default:
+							break;
+					}
+					if(received_command == 1)
+					{
+						printstrln(" init commutation");
+						break;
+					}
+				}*/
+				int init = 1;
+				while(1)
+				{
+					init = __check_commutation_init(c_commutation);
+					if(init == 0)
+						break;
+				}
+				while(1)
+				{
+					set_commutation_sinusoidal(c_commutation, voltage);
+				}
+			}
+		/*	timer t;
 			unsigned int time;
 			int state;
 			int check;
@@ -240,14 +272,17 @@ int main(void)
 			par
 			{
 
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
-						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
-						p_ifm_adc_misob);
+				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia,
+						p_ifm_adc_misoa, p_ifm_adc_misob);
 
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
-				commutation_sinusoidal(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
+				{
+					hall_par hall_params;
+					init_hall_param(hall_params);
+					commutation_sinusoidal(hall_params, c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
+				}
 
 				{
 					hall_par hall_params;

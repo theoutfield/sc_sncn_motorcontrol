@@ -21,9 +21,8 @@ int get_torque(chanend c_torque);
 
 void set_torque(chanend c_torque, int torque);
 
-void current_ctrl_loop(chanend c_signal, chanend signal_adc, chanend adc, chanend c_hall_1,
-		chanend sync_output, chanend c_commutation,
-		chanend c_torque);
+void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
+		chanend c_hall, chanend sync_output, chanend c_commutation,	chanend c_torque);
 
 
 
