@@ -39,6 +39,7 @@
 #include <torque_ctrl.h>
 #include <flash_somanet.h>
 #include <internal_config.h>
+#include <drive_config.h>
 
 #define ENABLE_xscope_main
 #define COM_CORE 0
@@ -58,12 +59,13 @@ int main(void)
 {
 	chan c_adc, c_adctrig;
 	chan c_qei;
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
 	chan sync_output;
 	chan c_pwm_ctrl, c_commutation;
 	chan dummy, dummy1, dummy2;
-	chan signal_adc;
-	chan sig_1, c_signal;
+	chan c_signal_adc;
+	chan c_sig_1, c_signal;
 	chan c_torque, signal_ctrl;
 
 	//etherCat Comm channels
@@ -84,6 +86,13 @@ int main(void)
 		{
 			{
 				int command;
+				int init = 1;
+				while(1)
+				{
+					init = __check_commutation_init(c_signal);
+					if(init == 0)
+						break;
+				}
 				while (1)
 				{
 					unsigned received = 0;
@@ -127,11 +136,17 @@ int main(void)
 		{
 			par
 			{
-				hall_qei_sync(c_qei, c_hall_p2, sync_output);
+				{
+					hall_par hall_params;
+					qei_par qei_params;
+					hall_qei_sync(qei_params, hall_params, c_qei_p1, c_hall_p2, sync_output);
+				}
 
-
-				current_ctrl_loop(c_signal, signal_adc, c_adc, c_hall_p3,
-										sync_output, c_commutation, c_torque);
+				{
+					hall_par hall_params;
+					current_ctrl_loop(hall_params, c_signal_adc, c_adc, c_hall_p3,
+							sync_output, c_commutation, c_torque);
+				}
 
 			}
 		}
@@ -151,12 +166,23 @@ int main(void)
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
-				commutation_sinusoidal(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
+				{
+					hall_par hall_params;
+					init_hall_param(hall_params);
+					commutation_sinusoidal(hall_params, c_commutation, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal); // hall based sinusoidal commutation
+				}
 
+				{
+					hall_par hall_params;
+					init_hall_param(hall_params);
+					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+				}
 
-				run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
-
-				run_qei(c_qei, p_ifm_encoder);
+				{
+					qei_par qei_params;
+					init_qei_param(qei_params);
+					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3 , c_qei_p4);  // channel priority 1,2..4
+				}
 
 			}
 		}
