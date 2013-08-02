@@ -58,7 +58,6 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 int main(void)
 {
 	chan c_adc, c_adctrig;
-	chan c_qei;
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
 	chan sync_output;
@@ -66,7 +65,7 @@ int main(void)
 	chan dummy, dummy1, dummy2;
 	chan c_signal_adc;
 	chan c_sig_1, c_signal;
-	chan c_torque, signal_ctrl;
+	chan c_torque_ctrl, signal_ctrl;
 
 	//etherCat Comm channels
 	chan coe_in; 	///< CAN from module_ethercat to consumer
@@ -93,24 +92,14 @@ int main(void)
 					if(init == 0)
 						break;
 				}
+				init = 1;
 				while (1)
 				{
-					unsigned received = 0;
-					select
-					{
-						case c_torque :> command:
-							printstrln("torque ctrl init");
-							received =1;
-							break;
-						default:
-							break;
-					}
-					if(received == 1)
-					{
+					init = __check_torque_init(c_torque_ctrl);
+					if(init == 0)
 						break;
-					}
 				}
-				set_torque_test(c_torque);
+				set_torque_test(c_torque_ctrl);
 			}
 		}
 
@@ -145,7 +134,7 @@ int main(void)
 				{
 					hall_par hall_params;
 					current_ctrl_loop(hall_params, c_signal_adc, c_adc, c_hall_p3,
-							sync_output, c_commutation, c_torque);
+							sync_output, c_commutation, c_torque_ctrl);
 				}
 
 			}

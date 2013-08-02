@@ -16,6 +16,7 @@
 
 #include <comm_loop.h>
 #include <dc_motor_config.h>
+#include <internal_config.h>
 
 int get_torque(chanend c_torque);
 

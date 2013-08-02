@@ -114,7 +114,7 @@ int main(void)
 		on stdcore[0]:
 		{
 			{
-				int voltage = 10500;
+				int voltage = 1500;
 				//check init signal from commutation level
 				/*while (1)
 				{
@@ -136,7 +136,7 @@ int main(void)
 				int init = 1;
 				while(1)
 				{
-					init = __check_commutation_init(c_commutation);
+					init = __check_commutation_init(c_signal);
 					if(init == 0)
 						break;
 				}

@@ -113,7 +113,7 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 	return;
 }
 
-void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_par qei_params, int sensor_used, \
+void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used, \
 		              chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation)
 {
 	int actual_position = 0;
@@ -135,6 +135,8 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 	int precision;
 	int precision_factor;
 
+	int init_state = INIT_BUSY;
+
 	while(1)
 	{
 		unsigned received_command = UNSET;
@@ -144,15 +146,21 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 				if(command == SET)
 				{
 					activate = SET;
+					received_command = SET;
 					// printstrln("pos activated");
 				}
 				else if(command == UNSET)
 				{
 					activate = UNSET;
+					received_command = SET;
 					//printstrln("pos disabled");
 				}
-				received_command = SUCCESS;
+				else if(command == CHECK_BUSY)
+				{
+					POSITION_CTRL_WRITE(init_state);
+				}
 				break;
+
 			default:
 				break;
 		}
@@ -178,7 +186,7 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 		precision = QEI_PRECISION;
 	}
 
-
+	init_state = INIT;
 	while(1)
 	{
 		#pragma ordered
@@ -248,6 +256,10 @@ void position_control(ctrl_par position_ctrl_params, hall_par hall_params, qei_p
 				else if(command == GET_POSITION_TOKEN)
 				{
 					POSITION_CTRL_WRITE(actual_position);
+				}
+				else if(command == CHECK_BUSY)
+				{
+					POSITION_CTRL_WRITE(init_state);
 				}
 				break;
 		}

@@ -113,7 +113,7 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 	const int TORQUE_INTEGRAL_MAX = 137000;
 	int input_torque;
 
-	int init = 0;
+	int init_state = INIT_BUSY;
 
 	/* PID Controller variables */
 	int Kp;							// Proportional gain
@@ -126,7 +126,7 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 
 	int TORQUE_OUTPUT_MAX = 13739;
 
-	int init_comm = 1;
+	//int init_comm = 1;
 	Kp = 15; Kd = 1; Ki = 11;
 
 
@@ -163,7 +163,8 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 	init_buffer(buffer_Iq, filter_dc);
 
 
-	c_torque <: 1;  						//signal outerloop
+	//c_torque <: 1;  						//signal outerloop
+	init_state = INIT;
 
 
 	ts :> time;
@@ -382,6 +383,10 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 				if(command == 3)
 				{
 					c_torque <: torque_actual;
+				}
+				if(command == CHECK_BUSY)
+				{
+					c_torque <: init_state;
 				}
 
 				break;

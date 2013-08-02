@@ -26,26 +26,26 @@ int read_controlword_fault_reset(int control_word) {
 
 bool __check_commutation_init(chanend c_signal)
 {
-	bool init;
+	bool init_state;
 	c_signal <: CHECK_BUSY;
-	c_signal :> init;
-	return init;
+	c_signal :> init_state;
+	return init_state;
 }
 
 bool __check_hall_init(chanend c_hall)
 {
-	bool init;
+	bool init_state;
 	c_hall <: CHECK_BUSY;
-	c_hall :> init;
-	return init;
+	c_hall :> init_state;
+	return init_state;
 }
 
 bool __check_qei_init(chanend c_qei)
 {
-	bool init;
+	bool init_state;
 	c_qei <: CHECK_BUSY;
-	c_qei :> init;
-	return init;
+	c_qei :> init_state;
+	return init_state;
 }
 
 bool __check_adc_init()
@@ -55,7 +55,10 @@ bool __check_adc_init()
 
 bool __check_torque_init(chanend c_torque_ctrl)
 {
-	return 0;
+	bool init_state;
+	c_torque_ctrl <: CHECK_BUSY;
+	c_torque_ctrl :> init_state;
+	return init_state;
 }
 bool __check_velocity_init(chanend c_velocity_ctrl)
 {
@@ -63,7 +66,10 @@ bool __check_velocity_init(chanend c_velocity_ctrl)
 }
 bool __check_position_init(chanend c_position_ctrl)
 {
-	return 0;
+	bool init_state;
+	c_position_ctrl <: CHECK_BUSY;
+	c_position_ctrl :> init_state;
+	return init_state;
 }
 
 void init_checklist(check_list &check_list_param)
