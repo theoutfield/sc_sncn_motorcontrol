@@ -8,6 +8,7 @@
 #ifndef VELOCITY_CTRL_H_
 #define VELOCITY_CTRL_H_
 #include "dc_motor_config.h"
+#include <internal_config.h>
 
 void init_velocity_control_param(ctrl_par &velocity_ctrl_par);
 

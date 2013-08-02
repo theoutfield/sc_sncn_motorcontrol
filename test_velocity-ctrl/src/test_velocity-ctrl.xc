@@ -39,6 +39,7 @@
 #include <internal_config.h>
 #include <ctrlproto.h>
 
+#include <drive_config.h>
 #include "profile_test.h"
 
 #define ENABLE_xscope_main
@@ -49,7 +50,7 @@ on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 ctrl_proto_values_t InOut;
-
+/*
 int get_target_velocity()
 {
 	return InOut.in_speed;
@@ -124,7 +125,7 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_vel
 		}
 	}
 }
-
+*/
 
 //test PVM
 void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
@@ -223,14 +224,11 @@ void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
 
 int main(void) {
 	chan c_adc, c_adctrig;
-	chan c_qei;
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
 	chan c_pwm_ctrl, c_commutation;
-	chan dummy, dummy1, dummy2;
-	chan enco_1, sync_output;
-	chan signal_adc, c_value, input;
-	chan c_torque;
-	chan sig_1, c_signal;
+	chan c_signal_adc;
+	chan c_sig_1, c_signal;
 	chan c_velocity_ctrl;
 
 	//etherCat Comm channels
@@ -256,7 +254,7 @@ int main(void) {
 
 		on stdcore[0] :
 		{
-			firmware_update(foe_out, foe_in, sig_1); // firmware update
+			firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}
 
 		on stdcore[1] :
@@ -265,15 +263,51 @@ int main(void) {
 		}
 		on stdcore[1]:
 		{
-			profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
+			//profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
+			par
+			{
+
+				{
+					{
+						int init_state = INIT_BUSY;
+
+						while(1)
+						{
+							//printintln(init_state);
+							init_state = __check_commutation_init(c_signal);
+							if(init_state == INIT)
+							{
+								printstrln("comm intialized");
+								break;
+							}
+						}
+
+						init_state = INIT_BUSY;
+
+						c_velocity_ctrl <: 1;
+						while(1)
+						{
+							printintln(init_state);
+							init_state = __check_velocity_init(c_velocity_ctrl);
+							if(init_state == INIT)
+							{
+								printstrln("vel intialized");
+								break;
+							}
+						}
+
+
+					}
+				}
+			}
 		}
 
 		on stdcore[1]:
 		{
-			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-								XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
-
-			xscope_config_io(XSCOPE_IO_BASIC);
+//			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
+//								XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
+//
+//			xscope_config_io(XSCOPE_IO_BASIC);
 		}
 
 		on stdcore[2]:
@@ -292,7 +326,7 @@ int main(void) {
 					 init_hall_param(hall_params);
 					 init_qei_param(qei_params);
 
-					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, qei_params, 2, c_hall_p2, c_qei, c_velocity_ctrl, c_commutation);
+					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, qei_params, 2, c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation);
 				 }
 			}
 		}
@@ -312,12 +346,24 @@ int main(void) {
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
-				commutation_sinusoidal(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
 
+				{
+					hall_par hall_params;
+					init_hall_param(hall_params);
+					commutation_sinusoidal(hall_params, c_commutation, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal); // hall based sinusoidal commutation
+				}
 
-				run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+				{
+					hall_par hall_params;
+					init_hall_param(hall_params);
+					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+				}
 
-				run_qei(c_qei, p_ifm_encoder);
+				{
+					qei_par qei_params;
+					init_qei_param(qei_params);
+					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4);  // channel priority 1,2..4
+				}
 
 			}
 		}

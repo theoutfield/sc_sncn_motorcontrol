@@ -26,8 +26,8 @@
 
 #ifndef __DC_MOTOR_CONFIG__H__test1
 #define __DC_MOTOR_CONFIG__H__test1
+#include <print.h>
 
-#define new
 
 #pragma once
 
@@ -36,15 +36,22 @@
  */
 #define POLE_PAIRS  8
 #define GEAR_RATIO  26
-#define MAX_NOMINAL_SPEED  4000		// in 1/min
+#define MAX_NOMINAL_SPEED  4000		// in rpm
 #define MAX_NOMINAL_CURRENT  2		// in A
+#define MAX_ACCELERATION   5000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
-#define QEI_COUNT_MAX (1024 * 4)	// Max count of Quadrature Encoder as multiple of 2
 #define POLARITY 1					// 1 / -1
+
+#define QEI_WITH_INDEX		1
+#define QEI_WITH_NO_INDEX 	0
+#define QEI_SENSOR_TYPE  	QEI_WITH_INDEX//QEI_WITH_NO_INDEX
 
 #define MAX_FOLLOWING_ERROR 0
 #define MAX_POSITION_LIMIT 	359
 #define MIN_POSITION_LIMIT -359
+
+#define DC100_RESOLUTION 	741
+#define DC900_RESOLUTION	264
 
 typedef struct S_Control
 {
@@ -69,6 +76,7 @@ typedef struct S_QEI {
 	int max_count;
 	int real_counts;
 	int gear_ratio;
+	int index;   //no_index - 0 index - 1
 } qei_par;
 
 
@@ -80,27 +88,6 @@ typedef struct S_Hall {
 	int gear_ratio;
 } hall_par;
 
-
-/**
- * \brief initialize QEI sensor
- *
- * \param q_max struct defines the max count for quadrature encoder (QEI)
- */
-void init_qei_param(qei_par &qei_max);
-
-/**
- * \brief initialize hall sensor
- *
- * \param h_pole struct defines the pole-pairs and gear ratio
- */
-void init_hall_param(hall_par &h_pole);
-
-
-
-#define SET_VELOCITY_TOKEN 50
-#define GET_VELOCITY_TOKEN 60
-
-
 typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 {
 	int max_motor_speed; // max motor speed
@@ -109,7 +96,6 @@ typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 	int polarity;
 } csv_par;
 
-int init_csv_param(csv_par &csv_params);
 
 typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 {
@@ -119,6 +105,23 @@ typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 	int min_position_limit;
 } csp_par;
 
-int init_csp_param(csp_par &csp_params);
+
+/**
+ * \brief initialize QEI sensor
+ *
+ * \param q_max struct defines the max count for quadrature encoder (QEI)
+ */
+void init_qei_param(qei_par &qei_params);
+
+/**
+ * \brief initialize hall sensor
+ *
+ * \param hall_params struct defines the pole-pairs and gear ratio
+ */
+void init_hall_param(hall_par &hall_params);
+
+void init_csv_param(csv_par &csv_params);
+
+void init_csp_param(csp_par &csp_params);
 
 #endif

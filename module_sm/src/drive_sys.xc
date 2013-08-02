@@ -62,7 +62,10 @@ bool __check_torque_init(chanend c_torque_ctrl)
 }
 bool __check_velocity_init(chanend c_velocity_ctrl)
 {
-	return 0;
+	bool init_state;
+	c_velocity_ctrl <: CHECK_BUSY;
+	c_velocity_ctrl :> init_state;
+	return init_state;
 }
 bool __check_position_init(chanend c_position_ctrl)
 {

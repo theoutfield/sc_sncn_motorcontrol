@@ -7,7 +7,7 @@
 #include <internal_config.h>
 #include <xscope.h>
 
-void run_hall(port in p_hall, hall_par hall_params, chanend c_hall_p1,
+void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
 		chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4)
 {
 	timer tx;

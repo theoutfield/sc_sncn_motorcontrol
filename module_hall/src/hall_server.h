@@ -38,4 +38,4 @@
  *  \param c_hall_p4 the control channel for reading hall position (priority 4)
  *
  */
-void run_hall( port in p_hall, hall_par hall_params, chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4);
+void run_hall( port in p_hall, hall_par &hall_params, chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4);

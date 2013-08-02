@@ -149,6 +149,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 	int command;
 
 	int activate = 0;
+	int init_state = INIT_BUSY;
 
 	init_filter(filter_buffer, index, filter_length);
 
@@ -162,21 +163,26 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 				if(command == SET)
 				{
 					activate = SET;
+					received_command = SET;
 					// printstrln("vel activated");
 				}
 				else if(command == UNSET)
 				{
 					activate = UNSET;
+					received_command = SET;
 					//printstrln("vel disabled");
 				}
-				received_command = SET;
+				else if(command == CHECK_BUSY)
+				{
+					VELOCITY_CTRL_WRITE(init_state);
+				}
 				break;
 			default:
 				break;
 		}
 		if(received_command == SET)
 		{
-			VELOCITY_CTRL_WRITE(received_command);
+			//VELOCITY_CTRL_WRITE(received_command);
 			break;
 		}
 	}
@@ -185,7 +191,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 	ts :> time;
 	//ts when timerafter(time+1*SEC_FAST) :> time;
 
-
+	init_state = INIT;
 	while(activate)
 	{
 		#pragma ordered
@@ -293,6 +299,9 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 				else if(command == GET_VELOCITY_TOKEN)
 					VELOCITY_CTRL_WRITE(actual_velocity);
+
+				else if(command == CHECK_BUSY)
+					VELOCITY_CTRL_WRITE(init_state);
 				break;
 
 		}

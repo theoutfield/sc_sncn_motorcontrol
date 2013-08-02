@@ -332,12 +332,6 @@ int main(void)
 					init_qei_param(qei_params);
 					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4);  // channel priority 1,2..4
 				}
-				//commutation_sinusoidal(c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
-
-
-				//run_hall( p_ifm_hall, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
-
-				//run_qei(c_qei, p_ifm_encoder);
 
 			}
 		}
