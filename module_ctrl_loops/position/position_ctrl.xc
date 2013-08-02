@@ -147,7 +147,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 				{
 					activate = SET;
 					received_command = SET;
-					// printstrln("pos activated");
+					 printstrln("pos activated");
 				}
 				else if(command == UNSET)
 				{
@@ -166,7 +166,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 		}
 		if(received_command == SET)
 		{
-			POSITION_CTRL_WRITE(received_command);
+//			POSITION_CTRL_WRITE(received_command);
 			break;
 		}
 	}
