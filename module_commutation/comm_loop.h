@@ -36,7 +36,7 @@ int init_commutation(chanend c_signal);
  * \channel c_pwm_ctrl channel to set pwm level output
  * \channel signal_adc channel for signaling to start adc after initialization
  */
-void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc, chanend c_signal);
+void commutation_sinusoidal(hall_par hall_params, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc, chanend c_signal);
 
 /**
  *  \brief Set Input voltage for commutation loop

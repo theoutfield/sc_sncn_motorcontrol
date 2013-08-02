@@ -62,7 +62,7 @@ void commutation_init_to_zero(chanend c_pwm_ctrl)
 
 /* Sinusoidal based commutation functions */
 
-void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl)
+void commutation_sinusoidal_loop( hall_par hall_params, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_signal)
 {
 	unsigned command;
 	unsigned pwm[3] = { 0, 0, 0 };
@@ -78,7 +78,7 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 	while (1)
 	{
 
-		speed = get_speed(c_hall);
+		speed = get_hall_speed(c_hall, hall_params);
 		angle = get_hall_angle(c_hall);
 
 
@@ -131,9 +131,11 @@ void commutation_sinusoidal_loop( chanend c_commutation, chanend c_hall, chanend
 				{
 					c_commutation :> voltage;
 				}
-				else if(command == CHECK_BUSY)			// init signal
+				break;
+			case c_signal :> command:
+				if(command == CHECK_BUSY)			// init signal
 				{
-					c_commutation <: init_state;
+					c_signal <: init_state;
 				}
 				break;
 
@@ -154,7 +156,7 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 	return;
 }
 
-void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc, chanend c_signal)
+void commutation_sinusoidal(hall_par hall_params, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc, chanend c_signal)
 {
 	  const unsigned t_delay = 300*USEC_FAST;
 	  const unsigned timeout = 2*SEC_FAST;
@@ -190,9 +192,9 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 				received_command = 1;
 				printstrln("timed out");
 				break;
-			case c_commutation :> command:  //
+			case c_signal :> command:  //
 				if(command == CHECK_BUSY)
-					c_commutation <: init_state;
+					c_signal <: init_state;
 				break;
 			default:
 				break;
@@ -203,7 +205,7 @@ void commutation_sinusoidal(chanend  c_commutation,  chanend c_hall, chanend c_p
 
 	  printstrln("start commutation");
 
-	  commutation_sinusoidal_loop( c_commutation, c_hall, c_pwm_ctrl);
+	  commutation_sinusoidal_loop( hall_params, c_commutation, c_hall, c_pwm_ctrl, c_signal);
 
 }
 
