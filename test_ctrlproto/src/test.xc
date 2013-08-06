@@ -15,7 +15,21 @@ void set_torque_test(chanend c_torque) {
 
 	}
 }
-
+/*{
+	int voltage = 1500;
+	//check init signal from commutation level
+	int init = 1;
+	while(1)
+	{
+		init = __check_commutation_init(c_signal);
+		if(init == 0)
+			break;
+	}
+	while(1)
+	{
+		set_commutation_sinusoidal(c_commutation_p1, voltage);
+	}
+}*/
 /*	{
 			int in_state;
 			int check, ctrl_input;

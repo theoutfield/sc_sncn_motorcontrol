@@ -26,6 +26,8 @@
 #include <adc_client_ad7949.h>
 #include <flash_somanet.h>
 #include <ctrlproto.h>
+#include <velocity_ctrl.h>
+#include <position_ctrl.h>
 
 #include <drive_config.h>
 #include <internal_config.h>
@@ -65,10 +67,10 @@ int main(void)
 	chan c_adc, c_adctrig;
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
-	chan c_pwm_ctrl, c_commutation;
-	chan dummy, dummy1, dummy2;
-	chan signal_adc;
-	chan sig_1, c_signal;
+	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
+	chan c_pwm_ctrl;
+	chan c_signal_adc;
+	chan c_sig_1, c_signal;
 	chan c_velocity_ctrl, c_position_ctrl , c_torque_ctrl;
 
 	//etherCat Comm channels
@@ -95,7 +97,7 @@ int main(void)
 
 		on stdcore[0] :
 		{
-			//firmware_update(foe_out, foe_in, sig_1); // firmware update
+			//firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}
 
 		on stdcore[1]:
@@ -113,39 +115,7 @@ int main(void)
 
 		on stdcore[0]:
 		{
-			{
-				int voltage = 1500;
-				//check init signal from commutation level
-				/*while (1)
-				{
-					unsigned received_command = 0 , command;
-					select
-					{
-						case c_signal :> command: 			//SIGNAL_READ(command):
-							received_command = 1;
-							break;
-						default:
-							break;
-					}
-					if(received_command == 1)
-					{
-						printstrln(" init commutation");
-						break;
-					}
-				}*/
-				int init = 1;
-				while(1)
-				{
-					init = __check_commutation_init(c_signal);
-					if(init == 0)
-						break;
-				}
-				while(1)
-				{
-					set_commutation_sinusoidal(c_commutation, voltage);
-				}
-			}
-		/*	timer t;
+			timer t;
 			unsigned int time;
 			int state;
 			int check;
@@ -155,6 +125,9 @@ int main(void)
 			int statusword;
 			int controlword;
 			int cmd;
+			int c_i = 1 , h_i = 1, q_i = 1, v_i = 1;
+			int init = 1;
+			int mode = 3;
 			check_list checklist;
 			state = init_state(); //init state
 
@@ -164,10 +137,23 @@ int main(void)
 
 			while(1)
 			{
-				update_checklist(checklist, c_commutation, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+				update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+				c_i = checklist._commutation_init; h_i = checklist._hall_init;
+				q_i = checklist._qei_init; v_i = checklist._velocity_init;
+
+				if(c_i == 0 && h_i == 0 && q_i == 0 && init == 1)
+				{
+					init = 0;
+					//c_velocity_ctrl <: 1;
+					c_position_ctrl <: 1;
+				}
+
 				printstr("comm ");printintln(checklist._commutation_init);
 				printstr("hall ");printintln(checklist._hall_init);
 				printstr("qei ");printintln(checklist._qei_init);
+				printstr("vel ");printintln(checklist._velocity_init);
+				printstr("pos ");printintln(checklist._position_init);
+
 				//printintln(__check_hall_init(c_hall_p4));
 			}
 			//update_checklist(checklist, c_commutation);
@@ -264,6 +250,43 @@ int main(void)
 		}
 
 
+
+		on stdcore[2]:
+		{
+			par
+			{
+
+				{
+					 ctrl_par velocity_ctrl_params;
+					 filt_par sensor_filter_params;
+					 hall_par hall_params;
+					 qei_par qei_params;
+
+					 init_velocity_control_param(velocity_ctrl_params);
+					 init_sensor_filter_param(sensor_filter_params);
+					 init_hall_param(hall_params);
+					 init_qei_param(qei_params);
+
+					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, qei_params, 2,\
+							 c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
+				 }
+
+
+				{
+					 ctrl_par position_ctrl_params;
+					 hall_par hall_params;
+					 qei_par qei_params;
+
+					 init_position_control_param(position_ctrl_params);
+					 init_hall_param(hall_params);
+					 init_qei_param(qei_params);
+
+					 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p3,\
+							 c_qei_p2, c_position_ctrl, c_commutation_p3);
+				}
+
+			}
+		}
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
@@ -281,7 +304,8 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					commutation_sinusoidal(hall_params, c_commutation, c_hall_p1, c_pwm_ctrl, signal_adc, c_signal); // hall based sinusoidal commutation
+					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
+							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
 				}
 
 				{

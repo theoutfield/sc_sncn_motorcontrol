@@ -187,7 +187,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 	}
 
 	init_state = INIT;
-	while(1)
+	while(activate)
 	{
 		#pragma ordered
 		select

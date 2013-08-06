@@ -120,7 +120,7 @@ extern int init_state(void);
 
 void init_checklist(check_list &check_list_param);
 
-extern void update_checklist(check_list &check_list_param, chanend c_commutation, chanend c_hall, chanend c_qei,
+extern void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
 		chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
 extern int update_statusword(int current_status, int state_reached);

@@ -62,7 +62,8 @@ void commutation_init_to_zero(chanend c_pwm_ctrl)
 
 /* Sinusoidal based commutation functions */
 
-void commutation_sinusoidal_loop( hall_par hall_params, chanend c_commutation, chanend c_hall, chanend c_pwm_ctrl, chanend c_signal)
+void commutation_sinusoidal_loop( hall_par &hall_params, chanend c_hall, chanend c_pwm_ctrl,
+	chanend c_signal, chanend  c_commutation_p1, chanend  c_commutation_p2, chanend  c_commutation_p3)
 {
 	unsigned command;
 	unsigned pwm[3] = { 0, 0, 0 };
@@ -126,10 +127,22 @@ void commutation_sinusoidal_loop( hall_par hall_params, chanend c_commutation, c
    		update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
 		select {
-			case c_commutation :> command:
+			case c_commutation_p1 :> command:
 				if(command == SET_VOLTAGE)				// set voltage
 				{
-					c_commutation :> voltage;
+					c_commutation_p1 :> voltage;
+				}
+				break;
+			case c_commutation_p2 :> command:
+				if(command == SET_VOLTAGE)				// set voltage
+				{
+					c_commutation_p2 :> voltage;
+				}
+				break;
+			case c_commutation_p3 :> command:
+				if(command == SET_VOLTAGE)				// set voltage
+				{
+					c_commutation_p3 :> voltage;
 				}
 				break;
 			case c_signal :> command:
@@ -156,7 +169,8 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 	return;
 }
 
-void commutation_sinusoidal(hall_par &hall_params, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc, chanend c_signal)
+void commutation_sinusoidal(hall_par &hall_params, chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc,
+		chanend c_signal, chanend  c_commutation_p1, chanend  c_commutation_p2, chanend  c_commutation_p3)
 {
 	  const unsigned t_delay = 300*USEC_FAST;
 	  const unsigned timeout = 2*SEC_FAST;
@@ -205,7 +219,7 @@ void commutation_sinusoidal(hall_par &hall_params, chanend  c_commutation,  chan
 
 	  printstrln("start commutation");
 
-	  commutation_sinusoidal_loop( hall_params, c_commutation, c_hall, c_pwm_ctrl, c_signal);
+	  commutation_sinusoidal_loop( hall_params, c_hall, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, c_commutation_p3);
 
 }
 

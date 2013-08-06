@@ -31,13 +31,15 @@ int init_commutation(chanend c_signal);
 /**
  * \brief Sinusoidal based Commutation Loop
  *
- * \channel c_commutation channel to receive motor voltage input value
  * \channel c_hall channel to receive position information
  * \channel c_pwm_ctrl channel to set pwm level output
  * \channel signal_adc channel for signaling to start adc after initialization
+ * \channel c_commutation_p1 channel to receive motor voltage input value - priority 1
+ * \channel c_commutation_p2 channel to receive motor voltage input value - priority 2
+ * \channel c_commutation_p3 channel to receive motor voltage input value - priority 3
  */
-void commutation_sinusoidal(hall_par &hall_params, chanend  c_commutation,  chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc, chanend c_signal);
-
+void commutation_sinusoidal(hall_par &hall_params, chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc,
+		chanend c_signal, chanend  c_commutation_p1, chanend  c_commutation_p2, chanend  c_commutation_p3);
 /**
  *  \brief Set Input voltage for commutation loop
  *

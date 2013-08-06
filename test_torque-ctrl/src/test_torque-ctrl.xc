@@ -60,8 +60,9 @@ int main(void)
 	chan c_adc, c_adctrig;
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
+	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan sync_output;
-	chan c_pwm_ctrl, c_commutation;
+	chan c_pwm_ctrl;
 	chan dummy, dummy1, dummy2;
 	chan c_signal_adc;
 	chan c_sig_1, c_signal;
@@ -134,7 +135,7 @@ int main(void)
 				{
 					hall_par hall_params;
 					current_ctrl_loop(hall_params, c_signal_adc, c_adc, c_hall_p3,
-							sync_output, c_commutation, c_torque_ctrl);
+							sync_output, c_commutation_p1, c_torque_ctrl);
 				}
 
 			}
@@ -158,7 +159,8 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					commutation_sinusoidal(hall_params, c_commutation, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal); // hall based sinusoidal commutation
+					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
+							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
 				}
 
 				{

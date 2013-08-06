@@ -92,12 +92,11 @@ void init_checklist(check_list &check_list_param)
 	check_list_param.switch_on = false;
 }
 
-void update_checklist(check_list &check_list_param, chanend c_commutation, chanend c_hall, chanend c_qei,
+void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
 		chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
 {
 	bool check;
 	bool skip = true;
-	int mode;
 	check = check_list_param._adc_init | check_list_param._commutation_init // & check_list_param._fault
 			| check_list_param._hall_init | check_list_param._qei_init;
 	switch(check)
@@ -126,21 +125,15 @@ void update_checklist(check_list &check_list_param, chanend c_commutation, chane
 			if(~check_list_param._torque_init && mode == 1)
 			{
 				check_list_param._torque_init = __check_torque_init(c_torque_ctrl);
-				skip = true;
 			}
-			if(~skip)
+			else if(~check_list_param._velocity_init && mode == 2)
 			{
-				if(~check_list_param._velocity_init && mode == 2)
-				{
-					check_list_param._velocity_init = __check_velocity_init(c_velocity_ctrl);
-					break;
-				}
-				if(~check_list_param._position_init && mode == 3)
-				{
-					check_list_param._position_init = __check_position_init(c_position_ctrl);
-				}
+				check_list_param._velocity_init = __check_velocity_init(c_velocity_ctrl);
 			}
-
+			else if(~check_list_param._position_init && mode == 3)
+			{
+				check_list_param._position_init = __check_position_init(c_position_ctrl);
+			}
 			break;
 	}
 

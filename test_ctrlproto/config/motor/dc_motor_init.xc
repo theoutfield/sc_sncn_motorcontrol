@@ -2,10 +2,10 @@
 
 extern int __qei_max_counts(int real_counts);
 
-void init_hall_param(hall_par &h_pole)
+void init_hall_param(hall_par &hall_params)
 {
-	h_pole.pole_pairs = POLE_PAIRS;
-	h_pole.gear_ratio = GEAR_RATIO;
+	hall_params.pole_pairs = POLE_PAIRS;
+	hall_params.gear_ratio = GEAR_RATIO;
 	return;
 }
 
