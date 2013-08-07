@@ -6,9 +6,11 @@
 #include "filter_blocks.h"
 #include <xscope.h>
 #include <internal_config.h>
+#include <drive_config.h>
 #include "print.h"
 
 //#define Debug_velocity_ctrl
+#define debug_print
 //default runs on CORE 2/CORE 1/CORE 0
 #define HALL 1
 #define QEI 2
@@ -50,7 +52,7 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {
-	unsigned command, received_command =0; //FIXME put declarations outside the loop
+	int init_state = INIT_BUSY; //FIXME put declarations outside the loop
 
 	VELOCITY_CTRL_ENABLE(); 	//activate velocity ctrl loop
 
@@ -58,20 +60,16 @@ int init_velocity_control(chanend c_velocity_ctrl)
 	 while(1)
 	 {
 
-		select
+		init_state = __check_velocity_init(c_velocity_ctrl);
+		if(init_state == INIT)
 		{
-			case VELOCITY_CTRL_READ(command):
-				received_command = SUCCESS;
-				break;
-			default:
-				break;
-		}
-		if(received_command == SUCCESS)
-		{
+#ifdef debug_print
+			printstrln("vel intialized");
+#endif
 			break;
 		}
 	 }
-	 return received_command;
+	 return init_state;
 }
 
 void init_sensor_filter_param(filt_par &sensor_filter_par) //optional for user to change
@@ -156,7 +154,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 	while(1)
 	{
-		unsigned received_command = UNSET;
+		int received_command = UNSET;
 		select
 		{
 			case VELOCITY_CTRL_READ(command):
@@ -164,13 +162,17 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 				{
 					activate = SET;
 					received_command = SET;
-					// printstrln("vel activated");
+#ifdef debug_print
+					printstrln("vel activated");
+#endif
 				}
 				else if(command == UNSET)
 				{
 					activate = UNSET;
 					received_command = SET;
-					//printstrln("vel disabled");
+#ifdef debug_print
+					printstrln("vel disabled");
+#endif
 				}
 				else if(command == CHECK_BUSY)
 				{
@@ -182,7 +184,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 		}
 		if(received_command == SET)
 		{
-			//VELOCITY_CTRL_WRITE(received_command);
 			break;
 		}
 	}

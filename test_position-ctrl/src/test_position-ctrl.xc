@@ -54,6 +54,15 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 ctrl_proto_values_t InOut;
 
+void xscope_initialise()
+{
+	xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
+						XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
+
+	xscope_config_io(XSCOPE_IO_BASIC);
+	return;
+}
+
 void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 {
 	int core_id = 1;
@@ -67,6 +76,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 	csp_par csp_params;
 
 	int init = 0;
+	int init_state = INIT_BUSY;
 
 	int acc = 350;				// rpm/s
 	int dec = 350;     			// rpm/s
@@ -77,25 +87,30 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 	init_csp_param(csp_params);
 	init_qei_param(qei_params);
 
-	//check init signal from commutation level
-	init = init_commutation(c_signal);
-	if(init == 1)
-		printstrln("initialized commutation");
-	else
-		printstrln(" initialize commutation failed");
+#ifdef ENABLE_xscope_main
+	xscope_initialise();
+#endif
 
-	if(init == 1)
+	while(1)
 	{
-		init = 0;
-		init = init_position_control(c_position_ctrl);
-		if(init == 1)
+		init_state = __check_commutation_init(c_signal);
+		if(init_state == INIT)
+		{
+			printstrln("comm intialized");
+			break;
+		}
+	}
+	if(init_state == INIT)
+	{
+		init_state = INIT_BUSY;
+		init_state = init_position_control(c_position_ctrl);
+		if(init_state == INIT)
 			printstrln("position control intialized");
 		else
 			printstrln("intialize position control failed");
 	}
 
-
-	if(init == 1)
+	if(init_state == INIT)
 	{
 		init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, MAX_NOMINAL_SPEED);
 
@@ -232,10 +247,10 @@ int main(void)
 		{
 	//		ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);   	// test CSP over ethercat with PPM on master side
 		}
-		on stdcore[0]:
+		on stdcore[1]:
 		{
-			//position_profile_test(c_position_ctrl, c_signal);		  	// test PPM on slave side
-			par
+			position_profile_test(c_position_ctrl, c_signal);		  	// test PPM on slave side
+			/*par
 			{
 
 				{
@@ -270,16 +285,9 @@ int main(void)
 
 					}
 				}
-			}
+			}*/
 		}
 
-		on stdcore[1]:
-		{
-			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
-								XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
-
-			xscope_config_io(XSCOPE_IO_BASIC);
-		}
 
 		on stdcore[2]:
 		{

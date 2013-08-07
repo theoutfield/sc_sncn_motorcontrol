@@ -1,8 +1,10 @@
 #include <position_ctrl.h>
 #include <xscope.h>
 #include <print.h>
+#include <drive_config.h>
 
 #define DEBUG
+#define debug_print
 
 #define SET_POSITION_TOKEN 40
 #define GET_POSITION_TOKEN 41
@@ -23,27 +25,23 @@ extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int
 
 int init_position_control(chanend c_position_ctrl)
 {
-	unsigned command, received_command =0;
+	int init_state = INIT_BUSY;
 
 	POSITION_CTRL_ENABLE(); 					//signal position ctrl loop
 
 	// init check from position control loop
 	while(1)
 	{
-		select
+		init_state = __check_position_init(c_position_ctrl);
+		if(init_state == INIT)
 		{
-			case POSITION_CTRL_READ(command):
-				received_command = SUCCESS;
-				break;
-			default:
-				break;
-		}
-		if(received_command == SUCCESS)
-		{
+#ifdef debug_print
+			printstrln("pos intialized");
+#endif
 			break;
 		}
 	}
-	return received_command;
+	return init_state;
 }
 
 //internal functions
@@ -139,7 +137,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
 	while(1)
 	{
-		unsigned received_command = UNSET;
+		int received_command = UNSET;
 		select
 		{
 			case POSITION_CTRL_READ(command):
@@ -147,13 +145,17 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 				{
 					activate = SET;
 					received_command = SET;
-					 printstrln("pos activated");
+#ifdef debug_print
+					printstrln("pos activated");
+#endif
 				}
 				else if(command == UNSET)
 				{
 					activate = UNSET;
 					received_command = SET;
-					//printstrln("pos disabled");
+#ifdef debug_print
+					printstrln("pos disabled");
+#endif
 				}
 				else if(command == CHECK_BUSY)
 				{

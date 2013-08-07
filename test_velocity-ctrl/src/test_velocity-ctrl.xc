@@ -126,7 +126,16 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_vel
 	}
 }
 */
+void xscope_initialise()
+{
+	{
+		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
+							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
 
+		xscope_config_io(XSCOPE_IO_BASIC);
+	}
+	return;
+}
 //test PVM
 void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
 {
@@ -147,27 +156,34 @@ void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
 	csv_par csv_params;
 
 	int init = 0;
+	int init_state = INIT_BUSY;
 
 	init_csv_param(csv_params);
 
-	//check init signal from commutation loop
-	init = init_commutation(c_signal);
-	if(init == 1)
-		printstrln("initialized commutation");
-	else
-		printstrln(" initialize commutation failed");
-
-	if(init == 1)
+#ifdef ENABLE_xscope_main
+	xscope_initialise();
+#endif
+	while(1)
 	{
-		init = 0;
-		init = init_velocity_control(c_velocity_ctrl);
-		if(init == 1)
+		//printintln(init_state);
+		init_state = __check_commutation_init(c_signal);
+		if(init_state == INIT)
+		{
+			printstrln("comm intialized");
+			break;
+		}
+	}
+	if(init_state == INIT)
+	{
+		init_state = INIT_BUSY;
+		init_state = init_velocity_control(c_velocity_ctrl);
+		if(init_state == INIT)
 			printstrln("velocity control intialized");
 		else
 			printstrln("intialize velocity control failed");
 	}
 
-	if(init == 1)
+	if(init_state == INIT)
 	{
 
 		steps = init_velocity_profile(target_velocity, actual_velocity * csv_params.polarity, acc, dec);
@@ -264,8 +280,9 @@ int main(void) {
 		}
 		on stdcore[1]:
 		{
-			//profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
-			par
+			profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
+
+			/*par
 			{
 
 				{
@@ -300,15 +317,7 @@ int main(void) {
 
 					}
 				}
-			}
-		}
-
-		on stdcore[1]:
-		{
-//			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-//								XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
-//
-//			xscope_config_io(XSCOPE_IO_BASIC);
+			}*/
 		}
 
 		on stdcore[2]:
