@@ -7,6 +7,7 @@
 
 #include <drive_config.h>
 #include <internal_config.h>
+#include <print.h>
 
 int read_controlword_switch_on(int control_word) {
 	return (control_word & SWITCH_ON_CONTROL);
@@ -97,26 +98,26 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
 {
 	bool check;
 	bool skip = true;
-	check = check_list_param._adc_init | check_list_param._commutation_init // & check_list_param._fault
-			| check_list_param._hall_init | check_list_param._qei_init;
+	check =  check_list_param._commutation_init // & check_list_param._fault check_list_param._adc_init &
+			& check_list_param._hall_init & check_list_param._qei_init;
 	switch(check)
 	{
 		case INIT_BUSY:
-			if(check_list_param._commutation_init)
+			if(~check_list_param._commutation_init)
 			{
 				check_list_param._commutation_init = __check_commutation_init(c_commutation);
-				if(~check_list_param._commutation_init)
+				if(check_list_param._commutation_init)
 					skip = false;
 			}
-			else if(~skip && check_list_param._adc_init)
+			if(~skip && ~check_list_param._adc_init)
 			{
 				check_list_param._adc_init = __check_adc_init();
 			}
-			else if(~skip && check_list_param._hall_init)
+			if(~skip && ~check_list_param._hall_init)
 			{
 				check_list_param._hall_init = __check_hall_init(c_hall);
 			}
-			else if(~skip && check_list_param._qei_init)
+			if(~skip &&  ~check_list_param._qei_init)
 			{
 				check_list_param._qei_init = __check_qei_init(c_qei);
 			}
@@ -126,11 +127,11 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
 			{
 				check_list_param._torque_init = __check_torque_init(c_torque_ctrl);
 			}
-			else if(~check_list_param._velocity_init && mode == 2)
+			if(~check_list_param._velocity_init && mode == 2)
 			{
 				check_list_param._velocity_init = __check_velocity_init(c_velocity_ctrl);
 			}
-			else if(~check_list_param._position_init && mode == 3)
+			if(~check_list_param._position_init && mode == 3)
 			{
 				check_list_param._position_init = __check_position_init(c_position_ctrl);
 			}

@@ -18,8 +18,8 @@
 #define SET    	1
 #define UNSET  	0
 
-#define INIT_BUSY 	1
-#define INIT		0
+#define INIT_BUSY 	0
+#define INIT		1
 #define CHECK_BUSY  10
 
 #define SUCCESS 1
