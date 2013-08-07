@@ -116,25 +116,25 @@ bool __check_torque_init(chanend c_torque_ctrl);
 bool __check_velocity_init(chanend c_velocity_ctrl);
 bool __check_position_init(chanend c_position_ctrl);
 
-extern int init_state(void);
+int init_state(void);
 
-void init_checklist(check_list &check_list_param);
+check_list init_checklist();
 
-extern void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
+void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
 		chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
-extern int update_statusword(int current_status, int state_reached);
+int update_statusword(int current_status, int state_reached);
 
-extern int get_next_values(int in_state, int check_init, int ctrl_input,
-		int fault);
+int get_next_values(int in_state, int check_init, int ctrl_input,
+	int fault);
 
-extern int read_controlword_switch_on(int control_word);
+int read_controlword_switch_on(int control_word);
 
-extern int read_controlword_quick_stop(int control_word);
+int read_controlword_quick_stop(int control_word);
 
-extern int read_controlword_enable_op(int control_word);
+int read_controlword_enable_op(int control_word);
 
-extern int read_controlword_fault_reset(int control_word);
+int read_controlword_fault_reset(int control_word);
 
 
 #endif /* DRIVE_CONFIG_H_*/

@@ -76,8 +76,9 @@ bool __check_position_init(chanend c_position_ctrl)
 	return init_state;
 }
 
-void init_checklist(check_list &check_list_param)
+check_list init_checklist()
 {
+	check_list check_list_param;
 	check_list_param._adc_init = INIT_BUSY;
 	check_list_param._commutation_init = INIT_BUSY;
 	check_list_param._hall_init = INIT_BUSY;
@@ -91,6 +92,7 @@ void init_checklist(check_list &check_list_param)
 	check_list_param.operation_enable = false;
 	check_list_param.ready = false;
 	check_list_param.switch_on = false;
+	return check_list_param;
 }
 
 void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
@@ -137,8 +139,16 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
 			}
 			break;
 	}
-
-
+	if(check_list_param._commutation_init && ~check_list_param.fault)
+	{
+		check_list_param.ready = true;
+	}
+	if(check_list_param.ready && check_list_param._hall_init && check_list_param._qei_init && ~check_list_param.fault)
+	{
+		check_list_param.switch_on = true;
+		check_list_param.mode_op = true;
+		check_list_param.operation_enable = true;
+	}
 }
 
 int init_state(void) {

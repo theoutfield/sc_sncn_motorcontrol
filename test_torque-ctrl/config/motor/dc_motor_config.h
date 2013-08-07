@@ -50,7 +50,7 @@
 #define MAX_POSITION_LIMIT 	359
 #define MIN_POSITION_LIMIT -359
 
-#define DC100_RESOLUTION 	741
+#define DC100_RESOLUTION 	740
 #define DC900_RESOLUTION	264
 
 typedef struct S_Control

@@ -114,7 +114,7 @@ int main(void)
 		}
 
 		on stdcore[0]:
-		{
+	/*	{
 			timer t;
 			unsigned int time;
 			int state;
@@ -149,107 +149,20 @@ int main(void)
 				}
 
 				printstr("comm ");printintln(checklist._commutation_init);
+				printstr("ready ");printintln(checklist.ready);
 				printstr("hall ");printintln(checklist._hall_init);
 				printstr("qei ");printintln(checklist._qei_init);
+				printstr("switch on ");printintln(checklist.switch_on);
 				printstr("vel ");printintln(checklist._velocity_init);
 				printstr("pos ");printintln(checklist._position_init);
+
 			}
 			//update_checklist(checklist, c_commutation);
-
-/*			while(1)
-			{
-
-				ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
-				t when timerafter(time + MSEC_STD) :> time;
-				controlword = InOut.control_word;
-
-				//update_checklist(checklist);
-				printintln(controlword);
-				switch(state)
-				{
-					case 1:
-						check = 1;// comm signal
-						fault = read_fault();
-						state = get_next_values(state, check, 0, fault);
-#ifdef print_slave
-						printstrln("1");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 2:
-						check = 1;// comm signal
-						fault = read_fault();
-						state = get_next_values(state, check, 0, fault);
-#ifdef print_slave
-						printstrln("2");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 7:
-						check = 1;// hall, qei
-						//printintln(controlword);
-						ctrl_input = read_controlword_switch_on(controlword);
-						fault = read_fault();
-						state = get_next_values(state, check, ctrl_input, fault);
-#ifdef print_slave
-						printstrln("7");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 3:
-						check = 1;//read_check();
-						ctrl_input = read_controlword_enable_op(controlword);
-						fault = read_fault();
-						state = get_next_values(state, check, ctrl_input, fault);
-#ifdef print_slave
-						printstrln("3");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 4:
-						check = 1;//read_check();
-						ctrl_input = read_controlword_quick_stop(controlword); //quick stop
-						fault = read_fault();
-						state = get_next_values(state, check, ctrl_input, fault);
-#ifdef print_slave
-						printstrln("4");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 5:
-						check = 1;//read_check();
-						ctrl_input = read_controlword_fault_reset(controlword);
-						fault = read_fault();
-						state = get_next_values(state, check, ctrl_input, fault);
-#ifdef print_slave
-						printstrln("5");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					default:
-						break;
-				}
-				statusword = update_statusword(statusword, state);
-				InOut.status_word = statusword;
-			}*/
-
-		}
+		}*/
 
 
 
-/*		{
+		{
 			timer t;
 			unsigned int time;
 			int state;
@@ -259,14 +172,12 @@ int main(void)
 
 			int statusword;
 			int controlword;
-			int cmd;
-			int c_i = 1 , h_i = 1, q_i = 1, v_i = 1;
-			int init = 1;
 			int mode = 3;
 			check_list checklist;
-			state = init_state(); //init state
 
-			init_checklist(checklist);
+			state = init_state(); 			//init state
+			checklist = init_checklist();
+
 			t :> time;
 			while(1)
 			{
@@ -275,12 +186,12 @@ int main(void)
 				t when timerafter(time + MSEC_STD) :> time;
 				controlword = InOut.control_word;
 
-				//update_checklist(checklist);
+				update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 				printintln(controlword);
 				switch(state)
 				{
 					case 1:
-						//check = 1;// comm signal  check_cas1
+						check = checklist.ready; // comm signal
 						fault = read_fault();
 						state = get_next_values(state, check, 0, fault);
 #ifdef print_slave
@@ -291,7 +202,7 @@ int main(void)
 						break;
 
 					case 2:
-						check = 1;// comm signal
+						check = checklist.ready;// comm signal
 						fault = read_fault();
 						state = get_next_values(state, check, 0, fault);
 #ifdef print_slave
@@ -302,7 +213,7 @@ int main(void)
 						break;
 
 					case 7:
-						check = 1;// hall, qei
+						check = checklist.switch_on;// hall, qei, ready (internal)
 						//printintln(controlword);
 						ctrl_input = read_controlword_switch_on(controlword);
 						fault = read_fault();
@@ -315,7 +226,7 @@ int main(void)
 						break;
 
 					case 3:
-						check = 1;//read_check();
+						check = checklist.switch_on;//read_check();
 						ctrl_input = read_controlword_enable_op(controlword);
 						fault = read_fault();
 						state = get_next_values(state, check, ctrl_input, fault);
@@ -327,7 +238,7 @@ int main(void)
 						break;
 
 					case 4:
-						check = 1;//read_check();
+						check = checklist.operation_enable;//read_check();
 						ctrl_input = read_controlword_quick_stop(controlword); //quick stop
 						fault = read_fault();
 						state = get_next_values(state, check, ctrl_input, fault);
@@ -339,7 +250,7 @@ int main(void)
 						break;
 
 					case 5:
-						check = 1;//read_check();
+						check = 1;// (dont care)
 						ctrl_input = read_controlword_fault_reset(controlword);
 						fault = read_fault();
 						state = get_next_values(state, check, ctrl_input, fault);
@@ -356,7 +267,7 @@ int main(void)
 				statusword = update_statusword(statusword, state);
 				InOut.status_word = statusword;
 			}
-		}*/
+		}
 
 		on stdcore[2]:
 		{
