@@ -95,6 +95,7 @@ typedef struct S_Check_list
 	bool switch_on;
 	bool operation_enable;
 	bool mode_op;
+	bool fault;
 
 	bool _commutation_init;
 	bool _hall_init;
@@ -104,7 +105,6 @@ typedef struct S_Check_list
 	bool _velocity_init;
 	bool _position_init;
 
-	bool fault;
 }check_list;
 
 
@@ -125,8 +125,7 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
 
 int update_statusword(int current_status, int state_reached);
 
-int get_next_values(int in_state, int check_init, int ctrl_input,
-	int fault);
+int get_next_values(int in_state, check_list &checklist, int controlword);
 
 int read_controlword_switch_on(int control_word);
 

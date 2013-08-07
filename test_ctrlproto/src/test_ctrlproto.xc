@@ -53,15 +53,9 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 ctrl_proto_values_t InOut;
 
 
-int read_fault()
-{
-	return 0;
-}
 
-//int read_check()
-//{
-//	return check_out;
-//}
+
+
 int main(void)
 {
 	chan c_adc, c_adctrig;
@@ -188,82 +182,8 @@ int main(void)
 
 				update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 				printintln(controlword);
-				switch(state)
-				{
-					case 1:
-						check = checklist.ready; // comm signal
-						fault = read_fault();
-						state = get_next_values(state, check, 0, fault);
-#ifdef print_slave
-						printstrln("1");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
 
-					case 2:
-						check = checklist.ready;// comm signal
-						fault = read_fault();
-						state = get_next_values(state, check, 0, fault);
-#ifdef print_slave
-						printstrln("2");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 7:
-						check = checklist.switch_on;// hall, qei, ready (internal)
-						//printintln(controlword);
-						ctrl_input = read_controlword_switch_on(controlword);
-						fault = read_fault();
-						state = get_next_values(state, check, ctrl_input, fault);
-#ifdef print_slave
-						printstrln("7");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 3:
-						check = checklist.switch_on;//read_check();
-						ctrl_input = read_controlword_enable_op(controlword);
-						fault = read_fault();
-						state = get_next_values(state, check, ctrl_input, fault);
-#ifdef print_slave
-						printstrln("3");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 4:
-						check = checklist.operation_enable;//read_check();
-						ctrl_input = read_controlword_quick_stop(controlword); //quick stop
-						fault = read_fault();
-						state = get_next_values(state, check, ctrl_input, fault);
-#ifdef print_slave
-						printstrln("4");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					case 5:
-						check = 1;// (dont care)
-						ctrl_input = read_controlword_fault_reset(controlword);
-						fault = read_fault();
-						state = get_next_values(state, check, ctrl_input, fault);
-#ifdef print_slave
-						printstrln("5");
-						printstr("updated state ");
-						printhexln(state);
-#endif
-						break;
-
-					default:
-						break;
-				}
+				state = get_next_values(state, checklist, controlword);
 				statusword = update_statusword(statusword, state);
 				InOut.status_word = statusword;
 			}
