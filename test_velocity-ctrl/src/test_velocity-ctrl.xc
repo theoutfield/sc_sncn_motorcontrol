@@ -49,19 +49,30 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
+void xscope_initialise()
+{
+	{
+		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
+							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
+
+		xscope_config_io(XSCOPE_IO_BASIC);
+	}
+	return;
+}
+
 ctrl_proto_values_t InOut;
-/*
+
 int get_target_velocity()
 {
-	return InOut.in_speed;
+	return InOut.target_velocity;
 }
 void send_actual_velocity(int actual_velocity)
 {
-	InOut.out_speed = actual_velocity;
+	InOut.velocity_actual = actual_velocity;
 }
 
 
-void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_velocity_ctrl)
+void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_hall_p4,chanend c_qei_p4,chanend c_adc,chanend c_torque_ctrl,chanend c_velocity_ctrl,chanend c_position_ctrl)
 {
 	int i = 0;
 	int mode = 0;
@@ -73,31 +84,64 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_vel
 	timer t;
 
 	int init = 0;
-
+int flag = 0;
 	csv_par csv_params;
 
+	int state;
+	int statusword;
+	int controlword;
+	check_list checklist;
+
+	state 		= init_state(); 			//init state
+	checklist 	= init_checklist();
+	InOut 		= init_ctrl_proto();
 
 	init_csv_param(csv_params);
 
-	init_ctrl_proto(InOut);
+#ifdef ENABLE_xscope_main
+	xscope_initialise();
+#endif
 
-	//check init signal from commutation loop
-	init = init_commutation(c_signal);
-	if(init == 1)
-		printstrln("initialized commutation");
-	else
-		printstrln(" initialize commutation failed");
-
-
-	if(init == 1)
+	while(1)
 	{
-		init = 0;
-		init = init_velocity_control(c_velocity_ctrl);
-		if(init == 1)
-			printstrln("velocity control intialized");
-		else
-			printstrln("intialize velocity control failed");
+		ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
+		//t when timerafter(time + MSEC_STD) :> time;
+		wait_ms(1, core_id, t);
+		controlword = InOut.control_word;
+		update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+	//	printintln(controlword);
+
+		state = get_next_state(state, checklist, controlword);
+		statusword = update_statusword(statusword, state);
+		InOut.status_word = statusword;
+
+		switch(InOut.operation_mode)
+		{
+			case CSV: 	//csv mode index
+				if(flag == 0)
+				{
+					init = init_velocity_control(c_velocity_ctrl);
+				}
+				if(init == 1)
+				{
+					flag = 1;
+				}
+				InOut.operation_mode_display = CSV;
+				//printstrln("csv");
+				target_velocity = get_target_velocity();
+				set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
+
+				actual_velocity = get_velocity(c_velocity_ctrl);
+				send_actual_velocity(actual_velocity);
+
+				xscope_probe_data(0, actual_velocity);
+				xscope_probe_data(1, target_velocity);
+				break;
+		}
+
 	}
+
+	/*
 
 	if(init == 1)
 	{
@@ -123,19 +167,10 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_vel
 
 			wait_ms(1, core_id, t);
 		}
-	}
+	}*/
 }
-*/
-void xscope_initialise()
-{
-	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
 
-		xscope_config_io(XSCOPE_IO_BASIC);
-	}
-	return;
-}
+
 //test PVM
 void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
 {
@@ -246,7 +281,7 @@ int main(void) {
 	chan c_pwm_ctrl;
 	chan c_signal_adc;
 	chan c_sig_1, c_signal;
-	chan c_velocity_ctrl;
+	chan c_velocity_ctrl, c_torque_ctrl, c_position_ctrl;
 
 	//etherCat Comm channels
 	chan coe_in; ///< CAN from module_ethercat to consumer
@@ -276,11 +311,12 @@ int main(void) {
 
 		on stdcore[1] :
 		{
-			//ether_comm(pdo_out, pdo_in, c_signal, c_velocity_ctrl);   // test CSV over ethercat with PVM on master side
+			ether_comm(pdo_out, pdo_in, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+			// test CSV over ethercat with PVM on master side
 		}
 		on stdcore[1]:
 		{
-			profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
+			//profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
 
 			/*par
 			{

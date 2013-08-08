@@ -8,7 +8,7 @@
 #include <drive_config.h>
 #include <internal_config.h>
 #include <print.h>
-#define print_slave
+//#define print_slave
 int read_controlword_switch_on(int control_word) {
 	return (control_word & SWITCH_ON_CONTROL);
 }
@@ -76,7 +76,7 @@ bool __check_position_init(chanend c_position_ctrl)
 	return init_state;
 }
 
-check_list init_checklist()
+check_list init_checklist(void)
 {
 	check_list check_list_param;
 	check_list_param._adc_init = INIT_BUSY;

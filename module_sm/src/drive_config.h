@@ -118,7 +118,7 @@ bool __check_position_init(chanend c_position_ctrl);
 
 int init_state(void);
 
-check_list init_checklist();
+check_list init_checklist(void);
 
 void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
 		chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);

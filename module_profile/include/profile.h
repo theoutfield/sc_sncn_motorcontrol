@@ -1,5 +1,4 @@
-#include "refclk.h"
-#include <dc_motor_config.h>
+//#include <dc_motor_config.h>
 
 /*Profile Velocity Quick Stop*/
 

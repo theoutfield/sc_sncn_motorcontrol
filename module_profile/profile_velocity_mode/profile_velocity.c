@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <profile.h>
 
 struct PROFILE_VELOCITY_PARAM
 {

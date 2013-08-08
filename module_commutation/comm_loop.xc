@@ -185,7 +185,7 @@ void commutation_sinusoidal(hall_par &hall_params, chanend c_hall, chanend c_pwm
 	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
 	  t when timerafter (ts + t_delay) :> ts;
 
-	  printstrln("start");
+	//  printstrln("start");
 
 
 	//  c_signal <: 1; 			//signal commutation init done.
@@ -199,12 +199,12 @@ void commutation_sinusoidal(hall_par &hall_params, chanend c_hall, chanend c_pwm
 		  {
 			case signal_adc :> command:
 				received_command = 1;
-				printstrln("received signal from torque ctrl");
+				//printstrln("received signal from torque ctrl");
 				signal_adc <: 1;
 				break;
 			case t when timerafter(ts + timeout) :> void:
 				received_command = 1;
-				printstrln("timed out");
+				//printstrln("timed out");
 				break;
 			case c_signal :> command:  //
 				if(command == CHECK_BUSY)
@@ -217,7 +217,7 @@ void commutation_sinusoidal(hall_par &hall_params, chanend c_hall, chanend c_pwm
 			  break;
 	  }
 
-	  printstrln("start commutation");
+	 // printstrln("start commutation");
 
 	  commutation_sinusoidal_loop( hall_params, c_hall, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, c_commutation_p3);
 
