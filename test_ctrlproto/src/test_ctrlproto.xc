@@ -102,80 +102,25 @@ int main(void)
 			xscope_config_io(XSCOPE_IO_BASIC);
 		}
 
-		on stdcore[1]:
-		{
-			//run_drive(info);
-		}
-
 		on stdcore[0]:
-	/*	{
-			timer t;
-			unsigned int time;
-			int state;
-			int check;
-			int ctrl_input;
-			int fault;
-
-			int statusword;
-			int controlword;
-			int cmd;
-			int c_i = 1 , h_i = 1, q_i = 1, v_i = 1;
-			int init = INIT_BUSY;
-			int mode = 2;
-			check_list checklist;
-			state = init_state(); //init state
-
-			init_checklist(checklist);
-			t :> time;
-
-
-			while(1)
-			{
-				update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
-				c_i = checklist._commutation_init; h_i = checklist._hall_init;
-				q_i = checklist._qei_init; v_i = checklist._velocity_init;
-
-				if(c_i == INIT && h_i == INIT && q_i == INIT && init == INIT_BUSY)
-				{
-					init = INIT;
-					c_velocity_ctrl <: 1;
-					//c_position_ctrl <: 1;
-				}
-
-				printstr("comm ");printintln(checklist._commutation_init);
-				printstr("ready ");printintln(checklist.ready);
-				printstr("hall ");printintln(checklist._hall_init);
-				printstr("qei ");printintln(checklist._qei_init);
-				printstr("switch on ");printintln(checklist.switch_on);
-				printstr("vel ");printintln(checklist._velocity_init);
-				printstr("pos ");printintln(checklist._position_init);
-
-			}
-			//update_checklist(checklist, c_commutation);
-		}*/
-
-
-
 		{
 			timer t;
 			unsigned int time;
 			int state;
-			int check;
-			int ctrl_input;
-			int fault;
 
 			int statusword;
 			int controlword;
 			int mode = 3;
 			check_list checklist;
 
-			state = init_state(); 			//init state
-			checklist = init_checklist();
+			state 		= init_state(); 			//init state
+			checklist 	= init_checklist();
+			InOut 		= init_ctrl_proto();
+
 
 			t :> time;
 			while(1)
 			{
-
 				ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 				t when timerafter(time + MSEC_STD) :> time;
 
