@@ -125,7 +125,7 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
 
 int update_statusword(int current_status, int state_reached);
 
-int get_next_values(int in_state, check_list &checklist, int controlword);
+int get_next_state(int in_state, check_list &checklist, int controlword);
 
 int read_controlword_switch_on(int control_word);
 

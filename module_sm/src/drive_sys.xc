@@ -202,7 +202,7 @@ int update_statusword(int current_status, int state_reached) {
 	return status_word;
 }
 
-int get_next_values(int in_state, check_list &checklist, int controlword) {
+int get_next_state(int in_state, check_list &checklist, int controlword) {
 	int out_state;
 	int ctrl_input;
 
@@ -211,9 +211,9 @@ int get_next_values(int in_state, check_list &checklist, int controlword) {
 
 		if (checklist.fault == true)
 			out_state = 5;
-		else if (checklist.ready == INIT_BUSY)
+		else if (checklist.ready == false)
 			out_state = 2;
-		else if (checklist.ready == INIT)
+		else if (checklist.ready == true)
 			out_state = 7;
 #ifdef print_slave
 		printstr("updated state ");
@@ -224,9 +224,9 @@ int get_next_values(int in_state, check_list &checklist, int controlword) {
 	case 2:
 		if (checklist.fault == true)
 			out_state = 5;
-		else if (checklist.ready == INIT_BUSY)
+		else if (checklist.ready == false)
 			out_state = 1;
-		else if (checklist.ready == INIT)
+		else if (checklist.ready == true)
 			out_state = 7;
 #ifdef print_slave
 		printstr("updated state ");
@@ -238,12 +238,12 @@ int get_next_values(int in_state, check_list &checklist, int controlword) {
 		ctrl_input = read_controlword_switch_on(controlword);
 		if (checklist.fault == true)
 			out_state = 5;
-		else if (checklist.switch_on == INIT_BUSY)
+		else if (checklist.switch_on == false)
 			out_state = 7;
-		else if (checklist.switch_on == INIT)
-			if (ctrl_input == 0)
+		else if (checklist.switch_on == true)
+			if (ctrl_input == false)
 				out_state = 7;
-			else if (ctrl_input == 1)
+			else if (ctrl_input == true)
 				out_state = 3;
 #ifdef print_slave
 		printstr("updated state ");
@@ -255,12 +255,12 @@ int get_next_values(int in_state, check_list &checklist, int controlword) {
 		ctrl_input = read_controlword_enable_op(controlword);
 		if (checklist.fault == true)
 			out_state = 5;
-		else if (checklist.switch_on == INIT_BUSY)
+		else if (checklist.switch_on == false)
 			out_state = 3;
-		else if (checklist.switch_on == INIT)
-			if (ctrl_input == 0)
+		else if (checklist.switch_on == true)
+			if (ctrl_input == false)
 				out_state = 3;
-			else if (ctrl_input == 1)
+			else if (ctrl_input == true)
 				out_state = 4;
 #ifdef print_slave
 		printstr("updated state ");
@@ -272,9 +272,9 @@ int get_next_values(int in_state, check_list &checklist, int controlword) {
 		ctrl_input = read_controlword_quick_stop(controlword); //quick stop
 		if (checklist.fault == true)
 			out_state = 5;
-		else if (ctrl_input == 0)
+		else if (ctrl_input == false)
 			out_state = 4;
-		else if (ctrl_input == 1) /*quick stop*/
+		else if (ctrl_input == true) /*quick stop*/
 			out_state = 6;
 #ifdef print_slave
 		printstr("updated state ");
@@ -284,9 +284,9 @@ int get_next_values(int in_state, check_list &checklist, int controlword) {
 
 	case 5:
 		ctrl_input = read_controlword_fault_reset(controlword);
-		if (ctrl_input == 0)
+		if (ctrl_input == false)
 			out_state = 5;
-		else if (ctrl_input == 1)
+		else if (ctrl_input == true)
 			out_state = 2;
 #ifdef print_slave
 		printstr("updated state ");

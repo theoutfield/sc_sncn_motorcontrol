@@ -178,12 +178,12 @@ int main(void)
 
 				ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 				t when timerafter(time + MSEC_STD) :> time;
-				controlword = InOut.control_word;
 
+				controlword = InOut.control_word;
 				update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 				printintln(controlword);
 
-				state = get_next_values(state, checklist, controlword);
+				state = get_next_state(state, checklist, controlword);
 				statusword = update_statusword(statusword, state);
 				InOut.status_word = statusword;
 			}
@@ -207,7 +207,7 @@ int main(void)
 
 					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, qei_params, 2,\
 							 c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
-				 }
+				}
 
 
 				{
