@@ -42,7 +42,7 @@
 #include <drive_config.h>
 #include "profile_test.h"
 
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -75,7 +75,7 @@ void send_actual_velocity(int actual_velocity)
 void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_hall_p4,chanend c_qei_p4,chanend c_adc,chanend c_torque_ctrl,chanend c_velocity_ctrl,chanend c_position_ctrl)
 {
 	int i = 0;
-	int mode = 0;
+	int mode = 2;
 	int core_id = 0;
 
 	int target_velocity;
@@ -84,9 +84,9 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_hal
 	timer t;
 
 	int init = 0;
-int flag = 0;
+	int flag = 0;
 	csv_par csv_params;
-
+	unsigned int time;
 	int state;
 	int statusword;
 	int controlword;
@@ -101,12 +101,12 @@ int flag = 0;
 #ifdef ENABLE_xscope_main
 	xscope_initialise();
 #endif
-
+t:>time;
 	while(1)
 	{
 		ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
-		//t when timerafter(time + MSEC_STD) :> time;
-		wait_ms(1, core_id, t);
+
+	//	wait_ms(1, core_id, t);
 		controlword = InOut.control_word;
 		update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 	//	printintln(controlword);
@@ -124,7 +124,7 @@ int flag = 0;
 				}
 				if(init == 1)
 				{
-					flag = 1;
+					flag = 1; mode = 4;
 				}
 				InOut.operation_mode_display = CSV;
 				//printstrln("csv");
@@ -138,36 +138,11 @@ int flag = 0;
 				xscope_probe_data(1, target_velocity);
 				break;
 		}
+		t when timerafter(time + MSEC_STD) :> time;
 
 	}
 
-	/*
 
-	if(init == 1)
-	{
-		//test only csv
-		while(1)
-		{
-			ctrlproto_protocol_handler_function( pdo_out, pdo_in, InOut);
-
-			switch(InOut.ctrl_motor)
-			{
-				case CSV: 	//csv mode index
-
-					target_velocity = get_target_velocity();
-					set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
-
-					actual_velocity = get_velocity(c_velocity_ctrl);
-					send_actual_velocity(actual_velocity);
-
-					xscope_probe_data(0, actual_velocity);
-					xscope_probe_data(1, target_velocity);
-					break;
-			}
-
-			wait_ms(1, core_id, t);
-		}
-	}*/
 }
 
 
@@ -309,7 +284,7 @@ int main(void) {
 			firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}
 
-		on stdcore[1] :
+		on stdcore[0] :
 		{
 			ether_comm(pdo_out, pdo_in, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 			// test CSV over ethercat with PVM on master side

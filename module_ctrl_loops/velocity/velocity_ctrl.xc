@@ -10,7 +10,7 @@
 #include "print.h"
 
 //#define Debug_velocity_ctrl
-#define debug_print
+//#define debug_print
 //default runs on CORE 2/CORE 1/CORE 0
 #define HALL 1
 #define QEI 2
