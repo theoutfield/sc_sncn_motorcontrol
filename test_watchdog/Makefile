@@ -10,7 +10,7 @@ APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 
-USED_MODULES = module_blocks sc_somanet-base/module_nodeconfig
+USED_MODULES = module_blocks module_common sc_somanet-base/module_nodeconfig
 
 #
 
