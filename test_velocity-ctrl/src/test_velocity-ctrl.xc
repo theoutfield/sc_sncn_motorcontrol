@@ -42,7 +42,7 @@
 #include <drive_config.h>
 #include "profile_test.h"
 
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -281,7 +281,7 @@ int main(void) {
 
 		on stdcore[0] :
 		{
-			firmware_update(foe_out, foe_in, c_sig_1); // firmware update
+			//firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}
 
 		on stdcore[0] :

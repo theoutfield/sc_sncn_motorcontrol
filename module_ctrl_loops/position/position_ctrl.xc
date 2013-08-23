@@ -6,20 +6,23 @@
 #define DEBUG
 #define debug_print
 
+/*Internal Controller Configs*/
 #define SET_POSITION_TOKEN 40
 #define GET_POSITION_TOKEN 41
 #define HALL 1
 #define QEI 2
 #define HALL_PRECISION		2
 #define QEI_PRECISION		512
+#define POSITION_CONTROL_LOOP_TIME 	1			//in 1 ms (default do not change)
 
+/*External Configs*/
 #define POSITION_Kp_NUMERATOR 	 	180
 #define POSITION_Kp_DENOMINATOR  	2000
 #define POSITION_Ki_NUMERATOR    	50
 #define POSITION_Ki_DENOMINATOR  	102000
 #define POSITION_Kd_NUMERATOR    	100
 #define POSITION_Kd_DENOMINATOR  	10000
-#define POSITION_CONTROL_LOOP_TIME 	1			//in 1 ms (default do not change)
+
 
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 

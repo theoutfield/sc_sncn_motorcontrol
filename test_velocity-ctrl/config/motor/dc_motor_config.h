@@ -32,7 +32,7 @@
 #pragma once
 
 /*
- * define Motor Specific Constants
+ * define Motor Specific Constants (may conform to CiA 402 Standrards)
  */
 #define POLE_PAIRS  8
 #define GEAR_RATIO  26
@@ -50,6 +50,7 @@
 #define MAX_POSITION_LIMIT 	359
 #define MIN_POSITION_LIMIT -359
 
+/*Somanet IFM Internal Config*/
 #define DC100_RESOLUTION 	740
 #define DC900_RESOLUTION	264
 

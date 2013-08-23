@@ -12,23 +12,25 @@
 //#define Debug_velocity_ctrl
 //#define debug_print
 //default runs on CORE 2/CORE 1/CORE 0
+
+/*Internal Controller Configs*/
 #define HALL 1
 #define QEI 2
-
-#define VELOCITY_Kp_NUMERATOR 	 5
-#define VELOCITY_Kp_DENOMINATOR  10
-#define VELOCITY_Ki_NUMERATOR    5
-#define VELOCITY_Ki_DENOMINATOR  100
-#define VELOCITY_Kd_NUMERATOR   0
-#define VELOCITY_Kd_DENOMINATOR 1
 #define VELOCITY_CONTROL_LOOP_TIME 1			//in ms
-
 #define FILTER_SIZE 8                           //default
-
-
 #define FILTER_SIZE_MAX 16
 #define SET_VELOCITY_TOKEN 50
 #define GET_VELOCITY_TOKEN 60
+
+/*External Controller Configs*/
+#define VELOCITY_Kp_NUMERATOR 	 	5
+#define VELOCITY_Kp_DENOMINATOR  	10
+#define VELOCITY_Ki_NUMERATOR    	5
+#define VELOCITY_Ki_DENOMINATOR  	100
+#define VELOCITY_Kd_NUMERATOR   	0
+#define VELOCITY_Kd_DENOMINATOR 	1
+
+
 
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 {
