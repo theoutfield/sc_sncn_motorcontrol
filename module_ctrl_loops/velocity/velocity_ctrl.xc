@@ -16,41 +16,10 @@
 /*Internal Controller Configs*/
 #define HALL 1
 #define QEI 2
-#define VELOCITY_CONTROL_LOOP_TIME 1			//in ms
 #define FILTER_SIZE 8                           //default
 #define FILTER_SIZE_MAX 16
 #define SET_VELOCITY_TOKEN 50
 #define GET_VELOCITY_TOKEN 60
-
-/*External Controller Configs*/
-#define VELOCITY_Kp_NUMERATOR 	 	5
-#define VELOCITY_Kp_DENOMINATOR  	10
-#define VELOCITY_Ki_NUMERATOR    	5
-#define VELOCITY_Ki_DENOMINATOR  	100
-#define VELOCITY_Kd_NUMERATOR   	0
-#define VELOCITY_Kd_DENOMINATOR 	1
-
-
-
-void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
-{
-	velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;
-	velocity_ctrl_params.Kp_d = VELOCITY_Kp_DENOMINATOR;
-	velocity_ctrl_params.Ki_n = VELOCITY_Ki_NUMERATOR;
-	velocity_ctrl_params.Ki_d = VELOCITY_Ki_DENOMINATOR;
-	velocity_ctrl_params.Kd_n = VELOCITY_Kd_NUMERATOR;
-	velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
-	velocity_ctrl_params.Loop_time = VELOCITY_CONTROL_LOOP_TIME * MSEC_STD;  //units - core timer value //CORE 2/1/0
-
-	velocity_ctrl_params.Control_limit = 13739; //default
-
-	if(velocity_ctrl_params.Ki_n != 0)    							//auto calculated using control_limit
-		velocity_ctrl_params.Integral_limit = (velocity_ctrl_params.Control_limit * velocity_ctrl_params.Ki_d)/velocity_ctrl_params.Ki_n ;
-	else
-		velocity_ctrl_params.Integral_limit = 0;
-
-	return;
-}
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {

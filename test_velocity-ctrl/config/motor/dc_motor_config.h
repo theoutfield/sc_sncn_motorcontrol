@@ -32,7 +32,7 @@
 #pragma once
 
 /*
- * define Motor Specific Constants (may conform to CiA 402 Standrards)
+ * define Motor Specific Constants (may conform to CiA 402 Standards)
  */
 #define POLE_PAIRS  8
 #define GEAR_RATIO  26
@@ -49,6 +49,22 @@
 #define MAX_FOLLOWING_ERROR 0
 #define MAX_POSITION_LIMIT 	359
 #define MIN_POSITION_LIMIT -359
+
+/*External Controller Configs*/
+#define VELOCITY_Kp_NUMERATOR 	 	5
+#define VELOCITY_Kp_DENOMINATOR  	10
+#define VELOCITY_Ki_NUMERATOR    	5
+#define VELOCITY_Ki_DENOMINATOR  	100
+#define VELOCITY_Kd_NUMERATOR   	0
+#define VELOCITY_Kd_DENOMINATOR 	1
+
+/*External Configs*/
+#define POSITION_Kp_NUMERATOR 	 	180
+#define POSITION_Kp_DENOMINATOR  	2000
+#define POSITION_Ki_NUMERATOR    	50
+#define POSITION_Ki_DENOMINATOR  	102000
+#define POSITION_Kd_NUMERATOR    	100
+#define POSITION_Kd_DENOMINATOR  	10000
 
 /*Somanet IFM Internal Config*/
 #define DC100_RESOLUTION 	740
@@ -124,5 +140,9 @@ void init_hall_param(hall_par &hall_params);
 void init_csv_param(csv_par &csv_params);
 
 void init_csp_param(csp_par &csp_params);
+
+void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
+
+void init_position_control_param(ctrl_par &position_ctrl_params);
 
 #endif

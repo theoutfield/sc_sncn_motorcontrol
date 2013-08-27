@@ -286,12 +286,12 @@ int main(void) {
 
 		on stdcore[0] :
 		{
-			ether_comm(pdo_out, pdo_in, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+			//ether_comm(pdo_out, pdo_in, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 			// test CSV over ethercat with PVM on master side
 		}
 		on stdcore[1]:
 		{
-			//profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
+			profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
 
 			/*par
 			{

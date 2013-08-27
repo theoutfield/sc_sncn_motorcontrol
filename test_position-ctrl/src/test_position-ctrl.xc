@@ -240,7 +240,7 @@ int main(void)
 
 		on stdcore[0] :
 		{
-			firmware_update(foe_out, foe_in, c_sig_1); // firmware update
+			//firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}
 
 		on stdcore[1] :

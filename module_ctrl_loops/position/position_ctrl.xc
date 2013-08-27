@@ -13,15 +13,9 @@
 #define QEI 2
 #define HALL_PRECISION		2
 #define QEI_PRECISION		512
-#define POSITION_CONTROL_LOOP_TIME 	1			//in 1 ms (default do not change)
 
-/*External Configs*/
-#define POSITION_Kp_NUMERATOR 	 	180
-#define POSITION_Kp_DENOMINATOR  	2000
-#define POSITION_Ki_NUMERATOR    	50
-#define POSITION_Ki_DENOMINATOR  	102000
-#define POSITION_Kd_NUMERATOR    	100
-#define POSITION_Kd_DENOMINATOR  	10000
+
+
 
 
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
@@ -88,31 +82,6 @@ void set_position_csp(csp_par &csp_params, int target_position, int position_off
 								   csp_params.min_position_limit * 10000) , c_position_ctrl);
 }
 
-
-void init_position_control_param(ctrl_par &position_ctrl_params)
-{
-
-	position_ctrl_params.Kp_n = POSITION_Kp_NUMERATOR;
-	position_ctrl_params.Kp_d = POSITION_Kp_DENOMINATOR;
-	position_ctrl_params.Ki_n = POSITION_Ki_NUMERATOR;
-	position_ctrl_params.Ki_d = POSITION_Ki_DENOMINATOR;
-	position_ctrl_params.Kd_n = POSITION_Kd_NUMERATOR;
-	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
-	position_ctrl_params.Loop_time = POSITION_CONTROL_LOOP_TIME * MSEC_STD;  // units - for CORE 2/1/0 only
-
-	position_ctrl_params.Control_limit = 13739; 							 // default do not change
-
-	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
-	{
-		position_ctrl_params.Integral_limit = (position_ctrl_params.Control_limit * position_ctrl_params.Ki_d)/position_ctrl_params.Ki_n ;
-	}
-	else
-	{
-		position_ctrl_params.Integral_limit = 0;
-	}
-
-	return;
-}
 
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used, \
 		              chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation)

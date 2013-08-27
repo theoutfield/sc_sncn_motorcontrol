@@ -1,4 +1,5 @@
 #include <dc_motor_config.h>
+#include "refclk.h"
 
 extern int __qei_max_counts(int real_counts);
 
@@ -41,4 +42,47 @@ void init_csp_param(csp_par &csp_params)
 	return;
 }
 
+void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
+{
+	velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;
+	velocity_ctrl_params.Kp_d = VELOCITY_Kp_DENOMINATOR;
+	velocity_ctrl_params.Ki_n = VELOCITY_Ki_NUMERATOR;
+	velocity_ctrl_params.Ki_d = VELOCITY_Ki_DENOMINATOR;
+	velocity_ctrl_params.Kd_n = VELOCITY_Kd_NUMERATOR;
+	velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
+	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
 
+	velocity_ctrl_params.Control_limit = 13739; //default
+
+	if(velocity_ctrl_params.Ki_n != 0)    							//auto calculated using control_limit
+		velocity_ctrl_params.Integral_limit = (velocity_ctrl_params.Control_limit * velocity_ctrl_params.Ki_d)/velocity_ctrl_params.Ki_n ;
+	else
+		velocity_ctrl_params.Integral_limit = 0;
+
+	return;
+}
+
+void init_position_control_param(ctrl_par &position_ctrl_params)
+{
+
+	position_ctrl_params.Kp_n = POSITION_Kp_NUMERATOR;
+	position_ctrl_params.Kp_d = POSITION_Kp_DENOMINATOR;
+	position_ctrl_params.Ki_n = POSITION_Ki_NUMERATOR;
+	position_ctrl_params.Ki_d = POSITION_Ki_DENOMINATOR;
+	position_ctrl_params.Kd_n = POSITION_Kd_NUMERATOR;
+	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
+	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - for CORE 2/1/0 only default
+
+	position_ctrl_params.Control_limit = 13739; 							 // default do not change
+
+	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
+	{
+		position_ctrl_params.Integral_limit = (position_ctrl_params.Control_limit * position_ctrl_params.Ki_d)/position_ctrl_params.Ki_n ;
+	}
+	else
+	{
+		position_ctrl_params.Integral_limit = 0;
+	}
+
+	return;
+}
