@@ -20,6 +20,8 @@
 #define FILTER_SIZE_MAX 16
 #define SET_VELOCITY_TOKEN 50
 #define GET_VELOCITY_TOKEN 60
+#define SET_CTRL_PARAMETER 100
+#define SENSOR_SELECT      150
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {
@@ -81,6 +83,24 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 	set_velocity( max_speed_limit(	(target_velocity + velocity_offset) * csv_params.polarity, csv_params.max_motor_speed  ), c_velocity_ctrl );
 }
 
+
+void set_velocity_ctrl_ethercat(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl)
+{
+	VELOCITY_CTRL_WRITE(SET_CTRL_PARAMETER);
+	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Kp_n);
+	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Kp_d);
+	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Ki_n);
+	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Ki_d);
+	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Kd_n);
+	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Kd_d);
+	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Integral_limit);
+}
+
+void set_velocity_sensor_ethercat(int sensor_used, chanend c_velocity_ctrl)
+{
+	VELOCITY_CTRL_WRITE(SENSOR_SELECT);
+	VELOCITY_CTRL_WRITE(sensor_used);
+}
 void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
 		 	 	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation)
 {
@@ -274,6 +294,19 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 				else if(command == CHECK_BUSY)
 					VELOCITY_CTRL_WRITE(init_state);
+
+				else if(command == SET_CTRL_PARAMETER)
+				{
+					VELOCITY_CTRL_READ(velocity_ctrl_params.Kp_n);
+					VELOCITY_CTRL_READ(velocity_ctrl_params.Kp_d);
+					VELOCITY_CTRL_READ(velocity_ctrl_params.Ki_n);
+					VELOCITY_CTRL_READ(velocity_ctrl_params.Ki_d);
+					VELOCITY_CTRL_READ(velocity_ctrl_params.Kd_n);
+					VELOCITY_CTRL_READ(velocity_ctrl_params.Kd_d);
+					VELOCITY_CTRL_READ(velocity_ctrl_params.Integral_limit);
+				}
+				else if(command == SENSOR_SELECT)
+					VELOCITY_CTRL_READ(sensor_used);
 				break;
 
 		}

@@ -7,7 +7,7 @@
  *
  * \author Martin Schwarz <mschwarz@synapticon.com>
  * \version 0.1 (2012-11-23 1850)
- *\Motor 3 motion profile size optimized code for position ctrl loops
+ *
  */
 
 #include <xs1.h>
@@ -21,7 +21,6 @@
 #include "qei_client.h"
 #include "pwm_service_inv.h"
 #include "adc_ad7949.h"
-#include "test.h"
 #include "pwm_config.h"
 #include "comm_loop.h"
 #include "refclk.h"
@@ -40,7 +39,7 @@
 #include <ctrlproto.h>
 
 #include <drive_config.h>
-#include "profile_test.h"
+
 
 #define ENABLE_xscope_main
 #define COM_CORE 0
@@ -48,6 +47,44 @@
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+
+
+void init_hall_ethercat(hall_par &hall_params, chanend coe_out)
+{
+	{hall_params.pole_pairs, hall_params.gear_ratio} = hall_sdo_update(coe_out);
+}
+
+void init_qei_ethercat(qei_par &qei_params, chanend coe_out)
+{
+	{qei_params.real_counts, qei_params.gear_ratio, qei_params.index} = qei_sdo_update(coe_out);
+}
+
+void init_csv_ethercat(csv_par &csv_params, chanend coe_out)
+{
+	{csv_params.max_motor_speed, csv_params.nominal_current, csv_params.polarity} = csv_sdo_update(coe_out);
+	if(csv_params.polarity >= 0)
+		csv_params.polarity = 1;
+	else if(csv_params.polarity < 0)
+		csv_params.polarity = -1;
+}
+
+void init_velocity_ctrl_ethercat(ctrl_par &velocity_ctrl_params, chanend coe_out)
+{
+	{velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);
+	velocity_ctrl_params.Kp_d = 16384;
+	velocity_ctrl_params.Ki_d = 16384;
+	velocity_ctrl_params.Kd_d = 16384;
+
+	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
+
+	velocity_ctrl_params.Control_limit = 13739; 	//default
+
+	if(velocity_ctrl_params.Ki_n != 0)    			//auto calculated using control_limit
+		velocity_ctrl_params.Integral_limit = (velocity_ctrl_params.Control_limit * velocity_ctrl_params.Ki_d)/velocity_ctrl_params.Ki_n ;
+	else
+		velocity_ctrl_params.Integral_limit = 0;
+	return;
+}
 
 void xscope_initialise()
 {
@@ -72,7 +109,7 @@ void send_actual_velocity(int actual_velocity)
 }
 
 
-void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_hall_p4,chanend c_qei_p4,chanend c_adc,chanend c_torque_ctrl,chanend c_velocity_ctrl,chanend c_position_ctrl)
+void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall_p4,chanend c_qei_p4,chanend c_adc,chanend c_torque_ctrl,chanend c_velocity_ctrl,chanend c_position_ctrl)
 {
 	int i = 0;
 	int mode = 2;
@@ -85,11 +122,19 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_hal
 
 	int init = 0;
 	int flag = 0;
-	csv_par csv_params;
+
+	csv_par 	csv_params;
+	ctrl_par 	velocity_ctrl_params;
+	qei_par 	qei_params;
+	hall_par 	hall_params;
+	int sensor_select;
+
 	unsigned int time;
 	int state;
 	int statusword;
 	int controlword;
+
+	int mode_selected = 0;
 	check_list checklist;
 
 	state 		= init_state(); 			//init state
@@ -115,138 +160,75 @@ t:>time;
 		statusword = update_statusword(statusword, state);
 		InOut.status_word = statusword;
 
-		switch(InOut.operation_mode)
+
+		//if(state == 3)
 		{
-			case CSV: 	//csv mode index
-				if(flag == 0)
-				{
-					init = init_velocity_control(c_velocity_ctrl);
-				}
-				if(init == 1)
-				{
-					flag = 1; mode = 4;
-				}
-				InOut.operation_mode_display = CSV;
-				//printstrln("csv");
-				target_velocity = get_target_velocity();
-				set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
 
-				actual_velocity = get_velocity(c_velocity_ctrl);
-				send_actual_velocity(actual_velocity);
+		}
+		if(mode_selected == 0)
+		{
+			switch(InOut.operation_mode)
+			{
+				case CSV: 	//csv mode index
+					//printstrln("CSV");
+					if(flag == 0)
+					{
+						init = init_velocity_control(c_velocity_ctrl); //init==1
+					}
+					if(init == 1)
+					{
+						flag = 1; mode = 4;
 
-				xscope_probe_data(0, actual_velocity);
-				xscope_probe_data(1, target_velocity);
-				break;
+						mode_selected = 1;
+						init_velocity_ctrl_ethercat(velocity_ctrl_params, coe_out);
+						sensor_select = sensor_select_sdo(coe_out);
+						init_csv_ethercat(csv_params, coe_out);
+						//init_qei_ethercat(qei_params, coe_out);				//init_hall_ethercat(hall_params, coe_out);
+//						printstrln("csv");
+//						printintln(velocity_ctrl_params.Kp_n);
+//						printintln(velocity_ctrl_params.Ki_n);
+//						printintln(velocity_ctrl_params.Kd_n);
+						set_velocity_ctrl_ethercat(velocity_ctrl_params, c_velocity_ctrl);
+						set_velocity_sensor_ethercat(sensor_select, c_velocity_ctrl);
+						InOut.operation_mode_display = CSV;
+					}
+					break;
+			}
+		}
+
+		if(mode_selected == 1)
+		{
+			switch(InOut.control_word)
+			{
+				case 0x000b: //quick stop
+
+					break;
+
+				case 0x000f: //switch on cyclic
+					//printstrln("cyclic");
+					target_velocity = get_target_velocity();
+					set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
+
+					actual_velocity = get_velocity(c_velocity_ctrl);
+					send_actual_velocity(actual_velocity);
+
+#ifdef ENABLE_xscope_main
+					xscope_probe_data(0, actual_velocity);
+					xscope_probe_data(1, target_velocity);
+#endif
+					break;
+
+				case 0x0006: //shutdown
+
+					break;
+
+			}
 		}
 		t when timerafter(time + MSEC_STD) :> time;
 
 	}
-
-
 }
 
-
-//test PVM
-void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
-{
-	int i;
-	int core_id = 1;
-
-	int steps;
-	int velocity_ramp;
-
-	int actual_velocity = 0;     // rpm
-	int target_velocity = 2000;	 // rpm
-	int acc = 8000;				 // rpm/s
-	int dec = 1050;				 // rpm/s
-
-	timer t;
-	unsigned time;
-
-	csv_par csv_params;
-
-	int init = 0;
-	int init_state = INIT_BUSY;
-
-	init_csv_param(csv_params);
-
-#ifdef ENABLE_xscope_main
-	xscope_initialise();
-#endif
-	while(1)
-	{
-		//printintln(init_state);
-		init_state = __check_commutation_init(c_signal);
-		if(init_state == INIT)
-		{
-			printstrln("comm intialized");
-			break;
-		}
-	}
-	if(init_state == INIT)
-	{
-		init_state = INIT_BUSY;
-		init_state = init_velocity_control(c_velocity_ctrl);
-		if(init_state == INIT)
-			printstrln("velocity control intialized");
-		else
-			printstrln("intialize velocity control failed");
-	}
-
-	if(init_state == INIT)
-	{
-
-		steps = init_velocity_profile(target_velocity, actual_velocity * csv_params.polarity, acc, dec);
-
-		for(i = 1; i < steps; i++)
-		{
-			wait_ms(1, core_id, t);
-
-			velocity_ramp = velocity_profile_generate(i);
-			set_velocity_csv(csv_params, velocity_ramp, 0, 0, c_velocity_ctrl);
-
-			actual_velocity = get_velocity(c_velocity_ctrl);
-
-			xscope_probe_data(0, actual_velocity);
-			xscope_probe_data(1, velocity_ramp);
-		}
-
-		wait_s(2, core_id, t);  // wait 2 seconds
-
-		actual_velocity = get_velocity(c_velocity_ctrl);	// rpm
-		target_velocity = 0; 								// rpm
-		acc = 8000; 										// rpm/s
-		dec = 1050;											// rpm/s
-
-		steps = init_velocity_profile(target_velocity, actual_velocity * csv_params.polarity, acc, dec);
-
-		for(i = 1; i < steps; i++)
-		{
-			wait_ms(1, core_id, t);
-
-			velocity_ramp = velocity_profile_generate(i);
-			set_velocity_csv(csv_params, velocity_ramp, 0, 0, c_velocity_ctrl);
-
-			actual_velocity = get_velocity(c_velocity_ctrl);
-
-			xscope_probe_data(0, actual_velocity);
-			xscope_probe_data(1, velocity_ramp);
-
-		}
-
-		while(1)
-		{
-			wait_ms(1, core_id, t);
-
-			set_velocity_csv(csv_params, velocity_ramp, 0, 0, c_velocity_ctrl);
-
-			actual_velocity = get_velocity(c_velocity_ctrl);
-
-			xscope_probe_data(0, actual_velocity);
-			xscope_probe_data(1, velocity_ramp);
-		}
-	}
-}
 
 int main(void) {
 	chan c_adc, c_adctrig;
@@ -286,12 +268,12 @@ int main(void) {
 
 		on stdcore[0] :
 		{
-			//ether_comm(pdo_out, pdo_in, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+			ether_comm(pdo_out, pdo_in, coe_out, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 			// test CSV over ethercat with PVM on master side
 		}
 		on stdcore[1]:
 		{
-			profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
+			//profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
 
 			/*par
 			{
