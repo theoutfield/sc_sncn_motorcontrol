@@ -158,7 +158,7 @@ int init_state(void) {
 /**
  *
  */
-int update_statusword(int current_status, int state_reached) {
+int update_statusword(int current_status, int state_reached, int ack) {
 	int status_word;
 
 	switch (state_reached) {
@@ -199,6 +199,8 @@ int update_statusword(int current_status, int state_reached) {
 		break;
 
 	}
+	if(ack == 1)
+		return status_word|TARGET_REACHED;
 	return status_word;
 }
 
@@ -297,8 +299,8 @@ int get_next_state(int in_state, check_list &checklist, int controlword) {
 	case 6:
 		if (checklist.fault == true)
 			out_state = 5;
-		else
-			out_state = 2;
+		//else
+		//	out_state = 2;
 #ifdef print_slave
 		printstr("updated state ");
 		printhexln(in_state);

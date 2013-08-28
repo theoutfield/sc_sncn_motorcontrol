@@ -112,8 +112,9 @@ void send_actual_velocity(int actual_velocity)
 void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall_p4,chanend c_qei_p4,chanend c_adc,chanend c_torque_ctrl,chanend c_velocity_ctrl,chanend c_position_ctrl)
 {
 	int i = 0;
-	int mode = 2;
+	int mode=40;
 	int core_id = 0;
+	int steps;
 
 	int target_velocity;
 	int actual_velocity = 0;
@@ -127,6 +128,7 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	ctrl_par 	velocity_ctrl_params;
 	qei_par 	qei_params;
 	hall_par 	hall_params;
+	int ack;
 	int sensor_select;
 
 	unsigned int time;
@@ -144,7 +146,7 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	init_csv_param(csv_params);
 
 #ifdef ENABLE_xscope_main
-	xscope_initialise();
+ //xscope_initialise();
 #endif
 t:>time;
 	while(1)
@@ -157,7 +159,7 @@ t:>time;
 	//	printintln(controlword);
 
 		state = get_next_state(state, checklist, controlword);
-		statusword = update_statusword(statusword, state);
+		statusword = update_statusword(statusword, state, ack);
 		InOut.status_word = statusword;
 
 
@@ -174,17 +176,20 @@ t:>time;
 					if(flag == 0)
 					{
 						init = init_velocity_control(c_velocity_ctrl); //init==1
+
 					}
 					if(init == 1)
 					{
-						flag = 1; mode = 4;
-
+						flag = 1;
+						enable_velocity_ctrl(c_velocity_ctrl);
 						mode_selected = 1;
-						init_velocity_ctrl_ethercat(velocity_ctrl_params, coe_out);
-						sensor_select = sensor_select_sdo(coe_out);
-						init_csv_ethercat(csv_params, coe_out);
+						ack = 0;
+					init_velocity_ctrl_ethercat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
+					sensor_select = sensor_select_sdo(coe_out);
+					init_csv_ethercat(csv_params, coe_out);
+
 						//init_qei_ethercat(qei_params, coe_out);				//init_hall_ethercat(hall_params, coe_out);
-//						printstrln("csv");
+					printstrln("csv");
 //						printintln(velocity_ctrl_params.Kp_n);
 //						printintln(velocity_ctrl_params.Ki_n);
 //						printintln(velocity_ctrl_params.Kd_n);
@@ -193,15 +198,22 @@ t:>time;
 						InOut.operation_mode_display = CSV;
 					}
 					break;
+
 			}
 		}
-
+		//printhexln(InOut.control_word);
 		if(mode_selected == 1)
 		{
 			switch(InOut.control_word)
 			{
 				case 0x000b: //quick stop
-
+					//printstrln("quick stop");
+					actual_velocity = get_velocity(c_velocity_ctrl);
+					steps = init_quick_stop_velocity_profile(actual_velocity, 1000);//default acc
+//
+//					//quick_stop_velocity_profile_generate( step);
+					i = 0;
+					mode_selected = 3;// non interruptible mode
 					break;
 
 				case 0x000f: //switch on cyclic
@@ -213,15 +225,71 @@ t:>time;
 					send_actual_velocity(actual_velocity);
 
 #ifdef ENABLE_xscope_main
-					xscope_probe_data(0, actual_velocity);
-					xscope_probe_data(1, target_velocity);
+//					xscope_probe_data(0, actual_velocity);
+//					xscope_probe_data(1, target_velocity);
 #endif
 					break;
 
 				case 0x0006: //shutdown
-
+					//deactivate
+					shutdown_velocity_ctrl(c_velocity_ctrl);
+					ack = 1;
+					flag = 0; init = 0;
+					mode_selected = 0;  // to reenable the op selection and reset the controller
 					break;
 
+			}
+		}
+		if(mode_selected == 3) // non interrupt
+		{
+			//printintln(mode_selected);
+			//printintln(steps);
+
+
+			while(i < steps)
+			{
+				target_velocity = quick_stop_velocity_profile_generate(i);
+				set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
+				actual_velocity = get_velocity(c_velocity_ctrl);
+#ifdef ENABLE_xscope_main
+//					xscope_probe_data(0, actual_velocity);
+//					xscope_probe_data(1, target_velocity);
+#endif
+
+
+
+				t when timerafter(time + MSEC_STD) :> time;
+				i++;
+			}
+			if(i >= steps)
+			{
+				if(actual_velocity < 50 || actual_velocity > -50)
+				{
+					//printstrln("stopped");
+
+					state = 2;
+					statusword = update_statusword(statusword, state, ack);
+					InOut.status_word = statusword;
+					ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
+					mode_selected = 100;
+					flag = 0; init = 0;
+				}
+			}
+
+
+		}
+		if(mode_selected ==100)
+		{
+			ack = 1;
+			statusword = update_statusword(statusword, state, ack);
+			InOut.status_word = statusword;
+			//ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
+			switch(InOut.operation_mode)
+			{
+				case 100: mode_selected = 0;
+					ack = 0;
+					InOut.operation_mode_display = 100;
+					break;
 			}
 		}
 		t when timerafter(time + MSEC_STD) :> time;
@@ -266,7 +334,7 @@ int main(void) {
 			//firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}
 
-		on stdcore[0] :
+		on stdcore[1] :
 		{
 			ether_comm(pdo_out, pdo_in, coe_out, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 			// test CSV over ethercat with PVM on master side
@@ -330,7 +398,7 @@ int main(void) {
 					 init_qei_param(qei_params);
 
 					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,\
-							 qei_params, 1, c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
+							 qei_params, 2, c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
 				 }
 			}
 		}

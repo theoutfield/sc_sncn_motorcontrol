@@ -18,10 +18,13 @@
 #define QEI 2
 #define FILTER_SIZE 8                           //default
 #define FILTER_SIZE_MAX 16
-#define SET_VELOCITY_TOKEN 50
-#define GET_VELOCITY_TOKEN 60
-#define SET_CTRL_PARAMETER 100
-#define SENSOR_SELECT      150
+
+#define SET_VELOCITY_TOKEN 	50
+#define GET_VELOCITY_TOKEN 	60
+#define SET_CTRL_PARAMETER 	100
+#define SENSOR_SELECT      	150
+#define SHUTDOWN_VEL	 	200
+#define ENABLE_VEL			250
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {
@@ -101,6 +104,18 @@ void set_velocity_sensor_ethercat(int sensor_used, chanend c_velocity_ctrl)
 	VELOCITY_CTRL_WRITE(SENSOR_SELECT);
 	VELOCITY_CTRL_WRITE(sensor_used);
 }
+
+void shutdown_velocity_ctrl(chanend c_velocity_ctrl)
+{
+	VELOCITY_CTRL_WRITE(SHUTDOWN_VEL);
+	VELOCITY_CTRL_WRITE(1);
+}
+
+void enable_velocity_ctrl(chanend c_velocity_ctrl)
+{
+	VELOCITY_CTRL_WRITE(ENABLE_VEL);
+	VELOCITY_CTRL_WRITE(0);
+}
 void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
 		 	 	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation)
 {
@@ -136,7 +151,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 	int cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);		  // variable qei_real_max  core 2/1/0 only
 
 	int command;
-
+	int deactivate = 0;
 	int activate = 0;
 	int init_state = INIT_BUSY;
 
@@ -274,7 +289,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 					velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
 
 
-
+				if(!deactivate)
 				set_commutation_sinusoidal(c_commutation, velocity_control_out);
 
 				previous_error = error_velocity;
@@ -307,6 +322,12 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 				}
 				else if(command == SENSOR_SELECT)
 					VELOCITY_CTRL_READ(sensor_used);
+
+				else if(command == SHUTDOWN_VEL)
+					VELOCITY_CTRL_READ(deactivate);
+
+				else if(command == ENABLE_VEL)
+					VELOCITY_CTRL_READ(deactivate);
 				break;
 
 		}
