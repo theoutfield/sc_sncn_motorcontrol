@@ -53,7 +53,32 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 ctrl_proto_values_t InOut;
 
 
+void fu(chanend c_signal)
+{				int command;
+int init_state = INIT_BUSY;
+while(1)
+{
+#pragma ordered
+	select
+	{
+		case c_signal :> command:  //
+			if(command == 10)
+			{
+				c_signal <: init_state;
+			}
+			else if(command == 20)
+			{
+				//c_signal :> hall_params.gear_ratio;
+				//c_signal :> hall_params.pole_pairs;
+			}
+			break;
 
+		default:
+			break;
+
+	}
+}
+}
 
 
 int main(void)
@@ -121,15 +146,15 @@ int main(void)
 			t :> time;
 			while(1)
 			{
-				ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
-				t when timerafter(time + MSEC_STD) :> time;
+//				ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
+//				t when timerafter(time + MSEC_STD) :> time;
 
 				controlword = InOut.control_word;
 				update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 				printintln(controlword);
 
 				state = get_next_state(state, checklist, controlword);
-				statusword = update_statusword(statusword, state);
+				statusword = update_statusword(statusword, state, 0);
 				InOut.status_word = statusword;
 			}
 		}
@@ -145,7 +170,7 @@ int main(void)
 					 hall_par hall_params;
 					 qei_par qei_params;
 
-					 init_velocity_control_param(velocity_ctrl_params);
+					// init_velocity_control_param(velocity_ctrl_params);
 					 init_sensor_filter_param(sensor_filter_params);
 					 init_hall_param(hall_params);
 					 init_qei_param(qei_params);
@@ -160,7 +185,7 @@ int main(void)
 					 hall_par hall_params;
 					 qei_par qei_params;
 
-					 init_position_control_param(position_ctrl_params);
+					// init_position_control_param(position_ctrl_params);
 					 init_hall_param(hall_params);
 					 init_qei_param(qei_params);
 
@@ -178,30 +203,32 @@ int main(void)
 			par
 			{
 
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia,
-						p_ifm_adc_misoa, p_ifm_adc_misob);
+//				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia,
+//						p_ifm_adc_misoa, p_ifm_adc_misob);
 
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				{
 					hall_par hall_params;
-					init_hall_param(hall_params);
+					//init_hall_param(hall_params);
+					fu(c_signal);
+
 					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
 							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
 				}
 
-				{
-					hall_par hall_params;
-					init_hall_param(hall_params);
-					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
-				}
-
-				{
-					qei_par qei_params;
-					init_qei_param(qei_params);
-					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3 , c_qei_p4);  // channel priority 1,2..4
-				}
+//				{
+//					hall_par hall_params;
+//					init_hall_param(hall_params);
+//					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+//				}
+//
+//				{
+//					qei_par qei_params;
+//					init_qei_param(qei_params);
+//					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3 , c_qei_p4);  // channel priority 1,2..4
+//				}
 
 			}
 		}

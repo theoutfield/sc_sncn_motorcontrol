@@ -24,8 +24,8 @@
  *
  **************************************************************************/
 
-#ifndef __DC_MOTOR_CONFIG__H__test1
-#define __DC_MOTOR_CONFIG__H__test1
+#ifndef __DC_MOTOR_CONFIG__H__test2
+#define __DC_MOTOR_CONFIG__H__test2
 #include <print.h>
 
 
@@ -63,6 +63,11 @@
 #define POSITION_Kd_NUMERATOR    	100
 #define POSITION_Kd_DENOMINATOR  	10000
 
+
+
+#define HALL 						1
+#define QEI_INDEX  					2
+#define QEI_NO_INDEX				3
 /*Somanet IFM Internal Config*/
 #define DC100_RESOLUTION 	740
 #define DC900_RESOLUTION	264

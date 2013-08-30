@@ -29,6 +29,6 @@
 {int, int} get_qei_position_count(chanend c_qei);
 
 
-
+extern int __qei_max_counts(int real_counts);
 
 #endif /* __QEI_CLIENT_H__ */

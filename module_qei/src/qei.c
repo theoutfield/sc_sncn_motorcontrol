@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 
-int __qei_max_counts(int real_counts)
+extern int __qei_max_counts(int real_counts)
 {
 	int max_counts;
 	double max_counts_power = log10( (double)real_counts)/log10(2.0);

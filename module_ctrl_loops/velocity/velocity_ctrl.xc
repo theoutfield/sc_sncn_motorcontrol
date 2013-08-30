@@ -87,7 +87,7 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 }
 
 
-void set_velocity_ctrl_ethercat(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl)
+void init_velocity_ctrl_param_ethercat(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl)
 {
 	VELOCITY_CTRL_WRITE(SET_CTRL_PARAMETER);
 	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Kp_n);
@@ -99,7 +99,7 @@ void set_velocity_ctrl_ethercat(ctrl_par &velocity_ctrl_params, chanend c_veloci
 	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Integral_limit);
 }
 
-void set_velocity_sensor_ethercat(int sensor_used, chanend c_velocity_ctrl)
+void init_velocity_sensor_ethercat(int sensor_used, chanend c_velocity_ctrl)
 {
 	VELOCITY_CTRL_WRITE(SENSOR_SELECT);
 	VELOCITY_CTRL_WRITE(sensor_used);

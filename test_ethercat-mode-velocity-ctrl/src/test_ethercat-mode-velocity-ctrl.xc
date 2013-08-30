@@ -37,7 +37,6 @@
 #include <flash_somanet.h>
 #include <internal_config.h>
 #include <ctrlproto.h>
-
 #include <drive_config.h>
 
 
@@ -57,6 +56,7 @@ void init_hall_ethercat(hall_par &hall_params, chanend coe_out)
 void init_qei_ethercat(qei_par &qei_params, chanend coe_out)
 {
 	{qei_params.real_counts, qei_params.gear_ratio, qei_params.index} = qei_sdo_update(coe_out);
+	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
 }
 
 void init_csv_ethercat(csv_par &csv_params, chanend coe_out)
@@ -184,17 +184,34 @@ t:>time;
 						enable_velocity_ctrl(c_velocity_ctrl);
 						mode_selected = 1;
 						ack = 0;
-					init_velocity_ctrl_ethercat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
-					sensor_select = sensor_select_sdo(coe_out);
-					init_csv_ethercat(csv_params, coe_out);
+						init_velocity_ctrl_ethercat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
+						sensor_select = sensor_select_sdo(coe_out);
 
-						//init_qei_ethercat(qei_params, coe_out);				//init_hall_ethercat(hall_params, coe_out);
-					printstrln("csv");
-//						printintln(velocity_ctrl_params.Kp_n);
-//						printintln(velocity_ctrl_params.Ki_n);
-//						printintln(velocity_ctrl_params.Kd_n);
-						set_velocity_ctrl_ethercat(velocity_ctrl_params, c_velocity_ctrl);
-						set_velocity_sensor_ethercat(sensor_select, c_velocity_ctrl);
+						if(sensor_select == HALL)
+						{
+							printstrln("HALL");
+							init_hall_ethercat(hall_params, coe_out);
+							printintln(hall_params.gear_ratio);
+							printintln(hall_params.pole_pairs);
+						}
+						else if(sensor_select == QEI_INDEX || sensor_select == QEI_NO_INDEX)
+						{
+							printstrln("QEI");
+							init_qei_ethercat(qei_params, coe_out);
+							printintln(qei_params.gear_ratio);
+							printintln(qei_params.index);
+							printintln(qei_params.real_counts);
+							printintln(qei_params.max_count);
+						}
+						init_csv_ethercat(csv_params, coe_out);
+//												printintln(velocity_ctrl_params.Kp_n);
+//												printintln(velocity_ctrl_params.Ki_n);
+//												printintln(velocity_ctrl_params.Kd_n);
+
+
+
+						init_velocity_ctrl_param_ethercat(velocity_ctrl_params, c_velocity_ctrl);
+						init_velocity_sensor_ethercat(sensor_select, c_velocity_ctrl);
 						InOut.operation_mode_display = CSV;
 					}
 					break;
@@ -338,47 +355,6 @@ int main(void) {
 		{
 			ether_comm(pdo_out, pdo_in, coe_out, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 			// test CSV over ethercat with PVM on master side
-		}
-		on stdcore[1]:
-		{
-			//profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
-
-			/*par
-			{
-
-				{
-					{
-						int init_state = INIT_BUSY;
-
-						while(1)
-						{
-							//printintln(init_state);
-							init_state = __check_commutation_init(c_signal);
-							if(init_state == INIT)
-							{
-								printstrln("comm intialized");
-								break;
-							}
-						}
-
-						init_state = INIT_BUSY;
-
-						c_velocity_ctrl <: 1;
-						while(1)
-						{
-							printintln(init_state);
-							init_state = __check_velocity_init(c_velocity_ctrl);
-							if(init_state == INIT)
-							{
-								printstrln("vel intialized");
-								break;
-							}
-						}
-
-
-					}
-				}
-			}*/
 		}
 
 		on stdcore[2]:
