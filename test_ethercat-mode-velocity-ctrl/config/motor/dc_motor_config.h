@@ -51,23 +51,18 @@
 #define MIN_POSITION_LIMIT -359
 
 /*External Controller Configs*/
-#define VELOCITY_KP				 	8192
-#define VELOCITY_KI    				819
+#define VELOCITY_KP				 	0       	// 5/10 * 16384
+#define VELOCITY_KI    				0			// 5/100 * 16384
 #define VELOCITY_KD				   	0
 
-/*External Configs*/
-#define POSITION_Kp_NUMERATOR 	 	180
-#define POSITION_Kp_DENOMINATOR  	2000
-#define POSITION_Ki_NUMERATOR    	50
-#define POSITION_Ki_DENOMINATOR  	102000
-#define POSITION_Kd_NUMERATOR    	100
-#define POSITION_Kd_DENOMINATOR  	10000
-
-
+#define POSITION_KP	 				1474		//180/ 	2000) * 16384
+#define POSITION_KI   				8			//50/ 	102000) * 16384
+#define POSITION_KD    				164			//100/ 	10000) * 16384
 
 #define HALL 						1
 #define QEI_INDEX  					2
 #define QEI_NO_INDEX				3
+
 /*Somanet IFM Internal Config*/
 #define DC100_RESOLUTION 	740
 #define DC900_RESOLUTION	264

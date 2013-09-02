@@ -55,7 +55,7 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 	velocity_ctrl_params.Control_limit = 13739; //default
 
 	if(velocity_ctrl_params.Ki_n != 0)    							//auto calculated using control_limit
-		velocity_ctrl_params.Integral_limit = (velocity_ctrl_params.Control_limit * velocity_ctrl_params.Ki_d)/velocity_ctrl_params.Ki_n ;
+		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
 	else
 		velocity_ctrl_params.Integral_limit = 0;
 
@@ -77,7 +77,7 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 
 	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
 	{
-		position_ctrl_params.Integral_limit = (position_ctrl_params.Control_limit * position_ctrl_params.Ki_d)/position_ctrl_params.Ki_n ;
+		position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n);
 	}
 	else
 	{

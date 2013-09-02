@@ -65,19 +65,19 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 void init_position_control_param(ctrl_par &position_ctrl_params)
 {
 
-	position_ctrl_params.Kp_n = POSITION_Kp_NUMERATOR;
-	position_ctrl_params.Kp_d = POSITION_Kp_DENOMINATOR;
-	position_ctrl_params.Ki_n = POSITION_Ki_NUMERATOR;
-	position_ctrl_params.Ki_d = POSITION_Ki_DENOMINATOR;
-	position_ctrl_params.Kd_n = POSITION_Kd_NUMERATOR;
-	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
+	position_ctrl_params.Kp_n = POSITION_KP;
+	position_ctrl_params.Kp_d = 16384;
+	position_ctrl_params.Ki_n = POSITION_KI;
+	position_ctrl_params.Ki_d = 16384;
+	position_ctrl_params.Kd_n = POSITION_KD;
+	position_ctrl_params.Kd_d = 16384;
 	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - for CORE 2/1/0 only default
 
 	position_ctrl_params.Control_limit = 13739; 							 // default do not change
 
 	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
 	{
-		position_ctrl_params.Integral_limit = (position_ctrl_params.Control_limit * position_ctrl_params.Ki_d)/position_ctrl_params.Ki_n ;
+		position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n) ;
 	}
 	else
 	{

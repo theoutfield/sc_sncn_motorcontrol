@@ -14,7 +14,10 @@
 #define HALL_PRECISION		2
 #define QEI_PRECISION		512
 
-
+#define SET_CTRL_PARAMETER 	101
+#define SENSOR_SELECT      	151
+#define SHUTDOWN_POS	 	201
+#define ENABLE_POS			251
 
 
 
@@ -83,6 +86,36 @@ void set_position_csp(csp_par &csp_params, int target_position, int position_off
 }
 
 
+void init_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend c_position_ctrl)
+{
+	POSITION_CTRL_WRITE(SET_CTRL_PARAMETER);
+	POSITION_CTRL_WRITE(position_ctrl_params.Kp_n);
+	POSITION_CTRL_WRITE(position_ctrl_params.Kp_d);
+	POSITION_CTRL_WRITE(position_ctrl_params.Ki_n);
+	POSITION_CTRL_WRITE(position_ctrl_params.Ki_d);
+	POSITION_CTRL_WRITE(position_ctrl_params.Kd_n);
+	POSITION_CTRL_WRITE(position_ctrl_params.Kd_d);
+	POSITION_CTRL_WRITE(position_ctrl_params.Integral_limit);
+}
+
+void init_position_sensor_ecat(int sensor_used, chanend c_position_ctrl)
+{
+	POSITION_CTRL_WRITE(SENSOR_SELECT);
+	POSITION_CTRL_WRITE(sensor_used);
+}
+
+void shutdown_position_ctrl(chanend c_position_ctrl)
+{
+	POSITION_CTRL_WRITE(SHUTDOWN_POS);
+	POSITION_CTRL_WRITE(1);
+}
+
+void enable_position_ctrl(chanend c_position_ctrl)
+{
+	POSITION_CTRL_WRITE(ENABLE_POS);
+	POSITION_CTRL_WRITE(0);
+}
+
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used, \
 		              chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation)
 {
@@ -99,6 +132,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 	unsigned int time;
 
 	int command;
+	int deactivate = 0;
 	int activate = 0;
 	int direction = 0;
 
@@ -208,7 +242,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 					position_control_out = 0 - position_ctrl_params.Control_limit;
 				}
 
-
+				if(!deactivate)
 				set_commutation_sinusoidal(c_commutation, position_control_out);
 
 				#ifdef DEBUG
@@ -235,6 +269,35 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 				{
 					POSITION_CTRL_WRITE(init_state);
 				}
+				else if(command == SET_CTRL_PARAMETER)
+				{
+					POSITION_CTRL_READ(position_ctrl_params.Kp_n);
+					POSITION_CTRL_READ(position_ctrl_params.Kp_d);
+					POSITION_CTRL_READ(position_ctrl_params.Ki_n);
+					POSITION_CTRL_READ(position_ctrl_params.Ki_d);
+					POSITION_CTRL_READ(position_ctrl_params.Kd_n);
+					POSITION_CTRL_READ(position_ctrl_params.Kd_d);
+					POSITION_CTRL_READ(position_ctrl_params.Integral_limit);
+				}
+				else if(command == SENSOR_SELECT)
+				{
+					POSITION_CTRL_READ(sensor_used);
+					if(sensor_used == HALL)
+					{
+						precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
+						precision = HALL_PRECISION;
+					}
+					else if(sensor_used == QEI)
+					{
+						precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
+						precision = QEI_PRECISION;
+					}
+				}
+				else if(command == SHUTDOWN_POS)
+					POSITION_CTRL_READ(deactivate);
+
+				else if(command == ENABLE_POS)
+					POSITION_CTRL_READ(deactivate);
 				break;
 		}
 

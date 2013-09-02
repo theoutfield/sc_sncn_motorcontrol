@@ -51,11 +51,14 @@
 #define MIN_POSITION_LIMIT -359
 
 /*External Controller Configs*/
-#define VELOCITY_KP				 	8192
-#define VELOCITY_KI    				819
-#define VELOCITY_KD				   	0
+#define VELOCITY_Kp_NUMERATOR 	 	5
+#define VELOCITY_Kp_DENOMINATOR  	10
+#define VELOCITY_Ki_NUMERATOR    	5
+#define VELOCITY_Ki_DENOMINATOR  	100
+#define VELOCITY_Kd_NUMERATOR    	0
+#define VELOCITY_Kd_DENOMINATOR  	1
 
-/*External Configs*/
+
 #define POSITION_Kp_NUMERATOR 	 	180
 #define POSITION_Kp_DENOMINATOR  	2000
 #define POSITION_Ki_NUMERATOR    	50

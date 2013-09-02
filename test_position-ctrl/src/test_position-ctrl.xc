@@ -7,7 +7,7 @@
  *
  * \author Martin Schwarz <mschwarz@synapticon.com>
  * \version 0.1 (2012-11-23 1850)
- *\Motor 3 motion profile size optimized code for position ctrl loops
+ *
  */
 
 #include <xs1.h>

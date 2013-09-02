@@ -71,7 +71,7 @@ void send_actual_velocity(int actual_velocity)
 	InOut.velocity_actual = actual_velocity;
 }
 
-
+/*
 void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_hall_p4,chanend c_qei_p4,chanend c_adc,chanend c_torque_ctrl,chanend c_velocity_ctrl,chanend c_position_ctrl)
 {
 	int i = 0;
@@ -144,7 +144,7 @@ t:>time;
 
 
 }
-
+*/
 
 //test PVM
 void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
