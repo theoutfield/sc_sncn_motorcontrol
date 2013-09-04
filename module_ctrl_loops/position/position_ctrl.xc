@@ -98,6 +98,23 @@ void init_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend c_pos
 	POSITION_CTRL_WRITE(position_ctrl_params.Integral_limit);
 }
 
+void init_position_ctrl_hall(hall_par &hall_params, chanend c_position_ctrl)
+{
+	c_position_ctrl <: SET_POS_CTRL_HALL;
+	c_position_ctrl <: hall_params.gear_ratio;
+	c_position_ctrl <: hall_params.pole_pairs;
+}
+
+void init_position_ctrl_qei(qei_par &qei_params, chanend c_position_ctrl)
+{
+	c_position_ctrl <: SET_POS_CTRL_QEI;
+	c_position_ctrl <: qei_params.gear_ratio;
+	c_position_ctrl <: qei_params.index;
+	c_position_ctrl <: qei_params.real_counts;
+	c_position_ctrl <: qei_params.max_count;
+}
+
+
 void init_position_sensor_ecat(int sensor_used, chanend c_position_ctrl)
 {
 	POSITION_CTRL_WRITE(SENSOR_SELECT);
@@ -298,6 +315,19 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
 				else if(command == ENABLE_POS)
 					POSITION_CTRL_READ(deactivate);
+
+				else if(command == SET_POS_CTRL_HALL)
+				{
+					c_position_ctrl :> hall_params.gear_ratio;
+					c_position_ctrl :> hall_params.pole_pairs;
+				}
+				else if(command == SET_POS_CTRL_QEI)
+				{
+					c_position_ctrl :> qei_params.gear_ratio;
+					c_position_ctrl :> qei_params.index;
+					c_position_ctrl :> qei_params.real_counts;
+					c_position_ctrl :> qei_params.max_count;
+				}
 				break;
 		}
 

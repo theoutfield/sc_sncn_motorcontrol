@@ -36,7 +36,8 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 //ethercat
 void init_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl);
 void init_velocity_sensor_ecat(int sensor_used, chanend c_velocity_ctrl);
-
+void init_velocity_ctrl_hall(hall_par &hall_params, chanend c_velocity_ctrl);
+void init_velocity_ctrl_qei(qei_par &qei_params, chanend c_velocity_ctrl);
 
 
 

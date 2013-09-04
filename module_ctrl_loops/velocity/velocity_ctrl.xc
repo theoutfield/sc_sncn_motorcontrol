@@ -99,6 +99,22 @@ void init_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend c_vel
 	VELOCITY_CTRL_WRITE(velocity_ctrl_params.Integral_limit);
 }
 
+void init_velocity_ctrl_hall(hall_par &hall_params, chanend c_velocity_ctrl)
+{
+	VELOCITY_CTRL_WRITE(SET_VEL_CTRL_HALL);
+	VELOCITY_CTRL_WRITE(hall_params.gear_ratio);
+	VELOCITY_CTRL_WRITE(hall_params.pole_pairs);
+}
+
+void init_velocity_ctrl_qei(qei_par &qei_params, chanend c_velocity_ctrl)
+{
+	VELOCITY_CTRL_WRITE(SET_VEL_CTRL_QEI);
+	VELOCITY_CTRL_WRITE(qei_params.gear_ratio);
+	VELOCITY_CTRL_WRITE(qei_params.index);
+	VELOCITY_CTRL_WRITE(qei_params.real_counts);
+	VELOCITY_CTRL_WRITE(qei_params.max_count);
+}
+
 void init_velocity_sensor_ecat(int sensor_used, chanend c_velocity_ctrl)
 {
 	VELOCITY_CTRL_WRITE(SENSOR_SELECT);
@@ -329,6 +345,19 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 				else if(command == ENABLE_VEL)
 					VELOCITY_CTRL_READ(deactivate);
+
+				else if(command == SET_VEL_CTRL_HALL)
+				{
+					VELOCITY_CTRL_READ(hall_params.gear_ratio);
+					VELOCITY_CTRL_READ(hall_params.pole_pairs);
+				}
+				else if(command == SET_VEL_CTRL_QEI)
+				{
+					VELOCITY_CTRL_READ(qei_params.gear_ratio);
+					VELOCITY_CTRL_READ(qei_params.index);
+					VELOCITY_CTRL_READ(qei_params.real_counts);
+					VELOCITY_CTRL_READ(qei_params.max_count);
+				}
 				break;
 
 		}

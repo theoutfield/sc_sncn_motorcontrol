@@ -25,6 +25,10 @@
 #define SET_COMM_PARAM_ECAT 20
 #define SET_HALL_PARAM_ECAT 21
 #define SET_QEI_PARAM_ECAT  22
+#define SET_POS_CTRL_HALL 	23
+#define SET_POS_CTRL_QEI	24
+#define SET_VEL_CTRL_HALL 	25
+#define SET_VEL_CTRL_QEI	26
 
 #define SUCCESS 1
 #define ERROR   0 //based on timeout for success

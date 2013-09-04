@@ -48,7 +48,6 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-
 void xscope_initialise()
 {
 	{
@@ -106,6 +105,7 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	ctrl_par	position_ctrl_params;
 	csp_par 	csp_params;
 
+	int setup_loop_flag = 0;
 	int sense;
 
 	int ack = 0;
@@ -134,30 +134,38 @@ t:>time;
 	{
 		ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 
-	//	wait_ms(1, core_id, t);
+
 		controlword = InOut.control_word;
 		update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
-		//printintln(controlword);
 
 		state = get_next_state(state, checklist, controlword);
 		statusword = update_statusword(statusword, state, ack);
 		InOut.status_word = statusword;
 
 
-		//if(state == 3)
+		if(setup_loop_flag == 0)
 		{
+			if(controlword == 6)
+			{
+				update_hall_param_ecat(hall_params, coe_out);
+				update_qei_param_ecat(qei_params, coe_out);
+				sensor_select = sensor_select_sdo(coe_out);
 
+				set_commutation_param_ecat(c_signal, hall_params);
+				set_hall_param_ecat(c_hall_p4, hall_params);
+				set_qei_param_ecat(c_qei_p4, qei_params);
+
+				setup_loop_flag = 1;
+			}
 		}
 		if(mode_selected == 0)
 		{
 			switch(InOut.operation_mode)
 			{
 				case CSP:
-
-					//printstrln("CSP");
 					if(op_set_flag == 0)
 					{
-						init = init_position_control(c_position_ctrl); //init==1
+						init = init_position_control(c_position_ctrl);
 					}
 					if(init == INIT)
 					{
@@ -167,31 +175,32 @@ t:>time;
 						op_mode = CSP;
 						ack = 0;
 
-					//	update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
-					//	sensor_select = sensor_select_sdo(coe_out);
-					//	update_csp_param_ecat(csp_params, coe_out);
+						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
+						sensor_select = sensor_select_sdo(coe_out);
+						update_csp_param_ecat(csp_params, coe_out);
 
-//						printintln(position_ctrl_params.Control_limit);						printintln(position_ctrl_params.Integral_limit);
-//						printintln(position_ctrl_params.Kd_d);						printintln(position_ctrl_params.Ki_d);
-//						printintln(position_ctrl_params.Kp_d);						printintln(position_ctrl_params.Kp_n);
-//						printintln(position_ctrl_params.Ki_n);						printintln(position_ctrl_params.Kd_n);
-//						printintln(position_ctrl_params.Loop_time);
-//						printintln(csp_params.base.max_motor_speed);						printintln(csp_params.base.nominal_current);
-//						printintln(csp_params.base.polarity);						printintln(csp_params.max_position_limit);
-//						printintln(csp_params.min_position_limit);
-//						printintln(sensor_select);
+						if(sensor_select == HALL)
+						{
+							update_hall_param_ecat(hall_params, coe_out);
+							init_position_ctrl_hall(hall_params, c_position_ctrl);
+						}
+						else if(sensor_select == QEI_INDEX || sensor_select == QEI_NO_INDEX)
+						{
+							update_qei_param_ecat(qei_params, coe_out);
+							init_position_ctrl_qei(qei_params, c_position_ctrl);
+						}
 
-					//	init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
-					//	init_position_sensor_ecat(sensor_select, c_position_ctrl);
+						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
+						init_position_sensor_ecat(sensor_select, c_position_ctrl);
+
 						InOut.operation_mode_display = CSP;
 					}
 					break;
 
 				case CSV: 	//csv mode index
-					//printstrln("CSV");
 					if(op_set_flag == 0)
 					{
-						init = init_velocity_control(c_velocity_ctrl); //init==1
+						init = init_velocity_control(c_velocity_ctrl);
 
 					}
 					if(init == 1)
@@ -202,34 +211,24 @@ t:>time;
 						op_mode = CSV;
 						ack = 0;
 
-					//	update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
-					//	sensor_select = sensor_select_sdo(coe_out);
-					//	update_csv_param_ecat(csv_params, coe_out);
-//
-//						if(sensor_select == HALL)
-//						{
-//							printstrln("HALL");
-//							update_hall_param_ecat(hall_params, coe_out);
-//							printintln(hall_params.gear_ratio);
-//							printintln(hall_params.pole_pairs);
-//						}
-//						else if(sensor_select == QEI_INDEX || sensor_select == QEI_NO_INDEX)
-//						{
-//							printstrln("QEI");
-//							update_qei_param_ecat(qei_params, coe_out);
-//							printintln(qei_params.gear_ratio);
-//							printintln(qei_params.index);
-//							printintln(qei_params.real_counts);
-//							printintln(qei_params.max_count);
-//						}
+						update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
+						sensor_select = sensor_select_sdo(coe_out);
+						update_csv_param_ecat(csv_params, coe_out);
 
-//						printintln(velocity_ctrl_params.Kp_n);	printintln(velocity_ctrl_params.Ki_n);
-//						printintln(velocity_ctrl_params.Kd_n);
+						if(sensor_select == HALL)
+						{
+							update_hall_param_ecat(hall_params, coe_out);
+							init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
+						}
+						else if(sensor_select == QEI_INDEX || sensor_select == QEI_NO_INDEX)
+						{
+							update_qei_param_ecat(qei_params, coe_out);
+							init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
+						}
 
+						init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
+						init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
 
-
-					//	init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
-					//	init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
 						InOut.operation_mode_display = CSV;
 					}
 					break;
@@ -244,15 +243,13 @@ t:>time;
 				case 0x000b: //quick stop
 					if(op_mode == CSV)
 					{
-						//printstrln("quick stop");
-						actual_velocity = get_velocity(c_velocity_ctrl);//p
+						actual_velocity = get_velocity(c_velocity_ctrl);
 						steps = init_quick_stop_velocity_profile(actual_velocity, 1000);//default acc
 						i = 0;
 						mode_selected = 3;// non interruptible mode
 					}
 					else if(op_mode == CSP)
 					{
-						//actual speed
 						actual_velocity = get_hall_speed(c_hall_p4, hall_params);
 						actual_position = get_position(c_position_ctrl);
 						if(!(actual_velocity<40 && actual_velocity>-40))
@@ -278,7 +275,7 @@ t:>time;
 					//printstrln("cyclic");
 					if(op_mode == CSV)
 					{
-						target_velocity = get_target_velocity();	//p
+						target_velocity = get_target_velocity();
 						set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
 
 						actual_velocity = get_velocity(c_velocity_ctrl);
@@ -286,7 +283,6 @@ t:>time;
 					}
 					else if(op_mode == CSP)
 					{
-					//	printstrln("cyclic CSP");
 						target_position = get_target_position();
 						set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
 
@@ -327,8 +323,6 @@ t:>time;
 		}
 		if(mode_selected == 3) // non interrupt
 		{
-			//printintln(mode_selected);		//printintln(steps);
-
 			if(op_mode == CSV)
 			{
 				while(i < steps)
@@ -341,8 +335,6 @@ t:>time;
 //					xscope_probe_data(1, target_velocity);
 #endif
 
-
-
 					t when timerafter(time + MSEC_STD) :> time;
 					i++;
 				}
@@ -350,7 +342,6 @@ t:>time;
 				{
 					if(actual_velocity < 50 || actual_velocity > -50)
 					{
-						//printstrln("stopped");
 						state = 2;
 						statusword = update_statusword(statusword, state, ack);
 						InOut.status_word = statusword;
@@ -391,12 +382,10 @@ t:>time;
 		if(mode_selected ==100)
 		{
 			ack = 1;
-			statusword = update_statusword(statusword, state, ack);
-			InOut.status_word = statusword;
-			//ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 			switch(InOut.operation_mode)
 			{
-				case 100: mode_selected = 0;
+				case 100:
+					mode_selected = 0;
 					ack = 0;
 					InOut.operation_mode_display = 100;
 					break;
@@ -419,13 +408,13 @@ int main(void) {
 	chan c_velocity_ctrl, c_torque_ctrl, c_position_ctrl;
 
 	//etherCat Comm channels
-	chan coe_in; ///< CAN from module_ethercat to consumer
-	chan coe_out; ///< CAN from consumer to module_ethercat
-	chan eoe_in; ///< Ethernet from module_ethercat to consumer
-	chan eoe_out; ///< Ethernet from consumer to module_ethercat
+	chan coe_in; 	///< CAN from module_ethercat to consumer
+	chan coe_out; 	///< CAN from consumer to module_ethercat
+	chan eoe_in; 	///< Ethernet from module_ethercat to consumer
+	chan eoe_out; 	///< Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; ///< File from module_ethercat to consumer
-	chan foe_out; ///< File from consumer to module_ethercat
+	chan foe_in; 	///< File from module_ethercat to consumer
+	chan foe_out; 	///< File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
 
@@ -502,20 +491,26 @@ int main(void) {
 
 				{
 					hall_par hall_params;
-					init_hall_param(hall_params);
+				//	init_hall_param(hall_params);
+					comm_init_ecat(c_signal, hall_params);
+
 					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
 							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
 				}
 
 				{
 					hall_par hall_params;
-					init_hall_param(hall_params);
+				//	init_hall_param(hall_params);
+					hall_init_ecat(c_hall_p4, hall_params);
+
 					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
 				}
 
 				{
 					qei_par qei_params;
-					init_qei_param(qei_params);
+				//	init_qei_param(qei_params);
+					qei_init_ecat(c_qei_p4, qei_params);
+
 					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4);  // channel priority 1,2..4
 				}
 
