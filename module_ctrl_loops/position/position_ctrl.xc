@@ -4,7 +4,7 @@
 #include <drive_config.h>
 
 #define DEBUG
-#define debug_print
+//#define debug_print
 
 /*Internal Controller Configs*/
 #define SET_POSITION_TOKEN 40

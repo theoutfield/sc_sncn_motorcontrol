@@ -39,79 +39,16 @@
 #include <internal_config.h>
 #include <ctrlproto.h>
 #include <drive_config.h>
+#include <comm.h>
 
-
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-void update_hall_param_ecat(hall_par &hall_params, chanend coe_out)
-{
-	{hall_params.pole_pairs, hall_params.gear_ratio} = hall_sdo_update(coe_out);
-}
 
-void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
-{
-	{qei_params.real_counts, qei_params.gear_ratio, qei_params.index} = qei_sdo_update(coe_out);
-	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
-}
-
-void update_csv_param_ecat(csv_par &csv_params, chanend coe_out)
-{
-	{csv_params.max_motor_speed, csv_params.nominal_current, csv_params.polarity} = csv_sdo_update(coe_out);
-	if(csv_params.polarity >= 0)
-		csv_params.polarity = 1;
-	else if(csv_params.polarity < 0)
-		csv_params.polarity = -1;
-}
-
-void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out)
-{
-	{velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);
-	velocity_ctrl_params.Kp_d = 16384;
-	velocity_ctrl_params.Ki_d = 16384;
-	velocity_ctrl_params.Kd_d = 16384;
-
-	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
-
-	velocity_ctrl_params.Control_limit = 13739; 	//default
-
-	if(velocity_ctrl_params.Ki_n != 0)    			//auto calculated using control_limit
-		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
-	else
-		velocity_ctrl_params.Integral_limit = 0;
-	return;
-}
-void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out)
-{
-	{position_ctrl_params.Kp_n, position_ctrl_params.Ki_n, position_ctrl_params.Kd_n} = position_sdo_update(coe_out);
-	position_ctrl_params.Kp_d = 16384;
-	position_ctrl_params.Ki_d = 16384;
-	position_ctrl_params.Kd_d = 16384;
-
-	position_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
-
-	position_ctrl_params.Control_limit = 13739; 	//default
-
-	if(position_ctrl_params.Ki_n != 0)    			//auto calculated using control_limit
-		position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n) ;
-	else
-		position_ctrl_params.Integral_limit = 0;
-	return;
-}
-
-void update_csp_param_ecat(csp_par &csp_params, chanend coe_out)
-{
-	{csp_params.base.max_motor_speed, csp_params.base.polarity, csp_params.base.nominal_current, \
-		csp_params.min_position_limit, csp_params.max_position_limit} = csp_sdo_update(coe_out);
-	if(csp_params.base.polarity >= 0)
-		csp_params.base.polarity = 1;
-	else if(csp_params.base.polarity < 0)
-		csp_params.base.polarity = -1;
-}
 void xscope_initialise()
 {
 	{
@@ -166,10 +103,12 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	ctrl_par 	velocity_ctrl_params;
 	qei_par 	qei_params;
 	hall_par 	hall_params;
-	ctrl_par position_ctrl_params;
-	csp_par csp_params;
+	ctrl_par	position_ctrl_params;
+	csp_par 	csp_params;
 
-	int ack;
+	int sense;
+
+	int ack = 0;
 	int sensor_select;
 
 	unsigned int time;
@@ -185,9 +124,10 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	InOut 		= init_ctrl_proto();
 
 	init_csv_param(csv_params);
-
+	init_csp_param(csp_params);
+	init_hall_param(hall_params);
 #ifdef ENABLE_xscope_main
- //xscope_initialise();
+ xscope_initialise();
 #endif
 t:>time;
 	while(1)
@@ -213,8 +153,8 @@ t:>time;
 			switch(InOut.operation_mode)
 			{
 				case CSP:
-				//	if(op_set_flag == 0)
-					printstrln("CSP");
+
+					//printstrln("CSP");
 					if(op_set_flag == 0)
 					{
 						init = init_position_control(c_position_ctrl); //init==1
@@ -222,14 +162,14 @@ t:>time;
 					if(init == INIT)
 					{
 						op_set_flag = 1;
-						//enable_velocity_ctrl(c_velocity_ctrl);
+						enable_position_ctrl(c_position_ctrl);
 						mode_selected = 1;
 						op_mode = CSP;
 						ack = 0;
 
-						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
-						sensor_select = sensor_select_sdo(coe_out);
-						update_csp_param_ecat(csp_params, coe_out);
+					//	update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
+					//	sensor_select = sensor_select_sdo(coe_out);
+					//	update_csp_param_ecat(csp_params, coe_out);
 
 //						printintln(position_ctrl_params.Control_limit);						printintln(position_ctrl_params.Integral_limit);
 //						printintln(position_ctrl_params.Kd_d);						printintln(position_ctrl_params.Ki_d);
@@ -241,8 +181,8 @@ t:>time;
 //						printintln(csp_params.min_position_limit);
 //						printintln(sensor_select);
 
-//						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
-//						init_position_sensor_ecat(sensor_select, c_position_ctrl);
+					//	init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
+					//	init_position_sensor_ecat(sensor_select, c_position_ctrl);
 						InOut.operation_mode_display = CSP;
 					}
 					break;
@@ -262,8 +202,9 @@ t:>time;
 						op_mode = CSV;
 						ack = 0;
 
-						update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
-						sensor_select = sensor_select_sdo(coe_out);
+					//	update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
+					//	sensor_select = sensor_select_sdo(coe_out);
+					//	update_csv_param_ecat(csv_params, coe_out);
 //
 //						if(sensor_select == HALL)
 //						{
@@ -281,14 +222,14 @@ t:>time;
 //							printintln(qei_params.real_counts);
 //							printintln(qei_params.max_count);
 //						}
-						update_csv_param_ecat(csv_params, coe_out);
+
 //						printintln(velocity_ctrl_params.Kp_n);	printintln(velocity_ctrl_params.Ki_n);
 //						printintln(velocity_ctrl_params.Kd_n);
 
 
 
-						init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
-						init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
+					//	init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
+					//	init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
 						InOut.operation_mode_display = CSV;
 					}
 					break;
@@ -303,13 +244,33 @@ t:>time;
 				case 0x000b: //quick stop
 					if(op_mode == CSV)
 					{
-					//printstrln("quick stop");
+						//printstrln("quick stop");
 						actual_velocity = get_velocity(c_velocity_ctrl);//p
 						steps = init_quick_stop_velocity_profile(actual_velocity, 1000);//default acc
-//
-//					//quick_stop_velocity_profile_generate( step);
 						i = 0;
 						mode_selected = 3;// non interruptible mode
+					}
+					else if(op_mode == CSP)
+					{
+						//actual speed
+						actual_velocity = get_hall_speed(c_hall_p4, hall_params);
+						actual_position = get_position(c_position_ctrl);
+						if(!(actual_velocity<40 && actual_velocity>-40))
+						{
+							if(actual_velocity < 0)
+							{
+								actual_velocity = 0-actual_velocity;
+								sense = -1;
+							}
+							steps = init_stop( (actual_velocity*360)/(60*hall_params.gear_ratio), actual_position);
+							i = 0;
+							mode_selected = 3;// non interruptible mode
+						}
+						else
+						{
+							mode_selected = 100;
+							op_set_flag = 0; init = 0;
+						}
 					}
 					break;
 
@@ -332,6 +293,10 @@ t:>time;
 
 						actual_position = get_position(c_position_ctrl);
 						send_actual_position(actual_position);
+#ifdef ENABLE_xscope_main
+										xscope_probe_data(0, actual_position);
+											xscope_probe_data(1, target_position);
+#endif
 					}
 
 #ifdef ENABLE_xscope_main
@@ -349,14 +314,20 @@ t:>time;
 						op_set_flag = 0; init = 0;
 						mode_selected = 0;  // to reenable the op selection and reset the controller
 					}
+					if(op_mode == CSP)
+					{
+						shutdown_position_ctrl(c_position_ctrl);//p
+						ack = 1;
+						op_set_flag = 0; init = 0;
+						mode_selected = 0;  // to reenable the op selection and reset the controller
+					}
 					break;
 
 			}
 		}
 		if(mode_selected == 3) // non interrupt
 		{
-			//printintln(mode_selected);
-			//printintln(steps);
+			//printintln(mode_selected);		//printintln(steps);
 
 			if(op_mode == CSV)
 			{
@@ -380,7 +351,6 @@ t:>time;
 					if(actual_velocity < 50 || actual_velocity > -50)
 					{
 						//printstrln("stopped");
-
 						state = 2;
 						statusword = update_statusword(statusword, state, ack);
 						InOut.status_word = statusword;
@@ -389,6 +359,31 @@ t:>time;
 						op_set_flag = 0; init = 0;
 					}
 				}
+			}
+			else if(op_mode == CSP)
+			{
+				while(i < steps)
+				{
+					target_position   =   mot_q_stop(i, actual_velocity*sense);
+					set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
+					//xscope_probe_data(0, actual_position);
+					//xscope_probe_data(1, target_position);
+					t when timerafter(time + MSEC_STD) :> time;
+					i++;
+				}
+				if(i >=steps )
+				{
+					actual_velocity = get_hall_speed(c_hall_p4, hall_params);
+					if(actual_velocity < 50 || actual_velocity > -50)
+					{
+						mode_selected = 100;
+						op_set_flag = 0; init = 0;
+					}
+				}
+#ifdef ENABLE_xscope_main
+										xscope_probe_data(0, actual_position);
+											xscope_probe_data(1, target_position);
+#endif
 			}
 
 

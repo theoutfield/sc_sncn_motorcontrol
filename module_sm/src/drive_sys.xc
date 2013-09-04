@@ -201,6 +201,8 @@ int update_statusword(int current_status, int state_reached, int ack) {
 	}
 	if(ack == 1)
 		return status_word|TARGET_REACHED;
+	else if(ack == 0)
+		return status_word & (~TARGET_REACHED);
 	return status_word;
 }
 

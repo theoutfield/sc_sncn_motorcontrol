@@ -1,5 +1,6 @@
-#include <math.h>
-#include <stdio.h>
+#include <profile.h>
+
+
 
 struct PROFILE_POSITION_PARAM
 {

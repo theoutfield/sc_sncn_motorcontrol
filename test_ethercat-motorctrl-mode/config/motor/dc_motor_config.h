@@ -51,8 +51,8 @@
 #define MIN_POSITION_LIMIT -359
 
 /*External Controller Configs*/
-#define VELOCITY_KP				 	0       	// 5/10 * 16384
-#define VELOCITY_KI    				0			// 5/100 * 16384
+#define VELOCITY_KP				 	8192       	// 5/10 * 16384
+#define VELOCITY_KI    				819			// 5/100 * 16384
 #define VELOCITY_KD				   	0
 
 #define POSITION_KP	 				1474		//180/ 	2000) * 16384

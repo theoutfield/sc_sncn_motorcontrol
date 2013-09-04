@@ -1,7 +1,7 @@
 /*Profile Velocity Quick Stop*/
+#include <profile.h>
 
-#include <stdio.h>
-#include <math.h>
+
 
 
 
