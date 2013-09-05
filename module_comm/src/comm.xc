@@ -23,7 +23,7 @@ void update_csv_param_ecat(csv_par &csv_params, chanend coe_out)
 void update_csp_param_ecat(csp_par &csp_params, chanend coe_out)
 {
 	{csp_params.base.max_motor_speed, csp_params.base.polarity, csp_params.base.nominal_current, \
-		csp_params.min_position_limit, csp_params.max_position_limit} = csp_sdo_update(coe_out);
+		csp_params.min_position_limit, csp_params.max_position_limit, csp_params.base.max_acceleration} = csp_sdo_update(coe_out);
 	if(csp_params.base.polarity >= 0)
 		csp_params.base.polarity = 1;
 	else if(csp_params.base.polarity < 0)

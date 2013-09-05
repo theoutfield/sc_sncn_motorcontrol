@@ -38,7 +38,7 @@
 #define GEAR_RATIO  26
 #define MAX_NOMINAL_SPEED  4000		// in rpm
 #define MAX_NOMINAL_CURRENT  2		// in A
-#define MAX_ACCELERATION   5000     // rpm/s
+#define MAX_ACCELERATION   8000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
 #define POLARITY 1					// 1 / -1
 
@@ -108,6 +108,7 @@ typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 	int nominal_current;
 	int motor_torque_constant;
 	int polarity;
+	int max_acceleration;
 } csv_par;
 
 
