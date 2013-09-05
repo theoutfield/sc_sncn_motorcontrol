@@ -260,7 +260,9 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 				}
 
 				if(!deactivate)
-				set_commutation_sinusoidal(c_commutation, position_control_out);
+					set_commutation_sinusoidal(c_commutation, position_control_out);
+				else
+					set_commutation_sinusoidal(c_commutation, 0);
 
 				#ifdef DEBUG
 				xscope_probe_data(0, actual_position);

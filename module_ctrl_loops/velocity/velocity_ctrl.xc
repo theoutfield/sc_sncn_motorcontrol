@@ -307,7 +307,9 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 
 				if(!deactivate)
-				set_commutation_sinusoidal(c_commutation, velocity_control_out);
+					set_commutation_sinusoidal(c_commutation, velocity_control_out);
+				else
+					set_commutation_sinusoidal(c_commutation, 0);
 
 				previous_error = error_velocity;
 
