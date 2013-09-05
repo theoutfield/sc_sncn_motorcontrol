@@ -32,48 +32,30 @@ struct pos_params
 	float samp; float len;
 
 	float cur_pos_s;
+	float acc;
 	int negative_s;
 } pos_param_s;   											// position quick stop parameters
 
 
 
 
-int init_stop(int c_vel, int c_pos)  //emergency stop
+int init_stop(int c_vel, int c_pos, int max_acc)  //emergency stop
 {
 	pos_param_s.qi = 0;
 	pos_param_s.qf = (float) c_vel;   //always positive
 
-	 if(pos_param_s.qf<0)
-		 pos_param_s.qf = 0-pos_param_s.qf;
+	 if(pos_param_s.qf < 0)
+		 pos_param_s.qf = 0 - pos_param_s.qf;
 
+	 pos_param_s.acc = pos_param_s.qf * 8;  // 8 times deceleration
+	 if(pos_param_s.acc > max_acc)
+		 pos_param_s.acc = max_acc;
 
 	 pos_param_s.cur_pos_s = (float) c_pos;
 
-	 pos_param_s.vi =   pos_param_s.qf;
-	 pos_param_s.qid = pos_param_s.qi; pos_param_s.qfd = pos_param_s.qf;
-	 pos_param_s.dist= pos_param_s.qf-pos_param_s.qi;
+	 pos_param_s.tb = pos_param_s.qf / pos_param_s.acc;
 
-	 pos_param_s.dirn = 1;
-	 if(pos_param_s.dist < 0)
-	 {
-		 pos_param_s.dist = - pos_param_s.dist;
-		 pos_param_s.dirn = -1;
-	 }
-
-	 pos_param_s.tb = (pos_param_s.dist*0.3)/pos_param_s.vi/2;
-
-	 if(pos_param_s.dirn == -1)
-	 {
-	    pos_param_s.vi = -pos_param_s.vi;
-	 }
-
-
-
-	 pos_param_s.ai = pos_param_s.qi;
-	 pos_param_s.bi = pos_param_s.qid;
-	 pos_param_s.ci = (pos_param_s.vi - pos_param_s.qid)/(pos_param_s.tb+pos_param_s.tb);
-
-
+	 pos_param_s.ci = - pos_param_s.acc / 2;
 	 pos_param_s.samp = pos_param_s.tb/1.0e-3;
 	 pos_param_s.t_int = pos_param_s.tb/pos_param_s.samp;
 	 if(pos_param_s.samp<0)
@@ -84,14 +66,14 @@ int init_stop(int c_vel, int c_pos)  //emergency stop
 int mot_q_stop(int i, int c_vel)
 {
 	pos_param_s.ts = pos_param_s.t_int*i;
-	pos_param_s.q = pos_param_s.ai + pos_param_s.ts*pos_param_s.bi + pos_param_s.ci*pos_param_s.ts*pos_param_s.ts;
+	pos_param_s.q = pos_param_s.qf * pos_param_s.ts + pos_param_s.ci*pos_param_s.ts*pos_param_s.ts;
     if(c_vel >= 0)
     {
-    	return (int) round( pos_param_s.cur_pos_s + pos_param_s.q*1000);
+    	return (int) round( pos_param_s.cur_pos_s + pos_param_s.q*10000.0f);
     }
     else if(c_vel < 0)
     {
-	    return (int) round( pos_param_s.cur_pos_s - pos_param_s.q*1000);
+	    return (int) round( pos_param_s.cur_pos_s - pos_param_s.q*10000.0f);
     }
     return 0;
 }

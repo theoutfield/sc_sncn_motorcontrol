@@ -29,5 +29,5 @@ typedef struct S_position {
 	int c_pos;
 } stop_data;
 
-extern int init_stop(int c_vel, int c_pos);  		//emergency stop profile
+extern int init_stop(int c_vel, int c_pos, int max_acc);  		//emergency stop profile
 extern  int mot_q_stop(int i, int c_vel);
