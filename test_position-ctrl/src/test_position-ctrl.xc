@@ -20,27 +20,18 @@
 #include "hall_client.h"
 #include "qei_client.h"
 #include "pwm_service_inv.h"
-#include "adc_ad7949.h"
-#include "test.h"
-#include "pwm_config.h"
 #include "comm_loop.h"
 #include "refclk.h"
-#include "velocity_ctrl.h"
 #include <xscope.h>
 #include "qei_client.h"
 #include "qei_server.h"
-#include "adc_client_ad7949.h"
 #include <dc_motor_config.h>
-#include "sine_table_big.h"
-#include "print.h"
-#include "filter_blocks.h"
 #include "profile.h"
 #include <position_ctrl.h>
 #include <drive_config.h>
 
 #include <flash_somanet.h>
 #include <internal_config.h>
-#include <ctrlproto.h>
 
 #define ENABLE_xscope_main
 #define COM_CORE 0
@@ -52,7 +43,6 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 #define HALL 1
 #define QEI 2
 
-ctrl_proto_values_t InOut;
 
 void xscope_initialise()
 {
@@ -73,19 +63,29 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 	int position_ramp;
 
 	qei_par qei_params;
-	csp_par csp_params;
+	pp_par  pp_params;
 
-	int init = 0;
 	int init_state = INIT_BUSY;
 
-	int acc = 350;				// rpm/s
+	int acc = 350;				// rpm/s       	 variable parameters
 	int dec = 350;     			// rpm/s
 	int velocity = 350;			// rpm
 	int actual_position = 0;	// degree
-	int target_position = 350;	// degree
+	int target_position = 150;	// degree
+	int quick_stop_deceleration;
 
-	init_csp_param(csp_params);
 	init_qei_param(qei_params);
+	init_pp_params(pp_params);
+
+	acc = pp_params.base.profile_acceleration;   // fixed parameters
+	dec =  pp_params.base.profile_deceleration;
+	velocity = pp_params.profile_velocity;
+	quick_stop_deceleration = pp_params.base.quick_stop_deceleration;
+
+	printintln(acc);
+	printintln(dec);
+	printintln(velocity);
+	printintln(quick_stop_deceleration);
 
 #ifdef ENABLE_xscope_main
 	xscope_initialise();
@@ -96,7 +96,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 		init_state = __check_commutation_init(c_signal);
 		if(init_state == INIT)
 		{
-			printstrln("comm intialized");
+			printstrln("commutation intialized");
 			break;
 		}
 	}
@@ -112,7 +112,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 
 	if(init_state == INIT)
 	{
-		init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, MAX_NOMINAL_SPEED);
+		init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, pp_params.base.max_profile_velocity);
 
 		steps = init_position_profile(target_position, actual_position, velocity, acc, dec);
 
@@ -136,14 +136,14 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 
 int main(void)
 {
-	chan c_adc, c_adctrig;
+	chan c_adctrig;
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan c_pwm_ctrl;
 	chan c_signal_adc;
 	chan c_sig_1, c_signal;
-	chan c_velocity_ctrl, c_position_ctrl;
+	chan c_position_ctrl;
 
 	//etherCat Comm channels
 	chan coe_in; 	///< CAN from module_ethercat to consumer
@@ -174,42 +174,6 @@ int main(void)
 		on stdcore[1]:
 		{
 			position_profile_test(c_position_ctrl, c_signal);		  	// test PPM on slave side
-			/*par
-			{
-
-				{
-					{
-						int init_state = INIT_BUSY;
-
-						while(1)
-						{
-							printintln(init_state);
-							init_state = __check_commutation_init(c_signal);
-							if(init_state == INIT)
-							{
-								printstrln("comm intialized");
-								break;
-							}
-						}
-
-						init_state = INIT_BUSY;
-
-						c_position_ctrl <: 1;
-						while(1)
-						{
-							printintln(init_state);
-							init_state = __check_position_init(c_position_ctrl);
-							if(init_state == INIT)
-							{
-								printstrln("pos intialized");
-								break;
-							}
-						}
-
-
-					}
-				}
-			}*/
 		}
 
 
@@ -238,10 +202,6 @@ int main(void)
 		{
 			par
 			{
-
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
-						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
-						p_ifm_adc_misob);
 
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
