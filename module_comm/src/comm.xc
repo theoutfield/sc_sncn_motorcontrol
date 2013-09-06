@@ -30,6 +30,20 @@ void update_csp_param_ecat(csp_par &csp_params, chanend coe_out)
 		csp_params.base.polarity = -1;
 }
 
+void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
+{
+	{pp_params.base.max_profile_velocity, pp_params.profile_velocity, \
+		pp_params.base.profile_acceleration, pp_params.base.profile_deceleration,\
+	 	pp_params.base.quick_stop_deceleration} = pp_sdo_update(coe_out);
+}
+
+void update_pv_param_ecat(pv_par &pv_params, chanend coe_out)
+{
+	{pv_params.max_profile_velocity, pv_params.profile_acceleration, \
+		pv_params.profile_deceleration,\
+	 	pv_params.quick_stop_deceleration} = pv_sdo_update(coe_out);
+}
+
 void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out)
 {
 	{velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);

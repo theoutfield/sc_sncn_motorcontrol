@@ -50,6 +50,13 @@
 #define MAX_POSITION_LIMIT 	359
 #define MIN_POSITION_LIMIT -359
 
+
+#define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
+#define PROFILE_VELOCITY 			1000
+#define PROFILE_ACCELERATION		2000
+#define PROFILE_DECELERATION   		2000
+#define QUICK_STOP_DECELERATION 	2000
+
 /*External Controller Configs*/
 #define VELOCITY_KP				 	8192       	// 5/10 * 16384
 #define VELOCITY_KI    				819			// 5/100 * 16384
@@ -120,6 +127,19 @@ typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 	int min_position_limit;
 } csp_par;
 
+typedef struct PROFILE_VELOCITY_PARAM
+{
+	int max_profile_velocity;
+	int profile_acceleration;
+	int profile_deceleration;
+	int quick_stop_deceleration;
+} pv_par;
+
+typedef struct PROFILE_POSITION_PARAM
+{
+	pv_par base;
+	int profile_velocity;
+} pp_par;
 
 /**
  * \brief initialize QEI sensor

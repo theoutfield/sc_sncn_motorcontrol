@@ -104,6 +104,8 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	hall_par 	hall_params;
 	ctrl_par	position_ctrl_params;
 	csp_par 	csp_params;
+	pp_par 		pp_params;
+	pv_par		pv_params;
 
 	int setup_loop_flag = 0;
 	int sense;
@@ -124,7 +126,7 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	InOut 		= init_ctrl_proto();
 
 	init_csv_param(csv_params);
-	//init_csp_param(csp_params);
+	init_csp_param(csp_params);
 	init_hall_param(hall_params);
 #ifdef ENABLE_xscope_main
  xscope_initialise();
@@ -162,6 +164,28 @@ t:>time;
 		{
 			switch(InOut.operation_mode)
 			{
+				case PP:
+					printstrln("ss");
+				//	config_sdo_handler(coe_out);
+					update_pp_param_ecat(pp_params, coe_out);
+					printintln(pp_params.base.max_profile_velocity);
+					printintln(pp_params.profile_velocity);
+					printintln(pp_params.base.profile_acceleration);
+					printintln(pp_params.base.profile_deceleration);
+					printintln(pp_params.base.quick_stop_deceleration);
+					InOut.operation_mode_display = PP;
+					break;
+
+				case PV:
+					printstrln("pv");
+					update_pv_param_ecat(pv_params, coe_out);
+					printintln(pv_params.max_profile_velocity);
+					printintln(pv_params.profile_acceleration);
+					printintln(pv_params.profile_deceleration);
+					printintln(pv_params.quick_stop_deceleration);
+					InOut.operation_mode_display = PV;
+					break;
+
 				case CSP:
 					if(op_set_flag == 0)
 					{
@@ -178,7 +202,7 @@ t:>time;
 						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
 						sensor_select = sensor_select_sdo(coe_out);
 						update_csp_param_ecat(csp_params, coe_out);
-						printintln(csp_params.base.max_acceleration);
+						//printintln(csp_params.base.max_acceleration);
 						if(sensor_select == HALL)
 						{
 							update_hall_param_ecat(hall_params, coe_out);

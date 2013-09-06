@@ -15,6 +15,10 @@ void update_csv_param_ecat(csv_par &csv_params, chanend coe_out);
 
 void update_csp_param_ecat(csp_par &csp_params, chanend coe_out);
 
+void update_pp_param_ecat(pp_par &pp_params, chanend coe_out);
+
+void update_pv_param_ecat(pv_par &pv_params, chanend coe_out);
+
 void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out);
 
 void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out);
