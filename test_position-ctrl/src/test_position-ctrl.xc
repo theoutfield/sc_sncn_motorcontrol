@@ -134,78 +134,6 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 	}
 }
 
-
-/*
-int get_target_position()
-{
-	return InOut.in_position;
-}
-void send_actual_position(int actual_position)
-{
-	InOut.out_position = actual_position;
-}
-void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_position_ctrl)
-{
-	int i = 0;
-	int mode = 0;
-	int core_id = 0;
-	int actual_position = 0;
-
-	timer t, t1;
-	unsigned time, time1, time2;
-	unsigned ts;
-	int target_position;
-	csp_par csp_params;
-	int init = 0;
-
-	init_csp_param(csp_params);
-	init_ctrl_proto(InOut);
-
-	//check init signal from commutation level
-	init = init_commutation(c_signal);
-	if(init == 1)
-		printstrln("initialized commutation");
-	else
-		printstrln(" initialize commutation failed");
-
-	if(init == 1)
-	{
-		init = 0;
-		init = init_position_control(c_position_ctrl);
-		if(init == 1)
-			printstrln("position control intialized");
-		else
-			printstrln("intialize position control failed");
-	}
-
-	if(init == 1)
-	{
-		//test only csp
-		while(1)
-		{
-
-			ctrlproto_protocol_handler_function( pdo_out, pdo_in, InOut);
-
-			switch(InOut.ctrl_motor)
-			{
-				case CSP: //csp mode index
-
-					target_position = get_target_position();
-					set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
-
-
-					actual_position = get_position(c_position_ctrl);
-					send_actual_position(actual_position);
-
-					xscope_probe_data(1, target_position);
-					break;
-			}
-
-			wait_ms(1, core_id, t);
-		}
-	}
-}
-*/
 int main(void)
 {
 	chan c_adc, c_adctrig;
@@ -243,10 +171,6 @@ int main(void)
 			//firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}
 
-		on stdcore[1] :
-		{
-	//		ether_comm(pdo_out, pdo_in, c_signal, c_position_ctrl);   	// test CSP over ethercat with PPM on master side
-		}
 		on stdcore[1]:
 		{
 			position_profile_test(c_position_ctrl, c_signal);		  	// test PPM on slave side
