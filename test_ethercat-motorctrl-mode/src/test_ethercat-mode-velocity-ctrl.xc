@@ -92,6 +92,8 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	int target_position;
 	int actual_position = 0;
 
+	int position_ramp = 0;
+	int prev_position = 0;
 	timer t;
 
 	int init = 0;
@@ -165,15 +167,58 @@ t:>time;
 			switch(InOut.operation_mode)
 			{
 				case PP:
-					printstrln("ss");
+					printstrln("PP");
 				//	config_sdo_handler(coe_out);
-					update_pp_param_ecat(pp_params, coe_out);
-					printintln(pp_params.base.max_profile_velocity);
-					printintln(pp_params.profile_velocity);
-					printintln(pp_params.base.profile_acceleration);
-					printintln(pp_params.base.profile_deceleration);
-					printintln(pp_params.base.quick_stop_deceleration);
-					InOut.operation_mode_display = PP;
+					//update_pp_param_ecat(pp_params, coe_out);
+
+				//	InOut.operation_mode_display = PP;
+
+					if(op_set_flag == 0)
+					{
+						init = init_position_control(c_position_ctrl);
+					}
+					if(init == INIT)
+					{
+						op_set_flag = 1;
+						enable_position_ctrl(c_position_ctrl);
+						mode_selected = 1;
+						op_mode = PP;
+						ack = 1;
+						steps = 0;
+
+						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
+						sensor_select = sensor_select_sdo(coe_out);
+						update_pp_param_ecat(pp_params, coe_out);
+//
+						init_position_profile_limits(qei_params.gear_ratio, pp_params.max_acceleration, pp_params.base.max_profile_velocity);
+//
+						printintln(pp_params.base.max_profile_velocity);
+						printintln(pp_params.profile_velocity);
+						printintln(pp_params.base.profile_acceleration);
+						printintln(pp_params.base.profile_deceleration);
+						printintln(pp_params.base.quick_stop_deceleration);
+						printintln(pp_params.software_position_limit_max);
+						printintln(pp_params.software_position_limit_min);
+						printintln(pp_params.polarity);
+						printintln(pp_params.max_acceleration);
+
+//
+						if(sensor_select == HALL)
+						{
+							update_hall_param_ecat(hall_params, coe_out);
+							init_position_ctrl_hall(hall_params, c_position_ctrl);
+						}
+						else if(sensor_select == QEI_INDEX || sensor_select == QEI_NO_INDEX)
+						{
+							update_qei_param_ecat(qei_params, coe_out);
+							init_position_ctrl_qei(qei_params, c_position_ctrl);
+						}
+//
+						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
+						init_position_sensor_ecat(sensor_select, c_position_ctrl);
+
+						InOut.operation_mode_display = PP;
+					}
 					break;
 
 				case PV:
@@ -317,6 +362,38 @@ t:>time;
 										xscope_probe_data(0, actual_position);
 											xscope_probe_data(1, target_position);
 #endif
+					}
+					else if(op_mode == PP)
+					{
+//						if(ack == 1)
+//						{
+//							ack = 0;
+//							target_position = get_target_position();
+//							actual_position = get_position(c_position_ctrl);
+//							if(prev_position != target_position)
+//							{
+//								steps = init_position_profile(target_position, actual_position, \
+//										pp_params.profile_velocity, pp_params.base.profile_acceleration,\
+//										pp_params.base.profile_deceleration);
+//								i = 1;
+//								prev_position = target_position;
+//							}
+//						}
+//						if(ack == 0)
+//						{
+//							if(i < steps)
+//							{
+//								position_ramp = position_profile_generate(i);
+//								set_position(position_ramp, c_position_ctrl);
+//								i++;
+//							}
+//							else if(i >= steps)
+//							{
+//								ack = 1;
+//							}
+//						}
+						//
+
 					}
 
 #ifdef ENABLE_xscope_main

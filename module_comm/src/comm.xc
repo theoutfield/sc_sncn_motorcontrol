@@ -34,7 +34,11 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
 {
 	{pp_params.base.max_profile_velocity, pp_params.profile_velocity, \
 		pp_params.base.profile_acceleration, pp_params.base.profile_deceleration,\
-	 	pp_params.base.quick_stop_deceleration} = pp_sdo_update(coe_out);
+	 	pp_params.base.quick_stop_deceleration,\
+		pp_params.software_position_limit_min, \
+		pp_params.software_position_limit_max, \
+		pp_params.polarity,\
+		pp_params.max_acceleration} = pp_sdo_update(coe_out);
 }
 
 void update_pv_param_ecat(pv_par &pv_params, chanend coe_out)

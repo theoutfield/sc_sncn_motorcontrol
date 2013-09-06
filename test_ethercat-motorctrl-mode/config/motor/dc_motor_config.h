@@ -139,6 +139,10 @@ typedef struct PROFILE_POSITION_PARAM
 {
 	pv_par base;
 	int profile_velocity;
+	int software_position_limit_min;
+	int software_position_limit_max;
+	int polarity;
+	int max_acceleration;
 } pp_par;
 
 /**
@@ -163,4 +167,7 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 
 void init_position_control_param(ctrl_par &position_ctrl_params);
 
+void init_pp_params(pp_par &pp_params);
+
+void init_pv_params(pv_par &pv_params);
 #endif
