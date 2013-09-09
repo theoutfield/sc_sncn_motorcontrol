@@ -130,9 +130,12 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	init_csv_param(csv_params);
 	init_csp_param(csp_params);
 	init_hall_param(hall_params);
-#ifdef ENABLE_xscope_main
+	init_pp_params(pp_params);
+	init_qei_param(qei_params);
+
+//#ifdef ENABLE_xscope_main
  xscope_initialise();
-#endif
+//#endif
 t:>time;
 	while(1)
 	{
@@ -147,7 +150,7 @@ t:>time;
 		InOut.status_word = statusword;
 
 
-		if(setup_loop_flag == 0)
+/*		if(setup_loop_flag == 0)
 		{
 			if(controlword == 6)
 			{
@@ -161,7 +164,7 @@ t:>time;
 
 				setup_loop_flag = 1;
 			}
-		}
+		}*/
 		if(mode_selected == 0)
 		{
 			switch(InOut.operation_mode)
@@ -186,10 +189,14 @@ t:>time;
 						ack = 1;
 						steps = 0;
 
-						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
-						sensor_select = sensor_select_sdo(coe_out);
-						update_pp_param_ecat(pp_params, coe_out);
+					//	update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
+						//sensor_select = sensor_select_sdo(coe_out);
+						//update_pp_param_ecat(pp_params, coe_out);
 //
+						printintln(qei_params.gear_ratio);
+										printintln(qei_params.index);
+										printintln(qei_params.max_count);
+										printintln(qei_params.real_counts);
 						init_position_profile_limits(qei_params.gear_ratio, pp_params.max_acceleration, pp_params.base.max_profile_velocity);
 //
 						printintln(pp_params.base.max_profile_velocity);
@@ -202,7 +209,10 @@ t:>time;
 						printintln(pp_params.polarity);
 						printintln(pp_params.max_acceleration);
 
-//
+
+						printstrln("end pp");
+
+/*
 						if(sensor_select == HALL)
 						{
 							update_hall_param_ecat(hall_params, coe_out);
@@ -213,9 +223,9 @@ t:>time;
 							update_qei_param_ecat(qei_params, coe_out);
 							init_position_ctrl_qei(qei_params, c_position_ctrl);
 						}
-//
+
 						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
-						init_position_sensor_ecat(sensor_select, c_position_ctrl);
+						init_position_sensor_ecat(sensor_select, c_position_ctrl);*/
 
 						InOut.operation_mode_display = PP;
 					}
@@ -244,7 +254,7 @@ t:>time;
 						op_mode = CSP;
 						ack = 0;
 
-						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
+/*						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
 						sensor_select = sensor_select_sdo(coe_out);
 						update_csp_param_ecat(csp_params, coe_out);
 						//printintln(csp_params.base.max_acceleration);
@@ -260,7 +270,7 @@ t:>time;
 						}
 
 						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
-						init_position_sensor_ecat(sensor_select, c_position_ctrl);
+						init_position_sensor_ecat(sensor_select, c_position_ctrl);*/
 
 						InOut.operation_mode_display = CSP;
 					}
@@ -317,7 +327,7 @@ t:>time;
 						i = 0;
 						mode_selected = 3;// non interruptible mode
 					}
-					else if(op_mode == CSP)
+					else if(op_mode == CSP || op_mode == PP)
 					{
 						actual_velocity = get_hall_speed(c_hall_p4, hall_params);
 						actual_position = get_position(c_position_ctrl);
@@ -358,40 +368,47 @@ t:>time;
 
 						actual_position = get_position(c_position_ctrl);
 						send_actual_position(actual_position);
-#ifdef ENABLE_xscope_main
+//#ifdef ENABLE_xscope_main
 										xscope_probe_data(0, actual_position);
 											xscope_probe_data(1, target_position);
-#endif
+//#endif
 					}
 					else if(op_mode == PP)
 					{
-//						if(ack == 1)
-//						{
-//							ack = 0;
-//							target_position = get_target_position();
-//							actual_position = get_position(c_position_ctrl);
-//							if(prev_position != target_position)
-//							{
-//								steps = init_position_profile(target_position, actual_position, \
-//										pp_params.profile_velocity, pp_params.base.profile_acceleration,\
-//										pp_params.base.profile_deceleration);
-//								i = 1;
-//								prev_position = target_position;
-//							}
-//						}
-//						if(ack == 0)
-//						{
-//							if(i < steps)
-//							{
-//								position_ramp = position_profile_generate(i);
-//								set_position(position_ramp, c_position_ctrl);
-//								i++;
-//							}
-//							else if(i >= steps)
-//							{
-//								ack = 1;
-//							}
-//						}
+						if(ack == 1)
+						{
+							target_position = get_target_position();
+							//printstr("tar pos ");printintln(target_position);
+							actual_position = get_position(c_position_ctrl);
+							send_actual_position(actual_position);
+							if(prev_position != target_position)
+							{
+								ack = 0;
+								steps = init_position_profile(target_position, actual_position/10000, \
+										pp_params.profile_velocity, pp_params.base.profile_acceleration,\
+										pp_params.base.profile_deceleration);
+								//printstr("steps ");printintln(steps);
+								i = 1;
+								prev_position = target_position;
+							}
+						}
+						else if(ack == 0)
+						{
+							if(i < steps)
+							{
+								position_ramp = position_profile_generate(i);
+								set_position(position_ramp, c_position_ctrl);
+
+								i++;
+							}
+							else if(i >= steps)
+							{
+								//printstr("i ");printintln(i);
+								ack = 1;
+							}
+							actual_position = get_position(c_position_ctrl);
+							send_actual_position(actual_position);
+						}
 						//
 
 					}
@@ -413,7 +430,7 @@ t:>time;
 						op_set_flag = 0; init = 0;
 						mode_selected = 0;  // to reenable the op selection and reset the controller
 					}
-					if(op_mode == CSP)
+					if(op_mode == CSP || op_mode == PP)
 					{
 						shutdown_position_ctrl(c_position_ctrl);//p
 						ack = 1;
@@ -434,6 +451,7 @@ t:>time;
 					target_velocity = quick_stop_velocity_profile_generate(i);		//p
 					set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
 					actual_velocity = get_velocity(c_velocity_ctrl);
+					send_actual_velocity(actual_velocity);
 #ifdef ENABLE_xscope_main
 //					xscope_probe_data(0, actual_velocity);
 //					xscope_probe_data(1, target_velocity);
@@ -444,6 +462,7 @@ t:>time;
 				}
 				if(i >= steps)
 				{
+					send_actual_velocity(actual_velocity);
 					if(actual_velocity < 50 || actual_velocity > -50)
 					{
 						state = 2;
@@ -455,7 +474,7 @@ t:>time;
 					}
 				}
 			}
-			else if(op_mode == CSP)
+			else if(op_mode == CSP || op_mode == PP)
 			{
 				{actual_position, sense} = get_qei_position_count(c_qei_p4);
 				while(i < steps)
@@ -463,26 +482,29 @@ t:>time;
 					target_position   =   mot_q_stop(i, sense);
 					set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
 					actual_position = get_position(c_position_ctrl);
-#ifdef ENABLE_xscope_main
+					send_actual_position(actual_position);
+//#ifdef ENABLE_xscope_main
 					xscope_probe_data(0, actual_position);
 					xscope_probe_data(1, target_position);
-#endif
+//#endif
 					t when timerafter(time + MSEC_STD) :> time;
 					i++;
 				}
 				if(i >=steps )
 				{
 					actual_velocity = get_hall_speed(c_hall_p4, hall_params);
+					actual_position = get_position(c_position_ctrl);
+					send_actual_position(actual_position);
 					if(actual_velocity < 50 || actual_velocity > -50)
 					{
 						mode_selected = 100;
 						op_set_flag = 0; init = 0;
 					}
 				}
-#ifdef ENABLE_xscope_main
+//#ifdef ENABLE_xscope_main
 										xscope_probe_data(0, actual_position);
 											xscope_probe_data(1, target_position);
-#endif
+//#endif
 			}
 
 
@@ -496,6 +518,8 @@ t:>time;
 					mode_selected = 0;
 					ack = 0;
 					InOut.operation_mode_display = 100;
+					actual_position = get_position(c_position_ctrl);
+					send_actual_position(actual_position);
 					break;
 			}
 			xscope_probe_data(0, actual_position);
@@ -601,8 +625,8 @@ int main(void) {
 
 				{
 					hall_par hall_params;
-				//	init_hall_param(hall_params);
-					comm_init_ecat(c_signal, hall_params);
+					init_hall_param(hall_params);
+				//	comm_init_ecat(c_signal, hall_params);
 
 					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
 							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
@@ -610,16 +634,16 @@ int main(void) {
 
 				{
 					hall_par hall_params;
-				//	init_hall_param(hall_params);
-					hall_init_ecat(c_hall_p4, hall_params);
+					init_hall_param(hall_params);
+				//	hall_init_ecat(c_hall_p4, hall_params);
 
 					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
 				}
 
 				{
 					qei_par qei_params;
-				//	init_qei_param(qei_params);
-					qei_init_ecat(c_qei_p4, qei_params);
+					init_qei_param(qei_params);
+				//	qei_init_ecat(c_qei_p4, qei_params);
 
 					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4);  // channel priority 1,2..4
 				}

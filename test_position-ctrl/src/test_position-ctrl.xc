@@ -67,25 +67,25 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 
 	int init_state = INIT_BUSY;
 
-	int acc = 350;				// rpm/s       	 variable parameters
-	int dec = 350;     			// rpm/s
-	int velocity = 350;			// rpm
-	int actual_position = 0;	// degree
-	int target_position = 150;	// degree
+	int acceleration = 350;				// rpm/s       	 variable parameters
+	int deceleration = 350;     		// rpm/s
+	int velocity = 350;					// rpm
+	int actual_position = 0;			// degree
+	int target_position = 150;			// degree
 	int quick_stop_deceleration;
 
 	init_qei_param(qei_params);
 	init_pp_params(pp_params);
 
-	acc = pp_params.base.profile_acceleration;   // fixed parameters
-	dec =  pp_params.base.profile_deceleration;
+	acceleration = pp_params.base.profile_acceleration;   // fixed parameters
+	deceleration =  pp_params.base.profile_deceleration;
 	velocity = pp_params.profile_velocity;
 	quick_stop_deceleration = pp_params.base.quick_stop_deceleration;
 
-	printintln(acc);
-	printintln(dec);
-	printintln(velocity);
-	printintln(quick_stop_deceleration);
+//	printintln(acceleration);
+//	printintln(deceleration);
+//	printintln(velocity);
+//	printintln(quick_stop_deceleration);
 
 #ifdef ENABLE_xscope_main
 	xscope_initialise();
@@ -114,22 +114,40 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 	{
 		init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, pp_params.base.max_profile_velocity);
 
-		steps = init_position_profile(target_position, actual_position, velocity, acc, dec);
+		steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
 
 		for(i = 1; i < steps; i++)
 		{
 			wait_ms(1, core_id, t);
 			position_ramp = position_profile_generate(i);
 			set_position(position_ramp, c_position_ctrl);
+			actual_position = get_position(c_position_ctrl);
 
-			xscope_probe_data(1, position_ramp);
+			//xscope_probe_data(0, actual_position);
+			//xscope_probe_data(1, position_ramp);
+		}
+		actual_position = get_position(c_position_ctrl);
+
+		steps = init_position_profile(0, actual_position/10000, velocity, acceleration, deceleration);
+
+		for(i = 1; i < steps; i++)
+		{
+			wait_ms(1, core_id, t);
+			position_ramp = position_profile_generate(i);
+			set_position(position_ramp, c_position_ctrl);
+			actual_position = get_position(c_position_ctrl);
+
+			//xscope_probe_data(0, actual_position);
+			//xscope_probe_data(1, position_ramp);
 		}
 		while(1)
 		{
 			wait_ms(1, core_id, t);
 			set_position(position_ramp, c_position_ctrl);
+			actual_position = get_position(c_position_ctrl);
 
-			xscope_probe_data(1, position_ramp);
+			//xscope_probe_data(0, actual_position);
+			//xscope_probe_data(1, position_ramp);
 		}
 	}
 }
