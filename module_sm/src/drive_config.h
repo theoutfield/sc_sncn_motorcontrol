@@ -123,7 +123,7 @@ check_list init_checklist(void);
 void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
 		chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
-int update_statusword(int current_status, int state_reached, int ack);
+int update_statusword(int current_status, int state_reached, int ack, int q_active, int shutdown_ack);
 
 int get_next_state(int in_state, check_list &checklist, int controlword);
 

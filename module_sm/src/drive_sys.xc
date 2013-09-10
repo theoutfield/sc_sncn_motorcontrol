@@ -158,7 +158,7 @@ int init_state(void) {
 /**
  *
  */
-int update_statusword(int current_status, int state_reached, int ack) {
+int update_statusword(int current_status, int state_reached, int ack, int q_active, int shutdown_ack) {
 	int status_word;
 
 	switch (state_reached) {
@@ -199,10 +199,12 @@ int update_statusword(int current_status, int state_reached, int ack) {
 		break;
 
 	}
-	if(ack == 1)
-		return status_word|TARGET_REACHED;
-	else if(ack == 0)
-		return status_word & (~TARGET_REACHED);
+	if(q_active == 1)
+		return status_word & (~QUICK_STOP_STATE);
+	else if(shutdown_ack == 1)
+		return status_word & (~VOLTAGE_ENABLED_STATE);
+	//else if(ack == 0)
+	//	return status_word |QUICK_STOP_STATE;
 	return status_word;
 }
 

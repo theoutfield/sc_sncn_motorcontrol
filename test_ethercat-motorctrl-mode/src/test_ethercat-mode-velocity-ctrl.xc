@@ -113,6 +113,9 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	int sense;
 
 	int ack = 0;
+	int quick_active = 0;
+	int mode_quick_flag = 0;
+	int shutdown_ack = 0;
 	int sensor_select;
 
 	unsigned int time;
@@ -134,7 +137,7 @@ void ether_comm(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_sign
 	init_qei_param(qei_params);
 
 //#ifdef ENABLE_xscope_main
- xscope_initialise();
+ //xscope_initialise();
 //#endif
 t:>time;
 	while(1)
@@ -146,7 +149,7 @@ t:>time;
 		update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 
 		state = get_next_state(state, checklist, controlword);
-		statusword = update_statusword(statusword, state, ack);
+		statusword = update_statusword(statusword, state, ack, quick_active, shutdown_ack);
 		InOut.status_word = statusword;
 
 
@@ -251,8 +254,10 @@ t:>time;
 						op_set_flag = 1;
 						enable_position_ctrl(c_position_ctrl);
 						mode_selected = 1;
+						mode_quick_flag = 10;
 						op_mode = CSP;
 						ack = 0;
+						shutdown_ack = 0;
 
 /*						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
 						sensor_select = sensor_select_sdo(coe_out);
@@ -287,10 +292,11 @@ t:>time;
 						op_set_flag = 1;
 						enable_velocity_ctrl(c_velocity_ctrl);
 						mode_selected = 1;
+						mode_quick_flag = 10;
 						op_mode = CSV;
 						ack = 0;
-
-						update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
+						shutdown_ack = 0;
+			/*			update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
 						sensor_select = sensor_select_sdo(coe_out);
 						update_csv_param_ecat(csv_params, coe_out);
 
@@ -307,14 +313,18 @@ t:>time;
 
 						init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
 						init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
-
+*/
 						InOut.operation_mode_display = CSV;
 					}
 					break;
 
 			}
 		}
-		//printhexln(InOut.control_word);
+//		printhexln(InOut.control_word);
+	//printstr("mode ");
+//	printhexln(mode_selected);
+		//printstr("shtudown ");printhexln(shutdown_ack);
+//		printstr("qactive ");printhexln(quick_active);
 		if(mode_selected == 1)
 		{
 			switch(InOut.control_word)
@@ -326,6 +336,7 @@ t:>time;
 						steps = init_quick_stop_velocity_profile(actual_velocity, 1000);//default acc
 						i = 0;
 						mode_selected = 3;// non interruptible mode
+						mode_quick_flag = 0;
 					}
 					else if(op_mode == CSP || op_mode == PP)
 					{
@@ -341,11 +352,13 @@ t:>time;
 							steps = init_stop( (actual_velocity*360)/(60*hall_params.gear_ratio), actual_position, csp_params.base.max_acceleration);
 							i = 0;
 							mode_selected = 3;// non interruptible mode
+							mode_quick_flag = 0;
 						}
 						else
 						{
 							mode_selected = 100;
 							op_set_flag = 0; init = 0;
+							mode_quick_flag = 0;
 						}
 					}
 					break;
@@ -369,8 +382,8 @@ t:>time;
 						actual_position = get_position(c_position_ctrl);
 						send_actual_position(actual_position);
 //#ifdef ENABLE_xscope_main
-										xscope_probe_data(0, actual_position);
-											xscope_probe_data(1, target_position);
+					//					xscope_probe_data(0, actual_position);
+					//						xscope_probe_data(1, target_position);
 //#endif
 					}
 					else if(op_mode == PP)
@@ -426,14 +439,14 @@ t:>time;
 					if(op_mode == CSV)
 					{
 						shutdown_velocity_ctrl(c_velocity_ctrl);//p
-						ack = 1;
+						shutdown_ack = 1;
 						op_set_flag = 0; init = 0;
 						mode_selected = 0;  // to reenable the op selection and reset the controller
 					}
 					if(op_mode == CSP || op_mode == PP)
 					{
 						shutdown_position_ctrl(c_position_ctrl);//p
-						ack = 1;
+						shutdown_ack = 1;
 						op_set_flag = 0; init = 0;
 						mode_selected = 0;  // to reenable the op selection and reset the controller
 					}
@@ -441,6 +454,11 @@ t:>time;
 
 			}
 		}
+//		printstr("mode ");printhexln(mode_selected);
+//		printstr("mode q flag ");printhexln(mode_quick_flag);
+//		printstr(" i ");printhexln(i);
+//		printstr(" steps ");printhexln(steps);
+
 		if(mode_selected == 3) // non interrupt
 		{
 			if(op_mode == CSV)
@@ -465,14 +483,18 @@ t:>time;
 					send_actual_velocity(actual_velocity);
 					if(actual_velocity < 50 || actual_velocity > -50)
 					{
-						state = 2;
-						statusword = update_statusword(statusword, state, ack);
-						InOut.status_word = statusword;
 						ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 						mode_selected = 100;
 						op_set_flag = 0; init = 0;
 					}
 				}
+				if(steps == 0)
+				{
+					mode_selected = 100;
+					op_set_flag = 0; init = 0;
+
+				}
+
 			}
 			else if(op_mode == CSP || op_mode == PP)
 			{
@@ -484,8 +506,8 @@ t:>time;
 					actual_position = get_position(c_position_ctrl);
 					send_actual_position(actual_position);
 //#ifdef ENABLE_xscope_main
-					xscope_probe_data(0, actual_position);
-					xscope_probe_data(1, target_position);
+				//	xscope_probe_data(0, actual_position);
+				//	xscope_probe_data(1, target_position);
 //#endif
 					t when timerafter(time + MSEC_STD) :> time;
 					i++;
@@ -502,8 +524,8 @@ t:>time;
 					}
 				}
 //#ifdef ENABLE_xscope_main
-										xscope_probe_data(0, actual_position);
-											xscope_probe_data(1, target_position);
+						//				xscope_probe_data(0, actual_position);
+						//					xscope_probe_data(1, target_position);
 //#endif
 			}
 
@@ -511,19 +533,24 @@ t:>time;
 		}
 		if(mode_selected ==100)
 		{
-			ack = 1;
+			if(mode_quick_flag == 0)
+				quick_active = 1;
 			switch(InOut.operation_mode)
 			{
 				case 100:
 					mode_selected = 0;
-					ack = 0;
+					quick_active = 0;
+					mode_quick_flag = 1;
 					InOut.operation_mode_display = 100;
-					actual_position = get_position(c_position_ctrl);
-					send_actual_position(actual_position);
+					if(op_mode == CSP)
+					{
+						actual_position = get_position(c_position_ctrl);
+						send_actual_position(actual_position);
+					}
 					break;
 			}
-			xscope_probe_data(0, actual_position);
-													xscope_probe_data(1, target_position);
+			//xscope_probe_data(0, actual_position);
+			//										xscope_probe_data(1, target_position);
 		}
 		t when timerafter(time + MSEC_STD) :> time;
 
