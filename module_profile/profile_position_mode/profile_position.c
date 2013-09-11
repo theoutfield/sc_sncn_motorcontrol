@@ -69,7 +69,11 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 {
 	profile_pos_params.qf = (float) target_position;
 
+	profile_pos_params.qf = profile_pos_params.qf/10000.0f;
+
 	profile_pos_params.qi = (float) actual_position;
+
+	profile_pos_params.qi = profile_pos_params.qi/10000.0f;
 
 	profile_pos_params.vi = (float) (velocity * 6)/profile_pos_params.gear_ratio;
 

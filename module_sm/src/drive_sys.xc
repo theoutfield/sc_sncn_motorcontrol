@@ -201,10 +201,12 @@ int update_statusword(int current_status, int state_reached, int ack, int q_acti
 	}
 	if(q_active == 1)
 		return status_word & (~QUICK_STOP_STATE);
-	else if(shutdown_ack == 1)
+	if(shutdown_ack == 1)
 		return status_word & (~VOLTAGE_ENABLED_STATE);
-	//else if(ack == 0)
-	//	return status_word |QUICK_STOP_STATE;
+	if(ack == 1)
+		return status_word|TARGET_REACHED;
+	else if(ack == 0)
+		return status_word & (~TARGET_REACHED);
 	return status_word;
 }
 
