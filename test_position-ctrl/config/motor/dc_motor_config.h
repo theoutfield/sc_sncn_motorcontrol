@@ -24,8 +24,8 @@
  *
  **************************************************************************/
 
-#ifndef __DC_MOTOR_CONFIG__H__test1
-#define __DC_MOTOR_CONFIG__H__test1
+#ifndef __DC_MOTOR_CONFIG__H__POSITION
+#define __DC_MOTOR_CONFIG__H__POSITION
 #include <print.h>
 
 
@@ -40,7 +40,7 @@
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define MAX_ACCELERATION   5000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
-#define POLARITY 1					// 1 / -1
+#define POLARITY -1					// 1 / -1
 
 #define QEI_WITH_INDEX		1
 #define QEI_WITH_NO_INDEX 	0
@@ -133,12 +133,16 @@ typedef struct PROFILE_VELOCITY_PARAM
 	int profile_acceleration;
 	int profile_deceleration;
 	int quick_stop_deceleration;
+	int polarity;
 } pv_par;
 
 typedef struct PROFILE_POSITION_PARAM
 {
 	pv_par base;
 	int profile_velocity;
+	int software_position_limit_min;
+	int software_position_limit_max;
+	int max_acceleration;
 } pp_par;
 
 /**

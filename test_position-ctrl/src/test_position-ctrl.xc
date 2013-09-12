@@ -77,7 +77,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 	init_qei_param(qei_params);
 	init_pp_params(pp_params);
 
-	acceleration = pp_params.base.profile_acceleration;   // fixed parameters
+	acceleration = pp_params.base.profile_acceleration;   // or fixed parameters
 	deceleration =  pp_params.base.profile_deceleration;
 	velocity = pp_params.profile_velocity;
 	quick_stop_deceleration = pp_params.base.quick_stop_deceleration;
