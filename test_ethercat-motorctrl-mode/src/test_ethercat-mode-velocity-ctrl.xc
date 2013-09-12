@@ -153,7 +153,7 @@ t:>time;
 		InOut.status_word = statusword;
 
 
-	/*	if(setup_loop_flag == 0)
+		if(setup_loop_flag == 0)
 		{
 			if(controlword == 6)
 			{
@@ -167,7 +167,7 @@ t:>time;
 
 				setup_loop_flag = 1;
 			}
-		}*/
+		}
 		if(mode_selected == 0)
 		{
 			switch(InOut.operation_mode)
@@ -194,7 +194,7 @@ t:>time;
 						ack = 0;
 						shutdown_ack = 0;
 
-				/*		update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
+						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
 						sensor_select = sensor_select_sdo(coe_out);
 						update_pp_param_ecat(pp_params, coe_out);
 //
@@ -204,15 +204,15 @@ t:>time;
 //										printintln(qei_params.real_counts);
 
 //
-//						printintln(pp_params.base.max_profile_velocity);
-//						printintln(pp_params.profile_velocity);
-//						printintln(pp_params.base.profile_acceleration);
-//						printintln(pp_params.base.profile_deceleration);
-//						printintln(pp_params.base.quick_stop_deceleration);
-//						printintln(pp_params.software_position_limit_max);
-//						printintln(pp_params.software_position_limit_min);
-//						printintln(pp_params.polarity);
-//						printintln(pp_params.max_acceleration);
+						printintln(pp_params.base.max_profile_velocity);
+						printintln(pp_params.profile_velocity);
+						printintln(pp_params.base.profile_acceleration);
+						printintln(pp_params.base.profile_deceleration);
+						printintln(pp_params.base.quick_stop_deceleration);
+						printintln(pp_params.software_position_limit_max);
+						printintln(pp_params.software_position_limit_min);
+						printintln(pp_params.polarity);
+						printintln(pp_params.max_acceleration);
 
 
 						//printstrln("end pp");
@@ -230,7 +230,7 @@ t:>time;
 						}
 
 						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
-						init_position_sensor_ecat(sensor_select, c_position_ctrl);*/
+						init_position_sensor_ecat(sensor_select, c_position_ctrl);//*/
 
 						init_position_profile_limits(qei_params.gear_ratio, pp_params.max_acceleration, pp_params.base.max_profile_velocity);
 						InOut.operation_mode_display = PP;
@@ -352,7 +352,10 @@ t:>time;
 								actual_velocity = 0-actual_velocity;
 								sense = -1;
 							}
-							steps = init_stop( (actual_velocity*360)/(60*hall_params.gear_ratio), actual_position, csp_params.base.max_acceleration);
+							if(op_mode == CSP)
+								steps = init_quick_stop_position_profile( (actual_velocity*360)/(60*hall_params.gear_ratio), actual_position, csp_params.base.max_acceleration);
+							else if(op_mode == PP)
+								steps = init_quick_stop_position_profile( (actual_velocity*360)/(60*hall_params.gear_ratio), actual_position, pp_params.base.quick_stop_deceleration);
 							i = 0;
 							mode_selected = 3;// non interruptible mode
 							mode_quick_flag = 0;
@@ -509,7 +512,7 @@ t:>time;
 				{actual_position, sense} = get_qei_position_count(c_qei_p4);
 				while(i < steps)
 				{
-					target_position   =   mot_q_stop(i, sense);
+					target_position   =   quick_stop_position_profile_generate(i, sense);
 					set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
 					actual_position = get_position(c_position_ctrl);
 					send_actual_position(actual_position);
@@ -664,8 +667,8 @@ int main(void) {
 
 				{
 					hall_par hall_params;
-					init_hall_param(hall_params);
-			//		comm_init_ecat(c_signal, hall_params);
+			//		init_hall_param(hall_params);
+					comm_init_ecat(c_signal, hall_params);
 
 					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
 							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
@@ -673,16 +676,16 @@ int main(void) {
 
 				{
 					hall_par hall_params;
-					init_hall_param(hall_params);
-			//		hall_init_ecat(c_hall_p4, hall_params);
+			//		init_hall_param(hall_params);
+					hall_init_ecat(c_hall_p4, hall_params);
 
 					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
 				}
 
 				{
 					qei_par qei_params;
-					init_qei_param(qei_params);
-			//		qei_init_ecat(c_qei_p4, qei_params);
+			//		init_qei_param(qei_params);
+					qei_init_ecat(c_qei_p4, qei_params);
 
 					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4);  // channel priority 1,2..4
 				}

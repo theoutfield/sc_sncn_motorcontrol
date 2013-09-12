@@ -24,8 +24,8 @@
  *
  **************************************************************************/
 
-#ifndef __DC_MOTOR_CONFIG__H__test2
-#define __DC_MOTOR_CONFIG__H__test2
+#ifndef __DC_MOTOR_CONFIG__H__ethercat_mode
+#define __DC_MOTOR_CONFIG__H__ethercat_mode
 #include <print.h>
 
 
