@@ -38,20 +38,19 @@ struct pos_params
 
 
 
-
-int init_stop(int c_vel, int c_pos, int max_acc)  //emergency stop
+int init_quick_stop_position_profile(int actual_velocity, int actual_position, int max_acceleration)  //emergency stop
 {
 	pos_param_s.qi = 0;
-	pos_param_s.qf = (float) c_vel;   //always positive
+	pos_param_s.qf = (float) actual_velocity;   //always positive
 
 	 if(pos_param_s.qf < 0)
 		 pos_param_s.qf = 0 - pos_param_s.qf;
 
 	 pos_param_s.acc = pos_param_s.qf * 8;  // 8 times deceleration
-	 if(pos_param_s.acc > max_acc)
-		 pos_param_s.acc = max_acc;
+	 if(pos_param_s.acc > max_acceleration)
+		 pos_param_s.acc = max_acceleration;
 
-	 pos_param_s.cur_pos_s = (float) c_pos;
+	 pos_param_s.cur_pos_s = (float) actual_position;
 
 	 pos_param_s.tb = pos_param_s.qf / pos_param_s.acc;
 
@@ -63,15 +62,15 @@ int init_stop(int c_vel, int c_pos, int max_acc)  //emergency stop
 	 return (int)  round((pos_param_s.samp));
 }
 
-int mot_q_stop(int i, int c_vel)
+int quick_stop_position_profile_generate(int steps, int actual_velocity)
 {
-	pos_param_s.ts = pos_param_s.t_int*i;
+	pos_param_s.ts = pos_param_s.t_int*steps;
 	pos_param_s.q = pos_param_s.qf * pos_param_s.ts + pos_param_s.ci*pos_param_s.ts*pos_param_s.ts;
-    if(c_vel >= 0)
+    if(actual_velocity >= 0)
     {
     	return (int) round( pos_param_s.cur_pos_s + pos_param_s.q*10000.0f);
     }
-    else if(c_vel < 0)
+    else if(actual_velocity < 0)
     {
 	    return (int) round( pos_param_s.cur_pos_s - pos_param_s.q*10000.0f);
     }

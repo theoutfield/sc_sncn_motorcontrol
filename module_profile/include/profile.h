@@ -1,6 +1,9 @@
 //#include <dc_motor_config.h>
 #include <stdio.h>
 #include <math.h>
+
+#ifndef _PROFILE_H_
+#define _PROFILE_H_
 /*Profile Velocity Quick Stop*/
 
 extern int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceleration);
@@ -22,12 +25,10 @@ extern int init_position_profile(int target_position, int actual_position,	int v
 
 extern int position_profile_generate(int step);
 
+/*Profile Position Quick Stop*/
 
-typedef struct S_position {
-	int negative;
-	int c_vel;
-	int c_pos;
-} stop_data;
+extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int max_acceleration);  		//emergency stop profile
 
-extern int init_stop(int c_vel, int c_pos, int max_acc);  		//emergency stop profile
-extern  int mot_q_stop(int i, int c_vel);
+extern  int quick_stop_position_profile_generate(int steps, int actual_velocity);
+
+#endif /* _PROFILE_H_ */
