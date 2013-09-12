@@ -12,7 +12,7 @@ extern int quick_stop_velocity_profile_generate(int step);
 
 /*Profile Velocity Mode*/
 
-extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration);
+extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration, int max_velocity);
 
 extern int velocity_profile_generate(int step);
 

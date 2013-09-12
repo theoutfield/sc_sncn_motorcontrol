@@ -37,7 +37,7 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
 	 	pp_params.base.quick_stop_deceleration,\
 		pp_params.software_position_limit_min, \
 		pp_params.software_position_limit_max, \
-		pp_params.polarity,\
+		pp_params.base.polarity,\
 		pp_params.max_acceleration} = pp_sdo_update(coe_out);
 }
 
