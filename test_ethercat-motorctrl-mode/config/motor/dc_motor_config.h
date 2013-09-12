@@ -133,6 +133,7 @@ typedef struct PROFILE_VELOCITY_PARAM
 	int profile_acceleration;
 	int profile_deceleration;
 	int quick_stop_deceleration;
+	int polarity;
 } pv_par;
 
 typedef struct PROFILE_POSITION_PARAM
@@ -141,7 +142,6 @@ typedef struct PROFILE_POSITION_PARAM
 	int profile_velocity;
 	int software_position_limit_min;
 	int software_position_limit_max;
-	int polarity;
 	int max_acceleration;
 } pp_par;
 

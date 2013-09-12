@@ -203,7 +203,7 @@ t:>time;
 //										printintln(qei_params.max_count);
 //										printintln(qei_params.real_counts);
 
-//
+
 						printintln(pp_params.base.max_profile_velocity);
 						printintln(pp_params.profile_velocity);
 						printintln(pp_params.base.profile_acceleration);
@@ -211,9 +211,10 @@ t:>time;
 						printintln(pp_params.base.quick_stop_deceleration);
 						printintln(pp_params.software_position_limit_max);
 						printintln(pp_params.software_position_limit_min);
-						printintln(pp_params.polarity);
+						printintln(pp_params.base.polarity);
 						printintln(pp_params.max_acceleration);
-
+//						if(pp_params.base.polarity  == 255)
+//							pp_params.base.polarity = -1;
 
 						//printstrln("end pp");
 
@@ -262,7 +263,7 @@ t:>time;
 						ack = 0;
 						shutdown_ack = 0;
 
-/*						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
+						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
 						sensor_select = sensor_select_sdo(coe_out);
 						update_csp_param_ecat(csp_params, coe_out);
 						//printintln(csp_params.base.max_acceleration);
@@ -278,7 +279,7 @@ t:>time;
 						}
 
 						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
-						init_position_sensor_ecat(sensor_select, c_position_ctrl);*/
+						init_position_sensor_ecat(sensor_select, c_position_ctrl);//*/
 
 						InOut.operation_mode_display = CSP;
 					}
@@ -299,7 +300,7 @@ t:>time;
 						op_mode = CSV;
 						ack = 0;
 						shutdown_ack = 0;
-			/*			update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
+						update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
 						sensor_select = sensor_select_sdo(coe_out);
 						update_csv_param_ecat(csv_params, coe_out);
 
@@ -316,7 +317,7 @@ t:>time;
 
 						init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
 						init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
-*/
+//*/
 						InOut.operation_mode_display = CSV;
 					}
 					break;
@@ -344,7 +345,10 @@ t:>time;
 					else if(op_mode == CSP || op_mode == PP)
 					{
 						actual_velocity = get_hall_speed(c_hall_p4, hall_params);
-						actual_position = get_position(c_position_ctrl);
+					//	if(op_mode == CSP)
+							actual_position = get_position(c_position_ctrl);
+					//	else if(op_mode == PP)
+					//		actual_position = get_position(c_position_ctrl)*pp_params.base.polarity;
 						if(!(actual_velocity<40 && actual_velocity>-40))
 						{
 							if(actual_velocity < 0)
@@ -376,7 +380,7 @@ t:>time;
 						target_velocity = get_target_velocity();
 						set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
 
-						actual_velocity = get_velocity(c_velocity_ctrl);
+						actual_velocity = get_velocity(c_velocity_ctrl) *  csv_params.polarity;
 						send_actual_velocity(actual_velocity);
 					}
 					else if(op_mode == CSP)
@@ -385,7 +389,7 @@ t:>time;
 						set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
 
 
-						actual_position = get_position(c_position_ctrl);
+						actual_position = get_position(c_position_ctrl) * csp_params.base.polarity;
 						send_actual_position(actual_position);
 //#ifdef ENABLE_xscope_main
 					//					xscope_probe_data(0, actual_position);
@@ -398,8 +402,9 @@ t:>time;
 						{
 							target_position = get_target_position();
 							//printstr("tar pos ");printintln(target_position);
-							actual_position = get_position(c_position_ctrl);
+							actual_position = get_position(c_position_ctrl)*pp_params.base.polarity;
 							send_actual_position(actual_position);
+
 							if(prev_position != target_position)
 							{
 								ack = 0;
@@ -416,7 +421,10 @@ t:>time;
 							if(i < steps)
 							{
 								position_ramp = position_profile_generate(i);
-								set_position(position_ramp, c_position_ctrl);
+								//set_position(position_ramp, c_position_ctrl);
+								set_position( position_limit( position_ramp * pp_params.base.polarity ,	\
+										pp_params.software_position_limit_max * 10000  , 			\
+										pp_params.software_position_limit_min * 10000) , c_position_ctrl);
 
 								i++;
 							}
@@ -430,7 +438,7 @@ t:>time;
 								t when timerafter(time + 100*MSEC_STD) :> time;
 								ack = 1;
 							}
-							actual_position = get_position(c_position_ctrl);
+							actual_position = get_position(c_position_ctrl) *pp_params.base.polarity;
 							send_actual_position(actual_position);
 						}
 						//
@@ -477,10 +485,12 @@ t:>time;
 
 				while(i < steps)
 				{
-					target_velocity = quick_stop_velocity_profile_generate(i);		//p
-					set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
+					target_velocity = quick_stop_velocity_profile_generate(i);
+					//set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
+					set_velocity( max_speed_limit(target_velocity, csv_params.max_motor_speed), c_velocity_ctrl );
+
 					actual_velocity = get_velocity(c_velocity_ctrl);
-					send_actual_velocity(actual_velocity);
+					send_actual_velocity(actual_velocity * csv_params.polarity);
 #ifdef ENABLE_xscope_main
 //					xscope_probe_data(0, actual_velocity);
 //					xscope_probe_data(1, target_velocity);
@@ -491,7 +501,7 @@ t:>time;
 				}
 				if(i >= steps)
 				{
-					send_actual_velocity(actual_velocity);
+					send_actual_velocity(actual_velocity*csv_params.polarity);
 					if(actual_velocity < 50 || actual_velocity > -50)
 					{
 						ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
@@ -513,9 +523,26 @@ t:>time;
 				while(i < steps)
 				{
 					target_position   =   quick_stop_position_profile_generate(i, sense);
-					set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
-					actual_position = get_position(c_position_ctrl);
-					send_actual_position(actual_position);
+				//	set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
+					if(op_mode == CSP)
+					{
+						set_position( position_limit( target_position ,				\
+								csp_params.max_position_limit * 10000  , 			\
+								csp_params.min_position_limit * 10000) , c_position_ctrl);
+						actual_position = get_position(c_position_ctrl);
+						send_actual_position(actual_position * csp_params.base.polarity);
+					}
+					else if(op_mode == PP)
+					{
+						set_position( position_limit( target_position ,						\
+								pp_params.software_position_limit_max * 10000  , 			\
+								pp_params.software_position_limit_min * 10000) , c_position_ctrl);
+						actual_position = get_position(c_position_ctrl);
+						send_actual_position(actual_position * pp_params.base.polarity);
+					}
+//						send_actual_position(actual_position * pp_params.base.polarity);
+//					else if(op_mode == CSP)
+//						send_actual_position(actual_position * csp_params.base.polarity);pp
 //#ifdef ENABLE_xscope_main
 				//	xscope_probe_data(0, actual_position);
 				//	xscope_probe_data(1, target_position);
@@ -531,7 +558,10 @@ t:>time;
 				{
 					actual_velocity = get_hall_speed(c_hall_p4, hall_params);
 					actual_position = get_position(c_position_ctrl);
-					send_actual_position(actual_position);
+					if(op_mode == CSP)
+						send_actual_position(actual_position * csp_params.base.polarity);
+					else if(op_mode == PP)
+						send_actual_position(actual_position*pp_params.base.polarity);
 					if(actual_velocity < 50 || actual_velocity > -50)
 					{
 						mode_selected = 100;
