@@ -20,27 +20,18 @@
 #include "hall_client.h"
 #include "qei_client.h"
 #include "pwm_service_inv.h"
-#include "adc_ad7949.h"
-#include "test.h"
-#include "pwm_config.h"
 #include "comm_loop.h"
 #include "refclk.h"
 #include "velocity_ctrl.h"
 #include <xscope.h>
 #include "qei_client.h"
 #include "qei_server.h"
-#include "adc_client_ad7949.h"
 #include <dc_motor_config.h>
-#include "sine_table_big.h"
-#include "print.h"
-#include "filter_blocks.h"
 #include "profile.h"
 #include <flash_somanet.h>
 #include <internal_config.h>
-#include <ctrlproto.h>
 
 #include <drive_config.h>
-#include "profile_test.h"
 
 #define ENABLE_xscope_main
 #define COM_CORE 0
@@ -60,91 +51,6 @@ void xscope_initialise()
 	return;
 }
 
-ctrl_proto_values_t InOut;
-
-int get_target_velocity()
-{
-	return InOut.target_velocity;
-}
-void send_actual_velocity(int actual_velocity)
-{
-	InOut.velocity_actual = actual_velocity;
-}
-
-/*
-void ether_comm(chanend pdo_out, chanend pdo_in, chanend c_signal, chanend c_hall_p4,chanend c_qei_p4,chanend c_adc,chanend c_torque_ctrl,chanend c_velocity_ctrl,chanend c_position_ctrl)
-{
-	int i = 0;
-	int mode = 2;
-	int core_id = 0;
-
-	int target_velocity;
-	int actual_velocity = 0;
-
-	timer t;
-
-	int init = 0;
-	int flag = 0;
-	csv_par csv_params;
-	unsigned int time;
-	int state;
-	int statusword;
-	int controlword;
-	check_list checklist;
-
-	state 		= init_state(); 			//init state
-	checklist 	= init_checklist();
-	InOut 		= init_ctrl_proto();
-
-	init_csv_param(csv_params);
-
-#ifdef ENABLE_xscope_main
-	xscope_initialise();
-#endif
-t:>time;
-	while(1)
-	{
-		ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
-
-	//	wait_ms(1, core_id, t);
-		controlword = InOut.control_word;
-		update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
-	//	printintln(controlword);
-
-		state = get_next_state(state, checklist, controlword);
-		statusword = update_statusword(statusword, state);
-		InOut.status_word = statusword;
-
-		switch(InOut.operation_mode)
-		{
-			case CSV: 	//csv mode index
-				if(flag == 0)
-				{
-					init = init_velocity_control(c_velocity_ctrl);
-				}
-				if(init == 1)
-				{
-					flag = 1; mode = 4;
-				}
-				InOut.operation_mode_display = CSV;
-				//printstrln("csv");
-				target_velocity = get_target_velocity();
-				set_velocity_csv(csv_params, target_velocity, 0, 0, c_velocity_ctrl);
-
-				actual_velocity = get_velocity(c_velocity_ctrl);
-				send_actual_velocity(actual_velocity);
-
-				xscope_probe_data(0, actual_velocity);
-				xscope_probe_data(1, target_velocity);
-				break;
-		}
-		t when timerafter(time + MSEC_STD) :> time;
-
-	}
-
-
-}
-*/
 
 //test PVM
 void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
@@ -155,31 +61,33 @@ void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
 	int steps;
 	int velocity_ramp;
 
-	int actual_velocity = 0;     // rpm
-	int target_velocity = 2000;	 // rpm
-	int acc = 8000;				 // rpm/s
-	int dec = 1050;				 // rpm/s
+	int actual_velocity = 0;     		// rpm
+	int target_velocity = 2000;	 		// rpm
+	int acceleration 	= 2000;			// rpm/s      variable parameters
+	int deceleration 	= 1050;			// rpm/s
 
 	timer t;
 	unsigned time;
 
-	csv_par csv_params;
+	pv_par pv_params;
 
 	int init = 0;
 	int init_state = INIT_BUSY;
 
-	init_csv_param(csv_params);
+	init_pv_params(pv_params);
+
+	acceleration = 	pv_params.profile_acceleration;   // or fixed parameters
+	deceleration =  pv_params.profile_deceleration;
 
 #ifdef ENABLE_xscope_main
-	xscope_initialise();
+//	xscope_initialise();
 #endif
 	while(1)
 	{
-		//printintln(init_state);
 		init_state = __check_commutation_init(c_signal);
 		if(init_state == INIT)
 		{
-			printstrln("comm intialized");
+			printstrln("commutation intialized");
 			break;
 		}
 	}
@@ -196,41 +104,37 @@ void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
 	if(init_state == INIT)
 	{
 
-		steps = init_velocity_profile(target_velocity, actual_velocity * csv_params.polarity, acc, dec);
+		steps = init_velocity_profile(target_velocity, actual_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY);
 
 		for(i = 1; i < steps; i++)
 		{
 			wait_ms(1, core_id, t);
 
 			velocity_ramp = velocity_profile_generate(i);
-			set_velocity_csv(csv_params, velocity_ramp, 0, 0, c_velocity_ctrl);
-
+			set_velocity(velocity_ramp, c_velocity_ctrl);
 			actual_velocity = get_velocity(c_velocity_ctrl);
 
-			xscope_probe_data(0, actual_velocity);
-			xscope_probe_data(1, velocity_ramp);
+//			xscope_probe_data(0, actual_velocity);
+//			xscope_probe_data(1, velocity_ramp);
 		}
 
 		wait_s(2, core_id, t);  // wait 2 seconds
 
 		actual_velocity = get_velocity(c_velocity_ctrl);	// rpm
 		target_velocity = 0; 								// rpm
-		acc = 8000; 										// rpm/s
-		dec = 1050;											// rpm/s
 
-		steps = init_velocity_profile(target_velocity, actual_velocity * csv_params.polarity, acc, dec);
+		steps = init_velocity_profile(target_velocity, actual_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY);
 
 		for(i = 1; i < steps; i++)
 		{
 			wait_ms(1, core_id, t);
 
 			velocity_ramp = velocity_profile_generate(i);
-			set_velocity_csv(csv_params, velocity_ramp, 0, 0, c_velocity_ctrl);
-
+			set_velocity(velocity_ramp, c_velocity_ctrl);
 			actual_velocity = get_velocity(c_velocity_ctrl);
 
-			xscope_probe_data(0, actual_velocity);
-			xscope_probe_data(1, velocity_ramp);
+//			xscope_probe_data(0, actual_velocity);
+//			xscope_probe_data(1, velocity_ramp);
 
 		}
 
@@ -238,34 +142,33 @@ void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
 		{
 			wait_ms(1, core_id, t);
 
-			set_velocity_csv(csv_params, velocity_ramp, 0, 0, c_velocity_ctrl);
-
+			set_velocity(velocity_ramp, c_velocity_ctrl);
 			actual_velocity = get_velocity(c_velocity_ctrl);
 
-			xscope_probe_data(0, actual_velocity);
-			xscope_probe_data(1, velocity_ramp);
+//			xscope_probe_data(0, actual_velocity);
+//			xscope_probe_data(1, velocity_ramp);
 		}
 	}
 }
 
 int main(void) {
-	chan c_adc, c_adctrig;
+	chan c_adctrig;
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan c_pwm_ctrl;
 	chan c_signal_adc;
 	chan c_sig_1, c_signal;
-	chan c_velocity_ctrl, c_torque_ctrl, c_position_ctrl;
+	chan c_velocity_ctrl;
 
 	//etherCat Comm channels
-	chan coe_in; ///< CAN from module_ethercat to consumer
-	chan coe_out; ///< CAN from consumer to module_ethercat
-	chan eoe_in; ///< Ethernet from module_ethercat to consumer
-	chan eoe_out; ///< Ethernet from consumer to module_ethercat
+	chan coe_in; 	///< CAN from module_ethercat to consumer
+	chan coe_out; 	///< CAN from consumer to module_ethercat
+	chan eoe_in; 	///< Ethernet from module_ethercat to consumer
+	chan eoe_out; 	///< Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; ///< File from module_ethercat to consumer
-	chan foe_out; ///< File from consumer to module_ethercat
+	chan foe_in; 	///< File from module_ethercat to consumer
+	chan foe_out; 	///< File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
 
@@ -284,51 +187,9 @@ int main(void) {
 			//firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}
 
-		on stdcore[0] :
-		{
-			//ether_comm(pdo_out, pdo_in, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
-			// test CSV over ethercat with PVM on master side
-		}
 		on stdcore[1]:
 		{
 			profile_velocity_test(c_signal, c_velocity_ctrl);			// test PVM on slave side
-
-			/*par
-			{
-
-				{
-					{
-						int init_state = INIT_BUSY;
-
-						while(1)
-						{
-							//printintln(init_state);
-							init_state = __check_commutation_init(c_signal);
-							if(init_state == INIT)
-							{
-								printstrln("comm intialized");
-								break;
-							}
-						}
-
-						init_state = INIT_BUSY;
-
-						c_velocity_ctrl <: 1;
-						while(1)
-						{
-							printintln(init_state);
-							init_state = __check_velocity_init(c_velocity_ctrl);
-							if(init_state == INIT)
-							{
-								printstrln("vel intialized");
-								break;
-							}
-						}
-
-
-					}
-				}
-			}*/
 		}
 
 		on stdcore[2]:
@@ -360,10 +221,6 @@ int main(void) {
 		{
 			par
 			{
-
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
-						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
-						p_ifm_adc_misob);
 
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
