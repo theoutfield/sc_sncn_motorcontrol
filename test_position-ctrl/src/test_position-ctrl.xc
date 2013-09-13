@@ -67,25 +67,20 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 
 	int init_state = INIT_BUSY;
 
-	int acceleration = 350;				// rpm/s       	 variable parameters
-	int deceleration = 350;     		// rpm/s
-	int velocity = 350;					// rpm
+	int acceleration 	= 350;			// rpm/s       	 variable parameters
+	int deceleration 	= 350;     		// rpm/s
+	int velocity 		= 350;			// rpm
+
 	int actual_position = 0;			// degree
 	int target_position = 350;			// degree
-	int quick_stop_deceleration;
 
 	init_qei_param(qei_params);
 	init_pp_params(pp_params);
 
 	acceleration = pp_params.base.profile_acceleration;   // or fixed parameters
-	deceleration =  pp_params.base.profile_deceleration;
-	velocity = pp_params.profile_velocity;
-	quick_stop_deceleration = pp_params.base.quick_stop_deceleration;
+	deceleration = pp_params.base.profile_deceleration;
+	velocity 	 = pp_params.profile_velocity;
 
-//	printintln(acceleration);
-//	printintln(deceleration);
-//	printintln(velocity);
-//	printintln(quick_stop_deceleration);
 
 #ifdef ENABLE_xscope_main
 	xscope_initialise();
@@ -112,7 +107,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 
 	if(init_state == INIT)
 	{
-		init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, pp_params.base.max_profile_velocity);
+		init_position_profile_limits(qei_params.gear_ratio, MAX_ACCELERATION, MAX_PROFILE_VELOCITY);
 
 		actual_position = get_position(c_position_ctrl); //degree * 10000
 		steps = init_position_profile(target_position*10000, actual_position, velocity, acceleration, deceleration);
@@ -127,9 +122,10 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 			xscope_probe_data(0, actual_position);
 			xscope_probe_data(1, position_ramp);
 		}
+
 		wait_ms(100, core_id, t);
 		actual_position = get_position(c_position_ctrl); //degree * 10000
-		target_position = 1;			//degree
+		target_position = 1;							 //degree
 		steps = init_position_profile(target_position*10000, actual_position, velocity, acceleration, deceleration);
 
 		for(i = 1; i < steps; i++)
@@ -142,6 +138,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 			xscope_probe_data(0, actual_position);
 			xscope_probe_data(1, position_ramp);
 		}
+
 		while(1)
 		{
 			wait_ms(1, core_id, t);
@@ -199,7 +196,6 @@ int main(void)
 
 		on stdcore[2]:
 		{
-
 			{
 				 ctrl_par position_ctrl_params;
 				 hall_par hall_params;
@@ -231,7 +227,7 @@ int main(void)
 					hall_par hall_params;
 					init_hall_param(hall_params);
 					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
-												c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
+												c_commutation_p1, c_commutation_p2, c_commutation_p3);	// hall based sinusoidal commutation
 				}
 
 				{
