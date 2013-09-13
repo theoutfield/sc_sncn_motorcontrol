@@ -7,6 +7,15 @@
 #include <qei_client.h>
 #include <internal_config.h>
 
+int get_target_velocity(ctrl_proto_values_t InOut);
+
+int get_target_position(ctrl_proto_values_t InOut);
+
+void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
+
+void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
+
+
 void update_hall_param_ecat(hall_par &hall_params, chanend coe_out);
 
 void update_qei_param_ecat(qei_par &qei_params, chanend coe_out);
