@@ -74,7 +74,7 @@ int max_speed_limit(int velocity, int max_speed) {
 	} else if (velocity < -max_speed) {
 		velocity = -max_speed;
 		return velocity;
-	} else if (velocity > -max_speed && velocity < max_speed) {
+	} else if (velocity >= -max_speed && velocity <= max_speed) {
 		return velocity;
 	}
 }
