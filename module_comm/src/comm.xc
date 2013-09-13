@@ -103,7 +103,7 @@ void comm_init_ecat(chanend c_signal, hall_par &hall_params)
 		#pragma ordered
 		select
 		{
-			case c_signal :> command:  //
+			case c_signal :> command:
 				//printintln(command);
 				if(command == CHECK_BUSY)
 				{
@@ -148,7 +148,7 @@ void hall_init_ecat(chanend c_hall, hall_par &hall_params)
 		#pragma ordered
 		select
 		{
-			case c_hall :> command:  //
+			case c_hall :> command:
 				if(command == CHECK_BUSY)
 				{
 					c_hall <: init_state;
@@ -194,7 +194,7 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
 		#pragma ordered
 		select
 		{
-			case c_qei :> command:  //
+			case c_qei :> command:
 				if(command == CHECK_BUSY)
 				{
 					c_qei <: init_state;
@@ -222,3 +222,4 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
 			break;
 	}
 }
+
