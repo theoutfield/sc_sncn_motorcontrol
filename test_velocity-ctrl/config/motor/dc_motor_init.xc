@@ -19,9 +19,11 @@ void init_qei_param(qei_par &qei_params)
 	return;
 }
 
+
 void init_csv_param(csv_par &csv_params)
 {
 	csv_params.max_motor_speed = MAX_NOMINAL_SPEED;
+	csv_params.max_acceleration = MAX_ACCELERATION;
 	if(POLARITY >= 0)
 		csv_params.polarity = 1;
 	else if(POLARITY < 0)
@@ -32,6 +34,7 @@ void init_csv_param(csv_par &csv_params)
 void init_csp_param(csp_par &csp_params)
 {
 	csp_params.base.max_motor_speed = MAX_NOMINAL_SPEED;
+	csp_params.base.max_acceleration = MAX_ACCELERATION;
 	if(POLARITY >= 0)
 		csp_params.base.polarity = 1;
 	else if(POLARITY < 0)

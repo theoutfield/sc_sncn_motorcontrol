@@ -44,7 +44,7 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 #define QEI 2
 
 
-void xscope_initialise()
+void xscope_initialise_1()
 {
 	xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
 						XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
@@ -83,7 +83,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_signal)
 
 
 #ifdef ENABLE_xscope_main
-	xscope_initialise();
+	xscope_initialise_1();
 #endif
 
 	while(1)

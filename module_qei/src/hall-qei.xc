@@ -175,7 +175,7 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, chanend c_qei, ch
 			break;
 
 			case t_hall when timerafter(time_hall + 5000) :> time_hall: //4khz  20000 14000
-			hall_position = get_hall_angle( c_hall);
+			hall_position = get_hall_position( c_hall);
 			//	xscope_probe_data(1, hall_position);
 
 

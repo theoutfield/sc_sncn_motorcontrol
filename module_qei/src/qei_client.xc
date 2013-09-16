@@ -20,23 +20,20 @@
 
 #include <xs1.h>
 #include <stdio.h>
-#include "qei_commands.h"
+#include "qei_config.h"
 #include "qei_client.h"
 #include <dc_motor_config.h>
 #include <print.h>
 
-
 //get position and valid from qei directly
-{unsigned, unsigned} get_qei_position(chanend c_qei, qei_par &qei_params)
+{unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params)
 {
-	unsigned p, ts1, ts2, v;
+	unsigned int p, v;
 
 
-	c_qei <: QEI_CMD_POS_REQ;
+	c_qei <: QEI_RAW_POS_REQ;
 	master {
 		c_qei :> p;
-		c_qei :> ts1;
-		c_qei :> ts2;
 		c_qei :> v;
 	}
 	p &= (qei_params.max_count - 1);
@@ -45,15 +42,29 @@
 }
 
 //counted up position from qei with gear ratio
-{int, int} get_qei_position_count(chanend c_qei)
+{int, int} get_qei_position_absolute(chanend c_qei)
 {
 	int pos;
 	int dirn; 				// clockwise +1  counterclockwise -1
-	c_qei <: 2;
+	c_qei <: QEI_ABSOLUTE_POS_REQ;
 	master
 	{
 		c_qei :> pos;
 		c_qei :> dirn;
 	}
 	return {pos, dirn};
+}
+
+int get_qei_velocity(chanend c_qei, qei_par &qei_params)
+{
+	int velocity;
+
+	c_qei <: QEI_VELOCITY_REQ;
+	master
+	{
+		c_qei :> velocity;
+	}
+	velocity = ((velocity / FILTER_LENGTH)*QEI_RPM_CONST) / (qei_params.real_counts);
+
+	return {velocity};
 }

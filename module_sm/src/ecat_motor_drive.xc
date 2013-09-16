@@ -156,7 +156,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			}
 			else if(op_mode == CSP || op_mode == PP)
 			{
-				actual_velocity = get_hall_speed(c_hall_p4, hall_params);
+				actual_velocity = get_hall_velocity(c_hall_p4, hall_params);
 				actual_position = get_position(c_position_ctrl);
 
 				if(!(actual_velocity<40 && actual_velocity>-40))
@@ -174,7 +174,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					mode_selected = 3;// non interruptible mode
 					mode_quick_flag = 0;
 				}
-				{actual_position, sense} = get_qei_position_count(c_qei_p4);
+				{actual_position, sense} = get_qei_position_absolute(c_qei_p4);
 				while(i < steps)
 				{
 					target_position   =   quick_stop_position_profile_generate(i, sense);
@@ -429,7 +429,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					}
 					else if(op_mode == CSP || op_mode == PP)
 					{
-						actual_velocity = get_hall_speed(c_hall_p4, hall_params);
+						actual_velocity = get_hall_velocity(c_hall_p4, hall_params);
 						actual_position = get_position(c_position_ctrl);
 
 						if(!(actual_velocity<40 && actual_velocity>-40))
@@ -650,7 +650,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			}
 			else if(op_mode == CSP || op_mode == PP)
 			{
-				{actual_position, sense} = get_qei_position_count(c_qei_p4);
+				{actual_position, sense} = get_qei_position_absolute(c_qei_p4);
 				while(i < steps)
 				{
 					target_position   =   quick_stop_position_profile_generate(i, sense);
@@ -683,7 +683,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				}
 				if(i >=steps )
 				{
-					actual_velocity = get_hall_speed(c_hall_p4, hall_params);
+					actual_velocity = get_hall_velocity(c_hall_p4, hall_params);
 					actual_position = get_position(c_position_ctrl);
 					if(op_mode == CSP)
 						send_actual_position(actual_position * csp_params.base.polarity, InOut);

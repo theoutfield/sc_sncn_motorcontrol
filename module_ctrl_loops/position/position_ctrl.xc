@@ -3,7 +3,7 @@
 #include <print.h>
 #include <drive_config.h>
 
-#define DEBUG
+//#define DEBUG
 //#define debug_print
 
 /*Internal Controller Configs*/
@@ -223,11 +223,11 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
 				if(sensor_used == HALL)
 				{   /* 100/(500*819) ~ 1/4095 appr (hall)  - to keep position info from hall in same range as qei*/
-					actual_position = ( ( ( (get_hall_absolute_pos(c_hall)/500)*precision_factor)/precision )/819)*100;
+					actual_position = ( ( ( (get_hall_position_absolute(c_hall)/500)*precision_factor)/precision )/819)*100;
 				}
 				else if(sensor_used == QEI)
 				{
-					{actual_position, direction} =  get_qei_position_count(c_qei);
+					{actual_position, direction} =  get_qei_position_absolute(c_qei);
 					actual_position = (actual_position * precision_factor)/precision;
 				}
 

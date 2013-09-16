@@ -6,27 +6,48 @@
 #include "dc_motor_config.h"
 #include <internal_config.h>
 #include <xscope.h>
+#include "hall_config.h"
+
+void hall_client_handler(chanend c_hall, int command, int angle, int time_elapsed, int init_state, int count)
+{
+	if (command == HALL_POS_REQ)
+	{
+		c_hall <: angle;
+	}
+	else if (command == HALL_VELOCITY_REQ)
+	{
+		c_hall <: time_elapsed;
+	}
+	else if (command == HALL_ABSOLUTE_POS_REQ)
+	{
+		c_hall <: count;
+	}
+	else if (command == CHECK_BUSY)
+	{
+		c_hall <: init_state;
+	}
+}
 
 void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
 		chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4)
 {
 	timer tx;
 	unsigned int ts;
-	unsigned command;
+	unsigned int command;
 
-	unsigned angle1;			 // newest angle (base angle on hall state transition)
-	unsigned delta_angle;
-	unsigned angle;
+	unsigned int angle1;			 // newest angle (base angle on hall state transition)
+	unsigned int delta_angle;
+	unsigned int angle;
 
-	unsigned iCountMicroSeconds;
-	unsigned iPeriodMicroSeconds;
-	unsigned iTimeCountOneTransition = 0;
-	unsigned iTimeSaveOneTransition = 0;
+	unsigned int iCountMicroSeconds;
+	unsigned int iPeriodMicroSeconds;
+	unsigned int iTimeCountOneTransition = 0;
+	unsigned int iTimeSaveOneTransition = 0;
 
-	unsigned pin_state; 		// newest hall state
-	unsigned pin_state_last;
-	unsigned new1, new2;
-	unsigned uHallNext, uHallPrevious;
+	unsigned int pin_state; 		// newest hall state
+	unsigned int pin_state_last;
+	unsigned int new1, new2;
+	unsigned int uHallNext, uHallPrevious;
 	int xreadings = 0;
 
 	int iHallError = 0;
@@ -173,28 +194,19 @@ void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
 		#pragma ordered
 		select {
 			case c_hall_p1 :> command:
-				if (command == 1) {c_hall_p1 <: angle;}
-				else if (command == 2) {c_hall_p1 <: time_elapsed;}
-				else if (command == 3) {c_hall_p1 <: count;}
+				hall_client_handler(c_hall_p1, command, angle, time_elapsed, init_state, count);
 				break;
 
 			case c_hall_p2 :> command:
-				if (command == 1) {c_hall_p2 <: angle;}
-				else if (command == 2) {c_hall_p2 <: time_elapsed;}
-				else if (command == 3) {c_hall_p2 <: count;}
+				hall_client_handler(c_hall_p2, command, angle, time_elapsed, init_state, count);
 				break;
 
 			case c_hall_p3 :> command:
-				if (command == 1) {c_hall_p3 <: angle;}
-				else if (command == 2) {c_hall_p3 <: time_elapsed;}
-				else if (command == 3) {c_hall_p3 <: count;}
+				hall_client_handler(c_hall_p3, command, angle, time_elapsed, init_state, count);
 				break;
 
 			case c_hall_p4 :> command:
-				if (command == 1) {c_hall_p4 <: angle;}
-				else if (command == 2) {c_hall_p4 <: time_elapsed;}
-				else if (command == 3) {c_hall_p4 <: count;}
-				else if (command == CHECK_BUSY) {c_hall_p4 <: init_state;}
+				hall_client_handler(c_hall_p4, command, angle, time_elapsed, init_state, count);
 				break;
 
 			default:

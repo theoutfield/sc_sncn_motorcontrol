@@ -20,7 +20,10 @@
 #define __QEI_SERVER_H__
 #include <xs1.h>
 #include <dc_motor_config.h>
-
+#include "qei_config.h"
+#include "internal_config.h"
+#include <refclk.h>
+#include "filter_blocks.h"
 
 /**
  * \brief Implementation of the QEI server thread (with index/no index)

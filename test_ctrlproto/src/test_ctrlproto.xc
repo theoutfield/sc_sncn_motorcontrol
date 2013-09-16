@@ -154,7 +154,7 @@ int main(void)
 				printintln(controlword);
 
 				state = get_next_state(state, checklist, controlword);
-				statusword = update_statusword(statusword, state, 0);
+			//	statusword = update_statusword(statusword, state, 0);
 				InOut.status_word = statusword;
 			}
 		}

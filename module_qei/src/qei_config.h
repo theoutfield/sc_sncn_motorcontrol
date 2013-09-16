@@ -1,5 +1,5 @@
 /**
- * File:    qei_commands.h
+ * File:    qei_config.h
  *
  * The copyrights, all other intellectual and industrial 
  * property rights are retained by XMOS and/or its licensors. 
@@ -14,12 +14,13 @@
  * copyright notice above.
  *
  **/                                   
-#ifndef __QEI_COMMANDS_H__
-#define __QEI_COMMANDS_H__
+#ifndef __QEI_CONFIG_H__
+#define __QEI_CONFIG_H__
 
-#define QEI_CMD_POS_REQ			1
-#define QEI_CMD_SPEED_REQ		2
-#define QEI_CMD_POS_KNOWN_REQ 	3
-#define QEI_CMD_CW_REQ			4
+#define FILTER_LENGTH 8
+#define QEI_RPM_CONST 1000*60
+#define QEI_RAW_POS_REQ 1
+#define QEI_ABSOLUTE_POS_REQ 2
+#define QEI_VELOCITY_REQ 3
 
-#endif /* __QEI_COMMANDS_H__ */
+#endif /* __QEI_CONFIG_H__ */

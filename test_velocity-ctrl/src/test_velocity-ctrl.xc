@@ -40,7 +40,7 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-void xscope_initialise()
+void xscope_initialise_1()
 {
 	{
 		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
@@ -80,7 +80,7 @@ void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl)
 	deceleration =  pv_params.profile_deceleration;
 
 #ifdef ENABLE_xscope_main
-//	xscope_initialise();
+//	xscope_initialise_1();
 #endif
 	while(1)
 	{

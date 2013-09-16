@@ -20,18 +20,17 @@
 #pragma once
 #include <stdint.h>
 #include "dc_motor_config.h"
-
-#define RPM_CONST 60000000  // 60 s/ 1us
+#include "hall_config.h"
 
 /**
  * \channel c_hall for communicating with the Hall Server
  *
  * \return the angle in range [0 - 4095] which maps to [0 - 359] degree
  */
-int get_hall_angle(chanend c_hall);
+int get_hall_position(chanend c_hall);
 
 
-int get_hall_absolute_pos(chanend c_hall);
+int get_hall_position_absolute(chanend c_hall);
 
 /**
  * \brief Client library function for Hall Sensor
@@ -40,4 +39,4 @@ int get_hall_absolute_pos(chanend c_hall);
  *
  * \return the speed in rpm from Hall Sensor
  */
-int get_hall_speed(chanend c_hall, hall_par &hall_params);
+int get_hall_velocity(chanend c_hall, hall_par &hall_params);

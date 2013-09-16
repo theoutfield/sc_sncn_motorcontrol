@@ -23,11 +23,13 @@
 #include<dc_motor_config.h>
 
 ///only position and valid
-{unsigned, unsigned} get_qei_position(chanend c_qei, qei_par &qei_params);
+{unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params);
 
 //counted up position and direction
-{int, int} get_qei_position_count(chanend c_qei);
+{int, int} get_qei_position_absolute(chanend c_qei);
 
+//return velocity
+int get_qei_velocity(chanend c_qei, qei_par &qei_params);
 
 extern int __qei_max_counts(int real_counts);
 

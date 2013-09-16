@@ -42,3 +42,27 @@ void init_csp_param(csp_par &csp_params)
 }
 
 
+void init_pp_params(pp_par &pp_params)
+{
+	pp_params.base.max_profile_velocity = MAX_PROFILE_VELOCITY;
+	pp_params.profile_velocity	= PROFILE_VELOCITY;
+	pp_params.base.profile_acceleration = PROFILE_ACCELERATION;
+	pp_params.base.profile_deceleration = PROFILE_DECELERATION;
+	pp_params.base.quick_stop_deceleration = QUICK_STOP_DECELERATION;
+	pp_params.max_acceleration = MAX_ACCELERATION;
+	pp_params.base.polarity = POLARITY;
+	pp_params.software_position_limit_max = MAX_POSITION_LIMIT;
+	pp_params.software_position_limit_min = MIN_POSITION_LIMIT;
+	return;
+}
+
+void init_pv_params(pv_par &pv_params)
+{
+	pv_params.max_profile_velocity = MAX_PROFILE_VELOCITY;
+	pv_params.profile_acceleration = PROFILE_ACCELERATION;
+	pv_params.profile_deceleration = PROFILE_DECELERATION;
+	pv_params.quick_stop_deceleration = QUICK_STOP_DECELERATION;
+	pv_params.polarity = POLARITY;
+	return;
+}
+

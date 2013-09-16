@@ -117,6 +117,7 @@ typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 	int nominal_current;
 	int motor_torque_constant;
 	int polarity;
+	int max_acceleration;
 } csv_par;
 
 

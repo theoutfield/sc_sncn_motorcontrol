@@ -203,7 +203,7 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 				if(filter_count == 10)
 				{
 					filter_count = 0;
-					actual_speed = get_hall_speed(c_hall, hall_params);
+					actual_speed = get_hall_velocity(c_hall, hall_params);
 				//	xscope_probe_data(0, actual_speed);
 					mod_speed = actual_speed;
 					if(actual_speed<0)
