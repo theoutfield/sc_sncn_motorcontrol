@@ -30,11 +30,12 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
 
 void update_csv_param_ecat(csv_par &csv_params, chanend coe_out)
 {
-	{csv_params.max_motor_speed, csv_params.nominal_current, csv_params.polarity} = csv_sdo_update(coe_out);
+	{csv_params.max_motor_speed, csv_params.nominal_current, csv_params.polarity, csv_params.max_acceleration} = csv_sdo_update(coe_out);
 	if(csv_params.polarity >= 0)
 		csv_params.polarity = 1;
 	else if(csv_params.polarity < 0)
 		csv_params.polarity = -1;
+	csv_params.motor_torque_constant = 0;
 }
 
 void update_csp_param_ecat(csp_par &csp_params, chanend coe_out)

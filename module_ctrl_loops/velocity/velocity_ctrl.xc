@@ -225,31 +225,29 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 
 
 				/* acq actual velocity hall/qei with filter*/
-
-				if(init == 0)
-				{
-					//set_commutation_sinusoidal(c_commutation, 400);
-					pos = get_hall_absolute_pos(c_hall);
-					if(pos > 2049)
-					{
-						init = 1;
-						prev = 2049;
-					}
-					else if(pos < -2049)
-					{
-						init = 1;
-						prev = -2049;
-					}
-					cal_speed = 0;
-
-					//target_velocity = 0;
-				}
 				if(sensor_used == HALL)
 				{
-					pos = get_hall_absolute_pos(c_hall);
-
-					if(init == 1)
+					if(init == 0)
 					{
+						//set_commutation_sinusoidal(c_commutation, 400);
+						pos = get_hall_absolute_pos(c_hall);
+						if(pos > 2049)
+						{
+							init = 1;
+							prev = 2049;
+						}
+						else if(pos < -2049)
+						{
+							init = 1;
+							prev = -2049;
+						}
+						cal_speed = 0;
+
+						//target_velocity = 0;
+					}
+					else if(init == 1)
+					{
+						pos = get_hall_absolute_pos(c_hall);
 						diff = pos - prev;
 						if(diff > 50000) diff = old;
 						else if(diff < -50000) diff = old;

@@ -6,6 +6,7 @@
  */
 #include <ecat_motor_drive.h>
 #include <xscope.h>
+#include <print.h>
 
 void xscope_initialise()
 {
@@ -17,7 +18,7 @@ void xscope_initialise()
 	}
 	return;
 }
-
+/*core 0/1/2 only*/
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall_p4,\
 		chanend c_qei_p4, chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
 {
@@ -61,6 +62,13 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	int shutdown_ack = 0;
 	int sensor_select;
 
+	int comm_active = 0;
+	unsigned int comm_inactive_time_stamp;
+	unsigned int c_time;
+	unsigned int inactive_delay = 100*MSEC_STD;
+	int comm_inactive_flag = 0;
+	int inactive_timeout_flag = 0;
+
 	unsigned int time;
 	int state;
 	int statusword;
@@ -73,12 +81,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	checklist 	= init_checklist();
 	InOut 		= init_ctrl_proto();
 
-	/*init_csv_param(csv_params);
+	init_csv_param(csv_params);
 	init_csp_param(csp_params);
 	init_hall_param(hall_params);
 	init_pp_params(pp_params);
 	init_pv_params(pv_params);
-	init_qei_param(qei_params);*/
+	init_qei_param(qei_params);
 
 //#ifdef ENABLE_xscope_main
  //xscope_initialise();
@@ -86,8 +94,116 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	t:>time;
 	while(1)
 	{
-		ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
+		comm_active = ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 
+		if(comm_active == 0)
+		{
+			if(comm_inactive_flag == 0)
+			{
+				comm_inactive_flag = 1;
+				t :> c_time;
+			}
+			else if(comm_inactive_flag == 1)
+			{
+				t :> comm_inactive_time_stamp;
+				if(comm_inactive_time_stamp - c_time> 1*SEC_STD)
+				{
+					//printstrln("comm inactive timeout");
+					inactive_timeout_flag = 1;
+				}
+			}
+		}
+		else if(comm_active >= 1)
+		{
+			comm_inactive_flag = 0;
+			inactive_timeout_flag = 0;
+		}
+
+		if(inactive_timeout_flag == 1)
+		{
+			if(op_mode == CSV || op_mode == PV)
+			{
+				actual_velocity = get_velocity(c_velocity_ctrl);
+				if(op_mode == CSV)
+					steps = init_quick_stop_velocity_profile(actual_velocity, csv_params.max_acceleration);//default acc
+				else if(op_mode == PV)
+					steps = init_quick_stop_velocity_profile(actual_velocity, pv_params.quick_stop_deceleration);
+				//printintln(steps);
+				i = 0;
+				while(i < steps)
+				{
+					target_velocity = quick_stop_velocity_profile_generate(i);
+					if(op_mode == CSV)
+					{
+						set_velocity( max_speed_limit(target_velocity, csv_params.max_motor_speed), c_velocity_ctrl );
+						actual_velocity = get_velocity(c_velocity_ctrl);
+						send_actual_velocity(actual_velocity * csv_params.polarity, InOut);
+					}
+					else if(op_mode == PV)
+					{
+						set_velocity( max_speed_limit(target_velocity, pv_params.max_profile_velocity), c_velocity_ctrl );
+						actual_velocity = get_velocity(c_velocity_ctrl);
+						send_actual_velocity(actual_velocity * pv_params.polarity, InOut);
+					}
+					t when timerafter(time + MSEC_STD) :> time;
+					i++;
+				}
+				if(i == steps )
+				{
+					//printstrln("stop");
+					while(1);
+				}
+			}
+			else if(op_mode == CSP || op_mode == PP)
+			{
+				actual_velocity = get_hall_speed(c_hall_p4, hall_params);
+				actual_position = get_position(c_position_ctrl);
+
+				if(!(actual_velocity<40 && actual_velocity>-40))
+				{
+					if(actual_velocity < 0)
+					{
+						actual_velocity = 0-actual_velocity;
+						sense = -1;
+					}
+					if(op_mode == CSP)
+						steps = init_quick_stop_position_profile( (actual_velocity*360)/(60*hall_params.gear_ratio), actual_position, csp_params.base.max_acceleration);
+					else if(op_mode == PP)
+						steps = init_quick_stop_position_profile( (actual_velocity*360)/(60*hall_params.gear_ratio), actual_position, pp_params.base.quick_stop_deceleration);
+					i = 0;
+					mode_selected = 3;// non interruptible mode
+					mode_quick_flag = 0;
+				}
+				{actual_position, sense} = get_qei_position_count(c_qei_p4);
+				while(i < steps)
+				{
+					target_position   =   quick_stop_position_profile_generate(i, sense);
+					if(op_mode == CSP)
+					{
+						set_position( position_limit( target_position ,				\
+								csp_params.max_position_limit * 10000  , 			\
+								csp_params.min_position_limit * 10000) , c_position_ctrl);
+						actual_position = get_position(c_position_ctrl);
+						send_actual_position(actual_position * csp_params.base.polarity, InOut);
+					}
+					else if(op_mode == PP)
+					{
+						set_position( position_limit( target_position ,						\
+								pp_params.software_position_limit_max * 10000  , 			\
+								pp_params.software_position_limit_min * 10000) , c_position_ctrl);
+						actual_position = get_position(c_position_ctrl);
+						send_actual_position(actual_position * pp_params.base.polarity, InOut);
+					}
+					t when timerafter(time + MSEC_STD) :> time;
+					i++;
+				}
+				if(i == steps )
+				{
+					//printstrln("stop");
+					while(1);
+				}
+			}
+		}
 
 		controlword = InOut.control_word;
 		update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
@@ -342,6 +458,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 				case 0x000f: //switch on cyclic
 					//printstrln("cyclic");
+
 					if(op_mode == CSV)
 					{
 						target_velocity = get_target_velocity(InOut);
@@ -443,11 +560,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							send_actual_velocity(actual_velocity, InOut);
 						}
 					}
-
 #ifdef ENABLE_xscope_main
 //					xscope_probe_data(0, actual_velocity);
 //					xscope_probe_data(1, target_velocity);
 #endif
+
+
 					break;
 
 
