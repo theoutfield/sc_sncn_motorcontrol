@@ -225,11 +225,12 @@ int main(void) {
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
-
 				{
 					hall_par hall_params;
+					commutation_par commutation_params;
 					init_hall_param(hall_params);
-					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
+					init_commutation_param(commutation_params); // initialize commutation params
+					commutation_sinusoidal(hall_params, commutation_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
 							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
 				}
 

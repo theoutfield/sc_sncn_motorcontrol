@@ -76,6 +76,9 @@
 #define DC100_RESOLUTION 	740
 #define DC900_RESOLUTION	264
 
+#define COMMUTATION_ANGLE_OFFSET_CLOCKWISE			  480  // range (0 - 4095)
+#define COMMUTATION_ANGLE_OFFSET_COUNTERCLOCKWISE	 3000  // range (0 - 4095)
+
 typedef struct S_Control
 {
 	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
@@ -110,6 +113,11 @@ typedef struct S_Hall {
 	int pole_pairs;
 	int gear_ratio;
 } hall_par;
+
+typedef struct S_COMMUTATION {
+	int angle_offset_clkwise;
+	int angle_offset_cclkwise;
+} commutation_par;
 
 typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 {
@@ -147,6 +155,13 @@ typedef struct PROFILE_POSITION_PARAM
 	int software_position_limit_max;
 	int max_acceleration;
 } pp_par;
+
+/**
+* \brief initialize commutation parameters
+*
+* \param commutation_params struct defines the commutation angle parameters
+*/
+void init_commutation_param(commutation_par &commutation_params);
 
 /**
  * \brief initialize QEI sensor

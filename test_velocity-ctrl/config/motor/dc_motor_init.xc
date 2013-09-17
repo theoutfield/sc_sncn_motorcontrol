@@ -3,6 +3,12 @@
 
 extern int __qei_max_counts(int real_counts);
 
+void init_commutation_param(commutation_par &commutation_params)
+{
+	commutation_params.angle_offset_clkwise = COMMUTATION_ANGLE_OFFSET_CLOCKWISE;
+	commutation_params.angle_offset_cclkwise = COMMUTATION_ANGLE_OFFSET_COUNTERCLOCKWISE;
+}
+
 void init_hall_param(hall_par &hall_params)
 {
 	hall_params.pole_pairs = POLE_PAIRS;

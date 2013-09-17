@@ -86,19 +86,25 @@ int main(void)
 		{
 			{
 				int command;
-				int init = 1;
+				int init = 0;
 				while(1)
 				{
 					init = __check_commutation_init(c_signal);
-					if(init == 0)
+					if(init == INIT)
+					{
+						printstrln("commutation intialized");
 						break;
+					}
 				}
 				init = 1;
 				while (1)
 				{
 					init = __check_torque_init(c_torque_ctrl);
-					if(init == 0)
+					if(init == INIT)
+					{
+						printstrln("torque control intialized");
 						break;
+					}
 				}
 				set_torque_test(c_torque_ctrl);
 			}
@@ -158,10 +164,13 @@ int main(void)
 
 				{
 					hall_par hall_params;
+					commutation_par commutation_params;
 					init_hall_param(hall_params);
-					commutation_sinusoidal(hall_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
+					init_commutation_param(commutation_params); // initialize commutation params
+					commutation_sinusoidal(hall_params, commutation_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
 							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
 				}
+
 
 				{
 					hall_par hall_params;
