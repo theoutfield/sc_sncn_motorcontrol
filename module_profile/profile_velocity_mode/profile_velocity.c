@@ -24,9 +24,9 @@ int init_velocity_profile(int target_velocity, int actual_velocity, int accelera
 	profile_vel_params.acc = (float) acceleration;
 	profile_vel_params.dec = (float) deceleration;
 
-	if(target_velocity > max_velocity)
+	if(target_velocity >= max_velocity)
 		target_velocity = max_velocity;
-	else if(target_velocity < -max_velocity)
+	else if(target_velocity <= -max_velocity)
 		target_velocity = 0-max_velocity;
 	profile_vel_params.v_d = (float) target_velocity;
 	//printf("srta");

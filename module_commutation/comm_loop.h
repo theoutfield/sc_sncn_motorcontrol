@@ -38,7 +38,7 @@ int init_commutation(chanend c_signal);
  * \channel c_commutation_p2 channel to receive motor voltage input value - priority 2
  * \channel c_commutation_p3 channel to receive motor voltage input value - priority 3
  */
-void commutation_sinusoidal(hall_par &hall_params, chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc,
+void commutation_sinusoidal(hall_par &hall_params, commutation_par &commutation_params, chanend c_hall, chanend c_pwm_ctrl, chanend signal_adc,
 		chanend c_signal, chanend  c_commutation_p1, chanend  c_commutation_p2, chanend  c_commutation_p3);
 /**
  *  \brief Set Input voltage for commutation loop
@@ -47,3 +47,5 @@ void commutation_sinusoidal(hall_par &hall_params, chanend c_hall, chanend c_pwm
  * 	\param input_voltage is motor voltage input value to be set (range allowed -13739 to 13739)
  */
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
+
+void set_commutation_params(chanend c_commutation, commutation_par &commutation_params);
