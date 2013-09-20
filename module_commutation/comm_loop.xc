@@ -61,6 +61,15 @@ void commutation_init_to_zero(chanend c_pwm_ctrl)
 	update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
+int absolute(int var)
+{
+	if(var < 0)
+		var = 0 - var;
+	return var;
+}
+
+#define FW_CONST 683  	//60  deg
+#define RW_CONST 2731	//240 deg
 /* Sinusoidal based commutation functions */
 
 void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commutation_params, chanend c_hall, chanend c_pwm_ctrl,
@@ -76,6 +85,8 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 	int voltage = 0;
 	int direction = 0;
 	int init_state = INIT;
+	//int angle_variance = commutation_params.angle_variance;
+	//int max_speed_reached = commutation_params.max_speed_reached;
 
 	while (1)
 	{
@@ -84,12 +95,13 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 		angle = get_hall_position(c_hall);
 
 
-		angle_rpm = speed;
-		if(angle_rpm < 0)
-			angle_rpm = -angle_rpm;
+//		angle_rpm = speed;
+//		if(angle_rpm < 0)
+//			angle_rpm = -angle_rpm;
 
-		angle_rpm *= 150;		// fixed variation range
-		angle_rpm /= 6780; 		// TODO should be settable (equal to max_rpm)
+		angle_rpm = (absolute(speed)*commutation_params.angle_variance)/commutation_params.max_speed_reached;
+//		angle_rpm *= 28;		// fixed variation range
+//		angle_rpm /= 3000; 		// TODO should be settable (equal to max_rpm)
 
 
 		if(voltage<0)
@@ -99,8 +111,8 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 
 
 		if (direction == 1)
-		{
-			angle_pwm = ((angle + angle_rpm  + commutation_params.angle_offset_clkwise) & 0x0fff) >> 4;					//100 M3  //100 M1 //180         TODO parameter  old 480
+		{//+ angle_rpm
+			angle_pwm = ((angle + angle_rpm + FW_CONST - commutation_params.angle_variance) & 0x0fff) >> 4;					//100 M3  //100 M1 //180           old 480
 																					// 0 - 4095  -> 0x0000 - 0x0fff
 			pwm[0] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
 			angle_pwm = (angle_pwm +85) & 0xff;
@@ -110,11 +122,12 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 
 		}
 		else if (direction == -1)
-		{
-			angle_pwm = ((angle - angle_rpm + commutation_params.angle_offset_cclkwise) & 0x0fff) >> 4;  				//2700 M3  //  2550 M1 //2700     TODO parameter old 3000
+		{//-angle_rpm
+			angle_pwm = ((angle - angle_rpm + RW_CONST + commutation_params.angle_variance) & 0x0fff) >> 4;  				//2700 M3  //  2550 M1 //2700      old 3000
 																					// 0 - 4095  -> 0x0000 - 0x0fff
 			pwm[0] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
 			angle_pwm = (angle_pwm +85) & 0xff;
+
 			pwm[1] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
 			angle_pwm = (angle_pwm + 86) & 0xff;
 			pwm[2] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
@@ -135,8 +148,8 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 				}
 				else if(command == SET_COMMUTATION_PARAMS)
 				{
-					c_commutation_p1 :> commutation_params.angle_offset_clkwise;
-					c_commutation_p1 :> commutation_params.angle_offset_cclkwise;
+					c_commutation_p1 :> commutation_params.angle_variance;
+					c_commutation_p1 :> commutation_params.max_speed_reached;
 				}
 				break;
 			case c_commutation_p2 :> command:
@@ -146,8 +159,8 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 				}
 				else if(command == SET_COMMUTATION_PARAMS)
 				{
-					c_commutation_p2 :> commutation_params.angle_offset_clkwise;
-					c_commutation_p2 :> commutation_params.angle_offset_cclkwise;
+					c_commutation_p2 :> commutation_params.angle_variance;
+					c_commutation_p2 :> commutation_params.max_speed_reached;
 				}
 				break;
 			case c_commutation_p3 :> command:
@@ -157,8 +170,8 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 				}
 				else if(command == SET_COMMUTATION_PARAMS)
 				{
-					c_commutation_p3 :> commutation_params.angle_offset_clkwise;
-					c_commutation_p3 :> commutation_params.angle_offset_cclkwise;
+					c_commutation_p3 :> commutation_params.angle_variance;
+					c_commutation_p3 :> commutation_params.max_speed_reached;
 				}
 				break;
 			case c_signal :> command:
@@ -179,8 +192,8 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params)
 {
 	c_commutation <: SET_COMMUTATION_PARAMS;
-	c_commutation <: commutation_params.angle_offset_clkwise;
-	c_commutation <: commutation_params.angle_offset_cclkwise;
+	c_commutation <: commutation_params.angle_variance;
+	c_commutation <: commutation_params.max_speed_reached;
 }
 /* MAX Input value 13739 */
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
