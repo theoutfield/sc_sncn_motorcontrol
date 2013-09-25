@@ -36,7 +36,7 @@
  */
 #define POLE_PAIRS  8
 #define GEAR_RATIO  26
-#define MAX_NOMINAL_SPEED  5500		// in rpm
+#define MAX_NOMINAL_SPEED  5260		// in rpm
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define MAX_ACCELERATION   5000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder

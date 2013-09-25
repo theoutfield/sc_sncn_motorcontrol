@@ -8,7 +8,7 @@
 #include <xscope.h>
 #include "hall_config.h"
 
-void hall_client_handler(chanend c_hall, int command, int angle, int time_elapsed, int init_state, int count)
+void hall_client_handler(chanend c_hall, int command, int angle, int time_elapsed, int init_state, int count, int raw_velocity)
 {
 	if (command == HALL_POS_REQ)
 	{
@@ -25,6 +25,10 @@ void hall_client_handler(chanend c_hall, int command, int angle, int time_elapse
 	else if (command == CHECK_BUSY)
 	{
 		c_hall <: init_state;
+	}
+	else if(command == HALL_VELOCITY_PWM_RESOLUTION_REQ)
+	{
+		c_hall <: raw_velocity;
 	}
 }
 
@@ -61,7 +65,24 @@ void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
 	int time_elapsed; 			//between two transitions to calculate speed
 	int init_state = INIT;
 
-	tx	:> ts;
+	timer t1;
+	unsigned int time1;
+	int init_velocity = 0;
+	int position1 = 0;
+	int previous_position1 = 0;
+	int velocity = 0;
+	int difference1 = 0;
+	int old_difference = 0;
+	int filter_length = FILTER_LENGTH_HALL;
+	int filter_buffer[FILTER_LENGTH_HALL];
+	int index = 0;
+	int raw_velocity;
+
+	//int cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
+
+
+	t1 :> time1;
+	tx :> ts;
 	while(1)
 	{
 		switch(xreadings)
@@ -191,22 +212,59 @@ void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
 			count = 0;
 		}
 
+
+
+
 		#pragma ordered
 		select {
 			case c_hall_p1 :> command:
-				hall_client_handler(c_hall_p1, command, angle, time_elapsed, init_state, count);
+				hall_client_handler(c_hall_p1, command, angle, time_elapsed, init_state, count, raw_velocity);
 				break;
 
 			case c_hall_p2 :> command:
-				hall_client_handler(c_hall_p2, command, angle, time_elapsed, init_state, count);
+				hall_client_handler(c_hall_p2, command, angle, time_elapsed, init_state, count, raw_velocity);
 				break;
 
 			case c_hall_p3 :> command:
-				hall_client_handler(c_hall_p3, command, angle, time_elapsed, init_state, count);
+				hall_client_handler(c_hall_p3, command, angle, time_elapsed, init_state, count, raw_velocity);
 				break;
 
 			case c_hall_p4 :> command:
-				hall_client_handler(c_hall_p4, command, angle, time_elapsed, init_state, count);
+				hall_client_handler(c_hall_p4, command, angle, time_elapsed, init_state, count, raw_velocity);
+				break;
+
+			case tx when timerafter(time1 + 13889) :> time1:
+					if(init_velocity == 0)
+					{
+						//position1 = count;
+						if(count > 2049)
+						{
+							init_velocity = 1;
+							previous_position1 = 2049;
+						}
+						else if(count < -2049)
+						{
+							init_velocity = 1;
+							previous_position1 = -2049;
+						}
+						velocity = 0;
+					}
+					else if(init_velocity == 1)
+					{
+						//position1 = count;
+						difference1 = count - previous_position1;
+						if(difference1 > 50000)
+							difference1 = old_difference;
+						else if(difference1 < -50000)
+							difference1 = old_difference;
+						velocity = difference1;
+				#ifdef Debug_velocity_ctrl
+						xscope_probe_data(0, velocity);
+				#endif
+						previous_position1 = count;
+						old_difference = difference1;
+					}
+					raw_velocity = _modified_internal_filter(filter_buffer, index, filter_length, velocity);
 				break;
 
 			default:

@@ -17,7 +17,7 @@
 #ifndef __QEI_CONFIG_H__
 #define __QEI_CONFIG_H__
 
-#define FILTER_LENGTH 8
+#define FILTER_LENGTH_QEI 8
 #define QEI_RPM_CONST 1000*60
 #define QEI_RAW_POS_REQ 1
 #define QEI_ABSOLUTE_POS_REQ 2

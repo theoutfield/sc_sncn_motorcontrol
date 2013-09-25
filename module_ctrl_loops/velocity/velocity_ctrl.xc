@@ -28,7 +28,7 @@
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {
-	int init_state = INIT_BUSY; //FIXME put declarations outside the loop
+	int init_state = INIT_BUSY;
 
 	VELOCITY_CTRL_ENABLE(); 	//activate velocity ctrl loop
 

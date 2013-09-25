@@ -87,9 +87,10 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 	unsigned int time;
 	int s_previous_position = 0;
 	int s_difference = 0;
+	int old_difference = 0;
 	int velocity_raw = 0;
-	int filter_length = 8;
-	int filter_buffer[8];						//default size used at compile time (cant be changed further)
+	int filter_length = FILTER_LENGTH_QEI;
+	int filter_buffer[FILTER_LENGTH_QEI];						//default size used at compile time (cant be changed further)
 	int index = 0;
 	int flag = 0;
 	init_filter(filter_buffer, index, filter_length);
@@ -146,21 +147,14 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 				break;
 
 			case t when timerafter (time+MSEC_FAST):> time :
-				if(qei_type == QEI_WITH_INDEX)
-				{
-					if(flag == 1)
-					{
-						s_difference = count - s_previous_position;
-						velocity_raw = _modified_internal_filter(filter_buffer, index, filter_length, s_difference);
-						s_previous_position = count;
-					}
-				}
-				else if(qei_type == QEI_WITH_NO_INDEX)
-				{
-					s_difference = count - s_previous_position;
-					velocity_raw = _modified_internal_filter(filter_buffer, index, filter_length, s_difference);
-					s_previous_position = count;
-				}
+				s_difference = count - s_previous_position;
+				if(s_difference > 3080)
+					s_difference = old_difference;
+				if(s_difference < -3080)
+					s_difference = old_difference;
+				velocity_raw = _modified_internal_filter(filter_buffer, index, filter_length, s_difference);
+				s_previous_position = count;
+				old_difference = s_difference;
 				break;
 
 			default:

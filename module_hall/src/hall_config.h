@@ -11,9 +11,11 @@
 #ifndef __HALL_CONFIG_H__
 #define __HALL_CONFIG_H__
 
-#define RPM_CONST 60000000  		// 60 s/ 1us
-#define HALL_POS_REQ  1
-#define HALL_ABSOLUTE_POS_REQ 3
-#define HALL_VELOCITY_REQ 2
+#define RPM_CONST 						 60000000  		// 60 s/ 1us
+#define HALL_POS_REQ  							1
+#define HALL_VELOCITY_REQ 						2
+#define HALL_ABSOLUTE_POS_REQ 					3
+#define HALL_VELOCITY_PWM_RESOLUTION_REQ 		4
+#define FILTER_LENGTH_HALL 						   32
 
 #endif /* __HALL_CONFIG_H__ */

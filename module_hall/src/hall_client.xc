@@ -41,3 +41,14 @@ int get_hall_velocity(chanend c_hall, hall_par &hall_params)
 	return speed;
 
 }
+
+int _get_hall_velocity_pwm_resolution(chanend c_hall, hall_par &hall_params)
+{
+	int velocity;
+	//hall_params.pole_pairs*4095*(1)
+	c_hall <: HALL_VELOCITY_PWM_RESOLUTION_REQ;
+	c_hall :> velocity;
+											//ms constant
+	velocity = ((velocity/FILTER_LENGTH_HALL) * 18000 * 60)/(hall_params.pole_pairs * 4095 *1);
+	return velocity;
+}

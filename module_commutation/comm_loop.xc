@@ -68,8 +68,8 @@ int absolute(int var)
 	return var;
 }
 
-#define FW_CONST 683  	//60  deg
-#define RW_CONST 2731	//240 deg
+#define FORWARD_CONSTANT 683  	//60  deg
+#define REVERSE_CONSTANT 2731	//240 deg
 /* Sinusoidal based commutation functions */
 
 void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commutation_params, chanend c_hall, chanend c_pwm_ctrl,
@@ -85,13 +85,14 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 	int voltage = 0;
 	int direction = 0;
 	int init_state = INIT;
+	int pwm_half = PWM_MAX_VALUE>>1;
 	//int angle_variance = commutation_params.angle_variance;
 	//int max_speed_reached = commutation_params.max_speed_reached;
 
 	while (1)
 	{
 
-		speed = get_hall_velocity(c_hall, hall_params);
+		speed = _get_hall_velocity_pwm_resolution(c_hall, hall_params);// get_hall_velocity(c_hall, hall_params);
 		angle = get_hall_position(c_hall);
 
 
@@ -101,7 +102,7 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 
 		angle_rpm = (absolute(speed)*commutation_params.angle_variance)/commutation_params.max_speed_reached;
 //		angle_rpm *= 28;		// fixed variation range
-//		angle_rpm /= 3000; 		// TODO should be settable (equal to max_rpm)
+//		angle_rpm /= 3000; 		//  should be settable (equal to max_rpm)
 
 
 		if(voltage<0)
@@ -111,26 +112,26 @@ void commutation_sinusoidal_loop( hall_par &hall_params, commutation_par &commut
 
 
 		if (direction == 1)
-		{//+ angle_rpm
-			angle_pwm = ((angle + angle_rpm + FW_CONST - commutation_params.angle_variance) & 0x0fff) >> 4;					//100 M3  //100 M1 //180           old 480
+		{
+			angle_pwm = ((angle + angle_rpm + FORWARD_CONSTANT - commutation_params.angle_variance) & 0x0fff) >> 4;					//100 M3  //100 M1 //180           old 480
 																					// 0 - 4095  -> 0x0000 - 0x0fff
-			pwm[0] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
+			pwm[0] = ((sine_third[angle_pwm])*voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm +85) & 0xff;
-			pwm[1] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
+			pwm[1] = ((sine_third[angle_pwm])*voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm + 86) & 0xff;
-			pwm[2] = ((sine_third[angle_pwm])*voltage)/13889   + PWM_MAX_VALUE/2;
+			pwm[2] = ((sine_third[angle_pwm])*voltage)/13889   + pwm_half;
 
 		}
 		else if (direction == -1)
-		{//-angle_rpm
-			angle_pwm = ((angle - angle_rpm + RW_CONST + commutation_params.angle_variance) & 0x0fff) >> 4;  				//2700 M3  //  2550 M1 //2700      old 3000
+		{
+			angle_pwm = ((angle - angle_rpm + REVERSE_CONSTANT + commutation_params.angle_variance) & 0x0fff) >> 4;  				//2700 M3  //  2550 M1 //2700      old 3000
 																					// 0 - 4095  -> 0x0000 - 0x0fff
-			pwm[0] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
+			pwm[0] = ((sine_third[angle_pwm])*-voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm +85) & 0xff;
 
-			pwm[1] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
+			pwm[1] = ((sine_third[angle_pwm])*-voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm + 86) & 0xff;
-			pwm[2] = ((sine_third[angle_pwm])*-voltage)/13889   + PWM_MAX_VALUE/2;
+			pwm[2] = ((sine_third[angle_pwm])*-voltage)/13889   + pwm_half;
 
 		}
 

@@ -64,7 +64,7 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params)
 	{
 		c_qei :> velocity;
 	}
-	velocity = ((velocity / FILTER_LENGTH)*QEI_RPM_CONST) / (qei_params.real_counts);
+	velocity = ((velocity / FILTER_LENGTH_QEI)*QEI_RPM_CONST) / (qei_params.real_counts);
 
-	return {velocity};
+	return velocity;
 }

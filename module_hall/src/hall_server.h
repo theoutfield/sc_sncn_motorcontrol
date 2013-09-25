@@ -23,7 +23,8 @@
 
 #include <xs1.h>
 #include <dc_motor_config.h>
-
+#include <filter_blocks.h>
+#include <refclk.h>
 
 
 /** \brief A basic hall encoder server

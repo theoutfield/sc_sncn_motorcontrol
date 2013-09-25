@@ -6,7 +6,7 @@ extern int __qei_max_counts(int real_counts);
 void init_commutation_param(commutation_par &commutation_params)
 {
 	commutation_params.angle_variance = 1024/(POLE_PAIRS * 3); // (60 * 4096)/( POLE_PAIRS * 2 *360)
-	commutation_params.max_speed_reached = MAX_NOMINAL_SPEED;
+	commutation_params.max_speed_reached = 10000;  //default
 //	printintln(commutation_params.angle_variance);
 //	printintln(commutation_params.max_speed_reached);
 }
