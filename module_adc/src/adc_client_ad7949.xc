@@ -1,74 +1,60 @@
-#include <print.h>
+//#include <print.h>
 #include <adc_ad7949.h>
 
 calib_data I_calib;
+#define ADC_CURRENT_REQ	1
+#define ADC_ALL_REQ	2
 #define ADC_CALIB_POINTS 64
+#define ADC_EXTERNAL_POT 3
 #define Factor 6
 
-int iAdcNrReadings=0;
 int iFilterSUM_Ia;
 int iFilterSUM_Ib;
-int Ia, Ib;
+int Ia=0;
+int Ib=0;
 
-{int, int, int, int, int, int, int, int, int, int} get_adc_calibrated_ad7949(chanend c_adc, int iPwmOnOff)
+{int, int, int, int, int, int, int, int, int, int} get_adc_calibrated_ad7949(chanend c_adc)
 {
-  //const int zero_amps = 9999; 	// 0A equals 2.5V --> 9999
+	//const int zero_amps = 9999; 	// 0A equals 2.5V --> 9999
 
-  int current_a, current_b;
-  int adc_a1, adc_Temperature1, adc_VoltageSupply, ExternalPot1;
-  int adc_b1, adc_Temperature2, adc_Dummy, ExternalPot2;
-
-
-  c_adc <: 0;
-   slave {
-	    c_adc :> current_a;
-        c_adc :> current_b;
-        c_adc :> adc_a1;
-        c_adc :> adc_Temperature1;
-        c_adc :> adc_VoltageSupply;
-        c_adc :> ExternalPot1;
-        c_adc :> adc_b1;
-        c_adc :> adc_Temperature2;
-        c_adc :> adc_Dummy;
-        c_adc :> ExternalPot2;
-   }
-
-  if(iAdcNrReadings < 5){
-	  iFilterSUM_Ia = current_a * 256;
-	  iFilterSUM_Ib = current_b * 256;
-  }
-  if(iAdcNrReadings++ > 512) iAdcNrReadings=256;
-
-  if(iPwmOnOff==0)
-  {
-	  iFilterSUM_Ia 	-= I_calib.Ia_calib;
-	  iFilterSUM_Ia 	+= current_a;
-	  I_calib.Ia_calib   = iFilterSUM_Ia/256;
-
-	  iFilterSUM_Ib 	-= I_calib.Ib_calib;
-	  iFilterSUM_Ib 	+= current_b;
-	  I_calib.Ib_calib 	 = iFilterSUM_Ib/256;
-  }
+	int current_a, current_b;
+	int adc_a1, adc_Temperature1, adc_VoltageSupply, ExternalPot1;
+	int adc_b1, adc_Temperature2, adc_Dummy, ExternalPot2;
 
 
-  Ia = 	current_a - I_calib.Ia_calib;
-  Ib = 	current_b - I_calib.Ib_calib;
+	c_adc <: ADC_ALL_REQ;
+	slave
+	{
+		c_adc :> current_a;
+		c_adc :> current_b;
+		c_adc :> adc_a1;
+		c_adc :> adc_Temperature1;
+		c_adc :> adc_VoltageSupply;
+		c_adc :> ExternalPot1;
+		c_adc :> adc_b1;
+		c_adc :> adc_Temperature2;
+		c_adc :> adc_Dummy;
+		c_adc :> ExternalPot2;
+	}
 
-  //return { Ia, Ib, adc_a1, adc_a2, adc_a3, adc_a4, adc_b1, adc_b2, I_calib.Ia_calib, I_calib.Ib_calib };
-  return { Ia, Ib, I_calib.Ia_calib, I_calib.Ib_calib, adc_Temperature1, adc_Temperature2, adc_VoltageSupply, adc_Dummy, ExternalPot1, ExternalPot2 };
+
+	return { adc_b1, adc_a1, current_a, current_b, adc_Temperature1, adc_Temperature2, adc_VoltageSupply, adc_Dummy, ExternalPot1, ExternalPot2 };
 
 }
 
 void do_adc_calibration_ad7949( chanend c_adc )
 {
-	unsigned a, b;
-	int i = 0; I_calib.Ia_calib = 0; I_calib.Ib_calib = 0;
+	unsigned int a, b;
+	int i = 0;
+	I_calib.Ia_calib = 0;
+	I_calib.Ib_calib = 0;
 	while ( i < ADC_CALIB_POINTS)
 	{
 		/* get ADC reading */
-		c_adc <: 0;
+		c_adc <: ADC_CURRENT_REQ;
 
-		slave {
+		slave
+		{
 			c_adc :> a;
 			c_adc :> b;
 		}
@@ -84,27 +70,43 @@ void do_adc_calibration_ad7949( chanend c_adc )
 	I_calib.Ia_calib = (I_calib.Ia_calib >> Factor);
 	I_calib.Ib_calib = (I_calib.Ib_calib >> Factor);
 
-	/*printstr("ia_calibration ");   printint(I_calib.Ia_calib); printstr("\n");
-	printstr("ib_calibration ");   printint(I_calib.Ib_calib); printstr("\n");*/
-
+//	printstr("ia_calibration ");   printint(I_calib.Ia_calib); printstr("\n");
+//	printstr("ib_calibration ");   printint(I_calib.Ib_calib); printstr("\n");
 }
 
 {int, int} get_adc_vals_calibrated_int16_ad7949( chanend c_adc )
 {
-  //const int zero_amps = 9999; 	// 0A equals 2.5V --> 9999
+	// 0A equals 2.5V --> 9999
+	unsigned int a, b;
+	int Ia, Ib;
 
-  unsigned a, b;
-  int Ia, Ib;
+	c_adc <: ADC_CURRENT_REQ;
 
-  c_adc <: 0;
+	slave
+	{
+		c_adc :> a;
+		c_adc :> b;
+	}
 
-  slave {
-    c_adc :> a;
-    c_adc :> b;
-  }
+	Ia = (int) a - I_calib.Ia_calib;
+	Ib = (int) b - I_calib.Ib_calib;
 
-  Ia = 	(int) a - I_calib.Ia_calib;
-  Ib = 	(int) b - I_calib.Ib_calib;
+	return { Ia, Ib };
+}
 
-  return { Ia, Ib };
+
+{int, int} get_adc_external_potentiometer(chanend c_adc)
+{
+
+	int p1, p2;
+
+	c_adc <: ADC_EXTERNAL_POT;
+
+	slave
+	{
+		c_adc :> p1;
+		c_adc :> p2;
+	}
+
+	return {p1, p2};
 }

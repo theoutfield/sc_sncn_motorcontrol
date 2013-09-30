@@ -24,7 +24,7 @@
  * \return Ia phase current value (raw) in whatever format the ADC delivers them in
  * \return Ib phase current value (raw) in whatever format the ADC delivers them in
  */
-{unsigned, unsigned} get_adc_vals_raw_ad7949( chanend c_adc );
+{int, int} get_adc_external_potentiometer(chanend c_adc);
 
 /**
  * \brief Calibrated Phase currents from the non triggered ADC server
@@ -42,7 +42,7 @@
  * \return External input 1 value
  * \return External input 2 value
  */
-{int, int, int, int, int, int, int, int, int, int} get_adc_calibrated_ad7949( chanend c_adc, int iPwmOnOff);
+{int, int, int, int, int, int, int, int, int, int} get_adc_calibrated_ad7949( chanend c_adc);
 
 
 
