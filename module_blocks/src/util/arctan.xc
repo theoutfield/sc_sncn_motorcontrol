@@ -69,3 +69,51 @@ int arctg1(int Real, int Imag)
 	}
 	return  iAngleResult;
 }
+
+
+int sine_reduce(int angle)
+{
+	int a1, a2;
+	int sign = 0;
+	a2 = angle >> 8;
+	a1 = a2 >> 1;
+
+	if(a1 == 1)
+	{
+		sign = -1;
+		if(a2 == 3)
+		{
+		   if(angle > 768)
+		   {
+			   angle = 1024 - angle;
+			   return sign * sine_third[angle];
+		   }
+		   else
+		   {
+			   angle =   angle - 512;
+			   return sign * sine_third[angle];
+		   }
+		}
+		else if(a2 == 2)
+		{
+			angle = angle - 512;
+			return sign * sine_third[angle];
+		}
+	}
+	else if(a1 == 0)
+	{
+		sign = 0;
+		if(a2 == 1)
+		{
+			if(angle > 256)
+			{
+				angle = 512 - angle;
+				return sine_third[angle];
+			}
+		}
+	}
+	if(sign < 0)
+		return sign * sine_third[angle];
+	else
+		sine_third[angle];
+}
