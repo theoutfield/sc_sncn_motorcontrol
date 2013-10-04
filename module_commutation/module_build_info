@@ -1,5 +1,5 @@
 
-MODULE_COMMUTATION_DIRS += predriver
+MODULE_COMMUTATION_DIRS += predriver auto-calib pwm
 
 XCC_FLAGS += -fsubword-select
 OPTIONAL_HEADERS += dsc_config.h refclk.h
