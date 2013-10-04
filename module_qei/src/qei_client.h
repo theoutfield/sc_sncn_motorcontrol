@@ -31,6 +31,8 @@
 //return velocity
 int get_qei_velocity(chanend c_qei, qei_par &qei_params);
 
+int _get_qei_velocity_pwm_resolution(chanend c_qei, qei_par &qei_params);
+
 extern int __qei_max_counts(int real_counts);
 
 #endif /* __QEI_CLIENT_H__ */

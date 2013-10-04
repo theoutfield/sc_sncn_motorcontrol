@@ -251,7 +251,6 @@ void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
 					}
 					else if(init_velocity == 1)
 					{
-						//position1 = count;
 						difference1 = count - previous_position1;
 						if(difference1 > 50000)
 							difference1 = old_difference;

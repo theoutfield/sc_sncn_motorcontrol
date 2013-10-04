@@ -23,7 +23,6 @@
 #include "pwm_service_inv.h"
 #include "adc_ad7949.h"
 #include "test.h"
-#include "pwm_config.h"
 #include "comm_loop.h"
 #include "refclk.h"
 #include <xscope.h>
@@ -31,11 +30,6 @@
 #include "qei_server.h"
 #include "adc_client_ad7949.h"
 #include <dc_motor_config.h>
-#include "sine_table_big.h"
-#include "print.h"
-#include "filter_blocks.h"
-#include "profile.h"
-#include <position_ctrl.h>
 #include <torque_ctrl.h>
 #include <flash_somanet.h>
 #include <internal_config.h>

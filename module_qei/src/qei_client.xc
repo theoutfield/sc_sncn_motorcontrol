@@ -68,3 +68,18 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params)
 
 	return velocity;
 }
+
+
+int _get_qei_velocity_pwm_resolution(chanend c_qei, qei_par &qei_params)
+{
+	int velocity;
+
+	c_qei <: QEI_VELOCITY_PWM_RES_REQ;
+	master
+	{
+		c_qei :> velocity;
+	}
+	velocity = ((velocity/FILTER_LENGTH_QEI_PWM)*QEI_PWM_RPM_CONST) / (qei_params.real_counts);
+
+	return velocity;
+}

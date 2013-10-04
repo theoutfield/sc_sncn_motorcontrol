@@ -40,7 +40,7 @@ static const unsigned char lookup[16][4] = {
 		{ 0, 0, 0, 0 }  // 11 xx
 };
 
-void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, int direction, int velocity_raw, int init_state)
+void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, int direction, int velocity_raw, int velocity_raw1, int init_state)
 {
 	if(command == QEI_RAW_POS_REQ)
 	{
@@ -65,6 +65,13 @@ void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, 
 			c_qei <: velocity_raw;
 		}
 	}
+	else if(command == QEI_VELOCITY_PWM_RES_REQ)
+	{
+		slave
+		{
+			c_qei <: velocity_raw1;
+		}
+	}
 	else if(command == CHECK_BUSY)
 	{
 		c_qei <: init_state;
@@ -84,7 +91,15 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 	int qei_type = qei_params.index;
 	int init_state = INIT;
 
-	unsigned int time;
+	unsigned int time, time1;
+	int s_previous_position1 = 0;
+	int s_difference1 = 0;
+	int old_difference1 = 0;
+	int velocity_raw1 = 0;
+	int filter_length1 = FILTER_LENGTH_QEI_PWM;
+	int filter_buffer1[FILTER_LENGTH_QEI_PWM];
+	int index1 = 0;
+
 	int s_previous_position = 0;
 	int s_difference = 0;
 	int old_difference = 0;
@@ -94,8 +109,11 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 	int index = 0;
 	int flag = 0;
 	init_filter(filter_buffer, index, filter_length);
+	init_filter(filter_buffer1, index1, filter_length1);
 	p_qei :> new_pins;
 	t :> ts1;
+	t :> time1;
+	t :> time;
 
 	while (1) {
 	#pragma ordered
@@ -131,19 +149,19 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 				break;
 
 			case c_qei_p1 :> command :
-				qei_client_hanlder( c_qei_p1, command, pos, ok, count, direction, velocity_raw, init_state);
+				qei_client_hanlder( c_qei_p1, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state);
 				break;
 
 			case c_qei_p2 :> command :
-				qei_client_hanlder( c_qei_p2, command, pos, ok, count, direction, velocity_raw, init_state);
+				qei_client_hanlder( c_qei_p2, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state);
 				break;
 
 			case c_qei_p3 :> command :
-				qei_client_hanlder( c_qei_p3, command, pos, ok, count, direction, velocity_raw, init_state);
+				qei_client_hanlder( c_qei_p3, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state);
 				break;
 
 			case c_qei_p4 :> command :
-				qei_client_hanlder( c_qei_p4, command, pos, ok, count, direction, velocity_raw, init_state);
+				qei_client_hanlder( c_qei_p4, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state);
 				break;
 
 			case t when timerafter (time+MSEC_FAST):> time :
@@ -193,6 +211,22 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 				{
 					count=0;
 				}
+				break;
+		}
+
+		select
+		{
+			case t when timerafter (time1 + 13889):> time1 :
+				s_difference1 = count - s_previous_position1;
+				if(s_difference1 > 3080)
+					s_difference1 = old_difference1;
+				if(s_difference1 < -3080)
+					s_difference1 = old_difference1;
+				velocity_raw1 = _modified_internal_filter(filter_buffer1, index1, filter_length1, s_difference1);
+				s_previous_position1 = count;
+				old_difference1 = s_difference1;
+				break;
+			default:
 				break;
 		}
 	}
