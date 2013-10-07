@@ -92,7 +92,7 @@ int main(void) {
 		on stdcore[1]:
 		{
 			{
-				int sensor_select = 2;
+				int sensor_select = 2; //use hall or qei
 				commutation_par commutation_params;
 				hall_par hall_params;
 				qei_par qei_params;
@@ -100,30 +100,6 @@ int main(void) {
 				init_qei_param(qei_params);
 				init_commutation_param(commutation_params); // initialize commutation params
 				commutation_sine_automate(sensor_select, c_signal,  c_commutation_p1, commutation_params, hall_params, qei_params, c_hall_p3, c_qei_p3);
-			}
-		}
-
-		on stdcore[2]:
-		{
-			par
-			{
-
-				{
-					 ctrl_par velocity_ctrl_params;
-					 filt_par sensor_filter_params;
-					 hall_par hall_params;
-					 qei_par qei_params;
-
-					 init_velocity_control_param(velocity_ctrl_params);
-					 init_sensor_filter_param(sensor_filter_params);
-					 init_hall_param(hall_params);
-					 init_qei_param(qei_params);
-
-					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,\
-							 qei_params, 2, c_hall_p2, c_qei_p2, c_velocity_ctrl, c_commutation_p2);
-
-				}
-
 			}
 		}
 
@@ -142,7 +118,7 @@ int main(void) {
 				{
 					hall_par hall_params;
 					commutation_par commutation_params;
-					int sensor_select =1;
+					int sensor_select =1; //hall
 					qei_par qei_params;
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);

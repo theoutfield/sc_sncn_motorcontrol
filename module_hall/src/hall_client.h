@@ -37,9 +37,7 @@ int get_hall_position_absolute(chanend c_hall);
  *
  * \channel c_hall for communicating with the Hall Server
  *
- * \return the speed in rpm from Hall Sensor
+ * \return the velocity in rpm from Hall Sensor
  */
 int get_hall_velocity(chanend c_hall, hall_par &hall_params);
 
-
-int _get_hall_velocity_pwm_resolution(chanend c_hall, hall_par &hall_params);

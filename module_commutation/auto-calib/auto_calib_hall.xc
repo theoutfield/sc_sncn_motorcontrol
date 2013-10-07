@@ -17,7 +17,7 @@ int get_average_velocity(int sensor_select, chanend c_hall, hall_par &hall_param
 	{
 		if(sensor_select == 1)
 		{
-			actual_velocity = _get_hall_velocity_pwm_resolution(c_hall, hall_params);
+			actual_velocity = get_hall_velocity(c_hall, hall_params);
 			velocity = velocity + actual_velocity;
 		}
 		else if(sensor_select == 2)
@@ -126,6 +126,7 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	max_reached_speed_pos = actual_velocity;
 
 	printintln(max_reached_speed_pos);
+
 	if(i<0)
 		sense = 1;
 	else if(i>0)

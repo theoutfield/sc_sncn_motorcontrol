@@ -8,7 +8,7 @@
 #include <xscope.h>
 #include "hall_config.h"
 
-void hall_client_handler(chanend c_hall, int command, int angle, int time_elapsed, int init_state, int count, int raw_velocity)
+void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state, int count)
 {
 	if (command == HALL_POS_REQ)
 	{
@@ -16,7 +16,7 @@ void hall_client_handler(chanend c_hall, int command, int angle, int time_elapse
 	}
 	else if (command == HALL_VELOCITY_REQ)
 	{
-		c_hall <: time_elapsed;
+		c_hall <: raw_velocity;
 	}
 	else if (command == HALL_ABSOLUTE_POS_REQ)
 	{
@@ -25,10 +25,6 @@ void hall_client_handler(chanend c_hall, int command, int angle, int time_elapse
 	else if (command == CHECK_BUSY)
 	{
 		c_hall <: init_state;
-	}
-	else if(command == HALL_VELOCITY_PWM_RESOLUTION_REQ)
-	{
-		c_hall <: raw_velocity;
 	}
 }
 
@@ -218,22 +214,22 @@ void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
 		#pragma ordered
 		select {
 			case c_hall_p1 :> command:
-				hall_client_handler(c_hall_p1, command, angle, time_elapsed, init_state, count, raw_velocity);
+				hall_client_handler(c_hall_p1, command, angle, raw_velocity, init_state, count);
 				break;
 
 			case c_hall_p2 :> command:
-				hall_client_handler(c_hall_p2, command, angle, time_elapsed, init_state, count, raw_velocity);
+				hall_client_handler(c_hall_p2, command, angle, raw_velocity, init_state, count);
 				break;
 
 			case c_hall_p3 :> command:
-				hall_client_handler(c_hall_p3, command, angle, time_elapsed, init_state, count, raw_velocity);
+				hall_client_handler(c_hall_p3, command, angle, raw_velocity, init_state, count);
 				break;
 
 			case c_hall_p4 :> command:
-				hall_client_handler(c_hall_p4, command, angle, time_elapsed, init_state, count, raw_velocity);
+				hall_client_handler(c_hall_p4, command, angle, raw_velocity, init_state, count);
 				break;
 
-			case tx when timerafter(time1 + 13889) :> time1:
+			case tx when timerafter(time1 + MSEC_FAST) :> time1:
 					if(init_velocity == 0)
 					{
 						//position1 = count;

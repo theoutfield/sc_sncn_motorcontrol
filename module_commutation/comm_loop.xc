@@ -98,7 +98,7 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 
 		//if(sensor_select == 1)
 		{
-			speed = _get_hall_velocity_pwm_resolution(c_hall, hall_params);// get_hall_velocity(c_hall, hall_params);
+			speed = get_hall_velocity(c_hall, hall_params);
 			angle = get_hall_position(c_hall);
 		}
 
@@ -218,7 +218,7 @@ void commutation_sinusoidal_loop_qei(qei_par &qei_params, commutation_par &commu
 
 //		if(sensor_select == 1)
 		{
-			speed = get_qei_velocity(c_qei, qei_params);//_get_hall_velocity_pwm_resolution(c_hall, hall_params);// get_hall_velocity(c_hall, hall_params);
+			speed = get_qei_velocity(c_qei, qei_params);//get_hall_velocity(c_hall, hall_params);// get_hall_velocity(c_hall, hall_params);
 		//	angle = get_hall_position(c_hall);
 			angle = (get_sync_position(c_sync) << 12)/500;
 		}
