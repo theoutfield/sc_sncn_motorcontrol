@@ -23,7 +23,7 @@
 #include "adc_client_ad7949.h"
 #include "hall_client.h"
 #include "qei_client.h"
-#include "hall-qei.h"
+#include "hall_qei.h"
 #include "comm_loop.h"
 #include <internal_config.h>
 #include "print.h"
