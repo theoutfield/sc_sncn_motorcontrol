@@ -6,9 +6,13 @@ extern int __qei_max_counts(int real_counts);
 void init_commutation_param(commutation_par &commutation_params)
 {
 	commutation_params.angle_variance = 1024/(POLE_PAIRS * 3); // (60 * 4096)/( POLE_PAIRS * 2 *360)
-	commutation_params.max_speed_reached = 5200;//10000;  //default
+	commutation_params.max_speed_reached = 4800;//10000;  //default
+	commutation_params.qei_forward_offset = 0;
+	commutation_params.qei_backward_offset = 0;
 //	printintln(commutation_params.angle_variance);
 //	printintln(commutation_params.max_speed_reached);
+	//printintln(commutation_params.qei_forward_offset);
+	//printintln(commutation_params.qei_backward_offset);
 }
 
 void init_hall_param(hall_par &hall_params)

@@ -36,10 +36,10 @@
  */
 #define POLE_PAIRS  8
 #define GEAR_RATIO  26
-#define MAX_NOMINAL_SPEED  4000		// in rpm
+#define MAX_NOMINAL_SPEED  4850		// in rpm
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define MAX_ACCELERATION   5000     // rpm/s
-#define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
+#define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder 4x encoding
 #define POLARITY 1					// 1 / -1
 
 #define QEI_WITH_INDEX		1
@@ -117,6 +117,8 @@ typedef struct S_Hall {
 typedef struct S_COMMUTATION {
 	int angle_variance;
 	int max_speed_reached;
+	int qei_forward_offset;
+	int qei_backward_offset;
 } commutation_par;
 
 typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
