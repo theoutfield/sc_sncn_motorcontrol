@@ -17,6 +17,7 @@
 
 #include "qei_server.h"
 
+#include <xscope.h>
 
 // Order is 00 -> 10 -> 11 -> 01
 // Bit 3 = Index
@@ -40,7 +41,7 @@ static const unsigned char lookup[16][4] = {
 		{ 0, 0, 0, 0 }  // 11 xx
 };
 
-void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, int direction, int velocity_raw, int velocity_raw1, int init_state)
+void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, int direction, int velocity_raw, int velocity_raw1, int init_state, int neww)
 {
 	if(command == QEI_RAW_POS_REQ)
 	{
@@ -72,6 +73,12 @@ void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, 
 			c_qei <: velocity_raw1;
 		}
 	}
+	else if(command == 5)
+		slave
+
+		{
+			c_qei <: neww;
+		}
 	else if(command == CHECK_BUSY)
 	{
 		c_qei <: init_state;
@@ -108,6 +115,7 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 	int filter_buffer[FILTER_LENGTH_QEI];						//default size used at compile time (cant be changed further)
 	int index = 0;
 	int flag = 0;
+	int sync_position = 0;
 	init_filter(filter_buffer, index, filter_length);
 	init_filter(filter_buffer1, index1, filter_length1);
 	p_qei :> new_pins;
@@ -128,6 +136,7 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 				  	  if(qei_type == QEI_WITH_INDEX)
 				  	  {
 						  v = lookup[new_pins][old_pins];
+
 						  if (!v) {
 							  pos = 0;
 							  ok = 1;
@@ -135,7 +144,6 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 						  else
 						  {
 							  { v, pos } = lmul(1, pos, v, -5);
-							  flag = 1;
 						  }
 				  	  }
 				  	  else if(qei_type == QEI_WITH_NO_INDEX)
@@ -145,90 +153,96 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 				  	  }
 
 				  	  old_pins = new_pins & 0x3;
+
+				  	if(first == 1)
+					{
+						prev = pos & (qei_max-1);
+						first = 0;
+					}
+					c_pos =  pos & (qei_max-1);
+					if(prev != c_pos )
+					{
+						difference = c_pos - prev;
+						if( difference > 3000)
+						{
+							count = count + 1;
+							direction = 1;
+
+					//		 xscope_probe_data(3, ff);
+						}
+						else if(difference < -3000)
+						{
+							count = count - 1;
+
+						//	xscope_probe_data(3, ff);
+							direction = -1;
+						}
+						else if( difference < 10 && difference >0)
+						{
+							count = count - difference;
+							direction = -1;
+
+						}
+						else if( difference < 0 && difference > -10)
+						{
+
+							count = count - difference;
+							direction = 1;
+						}
+						prev = c_pos;
+					}
+					if(count >= max_count_actual || count <= -max_count_actual)
+					{
+						count=0;
+					}
 				}
 				break;
 
 			case c_qei_p1 :> command :
-				qei_client_hanlder( c_qei_p1, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state);
+				qei_client_hanlder( c_qei_p1, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state,sync_position);
 				break;
 
 			case c_qei_p2 :> command :
-				qei_client_hanlder( c_qei_p2, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state);
+				qei_client_hanlder( c_qei_p2, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state,sync_position);
 				break;
 
 			case c_qei_p3 :> command :
-				qei_client_hanlder( c_qei_p3, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state);
+				qei_client_hanlder( c_qei_p3, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state,sync_position);
 				break;
 
 			case c_qei_p4 :> command :
-				qei_client_hanlder( c_qei_p4, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state);
+				qei_client_hanlder( c_qei_p4, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state,sync_position);
 				break;
 
-			case t when timerafter (time+MSEC_FAST):> time :
-				s_difference = count - s_previous_position;
-				if(s_difference > 3080)
-					s_difference = old_difference;
-				if(s_difference < -3080)
-					s_difference = old_difference;
-				velocity_raw = _modified_internal_filter(filter_buffer, index, filter_length, s_difference);
-				s_previous_position = count;
-				old_difference = s_difference;
-				break;
+//			case t when timerafter (time+MSEC_FAST):> time :
+//				s_difference = count - s_previous_position;
+//				if(s_difference > 3080)
+//					s_difference = old_difference;
+//				else if(s_difference < -3080)
+//					s_difference = old_difference;
+//				velocity_raw = _modified_internal_filter(filter_buffer, index, filter_length, s_difference);
+//				s_previous_position = count;
+//				old_difference = s_difference;
+//				break;
 
-			default:
-				if(first == 1)
-				{
-					prev = pos & (qei_max-1);
-					first = 0;
-				}
-				c_pos =  pos & (qei_max-1);
-				if(prev != c_pos )
-				{
-					difference = c_pos - prev;
-					if( difference > 3000)
-					{
-						count = count + 1;
-						direction = 1;
-					}
-					else if(difference < -3000)
-					{
-						count = count - 1;
-						direction = -1;
-					}
-					else if( difference < 10 && difference >0)
-					{
-						count = count - difference;
-						direction = -1;
-					}
-					else if( difference < 0 && difference > -10)
-					{
-						count = count - difference;
-						direction = 1;
-					}
-					prev = c_pos;
-				}
-				if(count >= max_count_actual || count <= -max_count_actual)
-				{
-					count=0;
-				}
-				break;
+
 		}
 
-		select
-		{
-			case t when timerafter (time1 + 13889):> time1 :
-				s_difference1 = count - s_previous_position1;
-				if(s_difference1 > 3080)
-					s_difference1 = old_difference1;
-				if(s_difference1 < -3080)
-					s_difference1 = old_difference1;
-				velocity_raw1 = _modified_internal_filter(filter_buffer1, index1, filter_length1, s_difference1);
-				s_previous_position1 = count;
-				old_difference1 = s_difference1;
-				break;
-			default:
-				break;
-		}
+//		select
+//		{
+//			case t when timerafter (time1 + 13889):> time1 :
+//				s_difference1 = count - s_previous_position1;
+//				if(s_difference1 > 3080)
+//					s_difference1 = old_difference1;
+//				if(s_difference1 < -3080)
+//					s_difference1 = old_difference1;
+//				velocity_raw1 = _modified_internal_filter(filter_buffer1, index1, filter_length1, s_difference1);
+//				s_previous_position1 = count;
+//				old_difference1 = s_difference1;
+//				break;
+//			default:
+//				break;
+//		}
 	}
 }
 

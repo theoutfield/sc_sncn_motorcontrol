@@ -32,7 +32,8 @@
 
 
 	c_qei <: QEI_RAW_POS_REQ;
-	master {
+	master
+	{
 		c_qei :> p;
 		c_qei :> v;
 	}
@@ -82,4 +83,20 @@ int _get_qei_velocity_pwm_resolution(chanend c_qei, qei_par &qei_params)
 	velocity = ((velocity/FILTER_LENGTH_QEI_PWM)*QEI_PWM_RPM_CONST) / (qei_params.real_counts);
 
 	return velocity;
+}
+
+
+
+int get_qei_syncp(chanend c_qei)
+{
+	int pos;
+
+	c_qei <: 5;
+	//master
+	{
+		c_qei :> pos;
+	}
+
+
+	return pos;
 }
