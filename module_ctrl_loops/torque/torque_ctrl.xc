@@ -17,7 +17,7 @@
 #include <refclk.h>
 #include <xscope.h>
 #include <print.h>
-#include "hall-qei.h"
+#include "hall_qei.h"
 #include <drive_config.h>
 //#define ENABLE_xscope_torq
 #define defParAngleUser 560

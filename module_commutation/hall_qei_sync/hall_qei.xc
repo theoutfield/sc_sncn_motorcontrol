@@ -1,4 +1,4 @@
-#include "hall-qei.h"
+#include "hall_qei.h"
 #include "refclk.h"
 #include "qei_client.h"
 #include "hall_client.h"

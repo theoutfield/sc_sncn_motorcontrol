@@ -29,7 +29,7 @@
 #include "qei_server.h"
 #include <dc_motor_config.h>
 #include "profile.h"
-#include "hall-qei.h"
+#include "hall_qei.h"
 #include <flash_somanet.h>
 #include <internal_config.h>
 #include "sine_table_big.h"
@@ -42,7 +42,7 @@
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
-static t_pwm_control pwm_ctrl1;
+
 void xscope_initialise_2()
 {
 	{
