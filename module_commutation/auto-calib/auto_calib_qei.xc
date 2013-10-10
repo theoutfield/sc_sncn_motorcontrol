@@ -29,6 +29,9 @@ void qei_calibrate(chanend c_signal, chanend c_commutation, commutation_par &com
 	int neg_ok_f = 0;
 
 	int calib_fw_offset;
+	qei_velocity_par qei_velocity_params;
+	int speed;
+	init_qei_velocity_params(qei_velocity_params);
 	while(1)
 	{
 
@@ -78,4 +81,39 @@ void qei_calibrate(chanend c_signal, chanend c_commutation, commutation_par &com
 	}
 	set_qei_offset(commutation_params, c_calib);
 
+	printintln(commutation_params.qei_forward_offset);
+	printintln(commutation_params.qei_backward_offset);
+
+	commutation_sensor_select( c_commutation, 2); //QEI
+
+	i = 0;
+	ramp_up(i, comm_max, t, core_id, c_commutation); // fw
+
+	wait_ms(5000, core_id, t);
+
+	printintln(get_hall_velocity(c_hall, hall_params));
+	if(i<0)
+		sense = 1;
+	else if(i>0)
+		sense = -1;
+	while( i != 0 )
+	{
+		set_commutation_sinusoidal(c_commutation, i);
+		i = (i + sense * 10);
+		wait_ms(5, core_id, t);
+	}
+
+	ramp_down(i, -comm_max, t, core_id, c_commutation);
+	wait_ms(5000, core_id, t);
+	printintln(get_hall_velocity(c_hall, hall_params));
+	if(i<0)
+		sense = 1;
+	else if(i>0)
+		sense = -1;
+	while( i != 0 )
+	{
+		set_commutation_sinusoidal(c_commutation, i);
+		i = (i + sense * 10);
+		wait_ms(5, core_id, t);
+	}
 }

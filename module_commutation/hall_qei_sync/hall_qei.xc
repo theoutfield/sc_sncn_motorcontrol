@@ -102,8 +102,10 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 
 	int not_synced = 0;
 
-	int not_calibrated = 1;
-
+	int calibrated_fw = 0;
+	int calibrated_bw = 0;
+	int direction = 0;
+	int dummy;
 	int condd= 1000;
 
 	int times_no = 100;
@@ -128,7 +130,7 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 		{
 			case t_qei when timerafter(time_qei + 750) :> time_qei:
 				{qei_position, qei_valid} = get_qei_position(c_qei, qei_params); //aquisition
-
+				{dummy, direction}= get_qei_position_absolute(c_qei);
 				if(qei_valid==1)
 				{
 					qei_position = qei_max_position - qei_position;
@@ -158,7 +160,7 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 							sync_position = commutation_params.qei_backward_offset;
 
 						//	xscope_probe_data(3, condd);
-							not_calibrated = 0;
+							calibrated_bw = 1;
 						}
 						else if(diffi < -(qei_crossover))  // qei_max_position - 300
 						{
@@ -178,7 +180,7 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 							//if( ! (sync_position < 1596 - 20 && sync_position > 1596 + 20) )
 							//{
 							sync_position = commutation_params.qei_forward_offset;
-							not_calibrated = 0;
+							calibrated_fw = 1;
 							//}
 							//xscope_probe_data(3, condd);
 						}
@@ -213,14 +215,29 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 			case sync_output :> cmd:
 				if(cmd == 20)
 				{
-					if(not_calibrated == 1)
+					if(direction == 1)
 					{
-						hall_position = get_hall_position( c_hall);
-						sync_output <: (hall_position * max_count) >> 12;
+						if(calibrated_fw == 1)
+						{
+							sync_output <: sync_position;
+						}
+						else
+						{
+							hall_position = get_hall_position( c_hall);
+							sync_output <: (hall_position * max_count) >> 12;
+						}
 					}
-					else
+					else if(direction == -1)
 					{
-						sync_output <: sync_position;
+						if(calibrated_bw == 1)
+						{
+							sync_output <: sync_position;
+						}
+						else
+						{
+							hall_position = get_hall_position( c_hall);
+							sync_output <: (hall_position * max_count) >> 12;
+						}
 					}
 				}
 				break;
@@ -253,6 +270,8 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 					//printintln(cmd);
 					c_calib :> commutation_params.qei_forward_offset;
 					c_calib :> commutation_params.qei_backward_offset;
+					calibrated_bw = 0;
+					calibrated_fw = 0;
 					//printintln(commutation_params.qei_forward_offset);
 					//printintln(commutation_params.qei_backward_offset);
 				}

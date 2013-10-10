@@ -8,6 +8,7 @@
 #ifndef HALL_QEI_H_
 #define HALL_QEI_H_
 #include "dc_motor_config.h"
+#include "comm_loop.h"
 
 /**
  *  \channel c_qei qei position data

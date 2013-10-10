@@ -57,21 +57,7 @@ void xscope_initialise_2()
 }
 
 
-int qei_speed(chanend c_qei, qei_par &qei_params, int &previous_position, int &old_difference, int filter_buffer[], int &index, int filter_length)
-{
-	int s_difference;
-	int count, dirn;
-	{count, dirn} = get_qei_position_absolute(c_qei);
-	s_difference = count - previous_position;
-	if(s_difference > 3080)
-		s_difference = old_difference;
-	else if(s_difference < -3080)
-		s_difference = old_difference;
-	//velocity_raw = //_modified_internal_filter(filter_buffer, index, filter_length, s_difference);
-	previous_position = count;
-	old_difference = s_difference;
-	return (filter(filter_buffer, index, filter_length, s_difference)*1000*60) / (qei_params.real_counts);
-}
+
 //test PVM
 void profile_velocity_test(chanend c_signal, chanend c_velocity_ctrl,  chanend c_hall, chanend c_qei, chanend c_calib)
 {
@@ -107,8 +93,8 @@ int calib_fw_offset;
 	init_filter(filter_buffer, index, filter_length);
 
 	init_pv_params(pv_params);
-	init_commutation_param(commutation_params);
 	init_hall_param(hall_params);
+	init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
 	init_qei_param(qei_params);
 
 	acceleration = pv_params.profile_acceleration;   // or fixed parameters
@@ -235,16 +221,7 @@ int main(void) {
 		{
 			//firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 			//xscope_initialise_1();
-			{
-							qei_par qei_params;
-							hall_par hall_params;
-							commutation_par commutation_params;
-							init_commutation_param(commutation_params);
-							xscope_initialise_2();
-							init_hall_param(hall_params);
-							init_qei_param(qei_params);
-							hall_qei_sync(qei_params, hall_params, commutation_params, c_qei_p1, c_hall_p2, c_sync, c_calib);
-						}
+
 
 		}
 
@@ -255,42 +232,21 @@ int main(void) {
 				qei_par qei_params;
 				hall_par hall_params;
 				commutation_par commutation_params;
-				init_commutation_param(commutation_params);
 				init_hall_param(hall_params);
+				init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
+
 				init_qei_param(qei_params);
 				qei_calibrate( c_signal,  c_commutation_p1, commutation_params,\
 						hall_params, qei_params, c_hall_p4, c_qei_p4, c_calib);
-			}
-//			{
+				printintln(commutation_params.qei_forward_offset);
+				printintln(commutation_params.qei_backward_offset);
+				printstrln("calibrate done");
 
-//				commutation_par commutation_params;
-//				int init_state;
-//				timer t;
-//				int voltage =500;
-//				init_commutation_param(commutation_params);
-//				while(1)
-//					{
-//						init_state = __check_commutation_init(c_signal);
-//						if(init_state == INIT)
-//						{
-//							printstrln("commutation intialized");
-//							break;
-//						}
-//					}
-//				wait_ms(5000, 1, t);
-//
-//				while(1)
-//					set_commutation_sinusoidal(c_commutation_p1, 12000);
-//
-//			}
-//			{
-//				int i;
-//				for(i=0;i<1024;i++)
-//				{
-//					printintln( sine_reduce(i));
-//				}
-//
-//			}
+
+			}
+
+
+
 		}
 
 		on stdcore[2]:
@@ -315,7 +271,16 @@ int main(void) {
 //				}
 
 
-
+				{
+					qei_par qei_params;
+					hall_par hall_params;
+					commutation_par commutation_params;
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
+					//xscope_initialise_2();
+					init_hall_param(hall_params);
+					init_qei_param(qei_params);
+					hall_qei_sync(qei_params, hall_params, commutation_params, c_qei_p1, c_hall_p2, c_sync, c_calib);
+				}
 
 			}
 		}
@@ -330,14 +295,6 @@ int main(void) {
 
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
-//				{
-//					hall_par hall_params;
-//					commutation_par commutation_params;
-//					init_hall_param(hall_params);
-//					init_commutation_param(commutation_params); // initialize commutation params
-//					test_delay_comm( hall_params, commutation_params, c_hall_p1, c_pwm_ctrl,
-//							c_signal, c_commutation_p1, c_commutation_p2, c_commutation_p3);
-//				}
 
 				{
 					hall_par hall_params;
@@ -346,7 +303,7 @@ int main(void) {
 					int sensor_select = 1;//hall
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					init_commutation_param(commutation_params); // initialize commutation params
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 					commutation_sinusoidal(sensor_select, hall_params, qei_params, commutation_params, c_hall_p1, c_qei_p2, c_pwm_ctrl, c_signal_adc, c_signal,
 							 c_sync, c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
 				}
@@ -362,8 +319,6 @@ int main(void) {
 					init_qei_param(qei_params);
 					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4);  // channel priority 1,2..4
 				}
-
-
 
 			}
 		}
