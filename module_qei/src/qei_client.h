@@ -21,12 +21,31 @@
 #define __QEI_CLIENT_H__
 
 #include<dc_motor_config.h>
+#include "filter_blocks.h"
+#include <print.h>
+#include <xs1.h>
+#include <stdio.h>
+#include "qei_config.h"
+
+typedef struct QEI_VELOCITY_PARAM
+{
+	int previous_position;
+	int old_difference;
+	int filter_buffer[8];
+	int index;
+	int filter_length;
+} qei_velocity_par;
+
+void init_qei_velocity_params(qei_velocity_par &qei_velocity_params);
 
 ///only position and valid
 {unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params);
 
 //counted up position and direction
 {int, int} get_qei_position_absolute(chanend c_qei);
+
+
+int qei_speed(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params);
 
 //return velocity
 int get_qei_velocity(chanend c_qei, qei_par &qei_params);

@@ -26,6 +26,23 @@
 #include "dc_motor_config.h"
 
 
+typedef struct S_COMMUTATION {
+	int angle_variance;
+	int max_speed_reached;
+	int qei_forward_offset;
+	int qei_backward_offset;
+	int flag;
+} commutation_par;
+
+/**
+* \brief initialize commutation parameters
+*
+* \param commutation_params struct defines the commutation angle parameters
+*/
+void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
+
+void commutation_sensor_select(chanend c_commutation, int sensor_select);
+
 int init_commutation(chanend c_signal);
 
 /**

@@ -7,7 +7,7 @@
 #include <auto_calib_hall.h>
 #include <print.h>
 
-int get_average_velocity(int sensor_select, chanend c_hall, hall_par &hall_params, int core_id, timer t, int &avg_times, chanend c_qei, qei_par &qei_params)
+int get_average_velocity(int sensor_select, chanend c_hall, hall_par &hall_params, qei_velocity_par &qei_velocity_params, int core_id, timer t, int &avg_times, chanend c_qei, qei_par &qei_params)
 {
 	int k;
 	int velocity = 0;
@@ -22,7 +22,7 @@ int get_average_velocity(int sensor_select, chanend c_hall, hall_par &hall_param
 		}
 		else if(sensor_select == 2)
 		{
-			actual_velocity = get_qei_velocity( c_qei, qei_params);
+			actual_velocity = qei_speed(c_qei, qei_params, qei_velocity_params);//get_qei_velocity( c_qei, qei_params);
 			velocity = velocity + actual_velocity;
 		}
 		wait_ms(1, core_id, t);
@@ -48,13 +48,13 @@ void ramp_down(int &i, int comm_voltage, timer t, int core_id, chanend c_commuta
 		wait_ms(5, core_id, t);
 	}
 }
-{int, int} update_comm_sine_max_state(int &sensor_select, timer t, int core_id, hall_par  &hall_params, int &avg_times, int max, chanend c_hall, chanend c_qei, qei_par &qei_params)
+{int, int} update_comm_sine_max_state(int &sensor_select, timer t, int core_id, hall_par  &hall_params, qei_velocity_par &qei_velocity_params, int &avg_times, int max, chanend c_hall, chanend c_qei, qei_par &qei_params)
 {
 	int s, actual_velocity;
 	int samples = avg_times;
 	printintln(samples);printstr(" sens ");printintln(sensor_select);
 	wait_ms(150, core_id, t);
-	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, core_id, t, samples, c_qei, qei_params);
+	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, qei_velocity_params, core_id, t, samples, c_qei, qei_params);
 	if(actual_velocity >= max)
 		s = 1;
 	else
@@ -88,6 +88,8 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 
 	int pos_ok_f = 0;
 	int neg_ok_f = 0;
+	qei_velocity_par qei_velocity_params;
+	init_qei_velocity_params(qei_velocity_params);
 	//xscope_initialise_1();
 	while(1)
 	{
@@ -104,7 +106,7 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	i = 0;
 	ramp_up(i, comm_voltage, t, core_id, c_commutation);
 
-	{s1,actual_velocity} = update_comm_sine_max_state(sensor_select, t, core_id, hall_params, avg_times, (max_nominal_speed*75)/1000, c_hall, c_qei, qei_params);
+	{s1,actual_velocity} = update_comm_sine_max_state(sensor_select, t, core_id, hall_params, qei_velocity_params, avg_times, (max_nominal_speed*75)/1000, c_hall, c_qei, qei_params);
 
 	printintln(s1);
 	//printintln(actual_velocity);
@@ -112,14 +114,14 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	comm_voltage = (comm_max * 375 )/1000;
 	ramp_up(i, comm_voltage, t, core_id, c_commutation);
 
-	{s2,actual_velocity} = update_comm_sine_max_state(sensor_select, t, core_id, hall_params, avg_times, (max_nominal_speed*375)/1000, c_hall, c_qei, qei_params);
+	{s2,actual_velocity} = update_comm_sine_max_state(sensor_select, t, core_id, hall_params, qei_velocity_params, avg_times, (max_nominal_speed*375)/1000, c_hall, c_qei, qei_params);
 	//printintln(actual_velocity);
 	printintln(s2);
 
 	comm_voltage = comm_max ;
 	ramp_up(i, comm_voltage, t, core_id, c_commutation);
 
-	{s3,actual_velocity} = update_comm_sine_max_state(sensor_select, t, core_id, hall_params, avg_times, max_reach_expected, c_hall, c_qei, qei_params);
+	{s3,actual_velocity} = update_comm_sine_max_state(sensor_select, t, core_id, hall_params, qei_velocity_params, avg_times, max_reach_expected, c_hall, c_qei, qei_params);
 	//printintln(actual_velocity);
 	printintln(s3);
 
@@ -140,9 +142,11 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 
 	if(s3 == 1)
 		ok_positive = 1;
-
-	commutation_params.max_speed_reached = max_reached_speed_pos;
-	set_commutation_params( c_commutation, commutation_params);
+	if(commutation_params.flag == 0)
+	{
+		commutation_params.max_speed_reached = max_reached_speed_pos;
+		set_commutation_params( c_commutation, commutation_params);
+	}
 
 
 	comm_voltage = -(comm_max * 75 )/1000;
@@ -150,7 +154,7 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	ramp_down(i, comm_voltage, t, core_id, c_commutation);
 
 	wait_ms(150, core_id, t);
-	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, core_id, t, avg_times, c_qei, qei_params);
+	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, qei_velocity_params, core_id, t, avg_times, c_qei, qei_params);
 	//printintln(actual_velocity);
 	if(actual_velocity <= - (max_nominal_speed*75)/1000)
 		s4 = 1;
@@ -162,7 +166,7 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	ramp_down(i, comm_voltage, t, core_id, c_commutation);
 
 	wait_ms(150, core_id, t);
-	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, core_id, t, avg_times, c_qei, qei_params);
+	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, qei_velocity_params, core_id, t, avg_times, c_qei, qei_params);
 	//printintln(actual_velocity);
 	if(actual_velocity <= - (max_nominal_speed*375)/1000)
 		s5 = 1;
@@ -174,7 +178,7 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	ramp_down(i, comm_voltage, t, core_id, c_commutation);
 
 	wait_ms(150, core_id, t);
-	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, core_id, t, avg_times, c_qei, qei_params);
+	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, qei_velocity_params, core_id, t, avg_times, c_qei, qei_params);
 	//printintln(actual_velocity);
 	if(actual_velocity <= - max_reach_expected)
 		s6 = 1;
@@ -200,8 +204,12 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	avg_speed_reach =  (0-actual_velocity + max_reached_speed_pos)/2;
 	//printintln(avg_speed_reach);
 
-	commutation_params.max_speed_reached = avg_speed_reach;
-	set_commutation_params( c_commutation, commutation_params);
+	if(commutation_params.flag == 0)
+	{
+		commutation_params.max_speed_reached = avg_speed_reach;
+		set_commutation_params( c_commutation, commutation_params);//setting parameters
+	}
+
 
 	printstrln("test ended");
 	//printintln(ok_positive);printstr(" ");printintln(ok_negative);
@@ -210,7 +218,7 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	comm_voltage = comm_max ;
 	ramp_up(i, comm_voltage, t, core_id, c_commutation);
 	wait_ms(150, core_id, t);
-	{s3,actual_velocity} = update_comm_sine_max_state(sensor_select, t, core_id, hall_params, avg_times, max_reach_expected, c_hall, c_qei, qei_params);
+	{s3,actual_velocity} = update_comm_sine_max_state(sensor_select, t, core_id, hall_params, qei_velocity_params, avg_times, max_reach_expected, c_hall, c_qei, qei_params);
 	max_reached_speed_pos = actual_velocity;
 	printintln(max_reached_speed_pos);
 	if(i<0)
@@ -232,7 +240,7 @@ void commutation_sine_automate(int &sensor_select, chanend c_signal, chanend c_c
 	i = 0;
 	ramp_down(i, comm_voltage, t, core_id, c_commutation);
 	wait_ms(150, core_id, t);
-	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, core_id, t, avg_times, c_qei, qei_params);
+	actual_velocity = get_average_velocity(sensor_select, c_hall, hall_params, qei_velocity_params, core_id, t, avg_times, c_qei, qei_params);
 	printintln(actual_velocity);
 
 	neg_ok_f = 0;

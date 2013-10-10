@@ -52,7 +52,6 @@ void xscope_initialise_1()
 	return;
 }
 
-
 int main(void) {
 	chan c_adctrig;
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
@@ -92,13 +91,13 @@ int main(void) {
 		on stdcore[1]:
 		{
 			{
-				int sensor_select = 2; //use hall or qei
+				int sensor_select = 1; //use hall or qei
 				commutation_par commutation_params;
 				hall_par hall_params;
 				qei_par qei_params;
 				init_hall_param(hall_params);
 				init_qei_param(qei_params);
-				init_commutation_param(commutation_params); // initialize commutation params
+				init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 				commutation_sine_automate(sensor_select, c_signal,  c_commutation_p1, commutation_params, hall_params, qei_params, c_hall_p3, c_qei_p3);
 			}
 		}
@@ -122,7 +121,7 @@ int main(void) {
 					qei_par qei_params;
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);
-					init_commutation_param(commutation_params); // initialize commutation params
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 					commutation_sinusoidal(sensor_select, hall_params, qei_params, commutation_params, c_hall_p1, c_qei_p1, c_pwm_ctrl, c_signal_adc, c_signal,
 							c_sync, c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
 				}

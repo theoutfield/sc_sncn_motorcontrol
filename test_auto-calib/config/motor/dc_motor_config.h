@@ -36,7 +36,7 @@
  */
 #define POLE_PAIRS  8
 #define GEAR_RATIO  26
-#define MAX_NOMINAL_SPEED  5260		// in rpm
+#define MAX_NOMINAL_SPEED  5360		// in rpm
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define MAX_ACCELERATION   5000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
@@ -114,11 +114,6 @@ typedef struct S_Hall {
 	int gear_ratio;
 } hall_par;
 
-typedef struct S_COMMUTATION {
-	int angle_variance;
-	int max_speed_reached;
-} commutation_par;
-
 typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 {
 	int max_motor_speed; // max motor speed
@@ -156,12 +151,7 @@ typedef struct PROFILE_POSITION_PARAM
 	int max_acceleration;
 } pp_par;
 
-/**
-* \brief initialize commutation parameters
-*
-* \param commutation_params struct defines the commutation angle parameters
-*/
-void init_commutation_param(commutation_par &commutation_params);
+
 
 /**
  * \brief initialize QEI sensor

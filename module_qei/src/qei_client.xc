@@ -18,12 +18,18 @@
  *
  */
 
-#include <xs1.h>
-#include <stdio.h>
-#include "qei_config.h"
+
 #include "qei_client.h"
-#include <dc_motor_config.h>
-#include <print.h>
+
+void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
+{
+	qei_velocity_params.previous_position=0;
+	qei_velocity_params.old_difference = 0;
+	qei_velocity_params.filter_length =8;
+	qei_velocity_params.index = 0;
+	init_filter(qei_velocity_params.filter_buffer, qei_velocity_params.index, qei_velocity_params.filter_length);
+	return;
+}
 
 //get position and valid from qei directly
 {unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params)
@@ -54,6 +60,22 @@
 		c_qei :> dirn;
 	}
 	return {pos, dirn};
+}
+
+
+int qei_speed(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params)
+{
+	int s_difference;
+	int count, dirn;
+	{count, dirn} = get_qei_position_absolute(c_qei);
+	s_difference = count - qei_velocity_params.previous_position;
+	if(s_difference > 3080)
+		s_difference = qei_velocity_params.old_difference;
+	else if(s_difference < -3080)
+		s_difference = qei_velocity_params.old_difference;
+	qei_velocity_params.previous_position = count;
+	qei_velocity_params.old_difference = s_difference;
+	return (filter(qei_velocity_params.filter_buffer, qei_velocity_params.index, qei_velocity_params.filter_length, s_difference)*1000*60) / (qei_params.real_counts);
 }
 
 int get_qei_velocity(chanend c_qei, qei_par &qei_params)
