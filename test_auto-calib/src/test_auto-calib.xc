@@ -91,7 +91,7 @@ int main(void) {
 		on stdcore[1]:
 		{
 			{
-				int sensor_select = 1; //use hall or qei
+				int sensor_select = 1;
 				commutation_par commutation_params;
 				hall_par hall_params;
 				qei_par qei_params;

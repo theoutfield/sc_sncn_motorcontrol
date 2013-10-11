@@ -141,9 +141,7 @@ t:>time;
 		//calib_fw_offset = calib_qei(c_calib,  t, 2);  //fw 1 bw 2
 
  	 	//printintln(calib_fw_offset);
-commutation_params.qei_backward_offset = 100;
-commutation_params.qei_forward_offset = 250;
- set_qei_offset(commutation_params,  c_calib);
+
 		while(1)
 		{
 			printstrln("wait loop");

@@ -12,7 +12,7 @@ void qei_calibrate(chanend c_signal, chanend c_commutation, commutation_par &com
 	int max_reach_expected = (MAX_NOMINAL_SPEED * 85 )/100;
 	int max_reached_speed_pos;
 	int comm_max = 13739;
-	int comm_min = 5000;
+	int comm_min = 2500;
 	int init_state;
 	int i;
 	int actual_velocity;
