@@ -1,12 +1,4 @@
 #include "hall_server.h"
-#include <stdlib.h>
-#include <print.h>
-#include <stdint.h>
-#include "refclk.h"
-#include "dc_motor_config.h"
-#include <internal_config.h>
-#include <xscope.h>
-#include "hall_config.h"
 
 void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state, int count)
 {
@@ -28,8 +20,8 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 	}
 }
 
-void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
-		chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4)
+void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
+		port in p_hall, hall_par &hall_params)
 {
 	timer tx;
 	unsigned int ts;
@@ -73,9 +65,6 @@ void run_hall(port in p_hall, hall_par &hall_params, chanend c_hall_p1,
 	int filter_buffer[FILTER_LENGTH_HALL];
 	int index = 0;
 	int raw_velocity;
-
-	//int cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
-
 
 	t1 :> time1;
 	tx :> ts;

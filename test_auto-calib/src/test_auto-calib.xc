@@ -122,20 +122,22 @@ int main(void) {
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(sensor_select, hall_params, qei_params, commutation_params, c_hall_p1, c_qei_p1, c_pwm_ctrl, c_signal_adc, c_signal,
-							c_sync, c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal_adc,
+							 c_signal, c_sync, c_commutation_p1, c_commutation_p2,
+							 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,
+							 qei_params, commutation_params);
 				}
 
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, p_ifm_encoder, qei_params);  // channel priority 1,2..4
 				}
 
 			}

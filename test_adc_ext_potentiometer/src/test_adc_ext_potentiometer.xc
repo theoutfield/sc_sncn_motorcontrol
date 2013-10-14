@@ -51,8 +51,8 @@ int main(void) {
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan c_pwm_ctrl;
 	chan c_signal_adc;
-	chan c_sig_1, c_signal;
-	chan c_adc;
+	chan c_sig_1, c_signal, c_sync;
+	chan c_adc, c_qei;
 
 
 	par
@@ -71,7 +71,7 @@ int main(void) {
 					while(1)
 					{
 						t when timerafter(time + 500*USEC_STD) :> time;
-						{external_pot1 , external_pot2} = get_adc_external_potentiometer(c_adc);
+						{external_pot1 , external_pot2} = get_adc_external_potentiometer_ad7949(c_adc);
 						xscope_probe_data(0, external_pot1);
 						xscope_probe_data(1, external_pot2);
 					}
@@ -88,9 +88,9 @@ int main(void) {
 		{
 			par
 			{
-				adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
+		//		adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
 
-	/*			adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
+				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
 						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
 						p_ifm_adc_misob);
 
@@ -98,19 +98,24 @@ int main(void) {
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				{
-					hall_par hall_params;
-					commutation_par commutation_params;
-					init_hall_param(hall_params);
-					init_commutation_param(commutation_params); // initialize commutation params
-					commutation_sinusoidal(hall_params, commutation_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
-							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
+//					hall_par hall_params;
+//					qei_par qei_params;
+//					commutation_par commutation_params;
+//					int sensor_select = 1;
+//					init_hall_param(hall_params);
+//					init_qei_param(qei_params);
+//					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
+//					commutation_sinusoidal(c_hall_p1,  c_qei, c_signal_adc,\
+//							 c_signal, c_sync, c_commutation_p1, c_commutation_p2,\
+//							 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,\
+//							 qei_params, commutation_params);
 				}
 
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
-				}*/
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, p_ifm_hall, hall_params); // channel priority 1,2..4
+				}
 			}
 		}
 

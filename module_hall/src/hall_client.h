@@ -21,15 +21,24 @@
 #include <stdint.h>
 #include "dc_motor_config.h"
 #include "hall_config.h"
+#include <xs1.h>
+#include <stdint.h>
 
 /**
  * \channel c_hall for communicating with the Hall Server
  *
- * \return the angle in range [0 - 4095] which maps to [0 - 359] degree
+ *  Output
+ * \return the position in the range [0 - 4095] which maps to [0 - 359]/pole-pairs
  */
 int get_hall_position(chanend c_hall);
 
-
+/**
+ * \channel c_hall for communicating with the Hall Server
+ *
+ *  Output
+ * \return the counted up position (accounts for pole-pairs and gear-ratio)
+ * 							in the range [0 - 4095]*pole-pairs*gear-ratio
+ */
 int get_hall_position_absolute(chanend c_hall);
 
 /**
@@ -37,6 +46,10 @@ int get_hall_position_absolute(chanend c_hall);
  *
  * \channel c_hall for communicating with the Hall Server
  *
+ *  Input
+ * \param hall_params struct defines the pole-pairs and gear ratio
+ *
+ *  Output
  * \return the velocity in rpm from Hall Sensor
  */
 int get_hall_velocity(chanend c_hall, hall_par &hall_params);

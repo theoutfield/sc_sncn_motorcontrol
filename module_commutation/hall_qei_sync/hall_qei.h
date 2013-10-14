@@ -9,6 +9,10 @@
 #define HALL_QEI_H_
 #include "dc_motor_config.h"
 #include "comm_loop.h"
+#include "refclk.h"
+#include "qei_client.h"
+#include "hall_client.h"
+#include "xscope.h"
 
 /**
  *  \channel c_qei qei position data

@@ -18,7 +18,7 @@
 #include "ioports.h"
 #include "hall_server.h"
 #include "hall_client.h"
-#include "hall-qei.h"
+#include "hall_qei.h"
 #include "qei_client.h"
 #include "pwm_service_inv.h"
 #include "adc_ad7949.h"
@@ -59,8 +59,8 @@ int main(void)
 	chan c_pwm_ctrl;
 	chan dummy, dummy1, dummy2;
 	chan c_signal_adc;
-	chan c_sig_1, c_signal;
-	chan c_torque_ctrl, signal_ctrl;
+	chan c_sig_1, c_signal, c_sync;
+	chan c_torque_ctrl, signal_ctrl, c_calib;
 
 	//etherCat Comm channels
 	chan coe_in; 	///< CAN from module_ethercat to consumer
@@ -129,11 +129,16 @@ int main(void)
 				{
 					hall_par hall_params;
 					qei_par qei_params;
-					hall_qei_sync(qei_params, hall_params, c_qei_p1, c_hall_p2, sync_output);
+					commutation_par commutation_params;
+					init_qei_param(qei_params);
+					init_hall_param(hall_params);
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
+					hall_qei_sync(qei_params, hall_params, commutation_params, c_qei_p1, c_hall_p2, sync_output, c_calib);
 				}
 
 				{
 					hall_par hall_params;
+					init_hall_param(hall_params);
 					current_ctrl_loop(hall_params, c_signal_adc, c_adc, c_hall_p3,
 							sync_output, c_commutation_p1, c_torque_ctrl);
 				}
@@ -157,25 +162,30 @@ int main(void)
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				{
+					int sensor_select = 1;
 					hall_par hall_params;
+					qei_par qei_params;
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
-					init_commutation_param(commutation_params); // initialize commutation params
-					commutation_sinusoidal(hall_params, commutation_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
-							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
-				}
+					init_qei_param(qei_params);
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
+					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal_adc,
+									 c_signal, c_sync, c_commutation_p1, c_commutation_p2,
+									 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,
+									 qei_params, commutation_params);
 
+				}
 
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3 , c_qei_p4);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, p_ifm_encoder, qei_params);  // channel priority 1,2..4
 				}
 
 			}

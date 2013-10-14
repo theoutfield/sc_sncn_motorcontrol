@@ -41,7 +41,7 @@ int main(void) {
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan c_pwm_ctrl;
 	chan c_signal_adc;
-	chan c_sig_1, c_signal;
+	chan c_sig_1, c_signal, c_sync;
 	chan c_velocity_ctrl;
 	chan c_torque_ctrl;
 	chan c_position_ctrl;
@@ -127,14 +127,20 @@ int main(void) {
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				{
+					int sensor_select = 1;
 					hall_par hall_params;
+					qei_par qei_params;
 					commutation_par commutation_params;
-					init_commutation_param(commutation_params); // initialize commutation params
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 				//	init_hall_param(hall_params);
 					comm_init_ecat(c_signal, hall_params);
+					init_qei_param(qei_params);
 
-					commutation_sinusoidal(hall_params, commutation_params, c_hall_p1, c_pwm_ctrl, c_signal_adc, c_signal,
-							c_commutation_p1, c_commutation_p2, c_commutation_p3);					 // hall based sinusoidal commutation
+					commutation_sinusoidal(c_hall_p1,  c_qei_p3, c_signal_adc,
+								 c_signal, c_sync, c_commutation_p1, c_commutation_p2,
+								 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,
+								 qei_params, commutation_params);
+
 				}
 
 				{
@@ -142,7 +148,7 @@ int main(void) {
 			//		init_hall_param(hall_params);
 					hall_init_ecat(c_hall_p4, hall_params);
 
-					run_hall(p_ifm_hall, hall_params, c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 
 				{
@@ -150,7 +156,7 @@ int main(void) {
 			//		init_qei_param(qei_params);
 					qei_init_ecat(c_qei_p4, qei_params);
 
-					run_qei(p_ifm_encoder, qei_params, c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, p_ifm_encoder, qei_params);  // channel priority 1,2..4
 				}
 
 			}

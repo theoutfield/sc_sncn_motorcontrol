@@ -41,13 +41,13 @@ static const unsigned char lookup[16][4] = {
 		{ 0, 0, 0, 0 }  // 11 xx
 };
 
-void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, int direction, int velocity_raw, int velocity_raw1, int init_state, int neww)
+void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int count, int direction, int init_state)
 {
 	if(command == QEI_RAW_POS_REQ)
 	{
 		slave
 		{
-			c_qei <: pos;
+			c_qei <: position;
 			c_qei <: ok;
 		}
 	}
@@ -59,7 +59,7 @@ void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, 
 			c_qei <: direction;
 		}
 	}
-	else if(command == QEI_VELOCITY_REQ)
+/*	else if(command == QEI_VELOCITY_REQ)
 	{
 		slave
 		{
@@ -72,33 +72,36 @@ void qei_client_hanlder(chanend c_qei, int command, int pos, int ok, int count, 
 		{
 			c_qei <: velocity_raw1;
 		}
-	}
-	else if(command == 5)
-		slave
-
-		{
-			c_qei <: neww;
-		}
+	}*/
 	else if(command == CHECK_BUSY)
 	{
 		c_qei <: init_state;
 	}
 }
 #pragma unsafe arrays
-void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4)
+void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, port in p_qei, qei_par &qei_params)
 {
-	unsigned int pos = 0, v, ts1, ts2, ok=0, old_pins=0, new_pins;
-	timer t;
+	unsigned int position = 0;
+	unsigned int v;
+	unsigned int ts1;
+	unsigned int ts2;
+	unsigned int ok = 0;
+	unsigned int old_pins = 0;
+	unsigned int new_pins;
 
 	int command;
-	int c_pos = 0, prev = 0, count = 0, first = 1;
+	int current_pos = 0;
+	int previous_position = 0;
+	int count = 0;
+	int first = 1;
 	int max_count_actual = qei_params.gear_ratio * qei_params.real_counts;
-	int difference = 0, direction = 0;
+	int difference = 0;
+	int direction = 0;
 	int qei_max = qei_params.max_count;
 	int qei_type = qei_params.index;
 	int init_state = INIT;
 
-	unsigned int time, time1;
+/*	unsigned int time, time1;
 	int s_previous_position1 = 0;
 	int s_difference1 = 0;
 	int old_difference1 = 0;
@@ -117,79 +120,73 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 	int flag = 0;
 	int sync_position = 0;
 	init_filter(filter_buffer, index, filter_length);
-	init_filter(filter_buffer1, index1, filter_length1);
+	init_filter(filter_buffer1, index1, filter_length1);*/
 	p_qei :> new_pins;
-	t :> ts1;
+	/*t :> ts1;
 	t :> time1;
-	t :> time;
+	t :> time;*/
 
 	while (1) {
 	#pragma ordered
 		select {
 			case p_qei when pinsneq(new_pins) :> new_pins :
 				{
-				  	  if ((new_pins & 0x3) != old_pins) {
+				  	 /* if ((new_pins & 0x3) != old_pins) {
 				  		  ts2 = ts1;
 				  		  t :> ts1;
-				  	  }
+				  	  }*/
 
 				  	  if(qei_type == QEI_WITH_INDEX)
 				  	  {
 						  v = lookup[new_pins][old_pins];
 
 						  if (!v) {
-							  pos = 0;
+							  position = 0;
 							  ok = 1;
 						  }
 						  else
 						  {
-							  { v, pos } = lmul(1, pos, v, -5);
+							  { v, position } = lmul(1, position, v, -5);
 						  }
 				  	  }
 				  	  else if(qei_type == QEI_WITH_NO_INDEX)
 				  	  {
 				  		  v = lookup[new_pins][old_pins];
-				  		  { v, pos } = lmul(1, pos, v, -5);
+				  		  { v, position } = lmul(1, position, v, -5);
 				  	  }
 
 				  	  old_pins = new_pins & 0x3;
 
 				  	if(first == 1)
 					{
-						prev = pos & (qei_max-1);
+						previous_position = position & (qei_max-1);
 						first = 0;
 					}
-					c_pos =  pos & (qei_max-1);
-					if(prev != c_pos )
+					current_pos =  position & (qei_max-1);
+					if(previous_position != current_pos )
 					{
-						difference = c_pos - prev;
+						difference = current_pos - previous_position;
 						if( difference > 3000)
 						{
 							count = count + 1;
 							direction = 1;
-
-					//		 xscope_probe_data(3, ff);
 						}
 						else if(difference < -3000)
 						{
 							count = count - 1;
-
-						//	xscope_probe_data(3, ff);
 							direction = -1;
 						}
 						else if( difference < 10 && difference >0)
 						{
 							count = count - difference;
 							direction = -1;
-
 						}
 						else if( difference < 0 && difference > -10)
 						{
-
 							count = count - difference;
 							direction = 1;
 						}
-						prev = c_pos;
+						previous_position = current_pos;
 					}
 					if(count >= max_count_actual || count <= -max_count_actual)
 					{
@@ -199,19 +196,19 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 				break;
 
 			case c_qei_p1 :> command :
-				qei_client_hanlder( c_qei_p1, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state,sync_position);
+				qei_client_hanlder( c_qei_p1, command, position, ok, count, direction, init_state);
 				break;
 
 			case c_qei_p2 :> command :
-				qei_client_hanlder( c_qei_p2, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state,sync_position);
+				qei_client_hanlder( c_qei_p2, command, position, ok, count, direction, init_state);
 				break;
 
 			case c_qei_p3 :> command :
-				qei_client_hanlder( c_qei_p3, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state,sync_position);
+				qei_client_hanlder( c_qei_p3, command, position, ok, count, direction, init_state);
 				break;
 
 			case c_qei_p4 :> command :
-				qei_client_hanlder( c_qei_p4, command, pos, ok, count, direction, velocity_raw, velocity_raw1, init_state,sync_position);
+				qei_client_hanlder( c_qei_p4, command, position, ok, count, direction, init_state);
 				break;
 
 //			case t when timerafter (time+MSEC_FAST):> time :
@@ -228,21 +225,6 @@ void run_qei ( port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_q
 
 		}
 
-//		select
-//		{
-//			case t when timerafter (time1 + 13889):> time1 :
-//				s_difference1 = count - s_previous_position1;
-//				if(s_difference1 > 3080)
-//					s_difference1 = old_difference1;
-//				if(s_difference1 < -3080)
-//					s_difference1 = old_difference1;
-//				velocity_raw1 = _modified_internal_filter(filter_buffer1, index1, filter_length1, s_difference1);
-//				s_previous_position1 = count;
-//				old_difference1 = s_difference1;
-//				break;
-//			default:
-//				break;
-//		}
 	}
 }
 

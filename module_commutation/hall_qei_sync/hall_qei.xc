@@ -1,8 +1,5 @@
 #include "hall_qei.h"
-#include "refclk.h"
-#include "qei_client.h"
-#include "hall_client.h"
-#include "xscope.h"
+
 
 
 int get_sync_position (chanend sync_output)

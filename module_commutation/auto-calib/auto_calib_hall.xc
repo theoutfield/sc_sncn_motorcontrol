@@ -22,7 +22,7 @@ int get_average_velocity(int sensor_select, chanend c_hall, hall_par &hall_param
 		}
 		else if(sensor_select == 2)
 		{
-			actual_velocity = qei_speed(c_qei, qei_params, qei_velocity_params);//get_qei_velocity( c_qei, qei_params);
+			actual_velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);//get_qei_velocity( c_qei, qei_params);
 			velocity = velocity + actual_velocity;
 		}
 		wait_ms(1, core_id, t);

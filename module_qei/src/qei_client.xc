@@ -34,50 +34,52 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
 //get position and valid from qei directly
 {unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params)
 {
-	unsigned int p, v;
-
+	unsigned int position;
+	unsigned int valid;
 
 	c_qei <: QEI_RAW_POS_REQ;
 	master
 	{
-		c_qei :> p;
-		c_qei :> v;
+		c_qei :> position;
+		c_qei :> valid;
 	}
-	p &= (qei_params.max_count - 1);
+	position &= (qei_params.max_count - 1);
 
-	return {p, v};
+	return {position, valid};
 }
 
 //counted up position from qei with gear ratio
 {int, int} get_qei_position_absolute(chanend c_qei)
 {
-	int pos;
-	int dirn; 				// clockwise +1  counterclockwise -1
+	int position;
+	int direction; 				// clockwise +1  counterclockwise -1
 	c_qei <: QEI_ABSOLUTE_POS_REQ;
 	master
 	{
-		c_qei :> pos;
-		c_qei :> dirn;
+		c_qei :> position;
+		c_qei :> direction;
 	}
-	return {pos, dirn};
+	return {position, direction};
 }
 
 
-int qei_speed(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params)
+int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params)
 {
-	int s_difference;
-	int count, dirn;
-	{count, dirn} = get_qei_position_absolute(c_qei);
-	s_difference = count - qei_velocity_params.previous_position;
-	if(s_difference > 3080)
-		s_difference = qei_velocity_params.old_difference;
-	else if(s_difference < -3080)
-		s_difference = qei_velocity_params.old_difference;
+	int difference;
+	int count;
+	int direction;
+	{count, direction} = get_qei_position_absolute(c_qei);
+	difference = count - qei_velocity_params.previous_position;
+	if(difference > 3080)
+		difference = qei_velocity_params.old_difference;
+	else if(difference < -3080)
+		difference = qei_velocity_params.old_difference;
 	qei_velocity_params.previous_position = count;
-	qei_velocity_params.old_difference = s_difference;
-	return (filter(qei_velocity_params.filter_buffer, qei_velocity_params.index, qei_velocity_params.filter_length, s_difference)*1000*60) / (qei_params.real_counts);
+	qei_velocity_params.old_difference = difference;
+	return (filter(qei_velocity_params.filter_buffer, qei_velocity_params.index, qei_velocity_params.filter_length, difference)*1000*60) / (qei_params.real_counts);
 }
 
+/*
 int get_qei_velocity(chanend c_qei, qei_par &qei_params)
 {
 	int velocity;
@@ -91,34 +93,4 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params)
 
 	return velocity;
 }
-
-
-int _get_qei_velocity_pwm_resolution(chanend c_qei, qei_par &qei_params)
-{
-	int velocity;
-
-	c_qei <: QEI_VELOCITY_PWM_RES_REQ;
-	master
-	{
-		c_qei :> velocity;
-	}
-	velocity = ((velocity/FILTER_LENGTH_QEI_PWM)*QEI_PWM_RPM_CONST) / (qei_params.real_counts);
-
-	return velocity;
-}
-
-
-
-int get_qei_syncp(chanend c_qei)
-{
-	int pos;
-
-	c_qei <: 5;
-	//master
-	{
-		c_qei :> pos;
-	}
-
-
-	return pos;
-}
+*/

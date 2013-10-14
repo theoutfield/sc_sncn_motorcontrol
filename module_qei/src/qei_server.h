@@ -28,13 +28,16 @@
 /**
  * \brief Implementation of the QEI server thread (with index/no index)
  *
- * \param p_qei the hardware port where the quadrature encoder is located
+ * \channel c_qei_p1 the control channel for reading qei position in order of priority (highest) 1 ... (lowest) 4
+ * \channel c_qei_p2 the control channel for reading qei position priority - 2
+ * \channel c_qei_p3 the control channel for reading qei position priority - 3
+ * \channel c_qei_p4 the control channel for reading qei position priority - 4
+ *
+ * \port p_qei the hardware port where the quadrature encoder is located
+ *
  * \param qei_params the struct defines sensor type and resolution parameters for qei
- * \param c_qei_p1 the control channel for reading qei position in order of priority (highest) 1 ... (lowest) 4
- * \param c_qei_p2 the control channel for reading qei position priority - 2
- * \param c_qei_p3 the control channel for reading qei position priority - 3
- * \param c_qei_p4 the control channel for reading qei position priority - 4
+ *
  */
-void run_qei(port in p_qei, qei_par &qei_params, chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4);
+void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, port in p_qei, qei_par &qei_params);
 
 #endif /*__QEI_SERVER_H__ */
