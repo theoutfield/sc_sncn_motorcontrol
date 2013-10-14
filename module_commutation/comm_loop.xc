@@ -16,18 +16,22 @@
  **/
 
 
+#include "comm_loop.h"
 #include <xs1.h>
 #include <stdint.h>
-#include <xscope.h>
-#include "refclk.h"
+#include <pwm_config.h>
+#include "pwm_cli_inv.h"
+#include "predriver/a4935.h"
+#include "sine_table_big.h"
 #include "adc_client_ad7949.h"
 #include "hall_client.h"
+#include "dc_motor_config.h"
+#include <xscope.h>
+#include "refclk.h"
 #include "qei_client.h"
 #include "hall_qei.h"
-#include "comm_loop.h"
 #include <internal_config.h>
 #include "print.h"
-
 #define SET_VOLTAGE    2
 #define SET_COMMUTATION_PARAMS 3
 #define HALL 1
@@ -255,8 +259,10 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 	return;
 }
 
-void commutation_sinusoidal(int sensor_select, hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params, chanend c_hall, chanend c_qei, chanend c_pwm_ctrl, chanend signal_adc,
-		chanend c_signal, chanend c_sync, chanend  c_commutation_p1, chanend  c_commutation_p2, chanend  c_commutation_p3)
+void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal_adc,\
+		chanend c_signal, chanend c_sync, chanend  c_commutation_p1, chanend  c_commutation_p2,\
+		chanend  c_commutation_p3, chanend c_pwm_ctrl, int sensor_select, hall_par &hall_params,\
+		qei_par &qei_params, commutation_par &commutation_params)
 {
 	  const unsigned t_delay = 300*USEC_FAST;
 	  const unsigned timeout = 2*SEC_FAST;
@@ -283,10 +289,10 @@ void commutation_sinusoidal(int sensor_select, hall_par &hall_params, qei_par &q
 		  #pragma ordered
 		  select
 		  {
-			case signal_adc :> command:
+			case c_signal_adc :> command:
 				received_command = 1;
 				//printstrln("received signal from torque ctrl");
-				signal_adc <: 1;
+				c_signal_adc <: 1;
 				break;
 			case t when timerafter(ts + timeout) :> void:
 				received_command = 1;
