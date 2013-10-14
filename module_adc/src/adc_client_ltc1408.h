@@ -21,7 +21,7 @@
 #pragma once
 
 /**
- * \brief ADC calibration sequence
+ * \brief ADC current calibration sequence
  *
  * \channel c_adc the channel for communicating with the adc server
  *
@@ -38,7 +38,7 @@ void do_adc_calibration_ltc1408( chanend c_adc );
  * \return Ic phase current value (raw) in whatever format the ADC delivers them in
  *
  */
-{unsigned, unsigned, unsigned} get_adc_vals_raw_ltc1408( chanend c_adc );
+{unsigned, unsigned, unsigned} get_adc_vals_ltc1408( chanend c_adc );
 
 /* get calibrated three phase current from the adc*/
 
@@ -52,6 +52,6 @@ void do_adc_calibration_ltc1408( chanend c_adc );
  * \return Ic calibrated phase current value
  *
  */
-{int, int, int} get_adc_vals_calibrated_int16_ltc1408( chanend c_adc );
+{int, int, int} get_adc_calibrated_current_ltc1408( chanend c_adc );
 
 

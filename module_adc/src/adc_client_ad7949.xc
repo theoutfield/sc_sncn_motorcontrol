@@ -13,7 +13,7 @@ int iFilterSUM_Ib;
 int Ia=0;
 int Ib=0;
 
-{int, int, int, int, int, int, int, int, int, int} get_adc_calibrated_ad7949(chanend c_adc)
+{int, int, int, int, int, int, int, int} get_adc_all_ad7949(chanend c_adc)
 {
 	//const int zero_amps = 9999; 	// 0A equals 2.5V --> 9999
 
@@ -38,7 +38,7 @@ int Ib=0;
 	}
 
 
-	return { adc_b1, adc_a1, current_a, current_b, adc_Temperature1, adc_Temperature2, adc_VoltageSupply, adc_Dummy, ExternalPot1, ExternalPot2 };
+	return { current_a, current_b, adc_Temperature1, adc_Temperature2, adc_VoltageSupply, adc_Dummy, ExternalPot1, ExternalPot2 };
 
 }
 
@@ -74,7 +74,7 @@ void do_adc_calibration_ad7949( chanend c_adc )
 //	printstr("ib_calibration ");   printint(I_calib.Ib_calib); printstr("\n");
 }
 
-{int, int} get_adc_vals_calibrated_int16_ad7949( chanend c_adc )
+{int, int} get_adc_calibrated_current_ad7949( chanend c_adc )
 {
 	// 0A equals 2.5V --> 9999
 	unsigned int a, b;
@@ -95,7 +95,7 @@ void do_adc_calibration_ad7949( chanend c_adc )
 }
 
 
-{int, int} get_adc_external_potentiometer(chanend c_adc)
+{int, int} get_adc_external_potentiometer_ad7949(chanend c_adc)
 {
 
 	int p1, p2;

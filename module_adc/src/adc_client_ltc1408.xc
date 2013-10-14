@@ -57,7 +57,7 @@ void do_adc_calibration_ltc1408( chanend c_adc )
 		printstr("ics ");   printint(Ic_calib); printstr("\n\n");
 }
 
-{unsigned, unsigned, unsigned} get_adc_vals_raw_ltc1408( chanend c_adc )
+{unsigned, unsigned, unsigned} get_adc_vals_ltc1408( chanend c_adc )
 {
 	unsigned a, b, c;
 
@@ -73,7 +73,7 @@ void do_adc_calibration_ltc1408( chanend c_adc )
 	return {a,b,c};
 }
 
-{int, int, int} get_adc_vals_calibrated_int16_ltc1408( chanend c_adc )
+{int, int, int} get_adc_calibrated_current_ltc1408( chanend c_adc )
 {
 	unsigned a, b, c;
 	int Ia, Ib, Ic;

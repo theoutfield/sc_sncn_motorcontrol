@@ -21,33 +21,30 @@
  *
  * \channel c_adc the channel for communicating with the adc server
  *
- * \return Ia phase current value (raw) in whatever format the ADC delivers them in
- * \return Ib phase current value (raw) in whatever format the ADC delivers them in
+ * \return External input 1 value (raw)
+ * \return External input 2 value (raw)
  */
-{int, int} get_adc_external_potentiometer(chanend c_adc);
+{int, int} get_adc_external_potentiometer_ad7949(chanend c_adc);
 
 /**
- * \brief Calibrated Phase currents from the non triggered ADC server
+ * \brief All ADC values from the non triggered ADC server
  *
  * \channel c_adc the channel for communicating with the adc server
  *
- * \return Ia calibrated phase current value
- * \return Ib calibrated phase current value
- * \return Calibration constant for phase current Ia
- * \return Calibration constant for phase current Ib
- * \return ADC temperature sensor 1 value
- * \return ADC temperature sensor 2 value
+ * \return Ia phase current value (raw)
+ * \return Ib phase current value (raw)
+ * \return ADC temperature sensor 1 value (raw)
+ * \return ADC temperature sensor 2 value (raw)
  * \return ADC Voltage Supply value
  * \return ADC dummy value
- * \return External input 1 value
- * \return External input 2 value
+ * \return External input 1 value (raw)
+ * \return External input 2 value (raw)
  */
-{int, int, int, int, int, int, int, int, int, int} get_adc_calibrated_ad7949( chanend c_adc);
-
+{int, int, int, int, int, int, int, int} get_adc_all_ad7949( chanend c_adc);
 
 
 /**
- * \brief ADC calibration sequence for Triggered ADC server
+ * \brief ADC current calibration sequence for Triggered ADC server
  *
  * \channel c_adc the channel for communicating with the adc server
  *
@@ -63,6 +60,6 @@ void do_adc_calibration_ad7949( chanend c_adc );
  * \return Ib calibrated phase current value
  *
  */
-{int, int} get_adc_vals_calibrated_int16_ad7949( chanend c_adc );
+{int, int} get_adc_calibrated_current_ad7949( chanend c_adc );
 
 
