@@ -177,7 +177,7 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 		select
 		{
 			case ts when timerafter(time+5556) :> time: // .05 ms
-				{phase_a_raw , phase_b_raw}= get_adc_vals_calibrated_int16_ad7949(c_adc);
+				{phase_a_raw , phase_b_raw}= get_adc_calibrated_current_ad7949(c_adc);
 				buffer_phase_a[fil_cnt] = phase_a_raw;
 				buffer_phase_b[fil_cnt] = phase_b_raw;
 
