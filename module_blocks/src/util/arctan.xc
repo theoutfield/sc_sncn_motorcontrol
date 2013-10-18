@@ -13,6 +13,8 @@
  **/
 
 #include "sine_table_big.h"
+#define COMMUTATION 1
+#define SINE_TABLE  2
 
 int arctg1(int Real, int Imag)
 {
@@ -71,7 +73,7 @@ int arctg1(int Real, int Imag)
 }
 
 
-int sine_reduce(int angle)
+int sine_expanded(int angle, int select_mode)
 {
 	int a1, a2;
 	int sign = 0;
@@ -86,18 +88,27 @@ int sine_reduce(int angle)
 		   if(angle > 768)
 		   {
 			   angle = 1024 - angle;
-			   return sign * sine_third[angle];
+			   if(select_mode == COMMUTATION)
+				   return sign * sine_third[angle];
+			   else if(select_mode == SINE_TABLE)
+				   return sign * sine_table[angle];
 		   }
 		   else
 		   {
 			   angle =   angle - 512;
-			   return sign * sine_third[angle];
+			   if(select_mode == COMMUTATION)
+				   return sign * sine_third[angle];
+			   else if(select_mode == SINE_TABLE)
+				   return sign * sine_table[angle];
 		   }
 		}
 		else if(a2 == 2)
 		{
 			angle = angle - 512;
-			return sign * sine_third[angle];
+			if(select_mode == COMMUTATION)
+			   return sign * sine_third[angle];
+			else if(select_mode == SINE_TABLE)
+			   return sign * sine_table[angle];
 		}
 	}
 	else if(a1 == 0)
@@ -108,12 +119,35 @@ int sine_reduce(int angle)
 			if(angle > 256)
 			{
 				angle = 512 - angle;
-				return sine_third[angle];
+				if(select_mode == COMMUTATION)
+				   return sine_third[angle];
+				else if(select_mode == SINE_TABLE)
+				   return sine_table[angle];
 			}
 		}
 	}
 	if(sign < 0)
-		return sign * sine_third[angle];
+	{
+	   if(select_mode == COMMUTATION)
+		   return sign * sine_third[angle];
+	   else if(select_mode == SINE_TABLE)
+		   return sign * sine_table[angle];
+	}
 	else
-		sine_third[angle];
+	{	sine_third[angle];
+		if(select_mode == COMMUTATION)
+		   return sine_third[angle];
+		else if(select_mode == SINE_TABLE)
+		   return sine_table[angle];
+	}
+}
+
+int sine_third_expanded(int angle)
+{
+	return sine_expanded(angle, COMMUTATION);
+}
+
+int sine_table_expanded(int angle)
+{
+	return sine_expanded(angle, SINE_TABLE);
 }

@@ -12,16 +12,14 @@
  *
  **/
 
-//extern short arctg_table[1024+6];
-
 int arctg1(int Real, int Imag);
 
 extern short arctg_table[];
 
-extern short sine_table[256];
-
 extern short sine_third[257];
 
-extern short newsine_table[500];
+extern short sine_table[257];
 
-int sine_reduce(int angle);
+int sine_third_expanded(int angle);
+
+int sine_table_expanded(int angle);
