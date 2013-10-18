@@ -40,9 +40,10 @@ int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor
 	return (int)  round(factor);
 }
 
+float result_tor;
 int root_function(int arg)
 {
-	float result = (float) arg;
-	result = sqrt(result);
-	return (int) round(result);
+	result_tor = (float) arg;
+	//result = ;
+	return (int) round(sqrt(result_tor));
 }
