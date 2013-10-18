@@ -55,7 +55,7 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 
 	int phase_a_raw = 0;
 	int phase_b_raw = 0;
-	int actual_speed;
+	int actual_speed = 0;
 	int command;
 	int buffer_phase_a[filter_length];
 	int	buffer_phase_b[filter_length];
@@ -73,25 +73,25 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 	int fl = 30;
 	int j = 0;
 	int flc = 3;
-	int mod;
-	int mod_speed;
+	int mod = 0;
+	int mod_speed = 0;
 	int filter_count = 0;
 
 	/* Torque control variables */
-	int hall_angle;
-	int sin;
-	int cos;
-	int alpha;
-	int beta;
-	int Id;
-	int Iq;
+	int hall_angle = 0;
+	int sin = 0;
+	int cos = 0;
+	int alpha = 0;
+	int beta = 0;
+	int Id = 0;
+	int Iq = 0;
 	int phase_1 = 0;
 	int phase_2 = 0;
 	int buffer_Id[filter_dc];
 	int buffer_Iq[filter_dc];
 
 
-	unsigned theta; // angle
+	unsigned theta = 0; // angle
 	int i1 = 0, j1 = 0, mod1 = 0;
 
 	int iq_filtered = 0;
@@ -103,17 +103,18 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 
 	int wait = 21000;
 
-	int torque_target = 0;
-	int torque_actual;
+	int torque_target = 1500;
+	int torque_actual = 0;
 	int torque_error = 0;
 	int torque_error_integral = 0;
 	int torque_error_derivative = 0;
 	int torque_error_previous = 0;
 	int torque_control_output = 0;
 	const int TORQUE_INTEGRAL_MAX = 137000;
-	int input_torque;
-
+	//int input_torque;
+	unsigned int received_command = 0;
 	int init_state = INIT_BUSY;
+	int commutation_init = INIT_BUSY;
 
 	/* PID Controller variables */
 	int Kp;							// Proportional gain
@@ -129,29 +130,64 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 	//int init_comm = 1;
 	Kp = 15; Kd = 1; Ki = 11;
 
-
-/*	init = init_commutation(c_signal);
+	/*	ts :> time;
+	ts when timerafter(time+2*SEC_FAST) :> time;
+	init = init_commutation(c_signal);
 	if(init == 1)
 		printstrln("initialized commutation");
 	else
 		printstrln(" initialize commutation failed");
 */
-	signal_adc <: 1;
+	//signal_adc <: 1;
 
-	while (1) {
-		unsigned received_command = 0;
+/*	while(1)
+	{
+		c_init = init_commutation(c_commutation);
+		printstrln("initialized commutation check?");
+		if(c_init == INIT)
+		{	printstrln("initialized commutation check");
+			break;
+		}
+	}*/
+	while (1)
+	{
+	//	unsigned int received_command = 0;
+		 if(commutation_init == INIT_BUSY)
+		 {
+	//		 printstrln("initialized commutation check");
+			 commutation_init = __check_commutation_init(c_commutation);
+			 if(commutation_init == INIT)
+			 {
+	//			 printstrln("initialized commutation checked");
+				 do_adc_calibration_ad7949(c_adc);
+				 received_command = 1;
+				// break;
+			 }
+		 }
+//		else if(c_init == INIT && received_command == 0)
+//		{
+//			 do_adc_calibration_ad7949(c_adc);
+//			 received_command = 1;
+//		}
+
 		select
 		{
-			case signal_adc :> command:
-				do_adc_calibration_ad7949(c_adc);
-				received_command =1;
+//			case signal_adc :> command:
+//				do_adc_calibration_ad7949(c_adc);
+//				received_command =1;
+//				break;
+			case c_torque :> command:
+				if(command == CHECK_BUSY)
+				{
+					c_torque <: init_state;
+				}
 				break;
 			default:
 				break;
 		}
 		if(received_command == 1)
 		{
-			//printstrln("adc calibrated");
+	//		printstrln("adc calibrated");
 			break;
 		}
 	}
@@ -165,7 +201,7 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 
 	//c_torque <: 1;  						//signal outerloop
 	init_state = INIT;
-
+//	printstrln("torq init done");
 
 	ts :> time;
 	tc :> time1;
@@ -196,7 +232,7 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 				}
 				phase_a_filtered /= flc;
 				phase_b_filtered /= flc;
-			//	xscope_probe_data(0, phase_a_filtered);
+				//xscope_probe_data(0, phase_a_filtered);
 			//	xscope_probe_data(1, phase_b_filtered);
 
 				filter_count++;
@@ -228,7 +264,8 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 
 				phase_1 = 0 - phase_a_filtered;
 				phase_2 = 0 - phase_b_filtered;
-
+				xscope_probe_data(0, phase_a_filtered);
+								xscope_probe_data(1, phase_b_filtered);
 				alpha = phase_1;
 				beta = (phase_1 + 2*phase_2); 			// beta = (a1 + 2*a2)/1.732 0.57736 --> invers from 1.732
 				beta *= 37838;
@@ -239,10 +276,10 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 
 				theta = hall_angle; 				//range 500 qei
 				theta &= 499;
-				sin = newsine_table[theta]; 		// sine( theta );
+			//	sin = newsine_table[theta]; 		// sine( theta );p
 				theta = (125 - theta); 				// 90-theta
 				theta &= 499; 						//499
-				cos = newsine_table[theta]; 		// values from 0 to +/- 16384
+			//	cos = newsine_table[theta]; 		// values from 0 to +/- 16384p
 
 				Id = (((alpha * cos ) /16384) + ((beta * sin ) /16384));
 				Iq = (((beta * cos ) /16384) - ((alpha * sin ) /16384));
@@ -312,12 +349,12 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 					{
 						torque_error_integral = TORQUE_INTEGRAL_MAX;
 					}
-					else if(torque_error_integral < 0)
+					else if(torque_error_integral < -TORQUE_INTEGRAL_MAX)
 					{
-						torque_error_integral = 0 ;
+						torque_error_integral = -TORQUE_INTEGRAL_MAX ;
 					}
 
-					if(torque_error_integral == 0) torque_error_integral = 1;
+				//	if(torque_error_integral == 0) torque_error_integral = 1;
 
 					proportional_member = (Kp * torque_error)/10;
 					integral_member = (Ki * torque_error_integral)/110;
@@ -343,24 +380,26 @@ void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
 					}
 					else
 					{
+						if(torque_control_output > 0){
+							torque_control_output = -torque_control_output;
+						}
 						if(torque_control_output <= -TORQUE_OUTPUT_MAX) {
 							torque_control_output = 0 - TORQUE_OUTPUT_MAX;
 						}
-						else if(torque_control_output > 0){
-							torque_control_output = 0;
-						}
+						//else
 					}
 
-
-
-					c_commutation <: 2;
-					c_commutation <: torque_control_output;
+				//	printstrln("loop");
+					set_commutation_sinusoidal(c_commutation, torque_control_output);
+				//	c_commutation <: 2;
+				//	c_commutation <: torque_control_output;
 					torque_target = torque_control_output;
 				}
 				else
 				{
-					c_commutation <: 2;
-					c_commutation <: torque_target;
+//					c_commutation <: 2;
+//					c_commutation <: torque_target;
+					set_commutation_sinusoidal(c_commutation, torque_target);
 					torque_error_integral = (torque_target*110)/Ki;
 				}
 

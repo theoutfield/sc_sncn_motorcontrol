@@ -24,8 +24,8 @@
  *
  **************************************************************************/
 
-#ifndef __DC_MOTOR_CONFIG__H__test1
-#define __DC_MOTOR_CONFIG__H__test1
+#ifndef __DC_MOTOR_CONFIG__H__test2
+#define __DC_MOTOR_CONFIG__H__test2
 #include <print.h>
 
 
