@@ -57,8 +57,8 @@ void set_torque(chanend c_torque, int torque);
  * \channel c_commutation channel to send motor voltage input value
  *
  */
-void current_ctrl_loop(hall_par &hall_params, chanend signal_adc, chanend c_adc,
-		chanend c_hall, chanend sync_output, chanend c_commutation,	chanend c_torque);
+void torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
+		chanend c_adc, chanend synced_out, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
 
 
 
