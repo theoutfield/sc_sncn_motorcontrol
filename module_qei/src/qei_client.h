@@ -86,6 +86,10 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params);
  */
 int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params);
 
+{int, int, int} get_qei_sync_position(chanend c_qei);
+
+void set_qei_sync_offset(chanend c_qei, int offset_forward, int offset_backward);
+
 /**
  * \brief Internal function to calculate QEI position information
  *

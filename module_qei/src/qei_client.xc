@@ -62,7 +62,6 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
 	return {position, direction};
 }
 
-
 int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params)
 {
 	int difference;
@@ -77,6 +76,27 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_v
 	qei_velocity_params.previous_position = count;
 	qei_velocity_params.old_difference = difference;
 	return (filter(qei_velocity_params.filter_buffer, qei_velocity_params.index, qei_velocity_params.filter_length, difference)*1000*60) / (qei_params.real_counts);
+}
+
+{int, int, int} get_qei_sync_position(chanend c_qei)
+{
+	int position, calib_fw_flag, calib_bw_flag;
+	c_qei <: SYNC;
+	master
+	{
+		c_qei :> position;
+		c_qei :> calib_fw_flag;
+		c_qei :> calib_bw_flag;
+	}
+	return {position , calib_fw_flag, calib_bw_flag};
+}
+
+void set_qei_sync_offset(chanend c_qei, int offset_forward, int offset_backward)
+{
+	c_qei <: SET_OFFSET;
+	c_qei <: offset_forward;
+	c_qei <: offset_backward;
+	return;
 }
 
 /*

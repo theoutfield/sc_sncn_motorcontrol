@@ -41,7 +41,8 @@ static const unsigned char lookup[16][4] = {
 		{ 0, 0, 0, 0 }  // 11 xx
 };
 
-void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int count, int direction, int init_state)
+void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int count, int direction,\
+		int init_state, int sync_out, int &calib_bw_flag, int &calib_fw_flag, int &offset_fw, int &offset_bw)
 {
 	if(command == QEI_RAW_POS_REQ)
 	{
@@ -59,14 +60,23 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 			c_qei <: direction;
 		}
 	}
-/*	else if(command == QEI_VELOCITY_REQ)
+	else if(command == SYNC)
 	{
 		slave
 		{
-			c_qei <: velocity_raw;
+			c_qei <: sync_out;
+			c_qei <: calib_fw_flag;
+			c_qei <: calib_bw_flag;
 		}
 	}
-	else if(command == QEI_VELOCITY_PWM_RES_REQ)
+	else if(command == SET_OFFSET)
+	{
+		c_qei :> offset_fw;
+		c_qei :> offset_bw;
+		calib_bw_flag = 0;
+		calib_fw_flag = 0;
+	}
+	/*	else if(command == QEI_VELOCITY_PWM_RES_REQ)
 	{
 		slave
 		{
@@ -101,41 +111,22 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 	int qei_type = qei_params.index;
 	int init_state = INIT;
 
-/*	unsigned int time, time1;
-	int s_previous_position1 = 0;
-	int s_difference1 = 0;
-	int old_difference1 = 0;
-	int velocity_raw1 = 0;
-	int filter_length1 = FILTER_LENGTH_QEI_PWM;
-	int filter_buffer1[FILTER_LENGTH_QEI_PWM];
-	int index1 = 0;
+	int qei_crossover = qei_max - qei_max/10;
+	int qei_count_per_hall = qei_params.real_counts / qei_params.poles;
+	int offset_fw = 185;
+	int offset_bw = 104;
+	int calib_fw_flag = 0;
+	int calib_bw_flag = 0;
+	int sync_out = 0;
 
-	int s_previous_position = 0;
-	int s_difference = 0;
-	int old_difference = 0;
-	int velocity_raw = 0;
-	int filter_length = FILTER_LENGTH_QEI;
-	int filter_buffer[FILTER_LENGTH_QEI];						//default size used at compile time (cant be changed further)
-	int index = 0;
-	int flag = 0;
-	int sync_position = 0;
-	init_filter(filter_buffer, index, filter_length);
-	init_filter(filter_buffer1, index1, filter_length1);*/
+
 	p_qei :> new_pins;
-	/*t :> ts1;
-	t :> time1;
-	t :> time;*/
 
 	while (1) {
 	#pragma ordered
 		select {
 			case p_qei when pinsneq(new_pins) :> new_pins :
 				{
-				  	 /* if ((new_pins & 0x3) != old_pins) {
-				  		  ts2 = ts1;
-				  		  t :> ts1;
-				  	  }*/
-
 				  	  if(qei_type == QEI_WITH_INDEX)
 				  	  {
 						  v = lookup[new_pins][old_pins];
@@ -166,62 +157,68 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 					if(previous_position != current_pos )
 					{
 						difference = current_pos - previous_position;
-						if( difference > 3000)
+						if( difference > qei_crossover)
 						{
 							count = count + 1;
+							sync_out = offset_fw;
+							calib_fw_flag = 1;
 							direction = 1;
 						}
-						else if(difference < -3000)
+						else if(difference < -qei_crossover)
 						{
 							count = count - 1;
+							sync_out = offset_bw;
+							calib_bw_flag = 1;
 							direction = -1;
 						}
 						else if( difference < 10 && difference >0)
 						{
 							count = count - difference;
+							sync_out = sync_out - difference;
 							direction = -1;
 						}
 						else if( difference < 0 && difference > -10)
 						{
 							count = count - difference;
+							sync_out = sync_out - difference;
 							direction = 1;
 						}
 						previous_position = current_pos;
+					}
+					if(sync_out < 0)
+					{
+						sync_out = qei_count_per_hall + sync_out;
 					}
 					if(count >= max_count_actual || count <= -max_count_actual)
 					{
 						count=0;
 					}
+					if(sync_out >= qei_count_per_hall )
+					{
+						sync_out = 0;
+					}
 				}
 				break;
 
 			case c_qei_p1 :> command :
-				qei_client_hanlder( c_qei_p1, command, position, ok, count, direction, init_state);
+				qei_client_hanlder( c_qei_p1, command, position, ok, count, direction, init_state,\
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
 				break;
 
 			case c_qei_p2 :> command :
-				qei_client_hanlder( c_qei_p2, command, position, ok, count, direction, init_state);
+				qei_client_hanlder( c_qei_p2, command, position, ok, count, direction, init_state,\
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
 				break;
 
 			case c_qei_p3 :> command :
-				qei_client_hanlder( c_qei_p3, command, position, ok, count, direction, init_state);
+				qei_client_hanlder( c_qei_p3, command, position, ok, count, direction, init_state,\
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
 				break;
 
 			case c_qei_p4 :> command :
-				qei_client_hanlder( c_qei_p4, command, position, ok, count, direction, init_state);
+				qei_client_hanlder( c_qei_p4, command, position, ok, count, direction, init_state,\
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
 				break;
-
-//			case t when timerafter (time+MSEC_FAST):> time :
-//				s_difference = count - s_previous_position;
-//				if(s_difference > 3080)
-//					s_difference = old_difference;
-//				else if(s_difference < -3080)
-//					s_difference = old_difference;
-//				velocity_raw = _modified_internal_filter(filter_buffer, index, filter_length, s_difference);
-//				s_previous_position = count;
-//				old_difference = s_difference;
-//				break;
-
 
 		}
 
