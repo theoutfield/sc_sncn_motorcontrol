@@ -323,7 +323,7 @@ void adc_ad7949_triggered( chanend c_adc,
 				if (ct == XS1_CT_END)
 				{
 					t :> ts;
-					t when timerafter(ts + 6200) :> ts;
+					t when timerafter(ts + 7080) :> ts; // 6200
 				//	adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
 					adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b,	clk,
 										adc_config_mot,	adc_config_other, delay, t);
