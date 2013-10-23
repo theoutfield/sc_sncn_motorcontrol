@@ -236,6 +236,11 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 							sync_output <: (hall_position * max_count) >> 12;
 						}
 					}
+					else
+					{
+						hall_position = get_hall_position( c_hall);
+						sync_output <: (hall_position * max_count) >> 12;
+					}
 				}
 				break;
 

@@ -21,6 +21,17 @@ int input_torq(in_data *d )
 	return 1;
 }
 
+int input_com_par(in_data *d )
+{
+	int fw, bw;
+	printf("enter fw\n");
+	scanf("%d", &fw);
+	printf("enter bw\n");
+	scanf("%d", &bw);
+	d->off_fw = fw;
+	d->off_bw = bw;
+	return 1;
+}
 
 int input_pos(in_data *d)
 {

@@ -4,6 +4,17 @@
 #include<print.h>
 #include "refclk.h"
 
+#include <internal_config.h>
+#include "adc_client_ad7949.h"
+#include <xscope.h>
+#include "hall_client.h"
+#include "qei_client.h"
+#include <drive_config.h>
+#include "hall_qei.h"
+int root_function(int arg);
+
+
+
 void set_torque_test(chanend c_torque) {
 	int torque;
 	in_data d;
@@ -16,6 +27,7 @@ void set_torque_test(chanend c_torque) {
 
 	}
 }
+
 
 /*{
 	int voltage = 1500;
@@ -60,23 +72,23 @@ void set_torque_test(chanend c_torque) {
 }*/
 
 /*
+{
+	timer ts;
+	unsigned time, a1, a2, init;
+
+	ts:>time;
+	init = init_commutation(c_signal);
+		if(init == 1)
+			printstrln("initialized commutation");
+		else
+			printstrln(" initialize commutation failed");
+
+	while(1)
 	{
-		timer ts;
-		unsigned time, a1, a2, init;
-
-		ts:>time;
-		init = init_commutation(c_signal);
-			if(init == 1)
-				printstrln("initialized commutation");
-			else
-				printstrln(" initialize commutation failed");
-
-		while(1)
-		{
-			ts when timerafter(time+5556) :> time; // .05 ms
-			{	a1 , a2}= get_adc_vals_calibrated_int16_ad7949(c_adc);
-			xscope_probe_data(0, a1);
-			xscope_probe_data(1, a2);
-		}
+		ts when timerafter(time+5556) :> time; // .05 ms
+		{	a1 , a2}= get_adc_vals_calibrated_int16_ad7949(c_adc);
+		xscope_probe_data(0, a1);
+		xscope_probe_data(1, a2);
 	}
- */
+}
+*/

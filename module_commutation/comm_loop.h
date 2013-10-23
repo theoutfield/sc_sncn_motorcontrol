@@ -33,6 +33,8 @@ typedef struct S_COMMUTATION {
 	int max_speed_reached;
 	int qei_forward_offset;
 	int qei_backward_offset;
+	int offset_forward;
+	int offset_backward;
 	int flag;
 } commutation_par;
 
@@ -84,9 +86,9 @@ void commutation_sensor_select(chanend c_commutation, int sensor_select);
  * \param commutation_params struct defines the commutation angle parameters
  *
  */
-void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal_adc,
-		chanend c_signal, chanend c_sync, chanend  c_commutation_p1, chanend  c_commutation_p2,
-		chanend  c_commutation_p3, chanend c_pwm_ctrl, int sensor_select, hall_par &hall_params,
+void commutation_sinusoidal(chanend c_hall, chanend c_qei,\
+		chanend c_signal, chanend c_sync, chanend  c_commutation_p1, chanend  c_commutation_p2,\
+		chanend  c_commutation_p3, chanend c_pwm_ctrl, int sensor_select, hall_par &hall_params,\
 		qei_par &qei_params, commutation_par &commutation_params);
 
 /**

@@ -59,6 +59,30 @@
 #define PROFILE_DECELERATION  		2004
 #define QUICK_STOP_DECELERATION 	2005
 
+
+/*External Controller Configs*/
+#define TORQUE_Kp_NUMERATOR 	   	50
+#define TORQUE_Kp_DENOMINATOR  		10
+#define TORQUE_Ki_NUMERATOR    		11
+#define TORQUE_Ki_DENOMINATOR  		110
+#define TORQUE_Kd_NUMERATOR    		1
+#define TORQUE_Kd_DENOMINATOR  		10
+
+#define VELOCITY_Kp_NUMERATOR 	 	5
+#define VELOCITY_Kp_DENOMINATOR  	10
+#define VELOCITY_Ki_NUMERATOR    	5
+#define VELOCITY_Ki_DENOMINATOR  	100
+#define VELOCITY_Kd_NUMERATOR    	0
+#define VELOCITY_Kd_DENOMINATOR  	1
+
+#define POSITION_Kp_NUMERATOR 	 	180
+#define POSITION_Kp_DENOMINATOR  	2000
+#define POSITION_Ki_NUMERATOR    	50
+#define POSITION_Ki_DENOMINATOR  	102000
+#define POSITION_Kd_NUMERATOR    	100
+#define POSITION_Kd_DENOMINATOR  	10000
+
+
 typedef struct S_Control
 {
 	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
@@ -83,6 +107,7 @@ typedef struct S_QEI {
 	int real_counts;
 	int gear_ratio;
 	int index;   //no_index - 0 index - 1
+	int poles;
 } qei_par;
 
 
@@ -103,6 +128,13 @@ typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 	int max_acceleration;
 } csv_par;
 
+typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
+{
+	int nominal_motor_speed;
+	int nominal_current;
+	int motor_torque_constant;
+	int polarity;
+} cst_par;
 
 typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 {
@@ -148,8 +180,16 @@ void init_csv_param(csv_par &csv_params);
 
 void init_csp_param(csp_par &csp_params);
 
+void init_cst_param(cst_par &cst_params);
+
 void init_pp_params(pp_par &pp_params);
 
 void init_pv_params(pv_par &pv_params);
+
+void init_torque_control_param(ctrl_par &torque_ctrl_params);
+
+void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
+
+void init_position_control_param(ctrl_par &position_ctrl_params);
 
 #endif

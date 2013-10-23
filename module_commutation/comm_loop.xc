@@ -120,6 +120,9 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 	{
 		c_commutation :> commutation_params.angle_variance;
 		c_commutation :> commutation_params.max_speed_reached;
+		c_commutation :> commutation_params.offset_forward;
+		c_commutation :> commutation_params.offset_backward;
+
 		return;
 	}
 	else if(command == CHANGE_SENSOR)
@@ -135,7 +138,7 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 }
 
 void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_par &qei_params,
-		commutation_par &commutation_params, chanend c_signal_adc, chanend c_hall, chanend c_qei,	chanend c_sync,
+		commutation_par &commutation_params, chanend c_hall, chanend c_qei,	chanend c_sync,
 		chanend c_pwm_ctrl,	chanend c_signal, chanend  c_commutation_p1, chanend  c_commutation_p2, chanend  c_commutation_p3)
 {
 	unsigned int command;
@@ -152,6 +155,10 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 	int pwm_half = PWM_MAX_VALUE>>1;
 	int max_count_per_hall = qei_params.real_counts/hall_params.pole_pairs;
 	int angle_offset = 682/(2*hall_params.pole_pairs);
+
+	int fw_flag = 0;
+	int bw_flag = 0;
+
 	qei_velocity_par qei_velocity_params;
 	init_qei_velocity_params(qei_velocity_params);
 
@@ -167,7 +174,23 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 		}
 		else if(sensor_select == QEI)
 		{
-			angle = (get_sync_position(c_sync) << 12)/max_count_per_hall;
+			//angle = (get_sync_position(c_sync) << 12)/max_count_per_hall;
+			{angle, fw_flag, bw_flag} = get_qei_sync_position(c_qei);
+			angle = (angle << 12)/max_count_per_hall;
+			if(voltage >=0)
+			{
+				if(fw_flag == 0)
+				{
+					angle = get_hall_position(c_hall);
+				}
+			}
+			else if(voltage <0)
+			{
+				if(bw_flag == 0)
+				{
+					angle = get_hall_position(c_hall);
+				}
+			}
 			angle_rpm = (absolute(speed)*commutation_params.angle_variance)/commutation_params.max_speed_reached;
 		}
 
@@ -185,7 +208,7 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 			}
 			else if(sensor_select == QEI)
 			{
-				angle_pwm = ((angle + FORWARD_CONSTANT) & 0x0fff) >> 2;	 //512
+				angle_pwm = ((angle + commutation_params.offset_forward) & 0x0fff) >> 2;	 //512
 			}
 			pwm[0] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm +341) & 0x3ff;
@@ -203,7 +226,7 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 			}
 			else if(sensor_select == QEI)
 			{
-				angle_pwm = ((angle  + REVERSE_CONSTANT ) & 0x0fff) >> 2;  	 //3100
+				angle_pwm = ((angle  + commutation_params.offset_backward ) & 0x0fff) >> 2;  	 //3100
 			}
 			pwm[0] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm +341) & 0x3ff;
@@ -242,12 +265,6 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 				}
 				break;
 
-			case c_signal_adc :> command:
-				//received_command = 1;
-				//printstrln("received signal from torque ctrl");
-				c_signal_adc <: 1;
-				break;
-
 			default:
 				break;
 		}
@@ -260,6 +277,8 @@ void set_commutation_params(chanend c_commutation, commutation_par &commutation_
 	c_commutation <: SET_COMMUTATION_PARAMS;
 	c_commutation <: commutation_params.angle_variance;
 	c_commutation <: commutation_params.max_speed_reached;
+	c_commutation <: commutation_params.offset_forward;
+	c_commutation <: commutation_params.offset_backward;
 }
 /* MAX Input value 13739 */
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
@@ -269,7 +288,7 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 	return;
 }
 
-void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal_adc,\
+void commutation_sinusoidal(chanend c_hall, chanend c_qei,\
 		chanend c_signal, chanend c_sync, chanend  c_commutation_p1, chanend  c_commutation_p2,\
 		chanend  c_commutation_p3, chanend c_pwm_ctrl, int sensor_select, hall_par &hall_params,\
 		qei_par &qei_params, commutation_par &commutation_params)
@@ -322,7 +341,7 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal_adc,
 	 // printstrln("start commutation");
 
 	//  if( sensor_select ==  HALL)
-		  commutation_sinusoidal_loop(sensor_select, hall_params, qei_params, commutation_params, c_signal_adc,\
+		  commutation_sinusoidal_loop(sensor_select, hall_params, qei_params, commutation_params,\
 				  c_hall, c_qei, c_sync, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, c_commutation_p3);
 	//  else if(sensor_select == QEI)
 	//	  commutation_sinusoidal_loop_qei( qei_params,hall_params, commutation_params, c_hall, c_pwm_ctrl, c_signal, c_sync, c_commutation_p1, c_commutation_p2, c_commutation_p3);

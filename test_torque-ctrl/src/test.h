@@ -3,6 +3,8 @@ typedef struct S_CMD {
 	int set_torque;
 	int set_position;
 	int set_velocity;
+	int off_fw;
+	int off_bw;
 } in_data;
 
 
