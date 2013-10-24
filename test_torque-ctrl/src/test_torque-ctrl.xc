@@ -31,6 +31,7 @@
 #include "adc_client_ad7949.h"
 #include <dc_motor_config.h>
 #include <torque_ctrl.h>
+#include <profile.h>
 #include <flash_somanet.h>
 #include <internal_config.h>
 #include <drive_config.h>
@@ -77,16 +78,7 @@ int main(void)
 	{
 		on stdcore[0]:
 		{
-			{
-				ctrl_par torque_ctrl_params;
-				hall_par hall_params;
-				qei_par qei_params;
-				init_qei_param(qei_params);
-				init_hall_param(hall_params);
-				init_torque_control_param(torque_ctrl_params);
-				torque_ctrl( torque_ctrl_params, hall_params, qei_params, c_adc,  sync_output, \
-						c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
-			}
+
 		}
 
 
@@ -95,49 +87,112 @@ int main(void)
 			par
 			{
 				{
-			xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
-					"n", XSCOPE_CONTINUOUS, "1 qei", XSCOPE_INT, "n",
-					XSCOPE_CONTINUOUS, "2 pos", XSCOPE_INT, "n",
-					XSCOPE_DISCRETE, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
-					"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
-					XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "6 vel_d", XSCOPE_INT,
-					"n", XSCOPE_CONTINUOUS, "7 speed", XSCOPE_INT, "n",
-					XSCOPE_CONTINUOUS, "8 sinepos_a", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "9 sinepos_b", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "10 sinepos_c", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "11 sine_a", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
-					XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
-			xscope_config_io(XSCOPE_IO_BASIC);
+					xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
+							"n", XSCOPE_CONTINUOUS, "1 qei", XSCOPE_INT, "n",
+							XSCOPE_CONTINUOUS, "2 pos", XSCOPE_INT, "n",
+							XSCOPE_DISCRETE, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
+							"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
+							XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "6 vel_d", XSCOPE_INT,
+							"n", XSCOPE_CONTINUOUS, "7 speed", XSCOPE_INT, "n",
+							XSCOPE_CONTINUOUS, "8 sinepos_a", XSCOPE_UINT, "n",
+							XSCOPE_CONTINUOUS, "9 sinepos_b", XSCOPE_UINT, "n",
+							XSCOPE_CONTINUOUS, "10 sinepos_c", XSCOPE_UINT, "n",
+							XSCOPE_CONTINUOUS, "11 sine_a", XSCOPE_UINT, "n",
+							XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
+							XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
+					xscope_config_io(XSCOPE_IO_BASIC);
 				}
 
-				{
-						int command;
-						int init = 0;
-						timer t;
-						unsigned int time;
+				/*{//cst
+					int command;
+					int init = INIT_BUSY;
+					timer t;
+					unsigned int time;
 
-						t:>time;
-						while (1)
+					t:>time;
+					while (1)
+					{
+						t when timerafter(time+2*MSEC_STD) :> time;
+						init = __check_torque_init(c_torque_ctrl);
+						if(init == INIT)
 						{
-							t when timerafter(time+2*MSEC_STD) :> time;
-							init = __check_torque_init(c_torque_ctrl);
-							if(init == INIT)
-							{
-								printstrln("torque control intialized");
-								break;
-							}
+							printstrln("torque control intialized");
+							break;
 						}
-						t:>time;
-						while(1)
+					}
+					t:>time;
+					init_torque_sensor_ecat(HALL, c_torque_ctrl);
+					while(1)
+					{
+						//t when timerafter(time+2*MSEC_STD) :> time;
+						set_torque_test(c_torque_ctrl);//
+					//	set_torque( 100, c_torque_ctrl);
+					}
+				}*/
+
+				{
+					int i;
+					int core_id  = 1;
+
+					int steps;
+					int torque_ramp;
+
+					int actual_torque = 0;
+					int target_torque = 200;
+					int acceleration  = 200;
+
+					timer t;
+					unsigned int time;
+					int init = INIT_BUSY;
+					cst_par cst_params;
+
+					init_cst_param(cst_params);
+
+					t:>time;
+					while(1)
+					{
+						t when timerafter(time+2*MSEC_STD) :> time;
+						init = __check_torque_init(c_torque_ctrl);
+						if(init == INIT)
 						{
-							//t when timerafter(time+2*MSEC_STD) :> time;
-							set_torque_test(c_torque_ctrl);//
-						//	set_torque(c_torque_ctrl, 100);
+							printstrln("torque control intialized");
+							break;
 						}
-						//while(1);
+					}
+					init_torque_sensor_ecat(QEI, c_torque_ctrl);
+					steps = init_linear_profile(target_torque, actual_torque, acceleration, 0, cst_params.max_torque);
+					for(i = 1; i<steps; i++)
+					{
+						wait_ms(1, core_id, t);
+						torque_ramp =  linear_profile_generate(i);
+						set_torque( torque_ramp, c_torque_ctrl);
+						actual_torque = get_torque(c_torque_ctrl);
+						xscope_probe_data(0, torque_ramp);
+						xscope_probe_data(1, actual_torque);
 					}
 
+					target_torque = -180;
+					//actual_torque = 400;
+					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
+					for(i = 1; i<steps; i++)
+					{
+						wait_ms(1, core_id, t);
+						torque_ramp =  linear_profile_generate(i);
+						set_torque( torque_ramp, c_torque_ctrl);
+						actual_torque = get_torque(c_torque_ctrl);
+						xscope_probe_data(0, torque_ramp);
+						xscope_probe_data(1, actual_torque);
+					}
+
+
+					while(1){
+						wait_ms(1, core_id, t);
+						actual_torque = get_torque(c_torque_ctrl);
+						xscope_probe_data(0, torque_ramp);
+						xscope_probe_data(1, actual_torque);
+					}
+
+				}
 			}
 		}
 
@@ -145,23 +200,17 @@ int main(void)
 		{
 			par
 			{
-			/*	{
+
+				{
+					ctrl_par torque_ctrl_params;
 					hall_par hall_params;
 					qei_par qei_params;
-					commutation_par commutation_params;
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);
-					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
-					hall_qei_sync(qei_params, hall_params, commutation_params, c_qei_p1, c_hall_p2, sync_output, c_calib);
-				}*/
-
-			/*	{
-					hall_par hall_params;
-					init_hall_param(hall_params);
-					current_ctrl_loop(hall_params, c_signal_adc, c_adc, c_hall_p3,
-							sync_output, c_commutation_p1, c_torque_ctrl);
-				}*/
-
+					init_torque_control_param(torque_ctrl_params);
+					torque_ctrl( torque_ctrl_params, hall_params, qei_params, c_adc, \
+							c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+				}
 
 			}
 		}

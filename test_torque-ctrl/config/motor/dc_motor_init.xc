@@ -143,4 +143,5 @@ void init_cst_param(cst_par &cst_params)
 	cst_params.nominal_current = MAX_NOMINAL_CURRENT;
 	cst_params.nominal_motor_speed = MAX_NOMINAL_SPEED;
 	cst_params.polarity = POLARITY;
+	cst_params.max_torque = MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
 }

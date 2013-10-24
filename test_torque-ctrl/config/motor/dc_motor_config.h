@@ -52,6 +52,7 @@
 
 #define DC100_RESOLUTION 	740
 #define DC900_RESOLUTION	264
+#define IFM_RESOLUTION		DC900_RESOLUTION
 
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY			1001
@@ -133,6 +134,7 @@ typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
 	int nominal_motor_speed;
 	int nominal_current;
 	int motor_torque_constant;
+	int max_torque;
 	int polarity;
 } cst_par;
 

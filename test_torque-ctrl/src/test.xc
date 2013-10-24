@@ -22,7 +22,7 @@ void set_torque_test(chanend c_torque) {
 		input_torq(d);
 		printintln(d.set_torque);
 
-		c_torque <: 2;
+		c_torque <: 40;
 		c_torque <: d.set_torque;
 
 	}
