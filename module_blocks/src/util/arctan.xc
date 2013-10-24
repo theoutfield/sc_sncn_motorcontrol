@@ -72,7 +72,7 @@ int arctg1(int Real, int Imag)
 	return  iAngleResult;
 }
 
-
+//TODO use subtraction instead of multiplication
 int sine_expanded(int angle, int select_mode)
 {
 	int a1, a2;

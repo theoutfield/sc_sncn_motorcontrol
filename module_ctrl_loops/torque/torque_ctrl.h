@@ -27,7 +27,7 @@
  *  Output
  * \return actual torque from torque control
  */
-int get_torque(chanend c_torque);
+int get_torque(chanend c_torque_ctrl);
 
 /**
  * \brief Set new target torque for torque control
@@ -38,7 +38,15 @@ int get_torque(chanend c_torque);
  *  Input
  * \param torque is the new target torque
  */
-void set_torque(chanend c_torque, int torque);
+void set_torque(int torque, chanend c_torque_ctrl);
+
+int torque_limit(int torque, int max_torque_limit);
+
+void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl);
+
+void init_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl);
+
+void init_torque_sensor_ecat(int sensor_used, chanend c_torque_ctrl);
 
 /**
  * \brief Torque Control Loop
@@ -58,7 +66,7 @@ void set_torque(chanend c_torque, int torque);
  *
  */
 void torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
-		chanend c_adc, chanend synced_out, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
+		chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
 
 
 
