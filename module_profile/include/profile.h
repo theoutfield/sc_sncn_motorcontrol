@@ -126,4 +126,10 @@ extern int init_quick_stop_position_profile(int actual_velocity, int actual_posi
  */
 extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
 
+
+extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value);
+
+
+extern int  linear_profile_generate(int step);
+
 #endif /* _PROFILE_H_ */
