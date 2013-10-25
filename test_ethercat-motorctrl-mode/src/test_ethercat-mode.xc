@@ -136,7 +136,7 @@ int main(void) {
 					comm_init_ecat(c_signal, hall_params);
 					init_qei_param(qei_params);
 
-					commutation_sinusoidal(c_hall_p1,  c_qei_p3, c_signal_adc,
+					commutation_sinusoidal(c_hall_p1,  c_qei_p3,
 								 c_signal, c_sync, c_commutation_p1, c_commutation_p2,
 								 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,
 								 qei_params, commutation_params);
