@@ -25,6 +25,7 @@
 #include <comm_loop.h>
 #include <velocity_ctrl.h>
 #include <position_ctrl.h>
+#include <torque_ctrl.h>
 #include <ecat_motor_drive.h>
 #include <dc_motor_config.h>
 
@@ -37,7 +38,7 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 int main(void) {
 	chan c_adc, c_adctrig;
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan c_pwm_ctrl;
 	chan c_signal_adc;
@@ -74,7 +75,7 @@ int main(void) {
 
 		on stdcore[1] :
 		{
-			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 		}
 
 		on stdcore[2]:
@@ -90,8 +91,8 @@ int main(void) {
 					 init_hall_param(hall_params);
 					 init_qei_param(qei_params);
 
-					 position_control(position_ctrl_params, hall_params, qei_params, 2, c_hall_p3,\
-							 c_qei_p2, c_position_ctrl, c_commutation_p3);
+					 position_control(position_ctrl_params, hall_params, qei_params, 2, c_hall_p4,\
+							 c_qei_p4, c_position_ctrl, c_commutation_p3);
 				}
 
 				{
@@ -106,8 +107,21 @@ int main(void) {
 					 init_qei_param(qei_params);
 
 					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,\
-							 qei_params, 2, c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
+							 qei_params, 2, c_hall_p3, c_qei_p3, c_velocity_ctrl, c_commutation_p2);
 				 }
+
+
+				{
+					ctrl_par torque_ctrl_params;
+					hall_par hall_params;
+					qei_par qei_params;
+					init_qei_param(qei_params);
+					init_hall_param(hall_params);
+					init_torque_control_param(torque_ctrl_params);
+					torque_ctrl( torque_ctrl_params, hall_params, qei_params, c_adc, \
+							c_commutation_p1,  c_hall_p2,  c_qei_p2, c_torque_ctrl);
+				}
+
 			}
 		}
 
@@ -134,9 +148,10 @@ int main(void) {
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 				//	init_hall_param(hall_params);
 					comm_init_ecat(c_signal, hall_params);
+
 					init_qei_param(qei_params);
 
-					commutation_sinusoidal(c_hall_p1,  c_qei_p3,
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1,
 								 c_signal, c_sync, c_commutation_p1, c_commutation_p2,
 								 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,
 								 qei_params, commutation_params);
@@ -146,17 +161,17 @@ int main(void) {
 				{
 					hall_par hall_params;
 			//		init_hall_param(hall_params);
-					hall_init_ecat(c_hall_p4, hall_params);
+					hall_init_ecat(c_hall_p5, hall_params);   //same as ecat drive channel
 
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 
 				{
 					qei_par qei_params;
 			//		init_qei_param(qei_params);
-					qei_init_ecat(c_qei_p4, qei_params);
+					qei_init_ecat(c_qei_p5, qei_params);  //same as ecat drive channel
 
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, p_ifm_encoder, qei_params);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  // channel priority 1,2..4
 				}
 
 			}
