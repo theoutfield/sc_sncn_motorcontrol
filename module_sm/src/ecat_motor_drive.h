@@ -36,7 +36,7 @@
  * \channel c_position_ctrl channel to receive/send position control information
  *
  */
-void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall_p4,\
-		chanend c_qei_p4, chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
+void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
+		chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
 #endif /* ECAT_MOTOR_DRIVE_H_ */

@@ -19,14 +19,14 @@ void xscope_initialise()
 	return;
 }
 /*core 0/1/2 only*/
-void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall_p4,\
-		chanend c_qei_p4, chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
+void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
+		chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
 {
 	int i = 0;
 	int mode=40;
 	int core_id = 0;
 	int steps;
-
+chan c_dummy;
 	int target_velocity;
 	int actual_velocity = 0;
 	int target_position;
@@ -156,7 +156,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			}
 			else if(op_mode == CSP || op_mode == PP)
 			{
-				actual_velocity = get_hall_velocity(c_hall_p4, hall_params);
+				actual_velocity = get_hall_velocity(c_hall, hall_params);
 				actual_position = get_position(c_position_ctrl);
 
 				if(!(actual_velocity<40 && actual_velocity>-40))
@@ -174,7 +174,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					mode_selected = 3;// non interruptible mode
 					mode_quick_flag = 0;
 				}
-				{actual_position, sense} = get_qei_position_absolute(c_qei_p4);
+				{actual_position, sense} = get_qei_position_absolute(c_qei);
 				while(i < steps)
 				{
 					target_position   =   quick_stop_position_profile_generate(i, sense);
@@ -206,7 +206,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 		}
 
 		controlword = InOut.control_word;
-		update_checklist(checklist, mode, c_signal, c_hall_p4, c_qei_p4, c_adc, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+		update_checklist(checklist, mode, c_signal, c_hall, c_qei, c_dummy, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 
 		state = get_next_state(state, checklist, controlword);
 		statusword = update_statusword(statusword, state, ack, quick_active, shutdown_ack);
@@ -222,8 +222,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				sensor_select = sensor_select_sdo(coe_out);
 
 				set_commutation_param_ecat(c_signal, hall_params);
-				set_hall_param_ecat(c_hall_p4, hall_params);
-				set_qei_param_ecat(c_qei_p4, qei_params);
+				set_hall_param_ecat(c_hall, hall_params);
+				set_qei_param_ecat(c_qei, qei_params);
 
 				setup_loop_flag = 1;
 			}
@@ -429,7 +429,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					}
 					else if(op_mode == CSP || op_mode == PP)
 					{
-						actual_velocity = get_hall_velocity(c_hall_p4, hall_params);
+						actual_velocity = get_hall_velocity(c_hall, hall_params);
 						actual_position = get_position(c_position_ctrl);
 
 						if(!(actual_velocity<40 && actual_velocity>-40))
@@ -650,7 +650,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			}
 			else if(op_mode == CSP || op_mode == PP)
 			{
-				{actual_position, sense} = get_qei_position_absolute(c_qei_p4);
+				{actual_position, sense} = get_qei_position_absolute(c_qei);
 				while(i < steps)
 				{
 					target_position   =   quick_stop_position_profile_generate(i, sense);
@@ -683,7 +683,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				}
 				if(i >=steps )
 				{
-					actual_velocity = get_hall_velocity(c_hall_p4, hall_params);
+					actual_velocity = get_hall_velocity(c_hall, hall_params);
 					actual_position = get_position(c_position_ctrl);
 					if(op_mode == CSP)
 						send_actual_position(actual_position * csp_params.base.polarity, InOut);
