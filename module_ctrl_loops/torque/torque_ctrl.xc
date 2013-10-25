@@ -43,16 +43,17 @@
 
 int root_function(int arg);
 
-int get_torque(chanend c_torque_ctrl)
+int get_torque(cst_par &cst_params, chanend c_torque_ctrl)
 {
 	int torque;
 	TORQUE_CTRL_WRITE(GET_TORQUE_TOKEN);
 	TORQUE_CTRL_READ(torque);
-	return torque;
+	return torque*cst_params.motor_torque_constant;
 }
 
-void set_torque(int torque, chanend c_torque_ctrl)
+void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl)
 {
+	torque = torque/cst_params.motor_torque_constant;
 	TORQUE_CTRL_WRITE(SET_TORQUE_TOKEN);
 	TORQUE_CTRL_WRITE(torque);
 	return;
@@ -101,7 +102,7 @@ int torque_limit(int torque, int max_torque_limit)
 void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl)
 {
 	set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity ,	\
-			cst_params.max_torque) , c_torque_ctrl);
+			cst_params.max_torque), cst_params , c_torque_ctrl);
 }
 
 void init_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
@@ -306,6 +307,8 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	int start_flag = 0;
 	int offset_fw_flag = 0;
 	int offset_bw_flag = 0;
+
+	int dum, dirn;
 	init_qei_velocity_params(qei_velocity_params);
 
 
@@ -369,6 +372,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				{
 					angle = get_hall_position(c_hall) >> 2; //  << 10 ) >> 12
 					actual_speed = get_hall_velocity(c_hall, hall_params);
+					{dum, dirn} = get_hall_position_absolute(c_hall);
 //					select
 //					{
 //						case c_speed :> command:
@@ -382,6 +386,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					{angle, offset_fw_flag, offset_bw_flag} = get_qei_sync_position(c_qei);
 					angle = (angle <<10)/qei_counts_per_hall;
 					actual_speed = get_qei_velocity( c_qei, qei_params, qei_velocity_params);//
+					{dum, dirn} = get_qei_position_absolute(c_qei);
 
 //					select
 //					{
@@ -504,7 +509,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				}
 				else if(command == GET_TORQUE_TOKEN)
 				{
-					c_torque_ctrl <: actual_torque;
+					c_torque_ctrl <: actual_torque*dirn;
 				}
 				else if(command == CHECK_BUSY)
 				{

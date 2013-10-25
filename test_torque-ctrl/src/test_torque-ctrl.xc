@@ -126,7 +126,7 @@ int main(void)
 					{
 						//t when timerafter(time+2*MSEC_STD) :> time;
 						set_torque_test(c_torque_ctrl);//
-					//	set_torque( 100, c_torque_ctrl);
+					//	set_torque( 100, cst_params , c_torque_ctrl);
 					}
 				}*/
 
@@ -138,8 +138,8 @@ int main(void)
 					int torque_ramp;
 
 					int actual_torque = 0;
-					int target_torque = 200;
-					int acceleration  = 200;
+					int target_torque = 6600;  //mNm  * current sensor resolution
+					int acceleration  = 6600;
 
 					timer t;
 					unsigned int time;
@@ -159,35 +159,81 @@ int main(void)
 							break;
 						}
 					}
-					init_torque_sensor_ecat(QEI, c_torque_ctrl);
-					steps = init_linear_profile(target_torque, actual_torque, acceleration, 0, cst_params.max_torque);
+					init_torque_sensor_ecat(HALL, c_torque_ctrl);
+					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
 					for(i = 1; i<steps; i++)
 					{
 						wait_ms(1, core_id, t);
 						torque_ramp =  linear_profile_generate(i);
-						set_torque( torque_ramp, c_torque_ctrl);
-						actual_torque = get_torque(c_torque_ctrl);
+						set_torque( torque_ramp, cst_params , c_torque_ctrl);
+						actual_torque = get_torque(cst_params , c_torque_ctrl);
 						xscope_probe_data(0, torque_ramp);
 						xscope_probe_data(1, actual_torque);
 					}
 
-					target_torque = -180;
+					wait_ms(2500, core_id, t);
+
+					target_torque = 0;
 					//actual_torque = 400;
 					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
 					for(i = 1; i<steps; i++)
 					{
 						wait_ms(1, core_id, t);
 						torque_ramp =  linear_profile_generate(i);
-						set_torque( torque_ramp, c_torque_ctrl);
-						actual_torque = get_torque(c_torque_ctrl);
+						set_torque( torque_ramp, cst_params , c_torque_ctrl);
+						actual_torque = get_torque(cst_params , c_torque_ctrl);
 						xscope_probe_data(0, torque_ramp);
 						xscope_probe_data(1, actual_torque);
 					}
 
+					wait_ms(2500, core_id, t);
+
+					target_torque = -3300;
+					//actual_torque = 400;
+					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
+					for(i = 1; i<steps; i++)
+					{
+						wait_ms(1, core_id, t);
+						torque_ramp =  linear_profile_generate(i);
+						set_torque( torque_ramp, cst_params , c_torque_ctrl);
+						actual_torque = get_torque(cst_params , c_torque_ctrl);
+						xscope_probe_data(0, torque_ramp);
+						xscope_probe_data(1, actual_torque);
+					}
+
+					wait_ms(2500, core_id, t);
+
+					target_torque = 3300;
+					//actual_torque = 400;
+					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
+					for(i = 1; i<steps; i++)
+					{
+						wait_ms(1, core_id, t);
+						torque_ramp =  linear_profile_generate(i);
+						set_torque( torque_ramp, cst_params , c_torque_ctrl);
+						actual_torque = get_torque(cst_params , c_torque_ctrl);
+						xscope_probe_data(0, torque_ramp);
+						xscope_probe_data(1, actual_torque);
+					}
+
+					wait_ms(2500, core_id, t);
+
+					target_torque = 8250;
+					//actual_torque = 400;
+					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
+					for(i = 1; i<steps; i++)
+					{
+						wait_ms(1, core_id, t);
+						torque_ramp =  linear_profile_generate(i);
+						set_torque( torque_ramp, cst_params , c_torque_ctrl);
+						actual_torque = get_torque(cst_params , c_torque_ctrl);
+						xscope_probe_data(0, torque_ramp);
+						xscope_probe_data(1, actual_torque);
+					}
 
 					while(1){
 						wait_ms(1, core_id, t);
-						actual_torque = get_torque(c_torque_ctrl);
+						actual_torque = get_torque(cst_params , c_torque_ctrl);
 						xscope_probe_data(0, torque_ramp);
 						xscope_probe_data(1, actual_torque);
 					}

@@ -41,6 +41,7 @@
 #define MAX_ACCELERATION   5000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
 #define POLARITY 1					// 1 / -1
+#define MOTOR_TORQUE_CONSTANT 34    // mNm/A
 
 #define QEI_WITH_INDEX		1
 #define QEI_WITH_NO_INDEX 	0
@@ -50,6 +51,7 @@
 #define MAX_POSITION_LIMIT 	359
 #define MIN_POSITION_LIMIT -359
 
+/*Current Resolution*/
 #define DC100_RESOLUTION 	740
 #define DC900_RESOLUTION	264
 #define IFM_RESOLUTION		DC900_RESOLUTION
@@ -59,6 +61,9 @@
 #define PROFILE_ACCELERATION		2002
 #define PROFILE_DECELERATION  		2004
 #define QUICK_STOP_DECELERATION 	2005
+
+#define PROFILE_TORQUE_ACCELERATION	200
+#define PROFILE_TORQUE_DECELERATION	200
 
 
 /*External Controller Configs*/
@@ -164,6 +169,14 @@ typedef struct PROFILE_POSITION_PARAM
 	int max_acceleration;
 } pp_par;
 
+typedef struct PROFILE_TORQUE_PARAM
+{
+	int profile_acceleration;
+	int profile_deceleration;
+	int quick_stop_deceleration;
+	int polarity;
+} pt_par;
+
 /**
  * \brief initialize QEI sensor
  *
@@ -187,6 +200,8 @@ void init_cst_param(cst_par &cst_params);
 void init_pp_params(pp_par &pp_params);
 
 void init_pv_params(pv_par &pv_params);
+
+void init_pt_params(pt_par &pt_params);
 
 void init_torque_control_param(ctrl_par &torque_ctrl_params);
 
