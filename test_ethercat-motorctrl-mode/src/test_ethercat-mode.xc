@@ -118,7 +118,7 @@ int main(void) {
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);
 					init_torque_control_param(torque_ctrl_params);
-					torque_ctrl( torque_ctrl_params, hall_params, qei_params, c_adc, \
+					torque_control( torque_ctrl_params, hall_params, qei_params, c_adc, \
 							c_commutation_p1,  c_hall_p2,  c_qei_p2, c_torque_ctrl);
 				}
 
