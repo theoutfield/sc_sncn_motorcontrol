@@ -223,7 +223,8 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
 				if(sensor_used == HALL)
 				{   /* 100/(500*819) ~ 1/4095 appr (hall)  - to keep position info from hall in same range as qei*/
-					actual_position = ( ( ( (get_hall_position_absolute(c_hall)/500)*precision_factor)/precision )/819)*100;
+					{actual_position , direction}= get_hall_position_absolute(c_hall);
+					actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
 				}
 				else if(sensor_used == QEI)
 				{
