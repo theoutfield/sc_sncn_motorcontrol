@@ -58,6 +58,15 @@
 #define QUICK_STOP_DECELERATION 	2000
 
 /*External Controller Configs*/
+
+#define TORQUE_Kp_NUMERATOR 	   	50
+#define TORQUE_Kp_DENOMINATOR  		10
+#define TORQUE_Ki_NUMERATOR    		11
+#define TORQUE_Ki_DENOMINATOR  		110
+#define TORQUE_Kd_NUMERATOR    		1
+#define TORQUE_Kd_DENOMINATOR  		10
+
+
 #define VELOCITY_KP				 	8192       	// 5/10 * 16384
 #define VELOCITY_KI    				819			// 5/100 * 16384
 #define VELOCITY_KD				   	0
@@ -73,6 +82,7 @@
 /*Somanet IFM Internal Config*/
 #define DC100_RESOLUTION 	740
 #define DC900_RESOLUTION	264
+#define IFM_RESOLUTION		DC900_RESOLUTION
 
 typedef struct S_Control
 {
@@ -98,6 +108,7 @@ typedef struct S_QEI {
 	int real_counts;
 	int gear_ratio;
 	int index;   //no_index - 0 index - 1
+	int poles;
 } qei_par;
 
 
@@ -118,6 +129,14 @@ typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 	int max_acceleration;
 } csv_par;
 
+typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
+{
+	int nominal_motor_speed;
+	int nominal_current;
+	int motor_torque_constant;
+	int max_torque;
+	int polarity;
+} cst_par;
 
 typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 {
@@ -163,11 +182,16 @@ void init_csv_param(csv_par &csv_params);
 
 void init_csp_param(csp_par &csp_params);
 
+void init_cst_param(cst_par &cst_params);
+
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 
 void init_position_control_param(ctrl_par &position_ctrl_params);
 
+void init_torque_control_param(ctrl_par &torque_ctrl_params);
+
 void init_pp_params(pp_par &pp_params);
 
 void init_pv_params(pv_par &pv_params);
+
 #endif

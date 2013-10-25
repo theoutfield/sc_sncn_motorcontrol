@@ -16,6 +16,7 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.gear_ratio = GEAR_RATIO;
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
+	qei_params.poles = POLE_PAIRS;
 	return;
 }
 
@@ -111,4 +112,37 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 	}
 
 	return;
+}
+
+void init_torque_control_param(ctrl_par &torque_ctrl_params)
+{
+
+	torque_ctrl_params.Kp_n = TORQUE_Kp_NUMERATOR;
+	torque_ctrl_params.Kp_d = TORQUE_Kp_DENOMINATOR;
+	torque_ctrl_params.Ki_n = TORQUE_Ki_NUMERATOR;
+	torque_ctrl_params.Ki_d = TORQUE_Ki_DENOMINATOR;
+	torque_ctrl_params.Kd_n = TORQUE_Kd_NUMERATOR;
+	torque_ctrl_params.Kd_d = TORQUE_Kd_DENOMINATOR;
+	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - for CORE 2/1/0 only default
+
+	torque_ctrl_params.Control_limit = 13739; 							 // default do not change
+
+	if(torque_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
+	{
+		torque_ctrl_params.Integral_limit = torque_ctrl_params.Control_limit * (torque_ctrl_params.Ki_d/torque_ctrl_params.Ki_n);
+	}
+	else
+	{
+		torque_ctrl_params.Integral_limit = 0;
+	}
+
+	return;
+}
+
+void init_cst_param(cst_par &cst_params)
+{
+	cst_params.nominal_current = MAX_NOMINAL_CURRENT;
+	cst_params.nominal_motor_speed = MAX_NOMINAL_SPEED;
+	cst_params.polarity = POLARITY;
+	cst_params.max_torque = MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
 }
