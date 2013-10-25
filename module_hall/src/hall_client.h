@@ -39,7 +39,7 @@ int get_hall_position(chanend c_hall);
  * \return the counted up position (accounts for pole-pairs and gear-ratio)
  * 							in the range [0 - 4095]*pole-pairs*gear-ratio
  */
-int get_hall_position_absolute(chanend c_hall);
+{int , int} get_hall_position_absolute(chanend c_hall);
 
 /**
  * \brief Client library function for Hall Sensor

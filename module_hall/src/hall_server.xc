@@ -1,6 +1,6 @@
 #include "hall_server.h"
 
-void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state, int count)
+void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state, int count, int direction)
 {
 	if (command == HALL_POS_REQ)
 	{
@@ -13,6 +13,7 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 	else if (command == HALL_ABSOLUTE_POS_REQ)
 	{
 		c_hall <: count;
+		c_hall <: direction;
 	}
 	else if (command == CHECK_BUSY)
 	{
@@ -203,19 +204,19 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 		#pragma ordered
 		select {
 			case c_hall_p1 :> command:
-				hall_client_handler(c_hall_p1, command, angle, raw_velocity, init_state, count);
+				hall_client_handler(c_hall_p1, command, angle, raw_velocity, init_state, count, direction);
 				break;
 
 			case c_hall_p2 :> command:
-				hall_client_handler(c_hall_p2, command, angle, raw_velocity, init_state, count);
+				hall_client_handler(c_hall_p2, command, angle, raw_velocity, init_state, count, direction);
 				break;
 
 			case c_hall_p3 :> command:
-				hall_client_handler(c_hall_p3, command, angle, raw_velocity, init_state, count);
+				hall_client_handler(c_hall_p3, command, angle, raw_velocity, init_state, count, direction);
 				break;
 
 			case c_hall_p4 :> command:
-				hall_client_handler(c_hall_p4, command, angle, raw_velocity, init_state, count);
+				hall_client_handler(c_hall_p4, command, angle, raw_velocity, init_state, count, direction);
 				break;
 
 			case tx when timerafter(time1 + MSEC_FAST) :> time1:

@@ -8,12 +8,14 @@ int get_hall_position(chanend c_hall)
   return position;
 }
 
-int get_hall_position_absolute(chanend c_hall)
+{int , int} get_hall_position_absolute(chanend c_hall)
 {
   int position;
+  int direction;
   c_hall <: HALL_ABSOLUTE_POS_REQ;
   c_hall :> position;
-  return position;
+  c_hall :> direction;
+  return {position, direction};
 }
 
 int get_hall_velocity(chanend c_hall, hall_par &hall_params)
