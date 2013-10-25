@@ -52,7 +52,7 @@ int main(void)
 {
 	chan c_adc, c_adctrig;
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan sync_output;
 	chan c_pwm_ctrl;
@@ -86,7 +86,7 @@ int main(void)
 		{
 			par
 			{
-				{
+			/*	{
 					xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
 							"n", XSCOPE_CONTINUOUS, "1 qei", XSCOPE_INT, "n",
 							XSCOPE_CONTINUOUS, "2 pos", XSCOPE_INT, "n",
@@ -101,9 +101,9 @@ int main(void)
 							XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
 							XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
 					xscope_config_io(XSCOPE_IO_BASIC);
-				}
+				}*/
 
-				/*{//cst
+				{//cst
 					int command;
 					int init = INIT_BUSY;
 					timer t;
@@ -113,7 +113,7 @@ int main(void)
 					while (1)
 					{
 						t when timerafter(time+2*MSEC_STD) :> time;
-						init = __check_torque_init(c_torque_ctrl);
+						init = init_torque_control(c_torque_ctrl);// __check_torque_init(c_torque_ctrl);
 						if(init == INIT)
 						{
 							printstrln("torque control intialized");
@@ -128,9 +128,9 @@ int main(void)
 						set_torque_test(c_torque_ctrl);//
 					//	set_torque( 100, cst_params , c_torque_ctrl);
 					}
-				}*/
+				}
 
-				{
+				/*{
 					int i;
 					int core_id  = 1;
 
@@ -238,7 +238,7 @@ int main(void)
 						xscope_probe_data(1, actual_torque);
 					}
 
-				}
+				}*/
 			}
 		}
 
@@ -294,13 +294,13 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, p_ifm_encoder, qei_params);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  // channel priority 1,2..4
 				}
 
 			}
