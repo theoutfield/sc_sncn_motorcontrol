@@ -88,8 +88,9 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 		c_qei <: init_state;
 	}
 }
+
 #pragma unsafe arrays
-void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, port in p_qei, qei_par &qei_params)
+void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, chanend c_qei_p5, port in p_qei, qei_par &qei_params)
 {
 	unsigned int position = 0;
 	unsigned int v;
@@ -217,6 +218,11 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 
 			case c_qei_p4 :> command :
 				qei_client_hanlder( c_qei_p4, command, position, ok, count, direction, init_state,\
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
+				break;
+
+			case c_qei_p5 :> command :
+				qei_client_hanlder( c_qei_p5, command, position, ok, count, direction, init_state,\
 						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
 				break;
 

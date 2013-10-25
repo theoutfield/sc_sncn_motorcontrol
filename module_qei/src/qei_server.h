@@ -38,6 +38,6 @@
  * \param qei_params the struct defines sensor type and resolution parameters for qei
  *
  */
-void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, port in p_qei, qei_par &qei_params);
+void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, chanend c_qei_p5, port in p_qei, qei_par &qei_params);
 
 #endif /*__QEI_SERVER_H__ */
