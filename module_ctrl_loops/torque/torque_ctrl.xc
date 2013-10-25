@@ -75,7 +75,7 @@ int get_torque(cst_par &cst_params, chanend c_torque_ctrl)
 	int torque;
 	TORQUE_CTRL_WRITE(GET_TORQUE_TOKEN);
 	TORQUE_CTRL_READ(torque);
-	return torque*cst_params.motor_torque_constant;
+	return (torque*cst_params.motor_torque_constant);
 }
 
 void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl)
@@ -128,6 +128,8 @@ int torque_limit(int torque, int max_torque_limit)
 
 void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl)
 {
+	xscope_probe_data(2, torque_limit( (target_torque + torque_offset) * cst_params.polarity ,	\
+			cst_params.max_torque));
 	set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity ,	\
 			cst_params.max_torque), cst_params , c_torque_ctrl);
 }
@@ -578,7 +580,10 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				}
 				else if(command == GET_TORQUE_TOKEN)
 				{
-					c_torque_ctrl <: actual_torque*dirn;
+					if(torque_control_output >= 0)
+					c_torque_ctrl <: actual_torque;
+					else
+						c_torque_ctrl <: (0 - actual_torque);
 				}
 				else if(command == CHECK_BUSY)
 				{
@@ -603,7 +608,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	}
 }
 
-void torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
+void torque_control(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
 		chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
 	chan c_current, c_speed;
