@@ -18,6 +18,8 @@
 #include <dc_motor_config.h>
 #include <internal_config.h>
 
+int init_torque_control(chanend c_torque_ctrl);
+
 /**
  * \brief Get actual torque from torque control
  *
