@@ -41,6 +41,7 @@
 #define MAX_ACCELERATION   8000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
 #define POLARITY 1					// 1 / -1
+#define MOTOR_TORQUE_CONSTANT 34    // mNm/A
 
 #define QEI_WITH_INDEX		1
 #define QEI_WITH_NO_INDEX 	0
@@ -57,6 +58,9 @@
 #define PROFILE_DECELERATION   		2000
 #define QUICK_STOP_DECELERATION 	2000
 
+#define PROFILE_TORQUE_ACCELERATION	200
+#define PROFILE_TORQUE_DECELERATION	200
+
 /*External Controller Configs*/
 
 #define TORQUE_Kp_NUMERATOR 	   	50
@@ -65,6 +69,7 @@
 #define TORQUE_Ki_DENOMINATOR  		110
 #define TORQUE_Kd_NUMERATOR    		1
 #define TORQUE_Kd_DENOMINATOR  		10
+
 
 
 #define VELOCITY_KP				 	8192       	// 5/10 * 16384
@@ -146,6 +151,14 @@ typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 	int min_position_limit;
 } csp_par;
 
+typedef struct PROFILE_TORQUE_PARAM
+{
+	int profile_acceleration;
+	int profile_deceleration;
+	int quick_stop_deceleration;
+	int polarity;
+} pt_par;
+
 typedef struct PROFILE_VELOCITY_PARAM
 {
 	int max_profile_velocity;
@@ -193,5 +206,7 @@ void init_torque_control_param(ctrl_par &torque_ctrl_params);
 void init_pp_params(pp_par &pp_params);
 
 void init_pv_params(pv_par &pv_params);
+
+void init_pt_params(pt_par &pt_params);
 
 #endif

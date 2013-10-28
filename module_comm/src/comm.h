@@ -7,9 +7,13 @@
 #include <qei_client.h>
 #include <internal_config.h>
 
+int get_target_torque(ctrl_proto_values_t InOut);
+
 int get_target_velocity(ctrl_proto_values_t InOut);
 
 int get_target_position(ctrl_proto_values_t InOut);
+
+void send_actual_torque(int actual_torque, ctrl_proto_values_t &InOut);
 
 void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
 

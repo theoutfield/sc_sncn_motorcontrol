@@ -19,6 +19,7 @@ void xscope_initialise()
 	return;
 }
 /*core 0/1/2 only*/
+#define ENABLE_xscope_main
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
 		chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
 {
@@ -27,9 +28,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	int core_id = 0;
 	int steps;
 chan c_dummy;
-	int target_velocity;
+
+	int target_torque = 0;
+	int actual_torque = 0;
+	int target_velocity = 0;
 	int actual_velocity = 0;
-	int target_position;
+	int target_position = 0;
 	int actual_position = 0;
 
 	int position_ramp = 0;
@@ -37,22 +41,29 @@ chan c_dummy;
 
 	int velocity_ramp = 0;
 	int prev_velocity = 0;
+
+	int torque_ramp = 0;
+	int prev_torque = 0;
+
 	timer t;
 
 	int init = 0;
 	int op_set_flag = 0;
 	int op_mode = 0;
 
-	csv_par 	csv_params;
-	ctrl_par 	velocity_ctrl_params;
-	qei_par 	qei_params;
-	hall_par 	hall_params;
-	ctrl_par	position_ctrl_params;
-	csp_par 	csp_params;
-	pp_par 		pp_params;
-	pv_par		pv_params;
-
+	cst_par cst_params;
+	ctrl_par torque_ctrl_params;
+	csv_par csv_params;
+	ctrl_par velocity_ctrl_params;
+	qei_par qei_params;
+	hall_par hall_params;
+	ctrl_par position_ctrl_params;
+	csp_par csp_params;
+	pp_par pp_params;
+	pv_par pv_params;
+	pt_par pt_params;
 	ctrl_proto_values_t InOut;
+
 	int setup_loop_flag = 0;
 	int sense;
 
@@ -74,6 +85,7 @@ chan c_dummy;
 	int statusword;
 	int controlword;
 
+	int torque_offstate = 0;
 	int mode_selected = 0;
 	check_list checklist;
 
@@ -81,22 +93,25 @@ chan c_dummy;
 	checklist 	= init_checklist();
 	InOut 		= init_ctrl_proto();
 
+	init_cst_param(cst_params);
 	init_csv_param(csv_params);
 	init_csp_param(csp_params);
 	init_hall_param(hall_params);
 	init_pp_params(pp_params);
 	init_pv_params(pv_params);
+	init_pt_params(pt_params);
 	init_qei_param(qei_params);
 
-//#ifdef ENABLE_xscope_main
- //xscope_initialise();
-//#endif
+	torque_offstate = (cst_params.max_torque * 15) / (cst_params.nominal_current * 100);
+#ifdef ENABLE_xscope_main
+	xscope_initialise();
+#endif
 	t:>time;
 	while(1)
 	{
 		comm_active = ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 
-		if(comm_active == 0)
+		/*if(comm_active == 0)
 		{
 			if(comm_inactive_flag == 0)
 			{
@@ -203,7 +218,7 @@ chan c_dummy;
 					while(1);
 				}
 			}
-		}
+		}*/
 
 		controlword = InOut.control_word;
 		update_checklist(checklist, mode, c_signal, c_hall, c_qei, c_dummy, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
@@ -211,9 +226,9 @@ chan c_dummy;
 		state = get_next_state(state, checklist, controlword);
 		statusword = update_statusword(statusword, state, ack, quick_active, shutdown_ack);
 		InOut.status_word = statusword;
+//printintln(controlword);
 
-
-		if(setup_loop_flag == 0)
+	/*	if(setup_loop_flag == 0)
 		{
 			if(controlword == 6)
 			{
@@ -404,6 +419,43 @@ chan c_dummy;
 					}
 					break;
 
+				case CST:
+					printstrln("op mode enabled on slave");
+					if(op_set_flag == 0)
+					{
+						init = init_torque_control(c_torque_ctrl);
+					}
+					if(init == 1)
+					{
+						op_set_flag = 1;
+						enable_torque_ctrl(c_torque_ctrl);
+						mode_selected = 1;
+						mode_quick_flag = 10;
+						op_mode = CST;
+						ack = 0;
+						shutdown_ack = 0;
+					/*	update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
+					//	sensor_select = sensor_select_sdo(coe_out);
+					//	update_csv_param_ecat(csv_params, coe_out);
+
+						if(sensor_select == HALL)
+						{
+							update_hall_param_ecat(hall_params, coe_out);
+							init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
+						}
+						else if(sensor_select == QEI_INDEX || sensor_select == QEI_NO_INDEX)
+						{
+							update_qei_param_ecat(qei_params, coe_out);
+							init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
+						}
+
+						init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
+						init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
+*/
+						InOut.operation_mode_display = CST;
+					}
+					break;
+
 			}
 		}
 //	    printhexln(InOut.control_word);
@@ -416,7 +468,15 @@ chan c_dummy;
 			switch(InOut.control_word)
 			{
 				case 0x000b: //quick stop
-					if(op_mode == CSV || op_mode == PV)
+					if(op_mode == CST)
+					{
+						actual_torque = get_torque(cst_params, c_torque_ctrl);
+						steps = init_linear_profile(0, actual_torque, 10000, 10000, cst_params.max_torque);
+						i = 0;
+						mode_selected = 3;// non interruptible mode
+						mode_quick_flag = 0;
+					}
+					else if(op_mode == CSV || op_mode == PV)
 					{
 						actual_velocity = get_velocity(c_velocity_ctrl);
 						if(op_mode == CSV)
@@ -466,6 +526,19 @@ chan c_dummy;
 
 						actual_velocity = get_velocity(c_velocity_ctrl) *  csv_params.polarity;
 						send_actual_velocity(actual_velocity, InOut);
+					}
+					else if(op_mode == CST)
+					{
+						//printstrln("CST");
+						target_torque = get_target_torque(InOut);
+						set_torque_cst(cst_params, target_torque, 0, c_torque_ctrl);
+						xscope_probe_data(0, target_torque);
+						//printintln(target_torque);
+
+						actual_torque = get_torque(cst_params, c_torque_ctrl) *  cst_params.polarity;
+						xscope_probe_data(1, actual_torque);
+						send_actual_torque(actual_torque, InOut);
+
 					}
 					else if(op_mode == CSP)
 					{
@@ -572,7 +645,14 @@ chan c_dummy;
 
 				case 0x0006: //shutdown
 					//deactivate
-					if(op_mode == CSV || op_mode == PV)
+					if(op_mode == CST)
+					{
+						shutdown_torque_ctrl(c_torque_ctrl);//p
+						shutdown_ack = 1;
+						op_set_flag = 0; init = 0;
+						mode_selected = 0;  // to reenable the op selection and reset the controller
+					}
+					else if(op_mode == CSV || op_mode == PV)
 					{
 						shutdown_velocity_ctrl(c_velocity_ctrl);//p
 						shutdown_ack = 1;
@@ -597,7 +677,42 @@ chan c_dummy;
 
 		if(mode_selected == 3) // non interrupt
 		{
-			if(op_mode == CSV || op_mode == PV)
+			if(op_mode == CST)
+			{
+				while(i < steps)
+				{
+					target_torque = linear_profile_generate(i);
+					set_torque(target_torque, cst_params, c_torque_ctrl);
+					actual_torque = get_torque(cst_params, c_torque_ctrl);
+					send_actual_torque(actual_torque, InOut);
+
+					t when timerafter(time + MSEC_STD) :> time;
+					i++;
+				}
+				if(i == steps )
+				{
+					t when timerafter(time + 100*MSEC_STD) :> time;
+					actual_torque = get_torque(cst_params, c_torque_ctrl);
+					send_actual_torque(actual_torque, InOut);
+				}
+				if(i >= steps)
+				{
+					actual_torque = get_torque(cst_params, c_torque_ctrl);
+					send_actual_torque(actual_torque, InOut);
+					if(actual_torque < torque_offstate || actual_torque > -torque_offstate)// 15/100 * 264 * 33
+					{
+						ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
+						mode_selected = 100;
+						op_set_flag = 0; init = 0;
+					}
+				}
+				if(steps == 0)
+				{
+					mode_selected = 100;
+					op_set_flag = 0; init = 0;
+				}
+			}
+			else if(op_mode == CSV || op_mode == PV)
 			{
 
 				while(i < steps)
@@ -708,7 +823,12 @@ chan c_dummy;
 			if(mode_quick_flag == 0)
 				quick_active = 1;
 
-			if(op_mode == CSP)
+			if(op_mode == CST)
+			{
+				actual_torque = get_torque(cst_params, c_torque_ctrl);
+				send_actual_torque(actual_torque, InOut);
+			}
+			else if(op_mode == CSP)
 			{
 				actual_position = get_position(c_position_ctrl);
 				send_actual_position(actual_position * csp_params.base.polarity, InOut);

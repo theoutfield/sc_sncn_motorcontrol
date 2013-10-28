@@ -1,17 +1,30 @@
 #include <comm.h>
 
+int get_target_torque(ctrl_proto_values_t InOut)
+{
+	return InOut.target_torque;
+}
+
 int get_target_velocity(ctrl_proto_values_t InOut)
 {
 	return InOut.target_velocity;
 }
+
 int get_target_position(ctrl_proto_values_t InOut)
 {
 	return InOut.target_position;
 }
+
+void send_actual_torque(int actual_torque, ctrl_proto_values_t &InOut)
+{
+	InOut.torque_actual = actual_torque;
+}
+
 void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut)
 {
 	InOut.velocity_actual = actual_velocity;
 }
+
 void send_actual_position(int actual_position, ctrl_proto_values_t &InOut)
 {
 	InOut.position_actual = actual_position;

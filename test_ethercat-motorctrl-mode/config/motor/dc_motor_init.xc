@@ -70,6 +70,13 @@ void init_pv_params(pv_par &pv_params)
 	return;
 }
 
+void init_pt_params(pt_par &pt_params)
+{
+	pt_params.profile_acceleration = PROFILE_TORQUE_ACCELERATION;
+	pt_params.profile_deceleration = PROFILE_TORQUE_DECELERATION;
+	pt_params.quick_stop_deceleration = PROFILE_TORQUE_DECELERATION;
+	pt_params.polarity = POLARITY;
+}
 
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 {
@@ -146,5 +153,6 @@ void init_cst_param(cst_par &cst_params)
 	cst_params.nominal_current = MAX_NOMINAL_CURRENT;
 	cst_params.nominal_motor_speed = MAX_NOMINAL_SPEED;
 	cst_params.polarity = POLARITY;
-	cst_params.max_torque = MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
+	cst_params.max_torque = MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
+	cst_params.motor_torque_constant = MOTOR_TORQUE_CONSTANT;
 }

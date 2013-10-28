@@ -11,6 +11,7 @@
 #include <drive_config.h>
 #include <velocity_ctrl.h>
 #include <position_ctrl.h>
+#include <torque_ctrl.h>
 #include <hall_server.h>
 #include <hall_client.h>
 #include <qei_client.h>

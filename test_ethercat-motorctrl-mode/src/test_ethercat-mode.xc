@@ -115,9 +115,11 @@ int main(void) {
 					ctrl_par torque_ctrl_params;
 					hall_par hall_params;
 					qei_par qei_params;
+
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);
 					init_torque_control_param(torque_ctrl_params);
+
 					torque_control( torque_ctrl_params, hall_params, qei_params, c_adc, \
 							c_commutation_p1,  c_hall_p2,  c_qei_p2, c_torque_ctrl);
 				}
@@ -146,8 +148,8 @@ int main(void) {
 					qei_par qei_params;
 					commutation_par commutation_params;
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-				//	init_hall_param(hall_params);
-					comm_init_ecat(c_signal, hall_params);
+					init_hall_param(hall_params);
+				//	comm_init_ecat(c_signal, hall_params);
 
 					init_qei_param(qei_params);
 
@@ -160,16 +162,16 @@ int main(void) {
 
 				{
 					hall_par hall_params;
-			//		init_hall_param(hall_params);
-					hall_init_ecat(c_hall_p5, hall_params);   //same as ecat drive channel
+					init_hall_param(hall_params);
+			//		hall_init_ecat(c_hall_p5, hall_params);   //same as ecat drive channel
 
 					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 
 				{
 					qei_par qei_params;
-			//		init_qei_param(qei_params);
-					qei_init_ecat(c_qei_p5, qei_params);  //same as ecat drive channel
+					init_qei_param(qei_params);
+			//		qei_init_ecat(c_qei_p5, qei_params);  //same as ecat drive channel
 
 					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  // channel priority 1,2..4
 				}

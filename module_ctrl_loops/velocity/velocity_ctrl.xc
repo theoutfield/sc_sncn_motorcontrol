@@ -14,6 +14,8 @@
 //default runs on CORE 2/CORE 1/CORE 0
 
 /*Internal Controller Configs*/
+
+
 #define HALL 1
 #define QEI 2
 #define FILTER_SIZE 8                           //default

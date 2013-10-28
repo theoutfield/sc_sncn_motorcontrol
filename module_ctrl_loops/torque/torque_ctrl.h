@@ -42,6 +42,10 @@ int get_torque(cst_par &cst_params, chanend c_torque_ctrl);
  */
 void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl);
 
+void enable_torque_ctrl(chanend c_torque_ctrl);
+
+void shutdown_torque_ctrl(chanend c_torque_ctrl);
+
 int torque_limit(int torque, int max_torque_limit);
 
 void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl);

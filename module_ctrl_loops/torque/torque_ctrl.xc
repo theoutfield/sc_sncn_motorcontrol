@@ -43,6 +43,7 @@
 #define SHUTDOWN_TORQUE	 		201
 #define ENABLE_TORQUE			251
 
+
 int root_function(int arg);
 
 int init_torque_control(chanend c_torque_ctrl)
@@ -128,8 +129,6 @@ int torque_limit(int torque, int max_torque_limit)
 
 void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl)
 {
-	xscope_probe_data(2, torque_limit( (target_torque + torque_offset) * cst_params.polarity ,	\
-			cst_params.max_torque));
 	set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity ,	\
 			cst_params.max_torque), cst_params , c_torque_ctrl);
 }
@@ -152,6 +151,17 @@ void init_torque_sensor_ecat(int sensor_used, chanend c_torque_ctrl)
 	TORQUE_CTRL_WRITE(sensor_used);
 }
 
+void enable_torque_ctrl(chanend c_torque_ctrl)
+{
+	TORQUE_CTRL_WRITE(ENABLE_TORQUE);
+	TORQUE_CTRL_WRITE(0);
+}
+
+void shutdown_torque_ctrl(chanend c_torque_ctrl)
+{
+	TORQUE_CTRL_WRITE(SHUTDOWN_TORQUE);
+	TORQUE_CTRL_WRITE(1);
+}
 
 void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 {
@@ -390,7 +400,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	{
 		if(commutation_init == INIT_BUSY)
 		{
-	//	 printstrln("initialized commutation check");
+		 printstrln("initialized commutation check");
 			 commutation_init = __check_commutation_init(c_commutation);
 			 if(commutation_init == INIT)
 			 {
@@ -406,7 +416,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 		select
 		{
 			case c_current :> command:
-		//		printstrln("adc calibrated");
+				printstrln("adc calibrated");
 				start_flag = 1;
 				break;
 			case c_torque_ctrl:> command:
@@ -529,7 +539,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				{
 					error_torque_integral = torque_ctrl_params.Integral_limit;
 				}
-				else if(error_torque_integral < -torque_ctrl_params.Integral_limit)
+				else if(error_torque_integral < 0-torque_ctrl_params.Integral_limit)
 				{
 					error_torque_integral = 0 - torque_ctrl_params.Integral_limit;
 				}
@@ -573,7 +583,8 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 			case c_torque_ctrl:> command:
 				if(command == SET_TORQUE_TOKEN)
 				{
-					c_torque_ctrl :> target_torque;
+					//c_torque_ctrl :> target_torque;
+					TORQUE_CTRL_READ(target_torque);
 					#ifdef ENABLE_xscope_torq
 					xscope_probe_data(2, target_torque);
 					#endif
@@ -581,13 +592,16 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				else if(command == GET_TORQUE_TOKEN)
 				{
 					if(torque_control_output >= 0)
-					c_torque_ctrl <: actual_torque;
+						TORQUE_CTRL_WRITE(actual_torque);
+					//c_torque_ctrl <: actual_torque;
 					else
-						c_torque_ctrl <: (0 - actual_torque);
+						//c_torque_ctrl <: (0 - actual_torque);
+						TORQUE_CTRL_WRITE(0-actual_torque);
 				}
 				else if(command == CHECK_BUSY)
 				{
-					c_torque_ctrl <: init_state;
+					//c_torque_ctrl <: init_state;
+					TORQUE_CTRL_WRITE(init_state);
 				}
 				else if(command == SET_CTRL_PARAMETER)
 				{
@@ -600,9 +614,14 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					TORQUE_CTRL_READ(torque_ctrl_params.Integral_limit);
 				}
 				else if(command == SENSOR_SELECT)
-				{
 					TORQUE_CTRL_READ(sensor_used);
-				}
+
+				else if(command == SHUTDOWN_TORQUE)
+					TORQUE_CTRL_READ(deactivate);
+
+				else if(command == ENABLE_TORQUE)
+					TORQUE_CTRL_READ(deactivate);
+
 				break;
 		}
 	}
