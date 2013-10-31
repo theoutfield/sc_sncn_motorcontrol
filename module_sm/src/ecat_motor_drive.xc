@@ -111,7 +111,7 @@ chan c_dummy;
 	{
 		comm_active = ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 
-		/*	if(comm_active == 0)
+		if(comm_active == 0)
 		{
 			if(comm_inactive_flag == 0)
 			{
@@ -136,6 +136,28 @@ chan c_dummy;
 
 		if(inactive_timeout_flag == 1)
 		{
+			if(op_mode == CST)
+			{
+				actual_torque = get_torque(cst_params, c_torque_ctrl);
+				steps = init_linear_profile(0, actual_torque, 10000, 10000, cst_params.max_torque);
+				i = 0;
+				while(i < steps)
+				{
+					target_torque = linear_profile_generate(i);
+					set_torque(target_torque, cst_params, c_torque_ctrl);
+					actual_torque = get_torque(cst_params, c_torque_ctrl);
+					send_actual_torque(actual_torque, InOut);
+
+					t when timerafter(time + MSEC_STD) :> time;
+					i++;
+				}
+				if(i == steps )
+				{
+					//printstrln("stop");
+					while(1);
+				}
+			}
+
 			if(op_mode == CSV || op_mode == PV)
 			{
 				actual_velocity = get_velocity(c_velocity_ctrl);
@@ -218,7 +240,7 @@ chan c_dummy;
 					while(1);
 				}
 			}
-		}*/
+		}
 
 		controlword = InOut.control_word;
 		update_checklist(checklist, mode, c_signal, c_hall, c_qei, c_dummy, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
