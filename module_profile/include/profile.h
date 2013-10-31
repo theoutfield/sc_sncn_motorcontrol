@@ -132,4 +132,5 @@ extern int init_linear_profile(int target_value, int actual_value, int accelerat
 
 extern int  linear_profile_generate(int step);
 
+
 #endif /* _PROFILE_H_ */
