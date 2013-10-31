@@ -41,9 +41,20 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
 	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
 }
 
+void update_cst_param_ecat(cst_par &cst_params, chanend coe_out)
+{
+	{cst_params.nominal_current, cst_params.nominal_motor_speed, cst_params.polarity,\
+		cst_params.max_torque, cst_params.motor_torque_constant} = cst_sdo_update(coe_out);
+	if(cst_params.polarity >= 0)
+		cst_params.polarity = 1;
+	else if(cst_params.polarity < 0)
+		cst_params.polarity = -1;
+}
+
 void update_csv_param_ecat(csv_par &csv_params, chanend coe_out)
 {
-	{csv_params.max_motor_speed, csv_params.nominal_current, csv_params.polarity, csv_params.max_acceleration} = csv_sdo_update(coe_out);
+	{csv_params.max_motor_speed, csv_params.nominal_current, csv_params.polarity, \
+		csv_params.max_acceleration} = csv_sdo_update(coe_out);
 	if(csv_params.polarity >= 0)
 		csv_params.polarity = 1;
 	else if(csv_params.polarity < 0)
@@ -54,11 +65,31 @@ void update_csv_param_ecat(csv_par &csv_params, chanend coe_out)
 void update_csp_param_ecat(csp_par &csp_params, chanend coe_out)
 {
 	{csp_params.base.max_motor_speed, csp_params.base.polarity, csp_params.base.nominal_current, \
-		csp_params.min_position_limit, csp_params.max_position_limit, csp_params.base.max_acceleration} = csp_sdo_update(coe_out);
+		csp_params.min_position_limit, csp_params.max_position_limit, \
+		csp_params.base.max_acceleration} = csp_sdo_update(coe_out);
 	if(csp_params.base.polarity >= 0)
 		csp_params.base.polarity = 1;
 	else if(csp_params.base.polarity < 0)
 		csp_params.base.polarity = -1;
+}
+
+void update_pt_param_ecat(pt_par &pt_params, chanend coe_out)
+{
+	{pt_params.profile_acceleration, pt_params.polarity} = pt_sdo_update(coe_out);
+	pt_params.profile_deceleration = pt_params.profile_acceleration;
+	pt_params.quick_stop_deceleration = pt_params.profile_acceleration;
+	if(pt_params.polarity >= 0)
+		pt_params.polarity = 1;
+	else if(pt_params.polarity < 0)
+		pt_params.polarity = -1;
+}
+
+void update_pv_param_ecat(pv_par &pv_params, chanend coe_out)
+{
+	{pv_params.max_profile_velocity, pv_params.profile_acceleration, \
+		pv_params.profile_deceleration,\
+	 	pv_params.quick_stop_deceleration,\
+		pv_params.polarity} = pv_sdo_update(coe_out);
 }
 
 void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
@@ -72,13 +103,24 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
 		pp_params.max_acceleration} = pp_sdo_update(coe_out);
 }
 
-void update_pv_param_ecat(pv_par &pv_params, chanend coe_out)
+void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out)
 {
-	{pv_params.max_profile_velocity, pv_params.profile_acceleration, \
-		pv_params.profile_deceleration,\
-	 	pv_params.quick_stop_deceleration,\
-		pv_params.polarity} = pv_sdo_update(coe_out);
+	{torque_ctrl_params.Kp_n, torque_ctrl_params.Ki_n, torque_ctrl_params.Kd_n} = torque_sdo_update(coe_out);
+	torque_ctrl_params.Kp_d = 16384;
+	torque_ctrl_params.Ki_d = 16384;
+	torque_ctrl_params.Kd_d = 16384;
+
+	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
+
+	torque_ctrl_params.Control_limit = 13739; 	//default
+
+	if(torque_ctrl_params.Ki_n != 0)    			//auto calculated using control_limit
+		torque_ctrl_params.Integral_limit = torque_ctrl_params.Control_limit * (torque_ctrl_params.Ki_d/torque_ctrl_params.Ki_n) ;
+	else
+		torque_ctrl_params.Integral_limit = 0;
+	return;
 }
+
 
 void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out)
 {

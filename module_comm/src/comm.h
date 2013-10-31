@@ -19,18 +19,23 @@ void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
 
 void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
 
-
 void update_hall_param_ecat(hall_par &hall_params, chanend coe_out);
 
 void update_qei_param_ecat(qei_par &qei_params, chanend coe_out);
+
+void update_cst_param_ecat(cst_par &cst_params, chanend coe_out);
 
 void update_csv_param_ecat(csv_par &csv_params, chanend coe_out);
 
 void update_csp_param_ecat(csp_par &csp_params, chanend coe_out);
 
-void update_pp_param_ecat(pp_par &pp_params, chanend coe_out);
+void update_pt_param_ecat(pt_par &pt_params, chanend coe_out);
 
 void update_pv_param_ecat(pv_par &pv_params, chanend coe_out);
+
+void update_pp_param_ecat(pp_par &pp_params, chanend coe_out);
+
+void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out);
 
 void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out);
 
