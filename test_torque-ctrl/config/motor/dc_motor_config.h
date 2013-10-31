@@ -40,7 +40,7 @@
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define MAX_ACCELERATION   5000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
-#define POLARITY 1					// 1 / -1
+#define POLARITY -1					// 1 / -1
 #define MOTOR_TORQUE_CONSTANT 34    // mNm/A
 
 #define QEI_WITH_INDEX		1

@@ -732,7 +732,7 @@ chan c_dummy;
 				{
 					target_torque = linear_profile_generate(i);
 					set_torque(target_torque, cst_params, c_torque_ctrl);
-					actual_torque = get_torque(cst_params, c_torque_ctrl);
+					actual_torque = get_torque(cst_params, c_torque_ctrl)*cst_params.polarity;
 					send_actual_torque(actual_torque, InOut);
 
 					t when timerafter(time + MSEC_STD) :> time;
@@ -874,7 +874,7 @@ chan c_dummy;
 
 			if(op_mode == CST)
 			{
-				actual_torque = get_torque(cst_params, c_torque_ctrl);
+				actual_torque = get_torque(cst_params, c_torque_ctrl)*cst_params.polarity;
 				send_actual_torque(actual_torque, InOut);
 			}
 			else if(op_mode == CSP)
