@@ -31,6 +31,8 @@
 #define SET_POS_CTRL_QEI	24
 #define SET_VEL_CTRL_HALL 	25
 #define SET_VEL_CTRL_QEI	26
+#define SET_TORQUE_CTRL_HALL 27
+#define SET_TORQUE_CTRL_QEI  28
 
 #define SUCCESS 1
 #define ERROR   0 //based on timeout for success

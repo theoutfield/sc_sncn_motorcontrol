@@ -50,9 +50,15 @@ int torque_limit(int torque, int max_torque_limit);
 
 void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl);
 
-void init_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl);
+void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl);
 
-void init_torque_sensor_ecat(int sensor_used, chanend c_torque_ctrl);
+void init_torque_sensor(int sensor_used, chanend c_torque_ctrl);
+
+void init_torque_ctrl_hall(hall_par &hall_params, chanend c_torque_ctrl);
+
+void init_torque_ctrl_qei(qei_par &qei_params, chanend c_torque_ctrl);
+
+
 
 /**
  * \brief Torque Control Loop

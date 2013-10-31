@@ -163,7 +163,7 @@ int main(void) {
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-			//		hall_init_ecat(c_hall_p5, hall_params);   //same as ecat drive channel
+			//		hall_init_ecat(c_hall_p5, hall_params);   	//same as ecat drive channel
 
 					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
@@ -171,7 +171,7 @@ int main(void) {
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-			//		qei_init_ecat(c_qei_p5, qei_params);  //same as ecat drive channel
+			//		qei_init_ecat(c_qei_p5, qei_params);  		//same as ecat drive channel
 
 					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  // channel priority 1,2..4
 				}

@@ -34,22 +34,27 @@
 /*
  * define Motor Specific Constants (may conform to CiA 402 Standards)
  */
-#define POLE_PAIRS  8
-#define GEAR_RATIO  26
-#define MAX_NOMINAL_SPEED  4000		// in rpm
-#define MAX_NOMINAL_CURRENT  2		// in A
-#define MAX_ACCELERATION   8000     // rpm/s
-#define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
-#define POLARITY 1					// 1 / -1
-#define MOTOR_TORQUE_CONSTANT 34    // mNm/A
+#define POLE_PAIRS  				8
+#define GEAR_RATIO  				26
+#define MAX_NOMINAL_SPEED  			4000		// in rpm
+#define MAX_NOMINAL_CURRENT  		2		// in A
+#define MAX_ACCELERATION   			8000     // rpm/s
+#define QEI_COUNT_MAX_REAL 			4000		// Max count of Quadrature Encoder
+#define POLARITY 					1					// 1 / -1
+#define MOTOR_TORQUE_CONSTANT 		34    // mNm/A
 
-#define QEI_WITH_INDEX		1
-#define QEI_WITH_NO_INDEX 	0
-#define QEI_SENSOR_TYPE  	QEI_WITH_INDEX//QEI_WITH_NO_INDEX
 
-#define MAX_FOLLOWING_ERROR 0
-#define MAX_POSITION_LIMIT 	359
-#define MIN_POSITION_LIMIT -359
+/*Somanet IFM Internal Config*/
+#define DC100_RESOLUTION 			740
+#define DC900_RESOLUTION			264
+#define IFM_RESOLUTION				DC900_RESOLUTION
+
+
+#define QEI_WITH_INDEX				1
+#define QEI_WITH_NO_INDEX 			0
+#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX//QEI_WITH_NO_INDEX
+
+
 
 
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
@@ -58,36 +63,31 @@
 #define PROFILE_DECELERATION   		2000
 #define QUICK_STOP_DECELERATION 	2000
 
+#define MAX_TORQUE					MOTOR_TORQUE_CONSTANT * IFM_RESOLUTION * MAX_NOMINAL_CURRENT
 #define PROFILE_TORQUE_ACCELERATION	200
 #define PROFILE_TORQUE_DECELERATION	200
 
 /*External Controller Configs*/
+#define TORQUE_KP					81920		//	50/10
+#define TORQUE_KI					1638		//	11/110
+#define TORQUE_KD					1638		//	1/10
 
-#define TORQUE_Kp_NUMERATOR 	   	50
-#define TORQUE_Kp_DENOMINATOR  		10
-#define TORQUE_Ki_NUMERATOR    		11
-#define TORQUE_Ki_DENOMINATOR  		110
-#define TORQUE_Kd_NUMERATOR    		1
-#define TORQUE_Kd_DENOMINATOR  		10
-
-
-
-#define VELOCITY_KP				 	8192       	// 5/10 * 16384
-#define VELOCITY_KI    				819			// 5/100 * 16384
+#define VELOCITY_KP				 	8192       	//  5/10 * 16384
+#define VELOCITY_KI    				819			//  5/100 * 16384
 #define VELOCITY_KD				   	0
 
-#define POSITION_KP	 				1474		//180/ 	2000) * 16384
-#define POSITION_KI   				8			//50/ 	102000) * 16384
-#define POSITION_KD    				164			//100/ 	10000) * 16384
+#define MAX_FOLLOWING_ERROR 		0
+#define MAX_POSITION_LIMIT 			359
+#define MIN_POSITION_LIMIT 			-359
+
+#define POSITION_KP	 				1474		//	180/2000) * 16384
+#define POSITION_KI   				8			//	50/102000) * 16384
+#define POSITION_KD    				164			//	100/10000) * 16384
 
 #define HALL 						1
 #define QEI_INDEX  					2
 #define QEI_NO_INDEX				3
 
-/*Somanet IFM Internal Config*/
-#define DC100_RESOLUTION 	740
-#define DC900_RESOLUTION	264
-#define IFM_RESOLUTION		DC900_RESOLUTION
 
 typedef struct S_Control
 {

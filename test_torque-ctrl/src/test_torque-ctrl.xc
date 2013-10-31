@@ -138,7 +138,7 @@ int main(void)
 					int torque_ramp;
 
 					int actual_torque = 0;
-					int target_torque = 36600;  //mNm  * current sensor resolution
+					int target_torque = 6600;  //mNm  * current sensor resolution
 					int acceleration  = 6600;
 
 					timer t;
@@ -159,7 +159,7 @@ int main(void)
 							break;
 						}
 					}
-					init_torque_sensor_ecat(HALL, c_torque_ctrl);
+					init_torque_sensor(HALL, c_torque_ctrl);
 					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
 					for(i = 1; i<steps; i++)
 					{
@@ -190,7 +190,7 @@ int main(void)
 
 					wait_ms(2500, core_id, t);
 
-					target_torque = -36600;
+					target_torque = -6600;
 					//actual_torque = 400;
 					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
 					for(i = 1; i<steps; i++)
@@ -206,7 +206,7 @@ int main(void)
 
 					wait_ms(2500, core_id, t);
 
-					target_torque = 36600;
+					target_torque = 0;
 					//actual_torque = 400;
 					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
 					for(i = 1; i<steps; i++)
@@ -222,7 +222,7 @@ int main(void)
 
 					wait_ms(2500, core_id, t);
 
-					target_torque = -36600;
+					target_torque = 6600;
 					//actual_torque = 400;
 					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
 					for(i = 1; i<steps; i++)

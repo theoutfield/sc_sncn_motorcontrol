@@ -25,6 +25,7 @@
 #include "hall_client.h"
 #include "qei_client.h"
 #include "hall_qei.h"
+#include <internal_config.h>
 
 //#define ENABLE_xscope_torq
 #pragma once
@@ -133,7 +134,7 @@ void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, c
 			cst_params.max_torque), cst_params , c_torque_ctrl);
 }
 
-void init_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
+void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SET_CTRL_PARAMETER);
 	TORQUE_CTRL_WRITE(torque_ctrl_params.Kp_n);
@@ -145,7 +146,23 @@ void init_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend c_torque_
 	TORQUE_CTRL_WRITE(torque_ctrl_params.Integral_limit);
 }
 
-void init_torque_sensor_ecat(int sensor_used, chanend c_torque_ctrl)
+void init_torque_ctrl_hall(hall_par &hall_params, chanend c_torque_ctrl)
+{
+	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_HALL);
+	TORQUE_CTRL_WRITE(hall_params.gear_ratio);
+	TORQUE_CTRL_WRITE(hall_params.pole_pairs);
+}
+
+void init_torque_ctrl_qei(qei_par &qei_params, chanend c_torque_ctrl)
+{
+	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_QEI);
+	TORQUE_CTRL_WRITE(qei_params.gear_ratio);
+	TORQUE_CTRL_WRITE(qei_params.index);
+	TORQUE_CTRL_WRITE(qei_params.real_counts);
+	TORQUE_CTRL_WRITE(qei_params.max_count);
+	TORQUE_CTRL_WRITE(qei_params.poles);
+}
+void init_torque_sensor(int sensor_used, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SENSOR_SELECT);
 	TORQUE_CTRL_WRITE(sensor_used);
@@ -622,10 +639,25 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				else if(command == ENABLE_TORQUE)
 					TORQUE_CTRL_READ(deactivate);
 
+				else if(command == SET_TORQUE_CTRL_HALL)
+				{
+					TORQUE_CTRL_READ(hall_params.gear_ratio);
+					TORQUE_CTRL_READ(hall_params.pole_pairs);
+				}
+				else if(command == SET_TORQUE_CTRL_QEI)
+				{
+					TORQUE_CTRL_READ(qei_params.gear_ratio);
+					TORQUE_CTRL_READ(qei_params.index);
+					TORQUE_CTRL_READ(qei_params.real_counts);
+					TORQUE_CTRL_READ(qei_params.max_count);
+					TORQUE_CTRL_READ(qei_params.poles);
+				}
+
 				break;
 		}
 	}
 }
+
 
 void torque_control(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
 		chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
