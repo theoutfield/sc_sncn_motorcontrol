@@ -139,14 +139,17 @@ int main(void)
 
 					int actual_torque = 0;
 					int target_torque = 6600;  //mNm  * current sensor resolution
-					int acceleration  = 6600;
+					int acceleration  = 6600;  //torque slope
 
 					timer t;
 					unsigned int time;
 					int init = INIT_BUSY;
 					cst_par cst_params;
 
+					pt_par pt_params;
+					init_pt_params(pt_params);
 					init_cst_param(cst_params);
+					acceleration = pt_params.profile_slope;
 
 					t:>time;
 					while(1)
@@ -165,8 +168,8 @@ int main(void)
 					{
 						wait_ms(1, core_id, t);
 						torque_ramp =  linear_profile_generate(i);
-						//	set_torque( torque_ramp, cst_params , c_torque_ctrl);
-						set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
+							set_torque( torque_ramp, cst_params , c_torque_ctrl);
+					//	set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
 						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
 						xscope_probe_data(0, torque_ramp);
 						xscope_probe_data(1, actual_torque);
@@ -181,8 +184,8 @@ int main(void)
 					{
 						wait_ms(1, core_id, t);
 						torque_ramp =  linear_profile_generate(i);
-						//set_torque( torque_ramp, cst_params , c_torque_ctrl);
-						set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
+						set_torque( torque_ramp, cst_params , c_torque_ctrl);
+					//	set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
 						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
 						xscope_probe_data(0, torque_ramp);
 						xscope_probe_data(1, actual_torque);
@@ -197,8 +200,8 @@ int main(void)
 					{
 						wait_ms(1, core_id, t);
 						torque_ramp =  linear_profile_generate(i);
-						//set_torque( torque_ramp, cst_params , c_torque_ctrl);
-						set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
+						set_torque( torque_ramp, cst_params , c_torque_ctrl);
+				//		set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
 						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
 						xscope_probe_data(0, torque_ramp);
 						xscope_probe_data(1, actual_torque);
@@ -213,8 +216,8 @@ int main(void)
 					{
 						wait_ms(1, core_id, t);
 						torque_ramp =  linear_profile_generate(i);
-						//	set_torque( torque_ramp, cst_params , c_torque_ctrl);
-						set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
+							set_torque( torque_ramp, cst_params , c_torque_ctrl);
+					//	set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
 						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
 						xscope_probe_data(0, torque_ramp);
 						xscope_probe_data(1, actual_torque);
@@ -229,8 +232,8 @@ int main(void)
 					{
 						wait_ms(1, core_id, t);
 						torque_ramp =  linear_profile_generate(i);
-						//set_torque( torque_ramp, cst_params , c_torque_ctrl);
-						set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
+						set_torque( torque_ramp, cst_params , c_torque_ctrl);
+					//	set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
 						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
 						xscope_probe_data(0, torque_ramp);
 						xscope_probe_data(1, actual_torque);

@@ -75,9 +75,7 @@ void update_csp_param_ecat(csp_par &csp_params, chanend coe_out)
 
 void update_pt_param_ecat(pt_par &pt_params, chanend coe_out)
 {
-	{pt_params.profile_acceleration, pt_params.polarity} = pt_sdo_update(coe_out);
-	pt_params.profile_deceleration = pt_params.profile_acceleration;
-	pt_params.quick_stop_deceleration = pt_params.profile_acceleration;
+	{pt_params.profile_slope, pt_params.polarity} = pt_sdo_update(coe_out);
 	if(pt_params.polarity >= 0)
 		pt_params.polarity = 1;
 	else if(pt_params.polarity < 0)

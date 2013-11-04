@@ -27,7 +27,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	int mode=40;
 	int core_id = 0;
 	int steps;
-chan c_dummy;
+	chan c_dummy;
 
 	int target_torque = 0;
 	int actual_torque = 0;
@@ -136,10 +136,10 @@ chan c_dummy;
 
 		if(inactive_timeout_flag == 1)
 		{
-			if(op_mode == CST)
+			if(op_mode == CST || op_mode == TQ)
 			{
 				actual_torque = get_torque(cst_params, c_torque_ctrl);
-				steps = init_linear_profile(0, actual_torque, 10000, 10000, cst_params.max_torque);
+				steps = init_linear_profile(0, actual_torque, pt_params.profile_slope, pt_params.profile_slope, cst_params.max_torque);
 				i = 0;
 				while(i < steps)
 				{
@@ -323,6 +323,58 @@ chan c_dummy;
 					}
 					break;
 
+				case TQ:
+					//printstrln("TQ");
+					if(op_set_flag == 0)
+					{
+						init = init_torque_control(c_torque_ctrl);
+					}
+					if(init == INIT)
+					{
+						op_set_flag = 1;
+						enable_torque_ctrl(c_torque_ctrl);
+						mode_selected = 1;
+						op_mode = TQ;
+						steps = 0;
+						mode_quick_flag = 10;
+						ack = 0;
+						shutdown_ack = 0;
+
+						update_torque_ctrl_param_ecat(torque_ctrl_params, coe_out);//update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
+						sensor_select = sensor_select_sdo(coe_out);
+						update_cst_param_ecat(cst_params, coe_out); //update_pv_param_ecat(pv_params, coe_out);
+						update_pt_param_ecat(pt_params, coe_out);
+
+						qei_params.poles = hall_params.pole_pairs;
+
+						/*printintln(qei_params.gear_ratio);						printintln(qei_params.index);
+						printintln(qei_params.max_count);						printintln(qei_params.real_counts);
+						printintln(hall_params.gear_ratio);						printintln(hall_params.pole_pairs);
+						printintln(torque_ctrl_params.Control_limit);						printintln(torque_ctrl_params.Integral_limit);
+						printintln(torque_ctrl_params.Kd_d);						printintln(torque_ctrl_params.Ki_d);
+						printintln(torque_ctrl_params.Kp_d);						printintln(torque_ctrl_params.Kp_n);
+						printintln(torque_ctrl_params.Ki_n);						printintln(torque_ctrl_params.Kd_n);
+						printintln(sensor_select);						printintln(cst_params.max_torque);
+						printintln(cst_params.motor_torque_constant);						printintln(cst_params.nominal_current);
+						printintln(cst_params.nominal_motor_speed);						printintln(cst_params.polarity);*/
+						if(sensor_select == HALL)
+						{
+							//update_hall_param_ecat(hall_params, coe_out);
+							init_torque_ctrl_hall(hall_params, c_torque_ctrl);//init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
+						}
+						else if(sensor_select == QEI_INDEX || sensor_select == QEI_NO_INDEX)
+						{
+							//update_qei_param_ecat(qei_params, coe_out);
+							init_torque_ctrl_qei(qei_params, c_torque_ctrl);//init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
+						}
+
+						set_torque_ctrl_param(torque_ctrl_params, c_torque_ctrl);//init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
+						init_torque_sensor(sensor_select, c_torque_ctrl);//init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl); //*/
+
+						InOut.operation_mode_display = TQ;
+					}
+					break;
+
 				case PV:
 					//printstrln("pv");
 					if(op_set_flag == 0)
@@ -411,7 +463,7 @@ chan c_dummy;
 						init = init_velocity_control(c_velocity_ctrl);
 
 					}
-					if(init == 1)
+					if(init == INIT)
 					{
 						op_set_flag = 1;
 						enable_velocity_ctrl(c_velocity_ctrl);
@@ -443,12 +495,12 @@ chan c_dummy;
 					break;
 
 				case CST:
-					printstrln("op mode enabled on slave");
+					//printstrln("op mode enabled on slave");
 					if(op_set_flag == 0)
 					{
 						init = init_torque_control(c_torque_ctrl);
 					}
-					if(init == 1)
+					if(init == INIT)
 					{
 						op_set_flag = 1;
 						enable_torque_ctrl(c_torque_ctrl);
@@ -462,28 +514,19 @@ chan c_dummy;
 
 						sensor_select = sensor_select_sdo(coe_out);
 						update_cst_param_ecat(cst_params, coe_out);//update_csv_param_ecat(csv_params, coe_out);
+						update_pt_param_ecat(pt_params, coe_out);
 
 						qei_params.poles = hall_params.pole_pairs;
-					/*	printintln(qei_params.gear_ratio);
-						printintln(qei_params.index);
-						printintln(qei_params.max_count);
-						printintln(qei_params.real_counts);
-						printintln(hall_params.gear_ratio);
-						printintln(hall_params.pole_pairs);
-						printintln(torque_ctrl_params.Control_limit);
-						printintln(torque_ctrl_params.Integral_limit);
-						printintln(torque_ctrl_params.Kd_d);
-						printintln(torque_ctrl_params.Ki_d);
-						printintln(torque_ctrl_params.Kp_d);
-						printintln(torque_ctrl_params.Kp_n);
-						printintln(torque_ctrl_params.Ki_n);
-						printintln(torque_ctrl_params.Kd_n);
-						printintln(sensor_select);
-						printintln(cst_params.max_torque);
-						printintln(cst_params.motor_torque_constant);
-						printintln(cst_params.nominal_current);
-						printintln(cst_params.nominal_motor_speed);
-						printintln(cst_params.polarity);*/
+					/*	printintln(qei_params.gear_ratio);						printintln(qei_params.index);
+						printintln(qei_params.max_count);						printintln(qei_params.real_counts);
+						printintln(hall_params.gear_ratio);						printintln(hall_params.pole_pairs);
+						printintln(torque_ctrl_params.Control_limit);						printintln(torque_ctrl_params.Integral_limit);
+						printintln(torque_ctrl_params.Kd_d);						printintln(torque_ctrl_params.Ki_d);
+						printintln(torque_ctrl_params.Kp_d);						printintln(torque_ctrl_params.Kp_n);
+						printintln(torque_ctrl_params.Ki_n);						printintln(torque_ctrl_params.Kd_n);
+						printintln(sensor_select);						printintln(cst_params.max_torque);
+						printintln(cst_params.motor_torque_constant);						printintln(cst_params.nominal_current);
+						printintln(cst_params.nominal_motor_speed);						printintln(cst_params.polarity);*/
 //while(1);
 						if(sensor_select == HALL)
 						{
@@ -517,10 +560,10 @@ chan c_dummy;
 			switch(InOut.control_word)
 			{
 				case 0x000b: //quick stop
-					if(op_mode == CST)
+					if(op_mode == CST || op_mode == TQ)
 					{
 						actual_torque = get_torque(cst_params, c_torque_ctrl);
-						steps = init_linear_profile(0, actual_torque, 10000, 10000, cst_params.max_torque);
+						steps = init_linear_profile(0, actual_torque, pt_params.profile_slope, pt_params.profile_slope, cst_params.max_torque);
 						i = 0;
 						mode_selected = 3;// non interruptible mode
 						mode_quick_flag = 0;
@@ -641,6 +684,50 @@ chan c_dummy;
 							send_actual_position(actual_position, InOut);
 						}
 					}
+					else if(op_mode == TQ)
+					{
+						//printstrln("cycl TQ ");
+						if(ack == 1)
+						{
+							target_torque = get_target_torque(InOut);
+							//printstr("tar vel ");printintln(target_torque);
+							actual_torque = get_torque(cst_params, c_torque_ctrl) *  pt_params.polarity;//actual_velocity = get_velocity(c_velocity_ctrl) *  pv_params.polarity;
+							send_actual_torque(actual_torque, InOut);
+
+							if(prev_torque != target_torque)
+							{
+								ack = 0;
+								steps = init_linear_profile(target_torque, actual_torque, \
+										pt_params.profile_slope, pt_params.profile_slope, cst_params.max_torque);
+								//steps = init_velocity_profile(target_velocity, actual_velocity, \
+										pv_params.profile_acceleration, pv_params.profile_deceleration,\
+										pv_params.max_profile_velocity);
+
+								//printstr("steps ");printintln(steps);
+								i = 1;
+								prev_torque = target_torque;
+							}
+						}
+						else if(ack == 0)
+						{
+							if(i < steps)
+							{
+								torque_ramp = linear_profile_generate(i);
+								//printintln(velocity_ramp);
+								set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
+								//set_velocity( max_speed_limit(	(velocity_ramp) * pv_params.polarity,\
+										pv_params.max_profile_velocity  ), c_velocity_ctrl );
+								i++;
+							}
+							else if(i >= steps)
+							{
+								t when timerafter(time + 100*MSEC_STD) :> time;
+								ack = 1;
+							}
+							actual_torque = get_torque(cst_params, c_torque_ctrl) *  pt_params.polarity;//actual_velocity = get_velocity(c_velocity_ctrl) *  pv_params.polarity;
+							send_actual_torque(actual_torque, InOut);//send_actual_velocity(actual_velocity, InOut);
+						}
+					}
 					else if(op_mode == PV)
 					{
 						//printstr("PV ");
@@ -694,7 +781,7 @@ chan c_dummy;
 
 				case 0x0006: //shutdown
 					//deactivate
-					if(op_mode == CST)
+					if(op_mode == CST || op_mode == TQ)
 					{
 						shutdown_torque_ctrl(c_torque_ctrl);//p
 						shutdown_ack = 1;
@@ -726,7 +813,7 @@ chan c_dummy;
 
 		if(mode_selected == 3) // non interrupt
 		{
-			if(op_mode == CST)
+			if(op_mode == CST || op_mode == TQ)
 			{
 				while(i < steps)
 				{

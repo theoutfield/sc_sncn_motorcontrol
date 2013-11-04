@@ -64,8 +64,7 @@
 #define QUICK_STOP_DECELERATION 	2000
 
 #define MAX_TORQUE					MOTOR_TORQUE_CONSTANT * IFM_RESOLUTION * MAX_NOMINAL_CURRENT
-#define PROFILE_TORQUE_ACCELERATION	200
-#define PROFILE_TORQUE_DECELERATION	200
+#define PROFILE_TORQUE_SLOPE		6600
 
 /*External Controller Configs*/
 #define TORQUE_KP					81920		//	50/10
@@ -125,15 +124,6 @@ typedef struct S_Hall {
 	int gear_ratio;
 } hall_par;
 
-typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
-{
-	int max_motor_speed; // max motor speed
-	int nominal_current;
-	int motor_torque_constant;
-	int polarity;
-	int max_acceleration;
-} csv_par;
-
 typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
 {
 	int nominal_motor_speed;
@@ -142,6 +132,15 @@ typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
 	int max_torque;
 	int polarity;
 } cst_par;
+
+typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
+{
+	int max_motor_speed; // max motor speed
+	int nominal_current;
+	int motor_torque_constant;
+	int polarity;
+	int max_acceleration;
+} csv_par;
 
 typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 {
@@ -153,9 +152,7 @@ typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 
 typedef struct PROFILE_TORQUE_PARAM
 {
-	int profile_acceleration;
-	int profile_deceleration;
-	int quick_stop_deceleration;
+	int profile_slope;
 	int polarity;
 } pt_par;
 
@@ -191,22 +188,23 @@ void init_qei_param(qei_par &qei_params);
  */
 void init_hall_param(hall_par &hall_params);
 
+void init_cst_param(cst_par &cst_params);
+
 void init_csv_param(csv_par &csv_params);
 
 void init_csp_param(csp_par &csp_params);
 
-void init_cst_param(cst_par &cst_params);
+void init_torque_control_param(ctrl_par &torque_ctrl_params);
 
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 
 void init_position_control_param(ctrl_par &position_ctrl_params);
 
-void init_torque_control_param(ctrl_par &torque_ctrl_params);
-
-void init_pp_params(pp_par &pp_params);
+void init_pt_params(pt_par &pt_params);
 
 void init_pv_params(pv_par &pv_params);
 
-void init_pt_params(pt_par &pt_params);
+void init_pp_params(pp_par &pp_params);
+
 
 #endif

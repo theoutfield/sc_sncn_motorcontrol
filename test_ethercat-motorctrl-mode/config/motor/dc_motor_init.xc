@@ -72,9 +72,7 @@ void init_pv_params(pv_par &pv_params)
 
 void init_pt_params(pt_par &pt_params)
 {
-	pt_params.profile_acceleration = PROFILE_TORQUE_ACCELERATION;
-	pt_params.profile_deceleration = PROFILE_TORQUE_DECELERATION;
-	pt_params.quick_stop_deceleration = PROFILE_TORQUE_DECELERATION;
+	pt_params.profile_slope = PROFILE_TORQUE_SLOPE;
 	pt_params.polarity = POLARITY;
 }
 
@@ -100,7 +98,6 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 
 void init_position_control_param(ctrl_par &position_ctrl_params)
 {
-
 	position_ctrl_params.Kp_n = POSITION_KP;
 	position_ctrl_params.Kp_d = 16384;
 	position_ctrl_params.Ki_n = POSITION_KI;

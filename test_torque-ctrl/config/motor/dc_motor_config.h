@@ -40,7 +40,7 @@
 #define MAX_NOMINAL_CURRENT  2		// in A
 #define MAX_ACCELERATION   5000     // rpm/s
 #define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
-#define POLARITY -1					// 1 / -1
+#define POLARITY 1					// 1 / -1
 #define MOTOR_TORQUE_CONSTANT 34    // mNm/A
 
 #define QEI_WITH_INDEX		1
@@ -52,9 +52,9 @@
 #define MIN_POSITION_LIMIT -359
 
 /*Current Resolution*/
-#define DC100_RESOLUTION 	740
-#define DC900_RESOLUTION	264
-#define IFM_RESOLUTION		DC900_RESOLUTION
+#define DC100_RESOLUTION 			740
+#define DC900_RESOLUTION			264
+#define IFM_RESOLUTION				DC900_RESOLUTION
 
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY			1001
@@ -62,8 +62,7 @@
 #define PROFILE_DECELERATION  		2004
 #define QUICK_STOP_DECELERATION 	2005
 
-#define PROFILE_TORQUE_ACCELERATION	200
-#define PROFILE_TORQUE_DECELERATION	200
+#define PROFILE_TORQUE_SLOPE		6600
 
 
 /*External Controller Configs*/
@@ -125,15 +124,6 @@ typedef struct S_Hall {
 	int gear_ratio;
 } hall_par;
 
-typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
-{
-	int max_motor_speed; // max motor speed
-	int nominal_current;
-	int motor_torque_constant;
-	int polarity;
-	int max_acceleration;
-} csv_par;
-
 typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
 {
 	int nominal_motor_speed;
@@ -143,6 +133,15 @@ typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
 	int polarity;
 } cst_par;
 
+typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
+{
+	int max_motor_speed; // max motor speed
+	int nominal_current;
+	int motor_torque_constant;
+	int polarity;
+	int max_acceleration;
+} csv_par;
+
 typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 {
 	csv_par base;
@@ -150,6 +149,12 @@ typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 	int max_position_limit;
 	int min_position_limit;
 } csp_par;
+
+typedef struct PROFILE_TORQUE_PARAM
+{
+	int profile_slope;
+	int polarity;
+} pt_par;
 
 typedef struct PROFILE_VELOCITY_PARAM
 {
@@ -169,13 +174,6 @@ typedef struct PROFILE_POSITION_PARAM
 	int max_acceleration;
 } pp_par;
 
-typedef struct PROFILE_TORQUE_PARAM
-{
-	int profile_acceleration;
-	int profile_deceleration;
-	int quick_stop_deceleration;
-	int polarity;
-} pt_par;
 
 /**
  * \brief initialize QEI sensor

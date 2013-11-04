@@ -50,21 +50,18 @@ int root_function(int arg);
 int init_torque_control(chanend c_torque_ctrl)
 {
 	int init_state = INIT_BUSY;
-	timer t;
-	unsigned int time;
-
 	TORQUE_CTRL_ENABLE(); 					//signal torque ctrl loop
 
 	// init check from torque control loop
-	t:>time;
+
 	while(1)
 	{
 		init_state = __check_torque_init(c_torque_ctrl);
-		t when timerafter(time+2*MSEC_STD) :> time;
+		//t when timerafter(time+2*MSEC_STD) :> time;
 		if(init_state == INIT)
 		{
 //#ifdef debug_print
-			printstrln("torque intialized");
+			//printstrln("torque intialized");
 //#endif
 			break;
 		}
@@ -387,7 +384,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					activate = SET;
 					received_command = SET;
 //#ifdef debug_print
-					printstrln("torque activated");
+				//	printstrln("torque activated");
 //#endif
 				}
 				else if(command == UNSET)
@@ -395,7 +392,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					activate = UNSET;
 					received_command = SET;
 //#ifdef debug_print
-					printstrln("torque disabled");
+					//printstrln("torque disabled");
 //#endif
 				}
 				else if(command == CHECK_BUSY)
@@ -417,7 +414,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	{
 		if(commutation_init == INIT_BUSY)
 		{
-		 printstrln("initialized commutation check");
+		// printstrln("initialized commutation check");
 			 commutation_init = __check_commutation_init(c_commutation);
 			 if(commutation_init == INIT)
 			 {
@@ -425,7 +422,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				 break;
 			 }
 		}
-		send_torque_init_state( c_torque_ctrl,  init_state);
+		//send_torque_init_state( c_torque_ctrl,  init_state);
 	}
 	while(activate)
 	{
@@ -433,7 +430,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 		select
 		{
 			case c_current :> command:
-				printstrln("adc calibrated");
+				//printstrln("adc calibrated");
 				start_flag = 1;
 				break;
 			case c_torque_ctrl:> command:

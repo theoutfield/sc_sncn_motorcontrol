@@ -70,9 +70,7 @@ void init_pv_params(pv_par &pv_params)
 
 void init_pt_params(pt_par &pt_params)
 {
-	pt_params.profile_acceleration = PROFILE_TORQUE_ACCELERATION;
-	pt_params.profile_deceleration = PROFILE_TORQUE_DECELERATION;
-	pt_params.quick_stop_deceleration = PROFILE_TORQUE_DECELERATION;
+	pt_params.profile_slope = PROFILE_TORQUE_SLOPE;
 	pt_params.polarity = POLARITY;
 }
 
