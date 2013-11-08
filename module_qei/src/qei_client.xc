@@ -67,11 +67,12 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_v
 	int difference;
 	int count;
 	int direction;
+	int qei_crossover = qei_params.max_count - qei_params.max_count/10;
 	{count, direction} = get_qei_position_absolute(c_qei);
 	difference = count - qei_velocity_params.previous_position;
-	if(difference > 3080)
+	if(difference > qei_crossover)
 		difference = qei_velocity_params.old_difference;
-	else if(difference < -3080)
+	else if(difference < -qei_crossover)
 		difference = qei_velocity_params.old_difference;
 	qei_velocity_params.previous_position = count;
 	qei_velocity_params.old_difference = difference;
@@ -99,18 +100,4 @@ void set_qei_sync_offset(chanend c_qei, int offset_forward, int offset_backward)
 	return;
 }
 
-/*
-int get_qei_velocity(chanend c_qei, qei_par &qei_params)
-{
-	int velocity;
 
-	c_qei <: QEI_VELOCITY_REQ;
-	master
-	{
-		c_qei :> velocity;
-	}
-	velocity = ((velocity / FILTER_LENGTH_QEI)*QEI_RPM_CONST) / (qei_params.real_counts);
-
-	return velocity;
-}
-*/

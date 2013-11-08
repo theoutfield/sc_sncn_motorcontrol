@@ -34,21 +34,20 @@
 /*
  * define Motor Specific Constants (may conform to CiA 402 Standards)
  */
-#define POLE_PAIRS  8
-#define GEAR_RATIO  26
-#define MAX_NOMINAL_SPEED  4000		// in rpm
-#define MAX_NOMINAL_CURRENT  2		// in A
-#define MAX_ACCELERATION   5000     // rpm/s
-#define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
-#define POLARITY -1					// 1 / -1
+#define POLE_PAIRS  				8
+#define GEAR_RATIO  				26
+#define MAX_NOMINAL_SPEED  			4000	// rpm
+#define MAX_NOMINAL_CURRENT  		2		// A
+#define MAX_ACCELERATION   			5000    // rpm/s
+#define QEI_COUNT_MAX_REAL 			4000	// Max count of Quadrature Encoder
+#define POLARITY 					-1		// 1 / -1
 
-#define QEI_WITH_INDEX		1
-#define QEI_WITH_NO_INDEX 	0
-#define QEI_SENSOR_TYPE  	QEI_WITH_INDEX//QEI_WITH_NO_INDEX
+#define QEI_WITH_INDEX				1
+#define QEI_WITH_NO_INDEX 			0
+#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX//QEI_WITH_NO_INDEX
 
-#define MAX_FOLLOWING_ERROR 0
-#define MAX_POSITION_LIMIT 	359
-#define MIN_POSITION_LIMIT -359
+#define MAX_POSITION_LIMIT 			359
+#define MIN_POSITION_LIMIT 			-359
 
 /*External Controller Configs*/
 #define VELOCITY_Kp_NUMERATOR 	 	5
@@ -57,6 +56,8 @@
 #define VELOCITY_Ki_DENOMINATOR  	100
 #define VELOCITY_Kd_NUMERATOR    	0
 #define VELOCITY_Kd_DENOMINATOR  	1
+
+#define VELOCITY_FILTER_SIZE        8
 
 #define POSITION_Kp_NUMERATOR 	 	180
 #define POSITION_Kp_DENOMINATOR  	2000
@@ -78,10 +79,12 @@
 #define PROFILE_DECELERATION  		2004
 #define QUICK_STOP_DECELERATION 	2005
 
+#define PROFILE_TORQUE_SLOPE		6600
+
 /*Somanet IFM Internal Config*/
-#define DC100_RESOLUTION 	740
-#define DC900_RESOLUTION	264
-#define IFM_RESOLUTION		DC900_RESOLUTION
+#define DC100_RESOLUTION 			740
+#define DC900_RESOLUTION			264
+#define IFM_RESOLUTION				DC900_RESOLUTION
 
 
 
@@ -99,7 +102,7 @@ typedef struct S_Control
 typedef struct S_Filter_length
 {
 	int filter_length;
-} filt_par;
+} filter_par;
 
 /**
  * \brief struct definition for quadrature sensor
@@ -147,6 +150,12 @@ typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 	int min_position_limit;
 } csp_par;
 
+typedef struct PROFILE_TORQUE_PARAM
+{
+	int profile_slope;
+	int polarity;
+} pt_par;
+
 typedef struct PROFILE_VELOCITY_PARAM
 {
 	int max_profile_velocity;
@@ -164,6 +173,8 @@ typedef struct PROFILE_POSITION_PARAM
 	int software_position_limit_max;
 	int max_acceleration;
 } pp_par;
+
+void init_sensor_filter_param(filter_par &sensor_filter_par) ;
 
 /**
  * \brief initialize QEI sensor
@@ -190,6 +201,8 @@ void init_position_control_param(ctrl_par &position_ctrl_params);
 void init_pp_params(pp_par &pp_params);
 
 void init_pv_params(pv_par &pv_params);
+
+void init_pt_params(pt_par &pt_params);
 
 void init_cst_param(cst_par &cst_params);
 

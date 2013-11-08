@@ -290,7 +290,7 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 
 void commutation_sinusoidal(chanend c_hall, chanend c_qei,\
 		chanend c_signal, chanend c_sync, chanend  c_commutation_p1, chanend  c_commutation_p2,\
-		chanend  c_commutation_p3, chanend c_pwm_ctrl, int sensor_select, hall_par &hall_params,\
+		chanend  c_commutation_p3, chanend c_pwm_ctrl, hall_par &hall_params,\
 		qei_par &qei_params, commutation_par &commutation_params)
 {
 	  const unsigned t_delay = 300*USEC_FAST;
@@ -341,7 +341,7 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei,\
 	 // printstrln("start commutation");
 
 	//  if( sensor_select ==  HALL)
-		  commutation_sinusoidal_loop(sensor_select, hall_params, qei_params, commutation_params,\
+		  commutation_sinusoidal_loop(HALL, hall_params, qei_params, commutation_params,\
 				  c_hall, c_qei, c_sync, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, c_commutation_p3);
 	//  else if(sensor_select == QEI)
 	//	  commutation_sinusoidal_loop_qei( qei_params,hall_params, commutation_params, c_hall, c_pwm_ctrl, c_signal, c_sync, c_commutation_p1, c_commutation_p2, c_commutation_p3);

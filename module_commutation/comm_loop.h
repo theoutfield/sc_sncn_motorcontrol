@@ -88,7 +88,7 @@ void commutation_sensor_select(chanend c_commutation, int sensor_select);
  */
 void commutation_sinusoidal(chanend c_hall, chanend c_qei,\
 		chanend c_signal, chanend c_sync, chanend  c_commutation_p1, chanend  c_commutation_p2,\
-		chanend  c_commutation_p3, chanend c_pwm_ctrl, int sensor_select, hall_par &hall_params,\
+		chanend  c_commutation_p3, chanend c_pwm_ctrl, hall_par &hall_params,\
 		qei_par &qei_params, commutation_par &commutation_params);
 
 /**

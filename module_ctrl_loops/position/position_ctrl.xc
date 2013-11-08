@@ -170,6 +170,16 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 				{
 					activate = SET;
 					received_command = SET;
+					while(1)
+					{
+						init_state = __check_commutation_init(c_commutation);
+						if(init_state == INIT)
+						{
+							printstrln("commutation intialized");
+							init_state = INIT_BUSY;
+							break;
+						}
+					}
 #ifdef debug_print
 					printstrln("pos activated");
 #endif
