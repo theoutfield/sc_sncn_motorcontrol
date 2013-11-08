@@ -12,11 +12,17 @@ void init_hall_param(hall_par &hall_params)
 
 void init_qei_param(qei_par &qei_params)
 {
-	qei_params.real_counts = QEI_COUNT_MAX_REAL;
+	qei_params.real_counts = ENCODER_RESOLUTION;
 	qei_params.gear_ratio = GEAR_RATIO;
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
 	qei_params.poles = POLE_PAIRS;
+	return;
+}
+
+void init_sensor_filter_param(filter_par &sensor_filter_par) //optional for user to change
+{
+	sensor_filter_par.filter_length = VELOCITY_FILTER_SIZE;
 	return;
 }
 
@@ -39,7 +45,7 @@ void init_csp_param(csp_par &csp_params)
 		csp_params.base.polarity = 1;
 	else if(POLARITY < 0)
 		csp_params.base.polarity = -1;
-	csp_params.max_following_error = MAX_FOLLOWING_ERROR;
+	csp_params.max_following_error = 0;
 	csp_params.max_position_limit = MAX_POSITION_LIMIT;
 	csp_params.min_position_limit = MIN_POSITION_LIMIT;
 	return;
@@ -68,6 +74,13 @@ void init_pv_params(pv_par &pv_params)
 	pv_params.polarity = POLARITY;
 	return;
 }
+
+void init_pt_params(pt_par &pt_params)
+{
+	pt_params.profile_slope = PROFILE_TORQUE_SLOPE;
+	pt_params.polarity = POLARITY;
+}
+
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 {
 	velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;

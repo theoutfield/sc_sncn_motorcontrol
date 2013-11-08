@@ -97,7 +97,7 @@ int main(void) {
 
 				{
 					 ctrl_par velocity_ctrl_params;
-					 filt_par sensor_filter_params;
+					 filter_par sensor_filter_params;
 					 hall_par hall_params;
 					 qei_par qei_params;
 
@@ -143,7 +143,6 @@ int main(void) {
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				{
-					int sensor_select = 1;
 					hall_par hall_params;
 					qei_par qei_params;
 					commutation_par commutation_params;
@@ -155,7 +154,7 @@ int main(void) {
 
 					commutation_sinusoidal(c_hall_p1,  c_qei_p1,
 								 c_signal, c_sync, c_commutation_p1, c_commutation_p2,
-								 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,
+								 c_commutation_p3, c_pwm_ctrl, hall_params,
 								 qei_params, commutation_params);
 
 				}

@@ -87,7 +87,7 @@
 #define QEI_INDEX  					2
 #define QEI_NO_INDEX				3
 
-
+#define VELOCITY_FILTER_SIZE        8
 typedef struct S_Control
 {
 	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
@@ -98,10 +98,11 @@ typedef struct S_Control
 	int Loop_time;
 } ctrl_par;
 
+
 typedef struct S_Filter_length
 {
 	int filter_length;
-} filt_par;
+} filter_par;
 
 
 /**
@@ -206,5 +207,6 @@ void init_pv_params(pv_par &pv_params);
 
 void init_pp_params(pp_par &pp_params);
 
+void init_sensor_filter_param(filter_par &sensor_filter_par);
 
 #endif

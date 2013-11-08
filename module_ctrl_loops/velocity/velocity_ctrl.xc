@@ -25,8 +25,8 @@
 #define GET_VELOCITY_TOKEN 	60
 #define SET_CTRL_PARAMETER 	100
 #define SENSOR_SELECT      	150
-#define SHUTDOWN_VEL	 	200
-#define ENABLE_VEL			250
+#define SHUTDOWN_VELOCITY 	200
+#define ENABLE_VELOCITY		250
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {
@@ -48,12 +48,6 @@ int init_velocity_control(chanend c_velocity_ctrl)
 		}
 	 }
 	 return init_state;
-}
-
-void init_sensor_filter_param(filt_par &sensor_filter_par) //optional for user to change
-{
-	sensor_filter_par.filter_length = FILTER_SIZE;
-	return;
 }
 
 //internal
@@ -87,6 +81,7 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 {
 	set_velocity( max_speed_limit(	(target_velocity + velocity_offset) * csv_params.polarity, csv_params.max_motor_speed  ), c_velocity_ctrl );
 }
+
 
 
 void init_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl)
@@ -123,20 +118,33 @@ void init_velocity_sensor_ecat(int sensor_used, chanend c_velocity_ctrl)
 	VELOCITY_CTRL_WRITE(sensor_used);
 }
 
+
+void set_velocity_filter(chanend c_velocity_ctrl, filter_par &filter_params)
+{
+	VELOCITY_CTRL_WRITE(SET_VELOCITY_FILTER);
+	VELOCITY_CTRL_WRITE(filter_params.filter_length);
+}
+
+
+
+
 void shutdown_velocity_ctrl(chanend c_velocity_ctrl)
 {
-	VELOCITY_CTRL_WRITE(SHUTDOWN_VEL);
+	VELOCITY_CTRL_WRITE(SHUTDOWN_VELOCITY);
 	VELOCITY_CTRL_WRITE(1);
 }
 
 void enable_velocity_ctrl(chanend c_velocity_ctrl)
 {
-	VELOCITY_CTRL_WRITE(ENABLE_VEL);
+	VELOCITY_CTRL_WRITE(ENABLE_VELOCITY);
 	VELOCITY_CTRL_WRITE(0);
 }
 
-void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
-		 	 	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation)
+
+
+
+void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
+	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation)
 {
 	/* Controller declarations */
 	int actual_velocity = 0;
@@ -151,7 +159,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 	unsigned int time;
 
 	/* Sensor filter declarations */
-	int filter_length = sensor_filter_params.filter_length;
+	int filter_length = sensor_filter_params.filter_length; //p new
 	int filter_buffer[FILTER_SIZE_MAX];						//default size used at compile time (cant be changed further)
 	int index = 0;
 	int filter_output;
@@ -166,20 +174,20 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 	int dirn = 0;
 	int old;
 	int cal_speed_n = 1000*60; // constant
-	int cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs    core 2/1/0 only
-	int cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);		  // variable qei_real_max  core 2/1/0 only
+	int cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD); 		// variable pole_pairs    core 2/1/0 only
+	int cal_speed_d_qei  = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);		  	// variable qei_real_max  core 2/1/0 only
 
 	int command;
 	int deactivate = 0;
 	int activate = 0;
 	int init_state = INIT_BUSY;
+	int qei_crossover = qei_params.max_count - qei_params.max_count/10;
 
-	init_filter(filter_buffer, index, filter_length);
-
-
+	init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 	while(1)
 	{
 		int received_command = UNSET;
+#pragma ordered
 		select
 		{
 			case VELOCITY_CTRL_READ(command):
@@ -187,6 +195,16 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 				{
 					activate = SET;
 					received_command = SET;
+					while(1)
+					{
+						init_state = __check_commutation_init(c_commutation);
+						if(init_state == INIT)
+						{
+							//printstrln("commutation intialized");
+							init_state = INIT_BUSY;
+							break;
+						}
+					}
 #ifdef debug_print
 					printstrln("vel activated");
 #endif
@@ -212,6 +230,8 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 			break;
 		}
 	}
+
+
 
 	//printstrln("start vel");
 	ts :> time;
@@ -265,8 +285,8 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 				{
 					{pos, dirn} = get_qei_position_absolute(c_qei);
 					diff = pos - prev;
-					if(diff > 3080) diff = old;
-					if(diff < -3080) diff = old;
+					if(diff > qei_crossover) diff = old;
+					if(diff < -qei_crossover) diff = old;
 					cal_speed = (diff*cal_speed_n)/cal_speed_d_qei;
 
 		#ifdef Debug_velocity_ctrl
@@ -342,16 +362,17 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 				else if(command == SENSOR_SELECT)
 					VELOCITY_CTRL_READ(sensor_used);
 
-				else if(command == SHUTDOWN_VEL)
+				else if(command == SHUTDOWN_VELOCITY)
 					VELOCITY_CTRL_READ(deactivate);
 
-				else if(command == ENABLE_VEL)
+				else if(command == ENABLE_VELOCITY)
 					VELOCITY_CTRL_READ(deactivate);
 
 				else if(command == SET_VEL_CTRL_HALL)
 				{
 					VELOCITY_CTRL_READ(hall_params.gear_ratio);
 					VELOCITY_CTRL_READ(hall_params.pole_pairs);
+					cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
 				}
 				else if(command == SET_VEL_CTRL_QEI)
 				{
@@ -359,6 +380,14 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filt_par &sensor_filter_pa
 					VELOCITY_CTRL_READ(qei_params.index);
 					VELOCITY_CTRL_READ(qei_params.real_counts);
 					VELOCITY_CTRL_READ(qei_params.max_count);
+					cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
+					qei_crossover = qei_params.max_count - qei_params.max_count/10;
+				}
+				else if(command == SET_VELOCITY_FILTER)
+				{
+					VELOCITY_CTRL_READ(filter_length);
+					if(filter_length > FILTER_SIZE_MAX)
+						filter_length = FILTER_SIZE_MAX;
 				}
 				break;
 

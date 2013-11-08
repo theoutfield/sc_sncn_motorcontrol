@@ -10,6 +10,11 @@ void init_hall_param(hall_par &hall_params)
 	return;
 }
 
+void init_sensor_filter_param(filter_par &sensor_filter_par) //optional for user to change
+{
+	sensor_filter_par.filter_length = VELOCITY_FILTER_SIZE;
+	return;
+}
 
 void init_qei_param(qei_par &qei_params)
 {
