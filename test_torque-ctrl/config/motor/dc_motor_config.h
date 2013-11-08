@@ -80,6 +80,8 @@
 #define VELOCITY_Kd_NUMERATOR    	0
 #define VELOCITY_Kd_DENOMINATOR  	1
 
+#define VELOCITY_FILTER_SIZE        8
+
 #define POSITION_Kp_NUMERATOR 	 	180
 #define POSITION_Kp_DENOMINATOR  	2000
 #define POSITION_Ki_NUMERATOR    	50
@@ -101,7 +103,7 @@ typedef struct S_Control
 typedef struct S_Filter_length
 {
 	int filter_length;
-} filt_par;
+} filter_par;
 
 
 /**
@@ -174,6 +176,9 @@ typedef struct PROFILE_POSITION_PARAM
 	int max_acceleration;
 } pp_par;
 
+
+
+void init_sensor_filter_param(filter_par &sensor_filter_par) ;
 
 /**
  * \brief initialize QEI sensor

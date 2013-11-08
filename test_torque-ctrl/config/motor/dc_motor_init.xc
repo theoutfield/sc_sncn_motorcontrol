@@ -37,7 +37,7 @@ void init_csp_param(csp_par &csp_params)
 		csp_params.base.polarity = 1;
 	else if(POLARITY < 0)
 		csp_params.base.polarity = -1;
-	csp_params.max_following_error = MAX_FOLLOWING_ERROR;
+	csp_params.max_following_error = 0;
 	csp_params.max_position_limit = MAX_POSITION_LIMIT;
 	csp_params.min_position_limit = MIN_POSITION_LIMIT;
 	return;
@@ -151,4 +151,10 @@ void init_cst_param(cst_par &cst_params)
 	cst_params.polarity = POLARITY;
 	cst_params.max_torque = MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
 	cst_params.motor_torque_constant = MOTOR_TORQUE_CONSTANT;
+}
+
+void init_sensor_filter_param(filter_par &sensor_filter_par) //optional for user to change
+{
+	sensor_filter_par.filter_length = VELOCITY_FILTER_SIZE;
+	return;
 }

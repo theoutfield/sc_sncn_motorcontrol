@@ -7,7 +7,7 @@
  *
  * \author Martin Schwarz <mschwarz@synapticon.com>
  * \version 0.1 (2012-11-23 1850)
- *\Motor 3 motion profile size optimized code for position ctrl loops
+ *
  */
 
 #include <xs1.h>
@@ -18,7 +18,7 @@
 #include "ioports.h"
 #include "hall_server.h"
 #include "hall_client.h"
-#include "hall_qei.h"
+#include "qei_server.h"
 #include "qei_client.h"
 #include "pwm_service_inv.h"
 #include "adc_ad7949.h"
@@ -26,17 +26,16 @@
 #include "comm_loop.h"
 #include "refclk.h"
 #include <xscope.h>
-#include "qei_client.h"
-#include "qei_server.h"
 #include "adc_client_ad7949.h"
 #include <dc_motor_config.h>
 #include <torque_ctrl.h>
 #include <profile.h>
+#include <profile_control.h>
 #include <flash_somanet.h>
 #include <internal_config.h>
 #include <drive_config.h>
-int root_function(int arg);
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
+
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -46,7 +45,34 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 #define HALL 1
 #define QEI 2
 
+void xscope_initialise_1()
+{
+	xscope_register(2, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
+						XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n");
+	xscope_config_io(XSCOPE_IO_BASIC);
+	return;
+}
 
+//test PTM
+void profile_torque_test(chanend c_torque_ctrl)
+{
+	int target_torque = 6600;  //mNm  * current sensor resolution
+	int torque_slope  = 6600;  //torque slope
+	cst_par cst_params;
+	init_cst_param(cst_params);
+
+#ifdef ENABLE_xscope_main
+	xscope_initialise_1();
+#endif
+
+	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+
+	target_torque = 0;
+	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+
+	target_torque = -6000;
+	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+}
 
 int main(void)
 {
@@ -62,13 +88,13 @@ int main(void)
 	chan c_torque_ctrl, signal_ctrl, c_calib, c_req, c_vel;
 
 	//etherCat Comm channels
-	chan coe_in; 	///< CAN from module_ethercat to consumer
-	chan coe_out; 	///< CAN from consumer to module_ethercat
-	chan eoe_in; 	///< Ethernet from module_ethercat to consumer
-	chan eoe_out; 	///< Ethernet from consumer to module_ethercat
+	chan coe_in; 			///< CAN from module_ethercat to consumer
+	chan coe_out; 			///< CAN from consumer to module_ethercat
+	chan eoe_in; 			///< Ethernet from module_ethercat to consumer
+	chan eoe_out; 			///< Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; 	///< File from module_ethercat to consumer
-	chan foe_out; 	///< File from consumer to module_ethercat
+	chan foe_in; 			///< File from module_ethercat to consumer
+	chan foe_out; 			///< File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
 
@@ -76,178 +102,21 @@ int main(void)
 	//
 	par
 	{
-		on stdcore[0]:
+		on stdcore[0] :
 		{
-
+			ecat_init();
+			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,\
+					foe_in, pdo_out, pdo_in);
 		}
 
+		on stdcore[0] :
+		{
+			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
+		}
 
 		on stdcore[1]:
 		{
-			par
-			{
-				{
-					xscope_register(14, XSCOPE_CONTINUOUS, "0 hall(delta)", XSCOPE_INT,
-							"n", XSCOPE_CONTINUOUS, "1 qei", XSCOPE_INT, "n",
-							XSCOPE_CONTINUOUS, "2 pos", XSCOPE_INT, "n",
-							XSCOPE_DISCRETE, "3 ep", XSCOPE_INT, "n", XSCOPE_DISCRETE,
-							"4 ev", XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "5 pos_d",
-							XSCOPE_INT, "n", XSCOPE_CONTINUOUS, "6 vel_d", XSCOPE_INT,
-							"n", XSCOPE_CONTINUOUS, "7 speed", XSCOPE_INT, "n",
-							XSCOPE_CONTINUOUS, "8 sinepos_a", XSCOPE_UINT, "n",
-							XSCOPE_CONTINUOUS, "9 sinepos_b", XSCOPE_UINT, "n",
-							XSCOPE_CONTINUOUS, "10 sinepos_c", XSCOPE_UINT, "n",
-							XSCOPE_CONTINUOUS, "11 sine_a", XSCOPE_UINT, "n",
-							XSCOPE_CONTINUOUS, "12 sine_b", XSCOPE_UINT, "n",
-							XSCOPE_CONTINUOUS, "13 sine_c", XSCOPE_UINT, "n");
-					xscope_config_io(XSCOPE_IO_BASIC);
-				}
-
-			/*	{//cst
-					int command;
-					int init = INIT_BUSY;
-					timer t;
-					unsigned int time;
-
-					t:>time;
-					while (1)
-					{
-						t when timerafter(time+2*MSEC_STD) :> time;
-						init = init_torque_control(c_torque_ctrl);// __check_torque_init(c_torque_ctrl);
-						if(init == INIT)
-						{
-							printstrln("torque control intialized");
-							break;
-						}
-					}
-					t:>time;
-					init_torque_sensor_ecat(HALL, c_torque_ctrl);
-					while(1)
-					{
-						//t when timerafter(time+2*MSEC_STD) :> time;
-						set_torque_test(c_torque_ctrl);//
-					//	set_torque( 100, cst_params , c_torque_ctrl);
-					}
-				}*/
-
-				{
-					int i;
-					int core_id  = 1;
-
-					int steps;
-					int torque_ramp;
-
-					int actual_torque = 0;
-					int target_torque = 6600;  //mNm  * current sensor resolution
-					int acceleration  = 6600;  //torque slope
-
-					timer t;
-					unsigned int time;
-					int init = INIT_BUSY;
-					cst_par cst_params;
-
-					pt_par pt_params;
-					init_pt_params(pt_params);
-					init_cst_param(cst_params);
-					acceleration = pt_params.profile_slope;
-
-					t:>time;
-					while(1)
-					{
-						t when timerafter(time+2*MSEC_STD) :> time;
-						init = init_torque_control(c_torque_ctrl);
-						if(init == INIT)
-						{
-							printstrln("torque control intialized");
-							break;
-						}
-					}
-					init_torque_sensor(HALL, c_torque_ctrl);
-					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
-					for(i = 1; i<steps; i++)
-					{
-						wait_ms(1, core_id, t);
-						torque_ramp =  linear_profile_generate(i);
-							set_torque( torque_ramp, cst_params , c_torque_ctrl);
-					//	set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
-						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
-						xscope_probe_data(0, torque_ramp);
-						xscope_probe_data(1, actual_torque);
-					}
-
-					wait_ms(2500, core_id, t);
-
-					target_torque = 0;
-					//actual_torque = 400;
-					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
-					for(i = 1; i<steps; i++)
-					{
-						wait_ms(1, core_id, t);
-						torque_ramp =  linear_profile_generate(i);
-						set_torque( torque_ramp, cst_params , c_torque_ctrl);
-					//	set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
-						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
-						xscope_probe_data(0, torque_ramp);
-						xscope_probe_data(1, actual_torque);
-					}
-
-					wait_ms(2500, core_id, t);
-
-					target_torque = -6600;
-					//actual_torque = 400;
-					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
-					for(i = 1; i<steps; i++)
-					{
-						wait_ms(1, core_id, t);
-						torque_ramp =  linear_profile_generate(i);
-						set_torque( torque_ramp, cst_params , c_torque_ctrl);
-				//		set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
-						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
-						xscope_probe_data(0, torque_ramp);
-						xscope_probe_data(1, actual_torque);
-					}
-
-					wait_ms(2500, core_id, t);
-
-					target_torque = 0;
-					//actual_torque = 400;
-					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
-					for(i = 1; i<steps; i++)
-					{
-						wait_ms(1, core_id, t);
-						torque_ramp =  linear_profile_generate(i);
-							set_torque( torque_ramp, cst_params , c_torque_ctrl);
-					//	set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
-						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
-						xscope_probe_data(0, torque_ramp);
-						xscope_probe_data(1, actual_torque);
-					}
-
-					wait_ms(2500, core_id, t);
-
-					target_torque = 6600;
-					//actual_torque = 400;
-					steps = init_linear_profile(target_torque, actual_torque, acceleration, acceleration, cst_params.max_torque);
-					for(i = 1; i<steps; i++)
-					{
-						wait_ms(1, core_id, t);
-						torque_ramp =  linear_profile_generate(i);
-						set_torque( torque_ramp, cst_params , c_torque_ctrl);
-					//	set_torque_cst(cst_params, torque_ramp, 0, c_torque_ctrl);
-						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
-						xscope_probe_data(0, torque_ramp);
-						xscope_probe_data(1, actual_torque);
-					}
-
-					while(1){
-						wait_ms(1, core_id, t);
-						actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
-						xscope_probe_data(0, torque_ramp);
-						xscope_probe_data(1, actual_torque);
-					}
-
-				}
-			}
+			profile_torque_test(c_torque_ctrl);
 		}
 
 		on stdcore[2]:
@@ -285,18 +154,15 @@ int main(void)
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				{
-					int sensor_select = 1;
 					hall_par hall_params;
 					qei_par qei_params;
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2,\
-									 c_signal, c_sync, c_commutation_p1, c_commutation_p2,\
-									 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,\
-									 qei_params, commutation_params);
-
+					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_sync, \
+							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
+							c_pwm_ctrl, hall_params, qei_params, commutation_params);
 				}
 
 				{

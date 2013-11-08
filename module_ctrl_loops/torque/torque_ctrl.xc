@@ -263,7 +263,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 			if(filter_count == 10)
 			{
 				filter_count = 0;
-				//actual_speed = get_hall_velocity(c_hall_p3, hall_params);
+
 			//	xscope_probe_data(0, actual_speed);
 				mod_speed = actual_speed;
 				if(actual_speed < 0)
@@ -367,7 +367,9 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
 	init_qei_velocity_params(qei_velocity_params);
 
-
+	fldc = filter_dc/hall_params.pole_pairs;
+	if(fldc < 10)
+		fldc = 10;
 	qei_counts_per_hall= qei_params.real_counts/ hall_params.pole_pairs;
 	init_buffer(buffer_Id, filter_dc);
 	init_buffer(buffer_Iq, filter_dc);
@@ -628,7 +630,9 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					TORQUE_CTRL_READ(torque_ctrl_params.Integral_limit);
 				}
 				else if(command == SENSOR_SELECT)
+				{
 					TORQUE_CTRL_READ(sensor_used);
+				}
 
 				else if(command == SHUTDOWN_TORQUE)
 					TORQUE_CTRL_READ(deactivate);
@@ -640,6 +644,10 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				{
 					TORQUE_CTRL_READ(hall_params.gear_ratio);
 					TORQUE_CTRL_READ(hall_params.pole_pairs);
+
+					fldc =  filter_dc/hall_params.pole_pairs;
+					if(fldc < 10)
+						fldc = 10;
 				}
 				else if(command == SET_TORQUE_CTRL_QEI)
 				{
@@ -648,6 +656,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					TORQUE_CTRL_READ(qei_params.real_counts);
 					TORQUE_CTRL_READ(qei_params.max_count);
 					TORQUE_CTRL_READ(qei_params.poles);
+					qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
 				}
 
 				break;
