@@ -338,15 +338,15 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 						if(sensor_select == HALL)
 						{
-							init_position_ctrl_hall(hall_params, c_position_ctrl);
+							set_position_ctrl_hall_param(hall_params, c_position_ctrl);
 						}
 						else if(sensor_select == QEI)
 						{
-							init_position_ctrl_qei(qei_params, c_position_ctrl);
+							set_position_ctrl_qei_param(qei_params, c_position_ctrl);
 						}
 
-						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
-						init_position_sensor_ecat(sensor_select, c_position_ctrl);//*/
+						set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
+						set_position_sensor(sensor_select, c_position_ctrl);//*/
 
 						init_position_profile_limits(qei_params.gear_ratio, pp_params.max_acceleration, pp_params.base.max_profile_velocity);
 						InOut.operation_mode_display = PP;
@@ -384,15 +384,15 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						printintln(cst_params.nominal_motor_speed);						printintln(cst_params.polarity);
 						if(sensor_select == HALL)
 						{
-							init_torque_ctrl_hall(hall_params, c_torque_ctrl);//init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
+							set_torque_ctrl_hall_param(hall_params, c_torque_ctrl);//init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
 						}
 						else if(sensor_select == QEI)
 						{
-							init_torque_ctrl_qei(qei_params, c_torque_ctrl);//init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
+							set_torque_ctrl_qei_param(qei_params, c_torque_ctrl);//init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
 						}
 
 						set_torque_ctrl_param(torque_ctrl_params, c_torque_ctrl);//init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
-						init_torque_sensor(sensor_select, c_torque_ctrl);//init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl); //*/
+						set_torque_sensor(sensor_select, c_torque_ctrl);//init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl); //*/
 
 						InOut.operation_mode_display = TQ;
 					}
@@ -430,15 +430,15 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 						if(sensor_select == HALL)
 						{
-							init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
+							set_velocity_ctrl_hall_param(hall_params, c_velocity_ctrl);
 						}
 						else if(sensor_select == QEI)
 						{
-							init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
+							set_velocity_ctrl_qei_param(qei_params, c_velocity_ctrl);
 						}
 
-						init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
-						init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl); //*/
+						set_velocity_ctrl_param(velocity_ctrl_params, c_velocity_ctrl);
+						set_velocity_sensor(sensor_select, c_velocity_ctrl); //*/
 
 						InOut.operation_mode_display = PV;
 					}
@@ -476,15 +476,15 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 						if(sensor_select == HALL)
 						{
-							init_position_ctrl_hall(hall_params, c_position_ctrl);
+							set_position_ctrl_hall_param(hall_params, c_position_ctrl);
 						}
 						else if(sensor_select == QEI)
 						{
-							init_position_ctrl_qei(qei_params, c_position_ctrl);
+							set_position_ctrl_qei_param(qei_params, c_position_ctrl);
 						}
 
-						init_position_ctrl_param_ecat(position_ctrl_params, c_position_ctrl);
-						init_position_sensor_ecat(sensor_select, c_position_ctrl);//*/
+						set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
+						set_position_sensor(sensor_select, c_position_ctrl);//*/
 
 						InOut.operation_mode_display = CSP;
 					}
@@ -521,15 +521,15 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 						if(sensor_select == HALL)
 						{
-							init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
+							set_velocity_ctrl_hall_param(hall_params, c_velocity_ctrl);
 						}
 						else if(sensor_select == QEI)
 						{
-							init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
+							set_velocity_ctrl_qei_param(qei_params, c_velocity_ctrl);
 						}
 
-						init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
-						init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
+						set_velocity_ctrl_param(velocity_ctrl_params, c_velocity_ctrl);
+						set_velocity_sensor(sensor_select, c_velocity_ctrl);
 //*/
 						InOut.operation_mode_display = CSV;
 					}
@@ -571,17 +571,14 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 //while(1);
 						if(sensor_select == HALL)
 						{
-
-							init_torque_ctrl_hall(hall_params, c_torque_ctrl);//init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
-
+							set_torque_ctrl_hall_param(hall_params, c_torque_ctrl);//init_velocity_ctrl_hall(hall_params, c_velocity_ctrl);
 						}
 						else if(sensor_select == QEI)
 						{
-
-							init_torque_ctrl_qei(qei_params, c_torque_ctrl);//init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
+							set_torque_ctrl_qei_param(qei_params, c_torque_ctrl);//init_velocity_ctrl_qei(qei_params, c_velocity_ctrl);
 						}
 
-						init_torque_sensor(sensor_select, c_torque_ctrl);//init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
+						set_torque_sensor(sensor_select, c_torque_ctrl);//init_velocity_sensor_ecat(sensor_select, c_velocity_ctrl);
 						set_torque_ctrl_param(torque_ctrl_params, c_torque_ctrl);//init_velocity_ctrl_param_ecat(velocity_ctrl_params, c_velocity_ctrl);
 
 //*/

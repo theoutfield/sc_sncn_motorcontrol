@@ -12,14 +12,6 @@
 
 
 /**
- * \brief Initialise Velocity Control Parameters
- *
- *  Input
- * \param velocity_ctrl_par struct defines the velocity control parameters
- */
-void init_velocity_control_param(ctrl_par &velocity_ctrl_par);
-
-/**
  * \brief Initialise Velocity Control Loop
  *  Input Channel
  * \channel c_velocity_ctrl channel to signal initialisation
@@ -27,15 +19,19 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_par);
 int init_velocity_control(chanend c_velocity_ctrl);
 
 /**
- * \brief Initialise Sensor Filter parameter
+ * \brief Velocity Limiter
+ *
  *  Input
- * \param sensor_filter_par struct defines the filter parameters
+ * \param velocity is the input velocity to be limited in range
+ * \param max_speed is the max speed that can be reached
+ *
+ *  Output
+ * \return velocity in the range [-max_speed to max_speed]
  */
-void init_sensor_filter_param(filter_par &sensor_filter_par);
-
+int max_speed_limit(int velocity, int max_speed);
 
 /**
- * \brief Set new target velocity for Velocity Control
+ * \brief Set new target velocity for Velocity Control Loop
  *
  *  Input Channel
  * \channel c_velocity_ctrl channel to signal new target velocity
@@ -45,8 +41,9 @@ void init_sensor_filter_param(filter_par &sensor_filter_par);
  */
 void set_velocity(int target_velocity, chanend c_velocity_ctrl);
 
+
 /**
- * \brief Get actual velocity from velocity control
+ * \brief Get actual velocity from Velocity Control Loop
  *
  *  Output Channel
  * \channel c_velocity_ctrl channel to receive actual velocity
@@ -55,6 +52,66 @@ void set_velocity(int target_velocity, chanend c_velocity_ctrl);
  * \return actual velocity from velocity control
  */
 int get_velocity(chanend c_velocity_ctrl);
+
+/**
+ * \brief Set Velocity Control PID Parameters
+ *
+ *  Input
+ * \param velocity_ctrl_params struct defines the velocity control PID parameters
+ */
+void set_velocity_ctrl_param(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl);
+
+/**
+ * \brief initialize hall sensor parameters for Velocity Control
+ *
+ * \param hall_params struct defines the pole-pairs and gear ratio
+ */
+void set_velocity_ctrl_hall_param(hall_par &hall_params, chanend c_velocity_ctrl);
+
+/**
+ * \brief initialize QEI sensor for Velocity Control
+ *
+ * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
+ * 	 gear-ratio used for the motor
+ */
+void set_velocity_ctrl_qei_param(qei_par &qei_params, chanend c_velocity_ctrl);
+
+/**
+ * \brief Sets the sensor used for Velocity Control
+ *
+ * \param sensor_used defines the sensor to be used (HALL/QEI) for Velocity Control
+ */
+void set_velocity_sensor(int sensor_used, chanend c_velocity_ctrl);
+
+/**
+ * \brief Enables Velocity Control mode operation
+ *
+ * \channel c_velocity_ctrl channel to signal enable velocity control
+ */
+void enable_velocity_ctrl(chanend c_velocity_ctrl);
+
+/**
+ * \brief Shutdown Velocity Control mode operation
+ *
+ * \channel c_velocity_ctrl channel to signal shutdown of velocity control
+ */
+void shutdown_velocity_ctrl(chanend c_velocity_ctrl);
+
+
+/**
+ * \brief Set new target velocity for velocity control
+ *
+ *  Input Channel
+ * \channel c_velocity_ctrl channel to signal new target velocity input
+ *
+ *  Input
+ * \param csv_param struct defines the motor parameters and velocity limits
+ * \param target_velocity is the new target velocity
+ * \param velocity_offset defines offset in velocity
+ * \param torque_offset defines offset in torque
+ */
+void set_velocity_csv(csv_par &csv_params, int target_velocity,
+		int velocity_offset, int torque_offset, chanend c_velocity_ctrl);
 
 
 /**
@@ -79,31 +136,4 @@ int get_velocity(chanend c_velocity_ctrl);
 void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
 	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation);
 
-/**
- * \brief Velocity Limiter
- *
- *  Input
- * \param velocity is the input velocity to be limited in range
- * \param max_speed is the max speed that can be reached
- *
- *  Output
- * \return velocity in the range [-max_speed to max_speed]
- */
-int max_speed_limit(int velocity, int max_speed);
-
-void set_profile_velocity(int target_velocity, int acceleration, int deceleration, int max_profile_velocity, chanend c_velocity_ctrl);
-
-/* Internal functions for velocity control via ethercat communication */
-
-void set_velocity_csv(csv_par &csv_params, int target_velocity,
-		int velocity_offset, int torque_offset, chanend c_velocity_ctrl);
-
-void init_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl);
-void init_velocity_sensor_ecat(int sensor_used, chanend c_velocity_ctrl);
-void init_velocity_ctrl_hall(hall_par &hall_params, chanend c_velocity_ctrl);
-void init_velocity_ctrl_qei(qei_par &qei_params, chanend c_velocity_ctrl);
-
-void shutdown_velocity_ctrl(chanend c_velocity_ctrl);
-
-void enable_velocity_ctrl(chanend c_velocity_ctrl);
 #endif /* VELOCITY_CTRL_H_ */

@@ -6,23 +6,6 @@
 //#define DEBUG
 //#define debug_print
 
-
-
-/*Internal Controller Configs*/
-#define SET_POSITION_TOKEN 40
-#define GET_POSITION_TOKEN 41
-#define HALL 1
-#define QEI 2
-#define HALL_PRECISION		2
-#define QEI_PRECISION		512
-
-#define SET_CTRL_PARAMETER 	101
-#define SENSOR_SELECT      	151
-#define SHUTDOWN_POS	 	201
-#define ENABLE_POS			251
-
-
-
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 int init_position_control(chanend c_position_ctrl)
@@ -88,7 +71,7 @@ void set_position_csp(csp_par &csp_params, int target_position, int position_off
 }
 
 
-void init_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend c_position_ctrl)
+void set_position_ctrl_param(ctrl_par &position_ctrl_params, chanend c_position_ctrl)
 {
 	POSITION_CTRL_WRITE(SET_CTRL_PARAMETER);
 	POSITION_CTRL_WRITE(position_ctrl_params.Kp_n);
@@ -100,16 +83,16 @@ void init_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend c_pos
 	POSITION_CTRL_WRITE(position_ctrl_params.Integral_limit);
 }
 
-void init_position_ctrl_hall(hall_par &hall_params, chanend c_position_ctrl)
+void set_position_ctrl_hall_param(hall_par &hall_params, chanend c_position_ctrl)
 {
-	c_position_ctrl <: SET_POS_CTRL_HALL;
+	c_position_ctrl <: SET_POSITION_CTRL_HALL;
 	c_position_ctrl <: hall_params.gear_ratio;
 	c_position_ctrl <: hall_params.pole_pairs;
 }
 
-void init_position_ctrl_qei(qei_par &qei_params, chanend c_position_ctrl)
+void set_position_ctrl_qei_param(qei_par &qei_params, chanend c_position_ctrl)
 {
-	c_position_ctrl <: SET_POS_CTRL_QEI;
+	c_position_ctrl <: SET_POSITION_CTRL_QEI;
 	c_position_ctrl <: qei_params.gear_ratio;
 	c_position_ctrl <: qei_params.index;
 	c_position_ctrl <: qei_params.real_counts;
@@ -117,7 +100,7 @@ void init_position_ctrl_qei(qei_par &qei_params, chanend c_position_ctrl)
 }
 
 
-void init_position_sensor_ecat(int sensor_used, chanend c_position_ctrl)
+void set_position_sensor(int sensor_used, chanend c_position_ctrl)
 {
 	POSITION_CTRL_WRITE(SENSOR_SELECT);
 	POSITION_CTRL_WRITE(sensor_used);
@@ -125,13 +108,13 @@ void init_position_sensor_ecat(int sensor_used, chanend c_position_ctrl)
 
 void shutdown_position_ctrl(chanend c_position_ctrl)
 {
-	POSITION_CTRL_WRITE(SHUTDOWN_POS);
+	POSITION_CTRL_WRITE(SHUTDOWN_POSITION);
 	POSITION_CTRL_WRITE(1);
 }
 
 void enable_position_ctrl(chanend c_position_ctrl)
 {
-	POSITION_CTRL_WRITE(ENABLE_POS);
+	POSITION_CTRL_WRITE(ENABLE_POSITION);
 	POSITION_CTRL_WRITE(0);
 }
 
@@ -325,18 +308,18 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						precision = QEI_PRECISION;
 					}
 				}
-				else if(command == SHUTDOWN_POS)
+				else if(command == SHUTDOWN_POSITION)
 					POSITION_CTRL_READ(deactivate);
 
-				else if(command == ENABLE_POS)
+				else if(command == ENABLE_POSITION)
 					POSITION_CTRL_READ(deactivate);
 
-				else if(command == SET_POS_CTRL_HALL)
+				else if(command == SET_POSITION_CTRL_HALL)
 				{
 					c_position_ctrl :> hall_params.gear_ratio;
 					c_position_ctrl :> hall_params.pole_pairs;
 				}
-				else if(command == SET_POS_CTRL_QEI)
+				else if(command == SET_POSITION_CTRL_QEI)
 				{
 					c_position_ctrl :> qei_params.gear_ratio;
 					c_position_ctrl :> qei_params.index;

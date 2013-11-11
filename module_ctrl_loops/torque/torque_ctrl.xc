@@ -28,22 +28,6 @@
 #include <internal_config.h>
 
 //#define ENABLE_xscope_torq
-#pragma once
-#define TORQUE_CTRL_READ(x)		c_torque_ctrl :> x
-#define TORQUE_CTRL_WRITE(x)	c_torque_ctrl <: x
-#define TORQUE_CTRL_ENABLE()	c_torque_ctrl <: 1
-#define TORQUE_CTRL_DISABLE()	c_torque_ctrl <: 0
-
-#define HALL 					1
-#define QEI 					2
-
-#define SET_TORQUE_TOKEN 		40
-#define GET_TORQUE_TOKEN 		41
-#define SET_CTRL_PARAMETER 		101
-#define SENSOR_SELECT      		151
-#define SHUTDOWN_TORQUE	 		201
-#define ENABLE_TORQUE			251
-
 
 int root_function(int arg);
 
@@ -143,14 +127,14 @@ void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
 	TORQUE_CTRL_WRITE(torque_ctrl_params.Integral_limit);
 }
 
-void init_torque_ctrl_hall(hall_par &hall_params, chanend c_torque_ctrl)
+void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_HALL);
 	TORQUE_CTRL_WRITE(hall_params.gear_ratio);
 	TORQUE_CTRL_WRITE(hall_params.pole_pairs);
 }
 
-void init_torque_ctrl_qei(qei_par &qei_params, chanend c_torque_ctrl)
+void set_torque_ctrl_qei_param(qei_par &qei_params, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_QEI);
 	TORQUE_CTRL_WRITE(qei_params.gear_ratio);
@@ -159,7 +143,7 @@ void init_torque_ctrl_qei(qei_par &qei_params, chanend c_torque_ctrl)
 	TORQUE_CTRL_WRITE(qei_params.max_count);
 	TORQUE_CTRL_WRITE(qei_params.poles);
 }
-void init_torque_sensor(int sensor_used, chanend c_torque_ctrl)
+void set_torque_sensor(int sensor_used, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SENSOR_SELECT);
 	TORQUE_CTRL_WRITE(sensor_used);
