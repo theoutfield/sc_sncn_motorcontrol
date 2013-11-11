@@ -23,7 +23,6 @@ void init_qei_param(qei_par &qei_params)
 void init_csv_param(csv_par &csv_params)
 {
 	csv_params.max_motor_speed = MAX_NOMINAL_SPEED;
-	csv_params.max_acceleration = MAX_ACCELERATION;
 	if(POLARITY >= 0)
 		csv_params.polarity = 1;
 	else if(POLARITY < 0)
@@ -34,16 +33,16 @@ void init_csv_param(csv_par &csv_params)
 void init_csp_param(csp_par &csp_params)
 {
 	csp_params.base.max_motor_speed = MAX_NOMINAL_SPEED;
-	csp_params.base.max_acceleration = MAX_ACCELERATION;
 	if(POLARITY >= 0)
 		csp_params.base.polarity = 1;
 	else if(POLARITY < 0)
 		csp_params.base.polarity = -1;
-	csp_params.max_following_error = MAX_FOLLOWING_ERROR;
+	csp_params.max_following_error = 0;
 	csp_params.max_position_limit = MAX_POSITION_LIMIT;
 	csp_params.min_position_limit = MIN_POSITION_LIMIT;
 	return;
 }
+
 
 void init_pp_params(pp_par &pp_params)
 {
@@ -68,6 +67,13 @@ void init_pv_params(pv_par &pv_params)
 	pv_params.polarity = POLARITY;
 	return;
 }
+
+void init_pt_params(pt_par &pt_params)
+{
+	pt_params.profile_slope = PROFILE_TORQUE_SLOPE;
+	pt_params.polarity = POLARITY;
+}
+
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 {
 	velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;
@@ -103,7 +109,7 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 
 	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
 	{
-		position_ctrl_params.Integral_limit = (position_ctrl_params.Control_limit * position_ctrl_params.Ki_d)/position_ctrl_params.Ki_n ;
+		position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n);
 	}
 	else
 	{
@@ -143,5 +149,12 @@ void init_cst_param(cst_par &cst_params)
 	cst_params.nominal_current = MAX_NOMINAL_CURRENT;
 	cst_params.nominal_motor_speed = MAX_NOMINAL_SPEED;
 	cst_params.polarity = POLARITY;
-	cst_params.max_torque = MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
+	cst_params.max_torque = MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
+	cst_params.motor_torque_constant = MOTOR_TORQUE_CONSTANT;
+}
+
+void init_sensor_filter_param(filter_par &sensor_filter_par) //optional for user to change
+{
+	sensor_filter_par.filter_length = VELOCITY_FILTER_SIZE;
+	return;
 }

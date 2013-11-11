@@ -19,7 +19,7 @@
  * copyright notice above.
  *
  **/                                   
-#include "adc_ltc1408.h"
+#include "adc_server_ltc1408.h"
 #include "adc_common.h"
 #include <stdlib.h>
 

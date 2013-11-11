@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "ioports.h"
-#include "adc_ad7949.h"
+#include "adc_server_ad7949.h"
 #include "adc_client_ad7949.h"
 #include "hall_server.h"
 #include "hall_client.h"
@@ -47,7 +47,7 @@ void xscope_initialise_1()
 
 int main(void) {
 	chan c_adctrig;
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4;
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan c_pwm_ctrl;
 	chan c_signal_adc;
@@ -107,14 +107,14 @@ int main(void) {
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 					commutation_sinusoidal(c_hall_p1,  c_qei,\
 							 c_signal, c_sync, c_commutation_p1, c_commutation_p2,\
-							 c_commutation_p3, c_pwm_ctrl, sensor_select, hall_params,\
+							 c_commutation_p3, c_pwm_ctrl, hall_params,\
 							 qei_params, commutation_params);
 				}
 
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 //#include <print.h>
-#include <adc_ad7949.h>
+#include <adc_common.h>
 
 calib_data I_calib;
 #define ADC_CURRENT_REQ	1
@@ -8,10 +8,6 @@ calib_data I_calib;
 #define ADC_EXTERNAL_POT 3
 #define Factor 6
 
-int iFilterSUM_Ia;
-int iFilterSUM_Ib;
-int Ia=0;
-int Ib=0;
 
 {int, int, int, int, int, int, int, int} get_adc_all_ad7949(chanend c_adc)
 {
