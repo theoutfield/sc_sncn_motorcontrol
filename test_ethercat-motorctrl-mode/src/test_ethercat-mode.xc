@@ -17,7 +17,7 @@
 #include <stdint.h>
 #include <ioports.h>
 #include <xscope.h>
-#include <adc_ad7949.h>
+#include <adc_server_ad7949.h>
 #include <qei_server.h>
 #include <hall_server.h>
 #include <flash_somanet.h>

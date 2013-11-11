@@ -40,9 +40,6 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-#define HALL 1
-#define QEI 2
-
 
 void xscope_initialise_1()
 {

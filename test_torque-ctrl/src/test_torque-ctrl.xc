@@ -21,7 +21,7 @@
 #include "qei_server.h"
 #include "qei_client.h"
 #include "pwm_service_inv.h"
-#include "adc_ad7949.h"
+#include "adc_server_ad7949.h"
 #include "test.h"
 #include "comm_loop.h"
 #include "refclk.h"
@@ -34,16 +34,13 @@
 #include <flash_somanet.h>
 #include <internal_config.h>
 #include <drive_config.h>
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
-
-#define HALL 1
-#define QEI 2
 
 void xscope_initialise_1()
 {

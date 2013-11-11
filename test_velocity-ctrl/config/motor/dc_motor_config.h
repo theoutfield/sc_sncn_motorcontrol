@@ -179,12 +179,18 @@ typedef struct PROFILE_POSITION_PARAM
 	int max_acceleration;
 } pp_par;
 
-
+/**
+ * \brief Initialise Sensor Filter parameter for velocity calculation
+ *  Input
+ * \param sensor_filter_par struct defines the filter parameters
+ */
 void init_sensor_filter_param(filter_par &sensor_filter_par) ;
+
 /**
  * \brief initialize QEI sensor
  *
- * \param q_max struct defines the max count for quadrature encoder (QEI)
+ * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
+ * 	 gear-ratio used for the motor
  */
 void init_qei_param(qei_par &qei_params);
 
@@ -201,6 +207,12 @@ void init_csp_param(csp_par &csp_params);
 
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 
+/**
+ * \brief Initialise Position Control Parameters
+ *
+ *  Input
+ * \param position_ctrl_params struct defines the position control parameters
+ */
 void init_position_control_param(ctrl_par &position_ctrl_params);
 
 void init_pp_params(pp_par &pp_params);

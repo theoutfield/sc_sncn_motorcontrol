@@ -34,22 +34,22 @@
 /*
  * define Motor Specific Constants
  */
-#define POLE_PAIRS  8
-#define GEAR_RATIO  26
-#define MAX_NOMINAL_SPEED  5260		// in rpm
-#define MAX_NOMINAL_CURRENT  2		// in A
-#define MAX_ACCELERATION   5000     // rpm/s
-#define QEI_COUNT_MAX_REAL 4000		// Max count of Quadrature Encoder
-#define POLARITY 1					// 1 / -1
-#define MOTOR_TORQUE_CONSTANT 34    // mNm/A
+#define POLE_PAIRS  				8
+#define GEAR_RATIO  				26
+#define MAX_NOMINAL_SPEED  			5260		// in rpm
+#define MAX_NOMINAL_CURRENT  		2		// in A
+#define MAX_ACCELERATION   			5000     // rpm/s
+#define QEI_COUNT_MAX_REAL 			4000		// Max count of Quadrature Encoder
+#define POLARITY 					1					// 1 / -1
+#define MOTOR_TORQUE_CONSTANT 		34    // mNm/A
 
-#define QEI_WITH_INDEX		1
-#define QEI_WITH_NO_INDEX 	0
-#define QEI_SENSOR_TYPE  	QEI_WITH_NO_INDEX//QEI_WITH_INDEX
+#define QEI_WITH_INDEX				1
+#define QEI_WITH_NO_INDEX 			0
+#define QEI_SENSOR_TYPE  			QEI_WITH_NO_INDEX//QEI_WITH_INDEX
 
-#define MAX_FOLLOWING_ERROR 0
-#define MAX_POSITION_LIMIT 	359
-#define MIN_POSITION_LIMIT -359
+#define MAX_FOLLOWING_ERROR 		0
+#define MAX_POSITION_LIMIT 			359
+#define MIN_POSITION_LIMIT 			-359
 
 /*Current Resolution*/
 #define DC100_RESOLUTION 			740
