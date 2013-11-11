@@ -9,9 +9,9 @@
 #define ECAT_MOTOR_DRIVE_H_
 #include <comm.h>
 #include <drive_config.h>
-#include <velocity_ctrl.h>
-#include <position_ctrl.h>
-#include <torque_ctrl.h>
+#include <velocity_ctrl_client.h>
+#include <position_ctrl_client.h>
+#include <torque_ctrl_client.h>
 #include <hall_server.h>
 #include <hall_client.h>
 #include <qei_client.h>

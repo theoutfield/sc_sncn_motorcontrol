@@ -27,7 +27,7 @@
 #include "qei_server.h"
 #include <dc_motor_config.h>
 #include "profile.h"
-#include <position_ctrl.h>
+#include <position_ctrl_server.h>
 #include <drive_config.h>
 #include <profile_control.h>
 #include <flash_somanet.h>

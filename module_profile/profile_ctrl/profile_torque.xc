@@ -1,4 +1,4 @@
-#include "torque_ctrl.h"
+#include "torque_ctrl_client.h"
 #include "refclk.h"
 #include "comm_loop.h"
 #include <xscope.h>

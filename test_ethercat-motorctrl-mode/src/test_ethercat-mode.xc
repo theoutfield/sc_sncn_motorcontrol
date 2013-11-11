@@ -23,9 +23,9 @@
 #include <flash_somanet.h>
 #include <pwm_service_inv.h>
 #include <comm_loop.h>
-#include <velocity_ctrl.h>
-#include <position_ctrl.h>
-#include <torque_ctrl.h>
+#include <velocity_ctrl_server.h>
+#include <position_ctrl_server.h>
+#include <torque_ctrl_server.h>
 #include <ecat_motor_drive.h>
 #include <dc_motor_config.h>
 

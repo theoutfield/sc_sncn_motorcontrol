@@ -18,9 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
-#define HALL 1
-#define QEI 2
+#include <internal_config.h>
 
 int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used)
 {

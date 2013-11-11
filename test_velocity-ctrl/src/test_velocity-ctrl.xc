@@ -23,7 +23,7 @@
 #include "pwm_service_inv.h"
 #include "comm_loop.h"
 #include "refclk.h"
-#include "velocity_ctrl.h"
+#include "velocity_ctrl_server.h"
 #include <xscope.h>
 #include "profile.h"
 #include <flash_somanet.h>

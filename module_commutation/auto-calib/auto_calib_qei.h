@@ -6,7 +6,7 @@
 #include "qei_client.h"
 #include "comm_loop.h"
 #include "refclk.h"
-#include "velocity_ctrl.h"
+#include "velocity_ctrl_client.h"
 #include <xscope.h>
 #include <internal_config.h>
 #include <drive_config.h>

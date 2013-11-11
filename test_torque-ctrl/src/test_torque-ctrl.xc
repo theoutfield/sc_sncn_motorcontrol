@@ -28,12 +28,11 @@
 #include <xscope.h>
 #include "adc_client_ad7949.h"
 #include <dc_motor_config.h>
-#include <torque_ctrl.h>
-#include <profile.h>
+#include <torque_ctrl_server.h>
 #include <profile_control.h>
 #include <flash_somanet.h>
 #include <internal_config.h>
-#include <drive_config.h>
+
 #define ENABLE_xscope_main
 
 #define COM_CORE 0

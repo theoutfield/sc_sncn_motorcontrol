@@ -1,4 +1,4 @@
-#include "position_ctrl.h"
+#include "position_ctrl_client.h"
 #include "refclk.h"
 #include "comm_loop.h"
 #include <xscope.h>
