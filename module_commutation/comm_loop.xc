@@ -32,10 +32,11 @@
 #include "hall_qei.h"
 #include <internal_config.h>
 #include "print.h"
-#define SET_VOLTAGE    2
-#define SET_COMMUTATION_PARAMS 3
-#define HALL 1
-#define QEI 2
+
+
+#define FORWARD_CONSTANT 		683  	//60  deg
+#define REVERSE_CONSTANT 		2731	//240 deg
+
 static t_pwm_control pwm_ctrl;
 
 
@@ -57,29 +58,7 @@ void init_commutation_param(commutation_par &commutation_params, hall_par &hall_
 //	printintln(commutation_params.angle_variance);
 //	printintln(commutation_params.max_speed_reached);
 }
-/*
-int init_commutation(chanend c_signal)
-{
-	unsigned command, received_command = 0;
 
-	// init check from commutation loop
-	while (1)
-	{
-		select
-		{
-			case SIGNAL_READ(command):
-				received_command = SUCCESS;
-				break;
-			default:
-				break;
-		}
-		if(received_command == SUCCESS)
-		{
-			break;
-		}
-	}
-	return received_command;
-}*/
 
 void commutation_init_to_zero(chanend c_pwm_ctrl)
 {
@@ -96,14 +75,12 @@ int absolute(int var)
 	return var;
 }
 
-#define FORWARD_CONSTANT 683  	//60  deg
-#define REVERSE_CONSTANT 2731	//240 deg
-#define CHANGE_SENSOR 20
+
 
 
 void commutation_sensor_select(chanend c_commutation, int sensor_select)
 {
-	c_commutation <: CHANGE_SENSOR;
+	c_commutation <: SENSOR_SELECT;
 	c_commutation <: sensor_select;
 	return;
 }
@@ -125,7 +102,7 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 
 		return;
 	}
-	else if(command == CHANGE_SENSOR)
+	else if(command == SENSOR_SELECT)
 	{
 		c_commutation :> sensor_select;
 		return;
@@ -306,45 +283,11 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei,\
 	  a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
 	  t when timerafter (ts + t_delay) :> ts;
 
-	//  printstrln("start");
-
-
-	//  c_signal <: 1; 			//signal commutation init done.
-
 	  t :> ts;
-/*	  while(1)
-	  {
-		  unsigned command, received_command = 0;
-		  #pragma ordered
-		  select
-		  {
-//			case c_signal_adc :> command:
-//				received_command = 1;
-//				//printstrln("received signal from torque ctrl");
-//				c_signal_adc <: 1;
-//				break;
-//			case t when timerafter(ts + timeout) :> void:
-//				received_command = 1;
-//				//printstrln("timed out");
-//				break;
-			case c_signal :> command:  //
-				if(command == CHECK_BUSY)
-					c_signal <: init_state;
-				break;
-			default:
-				break;
-		  }
-		  if(received_command == 1)
-			  break;
-	  }*/
 
-	 // printstrln("start commutation");
-
-	//  if( sensor_select ==  HALL)
-		  commutation_sinusoidal_loop(HALL, hall_params, qei_params, commutation_params,\
+	  commutation_sinusoidal_loop(HALL, hall_params, qei_params, commutation_params,\
 				  c_hall, c_qei, c_sync, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, c_commutation_p3);
-	//  else if(sensor_select == QEI)
-	//	  commutation_sinusoidal_loop_qei( qei_params,hall_params, commutation_params, c_hall, c_pwm_ctrl, c_signal, c_sync, c_commutation_p1, c_commutation_p2, c_commutation_p3);
+
 }
 
 

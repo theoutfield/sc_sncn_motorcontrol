@@ -63,6 +63,9 @@
 #define SHUTDOWN_POSITION 			201
 #define ENABLE_POSITION				251
 
+#define SET_VOLTAGE    				2
+#define SET_COMMUTATION_PARAMS 		3
+
 #define SET_CTRL_PARAMETER 			100
 #define SENSOR_SELECT      			150
 
