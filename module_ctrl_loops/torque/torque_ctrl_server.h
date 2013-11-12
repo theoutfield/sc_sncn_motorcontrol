@@ -14,7 +14,7 @@
  *
  **/
 
-#include <comm_loop.h>
+#include "comm_loop_client.h"
 #include <dc_motor_config.h>
 #include <internal_config.h>
 

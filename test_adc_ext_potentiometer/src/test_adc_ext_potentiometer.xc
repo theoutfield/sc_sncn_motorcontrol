@@ -21,7 +21,7 @@
 #include "hall_server.h"
 #include "hall_client.h"
 #include "pwm_service_inv.h"
-#include "comm_loop.h"
+#include "comm_loop_server.h"
 #include "refclk.h"
 #include <xscope.h>
 #include <dc_motor_config.h>
@@ -88,9 +88,9 @@ int main(void) {
 		{
 			par
 			{
-			//	adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
+				adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
 
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
+			/*	adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
 						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
 						p_ifm_adc_misob);
 
@@ -115,7 +115,7 @@ int main(void) {
 					hall_par hall_params;
 					init_hall_param(hall_params);
 					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
-				}
+				}*/
 			}
 		}
 

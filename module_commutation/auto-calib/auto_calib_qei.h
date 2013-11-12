@@ -4,7 +4,7 @@
 #include <dc_motor_config.h>
 #include "hall_client.h"
 #include "qei_client.h"
-#include "comm_loop.h"
+#include "comm_loop_client.h"
 #include "refclk.h"
 #include "velocity_ctrl_client.h"
 #include <xscope.h>

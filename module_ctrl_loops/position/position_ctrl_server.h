@@ -3,7 +3,7 @@
 #include "refclk.h"
 #include "qei_client.h"
 #include "hall_client.h"
-#include "comm_loop.h"
+#include "comm_loop_client.h"
 
 /**
  * \brief Position Control Loop

@@ -20,7 +20,7 @@
 #include "hall_client.h"
 #include "qei_client.h"
 #include "pwm_service_inv.h"
-#include "comm_loop.h"
+#include "comm_loop_server.h"
 #include "refclk.h"
 #include <xscope.h>
 #include "qei_client.h"

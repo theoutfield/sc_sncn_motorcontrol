@@ -21,7 +21,7 @@
 #include "qei_server.h"
 #include "qei_client.h"
 #include "pwm_service_inv.h"
-#include "comm_loop.h"
+#include "comm_loop_server.h"
 #include "refclk.h"
 #include "velocity_ctrl_server.h"
 #include <xscope.h>

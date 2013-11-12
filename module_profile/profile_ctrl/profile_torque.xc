@@ -1,6 +1,5 @@
 #include "torque_ctrl_client.h"
 #include "refclk.h"
-#include "comm_loop.h"
 #include <xscope.h>
 #include <internal_config.h>
 #include <drive_config.h>
