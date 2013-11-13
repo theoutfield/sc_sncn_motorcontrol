@@ -229,7 +229,19 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					VELOCITY_CTRL_READ(velocity_ctrl_params.Integral_limit);
 				}
 				else if(command == SENSOR_SELECT)
+				{
 					VELOCITY_CTRL_READ(sensor_used);
+					if(sensor_used == HALL)
+					{
+						cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
+					}
+					else if(sensor_used == QEI)
+					{
+						cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
+						qei_crossover = qei_params.max_count - qei_params.max_count/10;
+					}
+				}
+
 
 				else if(command == SHUTDOWN_VELOCITY)
 					VELOCITY_CTRL_READ(deactivate);
@@ -249,6 +261,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					VELOCITY_CTRL_READ(qei_params.index);
 					VELOCITY_CTRL_READ(qei_params.real_counts);
 					VELOCITY_CTRL_READ(qei_params.max_count);
+					VELOCITY_CTRL_READ(qei_params.poles);
 					cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
 					qei_crossover = qei_params.max_count - qei_params.max_count/10;
 				}

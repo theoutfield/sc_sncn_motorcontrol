@@ -49,7 +49,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						init_state = __check_commutation_init(c_commutation);
 						if(init_state == INIT)
 						{
-							printstrln("commutation intialized");
+							//printstrln("commutation intialized");
 							init_state = INIT_BUSY;
 							break;
 						}

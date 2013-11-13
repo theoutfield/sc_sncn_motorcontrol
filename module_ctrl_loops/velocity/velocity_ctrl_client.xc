@@ -87,6 +87,7 @@ void set_velocity_ctrl_qei_param(qei_par &qei_params, chanend c_velocity_ctrl)
 	VELOCITY_CTRL_WRITE(qei_params.index);
 	VELOCITY_CTRL_WRITE(qei_params.real_counts);
 	VELOCITY_CTRL_WRITE(qei_params.max_count);
+	VELOCITY_CTRL_WRITE(qei_params.poles);
 }
 
 void set_velocity_sensor(int sensor_used, chanend c_velocity_ctrl)

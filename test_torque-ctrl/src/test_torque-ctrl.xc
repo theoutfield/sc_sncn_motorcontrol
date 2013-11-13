@@ -15,25 +15,21 @@
 #include <print.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "ioports.h"
-#include "hall_server.h"
-#include "hall_client.h"
-#include "qei_server.h"
-#include "qei_client.h"
-#include "pwm_service_inv.h"
-#include "adc_server_ad7949.h"
-#include "test.h"
-#include "comm_loop_server.h"
-#include "refclk.h"
+#include <ioports.h>
+#include <hall_server.h>
+#include <qei_server.h>
+#include <pwm_service_inv.h>
+#include <adc_server_ad7949.h>
+#include <comm_loop_server.h>
+#include <refclk.h>
 #include <xscope.h>
-#include "adc_client_ad7949.h"
 #include <dc_motor_config.h>
 #include <torque_ctrl_server.h>
 #include <profile_control.h>
 #include <flash_somanet.h>
 #include <internal_config.h>
 
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -52,8 +48,8 @@ void xscope_initialise_1()
 //test PTM
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 6600;  //mNm  * current sensor resolution
-	int torque_slope  = 6600;  //torque slope
+	int target_torque = 150;  //(desired torque/torq_constant)  * current sensor resolution
+	int torque_slope  = 150;  //torque slope
 	cst_par cst_params;
 	init_cst_param(cst_params);
 
@@ -66,7 +62,7 @@ void profile_torque_test(chanend c_torque_ctrl)
 	target_torque = 0;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = -6000;
+	target_torque = -150;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 }
 
@@ -127,8 +123,8 @@ int main(void)
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);
 					init_torque_control_param(torque_ctrl_params);
-					torque_control( torque_ctrl_params, hall_params, qei_params, c_adc, \
-							c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+					torque_control( torque_ctrl_params, hall_params, qei_params, QEI,
+							c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
 				}
 
 			}
@@ -156,7 +152,7 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_sync, \
+					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, \
 							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);
 				}

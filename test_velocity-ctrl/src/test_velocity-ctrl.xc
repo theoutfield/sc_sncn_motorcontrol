@@ -147,7 +147,7 @@ int main(void) {
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_sync,\
+					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, \
 							c_commutation_p1, c_commutation_p2, c_commutation_p3,\
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);
 				}
