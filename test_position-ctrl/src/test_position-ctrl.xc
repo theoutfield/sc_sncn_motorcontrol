@@ -15,18 +15,15 @@
 #include <print.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "ioports.h"
-#include "hall_server.h"
-#include "hall_client.h"
-#include "qei_client.h"
-#include "pwm_service_inv.h"
-#include "comm_loop_server.h"
-#include "refclk.h"
+#include <ioports.h>
+#include <hall_server.h>
+#include <pwm_service_inv.h>
+#include <comm_loop_server.h>
+#include <refclk.h>
 #include <xscope.h>
-#include "qei_client.h"
-#include "qei_server.h"
+#include <qei_server.h>
 #include <dc_motor_config.h>
-#include "profile.h"
+#include <profile.h>
 #include <position_ctrl_server.h>
 #include <drive_config.h>
 #include <profile_control.h>
@@ -149,7 +146,7 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); 			// initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_sync, \
+					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, \
 							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);
 				}
