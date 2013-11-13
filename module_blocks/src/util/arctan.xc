@@ -13,6 +13,7 @@
  **/
 
 #include "sine_table_big.h"
+#include <print.h>
 #define COMMUTATION 1
 #define SINE_TABLE  2
 
@@ -79,7 +80,7 @@ int sine_expanded(int angle, int select_mode)
 	int sign = 0;
 	a2 = angle >> 8;
 	a1 = a2 >> 1;
-
+//printintln(angle);
 	if(a1 == 1)
 	{
 		sign = -1;

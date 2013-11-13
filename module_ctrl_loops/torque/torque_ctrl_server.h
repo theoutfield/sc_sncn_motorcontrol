@@ -36,8 +36,7 @@
  * \channel c_commutation channel to send motor voltage input value
  *
  */
+
 void torque_control(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
-		chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
-
-
+		int sensor_select, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
 

@@ -1,5 +1,6 @@
 #include <comm.h>
 
+
 int get_target_torque(ctrl_proto_values_t InOut)
 {
 	return InOut.target_torque;
@@ -157,16 +158,22 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
 }
 
 
-void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params)
+void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, int nominal_speed)
 {
 	c_signal <: SET_COMM_PARAM_ECAT;
 	c_signal <: hall_params.gear_ratio;
 	c_signal <: hall_params.pole_pairs;
+	c_signal <: qei_params.gear_ratio;
+	c_signal <: qei_params.index;
+	c_signal <: qei_params.max_count;
+	c_signal <: qei_params.real_counts;
+	c_signal <: nominal_speed;
 }
-
-void comm_init_ecat(chanend c_signal, hall_par &hall_params)
+//(c_signal, hall_params, qei_params, commutation_params);
+void comm_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params)
 {
 	int command;
+	int nominal_speed;
 	int flag = 0;
 	int init_state = INIT_BUSY;
 	while(1)
@@ -184,10 +191,30 @@ void comm_init_ecat(chanend c_signal, hall_par &hall_params)
 				{
 					c_signal :> hall_params.gear_ratio;
 					c_signal :> hall_params.pole_pairs;
+					c_signal :> qei_params.gear_ratio;
+					c_signal :> qei_params.index;
+					c_signal :> qei_params.max_count;
+					c_signal :> qei_params.real_counts;
+					c_signal :> nominal_speed;
 					flag = 1;
 
+					commutation_params.angle_variance = 1024/(hall_params.pole_pairs * 3);
+					if(hall_params.pole_pairs < 4)
+					{
+						commutation_params.max_speed_reached = nominal_speed*4;
+						commutation_params.flag = 1;
+					}
+					else if(hall_params.pole_pairs >=4)
+					{
+						commutation_params.max_speed_reached = nominal_speed;
+						commutation_params.flag = 0;
+					}
+					commutation_params.qei_forward_offset = 0;
+					commutation_params.qei_backward_offset = 0;
 //					printintln(hall_params.gear_ratio);
 //					printintln(hall_params.pole_pairs);
+//					printintln(commutation_params.max_speed_reached );
+//										printintln(commutation_params.angle_variance);
 
 				}
 				break;
@@ -253,6 +280,7 @@ void set_qei_param_ecat(chanend c_qei, qei_par &qei_params)
 	c_qei <: qei_params.index;
 	c_qei <: qei_params.max_count;
 	c_qei <: qei_params.real_counts;
+	c_qei <: qei_params.poles;
 }
 
 void qei_init_ecat(chanend c_qei, qei_par &qei_params)
@@ -276,6 +304,7 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
 					c_qei :> qei_params.index;
 					c_qei :> qei_params.max_count;
 					c_qei :> qei_params.real_counts;
+					c_qei :> qei_params.poles;
 					flag = 1;
 
 //					printintln(qei_params.gear_ratio);

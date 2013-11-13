@@ -67,8 +67,6 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 
 	int tim1, tim2, tim3;
 	int adc_calib_start = 0;
-	hall_par hall_params;
-	init_hall_param(hall_params);
 
 	while(1)
 	{
@@ -162,7 +160,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 
 
 void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
-		chanend c_current, chanend c_speed, chanend c_commutation, \
+		int sensor_used, chanend c_current, chanend c_speed, chanend c_commutation, \
 		chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
 	#define filter_dc 80 //80 27
@@ -213,9 +211,8 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	int init_state = INIT_BUSY;
 	int commutation_init = INIT_BUSY;
 
-	int sensor_used = HALL;
 
-	int qei_counts_per_hall ;
+	int qei_counts_per_hall = 1;
 	qei_velocity_par qei_velocity_params;
 	int qei_velocity = 0;
 	int start_flag = 0;
@@ -324,7 +321,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
 				if(sensor_used == HALL)
 				{
-					angle = get_hall_position(c_hall) >> 2; //  << 10 ) >> 12
+					angle = (get_hall_position(c_hall) >> 2) & 0x3ff; //  << 10 ) >> 12
 					actual_speed = get_hall_velocity(c_hall, hall_params);
 					{dum, dirn} = get_hall_position_absolute(c_hall);
 //					select
@@ -338,7 +335,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				{
 					//angle = (get_sync_position ( sync_output ) <<10)/qei_counts_per_hall; //synced input old
 					{angle, offset_fw_flag, offset_bw_flag} = get_qei_sync_position(c_qei);
-					angle = (angle <<10)/qei_counts_per_hall;
+					angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
 					actual_speed = get_qei_velocity( c_qei, qei_params, qei_velocity_params);//
 					{dum, dirn} = get_qei_position_absolute(c_qei);
 
@@ -372,7 +369,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				// ==== Park transform ====
 
 				sin = sine_table_expanded(angle);
-				cos = sine_table_expanded((256 - angle)&1023);
+				cos = sine_table_expanded((256 - angle)& 0x3ff);
 
 				Id = ( alpha * cos + beta * sin ) /16384;
 				Iq = ( beta * cos  - alpha * sin ) /16384;
@@ -493,6 +490,19 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				else if(command == SENSOR_SELECT)
 				{
 					TORQUE_CTRL_READ(sensor_used);
+					if(sensor_used == HALL)
+					{
+						fldc =  filter_dc/hall_params.pole_pairs;
+						if(fldc < 10)
+							fldc = 10;
+					}
+					else if(sensor_used == QEI)
+					{
+						qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
+						fldc =  filter_dc/qei_params.poles;
+						if(fldc < 10)
+							fldc = 10;
+					}
 				}
 
 				else if(command == SHUTDOWN_TORQUE)
@@ -518,6 +528,9 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					TORQUE_CTRL_READ(qei_params.max_count);
 					TORQUE_CTRL_READ(qei_params.poles);
 					qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
+					fldc =  filter_dc/qei_params.poles;
+						if(fldc < 10)
+							fldc = 10;
 				}
 
 				break;
@@ -527,13 +540,13 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
 
 void torque_control(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
-		chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
+		int sensor_select, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
 	chan c_current, c_speed;
 	par
 	{
 		current_filter(c_adc, c_current, c_speed);
-		_torque_ctrl(torque_ctrl_params, hall_params, qei_params, c_current, c_speed, c_commutation, c_hall, c_qei, c_torque_ctrl);
+		_torque_ctrl(torque_ctrl_params, hall_params, qei_params, sensor_select, c_current, c_speed, c_commutation, c_hall, c_qei, c_torque_ctrl);
 	}
 }
 

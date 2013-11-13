@@ -47,12 +47,12 @@ int get_torque(cst_par &cst_params, chanend c_torque_ctrl)
 	int torque;
 	TORQUE_CTRL_WRITE(GET_TORQUE_TOKEN);
 	TORQUE_CTRL_READ(torque);
-	return (torque*cst_params.motor_torque_constant);
+	return (torque); // *cst_params.motor_torque_constant too big to include
 }
 
 void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl)
 {
-	torque = torque/cst_params.motor_torque_constant;
+	torque = torque; //cst_params.motor_torque_constant; too big to include
 	TORQUE_CTRL_WRITE(SET_TORQUE_TOKEN);
 	TORQUE_CTRL_WRITE(torque);
 	return;

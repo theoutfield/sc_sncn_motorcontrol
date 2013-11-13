@@ -17,17 +17,17 @@
 #include <stdint.h>
 #include <ioports.h>
 #include <xscope.h>
-#include <adc_server_ad7949.h>
+#include <pwm_service_inv.h>
+#include <comm_loop_server.h>
 #include <qei_server.h>
 #include <hall_server.h>
-#include <flash_somanet.h>
-#include <pwm_service_inv.h>
-#include "comm_loop_server.h"
+#include <adc_server_ad7949.h>
 #include <velocity_ctrl_server.h>
 #include <position_ctrl_server.h>
 #include <torque_ctrl_server.h>
 #include <ecat_motor_drive.h>
 #include <dc_motor_config.h>
+#include <flash_somanet.h>
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -42,7 +42,7 @@ int main(void) {
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
 	chan c_pwm_ctrl;
 	chan c_signal_adc;
-	chan c_sig_1, c_signal, c_sync;
+	chan c_sig_1, c_signal;
 	chan c_velocity_ctrl;
 	chan c_torque_ctrl;
 	chan c_position_ctrl;
@@ -91,7 +91,7 @@ int main(void) {
 					 init_hall_param(hall_params);
 					 init_qei_param(qei_params);
 
-					 position_control(position_ctrl_params, hall_params, qei_params, 2, c_hall_p4,\
+					 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p4,\
 							 c_qei_p4, c_position_ctrl, c_commutation_p3);
 				}
 
@@ -107,7 +107,7 @@ int main(void) {
 					 init_qei_param(qei_params);
 
 					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,\
-							 qei_params, 2, c_hall_p3, c_qei_p3, c_velocity_ctrl, c_commutation_p2);
+							 qei_params, QEI, c_hall_p3, c_qei_p3, c_velocity_ctrl, c_commutation_p2);
 				 }
 
 
@@ -120,7 +120,7 @@ int main(void) {
 					init_hall_param(hall_params);
 					init_torque_control_param(torque_ctrl_params);
 
-					torque_control( torque_ctrl_params, hall_params, qei_params, c_adc, \
+					torque_control( torque_ctrl_params, hall_params, qei_params, QEI, c_adc, \
 							c_commutation_p1,  c_hall_p2,  c_qei_p2, c_torque_ctrl);
 				}
 
@@ -146,33 +146,31 @@ int main(void) {
 					hall_par hall_params;
 					qei_par qei_params;
 					commutation_par commutation_params;
-					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					init_hall_param(hall_params);
-				//	comm_init_ecat(c_signal, hall_params);
+				//	init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
+				//	init_hall_param(hall_params);
+				//	init_qei_param(qei_params);
+					comm_init_ecat(c_signal, hall_params, qei_params, commutation_params);
 
-					init_qei_param(qei_params);
-
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1,
-								 c_signal, c_sync, c_commutation_p1, c_commutation_p2,
-								 c_commutation_p3, c_pwm_ctrl, hall_params,
-								 qei_params, commutation_params);
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal,
+							c_commutation_p1, c_commutation_p2, c_commutation_p3,
+							c_pwm_ctrl, hall_params, qei_params, commutation_params);						// channel priority 1,2,3
 
 				}
 
 				{
 					hall_par hall_params;
-					init_hall_param(hall_params);
-			//		hall_init_ecat(c_hall_p5, hall_params);   	//same as ecat drive channel
+			//		init_hall_param(hall_params);
+					hall_init_ecat(c_hall_p5, hall_params);   	//same as ecat drive channel
 
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..5
 				}
 
 				{
 					qei_par qei_params;
-					init_qei_param(qei_params);
-			//		qei_init_ecat(c_qei_p5, qei_params);  		//same as ecat drive channel
+			//		init_qei_param(qei_params);
+					qei_init_ecat(c_qei_p5, qei_params);  		//same as ecat drive channel
 
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  // channel priority 1,2..5
 				}
 
 			}

@@ -6,6 +6,7 @@
 #include <ctrlproto.h>
 #include <qei_client.h>
 #include <internal_config.h>
+#include "comm_loop_client.h"
 
 int get_target_torque(ctrl_proto_values_t InOut);
 
@@ -41,8 +42,8 @@ void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe
 
 void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out);
 
-void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params); /*client*/
-void comm_init_ecat(chanend c_signal, hall_par &hall_params);
+void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, int nominal_speed); /*client*/
+void comm_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params);
 
 void set_hall_param_ecat(chanend c_hall, hall_par &hall_params); /*client*/
 void hall_init_ecat(chanend c_hall, hall_par &hall_params);

@@ -28,9 +28,9 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	unsigned int ts;
 	unsigned int command;
 
-	unsigned int angle1;			 // newest angle (base angle on hall state transition)
-	unsigned int delta_angle;
-	unsigned int angle;
+	unsigned int angle1 = 0;			 // newest angle (base angle on hall state transition)
+	unsigned int delta_angle = 0;
+	unsigned int angle = 0;
 
 	unsigned int iCountMicroSeconds;
 	unsigned int iPeriodMicroSeconds;
