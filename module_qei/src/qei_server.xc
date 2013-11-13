@@ -114,8 +114,8 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 
 	int qei_crossover = qei_max - qei_max/10;
 	int qei_count_per_hall = qei_params.real_counts / qei_params.poles;
-	int offset_fw = 185;
-	int offset_bw = 104;
+	int offset_fw = 0;
+	int offset_bw = 0;
 	int calib_fw_flag = 0;
 	int calib_bw_flag = 0;
 	int sync_out = 0;
