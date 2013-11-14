@@ -27,8 +27,8 @@
 #include <position_ctrl_server.h>
 #include <drive_config.h>
 #include <profile_control.h>
-#include <flash_somanet.h>
 #include <internal_config.h>
+#include <flash_somanet.h>
 
 //#define ENABLE_xscope_main
 #define COM_CORE 0

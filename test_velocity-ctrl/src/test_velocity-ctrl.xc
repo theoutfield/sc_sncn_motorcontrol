@@ -15,22 +15,20 @@
 #include <print.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "ioports.h"
-#include "hall_server.h"
-#include "hall_client.h"
-#include "qei_server.h"
-#include "qei_client.h"
-#include "pwm_service_inv.h"
-#include "comm_loop_server.h"
-#include "refclk.h"
-#include "velocity_ctrl_server.h"
+#include <ioports.h>
+#include <hall_server.h>
+#include <qei_server.h>
+#include <pwm_service_inv.h>
+#include <comm_loop_server.h>
+#include <refclk.h>
+#include <velocity_ctrl_server.h>
 #include <xscope.h>
-#include "profile.h"
-#include <flash_somanet.h>
+#include <profile.h>
 #include <internal_config.h>
 #include <dc_motor_config.h>
 #include <drive_config.h>
 #include <profile_control.h>
+#include <flash_somanet.h>
 
 //#define ENABLE_xscope_main
 #define COM_CORE 0

@@ -26,8 +26,8 @@
 #include <dc_motor_config.h>
 #include <torque_ctrl_server.h>
 #include <profile_control.h>
-#include <flash_somanet.h>
 #include <internal_config.h>
+#include <flash_somanet.h>
 
 //#define ENABLE_xscope_main
 
@@ -48,8 +48,8 @@ void xscope_initialise_1()
 //test PTM
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 150;  //(desired torque/torq_constant)  * current sensor resolution
-	int torque_slope  = 150;  //torque slope
+	int target_torque = 150;  //(desired torque/torq_constant)  * IFM resolution
+	int torque_slope  = 150;  //(desired torque_slope/torq_constant)  * IFM resolution
 	cst_par cst_params;
 	init_cst_param(cst_params);
 
@@ -94,6 +94,7 @@ int main(void)
 	//
 	par
 	{
+
 		on stdcore[0] :
 		{
 			ecat_init();
@@ -105,6 +106,7 @@ int main(void)
 		{
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
+
 
 		on stdcore[1]:
 		{

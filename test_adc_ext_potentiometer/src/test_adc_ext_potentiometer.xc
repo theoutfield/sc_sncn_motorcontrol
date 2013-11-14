@@ -15,18 +15,17 @@
 #include <print.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "ioports.h"
-#include "adc_server_ad7949.h"
-#include "adc_client_ad7949.h"
-#include "hall_server.h"
-#include "hall_client.h"
-#include "pwm_service_inv.h"
-#include "comm_loop_server.h"
-#include "refclk.h"
+#include <ioports.h>
+#include <adc_server_ad7949.h>
+#include <adc_client_ad7949.h>
+#include <hall_server.h>
+#include <pwm_service_inv.h>
+#include <comm_loop_server.h>
+#include <refclk.h>
 #include <xscope.h>
 #include <dc_motor_config.h>
-#include <flash_somanet.h>
 #include <drive_config.h>
+//#include <flash_somanet.h>
 
 #define ENABLE_xscope_main
 #define COM_CORE 0
