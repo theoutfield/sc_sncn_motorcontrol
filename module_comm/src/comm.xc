@@ -169,8 +169,8 @@ void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par
 	c_signal <: qei_params.real_counts;
 	c_signal <: nominal_speed;
 }
-//(c_signal, hall_params, qei_params, commutation_params);
-void comm_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params)
+
+void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params)
 {
 	int command;
 	int nominal_speed;

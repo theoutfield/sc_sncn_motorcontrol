@@ -22,7 +22,7 @@
 #include <refclk.h>
 #include <xscope.h>
 #include <qei_server.h>
-#include <dc_motor_config.h>
+#include <bldc_motor_config.h>
 #include <profile.h>
 #include <position_ctrl_server.h>
 #include <drive_config.h>
@@ -48,7 +48,7 @@ void xscope_initialise_1()
 }
 
 
-
+/* Position profile test function */
 void position_profile_test(chanend c_position_ctrl)
 {
 	int target_position = 350;			// degree
@@ -70,29 +70,28 @@ void position_profile_test(chanend c_position_ctrl)
 
 int main(void)
 {
-	chan c_adctrig;
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
-	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
-	chan c_pwm_ctrl;
-	chan c_signal_adc;
-	chan c_sig_1, c_signal, c_sync;
-	chan c_position_ctrl;
+	// Motor control channels
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;					// qei channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
+	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
+	chan c_pwm_ctrl, c_adctrig;												// pwm channels
+	chan c_position_ctrl;													// position control channel
 
-	//etherCat Comm channels
-	chan coe_in; 		///< CAN from module_ethercat to consumer
-	chan coe_out; 		///< CAN from consumer to module_ethercat
-	chan eoe_in; 		///< Ethernet from module_ethercat to consumer
-	chan eoe_out; 		///< Ethernet from consumer to module_ethercat
+	// EtherCat Comm channels
+	chan coe_in; 		//< CAN from module_ethercat to consumer
+	chan coe_out; 		//< CAN from consumer to module_ethercat
+	chan eoe_in; 		//< Ethernet from module_ethercat to consumer
+	chan eoe_out; 		//< Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; 		///< File from module_ethercat to consumer
-	chan foe_out; 		///< File from consumer to module_ethercat
+	chan foe_in; 		//< File from module_ethercat to consumer
+	chan foe_out; 		//< File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
-
+	chan c_sig_1;
 	//
 	par
 	{
+		/* Ethercat Communication Handler Loop */
 		on stdcore[0] :
 		{
 			ecat_init();
@@ -100,11 +99,13 @@ int main(void)
 			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);
 		}
 
+		/* Firmware Update Loop */
 		on stdcore[0] :
 		{
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
 
+		/* Position Control Loop */
 		on stdcore[1]:
 		{
 			position_profile_test(c_position_ctrl);		  	// test PPM on slave side
@@ -113,6 +114,7 @@ int main(void)
 
 		on stdcore[2]:
 		{
+			/* Position Control Loop */
 			{
 				 ctrl_par position_ctrl_params;
 				 hall_par hall_params;
@@ -135,10 +137,11 @@ int main(void)
 		{
 			par
 			{
-
+				/* PWM Loop */
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
+				/* Motor Commutation loop */
 				{
 					hall_par hall_params;
 					qei_par qei_params;
@@ -151,16 +154,18 @@ int main(void)
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);
 				}
 
+				/* Hall Server */
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..5
 				}
 
+				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  	// channel priority 1,2..5
 				}
 
 			}

@@ -1,8 +1,8 @@
 
 /**
- * \file torque_ctrl.h
+ * \file torque_ctrl_client.h
  *
- *	Torque Control Loop
+ *	Torque Control Loop Client functions
  *
  * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com>
@@ -14,11 +14,12 @@
  *
  **/
 
-#include <dc_motor_config.h>
+#include <bldc_motor_config.h>
 #include <internal_config.h>
 
 /**
  * \brief Initialise Torque Control Loop
+ *
  *  Input Channel
  * \channel c_torque_ctrl channel to signal initialisation
  */
@@ -32,7 +33,7 @@ int init_torque_control(chanend c_torque_ctrl);
  * \param max_torque_limit is the max torque that can be reached
  *
  *  Output
- * \return torque in the range [-max_torque_limit to max_torque_limit]
+ * \return torque in the range [-max_torque_limit to max_torque_limit] (mNm * Current resolution)
  */
 int torque_limit(int torque, int max_torque_limit);
 
@@ -67,14 +68,14 @@ void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl);
 void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl);
 
 /**
- * \brief initialize hall sensor parameters for Torque Control
+ * \brief Set hall sensor parameters for Torque Control
  *
  * \param hall_params struct defines the pole-pairs and gear ratio
  */
 void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl);
 
 /**
- * \brief initialize QEI sensor for Torque Control
+ * \brief Set QEI sensor parameters for Torque Control
  *
  * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor

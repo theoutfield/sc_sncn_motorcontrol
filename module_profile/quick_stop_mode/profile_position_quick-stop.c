@@ -1,9 +1,4 @@
-/*
- * profile_position_quick-stop.c
- *
- *  Created on: Sep 3, 2013
- *      Author: pkanajar
- */
+
 #include <profile.h>
 
 struct pos_params

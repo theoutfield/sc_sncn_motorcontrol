@@ -1,9 +1,3 @@
-/**
- * drive_sys.xc
- *
- *  Created on: Jul 12, 2013
- *      Author: pkanajar
- */
 
 #include <drive_config.h>
 #include <internal_config.h>

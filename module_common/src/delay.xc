@@ -2,7 +2,7 @@
 
 void wait_ms(int milliseconds, int core_id, timer t)
 {
-	unsigned time;
+	unsigned int time;
 	t :> time;
 	if(core_id == 3)
 	{
@@ -17,7 +17,7 @@ void wait_ms(int milliseconds, int core_id, timer t)
 
 void wait_s(int seconds, int core_id, timer t)
 {
-	unsigned time;
+	unsigned int time;
 	t :> time;
 	if(core_id == 3)
 	{

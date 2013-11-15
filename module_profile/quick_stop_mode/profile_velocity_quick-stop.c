@@ -1,10 +1,6 @@
 /*Profile Velocity Quick Stop*/
 #include <profile.h>
 
-
-
-
-
 struct QUICK_STOP_VELOCITY_PARAM
 {
 	float max_deceleration;		// max allowed deceleration

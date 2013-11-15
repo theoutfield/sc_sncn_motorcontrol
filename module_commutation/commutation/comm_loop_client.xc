@@ -1,6 +1,6 @@
 
 /**
- * \file comm_loop.xc
+ * \file comm_loop_client.xc
  *
  *	Commutation rountine based on Space Vector PWM method
  *
@@ -17,7 +17,7 @@
 #include "comm_loop_client.h"
 #include <xs1.h>
 #include <stdint.h>
-#include "dc_motor_config.h"
+#include <bldc_motor_config.h>
 #include "refclk.h"
 #include <internal_config.h>
 #include "print.h"

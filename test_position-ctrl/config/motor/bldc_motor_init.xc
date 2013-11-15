@@ -1,4 +1,4 @@
-#include <dc_motor_config.h>
+#include <bldc_motor_config.h>
 #include "refclk.h"
 
 extern int __qei_max_counts(int real_counts);
@@ -12,7 +12,7 @@ void init_hall_param(hall_par &hall_params)
 
 void init_qei_param(qei_par &qei_params)
 {
-	qei_params.real_counts = QEI_COUNT_MAX_REAL;
+	qei_params.real_counts = ENCODER_RESOLUTION;
 	qei_params.gear_ratio = GEAR_RATIO;
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_count = __qei_max_counts(qei_params.real_counts);

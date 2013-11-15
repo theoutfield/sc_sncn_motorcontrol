@@ -1,9 +1,31 @@
 
+/**
+ * \file profile.h
+ *
+ * \brief Profile Generation for Position, Velocity and Torque
+ * 	Implements position profile based on Linear Function with Parabolic Blends,
+ * 	velocity profile and torque profile based on linear functions.
+ *
+ *
+ * The copyrights, all other intellectual and industrial
+ * property rights are retained by Synapticon GmbH.
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors:  Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code arse still covered by the
+ * copyright notice above.
+ *
+ **/
+
 #include <stdio.h>
 #include <math.h>
-
 #ifndef _PROFILE_H_
 #define _PROFILE_H_
+
 /*Profile Velocity Quick Stop*/
 
 /**
@@ -70,7 +92,6 @@ extern int velocity_profile_generate(int step);
  */
 extern void init_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity);
 
-
 /**
  * \brief Initialise Position Profile
  *
@@ -86,7 +107,6 @@ extern void init_position_profile_limits(int gear_ratio, int max_acceleration, i
  */
 extern int init_position_profile(int target_position, int actual_position,	int velocity, int acceleration, \
         						 int deceleration);
-
 
 /**
  * \brief Generate Position Profile
@@ -126,12 +146,31 @@ extern int init_quick_stop_position_profile(int actual_velocity, int actual_posi
  */
 extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
 
-
+/**
+ * \brief Initialise Linear Profile
+ *
+ *  Input
+ * \param target_value
+ * \param actual_value
+ * \param acceleration for the Linear profile
+ * \param deceleration for the Linear profile
+ * \param max_value for the Linear profile
+ *
+ * Output
+ * \return no. of steps for linear profile : range [1 - steps]
+ */
 extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value);
 
-
-extern int  linear_profile_generate(int step);
-
+/**
+ * \brief Generate Linear Profile
+ *
+ *  Input
+ * \param step current step of the profile
+ *
+ * Output
+ * \return corresponding target value at the step input
+ */
+extern int linear_profile_generate(int step);
 
 
 #endif /* _PROFILE_H_ */

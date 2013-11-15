@@ -1,7 +1,5 @@
 #include <profile.h>
 
-
-
 struct PROFILE_POSITION_PARAM
 {
 	float max_acceleration;     // max acceleration

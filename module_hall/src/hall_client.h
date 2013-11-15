@@ -19,12 +19,15 @@
 
 #pragma once
 #include <stdint.h>
-#include "dc_motor_config.h"
+#include <bldc_motor_config.h>
 #include "hall_config.h"
 #include <xs1.h>
 #include <stdint.h>
 
 /**
+ * \brief Get position from Hall Server
+ *
+ *  Output channel
  * \channel c_hall for communicating with the Hall Server
  *
  *  Output
@@ -33,17 +36,21 @@
 int get_hall_position(chanend c_hall);
 
 /**
+ * \brief Get absolute position from Hall Server
+ *
+ * Output channel
  * \channel c_hall for communicating with the Hall Server
  *
  *  Output
- * \return the counted up position (accounts for pole-pairs and gear-ratio)
- * 							in the range [0 - 4095]*pole-pairs*gear-ratio
+ * \return the counted up position (compensates for pole-pairs and gear-ratio)
+ * 		   in the range [0 - 4095] * pole-pairs * gear-ratio
  */
 {int , int} get_hall_position_absolute(chanend c_hall);
 
 /**
- * \brief Client library function for Hall Sensor
+ * \brief Get Velocity from Hall Server
  *
+ * Output channel
  * \channel c_hall for communicating with the Hall Server
  *
  *  Input

@@ -1,16 +1,26 @@
-/*
- * velocity_ctrl.h
- *
- *  Created on: Jun 3, 2013
- *      Author: pkanajar
- */
 
-#include "dc_motor_config.h"
+/**
+ * \file velocity_ctrl_client.h
+ *
+ *	Velocity Control Loop Client functions
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
+
+#include <bldc_motor_config.h>
 #include <internal_config.h>
 
 
 /**
  * \brief Initialise Velocity Control Loop
+ *
  *  Input Channel
  * \channel c_velocity_ctrl channel to signal initialisation
  */
@@ -24,7 +34,7 @@ int init_velocity_control(chanend c_velocity_ctrl);
  * \param max_speed is the max speed that can be reached
  *
  *  Output
- * \return velocity in the range [-max_speed to max_speed]
+ * \return velocity in the range [-max_speed to max_speed] (rpm)
  */
 int max_speed_limit(int velocity, int max_speed);
 
@@ -35,7 +45,7 @@ int max_speed_limit(int velocity, int max_speed);
  * \channel c_velocity_ctrl channel to signal new target velocity
  *
  *  Input
- * \param target_velocity is the new target velocity
+ * \param target_velocity is the new target velocity (rpm)
  */
 void set_velocity(int target_velocity, chanend c_velocity_ctrl);
 
@@ -47,7 +57,7 @@ void set_velocity(int target_velocity, chanend c_velocity_ctrl);
  * \channel c_velocity_ctrl channel to receive actual velocity
  *
  *  Output
- * \return actual velocity from velocity control
+ * \return actual velocity from velocity control (rpm)
  */
 int get_velocity(chanend c_velocity_ctrl);
 
@@ -60,15 +70,17 @@ int get_velocity(chanend c_velocity_ctrl);
 void set_velocity_ctrl_param(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl);
 
 /**
- * \brief initialize hall sensor parameters for Velocity Control
+ * \brief Set hall sensor parameters for Velocity Control
  *
+ *	Input
  * \param hall_params struct defines the pole-pairs and gear ratio
  */
 void set_velocity_ctrl_hall_param(hall_par &hall_params, chanend c_velocity_ctrl);
 
 /**
- * \brief initialize QEI sensor for Velocity Control
+ * \brief Set QEI sensor for Velocity Control
  *
+ *	Input
  * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
  */
@@ -77,6 +89,7 @@ void set_velocity_ctrl_qei_param(qei_par &qei_params, chanend c_velocity_ctrl);
 /**
  * \brief Sets the sensor used for Velocity Control
  *
+ *  Input
  * \param sensor_used defines the sensor to be used (HALL/QEI) for Velocity Control
  */
 void set_velocity_sensor(int sensor_used, chanend c_velocity_ctrl);
@@ -110,7 +123,6 @@ void shutdown_velocity_ctrl(chanend c_velocity_ctrl);
  */
 void set_velocity_csv(csv_par &csv_params, int target_velocity,
 		int velocity_offset, int torque_offset, chanend c_velocity_ctrl);
-
 
 
 

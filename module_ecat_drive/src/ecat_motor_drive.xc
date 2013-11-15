@@ -1,9 +1,3 @@
-/*
- * ecat_motor_drive.xc
- *
- *  Created on: Sep 13, 2013
- *      Author: pkanajar
- */
 #include <ecat_motor_drive.h>
 #include <xscope.h>
 #include <print.h>
@@ -322,7 +316,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
 						sensor_select = sensor_select_sdo(coe_out);
 						update_pp_param_ecat(pp_params, coe_out);
-//
+/*
 						printintln(position_ctrl_params.Control_limit);						printintln(position_ctrl_params.Integral_limit);
 						printintln(position_ctrl_params.Kd_d);						printintln(position_ctrl_params.Ki_d);
 						printintln(position_ctrl_params.Kp_d);						printintln(position_ctrl_params.Kp_n);
@@ -338,7 +332,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						printintln(pp_params.software_position_limit_min);
 						printintln(pp_params.base.polarity);
 						printintln(pp_params.max_acceleration);
-
+*/
 						if(sensor_select == HALL)
 						{
 							set_position_ctrl_hall_param(hall_params, c_position_ctrl);
@@ -422,7 +416,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);  //after checking init go to set display mode
 						sensor_select = sensor_select_sdo(coe_out);
 						update_pv_param_ecat(pv_params, coe_out);
-						printintln(velocity_ctrl_params.Kp_n);
+				/*		printintln(velocity_ctrl_params.Kp_n);
 						printintln(velocity_ctrl_params.Ki_n);
 						printintln(velocity_ctrl_params.Kd_n);
 						printintln(sensor_select);
@@ -431,7 +425,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						printintln(pv_params.profile_deceleration);
 						printintln(pv_params.quick_stop_deceleration);
 						printintln(pv_params.polarity);
-
+				*/
 						if(sensor_select == HALL)
 						{
 							set_velocity_ctrl_hall_param(hall_params, c_velocity_ctrl);
@@ -466,7 +460,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						update_position_ctrl_param_ecat(position_ctrl_params, coe_out);
 						sensor_select = sensor_select_sdo(coe_out);
 						update_csp_param_ecat(csp_params, coe_out);
-						printintln(position_ctrl_params.Control_limit);						printintln(position_ctrl_params.Integral_limit);
+					/*	printintln(position_ctrl_params.Control_limit);						printintln(position_ctrl_params.Integral_limit);
 						printintln(position_ctrl_params.Kd_d);						printintln(position_ctrl_params.Ki_d);
 						printintln(position_ctrl_params.Kp_d);						printintln(position_ctrl_params.Kp_n);
 						printintln(position_ctrl_params.Ki_n);						printintln(position_ctrl_params.Kd_n);
@@ -477,7 +471,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						printintln(csp_params.base.polarity);
 						printintln(csp_params.max_position_limit);
 						printintln(csp_params.min_position_limit);
-
+					*/
 						if(sensor_select == HALL)
 						{
 							set_position_ctrl_hall_param(hall_params, c_position_ctrl);
@@ -513,7 +507,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						sensor_select = sensor_select_sdo(coe_out);
 						update_csv_param_ecat(csv_params, coe_out);
 
-						printintln(velocity_ctrl_params.Kp_n);
+					/*	printintln(velocity_ctrl_params.Kp_n);
 						printintln(velocity_ctrl_params.Ki_n);
 						printintln(velocity_ctrl_params.Kd_n);
 						printintln(csv_params.max_acceleration);
@@ -521,7 +515,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						printintln(csv_params.motor_torque_constant);
 						printintln(csv_params.nominal_current);
 						printintln(csv_params.polarity);
-
+					*/
 
 						if(sensor_select == HALL)
 						{

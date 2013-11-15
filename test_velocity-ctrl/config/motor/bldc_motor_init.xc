@@ -1,4 +1,4 @@
-#include <dc_motor_config.h>
+#include <bldc_motor_config.h>
 #include "refclk.h"
 
 extern int __qei_max_counts(int real_counts);

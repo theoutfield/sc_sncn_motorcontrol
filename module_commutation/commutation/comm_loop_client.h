@@ -1,8 +1,8 @@
 
 /**
- * \file comm_loop.h
+ * \file comm_loop_client.h
  *
- *	Commutation Loop based on Space Vector PWM method
+ *	Commutation Loop Client functions
  *
  * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com>, Ludwig Orgler <orgler@tin.it>
@@ -23,11 +23,11 @@
 #include "sine_table_big.h"
 #include "adc_client_ad7949.h"
 #include "hall_client.h"
-#include "dc_motor_config.h"
+#include <bldc_motor_config.h>
 
 /**
-* \brief Struct for commutation parameters
-*/
+ * \brief Struct for commutation parameters
+ */
 typedef struct S_COMMUTATION {
 	int angle_variance;
 	int max_speed_reached;
@@ -39,22 +39,21 @@ typedef struct S_COMMUTATION {
 } commutation_par;
 
 /**
-* \brief initialize commutation parameters
-*
-* \param commutation_params struct defines the commutation angle parameters
-* \param hall_params struct defines the pole-pairs and gear ratio
-* \param nominal speed is the rated speed for the motor given on specs sheet
-*/
+ * \brief Initialize commutation parameters
+ *
+ * \param commutation_params struct defines the commutation angle parameters
+ * \param hall_params struct defines the pole-pairs and gear ratio
+ * \param nominal speed is the rated speed for the motor given on specs sheet
+ */
 void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
 
 /**
-* \brief initialize commutation loop
-*/
+ * \brief Initialize commutation loop
+ */
 int init_commutation(chanend c_signal);
 
-
 /**
- * \brief Specify sensor for commutation
+ * \brief Specify sensor for motor commutation
  *
  * \channel c_commutation channel to send information to the commutation loop
  *
@@ -62,8 +61,6 @@ int init_commutation(chanend c_signal);
  * \param sensor_select specify sensor used for commutation through defines HALL and QEI
  */
 void commutation_sensor_select(chanend c_commutation, int sensor_select);
-
-
 
 /**
  *  \brief Set Input voltage for commutation loop
@@ -77,7 +74,7 @@ void commutation_sensor_select(chanend c_commutation, int sensor_select);
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
 
 /**
- *  \brief Internal function used to setup the commutation parameters for correct operation
+ *  \brief Internal function used to set the commutation parameters
  *
  *   Output Channels
  * 	\channel c_commutation channel to send out motor voltage input value

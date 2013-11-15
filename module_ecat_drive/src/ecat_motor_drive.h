@@ -1,9 +1,18 @@
-/*
- * ecat_motor_drive.h
+
+/**
+ * \file ecat_motor_drive.h
  *
- *  Created on: Sep 13, 2013
- *      Author: pkanajar
- */
+ *	Ethercat Motor Drive Server
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
 
 #ifndef ECAT_MOTOR_DRIVE_H_
 #define ECAT_MOTOR_DRIVE_H_
@@ -27,11 +36,9 @@
  * \channel c_signal channel to receive init ack from commutation loop
  * \channel c_hall channel to receive position information from hall
  * \channel c_qei channel to receive position information from qei
- * \channel c_adc channel to receive torque information from adc
  *
  *  Output Channel
  * \channel pdo_out channel to send out information via ethercat
- * \channel c_position_ctrl channel to receive actual position
  * \channel c_torque_ctrl channel to receive/send torque control information
  * \channel c_velocity_ctrl channel to receive/send velocity control information
  * \channel c_position_ctrl channel to receive/send position control information

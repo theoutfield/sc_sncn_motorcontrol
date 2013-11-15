@@ -1,8 +1,8 @@
 
 /**
- * \file comm_loop.xc
+ * \file comm_loop_server.xc
  *
- *	Commutation rountine based on Space Vector PWM method
+ *	Commutation Loop based on sinusoidal commutation method
  *
  * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com>, Ludwig Orgler <orgler@tin.it>

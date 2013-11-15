@@ -1,11 +1,20 @@
-/*
- * velocity_ctrl.h
- *
- *  Created on: Jun 3, 2013
- *      Author: pkanajar
- */
 
-#include "dc_motor_config.h"
+/**
+ * \file velocity_ctrl_server.h
+ *
+ *	Velocity Control Loop Server
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
+
+#include <bldc_motor_config.h>
 #include <internal_config.h>
 
 

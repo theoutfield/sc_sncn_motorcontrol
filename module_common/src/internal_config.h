@@ -1,7 +1,7 @@
 #ifndef INTERNAL_CONFIG_H_
 #define INTERNAL_CONFIG_H_
 #pragma once
-
+// default internal definitions (do not change)
 #define TORQUE_CTRL_READ(x)			c_torque_ctrl :> x
 #define TORQUE_CTRL_WRITE(x)		c_torque_ctrl <: x
 #define TORQUE_CTRL_ENABLE()		c_torque_ctrl <: 1
@@ -25,6 +25,13 @@
 
 #define HALL 						1
 #define QEI 						2
+
+
+#define QEI_WITH_INDEX				1
+#define QEI_WITH_NO_INDEX 			0
+
+#define DC100_RESOLUTION 			740
+#define DC900_RESOLUTION			264
 
 #define INIT_BUSY 					0
 #define INIT						1

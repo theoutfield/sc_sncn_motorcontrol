@@ -1,7 +1,5 @@
 /**
- * \file torque_ctrl.xc
- *
- *	Torque control rountine based on field oriented Torque control method
+ * \file torque_ctrl_server.xc
  *
  * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com>
@@ -19,7 +17,7 @@
 #include <print.h>
 #include <drive_config.h>
 #include <internal_config.h>
-#include <dc_motor_config.h>
+#include <bldc_motor_config.h>
 #include "adc_client_ad7949.h"
 #include "qei_client.h"
 #include "hall_client.h"

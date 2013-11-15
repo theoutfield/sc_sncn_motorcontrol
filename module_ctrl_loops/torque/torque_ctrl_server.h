@@ -1,8 +1,8 @@
 
 /**
- * \file torque_ctrl.h
+ * \file torque_ctrl_server.h
  *
- *	Torque Control Loop
+ *	Torque Control Loop Server
  *
  * Copyright 2013, Synapticon GmbH. All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com>
@@ -15,7 +15,7 @@
  **/
 
 #include "comm_loop_client.h"
-#include <dc_motor_config.h>
+#include <bldc_motor_config.h>
 #include <internal_config.h>
 
 
@@ -24,6 +24,7 @@
  *
  *  Input
  * \param hall_params struct defines the poles for hall sensor and gear-ratio
+ * \param sensor_used specify the sensors to used via HALL/QEI defines
  *
  *  Input Channel
  * \channel c_adc channel to receive to torque information from current sensor

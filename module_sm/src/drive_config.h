@@ -1,9 +1,25 @@
+
+/**
+ * \file drive_config.h
+ *
+ *	Motor Drive defines and configurations
+ *
+ * Copyright 2013, Synapticon GmbH. All rights reserved.
+ * Authors: Pavan Kanajar <pkanajar@synapticon.com>
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ *
+ **/
+
 #ifndef DRIVE_CONFIG_H_
 #define DRIVE_CONFIG_H_
 #pragma once
 
 /**
- * \brief Modes of Operation (CiA402)
+ * \brief Modes of Operation (CiA402 Standard)
  *
  * 	M - Mandatory, C - Conditional, R - Recommended, O - optional , FG - Function Group
  */
@@ -18,7 +34,7 @@
 #define CSV 	9	/* Cyclic synchronous velocity mode 						C*/
 #define CST 	10	/* Cyclic synchronous torque mode 							C*/
 #define CSTCA 	11	/* Cyclic synchronous torque mode with commutation angle 	O*/
-//100
+
 /* Manufacturer specific mode -128...-1 optional */
 
 /* Controlword */
@@ -37,7 +53,7 @@
 #define HALT_HOMING  			0x011F
 
 /* Profile Position Mode */
-#define ABSOLUTE_POSITIONING 	0x001F	 	// not supported yet
+#define ABSOLUTE_POSITIONING 	0x001F
 #define RELATIVE_POSITIONING 	0x005F   	// supported currently
 #define STOP_POSITIONING		0x010F
 
@@ -107,19 +123,90 @@ typedef struct S_Check_list
 
 }check_list;
 
-
+/**
+ * \brief Check commutation initialization
+ *
+ *  Output
+ * \return init state of the commutation loop
+ */
 bool __check_commutation_init(chanend c_signal);
+
+/**
+ * \brief Check hall initialization
+ *
+ *  Output
+ * \return init state of the hall loop
+ */
 bool __check_hall_init(chanend c_hall);
+
+/**
+ * \brief Check qei initialization
+ *
+ *  Output
+ * \return init state of the qei loop
+ */
 bool __check_qei_init(chanend c_qei);
+
+/**
+ * \brief Check adc initialization
+ *
+ *  Output
+ * \return init state of the adc loop
+ */
 bool __check_adc_init();
+
+/**
+ * \brief Check torque control initialization
+ *
+ *  Output
+ * \return init state of the torque control loop
+ */
 bool __check_torque_init(chanend c_torque_ctrl);
+
+/**
+ * \brief Check velocity control initialization
+ *
+ *  Output
+ * \return init state of the velocity control loop
+ */
 bool __check_velocity_init(chanend c_velocity_ctrl);
+
+/**
+ * \brief Check position control initialization
+ *
+ *  Output
+ * \return init state of the position control loop
+ */
 bool __check_position_init(chanend c_position_ctrl);
 
 int init_state(void);
 
+/**
+ * \brief Initialize checklist params
+ *
+ *  Output
+ * \return check_list initialised checklist parameters
+ */
 check_list init_checklist(void);
 
+/**
+ * \brief Update Checklist
+ *
+ *  Input channel
+ * \channel c_commutation for communicating with the commutation server
+ * \channel c_hall for communicating with the hall server
+ * \channel c_qei for communicating with the qei server
+ * \channel c_adc for communicating with the adc server
+ * \channel c_torque_ctrl for communicating with the torque control server
+ * \channel c_velocity_ctrl for communicating with the velocity control server
+ * \channel c_position_ctrl for communicating with the position control server
+ *
+ * 	Input
+ * \param mode sets mode of operation
+ *
+ *  Output
+ * \return check_list_param updated checklist parameters
+ */
 void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
 		chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
@@ -134,6 +221,5 @@ int read_controlword_quick_stop(int control_word);
 int read_controlword_enable_op(int control_word);
 
 int read_controlword_fault_reset(int control_word);
-
 
 #endif /* DRIVE_CONFIG_H_*/

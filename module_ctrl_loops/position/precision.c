@@ -1,20 +1,3 @@
-
-/**
- * \file mot_profile.c
- *
- * Motion Profile file used to generate motion profiles for position control rountine
- * Based on Linear Function with Parabolic Blends
- *
- * Copyright 2013, Synapticon GmbH. All rights reserved.
- * Authors: Pavan Kanajar <pkanajar@synapticon.com>
- *
- * In the case where this code is a modification of existing code
- * under a separate license, the separate license terms are shown
- * below. The modifications to the code are still covered by the
- * copyright notice above.
- *
- **/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
