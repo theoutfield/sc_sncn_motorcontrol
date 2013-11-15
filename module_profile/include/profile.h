@@ -16,7 +16,7 @@
  *
  * In the case where this code is a modification of existing code
  * under a separate license, the separate license terms are shown
- * below. The modifications to the code arse still covered by the
+ * below. The modifications to the code are still covered by the
  * copyright notice above.
  *
  **/

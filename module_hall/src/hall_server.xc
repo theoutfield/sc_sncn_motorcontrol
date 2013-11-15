@@ -65,8 +65,9 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int filter_length = FILTER_LENGTH_HALL;
 	int filter_buffer[FILTER_LENGTH_HALL];
 	int index = 0;
-	int raw_velocity;
+	int raw_velocity = 0;
 
+	init_filter(filter_buffer, index, FILTER_LENGTH_HALL);
 	t1 :> time1;
 	tx :> ts;
 	while(1)
