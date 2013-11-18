@@ -1,13 +1,13 @@
 /*
  *
- * \file
+ * \file test_adc_ext_potentiometer.xc
  * \brief Main project file
  *
- * Port declarations, etc.
  *
- * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 0.1 (2012-11-23 1850)
- *\Motor 3 motion profile size optimized code for position ctrl loops
+ *
+ *  \author Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
+ *
+ *
  */
 
 #include <xs1.h>

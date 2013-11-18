@@ -1,12 +1,12 @@
 /*
  *
- * \file
+ * \file test_torque-ctrl.xc
  * \brief Main project file
  *
- * Port declarations, etc.
  *
- * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 0.1 (2012-11-23 1850)
+ *
+ * \author Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
+ *
  *
  */
 

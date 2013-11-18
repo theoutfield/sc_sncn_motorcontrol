@@ -172,5 +172,10 @@ extern int init_linear_profile(int target_value, int actual_value, int accelerat
  */
 extern int linear_profile_generate(int step);
 
+#ifndef __XC__
+int init_linear_profile_float(float target_value, float actual_value, float acceleration, float deceleration, float max_value);
+
+float linear_profile_generate_float(int step);
+#endif
 
 #endif /* _PROFILE_H_ */
