@@ -10,7 +10,7 @@ APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 
-USED_MODULES = module_adc module_blocks module_common module_commutation module_ctrl_loops module_hall module_profile module_pwm_common module_pwm_symmetrical module_qei module_sm sc_somanet-base/module_nodeconfig
+USED_MODULES = module_blocks module_common module_qei module_sm sc_somanet-base/module_nodeconfig
 #sc_sncn_ethercat/module_ethercat sc_somanet-base/module_fwupdate
 
 #

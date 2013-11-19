@@ -21,7 +21,7 @@
 #include <refclk.h>
 #include <xscope.h>
 #include <bldc_motor_config.h>
-#include <drive_config.h>
+
 //#include <flash_somanet.h>
 
 //#define ENABLE_xscope_main
