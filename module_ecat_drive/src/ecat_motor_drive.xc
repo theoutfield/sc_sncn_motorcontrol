@@ -2,6 +2,8 @@
 #include <xscope.h>
 #include <print.h>
 
+extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
+
 void xscope_initialise()
 {
 	{
@@ -68,6 +70,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	int shutdown_ack = 0;
 	int sensor_select;
 
+	int direction;
+
 	int comm_active = 0;
 	unsigned int comm_inactive_time_stamp;
 	unsigned int c_time;
@@ -82,6 +86,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 	int status;
 	int tmp;
+	int precision;
+	int precision_factor;
 
 	int torque_offstate = 0;
 	int mode_selected = 0;
@@ -160,7 +166,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			{
 				actual_velocity = get_velocity(c_velocity_ctrl);
 				if(op_mode == CSV)
-					steps = init_quick_stop_velocity_profile(actual_velocity, csv_params.max_acceleration);//default acc
+					steps = init_quick_stop_velocity_profile(actual_velocity, csv_params.max_acceleration);
 				else if(op_mode == PV)
 					steps = init_quick_stop_velocity_profile(actual_velocity, pv_params.quick_stop_deceleration);
 				//printintln(steps);
@@ -286,13 +292,24 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				printintln(hall_params.pole_pairs);*/
 			//  config_sdo_handler( coe_out);
 
+				if(sensor_select == HALL)
+				{
+					precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_select);
+					precision = HALL_PRECISION;
+				}
+				else if(sensor_select == QEI)
+				{
+					precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_select);
+					precision = QEI_PRECISION;
+				}
+
 				set_hall_param_ecat(c_hall, hall_params);
 				set_qei_param_ecat(c_qei, qei_params);
 				set_commutation_param_ecat(c_signal, hall_params, qei_params, nominal_speed);
 
 				setup_loop_flag = 1;
 			}
-		}//*/
+		}
 		if(mode_selected == 0)
 		{
 			switch(InOut.operation_mode)
@@ -371,7 +388,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 						update_torque_ctrl_param_ecat(torque_ctrl_params, coe_out);  //after checking init go to set display mode
 						sensor_select = sensor_select_sdo(coe_out);
-						update_cst_param_ecat(cst_params, coe_out); //update_pv_param_ecat(pv_params, coe_out);
+						update_cst_param_ecat(cst_params, coe_out);
 						update_pt_param_ecat(pt_params, coe_out);
 						torque_offstate = (cst_params.max_torque * 15) / (cst_params.nominal_current * 100 * cst_params.motor_torque_constant);
 						//printintln(pt_params.profile_slope);
@@ -636,7 +653,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					{
 						actual_velocity = get_velocity(c_velocity_ctrl);
 						if(op_mode == CSV)
-							steps = init_quick_stop_velocity_profile(actual_velocity, csv_params.max_acceleration);//default acc
+							steps = init_quick_stop_velocity_profile(actual_velocity, csv_params.max_acceleration);
 						else if(op_mode == PV)
 							steps = init_quick_stop_velocity_profile(actual_velocity, pv_params.quick_stop_deceleration);
 						i = 0;
@@ -682,6 +699,17 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 						actual_velocity = get_velocity(c_velocity_ctrl) *  csv_params.polarity;
 						send_actual_velocity(actual_velocity, InOut);
+						if(sensor_select == HALL)
+						{
+							{actual_position, direction} = get_hall_position_absolute(c_hall);
+							actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
+						}
+						else if(sensor_select == QEI)
+						{
+							{actual_position, direction} = get_qei_position_absolute(c_qei);
+							actual_position = (actual_position * precision_factor)/precision;
+						}
+						send_actual_position(actual_position * csv_params.polarity, InOut);
 					#ifdef ENABLE_xscope_main
 					//	xscope_probe_data(0, actual_velocity);
 					//	xscope_probe_data(1, target_velocity);
@@ -718,7 +746,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						if(ack == 1)
 						{
 							target_position = get_target_position(InOut);
-							//printstr("tar pos ");printintln(target_position);
+							//printintln(target_position);
 							actual_position = get_position(c_position_ctrl)*pp_params.base.polarity;
 							send_actual_position(actual_position, InOut);
 
@@ -728,7 +756,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 								steps = init_position_profile(target_position, actual_position, \
 										pp_params.profile_velocity, pp_params.base.profile_acceleration,\
 										pp_params.base.profile_deceleration);
-								//printstr("steps ");printintln(steps);
+
 								i = 1;
 								prev_position = target_position;
 							}
@@ -754,7 +782,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					}
 					else if(op_mode == TQ)
 					{
-						//printstrln("cycl TQ ");
+						//printstrln("cyclic TQ ");
 						if(ack == 1)
 						{
 							target_torque = get_target_torque(InOut);
@@ -795,7 +823,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						if(ack == 1)
 						{
 							target_velocity = get_target_velocity(InOut);
-							//printstr("tar vel ");printintln(target_velocity);
+							//printintln(target_velocity);
 							actual_velocity = get_velocity(c_velocity_ctrl) *  pv_params.polarity;
 							send_actual_velocity(actual_velocity, InOut);
 
@@ -806,8 +834,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 										pv_params.profile_acceleration, pv_params.profile_deceleration,\
 										pv_params.max_profile_velocity);
 
-								//printstr("steps ");
-								//printintln(steps);
+
 								i = 1;
 								prev_velocity = target_velocity;
 							}
@@ -837,21 +864,21 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					//deactivate
 					if(op_mode == CST || op_mode == TQ)
 					{
-						shutdown_torque_ctrl(c_torque_ctrl);//p
+						shutdown_torque_ctrl(c_torque_ctrl);
 						shutdown_ack = 1;
 						op_set_flag = 0; init = 0;
 						mode_selected = 0;  // to reenable the op selection and reset the controller
 					}
 					else if(op_mode == CSV || op_mode == PV)
 					{
-						shutdown_velocity_ctrl(c_velocity_ctrl);//p
+						shutdown_velocity_ctrl(c_velocity_ctrl);
 						shutdown_ack = 1;
 						op_set_flag = 0; init = 0;
 						mode_selected = 0;  // to reenable the op selection and reset the controller
 					}
 					else if(op_mode == CSP || op_mode == PP)
 					{
-						shutdown_position_ctrl(c_position_ctrl);//p
+						shutdown_position_ctrl(c_position_ctrl);
 						shutdown_ack = 1;
 						op_set_flag = 0; init = 0;
 						mode_selected = 0;  // to reenable the op selection and reset the controller
@@ -894,7 +921,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				{
 					actual_torque = get_torque(cst_params, c_torque_ctrl);
 					send_actual_torque(actual_torque, InOut);
-					if(actual_torque < torque_offstate || actual_torque > -torque_offstate)// 15/100 * 264 * 33
+					if(actual_torque < torque_offstate || actual_torque > -torque_offstate)
 					{
 						ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 						mode_selected = 100;
@@ -918,6 +945,17 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						set_velocity( max_speed_limit(target_velocity, csv_params.max_motor_speed), c_velocity_ctrl );
 						actual_velocity = get_velocity(c_velocity_ctrl);
 						send_actual_velocity(actual_velocity * csv_params.polarity, InOut);
+						if(sensor_select == HALL)
+						{
+							{actual_position, direction} = get_hall_position_absolute(c_hall);
+							actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
+						}
+						else if(sensor_select == QEI)
+						{
+							{actual_position, direction} = get_qei_position_absolute(c_qei);
+							actual_position = (actual_position * precision_factor)/precision;
+						}
+						send_actual_position(actual_position * csv_params.polarity, InOut);
 					}
 					else if(op_mode == PV)
 					{
@@ -1044,6 +1082,17 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			{
 				actual_velocity = get_velocity(c_velocity_ctrl);
 				send_actual_velocity(actual_velocity*csv_params.polarity, InOut);
+				if(sensor_select == HALL)
+				{
+					{actual_position, direction} = get_hall_position_absolute(c_hall);
+					actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
+				}
+				else if(sensor_select == QEI)
+				{
+					{actual_position, direction} = get_qei_position_absolute(c_qei);
+					actual_position = (actual_position * precision_factor)/precision;
+				}
+				send_actual_position(actual_position * csv_params.polarity, InOut);
 			}
 			else if(op_mode == PV)
 			{
