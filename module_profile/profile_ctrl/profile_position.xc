@@ -49,7 +49,8 @@
 #include <profile.h>
 #include <profile_control.h>
 
-void set_profile_position(int target_position, int velocity, int acceleration, int deceleration, chanend c_position_ctrl)
+void set_profile_position(int target_position, int velocity, int acceleration, int deceleration, \
+		int max_position, int min_position, chanend c_position_ctrl)
 {
 	int i;
 	timer t;
@@ -71,6 +72,7 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 
 	if(init_state == INIT)
 	{
+		target_position = position_limit(target_position, max_position, min_position);
 		actual_position = get_position(c_position_ctrl); //degree * 10000
 		steps = init_position_profile(target_position*10000, actual_position, velocity, acceleration, deceleration);
 		t :> time;

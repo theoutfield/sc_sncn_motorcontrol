@@ -59,9 +59,12 @@
  * \param velocity in (rpm)
  * \param acceleration in (rpm/s)
  * \param deceleration in (rpm/s)
+ * \param min position in (degree)
+ * \param max position in (degree)
  *
  */
-void set_profile_position(int target_position, int velocity, int acceleration, int deceleration, chanend c_position_ctrl);
+void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,\
+		int max_position, int min_position, chanend c_position_ctrl);
 
 /**
  * \brief Set profile velocity with Velocity Control loop

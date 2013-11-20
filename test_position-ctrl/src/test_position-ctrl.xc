@@ -91,10 +91,10 @@ void position_profile_test(chanend c_position_ctrl)
 	xscope_initialise_1();
 #endif
 
-	set_profile_position(target_position, velocity, acceleration, deceleration, c_position_ctrl);
+	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 
 	target_position = 0; 	//degree
-	set_profile_position(target_position, velocity, acceleration, deceleration, c_position_ctrl);
+	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 }
 
 int main(void)
