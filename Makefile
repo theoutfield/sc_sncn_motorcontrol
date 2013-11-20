@@ -4,6 +4,6 @@
 #
 # If the variable is set to "all" then all directories that start with app_
 # are built.
-BUILD_SUBDIRS = test_ethercat-motorctrl-mode test_position-ctrl
+BUILD_SUBDIRS = 
 XMOS_MAKE_PATH ?= ..
 include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.toplevel
