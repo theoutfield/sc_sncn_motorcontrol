@@ -106,6 +106,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int filter_buffer[FILTER_LENGTH_HALL];
 	int index = 0;
 	int raw_velocity = 0;
+	int hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
 
 	init_filter(filter_buffer, index, FILTER_LENGTH_HALL);
 	t1 :> time1;
@@ -283,9 +284,9 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 					else if(init_velocity == 1)
 					{
 						difference1 = count - previous_position1;
-						if(difference1 > 50000)
+						if(difference1 > hall_crossover)
 							difference1 = old_difference;
-						else if(difference1 < -50000)
+						else if(difference1 < -hall_crossover)
 							difference1 = old_difference;
 						velocity = difference1;
 				#ifdef Debug_velocity_ctrl

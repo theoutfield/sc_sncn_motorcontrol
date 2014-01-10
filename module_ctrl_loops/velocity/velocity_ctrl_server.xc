@@ -67,7 +67,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 	unsigned int time;
 
 	/* Sensor filter declarations */
-	int filter_length = sensor_filter_params.filter_length; //p new
+	int filter_length = sensor_filter_params.filter_length;
 	int filter_buffer[FILTER_SIZE_MAX];						//default size used at compile time (cant be changed further)
 	int index = 0;
 	int filter_output;
@@ -90,6 +90,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 	int activate = 0;
 	int init_state = INIT_BUSY;
 	int qei_crossover = qei_params.max_count - qei_params.max_count/10;
+	int hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
 
 	init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 	while(1)
@@ -179,8 +180,8 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					{
 						{pos, dirn} = get_hall_position_absolute(c_hall);
 						diff = pos - prev;
-						if(diff > 50000) diff = old;
-						else if(diff < -50000) diff = old;
+						if(diff > hall_crossover) diff = old;
+						else if(diff < -hall_crossover) diff = old;
 						cal_speed = (diff*cal_speed_n)/cal_speed_d_hall;
 		#ifdef Debug_velocity_ctrl
 						xscope_probe_data(0, cal_speed);
