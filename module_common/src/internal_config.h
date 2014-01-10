@@ -71,7 +71,7 @@
 #define QEI_WITH_NO_INDEX 			0
 
 #define DC100_RESOLUTION 			740
-#define DC900_RESOLUTION			264
+#define DC300_RESOLUTION			264
 
 #define INIT_BUSY 					0
 #define INIT						1
