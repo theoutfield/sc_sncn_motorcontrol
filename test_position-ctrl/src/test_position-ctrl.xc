@@ -153,7 +153,7 @@ int main(void)
 				 init_hall_param(hall_params);
 				 init_qei_param(qei_params);
 
-				 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p2,\
+				 position_control(position_ctrl_params, hall_params, qei_params, HALL, c_hall_p2,\
 						 c_qei_p1, c_position_ctrl, c_commutation_p3);
 			}
 

@@ -155,7 +155,7 @@ int main(void)
 					init_qei_param(qei_params);
 
 					velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, \
-						 qei_params, QEI, c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
+						 qei_params, HALL, c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
 				}
 			}
 		}

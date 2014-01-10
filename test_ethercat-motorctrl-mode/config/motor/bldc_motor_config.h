@@ -64,7 +64,7 @@
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	//QEI_WITH_NO_INDEX
 
 /*Somanet IFM Internal Config*/
-#define IFM_RESOLUTION				DC900_RESOLUTION  // DC100_RESOLUTION   /* Specifies the current sensor resolution/A
+#define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A
 
 /*Changes direction of the motor drive*/
 #define POLARITY 					1		// 1 / -1

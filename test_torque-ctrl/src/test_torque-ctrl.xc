@@ -76,7 +76,7 @@ void xscope_initialise_1()
 //test Profile Torque Mode
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 150;  //(desired torque/torque_constant)  * IFM resolution
+	int target_torque = 350;  //(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 150;  //(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params;
 	init_cst_param(cst_params);
@@ -90,7 +90,7 @@ void profile_torque_test(chanend c_torque_ctrl)
 	target_torque = 0;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = -150;
+	target_torque = -350;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 }
 
@@ -154,7 +154,7 @@ int main(void)
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);
 					init_torque_control_param(torque_ctrl_params);
-					torque_control( torque_ctrl_params, hall_params, qei_params, QEI,
+					torque_control( torque_ctrl_params, hall_params, qei_params, HALL,
 							c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
 				}
 

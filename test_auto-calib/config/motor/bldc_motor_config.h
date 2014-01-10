@@ -27,7 +27,7 @@
 #ifndef __DC_MOTOR_CONFIG__H__VELOCITY
 #define __DC_MOTOR_CONFIG__H__VELOCITY
 #include <print.h>
-
+#include <internal_config.h>
 
 #pragma once
 
@@ -80,9 +80,7 @@
 #define QUICK_STOP_DECELERATION 	2005
 
 /*Somanet IFM Internal Config*/
-#define DC100_RESOLUTION 	740
-#define DC900_RESOLUTION	264
-#define IFM_RESOLUTION		DC900_RESOLUTION
+#define IFM_RESOLUTION		DC300_RESOLUTION
 
 #define COMMUTATION_ANGLE_OFFSET_CLOCKWISE			  480  // range (0 - 4095)
 #define COMMUTATION_ANGLE_OFFSET_COUNTERCLOCKWISE	 3000  // range (0 - 4095)
