@@ -73,7 +73,7 @@ void xscope_initialise_1()
 	return;
 }
 
-//test Profile Torque Mode
+/* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
 	int target_torque = 350;  //(desired torque/torque_constant)  * IFM resolution
@@ -90,39 +90,38 @@ void profile_torque_test(chanend c_torque_ctrl)
 	target_torque = 0;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = -350;
+	target_torque = -150;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 }
 
 int main(void)
 {
-	chan c_adc, c_adctrig;
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
-	chan c_commutation_p1, c_commutation_p2, c_commutation_p3;
-	chan sync_output;
-	chan c_pwm_ctrl;
-	chan dummy, dummy1, dummy2;
-	chan c_signal_adc;
-	chan c_sig_1, c_signal, c_sync;
-	chan c_torque_ctrl, signal_ctrl, c_calib, c_req, c_vel;
 
-	//etherCat Comm channels
-	chan coe_in; 			///< CAN from module_ethercat to consumer
-	chan coe_out; 			///< CAN from consumer to module_ethercat
-	chan eoe_in; 			///< Ethernet from module_ethercat to consumer
-	chan eoe_out; 			///< Ethernet from consumer to module_ethercat
+	// Motor control channels
+	chan c_adc, c_adctrig;													// adc channels
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;  				// qei channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
+	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
+	chan c_pwm_ctrl;														// pwm channel
+	chan c_torque_ctrl;														// torque control channel
+	chan c_watchdog; 														// watchdog channel
+
+	// EtherCat Comm channels
+	chan coe_in; 		//< CAN from module_ethercat to consumer
+	chan coe_out; 		//< CAN from consumer to module_ethercat
+	chan eoe_in; 		//< Ethernet from module_ethercat to consumer
+	chan eoe_out; 		//< Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; 			///< File from module_ethercat to consumer
-	chan foe_out; 			///< File from consumer to module_ethercat
+	chan foe_in; 		//< File from module_ethercat to consumer
+	chan foe_out; 		//< File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
+	chan c_sig_1;
 
-	chan c_test_in;
 	//
 	par
 	{
-
+		/* Ethercat Communication Handler Loop */
 		on stdcore[0] :
 		{
 			ecat_init();
@@ -130,12 +129,13 @@ int main(void)
 					foe_in, pdo_out, pdo_in);
 		}
 
+		/* Firmware Update Loop */
 		on stdcore[0] :
 		{
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
 
-
+		/* Test Profile Torque Function */
 		on stdcore[1]:
 		{
 			profile_torque_test(c_torque_ctrl);
@@ -144,20 +144,15 @@ int main(void)
 		on stdcore[2]:
 		{
 			/* Torque Control Loop */
-			par
 			{
-
-				{
-					ctrl_par torque_ctrl_params;
-					hall_par hall_params;
-					qei_par qei_params;
-					init_qei_param(qei_params);
-					init_hall_param(hall_params);
-					init_torque_control_param(torque_ctrl_params);
-					torque_control( torque_ctrl_params, hall_params, qei_params, HALL,
-							c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
-				}
-
+				ctrl_par torque_ctrl_params;
+				hall_par hall_params;
+				qei_par qei_params;
+				init_qei_param(qei_params);
+				init_hall_param(hall_params);
+				init_torque_control_param(torque_ctrl_params);
+				torque_control( torque_ctrl_params, hall_params, qei_params, HALL,
+						c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
 			}
 		}
 
@@ -168,14 +163,16 @@ int main(void)
 		{
 			par
 			{
-
+				/* ADC Loop */
 				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
 						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
 						p_ifm_adc_misob);
 
+				/* PWM Loop */
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
+				/* Motor Commutation loop */
 				{
 					hall_par hall_params;
 					qei_par qei_params;
@@ -183,17 +180,22 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, \
+					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, \
 							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);
 				}
 
+				/* Watchdog Server */
+				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
+
+				/* Hall Server */
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
 					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 
+				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
