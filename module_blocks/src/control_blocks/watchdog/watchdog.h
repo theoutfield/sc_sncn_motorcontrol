@@ -51,9 +51,9 @@
  * the watchdog circuitry. The enable signal must be the LSB
  * bit in a 4-bit port. The tick control must be a 1-bit port.
  *
- * \param c_wd the control channel for controlling the watchdog
+ * \param c_watchdog the control channel for controlling the watchdog
  * \param p_wd_tick control for the tick of the watchdog
  * \param p_shared_leds_wden control port for the watchdog device
  */
-void do_wd(chanend c_wd, out port p_wd_tick, out port p_shared_leds_wden);
+void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds_wden);
 

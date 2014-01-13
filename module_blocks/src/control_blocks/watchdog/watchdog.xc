@@ -41,10 +41,10 @@
 #include <xs1.h>
 
 
-void do_wd(chanend c_wd, out port p_wd_tick, out port p_shared_leds_wden)
+void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds_wden)
 {
-	unsigned cmd, wd_enabled = 1, shared_out = 0xe, tick_out = 0;
-	unsigned ts, ts2;
+	unsigned int cmd, wd_enabled = 1, shared_out = 0xe, tick_out = 0;
+	unsigned int ts, ts2;
 	timer t;
 
 	t :> ts;
@@ -55,7 +55,7 @@ void do_wd(chanend c_wd, out port p_wd_tick, out port p_shared_leds_wden)
 		select
 		{
 			// Get a command from the out loop
-			case c_wd :> cmd:
+			case c_watchdog :> cmd:
 				switch(cmd)
 				{
 					case WD_CMD_START: // produce a rising edge on the WD_EN

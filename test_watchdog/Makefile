@@ -24,6 +24,7 @@ XCC_FLAGS_Release = -g -O3 -Wcodes -Xmapper -Wcodes -lxscope
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
 VERBOSE = 0
+AUTO_ECLIPSE = 0
 
 XMOS_MAKE_PATH ?= ../..
 -include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common
