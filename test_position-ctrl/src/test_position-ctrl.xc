@@ -77,7 +77,7 @@ void xscope_initialise_1()
 }
 
 
-/* Position profile test function */
+/* Test Profile Position function */
 void position_profile_test(chanend c_position_ctrl)
 {
 	int target_position = 350;			// degree
@@ -135,7 +135,7 @@ int main(void)
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
 
-		/* Position Control Loop */
+		/* Test Profile Position function */
 		on stdcore[1]:
 		{
 			position_profile_test(c_position_ctrl);		  	// test PPM on slave side

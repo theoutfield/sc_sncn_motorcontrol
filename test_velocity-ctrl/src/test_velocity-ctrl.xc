@@ -77,7 +77,7 @@ void xscope_initialise_1()
 }
 
 
-/* Test profile velocity function */
+/* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
 	int target_velocity = 2000;	 		// rpm
@@ -133,7 +133,7 @@ int main(void)
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
 
-		/* Test profile velocity function */
+		/* Test Profile Velocity function */
 		on stdcore[1]:
 		{
 			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
