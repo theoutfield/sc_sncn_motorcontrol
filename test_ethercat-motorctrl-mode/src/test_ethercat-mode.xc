@@ -75,6 +75,8 @@ int main(void)
 	chan c_velocity_ctrl;													// velocity control channel
 	chan c_torque_ctrl;														// torque control channel
 	chan c_position_ctrl;													// position control channel
+	chan c_watchdog; 														// watchdog channel
+
 
 	// EtherCat Comm channels
 	chan coe_in; 		//< CAN from module_ethercat to consumer
@@ -184,10 +186,13 @@ int main(void)
 					qei_par qei_params;
 					commutation_par commutation_params;
 					commutation_init_ecat(c_signal, hall_params, qei_params, commutation_params);
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal,
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog,
 							c_commutation_p1, c_commutation_p2, c_commutation_p3,
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);							// channel priority 1,2,3
 				}
+
+				/* Watchdog Server */
+				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
 				/* Hall Server */
 				{
