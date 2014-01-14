@@ -127,7 +127,7 @@ int main(void)
 					 init_hall_param(hall_params);
 					 init_qei_param(qei_params);
 
-					 position_control(position_ctrl_params, hall_params, qei_params, QEI, c_hall_p4,\
+					 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, c_hall_p4,\
 							 c_qei_p4, c_position_ctrl, c_commutation_p3);
 				}
 
@@ -144,7 +144,7 @@ int main(void)
 					 init_qei_param(qei_params);
 
 					 velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,\
-							 qei_params, QEI, c_hall_p3, c_qei_p3, c_velocity_ctrl, c_commutation_p2);
+							 qei_params, SENSOR_USED, c_hall_p3, c_qei_p3, c_velocity_ctrl, c_commutation_p2);
 				}
 
 				/* Torque Control Loop */
@@ -157,7 +157,7 @@ int main(void)
 					init_hall_param(hall_params);
 					init_torque_control_param(torque_ctrl_params);
 
-					torque_control( torque_ctrl_params, hall_params, qei_params, QEI, c_adc, \
+					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED, c_adc, \
 							c_commutation_p1,  c_hall_p2,  c_qei_p2, c_torque_ctrl);
 				}
 

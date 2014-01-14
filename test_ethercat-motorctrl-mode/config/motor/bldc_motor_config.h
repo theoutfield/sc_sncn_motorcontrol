@@ -60,8 +60,11 @@
 #define GEAR_RATIO  				26		// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			4000	// 4 x Max count of Quadrature Encoder (4X decoding)
 
+/* Choose Position/Velocity Sensor */
+#define SENSOR_USED 				HALL 	// QEI
+
 /*Define your Encoder type*/
-#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	//QEI_WITH_NO_INDEX
+#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	// QEI_WITH_NO_INDEX
 
 /*Somanet IFM Internal Config*/
 #define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A
