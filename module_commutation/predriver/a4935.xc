@@ -39,42 +39,49 @@
  */
 
 #include <xs1.h>
-#include "platform.h"
-#include "ioports.h"
-#include "a4935.h"
+#include <platform.h>
+#include <a4935.h>
 
 
-//void a4935_init(port out p_esf_rstn_pwml_pwmh, port out p_coastn, unsigned configuration)
 void a4935_init(int configuration)
 {
-  timer timer1;
-  unsigned time1;
+	timer timer1;
+	unsigned time1;
 
-  configuration |= A4935_BIT_ESF; // add enable_stop_on_fault to config bits
-  
-  // set config pins and trigger reset
-  p_ifm_esf_rstn_pwml_pwmh <: configuration;
+	configuration |= A4935_BIT_ESF; // add enable_stop_on_fault to config bits
 
-  timer1 :> time1;
-  //timer1 when timerafter(time1 + A4935_AFTER_RESET_DELAY) :> time1;
-  timer1 when timerafter(time1 + (4 * USEC_FAST/*TICKS_US*/)) :> time1; // hold reset for at least 3.5us
+	// set config pins and trigger reset
+	p_ifm_esf_rstn_pwml_pwmh <: configuration;
 
-  /* enable pull-ups for ff1 and ff2, as these are open-drain outputs
-     and configure as inputs as long as we are just waiting for an
-     error to occur */
-  //configure_in_port_no_ready(p_ff1);
-  //configure_in_port_no_ready(p_ff2);
+	timer1 :> time1;
+	//timer1 when timerafter(time1 + A4935_AFTER_RESET_DELAY) :> time1;
+	timer1 when timerafter(time1 + (4 * USEC_FAST/*TICKS_US*/)) :> time1; // hold reset for at least 3.5us
 
-  // release reset
-  p_ifm_esf_rstn_pwml_pwmh <: ( A4935_BIT_RSTN | configuration );
+	/* enable pull-ups for ff1 and ff2, as these are open-drain outputs
+	 and configure as inputs as long as we are just waiting for an
+	 error to occur */
+	//configure_in_port_no_ready(p_ff1);
+	//configure_in_port_no_ready(p_ff2);
 
-  // pause before enabling FETs after reset
-  timer1 when timerafter(time1 + A4935_AFTER_RESET_DELAY) :> time1;
+	// release reset
+	p_ifm_esf_rstn_pwml_pwmh <: ( A4935_BIT_RSTN | configuration );
 
-  // enable FETs
-  p_ifm_coastn <: 1;
+	// pause before enabling FETs after reset
+	timer1 when timerafter(time1 + A4935_AFTER_RESET_DELAY) :> time1;
+
+	// enable FETs
+	p_ifm_coastn <: 1;
 
 }
 
+void a4935_disable_fets(out port p_ifm_coastn)
+{
+	p_ifm_coastn <: 0;
+}
+
+void a4935_enable_fets(out port p_ifm_coastn)
+{
+	  p_ifm_coastn <: 1;
+}
 
 

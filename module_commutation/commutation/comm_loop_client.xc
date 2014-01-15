@@ -91,3 +91,14 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 	return;
 }
 
+void disable_motor(chanend c_commutation)
+{
+	c_commutation <: DISABLE_FETS;
+	return;
+}
+
+void enable_motor(chanend c_commutation)
+{
+	c_commutation <: ENABLE_FETS;
+	return;
+}

@@ -80,8 +80,11 @@ int absolute(int var)
 
 /* Sinusoidal based commutation functions */
 
-void commutation_client_hanlder(chanend c_commutation, int command, commutation_par &commutation_params, int &voltage, int &sensor_select, int init_state)
+void commutation_client_hanlder(chanend c_commutation, int command, commutation_par &commutation_params, \
+		int &voltage, int &sensor_select, int init_state, timer t, unsigned int pwm[], chanend c_pwm_ctrl, \
+		out port p_ifm_coastn)
 {
+	unsigned int ts;
 	if(command == SET_VOLTAGE)				// set voltage
 	{
 		c_commutation :> voltage;
@@ -104,6 +107,26 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 	else if(command == CHECK_BUSY)			// init signal
 	{
 		c_commutation <: init_state;
+	}
+	else if(command == DISABLE_FETS)
+	{
+		pwm[0] = 0;  pwm[1] = 0;  pwm[2] = 0;
+		update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
+		t :> ts;
+		t when timerafter (ts + 300*USEC_FAST) :> ts;
+
+		a4935_disable_fets(p_ifm_coastn);
+		t when timerafter (ts + 300*USEC_FAST) :> ts;
+	}
+	else if(command == ENABLE_FETS)
+	{
+		pwm[0] = 0;  pwm[1] = 0;  pwm[2] = 0;
+		update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
+		t :> ts;
+		t when timerafter (ts + 300*USEC_FAST) :> ts;
+
+		a4935_enable_fets(p_ifm_coastn);
+		t when timerafter (ts + 300*USEC_FAST) :> ts;
 	}
 	return;
 }
@@ -129,7 +152,8 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 
 	int fw_flag = 0;
 	int bw_flag = 0;
-
+	int status = 0;
+	int nominal_speed;
 	qei_velocity_par qei_velocity_params;
 	init_qei_velocity_params(qei_velocity_params);
 
@@ -180,7 +204,7 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 				angle_pwm = (((angle + commutation_params.offset_forward) & 0x0fff) >> 2)&0x3ff;	 //512
 			}
 			pwm[0] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
-			angle_pwm = (angle_pwm +341) & 0x3ff;
+			angle_pwm = (angle_pwm + 341) & 0x3ff;
 
 			pwm[1] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm + 342) & 0x3ff;
@@ -198,7 +222,7 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 				angle_pwm = (((angle  + commutation_params.offset_backward ) & 0x0fff) >> 2)&0x3ff;  	 //3100
 			}
 			pwm[0] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
-			angle_pwm = (angle_pwm +341) & 0x3ff;
+			angle_pwm = (angle_pwm + 341) & 0x3ff;
 
 			pwm[1] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm + 342) & 0x3ff;
@@ -216,15 +240,18 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 		select
 		{
 			case c_commutation_p1 :> command:
-				commutation_client_hanlder( c_commutation_p1, command, commutation_params, voltage, sensor_select, init_state);
+				commutation_client_hanlder( c_commutation_p1, command, commutation_params, voltage, \
+						sensor_select, init_state, t, pwm, c_pwm_ctrl, p_ifm_coastn);
 				break;
 
 			case c_commutation_p2 :> command:
-				commutation_client_hanlder( c_commutation_p2, command, commutation_params, voltage, sensor_select, init_state);
+				commutation_client_hanlder( c_commutation_p2, command, commutation_params, voltage,
+						sensor_select, init_state, t, pwm, c_pwm_ctrl, p_ifm_coastn);
 				break;
 
 			case c_commutation_p3 :> command:
-				commutation_client_hanlder( c_commutation_p3, command, commutation_params, voltage, sensor_select, init_state);
+				commutation_client_hanlder( c_commutation_p3, command, commutation_params, voltage,
+						sensor_select, init_state, t, pwm, c_pwm_ctrl, p_ifm_coastn);
 				break;
 
 			case c_signal :> command:
@@ -232,11 +259,55 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 				{
 					c_signal <: init_state;
 				}
+				else if(command == SET_COMM_PARAM_ECAT)
+				{
+					c_signal :> hall_params.gear_ratio;
+					c_signal :> hall_params.pole_pairs;
+					c_signal :> qei_params.gear_ratio;
+					c_signal :> qei_params.index;
+					c_signal :> qei_params.max_count;
+					c_signal :> qei_params.real_counts;
+					c_signal :> nominal_speed;
+
+					commutation_params.angle_variance = 1024/(hall_params.pole_pairs * 3);
+					if(hall_params.pole_pairs < 4)
+					{
+						commutation_params.max_speed_reached = nominal_speed*4;
+						commutation_params.flag = 1;
+					}
+					else if(hall_params.pole_pairs >=4)
+					{
+						commutation_params.max_speed_reached = nominal_speed;
+						commutation_params.flag = 0;
+					}
+					commutation_params.qei_forward_offset = 0;
+					commutation_params.qei_backward_offset = 0;
+					pwm[0] = 0;
+					pwm[1] = 0;
+					pwm[2] = 0;
+					angle_pwm = 0;
+					angle = 0;
+					angle_rpm   = 0;
+					speed = 0;
+					voltage = 0;
+					direction = 0;
+					max_count_per_hall = qei_params.real_counts/hall_params.pole_pairs;
+					angle_offset = 682/(2*hall_params.pole_pairs);
+					fw_flag = 0;
+					bw_flag = 0;
+					init_qei_velocity_params(qei_velocity_params);
+			//					printintln(hall_params.gear_ratio);
+			//					printintln(hall_params.pole_pairs);
+			//					printintln(commutation_params.max_speed_reached );
+			//										printintln(commutation_params.angle_variance);
+
+				}
 				break;
 
 			default:
 				break;
 		}
+
 	}
 
 }
