@@ -65,32 +65,27 @@ void init_buffer(int buffer[], int length)
 
 void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 {
-	#define filter_length 80
+	#define FILTER_LENGTH_ADC 80
 	int phase_a_raw = 0;
 	int phase_b_raw = 0;
 	int actual_speed = 0;
 	int command;
-	int buffer_phase_a[filter_length];
-	int	buffer_phase_b[filter_length];
-	timer ts, tc;
+	int buffer_phase_a[FILTER_LENGTH_ADC];
+	int	buffer_phase_b[FILTER_LENGTH_ADC];
+	timer ts;
+	timer tc;
 	unsigned int time;
 	unsigned int time1;
-	int fil_cnt = 0;
+	int buffer_index = 0;
 	int phase_a_filtered = 0;
 	int phase_b_filtered = 0;
 	int i = 0;
-	int fl = filter_length;
 	int j = 0;
-	int flc = 3;
+	int filter_length = FILTER_LENGTH_ADC;
+	int filter_length_variance = 3;
 	int mod = 0;
-	int mod_speed = 0;
+	int abs_speed = 0;
 	int filter_count = 0;
-
-
-	int speed = 0 ;
-	//int sensor_select = HALL;
-
-	int tim1, tim2, tim3;
 	int adc_calib_start = 0;
 
 	while(1)
@@ -109,8 +104,8 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 	do_adc_calibration_ad7949(c_adc);
 
 	c_current<:1; // adc calib done
-	init_buffer(buffer_phase_a, filter_length);
-	init_buffer(buffer_phase_b, filter_length);
+	init_buffer(buffer_phase_a, FILTER_LENGTH_ADC);
+	init_buffer(buffer_phase_b, FILTER_LENGTH_ADC);
 	ts :> time;
 	tc :> time1;
 
@@ -120,58 +115,53 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 		select
 		{
 			case ts when timerafter(time+5556) :> time: // .05 ms
-			{phase_a_raw , phase_b_raw}= get_adc_calibrated_current_ad7949(c_adc);
-		//	xscope_probe_data(0, phase_a_raw);
-			buffer_phase_a[fil_cnt] = phase_a_raw;
-			buffer_phase_b[fil_cnt] = phase_b_raw;
+				{phase_a_raw , phase_b_raw}= get_adc_calibrated_current_ad7949(c_adc);
+			//	xscope_probe_data(0, phase_a_raw);
+				buffer_phase_a[buffer_index] = phase_a_raw;
+				buffer_phase_b[buffer_index] = phase_b_raw;
 
-			fil_cnt = (fil_cnt+1)%fl;
-			phase_a_filtered = 0;
-			phase_b_filtered = 0;
-			j=0;
-			for(i=0; i<flc; i++)
-			{
-				mod = (fil_cnt - 1 - j)%fl;
-				if(mod<0)
-				mod = fl + mod;
-				phase_a_filtered += buffer_phase_a[mod];
-				phase_b_filtered += buffer_phase_b[mod];
-				j++;
-			}
-			phase_a_filtered /= flc;
-			phase_b_filtered /= flc;
-		//	xscope_probe_data(0, phase_a_filtered);
-		//	xscope_probe_data(1, phase_b_filtered);
-
-			filter_count++;
-			if(filter_count == 10)
-			{
-				filter_count = 0;
-
-			//	xscope_probe_data(0, actual_speed);
-				mod_speed = actual_speed;
-				if(actual_speed < 0)
-					mod_speed = 0 - actual_speed;
-
-				if(mod_speed <= 100)
+				buffer_index = (buffer_index+1)%filter_length;
+				phase_a_filtered = 0;
+				phase_b_filtered = 0;
+				j=0;
+				for(i = 0; i < filter_length_variance; i++)
 				{
-					flc = 50;
+					mod = (buffer_index - 1 - j)%filter_length;
+					if( mod < 0 )
+					mod = filter_length + mod;
+					phase_a_filtered += buffer_phase_a[mod];
+					phase_b_filtered += buffer_phase_b[mod];
+					j++;
 				}
-				else if(mod_speed > 100 && mod_speed <= 800)
-				{
-					flc = 20;
-				}
-				else if(mod_speed >= 800)
-				{
-					flc = 3;
-				}
-			}//
-			break;
+				phase_a_filtered /= filter_length_variance;
+				phase_b_filtered /= filter_length_variance;
+			//	xscope_probe_data(0, phase_a_filtered);
+			//	xscope_probe_data(1, phase_b_filtered);
 
-//			case tc when timerafter(time1+MSEC_STD+250) :> time1: // .05 ms
-//				c_speed <: 2;
-//				master{	c_speed :> actual_speed; }
-//				break;
+				filter_count++;
+				if(filter_count == 10)
+				{
+					filter_count = 0;
+
+				//	xscope_probe_data(0, actual_speed);
+					abs_speed = actual_speed;
+					if(actual_speed < 0)
+						abs_speed = 0 - actual_speed;
+
+					if(abs_speed <= 100)
+					{
+						filter_length_variance = 50;
+					}
+					else if(abs_speed > 100 && abs_speed <= 800)
+					{
+						filter_length_variance = 20;
+					}
+					else if(abs_speed >= 800)
+					{
+						filter_length_variance = 3;
+					}
+				}
+				break;
 
 			case c_current :> command:
 				c_current :> actual_speed;
@@ -188,7 +178,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 		int sensor_used, chanend c_current, chanend c_speed, chanend c_commutation, \
 		chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
-	#define filter_dc 80 //80 27
+	#define FILTER_LENGTH_TORQUE 80
 	int actual_speed = 0;
 	int command;
 
@@ -208,8 +198,9 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	int Iq = 0;
 	int phase_1 = 0;
 	int phase_2 = 0;
-	int buffer_Id[filter_dc];
-	int buffer_Iq[filter_dc];
+	int filter_length = FILTER_LENGTH_TORQUE;
+	int buffer_Id[FILTER_LENGTH_TORQUE];
+	int buffer_Iq[FILTER_LENGTH_TORQUE];
 
 	int i1 = 0;
 	int j1 = 0;
@@ -217,9 +208,8 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
 	int iq_filtered = 0;
 	int id_filtered = 0;
-	int fdc = filter_dc;
-	int fil_cnt_dc = 0;
-	int fldc = filter_dc/hall_params.pole_pairs;
+	int buffer_index = 0;
+	int filter_length_variance = filter_length/hall_params.pole_pairs;
 	int speed = 0 ;
 
 	int actual_torque = 0;
@@ -237,25 +227,24 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	int commutation_init = INIT_BUSY;
 
 
-	int qei_counts_per_hall = 1;
+	int qei_counts_per_hall;
 	qei_velocity_par qei_velocity_params;
 	int qei_velocity = 0;
 	int start_flag = 0;
 	int offset_fw_flag = 0;
 	int offset_bw_flag = 0;
 
-	int dum, dirn;
 	int deactivate = 0;
 	int activate = 0;
 
 	init_qei_velocity_params(qei_velocity_params);
 
-	fldc = filter_dc/hall_params.pole_pairs;
-	if(fldc < 10)
-		fldc = 10;
+	filter_length_variance = filter_length/hall_params.pole_pairs;
+	if(filter_length_variance < 10)
+		filter_length_variance = 10;
 	qei_counts_per_hall= qei_params.real_counts/ hall_params.pole_pairs;
-	init_buffer(buffer_Id, filter_dc);
-	init_buffer(buffer_Iq, filter_dc);
+	init_buffer(buffer_Id, filter_length);
+	init_buffer(buffer_Iq, filter_length);
 
 
 	while(1)
@@ -307,7 +296,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				 break;
 			 }
 		}
-		//send_torque_init_state( c_torque_ctrl,  init_state);
+
 	}
 	while(activate)
 	{
@@ -325,7 +314,6 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				}
 				break;
 		}
-		//send_torque_init_state( c_torque_ctrl,  init_state);
 		if(start_flag == 1)
 			break;
 	}
@@ -337,40 +325,21 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 		#pragma ordered
 		select
 		{
-//			case c_speed :> command:
-//				slave{c_speed <: actual_speed;}
-//				break;
+
 
 			case tc when timerafter(time1 + MSEC_STD - 100) :> time1:
-
 
 				if(sensor_used == HALL)
 				{
 					angle = (get_hall_position(c_hall) >> 2) & 0x3ff; //  << 10 ) >> 12
 					actual_speed = get_hall_velocity(c_hall, hall_params);
-					{dum, dirn} = get_hall_position_absolute(c_hall);
-//					select
-//					{
-//						case c_speed :> command:
-//							slave{c_speed <: actual_speed;}
-//							break;
-//					}
 				}
 				else if(sensor_used == QEI)
 				{
 					//angle = (get_sync_position ( sync_output ) <<10)/qei_counts_per_hall; //synced input old
 					{angle, offset_fw_flag, offset_bw_flag} = get_qei_sync_position(c_qei);
 					angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
-					actual_speed = get_qei_velocity( c_qei, qei_params, qei_velocity_params);//
-					{dum, dirn} = get_qei_position_absolute(c_qei);
-
-//					select
-//					{
-//						case c_speed :> command:
-//							slave{c_speed <: actual_speed;}
-//							break;
-//					}
-
+					actual_speed = get_qei_velocity( c_qei, qei_params, qei_velocity_params);
 				}
 
 				c_current <: 2;
@@ -391,7 +360,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				beta /= 65536;
 				beta = -beta;
 
-				// ==== Park transform ====
+				/* Park transform */
 
 				sin = sine_table_expanded(angle);
 				cos = sine_table_expanded((256 - angle)& 0x3ff);
@@ -399,25 +368,25 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				Id = ( alpha * cos + beta * sin ) /16384;
 				Iq = ( beta * cos  - alpha * sin ) /16384;
 
-				buffer_Id[fil_cnt_dc] = Id;
-				buffer_Iq[fil_cnt_dc] = Iq;
-				fil_cnt_dc = (fil_cnt_dc+1)%fdc;
+				buffer_Id[buffer_index] = Id;
+				buffer_Iq[buffer_index] = Iq;
+				buffer_index = (buffer_index+1) % filter_length;
 
 				id_filtered = 0;
 				iq_filtered = 0;
 
 				j1=0;
-				for(i1=0; i1<fldc; i1++)
+				for(i1=0; i1<filter_length_variance; i1++)
 				{
-					mod1 = (fil_cnt_dc - 1 - j1)%fdc;
+					mod1 = (buffer_index - 1 - j1) % filter_length;
 					if(mod1<0)
-					mod1 = fdc + mod1;
+					mod1 = filter_length + mod1;
 					id_filtered += buffer_Id[mod1];
 					iq_filtered += buffer_Iq[mod1];
 					j1++;
 				}
-				id_filtered /= fldc;
-				iq_filtered /= fldc;
+				id_filtered /= filter_length_variance;
+				iq_filtered /= filter_length_variance;
 
 				actual_torque = root_function(iq_filtered * iq_filtered + id_filtered * id_filtered);
 
@@ -517,16 +486,16 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					TORQUE_CTRL_READ(sensor_used);
 					if(sensor_used == HALL)
 					{
-						fldc =  filter_dc/hall_params.pole_pairs;
-						if(fldc < 10)
-							fldc = 10;
+						filter_length_variance =  filter_length/hall_params.pole_pairs;
+						if(filter_length_variance < 10)
+							filter_length_variance = 10;
 					}
 					else if(sensor_used == QEI)
 					{
 						qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
-						fldc =  filter_dc/qei_params.poles;
-						if(fldc < 10)
-							fldc = 10;
+						filter_length_variance =  filter_length/qei_params.poles;
+						if(filter_length_variance < 10)
+							filter_length_variance = 10;
 					}
 				}
 
@@ -541,9 +510,9 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					TORQUE_CTRL_READ(hall_params.gear_ratio);
 					TORQUE_CTRL_READ(hall_params.pole_pairs);
 
-					fldc =  filter_dc/hall_params.pole_pairs;
-					if(fldc < 10)
-						fldc = 10;
+					filter_length_variance =  filter_length/hall_params.pole_pairs;
+					if(filter_length_variance < 10)
+						filter_length_variance = 10;
 				}
 				else if(command == SET_TORQUE_CTRL_QEI)
 				{
@@ -553,9 +522,9 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					TORQUE_CTRL_READ(qei_params.max_count);
 					TORQUE_CTRL_READ(qei_params.poles);
 					qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
-					fldc =  filter_dc/qei_params.poles;
-						if(fldc < 10)
-							fldc = 10;
+					filter_length_variance =  filter_length/qei_params.poles;
+						if(filter_length_variance < 10)
+							filter_length_variance = 10;
 				}
 
 				break;
