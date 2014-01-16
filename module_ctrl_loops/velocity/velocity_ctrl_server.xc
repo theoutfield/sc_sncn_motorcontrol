@@ -70,20 +70,18 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 	int filter_length = sensor_filter_params.filter_length;
 	int filter_buffer[FILTER_SIZE_MAX];						//default size used at compile time (cant be changed further)
 	int index = 0;
-	int filter_output;
-	int old_filter_output = 0;
 
 	/* speed calc declarations */
-	int pos;
+	int position;
 	int init = 0;
-	int prev = 0;
-	int cal_speed = 0;			// rpm
-	int diff;
-	int dirn = 0;
-	int old;
-	int cal_speed_n = 1000*60; // constant
-	int cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD); 		// variable pole_pairs    core 2/1/0 only
-	int cal_speed_d_qei  = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);		  	// variable qei_real_max  core 2/1/0 only
+	int previous_position = 0;
+	int raw_speed = 0;			// rpm
+	int difference;
+	int direction = 0;
+	int old_difference;
+	int rpm_constant = 1000*60; // constant
+	int speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD); 		// variable pole_pairs    core 2/1/0 only
+	int speed_factor_qei  = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);		  	// variable qei_real_max  core 2/1/0 only
 
 	int command;
 	int deactivate = 0;
@@ -154,97 +152,101 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 		{
 			case ts when timerafter(time + velocity_ctrl_params.Loop_time) :> time:
 
-
-				/* acq actual velocity hall/qei with filter*/
-				if(sensor_used == HALL)
+				if(activate == 1)
 				{
-					if(init == 0)
+					/* calculate actual velocity from hall/qei with filter*/
+					if(sensor_used == HALL)
 					{
-						//set_commutation_sinusoidal(c_commutation, 400);
-						{pos, dirn} = get_hall_position_absolute(c_hall);
-						if(pos > 2049)
+						if(init == 0)
 						{
-							init = 1;
-							prev = 2049;
-						}
-						else if(pos < -2049)
-						{
-							init = 1;
-							prev = -2049;
-						}
-						cal_speed = 0;
+							//set_commutation_sinusoidal(c_commutation, 400);
+							{position, direction} = get_hall_position_absolute(c_hall);
+							if(position > 2049)
+							{
+								init = 1;
+								previous_position = 2049;
+							}
+							else if(position < -2049)
+							{
+								init = 1;
+								previous_position = -2049;
+							}
+							raw_speed = 0;
 
-						//target_velocity = 0;
+							//target_velocity = 0;
+						}
+						else if(init == 1)
+						{
+							{position, direction} = get_hall_position_absolute(c_hall);
+							difference = position - previous_position;
+							if(difference > hall_crossover)
+								difference = old_difference;
+							else if(difference < -hall_crossover)
+								difference = old_difference;
+							raw_speed = (difference*rpm_constant)/speed_factor_hall;
+			#ifdef Debug_velocity_ctrl
+							xscope_probe_data(0, raw_speed);
+			#endif
+							previous_position = position;
+							old_difference = difference;
+						}
 					}
-					else if(init == 1)
+					else if(sensor_used == QEI)
 					{
-						{pos, dirn} = get_hall_position_absolute(c_hall);
-						diff = pos - prev;
-						if(diff > hall_crossover) diff = old;
-						else if(diff < -hall_crossover) diff = old;
-						cal_speed = (diff*cal_speed_n)/cal_speed_d_hall;
-		#ifdef Debug_velocity_ctrl
-						xscope_probe_data(0, cal_speed);
-		#endif
-						prev = pos;
-						old = diff;
+						{position, direction} = get_qei_position_absolute(c_qei);
+						difference = position - previous_position;
+						if(difference > qei_crossover)
+							difference = old_difference;
+						if(difference < -qei_crossover)
+							difference = old_difference;
+						raw_speed = (difference*rpm_constant)/speed_factor_qei;
+
+			#ifdef Debug_velocity_ctrl
+						xscope_probe_data(0, raw_speed);
+			#endif
+
+						previous_position = position;
+						old_difference = difference;
 					}
-				}
-				else if(sensor_used == QEI)
-				{
-					{pos, dirn} = get_qei_position_absolute(c_qei);
-					diff = pos - prev;
-					if(diff > qei_crossover) diff = old;
-					if(diff < -qei_crossover) diff = old;
-					cal_speed = (diff*cal_speed_n)/cal_speed_d_qei;
-
-		#ifdef Debug_velocity_ctrl
-					xscope_probe_data(0, cal_speed);
-		#endif
-
-					prev = pos;
-					old = diff;
-				}
 
 
 
-				actual_velocity = filter(filter_buffer, index, filter_length, cal_speed);
+					actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
 
 
-		#ifdef Debug_velocity_ctrl
-				xscope_probe_data(1, actual_velocity);
-		#endif
+			#ifdef Debug_velocity_ctrl
+					xscope_probe_data(1, actual_velocity);
+			#endif
 
-				/* Controller */
-				error_velocity   = (target_velocity - actual_velocity);
-				error_velocity_I = error_velocity_I + error_velocity;
-				error_velocity_D = error_velocity - previous_error;
+					/* Controller */
+					error_velocity   = (target_velocity - actual_velocity);
+					error_velocity_I = error_velocity_I + error_velocity;
+					error_velocity_D = error_velocity - previous_error;
 
-				if(error_velocity_I > (velocity_ctrl_params.Integral_limit))
-					error_velocity_I = (velocity_ctrl_params.Integral_limit);
-				else if(error_velocity_I < -(velocity_ctrl_params.Integral_limit))
-					error_velocity_I = 0 -(velocity_ctrl_params.Integral_limit);
+					if(error_velocity_I > (velocity_ctrl_params.Integral_limit))
+						error_velocity_I = (velocity_ctrl_params.Integral_limit);
+					else if(error_velocity_I < -(velocity_ctrl_params.Integral_limit))
+						error_velocity_I = 0 -(velocity_ctrl_params.Integral_limit);
 
-				velocity_control_out = (velocity_ctrl_params.Kp_n*error_velocity)/(velocity_ctrl_params.Kp_d)   \
-									 + (velocity_ctrl_params.Ki_n*error_velocity_I)/(velocity_ctrl_params.Ki_d) \
-									 + (velocity_ctrl_params.Kd_n*error_velocity_D)/(velocity_ctrl_params.Kd_d);
+					velocity_control_out = (velocity_ctrl_params.Kp_n*error_velocity)/(velocity_ctrl_params.Kp_d)   \
+										 + (velocity_ctrl_params.Ki_n*error_velocity_I)/(velocity_ctrl_params.Ki_d) \
+										 + (velocity_ctrl_params.Kd_n*error_velocity_D)/(velocity_ctrl_params.Kd_d);
 
-				if(velocity_control_out > velocity_ctrl_params.Control_limit)
-					velocity_control_out = velocity_ctrl_params.Control_limit;
-				else if(velocity_control_out < -velocity_ctrl_params.Control_limit)
-					velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
+					if(velocity_control_out > velocity_ctrl_params.Control_limit)
+						velocity_control_out = velocity_ctrl_params.Control_limit;
+					else if(velocity_control_out < -velocity_ctrl_params.Control_limit)
+						velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
 
 
-				if(!deactivate)
 					set_commutation_sinusoidal(c_commutation, velocity_control_out);
-				else
-					set_commutation_sinusoidal(c_commutation, 0);
+					/*if(!deactivate)
+						set_commutation_sinusoidal(c_commutation, velocity_control_out);
+					else
+						set_commutation_sinusoidal(c_commutation, 0);*/
 
-				previous_error = error_velocity;
+					previous_error = error_velocity;
 
-
-
-
+				}
 				break;
 
 				/* acq target velocity etherCAT */
@@ -273,11 +275,11 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					VELOCITY_CTRL_READ(sensor_used);
 					if(sensor_used == HALL)
 					{
-						cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
+						speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
 					}
 					else if(sensor_used == QEI)
 					{
-						cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
+						speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
 						qei_crossover = qei_params.max_count - qei_params.max_count/10;
 					}
 				}
@@ -293,7 +295,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 				{
 					VELOCITY_CTRL_READ(hall_params.gear_ratio);
 					VELOCITY_CTRL_READ(hall_params.pole_pairs);
-					cal_speed_d_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
+					speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
 				}
 				else if(command == SET_VELOCITY_CTRL_QEI)
 				{
@@ -302,7 +304,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					VELOCITY_CTRL_READ(qei_params.real_counts);
 					VELOCITY_CTRL_READ(qei_params.max_count);
 					VELOCITY_CTRL_READ(qei_params.poles);
-					cal_speed_d_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
+					speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
 					qei_crossover = qei_params.max_count - qei_params.max_count/10;
 				}
 				else if(command == SET_VELOCITY_FILTER)
