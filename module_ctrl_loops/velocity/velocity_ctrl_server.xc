@@ -49,7 +49,7 @@
 #include "print.h"
 
 //#define Debug_velocity_ctrl
-//#define debug_print
+#define debug_print
 
 void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
 	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation)
@@ -98,7 +98,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 		select
 		{
 			case VELOCITY_CTRL_READ(command):
-				if(command == SET)
+				if(command == ENABLE_VELOCITY_CTRL)
 				{
 					activate = SET;
 					received_command = SET;
@@ -116,7 +116,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					printstrln("vel activated");
 #endif
 				}
-				else if(command == UNSET)
+				else if(command == SHUTDOWN_VELOCITY_CTRL)
 				{
 					activate = UNSET;
 					received_command = SET;
@@ -126,7 +126,11 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 				}
 				else if(command == CHECK_BUSY)
 				{
-					VELOCITY_CTRL_WRITE(init_state);
+					VELOCITY_CTRL_WRITE(activate);
+				}
+				else if(command == VELOCITY_CTRL_STATUS)
+				{
+					VELOCITY_CTRL_WRITE(activate);
 				}
 				break;
 			default:
@@ -145,7 +149,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 	//ts when timerafter(time+1*SEC_FAST) :> time;
 
 	init_state = INIT;
-	while(activate)
+	while(1)
 	{
 		#pragma ordered
 		select
@@ -251,6 +255,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 
 				/* acq target velocity etherCAT */
 			case VELOCITY_CTRL_READ(command):
+
 				if(command == SET_VELOCITY_TOKEN)
 					VELOCITY_CTRL_READ(target_velocity);
 
@@ -258,7 +263,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					VELOCITY_CTRL_WRITE(actual_velocity);
 
 				else if(command == CHECK_BUSY)
-					VELOCITY_CTRL_WRITE(init_state);
+					VELOCITY_CTRL_WRITE(activate);
 
 				else if(command == SET_CTRL_PARAMETER)
 				{
@@ -285,11 +290,43 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 				}
 
 
-				else if(command == SHUTDOWN_VELOCITY)
-					VELOCITY_CTRL_READ(deactivate);
-
-				else if(command == ENABLE_VELOCITY)
-					VELOCITY_CTRL_READ(deactivate);
+				else if(command == SHUTDOWN_VELOCITY_CTRL)
+				{
+					VELOCITY_CTRL_READ(activate);
+					set_commutation_sinusoidal(c_commutation, 0);
+					error_velocity = 0;
+					error_velocity_D = 0;
+					error_velocity_I = 0;
+					previous_error = 0;
+					velocity_control_out = 0;
+					index = 0;
+					previous_position = 0;
+					raw_speed = 0;
+					old_difference = 0;
+					init = 0;
+					init_filter(filter_buffer, index, FILTER_SIZE_MAX);
+				}
+				else if(command == ENABLE_VELOCITY_CTRL)
+				{
+					VELOCITY_CTRL_READ(activate);
+					activate = SET;
+					while(1)
+					{
+						init_state = __check_commutation_init(c_commutation);
+						if(init_state == INIT)
+						{
+							printstrln("commutation intialized");
+							break;
+						}
+					}
+					#ifdef debug_print
+						printstrln("vel activated");
+					#endif
+				}
+				else if(command == VELOCITY_CTRL_STATUS)
+				{
+					VELOCITY_CTRL_WRITE(activate);
+				}
 
 				else if(command == SET_VELOCITY_CTRL_HALL)
 				{

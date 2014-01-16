@@ -45,28 +45,28 @@
 #include "print.h"
 
 //#define Debug_velocity_ctrl
-//#define debug_print
+#define debug_print
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {
-	int init_state = INIT_BUSY;
+	int ctrl_state = INIT_BUSY;
 
-	VELOCITY_CTRL_ENABLE(); 	//activate velocity ctrl loop
-
-	 // init check from velocity control loop
-	 while(1)
-	 {
-
-		init_state = __check_velocity_init(c_velocity_ctrl);
-		if(init_state == INIT)
+	while(1)
+	{
+		ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
+		if(ctrl_state == INIT_BUSY)
 		{
-#ifdef debug_print
-			printstrln("vel intialized");
-#endif
+			enable_velocity_ctrl(c_velocity_ctrl);
+		}
+		if(ctrl_state == INIT)
+		{
+			#ifdef debug_print
+				printstrln("vel intialized");
+			#endif
 			break;
 		}
-	 }
-	 return init_state;
+	}
+	return ctrl_state;
 }
 
 //internal
@@ -142,14 +142,22 @@ void set_velocity_filter(chanend c_velocity_ctrl, filter_par &filter_params)
 	VELOCITY_CTRL_WRITE(filter_params.filter_length);
 }
 
-void shutdown_velocity_ctrl(chanend c_velocity_ctrl)
+void enable_velocity_ctrl(chanend c_velocity_ctrl)
 {
-	VELOCITY_CTRL_WRITE(SHUTDOWN_VELOCITY);
+	VELOCITY_CTRL_WRITE(ENABLE_VELOCITY_CTRL);
 	VELOCITY_CTRL_WRITE(1);
 }
 
-void enable_velocity_ctrl(chanend c_velocity_ctrl)
+void shutdown_velocity_ctrl(chanend c_velocity_ctrl)
 {
-	VELOCITY_CTRL_WRITE(ENABLE_VELOCITY);
+	VELOCITY_CTRL_WRITE(SHUTDOWN_VELOCITY_CTRL);
 	VELOCITY_CTRL_WRITE(0);
+}
+
+int check_velocity_ctrl_state(chanend c_velocity_ctrl)
+{
+	int state;
+	VELOCITY_CTRL_WRITE(VELOCITY_CTRL_STATUS);
+	VELOCITY_CTRL_READ(state);
+	return state;
 }

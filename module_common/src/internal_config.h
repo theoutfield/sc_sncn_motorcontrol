@@ -52,8 +52,8 @@
 #define VELOCITY_CTRL_READ(x)		c_velocity_ctrl :> x
 #define VELOCITY_CTRL_WRITE(x)		c_velocity_ctrl <: x
 
-#define POSITION_CTRL_ENABLE()   	c_position_ctrl <: 1
-#define POSITION_CTRL_DISABLE()  	c_position_ctrl <: 0
+//#define POSITION_CTRL_ENABLE()   	c_position_ctrl <: 1
+//#define POSITION_CTRL_DISABLE()  	c_position_ctrl <: 0
 #define POSITION_CTRL_READ(x)		c_position_ctrl :> x
 #define POSITION_CTRL_WRITE(x)		c_position_ctrl <: x
 
@@ -92,26 +92,30 @@
 #define FILTER_SIZE_MAX 			16							//max size
 #define SET_VELOCITY_TOKEN 			50
 #define GET_VELOCITY_TOKEN 			60
-#define SHUTDOWN_VELOCITY 			200
-#define ENABLE_VELOCITY				250
+#define VELOCITY_CTRL_STATUS		71
+#define SHUTDOWN_VELOCITY_CTRL		200
+#define ENABLE_VELOCITY_CTRL		250
 
 #define SET_TORQUE_CTRL_HALL 		27
 #define SET_TORQUE_CTRL_QEI  		28
 #define SET_TORQUE_TOKEN 			40
 #define GET_TORQUE_TOKEN 			41
-#define SHUTDOWN_TORQUE	 			201
-#define ENABLE_TORQUE				251
+#define TORQUE_CTRL_STATUS			71
+#define SHUTDOWN_TORQUE_CTRL		201
+#define ENABLE_TORQUE_CTRL			251
 
 #define SET_POSITION_TOKEN 			40
 #define GET_POSITION_TOKEN 			41
 #define HALL_PRECISION				2
 #define QEI_PRECISION				512
-
-#define SHUTDOWN_POSITION 			201
-#define ENABLE_POSITION				251
+#define POSITION_CTRL_STATUS		71
+#define SHUTDOWN_POSITION_CTRL		201
+#define ENABLE_POSITION_CTRL		251
 
 #define SET_VOLTAGE    				2
 #define SET_COMMUTATION_PARAMS 		3
+#define DISABLE_FETS				4
+#define ENABLE_FETS					5
 
 #define SET_CTRL_PARAMETER 			100
 #define SENSOR_SELECT      			150

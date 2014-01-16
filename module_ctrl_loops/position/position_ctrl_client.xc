@@ -48,9 +48,22 @@
 
 int init_position_control(chanend c_position_ctrl)
 {
-	int init_state = INIT_BUSY;
+	int ctrl_state = INIT_BUSY;
 
-	POSITION_CTRL_ENABLE(); 					//signal position ctrl loop
+	while(1)
+	{
+		ctrl_state = check_position_ctrl_state(c_position_ctrl);
+		if(ctrl_state == INIT_BUSY)
+		{
+			enable_position_ctrl(c_position_ctrl);
+		}
+		if(ctrl_state == INIT)
+		{
+			printstrln("pos intialized");
+			break;
+		}
+	}
+	/*POSITION_CTRL_ENABLE(); 					//signal position ctrl loop
 
 	// init check from position control loop
 	while(1)
@@ -63,8 +76,10 @@ int init_position_control(chanend c_position_ctrl)
 #endif
 			break;
 		}
-	}
-	return init_state;
+	}*/
+
+
+	return ctrl_state;
 }
 
 //internal functions
@@ -144,14 +159,23 @@ void set_position_sensor(int sensor_used, chanend c_position_ctrl)
 	POSITION_CTRL_WRITE(sensor_used);
 }
 
-void shutdown_position_ctrl(chanend c_position_ctrl)
+void enable_position_ctrl(chanend c_position_ctrl)
 {
-	POSITION_CTRL_WRITE(SHUTDOWN_POSITION);
+	POSITION_CTRL_WRITE(ENABLE_POSITION_CTRL);
 	POSITION_CTRL_WRITE(1);
 }
 
-void enable_position_ctrl(chanend c_position_ctrl)
+void shutdown_position_ctrl(chanend c_position_ctrl)
 {
-	POSITION_CTRL_WRITE(ENABLE_POSITION);
+	POSITION_CTRL_WRITE(SHUTDOWN_POSITION_CTRL);
 	POSITION_CTRL_WRITE(0);
 }
+
+int check_position_ctrl_state(chanend c_position_ctrl)
+{
+	int state;
+	POSITION_CTRL_WRITE(POSITION_CTRL_STATUS);
+	POSITION_CTRL_READ(state);
+	return state;
+}
+

@@ -53,6 +53,7 @@
  */
 int init_position_control(chanend c_position_ctrl);
 
+int check_position_ctrl_state(chanend c_position_ctrl);
 
 /**
  * \brief Position Limiter

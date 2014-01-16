@@ -50,6 +50,8 @@
  */
 int init_velocity_control(chanend c_velocity_ctrl);
 
+int check_velocity_ctrl_state(chanend c_velocity_ctrl);
+
 /**
  * \brief Velocity Limiter
  *
