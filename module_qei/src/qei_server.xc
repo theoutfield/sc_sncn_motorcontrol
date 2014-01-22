@@ -63,7 +63,8 @@ static const unsigned char lookup[16][4] = {
 };
 
 void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int count, int direction,\
-		int init_state, int sync_out, int &calib_bw_flag, int &calib_fw_flag, int &offset_fw, int &offset_bw)
+		int init_state, int sync_out, int &calib_bw_flag, int &calib_fw_flag, int &offset_fw, \
+		int &offset_bw, qei_par &qei_params, int &status)
 {
 	if(command == QEI_RAW_POS_REQ)
 	{
@@ -72,6 +73,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 			c_qei <: position;
 			c_qei <: ok;
 		}
+		status = 0;
 	}
 	else if(command == QEI_ABSOLUTE_POS_REQ)
 	{
@@ -80,6 +82,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 			c_qei <: count;
 			c_qei <: direction;
 		}
+		status = 0;
 	}
 	else if(command == SYNC)
 	{
@@ -89,6 +92,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 			c_qei <: calib_fw_flag;
 			c_qei <: calib_bw_flag;
 		}
+		status = 0;
 	}
 	else if(command == SET_OFFSET)
 	{
@@ -96,6 +100,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 		c_qei :> offset_bw;
 		calib_bw_flag = 0;
 		calib_fw_flag = 0;
+		status = 0;
 	}
 	/*	else if(command == QEI_VELOCITY_PWM_RES_REQ)
 	{
@@ -107,6 +112,20 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 	else if(command == CHECK_BUSY)
 	{
 		c_qei <: init_state;
+		status = 0;
+	}
+	else if(command == SET_QEI_PARAM_ECAT)
+	{
+		c_qei :> qei_params.gear_ratio;
+		c_qei :> qei_params.index;
+		c_qei :> qei_params.max_count;
+		c_qei :> qei_params.real_counts;
+		c_qei :> qei_params.poles;
+		status = 1;
+//					printintln(qei_params.gear_ratio);
+//					printintln(qei_params.index);
+//					printintln(qei_params.max_count);
+//					printintln(qei_params.real_counts);
 	}
 }
 
@@ -140,7 +159,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 	int calib_fw_flag = 0;
 	int calib_bw_flag = 0;
 	int sync_out = 0;
-
+	int status = 0;
 
 	p_qei :> new_pins;
 
@@ -224,29 +243,59 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 
 			case c_qei_p1 :> command :
 				qei_client_hanlder( c_qei_p1, command, position, ok, count, direction, init_state,\
-						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,\
+						status);
 				break;
 
 			case c_qei_p2 :> command :
 				qei_client_hanlder( c_qei_p2, command, position, ok, count, direction, init_state,\
-						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,\
+						status);
 				break;
 
 			case c_qei_p3 :> command :
 				qei_client_hanlder( c_qei_p3, command, position, ok, count, direction, init_state,\
-						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,\
+						status);
 				break;
 
 			case c_qei_p4 :> command :
 				qei_client_hanlder( c_qei_p4, command, position, ok, count, direction, init_state,\
-						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,\
+						status);
 				break;
 
 			case c_qei_p5 :> command :
 				qei_client_hanlder( c_qei_p5, command, position, ok, count, direction, init_state,\
-						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw);
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,\
+						status);
 				break;
 
+		}
+		if(status = 1)
+		{
+			status = 0;
+			position = 0;
+			ok = 0;
+			old_pins = 0;
+
+			current_pos = 0;
+			previous_position = 0;
+			count = 0;
+			first = 1;
+			max_count_actual = qei_params.gear_ratio * qei_params.real_counts;
+			difference = 0;
+			direction = 0;
+			qei_max = qei_params.max_count;
+			qei_type = qei_params.index;
+			qei_crossover = qei_max - qei_max/10;
+			qei_count_per_hall = qei_params.real_counts / qei_params.poles;
+			offset_fw = 0;
+			offset_bw = 0;
+			calib_fw_flag = 0;
+			calib_bw_flag = 0;
+			sync_out = 0;
+			status = 0;
 		}
 
 	}

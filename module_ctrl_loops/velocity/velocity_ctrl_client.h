@@ -50,6 +50,15 @@
  */
 int init_velocity_control(chanend c_velocity_ctrl);
 
+/**
+ * \brief Checks Velocity Control Loop Status
+ *
+ *  Input Channel
+ * \channel c_velocity_ctrl channel to get state of control loop
+ *
+ *  Output
+ * \return state of the control loop : 1 - active, 0 - inactive
+ */
 int check_velocity_ctrl_state(chanend c_velocity_ctrl);
 
 /**

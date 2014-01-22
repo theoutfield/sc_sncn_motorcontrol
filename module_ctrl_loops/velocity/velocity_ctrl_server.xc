@@ -107,21 +107,22 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 						init_state = __check_commutation_init(c_commutation);
 						if(init_state == INIT)
 						{
-							//printstrln("commutation intialized");
+#ifdef debug_print
+							printstrln("commutation intialized");
+#endif
 							init_state = INIT_BUSY;
 							break;
 						}
 					}
 #ifdef debug_print
-					printstrln("vel activated");
+					printstrln("velocity control activated");
 #endif
 				}
 				else if(command == SHUTDOWN_VELOCITY_CTRL)
 				{
 					activate = UNSET;
-					received_command = SET;
 #ifdef debug_print
-					printstrln("vel disabled");
+					printstrln("velocity control disabled");
 #endif
 				}
 				else if(command == CHECK_BUSY)
@@ -144,9 +145,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 
 
 
-	//printstrln("start vel");
 	ts :> time;
-	//ts when timerafter(time+1*SEC_FAST) :> time;
 
 	init_state = INIT;
 	while(1)
@@ -163,7 +162,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					{
 						if(init == 0)
 						{
-							//set_commutation_sinusoidal(c_commutation, 400);
 							{position, direction} = get_hall_position_absolute(c_hall);
 							if(position > 2049)
 							{
@@ -243,10 +241,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 
 
 					set_commutation_sinusoidal(c_commutation, velocity_control_out);
-					/*if(!deactivate)
-						set_commutation_sinusoidal(c_commutation, velocity_control_out);
-					else
-						set_commutation_sinusoidal(c_commutation, 0);*/
 
 					previous_error = error_velocity;
 
@@ -305,6 +299,8 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					old_difference = 0;
 					init = 0;
 					init_filter(filter_buffer, index, FILTER_SIZE_MAX);
+					target_velocity = 0;
+					//disable_motor(c_commutation);
 				}
 				else if(command == ENABLE_VELOCITY_CTRL)
 				{
@@ -315,12 +311,15 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 						init_state = __check_commutation_init(c_commutation);
 						if(init_state == INIT)
 						{
+							//enable_motor(c_commutation);
+						#ifdef debug_print
 							printstrln("commutation intialized");
+						#endif
 							break;
 						}
 					}
 					#ifdef debug_print
-						printstrln("vel activated");
+						printstrln("velocity control activated");
 					#endif
 				}
 				else if(command == VELOCITY_CTRL_STATUS)
@@ -353,7 +352,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 				break;
 
 		}
-
 
 
 	}

@@ -89,21 +89,22 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						init_state = __check_commutation_init(c_commutation);
 						if(init_state == INIT)
 						{
-							//printstrln("commutation intialized");
+#ifdef debug_print
+							printstrln("commutation intialized");
+#endif
 							init_state = INIT_BUSY;
 							break;
 						}
 					}
 #ifdef debug_print
-					printstrln("pos activated");
+					printstrln("position control activated");
 #endif
 				}
 				else if(command == SHUTDOWN_POSITION_CTRL)	// SHUTDOWN_POSITION_CTRL
 				{
 					activate = UNSET;
-					received_command = SET;
 #ifdef debug_print
-					printstrln("pos disabled");
+					printstrln("position control disabled");
 #endif
 				}
 				else if(command == CHECK_BUSY) // CHECK INIT state
@@ -121,7 +122,6 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 		}
 		if(received_command == SET)
 		{
-//			POSITION_CTRL_WRITE(received_command);
 			break;
 		}
 	}
@@ -194,13 +194,10 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 					}
 
 					set_commutation_sinusoidal(c_commutation, position_control_out);
-					/*if(!deactivate)
-						set_commutation_sinusoidal(c_commutation, position_control_out);
-					else
-						set_commutation_sinusoidal(c_commutation, 0);*/
 
 					#ifdef DEBUG
-					xscope_probe_data(0, actual_position);
+						xscope_probe_data(0, actual_position);
+						xscope_probe_data(1, target_position);
 					#endif
 
 					previous_error = error_position;
@@ -257,6 +254,8 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 					error_position_I = 0;
 					previous_error = 0;
 					position_control_out = 0;
+					target_position = 0;
+				//	disable_motor(c_commutation);  TODO
 				}
 				else if(command == ENABLE_POSITION_CTRL)
 				{
@@ -267,12 +266,15 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						init_state = __check_commutation_init(c_commutation);
 						if(init_state == INIT)
 						{
+						#ifdef debug_print
 							printstrln("commutation intialized");
+						#endif
+					//		enable_motor(c_commutation); TODO
 							break;
 						}
 					}
 					#ifdef debug_print
-						printstrln("pos activated");
+						printstrln("position control activated");
 					#endif
 				}
 				else if(command == POSITION_CTRL_STATUS)

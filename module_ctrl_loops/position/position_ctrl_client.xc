@@ -42,8 +42,8 @@
 #include <print.h>
 #include <drive_config.h>
 
-//#define DEBUG
-//#define debug_print
+
+#define debug_print
 
 
 int init_position_control(chanend c_position_ctrl)
@@ -59,26 +59,12 @@ int init_position_control(chanend c_position_ctrl)
 		}
 		if(ctrl_state == INIT)
 		{
-			printstrln("pos intialized");
-			break;
-		}
-	}
-	/*POSITION_CTRL_ENABLE(); 					//signal position ctrl loop
-
-	// init check from position control loop
-	while(1)
-	{
-		init_state = __check_position_init(c_position_ctrl);
-		if(init_state == INIT)
-		{
 #ifdef debug_print
-			printstrln("pos intialized");
+			printstrln("position control intialized");
 #endif
 			break;
 		}
-	}*/
-
-
+	}
 	return ctrl_state;
 }
 

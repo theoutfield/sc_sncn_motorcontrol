@@ -44,7 +44,6 @@
 #include <drive_config.h>
 #include "print.h"
 
-//#define Debug_velocity_ctrl
 #define debug_print
 
 int init_velocity_control(chanend c_velocity_ctrl)
@@ -61,7 +60,7 @@ int init_velocity_control(chanend c_velocity_ctrl)
 		if(ctrl_state == INIT)
 		{
 			#ifdef debug_print
-				printstrln("vel intialized");
+				printstrln("velocity control intialized");
 			#endif
 			break;
 		}

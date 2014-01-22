@@ -53,6 +53,15 @@
  */
 int init_position_control(chanend c_position_ctrl);
 
+/**
+ * \brief Checks Position Control Loop Status
+ *
+ *  Input Channel
+ * \channel c_position_ctrl channel to get state of control loop
+ *
+ *  Output
+ * \return state of the control loop : 1 - active, 0 - inactive
+ */
 int check_position_ctrl_state(chanend c_position_ctrl);
 
 /**

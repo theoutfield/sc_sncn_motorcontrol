@@ -40,24 +40,38 @@
 
 #include "hall_server.h"
 
-void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state, int count, int direction)
+void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state,\
+		int count, int direction, hall_par &hall_params, int &status)
 {
 	if (command == HALL_POS_REQ)
 	{
 		c_hall <: angle;
+		//status = 0;
 	}
 	else if (command == HALL_VELOCITY_REQ)
 	{
 		c_hall <: raw_velocity;
+		//status = 0;
 	}
 	else if (command == HALL_ABSOLUTE_POS_REQ)
 	{
 		c_hall <: count;
 		c_hall <: direction;
+		//status = 0;
 	}
 	else if (command == CHECK_BUSY)
 	{
 		c_hall <: init_state;
+		//status = 0;
+	}
+	else if(command == SET_HALL_PARAM_ECAT)
+	{
+		c_hall :> hall_params.gear_ratio;
+		c_hall :> hall_params.pole_pairs;
+		status = 1;
+		//		printintln(hall_params.gear_ratio);
+		//		printintln(hall_params.pole_pairs);
+
 	}
 }
 
@@ -107,7 +121,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int index = 0;
 	int raw_velocity = 0;
 	int hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
-
+	int status = 0; //1 changed
 	init_filter(filter_buffer, index, FILTER_LENGTH_HALL);
 	t1 :> time1;
 	tx :> ts;
@@ -246,23 +260,28 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 		#pragma ordered
 		select {
 			case c_hall_p1 :> command:
-				hall_client_handler(c_hall_p1, command, angle, raw_velocity, init_state, count, direction);
+				hall_client_handler(c_hall_p1, command, angle, raw_velocity, init_state, count, \
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p2 :> command:
-				hall_client_handler(c_hall_p2, command, angle, raw_velocity, init_state, count, direction);
+				hall_client_handler(c_hall_p2, command, angle, raw_velocity, init_state, count, \
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p3 :> command:
-				hall_client_handler(c_hall_p3, command, angle, raw_velocity, init_state, count, direction);
+				hall_client_handler(c_hall_p3, command, angle, raw_velocity, init_state, count, \
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p4 :> command:
-				hall_client_handler(c_hall_p4, command, angle, raw_velocity, init_state, count, direction);
+				hall_client_handler(c_hall_p4, command, angle, raw_velocity, init_state, count, \
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p5 :> command:
-				hall_client_handler(c_hall_p5, command, angle, raw_velocity, init_state, count, direction);
+				hall_client_handler(c_hall_p5, command, angle, raw_velocity, init_state, count, \
+						direction, hall_params, status);
 				break;
 
 			case tx when timerafter(time1 + MSEC_FAST) :> time1:
@@ -300,6 +319,15 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 
 			default:
 				break;
+		}
+		if(status == 1)
+		{
+			hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
+			hall_enc_count = hall_params.pole_pairs * hall_params.gear_ratio * 4095;
+			first = 1;
+			previous_position = 0;
+			count = 0;
+			status = 0;
 		}
 
 		tx when timerafter(ts + 250) :> ts;

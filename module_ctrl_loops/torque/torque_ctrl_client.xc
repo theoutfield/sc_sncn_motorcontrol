@@ -44,27 +44,28 @@
 #include <drive_config.h>
 #include <internal_config.h>
 #include <bldc_motor_config.h>
+#define debug_print
 
 int init_torque_control(chanend c_torque_ctrl)
 {
-	int init_state = INIT_BUSY;
-	TORQUE_CTRL_ENABLE(); 					//signal torque ctrl loop
-
-	// init check from torque control loop
+	int ctrl_state = INIT_BUSY;
 
 	while(1)
 	{
-		init_state = __check_torque_init(c_torque_ctrl);
-		//t when timerafter(time+2*MSEC_STD) :> time;
-		if(init_state == INIT)
+		ctrl_state = check_torque_ctrl_state(c_torque_ctrl);
+		if(ctrl_state == INIT_BUSY)
 		{
-//#ifdef debug_print
-			//printstrln("torque intialized");
-//#endif
+			enable_torque_ctrl(c_torque_ctrl);
+		}
+		if(ctrl_state == INIT)
+		{
+			#ifdef debug_print
+				printstrln("torque control intialized");
+			#endif
 			break;
 		}
 	}
-	return init_state;
+	return ctrl_state;
 }
 
 int get_torque(cst_par &cst_params, chanend c_torque_ctrl)
@@ -155,12 +156,20 @@ void set_torque_sensor(int sensor_used, chanend c_torque_ctrl)
 
 void enable_torque_ctrl(chanend c_torque_ctrl)
 {
-	TORQUE_CTRL_WRITE(ENABLE_TORQUE);
-	TORQUE_CTRL_WRITE(0);
+	TORQUE_CTRL_WRITE(ENABLE_TORQUE_CTRL);
+	TORQUE_CTRL_WRITE(1);
 }
 
 void shutdown_torque_ctrl(chanend c_torque_ctrl)
 {
-	TORQUE_CTRL_WRITE(SHUTDOWN_TORQUE);
-	TORQUE_CTRL_WRITE(1);
+	TORQUE_CTRL_WRITE(SHUTDOWN_TORQUE_CTRL);
+	TORQUE_CTRL_WRITE(0);
+}
+
+int check_torque_ctrl_state(chanend c_torque_ctrl)
+{
+	int state;
+	TORQUE_CTRL_WRITE(TORQUE_CTRL_STATUS);
+	TORQUE_CTRL_READ(state);
+	return state;
 }

@@ -62,11 +62,11 @@ void set_profile_torque(int target_torque, int torque_slope, cst_par &cst_params
 	int init_state = __check_torque_init(c_torque_ctrl);
 	if(init_state == INIT_BUSY)
 	{
-		init = init_torque_control(c_torque_ctrl);
-		/*if(init == INIT)
+		init_state = init_torque_control(c_torque_ctrl);
+		if(init_state == INIT)
 		{
-			printstrln("torque control intialized");
-		}*/
+			//printstrln("torque control intialized");
+		}
 	}
 
 	actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
@@ -78,8 +78,8 @@ void set_profile_torque(int target_torque, int torque_slope, cst_par &cst_params
 		set_torque( torque_ramp, cst_params , c_torque_ctrl);
 		actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
 		t when timerafter(time + MSEC_STD) :> time;
-		/*xscope_probe_data(0, torque_ramp);
-		xscope_probe_data(1, actual_torque);*/
+		/*xscope_probe_data(1, torque_ramp);
+		xscope_probe_data(0, actual_torque);*/
 	}
 	t when timerafter(time + 30 * MSEC_STD) :> time;
 }

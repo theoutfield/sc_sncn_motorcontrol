@@ -62,10 +62,10 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 	if(init_state == INIT_BUSY)
 	{
 		init_state = init_velocity_control(c_velocity_ctrl);
-		if(init_state == INIT)
+	/*	if(init_state == INIT)
 			printstrln("velocity control intialized");
 		else
-			printstrln("intialize velocity control failed");
+			printstrln("intialize velocity control failed");*/
 	}
 
 
@@ -82,8 +82,8 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 
 			t when timerafter(time + MSEC_STD) :> time;
 
-			xscope_probe_data(0, actual_velocity);
-			xscope_probe_data(1, velocity_ramp);
+		/*	xscope_probe_data(0, actual_velocity);
+			xscope_probe_data(1, velocity_ramp);*/
 		}
 		t when timerafter(time + 30 * MSEC_STD) :> time;
 	}

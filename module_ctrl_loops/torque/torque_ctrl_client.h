@@ -50,6 +50,17 @@
 int init_torque_control(chanend c_torque_ctrl);
 
 /**
+ * \brief Checks Torque Control Loop Status
+ *
+ *  Input Channel
+ * \channel c_torque_ctrl channel to get state of control loop
+ *
+ *  Output
+ * \return state of the control loop : 1 - active, 0 - inactive
+ */
+int check_torque_ctrl_state(chanend c_torque_ctrl);
+
+/**
  * \brief Torque Limiter
  *
  *  Input

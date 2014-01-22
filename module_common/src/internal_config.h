@@ -44,16 +44,10 @@
 
 #define TORQUE_CTRL_READ(x)			c_torque_ctrl :> x
 #define TORQUE_CTRL_WRITE(x)		c_torque_ctrl <: x
-#define TORQUE_CTRL_ENABLE()		c_torque_ctrl <: 1
-#define TORQUE_CTRL_DISABLE()		c_torque_ctrl <: 0
 
-#define VELOCITY_CTRL_ENABLE()   	c_velocity_ctrl <: 1
-#define VELOCITY_CTRL_DISABLE()  	c_velocity_ctrl <: 0
 #define VELOCITY_CTRL_READ(x)		c_velocity_ctrl :> x
 #define VELOCITY_CTRL_WRITE(x)		c_velocity_ctrl <: x
 
-//#define POSITION_CTRL_ENABLE()   	c_position_ctrl <: 1
-//#define POSITION_CTRL_DISABLE()  	c_position_ctrl <: 0
 #define POSITION_CTRL_READ(x)		c_position_ctrl :> x
 #define POSITION_CTRL_WRITE(x)		c_position_ctrl <: x
 
