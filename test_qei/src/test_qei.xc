@@ -71,7 +71,7 @@ void xscope_initialise_1()
 	return;
 }
 
-/* hall sensor test function */
+/* qei sensor test function */
 void qei_test(chanend c_qei)
 {
 	int position;
@@ -99,9 +99,9 @@ void qei_test(chanend c_qei)
 		xscope_probe_data(0, position);
 		xscope_probe_data(1, velocity);
 #else
-		printstr("position");
+		printstr("position ");
 		printint(position);
-		printstr("velocity ");   // with print velocity information will be corrupt (use xscope)
+		printstr(" velocity ");   // with print velocity information will be corrupt (use xscope)
 		printintln(velocity);
 #endif
 	}
