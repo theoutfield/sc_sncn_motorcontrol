@@ -81,10 +81,8 @@ int absolute(int var)
 /* Sinusoidal based commutation functions */
 
 void commutation_client_hanlder(chanend c_commutation, int command, commutation_par &commutation_params, \
-		int &voltage, int &sensor_select, int init_state, timer t, unsigned int pwm[], chanend c_pwm_ctrl, \
-		out port p_ifm_coastn)
+		int &voltage, int &sensor_select, int init_state)
 {
-	unsigned int ts;
 	if(command == SET_VOLTAGE)				// set voltage
 	{
 		c_commutation :> voltage;
@@ -110,23 +108,11 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 	}
 	else if(command == DISABLE_FETS)
 	{
-		pwm[0] = 0;  pwm[1] = 0;  pwm[2] = 0;
-		update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
-		t :> ts;
-		t when timerafter (ts + 300*USEC_FAST) :> ts;
-
-		a4935_disable_fets(p_ifm_coastn);
-		t when timerafter (ts + 300*USEC_FAST) :> ts;
+		//TODO
 	}
 	else if(command == ENABLE_FETS)
 	{
-		pwm[0] = 0;  pwm[1] = 0;  pwm[2] = 0;
-		update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
-		t :> ts;
-		t when timerafter (ts + 300*USEC_FAST) :> ts;
-
-		a4935_enable_fets(p_ifm_coastn);
-		t when timerafter (ts + 300*USEC_FAST) :> ts;
+		//TODO
 	}
 	return;
 }
@@ -241,17 +227,17 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 		{
 			case c_commutation_p1 :> command:
 				commutation_client_hanlder( c_commutation_p1, command, commutation_params, voltage, \
-						sensor_select, init_state, t, pwm, c_pwm_ctrl, p_ifm_coastn);
+						sensor_select, init_state);
 				break;
 
 			case c_commutation_p2 :> command:
 				commutation_client_hanlder( c_commutation_p2, command, commutation_params, voltage,
-						sensor_select, init_state, t, pwm, c_pwm_ctrl, p_ifm_coastn);
+						sensor_select, init_state);
 				break;
 
 			case c_commutation_p3 :> command:
 				commutation_client_hanlder( c_commutation_p3, command, commutation_params, voltage,
-						sensor_select, init_state, t, pwm, c_pwm_ctrl, p_ifm_coastn);
+						sensor_select, init_state);
 				break;
 
 			case c_signal :> command:
@@ -296,11 +282,6 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 					fw_flag = 0;
 					bw_flag = 0;
 					init_qei_velocity_params(qei_velocity_params);
-			//					printintln(hall_params.gear_ratio);
-			//					printintln(hall_params.pole_pairs);
-			//					printintln(commutation_params.max_speed_reached );
-			//										printintln(commutation_params.angle_variance);
-
 				}
 				break;
 
@@ -322,11 +303,6 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 		unsigned int ts;
 		int init_state = INIT_BUSY;
 
-		// enable watchdog
-		t :> ts;
-		t when timerafter (ts + 250000*4):> ts;
-		c_watchdog <: WD_CMD_START;
-
 		commutation_init_to_zero(c_pwm_ctrl);
 		t :> ts;
 		t when timerafter (ts + t_delay) :> ts;
@@ -334,9 +310,15 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 		a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH);
 		t when timerafter (ts + t_delay) :> ts;
 
+		// enable watchdog
+		t :> ts;
+		t when timerafter (ts + 250000*4):> ts;
+		c_watchdog <: WD_CMD_START;
+
 		t :> ts;
 
 		commutation_sinusoidal_loop(HALL, hall_params, qei_params, commutation_params,\
-				  c_hall, c_qei, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, c_commutation_p3);
+				  c_hall, c_qei, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, \
+				  c_commutation_p3);
 
 }
