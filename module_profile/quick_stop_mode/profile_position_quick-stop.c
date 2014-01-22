@@ -80,7 +80,7 @@ int init_quick_stop_position_profile(int actual_velocity, int actual_position, i
 	 if(pos_param_s.qf < 0)
 		 pos_param_s.qf = 0 - pos_param_s.qf;
 
-	 pos_param_s.acc = pos_param_s.qf * 8;  // 8 times deceleration
+	 pos_param_s.acc = pos_param_s.qf;
 	 if(pos_param_s.acc > max_acceleration)
 		 pos_param_s.acc = max_acceleration;
 
