@@ -41,12 +41,12 @@
 #include <xs1.h>
 #include <platform.h>
 #include <a4935.h>
-
+#include <print.h>
 
 void a4935_init(int configuration)
 {
 	timer timer1;
-	unsigned time1;
+	unsigned int time1;
 
 	configuration |= A4935_BIT_ESF; // add enable_stop_on_fault to config bits
 
@@ -69,19 +69,6 @@ void a4935_init(int configuration)
 	// pause before enabling FETs after reset
 	timer1 when timerafter(time1 + A4935_AFTER_RESET_DELAY) :> time1;
 
-	// enable FETs
+	// enable FETs redundant with watchdog
 	p_ifm_coastn <: 1;
-
 }
-
-void a4935_disable_fets(out port p_ifm_coastn)
-{
-	p_ifm_coastn <: 0;
-}
-
-void a4935_enable_fets(out port p_ifm_coastn)
-{
-	  p_ifm_coastn <: 1;
-}
-
-

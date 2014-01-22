@@ -54,9 +54,3 @@
 
 /* e.g. a4935_init(p_mgmt, p_coast, A4935_BIT_PWMH | A4935_BIT_PWML); */
 void a4935_init(int configuration);
-
-void a4935_disable_fets(out port p_ifm_coastn);
-
-void a4935_enable_fets(out port p_ifm_coastn);
-
-
