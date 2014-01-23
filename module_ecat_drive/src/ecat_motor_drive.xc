@@ -147,9 +147,9 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	init_qei_param(qei_params);
 
 	torque_offstate = (cst_params.max_torque * 15) / (cst_params.nominal_current * 100 * cst_params.motor_torque_constant);
-//#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope_main
 	xscope_initialise();
-//#endif
+#endif
 	t:>time;
 	while(1)
 	{
@@ -167,7 +167,9 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				t :> comm_inactive_time_stamp;
 				if(comm_inactive_time_stamp - c_time> 1*SEC_STD)
 				{
-		//			printstrln("comm inactive timeout");
+					//printstrln("comm inactive timeout");
+					t :> time;
+					t when timerafter(time+2*SEC_STD) :> time;
 					inactive_timeout_flag = 1;
 				}
 			}
@@ -1143,10 +1145,10 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							actual_position = get_position(c_position_ctrl);
 							send_actual_position(actual_position * pp_params.base.polarity, InOut);
 						}
-					//#ifdef ENABLE_xscope_main
+					#ifdef ENABLE_xscope_main
 						xscope_probe_data(0, actual_position);
 						xscope_probe_data(1, target_position);
-					//#endif
+					#endif
 						t when timerafter(time + MSEC_STD) :> time;
 						i++;
 					}

@@ -101,7 +101,7 @@ int main(void)
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl, c_adctrig;												// pwm channels
-	chan c_velocity_ctrl, c_position_ctrl;													// velocity control channel
+	chan c_velocity_ctrl;													// velocity control channel
 	chan c_watchdog; 														// watchdog channel
 
 	// EtherCat Comm channels
