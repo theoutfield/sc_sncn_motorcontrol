@@ -78,14 +78,14 @@ int main(void)
 	chan c_watchdog; 														// watchdog channel
 
 
-	// EtherCat Comm channels
-	chan coe_in; 		//< CAN from module_ethercat to consumer
-	chan coe_out; 		//< CAN from consumer to module_ethercat
-	chan eoe_in; 		//< Ethernet from module_ethercat to consumer
-	chan eoe_out; 		//< Ethernet from consumer to module_ethercat
+	// EtherCat Communication channels
+	chan coe_in; 		// CAN from module_ethercat to consumer
+	chan coe_out; 		// CAN from consumer to module_ethercat
+	chan eoe_in; 		// Ethernet from module_ethercat to consumer
+	chan eoe_out; 		// Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; 		//< File from module_ethercat to consumer
-	chan foe_out; 		//< File from consumer to module_ethercat
+	chan foe_in; 		// File from module_ethercat to consumer
+	chan foe_out; 		// File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
 	chan c_sig_1;
@@ -110,7 +110,8 @@ int main(void)
 		/* Ethercat Motor Drive Loop */
 		on stdcore[1] :
 		{
-			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
+			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5, c_torque_ctrl, \
+					c_velocity_ctrl, c_position_ctrl);
 		}
 
 		on stdcore[2]:
@@ -121,6 +122,7 @@ int main(void)
 				{
 					 ctrl_par position_ctrl_params;
 					 hall_par hall_params;
+
 					 qei_par qei_params;
 
 					 init_position_control_param(position_ctrl_params);
@@ -186,8 +188,8 @@ int main(void)
 					qei_par qei_params;
 					commutation_par commutation_params;
 					commutation_init_ecat(c_signal, hall_params, qei_params, commutation_params);
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog,
-							c_commutation_p1, c_commutation_p2, c_commutation_p3,
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, \
+							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);							// channel priority 1,2,3
 				}
 

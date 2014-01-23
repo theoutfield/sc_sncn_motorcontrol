@@ -132,6 +132,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	int mode_selected = 0;
 	check_list checklist;
 
+	int ctrl_state;
 	state 		= init_state(); 			//init state
 	checklist 	= init_checklist();
 	InOut 		= init_ctrl_proto();
@@ -384,6 +385,16 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					case PP:
 						if(op_set_flag == 0)
 						{
+							ctrl_state = check_position_ctrl_state(c_position_ctrl);
+							if(ctrl_state == 0)
+								shutdown_position_ctrl(c_position_ctrl);
+							ctrl_state = check_torque_ctrl_state(c_torque_ctrl);
+							if(ctrl_state == 1)
+								shutdown_torque_ctrl(c_torque_ctrl);
+							ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
+							if(ctrl_state == 1)
+								shutdown_velocity_ctrl(c_velocity_ctrl);
+
 							init = init_position_control(c_position_ctrl);
 						}
 						if(init == INIT)
@@ -440,6 +451,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						//printstrln("TQ");
 						if(op_set_flag == 0)
 						{
+							ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
+							if(ctrl_state == 1)
+								shutdown_velocity_ctrl(c_velocity_ctrl);
+							ctrl_state = check_position_ctrl_state(c_position_ctrl);
+							if(ctrl_state == 1)
+								shutdown_position_ctrl(c_position_ctrl);
 							init = init_torque_control(c_torque_ctrl);
 						}
 						if(init == INIT)
@@ -493,6 +510,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						//printstrln("pv");
 						if(op_set_flag == 0)
 						{
+							ctrl_state = check_torque_ctrl_state(c_torque_ctrl);
+							if(ctrl_state == 1)
+								shutdown_torque_ctrl(c_torque_ctrl);
+							ctrl_state = check_position_ctrl_state(c_position_ctrl);
+							if(ctrl_state == 1)
+								shutdown_position_ctrl(c_position_ctrl);
 							init = init_velocity_control(c_velocity_ctrl);
 						}
 						if(init == INIT)
@@ -538,6 +561,15 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					case CSP:
 						if(op_set_flag == 0)
 						{
+							ctrl_state = check_position_ctrl_state(c_position_ctrl);
+							if(ctrl_state == 0)
+								shutdown_position_ctrl(c_position_ctrl);
+							ctrl_state = check_torque_ctrl_state(c_torque_ctrl);
+							if(ctrl_state == 1)
+								shutdown_torque_ctrl(c_torque_ctrl);
+							ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
+							if(ctrl_state == 1)
+								shutdown_velocity_ctrl(c_velocity_ctrl);
 							init = init_position_control(c_position_ctrl);
 						}
 						if(init == INIT)
@@ -589,8 +621,13 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					case CSV: 	//csv mode index
 						if(op_set_flag == 0)
 						{
+							ctrl_state = check_torque_ctrl_state(c_torque_ctrl);
+							if(ctrl_state == 1)
+								shutdown_torque_ctrl(c_torque_ctrl);
+							ctrl_state = check_position_ctrl_state(c_position_ctrl);
+							if(ctrl_state == 1)
+								shutdown_position_ctrl(c_position_ctrl);
 							init = init_velocity_control(c_velocity_ctrl);
-
 						}
 						if(init == INIT)
 						{
@@ -635,6 +672,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						printstrln("op mode enabled on slave");
 						if(op_set_flag == 0)
 						{
+							ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
+							if(ctrl_state == 1)
+								shutdown_velocity_ctrl(c_velocity_ctrl);
+							ctrl_state = check_position_ctrl_state(c_position_ctrl);
+							if(ctrl_state == 1)
+								shutdown_position_ctrl(c_position_ctrl);
 							init = init_torque_control(c_torque_ctrl);
 						}
 						if(init == INIT)
