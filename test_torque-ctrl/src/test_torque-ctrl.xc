@@ -67,7 +67,7 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
-	xscope_register(2, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
+	xscope_register(4, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
 						XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n");
 	xscope_config_io(XSCOPE_IO_BASIC);
 	return;
@@ -106,19 +106,19 @@ int main(void)
 	chan c_torque_ctrl;														// torque control channel
 	chan c_watchdog; 														// watchdog channel
 
-	// EtherCat Comm channels
-	chan coe_in; 		//< CAN from module_ethercat to consumer
-	chan coe_out; 		//< CAN from consumer to module_ethercat
-	chan eoe_in; 		//< Ethernet from module_ethercat to consumer
-	chan eoe_out; 		//< Ethernet from consumer to module_ethercat
+	// EtherCat Communication channels
+	chan coe_in; 		// CAN from module_ethercat to consumer
+	chan coe_out; 		// CAN from consumer to module_ethercat
+	chan eoe_in; 		// Ethernet from module_ethercat to consumer
+	chan eoe_out; 		// Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; 		//< File from module_ethercat to consumer
-	chan foe_out; 		//< File from consumer to module_ethercat
+	chan foe_in; 		// File from module_ethercat to consumer
+	chan foe_out; 		// File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
 	chan c_sig_1;
 
-	//
+
 	par
 	{
 		/* Ethercat Communication Handler Loop */

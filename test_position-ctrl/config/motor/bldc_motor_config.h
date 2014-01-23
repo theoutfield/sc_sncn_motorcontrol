@@ -86,7 +86,7 @@
 
 /* Control specific constants/variables */
 	/*Torque Control (Mandatory if Torque control used)*/
-#define TORQUE_Kp_NUMERATOR 	   	50
+#define TORQUE_Kp_NUMERATOR 	   	20
 #define TORQUE_Kp_DENOMINATOR  		10
 #define TORQUE_Ki_NUMERATOR    		11
 #define TORQUE_Ki_DENOMINATOR  		110

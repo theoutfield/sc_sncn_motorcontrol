@@ -107,7 +107,7 @@ int main(void)
 	chan c_position_ctrl;													// position control channel
 	chan c_watchdog; 														// watchdog channel
 
-	// EtherCat Comm channels
+	// EtherCat Communication channels
 	chan coe_in; 		//< CAN from module_ethercat to consumer
 	chan coe_out; 		//< CAN from consumer to module_ethercat
 	chan eoe_in; 		//< Ethernet from module_ethercat to consumer
@@ -118,7 +118,7 @@ int main(void)
 	chan pdo_in;
 	chan pdo_out;
 	chan c_sig_1;
-	//
+
 	par
 	{
 		/* Ethercat Communication Handler Loop */
@@ -135,7 +135,7 @@ int main(void)
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
 
-		/* Test Profile Position function */
+		/* Test Profile Position function*/
 		on stdcore[1]:
 		{
 			position_profile_test(c_position_ctrl);		  	// test PPM on slave side

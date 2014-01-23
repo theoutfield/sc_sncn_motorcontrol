@@ -85,7 +85,7 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 	int deceleration 	= 1050;			// rpm/s
 
 #ifdef ENABLE_xscope_main
-	xscope_initialise_1();
+	//xscope_initialise_1();
 #endif
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
@@ -101,22 +101,22 @@ int main(void)
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl, c_adctrig;												// pwm channels
-	chan c_velocity_ctrl;													// velocity control channel
+	chan c_velocity_ctrl, c_position_ctrl;													// velocity control channel
 	chan c_watchdog; 														// watchdog channel
 
 	// EtherCat Comm channels
-	chan coe_in; 		//< CAN from module_ethercat to consumer
-	chan coe_out; 		//< CAN from consumer to module_ethercat
-	chan eoe_in; 		//< Ethernet from module_ethercat to consumer
-	chan eoe_out; 		//< Ethernet from consumer to module_ethercat
+	chan coe_in; 		// CAN from module_ethercat to consumer
+	chan coe_out; 		// CAN from consumer to module_ethercat
+	chan eoe_in; 		// Ethernet from module_ethercat to consumer
+	chan eoe_out; 		// Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; 		//< File from module_ethercat to consumer
-	chan foe_out; 		//< File from consumer to module_ethercat
+	chan foe_in; 		// File from module_ethercat to consumer
+	chan foe_out; 		// File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
 	chan c_sig_1;
 
-	//
+
 	par
 	{
 		/* Ethercat Communication Handler Loop */
