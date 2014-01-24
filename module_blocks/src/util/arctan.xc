@@ -5,7 +5,7 @@
  *	Arc tangent calculations
  *
  *
- * Copyright (c) 2013, Synapticon GmbH
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
  * Authors: Ludwig Orgler <lorgler@synapticon.com> & Pavan Kanajar <pkanajar@synapticon.com>
  *

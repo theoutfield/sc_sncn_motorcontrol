@@ -5,9 +5,9 @@
  *
  *	Ethercat Motor Drive Server
  *
- * Copyright (c) 2013, Synapticon GmbH
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Martin Schwarz <mschwarz@synapticon.com>
+ * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -574,7 +574,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						break;
 
 					case CST:
-						printstrln("op mode enabled on slave");
+
 						if(op_set_flag == 0)
 						{
 							ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);

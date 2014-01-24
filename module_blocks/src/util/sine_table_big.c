@@ -5,7 +5,7 @@
  *	Sine Loopup tables
  *
  *
- * Copyright (c) 2013, Synapticon GmbH
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
  * Authors: Ludwig Orgler <lorgler@synapticon.com>
  *

@@ -5,7 +5,7 @@
  *
  *	QEI Sensor Config
  *
- * Copyright (c) 2013, Synapticon GmbH & XMOS Ltd
+ * Copyright (c) 2014, Synapticon GmbH & XMOS Ltd
  * All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *

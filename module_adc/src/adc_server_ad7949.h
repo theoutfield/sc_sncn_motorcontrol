@@ -5,7 +5,7 @@
  *
  * 	ADC Server
  *
- * Copyright (c) 2013, Synapticon GmbH
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
  * Author: Martin Schwarz <mschwarz@synapticon.com> & Ludwig Orgler <lorgler@synapticon.com>
  *
