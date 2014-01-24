@@ -1,0 +1,13 @@
+
+MODULE_PROFILE_DIRS += include
+MODULE_PROFILE_DIRS += profile_velocity_mode
+MODULE_PROFILE_DIRS += quick_stop_mode
+MODULE_PROFILE_DIRS += profile_position_mode
+MODULE_PROFILE_DIRS += profile_linear_mode
+MODULE_PROFILE_DIRS += profile_ctrl
+
+SOURCE_DIRS += $(MODULE_PROFILE_DIRS)
+INCLUDE_DIRS += $(MODULE_PROFILE_DIRS)
+
+XCC_FLAGS += -fsubword-select
+OPTIONAL_HEADERS += dc_motor_config.h refclk.h

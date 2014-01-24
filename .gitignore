@@ -1,18 +1,20 @@
-# Object files
-*.o
-*.ko
+## ignore XDE(ecipse) files
+.metadata/
 
-# Libraries
-*.lib
-*.a
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
 *.out
-*.app
+
+## build files and bins
+.build_Debug/
+.build_Release/
+bin/
+
+## XSCOPE output
+*.xmt
+
+## ignore KDE files
+.directory

@@ -1,0 +1,8 @@
+MODULE_BLOCKS_DIRS = src
+MODULE_BLOCKS_DIRS += src/control_blocks
+MODULE_BLOCKS_DIRS += src/filter_blocks
+MODULE_BLOCKS_DIRS += src/control_blocks/watchdog
+MODULE_BLOCKS_DIRS += src/util
+
+SOURCE_DIRS += $(MODULE_BLOCKS_DIRS)
+INCLUDE_DIRS += $(MODULE_BLOCKS_DIRS)

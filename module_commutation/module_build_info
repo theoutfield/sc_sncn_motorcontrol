@@ -1,0 +1,5 @@
+
+MODULE_COMMUTATION_DIRS += predriver pwm commutation
+
+XCC_FLAGS += -fsubword-select
+OPTIONAL_HEADERS += refclk.h
