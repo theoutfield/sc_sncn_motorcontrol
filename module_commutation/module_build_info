@@ -2,4 +2,4 @@
 MODULE_COMMUTATION_DIRS += predriver pwm commutation
 
 XCC_FLAGS += -fsubword-select
-OPTIONAL_HEADERS += dsc_config.h refclk.h
+OPTIONAL_HEADERS += refclk.h
