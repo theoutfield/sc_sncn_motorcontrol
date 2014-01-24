@@ -104,7 +104,7 @@ int main(void)
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl;														// pwm channels
 	chan c_qei;																// qei channels
-
+	chan c_watchdog; 														// watchdog channel
 
 	par
 	{
@@ -148,10 +148,13 @@ int main(void)
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 					commutation_sinusoidal(c_hall_p1,  c_qei,\
-							 c_signal, c_commutation_p1, c_commutation_p2,\
+							 c_signal, c_watchdog, c_commutation_p1, c_commutation_p2,\
 							 c_commutation_p3, c_pwm_ctrl, hall_params,\
 							 qei_params, commutation_params);
 				}
+
+				/* Watchdog Server */
+				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
 				/* Hall Server */
 				{
