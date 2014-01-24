@@ -120,7 +120,7 @@ int main(void)
 	par
 	{
 		/* Ethercat Communication Handler Loop */
-		on stdcore[0] :
+		on stdcore[COM_CORE] :
 		{
 			ecat_init();
 			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,\
@@ -128,7 +128,7 @@ int main(void)
 		}
 
 		/* Firmware Update Loop */
-		on stdcore[0] :
+		on stdcore[COM_CORE] :
 		{
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
@@ -178,7 +178,7 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation parameters
 					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, 	\
 							c_commutation_p1, c_commutation_p2, c_commutation_p3,		\
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);

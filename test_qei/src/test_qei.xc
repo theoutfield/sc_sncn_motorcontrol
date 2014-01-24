@@ -51,7 +51,6 @@
 #include <xscope.h>
 #include <bldc_motor_config.h>
 
-//#include <flash_somanet.h>
 
 //#define ENABLE_xscope_main
 
@@ -71,7 +70,7 @@ void xscope_initialise_1()
 	return;
 }
 
-/* qei sensor test function */
+/* QEI Sensor Test Function */
 void qei_test(chanend c_qei)
 {
 	int position;
@@ -80,10 +79,10 @@ void qei_test(chanend c_qei)
 	int core_id = 1;
 	timer t;
 	qei_par qei_params;
-	qei_velocity_par qei_velocity_params;  // to compute velocity from qei
+	qei_velocity_par qei_velocity_params;  // parameters to compute velocity from qei
 
 	init_qei_param(qei_params);
-	init_qei_velocity_params(qei_velocity_params);	// to compute velocity from qei
+	init_qei_velocity_params(qei_velocity_params);	// init parameters
 
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
@@ -101,7 +100,7 @@ void qei_test(chanend c_qei)
 #else
 		printstr("position ");
 		printint(position);
-		printstr(" velocity ");   // with print velocity information will be corrupt (use xscope)
+		printstr(" velocity ");   // with prints velocity information will be affected (use xscope)
 		printintln(velocity);
 #endif
 	}

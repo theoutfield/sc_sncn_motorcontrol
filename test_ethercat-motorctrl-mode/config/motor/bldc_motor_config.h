@@ -97,8 +97,8 @@
 #define POSITION_KP	 				1474		//	(180/2000)  * 16384
 #define POSITION_KI   				8			//	(50/102000) * 16384
 #define POSITION_KD    				164			//	(100/10000) * 16384
-#define MAX_POSITION_LIMIT 			359
-#define MIN_POSITION_LIMIT 			-359
+#define MAX_POSITION_LIMIT 			350			// degree should not exceed 359
+#define MIN_POSITION_LIMIT 			-350		// degree should not exceed 359
 
 #define HALL 						1
 #define QEI_INDEX  					2

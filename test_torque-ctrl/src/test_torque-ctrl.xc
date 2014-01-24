@@ -67,7 +67,7 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
-	xscope_register(4, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
+	xscope_register(2, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
 						XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n");
 	xscope_config_io(XSCOPE_IO_BASIC);
 	return;
@@ -76,7 +76,7 @@ void xscope_initialise_1()
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 350;  //(desired torque/torque_constant)  * IFM resolution
+	int target_torque = 150;  //(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 150;  //(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params;
 	init_cst_param(cst_params);
@@ -122,7 +122,7 @@ int main(void)
 	par
 	{
 		/* Ethercat Communication Handler Loop */
-		on stdcore[0] :
+		on stdcore[COM_CORE] :
 		{
 			ecat_init();
 			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,\
@@ -130,7 +130,7 @@ int main(void)
 		}
 
 		/* Firmware Update Loop */
-		on stdcore[0] :
+		on stdcore[COM_CORE] :
 		{
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
@@ -179,7 +179,7 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation parameters
 					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, \
 							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
 							c_pwm_ctrl, hall_params, qei_params, commutation_params);
