@@ -61,7 +61,7 @@ struct PROFILE_LINEAR_PARAM
 int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value)
 {
 	profile_linear_params.u = (float) actual_value;
-//	profile_linear_params.v_d = (float) target_value;
+
 	profile_linear_params.acc = (float) acceleration;
 	profile_linear_params.dec = (float) deceleration;
 
@@ -70,8 +70,7 @@ int init_linear_profile(int target_value, int actual_value, int acceleration, in
 	else if(target_value <= -max_value)
 		target_value = 0-max_value;
 	profile_linear_params.v_d = (float) target_value;
-	//printf("srta");
-//printf("\n%d\n",target_value);
+
 	/*both initial and desired velocity - positive case*/
     if(profile_linear_params.u>=0 && profile_linear_params.v_d >=0)
     {
@@ -152,7 +151,7 @@ int init_linear_profile(int target_value, int actual_value, int acceleration, in
 	if(profile_linear_params.T<0)
 		profile_linear_params.T = -profile_linear_params.T;
 
-	//length = (int) round (T);
+
 	profile_linear_params.s_time = profile_linear_params.t/profile_linear_params.T;
 
 	return (int) round (profile_linear_params.T);
@@ -166,7 +165,7 @@ int  linear_profile_generate(int step)
 int init_linear_profile_float(float target_value, float actual_value, float acceleration, float deceleration, float max_value)
 {
 	profile_linear_params.u =  actual_value;
-//	profile_linear_params.v_d = (float) target_value;
+
 	profile_linear_params.acc = acceleration;
 	profile_linear_params.dec = deceleration;
 
@@ -175,8 +174,7 @@ int init_linear_profile_float(float target_value, float actual_value, float acce
 	else if(target_value <= -max_value)
 		target_value = 0-max_value;
 	profile_linear_params.v_d = target_value;
-	//printf("srta");
-//printf("\n%d\n",target_value);
+
 	/*both initial and desired velocity - positive case*/
     if(profile_linear_params.u>=0 && profile_linear_params.v_d >=0)
     {
@@ -257,7 +255,7 @@ int init_linear_profile_float(float target_value, float actual_value, float acce
 	if(profile_linear_params.T<0)
 		profile_linear_params.T = -profile_linear_params.T;
 
-	//length = (int) round (T);
+
 	profile_linear_params.s_time = profile_linear_params.t/profile_linear_params.T;
 
 	return (int) round (profile_linear_params.T);

@@ -59,7 +59,6 @@ struct PROFILE_VELOCITY_PARAM
 int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration, int max_velocity)
 {
 	profile_vel_params.u = (float) actual_velocity;
-//	profile_vel_params.v_d = (float) target_velocity;
 	profile_vel_params.acc = (float) acceleration;
 	profile_vel_params.dec = (float) deceleration;
 
@@ -68,8 +67,6 @@ int init_velocity_profile(int target_velocity, int actual_velocity, int accelera
 	else if(target_velocity <= -max_velocity)
 		target_velocity = 0-max_velocity;
 	profile_vel_params.v_d = (float) target_velocity;
-	//printf("srta");
-//printf("\n%d\n",target_velocity);
 	/*both initial and desired velocity - positive case*/
     if(profile_vel_params.u>=0 && profile_vel_params.v_d >=0)
     {
@@ -150,7 +147,7 @@ int init_velocity_profile(int target_velocity, int actual_velocity, int accelera
 	if(profile_vel_params.T<0)
 		profile_vel_params.T = -profile_vel_params.T;
 
-	//length = (int) round (T);
+
 	profile_vel_params.s_time = profile_vel_params.t/profile_vel_params.T;
 
 	return (int) round (profile_vel_params.T);

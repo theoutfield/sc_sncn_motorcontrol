@@ -95,7 +95,7 @@ void update_csv_param_ecat(csv_par &csv_params, chanend coe_out)
 {
 	{csv_params.max_motor_speed, csv_params.nominal_current, csv_params.polarity, \
 		csv_params.max_acceleration, csv_params.motor_torque_constant} = csv_sdo_update(coe_out);
-		//return {max_motor_speed, nominal_current, polarity, max_acceleration, motor_torque_constant};
+
 	if(csv_params.polarity >= 0)
 		csv_params.polarity = 1;
 	else if(csv_params.polarity < 0)
@@ -221,7 +221,7 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
 		select
 		{
 			case c_signal :> command:
-				//printintln(command);
+
 				if(command == CHECK_BUSY)
 				{
 					c_signal <: init_state;
@@ -250,10 +250,8 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
 					}
 					commutation_params.qei_forward_offset = 0;
 					commutation_params.qei_backward_offset = 0;
-//					printintln(hall_params.gear_ratio);
-//					printintln(hall_params.pole_pairs);
-//					printintln(commutation_params.max_speed_reached );
-//										printintln(commutation_params.angle_variance);
+
+
 
 				}
 				break;
@@ -295,10 +293,6 @@ void hall_init_ecat(chanend c_hall, hall_par &hall_params)
 					c_hall :> hall_params.gear_ratio;
 					c_hall :> hall_params.pole_pairs;
 					flag = 1;
-
-//					printintln(hall_params.gear_ratio);
-//					printintln(hall_params.pole_pairs);
-
 				}
 				break;
 
@@ -345,11 +339,6 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
 					c_qei :> qei_params.real_counts;
 					c_qei :> qei_params.poles;
 					flag = 1;
-
-//					printintln(qei_params.gear_ratio);
-//					printintln(qei_params.index);
-//					printintln(qei_params.max_count);
-//					printintln(qei_params.real_counts);
 				}
 				break;
 

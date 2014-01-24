@@ -45,7 +45,6 @@
 #include <xscope.h>
 #include <internal_config.h>
 #include <drive_config.h>
-#include "print.h"
 #include <profile.h>
 #include <profile_control.h>
 
@@ -64,10 +63,6 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 	if(init_state == INIT_BUSY)
 	{
 		init_state = init_position_control(c_position_ctrl);
-		/*if(init_state == INIT)
-			printstrln("position control intialized");
-		else
-			printstrln("intialize position control failed");*/
 	}
 
 	if(init_state == INIT)

@@ -62,7 +62,7 @@ int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceler
 
 	qstop_vel_params.t = 0 - qstop_vel_params.u/qstop_vel_params.a_d;		//default reduce velocity to zero  (v_d - u)/a_d;
 
-	qstop_vel_params.s_time = 0.001; 											//
+	qstop_vel_params.s_time = 0.001;
 	qstop_vel_params.T = qstop_vel_params.t/qstop_vel_params.s_time;
 
     if(qstop_vel_params.T<0)

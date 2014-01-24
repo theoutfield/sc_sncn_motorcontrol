@@ -46,6 +46,7 @@
 #define PWM_MAX_VALUE 13889 /* 18 kHz */
 #define PWM_MIN_LIMIT 250
 #define PWM_MAX_LIMIT (PWM_MAX_VALUE - PWM_DEAD_TIME)
+
 // Define if ADC sampling is locked to PWM switching. The ADC sampling will occur in the middle of the  switching sequence.
 // It is triggered over a channel. Set this define to 0 to disable this feature
 #define LOCK_ADC_TO_PWM 1

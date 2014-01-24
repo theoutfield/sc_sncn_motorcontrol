@@ -52,6 +52,7 @@
  * \channel c_commutation_p1 channel to receive motor voltage input value - priority 1 (highest) 1 ... (lowest) 3
  * \channel c_commutation_p2 channel to receive motor voltage input value - priority 2
  * \channel c_commutation_p3 channel to receive motor voltage input value - priority 3
+ * \channel c_watchdog channel to start the watchdog
  *
  *  Output Channels
  * \channel c_pwm_ctrl channel to set pwm level output to motor phases

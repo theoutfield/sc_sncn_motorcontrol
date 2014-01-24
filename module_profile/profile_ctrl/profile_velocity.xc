@@ -44,10 +44,8 @@
 #include <xscope.h>
 #include <internal_config.h>
 #include <drive_config.h>
-#include "print.h"
 #include <profile.h>
 #include <profile_control.h>
-#define debug_print
 
 
 void set_profile_velocity(int target_velocity, int acceleration, int deceleration, int max_profile_velocity, chanend c_velocity_ctrl)
@@ -62,10 +60,7 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 	if(init_state == INIT_BUSY)
 	{
 		init_state = init_velocity_control(c_velocity_ctrl);
-	/*	if(init_state == INIT)
-			printstrln("velocity control intialized");
-		else
-			printstrln("intialize velocity control failed");*/
+
 	}
 
 

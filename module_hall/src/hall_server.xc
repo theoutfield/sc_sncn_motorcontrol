@@ -46,31 +46,29 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 	if (command == HALL_POS_REQ)
 	{
 		c_hall <: angle;
-		//status = 0;
+
 	}
 	else if (command == HALL_VELOCITY_REQ)
 	{
 		c_hall <: raw_velocity;
-		//status = 0;
+
 	}
 	else if (command == HALL_ABSOLUTE_POS_REQ)
 	{
 		c_hall <: count;
 		c_hall <: direction;
-		//status = 0;
+
 	}
 	else if (command == CHECK_BUSY)
 	{
 		c_hall <: init_state;
-		//status = 0;
+
 	}
 	else if(command == SET_HALL_PARAM_ECAT)
 	{
 		c_hall :> hall_params.gear_ratio;
 		c_hall :> hall_params.pole_pairs;
 		status = 1;
-		//		printintln(hall_params.gear_ratio);
-		//		printintln(hall_params.pole_pairs);
 
 	}
 }
@@ -287,7 +285,6 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 			case tx when timerafter(time1 + MSEC_FAST) :> time1:
 					if(init_velocity == 0)
 					{
-						//position1 = count;
 						if(count > 2049)
 						{
 							init_velocity = 1;

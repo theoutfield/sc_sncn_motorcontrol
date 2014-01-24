@@ -44,7 +44,7 @@
 #include <drive_config.h>
 #include <internal_config.h>
 #include <bldc_motor_config.h>
-#define debug_print
+//#define debug_print
 
 int init_torque_control(chanend c_torque_ctrl)
 {
@@ -73,12 +73,12 @@ int get_torque(cst_par &cst_params, chanend c_torque_ctrl)
 	int torque;
 	TORQUE_CTRL_WRITE(GET_TORQUE_TOKEN);
 	TORQUE_CTRL_READ(torque);
-	return (torque); // *cst_params.motor_torque_constant too big to include
+	return (torque);
 }
 
 void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl)
 {
-	torque = torque; //cst_params.motor_torque_constant; too big to include
+	torque = torque;
 	TORQUE_CTRL_WRITE(SET_TORQUE_TOKEN);
 	TORQUE_CTRL_WRITE(torque);
 	return;
@@ -100,7 +100,7 @@ void send_torque_init_state(chanend c_torque_ctrl, int init_state)
 
 int torque_limit(int torque, int max_torque_limit)
 {
-	if(torque > max_torque_limit) //adc range // (5 * DC900_RESOLUTION)/2
+	if(torque > max_torque_limit)
 	{
 		return max_torque_limit;
 	}

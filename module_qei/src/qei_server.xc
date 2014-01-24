@@ -73,7 +73,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 			c_qei <: position;
 			c_qei <: ok;
 		}
-		//status = 0;
+
 	}
 	else if(command == QEI_ABSOLUTE_POS_REQ)
 	{
@@ -82,7 +82,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 			c_qei <: count;
 			c_qei <: direction;
 		}
-		//status = 0;
+
 	}
 	else if(command == SYNC)
 	{
@@ -92,7 +92,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 			c_qei <: calib_fw_flag;
 			c_qei <: calib_bw_flag;
 		}
-		//status = 0;
+
 	}
 	else if(command == SET_OFFSET)
 	{
@@ -100,19 +100,13 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 		c_qei :> offset_bw;
 		calib_bw_flag = 0;
 		calib_fw_flag = 0;
-		//status = 0;
+
 	}
-	/*	else if(command == QEI_VELOCITY_PWM_RES_REQ)
-	{
-		slave
-		{
-			c_qei <: velocity_raw1;
-		}
-	}*/
+
 	else if(command == CHECK_BUSY)
 	{
 		c_qei <: init_state;
-		//status = 0;
+
 	}
 	else if(command == SET_QEI_PARAM_ECAT)
 	{
@@ -122,10 +116,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 		c_qei :> qei_params.real_counts;
 		c_qei :> qei_params.poles;
 		status = 1;
-//					printintln(qei_params.gear_ratio);
-//					printintln(qei_params.index);
-//					printintln(qei_params.max_count);
-//					printintln(qei_params.real_counts);
+
 	}
 }
 

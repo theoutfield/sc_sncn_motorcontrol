@@ -108,6 +108,3 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params);
 
 
-void disable_motor(chanend c_commutation);
-
-void enable_motor(chanend c_commutation);

@@ -65,6 +65,5 @@ float result_tor;
 int root_function(int arg)
 {
 	result_tor = (float) arg;
-	//result = ;
 	return (int) round(sqrt(result_tor));
 }

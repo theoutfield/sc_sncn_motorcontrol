@@ -50,7 +50,7 @@
 #include "hall_client.h"
 
 //#define ENABLE_xscope_torq
-#define debug_print
+//#define debug_print
 
 int root_function(int arg);
 
@@ -117,7 +117,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 		{
 			case ts when timerafter(time+5556) :> time: // .05 ms
 				{phase_a_raw , phase_b_raw}= get_adc_calibrated_current_ad7949(c_adc);
-			//	xscope_probe_data(0, phase_a_raw);
+
 				buffer_phase_a[buffer_index] = phase_a_raw;
 				buffer_phase_b[buffer_index] = phase_b_raw;
 
@@ -136,16 +136,12 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 				}
 				phase_a_filtered /= filter_length_variance;
 				phase_b_filtered /= filter_length_variance;
-				xscope_probe_data(0, phase_a_filtered);
-				xscope_probe_data(1, phase_b_filtered);
-				xscope_probe_data(2, phase_a_raw);
-								xscope_probe_data(3, phase_b_raw);
+
 				filter_count++;
 				if(filter_count == 10)
 				{
 					filter_count = 0;
 
-				//	xscope_probe_data(0, actual_speed);
 					abs_speed = actual_speed;
 					if(actual_speed < 0)
 						abs_speed = 0 - actual_speed;
@@ -323,7 +319,6 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 		select
 		{
 			case c_current :> command:
-				//printstrln("adc calibrated");
 				start_flag = 1;
 				break;
 			case c_torque_ctrl:> command:
@@ -355,12 +350,11 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 				{
 					if(sensor_used == HALL)
 					{
-						angle = (get_hall_position(c_hall) >> 2) & 0x3ff; //  << 10 ) >> 12
+						angle = (get_hall_position(c_hall) >> 2) & 0x3ff;
 						actual_speed = get_hall_velocity(c_hall, hall_params);
 					}
 					else if(sensor_used == QEI)
 					{
-						//angle = (get_sync_position ( sync_output ) <<10)/qei_counts_per_hall; //synced input old
 						{angle, offset_fw_flag, offset_bw_flag} = get_qei_sync_position(c_qei);
 						angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
 						actual_speed = get_qei_velocity( c_qei, qei_params, qei_velocity_params);
@@ -377,7 +371,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					#ifdef ENABLE_xscope_torq
 					xscope_probe_data(0, phase_a_filtered);
 					#endif
-					//				xscope_probe_data(1, phase_b_filtered);
+
 					alpha = phase_1;
 					beta = (phase_1 + 2*phase_2); 			// beta = (a1 + 2*a2)/1.732 0.57736 --> invers from 1.732
 					beta *= 37838;
@@ -423,7 +417,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					if(target_torque < 0)
 						absolute_torque = 0 - target_torque;
 
-					error_torque = absolute_torque - actual_torque; //350
+					error_torque = absolute_torque - actual_torque;
 					error_torque_integral = error_torque_integral + error_torque;
 					error_torque_derivative = error_torque - error_torque_previous;
 
@@ -537,7 +531,6 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					init_buffer(buffer_Id, filter_length);
 					init_buffer(buffer_Iq, filter_length);
 					target_torque = 0;
-					//disable_motor(c_commutation);
 				}
 				else if(command == ENABLE_TORQUE_CTRL)
 				{
@@ -551,7 +544,6 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 						#ifdef debug_print
 							printstrln("commutation intialized");
 						#endif
-							//enable_motor(c_commutation);
 							break;
 						}
 					}

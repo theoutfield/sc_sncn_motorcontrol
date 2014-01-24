@@ -49,7 +49,7 @@
 #include "print.h"
 
 //#define Debug_velocity_ctrl
-#define debug_print
+//#define debug_print
 
 void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
 	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation)
@@ -175,7 +175,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 							}
 							raw_speed = 0;
 
-							//target_velocity = 0;
 						}
 						else if(init == 1)
 						{
@@ -300,7 +299,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					init = 0;
 					init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 					target_velocity = 0;
-					//disable_motor(c_commutation);
 				}
 				else if(command == ENABLE_VELOCITY_CTRL)
 				{
@@ -311,7 +309,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 						init_state = __check_commutation_init(c_commutation);
 						if(init_state == INIT)
 						{
-							//enable_motor(c_commutation);
 						#ifdef debug_print
 							printstrln("commutation intialized");
 						#endif

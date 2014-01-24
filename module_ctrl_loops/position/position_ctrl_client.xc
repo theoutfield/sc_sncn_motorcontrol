@@ -43,7 +43,7 @@
 #include <drive_config.h>
 
 
-#define debug_print
+//#define debug_print
 
 
 int init_position_control(chanend c_position_ctrl)

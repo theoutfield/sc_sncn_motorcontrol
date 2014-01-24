@@ -133,7 +133,7 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
 {
 	bool check;
 	bool skip = true;
-	check =  check_list_param._commutation_init // & check_list_param._fault check_list_param._adc_init &
+	check =  check_list_param._commutation_init
 			& check_list_param._hall_init & check_list_param._qei_init;
 	switch(check)
 	{
@@ -188,9 +188,7 @@ int init_state(void) {
 	return 1;
 }
 
-/**
- *
- */
+
 int update_statusword(int current_status, int state_reached, int ack, int q_active, int shutdown_ack) {
 	int status_word;
 
@@ -338,8 +336,7 @@ int get_next_state(int in_state, check_list &checklist, int controlword) {
 	case 6:
 		if (checklist.fault == true)
 			out_state = 5;
-		//else
-		//	out_state = 2;
+
 #ifdef print_slave
 		printstr("updated state ");
 		printhexln(in_state);

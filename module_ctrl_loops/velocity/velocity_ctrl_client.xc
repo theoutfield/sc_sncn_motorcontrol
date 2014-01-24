@@ -44,7 +44,7 @@
 #include <drive_config.h>
 #include "print.h"
 
-#define debug_print
+//#define debug_print
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {

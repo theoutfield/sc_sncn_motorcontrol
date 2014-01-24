@@ -43,8 +43,7 @@
 #include <print.h>
 #include <drive_config.h>
 
-//#define DEBUG
-#define debug_print
+//#define debug_print
 
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
@@ -125,8 +124,6 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 			break;
 		}
 	}
-
-	//printstrln("start pos");
 
 
 
@@ -255,7 +252,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 					previous_error = 0;
 					position_control_out = 0;
 					target_position = 0;
-				//	disable_motor(c_commutation);  TODO
+
 				}
 				else if(command == ENABLE_POSITION_CTRL)
 				{
@@ -269,7 +266,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						#ifdef debug_print
 							printstrln("commutation intialized");
 						#endif
-					//		enable_motor(c_commutation); TODO
+
 							break;
 						}
 					}
