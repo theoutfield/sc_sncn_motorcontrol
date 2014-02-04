@@ -83,38 +83,38 @@ int absolute(int var)
 void commutation_client_hanlder(chanend c_commutation, int command, commutation_par &commutation_params, \
 		int &voltage, int &sensor_select, int init_state)
 {
-	if(command == SET_VOLTAGE)				// set voltage
+	switch(command)
 	{
-		c_commutation :> voltage;
-		return;
-	}
-	else if(command == SET_COMMUTATION_PARAMS)
-	{
-		c_commutation :> commutation_params.angle_variance;
-		c_commutation :> commutation_params.max_speed_reached;
-		c_commutation :> commutation_params.offset_forward;
-		c_commutation :> commutation_params.offset_backward;
+		case SET_VOLTAGE:				// set voltage
+			c_commutation :> voltage;
+			break;
 
-		return;
+		case SET_COMMUTATION_PARAMS:
+			c_commutation :> commutation_params.angle_variance;
+			c_commutation :> commutation_params.max_speed_reached;
+			c_commutation :> commutation_params.offset_forward;
+			c_commutation :> commutation_params.offset_backward;
+			break;
+
+		case SENSOR_SELECT:
+			c_commutation :> sensor_select;
+			break;
+
+		case CHECK_BUSY:		// init signal
+			c_commutation <: init_state;
+			break;
+
+		case DISABLE_FETS:
+			//TODO
+			break;
+
+		case ENABLE_FETS:
+			//TODO
+			break;
+
+		default:
+			break;
 	}
-	else if(command == SENSOR_SELECT)
-	{
-		c_commutation :> sensor_select;
-		return;
-	}
-	else if(command == CHECK_BUSY)			// init signal
-	{
-		c_commutation <: init_state;
-	}
-	else if(command == DISABLE_FETS)
-	{
-		//TODO
-	}
-	else if(command == ENABLE_FETS)
-	{
-		//TODO
-	}
-	return;
 }
 
 void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_par &qei_params,
@@ -183,7 +183,7 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 		{
 			if(sensor_select == HALL)
 			{
-				angle_pwm = (((angle + angle_rpm + FORWARD_CONSTANT - commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
+				angle_pwm = (((angle + angle_rpm + FORWARD_CONSTANT - commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;//
 			}
 			else if(sensor_select == QEI)
 			{

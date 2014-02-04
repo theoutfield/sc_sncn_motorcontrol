@@ -119,4 +119,8 @@ void set_qei_sync_offset(chanend c_qei, int offset_forward, int offset_backward)
 	return;
 }
 
-
+void set_qei_turns(chanend c_qei, int turns)
+{
+	c_qei <: 33;
+	c_qei <: turns;
+}

@@ -66,66 +66,71 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 		int init_state, int sync_out, int &calib_bw_flag, int &calib_fw_flag, int &offset_fw, \
 		int &offset_bw, qei_par &qei_params, int &status)
 {
-	if(command == QEI_RAW_POS_REQ)
+	switch(command)
 	{
-		slave
-		{
-			c_qei <: position;
-			c_qei <: ok;
-		}
-		//status = 0;
-	}
-	else if(command == QEI_ABSOLUTE_POS_REQ)
-	{
-		slave
-		{
-			c_qei <: count;
-			c_qei <: direction;
-		}
-		//status = 0;
-	}
-	else if(command == SYNC)
-	{
-		slave
-		{
-			c_qei <: sync_out;
-			c_qei <: calib_fw_flag;
-			c_qei <: calib_bw_flag;
-		}
-		//status = 0;
-	}
-	else if(command == SET_OFFSET)
-	{
-		c_qei :> offset_fw;
-		c_qei :> offset_bw;
-		calib_bw_flag = 0;
-		calib_fw_flag = 0;
-		//status = 0;
-	}
-	/*	else if(command == QEI_VELOCITY_PWM_RES_REQ)
-	{
-		slave
-		{
-			c_qei <: velocity_raw1;
-		}
-	}*/
-	else if(command == CHECK_BUSY)
-	{
-		c_qei <: init_state;
-		//status = 0;
-	}
-	else if(command == SET_QEI_PARAM_ECAT)
-	{
-		c_qei :> qei_params.gear_ratio;
-		c_qei :> qei_params.index;
-		c_qei :> qei_params.max_count;
-		c_qei :> qei_params.real_counts;
-		c_qei :> qei_params.poles;
-		status = 1;
-//					printintln(qei_params.gear_ratio);
-//					printintln(qei_params.index);
-//					printintln(qei_params.max_count);
-//					printintln(qei_params.real_counts);
+		case QEI_RAW_POS_REQ:
+			slave
+			{
+				c_qei <: position;
+				c_qei <: ok;
+			}
+			//status = 0;
+			break;
+
+		case QEI_ABSOLUTE_POS_REQ:
+			slave
+			{
+				c_qei <: count;
+				c_qei <: direction;
+			}
+			//status = 0;
+			break;
+
+		case SYNC:
+			slave
+			{
+				c_qei <: sync_out;
+				c_qei <: calib_fw_flag;
+				c_qei <: calib_bw_flag;
+			}
+			//status = 0;
+			break;
+
+		case SET_OFFSET:
+			c_qei :> offset_fw;
+			c_qei :> offset_bw;
+			calib_bw_flag = 0;
+			calib_fw_flag = 0;
+			//status = 0;
+			break;
+
+		/*	case QEI_VELOCITY_PWM_RES_REQ:
+			slave
+			{
+				c_qei <: velocity_raw1;
+			}
+			break;
+		*/
+		case CHECK_BUSY:
+			c_qei <: init_state;
+			//status = 0;
+			break;
+
+		case SET_QEI_PARAM_ECAT:
+			c_qei :> qei_params.gear_ratio;
+			c_qei :> qei_params.index;
+			c_qei :> qei_params.max_count;
+			c_qei :> qei_params.real_counts;
+			c_qei :> qei_params.poles;
+			status = 1;
+	//					printintln(qei_params.gear_ratio);
+	//					printintln(qei_params.index);
+	//					printintln(qei_params.max_count);
+	//					printintln(qei_params.real_counts);
+			break;
+
+		default:
+			break;
 	}
 }
 

@@ -63,7 +63,7 @@
  */
 {unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params);
 
-
+//void set_qei_turns(chanend c_qei, int turns);
 /**
  *  \brief Get absolute position from QEI Server
  *

@@ -43,7 +43,7 @@
 #include <drive_config.h>
 
 
-#define debug_print
+//#define debug_print
 
 
 int init_position_control(chanend c_position_ctrl)
@@ -105,7 +105,7 @@ void set_position_csp(csp_par &csp_params, int target_position, int position_off
 		              int torque_offset, chanend c_position_ctrl)
 {
 	set_position( position_limit( (target_position + position_offset) * csp_params.base.polarity ,	\
-								   csp_params.max_position_limit * 10000  , 						\
+								   csp_params.max_position_limit * 10000,	\
 								   csp_params.min_position_limit * 10000) , c_position_ctrl);
 }
 
@@ -164,4 +164,3 @@ int check_position_ctrl_state(chanend c_position_ctrl)
 	POSITION_CTRL_READ(state);
 	return state;
 }
-

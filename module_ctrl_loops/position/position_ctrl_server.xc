@@ -80,41 +80,47 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 		select
 		{
 			case POSITION_CTRL_READ(command):
-				if(command == ENABLE_POSITION_CTRL)   // ENABLE_POSITION_CTRL
+				switch(command)
 				{
-					activate = SET;
-					received_command = SET;
-					while(1)
-					{
-						init_state = __check_commutation_init(c_commutation);
-						if(init_state == INIT)
+					case ENABLE_POSITION_CTRL:   // ENABLE_POSITION_CTRL
+						activate = SET;
+						received_command = SET;
+						while(1)
 						{
-#ifdef debug_print
-							printstrln("commutation intialized");
-#endif
-							init_state = INIT_BUSY;
-							break;
+							init_state = __check_commutation_init(c_commutation);
+							if(init_state == INIT)
+							{
+								#ifdef debug_print
+								printstrln("commutation intialized");
+								#endif
+								init_state = INIT_BUSY;
+								break;
+							}
 						}
-					}
-#ifdef debug_print
-					printstrln("position control activated");
-#endif
+						#ifdef debug_print
+						printstrln("position control activated");
+						#endif
+						break;
+
+					case SHUTDOWN_POSITION_CTRL:	// SHUTDOWN_POSITION_CTRL
+						activate = UNSET;
+						#ifdef debug_print
+						printstrln("position control disabled");
+						#endif
+						break;
+
+					case CHECK_BUSY: // CHECK INIT state
+						POSITION_CTRL_WRITE(activate);
+						break;
+
+					case POSITION_CTRL_STATUS: //check active state
+						POSITION_CTRL_WRITE(activate);
+						break;
+
+					default:
+						break;
 				}
-				else if(command == SHUTDOWN_POSITION_CTRL)	// SHUTDOWN_POSITION_CTRL
-				{
-					activate = UNSET;
-#ifdef debug_print
-					printstrln("position control disabled");
-#endif
-				}
-				else if(command == CHECK_BUSY) // CHECK INIT state
-				{
-					POSITION_CTRL_WRITE(activate);
-				}
-				else if(command == POSITION_CTRL_STATUS) //check active state
-				{
-					POSITION_CTRL_WRITE(activate);
-				}
+
 				break;
 
 			default:
@@ -162,7 +168,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 					else if(sensor_used == QEI)
 					{
 						{actual_position, direction} =  get_qei_position_absolute(c_qei);
-						actual_position = (actual_position * precision_factor)/precision;
+					//	actual_position = (actual_position * precision_factor)/precision;
 					}
 
 					/* Controller */
@@ -209,89 +215,94 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
 			case POSITION_CTRL_READ(command):
 
-				if(command == SET_POSITION_TOKEN)
+				switch(command)
 				{
-					POSITION_CTRL_READ(target_position);
-				}
-				else if(command == GET_POSITION_TOKEN)
-				{
-					POSITION_CTRL_WRITE(actual_position);
-				}
-				else if(command == CHECK_BUSY)
-				{
-					POSITION_CTRL_WRITE(activate);
-				}
-				else if(command == SET_CTRL_PARAMETER)
-				{
-					POSITION_CTRL_READ(position_ctrl_params.Kp_n);
-					POSITION_CTRL_READ(position_ctrl_params.Kp_d);
-					POSITION_CTRL_READ(position_ctrl_params.Ki_n);
-					POSITION_CTRL_READ(position_ctrl_params.Ki_d);
-					POSITION_CTRL_READ(position_ctrl_params.Kd_n);
-					POSITION_CTRL_READ(position_ctrl_params.Kd_d);
-					POSITION_CTRL_READ(position_ctrl_params.Integral_limit);
-				}
-				else if(command == SENSOR_SELECT)
-				{
-					POSITION_CTRL_READ(sensor_used);
-					if(sensor_used == HALL)
-					{
-						precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
-						precision = HALL_PRECISION;
-					}
-					else if(sensor_used == QEI)
-					{
-						precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
-						precision = QEI_PRECISION;
-					}
-				}
-				else if(command == SHUTDOWN_POSITION_CTRL)
-				{
-					POSITION_CTRL_READ(activate);
-					set_commutation_sinusoidal(c_commutation, 0);
-					error_position = 0;
-					error_position_D = 0;
-					error_position_I = 0;
-					previous_error = 0;
-					position_control_out = 0;
-					target_position = 0;
-				//	disable_motor(c_commutation);  TODO
-				}
-				else if(command == ENABLE_POSITION_CTRL)
-				{
-					POSITION_CTRL_READ(activate);
-					activate = SET;
-					while(1)
-					{
-						init_state = __check_commutation_init(c_commutation);
-						if(init_state == INIT)
+					case SET_POSITION_TOKEN:
+						POSITION_CTRL_READ(target_position);
+						break;
+
+					case GET_POSITION_TOKEN:
+						POSITION_CTRL_WRITE(actual_position);
+						break;
+
+					case CHECK_BUSY:
+						POSITION_CTRL_WRITE(activate);
+						break;
+
+					case SET_CTRL_PARAMETER:
+						POSITION_CTRL_READ(position_ctrl_params.Kp_n);
+						POSITION_CTRL_READ(position_ctrl_params.Kp_d);
+						POSITION_CTRL_READ(position_ctrl_params.Ki_n);
+						POSITION_CTRL_READ(position_ctrl_params.Ki_d);
+						POSITION_CTRL_READ(position_ctrl_params.Kd_n);
+						POSITION_CTRL_READ(position_ctrl_params.Kd_d);
+						POSITION_CTRL_READ(position_ctrl_params.Integral_limit);
+						break;
+
+					case SENSOR_SELECT:
+						POSITION_CTRL_READ(sensor_used);
+						if(sensor_used == HALL)
 						{
-						#ifdef debug_print
-							printstrln("commutation intialized");
-						#endif
-					//		enable_motor(c_commutation); TODO
-							break;
+							precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
+							precision = HALL_PRECISION;
 						}
-					}
-					#ifdef debug_print
-						printstrln("position control activated");
-					#endif
-				}
-				else if(command == POSITION_CTRL_STATUS)
-				{
-					POSITION_CTRL_WRITE(activate);
-				}
-				else if(command == SET_POSITION_CTRL_HALL)
-				{
-					c_position_ctrl :> hall_params.gear_ratio;
-					c_position_ctrl :> hall_params.pole_pairs;
-				}
-				else if(command == SET_POSITION_CTRL_QEI)
-				{
-					c_position_ctrl :> qei_params.gear_ratio;
-					c_position_ctrl :> qei_params.index;
-					c_position_ctrl :> qei_params.real_counts;
-					c_position_ctrl :> qei_params.max_count;
+						else if(sensor_used == QEI)
+						{
+							precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
+							precision = QEI_PRECISION;
+						}
+						break;
+
+					case SHUTDOWN_POSITION_CTRL:
+						POSITION_CTRL_READ(activate);
+						set_commutation_sinusoidal(c_commutation, 0);
+						error_position = 0;
+						error_position_D = 0;
+						error_position_I = 0;
+						previous_error = 0;
+						position_control_out = 0;
+						target_position = 0;
+					//	disable_motor(c_commutation);  TODO
+						break;
+
+					case ENABLE_POSITION_CTRL:
+						POSITION_CTRL_READ(activate);
+						activate = SET;
+						while(1)
+						{
+							init_state = __check_commutation_init(c_commutation);
+							if(init_state == INIT)
+							{
+							#ifdef debug_print
+								printstrln("commutation intialized");
+							#endif
+						//		enable_motor(c_commutation); TODO
+								break;
+							}
+						}
+						#ifdef debug_print
+							printstrln("position control activated");
+						#endif
+							break;
+
+					case POSITION_CTRL_STATUS:
+						POSITION_CTRL_WRITE(activate);
+						break;
+
+					case SET_POSITION_CTRL_HALL:
+						c_position_ctrl :> hall_params.gear_ratio;
+						c_position_ctrl :> hall_params.pole_pairs;
+						break;
+
+					case SET_POSITION_CTRL_QEI:
+						c_position_ctrl :> qei_params.gear_ratio;
+						c_position_ctrl :> qei_params.index;
+						c_position_ctrl :> qei_params.real_counts;
+						c_position_ctrl :> qei_params.max_count;
+						break;
+
+					default:
+						break;
 				}
 				break;
 		}

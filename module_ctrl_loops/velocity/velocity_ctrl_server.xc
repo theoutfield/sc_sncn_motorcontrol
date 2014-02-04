@@ -98,42 +98,48 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 		select
 		{
 			case VELOCITY_CTRL_READ(command):
-				if(command == ENABLE_VELOCITY_CTRL)
+				switch(command)
 				{
-					activate = SET;
-					received_command = SET;
-					while(1)
-					{
-						init_state = __check_commutation_init(c_commutation);
-						if(init_state == INIT)
+					case ENABLE_VELOCITY_CTRL:
+						activate = SET;
+						received_command = SET;
+						while(1)
 						{
-#ifdef debug_print
-							printstrln("commutation intialized");
-#endif
-							init_state = INIT_BUSY;
-							break;
+							init_state = __check_commutation_init(c_commutation);
+							if(init_state == INIT)
+							{
+						#ifdef debug_print
+								printstrln("commutation intialized");
+						#endif
+								init_state = INIT_BUSY;
+								break;
+							}
 						}
-					}
-#ifdef debug_print
-					printstrln("velocity control activated");
-#endif
-				}
-				else if(command == SHUTDOWN_VELOCITY_CTRL)
-				{
-					activate = UNSET;
-#ifdef debug_print
-					printstrln("velocity control disabled");
-#endif
-				}
-				else if(command == CHECK_BUSY)
-				{
-					VELOCITY_CTRL_WRITE(activate);
-				}
-				else if(command == VELOCITY_CTRL_STATUS)
-				{
-					VELOCITY_CTRL_WRITE(activate);
+						#ifdef debug_print
+						printstrln("velocity control activated");
+						#endif
+						break;
+
+					case SHUTDOWN_VELOCITY_CTRL:
+						activate = UNSET;
+						#ifdef debug_print
+						printstrln("velocity control disabled");
+						#endif
+						break;
+
+					case CHECK_BUSY:
+						VELOCITY_CTRL_WRITE(activate);
+						break;
+
+					case VELOCITY_CTRL_STATUS:
+						VELOCITY_CTRL_WRITE(activate);
+						break;
+
+					default:
+						break;
 				}
 				break;
+
 			default:
 				break;
 		}
@@ -249,105 +255,111 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 
 				/* acq target velocity etherCAT */
 			case VELOCITY_CTRL_READ(command):
-
-				if(command == SET_VELOCITY_TOKEN)
-					VELOCITY_CTRL_READ(target_velocity);
-
-				else if(command == GET_VELOCITY_TOKEN)
-					VELOCITY_CTRL_WRITE(actual_velocity);
-
-				else if(command == CHECK_BUSY)
-					VELOCITY_CTRL_WRITE(activate);
-
-				else if(command == SET_CTRL_PARAMETER)
+				switch(command)
 				{
-					VELOCITY_CTRL_READ(velocity_ctrl_params.Kp_n);
-					VELOCITY_CTRL_READ(velocity_ctrl_params.Kp_d);
-					VELOCITY_CTRL_READ(velocity_ctrl_params.Ki_n);
-					VELOCITY_CTRL_READ(velocity_ctrl_params.Ki_d);
-					VELOCITY_CTRL_READ(velocity_ctrl_params.Kd_n);
-					VELOCITY_CTRL_READ(velocity_ctrl_params.Kd_d);
-					VELOCITY_CTRL_READ(velocity_ctrl_params.Integral_limit);
-				}
-				else if(command == SENSOR_SELECT)
-				{
-					VELOCITY_CTRL_READ(sensor_used);
-					if(sensor_used == HALL)
-					{
+					case SET_VELOCITY_TOKEN:
+						VELOCITY_CTRL_READ(target_velocity);
+						break;
+
+					case GET_VELOCITY_TOKEN:
+						VELOCITY_CTRL_WRITE(actual_velocity);
+						break;
+
+					case CHECK_BUSY:
+						VELOCITY_CTRL_WRITE(activate);
+						break;
+
+					case SET_CTRL_PARAMETER:
+						VELOCITY_CTRL_READ(velocity_ctrl_params.Kp_n);
+						VELOCITY_CTRL_READ(velocity_ctrl_params.Kp_d);
+						VELOCITY_CTRL_READ(velocity_ctrl_params.Ki_n);
+						VELOCITY_CTRL_READ(velocity_ctrl_params.Ki_d);
+						VELOCITY_CTRL_READ(velocity_ctrl_params.Kd_n);
+						VELOCITY_CTRL_READ(velocity_ctrl_params.Kd_d);
+						VELOCITY_CTRL_READ(velocity_ctrl_params.Integral_limit);
+						break;
+
+					case SENSOR_SELECT:
+						VELOCITY_CTRL_READ(sensor_used);
+						if(sensor_used == HALL)
+						{
+							speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
+						}
+						else if(sensor_used == QEI)
+						{
+							speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
+							qei_crossover = qei_params.max_count - qei_params.max_count/10;
+						}
+						break;
+
+
+
+					case SHUTDOWN_VELOCITY_CTRL:
+						VELOCITY_CTRL_READ(activate);
+						set_commutation_sinusoidal(c_commutation, 0);
+						error_velocity = 0;
+						error_velocity_D = 0;
+						error_velocity_I = 0;
+						previous_error = 0;
+						velocity_control_out = 0;
+						index = 0;
+						previous_position = 0;
+						raw_speed = 0;
+						old_difference = 0;
+						init = 0;
+						init_filter(filter_buffer, index, FILTER_SIZE_MAX);
+						target_velocity = 0;
+						//disable_motor(c_commutation);
+						break;
+
+					case ENABLE_VELOCITY_CTRL:
+						VELOCITY_CTRL_READ(activate);
+						activate = SET;
+						while(1)
+						{
+							init_state = __check_commutation_init(c_commutation);
+							if(init_state == INIT)
+							{
+								//enable_motor(c_commutation);
+							#ifdef debug_print
+								printstrln("commutation intialized");
+							#endif
+								break;
+							}
+						}
+						#ifdef debug_print
+							printstrln("velocity control activated");
+						#endif
+						break;
+
+					case VELOCITY_CTRL_STATUS:
+						VELOCITY_CTRL_WRITE(activate);
+						break;
+
+					case SET_VELOCITY_CTRL_HALL:
+						VELOCITY_CTRL_READ(hall_params.gear_ratio);
+						VELOCITY_CTRL_READ(hall_params.pole_pairs);
 						speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
-					}
-					else if(sensor_used == QEI)
-					{
+						break;
+
+					case SET_VELOCITY_CTRL_QEI:
+						VELOCITY_CTRL_READ(qei_params.gear_ratio);
+						VELOCITY_CTRL_READ(qei_params.index);
+						VELOCITY_CTRL_READ(qei_params.real_counts);
+						VELOCITY_CTRL_READ(qei_params.max_count);
+						VELOCITY_CTRL_READ(qei_params.poles);
 						speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
 						qei_crossover = qei_params.max_count - qei_params.max_count/10;
-					}
-				}
+						break;
 
+					case SET_VELOCITY_FILTER:
+						VELOCITY_CTRL_READ(filter_length);
+						if(filter_length > FILTER_SIZE_MAX)
+							filter_length = FILTER_SIZE_MAX;
+						break;
 
-				else if(command == SHUTDOWN_VELOCITY_CTRL)
-				{
-					VELOCITY_CTRL_READ(activate);
-					set_commutation_sinusoidal(c_commutation, 0);
-					error_velocity = 0;
-					error_velocity_D = 0;
-					error_velocity_I = 0;
-					previous_error = 0;
-					velocity_control_out = 0;
-					index = 0;
-					previous_position = 0;
-					raw_speed = 0;
-					old_difference = 0;
-					init = 0;
-					init_filter(filter_buffer, index, FILTER_SIZE_MAX);
-					target_velocity = 0;
-					//disable_motor(c_commutation);
-				}
-				else if(command == ENABLE_VELOCITY_CTRL)
-				{
-					VELOCITY_CTRL_READ(activate);
-					activate = SET;
-					while(1)
-					{
-						init_state = __check_commutation_init(c_commutation);
-						if(init_state == INIT)
-						{
-							//enable_motor(c_commutation);
-						#ifdef debug_print
-							printstrln("commutation intialized");
-						#endif
-							break;
-						}
-					}
-					#ifdef debug_print
-						printstrln("velocity control activated");
-					#endif
-				}
-				else if(command == VELOCITY_CTRL_STATUS)
-				{
-					VELOCITY_CTRL_WRITE(activate);
-				}
-
-				else if(command == SET_VELOCITY_CTRL_HALL)
-				{
-					VELOCITY_CTRL_READ(hall_params.gear_ratio);
-					VELOCITY_CTRL_READ(hall_params.pole_pairs);
-					speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
-				}
-				else if(command == SET_VELOCITY_CTRL_QEI)
-				{
-					VELOCITY_CTRL_READ(qei_params.gear_ratio);
-					VELOCITY_CTRL_READ(qei_params.index);
-					VELOCITY_CTRL_READ(qei_params.real_counts);
-					VELOCITY_CTRL_READ(qei_params.max_count);
-					VELOCITY_CTRL_READ(qei_params.poles);
-					speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
-					qei_crossover = qei_params.max_count - qei_params.max_count/10;
-				}
-				else if(command == SET_VELOCITY_FILTER)
-				{
-					VELOCITY_CTRL_READ(filter_length);
-					if(filter_length > FILTER_SIZE_MAX)
-						filter_length = FILTER_SIZE_MAX;
+					default:
+						break;
 				}
 				break;
 
