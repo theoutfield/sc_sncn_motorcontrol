@@ -39,39 +39,52 @@
  */
 
 #include "hall_server.h"
+//#pragma xta command "analyze loop hall_loop"
+//#pragma xta command "set required - 10.0 us"
 
 void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state,\
 		int count, int direction, hall_par &hall_params, int &status)
 {
-	if (command == HALL_POS_REQ)
+	switch(command)
 	{
-		c_hall <: angle;
-		//status = 0;
-	}
-	else if (command == HALL_VELOCITY_REQ)
-	{
-		c_hall <: raw_velocity;
-		//status = 0;
-	}
-	else if (command == HALL_ABSOLUTE_POS_REQ)
-	{
-		c_hall <: count;
-		c_hall <: direction;
-		//status = 0;
-	}
-	else if (command == CHECK_BUSY)
-	{
-		c_hall <: init_state;
-		//status = 0;
-	}
-	else if(command == SET_HALL_PARAM_ECAT)
-	{
-		c_hall :> hall_params.gear_ratio;
-		c_hall :> hall_params.pole_pairs;
-		status = 1;
-		//		printintln(hall_params.gear_ratio);
-		//		printintln(hall_params.pole_pairs);
+		case HALL_POS_REQ:
 
+			c_hall <: angle;
+			//status = 0;
+
+			break;
+
+		case HALL_VELOCITY_REQ:
+
+			c_hall <: raw_velocity;
+			//status = 0;
+			break;
+
+		case HALL_ABSOLUTE_POS_REQ:
+
+			c_hall <: count;
+			c_hall <: direction;
+			//status = 0;
+			break;
+
+		case CHECK_BUSY:
+
+			c_hall <: init_state;
+			//status = 0;
+			break;
+
+		case SET_HALL_PARAM_ECAT:
+
+			c_hall :> hall_params.gear_ratio;
+			c_hall :> hall_params.pole_pairs;
+			status = 1;
+			//		printintln(hall_params.gear_ratio);
+			//		printintln(hall_params.pole_pairs);
+
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -86,15 +99,17 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	unsigned int delta_angle = 0;
 	unsigned int angle = 0;
 
-	unsigned int iCountMicroSeconds;
-	unsigned int iPeriodMicroSeconds;
+	unsigned int iCountMicroSeconds = 0;
+	unsigned int iPeriodMicroSeconds = 0;
 	unsigned int iTimeCountOneTransition = 0;
 	unsigned int iTimeSaveOneTransition = 0;
 
-	unsigned int pin_state; 		// newest hall state
-	unsigned int pin_state_last;
-	unsigned int new1, new2;
-	unsigned int uHallNext, uHallPrevious;
+	unsigned int pin_state = 0; 		// newest hall state
+	unsigned int pin_state_last = 0;
+	unsigned int new1 = 0;
+	unsigned int new2 = 0;
+	unsigned int uHallNext = 0;
+	unsigned int uHallPrevious = 0;
 	int xreadings = 0;
 
 	int iHallError = 0;
@@ -105,11 +120,11 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int count = 0;
 	int first = 1;
 	int hall_enc_count = hall_params.pole_pairs * hall_params.gear_ratio * 4095;
-	int time_elapsed; 			//between two transitions to calculate speed
+	int time_elapsed = 0; 			//between two transitions to calculate speed
 	int init_state = INIT;
 
 	timer t1;
-	unsigned int time1;
+	int time1;
 	int init_velocity = 0;
 	int position1 = 0;
 	int previous_position1 = 0;
@@ -122,11 +137,13 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int raw_velocity = 0;
 	int hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
 	int status = 0; //1 changed
+
 	init_filter(filter_buffer, index, FILTER_LENGTH_HALL);
 	t1 :> time1;
 	tx :> ts;
 	while(1)
 	{
+#pragma xta endpoint "hall_loop"
 		switch(xreadings)
 		{
 			case 0: p_hall :> new1; new1 &= 0x07; xreadings++;
@@ -141,8 +158,8 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 			break;
 		}
 
-		iCountMicroSeconds++; // period in usec
-		iTimeCountOneTransition++;
+		iCountMicroSeconds = iCountMicroSeconds + 10; // period in 10 usec
+		iTimeCountOneTransition = iTimeCountOneTransition + 10 ;
 
 		if(pin_state != pin_state_last)
 		{
@@ -254,7 +271,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 			count = 0;
 		}
 
-
+	//	xscope_probe_data(0, angle);
 
 
 		#pragma ordered
@@ -300,7 +317,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 						}
 						velocity = 0;
 					}
-					else if(init_velocity == 1)
+					else //if(init_velocity == 1)
 					{
 						difference1 = count - previous_position1;
 						if(difference1 > hall_crossover)
@@ -330,7 +347,9 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 			status = 0;
 		}
 
-		tx when timerafter(ts + 250) :> ts;
+		tx when timerafter(ts + 2500) :> ts; //10 usec 2500
+
+#pragma xta endpoint "hall_loop_stop"
 	}
 }
 

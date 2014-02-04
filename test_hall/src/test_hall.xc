@@ -53,7 +53,7 @@
 #include <drive_config.h>
 //#include <flash_somanet.h>
 
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -63,7 +63,8 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 void xscope_initialise_1()
 {
 	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 hall_position", XSCOPE_INT,	"n",
+		xscope_register(3, XSCOPE_CONTINUOUS, "0 hall_position", XSCOPE_INT,	"n",
+				           XSCOPE_CONTINUOUS, "1 hall_velocity", XSCOPE_INT,	"n",
 				           XSCOPE_CONTINUOUS, "1 hall_velocity", XSCOPE_INT,	"n");
 		xscope_config_io(XSCOPE_IO_BASIC);
 	}
@@ -77,7 +78,8 @@ void hall_test(chanend c_hall)
 	int position;
 	int velocity;
 	int core_id = 1;
-	timer t;
+	timer t; int time;
+	int dirn,pos;
 	hall_par hall_params;
 	init_hall_param(hall_params);
 
@@ -87,19 +89,22 @@ void hall_test(chanend c_hall)
 
 	while(1)
 	{
-		position = get_hall_position(c_hall);
+		{position, dirn} = get_hall_position_absolute(c_hall);
+		pos = get_hall_position(c_hall);
 		velocity = get_hall_velocity(c_hall, hall_params);
 		wait_ms(1, core_id, t);
-
+//t when timerafter(time +700):>time;
 #ifdef ENABLE_xscope_main
 		xscope_probe_data(0, position);
 		xscope_probe_data(1, velocity);
+		xscope_probe_data(2, pos);
 #else
 		printstr("position");
 		printint(position);
 		printstr("velocity ");
 		printintln(velocity);
 #endif
+
 	}
 }
 
