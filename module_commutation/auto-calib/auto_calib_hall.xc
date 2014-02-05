@@ -36,7 +36,7 @@ void ramp_up(int &i, int comm_voltage, timer t, int core_id, chanend c_commutati
 	{
 		set_commutation_sinusoidal(c_commutation, i);
 		i = (i + 10);
-		wait_ms(5, core_id, t);
+		wait_ms(25, core_id, t);
 	}
 }
 void ramp_down(int &i, int comm_voltage, timer t, int core_id, chanend c_commutation)
@@ -45,7 +45,7 @@ void ramp_down(int &i, int comm_voltage, timer t, int core_id, chanend c_commuta
 	{
 		set_commutation_sinusoidal(c_commutation, i);
 		i = (i - 10);
-		wait_ms(5, core_id, t);
+		wait_ms(25, core_id, t);
 	}
 }
 {int, int} update_comm_sine_max_state(int &sensor_select, timer t, int core_id, hall_par  &hall_params, qei_velocity_par &qei_velocity_params, int &avg_times, int max, chanend c_hall, chanend c_qei, qei_par &qei_params)

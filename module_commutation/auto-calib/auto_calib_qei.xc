@@ -1,34 +1,35 @@
 #include <auto_calib_qei.h>
 
-void calculate_offset(qei_par &qei_params, hall_par &hall_params, chanend c_qei, chanend c_hall, timer t_qei, int &calib_bw_offset, int &calib_fw_offset, int calib_bw_flag, int calib_fw_flag)
+void calculate_offset(qei_par &qei_params, hall_par &hall_params, chanend c_qei, chanend c_hall, timer t_qei,\
+		int &calib_bw_offset, int &calib_fw_offset, int calib_bw_flag, int calib_fw_flag)
 {
 	int hall_position = 0; // Hall input
-		int qei_position = 0; // Qei input
-		int sync_position = 0; // output
+	int qei_position = 0; // Qei input
+	int sync_position = 0; // output
 
-		int qei_valid; // qei validity (0 or 1)
+	int qei_valid; // qei validity (0 or 1)
 
-		int qei_max_position = qei_params.max_count;
-		int qei_crossover = qei_max_position - qei_max_position /10;
-		unsigned int time_qei;
+	int qei_max_position = qei_params.max_count;
+	int qei_crossover = qei_max_position - qei_max_position /10;
+	unsigned int time_qei;
 
-		int previous_position = 0;
+	int previous_position = 0;
 
-		int max_count = qei_params.real_counts / hall_params.pole_pairs ;
+	int max_count = qei_params.real_counts / hall_params.pole_pairs ;
 
-		int difference;
+	int difference;
 
-		int init = 1;
+	int init = 1;
 
-		int not_synced = 0;
+	int not_synced = 0;
 
-		int calibrated_fw = 0;
-		int calibrated_bw = 0;
-		int direction = 0;
-		int dummy;
-		int condd= 1000;
+	int calibrated_fw = 0;
+	int calibrated_bw = 0;
+	int direction = 0;
+	int dummy;
+	int condd= 1000;
 
-		int times_no = 100;
+	int times_no = 100;
 
 	t_qei	:> time_qei;
 	while(1)
@@ -95,7 +96,21 @@ void calculate_offset(qei_par &qei_params, hall_par &hall_params, chanend c_qei,
 	}
 }
 
-void qei_calibrate(chanend c_signal, chanend c_commutation, commutation_par &commutation_params,\
+void ramp_zero(int &i, int &sense, chanend c_commutation, int core_id, timer t)
+{
+	if(i<0)
+		sense = 1;
+	else if(i>0)
+		sense = -1;
+	while( i != 0 )
+	{
+		set_commutation_sinusoidal(c_commutation, i);
+		i = (i + sense * 10);
+		wait_ms(25, core_id, t);
+	}
+}
+
+void qei_calibrate(chanend c_commutation, commutation_par &commutation_params,\
 		hall_par &hall_params, qei_par &qei_params, chanend c_hall, chanend c_qei, chanend c_calib) //commutation purpose also send the offset to the thread.
 {
 	timer t;
@@ -137,7 +152,7 @@ void qei_calibrate(chanend c_signal, chanend c_commutation, commutation_par &com
 	while(1)
 	{
 
-		init_state = __check_commutation_init(c_signal);
+		init_state = __check_commutation_init(c_commutation);
 		if(init_state == INIT)
 		{
 			printstrln("commutation intialized");
@@ -146,8 +161,10 @@ void qei_calibrate(chanend c_signal, chanend c_commutation, commutation_par &com
 	}
 
 	i = 0;
+	//set_commutation_sinusoidal(c_commutation , 400);
 	ramp_up(i, comm_min, t, core_id, c_commutation); // fw
 
+	wait_s(10, core_id, t);
 	calib_fw_flag = 1;
 	printstrln("loop start");
 	printintln(times_no);
@@ -159,16 +176,8 @@ void qei_calibrate(chanend c_signal, chanend c_commutation, commutation_par &com
 	//calib_fw_offset = calib_qei(c_calib,  t, 1);
 	printintln(commutation_params.qei_forward_offset);
 
-	if(i<0)
-		sense = 1;
-	else if(i>0)
-		sense = -1;
-	while( i != 0 )
-	{
-		set_commutation_sinusoidal(c_commutation, i);
-		i = (i + sense * 10);
-		wait_ms(5, core_id, t);
-	}
+	ramp_zero(i, sense, c_commutation, core_id, t);
+
 
 
 	ramp_down(i, -comm_min, t, core_id, c_commutation);
@@ -183,28 +192,20 @@ void qei_calibrate(chanend c_signal, chanend c_commutation, commutation_par &com
 	commutation_params.qei_backward_offset = ((calib_bw_offset*qei_params.real_counts)/(4096*hall_params.pole_pairs))/times_no;
 	printintln(commutation_params.qei_backward_offset);
 
-	if(i<0)
-		sense = 1;
-	else if(i>0)
-		sense = -1;
-	while( i != 0 )
-	{
-		set_commutation_sinusoidal(c_commutation, i);
-		i = (i + sense * 10);
-		wait_ms(5, core_id, t);
-	}
+	ramp_zero(i, sense, c_commutation, core_id, t);
 
 	set_qei_sync_offset(c_qei, commutation_params.qei_forward_offset, commutation_params.qei_backward_offset);
-
-
+	/*
 	commutation_params.offset_forward = 682;
 	set_commutation_params(c_commutation, commutation_params);
 	commutation_sensor_select( c_commutation, 2); //QEI
-
-	i = 0;
+*/
+/*	i = 0;
 	ramp_up(i, 1000, t, core_id, c_commutation); // fw
 
 	wait_ms(5000, core_id, t);
+
+	{pos_q, f1 ,f2} = get_qei_sync_position(c_qei_p4);*/
 /*
 	//printintln(get_hall_velocity(c_hall, hall_params));
 	if(i<0)
