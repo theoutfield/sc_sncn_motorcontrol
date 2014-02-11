@@ -1,4 +1,4 @@
-SOFTWARE COMPONENT Sinusoidal Motor Control 
+Sinusoidal Motor Control SOFTWARE COMPONENT 
 ...........................................
 .. image:: http://forum.synapticon.com/Themes/MinimalistAndEffective_by_SMFSimple/images/logo.png
 
