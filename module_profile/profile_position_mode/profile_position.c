@@ -97,6 +97,7 @@ struct PROFILE_POSITION_PARAM
 
 } 	profile_pos_params;
 
+
 void init_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity)
 {
 	profile_pos_params.max_acceleration = (max_acceleration * 6)/ gear_ratio;
@@ -333,4 +334,244 @@ int position_profile_generate(int step)
 	}
 
 	return (int) round(profile_pos_params.q * 10000.0f);
+}
+
+//for c only
+void __initialize_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity, profile_position_param *profile_pos_params)
+{
+	profile_pos_params->max_acceleration = (max_acceleration * 6)/ gear_ratio;
+	profile_pos_params->max_velocity = (max_velocity * 6)/ gear_ratio ;
+	profile_pos_params->gear_ratio = (float) gear_ratio;
+}
+
+int __initialize_position_profile(int target_position, int actual_position,	int velocity, int acceleration, \
+		                  int deceleration, profile_position_param *profile_pos_params)
+{
+	profile_pos_params->qf = (float) target_position;
+
+	profile_pos_params->qf = profile_pos_params->qf/10000.0f;
+
+	profile_pos_params->qi = (float) actual_position;
+
+	profile_pos_params->qi = profile_pos_params->qi/10000.0f;
+
+	profile_pos_params->vi = (float) (velocity * 6)/profile_pos_params->gear_ratio;
+
+	profile_pos_params->acc = (float) (acceleration * 6)/profile_pos_params->gear_ratio;
+
+	profile_pos_params->dec = (float) (deceleration * 6)/profile_pos_params->gear_ratio;
+
+
+	if(profile_pos_params->acc > profile_pos_params->max_acceleration)
+		profile_pos_params->acc = profile_pos_params->max_acceleration;
+
+	if(profile_pos_params->dec > profile_pos_params->max_acceleration)
+		profile_pos_params->dec = profile_pos_params->max_acceleration;
+
+	if(profile_pos_params->vi > profile_pos_params->max_velocity)
+		profile_pos_params->vi = profile_pos_params->max_velocity;
+
+
+	/* Internal params */
+
+	profile_pos_params->acc_too_low = 0;
+
+	profile_pos_params->qid = 0.0f;
+
+	/* leads to shorter blend times in the begining (if init condition != 0) non zero case - not yet considered */
+
+	profile_pos_params->qfd = 0.0f;
+
+
+	/* compute distance */
+
+	profile_pos_params->total_distance = profile_pos_params->qf - profile_pos_params->qi;
+
+	profile_pos_params->direction = 1;
+
+	if (profile_pos_params->total_distance < 0)
+	{
+		profile_pos_params->total_distance = -profile_pos_params->total_distance;
+
+		profile_pos_params->direction = -1;
+	}
+
+	profile_pos_params->tb_acc = profile_pos_params->vi / profile_pos_params->acc;
+
+	profile_pos_params->tb_dec = profile_pos_params->vi / profile_pos_params->dec;
+
+	profile_pos_params->distance_acc = (profile_pos_params->acc * profile_pos_params->tb_acc 	\
+			                        * profile_pos_params->tb_acc) / 2.0f;
+
+	profile_pos_params->distance_dec = (profile_pos_params->dec * profile_pos_params->tb_dec	\
+			                        * profile_pos_params->tb_dec) / 2.0f;
+
+	profile_pos_params->distance_left = profile_pos_params->total_distance 	\
+									 - profile_pos_params->distance_acc   	\
+									 - profile_pos_params->distance_dec;
+
+
+	/*check velocity and distance constraint*/
+
+	if (profile_pos_params->distance_left < 0)
+	{
+		profile_pos_params->acc_too_low = 1;
+
+		/* acc too low to meet distance/vel constraint */
+
+        if(profile_pos_params->vi > profile_pos_params->total_distance)
+        {
+        	profile_pos_params->vi = profile_pos_params->total_distance;
+
+        	profile_pos_params->acc_min = profile_pos_params->vi;
+
+        	if(profile_pos_params->acc < profile_pos_params->acc_min)
+        	{
+        		profile_pos_params->acc = profile_pos_params->acc_min;
+        	}
+
+        	if(profile_pos_params->dec < profile_pos_params->acc_min)
+        	{
+        		profile_pos_params->dec = profile_pos_params->acc_min;
+        	}
+        }
+        else if(profile_pos_params->vi < profile_pos_params->total_distance)
+        {
+        	profile_pos_params->acc_min = profile_pos_params->vi;
+
+        	if(profile_pos_params->acc < profile_pos_params->acc_min)
+        	{
+        		profile_pos_params->acc = profile_pos_params->acc_min;
+        	}
+        	if(profile_pos_params->dec < profile_pos_params->acc_min)
+        	{
+        		profile_pos_params->dec = profile_pos_params->acc_min;
+        	}
+        }
+
+        profile_pos_params->tb_acc = profile_pos_params->vi / profile_pos_params->acc;
+
+        profile_pos_params->tb_dec = profile_pos_params->vi / profile_pos_params->dec;
+
+        profile_pos_params->distance_acc = (profile_pos_params->acc * profile_pos_params->tb_acc 	\
+        								* profile_pos_params->tb_acc)/2.0f;
+
+        profile_pos_params->distance_dec = (profile_pos_params->dec * profile_pos_params->tb_dec 	\
+        								* profile_pos_params->tb_dec)/2.0f;
+
+        profile_pos_params->distance_left = profile_pos_params->total_distance 	\
+        								 - profile_pos_params->distance_acc 		\
+        								 - profile_pos_params->distance_dec;
+
+	}
+	else if (profile_pos_params->distance_left > 0)
+	{
+		profile_pos_params->acc_too_low = 0;
+	}
+
+
+	/* check velocity and min acceleration constraint */
+
+	if (profile_pos_params->distance_left < 0)
+	{
+		profile_pos_params->acc_too_low = 1;
+
+		/* acc too low to meet distance/velocity constraint */
+
+		profile_pos_params->acc_min = profile_pos_params->vi;
+
+        if(profile_pos_params->acc < profile_pos_params->acc_min)
+        {
+        	profile_pos_params->acc = profile_pos_params->acc_min;
+        }
+
+        if(profile_pos_params->dec < profile_pos_params->acc_min)
+        {
+        	profile_pos_params->dec = profile_pos_params->acc_min;
+        }
+
+        profile_pos_params->tb_acc = profile_pos_params->vi / profile_pos_params->acc;
+
+        profile_pos_params->tb_dec = profile_pos_params->vi / profile_pos_params->dec;
+
+        profile_pos_params->distance_acc = (profile_pos_params->acc * profile_pos_params->tb_acc 	\
+        								* profile_pos_params->tb_acc)/2.0f;
+
+        profile_pos_params->distance_dec = (profile_pos_params->dec * profile_pos_params->tb_dec 	\
+        								* profile_pos_params->tb_dec)/2.0f;
+
+        profile_pos_params->distance_left = profile_pos_params->total_distance	\
+        								 - profile_pos_params->distance_acc		\
+        								 - profile_pos_params->distance_dec;
+	}
+	else if (profile_pos_params->distance_left > 0)
+	{
+		profile_pos_params->acc_too_low = 0;
+	}
+
+	profile_pos_params->distance_cruise = profile_pos_params->distance_left;
+
+	profile_pos_params->t_cruise = (profile_pos_params->distance_cruise) / profile_pos_params->vi;
+
+	profile_pos_params->tf = profile_pos_params->tb_acc + profile_pos_params->tb_dec \
+			              + profile_pos_params->t_cruise;
+
+	if (profile_pos_params->direction == -1)
+	{
+		profile_pos_params->vi = -profile_pos_params->vi;
+	}
+
+	/* compute LFPB motion constants */
+
+	profile_pos_params->ai = profile_pos_params->qi;
+
+	profile_pos_params->bi = profile_pos_params->qid;
+
+	profile_pos_params->ci = (profile_pos_params->vi - profile_pos_params->qid) / (2.0f * profile_pos_params->tb_acc);
+
+	profile_pos_params->di = profile_pos_params->ai + profile_pos_params->tb_acc * profile_pos_params->bi 		\
+						  + profile_pos_params->ci * profile_pos_params->tb_acc * profile_pos_params->tb_acc 	\
+						  - profile_pos_params->vi * profile_pos_params->tb_acc;
+
+	profile_pos_params->ei = profile_pos_params->qf;
+
+	profile_pos_params->fi = profile_pos_params->qfd;
+
+	profile_pos_params->gi = (profile_pos_params->di + (profile_pos_params->tf - profile_pos_params->tb_dec) 	\
+			 	 	 	  * profile_pos_params->vi + profile_pos_params->fi * profile_pos_params->tb_dec 		\
+			              - profile_pos_params->ei) / (profile_pos_params->tb_dec * profile_pos_params->tb_dec);
+
+	profile_pos_params->T = profile_pos_params->tf / 0.001f;        	// 1 ms
+
+	profile_pos_params->s_time = 0.001f;								// 1 ms
+
+	return (int) round(profile_pos_params->T);
+}
+
+//c only
+int __position_profile_generate_in_steps(int step, profile_position_param *profile_pos_params)
+{
+	profile_pos_params->ts = profile_pos_params->s_time * step ;
+
+	if (profile_pos_params->ts < profile_pos_params->tb_acc)
+	{
+		profile_pos_params->q = profile_pos_params->ai + profile_pos_params->ts * profile_pos_params->bi 	\
+							 + profile_pos_params->ci * profile_pos_params->ts * profile_pos_params->ts;
+	}
+
+	else if (profile_pos_params->tb_acc <= profile_pos_params->ts 										\
+			 &&  profile_pos_params->ts < (profile_pos_params->tf - profile_pos_params->tb_dec) )
+	{
+		profile_pos_params->q = profile_pos_params->di + profile_pos_params->vi * profile_pos_params->ts;
+	}
+
+	else if ( (profile_pos_params->tf - profile_pos_params->tb_dec) <= profile_pos_params->ts				\
+			                             && profile_pos_params->ts <= profile_pos_params->tf)
+	{
+		profile_pos_params->q = profile_pos_params->ei + (profile_pos_params->ts - profile_pos_params->tf)	\
+							 * profile_pos_params->fi + (profile_pos_params->ts - profile_pos_params->tf) 	\
+							 * (profile_pos_params->ts - profile_pos_params->tf) * profile_pos_params->gi;
+	}
+
+	return (int) round(profile_pos_params->q * 10000.0f);
 }
