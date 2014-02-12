@@ -62,7 +62,7 @@ static const unsigned char lookup[16][4] = {
 		{ 0, 0, 0, 0 }  // 11 xx
 };
 
-void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int count, int direction,\
+void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &count, int direction,\
 		int init_state, int sync_out, int &calib_bw_flag, int &calib_fw_flag, int &offset_fw, \
 		int &offset_bw, qei_par &qei_params, int &status)
 {
@@ -129,13 +129,18 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int co
 	//					printintln(qei_params.real_counts);
 			break;
 
+		case QEI_RESET_COUNT:
+			c_qei :> count;
+			break;
+
 		default:
 			break;
 	}
 }
 
 #pragma unsafe arrays
-void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, chanend c_qei_p5, port in p_qei, qei_par &qei_params)
+void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, chanend c_qei_p5, \
+		chanend c_qei_p6, port in p_qei, qei_par &qei_params)
 {
 	unsigned int position = 0;
 	unsigned int v;
@@ -272,6 +277,12 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 
 			case c_qei_p5 :> command :
 				qei_client_hanlder( c_qei_p5, command, position, ok, count, direction, init_state,\
+						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,\
+						status);
+				break;
+
+			case c_qei_p6 :> command :
+				qei_client_hanlder( c_qei_p6, command, position, ok, count, direction, init_state,\
 						sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,\
 						status);
 				break;

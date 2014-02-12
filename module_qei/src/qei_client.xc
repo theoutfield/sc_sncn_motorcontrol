@@ -119,6 +119,12 @@ void set_qei_sync_offset(chanend c_qei, int offset_forward, int offset_backward)
 	return;
 }
 
+void reset_qei_count(chanend c_qei, int offset)
+{
+	c_qei <: QEI_RESET_COUNT;
+	c_qei <: offset;
+}
+
 void set_qei_turns(chanend c_qei, int turns)
 {
 	c_qei <: 33;

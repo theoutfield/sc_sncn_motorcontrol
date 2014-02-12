@@ -136,5 +136,6 @@ extern int __qei_max_counts(int real_counts);
  */
 void set_qei_sync_offset(chanend c_qei, int offset_forward, int offset_backward);
 
+void reset_qei_count(chanend c_qei, int offset);
 
 #endif /* __QEI_CLIENT_H__ */

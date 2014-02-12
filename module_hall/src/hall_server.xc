@@ -89,7 +89,7 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 }
 
 void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
-		chanend c_hall_p5, port in p_hall, hall_par &hall_params)
+		chanend c_hall_p5, chanend c_hall_p6, port in p_hall, hall_par &hall_params)
 {
 	timer tx;
 	unsigned int ts;
@@ -143,7 +143,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	tx :> ts;
 	while(1)
 	{
-#pragma xta endpoint "hall_loop"
+//#pragma xta endpoint "hall_loop"
 		switch(xreadings)
 		{
 			case 0: p_hall :> new1; new1 &= 0x07; xreadings++;
@@ -298,6 +298,11 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 
 			case c_hall_p5 :> command:
 				hall_client_handler(c_hall_p5, command, angle, raw_velocity, init_state, count, \
+						direction, hall_params, status);
+				break;
+
+			case c_hall_p6 :> command:
+				hall_client_handler(c_hall_p6, command, angle, raw_velocity, init_state, count, \
 						direction, hall_params, status);
 				break;
 
