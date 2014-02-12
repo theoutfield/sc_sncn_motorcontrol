@@ -58,7 +58,7 @@
 #include <profile_control.h>
 #include <flash_somanet.h>
 
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -80,25 +80,31 @@ void xscope_initialise_1()
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity = 2000;	 		// rpm
-	int acceleration 	= 2000;			// rpm/s
-	int deceleration 	= 1050;			// rpm/s
+	int target_velocity = 500;	 		// rpm
+	int acceleration 	= 100;			// rpm/s
+	int deceleration 	= 100;			// rpm/s
 
 #ifdef ENABLE_xscope_main
-	//xscope_initialise_1();
+	xscope_initialise_1();
 #endif
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
-	target_velocity = 0;				// rpm
-	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+//	target_velocity = 0;				// rpm
+//	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+
+	/*target_velocity = -4000;				// rpm
+		set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+
+		target_velocity = 0;				// rpm
+		set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);*/
 }
 
 int main(void)
 {
 	// Motor control channels
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;					// qei channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6;		// qei channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl, c_adctrig;												// pwm channels
 	chan c_velocity_ctrl;													// velocity control channel
@@ -120,23 +126,39 @@ int main(void)
 	par
 	{
 		/* Ethercat Communication Handler Loop */
-		on stdcore[0] :
+/*		on stdcore[0] :
 		{
 			ecat_init();
 			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,\
 					foe_in, pdo_out, pdo_in);
 		}
 
-		/* Firmware Update Loop */
+		 Firmware Update Loop
 		on stdcore[0] :
 		{
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
-		}
+		}*/
 
 		/* Test Profile Velocity function */
 		on stdcore[1]:
 		{
 			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
+			/*{
+				int init_state;
+				while(1)
+				{
+					init_state = __check_commutation_init(c_commutation_p1);
+					if(init_state == INIT)
+					{
+#ifdef debug_print
+						printstrln("commutation intialized");
+#endif
+						set_commutation_sinusoidal(c_commutation_p1, 600);
+						init_state = INIT_BUSY;
+						break;
+					}
+				}
+			}*/
 		}
 
 		on stdcore[2]:
@@ -191,14 +213,14 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..5
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..5
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params); 	 // channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params); 	 // channel priority 1,2..5
 				}
 			}
 		}

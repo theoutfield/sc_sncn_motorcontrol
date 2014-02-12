@@ -52,12 +52,12 @@
 #define POLE_PAIRS  				8
 #define MAX_NOMINAL_SPEED  			5260				// rpm
 #define MAX_NOMINAL_CURRENT  		2					// A
-#define MOTOR_TORQUE_CONSTANT 		34    				// mNm/A
+#define MOTOR_TORQUE_CONSTANT 		38    				// mNm/A
 
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				26					// if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO  				18					// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			4000				// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
@@ -74,13 +74,20 @@
 /*Changes direction of the motor drive*/
 #define POLARITY 					1					// 1 / -1
 
+/*Commutation offset (range 0-4095) */
+#define COMMUTATION_OFFSET_CLK		683
+#define COMMUTATION_OFFSET_CCLK		2731
+
+/*Motor Winding type*/
+#define WINDING_TYPE				DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
+
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
-#define PROFILE_VELOCITY			1001				// rpm
-#define MAX_ACCELERATION   			5000   				// rpm/s
-#define PROFILE_ACCELERATION		2002				// rpm/s
-#define PROFILE_DECELERATION  		2004				// rpm/s
-#define QUICK_STOP_DECELERATION 	2005				// rpm/s
+#define PROFILE_VELOCITY			1000				// rpm
+#define MAX_ACCELERATION   			4000   				// rpm/s
+#define PROFILE_ACCELERATION		2000				// rpm/s
+#define PROFILE_DECELERATION  		2000				// rpm/s
+#define QUICK_STOP_DECELERATION 	2000				// rpm/s
 #define PROFILE_TORQUE_SLOPE		66					// (desired torque_slope/torque_constant)  * IFM resolution
 
 

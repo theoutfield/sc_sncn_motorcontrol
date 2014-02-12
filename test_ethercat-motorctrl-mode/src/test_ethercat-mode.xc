@@ -68,15 +68,15 @@ int main(void)
 {
 	// Motor control channels
 	chan c_adc, c_adctrig;													// adc channels
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;					// qei channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6 ;		// qei channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl;														// pwm channels
 	chan c_velocity_ctrl;													// velocity control channel
 	chan c_torque_ctrl;														// torque control channel
 	chan c_position_ctrl;													// position control channel
 	chan c_watchdog; 														// watchdog channel
-
+	chan c_home;															// homing channel
 
 	// EtherCat Communication channels
 	chan coe_in; 		// CAN from module_ethercat to consumer
@@ -110,8 +110,8 @@ int main(void)
 		/* Ethercat Motor Drive Loop */
 		on stdcore[1] :
 		{
-			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5, c_torque_ctrl, \
-					c_velocity_ctrl, c_position_ctrl);
+			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5, c_home,\
+					c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 		}
 
 		on stdcore[2]:
@@ -196,18 +196,22 @@ int main(void)
 				/* Watchdog Server */
 				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
+				//track_home_positon(p_ifm_ext_d0, p_ifm_ext_d1, c_home, c_qei_p6, c_hall_p6);
+
 				/* Hall Server */
 				{
 					hall_par hall_params;
 					hall_init_ecat(c_hall_p5, hall_params);   	//same as ecat drive channel
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); 	// channel priority 1,2..5
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, \
+							p_ifm_hall, hall_params); 	// channel priority 1,2..5
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					qei_init_ecat(c_qei_p5, qei_params);  		//same as ecat drive channel
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  		// channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, \
+							qei_params);  		// channel priority 1,2..5
 				}
 
 			}

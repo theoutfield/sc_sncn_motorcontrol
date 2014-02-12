@@ -49,6 +49,7 @@
 #include <qei_client.h>
 #include <qei_server.h>
 #include <profile.h>
+#include <homing.h>
 
 /**
  * \brief This server implementation enables motor drive functions via Ethercat communication
@@ -68,6 +69,6 @@
  *
  */
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
-		chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
+		chanend c_qei, chanend c_home, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
 #endif /* ECAT_MOTOR_DRIVE_H_ */

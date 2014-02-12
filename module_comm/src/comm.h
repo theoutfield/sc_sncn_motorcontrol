@@ -111,6 +111,8 @@ void update_hall_param_ecat(hall_par &hall_params, chanend coe_out);
 */
 void update_qei_param_ecat(qei_par &qei_params, chanend coe_out);
 
+void update_commutation_param_ecat(commutation_par &commutation_params, chanend coe_out);
+
 /**
 * \brief Update cyclic synchronous torque parameters from Ethercat
 *
@@ -192,7 +194,8 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
  * 	 gear-ratio used for the motor
  * \param nominal_speed defines nominal speed for the motor
  */
-void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, int nominal_speed);
+void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, \
+		commutation_par &commutation_params, int nominal_speed);
 
 /**
  * \brief Set hall sensor parameters from Ethercat communication loop

@@ -87,13 +87,18 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 	{
 		case SET_VOLTAGE:				// set voltage
 			c_commutation :> voltage;
+			if(commutation_params.winding_type == STAR_WINDING)
+			{
+				voltage = 0 - voltage;
+			}
 			break;
 
 		case SET_COMMUTATION_PARAMS:
 			c_commutation :> commutation_params.angle_variance;
 			c_commutation :> commutation_params.max_speed_reached;
-			c_commutation :> commutation_params.offset_forward;
-			c_commutation :> commutation_params.offset_backward;
+			c_commutation :> commutation_params.hall_offset_clk;
+			c_commutation :> commutation_params.hall_offset_cclk;
+			c_commutation :> commutation_params.winding_type;
 			break;
 
 		case SENSOR_SELECT:
@@ -142,7 +147,9 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 	int nominal_speed;
 	qei_velocity_par qei_velocity_params;
 	init_qei_velocity_params(qei_velocity_params);
-
+	//printintln(commutation_params.hall_offset_clk);
+	//printintln(commutation_params.hall_offset_cclk);
+	//printintln(commutation_params.winding_type);
 	while (1)
 	{
 		if(sensor_select == HALL) //hall only
@@ -183,11 +190,11 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 		{
 			if(sensor_select == HALL)
 			{
-				angle_pwm = (((angle + angle_rpm + FORWARD_CONSTANT - commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;//
+				angle_pwm = (((angle + angle_rpm + commutation_params.hall_offset_clk - commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;//
 			}
 			else if(sensor_select == QEI)
 			{
-				angle_pwm = (((angle + commutation_params.offset_forward) & 0x0fff) >> 2)&0x3ff;	 //512
+				angle_pwm = (((angle + commutation_params.qei_forward_offset) & 0x0fff) >> 2)&0x3ff;	 //512
 			}
 			pwm[0] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm + 341) & 0x3ff;
@@ -201,11 +208,11 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 		{
 			if(sensor_select == HALL)
 			{
-				angle_pwm = (((angle - angle_rpm + REVERSE_CONSTANT + commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
+				angle_pwm = (((angle - angle_rpm + commutation_params.hall_offset_cclk + commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
 			}
 			else if(sensor_select == QEI)
 			{
-				angle_pwm = (((angle  + commutation_params.offset_backward ) & 0x0fff) >> 2)&0x3ff;  	 //3100
+				angle_pwm = (((angle  + commutation_params.qei_backward_offset ) & 0x0fff) >> 2)&0x3ff;  	 //3100
 			}
 			pwm[0] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
 			angle_pwm = (angle_pwm + 341) & 0x3ff;
@@ -254,7 +261,9 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 					c_signal :> qei_params.max_count;
 					c_signal :> qei_params.real_counts;
 					c_signal :> nominal_speed;
-
+					c_signal :> commutation_params.hall_offset_clk;
+					c_signal :> commutation_params.hall_offset_cclk;
+					c_signal :> commutation_params.winding_type;
 					commutation_params.angle_variance = 1024/(hall_params.pole_pairs * 3);
 					if(hall_params.pole_pairs < 4)
 					{

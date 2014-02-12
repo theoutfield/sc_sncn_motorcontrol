@@ -67,6 +67,9 @@
 #define DC100_RESOLUTION 			740
 #define DC300_RESOLUTION			264
 
+#define STAR_WINDING				1
+#define DELTA_WINDING				2
+
 #define INIT_BUSY 					0
 #define INIT						1
 #define CHECK_BUSY  				10
@@ -113,6 +116,9 @@
 
 #define SET_CTRL_PARAMETER 			100
 #define SENSOR_SELECT      			150
+
+#define ACTIVE_HIGH					1
+#define ACTIVE_LOW					2
 
 #define SUCCESS 					1
 #define ERROR   					0

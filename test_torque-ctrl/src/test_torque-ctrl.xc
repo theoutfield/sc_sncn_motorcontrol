@@ -57,7 +57,8 @@
 #include <internal_config.h>
 #include <flash_somanet.h>
 
-//#define ENABLE_xscope_main
+#include "torque_ctrl_client.h"
+#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -67,7 +68,7 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
-	xscope_register(4, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
+	xscope_register(2, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
 						XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n");
 	xscope_config_io(XSCOPE_IO_BASIC);
 	return;
@@ -76,9 +77,9 @@ void xscope_initialise_1()
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 350;  //(desired torque/torque_constant)  * IFM resolution
-	int torque_slope  = 150;  //(desired torque_slope/torque_constant)  * IFM resolution
-	cst_par cst_params;
+	int target_torque = 100;  //(desired torque/torque_constant)  * IFM resolution
+	int torque_slope  = 100;  //(desired torque_slope/torque_constant)  * IFM resolution
+	cst_par cst_params; timer t; unsigned int time; int actual_torque;
 	init_cst_param(cst_params);
 
 #ifdef ENABLE_xscope_main
@@ -87,6 +88,15 @@ void profile_torque_test(chanend c_torque_ctrl)
 
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
+/*	while(1)
+	{
+		t :> time;
+		actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
+		t when timerafter(time + MSEC_STD) :> time;
+		//xscope_probe_data(1, torque_ramp);
+		xscope_probe_data(0, actual_torque);
+
+	}*/
 	target_torque = 0;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
@@ -99,8 +109,8 @@ int main(void)
 
 	// Motor control channels
 	chan c_adc, c_adctrig;													// adc channels
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;  				// qei channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6 ; 		// qei channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl;														// pwm channel
 	chan c_torque_ctrl;														// torque control channel
@@ -192,14 +202,14 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  // channel priority 1,2..4
 				}
 
 			}

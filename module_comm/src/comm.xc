@@ -81,6 +81,12 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
 	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
 }
 
+void update_commutation_param_ecat(commutation_par &commutation_params, chanend coe_out)
+{
+	{commutation_params.hall_offset_clk, commutation_params.hall_offset_cclk, \
+		commutation_params.winding_type} = commutation_sdo_update(coe_out);
+}
+
 void update_cst_param_ecat(cst_par &cst_params, chanend coe_out)
 {
 	{cst_params.nominal_current, cst_params.nominal_motor_speed, cst_params.polarity,\
@@ -197,7 +203,8 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
 }
 
 
-void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, int nominal_speed)
+void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, \
+		commutation_par &commutation_params, int nominal_speed)
 {
 	c_signal <: SET_COMM_PARAM_ECAT;
 	c_signal <: hall_params.gear_ratio;
@@ -207,6 +214,9 @@ void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par
 	c_signal <: qei_params.max_count;
 	c_signal <: qei_params.real_counts;
 	c_signal <: nominal_speed;
+	c_signal <: commutation_params.hall_offset_clk;
+	c_signal <: commutation_params.hall_offset_cclk;
+	c_signal <: commutation_params.winding_type;
 }
 
 void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params)
@@ -235,6 +245,9 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
 					c_signal :> qei_params.max_count;
 					c_signal :> qei_params.real_counts;
 					c_signal :> nominal_speed;
+					c_signal :> commutation_params.hall_offset_clk;
+					c_signal :> commutation_params.hall_offset_cclk;
+					c_signal :> commutation_params.winding_type;
 					flag = 1;
 
 					commutation_params.angle_variance = 1024/(hall_params.pole_pairs * 3);
@@ -250,6 +263,7 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
 					}
 					commutation_params.qei_forward_offset = 0;
 					commutation_params.qei_backward_offset = 0;
+					//printstrln("ecat");
 //					printintln(hall_params.gear_ratio);
 //					printintln(hall_params.pole_pairs);
 //					printintln(commutation_params.max_speed_reached );

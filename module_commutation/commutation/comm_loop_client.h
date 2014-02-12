@@ -57,7 +57,9 @@ typedef struct S_COMMUTATION {
 	int qei_forward_offset;
 	int qei_backward_offset;
 	int offset_forward;
-	int offset_backward;
+	int hall_offset_clk;
+	int hall_offset_cclk;
+	int winding_type;
 	int flag;
 } commutation_par;
 

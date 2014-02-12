@@ -57,7 +57,7 @@
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				26				// if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO  				18				// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			4000			// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
@@ -68,11 +68,18 @@
 
 
 /* Somanet IFM Internal Config */
-#define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
+#define IFM_RESOLUTION				DC300_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
 
 
 /*Changes direction of the motor drive*/
 #define POLARITY 					1		// 1 / -1
+
+/*Commutation offset (range 0-4095) */
+#define COMMUTATION_OFFSET_CLK		683
+#define COMMUTATION_OFFSET_CCLK		2731
+
+/*Motor Winding type*/
+#define WINDING_TYPE				DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
 
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED

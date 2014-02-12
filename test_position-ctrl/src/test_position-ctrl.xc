@@ -78,21 +78,20 @@ void xscope_initialise_1()
 
 
 /* Test Profile Position function */
-void position_profile_test(chanend c_position_ctrl)
+void position_profile_test(chanend c_position_ctrl, chanend c_qei)
 {
-	int target_position = 350;			// degree
+	int target_position = 350;			// deg
 	int velocity 		= 350;			// rpm
 	int acceleration 	= 350;			// rpm/s
 	int deceleration 	= 350;     		// rpm/s
-
+	int turns = 1;
 	init_position_profile_limits(GEAR_RATIO, MAX_ACCELERATION, MAX_PROFILE_VELOCITY);
 
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif
-
+	//set_qei_turns(c_qei, turns);
 	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
-
 	target_position = 0; 	//degree
 	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 }
@@ -100,8 +99,8 @@ void position_profile_test(chanend c_position_ctrl)
 int main(void)
 {
 	// Motor control channels
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5 ;					// qei channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6;		// qei channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl, c_adctrig;												// pwm channels
 	chan c_position_ctrl;													// position control channel
@@ -138,7 +137,7 @@ int main(void)
 		/* Test Profile Position function*/
 		on stdcore[1]:
 		{
-			position_profile_test(c_position_ctrl);		  	// test PPM on slave side
+			position_profile_test(c_position_ctrl, c_qei_p5);		  	// test PPM on slave side
 		}
 
 
@@ -191,14 +190,14 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..5
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..5
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  	// channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  	// channel priority 1,2..5
 				}
 
 			}
