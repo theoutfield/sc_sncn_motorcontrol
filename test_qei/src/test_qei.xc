@@ -50,10 +50,11 @@
 #include <refclk.h>
 #include <xscope.h>
 #include <bldc_motor_config.h>
-
+#include <hall_client.h>
+#include <hall_server.h>
 //#include <flash_somanet.h>
 
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -64,15 +65,15 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 void xscope_initialise_1()
 {
 	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 hall_position", XSCOPE_INT,	"n",
-				           XSCOPE_CONTINUOUS, "1 hall_velocity", XSCOPE_INT,	"n");
+		xscope_register(2, XSCOPE_CONTINUOUS, "0 qei_position", XSCOPE_INT,	"n",
+				           XSCOPE_CONTINUOUS, "1 qei_velocity", XSCOPE_INT,	"n");
 		xscope_config_io(XSCOPE_IO_BASIC);
 	}
 	return;
 }
 
 /* qei sensor test function */
-void qei_test(chanend c_qei)
+void qei_test(chanend c_qei, chanend c_hall)
 {
 	int position;
 	int velocity;
@@ -81,23 +82,24 @@ void qei_test(chanend c_qei)
 	timer t;
 	qei_par qei_params;
 	qei_velocity_par qei_velocity_params;  // to compute velocity from qei
-
+int hall_p, hall_di;
 	init_qei_param(qei_params);
 	init_qei_velocity_params(qei_velocity_params);	// to compute velocity from qei
 
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif
-
+	//set_qei_turns(c_qei, 1);
 	while(1)
 	{
 		{position, valid} = get_qei_position(c_qei, qei_params);
-		velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
+		hall_p =  get_hall_position(c_hall);
+	//	velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
 		wait_ms(1, core_id, t);
 
 #ifdef ENABLE_xscope_main
 		xscope_probe_data(0, position);
-		xscope_probe_data(1, velocity);
+		xscope_probe_data(1, hall_p);
 #else
 		printstr("position ");
 		printint(position);
@@ -112,6 +114,7 @@ int main(void)
 	chan c_adctrig, c_adc;													// adc channels
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5;					// qei channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
 	chan c_pwm_ctrl;														// pwm channels
 
 
@@ -123,7 +126,7 @@ int main(void)
 			/* Test qei sensor */
 			par
 			{
-				qei_test(c_qei_p1);
+				qei_test(c_qei_p1, c_hall_p1);
 			}
 		}
 
@@ -142,6 +145,13 @@ int main(void)
 					init_qei_param(qei_params);
 					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  		// channel priority 1,2..5
 				}
+
+				/* Hall Server */
+					{
+						hall_par hall_params;
+						init_hall_param(hall_params);
+						run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
+					}
 			}
 		}
 
