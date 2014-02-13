@@ -53,4 +53,4 @@ Please see `LICENSE`_.
 .. _sc_sncn_ethercat: https://github.com/synapticon/sc_sncn_ethercat
 
 .. _DOCUMENTATION: http://synapticon.github.io/sc_sncn_motorctrl_sin/
-.. _LICENSE: https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/LICENSE
+.. _LICENSE: https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/LICENSE.dox
