@@ -59,6 +59,7 @@
 #include "velocity_ctrl_client.h"
 #include <flash_somanet.h>
 #include <qei_client.h>
+#include <homing.h>
 //#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -102,128 +103,8 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 		set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);*/
 }
 
-{int, int, int, int} get_home_state(chanend c_home)
-{
-	int position;
-	int direction;
-	int home_state;
-	int safety_state;
-	c_home <: 1;
-	c_home :> home_state;
-	c_home :> safety_state;
-	c_home :> position;
-	c_home :> direction;
-	return {home_state, safety_state, position, direction};
-}
-void home_track(port in p_ifm_ext_d0, port in p_ifm_ext_d1, chanend c_home, chanend c_qei, chanend c_hall)
-{
-	timer t;
-	unsigned int time, time1;
-	int home_switch;
-	int home_switch_1;
-	int home_state = 0;
-	int safety_state = 0;
-	int safety_switch;
-	int safety_switch_1;
-	int position = 0;
-	int direction;
-	int command;
-
-	int switch_type = 1; //active high switch = 1/ active low switch = 2
-	if(switch_type == 1)
-	{
-		set_port_pull_down(p_ifm_ext_d0);
-		set_port_pull_down(p_ifm_ext_d1);
-	}
-	t:>time;
-	printstrln("start");
-	xscope_initialise_1();
-	p_ifm_ext_d0 :> home_switch;   //once
-	p_ifm_ext_d1 :> safety_switch; //once
-	if(home_switch == 1)
-	{
-		//printstrln("home");
-		home_state = 1;
-		xscope_probe_data(0, home_state);
-	}
-	while(1)
-	{
-
-		//xscope_probe_data(0, home_switch);
-		//xscope_probe_data(1, safety_switch);
 
 
-		select
-		{
-			case p_ifm_ext_d0 when pinsneq(home_switch) :> home_switch:
-				//t when timerafter(time + 83333) :> time; //3khz
-				if(home_switch == 1)
-				{//register pos data
-					t :> time1;
-					t when timerafter(time1 + 83333) :> time1;
-					p_ifm_ext_d0 :> home_switch_1;
-					if(home_switch_1 == 1)
-					{
-						t when timerafter(time1 + 83333) :> time1;
-						p_ifm_ext_d0 :> home_switch_1;
-						if(home_switch_1 == 1)
-						{
-							home_state = 1;
-							xscope_probe_data(0, home_state);
-							{position, direction} = get_qei_position_absolute(c_qei);
-						//printstrln("home");//xscope_probe_data(0, home_switch);  // confirm home position
-						}
-					}
-				}
-				else
-				{
-					home_state = 0;
-					xscope_probe_data(0, home_state);
-				}
-			//case p_ifm_ext_d0 :> home_switch:
-				//if(home_switch == 1) // high  ON
-				//	printstrln("home");
-				break;
-
-			case p_ifm_ext_d1 when pinsneq(safety_switch) :> safety_switch:
-			//case p_ifm_ext_d1 :> safety_switch:  // find safety switch in reverse direction
-				//if(safety_switch == 1) // low OFF
-				//	printstrln("safety");
-
-				if(safety_switch == 1)
-				{//register pos data
-					t :> time1;
-					t when timerafter(time1 + 83333) :> time1;
-					p_ifm_ext_d1 :> safety_switch_1;
-					if(safety_switch_1 == 1)
-					{
-						t when timerafter(time1 + 83333) :> time1;
-						p_ifm_ext_d1 :> safety_switch_1;
-						if(safety_switch_1 == 1)
-						{
-							safety_state = 1;
-							//xscope_probe_data(0, safety_state);
-							//{position, direction} = get_qei_position_absolute(c_qei);
-						//printstrln("home");//xscope_probe_data(0, home_switch);  // confirm home position
-						}
-					}
-				}
-				else
-				{
-					safety_state = 0;
-				}
-				break;
-
-
-			case c_home :> command:   //case upon request send home state with position info too
-				c_home <: home_state;
-				c_home <: safety_state;
-				c_home <: position;
-				c_home <: direction;
-				break;
-		}
-	}
-}
 
 int main(void)
 {
@@ -246,13 +127,13 @@ int main(void)
 	chan pdo_in;
 	chan pdo_out;
 	chan c_sig_1;
- chan c_home;
+	chan c_home;
 
 	par
 	{
 		on stdcore[3]:
 		{
-			home_track( p_ifm_ext_d0, p_ifm_ext_d1, c_home, c_qei_p5, c_hall_p5);
+			track_home_positon( p_ifm_ext_d0, p_ifm_ext_d1, c_home, c_qei_p5, c_hall_p5);
 		}
 
 
@@ -262,8 +143,9 @@ int main(void)
 			{
 				int target_velocity = 2000;
 				int acceleration = 3000;
-				int deceleration = 3000;
-				int max_profile_velocity = 4000;
+				int max_profile_velocity = 2000;
+				int limit_switch = 1; // positive negative limit switches
+
 				int reset_counter = 0;
 				int velocity_ramp;
 				int actual_velocity;
@@ -272,7 +154,6 @@ int main(void)
 				timer t;
 				unsigned int time;
 				int steps;
-				int limit_switch = -1; // positive negative limit switches
 				int home_state = 0;
 				int safety_state = 0;
 				int position = 0;
@@ -280,7 +161,10 @@ int main(void)
 				int offset = 0;
 				int dirn;
 				int end_state = 0;
-				int init_state = __check_velocity_init(c_velocity_ctrl);
+				int init_state;
+				init_state = __check_velocity_init(c_velocity_ctrl);
+
+				set_home_switch_type(c_home, ACTIVE_HIGH);
 				while(1)
 				{
 					init_state = init_velocity_control(c_velocity_ctrl);
@@ -290,7 +174,7 @@ int main(void)
 
 				i = 1;
 				actual_velocity = get_velocity(c_velocity_ctrl);
-				steps = init_velocity_profile(target_velocity*limit_switch, actual_velocity, acceleration, deceleration, max_profile_velocity);
+				steps = init_velocity_profile(target_velocity*limit_switch, actual_velocity, acceleration, acceleration, max_profile_velocity);
 				t :> time;
 				while(1)
 				{
@@ -308,7 +192,7 @@ int main(void)
 							if(home_state == 1 || safety_state == 1)
 							{
 								actual_velocity = get_velocity(c_velocity_ctrl);
-								steps = init_velocity_profile(0, actual_velocity, acceleration, deceleration, max_profile_velocity);
+								steps = init_velocity_profile(0, actual_velocity, acceleration, acceleration, max_profile_velocity);
 								for(i = 1; i < steps; i++)
 								{
 									velocity_ramp = velocity_profile_generate(i);
@@ -320,7 +204,7 @@ int main(void)
 								}
 								end_state = 1;
 								shutdown_velocity_ctrl(c_velocity_ctrl);
-								printintln(position);
+								//printintln(position);
 								if(home_state == 1)
 								{
 									{current_position, direction} = get_qei_position_absolute(c_qei_p4);
@@ -328,6 +212,7 @@ int main(void)
 									offset = current_position - position;
 									printintln(offset);
 									reset_qei_count(c_qei_p4, offset);
+									reset_counter = 1;
 								}
 
 							}
@@ -337,6 +222,16 @@ int main(void)
 					if(end_state == 1)
 						break;
 				}
+				 xscope_initialise_1();
+					if(reset_counter == 1)
+								printstrln("homing_success");
+				while(1)
+				{
+					{current_position, direction} = get_qei_position_absolute(c_qei_p4);
+					wait_ms(1, 1, t);
+					xscope_probe_data(0, current_position);
+				}
+
 			}
 		}
 
@@ -391,14 +286,14 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..5
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..5
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params); 	 // channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params); 	 // channel priority 1,2..5
 				}
 			}
 		}
