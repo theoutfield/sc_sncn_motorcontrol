@@ -49,7 +49,7 @@
 #include "print.h"
 
 //#define Debug_velocity_ctrl
-#define debug_print
+//#define debug_print
 
 void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
 	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation)

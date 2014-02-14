@@ -44,7 +44,7 @@
 #include <drive_config.h>
 
 //#define DEBUG
-#define debug_print
+//#define debug_print
 
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 

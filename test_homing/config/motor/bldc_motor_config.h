@@ -110,11 +110,11 @@
 #define VELOCITY_FILTER_SIZE        8  	//default (could be changed upto 16)
 
 	/*Position Control (Mandatory if Position control used)*/
-#define POSITION_Kp_NUMERATOR 	 	180
+#define POSITION_Kp_NUMERATOR 	 	80
 #define POSITION_Kp_DENOMINATOR  	2000
-#define POSITION_Ki_NUMERATOR    	50
+#define POSITION_Ki_NUMERATOR    	10
 #define POSITION_Ki_DENOMINATOR  	102000
-#define POSITION_Kd_NUMERATOR    	100
+#define POSITION_Kd_NUMERATOR    	0
 #define POSITION_Kd_DENOMINATOR  	10000
 
 #define MAX_POSITION_LIMIT 			359		// degree

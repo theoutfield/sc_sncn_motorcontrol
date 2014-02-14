@@ -152,6 +152,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	int limit_switch_type;
 	int homing_method;
 
+	int homing_done = 0;
 	state 		= init_state(); 			//init state
 	checklist 	= init_checklist();
 	InOut 		= init_ctrl_proto();
@@ -406,7 +407,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						precision = QEI_PRECISION;
 					}
 					set_hall_param_ecat(c_hall, hall_params);
-					set_qei_param_ecat(c_qei, qei_params);
+					if(homing_done == 0)
+						set_qei_param_ecat(c_qei, qei_params);
 					set_commutation_param_ecat(c_signal, hall_params, qei_params, commutation_params, nominal_speed);
 
 					setup_loop_flag = 1;
@@ -418,7 +420,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				switch(InOut.operation_mode)
 				{
 					case HM:
-						printstrln("Homing mode op");
+						//printstrln("Homing mode op");
 						if(op_set_flag == 0)
 						{
 							ctrl_state = check_torque_ctrl_state(c_torque_ctrl);
@@ -451,7 +453,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 								set_velocity_ctrl_qei_param(qei_params, c_velocity_ctrl);
 							}
 							set_velocity_ctrl_param(velocity_ctrl_params, c_velocity_ctrl);*/
-							set_velocity_sensor(HALL, c_velocity_ctrl); //QEI
+							set_velocity_sensor(QEI, c_velocity_ctrl); //QEI
 							InOut.operation_mode_display = HM;
 						}
 						break;
@@ -742,7 +744,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						break;
 
 					case CST:
-						printstrln("op mode enabled on slave");
+						//printstrln("op mode enabled on slave");
 						if(op_set_flag == 0)
 						{
 							ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
@@ -902,8 +904,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 										actual_velocity = get_velocity(c_velocity_ctrl);
 										steps = init_velocity_profile(home_velocity * limit_switch, actual_velocity, home_acceleration,\
 												home_acceleration, home_velocity);
-										printintln(home_velocity);
-										printintln(home_acceleration);
+										//printintln(home_velocity);
+										//printintln(home_acceleration);
 										ack = 1;
 										reset_counter = 0;
 										end_state = 0;
@@ -938,7 +940,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 											{current_position, direction} = get_qei_position_absolute(c_qei);
 											//printintln(current_position);
 											home_offset = current_position - capture_position;
-											printintln(home_offset);
+											//printintln(home_offset);
 											reset_qei_count(c_qei, home_offset);
 											reset_counter = 1;
 										}
@@ -948,7 +950,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 								{
 									ack = 0;//h_active = 1;
 									//mode_selected = 100;
-									printstrln("homing_success"); //done
+									homing_done = 1;
+									//printstrln("homing_success"); //done
 									InOut.operation_mode_display = 250;
 
 									//op_set_flag = 0;

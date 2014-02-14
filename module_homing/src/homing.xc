@@ -69,12 +69,7 @@ void track_home_positon(port in p_ifm_ext_d0, port in p_ifm_ext_d1, chanend c_ho
 	t:>time;
 
 	//xscope_initialise_1();
-/*	{
-			xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-								XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
 
-			xscope_config_io(XSCOPE_IO_BASIC);
-		}*/
 	p_ifm_ext_d0 :> home_switch;   //once
 	p_ifm_ext_d1 :> safety_switch; //once
 	if(home_switch == active_state)
