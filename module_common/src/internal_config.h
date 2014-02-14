@@ -120,6 +120,9 @@
 #define ACTIVE_HIGH					1
 #define ACTIVE_LOW					2
 
+#define HOMING_NEGATIVE_SWITCH		1
+#define HOMING_POSITIVE_SWITCH		2
+
 #define SUCCESS 					1
 #define ERROR   					0
 

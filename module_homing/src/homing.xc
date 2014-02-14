@@ -98,6 +98,21 @@ void track_home_positon(port in p_ifm_ext_d0, port in p_ifm_ext_d1, chanend c_ho
 #pragma ordered
 		select
 		{
+			case c_home :> command:   //case upon request send home state, safety state with position info too
+				if(command == GET_HOME_STATE)
+				{
+					c_home <: home_state;
+					c_home <: safety_state;
+					c_home <: position;
+					c_home <: direction;
+				}
+				else if(command == SET_SWITCH_TYPE)
+				{
+					c_home :> switch_type;
+					//switch_setup_flag = 1;
+				}
+				break;
+
 			case p_ifm_ext_d0 when pinsneq(home_switch) :> home_switch:
 				if(home_switch == active_state)
 				{	//register pos data immediately
@@ -147,15 +162,7 @@ void track_home_positon(port in p_ifm_ext_d0, port in p_ifm_ext_d1, chanend c_ho
 				}
 				break;
 
-			case c_home :> command:   //case upon request send home state, safety state with position info too
-				if(command == GET_HOME_STATE)
-				{
-					c_home <: home_state;
-					c_home <: safety_state;
-					c_home <: position;
-					c_home <: direction;
-				}
-				break;
+
 
 		}
 	}

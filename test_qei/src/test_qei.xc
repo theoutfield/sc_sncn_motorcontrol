@@ -54,7 +54,7 @@
 #include <hall_server.h>
 //#include <flash_somanet.h>
 
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -92,8 +92,8 @@ int hall_p, hall_di;
 	//set_qei_turns(c_qei, 1);
 	while(1)
 	{
-		{position, valid} = get_qei_position(c_qei, qei_params);
-		hall_p =  get_hall_position(c_hall);
+		{position, valid} = get_qei_position_absolute(c_qei);
+	//	hall_p =  get_hall_position(c_hall);
 	//	velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
 		wait_ms(1, core_id, t);
 
@@ -102,9 +102,9 @@ int hall_p, hall_di;
 		xscope_probe_data(1, hall_p);
 #else
 		printstr("position ");
-		printint(position);
-		printstr(" velocity ");   // with print velocity information will be corrupt (use xscope)
-		printintln(velocity);
+		printintln(position);
+	//	printstr(" velocity ");   // with print velocity information will be corrupt (use xscope)
+	//	printintln(velocity);
 #endif
 	}
 }
@@ -112,7 +112,7 @@ int hall_p, hall_di;
 int main(void)
 {
 	chan c_adctrig, c_adc;													// adc channels
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5;					// qei channels
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_hall_p6, c_qei_p6;					// qei channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;
 	chan c_pwm_ctrl;														// pwm channels
@@ -143,14 +143,14 @@ int main(void)
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, p_ifm_encoder, qei_params);  		// channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  		// channel priority 1,2..5
 				}
 
 				/* Hall Server */
 					{
 						hall_par hall_params;
 						init_hall_param(hall_params);
-						run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
+						run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..4
 					}
 			}
 		}

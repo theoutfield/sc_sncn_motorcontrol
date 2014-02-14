@@ -49,7 +49,7 @@
 #include <qei_client.h>
 #include <qei_server.h>
 #include <profile.h>
-//#include <homing.h>
+#include <homing.h>
 
 /**
  * \brief This server implementation enables motor drive functions via Ethercat communication

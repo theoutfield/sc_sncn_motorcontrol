@@ -58,7 +58,7 @@
 #include <profile_control.h>
 #include <internal_config.h>
 #include <flash_somanet.h>
-
+#include "position_ctrl_client.h"
 //#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -80,7 +80,8 @@ void xscope_initialise_1()
 /* Test Profile Position function */
 void position_profile_test(chanend c_position_ctrl, chanend c_qei)
 {
-	int target_position = 350;			// deg
+	int init_state;
+	int target_position = -350;			// deg
 	int velocity 		= 350;			// rpm
 	int acceleration 	= 350;			// rpm/s
 	int deceleration 	= 350;     		// rpm/s
@@ -90,10 +91,21 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei)
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif
+
+	init_state = __check_position_init(c_position_ctrl);
+	while(init_state == INIT_BUSY)
+	{
+		init_state = init_position_control(c_position_ctrl);
+		if(init_state == INIT)
+			printstrln("position control intialized");
+		else
+			printstrln("intialize position control failed");
+	}
+	set_position(0, c_position_ctrl);
 	//set_qei_turns(c_qei, turns);
-	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
-	target_position = 0; 	//degree
-	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+	//set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+//	target_position = 0; 	//degree
+//	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 }
 
 int main(void)

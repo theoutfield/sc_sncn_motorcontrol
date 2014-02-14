@@ -49,8 +49,8 @@
  * define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				8
-#define MAX_NOMINAL_SPEED  			5260			// rpm
+#define POLE_PAIRS  				1
+#define MAX_NOMINAL_SPEED  			2500			// rpm
 #define MAX_NOMINAL_CURRENT  		2				// A
 #define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
 
@@ -58,7 +58,7 @@
  * and any additional encoders attached specify encoder resolution here (optional)
  */
 #define GEAR_RATIO  				18				// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			4000			// 4 x Max count of Quadrature Encoder (4X decoding)
+#define ENCODER_RESOLUTION 			2000			// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
 #define SENSOR_USED 				HALL 			// QEI
@@ -68,7 +68,7 @@
 
 
 /* Somanet IFM Internal Config */
-#define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
+#define IFM_RESOLUTION				DC300_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
 
 
 /*Changes direction of the motor drive*/

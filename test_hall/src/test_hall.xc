@@ -53,7 +53,7 @@
 #include <drive_config.h>
 //#include <flash_somanet.h>
 
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -90,19 +90,19 @@ void hall_test(chanend c_hall)
 	while(1)
 	{
 		{position, dirn} = get_hall_position_absolute(c_hall);
-		pos = get_hall_position(c_hall);
-		velocity = get_hall_velocity(c_hall, hall_params);
-		wait_ms(1, core_id, t);
+		//pos = get_hall_position(c_hall);
+	//	velocity = get_hall_velocity(c_hall, hall_params);
+	//	wait_ms(1, core_id, t);
 //t when timerafter(time +700):>time;
 #ifdef ENABLE_xscope_main
 		xscope_probe_data(0, position);
 		xscope_probe_data(1, velocity);
 		xscope_probe_data(2, pos);
 #else
-		printstr("position");
-		printint(position);
-		printstr("velocity ");
-		printintln(velocity);
+		printstr("position ");
+		printintln(position);
+	//	printstr("velocity ");
+		//printintln(velocity);
 #endif
 
 	}
@@ -111,7 +111,7 @@ void hall_test(chanend c_hall)
 int main(void)
 {
 	chan c_adctrig, c_adc;													// adc channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,c_hall_p6;				// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl;														// pwm channels
 	chan c_qei;																// qei channels
@@ -142,7 +142,7 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 			}
 		}

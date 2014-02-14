@@ -49,19 +49,19 @@
  * define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				8
-#define MAX_NOMINAL_SPEED  			5260				// rpm
+#define POLE_PAIRS  				1
+#define MAX_NOMINAL_SPEED  			2500				// rpm
 #define MAX_NOMINAL_CURRENT  		2					// A
 #define MOTOR_TORQUE_CONSTANT 		38    				// mNm/A
 
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				18					// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			4000				// 4 x Max count of Quadrature Encoder (4X decoding)
+#define GEAR_RATIO  				1					// if no gears are attached - set to gear ratio to 1
+#define ENCODER_RESOLUTION 			2000				// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				HALL 				// QEI
+#define SENSOR_USED 				QEI//HALL 				// QEI
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX		// QEI_WITH_NO_INDEX
@@ -84,7 +84,7 @@
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY			1000				// rpm
-#define MAX_ACCELERATION   			4000   				// rpm/s
+#define MAX_ACCELERATION   			2500   				// rpm/s
 #define PROFILE_ACCELERATION		2000				// rpm/s
 #define PROFILE_DECELERATION  		2000				// rpm/s
 #define QUICK_STOP_DECELERATION 	2000				// rpm/s
@@ -111,11 +111,11 @@
 #define VELOCITY_FILTER_SIZE        8  	//default (could be changed upto 16)
 
 	/*Position Control (Mandatory if Position control used)*/
-#define POSITION_Kp_NUMERATOR 	 	180
+#define POSITION_Kp_NUMERATOR 	 	80
 #define POSITION_Kp_DENOMINATOR  	2000
-#define POSITION_Ki_NUMERATOR    	50
+#define POSITION_Ki_NUMERATOR    	0
 #define POSITION_Ki_DENOMINATOR  	102000
-#define POSITION_Kd_NUMERATOR    	100
+#define POSITION_Kd_NUMERATOR    	0
 #define POSITION_Kd_DENOMINATOR  	10000
 
 #define MAX_POSITION_LIMIT 			350		// degree should not exceed 359

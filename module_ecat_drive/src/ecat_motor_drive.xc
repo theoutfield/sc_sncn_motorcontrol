@@ -149,6 +149,9 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	int end_state = 0;
 
 	int ctrl_state;
+	int limit_switch_type;
+	int homing_method;
+
 	state 		= init_state(); 			//init state
 	checklist 	= init_checklist();
 	InOut 		= init_ctrl_proto();
@@ -162,7 +165,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	init_pt_params(pt_params);
 	init_qei_param(qei_params);
 	init_velocity_control_param(velocity_ctrl_params);
-	torque_offstate = (cst_params.max_torque * 15) / (cst_params.nominal_current * 100 * cst_params.motor_torque_constant);
+
 #ifdef ENABLE_xscope_main
 	xscope_initialise();
 #endif
@@ -381,6 +384,16 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					printintln(commutation_params.hall_offset_cclk);
 					printintln(commutation_params.winding_type);*/
 					//config_sdo_handler( coe_out);
+					{homing_method, limit_switch_type} = homing_sdo_update(coe_out);
+					if(homing_method == HOMING_NEGATIVE_SWITCH)
+						limit_switch = -1;
+					else if(homing_method == HOMING_POSITIVE_SWITCH)
+						limit_switch = 1;
+
+
+
+					//printintln(homing_method); printintln(limit_switch);
+					//printintln(limit_switch_type);
 
 					if(sensor_select == HALL)
 					{
@@ -404,7 +417,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			{
 				switch(InOut.operation_mode)
 				{
-		/*			case HM:
+					case HM:
 						printstrln("Homing mode op");
 						if(op_set_flag == 0)
 						{
@@ -427,9 +440,9 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							ack = 0;
 							shutdown_ack = 0;
 
-							update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);
-							sensor_select = sensor_select_sdo(coe_out);
-							if(sensor_select == HALL)
+						//	update_velocity_ctrl_param_ecat(velocity_ctrl_params, coe_out);
+						//	sensor_select = sensor_select_sdo(coe_out);
+						/*	if(sensor_select == HALL)
 							{
 								set_velocity_ctrl_hall_param(hall_params, c_velocity_ctrl);
 							}
@@ -437,11 +450,11 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							{
 								set_velocity_ctrl_qei_param(qei_params, c_velocity_ctrl);
 							}
-							set_velocity_ctrl_param(velocity_ctrl_params, c_velocity_ctrl);
-							set_velocity_sensor(QEI, c_velocity_ctrl);
+							set_velocity_ctrl_param(velocity_ctrl_params, c_velocity_ctrl);*/
+							set_velocity_sensor(HALL, c_velocity_ctrl); //QEI
 							InOut.operation_mode_display = HM;
 						}
-						break;*/
+						break;
 					case PP:
 						if(op_set_flag == 0)
 						{
@@ -862,37 +875,91 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						break;
 
 					case 0x000f: //switch on cyclic
-				/*		printstrln("cyclic");
+						//printstrln("cyclic");
 						if(op_mode == HM)
 						{
-							home_velocity = get_target_velocity(InOut);
-							home_acceleration = get_target_position(InOut);
-							h_active = 1;
-						//	if(home_velocity >0 || home_velocity < 0)
-							if(home_velocity == 0)
+							if(ack == 0 )
 							{
 								home_velocity = get_target_velocity(InOut);
-							}
-
-							if(home_acceleration == 0)
-							{
 								home_acceleration = get_target_position(InOut);
-							}
-							if(home_velocity > 0 || home_velocity < 0)
-							{
-								if( home_acceleration > 0 || home_acceleration < 0)
+								//h_active = 1;
+								//if(home_velocity >0 || home_velocity < 0)
+								if(home_velocity == 0)
 								{
-									mode_selected = 4;
+									home_velocity = get_target_velocity(InOut);
+								}
+								if(home_acceleration == 0)
+								{
+									home_acceleration = get_target_position(InOut);
+								}
+								if(home_velocity > 0 || home_velocity < 0)
+								{
+									if( home_acceleration > 0 || home_acceleration < 0)
+									{
+										//mode_selected = 4;
+										set_home_switch_type(c_home, limit_switch_type);
+										i = 1;
+										actual_velocity = get_velocity(c_velocity_ctrl);
+										steps = init_velocity_profile(home_velocity * limit_switch, actual_velocity, home_acceleration,\
+												home_acceleration, home_velocity);
+										printintln(home_velocity);
+										printintln(home_acceleration);
+										ack = 1;
+										reset_counter = 0;
+										end_state = 0;
+									}
+								}
+							}
+							else if(ack == 1)
+							{
+								if(reset_counter == 0)
+								{
+									ack =1;//h_active = 1;
+									if(i < steps)
+									{
+										velocity_ramp = velocity_profile_generate(i);
+										set_velocity(velocity_ramp, c_velocity_ctrl);
+										i = i+1;
+									}
+									{home_state, safety_state, capture_position, direction} = get_home_state(c_home);
+									if( (home_state == 1 || safety_state == 1 ) && end_state == 0)
+									{
+										actual_velocity = get_velocity(c_velocity_ctrl);
+										steps = init_velocity_profile(0, actual_velocity, home_acceleration, home_acceleration,\
+												home_velocity);
+										i = 1;
+										end_state = 1;
+									}
+									if(end_state == 1 && i >= steps)
+									{
+										shutdown_velocity_ctrl(c_velocity_ctrl);
+										if(home_state == 1)
+										{
+											{current_position, direction} = get_qei_position_absolute(c_qei);
+											//printintln(current_position);
+											home_offset = current_position - capture_position;
+											printintln(home_offset);
+											reset_qei_count(c_qei, home_offset);
+											reset_counter = 1;
+										}
+									}
+								}
+								if(reset_counter == 1)
+								{
+									ack = 0;//h_active = 1;
+									//mode_selected = 100;
+									printstrln("homing_success"); //done
+									InOut.operation_mode_display = 250;
+
+									//op_set_flag = 0;
+									//init = 0;
+									//mode_selected = 0;  // to reenable the op selection and reset the controller
+									//setup_loop_flag = 0;
 								}
 							}
 
-						//
-							//printintln(home_velocity);
-							//printintln(home_acceleration);
-						//	mode_selected = 4;
-							// printstrln();
-							// default method
-						}*/
+
+						}
 						if(op_mode == CSV)
 						{
 							target_velocity = get_target_velocity(InOut);
@@ -1090,6 +1157,15 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							mode_selected = 0;  // to reenable the op selection and reset the controller
 							setup_loop_flag = 0;
 						}
+						else if(op_mode == HM)
+						{
+							//shutdown_position_ctrl(c_position_ctrl);
+							shutdown_ack = 1;
+							op_set_flag = 0;
+							init = 0;
+							mode_selected = 0;  // to reenable the op selection and reset the controller
+							setup_loop_flag = 0;
+						}
 						break;
 
 				}
@@ -1103,83 +1179,82 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			printhexln(i);
 			printstr(" steps ");
 			printhexln(steps);*/
-			/*else if(mode_selected == 4)
+			else if(mode_selected == 4)
 			{
-				mode_selected = 1000; // changing the mode to stop after homing
+				//mode_selected = 1000; // changing the mode to stop after homing
 				//reset_counter = 0;
+				//printstrln("home mode");
+				//printintln(home_velocity);
 				if(reset_counter == 0)
 				{
-					h_active = 1;
-					i = 1;
-					home_state = 0;
-					safety_state = 0;
-					end_state = 0;
+					ack =1;//h_active = 1;
+					//i = 1;
+//					home_state = 0;
+//					safety_state = 0;
+//					end_state = 0;
 
-					set_home_switch_type(c_home, ACTIVE_HIGH);
-					i = 1;
-					actual_velocity = get_velocity(c_velocity_ctrl);
-					steps = init_velocity_profile(home_velocity * limit_switch, actual_velocity, home_acceleration,\
-							home_acceleration, home_velocity);
-					t :> h_time;
-					while(1)
+
+					if(i < steps)
 					{
-						select
+						velocity_ramp = velocity_profile_generate(i);
+						set_velocity(velocity_ramp, c_velocity_ctrl);
+						i = i+1;
+					}
+
+					{home_state, safety_state, capture_position, direction} = get_home_state(c_home);
+					if( (home_state == 1 || safety_state == 1 ) && end_state == 0)
+					{
+						actual_velocity = get_velocity(c_velocity_ctrl);
+						steps = init_velocity_profile(0, actual_velocity, home_acceleration, home_acceleration,\
+								home_velocity);
+						i = 1;
+					/*	for(i = 1; i < steps; i++)
 						{
+							velocity_ramp = velocity_profile_generate(i);
+							set_velocity(velocity_ramp, c_velocity_ctrl);
+							actual_velocity = get_velocity(c_velocity_ctrl);
 
-							case t when timerafter(h_time + MSEC_STD) :> h_time:
-								if(i < steps)
-								{
-									velocity_ramp = velocity_profile_generate(i);
-							//		set_velocity(velocity_ramp, c_velocity_ctrl);
-									i = i+1;
-								}
+							t when timerafter(h_time + MSEC_STD) :> h_time;
 
-
-								{home_state, safety_state, capture_position, direction} = get_home_state(c_home);
-								if(home_state == 1 || safety_state == 1)
-								{
-									actual_velocity = get_velocity(c_velocity_ctrl);
-									steps = init_velocity_profile(0, actual_velocity, home_acceleration, home_acceleration,\
-											home_velocity);
-									for(i = 1; i < steps; i++)
-									{
-										velocity_ramp = velocity_profile_generate(i);
-								//		set_velocity(velocity_ramp, c_velocity_ctrl);
-										actual_velocity = get_velocity(c_velocity_ctrl);
-
-										t when timerafter(h_time + MSEC_STD) :> h_time;
-
-									}
-									end_state = 1;
-									shutdown_velocity_ctrl(c_velocity_ctrl);
-									//printintln(capture_position);
-									if(home_state == 1)
-									{
-										{current_position, direction} = get_qei_position_absolute(c_qei);
-										//printintln(current_position);
-										home_offset = current_position - capture_position;
-										printintln(home_offset);
-										reset_qei_count(c_qei, home_offset);
-										reset_counter = 1;
-									}
-
-								}
-
-								break;
+						}*/
+						end_state = 1;
+						//shutdown_velocity_ctrl(c_velocity_ctrl);
+						//printintln(capture_position);
+					}
+					//statusword = update_statusword(statusword, state, ack, quick_active, shutdown_ack);
+					//	InOut.status_word = statusword;
+					//	ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 
 
-							}
-							if(end_state == 1)
-								break;
+					if(end_state == 1 && i >= steps)
+					{
+						shutdown_velocity_ctrl(c_velocity_ctrl);
+						if(home_state == 1)
+						{
+							{current_position, direction} = get_qei_position_absolute(c_qei);
+							//printintln(current_position);
+							home_offset = current_position - capture_position;
+							printintln(home_offset);
+							reset_qei_count(c_qei, home_offset);
+							reset_counter = 1;
+						}
 					}
 				}
-				else if(reset_counter == 1)
+
+				if(reset_counter == 1)
 				{
-					h_active = 1;
+					ack = 0;//h_active = 1;
+					//mode_selected = 100;
 					printstrln("homing_success"); //done
+					InOut.operation_mode_display = 250;
+					shutdown_ack = 1;
+					op_set_flag = 0;
+					init = 0;
+					//mode_selected = 0;  // to reenable the op selection and reset the controller
+					setup_loop_flag = 0;
 				}
 			}
-*/
+
 			else if(mode_selected == 3) // non interrupt
 			{
 				if(op_mode == CST || op_mode == TQ)
