@@ -168,7 +168,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 					else if(sensor_used == QEI)
 					{
 						{actual_position, direction} =  get_qei_position_absolute(c_qei);
-					//	actual_position = (actual_position * precision_factor)/precision;
+						actual_position = (actual_position * precision_factor)/precision;
 					}
 
 					/* Controller */

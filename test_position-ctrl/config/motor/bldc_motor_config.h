@@ -51,13 +51,13 @@
  */
 #define POLE_PAIRS  				1
 #define MAX_NOMINAL_SPEED  			2500				// rpm
-#define MAX_NOMINAL_CURRENT  		2					// A
+#define MAX_NOMINAL_CURRENT  		6					// A
 #define MOTOR_TORQUE_CONSTANT 		38    				// mNm/A
 
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				1					// if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO  				18					// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			2000				// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
@@ -68,7 +68,7 @@
 
 
 /* Somanet IFM Internal Config */
-#define IFM_RESOLUTION				DC100_RESOLUTION 	 // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
+#define IFM_RESOLUTION				DC300_RESOLUTION 	 // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
 
 
 /*Changes direction of the motor drive*/
@@ -113,7 +113,7 @@
 	/*Position Control (Mandatory if Position control used)*/
 #define POSITION_Kp_NUMERATOR 	 	80
 #define POSITION_Kp_DENOMINATOR  	2000
-#define POSITION_Ki_NUMERATOR    	0
+#define POSITION_Ki_NUMERATOR    	10
 #define POSITION_Ki_DENOMINATOR  	102000
 #define POSITION_Kd_NUMERATOR    	0
 #define POSITION_Kd_DENOMINATOR  	10000
