@@ -101,10 +101,12 @@ int hall_p, hall_di;
 		xscope_probe_data(0, position);
 		xscope_probe_data(1, hall_p);
 #else
-		printstr("position ");
-		printintln(position);
-	//	printstr(" velocity ");   // with print velocity information will be corrupt (use xscope)
-	//	printintln(velocity);
+
+		printstr("Position: ");
+		printint(position);
+		printstr(" ");
+		printstr("Velocity: "); // with print velocity information will be corrupt (use xscope)
+		printintln(velocity);
 #endif
 	}
 }

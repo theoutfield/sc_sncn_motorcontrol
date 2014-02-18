@@ -100,10 +100,11 @@ void external_pot_test(chanend c_adc)
 int main(void)
 {
 	chan c_adctrig, c_adc;													// adc channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl;														// pwm channels
-	chan c_qei;																// qei channels
+	chan c_qei;																// qei channel
+	chan c_watchdog;														// watchdog channel
 
 
 	par
@@ -147,17 +148,19 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei,\
-							 c_signal, c_commutation_p1, c_commutation_p2,\
-							 c_commutation_p3, c_pwm_ctrl, hall_params,\
-							 qei_params, commutation_params);
+					commutation_sinusoidal(c_hall_p1,  c_qei, c_signal, c_watchdog, \
+							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
+							c_pwm_ctrl, hall_params, qei_params, commutation_params);
 				}
+
+				/* Watchdog Server */
+				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
 				/* Hall Server */
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..4
 				}
 			}
 		}

@@ -58,7 +58,7 @@
 #include <flash_somanet.h>
 
 #include "torque_ctrl_client.h"
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -77,9 +77,9 @@ void xscope_initialise_1()
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 100;  //(desired torque/torque_constant)  * IFM resolution
+	int target_torque = 200;  //(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 100;  //(desired torque_slope/torque_constant)  * IFM resolution
-	cst_par cst_params; timer t; unsigned int time; int actual_torque;
+	cst_par cst_params;
 	init_cst_param(cst_params);
 
 #ifdef ENABLE_xscope_main
@@ -88,19 +88,10 @@ void profile_torque_test(chanend c_torque_ctrl)
 
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-/*	while(1)
-	{
-		t :> time;
-		actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
-		t when timerafter(time + MSEC_STD) :> time;
-		//xscope_probe_data(1, torque_ramp);
-		xscope_probe_data(0, actual_torque);
-
-	}*/
 	target_torque = 0;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = -150;
+	target_torque = -250;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 }
 

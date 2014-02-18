@@ -89,9 +89,9 @@ void hall_test(chanend c_hall)
 
 	while(1)
 	{
-		{position, dirn} = get_hall_position_absolute(c_hall);
-		//pos = get_hall_position(c_hall);
-	//	velocity = get_hall_velocity(c_hall, hall_params);
+		//{position, dirn} = get_hall_position_absolute(c_hall);
+		position = get_hall_position(c_hall);
+		velocity = get_hall_velocity(c_hall, hall_params);
 	//	wait_ms(1, core_id, t);
 //t when timerafter(time +700):>time;
 #ifdef ENABLE_xscope_main
@@ -99,10 +99,11 @@ void hall_test(chanend c_hall)
 		xscope_probe_data(1, velocity);
 		xscope_probe_data(2, pos);
 #else
-		printstr("position ");
-		printintln(position);
-	//	printstr("velocity ");
-		//printintln(velocity);
+		printstr("Position: ");
+		printint(position);
+		printstr(" ");
+		printstr("Velocity: ");
+		printintln(velocity);
 #endif
 
 	}
