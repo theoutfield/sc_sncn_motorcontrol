@@ -43,7 +43,7 @@
 //#pragma xta command "set required - 10.0 us"
 
 void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state,\
-		int count, int direction, hall_par &hall_params, int &status)
+		int &count, int direction, hall_par &hall_params, int &status)
 {
 	switch(command)
 	{
@@ -81,6 +81,10 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 			//		printintln(hall_params.gear_ratio);
 			//		printintln(hall_params.pole_pairs);
 
+			break;
+
+		case HALL_RESET_COUNT:
+			c_hall :> count;
 			break;
 
 		default:

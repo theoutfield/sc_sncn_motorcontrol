@@ -86,21 +86,50 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei)
 	int acceleration 	= 350;			// rpm/s
 	int deceleration 	= 350;     		// rpm/s
 	int turns = 1;
+	int actual_position;
+	int target_pos = 52*10000;
+	timer t; unsigned int time;
+	 ctrl_par position_ctrl_params;
+	 hall_par hall_params;
+	 qei_par qei_params;
 	init_position_profile_limits(GEAR_RATIO, MAX_ACCELERATION, MAX_PROFILE_VELOCITY);
 
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif
 
+	reset_qei_count(c_qei, -5260);
 
-	//set_qei_turns(c_qei, turns);
-	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+
+
+	 init_position_control_param(position_ctrl_params);
+	 init_hall_param(hall_params);
+	 init_qei_param(qei_params);
+	 set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
+	 set_position_ctrl_hall_param(hall_params, c_position_ctrl);
+	 set_position_ctrl_qei_param(qei_params, c_position_ctrl);
+//set_position_sensor(QEI, c_position_ctrl);
+	  //add sensor select to set position profile
+	set_profile_position(92, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+
+
+	//set_position_sensor(QEI, c_position_ctrl);
+
+/*	while(1)
+	{
+
+		actual_position = get_position(c_position_ctrl);
+		t when timerafter(time + MSEC_STD) :> time;
+		xscope_probe_data(0, actual_position);
+		xscope_probe_data(1, target_pos);
+
+	}*/
 	//set_qei_turns(c_qei, turns);
 	/*reset_qei_count(c_qei, 0);
 	shutdown_position_ctrl(c_position_ctrl);
 */
-	target_position = 350; 	//degree
-	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+	//target_position = 350; 	//degree
+	//set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 }
 
 int main(void)
@@ -130,15 +159,15 @@ int main(void)
 		/* Ethercat Communication Handler Loop */
 		on stdcore[0] :
 		{
-			ecat_init();
+			//ecat_init();
 
-			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);
+			//ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);
 		}
 
 		/* Firmware Update Loop */
 		on stdcore[0] :
 		{
-			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
+			//firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
 
 		/* Test Profile Position function*/

@@ -57,7 +57,7 @@
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				18					// if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO  				26					// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			2000				// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */

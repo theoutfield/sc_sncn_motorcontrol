@@ -110,7 +110,7 @@ void track_home_positon(port in p_ifm_ext_d0, port in p_ifm_ext_d1, chanend c_ho
 
 			case p_ifm_ext_d0 when pinsneq(home_switch) :> home_switch:
 				if(home_switch == active_state)
-				{	//register pos data immediately
+				{	//register pos data immediately					{position, direction}= get_hall_position_absolute(c_hall);//
 					{position, direction} = get_qei_position_absolute(c_qei);
 					t :> time1;
 					t when timerafter(time1 + 3333) :> time1; //3khz

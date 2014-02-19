@@ -82,3 +82,4 @@ int get_hall_position(chanend c_hall);
  */
 int get_hall_velocity(chanend c_hall, hall_par &hall_params);
 
+void reset_hall_count(chanend c_hall, int offset);
