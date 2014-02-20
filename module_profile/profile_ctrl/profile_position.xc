@@ -62,15 +62,13 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 
 	int init_state = __check_position_init(c_position_ctrl);
 
-	set_position_sensor(QEI, c_position_ctrl);
-
 	while(init_state == INIT_BUSY)
 	{
 		init_state = init_position_control(c_position_ctrl);
-		if(init_state == INIT)
+		/*if(init_state == INIT)
 			printstrln("position control intialized");
 		else
-			printstrln("intialize position control failed");
+			printstrln("intialize position control failed");*/
 	}
 
 	if(init_state == INIT)

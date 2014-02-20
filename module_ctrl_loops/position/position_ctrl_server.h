@@ -47,6 +47,8 @@
 
 /**
  * \brief Position Control Loop
+ *		Implements PID controller for position using Hall or QEI sensors.
+ *		Note: The Server must be placed on CORES 0/1/2 only.
  *
  *  Input
  * \param position_ctrl_params struct defines the position control parameters

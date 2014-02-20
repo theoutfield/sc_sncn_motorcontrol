@@ -118,6 +118,10 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 			voltage = 0;
 			break;
 
+		case FETS_STATE:
+			c_commutation <: shutdown;
+			break;
+
 		default:
 			break;
 	}

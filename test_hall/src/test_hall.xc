@@ -92,7 +92,7 @@ void hall_test(chanend c_hall)
 		//{position, dirn} = get_hall_position_absolute(c_hall);
 		position = get_hall_position(c_hall);
 		velocity = get_hall_velocity(c_hall, hall_params);
-	//	wait_ms(1, core_id, t);
+		wait_ms(1, core_id, t);
 //t when timerafter(time +700):>time;
 #ifdef ENABLE_xscope_main
 		xscope_probe_data(0, position);

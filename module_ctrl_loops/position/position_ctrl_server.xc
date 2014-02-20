@@ -54,8 +54,8 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 {
 	int actual_position = 0;
 	int target_position = 0;
-	int error_position = 0;
 
+	int error_position = 0;
 	int error_position_D = 0;
 	int error_position_I = 0;
 	int previous_error = 0;
@@ -64,15 +64,15 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 	timer ts;
 	unsigned int time;
 
-	int command;
+	int command = 0;
 	int deactivate = 0;
 	int activate = 0;
 	int direction = 0;
 
-	int precision;
-	int precision_factor;
-
-	int init_state = INIT_BUSY;
+	int precision = 1;
+	int precision_factor = 1;
+	int fet_state = 0;
+	int init_state = INIT_BUSY; /* check commutation init */
 
 //	{
 //		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
@@ -80,118 +80,29 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 //
 //		xscope_config_io(XSCOPE_IO_BASIC);
 //	}
-	while(1)
+	//printstrln("start pos");
+
+	if(sensor_used == HALL)
 	{
-		int received_command = UNSET;
-		select
-		{
-			case POSITION_CTRL_READ(command):
-				switch(command)
-				{
-					case ENABLE_POSITION_CTRL:   // ENABLE_POSITION_CTRL
-						activate = SET;
-						received_command = SET;
-						while(1)
-						{
-							init_state = __check_commutation_init(c_commutation);
-							if(init_state == INIT)
-							{
-								#ifdef debug_print
-								printstrln("commutation intialized");
-								#endif
-								init_state = INIT_BUSY;
-								break;
-							}
-						}
-						#ifdef debug_print
-						printstrln("position control activated");
-						#endif
-						break;
-
-					case SENSOR_SELECT:
-						POSITION_CTRL_READ(sensor_used);
-						if(sensor_used == HALL)
-						{
-							precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
-							precision = HALL_PRECISION;
-							{actual_position , direction}= get_hall_position_absolute(c_hall);
-							actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
-							target_position = actual_position;
-							printintln(target_position);
-							printintln(actual_position);
-						}
-						else if(sensor_used == QEI)
-						{
-							precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
-							precision = QEI_PRECISION;
-							{actual_position, direction} =  get_qei_position_absolute(c_qei);
-							actual_position = (actual_position * precision_factor)/precision;
-							target_position = actual_position;
-							printintln(target_position);
-							printintln(actual_position);
-						}
-						break;
-
-					case SHUTDOWN_POSITION_CTRL:	// SHUTDOWN_POSITION_CTRL
-						activate = UNSET;
-						#ifdef debug_print
-						printstrln("position control disabled");
-						#endif
-						break;
-
-					case CHECK_BUSY: // CHECK INIT state
-						POSITION_CTRL_WRITE(activate);
-						break;
-
-					case POSITION_CTRL_STATUS: //check active state
-						POSITION_CTRL_WRITE(activate);
-						break;
-
-					case SET_CTRL_PARAMETER:
-						POSITION_CTRL_READ(position_ctrl_params.Kp_n);
-						POSITION_CTRL_READ(position_ctrl_params.Kp_d);
-						POSITION_CTRL_READ(position_ctrl_params.Ki_n);
-						POSITION_CTRL_READ(position_ctrl_params.Ki_d);
-						POSITION_CTRL_READ(position_ctrl_params.Kd_n);
-						POSITION_CTRL_READ(position_ctrl_params.Kd_d);
-						POSITION_CTRL_READ(position_ctrl_params.Integral_limit);
-						break;
-
-					case SET_POSITION_CTRL_HALL:
-						c_position_ctrl :> hall_params.gear_ratio;
-						c_position_ctrl :> hall_params.pole_pairs;
-						break;
-
-					case SET_POSITION_CTRL_QEI:
-						c_position_ctrl :> qei_params.gear_ratio;
-						c_position_ctrl :> qei_params.index;
-						c_position_ctrl :> qei_params.real_counts;
-						c_position_ctrl :> qei_params.max_count;
-						break;
-
-					default:
-						break;
-				}
-
-				break;
-
-			default:
-				break;
-		}
-		if(received_command == SET)
-		{
-			break;
-		}
+		precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
+		precision = HALL_PRECISION;
+		{actual_position , direction}= get_hall_position_absolute(c_hall);
+		actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
+		target_position = actual_position;
+	//	printintln(target_position);
+	//	printintln(actual_position);
+	}
+	else if(sensor_used == QEI)
+	{
+		precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
+		precision = QEI_PRECISION;
+		{actual_position, direction} =  get_qei_position_absolute(c_qei);
+		actual_position = (actual_position * precision_factor)/precision;
+		target_position = actual_position;
+	//	printintln(target_position);
+	//	printintln(actual_position);
 	}
 
-	printstrln("start pos");
-
-
-	printintln(target_position);
-	printintln(actual_position);
-
-
-	init_state = INIT;
 	ts:> time;
 
 	while(1)
@@ -216,7 +127,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						actual_position = (actual_position * precision_factor)/precision;
 					}
 
-					/* Controller */
+					/* PID Controller */
 
 					error_position = (target_position - actual_position);
 					error_position_I = error_position_I + error_position;
@@ -256,10 +167,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
 				break;
 
-				/* acq target position from etherCAT */
-
 			case POSITION_CTRL_READ(command):
-
 				switch(command)
 				{
 					case SET_POSITION_TOKEN:
@@ -270,7 +178,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						POSITION_CTRL_WRITE(actual_position);
 						break;
 
-					case CHECK_BUSY:
+					case CHECK_BUSY: 					/* Check init state */
 						POSITION_CTRL_WRITE(activate);
 						break;
 
@@ -284,62 +192,6 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						POSITION_CTRL_READ(position_ctrl_params.Integral_limit);
 						break;
 
-					case SENSOR_SELECT:
-						POSITION_CTRL_READ(sensor_used);
-						if(sensor_used == HALL)
-						{
-							precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
-							precision = HALL_PRECISION;
-							{actual_position , direction}= get_hall_position_absolute(c_hall);
-							actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
-							target_position = actual_position;
-						}
-						else if(sensor_used == QEI)
-						{
-							precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
-							precision = QEI_PRECISION;
-							{actual_position, direction} =  get_qei_position_absolute(c_qei);
-							actual_position = (actual_position * precision_factor)/precision;
-							target_position = actual_position;
-						}
-						break;
-
-					case SHUTDOWN_POSITION_CTRL:
-						POSITION_CTRL_READ(activate);
-						set_commutation_sinusoidal(c_commutation, 0);
-						error_position = 0;
-						error_position_D = 0;
-						error_position_I = 0;
-						previous_error = 0;
-						position_control_out = 0;
-						//target_position = 0;
-					//	disable_motor(c_commutation);  TODO
-						break;
-
-					case ENABLE_POSITION_CTRL:
-						POSITION_CTRL_READ(activate);
-						activate = SET;
-						while(1)
-						{
-							init_state = __check_commutation_init(c_commutation);
-							if(init_state == INIT)
-							{
-							#ifdef debug_print
-								printstrln("commutation intialized");
-							#endif
-						//		enable_motor(c_commutation); TODO
-								break;
-							}
-						}
-						#ifdef debug_print
-							printstrln("position control activated");
-						#endif
-							break;
-
-					case POSITION_CTRL_STATUS:
-						POSITION_CTRL_WRITE(activate);
-						break;
-
 					case SET_POSITION_CTRL_HALL:
 						c_position_ctrl :> hall_params.gear_ratio;
 						c_position_ctrl :> hall_params.pole_pairs;
@@ -350,6 +202,76 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						c_position_ctrl :> qei_params.index;
 						c_position_ctrl :> qei_params.real_counts;
 						c_position_ctrl :> qei_params.max_count;
+						break;
+
+					case SENSOR_SELECT:
+						POSITION_CTRL_READ(sensor_used);
+						if(sensor_used == HALL)
+						{
+							precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
+							precision = HALL_PRECISION;
+							{actual_position , direction}= get_hall_position_absolute(c_hall);
+							actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
+							target_position = actual_position;
+							//printintln(target_position);
+							//printintln(actual_position);
+						}
+						else if(sensor_used == QEI)
+						{
+							precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
+							precision = QEI_PRECISION;
+							{actual_position, direction} =  get_qei_position_absolute(c_qei);
+							actual_position = (actual_position * precision_factor)/precision;
+							target_position = actual_position;
+							//printintln(target_position);
+							//printintln(actual_position);
+						}
+						break;
+
+					case ENABLE_POSITION_CTRL:
+						POSITION_CTRL_READ(activate);
+						activate = SET;
+						while(1)
+						{
+							init_state = __check_commutation_init(c_commutation);
+							if(init_state == INIT)
+							{
+								#ifdef debug_print
+								printstrln("commutation intialized");
+								#endif
+								fet_state = check_fet_state(c_commutation);
+								if(fet_state == 1)
+								{
+									enable_motor(c_commutation);
+									wait_ms(30, 1, ts);
+								}
+								break;
+							}
+						}
+						#ifdef debug_print
+						printstrln("position control activated");
+						#endif
+						break;
+
+					case SHUTDOWN_POSITION_CTRL:	// SHUTDOWN_POSITION_CTRL
+						POSITION_CTRL_READ(activate);
+						set_commutation_sinusoidal(c_commutation, 0);
+						error_position = 0;
+						error_position_D = 0;
+						error_position_I = 0;
+						previous_error = 0;
+						position_control_out = 0;
+						//	target_position = 0;
+						disable_motor(c_commutation);
+						wait_ms(30, 1, ts); //
+						#ifdef debug_print
+							printstrln("position control disabled");
+						#endif
+						break;
+
+
+					case POSITION_CTRL_STATUS: //check active state
+						POSITION_CTRL_WRITE(activate);
 						break;
 
 					default:

@@ -82,7 +82,7 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 
 			t when timerafter(time + MSEC_STD) :> time;
 
-		/*	xscope_probe_data(0, actual_velocity);
+			/*xscope_probe_data(0, actual_velocity);
 			xscope_probe_data(1, velocity_ramp);*/
 		}
 		t when timerafter(time + 30 * MSEC_STD) :> time;

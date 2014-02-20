@@ -113,6 +113,7 @@
 #define SET_COMMUTATION_PARAMS 		3
 #define DISABLE_FETS				4
 #define ENABLE_FETS					5
+#define FETS_STATE					6
 
 #define SET_CTRL_PARAMETER 			100
 #define SENSOR_SELECT      			150

@@ -59,9 +59,9 @@ int init_position_control(chanend c_position_ctrl)
 		}
 		if(ctrl_state == INIT)
 		{
-#ifdef debug_print
+			#ifdef debug_print
 			printstrln("position control intialized");
-#endif
+			#endif
 			break;
 		}
 	}

@@ -59,7 +59,10 @@
 #include <internal_config.h>
 #include <flash_somanet.h>
 #include "position_ctrl_client.h"
-//#define ENABLE_xscope_main
+
+#include <test.h>  //Unit Testing Position control (optional)
+
+#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -78,7 +81,7 @@ void xscope_initialise_1()
 
 
 /* Test Profile Position function */
-void position_profile_test(chanend c_position_ctrl, chanend c_qei)
+void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
 {
 	int init_state;
 	int target_position = 350;			// deg
@@ -87,30 +90,34 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei)
 	int deceleration 	= 350;     		// rpm/s
 	int turns = 1;
 	int actual_position;
-	int target_pos = 52*10000;
 	timer t; unsigned int time;
-	 ctrl_par position_ctrl_params;
-	 hall_par hall_params;
-	 qei_par qei_params;
+	ctrl_par position_ctrl_params;
+	hall_par hall_params;
+	qei_par qei_params;
 	init_position_profile_limits(GEAR_RATIO, MAX_ACCELERATION, MAX_PROFILE_VELOCITY);
 
 #ifdef ENABLE_xscope_main
-	xscope_initialise_1();
+	//xscope_initialise_1();
 #endif
 
-	reset_qei_count(c_qei, -5260);
+	//reset_qei_count(c_qei, -5260);  // reset_hall_count(c_hall, 40960);
+
+	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+
+//	set_profile_position(92, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+	//reset_qei_count(c_qei, -5260);
 
 
 
-	 init_position_control_param(position_ctrl_params);
-	 init_hall_param(hall_params);
-	 init_qei_param(qei_params);
-	 set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
-	 set_position_ctrl_hall_param(hall_params, c_position_ctrl);
-	 set_position_ctrl_qei_param(qei_params, c_position_ctrl);
+//	 init_position_control_param(position_ctrl_params);
+//	 init_hall_param(hall_params);
+//	 init_qei_param(qei_params);
+//	 set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
+//	 set_position_ctrl_hall_param(hall_params, c_position_ctrl);
+//	 set_position_ctrl_qei_param(qei_params, c_position_ctrl);
 //set_position_sensor(QEI, c_position_ctrl);
 	  //add sensor select to set position profile
-	set_profile_position(92, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+	//set_profile_position(92, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 
 
 	//set_position_sensor(QEI, c_position_ctrl);
@@ -173,7 +180,8 @@ int main(void)
 		/* Test Profile Position function*/
 		on stdcore[1]:
 		{
-			position_profile_test(c_position_ctrl, c_qei_p5);		  	// test PPM on slave side
+			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		  	// test PPM on slave side
+			//position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 			// Unit test controller
 		}
 
 

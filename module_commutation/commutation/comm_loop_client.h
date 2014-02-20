@@ -113,3 +113,5 @@ void set_commutation_params(chanend c_commutation, commutation_par &commutation_
 void disable_motor(chanend c_commutation);
 
 void enable_motor(chanend c_commutation);
+
+int check_fet_state(chanend c_commutation);

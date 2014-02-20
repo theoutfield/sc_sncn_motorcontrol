@@ -85,13 +85,13 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 	int deceleration 	= 100;			// rpm/s
 
 #ifdef ENABLE_xscope_main
-	//xscope_initialise_1();
+	xscope_initialise_1();
 #endif
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
-//	target_velocity = 0;				// rpm
-//	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+	target_velocity = 0;				// rpm
+	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
 	/*target_velocity = -4000;				// rpm
 		set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
