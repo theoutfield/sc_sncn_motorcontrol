@@ -81,7 +81,7 @@ int absolute(int var)
 /* Sinusoidal based commutation functions */
 
 void commutation_client_hanlder(chanend c_commutation, int command, commutation_par &commutation_params, \
-		int &voltage, int &sensor_select, int init_state)
+		int &voltage, int &sensor_select, int init_state, int &shutdown)
 {
 	switch(command)
 	{
@@ -110,11 +110,12 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 			break;
 
 		case DISABLE_FETS:
-			//TODO
+			shutdown = 1;
 			break;
 
 		case ENABLE_FETS:
-			//TODO
+			shutdown = 0;
+			voltage = 0;
 			break;
 
 		default:
@@ -145,6 +146,7 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 	int bw_flag = 0;
 	int status = 0;
 	int nominal_speed;
+	int shutdown = 0; //Disable FETS
 	qei_velocity_par qei_velocity_params;
 	init_qei_velocity_params(qei_velocity_params);
 	//printintln(commutation_params.hall_offset_clk);
@@ -185,66 +187,77 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 		else if(voltage >= 0)
 			direction = 1;
 
-
-		if (direction == 1)
+		if(shutdown == 1)
 		{
-			if(sensor_select == HALL)
-			{
-				angle_pwm = (((angle + angle_rpm + commutation_params.hall_offset_clk - commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;//
-			}
-			else if(sensor_select == QEI)
-			{
-				angle_pwm = (((angle + commutation_params.qei_forward_offset) & 0x0fff) >> 2)&0x3ff;	 //512
-			}
-			pwm[0] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
-			angle_pwm = (angle_pwm + 341) & 0x3ff;
-
-			pwm[1] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
-			angle_pwm = (angle_pwm + 342) & 0x3ff;
-			pwm[2] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
-
+			pwm[0] = -1;
+			pwm[1] = -1;
+			pwm[2] = -1;
 		}
-		else if (direction == -1)
+		else
 		{
-			if(sensor_select == HALL)
+			if (direction == 1)
 			{
-				angle_pwm = (((angle - angle_rpm + commutation_params.hall_offset_cclk + commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
+				if(sensor_select == HALL)
+				{
+					angle_pwm = (((angle + angle_rpm + commutation_params.hall_offset_clk - commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;//
+				}
+				else if(sensor_select == QEI)
+				{
+					angle_pwm = (((angle + commutation_params.qei_forward_offset) & 0x0fff) >> 2)&0x3ff;	 //512
+				}
+				pwm[0] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
+				angle_pwm = (angle_pwm + 341) & 0x3ff;
+
+				pwm[1] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
+				angle_pwm = (angle_pwm + 342) & 0x3ff;
+				pwm[2] = ((sine_third_expanded(angle_pwm))*voltage)/13889   + pwm_half;
+
 			}
-			else if(sensor_select == QEI)
+			else if (direction == -1)
 			{
-				angle_pwm = (((angle  + commutation_params.qei_backward_offset ) & 0x0fff) >> 2)&0x3ff;  	 //3100
+				if(sensor_select == HALL)
+				{
+					angle_pwm = (((angle - angle_rpm + commutation_params.hall_offset_cclk + commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
+				}
+				else if(sensor_select == QEI)
+				{
+					angle_pwm = (((angle  + commutation_params.qei_backward_offset ) & 0x0fff) >> 2)&0x3ff;  	 //3100
+				}
+				pwm[0] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
+				angle_pwm = (angle_pwm + 341) & 0x3ff;
+
+				pwm[1] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
+				angle_pwm = (angle_pwm + 342) & 0x3ff;
+				pwm[2] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
+
 			}
-			pwm[0] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
-			angle_pwm = (angle_pwm + 341) & 0x3ff;
 
-			pwm[1] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
-			angle_pwm = (angle_pwm + 342) & 0x3ff;
-			pwm[2] = ((sine_third_expanded(angle_pwm))*-voltage)/13889   + pwm_half;
-
+			if(pwm[0] < PWM_MIN_LIMIT)
+				pwm[0] = 0;
+			if(pwm[1] < PWM_MIN_LIMIT)
+				pwm[1] = 0;
+			if(pwm[2] < PWM_MIN_LIMIT)
+				pwm[2] = 0;
 		}
-
-		if(pwm[0] < PWM_MIN_LIMIT)      pwm[0] = 0;
-		if(pwm[1] < PWM_MIN_LIMIT)      pwm[1] = 0;
-		if(pwm[2] < PWM_MIN_LIMIT)      pwm[2] = 0;
 
    		update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
-#pragma ordered
+		#pragma ordered
 		select
 		{
 			case c_commutation_p1 :> command:
 				commutation_client_hanlder( c_commutation_p1, command, commutation_params, voltage, \
-						sensor_select, init_state);
+						sensor_select, init_state, shutdown);
 				break;
 
 			case c_commutation_p2 :> command:
 				commutation_client_hanlder( c_commutation_p2, command, commutation_params, voltage,
-						sensor_select, init_state);
+						sensor_select, init_state, shutdown);
 				break;
 
 			case c_commutation_p3 :> command:
 				commutation_client_hanlder( c_commutation_p3, command, commutation_params, voltage,
-						sensor_select, init_state);
+						sensor_select, init_state, shutdown);
 				break;
 
 			case c_signal :> command:

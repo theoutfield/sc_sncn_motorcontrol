@@ -4,8 +4,44 @@
 #include "refclk.h"
 #include <torque_ctrl_client.h>
 #include <velocity_ctrl_client.h>
+#include "comm_loop_client.h"
 #include <profile_control.h>
 #include <bldc_motor_config.h>
+
+void enable_motor_test(chanend c_commutation)
+{
+	int i;
+	in_data d;
+	int ramp = -2800;
+	timer t;
+	while(1)
+	{
+		input_shutdown(d);
+		if(d.shutdown == 1)
+		{
+			set_commutation_sinusoidal(c_commutation, 0);
+			disable_motor(c_commutation);
+			wait_ms(30, 1, t);
+		}
+		else if(d.shutdown == 0)
+		{
+			enable_motor(c_commutation);
+			wait_ms(30, 1, t);
+			i = 0;
+			while(1)
+			{
+				set_commutation_sinusoidal(c_commutation, i);
+				i = i-10;
+				if(i < ramp)
+				{
+					i = ramp;
+					break;
+				}
+				wait_ms(10, 1, t);
+			}
+		}
+	}
+}
 
 void set_torque_test(chanend c_torque_ctrl, chanend c_velocity_ctrl) {
 	int torque;

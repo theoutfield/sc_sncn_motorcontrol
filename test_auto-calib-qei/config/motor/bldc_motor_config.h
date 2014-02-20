@@ -49,8 +49,8 @@
  * define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				8
-#define MAX_NOMINAL_SPEED  			5260			// rpm
+#define POLE_PAIRS  				1
+#define MAX_NOMINAL_SPEED  			2500			// rpm
 #define MAX_NOMINAL_CURRENT  		2				// A
 #define MOTOR_TORQUE_CONSTANT 		33    			// mNm/A
 
@@ -71,8 +71,15 @@
 #define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
 
 
-/*Changes direction of the motor drive*/
+/* Changes direction of the motor drive */
 #define POLARITY 					1					// 1 / -1
+
+/* Commutation offset (range 0-4095) */
+#define COMMUTATION_OFFSET_CLK		683
+#define COMMUTATION_OFFSET_CCLK		2731
+
+/* Motor Winding type */
+#define WINDING_TYPE				DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
 
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED

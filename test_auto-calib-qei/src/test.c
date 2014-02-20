@@ -19,6 +19,14 @@ int input_torq(in_data *d )
 	return 1;
 }
 
+int input_shutdown(in_data *d)
+{
+	int shutdown;
+	printf("enable 0/ disable 1\n");
+	scanf("%d", &shutdown);
+	d->shutdown = shutdown;
+	return 1;
+}
 
 int input_pos(in_data *d)
 {
