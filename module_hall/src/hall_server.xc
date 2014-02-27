@@ -77,7 +77,7 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 
 			c_hall :> hall_params.gear_ratio;
 			c_hall :> hall_params.pole_pairs;
-			status = 1;
+		status = 1;
 			//		printintln(hall_params.gear_ratio);
 			//		printintln(hall_params.pole_pairs);
 
@@ -143,6 +143,26 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int status = 0; //1 changed
 
 	init_filter(filter_buffer, index, FILTER_LENGTH_HALL);
+
+
+	/* Init hall sensor */
+	p_hall :> pin_state;
+	switch(pin_state)
+	{
+		case 3: angle = 0;
+				break;
+		case 2: angle = 682;
+				break; //  60
+		case 6: angle = 1365;
+				break;
+		case 4: angle = 2048;
+				break; // 180
+		case 5: angle = 2730;
+				break;
+		case 1: angle = 3413;
+				break; // 300 degree
+	}
+
 	t1 :> time1;
 	tx :> ts;
 	while(1)
@@ -350,9 +370,9 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 		{
 			hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
 			hall_enc_count = hall_params.pole_pairs * hall_params.gear_ratio * 4095;
-			first = 1;
-			previous_position = 0;
-			count = 0;
+			//first = 1;
+			//previous_position = 0;
+			//count = 0;
 			status = 0;
 		}
 
