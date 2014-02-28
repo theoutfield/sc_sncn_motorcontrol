@@ -58,7 +58,9 @@
 #include <flash_somanet.h>
 
 #include "torque_ctrl_client.h"
-//#define ENABLE_xscope_main
+
+#include <test.h>
+#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -77,9 +79,9 @@ void xscope_initialise_1()
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 200;  //(desired torque/torque_constant)  * IFM resolution
-	int torque_slope  = 100;  //(desired torque_slope/torque_constant)  * IFM resolution
-	cst_par cst_params;
+	int target_torque = 180; 	//(desired torque/torque_constant)  * IFM resolution   125 (dc900) 180 (dc300)
+	int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
+	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);
 
 #ifdef ENABLE_xscope_main
@@ -91,8 +93,14 @@ void profile_torque_test(chanend c_torque_ctrl)
 	target_torque = 0;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = -250;
+	target_torque = -400;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+	while(1)
+	{
+		actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
+		t when timerafter(time + MSEC_STD) :> time;
+		xscope_probe_data(0, actual_torque);
+	}
 }
 
 int main(void)
@@ -123,23 +131,24 @@ int main(void)
 	par
 	{
 		/* Ethercat Communication Handler Loop */
-		on stdcore[0] :
+	/*	on stdcore[0] :
 		{
 			ecat_init();
 			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,\
 					foe_in, pdo_out, pdo_in);
 		}
 
-		/* Firmware Update Loop */
+		 Firmware Update Loop
 		on stdcore[0] :
 		{
 			firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
-		}
+		}*/
 
 		/* Test Profile Torque Function */
 		on stdcore[1]:
 		{
-			profile_torque_test(c_torque_ctrl);
+			//profile_torque_test(c_torque_ctrl);
+			torque_ctrl_unit_test(c_torque_ctrl, c_qei_p4, c_hall_p4);
 		}
 
 		on stdcore[2]:
