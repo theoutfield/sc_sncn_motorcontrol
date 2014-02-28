@@ -58,7 +58,9 @@
 #include <profile_control.h>
 #include <flash_somanet.h>
 
-#define ENABLE_xscope_main
+#include <test.h>
+
+//#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -80,7 +82,7 @@ void xscope_initialise_1()
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity = -500;	 		// rpm
+	int target_velocity = 500;	 		// rpm
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
 
@@ -90,8 +92,8 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
-	target_velocity = 0;				// rpm
-	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+	//target_velocity = 0;				// rpm
+	//set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
 	/*target_velocity = -4000;				// rpm
 		set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
@@ -142,23 +144,24 @@ int main(void)
 		/* Test Profile Velocity function */
 		on stdcore[1]:
 		{
-			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
-			/*{
-				int init_state;
-				while(1)
-				{
-					init_state = __check_commutation_init(c_commutation_p1);
-					if(init_state == INIT)
-					{
-#ifdef debug_print
-						printstrln("commutation intialized");
-#endif
-						set_commutation_sinusoidal(c_commutation_p1, 600);
-						init_state = INIT_BUSY;
-						break;
-					}
-				}
-			}*/
+		//	profile_velocity_test(c_velocity_ctrl);			// test PVM on node
+			velocity_ctrl_unit_test(c_velocity_ctrl, c_qei_p3, c_hall_p3);
+//			{
+//				int init_state;
+//				while(1)
+//				{
+//					init_state = __check_commutation_init(c_commutation_p1);
+//					if(init_state == INIT)
+//					{
+//#ifdef debug_print
+//						printstrln("commutation intialized");
+//#endif
+//						set_commutation_sinusoidal(c_commutation_p1, 0);
+//						init_state = INIT_BUSY;
+//						break;
+//					}
+//				}
+//			}
 		}
 
 		on stdcore[2]:

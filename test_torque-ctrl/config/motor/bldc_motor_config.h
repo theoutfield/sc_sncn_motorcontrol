@@ -68,7 +68,7 @@
 
 
 /* Somanet IFM Internal Config */
-#define IFM_RESOLUTION				new_DC300_RESOLUTION//DC100_RESOLUTION //DC300_RESOLUTION //new_DC300_RESOLUTION  //    /* Specifies the current sensor resolution/A */
+#define IFM_RESOLUTION				DC300_RESOLUTION	//DC100_RESOLUTION    /* Specifies the current sensor resolution/A */
 
 
 /*Changes direction of the motor drive*/
