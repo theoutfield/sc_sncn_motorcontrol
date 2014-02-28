@@ -294,20 +294,20 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 					}
 					commutation_params.qei_forward_offset = 0;
 					commutation_params.qei_backward_offset = 0;
-					pwm[0] = 0;
-					pwm[1] = 0;
-					pwm[2] = 0;
-					angle_pwm = 0;
-					angle = 0;
-					angle_rpm   = 0;
-					speed = 0;
+					//pwm[0] = 0;
+					//pwm[1] = 0;
+					//pwm[2] = 0;
+					// angle_pwm = 0;
+					// angle = 0;
+					// angle_rpm   = 0;
+					// speed = 0;
 					voltage = 0;
-					direction = 0;
+					//direction = 0;
 					max_count_per_hall = qei_params.real_counts/hall_params.pole_pairs;
 					angle_offset = 682/(2*hall_params.pole_pairs);
 					fw_flag = 0;
 					bw_flag = 0;
-					init_qei_velocity_params(qei_velocity_params);
+					//init_qei_velocity_params(qei_velocity_params);
 				}
 				break;
 

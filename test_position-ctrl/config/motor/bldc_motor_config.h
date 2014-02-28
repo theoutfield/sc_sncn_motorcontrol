@@ -61,7 +61,7 @@
 #define ENCODER_RESOLUTION 			2000				// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				HALL 				// QEI
+#define SENSOR_USED 				QEI //HALL 				// QEI
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX		// QEI_WITH_NO_INDEX
@@ -84,7 +84,7 @@
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY			1000				// rpm
-#define MAX_ACCELERATION   			2500   				// rpm/s
+#define MAX_ACCELERATION   			4000   				// rpm/s
 #define PROFILE_ACCELERATION		2000				// rpm/s
 #define PROFILE_DECELERATION  		2000				// rpm/s
 #define QUICK_STOP_DECELERATION 	2000				// rpm/s
@@ -113,9 +113,9 @@
 	/*Position Control (Mandatory if Position control used)*/
 #define POSITION_Kp_NUMERATOR 	 	80 //180//
 #define POSITION_Kp_DENOMINATOR  	2000
-#define POSITION_Ki_NUMERATOR    	10  //50//
+#define POSITION_Ki_NUMERATOR    	10 //50//
 #define POSITION_Ki_DENOMINATOR  	102000
-#define POSITION_Kd_NUMERATOR    	0  	//100//
+#define POSITION_Kd_NUMERATOR    	0  //100//
 #define POSITION_Kd_DENOMINATOR  	10000
 
 #define MAX_POSITION_LIMIT 			350		// degree should not exceed 359

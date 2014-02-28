@@ -74,12 +74,14 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 	int fet_state = 0;
 	int init_state = INIT_BUSY; /* check commutation init */
 
-//	{
-//		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-//							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
-//
-//		xscope_config_io(XSCOPE_IO_BASIC);
-//	}
+	#ifdef DEBUG
+	{
+		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
+							XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
+
+		xscope_config_io(XSCOPE_IO_BASIC);
+	}
+	#endif
 	//printstrln("start pos");
 
 	if(sensor_used == HALL)
@@ -243,7 +245,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 								if(fet_state == 1)
 								{
 									enable_motor(c_commutation);
-									wait_ms(30, 1, ts);
+									wait_ms(2, 1, ts);
 								}
 								break;
 							}

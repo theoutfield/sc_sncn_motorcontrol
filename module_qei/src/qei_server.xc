@@ -291,27 +291,27 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 		if(status == 1)
 		{
 			status = 0;
-			position = 0;
-			ok = 0;
-			old_pins = 0;
+			//position = 0;
+			//ok = 0;
+			//old_pins = 0;
 
-			current_pos = 0;
-			previous_position = 0;
-			count = 0;
-			first = 1;
+			//current_pos = 0;
+			//previous_position = 0;
+			//count = 0;
+			//first = 1;
 			max_count_actual = qei_params.gear_ratio * qei_params.real_counts;
-			difference = 0;
-			direction = 0;
+			//difference = 0;
+			//direction = 0;
 			qei_max = qei_params.max_count;
 			qei_type = qei_params.index;
 			qei_crossover = qei_max - qei_max/10;
 			qei_count_per_hall = qei_params.real_counts / qei_params.poles;
-			offset_fw = 0;
-			offset_bw = 0;
-			calib_fw_flag = 0;
-			calib_bw_flag = 0;
-			sync_out = 0;
-			status = 0;
+			//offset_fw = 0;
+			//offset_bw = 0;
+			//calib_fw_flag = 0;
+			//calib_bw_flag = 0;
+			//sync_out = 0;
+
 		}
 
 	}
