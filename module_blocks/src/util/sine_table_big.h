@@ -2,14 +2,15 @@
 /**
  *
  * \file sine_table_big.h
- *	Sine Loopup table declarations
+ * \brief Sine Loopup table declarations
+ * \authors Martin Schwarz <mschwarz@synapticon.com>, Ludwig Orgler <lorgler@synapticon.com>
  *
- *
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Authors: Martin Schwarz <mschwarz@synapticon.com> & Ludwig Orgler <lorgler@synapticon.com>
- *
- *
+ *  
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *

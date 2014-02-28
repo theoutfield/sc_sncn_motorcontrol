@@ -2,13 +2,14 @@
 /**
  *
  * \file delay.xc
+ * \author: Martin Schwarz <mschwarz@synapticon.com>, Pavan Kanajar <pkanajar@synapticon.com>
  *
- *
- *
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Martin Schwarz <mschwarz@synapticon.com> & Pavan Kanajar <pkanajar@synapticon.com>
- *
+ *  
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -36,7 +37,6 @@
  * either expressed or implied, of the Synapticon GmbH.
  *
  */
-
 
 #include <refclk.h>
 

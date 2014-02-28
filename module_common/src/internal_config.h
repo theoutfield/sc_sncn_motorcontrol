@@ -2,12 +2,15 @@
 /**
  *
  * \file internal_config.h
+ * \author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  *
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
- *
+ *  
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
