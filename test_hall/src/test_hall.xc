@@ -53,7 +53,7 @@
 #include <drive_config.h>
 //#include <flash_somanet.h>
 
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 

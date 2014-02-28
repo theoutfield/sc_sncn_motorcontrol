@@ -71,4 +71,7 @@
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
 		chanend c_qei, chanend c_home, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
+
+void _fetch_position_and_send(ctrl_proto_values_t InOut, int sensor_select, int actual_position, \
+		int direction, chanend c_hall, chanend c_qei, int precision_factor, int precision, int polarity);
 #endif /* ECAT_MOTOR_DRIVE_H_ */
