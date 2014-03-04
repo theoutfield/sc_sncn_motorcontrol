@@ -59,6 +59,13 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
                                 </option>
                                 <option id="gnu.c.compiler.option.include.paths.41317830" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_TOOL_PATH}/target/include&quot;' />
@@ -101,6 +108,13 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
                                 </option>
                                 <option id="com.xmos.xc.compiler.option.include.paths.1623105917" name="com.xmos.xc.compiler.option.include.paths" superClass="com.xmos.xc.compiler.option.include.paths" valueType="includePath">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_TOOL_PATH}/target/include&quot;' />
@@ -271,6 +285,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -285,6 +334,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.c.compiler.base.11111" name="com.xmos.cdt.c.compiler.base" superClass="com.xmos.cdt.c.compiler.base">
@@ -301,6 +385,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -315,6 +434,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.cpp.compiler.base.11111" name="com.xmos.cdt.cpp.compiler.base" superClass="com.xmos.cdt.cpp.compiler.base">
@@ -331,6 +485,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -345,6 +534,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.core.assembler.base.11111" name="com.xmos.cdt.core.assembler.base" superClass="com.xmos.cdt.core.assembler.base">
@@ -361,6 +585,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -375,6 +634,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                             </tool>
                         </toolChain>
@@ -525,6 +819,13 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
                                 </option>
                                 <option id="gnu.c.compiler.option.include.paths.18492114" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_TOOL_PATH}/target/include&quot;' />
@@ -567,6 +868,13 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
                                 </option>
                                 <option id="com.xmos.xc.compiler.option.include.paths.1700739144" name="com.xmos.xc.compiler.option.include.paths" superClass="com.xmos.xc.compiler.option.include.paths" valueType="includePath">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_TOOL_PATH}/target/include&quot;' />
@@ -739,6 +1047,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -753,6 +1096,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.c.compiler.base.11111" name="com.xmos.cdt.c.compiler.base" superClass="com.xmos.cdt.c.compiler.base">
@@ -769,6 +1147,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -783,6 +1196,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.cpp.compiler.base.11111" name="com.xmos.cdt.cpp.compiler.base" superClass="com.xmos.cdt.cpp.compiler.base">
@@ -799,6 +1247,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -813,6 +1296,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.core.assembler.base.11111" name="com.xmos.cdt.core.assembler.base" superClass="com.xmos.cdt.core.assembler.base">
@@ -829,6 +1347,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -843,6 +1396,41 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_common/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_nodeconfig}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_common}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/client}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src/server}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_pwm/module_pwm_symmetrical}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/../common_include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ctrlproto/module_ctrlproto/./src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src/canod}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_ethercat/module_ethercat}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_adc}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_comm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/auto-calib}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/hall_qei_sync}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/predriver}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation/pwm}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_commutation}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/position}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/torque}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ctrl_loops/velocity}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_ecat_drive/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_hall/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_homing/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/include}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_ctrl}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_linear_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_position_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/profile_velocity_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_profile/quick_stop_mode}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_qei/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_sncn_motorctrl_sin/module_sm/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_somanet-base/module_fwupdate}&quot;' />
                                 </option>
                             </tool>
                         </toolChain>

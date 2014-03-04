@@ -49,10 +49,10 @@
  * define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				1
-#define MAX_NOMINAL_SPEED  			2500			// rpm
-#define MAX_NOMINAL_CURRENT  		6				// A
-#define MOTOR_TORQUE_CONSTANT 		147    			// mNm/A
+#define POLE_PAIRS  				8//1
+#define MAX_NOMINAL_SPEED  			5260//2500			// rpm
+#define MAX_NOMINAL_CURRENT  		2				// A
+#define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
 
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
@@ -61,7 +61,7 @@
 #define ENCODER_RESOLUTION 			2000			// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				QEI //HALL 			// QEI
+#define SENSOR_USED 				HALL //HALL 			// QEI
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	//QEI_WITH_NO_INDEX

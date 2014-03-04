@@ -70,8 +70,10 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
-	xscope_register(2, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
-						XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n");
+	xscope_register(4, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
+						XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n",
+						 XSCOPE_CONTINUOUS, "2 target_torque1", XSCOPE_INT, "n",
+						XSCOPE_CONTINUOUS, "3 actual_torque1", XSCOPE_INT, "n");
 	xscope_config_io(XSCOPE_IO_BASIC);
 	return;
 }
@@ -79,7 +81,7 @@ void xscope_initialise_1()
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 180; 	//(desired torque/torque_constant)  * IFM resolution   125 (dc900) 180 (dc300)
+	int target_torque = 380; 	//(desired torque/torque_constant)  * IFM resolution   125 (dc900) 180 (dc300)
 	int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);
@@ -90,11 +92,11 @@ void profile_torque_test(chanend c_torque_ctrl)
 
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = 0;
-	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+//	target_torque = 0;
+//	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = -300;
-	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+	//target_torque = -300;
+	//set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 	/*while(1)
 	{
 		actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
@@ -147,8 +149,8 @@ int main(void)
 		/* Test Profile Torque Function */
 		on stdcore[1]:
 		{
-			//profile_torque_test(c_torque_ctrl);
-			torque_ctrl_unit_test(c_torque_ctrl, c_qei_p4, c_hall_p4);
+			profile_torque_test(c_torque_ctrl);
+			//torque_ctrl_unit_test(c_torque_ctrl, c_qei_p4, c_hall_p4);
 		}
 
 		on stdcore[2]:

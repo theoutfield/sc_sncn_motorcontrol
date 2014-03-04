@@ -139,7 +139,7 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 	int speed = 0;
 	timer t;
 	unsigned int ts;
-	int voltage = 400;
+	int voltage = 0;
 	int direction = 0;
 	int init_state = INIT;
 	int pwm_half = PWM_MAX_VALUE>>1;
