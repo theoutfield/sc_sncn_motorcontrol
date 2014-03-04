@@ -80,7 +80,7 @@
 #define COMMUTATION_OFFSET_CCLK		2731
 
 /*Motor Winding type*/
-#define WINDING_TYPE				DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
+#define WINDING_TYPE				STAR_WINDING 		//DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
 
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED

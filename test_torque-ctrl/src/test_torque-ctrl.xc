@@ -60,7 +60,7 @@
 #include "torque_ctrl_client.h"
 
 #include <test.h>
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -93,14 +93,14 @@ void profile_torque_test(chanend c_torque_ctrl)
 	target_torque = 0;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = -400;
+	target_torque = -300;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
-	while(1)
+	/*while(1)
 	{
 		actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
 		t when timerafter(time + MSEC_STD) :> time;
 		xscope_probe_data(0, actual_torque);
-	}
+	}*/
 }
 
 int main(void)
@@ -190,9 +190,10 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, \
-							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
-							c_pwm_ctrl, hall_params, qei_params, commutation_params);
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
+							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
+							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn,\
+							hall_params, qei_params, commutation_params);
 				}
 
 				/* Watchdog Server */

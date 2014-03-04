@@ -59,7 +59,8 @@
 #include <flash_somanet.h>
 
 #include <test.h>
-
+#include <qei_client.h>
+#include <ecat_motor_drive.h>
 //#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -82,7 +83,7 @@ void xscope_initialise_1()
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity = 500;	 		// rpm
+	int target_velocity = 1200;	 		// rpm
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
 
@@ -105,8 +106,8 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 int main(void)
 {
 	// Motor control channels
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6;		// qei channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_hall_p6, c_qei_p6;		// qei channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl, c_adctrig;												// pwm channels
 	chan c_velocity_ctrl;													// velocity control channel
@@ -123,7 +124,6 @@ int main(void)
 	chan pdo_in;
 	chan pdo_out;
 	chan c_sig_1;
-
 
 	par
 	{
@@ -144,8 +144,8 @@ int main(void)
 		/* Test Profile Velocity function */
 		on stdcore[1]:
 		{
-		//	profile_velocity_test(c_velocity_ctrl);			// test PVM on node
-			velocity_ctrl_unit_test(c_velocity_ctrl, c_qei_p3, c_hall_p3);
+			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
+		//	velocity_ctrl_unit_test(c_velocity_ctrl, c_qei_p3, c_hall_p3);
 //			{
 //				int init_state;
 //				while(1)
@@ -162,12 +162,16 @@ int main(void)
 //					}
 //				}
 //			}
+			{
+			//detect_sensor_placement( c_hall_p3, c_qei_p3, c_commutation_p3);
+			//printstrln("done");
+			}
 		}
 
 		on stdcore[2]:
 		{
 
-			/*Velocity Control Loop*/
+			/* Velocity Control Loop */
 			{
 				ctrl_par velocity_ctrl_params;
 				filter_par sensor_filter_params;
@@ -180,7 +184,7 @@ int main(void)
 				init_qei_param(qei_params);
 
 				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, \
-					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
+					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, c_commutation_p2);
 			}
 
 		}
@@ -204,15 +208,17 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, 	\
-							c_commutation_p1, c_commutation_p2, c_commutation_p3,		\
-							c_pwm_ctrl, hall_params, qei_params, commutation_params);
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
+							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
+							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn,\
+							hall_params, qei_params, commutation_params);
 				}
 
 				/* Watchdog Server */
 				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
 				/* Hall Server */
+
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
@@ -220,11 +226,13 @@ int main(void)
 				}
 
 				/* QEI Server */
+
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params); 	 // channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  		 // channel priority 1,2..5
 				}
+
 			}
 		}
 

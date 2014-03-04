@@ -180,8 +180,8 @@ int main(void)
 		/* Test Profile Position function*/
 		on stdcore[1]:
 		{
-			//position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		  	// test PPM on slave side
-			position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 			// Unit test controller
+			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		  	// test PPM on slave side
+			//position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 			// Unit test controller
 		}
 
 
@@ -198,7 +198,7 @@ int main(void)
 				 init_qei_param(qei_params);
 
 				 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, c_hall_p2,\
-						 c_qei_p1, c_position_ctrl, c_commutation_p3);
+						 c_qei_p2, c_position_ctrl, c_commutation_p3);
 			}
 
 		}
@@ -222,9 +222,10 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); 			// initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, \
-							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
-							c_pwm_ctrl, hall_params, qei_params, commutation_params);
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
+							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
+							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn,\
+							hall_params, qei_params, commutation_params);
 				}
 
 				/* Watchdog Server */

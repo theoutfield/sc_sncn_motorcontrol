@@ -54,7 +54,7 @@
 #include <hall_server.h>
 //#include <flash_somanet.h>
 
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -65,8 +65,10 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 void xscope_initialise_1()
 {
 	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 qei_position", XSCOPE_INT,	"n",
-				           XSCOPE_CONTINUOUS, "1 qei_velocity", XSCOPE_INT,	"n");
+		xscope_register(4, XSCOPE_CONTINUOUS, "0 qei_position", XSCOPE_INT,	"n",
+				           XSCOPE_CONTINUOUS, "1 qei_velocity", XSCOPE_INT,	"n",
+				           XSCOPE_CONTINUOUS, "2 qei_position1", XSCOPE_INT, "n",
+				           XSCOPE_CONTINUOUS, "3 qei_velocity1", XSCOPE_INT, "n");
 		xscope_config_io(XSCOPE_IO_BASIC);
 	}
 	return;
@@ -82,7 +84,9 @@ void qei_test(chanend c_qei, chanend c_hall)
 	timer t;
 	qei_par qei_params;
 	qei_velocity_par qei_velocity_params;  // to compute velocity from qei
-int hall_p, hall_di;
+	hall_par hall_params;
+int hall_p, hall_di, hall_velocity;
+	init_hall_param(hall_params);
 	init_qei_param(qei_params);
 	init_qei_velocity_params(qei_velocity_params);	// to compute velocity from qei
 
@@ -90,24 +94,31 @@ int hall_p, hall_di;
 	xscope_initialise_1();
 #endif
 	//set_qei_turns(c_qei, 1);
+
 	while(1)
 	{
 		{position, valid} = get_qei_position_absolute(c_qei);
-	//	hall_p =  get_hall_position(c_hall);
-	//	velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
+		{hall_p, hall_di} =  get_hall_position_absolute(c_hall);
+
+		hall_velocity =  get_hall_velocity(c_hall, hall_params);
+
+		velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
 		wait_ms(1, core_id, t);
 
-#ifdef ENABLE_xscope_main
+	#ifdef ENABLE_xscope_main
 		xscope_probe_data(0, position);
 		xscope_probe_data(1, hall_p);
-#else
-
+		xscope_probe_data(2, hall_velocity);
+		xscope_probe_data(3, velocity);
+	//	printintln(position);
+		//printintln(hall_p);
+	#else
 		printstr("Position: ");
 		printint(position);
 		printstr(" ");
 		printstr("Velocity: "); // with print velocity information will be corrupt (use xscope)
 		printintln(velocity);
-#endif
+	#endif
 	}
 }
 
@@ -149,11 +160,11 @@ int main(void)
 				}
 
 				/* Hall Server */
-					{
-						hall_par hall_params;
-						init_hall_param(hall_params);
-						run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..4
-					}
+				{
+					hall_par hall_params;
+					init_hall_param(hall_params);
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..4
+				}
 			}
 		}
 
