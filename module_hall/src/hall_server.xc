@@ -92,7 +92,7 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 	}
 }
 
-void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
+void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4, \
 		chanend c_hall_p5, chanend c_hall_p6, port in p_hall, hall_par &hall_params)
 {
 	timer tx;
