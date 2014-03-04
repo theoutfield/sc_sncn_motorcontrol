@@ -55,9 +55,9 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
 	qei_params.poles = POLE_PAIRS;
+	qei_params.sensor_placement = SENSOR_PLACEMENT;
 	return;
 }
-
 void init_csv_param(csv_par &csv_params)
 {
 	csv_params.max_motor_speed = MAX_NOMINAL_SPEED;

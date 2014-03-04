@@ -122,6 +122,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
 			c_qei :> qei_params.max_count;
 			c_qei :> qei_params.real_counts;
 			c_qei :> qei_params.poles;
+			//c_qei :> qei_params.sensor_placement;
 			status = 1;
 	//					printintln(qei_params.gear_ratio);
 	//					printintln(qei_params.index);
@@ -170,6 +171,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 	int calib_bw_flag = 0;
 	int sync_out = 0;
 	int status = 0;
+	//int sensor_placement = 1; // in_phase : 1 Default, out of phase : -1
 
 	p_qei :> new_pins;
 
@@ -191,7 +193,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 							  { v, position } = lmul(1, position, v, -5);
 						  }
 				  	  }
-				  	  else if(qei_type == QEI_WITH_NO_INDEX)
+				  	  else if(qei_type == QEI_WITH_NO_INDEX) //this should be selected always
 				  	  {
 				  		  v = lookup[new_pins][old_pins];
 				  		  { v, position } = lmul(1, position, v, -5);
@@ -224,14 +226,30 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 						}
 						else if( difference < 10 && difference >0)
 						{
-							count = count - difference;
-							sync_out = sync_out - difference;
+							if(qei_params.sensor_placement == IN_PHASE)
+							{
+								count = count + difference;
+								sync_out = sync_out + difference;
+							}
+							else if(qei_params.sensor_placement == OUT_OF_PHASE)
+							{
+								count = count - difference; //out of phase -
+								sync_out = sync_out - difference;
+							}
 							direction = -1;
 						}
 						else if( difference < 0 && difference > -10)
 						{
-							count = count - difference;
-							sync_out = sync_out - difference;
+							if(qei_params.sensor_placement == IN_PHASE)
+							{
+								count = count + difference;
+								sync_out = sync_out + difference;
+							}
+							else if(qei_params.sensor_placement == OUT_OF_PHASE)
+							{
+								count = count - difference; //out of phase -
+								sync_out = sync_out - difference;
+							}
 							direction = 1;
 						}
 						previous_position = current_pos;
@@ -306,12 +324,12 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 			qei_type = qei_params.index;
 			qei_crossover = qei_max - qei_max/10;
 			qei_count_per_hall = qei_params.real_counts / qei_params.poles;
+			//sensor_placement = qei_params.sensor_placement;
 			//offset_fw = 0;
 			//offset_bw = 0;
 			//calib_fw_flag = 0;
 			//calib_bw_flag = 0;
 			//sync_out = 0;
-
 		}
 
 	}

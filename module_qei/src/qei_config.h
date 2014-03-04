@@ -52,4 +52,5 @@
 #define SET_OFFSET 					6
 #define QEI_RESET_COUNT 			7
 
+
 #endif /* __QEI_CONFIG_H__ */

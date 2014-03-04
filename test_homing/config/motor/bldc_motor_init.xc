@@ -48,6 +48,7 @@ void init_hall_param(hall_par &hall_params)
 	return;
 }
 
+
 void init_qei_param(qei_par &qei_params)
 {
 	qei_params.real_counts = ENCODER_RESOLUTION;
@@ -55,6 +56,7 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
 	qei_params.poles = POLE_PAIRS;
+	qei_params.sensor_placement = SENSOR_PLACEMENT;
 	return;
 }
 

@@ -57,13 +57,14 @@
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				4		// if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO  				2		// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			2000	// 4 x Max count of Quadrature Encoder (4X decoding)
 
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	//QEI_WITH_NO_INDEX
 
+#define SENSOR_PLACEMENT			IN_PHASE		// OUT_OF_PHASE
 
 /* Somanet IFM Internal Config */
 #define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
@@ -112,115 +113,6 @@
 #define MAX_POSITION_LIMIT 			359		// degree
 #define MIN_POSITION_LIMIT 			-359	// degree
 
-
-
-/**
- * \brief struct definition for PID Controller
- */
-typedef struct S_Control
-{
-	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
-	int Kd_n, Kd_d; //Kd = Kd_n/Kd_d
-	int Integral_limit;
-	int Control_limit;
-	int Loop_time;
-} ctrl_par;
-
-/**
- * \brief struct definition for velocity filter
- */
-typedef struct S_Filter_length
-{
-	int filter_length;
-} filter_par;
-
-/**
- * \brief struct definition for quadrature sensor
- */
-typedef struct S_QEI {
-	int max_count;
-	int real_counts;
-	int gear_ratio;
-	int index;   //no_index - 0 index - 1
-	int poles;
-} qei_par;
-
-/**
- * \brief struct definition for hall sensor
- */
-typedef struct S_Hall {
-	int pole_pairs;
-	int gear_ratio;
-} hall_par;
-
-/**
- * \brief struct definition for Synchronous torque param
- */
-typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
-{
-	int nominal_motor_speed;
-	int nominal_current;
-	int motor_torque_constant;
-	int max_torque;
-	int polarity;
-} cst_par;
-
-/**
- * \brief struct definition for Synchronous velocity param
- */
-typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
-{
-	int max_motor_speed;
-	int nominal_current;
-	int motor_torque_constant;
-	int polarity;
-	int max_acceleration;
-} csv_par;
-
-/**
- * \brief struct definition for Synchronous position param
- */
-typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
-{
-	csv_par base;
-	int max_following_error;
-	int max_position_limit;
-	int min_position_limit;
-} csp_par;
-
-/**
- * \brief struct definition for profile torque param
- */
-typedef struct PROFILE_TORQUE_PARAM
-{
-	int profile_slope;
-	int polarity;
-} pt_par;
-
-/**
- * \brief struct definition for profile velocity param
- */
-typedef struct PROFILE_VELOCITY_PARAM
-{
-	int max_profile_velocity;
-	int profile_acceleration;
-	int profile_deceleration;
-	int quick_stop_deceleration;
-	int polarity;
-} pv_par;
-
-/**
- * \brief struct definition for profile position param
- */
-typedef struct PROFILE_POSITION_PARAM
-{
-	pv_par base;
-	int profile_velocity;
-	int software_position_limit_min;
-	int software_position_limit_max;
-	int max_acceleration;
-} pp_par;
 
 /**
  * \brief initialize Velocity sensor filter

@@ -334,6 +334,7 @@ void set_qei_param_ecat(chanend c_qei, qei_par &qei_params)
 	c_qei <: qei_params.max_count;
 	c_qei <: qei_params.real_counts;
 	c_qei <: qei_params.poles;
+	//c_qei <: qei_params.sensor_placement;
 }
 
 void qei_init_ecat(chanend c_qei, qei_par &qei_params)
@@ -358,6 +359,7 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
 					c_qei :> qei_params.max_count;
 					c_qei :> qei_params.real_counts;
 					c_qei :> qei_params.poles;
+					//c_qei :> qei_params.sensor_placement;
 					flag = 1;
 
 //					printintln(qei_params.gear_ratio);
