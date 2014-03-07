@@ -62,7 +62,7 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
 		c_qei :> position;
 		c_qei :> valid;
 	}
-	position &= (qei_params.max_count - 1);
+	position &= (qei_params.max_ticks_per_turn - 1);
 
 	return {position, valid};
 }
@@ -86,7 +86,7 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_v
 	int difference;
 	int count;
 	int direction;
-	int qei_crossover = qei_params.max_count - qei_params.max_count/10;
+	int qei_crossover = qei_params.max_ticks_per_turn - qei_params.max_ticks_per_turn/10;
 	{count, direction} = get_qei_position_absolute(c_qei);
 	difference = count - qei_velocity_params.previous_position;
 	if(difference > qei_crossover)
@@ -123,10 +123,4 @@ void reset_qei_count(chanend c_qei, int offset)
 {
 	c_qei <: QEI_RESET_COUNT;
 	c_qei <: offset;
-}
-
-void set_qei_turns(chanend c_qei, int turns)
-{
-	c_qei <: 33;
-	c_qei <: turns;
 }
