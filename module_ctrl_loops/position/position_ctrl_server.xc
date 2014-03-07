@@ -46,7 +46,7 @@
 //#define DEBUG
 //#define debug_print
 
-extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
+//extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used, \
@@ -69,8 +69,6 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 	int activate = 0;
 	int direction = 0;
 
-	int precision = 1;
-	int precision_factor = 1;
 	int fet_state = 0;
 	int init_state = INIT_BUSY; /* check commutation init */
 
@@ -86,20 +84,15 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
 	if(sensor_used == HALL)
 	{
-		precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
-		precision = HALL_PRECISION;
-		{actual_position , direction}= get_hall_position_absolute(c_hall);
-		actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
+		//precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);		precision = HALL_PRECISION;
+		{actual_position , direction}= get_hall_position_absolute(c_hall); //actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
 		target_position = actual_position;
 	//	printintln(target_position);
 	//	printintln(actual_position);
 	}
 	else if(sensor_used == QEI)
 	{
-		precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
-		precision = QEI_PRECISION;
 		{actual_position, direction} =  get_qei_position_absolute(c_qei);
-		actual_position = (actual_position * precision_factor)/precision;
 		target_position = actual_position;
 	//	printintln(target_position);
 	//	printintln(actual_position);
@@ -117,16 +110,21 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 				if(activate == 1)
 				{
 					/* acq actual position hall/qei */
-
-					if(sensor_used == HALL)
-					{   /* 100/(500*819) ~ 1/4095 appr (hall)  - to keep position info from hall in same range as qei*/
-						{actual_position , direction}= get_hall_position_absolute(c_hall);
-						actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
-					}
-					else if(sensor_used == QEI)
+					switch(sensor_used)
 					{
-						{actual_position, direction} =  get_qei_position_absolute(c_qei);
-						actual_position = (actual_position * precision_factor)/precision;
+						case HALL:
+						   /* 100/(500*819) ~ 1/4095 appr (hall)  - to keep position info from hall in same range as qei*/
+							{actual_position , direction}= get_hall_position_absolute(c_hall);
+							//actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
+							break;
+
+						case QEI:
+							{actual_position, direction} =  get_qei_position_absolute(c_qei);
+							break;
+
+						/*case ANY_OTHER_SENSOR:
+							actual_position = get_position_sensor(c_sensor);
+							break;*/
 					}
 
 					/* PID Controller */
@@ -200,30 +198,25 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						break;
 
 					case SET_POSITION_CTRL_QEI:
-						c_position_ctrl :> qei_params.gear_ratio;
+			//p			c_position_ctrl :> qei_params.gear_ratio;
 						c_position_ctrl :> qei_params.index;
 						c_position_ctrl :> qei_params.real_counts;
-						c_position_ctrl :> qei_params.max_count;
+			//p			c_position_ctrl :> qei_params.max_count;
 						break;
 
 					case SENSOR_SELECT:
 						POSITION_CTRL_READ(sensor_used);
 						if(sensor_used == HALL)
 						{
-							precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);
-							precision = HALL_PRECISION;
-							{actual_position , direction}= get_hall_position_absolute(c_hall);
-							actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
+							//precision_factor = position_factor(hall_params.gear_ratio, 1, hall_params.pole_pairs, sensor_used);precision = HALL_PRECISION;
+							{actual_position , direction}= get_hall_position_absolute(c_hall);	//actual_position = ( ( ( (actual_position/500)*precision_factor)/precision )/819)*100;
 							target_position = actual_position;
 							//printintln(target_position);
 							//printintln(actual_position);
 						}
 						else if(sensor_used == QEI)
 						{
-							precision_factor = position_factor(qei_params.gear_ratio, qei_params.real_counts, 1, sensor_used);
-							precision = QEI_PRECISION;
 							{actual_position, direction} =  get_qei_position_absolute(c_qei);
-							actual_position = (actual_position * precision_factor)/precision;
 							target_position = actual_position;
 							//printintln(target_position);
 							//printintln(actual_position);

@@ -132,10 +132,10 @@ void set_position_ctrl_hall_param(hall_par &hall_params, chanend c_position_ctrl
 void set_position_ctrl_qei_param(qei_par &qei_params, chanend c_position_ctrl)
 {
 	c_position_ctrl <: SET_POSITION_CTRL_QEI;
-	c_position_ctrl <: qei_params.gear_ratio;
+//p	c_position_ctrl <: qei_params.gear_ratio;
 	c_position_ctrl <: qei_params.index;
 	c_position_ctrl <: qei_params.real_counts;
-	c_position_ctrl <: qei_params.max_count;
+//p	c_position_ctrl <: qei_params.max_count;
 }
 
 

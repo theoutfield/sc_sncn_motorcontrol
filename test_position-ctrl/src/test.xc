@@ -10,7 +10,7 @@
 #include <profile_control.h>
 #include <bldc_motor_config.h>
 
-void position_ctrl_unit_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
+/*void position_ctrl_unit_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
 {
 	int target_position = 350;			// deg
 	int velocity 		= 350;			// rpm
@@ -149,10 +149,10 @@ void set_torque_test(chanend c_torque_ctrl, chanend c_velocity_ctrl) {
 		}
 	}
 
-	/*while (1) {
+	while (1) {
 		input_torq(d);
 		printintln(d.set_torque);
 		//set_profile_torque( d.set_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	}*/
-}
+	}
+}*/

@@ -72,8 +72,9 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
-	xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
-						XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
+	xscope_register(3, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
+						XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n",
+						XSCOPE_CONTINUOUS, "2 follow_error", XSCOPE_INT, "n");
 
 	xscope_config_io(XSCOPE_IO_BASIC);
 	return;
@@ -84,25 +85,67 @@ void xscope_initialise_1()
 void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
 {
 	int init_state;
-	int target_position = 350;			// deg
-	int velocity 		= 350;			// rpm
-	int acceleration 	= 350;			// rpm/s
-	int deceleration 	= 350;     		// rpm/s
+	int actual_position = 0;			// ticks test purpose only
+	int target_position = -1500;		// ticks
+	int velocity 		= 2500;			// rpm
+	int acceleration 	= 500;			// rpm/s
+	int deceleration 	= 500;     		// rpm/s
 	int turns = 1;
-	int actual_position;
+	int follow_error;
 	timer t; unsigned int time;
 	ctrl_par position_ctrl_params;
 	hall_par hall_params;
 	qei_par qei_params;
-	init_position_profile_limits(GEAR_RATIO, MAX_ACCELERATION, MAX_PROFILE_VELOCITY);
+	int position_ramp = 0; int steps; int i;
+	init_state = __check_position_init(c_position_ctrl);
+
+	while(init_state == INIT_BUSY)
+	{
+		init_state = init_position_control(c_position_ctrl);
+		//if(init_state == INIT)
+		///	//printstrln("position control intialized");
+		//else
+			//printstrln("intialize position control failed");
+	}
+
+	init_qei_param(qei_params);
+	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params);
 
 #ifdef ENABLE_xscope_main
-	//xscope_initialise_1();
+	xscope_initialise_1();
 #endif
+	actual_position = get_position(c_position_ctrl);
+	steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
+	//printintln(steps);
+	t :> time;
+	for(i = 0; i < steps; i++)
+	{
+		xscope_probe_data(0, position_ramp);
+		position_ramp = position_profile_generate(i);
+		set_position(position_ramp, c_position_ctrl);
+		actual_position = get_position(c_position_ctrl);
+		follow_error = position_ramp - actual_position;
+		t when timerafter(time + MSEC_STD) :> time;
+		//printintln(position_ramp);
 
+		xscope_probe_data(1, actual_position);
+		xscope_probe_data(2, follow_error);
+
+	}
+//	printstrln("done");
+	while(1)
+	{
+		actual_position = get_position(c_position_ctrl);
+		follow_error = position_ramp - actual_position;
+		xscope_probe_data(0, position_ramp);
+		xscope_probe_data(1, actual_position);
+		xscope_probe_data(2, follow_error);
+		t when timerafter(time + MSEC_STD) :> time;
+	}
+				/*xscope_probe_data(0, actual_position);
 	//reset_qei_count(c_qei, -5260);  // reset_hall_count(c_hall, 40960);
 
-	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+//	set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 
 //	set_profile_position(92, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 	//reset_qei_count(c_qei, -5260);
