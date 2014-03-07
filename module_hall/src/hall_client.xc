@@ -63,7 +63,7 @@ int get_hall_velocity(chanend c_hall, hall_par &hall_params)
 	int velocity;
 	c_hall <: HALL_VELOCITY_REQ;
 	c_hall :> velocity;
-	velocity = ((velocity/FILTER_LENGTH_HALL) * 1000 * 60)/(hall_params.pole_pairs * 4095 *1);
+	velocity = ((velocity/FILTER_LENGTH_HALL) * 1000 * 60)/(hall_params.pole_pairs * 4096 *1);
 	return velocity;
 }
 

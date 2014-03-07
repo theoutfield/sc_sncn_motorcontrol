@@ -41,9 +41,10 @@
 #include "hall_server.h"
 //#pragma xta command "analyze loop hall_loop"
 //#pragma xta command "set required - 10.0 us"
+//#define DEBUG
 
 void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state,\
-		int &count, int direction, hall_par &hall_params, int &status)
+		int &count, int direction, hall_par &hall_params, int &status, int filter_length)
 {
 	switch(command)
 	{
@@ -57,6 +58,7 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 		case HALL_VELOCITY_REQ:
 
 			c_hall <: raw_velocity;
+			//c_hall <: filter_length;
 			//status = 0;
 			break;
 
@@ -123,7 +125,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int previous_position = 0;
 	int count = 0;
 	int first = 1;
-	int hall_enc_count = hall_params.pole_pairs * hall_params.gear_ratio * 4095;
+	int hall_max_count = hall_params.max_ticks; //hall_params.pole_pairs * hall_params.gear_ratio * 4095;
 	int time_elapsed = 0; 			//between two transitions to calculate speed
 	int init_state = INIT;
 
@@ -135,16 +137,23 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int velocity = 0;
 	int difference1 = 0;
 	int old_difference = 0;
-	int filter_length = FILTER_LENGTH_HALL;
+	int filter_length = FILTER_LENGTH_HALL;	///hall_params.pole_pairs;
 	int filter_buffer[FILTER_LENGTH_HALL];
 	int index = 0;
 	int raw_velocity = 0;
-	int hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
+	int hall_crossover = (4096 * 9 )/10;
 	int status = 0; //1 changed
+	hall_params.filter_length = filter_length;
 
-	init_filter(filter_buffer, index, FILTER_LENGTH_HALL);
-
-
+	init_filter(filter_buffer, index, filter_length);
+#ifdef DEBUG
+	{
+		xscope_register(3, XSCOPE_CONTINUOUS, "0 hall_position", XSCOPE_INT,	"n",
+				           XSCOPE_CONTINUOUS, "1 hall_velocity", XSCOPE_INT,	"n",
+				           XSCOPE_CONTINUOUS, "1 hall_velocity", XSCOPE_INT,	"n");
+		xscope_config_io(XSCOPE_IO_BASIC);
+	}
+#endif
 	/* Init hall sensor */
 	p_hall :> pin_state;
 	switch(pin_state)
@@ -290,44 +299,48 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 
 		}
 
-		if(count > hall_enc_count || count < -hall_enc_count)
+		if(count > hall_max_count || count < -hall_max_count)
 		{
 			count = 0;
 		}
 
-	//	xscope_probe_data(0, angle);
+		#ifdef DEBUG
+			xscope_probe_data(0, angle);
+			xscope_probe_data(1, count);
+			xscope_probe_data(2, raw_velocity);
+		#endif
 
 
 		#pragma ordered
 		select {
 			case c_hall_p1 :> command:
 				hall_client_handler(c_hall_p1, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status);
+						direction, hall_params, status, filter_length);
 				break;
 
 			case c_hall_p2 :> command:
 				hall_client_handler(c_hall_p2, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status);
+						direction, hall_params, status, filter_length);
 				break;
 
 			case c_hall_p3 :> command:
 				hall_client_handler(c_hall_p3, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status);
+						direction, hall_params, status, filter_length);
 				break;
 
 			case c_hall_p4 :> command:
 				hall_client_handler(c_hall_p4, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status);
+						direction, hall_params, status, filter_length);
 				break;
 
 			case c_hall_p5 :> command:
 				hall_client_handler(c_hall_p5, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status);
+						direction, hall_params, status, filter_length);
 				break;
 
 			case c_hall_p6 :> command:
 				hall_client_handler(c_hall_p6, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status);
+						direction, hall_params, status, filter_length);
 				break;
 
 			case tx when timerafter(time1 + MSEC_FAST) :> time1:
@@ -346,7 +359,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 						}
 						velocity = 0;
 					}
-					else //if(init_velocity == 1)
+					else
 					{
 						difference1 = count - previous_position1;
 						if(difference1 > hall_crossover)
@@ -354,9 +367,9 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 						else if(difference1 < -hall_crossover)
 							difference1 = old_difference;
 						velocity = difference1;
-				#ifdef Debug_velocity_ctrl
-						xscope_probe_data(0, velocity);
-				#endif
+						#ifdef Debug_velocity_ctrl
+								xscope_probe_data(0, velocity);
+						#endif
 						previous_position1 = count;
 						old_difference = difference1;
 					}
@@ -368,17 +381,13 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 		}
 		if(status == 1)
 		{
-			hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
-			hall_enc_count = hall_params.pole_pairs * hall_params.gear_ratio * 4095;
-			//first = 1;
-			//previous_position = 0;
-			//count = 0;
+			hall_max_count = hall_params.max_ticks; 	//pole_pairs * hall_params.gear_ratio * 4095;
 			status = 0;
 		}
 
 		tx when timerafter(ts + 2500) :> ts; //10 usec 2500
 
-#pragma xta endpoint "hall_loop_stop"
+//#pragma xta endpoint "hall_loop_stop"
 	}
 }
 

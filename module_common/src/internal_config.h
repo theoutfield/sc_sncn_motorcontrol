@@ -156,10 +156,10 @@ typedef struct S_Filter_length
  * \brief struct definition for quadrature sensor
  */
 typedef struct S_QEI {
-	int max_count;
-	int real_counts;
-	int gear_ratio;
-	int index;   //no_index - 0 index - 1
+	int max_ticks_per_turn;
+	int real_counts;	//	int gear_ratio;
+	int max_ticks;	// paramater allows for more turns
+	int index;   	// no_index - 0 index - 1
 	int poles;
 	int sensor_placement;
 } qei_par;
@@ -170,6 +170,8 @@ typedef struct S_QEI {
 typedef struct S_Hall {
 	int pole_pairs;
 	int gear_ratio;
+	int max_ticks;
+	int filter_length;
 } hall_par;
 
 /**
