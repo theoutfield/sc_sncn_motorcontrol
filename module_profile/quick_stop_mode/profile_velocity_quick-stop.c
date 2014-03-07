@@ -40,7 +40,7 @@
 
 #include <profile.h>
 
-struct QUICK_STOP_VELOCITY_PARAM
+struct
 {
 	float max_deceleration;		// max allowed deceleration
 	float u;					// initial velocity

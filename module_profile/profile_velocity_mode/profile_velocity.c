@@ -43,7 +43,7 @@
 #include <stdio.h>
 
 
-struct PROFILE_VELOCITY_PARAM
+struct
 {
 	float max_acceleration, max_deceleration;	// max allowed acceleration & deceleration
 	float acc, dec;								// acceleration & deceleration input

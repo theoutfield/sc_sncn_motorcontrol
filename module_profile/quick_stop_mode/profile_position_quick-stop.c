@@ -40,7 +40,7 @@
 
 #include <profile.h>
 
-struct pos_params
+struct
 {
 	float max;												// shaft output speed in deg/s
 

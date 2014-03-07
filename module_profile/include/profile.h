@@ -43,6 +43,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <internal_config.h>
 #ifndef _PROFILE_H_
 #define _PROFILE_H_
 
@@ -110,7 +111,8 @@ extern int velocity_profile_generate(int step);
  * \param max_velocity for the position profile
  *
  */
-extern void init_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity);
+extern void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params);
+//int init_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity);
 
 /**
  * \brief Initialise Position Profile

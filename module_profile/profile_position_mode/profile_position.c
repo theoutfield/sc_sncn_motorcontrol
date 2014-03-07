@@ -42,7 +42,8 @@
 
 #include <profile.h>
 
-struct PROFILE_POSITION_PARAM
+
+struct
 {
 	float max_acceleration;     // max acceleration
 	float max_velocity;
@@ -63,6 +64,7 @@ struct PROFILE_POSITION_PARAM
 	int direction;
 	int acc_too_low;			// flag for low acceleration constraint
 	float acc_min;				// constraint minimum acceleration
+	float limit_factor;			// max acceleration constraint
 
 	/*LFPB motion profile constants*/
 
@@ -93,16 +95,28 @@ struct PROFILE_POSITION_PARAM
 
 	float q;					// position profile
 
-	float gear_ratio;
+	qei_par qei_params;
+	hall_par hall_params;
 
 } 	profile_pos_params;
 
-
-void init_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity)
+int rpm_to_ticks_qei(int rpm, qei_par qei_params)
 {
-	profile_pos_params.max_acceleration = (max_acceleration * 6)/ gear_ratio;
-	profile_pos_params.max_velocity = (max_velocity * 6)/ gear_ratio ;
-	profile_pos_params.gear_ratio = (float) gear_ratio;
+	int ticks = (rpm * qei_params.max_ticks_per_turn)/60;
+	return ticks;
+}
+int rpm_to_ticks_hall(int rpm, hall_par hall_params)
+{
+	//int ticks = (rpm * qei_params.max_ticks_per_turn)/60;
+	return 1;
+}
+//sensor used
+void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params)
+{
+	profile_pos_params.qei_params = qei_params;
+	profile_pos_params.max_acceleration =  rpm_to_ticks_qei(max_acceleration , qei_params);
+	profile_pos_params.max_velocity = rpm_to_ticks_qei(max_velocity, qei_params);
+	profile_pos_params.limit_factor = 10;
 }
 
 int init_position_profile(int target_position, int actual_position,	int velocity, int acceleration, \
@@ -110,41 +124,31 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 {
 	profile_pos_params.qf = (float) target_position;
 
-	profile_pos_params.qf = profile_pos_params.qf/10000.0f;
-
 	profile_pos_params.qi = (float) actual_position;
 
-	profile_pos_params.qi = profile_pos_params.qi/10000.0f;
+	profile_pos_params.vi = rpm_to_ticks_qei(velocity, profile_pos_params.qei_params);//   (float) (velocity * 6)/profile_pos_params.gear_ratio;
 
-	profile_pos_params.vi = (float) (velocity * 6)/profile_pos_params.gear_ratio;
+	profile_pos_params.acc =  rpm_to_ticks_qei(acceleration, profile_pos_params.qei_params);//(float) (acceleration * 6)/profile_pos_params.gear_ratio;
 
-	profile_pos_params.acc = (float) (acceleration * 6)/profile_pos_params.gear_ratio;
+	profile_pos_params.dec =  rpm_to_ticks_qei(deceleration, profile_pos_params.qei_params); //(float) (deceleration * 6)/profile_pos_params.gear_ratio;
 
-	profile_pos_params.dec = (float) (deceleration * 6)/profile_pos_params.gear_ratio;
-
-
-	if(profile_pos_params.acc > profile_pos_params.max_acceleration)
-		profile_pos_params.acc = profile_pos_params.max_acceleration;
-
-	if(profile_pos_params.dec > profile_pos_params.max_acceleration)
-		profile_pos_params.dec = profile_pos_params.max_acceleration;
 
 	if(profile_pos_params.vi > profile_pos_params.max_velocity)
 		profile_pos_params.vi = profile_pos_params.max_velocity;
 
 
-	/* Internal params */
+	// Internal params
 
 	profile_pos_params.acc_too_low = 0;
 
 	profile_pos_params.qid = 0.0f;
 
-	/* leads to shorter blend times in the begining (if init condition != 0) non zero case - not yet considered */
+	// leads to shorter blend times in the begining (if init condition != 0) non zero case - not yet considered
 
 	profile_pos_params.qfd = 0.0f;
 
 
-	/* compute distance */
+	// compute distance
 
 	profile_pos_params.total_distance = profile_pos_params.qf - profile_pos_params.qi;
 
@@ -156,6 +160,18 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 
 		profile_pos_params.direction = -1;
 	}
+
+	if(profile_pos_params.acc > profile_pos_params.limit_factor * profile_pos_params.total_distance)
+		profile_pos_params.acc = profile_pos_params.limit_factor * profile_pos_params.total_distance;
+
+	if(profile_pos_params.acc > profile_pos_params.max_acceleration)
+		profile_pos_params.acc = profile_pos_params.max_acceleration;
+
+	if(profile_pos_params.dec > profile_pos_params.limit_factor * profile_pos_params.total_distance)
+		profile_pos_params.dec = profile_pos_params.limit_factor * profile_pos_params.total_distance;
+
+	if(profile_pos_params.dec > profile_pos_params.max_acceleration)
+		profile_pos_params.dec = profile_pos_params.max_acceleration;
 
 	profile_pos_params.tb_acc = profile_pos_params.vi / profile_pos_params.acc;
 
@@ -172,13 +188,13 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 									 - profile_pos_params.distance_dec;
 
 
-	/*check velocity and distance constraint*/
+	// check velocity and distance constraint
 
 	if (profile_pos_params.distance_left < 0)
 	{
 		profile_pos_params.acc_too_low = 1;
 
-		/* acc too low to meet distance/vel constraint */
+		// acc too low to meet distance/vel constraint
 
         if(profile_pos_params.vi > profile_pos_params.total_distance)
         {
@@ -231,13 +247,13 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 	}
 
 
-	/* check velocity and min acceleration constraint */
+	// check velocity and min acceleration constraint
 
 	if (profile_pos_params.distance_left < 0)
 	{
 		profile_pos_params.acc_too_low = 1;
 
-		/* acc too low to meet distance/velocity constraint */
+		// acc too low to meet distance/velocity constraint
 
 		profile_pos_params.acc_min = profile_pos_params.vi;
 
@@ -282,7 +298,7 @@ int init_position_profile(int target_position, int actual_position,	int velocity
 		profile_pos_params.vi = -profile_pos_params.vi;
 	}
 
-	/* compute LFPB motion constants */
+	// compute LFPB motion constants
 
 	profile_pos_params.ai = profile_pos_params.qi;
 
@@ -333,8 +349,9 @@ int position_profile_generate(int step)
 							 * (profile_pos_params.ts - profile_pos_params.tf) * profile_pos_params.gi;
 	}
 
-	return (int) round(profile_pos_params.q * 10000.0f);
+	return (int) round(profile_pos_params.q);
 }
+
 
 //for c only
 void __initialize_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity, profile_position_param *profile_pos_params)
