@@ -13,7 +13,7 @@ Implementation of Sinusoidal Motor Control for SOMANET devices.
 </tr>
 <tr>
   <td height="30px">Maintainer:</td>
-  <td><a href="mailto:support@synapticon.com">support@synapticon.com</a</td>
+  <td><a href="mailto:support@synapticon.com">support@synapticon.com</a></td>
 </tr>
 </table> 
 
@@ -51,4 +51,4 @@ Changelog
 License
 ---------
 
-Please see [LICENSE](http://synapticon.github.io/sc_sncn_motorctrl_sin//legal.html).
+Please see [LICENSE](http://synapticon.github.io/sc_sncn_motorctrl_sin/legal.html).
