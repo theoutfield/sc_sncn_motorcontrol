@@ -1,0 +1,8 @@
+var searchData=
+[
+  ['a4935_5finit',['a4935_init',['../a4935_8h.html#a590a5b8e6fd89530f0cb6eea576911c7',1,'a4935_init(int configuration):&#160;a4935.xc'],['../a4935_8xc.html#a590a5b8e6fd89530f0cb6eea576911c7',1,'a4935_init(int configuration):&#160;a4935.xc']]],
+  ['absolute',['absolute',['../comm__loop__server_8xc.html#a178d4c43077cf59589dfba0bad80187b',1,'comm_loop_server.xc']]],
+  ['adc_5fad7949',['adc_ad7949',['../adc__server__ad7949_8h.html#a619f90bb0e15fd811bf052f70d8c1240',1,'adc_ad7949(chanend c_adc, clock clk, buffered out port:32 p_sclk_conv_mosib_mosia, in buffered port:32 p_data_a, in buffered port:32 p_data_b):&#160;adc_server_ad7949.xc'],['../adc__server__ad7949_8xc.html#a619f90bb0e15fd811bf052f70d8c1240',1,'adc_ad7949(chanend c_adc, clock clk, buffered out port:32 p_sclk_conv_mosib_mosia, in buffered port:32 p_data_a, in buffered port:32 p_data_b):&#160;adc_server_ad7949.xc']]],
+  ['adc_5fad7949_5ftriggered',['adc_ad7949_triggered',['../adc__server__ad7949_8h.html#a31713ab30cf5be0260983eecf1c0c792',1,'adc_ad7949_triggered(chanend c_adc, chanend c_trig, clock clk, buffered out port:32 p_sclk_conv_mosib_mosia, in buffered port:32 p_data_a, in buffered port:32 p_data_b):&#160;adc_server_ad7949.xc'],['../adc__server__ad7949_8xc.html#a31713ab30cf5be0260983eecf1c0c792',1,'adc_ad7949_triggered(chanend c_adc, chanend c_trig, clock clk, buffered out port:32 p_sclk_conv_mosib_mosia, in buffered port:32 p_data_a, in buffered port:32 p_data_b):&#160;adc_server_ad7949.xc']]],
+  ['arctg1',['arctg1',['../arctan_8xc.html#aac882ef6ce26a6eceb24654f6aad71c6',1,'arctg1(int Real, int Imag):&#160;arctan.xc'],['../sine__table__big_8h.html#aac882ef6ce26a6eceb24654f6aad71c6',1,'arctg1(int Real, int Imag):&#160;arctan.xc']]]
+];

@@ -1,0 +1,7 @@
+<map id="init_velocity_profile" name="init_velocity_profile">
+<area shape="rect" id="node3" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="193,5,316,35"/>
+<area shape="rect" id="node7" href="$profile__velocity_8xc.html#aa36d33aac3d83abb33a79d2703d7037f" title="Set profile velocity with Velocity Control loop. " alt="" coords="188,59,321,88"/>
+<area shape="rect" id="node5" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="415,5,465,35"/>
+<area shape="rect" id="node9" href="$test__velocity-ctrl_8xc.html#a24cd8832141a29f657033a04184271ce" title="profile_velocity_test" alt="" coords="371,59,509,88"/>
+<area shape="rect" id="node11" href="$test__velocity-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="557,59,608,88"/>
+</map>

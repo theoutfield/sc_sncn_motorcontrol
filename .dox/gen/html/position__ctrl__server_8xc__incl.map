@@ -1,0 +1,16 @@
+<map id="module_ctrl_loops/position/position_ctrl_server.xc" name="module_ctrl_loops/position/position_ctrl_server.xc">
+<area shape="rect" id="node3" href="$position__ctrl__server_8h.html" title="position_ctrl_server.h" alt="" coords="1000,101,1147,131"/>
+<area shape="rect" id="node53" href="$drive__config_8h.html" title="drive_config.h" alt="" coords="1604,101,1705,131"/>
+<area shape="rect" id="node7" href="$internal__config_8h.html" title="internal_config.h" alt="" coords="1141,179,1259,208"/>
+<area shape="rect" id="node9" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="9,333,73,363"/>
+<area shape="rect" id="node13" href="$qei__client_8h.html" title="qei_client.h" alt="" coords="1029,179,1117,208"/>
+<area shape="rect" id="node25" href="$hall__client_8h.html" title="hall_client.h" alt="" coords="729,256,820,285"/>
+<area shape="rect" id="node33" href="$comm__loop__client_8h.html" title="comm_loop_client.h" alt="" coords="489,179,628,208"/>
+<area shape="rect" id="node16" href="$filter__blocks_8h.html" title="Moving Average Filter Implementation. " alt="" coords="1111,256,1212,285"/>
+<area shape="rect" id="node23" href="$qei__config_8h.html" title="qei_config.h" alt="" coords="945,256,1036,285"/>
+<area shape="rect" id="node30" href="$hall__config_8h.html" title="hall_config.h" alt="" coords="592,333,685,363"/>
+<area shape="rect" id="node35" href="$pwm__config_8h.html" title="pwm_config.h" alt="" coords="172,256,273,285"/>
+<area shape="rect" id="node39" href="$a4935_8h.html" title="predriver/a4935.h" alt="" coords="25,256,148,285"/>
+<area shape="rect" id="node44" href="$sine__table__big_8h.html" title="Sine Loopup table declarations. " alt="" coords="425,256,540,285"/>
+<area shape="rect" id="node46" href="$adc__client__ad7949_8h.html" title="ADC Client. " alt="" coords="564,256,705,285"/>
+</map>

@@ -1,0 +1,26 @@
+var adc__server__ad7949_8xc =
+[
+    [ "ADC_ALL_REQ", "adc__server__ad7949_8xc.html#aa9204f162c2c61349711a8dfc69796c2", null ],
+    [ "ADC_CALIB_POINTS", "adc__server__ad7949_8xc.html#acf05a45f9a5b59f63b80b996174478cf", null ],
+    [ "ADC_CURRENT_REQ", "adc__server__ad7949_8xc.html#a74e6ab92bd206d2efaab72f9f744bc7a", null ],
+    [ "ADC_EXTERNAL_POT", "adc__server__ad7949_8xc.html#a5a75c27e962bfeb7a9d384246abd722f", null ],
+    [ "BIT0", "adc__server__ad7949_8xc.html#ad4d43f8748b542bce39e18790f845ecc", null ],
+    [ "BIT01", "adc__server__ad7949_8xc.html#a48a3cd717f2b2a1a82ab6454c9b97104", null ],
+    [ "BIT02", "adc__server__ad7949_8xc.html#ad557ab9e2c269fc7df7fea68c2be1b8f", null ],
+    [ "BIT03", "adc__server__ad7949_8xc.html#adc6650dd2f8f4807638cf65565084828", null ],
+    [ "BIT04", "adc__server__ad7949_8xc.html#a320ddeec9345460bda632c6834390c45", null ],
+    [ "BIT05", "adc__server__ad7949_8xc.html#a14e2cda821f66bfa327cad05729704c6", null ],
+    [ "BIT06", "adc__server__ad7949_8xc.html#a95570ef714bdf4825fd6599079308446", null ],
+    [ "BIT07", "adc__server__ad7949_8xc.html#a9f4599a5f2c8eac0ceae54404e594d04", null ],
+    [ "BIT08", "adc__server__ad7949_8xc.html#a710f37bb5c58107d041f72664e6ae820", null ],
+    [ "BIT09", "adc__server__ad7949_8xc.html#aacf2b6e50bea7b917700012b14456b6a", null ],
+    [ "BIT10", "adc__server__ad7949_8xc.html#a8c0f01fdf020d0f7467449b181fe95cb", null ],
+    [ "BIT11", "adc__server__ad7949_8xc.html#a2cda1debde057b596766eba6a76daca0", null ],
+    [ "BIT12", "adc__server__ad7949_8xc.html#aaa0a6acba8436baabcaa1e91fad6c0bd", null ],
+    [ "BIT13", "adc__server__ad7949_8xc.html#a965dc1748ab1cf91426bd04a2fe16ecf", null ],
+    [ "SPI_IDLE", "adc__server__ad7949_8xc.html#a25069bb777de74a2060d87652cb4f79b", null ],
+    [ "adc_ad7949", "adc__server__ad7949_8xc.html#a619f90bb0e15fd811bf052f70d8c1240", null ],
+    [ "adc_ad7949_triggered", "adc__server__ad7949_8xc.html#a31713ab30cf5be0260983eecf1c0c792", null ],
+    [ "output_adc_config_data", "adc__server__ad7949_8xc.html#ac924ad14455d4c41e89c4ca28b0f0074", null ],
+    [ "adc_index", "adc__server__ad7949_8xc.html#ae01d54b7747e3e5cadef5fb1b959c822", null ]
+];

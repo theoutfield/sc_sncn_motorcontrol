@@ -1,0 +1,7 @@
+<map id="init_position_profile" name="init_position_profile">
+<area shape="rect" id="node3" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="193,5,316,35"/>
+<area shape="rect" id="node7" href="$profile__position_8xc.html#a1929aaa5ffbd5d1c26edf326a76f420b" title="Set profile position with Position Control loop. " alt="" coords="188,59,321,88"/>
+<area shape="rect" id="node5" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="415,5,465,35"/>
+<area shape="rect" id="node9" href="$test__position-ctrl_8xc.html#a8d47bfed20c02fd986a277e55de4f9a8" title="position_profile_test" alt="" coords="371,59,509,88"/>
+<area shape="rect" id="node11" href="$test__position-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="557,59,608,88"/>
+</map>

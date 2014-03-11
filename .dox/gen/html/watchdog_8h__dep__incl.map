@@ -1,0 +1,10 @@
+<map id="module_blocks/src/control_blocks/watchdog/watchdog.h" name="module_blocks/src/control_blocks/watchdog/watchdog.h">
+<area shape="rect" id="node3" href="$watchdog_8xc.html" title="module_blocks/src/control\l_blocks/watchdog/watchdog.xc" alt="" coords="308,110,513,157"/>
+<area shape="rect" id="node5" href="$comm__loop__server_8h.html" title="module_commutation\l/commutation/comm_loop\l_server.h" alt="" coords="537,101,708,165"/>
+<area shape="rect" id="node7" href="$comm__loop__server_8xc.html" title="module_commutation\l/commutation/comm_loop\l_server.xc" alt="" coords="5,213,176,277"/>
+<area shape="rect" id="node9" href="$test__adc__ext__potentiometer_8xc.html" title="Main project file Test illustrates usage of adc to get external potentiometer sensor values..." alt="" coords="200,222,427,269"/>
+<area shape="rect" id="node11" href="$test__ethercat-mode_8xc.html" title="Main project file Test illustrates usage of Motor Control with Ethercat. " alt="" coords="451,213,611,277"/>
+<area shape="rect" id="node13" href="$test__position-ctrl_8xc.html" title="Main project file Test illustrates usage of profile position control. " alt="" coords="635,222,797,269"/>
+<area shape="rect" id="node15" href="$test__torque-ctrl_8xc.html" title="Main project file Test illustrates usage of profile torque control. " alt="" coords="821,222,952,269"/>
+<area shape="rect" id="node17" href="$test__velocity-ctrl_8xc.html" title="Main project file Test illustrates usage of profile velocity control. " alt="" coords="976,222,1139,269"/>
+</map>

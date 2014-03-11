@@ -1,0 +1,10 @@
+<map id="module_qei/src/qei_server.h" name="module_qei/src/qei_server.h">
+<area shape="rect" id="node3" href="$ecat__motor__drive_8h.html" title="module_ecat_drive/src\l/ecat_motor_drive.h" alt="" coords="72,102,224,149"/>
+<area shape="rect" id="node7" href="$test__ethercat-mode_8xc.html" title="Main project file Test illustrates usage of Motor Control with Ethercat. " alt="" coords="181,197,341,261"/>
+<area shape="rect" id="node9" href="$qei__server_8xc.html" title="module_qei/src/qei\l_server.xc" alt="" coords="299,102,429,149"/>
+<area shape="rect" id="node12" href="$test__position-ctrl_8xc.html" title="Main project file Test illustrates usage of profile position control. " alt="" coords="453,102,616,149"/>
+<area shape="rect" id="node14" href="$test__qei_8xc.html" title="Main project file Test illustrates usage of qei sensor for position and velocity information. " alt="" coords="640,111,797,140"/>
+<area shape="rect" id="node16" href="$test__torque-ctrl_8xc.html" title="Main project file Test illustrates usage of profile torque control. " alt="" coords="821,102,952,149"/>
+<area shape="rect" id="node18" href="$test__velocity-ctrl_8xc.html" title="Main project file Test illustrates usage of profile velocity control. " alt="" coords="976,102,1139,149"/>
+<area shape="rect" id="node5" href="$ecat__motor__drive_8xc.html" title="module_ecat_drive/src\l/ecat_motor_drive.xc" alt="" coords="5,206,157,253"/>
+</map>

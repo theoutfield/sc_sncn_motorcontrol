@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['d_5fcruise',['d_cruise',['../structpos__params.html#a7f19ab217f51c9a23537a989dd6f9503',1,'pos_params']]],
+  ['dc100_5fresolution',['DC100_RESOLUTION',['../internal__config_8h.html#adfd39ad50d398c4f32da2c39c66a7f2d',1,'internal_config.h']]],
+  ['dc300_5fresolution',['DC300_RESOLUTION',['../internal__config_8h.html#a94617c58004ea4598566f08e26c265c9',1,'internal_config.h']]],
+  ['dec',['dec',['../structPROFILE__LINEAR__PARAM.html#a0c94f7c6e1afe921106a047d1ef87881',1,'PROFILE_LINEAR_PARAM::dec()'],['../structPROFILE__POSITION__PARAM.html#a1621c96146bf474b63fd870ec68faf43',1,'PROFILE_POSITION_PARAM::dec()'],['../structPROFILE__VELOCITY__PARAM.html#aa03da9c15021f4946171d5bb743bf7b7',1,'PROFILE_VELOCITY_PARAM::dec()']]],
+  ['deffactor',['defFactor',['../arctan_8xc.html#ae8fff607ff89e160d082ca7cb7988798',1,'arctan.xc']]],
+  ['defperiodmax',['defPeriodMax',['../hall__server_8xc.html#a32a3c18d7b8a2cdf816cf6855a27b467',1,'hall_server.xc']]],
+  ['delay_2exc',['delay.xc',['../delay_8xc.html',1,'']]],
+  ['di',['di',['../structPROFILE__POSITION__PARAM.html#a80055c0667e4af641146b5133160060c',1,'PROFILE_POSITION_PARAM::di()'],['../structpos__params.html#a885a62bcd804998b65ee2c4fcc5e4106',1,'pos_params::di()']]],
+  ['direction',['direction',['../structPROFILE__POSITION__PARAM.html#ac720404f5175e8f2c2f64b9990de8588',1,'PROFILE_POSITION_PARAM']]],
+  ['dirn',['dirn',['../structpos__params.html#a2f77ea70d971d140479e0e69bc029a28',1,'pos_params']]],
+  ['disable_5ffets',['DISABLE_FETS',['../internal__config_8h.html#a057810e26f45d5f9398219a6f1660914',1,'internal_config.h']]],
+  ['dist',['dist',['../structpos__params.html#ade99d591b7a1698e4e98064499218d47',1,'pos_params']]],
+  ['distance_5facc',['distance_acc',['../structPROFILE__POSITION__PARAM.html#a323029917a56fd45a7d6f11274048c40',1,'PROFILE_POSITION_PARAM']]],
+  ['distance_5fcruise',['distance_cruise',['../structPROFILE__POSITION__PARAM.html#ab2ec599d196f0fc9d3bcf6871a930e22',1,'PROFILE_POSITION_PARAM']]],
+  ['distance_5fdec',['distance_dec',['../structPROFILE__POSITION__PARAM.html#a6317fbd84164842916de32b9e3fbfd95',1,'PROFILE_POSITION_PARAM']]],
+  ['distance_5fleft',['distance_left',['../structPROFILE__POSITION__PARAM.html#aa0618cf6cbdaa973ef507b291575fcf2',1,'PROFILE_POSITION_PARAM']]],
+  ['do_5fadc_5fcalibration_5fad7949',['do_adc_calibration_ad7949',['../adc__client__ad7949_8h.html#a316d6bc788c19ea839274ea4142cc0e9',1,'adc_client_ad7949.h']]],
+  ['drive_5fconfig_2eh',['drive_config.h',['../drive__config_8h.html',1,'']]],
+  ['drive_5fsys_2exc',['drive_sys.xc',['../drive__sys_8xc.html',1,'']]]
+];

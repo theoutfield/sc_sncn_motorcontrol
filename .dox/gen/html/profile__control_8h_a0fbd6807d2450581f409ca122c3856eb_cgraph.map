@@ -1,0 +1,12 @@
+<map id="set_profile_torque" name="set_profile_torque">
+<area shape="rect" id="node3" href="$drive__config_8h.html#acb813c9f2fd5b66f9e926e6d1bd2bc11" title="Check torque control initialization. " alt="" coords="185,5,324,35"/>
+<area shape="rect" id="node7" href="$torque__ctrl__client_8h.html#ae79eda0dd38b6cd28ecd485a4f6e3074" title="Get actual torque from Torque Control Loop. " alt="" coords="213,59,296,88"/>
+<area shape="rect" id="node9" href="$profile_8h.html#a0ee62fddfd9ed4e36e2ac04da0689339" title="Initialise Linear Profile. " alt="" coords="196,112,313,141"/>
+<area shape="rect" id="node11" href="$drive__config_8h.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="217,165,292,195"/>
+<area shape="rect" id="node13" href="$torque__ctrl__client_8h.html#ac5d0fd53e9112eaa71baee24c6546e5c" title="Initialise Torque Control Loop. " alt="" coords="191,219,319,248"/>
+<area shape="rect" id="node19" href="$profile_8h.html#ad37f9ba93ffce88fecdd98eba97b7c6f" title="Generate Linear Profile. " alt="" coords="179,272,331,301"/>
+<area shape="rect" id="node21" href="$torque__ctrl__client_8h.html#a8369997cead41871cad63db5635ec980" title="Set new target torque for Torque Control Loop. " alt="" coords="213,325,296,355"/>
+<area shape="rect" id="node5" href="$drive__sys_8xc.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="423,5,497,35"/>
+<area shape="rect" id="node15" href="$torque__ctrl__client_8xc.html#aa66ae55ebb2b63e345e2b49d95d0587c" title="Checks Torque Control Loop Status. " alt="" coords="380,192,540,221"/>
+<area shape="rect" id="node17" href="$torque__ctrl__client_8xc.html#ae6a372ea3d1fe2d01d69bb4b9aad1d57" title="Enables Torque Control mode operation. " alt="" coords="396,245,524,275"/>
+</map>

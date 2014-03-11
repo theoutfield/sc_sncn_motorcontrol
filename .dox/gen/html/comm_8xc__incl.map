@@ -1,0 +1,15 @@
+<map id="module_comm/src/comm.xc" name="module_comm/src/comm.xc">
+<area shape="rect" id="node3" href="$comm_8h.html" title="comm.h" alt="" coords="1037,83,1107,112"/>
+<area shape="rect" id="node7" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="1256,315,1320,344"/>
+<area shape="rect" id="node13" href="$qei__client_8h.html" title="qei_client.h" alt="" coords="249,237,337,267"/>
+<area shape="rect" id="node25" href="$internal__config_8h.html" title="internal_config.h" alt="" coords="1436,160,1553,189"/>
+<area shape="rect" id="node27" href="$comm__loop__client_8h.html" title="comm_loop_client.h" alt="" coords="780,160,919,189"/>
+<area shape="rect" id="node16" href="$filter__blocks_8h.html" title="Moving Average Filter Implementation. " alt="" coords="5,315,107,344"/>
+<area shape="rect" id="node23" href="$qei__config_8h.html" title="qei_config.h" alt="" coords="299,315,389,344"/>
+<area shape="rect" id="node29" href="$pwm__config_8h.html" title="pwm_config.h" alt="" coords="463,237,564,267"/>
+<area shape="rect" id="node33" href="$a4935_8h.html" title="predriver/a4935.h" alt="" coords="1135,237,1257,267"/>
+<area shape="rect" id="node38" href="$sine__table__big_8h.html" title="Sine Loopup table declarations. " alt="" coords="716,237,831,267"/>
+<area shape="rect" id="node40" href="$adc__client__ad7949_8h.html" title="ADC Client. " alt="" coords="855,237,996,267"/>
+<area shape="rect" id="node42" href="$hall__client_8h.html" title="hall_client.h" alt="" coords="1020,237,1111,267"/>
+<area shape="rect" id="node47" href="$hall__config_8h.html" title="hall_config.h" alt="" coords="955,315,1048,344"/>
+</map>

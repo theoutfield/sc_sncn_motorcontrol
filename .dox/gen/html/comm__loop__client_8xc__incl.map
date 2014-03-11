@@ -1,0 +1,11 @@
+<map id="module_commutation/commutation/comm_loop_client.xc" name="module_commutation/commutation/comm_loop_client.xc">
+<area shape="rect" id="node3" href="$comm__loop__client_8h.html" title="comm_loop_client.h" alt="" coords="428,117,567,147"/>
+<area shape="rect" id="node11" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="20,272,84,301"/>
+<area shape="rect" id="node35" href="$internal__config_8h.html" title="internal_config.h" alt="" coords="1041,117,1159,147"/>
+<area shape="rect" id="node5" href="$pwm__config_8h.html" title="pwm_config.h" alt="" coords="447,195,548,224"/>
+<area shape="rect" id="node9" href="$a4935_8h.html" title="predriver/a4935.h" alt="" coords="71,195,193,224"/>
+<area shape="rect" id="node17" href="$sine__table__big_8h.html" title="Sine Loopup table declarations. " alt="" coords="572,195,687,224"/>
+<area shape="rect" id="node19" href="$adc__client__ad7949_8h.html" title="ADC Client. " alt="" coords="711,195,852,224"/>
+<area shape="rect" id="node21" href="$hall__client_8h.html" title="hall_client.h" alt="" coords="876,195,967,224"/>
+<area shape="rect" id="node27" href="$hall__config_8h.html" title="hall_config.h" alt="" coords="855,272,948,301"/>
+</map>

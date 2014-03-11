@@ -1,0 +1,146 @@
+<map id="main" name="main">
+<area shape="rect" id="node3" href="$adc__server__ad7949_8h.html#a31713ab30cf5be0260983eecf1c0c792" title="Triggered ADC server. " alt="" coords="111,547,260,576"/>
+<area shape="rect" id="node5" href="$comm_8h.html#add37dec33cc69e6e841263a7c99858d2" title="Initialize commutation parameters from Ethercat communication loop (call before start&#45;up of Commutati..." alt="" coords="109,4953,261,4983"/>
+<area shape="rect" id="node9" href="$comm__loop__server_8h.html#a5b6c59659b6e38afe48b6326c2e8e1e1" title="Sinusoidal based Commutation Loop. " alt="" coords="104,600,267,629"/>
+<area shape="rect" id="node36" href="$ecat__motor__drive_8h.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="124,2927,247,2956"/>
+<area shape="rect" id="node75" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a6cbe5a4a0e10c0d054bafa40a72f07ba" title="initialize hall sensor " alt="" coords="359,760,468,789"/>
+<area shape="rect" id="node95" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#ae34af4a4c02415d73182f410d833bc03" title="initialize QEI sensor " alt="" coords="360,813,467,843"/>
+<area shape="rect" id="node249" href="$comm_8h.html#a0951002d18335efc8dc60b7a0b312b58" title="Initialize hall sensor parameters from Ethercat communication loop (call before start&#45;up of Hall acqu..." alt="" coords="136,4665,235,4695"/>
+<area shape="rect" id="node253" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a4fad7ce2905abc370797fac64f5e62ea" title="initialize position control PID params " alt="" coords="117,3918,253,3965"/>
+<area shape="rect" id="node256" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#ac2c3b99149bab96aeeeee666b337baae" title="initialize Velocity sensor filter " alt="" coords="127,3987,244,4034"/>
+<area shape="rect" id="node258" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a7c0eae86d8688c486691c6e13cb12291" title="initialize torque control PID params " alt="" coords="121,4057,249,4103"/>
+<area shape="rect" id="node260" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a58c34386d68fbcb05eb4a87c9c8cd2de" title="initialize velocity control PID params " alt="" coords="117,4126,253,4173"/>
+<area shape="rect" id="node262" href="$position__ctrl__server_8h.html#ae69df7485764909bbc1b3584c092cd21" title="Position Control Loop. " alt="" coords="357,653,469,683"/>
+<area shape="rect" id="node272" href="$comm_8h.html#a571ba0f76d89d72d5893d8be91e23267" title="Initialize QEI sensor parameters from Ethercat communication loop (call before start&#45;up of QEI acquis..." alt="" coords="139,5373,232,5403"/>
+<area shape="rect" id="node275" href="$hall__server_8h.html#a3fa26a655dc9c1f78c4643d899d46d69" title="A basic hall encoder server. " alt="" coords="380,5600,447,5629"/>
+<area shape="rect" id="node284" href="$qei__server_8h.html#ad16add33e9d496017bb09ab6849475b0" title="Implementation of the QEI server thread (for sensor with index/no index) " alt="" coords="381,707,445,736"/>
+<area shape="rect" id="node290" href="$watchdog_8h.html#ac25fa83765b3d00dc8bc6b0064d555c3" title="Run the watchdog timer server. " alt="" coords="135,5228,236,5257"/>
+<area shape="rect" id="node292" href="$torque__ctrl__server_8h.html#a4de1f052ddac083b6ee28d92f9c18318" title="Torque Control Loop. " alt="" coords="133,5124,237,5153"/>
+<area shape="rect" id="node316" href="$velocity__ctrl__server_8h.html#a6618105986bd54c111a65ce7d42e63e9" title="Velocity Control Loop. " alt="" coords="357,5387,469,5416"/>
+<area shape="rect" id="node7" href="$drive__config_8h.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="817,4225,892,4255"/>
+<area shape="rect" id="node11" href="$a4935_8h.html#a590a5b8e6fd89530f0cb6eea576911c7" title="a4935_init" alt="" coords="373,139,453,168"/>
+<area shape="rect" id="node13" href="$comm__loop__server_8xc.html#ac78654bb83fd4f0a19c9eaadbd9c5517" title="commutation_init_to_zero" alt="" coords="328,192,499,221"/>
+<area shape="rect" id="node15" href="$comm__loop__server_8xc.html#ac7681bcd7b00eadaf447209e719e2bbc" title="commutation_sinusoidal_loop" alt="" coords="317,549,509,579"/>
+<area shape="rect" id="node17" href="$comm__loop__server_8xc.html#a178d4c43077cf59589dfba0bad80187b" title="absolute" alt="" coords="621,379,691,408"/>
+<area shape="rect" id="node19" href="$comm__loop__server_8xc.html#a02af88fa4ce599353be5998729f8b2c8" title="commutation_client\l_hanlder" alt="" coords="589,485,723,531"/>
+<area shape="rect" id="node22" href="$hall__client_8h.html#aae528b0db1cdd1dd46e844041d8a7768" title="Get position from Hall Server. " alt="" coords="597,4851,715,4880"/>
+<area shape="rect" id="node24" href="$hall__client_8h.html#a56ff8e550a6d620b703e64d37c2c7bdd" title="Get absolute position from Hall Server. " alt="" coords="597,1872,715,1901"/>
+<area shape="rect" id="node26" href="$qei__client_8h.html#a4080859b832dba0cbc7e1093c5f633ce" title="Initialize struct for velocity calculation from QEI sensor. " alt="" coords="573,4955,739,4984"/>
+<area shape="rect" id="node31" href="$arctan_8xc.html#a7a807e6e12e5c8594133de913dc916e6" title="sine_third_expanded" alt="" coords="585,432,727,461"/>
+<area shape="rect" id="node28" href="$filter__blocks_8h.html#a8df6ee0c7ec6d376aea562ce690c6f9f" title="Initialise Moving Average Filter Parameters. " alt="" coords="820,5652,889,5681"/>
+<area shape="rect" id="node33" href="$arctan_8xc.html#aea2ee7b8dd000b7cf9bda18dd3fbc557" title="sine_expanded" alt="" coords="800,2328,909,2357"/>
+<area shape="rect" id="node38" href="$position__ctrl__client_8h.html#a32e2cc931f43e75e84096e4dbe4fbe87" title="Checks Position Control Loop Status. " alt="" coords="347,4498,480,4545"/>
+<area shape="rect" id="node40" href="$torque__ctrl__client_8h.html#aa66ae55ebb2b63e345e2b49d95d0587c" title="Checks Torque Control Loop Status. " alt="" coords="333,4568,493,4597"/>
+<area shape="rect" id="node42" href="$velocity__ctrl__client_8h.html#aac9218b2d7a303df570c4927f202bbe2" title="Checks Velocity Control Loop Status. " alt="" coords="347,4621,480,4667"/>
+<area shape="rect" id="node45" href="$drive__config_8h.html#a6a70a618bd2f0854e01061122adb6dcc" title="get_next_state" alt="" coords="360,973,467,1003"/>
+<area shape="rect" id="node55" href="$position__ctrl__client_8h.html#ac30bc4144cf831e9c9fef809643bbe1d" title="Get actual position from position control. " alt="" coords="368,4691,459,4720"/>
+<area shape="rect" id="node57" href="$comm_8h.html#af34f2fdb09575b7f919a260a64aad139" title="Get target position from Ethercat. " alt="" coords="348,4744,479,4773"/>
+<area shape="rect" id="node59" href="$comm_8h.html#ad6c7d2f5757b338dd3a05177e0ffc951" title="Get target torque from Ethercat. " alt="" coords="352,4797,475,4827"/>
+<area shape="rect" id="node61" href="$comm_8h.html#a10baf88a37a28b14033cf4f8eb36cd6f" title="Get target velocity from Ethercat. " alt="" coords="348,4851,479,4880"/>
+<area shape="rect" id="node63" href="$torque__ctrl__client_8h.html#ae79eda0dd38b6cd28ecd485a4f6e3074" title="Get actual torque from Torque Control Loop. " alt="" coords="372,4904,455,4933"/>
+<area shape="rect" id="node65" href="$velocity__ctrl__client_8h.html#ad485c06ccd18cc4e548fd3eb5aa32bac" title="Get actual velocity from Velocity Control Loop. " alt="" coords="368,4957,459,4987"/>
+<area shape="rect" id="node67" href="$drive__config_8h.html#a2cdd1edf405089aed5519ce065a1adc2" title="Initialize checklist params. " alt="" coords="364,5011,463,5040"/>
+<area shape="rect" id="node69" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#aa5a3ea0a38c72991c253e01d25f90610" title="initialize cyclic synchronous position params " alt="" coords="359,5064,468,5093"/>
+<area shape="rect" id="node71" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a409d2a26f335498d5924847447904947" title="initialize cyclic synchronous torque params " alt="" coords="360,5117,467,5147"/>
+<area shape="rect" id="node73" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a9591cdd45e44bcab492332333daa4708" title="initialize cyclic synchronous velocity params " alt="" coords="359,1027,468,1056"/>
+<area shape="rect" id="node77" href="$profile_8h.html#a0ee62fddfd9ed4e36e2ac04da0689339" title="Initialise Linear Profile. " alt="" coords="355,1080,472,1109"/>
+<area shape="rect" id="node79" href="$position__ctrl__client_8h.html#a1e1af4f6cca4085fac087d9806294a67" title="Initialise Position Control Loop. " alt="" coords="345,1485,481,1515"/>
+<area shape="rect" id="node85" href="$profile_8h.html#a1407de9ee297a26175bb3c3b4471a4c7" title="Initialise Position Profile. " alt="" coords="347,1133,480,1163"/>
+<area shape="rect" id="node87" href="$profile_8h.html#afd06c6efe9952b998e61223d21cb7323" title="Initialise Position Profile Limits. " alt="" coords="347,1186,480,1233"/>
+<area shape="rect" id="node89" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#aaf2f50754ef4cb0dc27a3d3e81153cf6" title="initialize profile position params " alt="" coords="359,1256,468,1285"/>
+<area shape="rect" id="node91" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a53a88ce5675a3a92eac901c9d199f24b" title="initialize profile torque params " alt="" coords="360,1309,467,1339"/>
+<area shape="rect" id="node93" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#ab1a6256ea09c62cf247eae6e22206c1d" title="initialize profile velocity params " alt="" coords="359,1363,468,1392"/>
+<area shape="rect" id="node97" href="$profile_8h.html#a2b098a9f66de3cf7500a998f86e4603c" title="Initialise Quick Stop Position Profile. " alt="" coords="333,1415,493,1462"/>
+<area shape="rect" id="node99" href="$profile_8h.html#a48a965e84e04ac6436630f26871d0175" title="Initialise Quick Stop Velocity Profile. " alt="" coords="333,1538,493,1585"/>
+<area shape="rect" id="node102" href="$torque__ctrl__client_8h.html#ac5d0fd53e9112eaa71baee24c6546e5c" title="Initialise Torque Control Loop. " alt="" coords="349,1925,477,1955"/>
+<area shape="rect" id="node108" href="$velocity__ctrl__client_8h.html#a099c83f9d769503b6e522f676fb1b3a6" title="Initialise Velocity Control Loop. " alt="" coords="345,2560,481,2589"/>
+<area shape="rect" id="node114" href="$profile_8h.html#a4ee0527ffdb7d11313ba99f0252e55e8" title="Initialise Velocity Profile. " alt="" coords="347,1608,480,1637"/>
+<area shape="rect" id="node116" href="$profile_8h.html#ad37f9ba93ffce88fecdd98eba97b7c6f" title="Generate Linear Profile. " alt="" coords="337,1661,489,1691"/>
+<area shape="rect" id="node118" href="$velocity__ctrl__client_8h.html#a722c16dfaf1b9b03f3d7e79ef2bf08b5" title="Velocity Limiter. " alt="" coords="353,1715,473,1744"/>
+<area shape="rect" id="node120" href="$ecat__motor__drive_8xc.html#a1487d19e36ee78f182d5f6ee4faeccae" title="position_factor" alt="" coords="360,1768,467,1797"/>
+<area shape="rect" id="node122" href="$position__ctrl__client_8h.html#a3b06061218d4d2151249f6d57a1d32d5" title="Position Limiter. " alt="" coords="364,1821,463,1851"/>
+<area shape="rect" id="node124" href="$profile_8h.html#aa39134d0d88615ced34c81f9c55aecfc" title="Generate Position Profile. " alt="" coords="331,1979,496,2008"/>
+<area shape="rect" id="node126" href="$profile_8h.html#aaa72c2f9026bf74e5b989f545966cebe" title="Generate Quick Stop Position Profile. " alt="" coords="345,2031,481,2078"/>
+<area shape="rect" id="node128" href="$profile_8h.html#a54f60515dd2cc432cdb6ed56aa77b3cd" title="Generate Quick Stop Velocity Profile. " alt="" coords="345,2101,481,2147"/>
+<area shape="rect" id="node130" href="$comm_8h.html#ad67108100b12e69ad1987eb86105f7f0" title="Send actual position to Ethercat. " alt="" coords="341,2171,485,2200"/>
+<area shape="rect" id="node132" href="$comm_8h.html#aa77a84c5442490a858a982292f914294" title="Send actual torque to Ethercat. " alt="" coords="347,2224,480,2253"/>
+<area shape="rect" id="node134" href="$comm_8h.html#ab14c510a068779470848576649d329ce" title="Send actual velocity to Ethercat. " alt="" coords="341,2277,485,2307"/>
+<area shape="rect" id="node136" href="$comm_8h.html#a2e661bfebb3e6dd80f254fdd6e18da15" title="Set commutation parameters from Ethercat communication loop. " alt="" coords="315,2331,512,2360"/>
+<area shape="rect" id="node138" href="$comm_8h.html#a4b1c671da62bf6e603b603af1b77dddf" title="Set hall sensor parameters from Ethercat communication loop. " alt="" coords="343,2384,484,2413"/>
+<area shape="rect" id="node140" href="$position__ctrl__client_8h.html#a124318ee3e51b2841cd126d0a86ea100" title="Set new target position for position control. " alt="" coords="368,2437,459,2467"/>
+<area shape="rect" id="node142" href="$position__ctrl__client_8h.html#a691301ddbc735439701f307709a51acc" title="Set new target position for position control (advanced function) " alt="" coords="353,2843,473,2872"/>
+<area shape="rect" id="node148" href="$position__ctrl__client_8h.html#abe80162dd6b6343252d0bd58fb6daa5e" title="Set hall sensor parameters for Position Control. " alt="" coords="341,2490,485,2537"/>
+<area shape="rect" id="node150" href="$position__ctrl__client_8h.html#ad5e39a01ad44a69b9e2dfb173a54f54d" title="Set Position Control PID Parameters. " alt="" coords="333,2613,493,2643"/>
+<area shape="rect" id="node152" href="$position__ctrl__client_8h.html#a80cfc1caf3709a5cc988c611ebec57a4" title="Set QEI sensor for Position Control. " alt="" coords="343,2666,484,2713"/>
+<area shape="rect" id="node154" href="$position__ctrl__client_8h.html#a44643f095c64637390f98d139f8c7959" title="Sets the sensor used for Position Control. " alt="" coords="344,2736,483,2765"/>
+<area shape="rect" id="node156" href="$comm_8h.html#a3b0eb0d9674fb7e662af01599ab4ea2b" title="Set QEI sensor parameters from Ethercat communication loop. " alt="" coords="344,2789,483,2819"/>
+<area shape="rect" id="node158" href="$torque__ctrl__client_8h.html#a8369997cead41871cad63db5635ec980" title="Set new target torque for Torque Control Loop. " alt="" coords="372,2896,455,2925"/>
+<area shape="rect" id="node160" href="$torque__ctrl__client_8h.html#acc5a2980e58b385327386df6cf1f1536" title="Set new target torque for torque control (advanced function) " alt="" coords="360,3248,467,3277"/>
+<area shape="rect" id="node166" href="$torque__ctrl__client_8h.html#a272a28c046a6b27c91c7eb08fe990e68" title="Set hall sensor parameters for Torque Control. " alt="" coords="347,2949,480,2995"/>
+<area shape="rect" id="node168" href="$torque__ctrl__client_8h.html#ac055c1c19f86c2da241c808ee0fe0537" title="Set Torque Control PID Parameters. " alt="" coords="339,3019,488,3048"/>
+<area shape="rect" id="node170" href="$torque__ctrl__client_8h.html#ad55427bbd21b156808772929ccc6751b" title="Set QEI sensor parameters for Torque Control. " alt="" coords="348,3071,479,3118"/>
+<area shape="rect" id="node172" href="$torque__ctrl__client_8h.html#a589cf1301adaf3daa44f38917c56147f" title="Sets the sensor used for Torque Control. " alt="" coords="349,3141,477,3171"/>
+<area shape="rect" id="node174" href="$velocity__ctrl__client_8h.html#adcbc06a5bd1c0e96a44b51cd9af205f0" title="Set new target velocity for Velocity Control Loop. " alt="" coords="368,3195,459,3224"/>
+<area shape="rect" id="node176" href="$velocity__ctrl__client_8h.html#a61fd1370f1ae0e70389ee118948dce77" title="Set new target velocity for velocity control (advanced function) " alt="" coords="353,867,473,896"/>
+<area shape="rect" id="node182" href="$velocity__ctrl__client_8h.html#ac50435ce708af7bdcbfdf9998c870e09" title="Set hall sensor parameters for Velocity Control. " alt="" coords="341,3301,485,3347"/>
+<area shape="rect" id="node184" href="$velocity__ctrl__client_8h.html#ac3327a33a405a6bc5671886634117e9b" title="Set Velocity Control PID Parameters. " alt="" coords="333,3371,493,3400"/>
+<area shape="rect" id="node186" href="$velocity__ctrl__client_8h.html#a4ca80b60504284fd937fbd792a18f4f1" title="Set QEI sensor for Velocity Control. " alt="" coords="343,3423,484,3470"/>
+<area shape="rect" id="node188" href="$velocity__ctrl__client_8h.html#aedb7cc2f6ccaec65a55a5c9a0dff24a3" title="Sets the sensor used for Velocity Control. " alt="" coords="344,3493,483,3523"/>
+<area shape="rect" id="node190" href="$position__ctrl__client_8h.html#aeb6b6d694dd6d65576dd0de5a417b9e2" title="Shutdown Position Control mode operation. " alt="" coords="336,3547,491,3576"/>
+<area shape="rect" id="node192" href="$torque__ctrl__client_8h.html#add41eb0ae9aac6f9f527e505839c2ac8" title="Shutdown Torque Control mode operation. " alt="" coords="340,3600,487,3629"/>
+<area shape="rect" id="node194" href="$velocity__ctrl__client_8h.html#ac9b5bed5689fe71c280d4d35eaf4920d" title="Shutdown Velocity Control mode operation. " alt="" coords="336,4445,491,4475"/>
+<area shape="rect" id="node196" href="$drive__config_8h.html#ad93678d13004a59f75fbd7a2716ce082" title="Update Checklist. " alt="" coords="353,245,473,275"/>
+<area shape="rect" id="node219" href="$comm_8h.html#a95e77325a598d4761bc90c772f6688f8" title="Update cyclic synchronous position parameters from Ethercat. " alt="" coords="332,3704,495,3733"/>
+<area shape="rect" id="node221" href="$comm_8h.html#abdf5960dc96df2c64a2f1d5cc635da25" title="Update cyclic synchronous torque parameters from Ethercat. " alt="" coords="333,3757,493,3787"/>
+<area shape="rect" id="node223" href="$comm_8h.html#a0b01eeded3d3a8d5af38581ba301838d" title="Update cyclic synchronous velocity parameters from Ethercat. " alt="" coords="332,3811,495,3840"/>
+<area shape="rect" id="node225" href="$comm_8h.html#a8da9915ae29d1abcedcb7e4b38db66e0" title="Update Hall sensor parameters from Ethercat. " alt="" coords="332,3864,495,3893"/>
+<area shape="rect" id="node227" href="$comm_8h.html#a1e7ca2875a5052205f98887ea19d054e" title="Update position control PID params from Ethercat. " alt="" coords="344,3917,483,3963"/>
+<area shape="rect" id="node229" href="$comm_8h.html#a7c66bfdf6a31b30aafeae05cdc5d3022" title="Update profile position parameters from Ethercat. " alt="" coords="335,3987,492,4016"/>
+<area shape="rect" id="node231" href="$comm_8h.html#a3abc377c7cdab2b58187d90616632e32" title="Update profile torque parameters from Ethercat. " alt="" coords="336,4040,491,4069"/>
+<area shape="rect" id="node233" href="$comm_8h.html#a11a776e400d05b9922fed6c26a2244f0" title="Update profile velocity parameters from Ethercat. " alt="" coords="335,4093,492,4123"/>
+<area shape="rect" id="node235" href="$comm_8h.html#a3c82dca09853ab74e48fd7b27928d62c" title="Update QEI sensor parameters from Ethercat. " alt="" coords="333,920,493,949"/>
+<area shape="rect" id="node239" href="$drive__config_8h.html#a7078cbf984eacb367f7fe054163040b9" title="update_statusword" alt="" coords="348,4147,479,4176"/>
+<area shape="rect" id="node241" href="$comm_8h.html#a334c7475557724ac82d4c3c5bf255b0e" title="Update torque control PID parameters from Ethercat. " alt="" coords="349,4199,477,4246"/>
+<area shape="rect" id="node243" href="$comm_8h.html#a69f1c4ddbbe3d49ae6ed62e37b322822" title="Update velocity control PID parameters from Ethercat. " alt="" coords="344,4269,483,4315"/>
+<area shape="rect" id="node245" href="$profile_8h.html#a6c6d3379db189637a620470b64b1a7df" title="Generate Velocity Profile. " alt="" coords="331,4339,496,4368"/>
+<area shape="rect" id="node247" href="$ecat__motor__drive_8xc.html#a39902395d19c81842210e7769742a6fa" title="xscope_initialise" alt="" coords="355,4392,472,4421"/>
+<area shape="rect" id="node47" href="$drive__sys_8xc.html#a747c9c41454e3743b3c8da7a9f1b693c" title="read_controlword_enable_op" alt="" coords="563,1131,749,1160"/>
+<area shape="rect" id="node49" href="$drive__sys_8xc.html#a4f6836e94061baaee749f5642cff8823" title="read_controlword_fault\l_reset" alt="" coords="580,1183,732,1230"/>
+<area shape="rect" id="node51" href="$drive__sys_8xc.html#a84b084b4d6fb3677dd53bbc8c218ea27" title="read_controlword_quick_stop" alt="" coords="561,1024,751,1053"/>
+<area shape="rect" id="node53" href="$drive__sys_8xc.html#acb20a80da0e12f5467389ca33b5e1e13" title="read_controlword_switch_on" alt="" coords="563,1077,749,1107"/>
+<area shape="rect" id="node81" href="$position__ctrl__client_8xc.html#a32e2cc931f43e75e84096e4dbe4fbe87" title="Checks Position Control Loop Status. " alt="" coords="589,1446,723,1493"/>
+<area shape="rect" id="node83" href="$position__ctrl__client_8xc.html#a0f8f8a9cd88e42f22c7dce16fa8a8c4e" title="Enables Position Control mode operation. " alt="" coords="588,1516,724,1545"/>
+<area shape="rect" id="node104" href="$torque__ctrl__client_8xc.html#aa66ae55ebb2b63e345e2b49d95d0587c" title="Checks Torque Control Loop Status. " alt="" coords="576,1925,736,1955"/>
+<area shape="rect" id="node106" href="$torque__ctrl__client_8xc.html#ae6a372ea3d1fe2d01d69bb4b9aad1d57" title="Enables Torque Control mode operation. " alt="" coords="592,1979,720,2008"/>
+<area shape="rect" id="node110" href="$velocity__ctrl__client_8xc.html#aac9218b2d7a303df570c4927f202bbe2" title="Checks Velocity Control Loop Status. " alt="" coords="589,2582,723,2629"/>
+<area shape="rect" id="node112" href="$velocity__ctrl__client_8xc.html#a635b5cbe1a56f8a66006fadff9499ff5" title="Enables Velocity Control mode operation. " alt="" coords="588,2529,724,2559"/>
+<area shape="rect" id="node144" href="$position__ctrl__client_8xc.html#a3b06061218d4d2151249f6d57a1d32d5" title="Position Limiter. " alt="" coords="607,2869,705,2899"/>
+<area shape="rect" id="node146" href="$position__ctrl__client_8xc.html#a124318ee3e51b2841cd126d0a86ea100" title="Set new target position for position control. " alt="" coords="611,2816,701,2845"/>
+<area shape="rect" id="node162" href="$torque__ctrl__client_8xc.html#a8369997cead41871cad63db5635ec980" title="Set new target torque for Torque Control Loop. " alt="" coords="615,3221,697,3251"/>
+<area shape="rect" id="node164" href="$torque__ctrl__client_8xc.html#a26767a58caa19a8ba34c62d7e0f6bb0b" title="Torque Limiter. " alt="" coords="612,3275,700,3304"/>
+<area shape="rect" id="node178" href="$velocity__ctrl__client_8xc.html#a722c16dfaf1b9b03f3d7e79ef2bf08b5" title="Velocity Limiter. " alt="" coords="596,864,716,893"/>
+<area shape="rect" id="node180" href="$velocity__ctrl__client_8xc.html#adcbc06a5bd1c0e96a44b51cd9af205f0" title="Set new target velocity for Velocity Control Loop. " alt="" coords="611,917,701,947"/>
+<area shape="rect" id="node198" href="$drive__sys_8xc.html#a7c3261f279ca3a47bc2ef0296cf13385" title="Check adc initialization. " alt="" coords="595,325,717,355"/>
+<area shape="rect" id="node200" href="$drive__sys_8xc.html#ab7bc92e31090bc6e9d92f600302127bd" title="Check commutation initialization. " alt="" coords="568,5,744,35"/>
+<area shape="rect" id="node204" href="$drive__sys_8xc.html#a3f293b422d6258a819b59f8633d4bcb2" title="Check hall initialization. " alt="" coords="595,59,717,88"/>
+<area shape="rect" id="node207" href="$drive__sys_8xc.html#ad1b8faae4a3d2ae71865cdb9035054fd" title="Check position control initialization. " alt="" coords="583,112,729,141"/>
+<area shape="rect" id="node210" href="$drive__sys_8xc.html#a3e54647a9d5322759358e1f4a2a2019b" title="Check qei initialization. " alt="" coords="597,165,715,195"/>
+<area shape="rect" id="node213" href="$drive__sys_8xc.html#acb813c9f2fd5b66f9e926e6d1bd2bc11" title="Check torque control initialization. " alt="" coords="587,219,725,248"/>
+<area shape="rect" id="node216" href="$drive__sys_8xc.html#a66972f50fe0e7dc1db3bc32399e023db" title="Check velocity control initialization. " alt="" coords="583,272,729,301"/>
+<area shape="rect" id="node202" href="$drive__sys_8xc.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="817,165,892,195"/>
+<area shape="rect" id="node237" href="$qei_8c.html#af797fd929966c7f882f7e000122afeb2" title="Internal function to calculate QEI position information. " alt="" coords="591,971,721,1000"/>
+<area shape="rect" id="node264" href="$drive__config_8h.html#ab7bc92e31090bc6e9d92f600302127bd" title="Check commutation initialization. " alt="" coords="568,5008,744,5037"/>
+<area shape="rect" id="node268" href="$position__ctrl__server_8xc.html#a1487d19e36ee78f182d5f6ee4faeccae" title="position_factor" alt="" coords="603,656,709,685"/>
+<area shape="rect" id="node270" href="$comm__loop__client_8h.html#ae25b15f1f209cadb215441d6ff08d6b0" title="Set Input voltage for commutation loop. " alt="" coords="563,5112,749,5141"/>
+<area shape="rect" id="node277" href="$filter__blocks_8h.html#a826f0b956f59a8e9a67dd8ddffcbd352" title="_modified_internal\l_filter" alt="" coords="593,5703,719,5750"/>
+<area shape="rect" id="node279" href="$hall__server_8xc.html#a17ba988311304f1323b603141b036859" title="hall_client_handler" alt="" coords="592,5600,720,5629"/>
+<area shape="rect" id="node287" href="$qei__server_8xc.html#a7a675968340fcf169002f75b1a2f7492" title="qei_client_hanlder" alt="" coords="593,760,719,789"/>
+<area shape="rect" id="node294" href="$torque__ctrl__server_8xc.html#a5df2645afcebbf2af09f2b1dc5fe77da" title="_torque_ctrl" alt="" coords="368,5272,459,5301"/>
+<area shape="rect" id="node311" href="$torque__ctrl__server_8xc.html#ad6601b6bf1938b1995f3ff336679aa3a" title="current_filter" alt="" coords="367,5325,460,5355"/>
+<area shape="rect" id="node299" href="$qei__client_8h.html#ae17f2eb55511f9b1a306e045899b2078" title="Calculates the velocity from QEI sensor in 1 ms loop. " alt="" coords="599,5165,713,5195"/>
+<area shape="rect" id="node301" href="$torque__ctrl__server_8xc.html#ac7c8626411ef4ee1371d5ea82fb7c4a0" title="init_buffer" alt="" coords="617,5272,695,5301"/>
+<area shape="rect" id="node305" href="$torque__ctrl__server_8xc.html#a29d5e30547b72c1cc9853e2a84a053b5" title="root_function" alt="" coords="608,5219,704,5248"/>
+<area shape="rect" id="node308" href="$arctan_8xc.html#a0587be920f34ba30a604b44110dedddf" title="sine_table_expanded" alt="" coords="584,4224,728,4253"/>
+<area shape="rect" id="node313" href="$adc__client__ad7949_8h.html#a316d6bc788c19ea839274ea4142cc0e9" title="ADC current calibration sequence for Triggered ADC server. " alt="" coords="591,5325,721,5371"/>
+<area shape="rect" id="node319" href="$filter__blocks_8h.html#a62028f14fe649dcbba25270509bad90e" title="Get moving average filtered output by passing the sampled data to be filtered as input. " alt="" coords="633,5445,679,5475"/>
+</map>

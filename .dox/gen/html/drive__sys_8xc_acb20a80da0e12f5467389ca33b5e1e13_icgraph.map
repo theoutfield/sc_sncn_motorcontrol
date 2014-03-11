@@ -1,0 +1,5 @@
+<map id="read_controlword_switch_on" name="read_controlword_switch_on">
+<area shape="rect" id="node3" href="$drive__sys_8xc.html#a6a70a618bd2f0854e01061122adb6dcc" title="get_next_state" alt="" coords="241,5,348,35"/>
+<area shape="rect" id="node5" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="397,5,520,35"/>
+<area shape="rect" id="node7" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="568,5,619,35"/>
+</map>

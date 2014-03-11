@@ -1,0 +1,4 @@
+<map id="set_torque_cst" name="set_torque_cst">
+<area shape="rect" id="node3" href="$torque__ctrl__client_8xc.html#a8369997cead41871cad63db5635ec980" title="Set new target torque for Torque Control Loop. " alt="" coords="167,5,249,35"/>
+<area shape="rect" id="node5" href="$torque__ctrl__client_8xc.html#a26767a58caa19a8ba34c62d7e0f6bb0b" title="Torque Limiter. " alt="" coords="164,59,252,88"/>
+</map>

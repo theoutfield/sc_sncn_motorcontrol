@@ -1,0 +1,5 @@
+<map id="sine_third_expanded" name="sine_third_expanded">
+<area shape="rect" id="node3" href="$comm__loop__server_8xc.html#ac7681bcd7b00eadaf447209e719e2bbc" title="commutation_sinusoidal_loop" alt="" coords="196,5,388,35"/>
+<area shape="rect" id="node5" href="$comm__loop__server_8xc.html#a5b6c59659b6e38afe48b6326c2e8e1e1" title="Sinusoidal based Commutation Loop. " alt="" coords="437,5,600,35"/>
+<area shape="rect" id="node7" href="$test__adc__ext__potentiometer_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="648,5,699,35"/>
+</map>

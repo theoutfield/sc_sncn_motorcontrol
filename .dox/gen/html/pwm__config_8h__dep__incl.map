@@ -1,0 +1,20 @@
+<map id="module_commutation/pwm/pwm_config.h" name="module_commutation/pwm/pwm_config.h">
+<area shape="rect" id="node3" href="$comm__loop__client_8h.html" title="module_commutation\l/commutation/comm_loop\l_client.h" alt="" coords="849,101,1020,165"/>
+<area shape="rect" id="node19" href="$comm__loop__server_8xc.html" title="module_commutation\l/commutation/comm_loop\l_server.xc" alt="" coords="5,325,176,389"/>
+<area shape="rect" id="node5" href="$comm_8h.html" title="module_comm/src/comm.h" alt="" coords="1524,231,1703,260"/>
+<area shape="rect" id="node15" href="$comm__loop__client_8xc.html" title="module_commutation\l/commutation/comm_loop\l_client.xc" alt="" coords="652,213,823,277"/>
+<area shape="rect" id="node17" href="$comm__loop__server_8h.html" title="module_commutation\l/commutation/comm_loop\l_server.h" alt="" coords="457,213,628,277"/>
+<area shape="rect" id="node30" href="$position__ctrl__server_8h.html" title="module_ctrl_loops/position\l/position_ctrl_server.h" alt="" coords="1047,222,1223,269"/>
+<area shape="rect" id="node36" href="$torque__ctrl__server_8h.html" title="module_ctrl_loops/torque\l/torque_ctrl_server.h" alt="" coords="1259,222,1424,269"/>
+<area shape="rect" id="node42" href="$velocity__ctrl__server_8xc.html" title="module_ctrl_loops/velocity\l/velocity_ctrl_server.xc" alt="" coords="847,222,1023,269"/>
+<area shape="rect" id="node7" href="$comm_8xc.html" title="module_comm/src/comm.xc" alt="" coords="1520,343,1707,372"/>
+<area shape="rect" id="node9" href="$ecat__motor__drive_8h.html" title="module_ecat_drive/src\l/ecat_motor_drive.h" alt="" coords="1731,334,1883,381"/>
+<area shape="rect" id="node11" href="$ecat__motor__drive_8xc.html" title="module_ecat_drive/src\l/ecat_motor_drive.xc" alt="" coords="1731,446,1883,493"/>
+<area shape="rect" id="node13" href="$test__ethercat-mode_8xc.html" title="Main project file Test illustrates usage of Motor Control with Ethercat. " alt="" coords="1105,437,1265,501"/>
+<area shape="rect" id="node21" href="$test__adc__ext__potentiometer_8xc.html" title="Main project file Test illustrates usage of adc to get external potentiometer sensor values..." alt="" coords="200,334,427,381"/>
+<area shape="rect" id="node24" href="$test__position-ctrl_8xc.html" title="Main project file Test illustrates usage of profile position control. " alt="" coords="688,334,851,381"/>
+<area shape="rect" id="node26" href="$test__torque-ctrl_8xc.html" title="Main project file Test illustrates usage of profile torque control. " alt="" coords="925,334,1056,381"/>
+<area shape="rect" id="node28" href="$test__velocity-ctrl_8xc.html" title="Main project file Test illustrates usage of profile velocity control. " alt="" coords="451,334,613,381"/>
+<area shape="rect" id="node32" href="$position__ctrl__server_8xc.html" title="module_ctrl_loops/position\l/position_ctrl_server.xc" alt="" coords="1080,334,1256,381"/>
+<area shape="rect" id="node38" href="$torque__ctrl__server_8xc.html" title="module_ctrl_loops/torque\l/torque_ctrl_server.xc" alt="" coords="1280,334,1445,381"/>
+</map>

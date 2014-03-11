@@ -1,0 +1,14 @@
+<map id="commutation_sinusoidal" name="commutation_sinusoidal">
+<area shape="rect" id="node3" href="$a4935_8h.html#a590a5b8e6fd89530f0cb6eea576911c7" title="a4935_init" alt="" coords="273,83,353,112"/>
+<area shape="rect" id="node5" href="$comm__loop__server_8xc.html#ac78654bb83fd4f0a19c9eaadbd9c5517" title="commutation_init_to_zero" alt="" coords="228,136,399,165"/>
+<area shape="rect" id="node7" href="$comm__loop__server_8xc.html#ac7681bcd7b00eadaf447209e719e2bbc" title="commutation_sinusoidal_loop" alt="" coords="217,189,409,219"/>
+<area shape="rect" id="node9" href="$drive__config_8h.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="689,331,764,360"/>
+<area shape="rect" id="node11" href="$qei__client_8h.html#a4080859b832dba0cbc7e1093c5f633ce" title="Initialize struct for velocity calculation from QEI sensor. " alt="" coords="459,59,624,88"/>
+<area shape="rect" id="node15" href="$hall__client_8h.html#a56ff8e550a6d620b703e64d37c2c7bdd" title="Get absolute position from Hall Server. " alt="" coords="483,163,600,192"/>
+<area shape="rect" id="node17" href="$hall__client_8h.html#aae528b0db1cdd1dd46e844041d8a7768" title="Get position from Hall Server. " alt="" coords="483,216,600,245"/>
+<area shape="rect" id="node19" href="$comm__loop__server_8xc.html#a178d4c43077cf59589dfba0bad80187b" title="absolute" alt="" coords="507,269,576,299"/>
+<area shape="rect" id="node21" href="$arctan_8xc.html#a7a807e6e12e5c8594133de913dc916e6" title="sine_third_expanded" alt="" coords="471,5,612,35"/>
+<area shape="rect" id="node25" href="$comm__loop__server_8xc.html#a02af88fa4ce599353be5998729f8b2c8" title="commutation_client\l_hanlder" alt="" coords="475,322,608,369"/>
+<area shape="rect" id="node13" href="$filter__blocks_8h.html#a8df6ee0c7ec6d376aea562ce690c6f9f" title="Initialise Moving Average Filter Parameters. " alt="" coords="692,59,761,88"/>
+<area shape="rect" id="node23" href="$arctan_8xc.html#aea2ee7b8dd000b7cf9bda18dd3fbc557" title="sine_expanded" alt="" coords="672,5,781,35"/>
+</map>

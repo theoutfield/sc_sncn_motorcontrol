@@ -1,0 +1,13 @@
+<map id="init_filter" name="init_filter">
+<area shape="rect" id="node3" href="$qei__client_8xc.html#a4080859b832dba0cbc7e1093c5f633ce" title="Initialize struct for velocity calculation from QEI sensor. " alt="" coords="125,109,291,139"/>
+<area shape="rect" id="node21" href="$hall__server_8xc.html#a3fa26a655dc9c1f78c4643d899d46d69" title="A basic hall encoder server. " alt="" coords="175,188,241,217"/>
+<area shape="rect" id="node24" href="$velocity__ctrl__server_8xc.html#a6618105986bd54c111a65ce7d42e63e9" title="Velocity Control Loop. " alt="" coords="152,31,264,60"/>
+<area shape="rect" id="node5" href="$comm__loop__server_8xc.html#ac7681bcd7b00eadaf447209e719e2bbc" title="commutation_sinusoidal_loop" alt="" coords="340,163,532,192"/>
+<area shape="rect" id="node11" href="$torque__ctrl__server_8xc.html#a5df2645afcebbf2af09f2b1dc5fe77da" title="_torque_ctrl" alt="" coords="391,109,481,139"/>
+<area shape="rect" id="node17" href="$test__qei_8xc.html#aeacee54a7ac75c8d4ddc1895fb7026a1" title="qei_test" alt="" coords="403,56,469,85"/>
+<area shape="rect" id="node7" href="$comm__loop__server_8xc.html#a5b6c59659b6e38afe48b6326c2e8e1e1" title="Sinusoidal based Commutation Loop. " alt="" coords="581,163,744,192"/>
+<area shape="rect" id="node9" href="$test__adc__ext__potentiometer_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="792,176,843,205"/>
+<area shape="rect" id="node13" href="$torque__ctrl__server_8xc.html#a4de1f052ddac083b6ee28d92f9c18318" title="Torque Control Loop. " alt="" coords="611,109,715,139"/>
+<area shape="rect" id="node15" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="792,97,843,127"/>
+<area shape="rect" id="node19" href="$test__qei_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="637,56,688,85"/>
+</map>

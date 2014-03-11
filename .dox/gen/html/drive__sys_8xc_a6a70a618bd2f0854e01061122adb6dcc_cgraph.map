@@ -1,0 +1,6 @@
+<map id="get_next_state" name="get_next_state">
+<area shape="rect" id="node3" href="$drive__sys_8xc.html#a747c9c41454e3743b3c8da7a9f1b693c" title="read_controlword_enable_op" alt="" coords="165,5,352,35"/>
+<area shape="rect" id="node5" href="$drive__sys_8xc.html#a4f6836e94061baaee749f5642cff8823" title="read_controlword_fault\l_reset" alt="" coords="183,58,335,105"/>
+<area shape="rect" id="node7" href="$drive__sys_8xc.html#a84b084b4d6fb3677dd53bbc8c218ea27" title="read_controlword_quick_stop" alt="" coords="164,128,353,157"/>
+<area shape="rect" id="node9" href="$drive__sys_8xc.html#acb20a80da0e12f5467389ca33b5e1e13" title="read_controlword_switch_on" alt="" coords="165,181,352,211"/>
+</map>

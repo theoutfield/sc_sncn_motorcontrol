@@ -1,0 +1,36 @@
+<map id="init_state" name="init_state">
+<area shape="rect" id="node3" href="$drive__sys_8xc.html#ab7bc92e31090bc6e9d92f600302127bd" title="Check commutation initialization. " alt="" coords="129,433,305,463"/>
+<area shape="rect" id="node5" href="$position__ctrl__server_8xc.html#ae69df7485764909bbc1b3584c092cd21" title="Position Control Loop. " alt="" coords="396,332,508,361"/>
+<area shape="rect" id="node9" href="$torque__ctrl__server_8xc.html#a5df2645afcebbf2af09f2b1dc5fe77da" title="_torque_ctrl" alt="" coords="407,387,497,416"/>
+<area shape="rect" id="node14" href="$velocity__ctrl__server_8xc.html#a6618105986bd54c111a65ce7d42e63e9" title="Velocity Control Loop. " alt="" coords="396,440,508,469"/>
+<area shape="rect" id="node19" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="617,333,740,363"/>
+<area shape="rect" id="node22" href="$drive__sys_8xc.html#a3f293b422d6258a819b59f8633d4bcb2" title="Check hall initialization. " alt="" coords="156,537,279,567"/>
+<area shape="rect" id="node25" href="$drive__sys_8xc.html#ad1b8faae4a3d2ae71865cdb9035054fd" title="Check position control initialization. " alt="" coords="144,644,291,673"/>
+<area shape="rect" id="node27" href="$profile__position_8xc.html#a1929aaa5ffbd5d1c26edf326a76f420b" title="Set profile position with Position Control loop. " alt="" coords="385,671,519,700"/>
+<area shape="rect" id="node34" href="$drive__sys_8xc.html#a3e54647a9d5322759358e1f4a2a2019b" title="Check qei initialization. " alt="" coords="159,591,276,620"/>
+<area shape="rect" id="node37" href="$drive__sys_8xc.html#acb813c9f2fd5b66f9e926e6d1bd2bc11" title="Check torque control initialization. " alt="" coords="148,748,287,777"/>
+<area shape="rect" id="node39" href="$profile__torque_8xc.html#a0fbd6807d2450581f409ca122c3856eb" title="Set profile torque with Torque Control loop. " alt="" coords="389,775,515,804"/>
+<area shape="rect" id="node46" href="$drive__sys_8xc.html#a66972f50fe0e7dc1db3bc32399e023db" title="Check velocity control initialization. " alt="" coords="144,852,291,881"/>
+<area shape="rect" id="node48" href="$profile__velocity_8xc.html#aa36d33aac3d83abb33a79d2703d7037f" title="Set profile velocity with Velocity Control loop. " alt="" coords="385,879,519,908"/>
+<area shape="rect" id="node56" href="$comm__loop__server_8xc.html#a02af88fa4ce599353be5998729f8b2c8" title="commutation_client\l_hanlder" alt="" coords="151,1161,284,1207"/>
+<area shape="rect" id="node58" href="$comm__loop__server_8xc.html#ac7681bcd7b00eadaf447209e719e2bbc" title="commutation_sinusoidal_loop" alt="" coords="356,1111,548,1140"/>
+<area shape="rect" id="node60" href="$comm__loop__server_8xc.html#a5b6c59659b6e38afe48b6326c2e8e1e1" title="Sinusoidal based Commutation Loop. " alt="" coords="597,1059,760,1088"/>
+<area shape="rect" id="node64" href="$comm_8xc.html#add37dec33cc69e6e841263a7c99858d2" title="Initialize commutation parameters from Ethercat communication loop (call before start&#45;up of Commutati..." alt="" coords="603,36,755,65"/>
+<area shape="rect" id="node70" href="$hall__server_8xc.html#a17ba988311304f1323b603141b036859" title="hall_client_handler" alt="" coords="153,1007,281,1036"/>
+<area shape="rect" id="node72" href="$hall__server_8xc.html#a3fa26a655dc9c1f78c4643d899d46d69" title="A basic hall encoder server. " alt="" coords="419,1007,485,1036"/>
+<area shape="rect" id="node75" href="$comm_8xc.html#a0951002d18335efc8dc60b7a0b312b58" title="Initialize hall sensor parameters from Ethercat communication loop (call before start&#45;up of Hall acqu..." alt="" coords="629,101,728,131"/>
+<area shape="rect" id="node79" href="$qei__server_8xc.html#a7a675968340fcf169002f75b1a2f7492" title="qei_client_hanlder" alt="" coords="155,177,280,207"/>
+<area shape="rect" id="node81" href="$qei__server_8xc.html#ad16add33e9d496017bb09ab6849475b0" title="Implementation of the QEI server thread (for sensor with index/no index) " alt="" coords="420,177,484,207"/>
+<area shape="rect" id="node84" href="$comm_8xc.html#a571ba0f76d89d72d5893d8be91e23267" title="Initialize QEI sensor parameters from Ethercat communication loop (call before start&#45;up of QEI acquis..." alt="" coords="632,229,725,259"/>
+<area shape="rect" id="node89" href="$torque__ctrl__client_8xc.html#ad6c5cde63572e9f2686bec8c4db63feb" title="send_torque_init_state" alt="" coords="141,1231,293,1260"/>
+<area shape="rect" id="node17" href="$drive__sys_8xc.html#ad93678d13004a59f75fbd7a2716ce082" title="Update Checklist. " alt="" coords="392,591,512,620"/>
+<area shape="rect" id="node7" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="808,256,859,285"/>
+<area shape="rect" id="node11" href="$torque__ctrl__server_8xc.html#a4de1f052ddac083b6ee28d92f9c18318" title="Torque Control Loop. " alt="" coords="627,387,731,416"/>
+<area shape="rect" id="node29" href="$test__position-ctrl_8xc.html#a8d47bfed20c02fd986a277e55de4f9a8" title="position_profile_test" alt="" coords="609,671,748,700"/>
+<area shape="rect" id="node31" href="$test__position-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="808,671,859,700"/>
+<area shape="rect" id="node41" href="$test__torque-ctrl_8xc.html#a6e283f69a56482f96dba054e78d9be1f" title="profile_torque_test" alt="" coords="615,775,743,804"/>
+<area shape="rect" id="node43" href="$test__torque-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="808,775,859,804"/>
+<area shape="rect" id="node50" href="$test__velocity-ctrl_8xc.html#a24cd8832141a29f657033a04184271ce" title="profile_velocity_test" alt="" coords="609,879,748,908"/>
+<area shape="rect" id="node52" href="$test__velocity-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="808,879,859,908"/>
+<area shape="rect" id="node62" href="$test__adc__ext__potentiometer_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="808,1032,859,1061"/>
+</map>

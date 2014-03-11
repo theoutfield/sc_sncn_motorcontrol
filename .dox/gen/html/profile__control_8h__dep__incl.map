@@ -1,0 +1,8 @@
+<map id="module_profile/include/profile_control.h" name="module_profile/include/profile_control.h">
+<area shape="rect" id="node3" href="$profile__position_8xc.html" title="Profile Position Control functions Implements position profile control function. " alt="" coords="5,102,160,149"/>
+<area shape="rect" id="node5" href="$profile__torque_8xc.html" title="Profile Torque Control functions Implements torque profile control function. " alt="" coords="184,102,331,149"/>
+<area shape="rect" id="node7" href="$profile__velocity_8xc.html" title="Profile Velocity Control functions Implements velocity profile control function. " alt="" coords="355,102,509,149"/>
+<area shape="rect" id="node9" href="$test__position-ctrl_8xc.html" title="Main project file Test illustrates usage of profile position control. " alt="" coords="533,102,696,149"/>
+<area shape="rect" id="node11" href="$test__torque-ctrl_8xc.html" title="Main project file Test illustrates usage of profile torque control. " alt="" coords="720,102,851,149"/>
+<area shape="rect" id="node13" href="$test__velocity-ctrl_8xc.html" title="Main project file Test illustrates usage of profile velocity control. " alt="" coords="875,102,1037,149"/>
+</map>

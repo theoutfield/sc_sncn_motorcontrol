@@ -1,0 +1,7 @@
+<map id="module_ctrl_loops/position/position_ctrl_client.h" name="module_ctrl_loops/position/position_ctrl_client.h">
+<area shape="rect" id="node3" href="$position__ctrl__client_8xc.html" title="module_ctrl_loops/position\l/position_ctrl_client.xc" alt="" coords="5,102,181,149"/>
+<area shape="rect" id="node5" href="$ecat__motor__drive_8h.html" title="module_ecat_drive/src\l/ecat_motor_drive.h" alt="" coords="205,102,357,149"/>
+<area shape="rect" id="node11" href="$profile__position_8xc.html" title="Profile Position Control functions Implements position profile control function. " alt="" coords="381,102,536,149"/>
+<area shape="rect" id="node7" href="$ecat__motor__drive_8xc.html" title="module_ecat_drive/src\l/ecat_motor_drive.xc" alt="" coords="115,206,267,253"/>
+<area shape="rect" id="node9" href="$test__ethercat-mode_8xc.html" title="Main project file Test illustrates usage of Motor Control with Ethercat. " alt="" coords="291,197,451,261"/>
+</map>

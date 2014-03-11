@@ -1,0 +1,23 @@
+<map id="module_qei/src/qei_config.h" name="module_qei/src/qei_config.h">
+<area shape="rect" id="node3" href="$qei__client_8h.html" title="module_qei/src/qei\l_client.h" alt="" coords="1177,102,1308,149"/>
+<area shape="rect" id="node40" href="$qei__server_8h.html" title="module_qei/src/qei\l_server.h" alt="" coords="456,206,587,253"/>
+<area shape="rect" id="node5" href="$comm_8h.html" title="module_comm/src/comm.h" alt="" coords="1607,215,1785,244"/>
+<area shape="rect" id="node9" href="$ecat__motor__drive_8h.html" title="module_ecat_drive/src\l/ecat_motor_drive.h" alt="" coords="1657,310,1809,357"/>
+<area shape="rect" id="node15" href="$comm__loop__server_8xc.html" title="module_commutation\l/commutation/comm_loop\l_server.xc" alt="" coords="868,197,1039,261"/>
+<area shape="rect" id="node17" href="$position__ctrl__client_8h.html" title="module_ctrl_loops/position\l/position_ctrl_client.h" alt="" coords="1860,206,2036,253"/>
+<area shape="rect" id="node24" href="$position__ctrl__server_8h.html" title="module_ctrl_loops/position\l/position_ctrl_server.h" alt="" coords="668,206,844,253"/>
+<area shape="rect" id="node31" href="$torque__ctrl__server_8xc.html" title="module_ctrl_loops/torque\l/torque_ctrl_server.xc" alt="" coords="1063,206,1228,253"/>
+<area shape="rect" id="node33" href="$velocity__ctrl__server_8xc.html" title="module_ctrl_loops/velocity\l/velocity_ctrl_server.xc" alt="" coords="1252,206,1428,253"/>
+<area shape="rect" id="node36" href="$qei__client_8xc.html" title="module_qei/src/qei\l_client.xc" alt="" coords="1452,206,1583,253"/>
+<area shape="rect" id="node38" href="$test__qei_8xc.html" title="Main project file Test illustrates usage of qei sensor for position and velocity information. " alt="" coords="552,319,709,348"/>
+<area shape="rect" id="node7" href="$comm_8xc.html" title="module_comm/src/comm.xc" alt="" coords="1447,319,1633,348"/>
+<area shape="rect" id="node11" href="$ecat__motor__drive_8xc.html" title="module_ecat_drive/src\l/ecat_motor_drive.xc" alt="" coords="1657,414,1809,461"/>
+<area shape="rect" id="node13" href="$test__ethercat-mode_8xc.html" title="Main project file Test illustrates usage of Motor Control with Ethercat. " alt="" coords="853,405,1013,469"/>
+<area shape="rect" id="node19" href="$position__ctrl__client_8xc.html" title="module_ctrl_loops/position\l/position_ctrl_client.xc" alt="" coords="2031,310,2207,357"/>
+<area shape="rect" id="node22" href="$profile__position_8xc.html" title="Profile Position Control functions Implements position profile control function. " alt="" coords="1852,310,2007,357"/>
+<area shape="rect" id="node26" href="$position__ctrl__server_8xc.html" title="module_ctrl_loops/position\l/position_ctrl_server.xc" alt="" coords="971,310,1147,357"/>
+<area shape="rect" id="node29" href="$test__position-ctrl_8xc.html" title="Main project file Test illustrates usage of profile position control. " alt="" coords="733,310,896,357"/>
+<area shape="rect" id="node43" href="$qei__server_8xc.html" title="module_qei/src/qei\l_server.xc" alt="" coords="192,310,323,357"/>
+<area shape="rect" id="node48" href="$test__torque-ctrl_8xc.html" title="Main project file Test illustrates usage of profile torque control. " alt="" coords="347,310,477,357"/>
+<area shape="rect" id="node50" href="$test__velocity-ctrl_8xc.html" title="Main project file Test illustrates usage of profile velocity control. " alt="" coords="5,310,168,357"/>
+</map>

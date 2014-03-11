@@ -1,0 +1,8 @@
+<map id="wait_ms" name="wait_ms">
+<area shape="rect" id="node3" href="$test__adc__ext__potentiometer_8xc.html#a61ac1e448ae50cec7d9e99db20a2f080" title="external_pot_test" alt="" coords="125,5,248,35"/>
+<area shape="rect" id="node7" href="$test__hall_8xc.html#aaf9346e42aa98985ac620882c9486675" title="hall_test" alt="" coords="152,59,221,88"/>
+<area shape="rect" id="node11" href="$test__qei_8xc.html#aeacee54a7ac75c8d4ddc1895fb7026a1" title="qei_test" alt="" coords="153,112,220,141"/>
+<area shape="rect" id="node5" href="$test__adc__ext__potentiometer_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="296,5,347,35"/>
+<area shape="rect" id="node9" href="$test__hall_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="296,59,347,88"/>
+<area shape="rect" id="node13" href="$test__qei_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="296,112,347,141"/>
+</map>

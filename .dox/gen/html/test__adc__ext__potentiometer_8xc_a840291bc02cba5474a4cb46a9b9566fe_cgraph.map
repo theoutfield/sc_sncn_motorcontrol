@@ -1,0 +1,27 @@
+<map id="main" name="main">
+<area shape="rect" id="node3" href="$adc__server__ad7949_8h.html#a619f90bb0e15fd811bf052f70d8c1240" title="Non triggered ADC server. " alt="" coords="141,335,232,364"/>
+<area shape="rect" id="node5" href="$adc__server__ad7949_8h.html#a31713ab30cf5be0260983eecf1c0c792" title="Triggered ADC server. " alt="" coords="112,388,261,417"/>
+<area shape="rect" id="node7" href="$comm__loop__server_8h.html#a5b6c59659b6e38afe48b6326c2e8e1e1" title="Sinusoidal based Commutation Loop. " alt="" coords="105,441,268,471"/>
+<area shape="rect" id="node35" href="$test__adc__ext__potentiometer_8xc.html#a61ac1e448ae50cec7d9e99db20a2f080" title="external_pot_test" alt="" coords="125,545,248,575"/>
+<area shape="rect" id="node41" href="$comm__loop__client_8h.html#a45c8f4fee19bb726e13c7dd23379c379" title="Initialize commutation parameters. " alt="" coords="105,599,268,628"/>
+<area shape="rect" id="node43" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a6cbe5a4a0e10c0d054bafa40a72f07ba" title="initialize hall sensor " alt="" coords="132,652,241,681"/>
+<area shape="rect" id="node45" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#ae34af4a4c02415d73182f410d833bc03" title="initialize QEI sensor " alt="" coords="133,705,240,735"/>
+<area shape="rect" id="node47" href="$hall__server_8h.html#a3fa26a655dc9c1f78c4643d899d46d69" title="A basic hall encoder server. " alt="" coords="381,493,448,523"/>
+<area shape="rect" id="node56" href="$watchdog_8h.html#ac25fa83765b3d00dc8bc6b0064d555c3" title="Run the watchdog timer server. " alt="" coords="136,759,237,788"/>
+<area shape="rect" id="node9" href="$a4935_8h.html#a590a5b8e6fd89530f0cb6eea576911c7" title="a4935_init" alt="" coords="375,336,455,365"/>
+<area shape="rect" id="node11" href="$comm__loop__server_8xc.html#ac78654bb83fd4f0a19c9eaadbd9c5517" title="commutation_init_to_zero" alt="" coords="329,389,500,419"/>
+<area shape="rect" id="node13" href="$comm__loop__server_8xc.html#ac7681bcd7b00eadaf447209e719e2bbc" title="commutation_sinusoidal_loop" alt="" coords="319,192,511,221"/>
+<area shape="rect" id="node19" href="$drive__config_8h.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="791,441,865,471"/>
+<area shape="rect" id="node15" href="$comm__loop__server_8xc.html#a178d4c43077cf59589dfba0bad80187b" title="absolute" alt="" coords="608,219,677,248"/>
+<area shape="rect" id="node17" href="$comm__loop__server_8xc.html#a02af88fa4ce599353be5998729f8b2c8" title="commutation_client\l_hanlder" alt="" coords="576,373,709,419"/>
+<area shape="rect" id="node21" href="$hall__client_8h.html#aae528b0db1cdd1dd46e844041d8a7768" title="Get position from Hall Server. " alt="" coords="584,112,701,141"/>
+<area shape="rect" id="node23" href="$hall__client_8h.html#a56ff8e550a6d620b703e64d37c2c7bdd" title="Get absolute position from Hall Server. " alt="" coords="584,165,701,195"/>
+<area shape="rect" id="node25" href="$qei__client_8h.html#a4080859b832dba0cbc7e1093c5f633ce" title="Initialize struct for velocity calculation from QEI sensor. " alt="" coords="560,59,725,88"/>
+<area shape="rect" id="node30" href="$arctan_8xc.html#a7a807e6e12e5c8594133de913dc916e6" title="sine_third_expanded" alt="" coords="572,5,713,35"/>
+<area shape="rect" id="node27" href="$filter__blocks_8h.html#a8df6ee0c7ec6d376aea562ce690c6f9f" title="Initialise Moving Average Filter Parameters. " alt="" coords="793,191,863,220"/>
+<area shape="rect" id="node32" href="$arctan_8xc.html#aea2ee7b8dd000b7cf9bda18dd3fbc557" title="sine_expanded" alt="" coords="773,5,883,35"/>
+<area shape="rect" id="node37" href="$delay_8xc.html#a912e4177918fbf1e661b8bb9da1b04bf" title="Delay function in milliseconds. " alt="" coords="380,600,449,629"/>
+<area shape="rect" id="node39" href="$test__adc__ext__potentiometer_8xc.html#aea2a77c0e3d2995e1d8391b9842878c6" title="xscope_initialise_1" alt="" coords="349,547,480,576"/>
+<area shape="rect" id="node49" href="$filter__blocks_8h.html#a826f0b956f59a8e9a67dd8ddffcbd352" title="_modified_internal\l_filter" alt="" coords="580,597,705,643"/>
+<area shape="rect" id="node51" href="$hall__server_8xc.html#a17ba988311304f1323b603141b036859" title="hall_client_handler" alt="" coords="579,544,707,573"/>
+</map>

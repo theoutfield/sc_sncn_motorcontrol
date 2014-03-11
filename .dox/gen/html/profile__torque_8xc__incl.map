@@ -1,0 +1,8 @@
+<map id="module_profile/profile_ctrl/profile_torque.xc" name="module_profile/profile_ctrl/profile_torque.xc">
+<area shape="rect" id="node3" href="$torque__ctrl__client_8h.html" title="torque_ctrl_client.h" alt="" coords="101,101,232,131"/>
+<area shape="rect" id="node7" href="$internal__config_8h.html" title="internal_config.h" alt="" coords="5,179,123,208"/>
+<area shape="rect" id="node9" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="619,101,683,131"/>
+<area shape="rect" id="node16" href="$drive__config_8h.html" title="drive_config.h" alt="" coords="493,101,595,131"/>
+<area shape="rect" id="node18" href="$profile_8h.html" title="Profile Generation for Position, Velocity and Torque Implements position profile based on Linear Func..." alt="" coords="707,101,773,131"/>
+<area shape="rect" id="node24" href="$profile__control_8h.html" title="Profile Control functions Implements position profile control, velocity profile control and torque pr..." alt="" coords="256,101,371,131"/>
+</map>

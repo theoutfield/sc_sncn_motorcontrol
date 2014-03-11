@@ -1,0 +1,10 @@
+<map id="update_checklist" name="update_checklist">
+<area shape="rect" id="node3" href="$drive__sys_8xc.html#a7c3261f279ca3a47bc2ef0296cf13385" title="Check adc initialization. " alt="" coords="201,5,324,35"/>
+<area shape="rect" id="node5" href="$drive__sys_8xc.html#ab7bc92e31090bc6e9d92f600302127bd" title="Check commutation initialization. " alt="" coords="175,59,351,88"/>
+<area shape="rect" id="node9" href="$drive__sys_8xc.html#a3f293b422d6258a819b59f8633d4bcb2" title="Check hall initialization. " alt="" coords="201,112,324,141"/>
+<area shape="rect" id="node12" href="$drive__sys_8xc.html#ad1b8faae4a3d2ae71865cdb9035054fd" title="Check position control initialization. " alt="" coords="189,165,336,195"/>
+<area shape="rect" id="node15" href="$drive__sys_8xc.html#a3e54647a9d5322759358e1f4a2a2019b" title="Check qei initialization. " alt="" coords="204,219,321,248"/>
+<area shape="rect" id="node18" href="$drive__sys_8xc.html#acb813c9f2fd5b66f9e926e6d1bd2bc11" title="Check torque control initialization. " alt="" coords="193,272,332,301"/>
+<area shape="rect" id="node21" href="$drive__sys_8xc.html#a66972f50fe0e7dc1db3bc32399e023db" title="Check velocity control initialization. " alt="" coords="189,325,336,355"/>
+<area shape="rect" id="node7" href="$drive__sys_8xc.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="400,192,475,221"/>
+</map>

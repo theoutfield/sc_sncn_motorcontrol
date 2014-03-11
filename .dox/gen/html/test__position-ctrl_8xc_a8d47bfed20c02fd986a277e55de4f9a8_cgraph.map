@@ -1,0 +1,16 @@
+<map id="position_profile_test" name="position_profile_test">
+<area shape="rect" id="node3" href="$profile_8h.html#afd06c6efe9952b998e61223d21cb7323" title="Initialise Position Profile Limits. " alt="" coords="193,122,327,169"/>
+<area shape="rect" id="node5" href="$profile__control_8h.html#a1929aaa5ffbd5d1c26edf326a76f420b" title="Set profile position with Position Control loop. " alt="" coords="193,192,327,221"/>
+<area shape="rect" id="node29" href="$test__position-ctrl_8xc.html#aea2a77c0e3d2995e1d8391b9842878c6" title="xscope_initialise_1" alt="" coords="195,245,325,275"/>
+<area shape="rect" id="node7" href="$drive__config_8h.html#ad1b8faae4a3d2ae71865cdb9035054fd" title="Check position control initialization. " alt="" coords="387,5,533,35"/>
+<area shape="rect" id="node11" href="$position__ctrl__client_8h.html#ac30bc4144cf831e9c9fef809643bbe1d" title="Get actual position from position control. " alt="" coords="415,59,505,88"/>
+<area shape="rect" id="node13" href="$position__ctrl__client_8h.html#a1e1af4f6cca4085fac087d9806294a67" title="Initialise Position Control Loop. " alt="" coords="392,112,528,141"/>
+<area shape="rect" id="node19" href="$profile_8h.html#a1407de9ee297a26175bb3c3b4471a4c7" title="Initialise Position Profile. " alt="" coords="393,165,527,195"/>
+<area shape="rect" id="node21" href="$drive__config_8h.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="423,219,497,248"/>
+<area shape="rect" id="node23" href="$position__ctrl__client_8h.html#a3b06061218d4d2151249f6d57a1d32d5" title="Position Limiter. " alt="" coords="411,272,509,301"/>
+<area shape="rect" id="node25" href="$profile_8h.html#aa39134d0d88615ced34c81f9c55aecfc" title="Generate Position Profile. " alt="" coords="377,325,543,355"/>
+<area shape="rect" id="node27" href="$position__ctrl__client_8h.html#a124318ee3e51b2841cd126d0a86ea100" title="Set new target position for position control. " alt="" coords="415,379,505,408"/>
+<area shape="rect" id="node9" href="$drive__sys_8xc.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="624,5,699,35"/>
+<area shape="rect" id="node15" href="$position__ctrl__client_8xc.html#a32e2cc931f43e75e84096e4dbe4fbe87" title="Checks Position Control Loop Status. " alt="" coords="595,81,728,127"/>
+<area shape="rect" id="node17" href="$position__ctrl__client_8xc.html#a0f8f8a9cd88e42f22c7dce16fa8a8c4e" title="Enables Position Control mode operation. " alt="" coords="593,151,729,180"/>
+</map>

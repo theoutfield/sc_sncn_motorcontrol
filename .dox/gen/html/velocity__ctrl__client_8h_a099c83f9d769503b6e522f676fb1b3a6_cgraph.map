@@ -1,0 +1,4 @@
+<map id="init_velocity_control" name="init_velocity_control">
+<area shape="rect" id="node3" href="$velocity__ctrl__client_8xc.html#aac9218b2d7a303df570c4927f202bbe2" title="Checks Velocity Control Loop Status. " alt="" coords="195,5,328,51"/>
+<area shape="rect" id="node5" href="$velocity__ctrl__client_8xc.html#a635b5cbe1a56f8a66006fadff9499ff5" title="Enables Velocity Control mode operation. " alt="" coords="193,75,329,104"/>
+</map>

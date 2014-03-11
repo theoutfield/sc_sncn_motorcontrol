@@ -1,0 +1,6 @@
+<map id="module_comm/src/comm.h" name="module_comm/src/comm.h">
+<area shape="rect" id="node3" href="$comm_8xc.html" title="module_comm/src/comm.xc" alt="" coords="5,92,192,121"/>
+<area shape="rect" id="node5" href="$ecat__motor__drive_8h.html" title="module_ecat_drive/src\l/ecat_motor_drive.h" alt="" coords="216,83,368,130"/>
+<area shape="rect" id="node7" href="$ecat__motor__drive_8xc.html" title="module_ecat_drive/src\l/ecat_motor_drive.xc" alt="" coords="125,187,277,234"/>
+<area shape="rect" id="node9" href="$test__ethercat-mode_8xc.html" title="Main project file Test illustrates usage of Motor Control with Ethercat. " alt="" coords="301,179,461,243"/>
+</map>

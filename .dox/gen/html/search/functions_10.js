@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['torque_5fcontrol',['torque_control',['../torque__ctrl__server_8h.html#a4de1f052ddac083b6ee28d92f9c18318',1,'torque_control(ctrl_par &amp;torque_ctrl_params, hall_par &amp;hall_params, qei_par &amp;qei_params, int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl):&#160;torque_ctrl_server.xc'],['../torque__ctrl__server_8xc.html#a4de1f052ddac083b6ee28d92f9c18318',1,'torque_control(ctrl_par &amp;torque_ctrl_params, hall_par &amp;hall_params, qei_par &amp;qei_params, int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl):&#160;torque_ctrl_server.xc']]],
+  ['torque_5flimit',['torque_limit',['../torque__ctrl__client_8h.html#a26767a58caa19a8ba34c62d7e0f6bb0b',1,'torque_limit(int torque, int max_torque_limit):&#160;torque_ctrl_client.xc'],['../torque__ctrl__client_8xc.html#a26767a58caa19a8ba34c62d7e0f6bb0b',1,'torque_limit(int torque, int max_torque_limit):&#160;torque_ctrl_client.xc']]]
+];

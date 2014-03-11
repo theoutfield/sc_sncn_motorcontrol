@@ -1,0 +1,15 @@
+<map id="profile_torque_test" name="profile_torque_test">
+<area shape="rect" id="node3" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a409d2a26f335498d5924847447904947" title="initialize cyclic synchronous torque params " alt="" coords="197,112,304,141"/>
+<area shape="rect" id="node5" href="$profile__control_8h.html#a0fbd6807d2450581f409ca122c3856eb" title="Set profile torque with Torque Control loop. " alt="" coords="188,165,313,195"/>
+<area shape="rect" id="node27" href="$test__torque-ctrl_8xc.html#aea2a77c0e3d2995e1d8391b9842878c6" title="xscope_initialise_1" alt="" coords="185,219,316,248"/>
+<area shape="rect" id="node7" href="$drive__config_8h.html#acb813c9f2fd5b66f9e926e6d1bd2bc11" title="Check torque control initialization. " alt="" coords="372,5,511,35"/>
+<area shape="rect" id="node11" href="$torque__ctrl__client_8h.html#ae79eda0dd38b6cd28ecd485a4f6e3074" title="Get actual torque from Torque Control Loop. " alt="" coords="400,59,483,88"/>
+<area shape="rect" id="node13" href="$profile_8h.html#a0ee62fddfd9ed4e36e2ac04da0689339" title="Initialise Linear Profile. " alt="" coords="383,112,500,141"/>
+<area shape="rect" id="node15" href="$drive__config_8h.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="404,165,479,195"/>
+<area shape="rect" id="node17" href="$torque__ctrl__client_8h.html#ac5d0fd53e9112eaa71baee24c6546e5c" title="Initialise Torque Control Loop. " alt="" coords="377,219,505,248"/>
+<area shape="rect" id="node23" href="$profile_8h.html#ad37f9ba93ffce88fecdd98eba97b7c6f" title="Generate Linear Profile. " alt="" coords="365,272,517,301"/>
+<area shape="rect" id="node25" href="$torque__ctrl__client_8h.html#a8369997cead41871cad63db5635ec980" title="Set new target torque for Torque Control Loop. " alt="" coords="400,325,483,355"/>
+<area shape="rect" id="node9" href="$drive__sys_8xc.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="609,5,684,35"/>
+<area shape="rect" id="node19" href="$torque__ctrl__client_8xc.html#aa66ae55ebb2b63e345e2b49d95d0587c" title="Checks Torque Control Loop Status. " alt="" coords="567,192,727,221"/>
+<area shape="rect" id="node21" href="$torque__ctrl__client_8xc.html#ae6a372ea3d1fe2d01d69bb4b9aad1d57" title="Enables Torque Control mode operation. " alt="" coords="583,245,711,275"/>
+</map>

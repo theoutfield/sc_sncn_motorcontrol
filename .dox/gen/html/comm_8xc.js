@@ -1,0 +1,26 @@
+var comm_8xc =
+[
+    [ "commutation_init_ecat", "comm_8xc.html#add37dec33cc69e6e841263a7c99858d2", null ],
+    [ "get_target_position", "comm_8xc.html#af34f2fdb09575b7f919a260a64aad139", null ],
+    [ "get_target_torque", "comm_8xc.html#ad6c7d2f5757b338dd3a05177e0ffc951", null ],
+    [ "get_target_velocity", "comm_8xc.html#a10baf88a37a28b14033cf4f8eb36cd6f", null ],
+    [ "hall_init_ecat", "comm_8xc.html#a0951002d18335efc8dc60b7a0b312b58", null ],
+    [ "qei_init_ecat", "comm_8xc.html#a571ba0f76d89d72d5893d8be91e23267", null ],
+    [ "send_actual_position", "comm_8xc.html#ad67108100b12e69ad1987eb86105f7f0", null ],
+    [ "send_actual_torque", "comm_8xc.html#aa77a84c5442490a858a982292f914294", null ],
+    [ "send_actual_velocity", "comm_8xc.html#ab14c510a068779470848576649d329ce", null ],
+    [ "set_commutation_param_ecat", "comm_8xc.html#a2e661bfebb3e6dd80f254fdd6e18da15", null ],
+    [ "set_hall_param_ecat", "comm_8xc.html#a4b1c671da62bf6e603b603af1b77dddf", null ],
+    [ "set_qei_param_ecat", "comm_8xc.html#a3b0eb0d9674fb7e662af01599ab4ea2b", null ],
+    [ "update_csp_param_ecat", "comm_8xc.html#a95e77325a598d4761bc90c772f6688f8", null ],
+    [ "update_cst_param_ecat", "comm_8xc.html#abdf5960dc96df2c64a2f1d5cc635da25", null ],
+    [ "update_csv_param_ecat", "comm_8xc.html#a0b01eeded3d3a8d5af38581ba301838d", null ],
+    [ "update_hall_param_ecat", "comm_8xc.html#a8da9915ae29d1abcedcb7e4b38db66e0", null ],
+    [ "update_position_ctrl_param_ecat", "comm_8xc.html#a1e7ca2875a5052205f98887ea19d054e", null ],
+    [ "update_pp_param_ecat", "comm_8xc.html#a7c66bfdf6a31b30aafeae05cdc5d3022", null ],
+    [ "update_pt_param_ecat", "comm_8xc.html#a3abc377c7cdab2b58187d90616632e32", null ],
+    [ "update_pv_param_ecat", "comm_8xc.html#a11a776e400d05b9922fed6c26a2244f0", null ],
+    [ "update_qei_param_ecat", "comm_8xc.html#a3c82dca09853ab74e48fd7b27928d62c", null ],
+    [ "update_torque_ctrl_param_ecat", "comm_8xc.html#a334c7475557724ac82d4c3c5bf255b0e", null ],
+    [ "update_velocity_ctrl_param_ecat", "comm_8xc.html#a69f1c4ddbbe3d49ae6ed62e37b322822", null ]
+];

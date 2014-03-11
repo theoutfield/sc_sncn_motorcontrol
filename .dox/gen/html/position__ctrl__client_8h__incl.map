@@ -1,0 +1,9 @@
+<map id="module_ctrl_loops/position/position_ctrl_client.h" name="module_ctrl_loops/position/position_ctrl_client.h">
+<area shape="rect" id="node5" href="$internal__config_8h.html" title="internal_config.h" alt="" coords="344,101,461,131"/>
+<area shape="rect" id="node7" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="536,101,600,131"/>
+<area shape="rect" id="node11" href="$qei__client_8h.html" title="qei_client.h" alt="" coords="232,101,320,131"/>
+<area shape="rect" id="node23" href="$hall__client_8h.html" title="hall_client.h" alt="" coords="624,101,715,131"/>
+<area shape="rect" id="node14" href="$filter__blocks_8h.html" title="Moving Average Filter Implementation. " alt="" coords="5,179,107,208"/>
+<area shape="rect" id="node21" href="$qei__config_8h.html" title="qei_config.h" alt="" coords="299,179,389,208"/>
+<area shape="rect" id="node28" href="$hall__config_8h.html" title="hall_config.h" alt="" coords="741,179,835,208"/>
+</map>
