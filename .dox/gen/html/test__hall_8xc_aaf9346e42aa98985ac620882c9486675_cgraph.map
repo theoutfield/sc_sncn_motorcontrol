@@ -1,7 +1,0 @@
-<map id="hall_test" name="hall_test">
-<area shape="rect" id="node3" href="$hall__client_8h.html#aae528b0db1cdd1dd46e844041d8a7768" title="Get position from Hall Server. " alt="" coords="133,5,251,35"/>
-<area shape="rect" id="node5" href="$hall__client_8h.html#a56ff8e550a6d620b703e64d37c2c7bdd" title="Get absolute position from Hall Server. " alt="" coords="133,59,251,88"/>
-<area shape="rect" id="node7" href="$test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a6cbe5a4a0e10c0d054bafa40a72f07ba" title="initialize hall sensor " alt="" coords="137,112,247,141"/>
-<area shape="rect" id="node9" href="$delay_8xc.html#a912e4177918fbf1e661b8bb9da1b04bf" title="Delay function in milliseconds. " alt="" coords="157,165,227,195"/>
-<area shape="rect" id="node11" href="$test__hall_8xc.html#aea2a77c0e3d2995e1d8391b9842878c6" title="xscope_initialise_1" alt="" coords="127,219,257,248"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="__qei_max_counts" name="__qei_max_counts">
-<area shape="rect" id="node3" href="$test__velocity-ctrl_2config_2motor_2bldc__motor__config_8h.html#ae34af4a4c02415d73182f410d833bc03" title="initialize QEI sensor " alt="" coords="211,5,317,35"/>
-<area shape="rect" id="node5" href="$comm_8xc.html#a3c82dca09853ab74e48fd7b27928d62c" title="Update QEI sensor parameters from Ethercat. " alt="" coords="184,59,344,88"/>
-<area shape="rect" id="node7" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="392,59,515,88"/>
-<area shape="rect" id="node9" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="563,59,613,88"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="do_adc_calibration_ad7949" name="do_adc_calibration_ad7949">
-<area shape="rect" id="node3" href="$torque__ctrl__server_8xc.html#ad6601b6bf1938b1995f3ff336679aa3a" title="current_filter" alt="" coords="185,13,279,43"/>
-<area shape="rect" id="node5" href="$torque__ctrl__server_8xc.html#a4de1f052ddac083b6ee28d92f9c18318" title="Torque Control Loop. " alt="" coords="328,13,432,43"/>
-<area shape="rect" id="node7" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="480,13,531,43"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="get_qei_velocity" name="get_qei_velocity">
-<area shape="rect" id="node3" href="$torque__ctrl__server_8xc.html#a5df2645afcebbf2af09f2b1dc5fe77da" title="_torque_ctrl" alt="" coords="171,5,261,35"/>
-<area shape="rect" id="node9" href="$test__qei_8xc.html#aeacee54a7ac75c8d4ddc1895fb7026a1" title="qei_test" alt="" coords="183,59,249,88"/>
-<area shape="rect" id="node5" href="$torque__ctrl__server_8xc.html#a4de1f052ddac083b6ee28d92f9c18318" title="Torque Control Loop. " alt="" coords="309,5,413,35"/>
-<area shape="rect" id="node7" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="461,5,512,35"/>
-<area shape="rect" id="node11" href="$test__qei_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="336,59,387,88"/>
-</map>

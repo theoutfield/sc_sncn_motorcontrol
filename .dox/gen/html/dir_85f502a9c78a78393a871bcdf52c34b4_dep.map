@@ -1,6 +1,0 @@
-<map id="test_adc_ext_potentiometer/config/motor" name="test_adc_ext_potentiometer/config/motor">
-<area shape="rect" id="node2" href="dir_85f502a9c78a78393a871bcdf52c34b4.html" title="motor" alt="" coords="29,55,101,103"/>
-<area shape="rect" id="node3" href="dir_2bb765bb6e74aedd49a23c2a83828cda.html" title="module_common" alt="" coords="5,151,125,199"/>
-<area shape="rect" id="edge3" href="dir_000037_000010.html" title="2" alt="" coords="70,123,78,141"/>
-<area shape="rect" id="graph2" href="dir_4606eb2b8c555a7d29f4b580eee4ebc8.html" title="config" alt="" coords="19,16,112,113"/>
-</map>

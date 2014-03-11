@@ -1,8 +1,0 @@
-<map id="module_commutation/commutation/comm_loop_server.h" name="module_commutation/commutation/comm_loop_server.h">
-<area shape="rect" id="node3" href="$comm__loop__server_8xc.html" title="module_commutation\l/commutation/comm_loop\l_server.xc" alt="" coords="5,117,176,181"/>
-<area shape="rect" id="node5" href="$test__adc__ext__potentiometer_8xc.html" title="Main project file Test illustrates usage of adc to get external potentiometer sensor values..." alt="" coords="200,126,427,173"/>
-<area shape="rect" id="node7" href="$test__ethercat-mode_8xc.html" title="Main project file Test illustrates usage of Motor Control with Ethercat. " alt="" coords="451,117,611,181"/>
-<area shape="rect" id="node9" href="$test__position-ctrl_8xc.html" title="Main project file Test illustrates usage of profile position control. " alt="" coords="635,126,797,173"/>
-<area shape="rect" id="node11" href="$test__torque-ctrl_8xc.html" title="Main project file Test illustrates usage of profile torque control. " alt="" coords="821,126,952,173"/>
-<area shape="rect" id="node13" href="$test__velocity-ctrl_8xc.html" title="Main project file Test illustrates usage of profile velocity control. " alt="" coords="976,126,1139,173"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="init_torque_control" name="init_torque_control">
-<area shape="rect" id="node3" href="$torque__ctrl__client_8xc.html#aa66ae55ebb2b63e345e2b49d95d0587c" title="Checks Torque Control Loop Status. " alt="" coords="183,5,343,35"/>
-<area shape="rect" id="node5" href="$torque__ctrl__client_8xc.html#ae6a372ea3d1fe2d01d69bb4b9aad1d57" title="Enables Torque Control mode operation. " alt="" coords="199,59,327,88"/>
-</map>

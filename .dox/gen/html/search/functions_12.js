@@ -1,5 +1,0 @@
-var searchData=
-[
-  ['velocity_5fcontrol',['velocity_control',['../velocity__ctrl__server_8h.html#a6618105986bd54c111a65ce7d42e63e9',1,'velocity_control(ctrl_par &amp;velocity_ctrl_params, filter_par &amp;sensor_filter_params, hall_par &amp;hall_params, qei_par &amp;qei_params, int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation):&#160;velocity_ctrl_server.xc'],['../velocity__ctrl__server_8xc.html#a6618105986bd54c111a65ce7d42e63e9',1,'velocity_control(ctrl_par &amp;velocity_ctrl_params, filter_par &amp;sensor_filter_params, hall_par &amp;hall_params, qei_par &amp;qei_params, int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation):&#160;velocity_ctrl_server.xc']]],
-  ['velocity_5fprofile_5fgenerate',['velocity_profile_generate',['../profile_8h.html#a6c6d3379db189637a620470b64b1a7df',1,'velocity_profile_generate(int step):&#160;profile_velocity.c'],['../profile__velocity_8c.html#a6c6d3379db189637a620470b64b1a7df',1,'velocity_profile_generate(int step):&#160;profile_velocity.c']]]
-];

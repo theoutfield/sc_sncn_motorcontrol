@@ -1,9 +1,0 @@
-<map id="test_hall/src/test_hall.xc" name="test_hall/src/test_hall.xc">
-<area shape="rect" id="node15" href="$hall__client_8h.html" title="hall_client.h" alt="" coords="186,101,276,131"/>
-<area shape="rect" id="node23" href="$hall__server_8h.html" title="hall_server.h" alt="" coords="511,101,607,131"/>
-<area shape="rect" id="node29" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="442,179,506,208"/>
-<area shape="rect" id="node44" href="$drive__config_8h.html" title="drive_config.h" alt="" coords="967,101,1068,131"/>
-<area shape="rect" id="node20" href="$hall__config_8h.html" title="hall_config.h" alt="" coords="324,179,418,208"/>
-<area shape="rect" id="node27" href="$filter__blocks_8h.html" title="Moving Average Filter Implementation. " alt="" coords="663,179,764,208"/>
-<area shape="rect" id="node36" href="$internal__config_8h.html" title="internal_config.h" alt="" coords="876,179,994,208"/>
-</map>

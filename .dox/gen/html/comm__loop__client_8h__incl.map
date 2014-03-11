@@ -1,9 +1,0 @@
-<map id="module_commutation/commutation/comm_loop_client.h" name="module_commutation/commutation/comm_loop_client.h">
-<area shape="rect" id="node3" href="$pwm__config_8h.html" title="pwm_config.h" alt="" coords="5,117,107,147"/>
-<area shape="rect" id="node7" href="$a4935_8h.html" title="predriver/a4935.h" alt="" coords="259,117,381,147"/>
-<area shape="rect" id="node15" href="$sine__table__big_8h.html" title="Sine Loopup table declarations. " alt="" coords="405,117,520,147"/>
-<area shape="rect" id="node17" href="$adc__client__ad7949_8h.html" title="ADC Client. " alt="" coords="544,117,685,147"/>
-<area shape="rect" id="node19" href="$hall__client_8h.html" title="hall_client.h" alt="" coords="709,117,800,147"/>
-<area shape="rect" id="node9" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="288,195,352,224"/>
-<area shape="rect" id="node25" href="$hall__config_8h.html" title="hall_config.h" alt="" coords="693,195,787,224"/>
-</map>

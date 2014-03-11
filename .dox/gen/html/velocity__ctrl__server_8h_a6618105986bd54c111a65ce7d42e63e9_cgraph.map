@@ -1,8 +1,0 @@
-<map id="velocity_control" name="velocity_control">
-<area shape="rect" id="node3" href="$drive__config_8h.html#ab7bc92e31090bc6e9d92f600302127bd" title="Check commutation initialization. " alt="" coords="173,5,349,35"/>
-<area shape="rect" id="node7" href="$filter__blocks_8h.html#a62028f14fe649dcbba25270509bad90e" title="Get moving average filtered output by passing the sampled data to be filtered as input. " alt="" coords="239,59,284,88"/>
-<area shape="rect" id="node9" href="$filter__blocks_8h.html#a8df6ee0c7ec6d376aea562ce690c6f9f" title="Initialise Moving Average Filter Parameters. " alt="" coords="227,112,296,141"/>
-<area shape="rect" id="node11" href="$drive__config_8h.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="224,165,299,195"/>
-<area shape="rect" id="node13" href="$comm__loop__client_8h.html#ae25b15f1f209cadb215441d6ff08d6b0" title="Set Input voltage for commutation loop. " alt="" coords="168,219,355,248"/>
-<area shape="rect" id="node5" href="$drive__sys_8xc.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="403,5,477,35"/>
-</map>

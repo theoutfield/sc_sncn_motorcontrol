@@ -1,6 +1,0 @@
-<map id="run_hall" name="run_hall">
-<area shape="rect" id="node3" href="$filter__blocks_8h.html#a826f0b956f59a8e9a67dd8ddffcbd352" title="_modified_internal\l_filter" alt="" coords="123,5,248,51"/>
-<area shape="rect" id="node5" href="$hall__server_8xc.html#a17ba988311304f1323b603141b036859" title="hall_client_handler" alt="" coords="121,75,249,104"/>
-<area shape="rect" id="node7" href="$drive__config_8h.html#aaaf8b7e21796cc3cf9d34ad5a7e6e504" title="init_state" alt="" coords="299,101,373,131"/>
-<area shape="rect" id="node9" href="$filter__blocks_8h.html#a8df6ee0c7ec6d376aea562ce690c6f9f" title="Initialise Moving Average Filter Parameters. " alt="" coords="151,179,220,208"/>
-</map>

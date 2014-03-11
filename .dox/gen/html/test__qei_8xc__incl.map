@@ -1,8 +1,0 @@
-<map id="test_qei/src/test_qei.xc" name="test_qei/src/test_qei.xc">
-<area shape="rect" id="node15" href="$qei__client_8h.html" title="qei_client.h" alt="" coords="243,83,331,112"/>
-<area shape="rect" id="node26" href="$qei__server_8h.html" title="qei_server.h" alt="" coords="455,83,548,112"/>
-<area shape="rect" id="node33" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="836,160,900,189"/>
-<area shape="rect" id="node19" href="$filter__blocks_8h.html" title="Moving Average Filter Implementation. " alt="" coords="356,160,458,189"/>
-<area shape="rect" id="node24" href="$qei__config_8h.html" title="qei_config.h" alt="" coords="242,160,332,189"/>
-<area shape="rect" id="node31" href="$internal__config_8h.html" title="internal_config.h" alt="" coords="695,160,812,189"/>
-</map>

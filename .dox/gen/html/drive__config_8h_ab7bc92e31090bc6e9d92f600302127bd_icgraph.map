@@ -1,9 +1,0 @@
-<map id="__check_commutation_init" name="__check_commutation_init">
-<area shape="rect" id="node3" href="$torque__ctrl__server_8xc.html#a5df2645afcebbf2af09f2b1dc5fe77da" title="_torque_ctrl" alt="" coords="247,7,337,36"/>
-<area shape="rect" id="node9" href="$position__ctrl__server_8xc.html#ae69df7485764909bbc1b3584c092cd21" title="Position Control Loop. " alt="" coords="405,59,517,88"/>
-<area shape="rect" id="node12" href="$drive__sys_8xc.html#ad93678d13004a59f75fbd7a2716ce082" title="Update Checklist. " alt="" coords="232,111,352,140"/>
-<area shape="rect" id="node17" href="$velocity__ctrl__server_8xc.html#a6618105986bd54c111a65ce7d42e63e9" title="Velocity Control Loop. " alt="" coords="236,164,348,193"/>
-<area shape="rect" id="node5" href="$torque__ctrl__server_8xc.html#a4de1f052ddac083b6ee28d92f9c18318" title="Torque Control Loop. " alt="" coords="409,5,513,35"/>
-<area shape="rect" id="node7" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="571,85,621,115"/>
-<area shape="rect" id="node14" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="400,112,523,141"/>
-</map>

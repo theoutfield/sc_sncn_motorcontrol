@@ -1,8 +1,0 @@
-<map id="set_torque" name="set_torque">
-<area shape="rect" id="node3" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="313,5,436,35"/>
-<area shape="rect" id="node7" href="$profile__torque_8xc.html#a0fbd6807d2450581f409ca122c3856eb" title="Set profile torque with Torque Control loop. " alt="" coords="136,84,261,113"/>
-<area shape="rect" id="node13" href="$torque__ctrl__client_8xc.html#acc5a2980e58b385327386df6cf1f1536" title="Set new target torque for torque control (advanced function) " alt="" coords="145,31,252,60"/>
-<area shape="rect" id="node5" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="488,5,539,35"/>
-<area shape="rect" id="node9" href="$test__torque-ctrl_8xc.html#a6e283f69a56482f96dba054e78d9be1f" title="profile_torque_test" alt="" coords="311,84,439,113"/>
-<area shape="rect" id="node11" href="$test__torque-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="488,84,539,113"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="set_velocity_ctrl_hall_param" name="set_velocity_ctrl_hall_param">
-<area shape="rect" id="node3" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="197,13,320,43"/>
-<area shape="rect" id="node5" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="368,13,419,43"/>
-</map>

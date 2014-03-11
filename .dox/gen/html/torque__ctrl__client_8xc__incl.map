@@ -1,6 +1,0 @@
-<map id="module_ctrl_loops/torque/torque_ctrl_client.xc" name="module_ctrl_loops/torque/torque_ctrl_client.xc">
-<area shape="rect" id="node3" href="$torque__ctrl__client_8h.html" title="torque_ctrl_client.h" alt="" coords="109,101,240,131"/>
-<area shape="rect" id="node7" href="$internal__config_8h.html" title="internal_config.h" alt="" coords="175,179,292,208"/>
-<area shape="rect" id="node9" href="$refclk_8h.html" title="Reference Core Clock definitions. " alt="" coords="315,101,379,131"/>
-<area shape="rect" id="node15" href="$drive__config_8h.html" title="drive_config.h" alt="" coords="485,101,587,131"/>
-</map>

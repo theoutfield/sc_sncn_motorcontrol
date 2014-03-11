@@ -1,7 +1,0 @@
-<map id="module_adc/src/adc_common.h" name="module_adc/src/adc_common.h">
-<area shape="rect" id="node3" href="$adc__client__ad7949_8xc.html" title="ADC Client. " alt="" coords="104,102,243,149"/>
-<area shape="rect" id="node5" href="$adc__server__ad7949_8h.html" title="ADC Server. " alt="" coords="267,102,405,149"/>
-<area shape="rect" id="node7" href="$test__adc__ext__potentiometer_8xc.html" title="Main project file Test illustrates usage of adc to get external potentiometer sensor values..." alt="" coords="5,206,232,253"/>
-<area shape="rect" id="node9" href="$test__ethercat-mode_8xc.html" title="Main project file Test illustrates usage of Motor Control with Ethercat. " alt="" coords="256,197,416,261"/>
-<area shape="rect" id="node11" href="$test__torque-ctrl_8xc.html" title="Main project file Test illustrates usage of profile torque control. " alt="" coords="440,206,571,253"/>
-</map>

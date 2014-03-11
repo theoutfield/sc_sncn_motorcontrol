@@ -1,4 +1,0 @@
-<map id="set_velocity_csv" name="set_velocity_csv">
-<area shape="rect" id="node3" href="$velocity__ctrl__client_8xc.html#a722c16dfaf1b9b03f3d7e79ef2bf08b5" title="Velocity Limiter. " alt="" coords="173,5,293,35"/>
-<area shape="rect" id="node5" href="$velocity__ctrl__client_8xc.html#adcbc06a5bd1c0e96a44b51cd9af205f0" title="Set new target velocity for Velocity Control Loop. " alt="" coords="188,59,279,88"/>
-</map>

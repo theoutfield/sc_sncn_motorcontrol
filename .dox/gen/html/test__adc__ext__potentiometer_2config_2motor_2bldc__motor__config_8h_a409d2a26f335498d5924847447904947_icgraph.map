@@ -1,6 +1,0 @@
-<map id="init_cst_param" name="init_cst_param">
-<area shape="rect" id="node3" href="$ecat__motor__drive_8xc.html#a5943baef8ef2f470006fc7d741be03b8" title="This server implementation enables motor drive functions via Ethercat communication. " alt="" coords="164,5,287,35"/>
-<area shape="rect" id="node7" href="$test__torque-ctrl_8xc.html#a6e283f69a56482f96dba054e78d9be1f" title="profile_torque_test" alt="" coords="161,59,289,88"/>
-<area shape="rect" id="node5" href="$test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="339,5,389,35"/>
-<area shape="rect" id="node9" href="$test__torque-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe" title="main" alt="" coords="339,59,389,88"/>
-</map>

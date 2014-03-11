@@ -1,5 +1,0 @@
-var searchData=
-[
-  ['main',['main',['../test__adc__ext__potentiometer_8xc.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_adc_ext_potentiometer.xc'],['../test__ethercat-mode_8xc.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_ethercat-mode.xc'],['../test__hall_8xc.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_hall.xc'],['../test__position-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_position-ctrl.xc'],['../test__qei_8xc.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_qei.xc'],['../test__torque-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_torque-ctrl.xc'],['../test__velocity-ctrl_8xc.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_velocity-ctrl.xc']]],
-  ['max_5fspeed_5flimit',['max_speed_limit',['../velocity__ctrl__client_8h.html#a722c16dfaf1b9b03f3d7e79ef2bf08b5',1,'max_speed_limit(int velocity, int max_speed):&#160;velocity_ctrl_client.xc'],['../velocity__ctrl__client_8xc.html#a722c16dfaf1b9b03f3d7e79ef2bf08b5',1,'max_speed_limit(int velocity, int max_speed):&#160;velocity_ctrl_client.xc']]]
-];

@@ -1,7 +1,0 @@
-var searchData=
-[
-  ['gear_5fratio',['GEAR_RATIO',['../test__adc__ext__potentiometer_2config_2motor_2bldc__motor__config_8h.html#a1b5f0a2cda8866a2a87331026ac8bd9a',1,'GEAR_RATIO():&#160;bldc_motor_config.h'],['../test__ethercat-motorctrl-mode_2config_2motor_2bldc__motor__config_8h.html#a1b5f0a2cda8866a2a87331026ac8bd9a',1,'GEAR_RATIO():&#160;bldc_motor_config.h'],['../test__hall_2config_2motor_2bldc__motor__config_8h.html#a1b5f0a2cda8866a2a87331026ac8bd9a',1,'GEAR_RATIO():&#160;bldc_motor_config.h'],['../test__position-ctrl_2config_2motor_2bldc__motor__config_8h.html#a1b5f0a2cda8866a2a87331026ac8bd9a',1,'GEAR_RATIO():&#160;bldc_motor_config.h'],['../test__qei_2config_2motor_2bldc__motor__config_8h.html#a1b5f0a2cda8866a2a87331026ac8bd9a',1,'GEAR_RATIO():&#160;bldc_motor_config.h'],['../test__torque-ctrl_2config_2motor_2bldc__motor__config_8h.html#a1b5f0a2cda8866a2a87331026ac8bd9a',1,'GEAR_RATIO():&#160;bldc_motor_config.h'],['../test__velocity-ctrl_2config_2motor_2bldc__motor__config_8h.html#a1b5f0a2cda8866a2a87331026ac8bd9a',1,'GEAR_RATIO():&#160;bldc_motor_config.h']]],
-  ['get_5fposition_5ftoken',['GET_POSITION_TOKEN',['../internal__config_8h.html#a06481c73c16c565699b82bff239fc945',1,'internal_config.h']]],
-  ['get_5ftorque_5ftoken',['GET_TORQUE_TOKEN',['../internal__config_8h.html#a61003d77110fd036d1c076840e5a6ad1',1,'internal_config.h']]],
-  ['get_5fvelocity_5ftoken',['GET_VELOCITY_TOKEN',['../internal__config_8h.html#ab7c5c44b956b82fe49a2825e7e62144c',1,'internal_config.h']]]
-];
