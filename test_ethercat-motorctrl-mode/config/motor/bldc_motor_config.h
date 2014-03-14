@@ -66,7 +66,7 @@
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	// QEI_WITH_NO_INDEX
 
-#define SENSOR_PLACEMENT			OUT_OF_PHASE		// OUT_OF_PHASE
+#define QEI_SENSOR_POLARITY			OUT_OF_PHASE		// OUT_OF_PHASE
 
 /*Somanet IFM Internal Config*/
 #define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A

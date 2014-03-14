@@ -104,7 +104,7 @@ int main(void)
 		/* Firmware Update Loop */
 		on stdcore[0] :
 		{
-			firmware_update(foe_out, foe_in, c_sig_1); // firmware update over Ethercat
+			firmware_update_loop(foe_out, foe_in, c_sig_1); // firmware update over Ethercat
 		}
 
 		/* Ethercat Motor Drive Loop */
