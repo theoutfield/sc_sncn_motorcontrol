@@ -59,6 +59,7 @@
 
 #define HALL 						1
 #define QEI 						2
+#define QEI_1						3
 
 
 #define QEI_WITH_INDEX				1
@@ -87,7 +88,7 @@
 #define INIT_VELOCITY_CTRL  		29
 #define SET_VELOCITY_FILTER 		30
 #define FILTER_SIZE 				8                           //default
-#define FILTER_SIZE_MAX 			16							//max size
+#define FILTER_SIZE_MAX 			128							//max size
 #define SET_VELOCITY_TOKEN 			50
 #define GET_VELOCITY_TOKEN 			60
 #define VELOCITY_CTRL_STATUS		71
@@ -161,7 +162,7 @@ typedef struct S_QEI {
 	int max_ticks;	// paramater allows for more turns
 	int index;   	// no_index - 0 index - 1
 	int poles;
-	int sensor_placement;
+	int sensor_polarity;
 } qei_par;
 
 /**
@@ -169,9 +170,8 @@ typedef struct S_QEI {
  */
 typedef struct S_Hall {
 	int pole_pairs;
-	int gear_ratio;
+	int max_ticks_per_turn;
 	int max_ticks;
-	int filter_length;
 } hall_par;
 
 /**

@@ -63,12 +63,12 @@ int get_hall_velocity(chanend c_hall, hall_par &hall_params)
 	int velocity;
 	c_hall <: HALL_VELOCITY_REQ;
 	c_hall :> velocity;
-	velocity = ((velocity/FILTER_LENGTH_HALL) * 1000 * 60)/(hall_params.pole_pairs * 4096 *1);
+	velocity = ((velocity/FILTER_LENGTH_HALL) * 1000 * 60)/(hall_params.max_ticks_per_turn);
 	return velocity;
 }
 
 void reset_hall_count(chanend c_hall, int offset)
 {
-	c_hall <: HALL_RESET_COUNT;
+	c_hall <: RESET_HALL_COUNT;
 	c_hall <: offset;
 }

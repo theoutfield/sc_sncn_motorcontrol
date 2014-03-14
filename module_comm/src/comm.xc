@@ -72,13 +72,102 @@ void send_actual_position(int actual_position, ctrl_proto_values_t &InOut)
 
 void update_hall_param_ecat(hall_par &hall_params, chanend coe_out)
 {
-	{hall_params.pole_pairs, hall_params.gear_ratio} = hall_sdo_update(coe_out);
+	int min;
+	int max;
+	{hall_params.pole_pairs, max, min} = hall_sdo_update(coe_out);
+	if(max >= 0 && min >= 0)
+	{
+		if(max > min)
+			hall_params.max_ticks = max;
+		else
+			hall_params.max_ticks = min;
+	}
+	else if(max <= 0 && min <= 0)
+	{
+		if(max < min)
+			hall_params.max_ticks = 0 - max;
+		else
+			hall_params.max_ticks = 0 - min;
+	}
+	else if(max > 0 && min < 0)
+	{
+		if(max > 0 - min)
+			hall_params.max_ticks = max;
+		else
+			hall_params.max_ticks = 0 - min;
+	}
+	else if(max < 0 && min > 0)
+	{
+		if(min > 0 - max)
+			hall_params.max_ticks = min;
+		else
+			hall_params.max_ticks = 0 - max;
+	}
+	hall_params.max_ticks_per_turn = hall_params.pole_pairs * 4096;
+	hall_params.max_ticks += hall_params.max_ticks_per_turn;
 }
 
 void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
 {
-	{qei_params.real_counts, qei_params.gear_ratio, qei_params.index} = qei_sdo_update(coe_out);
-	qei_params.max_count = __qei_max_counts(qei_params.real_counts);
+	int min;
+	int max;
+	int sensor_polarity;
+	{qei_params.real_counts, max, min, qei_params.index, sensor_polarity} = qei_sdo_update(coe_out);
+
+	if(max >= 0 && min >= 0)
+	{
+		if(max > min)
+			qei_params.max_ticks = max;
+		else
+			qei_params.max_ticks = min;
+	}
+	else if(max <= 0 && min <= 0)
+	{
+		if(max < min)
+			qei_params.max_ticks = 0 - max;
+		else
+			qei_params.max_ticks = 0 - min;
+	}
+	else if(max > 0 && min < 0)
+	{
+		if(max > 0 - min)
+			qei_params.max_ticks = max;
+		else
+			qei_params.max_ticks = 0 - min;
+	}
+	else if(max < 0 && min > 0)
+	{
+		if(min > 0 - max)
+			qei_params.max_ticks = min;
+		else
+			qei_params.max_ticks = 0 - max;
+	}
+
+	qei_params.max_ticks_per_turn = __qei_max_counts(qei_params.real_counts);
+	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
+
+	//printstr(" value ");
+	printintln(qei_params.max_ticks_per_turn );
+	printintln(qei_params.max_ticks);
+	sensor_polarity = sensor_polarity&0x01;
+
+	switch(sensor_polarity)
+	{
+		case 0:
+			//printstr(" nor ");
+			sensor_polarity = IN_PHASE;
+			break;
+
+		case 1:
+			//printstr(" inv ");
+			sensor_polarity = OUT_OF_PHASE;
+			break;
+
+		default:
+			break;
+	}
+	//printintln(sensor_polarity);
+	qei_params.sensor_polarity = sensor_polarity;
 }
 
 void update_commutation_param_ecat(commutation_par &commutation_params, chanend coe_out)
@@ -207,11 +296,9 @@ void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par
 		commutation_par &commutation_params, int nominal_speed)
 {
 	c_signal <: SET_COMM_PARAM_ECAT;
-	c_signal <: hall_params.gear_ratio;
 	c_signal <: hall_params.pole_pairs;
-	c_signal <: qei_params.gear_ratio;
 	c_signal <: qei_params.index;
-	c_signal <: qei_params.max_count;
+	c_signal <: qei_params.max_ticks_per_turn;
 	c_signal <: qei_params.real_counts;
 	c_signal <: nominal_speed;
 	c_signal <: commutation_params.hall_offset_clk;
@@ -238,11 +325,9 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
 				}
 				else if(command == SET_COMM_PARAM_ECAT)
 				{
-					c_signal :> hall_params.gear_ratio;
 					c_signal :> hall_params.pole_pairs;
-					c_signal :> qei_params.gear_ratio;
 					c_signal :> qei_params.index;
-					c_signal :> qei_params.max_count;
+					c_signal :> qei_params.max_ticks_per_turn;
 					c_signal :> qei_params.real_counts;
 					c_signal :> nominal_speed;
 					c_signal :> commutation_params.hall_offset_clk;
@@ -285,8 +370,11 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
 void set_hall_param_ecat(chanend c_hall, hall_par &hall_params)
 {
 	c_hall <: SET_HALL_PARAM_ECAT;
-	c_hall <: hall_params.gear_ratio;
 	c_hall <: hall_params.pole_pairs;
+	c_hall <: hall_params.max_ticks;
+	c_hall <: hall_params.max_ticks_per_turn;
+	//hall_params.
+
 }
 
 void hall_init_ecat(chanend c_hall, hall_par &hall_params)
@@ -306,12 +394,13 @@ void hall_init_ecat(chanend c_hall, hall_par &hall_params)
 				}
 				else if(command == SET_HALL_PARAM_ECAT)
 				{
-					c_hall :> hall_params.gear_ratio;
 					c_hall :> hall_params.pole_pairs;
+					c_hall :> hall_params.max_ticks;
+					c_hall :> hall_params.max_ticks_per_turn;
 					flag = 1;
 
-//					printintln(hall_params.gear_ratio);
-//					printintln(hall_params.pole_pairs);
+					//printintln(hall_params.max_ticks);
+					//printintln(hall_params.pole_pairs);
 
 				}
 				break;
@@ -328,13 +417,12 @@ void hall_init_ecat(chanend c_hall, hall_par &hall_params)
 void set_qei_param_ecat(chanend c_qei, qei_par &qei_params)
 {
 	c_qei <: SET_QEI_PARAM_ECAT;
-
-	c_qei <: qei_params.gear_ratio;
 	c_qei <: qei_params.index;
-	c_qei <: qei_params.max_count;
+	c_qei <: qei_params.max_ticks_per_turn;
 	c_qei <: qei_params.real_counts;
 	c_qei <: qei_params.poles;
-	//c_qei <: qei_params.sensor_placement;
+	c_qei <: qei_params.max_ticks;
+	c_qei <: qei_params.sensor_polarity;
 }
 
 void qei_init_ecat(chanend c_qei, qei_par &qei_params)
@@ -354,17 +442,17 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
 				}
 				else if(command == SET_QEI_PARAM_ECAT)
 				{
-					c_qei :> qei_params.gear_ratio;
 					c_qei :> qei_params.index;
-					c_qei :> qei_params.max_count;
+					c_qei :> qei_params.max_ticks_per_turn;
 					c_qei :> qei_params.real_counts;
 					c_qei :> qei_params.poles;
-					//c_qei :> qei_params.sensor_placement;
+					c_qei :> qei_params.max_ticks;
+					c_qei :> qei_params.sensor_polarity;
 					flag = 1;
 
 //					printintln(qei_params.gear_ratio);
 //					printintln(qei_params.index);
-//					printintln(qei_params.max_count);
+//					printintln(qei_params.max_ticks_per_turn);
 //					printintln(qei_params.real_counts);
 				}
 				break;

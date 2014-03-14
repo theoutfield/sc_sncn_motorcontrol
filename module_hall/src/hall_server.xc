@@ -44,48 +44,35 @@
 //#define DEBUG
 
 void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state,\
-		int &count, int direction, hall_par &hall_params, int &status, int filter_length)
+		int &count, int direction, hall_par &hall_params, int &status)
 {
 	switch(command)
 	{
 		case HALL_POS_REQ:
-
 			c_hall <: angle;
-			//status = 0;
-
 			break;
 
 		case HALL_VELOCITY_REQ:
-
 			c_hall <: raw_velocity;
-			//c_hall <: filter_length;
-			//status = 0;
 			break;
 
 		case HALL_ABSOLUTE_POS_REQ:
-
 			c_hall <: count;
 			c_hall <: direction;
-			//status = 0;
 			break;
 
 		case CHECK_BUSY:
-
 			c_hall <: init_state;
-			//status = 0;
 			break;
 
 		case SET_HALL_PARAM_ECAT:
-
-			c_hall :> hall_params.gear_ratio;
 			c_hall :> hall_params.pole_pairs;
-		status = 1;
-			//		printintln(hall_params.gear_ratio);
-			//		printintln(hall_params.pole_pairs);
-
+			c_hall :> hall_params.max_ticks;
+			c_hall :> hall_params.max_ticks_per_turn;
+			status = 1;
 			break;
 
-		case HALL_RESET_COUNT:
+		case RESET_HALL_COUNT:
 			c_hall :> count;
 			break;
 
@@ -125,8 +112,8 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int previous_position = 0;
 	int count = 0;
 	int first = 1;
-	int hall_max_count = hall_params.max_ticks; //hall_params.pole_pairs * hall_params.gear_ratio * 4095;
-	int time_elapsed = 0; 			//between two transitions to calculate speed
+	int hall_max_count = hall_params.max_ticks;
+	int time_elapsed = 0;
 	int init_state = INIT;
 
 	timer t1;
@@ -137,13 +124,12 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	int velocity = 0;
 	int difference1 = 0;
 	int old_difference = 0;
-	int filter_length = FILTER_LENGTH_HALL;	///hall_params.pole_pairs;
+	int filter_length = FILTER_LENGTH_HALL;
 	int filter_buffer[FILTER_LENGTH_HALL];
 	int index = 0;
 	int raw_velocity = 0;
 	int hall_crossover = (4096 * 9 )/10;
 	int status = 0; //1 changed
-	hall_params.filter_length = filter_length;
 
 	init_filter(filter_buffer, index, filter_length);
 #ifdef DEBUG
@@ -315,32 +301,32 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 		select {
 			case c_hall_p1 :> command:
 				hall_client_handler(c_hall_p1, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status, filter_length);
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p2 :> command:
 				hall_client_handler(c_hall_p2, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status, filter_length);
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p3 :> command:
 				hall_client_handler(c_hall_p3, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status, filter_length);
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p4 :> command:
 				hall_client_handler(c_hall_p4, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status, filter_length);
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p5 :> command:
 				hall_client_handler(c_hall_p5, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status, filter_length);
+						direction, hall_params, status);
 				break;
 
 			case c_hall_p6 :> command:
 				hall_client_handler(c_hall_p6, command, angle, raw_velocity, init_state, count, \
-						direction, hall_params, status, filter_length);
+						direction, hall_params, status);
 				break;
 
 			case tx when timerafter(time1 + MSEC_FAST) :> time1:
@@ -381,7 +367,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 		}
 		if(status == 1)
 		{
-			hall_max_count = hall_params.max_ticks; 	//pole_pairs * hall_params.gear_ratio * 4095;
+			hall_max_count = hall_params.max_ticks;
 			status = 0;
 		}
 

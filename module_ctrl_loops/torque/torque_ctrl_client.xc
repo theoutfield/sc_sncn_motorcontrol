@@ -135,17 +135,15 @@ void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
 void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_HALL);
-	TORQUE_CTRL_WRITE(hall_params.gear_ratio);
 	TORQUE_CTRL_WRITE(hall_params.pole_pairs);
 }
 
 void set_torque_ctrl_qei_param(qei_par &qei_params, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_QEI);
-	TORQUE_CTRL_WRITE(qei_params.gear_ratio);
 	TORQUE_CTRL_WRITE(qei_params.index);
 	TORQUE_CTRL_WRITE(qei_params.real_counts);
-	TORQUE_CTRL_WRITE(qei_params.max_count);
+	TORQUE_CTRL_WRITE(qei_params.max_ticks_per_turn);
 	TORQUE_CTRL_WRITE(qei_params.poles);
 }
 void set_torque_sensor(int sensor_used, chanend c_torque_ctrl)

@@ -117,12 +117,12 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
 			break;
 
 		case SET_QEI_PARAM_ECAT:
-//p			c_qei :> qei_params.gear_ratio;
 			c_qei :> qei_params.index;
 			c_qei :> qei_params.max_ticks_per_turn;
 			c_qei :> qei_params.real_counts;
 			c_qei :> qei_params.poles;
-			//c_qei :> qei_params.sensor_placement;
+			c_qei :> qei_params.max_ticks;
+			c_qei :> qei_params.sensor_polarity;
 			status = 1;
 	//					printintln(qei_params.gear_ratio);
 	//					printintln(qei_params.index);
@@ -231,12 +231,12 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 					}
 					else if( difference < 10 && difference >0)
 					{
-						if(qei_params.sensor_placement == IN_PHASE)
+						if(qei_params.sensor_polarity == IN_PHASE)
 						{
 							count = count + difference;
 							sync_out = sync_out + difference;
 						}
-						else if(qei_params.sensor_placement == OUT_OF_PHASE)
+						else if(qei_params.sensor_polarity == OUT_OF_PHASE)
 						{
 							count = count - difference; //out of phase -
 							sync_out = sync_out - difference;
@@ -245,12 +245,12 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 					}
 					else if( difference < 0 && difference > -10)
 					{
-						if(qei_params.sensor_placement == IN_PHASE)
+						if(qei_params.sensor_polarity == IN_PHASE)
 						{
 							count = count + difference;
 							sync_out = sync_out + difference;
 						}
-						else if(qei_params.sensor_placement == OUT_OF_PHASE)
+						else if(qei_params.sensor_polarity == OUT_OF_PHASE)
 						{
 							count = count - difference; //out of phase -
 							sync_out = sync_out - difference;

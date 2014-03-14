@@ -44,7 +44,7 @@
 #define HALL_POS_REQ  							1
 #define HALL_VELOCITY_REQ 						2
 #define HALL_ABSOLUTE_POS_REQ 					3
-#define FILTER_LENGTH_HALL 						8
-#define HALL_RESET_COUNT						9
+#define FILTER_LENGTH_HALL 						16
+#define RESET_HALL_COUNT						9
 
 #endif /* __HALL_CONFIG_H__ */

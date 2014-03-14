@@ -40,6 +40,21 @@
 
 #include <refclk.h>
 
+void wait_micro_s(int microseconds, int core_id, timer t)
+{
+	unsigned int time;
+	t :> time;
+	if(core_id == 3)
+	{
+		t when timerafter(time + (microseconds * MSEC_FAST)/1000) :> time;
+	}
+	else
+	{
+		t when timerafter(time + (microseconds * MSEC_STD)/1000) :> time;
+	}
+	return;
+}
+
 void wait_ms(int milliseconds, int core_id, timer t)
 {
 	unsigned int time;

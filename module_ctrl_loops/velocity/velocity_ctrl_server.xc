@@ -80,17 +80,18 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 	int direction = 0;
 	int old_difference;
 	int rpm_constant = 1000*60; // constant
-	int speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD); 		// variable pole_pairs    core 2/1/0 only
+	int speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD); 		// variable pole_pairs    core 2/1/0 only
 	int speed_factor_qei  = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);		  	// variable qei_real_max  core 2/1/0 only
 
 	int command;
 	int deactivate = 0;
 	int activate = 0;
 	int init_state = INIT_BUSY;
-	int qei_crossover = qei_params.max_count - qei_params.max_count/10;
-	int hall_crossover = (hall_params.pole_pairs * hall_params.gear_ratio * 4095 * 9 )/10;
+	int qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
+	int hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
 	int compute_flag = 0;
 	int fet_state = 0;
+	int valid;
 	init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 
 	ts :> time;
@@ -135,7 +136,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 							difference = old_difference;
 						raw_speed = (difference*rpm_constant)/speed_factor_hall;
 		#ifdef Debug_velocity_ctrl
-						xscope_probe_data(0, raw_speed);
+					//	xscope_probe_data(0, raw_speed);
 		#endif
 						previous_position = position;
 						old_difference = difference;
@@ -152,7 +153,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					raw_speed = (difference*rpm_constant)/speed_factor_qei;
 
 		#ifdef Debug_velocity_ctrl
-					xscope_probe_data(0, raw_speed);
+					//xscope_probe_data(0, raw_speed);
 		#endif
 
 					previous_position = position;
@@ -160,11 +161,13 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 				}
 
 				actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
+
 			}
 				if(activate == 1)
 				{
 					#ifdef Debug_velocity_ctrl
-							xscope_probe_data(1, actual_velocity);
+						xscope_probe_data(0,actual_velocity );
+						xscope_probe_data(1, target_velocity);
 					#endif
 					compute_flag = 1;
 					/* Controller */
@@ -207,19 +210,21 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 						break;
 
 					case SET_VELOCITY_CTRL_HALL:
-						VELOCITY_CTRL_READ(hall_params.gear_ratio);
 						VELOCITY_CTRL_READ(hall_params.pole_pairs);
-						speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
+						VELOCITY_CTRL_READ(hall_params.max_ticks);
+						VELOCITY_CTRL_READ(hall_params.max_ticks_per_turn);
+					//	speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
+					//	hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
 						break;
 
 					case SET_VELOCITY_CTRL_QEI:
-						VELOCITY_CTRL_READ(qei_params.gear_ratio);
+						VELOCITY_CTRL_READ(qei_params.max_ticks);
 						VELOCITY_CTRL_READ(qei_params.index);
 						VELOCITY_CTRL_READ(qei_params.real_counts);
-						VELOCITY_CTRL_READ(qei_params.max_count);
+						VELOCITY_CTRL_READ(qei_params.max_ticks_per_turn);
 						VELOCITY_CTRL_READ(qei_params.poles);
-						speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
-						qei_crossover = qei_params.max_count - qei_params.max_count/10;
+					//	speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
+					//	qei_crossover = qei_params.max_ticks_per_turn - qei_params.max_ticks_per_turn/10;
 						break;
 
 					case SET_VELOCITY_FILTER:
@@ -242,13 +247,14 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 						VELOCITY_CTRL_READ(sensor_used);
 						if(sensor_used == HALL)
 						{
-							speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
+							speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD);
+							hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
 							target_velocity =  actual_velocity;
 						}
 						else if(sensor_used == QEI)
 						{
 							speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
-							qei_crossover = qei_params.max_count - qei_params.max_count/10;
+							qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
 							target_velocity = actual_velocity;
 						}
 						break;

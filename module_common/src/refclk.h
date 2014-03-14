@@ -64,6 +64,16 @@
 #endif
 
 /**
+ * \brief Delay function in microseconds
+ *
+ *  Input
+ * \param microseconds specify the delay in microseconds
+ * \param core_id specify the core number in which the function is called
+ * \param t timer used to calculate the microseconds elapsed
+ */
+void wait_micro_s(int microseconds, int core_id, timer t);
+
+/**
  * \brief Delay function in milliseconds
  *
  *  Input
