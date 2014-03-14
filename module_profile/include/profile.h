@@ -111,8 +111,8 @@ extern int velocity_profile_generate(int step);
  * \param max_velocity for the position profile
  *
  */
-extern void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params);
-//int init_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity);
+extern void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params, \
+		hall_par hall_params, int sensor_select, int max_position, int min_position);
 
 /**
  * \brief Initialise Position Profile
@@ -154,7 +154,7 @@ extern int position_profile_generate(int step);
  * Output
  * \return no. of steps for quick stop profile : range [1 - steps]
  */
-extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int max_acceleration);
+extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int max_deceleration) ;
 
 /**
  * \brief Generate Quick Stop Position Profile
@@ -217,6 +217,7 @@ typedef struct
 	int direction;
 	int acc_too_low;			// flag for low acceleration constraint
 	float acc_min;				// constraint minimum acceleration
+	float limit_factor;			// max acceleration constraint
 
 	/*LFPB motion profile constants*/
 
@@ -247,11 +248,18 @@ typedef struct
 
 	float q;					// position profile
 
-	float gear_ratio;
+	qei_par qei_params;
+	hall_par hall_params;
+	int sensor_used;
+	float max_position;
+	float min_position;
 
 } 	profile_position_param;
 
-void __initialize_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity, profile_position_param *profile_pos_params);
+//void __initialize_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity, profile_position_param *profile_pos_params);
+
+void __initialize_position_profile_limits(int max_acceleration, int max_velocity,  \
+		int sensor_select, int max_position, int min_position, profile_position_param *profile_pos_params);
 
 int __initialize_position_profile(int target_position, int actual_position, int velocity, int acceleration, \
 		                  int deceleration, profile_position_param *profile_pos_params);

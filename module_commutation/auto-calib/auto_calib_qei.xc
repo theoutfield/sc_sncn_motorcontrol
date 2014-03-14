@@ -9,7 +9,7 @@ void calculate_offset(qei_par &qei_params, hall_par &hall_params, chanend c_qei,
 
 	int qei_valid; // qei validity (0 or 1)
 
-	int qei_max_position = qei_params.max_count;
+	int qei_max_position = qei_params.max_ticks_per_turn;//qei_params.max_count;
 	int qei_crossover = qei_max_position - qei_max_position /10;
 	unsigned int time_qei;
 

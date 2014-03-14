@@ -50,7 +50,7 @@
 #include <profile_control.h>
 
 void set_profile_position(int target_position, int velocity, int acceleration, int deceleration, \
-		int max_position, int min_position, chanend c_position_ctrl)
+		int sensor_select, chanend c_position_ctrl)
 {
 	int i;
 	timer t;
@@ -64,6 +64,7 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 
 	while(init_state == INIT_BUSY)
 	{
+		set_position_sensor(sensor_select, c_position_ctrl);
 		init_state = init_position_control(c_position_ctrl);
 		/*if(init_state == INIT)
 			printstrln("position control intialized");
@@ -73,9 +74,8 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 
 	if(init_state == INIT)
 	{
-		target_position = position_limit(target_position, max_position, min_position);
-		actual_position = get_position(c_position_ctrl); //degree * 10000
-		steps = init_position_profile(target_position*10000, actual_position, velocity, acceleration, deceleration);
+		actual_position = get_position(c_position_ctrl);
+		steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
 		t :> time;
 		for(i = 1; i < steps; i++)
 		{

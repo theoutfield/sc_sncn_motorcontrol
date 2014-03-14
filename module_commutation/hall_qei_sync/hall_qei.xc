@@ -83,7 +83,7 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 
 	int qei_valid; // qei validity (0 or 1)
 
-	int qei_max_position = qei_params.max_count;
+	int qei_max_position = qei_params.max_ticks_per_turn;
 	int qei_crossover = qei_max_position - qei_max_position /10;
 	timer t_qei, t_hall;
 	unsigned int time_qei;

@@ -271,11 +271,9 @@ void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_p
 				}
 				else if(command == SET_COMM_PARAM_ECAT)
 				{
-					c_signal :> hall_params.gear_ratio;
 					c_signal :> hall_params.pole_pairs;
-					c_signal :> qei_params.gear_ratio;
 					c_signal :> qei_params.index;
-					c_signal :> qei_params.max_count;
+					c_signal :> qei_params.max_ticks_per_turn;
 					c_signal :> qei_params.real_counts;
 					c_signal :> nominal_speed;
 					c_signal :> commutation_params.hall_offset_clk;
