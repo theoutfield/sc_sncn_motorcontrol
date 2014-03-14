@@ -46,8 +46,9 @@ extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int
 void xscope_initialise()
 {
 	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
+		xscope_register(3, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
+							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n",
+							XSCOPE_CONTINUOUS, "2 target_velocity", XSCOPE_INT, "n");
 
 		xscope_config_io(XSCOPE_IO_BASIC);
 	}
@@ -270,7 +271,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				actual_velocity = get_hall_velocity(c_hall, hall_params);
 				actual_position = get_position(c_position_ctrl);
 
-				if(!(actual_velocity<100 && actual_velocity>-100))
+				if(!(actual_velocity<500 && actual_velocity>500))
 				{
 					if(actual_velocity < 0)
 					{
@@ -1289,7 +1290,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				{actual_position, direction} = get_qei_position_absolute(c_qei);
 			}
 			send_actual_position(actual_position * polarity, InOut);
-
+			xscope_probe_data(0, actual_position);
+			xscope_probe_data(1, InOut.target_position);
 			t when timerafter(time + MSEC_STD) :> time;
 		}
 //#pragma xta endpoint "ecatloop_stop"

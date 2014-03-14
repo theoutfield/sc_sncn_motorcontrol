@@ -158,7 +158,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						xscope_probe_data(0, actual_position);
 						xscope_probe_data(1, target_position);
 					#endif
-
+						xscope_probe_data(2, target_position);
 					previous_error = error_position;
 				}
 
@@ -252,7 +252,6 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 							printstrln("position control disabled");
 						#endif
 						break;
-
 
 					case POSITION_CTRL_STATUS: //check active state
 						POSITION_CTRL_WRITE(activate);
