@@ -54,7 +54,8 @@
 #include <hall_server.h>
 //#include <flash_somanet.h>
 
-#define ENABLE_xscope_main
+#include <test.h>
+//#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -85,7 +86,7 @@ void qei_test(chanend c_qei, chanend c_hall)
 	qei_par qei_params;
 	qei_velocity_par qei_velocity_params;  // to compute velocity from qei
 	hall_par hall_params;
-int hall_p, hall_di, hall_velocity;
+int hall_p, hall_di, hall_velocity, time;
 	init_hall_param(hall_params);
 	init_qei_param(qei_params);
 	init_qei_velocity_params(qei_velocity_params);	// to compute velocity from qei
@@ -94,22 +95,22 @@ int hall_p, hall_di, hall_velocity;
 	xscope_initialise_1();
 #endif
 	//set_qei_turns(c_qei, 1);
-
+	t :> time;
 	while(1)
 	{
 		{position, valid} = get_qei_position_absolute(c_qei);
-		{hall_p, hall_di} =  get_hall_position_absolute(c_hall);
+		//{hall_p, hall_di} =  get_hall_position_absolute(c_hall);
 
-		hall_velocity =  get_hall_velocity(c_hall, hall_params);
+		//hall_velocity =  get_hall_velocity(c_hall, hall_params);
 
 		velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
 		wait_ms(1, core_id, t);
-
+		//t when timerafter(time+13000) :> time;
 	#ifdef ENABLE_xscope_main
 		xscope_probe_data(0, position);
-		xscope_probe_data(1, hall_p);
-		xscope_probe_data(2, hall_velocity);
-		xscope_probe_data(3, velocity);
+		//xscope_probe_data(1, hall_p);
+		//xscope_probe_data(2, hall_velocity);
+		xscope_probe_data(1, velocity);
 	//	printintln(position);
 		//printintln(hall_p);
 	#else
@@ -140,6 +141,8 @@ int main(void)
 			par
 			{
 				qei_test(c_qei_p1, c_hall_p1);
+				//qei_unit_test();
+
 			}
 		}
 
@@ -152,6 +155,8 @@ int main(void)
 		{
 			par
 			{
+
+
 				/* QEI Server */
 				{
 					qei_par qei_params;

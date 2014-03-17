@@ -86,14 +86,14 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hal
 {
 	int init_state;
 	int actual_position = 0;			// ticks test purpose only
-	int target_position = -1500;		// ticks
-	int velocity 		= 2500;			// rpm
+	int target_position = 32000;		// ticks
+	int velocity 		= 500;			// rpm
 	int acceleration 	= 500;			// rpm/s
 	int deceleration 	= 500;     		// rpm/s
 	int turns = 1;
 	int follow_error;
 	timer t; unsigned int time;
-	ctrl_par position_ctrl_params;
+	//ctrl_par position_ctrl_params;
 	hall_par hall_params;
 	qei_par qei_params;
 	int position_ramp = 0; int steps; int i;
@@ -101,6 +101,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hal
 
 	while(init_state == INIT_BUSY)
 	{
+		set_position_sensor(SENSOR_USED, c_position_ctrl);
 		init_state = init_position_control(c_position_ctrl);
 		//if(init_state == INIT)
 		///	//printstrln("position control intialized");
@@ -109,14 +110,27 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hal
 	}
 
 	init_qei_param(qei_params);
-	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params);
+	init_hall_param(hall_params);
+
+
+	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_params, \
+			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
 
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif
+	/*steps = init_quick_stop_position_profile((4000*qei_params.real_counts)/60, 4000, (MAX_ACCELERATION *10* qei_params.real_counts)/60);
+	printstr("steps ");
+	printintln(steps);
+	for(i = 0; i < steps; i++)
+	{
+		position_ramp = quick_stop_position_profile_generate(i, -4000);
+		xscope_probe_data(0, position_ramp);
+	}*/
+	//set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, c_position_ctrl);
 	actual_position = get_position(c_position_ctrl);
 	steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
-	//printintln(steps);
+	printintln(steps);
 	t :> time;
 	for(i = 0; i < steps; i++)
 	{
@@ -141,7 +155,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hal
 		xscope_probe_data(1, actual_position);
 		xscope_probe_data(2, follow_error);
 		t when timerafter(time + MSEC_STD) :> time;
-	}
+	}//*/
 				/*xscope_probe_data(0, actual_position);
 	//reset_qei_count(c_qei, -5260);  // reset_hall_count(c_hall, 40960);
 
@@ -182,6 +196,7 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hal
 	//set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
 }
 
+
 int main(void)
 {
 	// Motor control channels
@@ -217,14 +232,14 @@ int main(void)
 		/* Firmware Update Loop */
 		on stdcore[0] :
 		{
-			//firmware_update(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
+			//firmware_update_loop(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
 		}
 
 		/* Test Profile Position function*/
 		on stdcore[1]:
 		{
-			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		  	// test PPM on slave side
-			//position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 			// Unit test controller
+			//position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		  	// test PPM on slave side
+			position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 			// Unit test controller
 		}
 
 

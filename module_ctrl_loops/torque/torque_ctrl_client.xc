@@ -136,6 +136,8 @@ void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_HALL);
 	TORQUE_CTRL_WRITE(hall_params.pole_pairs);
+	TORQUE_CTRL_WRITE(hall_params.max_ticks);
+	TORQUE_CTRL_WRITE(hall_params.max_ticks_per_turn);
 }
 
 void set_torque_ctrl_qei_param(qei_par &qei_params, chanend c_torque_ctrl)
@@ -145,6 +147,7 @@ void set_torque_ctrl_qei_param(qei_par &qei_params, chanend c_torque_ctrl)
 	TORQUE_CTRL_WRITE(qei_params.real_counts);
 	TORQUE_CTRL_WRITE(qei_params.max_ticks_per_turn);
 	TORQUE_CTRL_WRITE(qei_params.poles);
+	TORQUE_CTRL_WRITE(qei_params.max_ticks);
 }
 void set_torque_sensor(int sensor_used, chanend c_torque_ctrl)
 {

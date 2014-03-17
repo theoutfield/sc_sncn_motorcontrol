@@ -61,7 +61,7 @@
 #include <test.h>
 #include <qei_client.h>
 #include <ecat_motor_drive.h>
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -83,16 +83,26 @@ void xscope_initialise_1()
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity = 1200;	 		// rpm
-	int acceleration 	= 100;			// rpm/s
+	int target_velocity = 500;	 		// rpm
+	int acceleration 	= 1000;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
-
+timer t; int time; int actual_velocity;
 #ifdef ENABLE_xscope_main
-	xscope_initialise_1();
+	//xscope_initialise_1();
 #endif
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+	t:>time;
+while(1)
+{
+	actual_velocity = get_velocity(c_velocity_ctrl);
 
+	t when timerafter(time + MSEC_STD) :> time;
+
+	//xscope_probe_data(0, actual_velocity);
+	//xscope_probe_data(1, target_velocity);
+
+}
 	//target_velocity = 0;				// rpm
 	//set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
@@ -146,22 +156,22 @@ int main(void)
 		{
 			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
 		//	velocity_ctrl_unit_test(c_velocity_ctrl, c_qei_p3, c_hall_p3);
-//			{
-//				int init_state;
-//				while(1)
-//				{
-//					init_state = __check_commutation_init(c_commutation_p1);
-//					if(init_state == INIT)
-//					{
-//#ifdef debug_print
-//						printstrln("commutation intialized");
-//#endif
-//						set_commutation_sinusoidal(c_commutation_p1, 0);
-//						init_state = INIT_BUSY;
-//						break;
-//					}
-//				}
-//			}
+			/*{
+				int init_state;
+				while(1)
+				{
+					init_state = __check_commutation_init(c_commutation_p1);
+					if(init_state == INIT)
+					{
+#ifdef debug_print
+						printstrln("commutation intialized");
+#endif
+						set_commutation_sinusoidal(c_commutation_p1, 400);
+						init_state = INIT_BUSY;
+						break;
+					}
+				}
+			}*/
 			{
 			//detect_sensor_placement( c_hall_p3, c_qei_p3, c_commutation_p3);
 			//printstrln("done");

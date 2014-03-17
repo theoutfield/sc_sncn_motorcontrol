@@ -10,7 +10,7 @@
 #include <profile_control.h>
 #include <bldc_motor_config.h>
 
-/*void position_ctrl_unit_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
+void position_ctrl_unit_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
 {
 	int target_position = 350;			// deg
 	int velocity 		= 350;			// rpm
@@ -21,8 +21,12 @@
 	hall_par hall_params;
 	qei_par qei_params;
 	in_data d;
+	init_qei_param(qei_params);
+	init_hall_param(hall_params);
 
-	init_position_profile_limits(GEAR_RATIO, MAX_ACCELERATION, MAX_PROFILE_VELOCITY);
+
+	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_params, SENSOR_USED,\
+			MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
 
 	while(1)
 	{
@@ -38,7 +42,7 @@
 					input_pos(d);
 
 					printintln(d.set_position);
-					set_profile_position(d.set_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
+					set_profile_position(d.set_position, velocity, acceleration, deceleration, SENSOR_USED, c_position_ctrl);
 					if(d.exit_mode == 1)
 					{
 						printstrln(" set position exit ");
@@ -149,10 +153,10 @@ void set_torque_test(chanend c_torque_ctrl, chanend c_velocity_ctrl) {
 		}
 	}
 
-	while (1) {
+	/*while (1) {
 		input_torq(d);
 		printintln(d.set_torque);
 		//set_profile_torque( d.set_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	}
-}*/
+	}*/
+}

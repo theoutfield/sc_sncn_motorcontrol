@@ -43,8 +43,43 @@ extern int __qei_max_counts(int real_counts);
 
 void init_hall_param(hall_par &hall_params)
 {
+	int max = MAX_POSITION_LIMIT;
+	int min = MIN_POSITION_LIMIT;
 	hall_params.pole_pairs = POLE_PAIRS;
-	hall_params.gear_ratio = GEAR_RATIO;
+
+	if(max >= 0 && min >= 0)
+	{
+		if(max > min)
+			hall_params.max_ticks = max;
+		else
+			hall_params.max_ticks = min;
+	}
+	else if(max <= 0 && min <= 0)
+	{
+		if(max < min)
+			hall_params.max_ticks = -max;
+		else
+			hall_params.max_ticks = -min;
+	}
+	else if(max > 0 && min < 0)
+	{
+		if(max > 0 - min)
+			hall_params.max_ticks = max;
+		else
+			hall_params.max_ticks = 0 - min;
+	}
+	else if(max < 0 && min > 0)
+	{
+		if(min > 0 - max)
+			hall_params.max_ticks = min;
+		else
+			hall_params.max_ticks = 0 - max;
+	}
+	hall_params.max_ticks_per_turn = POLE_PAIRS * 4096;
+	printintln(hall_params.max_ticks);
+	hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
+	//printintln(hall_params.max_ticks);
+
 	return;
 }
 
@@ -90,7 +125,7 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
 	//printintln(qei_params.max_ticks);
 	qei_params.poles = POLE_PAIRS;
-	qei_params.sensor_placement = SENSOR_PLACEMENT;
+	qei_params.sensor_polarity = SENSOR_PLACEMENT;
 	return;
 }
 

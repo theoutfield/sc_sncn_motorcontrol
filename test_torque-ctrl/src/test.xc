@@ -107,53 +107,6 @@ void velocity_ctrl_unit_test(chanend c_velocity_ctrl, chanend c_qei, chanend c_h
 
 
 
-void position_ctrl_unit_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
-{
-	int target_position = 350;			// deg
-	int velocity 		= 350;			// rpm
-	int acceleration 	= 350;			// rpm/s
-	int deceleration 	= 350;     		// rpm/s
-	int actual_position;
-	ctrl_par position_ctrl_params;
-	hall_par hall_params;
-	qei_par qei_params;
-	in_data d;
-
-	init_position_profile_limits(GEAR_RATIO, MAX_ACCELERATION, MAX_PROFILE_VELOCITY);
-
-	while(1)
-	{
-		input_activate(d);
-		switch(d.activate)
-		{
-			case 1:	// Enable Position control
-				printstrln("Position control enabled");
-				set_position_sensor(SENSOR_USED, c_position_ctrl);
-				init_position_control(c_position_ctrl);   // once
-				while (1)
-				{
-					input_pos(d);
-
-					printintln(d.set_position);
-					set_profile_position(d.set_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
-					if(d.exit_mode == 1)
-					{
-						printstrln(" set position exit ");
-						break;
-					}
-				}
-				break;
-
-			case 0: // Disable Position control
-				printstrln("Position control disabled");
-				shutdown_position_ctrl(c_position_ctrl);
-				break;
-
-			default:
-				break;
-		}
-	}
-}
 
 void enable_motor_test(chanend c_commutation)
 {

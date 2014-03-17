@@ -49,24 +49,24 @@
  * define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				8//2//8//1
-#define MAX_NOMINAL_SPEED  			5260//2800//5260//2500			// rpm
+#define POLE_PAIRS  				1//2//8//1
+#define MAX_NOMINAL_SPEED  			2500//2800//5260//2500			// rpm
 #define MAX_NOMINAL_CURRENT  		2				// A
 #define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
 
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				18				// if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO  				26				// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			2000			// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				HALL //HALL 			// QEI
+#define SENSOR_USED 				HALL // 			// QEI
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	// QEI_WITH_NO_INDEX
 
-#define SENSOR_PLACEMENT			OUT_OF_PHASE		// OUT_OF_PHASE
+#define QEI_SENSOR_POLARITY			OUT_OF_PHASE		// OUT_OF_PHASE
 
 /* Somanet IFM Internal Config */
 #define IFM_RESOLUTION				DC300_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
@@ -109,7 +109,7 @@
 #define VELOCITY_Kd_NUMERATOR    	0
 #define VELOCITY_Kd_DENOMINATOR  	1
 
-#define VELOCITY_FILTER_SIZE        8  	//default (could be changed upto 16)
+#define VELOCITY_FILTER_SIZE        24  	//default (could be changed upto 128)
 
 	/*Position Control (Mandatory if Position control used)*/
 #define POSITION_Kp_NUMERATOR 	 	180
@@ -119,8 +119,8 @@
 #define POSITION_Kd_NUMERATOR    	100
 #define POSITION_Kd_DENOMINATOR  	10000
 
-#define MAX_POSITION_LIMIT 			359		// degree
-#define MIN_POSITION_LIMIT 			-359	// degree
+#define MAX_POSITION_LIMIT 			350		// degree
+#define MIN_POSITION_LIMIT 			-350		// degree
 
 
 

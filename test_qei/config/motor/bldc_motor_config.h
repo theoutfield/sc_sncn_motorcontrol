@@ -57,7 +57,7 @@
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				2		// if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO  				3		// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			2000	// 4 x Max count of Quadrature Encoder (4X decoding)
 
 
@@ -110,8 +110,8 @@
 #define POSITION_Kd_NUMERATOR    	100
 #define POSITION_Kd_DENOMINATOR  	10000
 
-#define MAX_POSITION_LIMIT 			359		// degree
-#define MIN_POSITION_LIMIT 			-359	// degree
+#define MAX_POSITION_LIMIT 			4000		// ticks //degree  MAX int_32
+#define MIN_POSITION_LIMIT 			-4000	// ticks //degree  Min int_32
 
 
 /**

@@ -56,7 +56,7 @@
 #include <drive_config.h>
 //#include <flash_somanet.h>
 
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -88,11 +88,20 @@ void external_pot_test(chanend c_adc)
 	while(1)
 	{
 		{external_pot1 , external_pot2} = get_adc_external_potentiometer_ad7949(c_adc);
+//		{phase_a, phase_b, ;
+//			get_adc_all_ad7949(c_adc);
+
 		wait_ms(1, core_id, t);
 
 #ifdef ENABLE_xscope_main
 		xscope_probe_data(0, external_pot1);
 		xscope_probe_data(1, external_pot2);
+#else
+		printstr("External pot1: ");
+		printintln(external_pot1);
+		printstr(" ");
+		printstr("External pot2:");
+		printintln(external_pot2);
 #endif
 	}
 }
@@ -148,9 +157,10 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei, c_signal, c_watchdog, \
-							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
-							c_pwm_ctrl, hall_params, qei_params, commutation_params);
+					commutation_sinusoidal(c_hall_p1,  c_qei, c_signal, c_watchdog, 	\
+							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
+							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn,\
+							hall_params, qei_params, commutation_params);
 				}
 
 				/* Watchdog Server */

@@ -427,6 +427,8 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
 					case SET_TORQUE_CTRL_HALL:
 						TORQUE_CTRL_READ(hall_params.pole_pairs);
+						TORQUE_CTRL_READ(hall_params.max_ticks);
+						TORQUE_CTRL_READ(hall_params.max_ticks_per_turn);
 
 						filter_length_variance =  filter_length/hall_params.pole_pairs;
 						if(filter_length_variance < 10)
@@ -438,6 +440,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 						TORQUE_CTRL_READ(qei_params.real_counts);
 						TORQUE_CTRL_READ(qei_params.max_ticks_per_turn);
 						TORQUE_CTRL_READ(qei_params.poles);
+						TORQUE_CTRL_READ(qei_params.max_ticks);
 						qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
 						filter_length_variance =  filter_length/qei_params.poles;
 						if(filter_length_variance < 10)
