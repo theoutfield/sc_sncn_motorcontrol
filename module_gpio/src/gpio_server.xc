@@ -18,30 +18,6 @@ void xscope_initialise_2()
 #define OUTPUT_PORT 		2
 #define NUMBER_OF_IO_PORTS	4           /**< Defines number of Digital IOs available. */
 
-//config_gpio()
-void probe_switch(port port_input, timer t, int &port_state, int &port_switch_state, int active_state)
-{
-	unsigned int time;
-	select
-	{
-		case port_input when pinsneq(port_state) :> port_state:
-			if(port_state == active_state)
-			{
-				//t :> time;
-				//t when timerafter(time + 3333) :> time; //3khz
-				port_input :> port_state;
-				port_input :> port_state;
-				if(port_state == active_state)
-					port_switch_state = 1;
-			}
-			else
-				port_switch_state = 0;
-			break;
-
-		default:
-			break;
-	}
-}
 
 void gpio_config_handler(chanend c_gpio, port p_ifm_ext_d[], int port_function[], int active_states[], int input_types[], int &all_ports_input)
 {
@@ -264,24 +240,6 @@ void gpio_digital_server(port p_ifm_ext_d[], chanend c_gpio_0, chanend c_gpio_1)
 	//	for(i = 0 ; i< NUMBER_OF_IO_PORTS; i++)
 	//		xscope_probe_data(i, port_switch_states[i]);
 
-//		if(all_ports_input == 1)
-//		{
-//			if(input_types[0] == SWITCH_INPUT_TYPE)
-//			{
-//				for(i = 0 ; i< NUMBER_OF_IO_PORTS; i++)
-//					probe_switch(p_ifm_ext_d[i], t, port_state[i], port_switch_states[i], active_states[i]);
-//			}
-//		}
-//		else
-//		{
-//			for(i = 0 ; i< NUMBER_OF_IO_PORTS; i++)
-//			{
-//				if(port_function[i] == INPUT_PORT && input_types[i] == SWITCH_INPUT_TYPE)
-//				{
-//					probe_switch(p_ifm_ext_d[i], t, port_state[i], port_switch_states[i], active_states[i]);
-//				}
-//			}
-//		}
 #pragma ordered
 		select
 		{
