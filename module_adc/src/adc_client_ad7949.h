@@ -38,7 +38,7 @@
  */
 
 #pragma once
-
+#include <adc_common.h>
 
 /**
  * \brief Get external potentiometer sensor value
@@ -74,7 +74,7 @@
  * \channel c_adc the channel for communicating with the adc server
  *
  */
-void do_adc_calibration_ad7949( chanend c_adc );
+void do_adc_calibration_ad7949(chanend c_adc, calib_data &I_calib);
 
 /**
  * \brief Get Calibrated current of two phases from the Triggered ADC server
@@ -85,6 +85,6 @@ void do_adc_calibration_ad7949( chanend c_adc );
  * \return Ib calibrated phase current value
  *
  */
-{int, int} get_adc_calibrated_current_ad7949( chanend c_adc );
+{int, int} get_adc_calibrated_current_ad7949(chanend c_adc, calib_data &I_calib);
 
 

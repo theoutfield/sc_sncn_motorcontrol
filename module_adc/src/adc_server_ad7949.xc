@@ -41,10 +41,9 @@
 #include <stdint.h>
 #include <xclib.h>
 #include "refclk.h"
+//static unsigned int adc_data_a[5];
+//static unsigned int adc_data_b[5];
 
-static unsigned int adc_data_a[5];
-static unsigned int adc_data_b[5];
-unsigned short adc_index = 0;
 
 #define ADC_CURRENT_REQ	1
 #define ADC_ALL_REQ	2
@@ -201,13 +200,15 @@ static void adc_ad7949_singleshot(buffered out port:32 p_sclk_conv_mosib_mosia,
 		   	   	   	   	   	   	  const unsigned int adc_config_mot,
 		   	   	   	   	   	   	  const unsigned int adc_config_other[],
 		   	   	   	   	   	   	  const unsigned int delay,
-		   	   	   	   	   	   	  timer t)
+		   	   	   	   	   	   	  timer t,
+		   	   	   	   	   	   	  unsigned int adc_data_a[],
+		   	   	   	   	   	   	  unsigned int adc_data_b[])
 {
 
 		unsigned int ts;
 		unsigned int data_raw_a;
 		unsigned int data_raw_b;
-
+		unsigned short adc_index = 0;
 		/* Reading/Writing after conversion (RAC)
 		   Read previous conversion result
 		   Write CFG for next conversion */
@@ -269,7 +270,8 @@ void adc_ad7949(chanend c_adc,
 										      0b11111011001001};   	// ADC Channel 5, unipolar, referenced to GND
 
 	const unsigned int delay = (11*USEC_FAST) / 3; 			// 3.7 us
-
+	static unsigned int adc_data_a[5];
+	static unsigned int adc_data_b[5];
 	configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
 	tx :> ts;
 
@@ -288,12 +290,12 @@ void adc_ad7949(chanend c_adc,
 								adc_config_mot,
 								adc_config_other,
 								delay,
-								tx);
+								tx,
+								adc_data_a,
+								adc_data_b);
 	//		xCount = 100;
 	//		tx :> ts;
 	//	}
-
-
 
 #pragma ordered
 	    select {
@@ -349,7 +351,8 @@ void adc_ad7949_triggered( chanend c_adc,
 											  0b11111001001001,  	// ADC Channel 4, unipolar, referenced to GND
 											  0b11111011001001};   	// ADC Channel 5, unipolar, referenced to GND
 	const unsigned int delay = (11*USEC_FAST) / 3; 			// 3.7 us
-
+	static unsigned int adc_data_a[5];
+	static unsigned int adc_data_b[5];
 	configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
 
 	while (1)
@@ -364,7 +367,7 @@ void adc_ad7949_triggered( chanend c_adc,
 					t when timerafter(ts + 7080) :> ts; // 6200
 				//	adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
 					adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b,	clk,
-										adc_config_mot,	adc_config_other, delay, t);
+										adc_config_mot,	adc_config_other, delay, t, adc_data_a, adc_data_b);
 				}
 				break;
 

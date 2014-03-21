@@ -39,7 +39,7 @@
 
 #include <adc_common.h>
 
-calib_data I_calib;
+//calib_data I_calib;
 #define ADC_CURRENT_REQ	1
 #define ADC_ALL_REQ	2
 #define ADC_CALIB_POINTS 64
@@ -76,7 +76,7 @@ calib_data I_calib;
 
 }
 
-void do_adc_calibration_ad7949( chanend c_adc )
+void do_adc_calibration_ad7949(chanend c_adc, calib_data &I_calib)
 {
 	unsigned int a, b;
 	int i = 0;
@@ -108,7 +108,7 @@ void do_adc_calibration_ad7949( chanend c_adc )
 //	printstr("ib_calibration ");   printint(I_calib.Ib_calib); printstr("\n");
 }
 
-{int, int} get_adc_calibrated_current_ad7949( chanend c_adc )
+{int, int} get_adc_calibrated_current_ad7949(chanend c_adc, calib_data &I_calib)
 {
 	// 0A equals 2.5V --> 9999
 	unsigned int a, b;
