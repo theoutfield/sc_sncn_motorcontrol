@@ -60,7 +60,7 @@
 #include "torque_ctrl_client.h"
 
 #include <test.h>
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -81,7 +81,7 @@ void xscope_initialise_1()
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 380; 	//(desired torque/torque_constant)  * IFM resolution   125 (dc900) 180 (dc300)
+	int target_torque = 100; 	//(desired torque/torque_constant)  * IFM resolution   125 (dc900) 180 (dc300)
 	int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);
@@ -176,8 +176,8 @@ int main(void)
 			par
 			{
 				/* ADC Loop */
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
-						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,
+				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,\
+						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,\
 						p_ifm_adc_misob);
 
 				/* PWM Loop */
@@ -209,11 +209,11 @@ int main(void)
 				}
 
 				/* QEI Server */
-				{
-					qei_par qei_params;
-					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  // channel priority 1,2..4
-				}
+//				{
+//					qei_par qei_params;
+//					init_qei_param(qei_params);
+//					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  // channel priority 1,2..4
+//				}
 
 			}
 		}

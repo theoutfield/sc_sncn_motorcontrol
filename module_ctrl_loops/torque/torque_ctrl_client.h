@@ -81,7 +81,7 @@ int torque_limit(int torque, int max_torque_limit);
  *  Output
  * \return actual torque from torque control in range [0 - mNm * Current Resolution]
  */
-int get_torque(cst_par &cst_params, chanend c_torque_ctrl);
+int get_torque(chanend c_torque_ctrl);
 
 /**
  * \brief Set new target torque for Torque Control Loop
@@ -92,7 +92,7 @@ int get_torque(cst_par &cst_params, chanend c_torque_ctrl);
  *  Input
  * \param torque is the new target torque range [0 - mNm * Current Resolution]
  */
-void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl);
+void set_torque(int torque, chanend c_torque_ctrl);
 
 /**
  * \brief Set Torque Control PID Parameters

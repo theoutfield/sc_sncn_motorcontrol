@@ -197,7 +197,7 @@ int main(void)
 				/* Watchdog Server */
 				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
-				track_home_positon(p_ifm_ext_d0, p_ifm_ext_d1, c_home, c_qei_p6, c_hall_p6);
+				track_home_positon(p_ifm_ext_d[0], p_ifm_ext_d[1], c_home, c_qei_p6, c_hall_p6);
 
 				/* Hall Server */
 				{

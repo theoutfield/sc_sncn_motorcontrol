@@ -88,6 +88,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 	int abs_speed = 0;
 	int filter_count = 0;
 	int adc_calib_start = 0;
+	calib_data I_calib;
 
 	while(1)
 	{
@@ -102,7 +103,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 			break;
 	}
 
-	do_adc_calibration_ad7949(c_adc);
+	do_adc_calibration_ad7949(c_adc, I_calib);
 
 	c_current<:1; // adc calib done
 	init_buffer(buffer_phase_a, FILTER_LENGTH_ADC);
@@ -116,7 +117,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 		select
 		{
 			case ts when timerafter(time+5556) :> time: // .05 ms
-				{phase_a_raw , phase_b_raw}= get_adc_calibrated_current_ad7949(c_adc);
+				{phase_a_raw , phase_b_raw}= get_adc_calibrated_current_ad7949(c_adc, I_calib);
 			//	xscope_probe_data(0, phase_a_raw);
 				buffer_phase_a[buffer_index] = phase_a_raw;
 				buffer_phase_b[buffer_index] = phase_b_raw;
@@ -136,9 +137,9 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 				}
 				phase_a_filtered /= filter_length_variance;
 				phase_b_filtered /= filter_length_variance;
-			/*	xscope_probe_data(0, phase_a_filtered);
+				xscope_probe_data(0, phase_a_filtered);
 				xscope_probe_data(1, phase_b_filtered);
-				xscope_probe_data(2, phase_a_raw);
+				/*	xscope_probe_data(2, phase_a_raw);
 								xscope_probe_data(3, phase_b_raw);*/
 				filter_count++;
 				if(filter_count == 10)

@@ -69,14 +69,14 @@ void set_profile_torque(int target_torque, int torque_slope, cst_par &cst_params
 		}
 	}
 
-	actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
+	actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
 	steps = init_linear_profile(target_torque, actual_torque, torque_slope, torque_slope, cst_params.max_torque);
 	t:>time;
 	for(i = 1; i<steps; i++)
 	{
 		torque_ramp =  linear_profile_generate(i);
-		set_torque( torque_ramp, cst_params , c_torque_ctrl);
-		actual_torque = get_torque(cst_params , c_torque_ctrl)*cst_params.polarity;
+		set_torque( torque_ramp, c_torque_ctrl);
+		actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
 		t when timerafter(time + MSEC_STD) :> time;
 		/*xscope_probe_data(1, torque_ramp);
 		xscope_probe_data(0, actual_torque);*/

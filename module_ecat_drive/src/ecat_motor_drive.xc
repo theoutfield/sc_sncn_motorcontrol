@@ -212,15 +212,15 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 			if(op_mode == CST || op_mode == TQ)
 			{
-				actual_torque = get_torque(cst_params, c_torque_ctrl);
+				actual_torque = get_torque(c_torque_ctrl);
 				steps = init_linear_profile(0, actual_torque, pt_params.profile_slope, pt_params.profile_slope, cst_params.max_torque);
 				i = 0;
 				t:>c_time;
 				while(i < steps)
 				{
 					target_torque = linear_profile_generate(i);
-					set_torque(target_torque, cst_params, c_torque_ctrl);
-					actual_torque = get_torque(cst_params, c_torque_ctrl);
+					set_torque(target_torque, c_torque_ctrl);
+					actual_torque = get_torque(c_torque_ctrl);
 					send_actual_torque(actual_torque*cst_params.polarity, InOut);
 
 					t when timerafter(c_time + MSEC_STD) :> c_time;
@@ -723,7 +723,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					case 0x000b: //quick stop
 						if(op_mode == CST || op_mode == TQ)
 						{
-							actual_torque = get_torque(cst_params, c_torque_ctrl);
+							actual_torque = get_torque(c_torque_ctrl);
 							steps = init_linear_profile(0, actual_torque, pt_params.profile_slope, pt_params.profile_slope, cst_params.max_torque);
 							i = 0;
 							mode_selected = 3;// non interruptible mode
@@ -894,7 +894,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							set_torque_cst(cst_params, target_torque, 0, c_torque_ctrl);
 						//	xscope_probe_data(0, target_torque);
 
-							actual_torque = get_torque(cst_params, c_torque_ctrl) *  cst_params.polarity;
+							actual_torque = get_torque(c_torque_ctrl) *  cst_params.polarity;
 						//	xscope_probe_data(1, actual_torque);
 							send_actual_torque(actual_torque, InOut);
 
@@ -961,7 +961,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							if(ack == 1)
 							{
 								target_torque = get_target_torque(InOut);
-								actual_torque = get_torque(cst_params, c_torque_ctrl) *  pt_params.polarity;
+								actual_torque = get_torque(c_torque_ctrl) *  pt_params.polarity;
 								send_actual_torque(actual_torque, InOut);
 
 								if(prev_torque != target_torque)
@@ -992,7 +992,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 								{
 									ack = 1;
 								}
-								actual_torque = get_torque(cst_params, c_torque_ctrl) *  pt_params.polarity;
+								actual_torque = get_torque(c_torque_ctrl) *  pt_params.polarity;
 								send_actual_torque(actual_torque, InOut);
 							}
 						}
@@ -1103,8 +1103,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					while(i < steps)
 					{
 						target_torque = linear_profile_generate(i);
-						set_torque(target_torque, cst_params, c_torque_ctrl);
-						actual_torque = get_torque(cst_params, c_torque_ctrl)*cst_params.polarity;
+						set_torque(target_torque, c_torque_ctrl);
+						actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
 						send_actual_torque(actual_torque, InOut);
 					//	xscope_probe_data(0, target_torque);
 					//	xscope_probe_data(1, actual_torque);
@@ -1114,12 +1114,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					if(i == steps )
 					{
 						t when timerafter(c_time + 100*MSEC_STD) :> c_time;
-						actual_torque = get_torque(cst_params, c_torque_ctrl);
+						actual_torque = get_torque(c_torque_ctrl);
 						send_actual_torque(actual_torque, InOut);
 					}
 					if(i >= steps)
 					{
-						actual_torque = get_torque(cst_params, c_torque_ctrl);
+						actual_torque = get_torque(c_torque_ctrl);
 						send_actual_torque(actual_torque, InOut);
 						if(actual_torque < torque_offstate || actual_torque > -torque_offstate)
 						{
@@ -1246,12 +1246,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 				if(op_mode == CST)
 				{
-					actual_torque = get_torque(cst_params, c_torque_ctrl)*cst_params.polarity;
+					actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
 					send_actual_torque(actual_torque, InOut);
 				}
 				else if(op_mode == TQ)
 				{
-					actual_torque = get_torque(cst_params, c_torque_ctrl)*cst_params.polarity;
+					actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
 					send_actual_torque(actual_torque, InOut);
 				}
 				else if(op_mode == CSV)

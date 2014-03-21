@@ -68,17 +68,16 @@ int init_torque_control(chanend c_torque_ctrl)
 	return ctrl_state;
 }
 
-int get_torque(cst_par &cst_params, chanend c_torque_ctrl)
+int get_torque(chanend c_torque_ctrl)
 {
 	int torque;
 	TORQUE_CTRL_WRITE(GET_TORQUE_TOKEN);
 	TORQUE_CTRL_READ(torque);
-	return (torque); // *cst_params.motor_torque_constant too big to include
+	return (torque);
 }
 
-void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl)
+void set_torque(int torque, chanend c_torque_ctrl)
 {
-	torque = torque; //cst_params.motor_torque_constant; too big to include
 	TORQUE_CTRL_WRITE(SET_TORQUE_TOKEN);
 	TORQUE_CTRL_WRITE(torque);
 	return;
@@ -117,7 +116,7 @@ int torque_limit(int torque, int max_torque_limit)
 void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl)
 {
 	set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity ,	\
-			cst_params.max_torque), cst_params , c_torque_ctrl);
+			cst_params.max_torque), c_torque_ctrl);
 }
 
 void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
