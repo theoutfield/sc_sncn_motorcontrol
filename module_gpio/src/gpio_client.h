@@ -10,7 +10,8 @@
  *
  *  \param c_gpio channel used to configure any digital ports /and send commands  to read/write to port specified
  *  \param port_number selects a port to be configured: 0 - EXT_D0, 1 - EXT_D1, 2 - EXT_D2, 3 - EXT_D3, 4 - all EXT_D0, EXT_D1, EXT_D2, EXT_D3
- *  \param switch_type specifies type: Active High/Active Low when switch is closed
+ *  \param input_type specify type: General purpose (GP_INPUT_TYPE) / Switch (SWITCH_INPUT_TYPE)
+ *  \param switch_type specifies type: ACTIVE_HIGH / ACTIVE_LOW when switch is closed
  *
  *  \return 1 - success
  *
