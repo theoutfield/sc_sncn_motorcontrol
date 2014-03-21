@@ -5,6 +5,12 @@
  *
  *	QEI Sensor Server
  *
+ *	Server limits:
+ *	 10000 rpm on 1000 count encoder
+ *	  2500 rpm on 4000 count encoder
+ */
+
+/*
  * Copyright (c) 2013, Synapticon GmbH & XMOS Ltd
  * All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
@@ -39,7 +45,8 @@
 
 #include "qei_server.h"
 #include <xscope.h>
-
+//#pragma xta command "analyze loop qei_loop"
+//#pragma xta command "set required - 10.0 us"
 // Order is 00 -> 10 -> 11 -> 01
 // Bit 3 = Index
 static const unsigned char lookup[16][4] = {
@@ -104,13 +111,6 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
 			//status = 0;
 			break;
 
-		/*	case QEI_VELOCITY_PWM_RES_REQ:
-			slave
-			{
-				c_qei <: velocity_raw1;
-			}
-			break;
-		*/
 		case CHECK_BUSY:
 			c_qei <: init_state;
 			//status = 0;
@@ -184,6 +184,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 
 	while (1)
 	{	//xscope_probe_data(0, count);
+#pragma xta endpoint "qei_loop"
 		#pragma ordered
 		select
 		{
@@ -320,7 +321,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 			qei_crossover = qei_max - qei_max/10;
 			qei_count_per_hall = qei_params.real_counts / qei_params.poles;
 		}
-
+#pragma xta endpoint "qei_loop_end_point"
 	}
 }
 

@@ -43,7 +43,7 @@
 #include <bldc_motor_config.h>
 #include "hall_config.h"
 #include <xs1.h>
-#include <stdint.h>
+
 
 /**
  * \brief Get position from Hall Server
@@ -63,8 +63,8 @@ int get_hall_position(chanend c_hall);
  * \channel c_hall for communicating with the Hall Server
  *
  *  Output
- * \return the counted up position (compensates for pole-pairs and gear-ratio)
- * 		   in the range [0 - 4095] * pole-pairs * gear-ratio
+ * \return the counted up position (compensates for pole-pairs)
+ * 		   in the range [0 - 4095] * pole-pairs
  */
 {int , int} get_hall_position_absolute(chanend c_hall);
 
@@ -75,7 +75,7 @@ int get_hall_position(chanend c_hall);
  * \channel c_hall for communicating with the Hall Server
  *
  *  Input
- * \param hall_params struct defines the pole-pairs and gear ratio
+ * \param hall_params struct defines the pole-pairs
  *
  *  Output
  * \return the velocity in rpm from Hall Sensor
