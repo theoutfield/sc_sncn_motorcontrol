@@ -57,11 +57,11 @@
 #define FORWARD_CONSTANT 		683  	//60  deg
 #define REVERSE_CONSTANT 		2731	//240 deg
 
-static t_pwm_control pwm_ctrl;
+//static t_pwm_control pwm_ctrl;
 
 
 
-void commutation_init_to_zero(chanend c_pwm_ctrl)
+void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 {
 	unsigned int pwm[3] = {0, 0, 0};  // PWM OFF
 	pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
@@ -127,7 +127,7 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 	}
 }
 
-void commutation_sinusoidal_loop(int sensor_select, hall_par &hall_params, qei_par &qei_params,
+void commutation_sinusoidal_loop(int sensor_select, t_pwm_control &pwm_ctrl, hall_par &hall_params, qei_par &qei_params,
 		commutation_par &commutation_params, chanend c_hall, chanend c_qei,	chanend c_pwm_ctrl,
 		chanend c_signal, chanend  c_commutation_p1, chanend  c_commutation_p2, chanend  c_commutation_p3)
 {
@@ -326,9 +326,10 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 		const unsigned timeout = 2*SEC_FAST;
 		timer t;
 		unsigned int ts;
+		t_pwm_control pwm_ctrl;
 		int init_state = INIT_BUSY;
 
-		commutation_init_to_zero(c_pwm_ctrl);
+		commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 		t :> ts;
 		t when timerafter (ts + t_delay) :> ts;
 
@@ -340,7 +341,7 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 		t when timerafter (ts + 250000*4):> ts;
 		c_watchdog <: WD_CMD_START;
 
-		commutation_sinusoidal_loop(HALL, hall_params, qei_params, commutation_params,\
+		commutation_sinusoidal_loop(HALL, pwm_ctrl, hall_params, qei_params, commutation_params,\
 				  c_hall, c_qei, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, \
 				  c_commutation_p3);
 }
