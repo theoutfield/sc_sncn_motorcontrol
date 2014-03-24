@@ -68,7 +68,7 @@ int init_torque_control(chanend c_torque_ctrl)
 	return ctrl_state;
 }
 
-int get_torque(cst_par &cst_params, chanend c_torque_ctrl)
+int get_torque(chanend c_torque_ctrl)
 {
 	int torque;
 	TORQUE_CTRL_WRITE(GET_TORQUE_TOKEN);
