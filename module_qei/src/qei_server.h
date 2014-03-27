@@ -5,6 +5,14 @@
  *
  *	QEI Sensor Server
  *
+ *	Server limits:
+ *	  8800 rpm on 1000 count encoder
+ *	  2200 rpm on 4000 count encoder
+ *	  425 rpm on 20000 count encoder
+ */
+
+/*
+ *
  * Copyright (c) 2013, Synapticon GmbH & XMOS Ltd
  * All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
@@ -55,6 +63,7 @@
  * \channel c_qei_p3 the control channel for reading qei position priority - 3
  * \channel c_qei_p4 the control channel for reading qei position priority - 4
  * \channel c_qei_p5 the control channel for reading qei position priority - 5
+ * \channel c_qei_p6 the control channel for reading qei position priority - 6
  *
  *	Input port
  * \port p_qei the hardware port where the quadrature encoder is located

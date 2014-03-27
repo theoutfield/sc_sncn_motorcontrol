@@ -4,7 +4,8 @@
  * \file qei_client.h
  *
  *	QEI Sensor Client Functions
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH & XMOS Ltd
  * All rights reserved.
  * Authors: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
@@ -63,7 +64,7 @@
  */
 {unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params);
 
-//void set_qei_turns(chanend c_qei, int turns);
+
 /**
  *  \brief Get absolute position from QEI Server
  *
@@ -71,8 +72,8 @@
  * \channel c_qei for communicating with the QEI Server
  *
  *	Output
- * \return  counted up position from qei sensor (incorporates gear ratio)
- * 			in the range [0 - encoder_resolution] * gear-ratio
+ * \return  counted up position from qei sensor (incorporates set max ticks)
+ * 			in the range [ -max ticks to +max ticks]
  * \return  direction of rotation, clockwise : 1 / anti-clockwise : -1
  */
 {int, int} get_qei_position_absolute(chanend c_qei);

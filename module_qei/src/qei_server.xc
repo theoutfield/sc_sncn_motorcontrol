@@ -6,8 +6,9 @@
  *	QEI Sensor Server
  *
  *	Server limits:
- *	 10000 rpm on 1000 count encoder
- *	  2500 rpm on 4000 count encoder
+ *	  8800 rpm on 1000 count encoder
+ *	  2200 rpm on 4000 count encoder
+ *	  425 rpm on 20000 count encoder
  */
 
 /*
@@ -46,7 +47,7 @@
 #include "qei_server.h"
 #include <xscope.h>
 //#pragma xta command "analyze loop qei_loop"
-//#pragma xta command "set required - 10.0 us"
+//#pragma xta command "set required - 1.0 us"
 // Order is 00 -> 10 -> 11 -> 01
 // Bit 3 = Index
 static const unsigned char lookup[16][4] = {
@@ -81,7 +82,6 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
 				c_qei <: position;
 				c_qei <: ok;
 			}
-			//status = 0;
 			break;
 
 		case QEI_ABSOLUTE_POS_REQ:
@@ -90,7 +90,6 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
 				c_qei <: count;
 				c_qei <: direction;
 			}
-			//status = 0;
 			break;
 
 		case SYNC:
@@ -100,7 +99,6 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
 				c_qei <: calib_fw_flag;
 				c_qei <: calib_bw_flag;
 			}
-			//status = 0;
 			break;
 
 		case SET_OFFSET:
@@ -108,12 +106,10 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
 			c_qei :> offset_bw;
 			calib_bw_flag = 0;
 			calib_fw_flag = 0;
-			//status = 0;
 			break;
 
 		case CHECK_BUSY:
 			c_qei <: init_state;
-			//status = 0;
 			break;
 
 		case SET_QEI_PARAM_ECAT:
@@ -156,14 +152,14 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 	int previous_position = 0;
 	int count = 0;
 	int first = 1;
-	int max_count_actual = qei_params.max_ticks;// = qei_params.gear_ratio * qei_params.real_counts;
+	int max_count_actual = qei_params.max_ticks;
 	int difference = 0;
 	int direction = 0;
 	int qei_max = qei_params.max_ticks_per_turn;
 	int qei_type = qei_params.index;            // TODO use to disable sync for no-index
 	int init_state = INIT;
 
-	int qei_crossover = qei_max - qei_max/10;
+	int qei_crossover = (qei_max*19)/100;
 	int qei_count_per_hall = qei_params.real_counts / qei_params.poles;
 	int offset_fw = 0;
 	int offset_bw = 0;
@@ -172,7 +168,8 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 	int sync_out = 0;
 	int status = 0;
 	int flag_index = 0;
-//int sensor_placement = 1; // in_phase : 1 Default, out of phase : -1
+	unsigned int new_pins_1;
+
 	/*{
 			xscope_register(4, XSCOPE_CONTINUOUS, "0 qei_position", XSCOPE_INT,	"n",
 					           XSCOPE_CONTINUOUS, "1 qei_velocity", XSCOPE_INT,	"n",
@@ -183,95 +180,113 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 	p_qei :> new_pins;
 
 	while (1)
-	{	//xscope_probe_data(0, count);
+	{
 #pragma xta endpoint "qei_loop"
 		#pragma ordered
 		select
 		{
 			case p_qei when pinsneq(new_pins) :> new_pins :
-
-				v = lookup[new_pins][old_pins];
-
-				if (!v)
+				p_qei :> new_pins_1;
+				p_qei :> new_pins_1;
+				if(new_pins_1 == new_pins)
 				{
-					flag_index = 1;
-					position = 0;
-					ok = 1;
-				}
-				else
-				{
-					flag_index = 0;
-				}
-
-				{ v, position } = lmul(1, position, v, -5);
-
-				old_pins = new_pins & 0x3;
-
-				if(first == 1)
-				{
-					previous_position = position & (qei_max-1);
-					first = 0;
-				}
-				current_pos =  position & (qei_max-1);
-				if(previous_position != current_pos )
-				{
-					difference = current_pos - previous_position;
-					if( difference > qei_crossover)
+					p_qei :> new_pins;
+					if(new_pins_1 == new_pins)
 					{
-						count = count + 1;
-						sync_out = offset_fw;  //valid needed
-						calib_fw_flag = 1;
-						direction = 1;
-					}
-					else if(difference < -qei_crossover)
-					{
-						count = count - 1;
-						sync_out = offset_bw;
-						calib_bw_flag = 1;
-						direction = -1;
-					}
-					else if( difference < 10 && difference >0)
-					{
-						if(qei_params.sensor_polarity == IN_PHASE)
+						v = lookup[new_pins][old_pins];
+
+						if (!v)
 						{
-							count = count + difference;
-							sync_out = sync_out + difference;
+							flag_index = 1;
+							ok = 1;
+							position = 0;
 						}
-						else if(qei_params.sensor_polarity == OUT_OF_PHASE)
+						else
 						{
-							count = count - difference; //out of phase -
-							sync_out = sync_out - difference;
+							flag_index = 0;
 						}
-						direction = -1;
+
+						{ v, position } = lmul(1, position, v, -5);
+
+						old_pins = new_pins & 0x3;
+
+						if(first == 1)
+						{
+							previous_position = position;
+							first = 0;
+						}
+
+						if(previous_position != position )
+						{
+							difference = position - previous_position;
+							//xscope_probe_data(1, difference);
+							if( difference >= qei_crossover)
+							{
+								if(qei_params.sensor_polarity == IN_PHASE)
+									count = count - 1;
+								else
+									count = count + 1;
+								sync_out = offset_fw;  //valid needed
+								calib_fw_flag = 1;
+								direction = -1;
+							}
+							else if(difference <= -qei_crossover)
+							{
+								if(qei_params.sensor_polarity == IN_PHASE)
+									count = count + 1;
+								else
+									count = count - 1;
+								sync_out = offset_bw;
+								calib_bw_flag = 1;
+								direction = +1;
+							}
+							else if( difference <= 2 && difference > 0)
+							{
+								if(qei_params.sensor_polarity == IN_PHASE)
+								{
+									count = count + difference;
+									sync_out = sync_out + difference;
+								}
+								else if(qei_params.sensor_polarity == OUT_OF_PHASE)
+								{
+									count = count - difference;
+									sync_out = sync_out - difference;
+								}
+								direction = -1;
+							}
+							else if( difference < 0 && difference >= -2)
+							{
+								if(qei_params.sensor_polarity == IN_PHASE)
+								{
+									count = count + difference;
+									sync_out = sync_out + difference;
+								}
+								else if(qei_params.sensor_polarity == OUT_OF_PHASE)
+								{
+									count = count - difference;
+									sync_out = sync_out - difference;
+								}
+								direction = 1;
+							}
+							previous_position = position;
+						}
+						if(sync_out < 0)
+						{
+							sync_out = qei_count_per_hall + sync_out;
+						}
+						if(count >= max_count_actual || count <= -max_count_actual)
+						{
+							count=0;
+						}
+						if(sync_out >= qei_count_per_hall )
+						{
+							sync_out = 0;
+						}
 					}
-					else if( difference < 0 && difference > -10)
-					{
-						if(qei_params.sensor_polarity == IN_PHASE)
-						{
-							count = count + difference;
-							sync_out = sync_out + difference;
-						}
-						else if(qei_params.sensor_polarity == OUT_OF_PHASE)
-						{
-							count = count - difference; //out of phase -
-							sync_out = sync_out - difference;
-						}
-						direction = 1;
-					}
-					previous_position = current_pos;
 				}
-				if(sync_out < 0)
-				{
-					sync_out = qei_count_per_hall + sync_out;
-				}
-				if(count >= max_count_actual || count <= -max_count_actual)
-				{
-					count=0;
-				}
-				if(sync_out >= qei_count_per_hall )
-				{
-					sync_out = 0;
-				}
+				//xscope_probe_data(0, position);
+				//xscope_probe_data(1, count);
+
 				break;
 
 			case c_qei_p1 :> command :
@@ -315,10 +330,10 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 		if(status == 1)
 		{
 			status = 0;
-			max_count_actual = qei_params.max_ticks; //qei_params.gear_ratio * qei_params.real_counts;
+			max_count_actual = qei_params.max_ticks;
 			qei_max = qei_params.max_ticks_per_turn;
 			qei_type = qei_params.index;
-			qei_crossover = qei_max - qei_max/10;
+			qei_crossover = (qei_max*19)/100;
 			qei_count_per_hall = qei_params.real_counts / qei_params.poles;
 		}
 #pragma xta endpoint "qei_loop_end_point"
