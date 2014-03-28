@@ -43,7 +43,7 @@
 #include <a4935.h>
 #include <print.h>
 
-void a4935_init(int configuration, out port p_ifm_esf_rstn_pwml_pwmh, out port p_ifm_coastn)
+void a4935_init(int configuration, out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn)
 {
 	timer timer1;
 	unsigned int time1;

@@ -147,7 +147,7 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 							{
 								if(times_no >0)
 								{
-									calib_bw_offset += get_hall_position( c_hall);
+								//	calib_bw_offset += get_hall_position( c_hall);
 									times_no--;
 								}
 								else
@@ -167,7 +167,7 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 							//	printintln(times_no);
 								if(times_no >0)
 								{
-									calib_fw_offset += get_hall_position( c_hall);
+								//	calib_fw_offset += get_hall_position( c_hall);
 									times_no--;
 								}
 								else
@@ -220,7 +220,7 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 						}
 						else
 						{
-							hall_position = get_hall_position( c_hall);
+						//	hall_position = get_hall_position( c_hall);
 							sync_output <: (hall_position * max_count) >> 12;
 						}
 					}
@@ -232,13 +232,13 @@ void hall_qei_sync(qei_par &qei_params, hall_par &hall_params, commutation_par &
 						}
 						else
 						{
-							hall_position = get_hall_position( c_hall);
+						//	hall_position = get_hall_position( c_hall);
 							sync_output <: (hall_position * max_count) >> 12;
 						}
 					}
 					else
 					{
-						hall_position = get_hall_position( c_hall);
+					//	hall_position = get_hall_position( c_hall);
 						sync_output <: (hall_position * max_count) >> 12;
 					}
 				}

@@ -64,7 +64,7 @@ void calculate_offset(qei_par &qei_params, hall_par &hall_params, chanend c_qei,
 							{
 								if(times_no >0)
 								{
-									calib_bw_offset += get_hall_position( c_hall);
+								//	calib_bw_offset += get_hall_position( c_hall);
 									times_no--;
 								}
 								else
@@ -78,7 +78,7 @@ void calculate_offset(qei_par &qei_params, hall_par &hall_params, chanend c_qei,
 							{
 								if(times_no >0)
 								{
-									calib_fw_offset += get_hall_position( c_hall);
+								//	calib_fw_offset += get_hall_position( c_hall);
 									times_no--;
 								}
 								else
