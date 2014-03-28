@@ -181,6 +181,7 @@ typedef struct S_Hall {
 	int pole_pairs;
 	int max_ticks_per_turn;
 	int max_ticks;
+	int sensor_polarity;
 } hall_par;
 
 /**

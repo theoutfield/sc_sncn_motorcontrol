@@ -49,24 +49,24 @@
  * define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				1//8
-#define MAX_NOMINAL_SPEED  			2500//5260				// rpm
+#define POLE_PAIRS  				4//4//1//8
+#define MAX_NOMINAL_SPEED  			3000//4600//2500//5260				// rpm
 #define MAX_NOMINAL_CURRENT  		6					// A
 #define MOTOR_TORQUE_CONSTANT 		38    				// mNm/A
 
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				26					// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			2000				// 4 x Max count of Quadrature Encoder (4X decoding)
+#define GEAR_RATIO  				120					// if no gears are attached - set to gear ratio to 1
+#define ENCODER_RESOLUTION 			4000				// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				HALL 				// QEI
+#define SENSOR_USED 				QEI//HALL 				// QEI
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX		// QEI_WITH_NO_INDEX
 
-#define SENSOR_PLACEMENT			OUT_OF_PHASE		// OUT_OF_PHASE
+#define SENSOR_PLACEMENT			OUT_OF_PHASE //IN_PHASE			// OUT_OF_PHASE
 
 /* Somanet IFM Internal Config */
 #define IFM_RESOLUTION				DC100_RESOLUTION 	 // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
@@ -76,16 +76,16 @@
 #define POLARITY 					1					// 1 / -1
 
 /*Commutation offset (range 0-4095) */
-#define COMMUTATION_OFFSET_CLK		683
-#define COMMUTATION_OFFSET_CCLK		2731
+#define COMMUTATION_OFFSET_CLK		770
+#define COMMUTATION_OFFSET_CCLK		2601
 
 /*Motor Winding type*/
-#define WINDING_TYPE				STAR_WINDING 		//DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
+#define WINDING_TYPE				DELTA_WINDING //STAR_WINDING 		//DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
 
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY			1000				// rpm
-#define MAX_ACCELERATION   			2500   				// rpm/s
+#define MAX_ACCELERATION   			3000   				// rpm/s
 #define PROFILE_ACCELERATION		2000				// rpm/s
 #define PROFILE_DECELERATION  		2000				// rpm/s
 #define QUICK_STOP_DECELERATION 	2000				// rpm/s
@@ -123,13 +123,13 @@
 	#define MAX_POSITION_LIMIT 			POLE_PAIRS*4096*GEAR_RATIO		// ticks - qei/hall/any position sensor
 	#define MIN_POSITION_LIMIT 			-POLE_PAIRS*4096*GEAR_RATIO		// ticks - qei/hall/any position sensor
 #endif
-#if(SENSOR_USED == 2)
-	#define POSITION_Kp_NUMERATOR 	 	250	//215	//250 //180//
-	#define POSITION_Kp_DENOMINATOR  	20	//1000//20
-	#define POSITION_Ki_NUMERATOR    	50	//1	//50 //50//
-	#define POSITION_Ki_DENOMINATOR  	102	//10000//102
-	#define POSITION_Kd_NUMERATOR    	80	//1	//80 //100//
-	#define POSITION_Kd_DENOMINATOR  	100	//1000//100
+#if(SENSOR_USED == 2)// quadrature pid
+	#define POSITION_Kp_NUMERATOR 	 	660	//250	//215	//250 //180//
+	#define POSITION_Kp_DENOMINATOR  	80	//20	//1000//20
+	#define POSITION_Ki_NUMERATOR    	1	//50	//1	//50 //50//
+	#define POSITION_Ki_DENOMINATOR  	25384	//102	//10000//102
+	#define POSITION_Kd_NUMERATOR    	0	//80	//1	//80 //100//
+	#define POSITION_Kd_DENOMINATOR  	10000	//100	//1000//100
 
 	#define MAX_POSITION_LIMIT 			GEAR_RATIO*ENCODER_RESOLUTION	// ticks - qei/hall/any position sensor
 	#define MIN_POSITION_LIMIT 			-GEAR_RATIO*ENCODER_RESOLUTION	// ticks - qei/hall/any position sensor

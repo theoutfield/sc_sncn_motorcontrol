@@ -76,7 +76,7 @@ void init_hall_param(hall_par &hall_params)
 			hall_params.max_ticks = 0 - max;
 	}
 	hall_params.max_ticks_per_turn = POLE_PAIRS * 4096;
-	printintln(hall_params.max_ticks);
+	//printintln(hall_params.max_ticks);
 	hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
 	//printintln(hall_params.max_ticks);
 
@@ -88,7 +88,6 @@ void init_qei_param(qei_par &qei_params)
 	int max = MAX_POSITION_LIMIT;
 	int min = MIN_POSITION_LIMIT;
 	qei_params.real_counts = ENCODER_RESOLUTION;
-	//qei_params.gear_ratio = GEAR_RATIO;
 
 	if(max >= 0 && min >= 0)
 	{
@@ -213,7 +212,7 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
 	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - for CORE 2/1/0 only default
 
-	position_ctrl_params.Control_limit = 13739; 							 // default do not change
+	position_ctrl_params.Control_limit = 6869;	//13739; 							 // default do not change
 
 	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
 	{
