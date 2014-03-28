@@ -162,7 +162,7 @@ void gpio_digital_server(port p_ifm_ext_d[], chanend c_gpio_0, chanend c_gpio_1)
 	unsigned int time;
 	int command;
 	int type;
-
+	int new_pin;
 	int input;
 	int output;
 	int config_state = 0;
@@ -255,65 +255,73 @@ void gpio_digital_server(port p_ifm_ext_d[], chanend c_gpio_0, chanend c_gpio_1)
 				break;
 
 			case p_ifm_ext_d[0] when pinsneq(port_state[0]) :> port_state[0]:
-				if(port_state[0] == active_states[0])
+				p_ifm_ext_d[0] :> new_pin;
+				if(new_pin ==  port_state[0])
 				{
-					//t :> time;
-					//t when timerafter(time + 3333) :> time; //3khz
-					p_ifm_ext_d[0] :> port_state[0];
-					p_ifm_ext_d[0] :> port_state[0];
-					if(port_state[0] == active_states[0])
-						port_switch_states[0] = 1;
+					p_ifm_ext_d[0] :> new_pin;
+					if(new_pin == port_state[0])
+					{
+						if(port_state[0] == active_states[0])
+						{
+							port_switch_states[0] = 1;
+						}
+						else
+							port_switch_states[0] = 0;
+					}
 				}
-				else
-					port_switch_states[0] = 0;
 				break;
 
 			case p_ifm_ext_d[1] when pinsneq(port_state[1]) :> port_state[1]:
-					if(port_state[1] == active_states[1])
+					p_ifm_ext_d[1] :> new_pin;
+					if(new_pin ==  port_state[1])
 					{
-						//t :> time;
-						//t when timerafter(time + 3333) :> time; //3khz
-						p_ifm_ext_d[1] :> port_state[1];
-						p_ifm_ext_d[1] :> port_state[1];
-						if(port_state[1] == active_states[1])
-							port_switch_states[1] = 1;
+						p_ifm_ext_d[1] :> new_pin;
+						if(new_pin == port_state[1])
+						{
+							if(port_state[1] == active_states[1])
+							{
+								port_switch_states[1] = 1;
+							}
+							else
+								port_switch_states[1] = 0;
+						}
 					}
-					else
-						port_switch_states[1] = 0;
 					break;
 
 			case p_ifm_ext_d[2] when pinsneq(port_state[2]) :> port_state[2]:
-					if(port_state[2] == active_states[2])
+					p_ifm_ext_d[2] :> new_pin;
+					if(new_pin ==  port_state[2])
 					{
-						//t :> time;
-						//t when timerafter(time + 3333) :> time; //3khz
-						p_ifm_ext_d[2] :> port_state[2];
-						p_ifm_ext_d[2] :> port_state[2];
-						if(port_state[2] == active_states[2])
-							port_switch_states[2] = 1;
+						p_ifm_ext_d[2] :> new_pin;
+						if(new_pin == port_state[2])
+						{
+							if(port_state[2] == active_states[2])
+							{
+								port_switch_states[2] = 1;
+							}
+							else
+								port_switch_states[2] = 0;
+						}
 					}
-					else
-						port_switch_states[2] = 0;
 					break;
 
 			case p_ifm_ext_d[3] when pinsneq(port_state[3]) :> port_state[3]:
-					if(port_state[3] == active_states[3])
+					p_ifm_ext_d[3] :> new_pin;
+					if(new_pin ==  port_state[3])
 					{
-						//t :> time;
-						//t when timerafter(time + 3333) :> time; //3khz
-						p_ifm_ext_d[3] :> port_state[3];
-						p_ifm_ext_d[3] :> port_state[3];
-						if(port_state[3] == active_states[3])
-							port_switch_states[3] = 1;
+						p_ifm_ext_d[3] :> new_pin;
+						if(new_pin == port_state[3])
+						{
+							if(port_state[3] == active_states[3])
+							{
+								port_switch_states[3] = 1;
+							}
+							else
+								port_switch_states[3] = 0;
+						}
 					}
-					else
-						port_switch_states[3] = 0;
 					break;
 
-
-
-			//default:
-			//	break;
 		}
 	}
 }

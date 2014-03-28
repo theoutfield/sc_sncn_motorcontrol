@@ -49,7 +49,7 @@
 #include <gpio_server.h>
 #include <gpio_client.h>
 
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
