@@ -40,7 +40,7 @@
 #include <ecat_motor_drive.h>
 #include <xscope.h>
 #include <print.h>
-
+#include <gpio_client.h>
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 void xscope_initialise()
@@ -60,7 +60,8 @@ void xscope_initialise()
 /*core 0/1/2 only*/
 //#define ENABLE_xscope_main
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
-		chanend c_qei, chanend c_home, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
+		chanend c_qei, chanend c_home, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl,\
+		chanend c_gpio)
 {
 	int i = 0;
 	int mode=40;
@@ -152,7 +153,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	int current_position = 0;
 	int home_offset = 0;
 	int end_state = 0;
-
+	int drive_port_state = 0;
 	int ctrl_state;
 	int limit_switch_type;
 	int homing_method;
@@ -377,16 +378,16 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						InOut.operation_mode_display = 105;
 					}
 				}
-				if(controlword == 5)
+				if(controlword == 5)  /* Configuration of GPIOs follows here */
 				{
 					update_commutation_param_ecat(commutation_params, coe_out);
 					sensor_select = sensor_select_sdo(coe_out);
 					//printintln(sensor_select);
-					if(sensor_select == HALL)
-					{
+					//if(sensor_select == HALL)
+					//{
 						update_hall_param_ecat(hall_params, coe_out);
-					}
-					else if(sensor_select == QEI || sensor_select == QEI_1)
+					//}
+					if(sensor_select == QEI || sensor_select == QEI_1)
 					{
 						update_qei_param_ecat(qei_params, coe_out);
 					}
@@ -401,7 +402,9 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						limit_switch = -1;
 					else if(homing_method == HOMING_POSITIVE_SWITCH)
 						limit_switch = 1;
-
+					config_gpio_digital_input(c_gpio, 0, SWITCH_INPUT_TYPE, limit_switch_type);
+					config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, limit_switch_type);
+					end_config_gpio(c_gpio);
 					set_hall_param_ecat(c_hall, hall_params);
 					if(homing_done == 0)
 						set_qei_param_ecat(c_qei, qei_params);
@@ -805,7 +808,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 									if( home_acceleration > 0 || home_acceleration < 0)
 									{
 										//mode_selected = 4;
-										set_home_switch_type(c_home, limit_switch_type);
+										// set_home_switch_type(c_home, limit_switch_type);
 										i = 1;
 										actual_velocity = get_velocity(c_velocity_ctrl);
 										steps = init_velocity_profile(home_velocity * limit_switch, actual_velocity, home_acceleration,\
@@ -823,15 +826,16 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 								if(reset_counter == 0)
 								{
 									ack =1;//h_active = 1;
-									if(i < steps)
-										update_hall_param_ecat(hall_params, coe_out);
+									if(i < steps)//update_hall_param_ecat(hall_params, coe_out);
 									{
 										velocity_ramp = velocity_profile_generate(i);
 										set_velocity(velocity_ramp, c_velocity_ctrl);
 										i = i+1;
 									}
-
-									{home_state, safety_state, capture_position, direction} = get_home_state(c_home);
+									home_state = read_gpio_digital_input(c_gpio, 0);
+									safety_state = read_gpio_digital_input(c_gpio, 1);
+									{capture_position, direction} = get_qei_position_absolute(c_qei);
+									//{home_state, safety_state, capture_position, direction} = get_home_state(c_home);
 //									if(i>=steps && end_state ==0)
 //									{
 //										home_state =1;//simulate switch
@@ -904,13 +908,17 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							target_position = get_target_position(InOut);
 							set_position_csp(csp_params, target_position, 0, 0, 0, c_position_ctrl);
 
-//printintln(target_position);
 							actual_position = get_position(c_position_ctrl) * csp_params.base.polarity;
 							send_actual_position(actual_position, InOut);
-				//	#ifdef ENABLE_xscope_main
-							xscope_probe_data(0, actual_position);
-							xscope_probe_data(1, target_position);
-				//	#endif
+					//	#ifdef ENABLE_xscope_main
+							//xscope_probe_data(0, actual_position);
+							//xscope_probe_data(1, target_position);
+					//	#endif
+							safety_state = read_gpio_digital_input(c_gpio, 1);     	// read port 1
+							//value = (port_3_value<<3 | port_2_value<<2 | port_1_value <<1| safety_state );  pack values if more than one port inputs
+							send_actual_torque(safety_state, InOut);
+							drive_port_state = get_target_torque(InOut);
+							write_gpio_digital_output(c_gpio, 2, drive_port_state); // write port 2
 						}
 						else if(op_mode == PP)
 						{
@@ -1290,8 +1298,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				{actual_position, direction} = get_qei_position_absolute(c_qei);
 			}
 			send_actual_position(actual_position * polarity, InOut);
-			xscope_probe_data(0, actual_position);
-			xscope_probe_data(1, InOut.target_position);
+		//	xscope_probe_data(0, actual_position);
+		//	xscope_probe_data(1, InOut.target_position);
 			t when timerafter(time + MSEC_STD) :> time;
 		}
 //#pragma xta endpoint "ecatloop_stop"
