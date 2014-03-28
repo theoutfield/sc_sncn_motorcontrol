@@ -56,11 +56,12 @@
 #include <profile_control.h>
 #include <internal_config.h>
 #include <flash_somanet.h>
-
+#include <drive_config.h>
 #include "torque_ctrl_client.h"
-
+#include "velocity_ctrl_client.h"
+#include "velocity_ctrl_server.h"
 #include <test.h>
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -81,7 +82,7 @@ void xscope_initialise_1()
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 100; 	//(desired torque/torque_constant)  * IFM resolution   125 (dc900) 180 (dc300)
+	int target_torque = 250; 	//(desired torque/torque_constant)  * IFM resolution   125 (dc900) 180 (dc300)
 	int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);
@@ -114,7 +115,7 @@ int main(void)
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl;														// pwm channel
-	chan c_torque_ctrl;														// torque control channel
+	chan c_torque_ctrl,c_velocity_ctrl;														// torque control channel
 	chan c_watchdog; 														// watchdog channel
 
 	// EtherCat Communication channels
@@ -151,20 +152,81 @@ int main(void)
 		{
 			profile_torque_test(c_torque_ctrl);
 			//torque_ctrl_unit_test(c_torque_ctrl, c_qei_p4, c_hall_p4);
+	/*		{
+				int target_torque = 100; 	//(desired torque/torque_constant)  * IFM resolution   125 (dc900) 180 (dc300)
+				int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
+				cst_par cst_params; int actual_torque; timer t; unsigned int time;
+				int init_state = __check_torque_init(c_torque_ctrl);
+				int target_velocity =200;	 		// rpm
+					int acceleration 	= 100;			// rpm/s
+					int deceleration 	= 100;			// rpm/s
+					int actual_velocity;
+
+
+
+				init_cst_param(cst_params);
+
+			#ifdef ENABLE_xscope_main
+				xscope_initialise_1();
+			#endif
+
+
+				while(init_state == INIT_BUSY)
+				{
+					init_state = init_torque_control(c_torque_ctrl);
+					if(init_state == INIT)
+					{
+						printstrln("torque control intialized");
+						break;
+					}
+				}
+
+				shutdown_torque_ctrl(c_torque_ctrl);
+
+
+				set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+				set_profile_velocity( 0, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+				t:>time;
+				while(1)
+				{
+					actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
+					t when timerafter(time + MSEC_STD) :> time;
+					xscope_probe_data(0, actual_torque);
+				}
+			}*/
 		}
 
 		on stdcore[2]:
 		{
-			/* Torque Control Loop */
+			par
 			{
-				ctrl_par torque_ctrl_params;
-				hall_par hall_params;
-				qei_par qei_params;
-				init_qei_param(qei_params);
-				init_hall_param(hall_params);
-				init_torque_control_param(torque_ctrl_params);
-				torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
-						c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+				/* Torque Control Loop */
+				{
+					ctrl_par torque_ctrl_params;
+					hall_par hall_params;
+					qei_par qei_params;
+					init_qei_param(qei_params);
+					init_hall_param(hall_params);
+					init_torque_control_param(torque_ctrl_params);
+					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
+							c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+				}
+
+				/* Velocity Control Loop */
+				/*{
+					ctrl_par velocity_ctrl_params;
+					filter_par sensor_filter_params;
+					hall_par hall_params;
+					qei_par qei_params;
+
+					init_velocity_control_param(velocity_ctrl_params);
+					init_sensor_filter_param(sensor_filter_params);
+					init_hall_param(hall_params);
+					init_qei_param(qei_params);
+
+					velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, \
+						 qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, c_commutation_p2);
+				}*/
 			}
 		}
 
@@ -194,7 +256,7 @@ int main(void)
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
 							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
-							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn,\
+							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
 							hall_params, qei_params, commutation_params);
 				}
 
@@ -209,11 +271,11 @@ int main(void)
 				}
 
 				/* QEI Server */
-//				{
-//					qei_par qei_params;
-//					init_qei_param(qei_params);
-//					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  // channel priority 1,2..4
-//				}
+				{
+					qei_par qei_params;
+					init_qei_param(qei_params);
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  // channel priority 1,2..4
+				}
 
 			}
 		}

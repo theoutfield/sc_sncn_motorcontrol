@@ -49,24 +49,24 @@
  * define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				1//2//8//1
-#define MAX_NOMINAL_SPEED  			2500//2800//5260//2500			// rpm
+#define POLE_PAIRS  				4//2//8//1
+#define MAX_NOMINAL_SPEED  			3000//2800//5260//2500			// rpm
 #define MAX_NOMINAL_CURRENT  		2				// A
 #define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
 
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				26				// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			2000			// 4 x Max count of Quadrature Encoder (4X decoding)
+#define GEAR_RATIO  				1				// if no gears are attached - set to gear ratio to 1
+#define ENCODER_RESOLUTION 			4000			// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				HALL // 			// QEI
+#define SENSOR_USED 				QEI//HALL // 			// QEI
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	// QEI_WITH_NO_INDEX
 
-#define QEI_SENSOR_POLARITY			OUT_OF_PHASE		// OUT_OF_PHASE
+#define QEI_SENSOR_POLARITY			OUT_OF_PHASE//OUT_OF_PHASE//		// OUT_OF_PHASE
 
 /* Somanet IFM Internal Config */
 #define IFM_RESOLUTION				DC300_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
@@ -76,16 +76,16 @@
 #define POLARITY 					1					// 1 / -1
 
 /*Commutation offset (range 0-4095) */
-#define COMMUTATION_OFFSET_CLK		683
-#define COMMUTATION_OFFSET_CCLK		2731
+#define COMMUTATION_OFFSET_CLK		770		// com neg
+#define COMMUTATION_OFFSET_CCLK		2601    //com pos
 
 /*Motor Winding type*/
-#define WINDING_TYPE				STAR_WINDING	//DELTA_WINDING
+#define WINDING_TYPE				DELTA_WINDING //STAR_WINDING	//DELTA_WINDING
 
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY			1001				// rpm
-#define MAX_ACCELERATION   			4000    			// rpm/s
+#define MAX_ACCELERATION   			2500    			// rpm/s
 #define PROFILE_ACCELERATION		2002				// rpm/s
 #define PROFILE_DECELERATION  		2004				// rpm/s
 #define QUICK_STOP_DECELERATION 	2005				// rpm/s
@@ -109,7 +109,7 @@
 #define VELOCITY_Kd_NUMERATOR    	0
 #define VELOCITY_Kd_DENOMINATOR  	1
 
-#define VELOCITY_FILTER_SIZE        24  	//default (could be changed upto 128)
+#define VELOCITY_FILTER_SIZE        8  	//default (could be changed upto 128)
 
 	/*Position Control (Mandatory if Position control used)*/
 #define POSITION_Kp_NUMERATOR 	 	180
@@ -119,8 +119,8 @@
 #define POSITION_Kd_NUMERATOR    	100
 #define POSITION_Kd_DENOMINATOR  	10000
 
-#define MAX_POSITION_LIMIT 			350		// degree
-#define MIN_POSITION_LIMIT 			-350		// degree
+#define MAX_POSITION_LIMIT 			16000		// degree
+#define MIN_POSITION_LIMIT 			-16000		// degree
 
 
 

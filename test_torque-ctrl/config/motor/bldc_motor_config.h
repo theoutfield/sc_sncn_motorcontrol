@@ -49,19 +49,19 @@
  * define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				1
-#define MAX_NOMINAL_SPEED  			2500			// rpm
+#define POLE_PAIRS  				4
+#define MAX_NOMINAL_SPEED  			3000			// rpm
 #define MAX_NOMINAL_CURRENT  		6				// A
-#define MOTOR_TORQUE_CONSTANT 		147    			// mNm/A
+#define MOTOR_TORQUE_CONSTANT 		112    			// mNm/A
 
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
 #define GEAR_RATIO  				18				// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			2000			// 4 x Max count of Quadrature Encoder (4X decoding)
+#define ENCODER_RESOLUTION 			4000			// 4 x Max count of Quadrature Encoder (4X decoding)
 
 /* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				HALL//HALL //HALL 			// QEI
+#define SENSOR_USED 				HALL// //HALL 			// QEI
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	//QEI_WITH_NO_INDEX
@@ -69,18 +69,18 @@
 #define SENSOR_PLACEMENT			OUT_OF_PHASE		// OUT_OF_PHASE
 
 /* Somanet IFM Internal Config */
-#define IFM_RESOLUTION				DC100_RESOLUTION	//DC100_RESOLUTION    /* Specifies the current sensor resolution/A */
+#define IFM_RESOLUTION				400	//    /* Specifies the current sensor resolution/A */
 
 
 /*Changes direction of the motor drive*/
 #define POLARITY 					1		// 1 / -1
 
 /*Commutation offset (range 0-4095) */
-#define COMMUTATION_OFFSET_CLK		683
-#define COMMUTATION_OFFSET_CCLK		2731
+#define COMMUTATION_OFFSET_CLK		770
+#define COMMUTATION_OFFSET_CCLK		2601
 
 /*Motor Winding type*/
-#define WINDING_TYPE				STAR_WINDING 	//DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
+#define WINDING_TYPE				DELTA_WINDING 	//DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
 
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED

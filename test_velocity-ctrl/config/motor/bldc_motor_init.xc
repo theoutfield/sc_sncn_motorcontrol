@@ -79,7 +79,7 @@ void init_hall_param(hall_par &hall_params)
 	//printintln(hall_params.max_ticks);
 	hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
 	//printintln(hall_params.max_ticks);
-
+	hall_params.sensor_polarity = -1;
 	return;
 }
 
@@ -123,8 +123,8 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_ticks_per_turn = __qei_max_counts(qei_params.real_counts);
 	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
-	printintln(qei_params.max_ticks);
-	printintln(qei_params.max_ticks_per_turn);
+	//printintln(qei_params.max_ticks);
+	//printintln(qei_params.max_ticks_per_turn);
 	qei_params.poles = POLE_PAIRS;
 	qei_params.sensor_polarity = QEI_SENSOR_POLARITY;
 	return;
@@ -201,7 +201,7 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 	velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
 	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
 
-	velocity_ctrl_params.Control_limit = 13739; //default
+	velocity_ctrl_params.Control_limit = 6869; //default
 
 	if(velocity_ctrl_params.Ki_n != 0)    							//auto calculated using control_limit
 		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
@@ -222,7 +222,7 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
 	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - for CORE 2/1/0 only default
 
-	position_ctrl_params.Control_limit = 13739; 							 // default do not change
+	position_ctrl_params.Control_limit = 6869; 							 // default do not change
 
 	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
 	{
@@ -249,7 +249,7 @@ void init_torque_control_param(ctrl_par &torque_ctrl_params)
 	torque_ctrl_params.Kd_d = TORQUE_Kd_DENOMINATOR;
 	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - for CORE 2/1/0 only default
 
-	torque_ctrl_params.Control_limit = 13739; 							 // default do not change
+	torque_ctrl_params.Control_limit = 6869; 							 // default do not change
 
 	if(torque_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
 	{

@@ -53,7 +53,7 @@
 #include <drive_config.h>
 //#include <flash_somanet.h>
 
-//#define ENABLE_xscope_main
+#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -95,8 +95,11 @@ void hall_test(chanend c_hall)
 		//wait_ms(1, core_id, t);
 //t when timerafter(time +700):>time;
 #ifdef ENABLE_xscope_main
-		xscope_probe_data(0, position);
-	//	xscope_probe_data(1, velocity);
+		if(dirn == 1)
+		xscope_probe_data(0, hall_params.max_ticks-pos);
+		else if(dirn == -1)
+			xscope_probe_data(0, pos);
+		xscope_probe_data(1, velocity);
 	//	xscope_probe_data(2, pos);
 #else
 		printstr("Position: ");

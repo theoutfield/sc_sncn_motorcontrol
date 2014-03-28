@@ -71,8 +71,9 @@ on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 void xscope_initialise_1()
 {
 	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
+		xscope_register(3, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
+							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n",
+							XSCOPE_CONTINUOUS, "2 target_velocity3", XSCOPE_INT, "n");
 
 		xscope_config_io(XSCOPE_IO_BASIC);
 	}
@@ -83,12 +84,12 @@ void xscope_initialise_1()
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity = 500;	 		// rpm
+	int target_velocity =-3000;	 		// rpm
 	int acceleration 	= 1000;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
 timer t; int time; int actual_velocity;
 #ifdef ENABLE_xscope_main
-	//xscope_initialise_1();
+	xscope_initialise_1();
 #endif
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
@@ -98,9 +99,10 @@ while(1)
 	actual_velocity = get_velocity(c_velocity_ctrl);
 
 	t when timerafter(time + MSEC_STD) :> time;
-
-	//xscope_probe_data(0, actual_velocity);
-	//xscope_probe_data(1, target_velocity);
+#ifdef ENABLE_xscope_main
+	xscope_probe_data(0, actual_velocity);
+	xscope_probe_data(1, target_velocity);
+#endif
 
 }
 	//target_velocity = 0;				// rpm
@@ -156,26 +158,42 @@ int main(void)
 		{
 			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
 		//	velocity_ctrl_unit_test(c_velocity_ctrl, c_qei_p3, c_hall_p3);
-			/*{
-				int init_state;
-				while(1)
-				{
-					init_state = __check_commutation_init(c_commutation_p1);
-					if(init_state == INIT)
-					{
-#ifdef debug_print
-						printstrln("commutation intialized");
-#endif
-						set_commutation_sinusoidal(c_commutation_p1, 400);
-						init_state = INIT_BUSY;
-						break;
-					}
-				}
-			}*/
-			{
+//			{
+//				int init_state;
+//				int i = 0;
+//				int ramp = -500;
+//				timer t;
+//				while(1)
+//				{
+//					init_state = __check_commutation_init(c_commutation_p1);
+//					if(init_state == INIT)
+//					{
+////#ifdef debug_print
+//						printstrln("commutation intialized");
+////#endif
+//						set_commutation_sinusoidal(c_commutation_p1, 500);
+//						init_state = INIT_BUSY;
+//						break;
+//					}
+//				}
+//				while(1)
+//				{
+//					set_commutation_sinusoidal(c_commutation_p1, i);
+//					i = i-10;
+//					if(i < ramp)
+//					{
+//						i = ramp;
+//						break;
+//					}
+//					wait_ms(15, 1, t);
+//				}
+//			}
+
+			// enable_motor_test(c_commutation_p1);
+			//{
 			//detect_sensor_placement( c_hall_p3, c_qei_p3, c_commutation_p3);
 			//printstrln("done");
-			}
+			//}
 		}
 
 		on stdcore[2]:
@@ -215,12 +233,18 @@ int main(void)
 					hall_par hall_params;
 					qei_par qei_params;
 					commutation_par commutation_params;
+					int init_state;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
+					//xscope_initialise_1();
+					//init_state = __check_hall_init(c_hall_p1);
+					//while(init_state != INIT)
+					//	init_state = __check_hall_init(c_hall_p1);
+					//printstrln("init");
 					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
 							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
-							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn,\
+							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
 							hall_params, qei_params, commutation_params);
 				}
 
