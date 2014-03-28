@@ -123,9 +123,10 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_ticks_per_turn = __qei_max_counts(qei_params.real_counts);
 	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
-	//printintln(qei_params.max_ticks);
+	printintln(qei_params.max_ticks_per_turn);
+	printintln(qei_params.max_ticks);
 	qei_params.poles = POLE_PAIRS;
-	qei_params.sensor_polarity = SENSOR_PLACEMENT;
+	qei_params.sensor_polarity = QEI_SENSOR_POLARITY;
 	return;
 }
 

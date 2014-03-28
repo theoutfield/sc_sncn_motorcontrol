@@ -83,10 +83,12 @@ void qei_test(chanend c_qei, chanend c_hall)
 	int valid;
 	int core_id = 1;
 	timer t;
+	int index_count;
+	int count=0;
 	qei_par qei_params;
 	qei_velocity_par qei_velocity_params;  // to compute velocity from qei
 	hall_par hall_params;
-int hall_p, hall_di, hall_velocity, time;
+	int hall_p, hall_di, hall_velocity, time;
 	init_hall_param(hall_params);
 	init_qei_param(qei_params);
 	init_qei_velocity_params(qei_velocity_params);	// to compute velocity from qei
@@ -94,31 +96,28 @@ int hall_p, hall_di, hall_velocity, time;
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif
-	//set_qei_turns(c_qei, 1);
+
 	t :> time;
 	while(1)
 	{
-		{position, valid} = get_qei_position_absolute(c_qei);
-		//{hall_p, hall_di} =  get_hall_position_absolute(c_hall);
-
-		//hall_velocity =  get_hall_velocity(c_hall, hall_params);
-
-		velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
-		wait_ms(1, core_id, t);
-		//t when timerafter(time+13000) :> time;
+		{position, valid} =get_qei_position_absolute(c_qei); 	//{position, valid} = get_qei_position(c_qei, qei_params);		//		//hall_velocity =  get_hall_velocity(c_hall, hall_params);//velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
+	//	{hall_p, hall_di} =  get_hall_position_absolute(c_hall);
+		//{index_count, position, count} = get_qei_data(c_qei);
+		wait_ms(1, core_id, t);			//t when timerafter(time+13000) :> time;
 	#ifdef ENABLE_xscope_main
 		xscope_probe_data(0, position);
-		//xscope_probe_data(1, hall_p);
+	//	xscope_probe_data(1, hall_p);
 		//xscope_probe_data(2, hall_velocity);
-		xscope_probe_data(1, velocity);
-	//	printintln(position);
-		//printintln(hall_p);
+		//xscope_probe_data(1, velocity);
 	#else
 		printstr("Position: ");
 		printint(position);
+		//printstr(" ");
+		//printstr("index: "); // with print velocity information will be corrupt (use xscope)
+		//printint(position&(qei_params.max_ticks_per_turn-1));
 		printstr(" ");
-		printstr("Velocity: "); // with print velocity information will be corrupt (use xscope)
-		printintln(velocity);
+			printstr("count: "); // with print velocity information will be corrupt (use xscope)
+			printintln(count);
 	#endif
 	}
 }
@@ -161,6 +160,7 @@ int main(void)
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
+					//xscope_initialise_1();
 					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  		// channel priority 1,2..5
 				}
 

@@ -57,14 +57,14 @@
 /* If you have any gears added specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (optional)
  */
-#define GEAR_RATIO  				3		// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			2000	// 4 x Max count of Quadrature Encoder (4X decoding)
+#define GEAR_RATIO  				120		// if no gears are attached - set to gear ratio to 1
+#define ENCODER_RESOLUTION 			4000	// 4 x Max count of Quadrature Encoder (4X decoding)
 
 
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	//QEI_WITH_NO_INDEX
 
-#define SENSOR_PLACEMENT			IN_PHASE		// OUT_OF_PHASE
+#define QEI_SENSOR_POLARITY			IN_PHASE//		// OUT_OF_PHASE
 
 /* Somanet IFM Internal Config */
 #define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
@@ -110,8 +110,8 @@
 #define POSITION_Kd_NUMERATOR    	100
 #define POSITION_Kd_DENOMINATOR  	10000
 
-#define MAX_POSITION_LIMIT 			4000		// ticks //degree  MAX int_32
-#define MIN_POSITION_LIMIT 			-4000	// ticks //degree  Min int_32
+#define MAX_POSITION_LIMIT 			GEAR_RATIO*ENCODER_RESOLUTION		// ticks //degree  MAX int_32
+#define MIN_POSITION_LIMIT 			-GEAR_RATIO*ENCODER_RESOLUTION	// ticks //degree  Min int_32
 
 
 /**
