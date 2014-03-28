@@ -147,8 +147,8 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
 	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
 
 	//printstr(" value ");
-	printintln(qei_params.max_ticks_per_turn );
-	printintln(qei_params.max_ticks);
+	//printintln(qei_params.max_ticks_per_turn );
+	//printintln(qei_params.max_ticks);
 	sensor_polarity = sensor_polarity&0x01;
 
 	switch(sensor_polarity)
@@ -239,15 +239,15 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
 void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out)
 {
 	{torque_ctrl_params.Kp_n, torque_ctrl_params.Ki_n, torque_ctrl_params.Kd_n} = torque_sdo_update(coe_out);
-	torque_ctrl_params.Kp_d = 16384;
-	torque_ctrl_params.Ki_d = 16384;
-	torque_ctrl_params.Kd_d = 16384;
+	torque_ctrl_params.Kp_d = 65536; 				// 16 bit precision PID gains
+	torque_ctrl_params.Ki_d = 65536;
+	torque_ctrl_params.Kd_d = 65536;
 
-	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
+	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  	// units - core timer value //CORE 2/1/0 default
 
-	torque_ctrl_params.Control_limit = 13739; 	//default
+	torque_ctrl_params.Control_limit = 6869; 		// 12.74 bit PWM resolution
 
-	if(torque_ctrl_params.Ki_n != 0)    			//auto calculated using control_limit
+	if(torque_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		torque_ctrl_params.Integral_limit = torque_ctrl_params.Control_limit * (torque_ctrl_params.Ki_d/torque_ctrl_params.Ki_n) ;
 	else
 		torque_ctrl_params.Integral_limit = 0;
@@ -258,15 +258,15 @@ void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out
 void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out)
 {
 	{velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);
-	velocity_ctrl_params.Kp_d = 16384;
-	velocity_ctrl_params.Ki_d = 16384;
-	velocity_ctrl_params.Kd_d = 16384;
+	velocity_ctrl_params.Kp_d = 65536; 				// 16 bit precision PID gains
+	velocity_ctrl_params.Ki_d = 65536;
+	velocity_ctrl_params.Kd_d = 65536;
 
-	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
+	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - core timer value //CORE 2/1/0 default
 
-	velocity_ctrl_params.Control_limit = 13739; 	//default
+	velocity_ctrl_params.Control_limit = 6869; 		// 12.74 bit PWM resolution
 
-	if(velocity_ctrl_params.Ki_n != 0)    			//auto calculated using control_limit
+	if(velocity_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
 	else
 		velocity_ctrl_params.Integral_limit = 0;
@@ -276,15 +276,15 @@ void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe
 void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out)
 {
 	{position_ctrl_params.Kp_n, position_ctrl_params.Ki_n, position_ctrl_params.Kd_n} = position_sdo_update(coe_out);
-	position_ctrl_params.Kp_d = 16384;
-	position_ctrl_params.Ki_d = 16384;
-	position_ctrl_params.Kd_d = 16384;
+	position_ctrl_params.Kp_d = 65536; 				// 16 bit precision PID gains
+	position_ctrl_params.Ki_d = 65536;
+	position_ctrl_params.Kd_d = 65536;
 
-	position_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
+	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - core timer value //CORE 2/1/0 default
 
-	position_ctrl_params.Control_limit = 13739; 	//default
+	position_ctrl_params.Control_limit = 6869; 		// 12.74 bit PWM resolution
 
-	if(position_ctrl_params.Ki_n != 0)    			//auto calculated using control_limit
+	if(position_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n) ;
 	else
 		position_ctrl_params.Integral_limit = 0;

@@ -190,7 +190,7 @@ int main(void)
 					commutation_init_ecat(c_signal, hall_params, qei_params, commutation_params);
 					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
 						c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
-						p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn,\
+						p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
 						hall_params, qei_params, commutation_params);						// channel priority 1,2,3
 				}
 

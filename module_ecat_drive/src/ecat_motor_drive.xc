@@ -854,7 +854,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 											//{current_position, direction} = get_hall_position_absolute(c_hall);
 											//printintln(current_position);
 											home_offset = current_position - capture_position;
-											printintln(home_offset);
+											//printintln(home_offset);
 											reset_qei_count(c_qei, home_offset); //reset_hall_count(c_hall, home_offset);//
 											reset_counter = 1;
 										}
@@ -867,7 +867,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 									//mode_selected = 100;
 									homing_done = 1;
-									printstrln("homing_success"); //done
+									//printstrln("homing_success"); //done
 									InOut.operation_mode_display = 250;
 
 								}
