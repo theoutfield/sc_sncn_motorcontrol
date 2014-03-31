@@ -139,7 +139,7 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
 void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, chanend c_qei_p5, \
 		chanend c_qei_p6, port in p_qei, qei_par &qei_params)
 {
-	unsigned int position = 0;
+	int position = 0;
 	unsigned int v;
 	unsigned int ts1;
 	unsigned int ts2;
@@ -195,18 +195,31 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 					{
 						v = lookup[new_pins][old_pins];
 
-						if (!v)
+						if(qei_type == QEI_WITH_NO_INDEX)
 						{
-							flag_index = 1;
-							ok = 1;
-							position = 0;
+							{ v, position } = lmul(1, position, v, -5);
+							if(position > qei_params.real_counts )
+								position = 0;
+							else if(position < -qei_params.real_counts )
+								position = 0;
 						}
 						else
 						{
-							flag_index = 0;
+							if (!v)
+							{
+								flag_index = 1;
+								ok = 1;
+								position = 0;
+							}
+							else
+							{
+								{ v, position } = lmul(1, position, v, -5);
+								flag_index = 0;
+							}
 						}
 
-						{ v, position } = lmul(1, position, v, -5);
+
+					//	xscope_probe_data(0, position);
 
 						old_pins = new_pins & 0x3;
 
