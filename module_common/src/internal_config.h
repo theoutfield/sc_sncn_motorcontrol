@@ -41,7 +41,7 @@
 #pragma once
 
 // default internal definitions (do not change)
-
+#define CONTROL_LIMIT_PWM			6944
 #define TORQUE_CTRL_READ(x)			c_torque_ctrl :> x
 #define TORQUE_CTRL_WRITE(x)		c_torque_ctrl <: x
 

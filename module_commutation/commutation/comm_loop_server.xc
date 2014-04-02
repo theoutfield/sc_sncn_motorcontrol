@@ -218,12 +218,12 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 				{
 					angle_pwm = (((angle + commutation_params.qei_forward_offset) & 0x0fff) >> 2)&0x3ff;	 //512
 				}
-				pwm[0] = ((sine_third_expanded(angle_pwm))*voltage)/pwm_half   + pwm_half;		// 6944 -- 6867range
+				pwm[0] = ((sine_third_expanded(angle_pwm))*voltage)/CONTROL_LIMIT_PWM   + pwm_half;		// 6944 -- 6867range
 				angle_pwm = (angle_pwm + 341) & 0x3ff;
 
-				pwm[1] = ((sine_third_expanded(angle_pwm))*voltage)/pwm_half   + pwm_half;
+				pwm[1] = ((sine_third_expanded(angle_pwm))*voltage)/CONTROL_LIMIT_PWM   + pwm_half;
 				angle_pwm = (angle_pwm + 342) & 0x3ff;
-				pwm[2] = ((sine_third_expanded(angle_pwm))*voltage)/pwm_half   + pwm_half;
+				pwm[2] = ((sine_third_expanded(angle_pwm))*voltage)/CONTROL_LIMIT_PWM   + pwm_half;
 
 			}
 			else if (direction == -1)
@@ -236,12 +236,12 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 				{
 					angle_pwm = (((angle  + commutation_params.qei_backward_offset ) & 0x0fff) >> 2)&0x3ff;  	 //3100
 				}
-				pwm[0] = ((sine_third_expanded(angle_pwm))*-voltage)/pwm_half   + pwm_half;
+				pwm[0] = ((sine_third_expanded(angle_pwm))*-voltage)/CONTROL_LIMIT_PWM   + pwm_half;
 				angle_pwm = (angle_pwm + 341) & 0x3ff;
 
-				pwm[1] = ((sine_third_expanded(angle_pwm))*-voltage)/pwm_half   + pwm_half;
+				pwm[1] = ((sine_third_expanded(angle_pwm))*-voltage)/CONTROL_LIMIT_PWM   + pwm_half;
 				angle_pwm = (angle_pwm + 342) & 0x3ff;
-				pwm[2] = ((sine_third_expanded(angle_pwm))*-voltage)/pwm_half   + pwm_half;
+				pwm[2] = ((sine_third_expanded(angle_pwm))*-voltage)/CONTROL_LIMIT_PWM   + pwm_half;
 
 			}
 

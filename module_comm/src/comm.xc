@@ -245,7 +245,7 @@ void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out
 
 	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  	// units - core timer value //CORE 2/1/0 default
 
-	torque_ctrl_params.Control_limit = 6869; 		// PWM resolution
+	torque_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150;  // PWM resolution
 
 	if(torque_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		torque_ctrl_params.Integral_limit = torque_ctrl_params.Control_limit * (torque_ctrl_params.Ki_d/torque_ctrl_params.Ki_n) ;
@@ -264,7 +264,7 @@ void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe
 
 	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - core timer value //CORE 2/1/0 default
 
-	velocity_ctrl_params.Control_limit = 6869; 		// PWM resolution
+	velocity_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; // PWM resolution
 
 	if(velocity_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
@@ -282,7 +282,7 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
 
 	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - core timer value //CORE 2/1/0 default
 
-	position_ctrl_params.Control_limit = 6869; 		// PWM resolution
+	position_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; // PWM resolution
 
 	if(position_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n) ;
