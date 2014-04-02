@@ -135,7 +135,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 					phase_b_filtered += buffer_phase_b[mod];
 					j++;
 				}
-				phase_a_filtered /= filter_length_variance;
+				/*phase_a_filtered /= filter_length_variance;
 				phase_b_filtered /= filter_length_variance;
 				/*xscope_probe_data(0, phase_a_filtered);
 				xscope_probe_data(1, phase_b_filtered);
@@ -214,8 +214,8 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	int beta = 0;
 	int Id = 0;
 	int Iq = 0;
-	int phase_1 = 0;
-	int phase_2 = 0;
+	int phase_a = 0;
+	int phase_b = 0;
 	int filter_length = FILTER_LENGTH_TORQUE;
 	int buffer_Id[FILTER_LENGTH_TORQUE];
 	int buffer_Iq[FILTER_LENGTH_TORQUE];
@@ -292,15 +292,15 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					c_current :> phase_a_filtered;
 					c_current :> phase_b_filtered;
 
-					phase_1 = 0 - phase_a_filtered;
-					phase_2 = 0 - phase_b_filtered;
+					phase_a = 0 - phase_a_filtered;
+					phase_b = 0 - phase_b_filtered;
 
 					#ifdef ENABLE_xscope_torq
 					xscope_probe_data(0, phase_a_filtered);
 					#endif
 					//				xscope_probe_data(1, phase_b_filtered);
-					alpha = phase_1;
-					beta = (phase_1 + 2*phase_2); 			// beta = (a1 + 2*a2)/1.732 0.57736 --> invers from 1.732
+					alpha = phase_a;
+					beta = (phase_a + 2*phase_b); 			// beta = (a1 + 2*a2)/1.732 0.57736 --> invers from 1.732
 					beta *= 37838;
 					beta /= 65536;
 					beta = -beta;
@@ -379,8 +379,6 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					}
 					else
 					{
-
-
 						torque_control_output = 0 - torque_control_output;
 						if(torque_control_output > 0)
 							torque_control_output = 0;

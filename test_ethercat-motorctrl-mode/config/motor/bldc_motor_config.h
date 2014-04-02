@@ -5,7 +5,8 @@
  *	Motor Control config file
  *
  *	Please define your the motor specifications here
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
  * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>

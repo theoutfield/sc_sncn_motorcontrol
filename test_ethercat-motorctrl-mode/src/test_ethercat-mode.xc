@@ -5,7 +5,8 @@
  *
  * \brief Main project file
  *  Test illustrates usage of Motor Control with Ethercat
- *
+ */
+/*
  *
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
@@ -42,10 +43,7 @@
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <ioports.h>
-#include <xscope.h>
 #include <pwm_service_inv.h>
 #include <comm_loop_server.h>
 #include <qei_server.h>
@@ -76,7 +74,7 @@ int main(void)
 	chan c_torque_ctrl;														// torque control channel
 	chan c_position_ctrl;													// position control channel
 	chan c_watchdog; 														// watchdog channel
-	chan c_home;															// homing channel
+	chan c_gpio_0, c_gpio_1;												// gpio digital channels
 
 	// EtherCat Communication channels
 	chan coe_in; 		// CAN from module_ethercat to consumer
@@ -90,7 +88,6 @@ int main(void)
 	chan pdo_out;
 	chan c_sig_1;
 
-	chan c_gpio_0, c_gpio_1;
 	par
 	{
 		/* Ethercat Communication Handler Loop */
@@ -110,7 +107,7 @@ int main(void)
 		/* Ethercat Motor Drive Loop */
 		on stdcore[1] :
 		{
-			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5, c_home,\
+			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5,\
 					c_torque_ctrl, c_velocity_ctrl, c_position_ctrl, c_gpio_0);
 		}
 

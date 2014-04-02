@@ -4,7 +4,8 @@
  * \file ecat_motor_drive.h
  *
  *	Ethercat Motor Drive Server
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
  * Author: Martin Schwarz <mschwarz@synapticon.com>
@@ -44,12 +45,9 @@
 #include <velocity_ctrl_client.h>
 #include <position_ctrl_client.h>
 #include <torque_ctrl_client.h>
-#include <hall_server.h>
 #include <hall_client.h>
 #include <qei_client.h>
-#include <qei_server.h>
 #include <profile.h>
-#include <homing.h>
 
 /**
  * \brief This server implementation enables motor drive functions via Ethercat communication
@@ -66,11 +64,11 @@
  * \channel c_torque_ctrl channel to receive/send torque control information
  * \channel c_velocity_ctrl channel to receive/send velocity control information
  * \channel c_position_ctrl channel to receive/send position control information
+ * \channel c_gpio channel to config/read/drive GPIO digital ports
  *
  */
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
-		chanend c_qei, chanend c_home, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl,\
-		chanend c_gpio);
+		chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio);
 
 int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation);
 #endif /* ECAT_MOTOR_DRIVE_H_ */
