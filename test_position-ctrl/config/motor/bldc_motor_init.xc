@@ -75,7 +75,7 @@ void init_hall_param(hall_par &hall_params)
 		else
 			hall_params.max_ticks = 0 - max;
 	}
-	hall_params.max_ticks_per_turn = POLE_PAIRS * 4096;
+	hall_params.max_ticks_per_turn = POLE_PAIRS * HALL_POSITION_INTERPOLATED_RANGE;
 	//printintln(hall_params.max_ticks);
 	hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
 	//printintln(hall_params.max_ticks);
@@ -124,7 +124,7 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
 	//printintln(qei_params.max_ticks);
 	qei_params.poles = POLE_PAIRS;
-	qei_params.sensor_polarity = SENSOR_PLACEMENT;
+	qei_params.sensor_polarity = QEI_SENSOR_POLARITY;
 	return;
 }
 
@@ -203,7 +203,6 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 
 void init_position_control_param(ctrl_par &position_ctrl_params)
 {
-
 	position_ctrl_params.Kp_n = POSITION_Kp_NUMERATOR;
 	position_ctrl_params.Kp_d = POSITION_Kp_DENOMINATOR;
 	position_ctrl_params.Ki_n = POSITION_Ki_NUMERATOR;
@@ -228,7 +227,6 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 
 void init_torque_control_param(ctrl_par &torque_ctrl_params)
 {
-
 	torque_ctrl_params.Kp_n = TORQUE_Kp_NUMERATOR;
 	torque_ctrl_params.Kp_d = TORQUE_Kp_DENOMINATOR;
 	torque_ctrl_params.Ki_n = TORQUE_Ki_NUMERATOR;

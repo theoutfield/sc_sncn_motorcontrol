@@ -5,8 +5,8 @@
  *
  * \brief Main project file
  *  Test illustrates usage of adc to get external potentiometer sensor values
- *
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
  * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
@@ -54,7 +54,6 @@
 #include <xscope.h>
 #include <bldc_motor_config.h>
 #include <drive_config.h>
-//#include <flash_somanet.h>
 
 //#define ENABLE_xscope_main
 #define COM_CORE 0
@@ -80,7 +79,6 @@ void external_pot_test(chanend c_adc)
 	int external_pot2;
 	int core_id = 1;
 	timer t;
-
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif
@@ -88,9 +86,6 @@ void external_pot_test(chanend c_adc)
 	while(1)
 	{
 		{external_pot1 , external_pot2} = get_adc_external_potentiometer_ad7949(c_adc);
-//		{phase_a, phase_b, ;
-//			get_adc_all_ad7949(c_adc);
-
 		wait_ms(1, core_id, t);
 
 #ifdef ENABLE_xscope_main
@@ -98,9 +93,9 @@ void external_pot_test(chanend c_adc)
 		xscope_probe_data(1, external_pot2);
 #else
 		printstr("External pot1: ");
-		printintln(external_pot1);
+		printint(external_pot1);
 		printstr(" ");
-		printstr("External pot2:");
+		printstr(" External pot2: ");
 		printintln(external_pot2);
 #endif
 	}
@@ -138,7 +133,8 @@ int main(void)
 			par
 			{
 				/* ADC loop (only if motor control is not used) */
-			//	adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
+		//		adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
+
 
 				/* ADC triggered loop (only if motor control is used) */
 				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,
@@ -146,7 +142,7 @@ int main(void)
 						p_ifm_adc_misob);
 
 				/* PWM Loop */
-				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
+				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,\
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				/* Motor Commutation loop */
@@ -159,7 +155,7 @@ int main(void)
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); // initialize commutation params
 					commutation_sinusoidal(c_hall_p1,  c_qei, c_signal, c_watchdog, 	\
 							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
-							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn,\
+							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
 							hall_params, qei_params, commutation_params);
 				}
 

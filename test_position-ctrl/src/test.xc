@@ -9,6 +9,8 @@
 #include "comm_loop_client.h"
 #include <profile_control.h>
 #include <bldc_motor_config.h>
+#include <drive_config.h>
+#include <xscope.h>
 
 void position_ctrl_unit_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
 {
@@ -59,6 +61,86 @@ void position_ctrl_unit_test(chanend c_position_ctrl, chanend c_qei, chanend c_h
 			default:
 				break;
 		}
+	}
+}
+
+void positioning_accuracy(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
+{
+	int init_state;
+	int actual_position = 0;			// ticks test purpose only
+	int target_position = -70997;		// ticks
+	int velocity 		= 1000;			// rpm
+	int acceleration 	= 1000;			// rpm/s
+	int deceleration 	= 1000;     	// rpm/s
+	//int turns = 1;
+	int tickss= 704512;
+	int follow_error;
+	timer t; unsigned int time;
+	//ctrl_par position_ctrl_params;
+	hall_par hall_params;
+	qei_par qei_params;
+	int position_ramp = 0; int steps; int i;
+	int ki = 0;
+	init_state = __check_position_init(c_position_ctrl);
+	init_qei_param(qei_params);
+		init_hall_param(hall_params);
+	while(init_state == INIT_BUSY)
+	{
+		set_position_sensor(SENSOR_USED, c_position_ctrl);
+		init_state = init_position_control(c_position_ctrl);
+	}
+
+	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_params, \
+			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
+
+#ifdef ENABLE_xscope_main
+	xscope_initialise_1();
+#endif
+
+	//set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, c_position_ctrl);
+	target_position = tickss;
+	while(ki <= 10)
+	{
+		actual_position = get_position(c_position_ctrl);
+		steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
+
+		t :> time;
+		for(i = 0; i < steps; i++)
+		{
+		//	xscope_probe_data(0, position_ramp);
+			position_ramp = position_profile_generate(i);
+			set_position(position_ramp, c_position_ctrl);
+			actual_position = get_position(c_position_ctrl);
+			follow_error = position_ramp - actual_position;
+			t when timerafter(time + MSEC_STD) :> time;
+		//	xscope_probe_data(1, actual_position);
+		//	xscope_probe_data(2, follow_error);
+
+		}
+		t when timerafter(time + 100*MSEC_STD) :> time;
+		//printintln(target_position);
+		ki = ki + 1;
+		//target_position = target_position - 16000;
+		target_position = ki&1;
+		if(target_position == 0)
+			target_position = tickss;
+		else
+			target_position = -tickss;
+
+	}
+	printintln(target_position);
+	actual_position = get_position(c_position_ctrl);
+	printintln(actual_position);
+//	printstrln("done");
+	while(1)
+	{
+		actual_position = get_position(c_position_ctrl);
+		//printintln(actual_position);
+		follow_error = target_position - actual_position;
+		//xscope_probe_data(0, position_ramp);
+		xscope_probe_data(1, actual_position);
+		xscope_probe_data(2, follow_error);
+		t when timerafter(time + MSEC_STD) :> time;
 	}
 }
 

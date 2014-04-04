@@ -135,12 +135,12 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 					phase_b_filtered += buffer_phase_b[mod];
 					j++;
 				}
-				/*phase_a_filtered /= filter_length_variance;
+				phase_a_filtered /= filter_length_variance;
 				phase_b_filtered /= filter_length_variance;
-				/*xscope_probe_data(0, phase_a_filtered);
-				xscope_probe_data(1, phase_b_filtered);
-				/*	xscope_probe_data(2, phase_a_raw);
-								xscope_probe_data(3, phase_b_raw);*/
+				/*xscope_probe_data(2, phase_a_filtered);
+				xscope_probe_data(3, phase_b_filtered);
+				xscope_probe_data(2, phase_a_raw);
+				xscope_probe_data(3, phase_b_raw);*/
 				filter_count++;
 				if(filter_count == 10)
 				{

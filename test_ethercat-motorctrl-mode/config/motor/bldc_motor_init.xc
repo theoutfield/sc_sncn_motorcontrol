@@ -3,7 +3,8 @@
  *
  * \file bldc_motor_init.xc
  *	Motor Control config declarations
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
  * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
@@ -199,9 +200,9 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 	velocity_ctrl_params.Ki_d = 16384;
 	velocity_ctrl_params.Kd_n = VELOCITY_KD;
 	velocity_ctrl_params.Kd_d = 16384;
-	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  //units - core timer value //CORE 2/1/0 default
+	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  				//units - core timer value //CORE 2/1/0 default
 
-	velocity_ctrl_params.Control_limit = 13739; //default
+	velocity_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; 	//default
 
 	if(velocity_ctrl_params.Ki_n != 0)    							//auto calculated using control_limit
 		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n );
@@ -219,11 +220,11 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 	position_ctrl_params.Ki_d = 16384;
 	position_ctrl_params.Kd_n = POSITION_KD;
 	position_ctrl_params.Kd_d = 16384;
-	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - for CORE 2/1/0 only default
+	position_ctrl_params.Loop_time = 1 * MSEC_STD;  				// units - for CORE 2/1/0 only default
 
-	position_ctrl_params.Control_limit = 13739; 							 // default do not change
+	position_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150;	// default do not change
 
-	if(position_ctrl_params.Ki_n != 0)										 // auto calculated using control_limit
+	if(position_ctrl_params.Ki_n != 0)								// auto calculated using control_limit
 	{
 		position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n) ;
 	}
@@ -237,7 +238,6 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 
 void init_torque_control_param(ctrl_par &torque_ctrl_params)
 {
-
 	torque_ctrl_params.Kp_n = TORQUE_KP;
 	torque_ctrl_params.Kp_d = 16384;
 	torque_ctrl_params.Ki_n = TORQUE_KI;
@@ -246,7 +246,7 @@ void init_torque_control_param(ctrl_par &torque_ctrl_params)
 	torque_ctrl_params.Kd_d = 16384;
 	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  				// default do not change - for CORES 2/1/0 only
 
-	torque_ctrl_params.Control_limit = 13739; 					// default do not change
+	torque_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150;	// default do not change
 
 	if(torque_ctrl_params.Ki_n != 0)							// auto calculated using control_limit
 	{

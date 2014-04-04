@@ -5,7 +5,8 @@
  *	Motor Control config file
  *
  *	Please define your the motor specifications here
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
  * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
@@ -45,47 +46,54 @@
 
 #pragma once
 
-/*
- * define Motor Specific Constants (found in motor specification sheet)
+/**
+ * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				4//2//8//1
-#define MAX_NOMINAL_SPEED  			3000//2800//5260//2500			// rpm
+#define POLE_PAIRS  				4				// Number of pole pairs
+#define MAX_NOMINAL_SPEED  			3000			// rpm
 #define MAX_NOMINAL_CURRENT  		2				// A
 #define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
 
-/* If you have any gears added specify gear-ratio
- * and any additional encoders attached specify encoder resolution here (optional)
+/**
+ * If you have any gears added, specify gear-ratio
+ * and any additional encoders attached specify encoder resolution here (Mandatory)
  */
-#define GEAR_RATIO  				1				// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			4000			// 4 x Max count of Quadrature Encoder (4X decoding)
+#define GEAR_RATIO  				100				// if no gears are attached - set to gear ratio to 1
+#define ENCODER_RESOLUTION 			4000			// 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
 
-/* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				QEI//HALL // 			// QEI
+/* Position/Velocity Sensor Types (select your sensor type here)
+ * (HALL/ QEI) */
+#define SENSOR_USED 				QEI
 
-/*Define your Encoder type*/
-#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	// QEI_WITH_NO_INDEX
+/* Define your Incremental Encoder type (QEI_INDEX/ QEI_NO_INDEX) */
+#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX
 
-#define QEI_SENSOR_POLARITY			OUT_OF_PHASE//OUT_OF_PHASE//		// OUT_OF_PHASE
+/* Polarity is used to keep all position sensors to count ticks in the same direction
+ *  (NORMAL/INVERTED) */
+#define QEI_SENSOR_POLARITY			INVERTED
 
-/* Somanet IFM Internal Config */
-#define IFM_RESOLUTION				DC300_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
+/* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
+ *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
+#define IFM_RESOLUTION				DC300_RESOLUTION
 
-
-/*Changes direction of the motor drive*/
-#define POLARITY 					1					// 1 / -1
-
-/*Commutation offset (range 0-4095) */
+/* Commutation offset (range 0-4095) (HALL sensor based commutation) */
 #define COMMUTATION_OFFSET_CLK		770		// com neg
 #define COMMUTATION_OFFSET_CCLK		2601    //com pos
 
-/*Motor Winding type*/
-#define WINDING_TYPE				DELTA_WINDING //STAR_WINDING	//DELTA_WINDING
+/* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
+#define WINDING_TYPE				DELTA_WINDING
 
-/* Profile defines (optional) */
+/* Changes direction of the motor drive  (1 /-1) */
+#define POLARITY 					1
+
+#define MAX_POSITION_LIMIT 			16000				// ticks (max range: 2^30, limited for safe operation)
+#define MIN_POSITION_LIMIT 			-16000				// ticks (min range: -2^30, limited for safe operation)
+
+/* Profile defines (Mandatory for profile modes) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY			1001				// rpm
-#define MAX_ACCELERATION   			2500    			// rpm/s
+#define MAX_ACCELERATION   			3000    			// rpm/s
 #define PROFILE_ACCELERATION		2002				// rpm/s
 #define PROFILE_DECELERATION  		2004				// rpm/s
 #define QUICK_STOP_DECELERATION 	2005				// rpm/s
@@ -93,15 +101,9 @@
 
 
 /* Control specific constants/variables */
-	/*Torque Control (Mandatory if Torque control used)*/
-#define TORQUE_Kp_NUMERATOR 	   	50
-#define TORQUE_Kp_DENOMINATOR  		10
-#define TORQUE_Ki_NUMERATOR    		11
-#define TORQUE_Ki_DENOMINATOR  		110
-#define TORQUE_Kd_NUMERATOR    		1
-#define TORQUE_Kd_DENOMINATOR  		10
-
-	/*Velocity Control (Mandatory if Velocity control used)*/
+	/* Velocity Control (Mandatory if Velocity control used)
+	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
 #define VELOCITY_Kp_NUMERATOR 	 	5
 #define VELOCITY_Kp_DENOMINATOR  	10
 #define VELOCITY_Ki_NUMERATOR    	5
@@ -111,7 +113,19 @@
 
 #define VELOCITY_FILTER_SIZE        8  	//default (could be changed upto 128)
 
-	/*Position Control (Mandatory if Position control used)*/
+	/* Torque Control (Mandatory if Torque control used)
+	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
+#define TORQUE_Kp_NUMERATOR 	   	50
+#define TORQUE_Kp_DENOMINATOR  		10
+#define TORQUE_Ki_NUMERATOR    		11
+#define TORQUE_Ki_DENOMINATOR  		110
+#define TORQUE_Kd_NUMERATOR    		1
+#define TORQUE_Kd_DENOMINATOR  		10
+
+	/* Position Control (Mandatory if Position control used)
+	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
 #define POSITION_Kp_NUMERATOR 	 	180
 #define POSITION_Kp_DENOMINATOR  	2000
 #define POSITION_Ki_NUMERATOR    	50
@@ -119,8 +133,7 @@
 #define POSITION_Kd_NUMERATOR    	100
 #define POSITION_Kd_DENOMINATOR  	10000
 
-#define MAX_POSITION_LIMIT 			16000		// degree
-#define MIN_POSITION_LIMIT 			-16000		// degree
+
 
 
 

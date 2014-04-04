@@ -54,13 +54,6 @@
 #include "print.h"
 
 
-#define FORWARD_CONSTANT 		683  	//60  deg
-#define REVERSE_CONSTANT 		2731	//240 deg
-
-//static t_pwm_control pwm_ctrl;
-
-
-
 void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 {
 	unsigned int pwm[3] = {0, 0, 0};  // PWM OFF
@@ -86,8 +79,8 @@ void commutation_client_hanlder(chanend c_commutation, int command, commutation_
 	switch(command)
 	{
 		case SET_VOLTAGE:				// set voltage
-			c_commutation :> voltage;
-			if(commutation_params.winding_type == DELTA_WINDING) //STAR_WINDING
+			c_commutation :> voltage;	//STAR_WINDING
+			if(commutation_params.winding_type == DELTA_WINDING)
 			{
 				voltage = 0 - voltage;
 			}

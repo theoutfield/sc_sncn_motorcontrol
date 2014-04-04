@@ -112,23 +112,23 @@ int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation
 	printintln(avg_q);
 	if(avg_q > 0 && sum_h <0)
 	{
-		sensor_placement_type = OUT_OF_PHASE;
-		printstrln("out of phase case1");
+		sensor_placement_type = INVERTED;
+		printstrln("inverted case1");
 	}
 	if(avg_q<0  && sum_h>0)
 	{
-		sensor_placement_type = OUT_OF_PHASE;
-		printstrln("out of phase case2");
+		sensor_placement_type = INVERTED;
+		printstrln("inverted case2");
 	}
 	if(avg_q>0 && sum_h>0)
 	{
-		sensor_placement_type = IN_PHASE;
-		printstrln("in phase case1");
+		sensor_placement_type = NORMAL;
+		printstrln("normal case1");
 	}
 	if(avg_q<0 && sum_h<0)
 	{
-		sensor_placement_type = IN_PHASE;
-		printstrln("in phase case2");
+		sensor_placement_type = NORMAL;
+		printstrln("normal case2");
 	}
 	set_commutation_sinusoidal(c_commutation ,0);
 	return sensor_placement_type;

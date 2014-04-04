@@ -56,7 +56,36 @@ void velocity_ctrl_unit_test(chanend c_velocity_ctrl, chanend c_qei, chanend c_h
 	}
 }
 
-
+//			{
+//				int init_state;
+//				int i = 0;
+//				int ramp = -500;
+//				timer t;
+//				while(1)
+//				{
+//					init_state = __check_commutation_init(c_commutation_p1);
+//					if(init_state == INIT)
+//					{
+////#ifdef debug_print
+//						printstrln("commutation intialized");
+////#endif
+//						set_commutation_sinusoidal(c_commutation_p1, 500);
+//						init_state = INIT_BUSY;
+//						break;
+//					}
+//				}
+//				while(1)
+//				{
+//					set_commutation_sinusoidal(c_commutation_p1, i);
+//					i = i-10;
+//					if(i < ramp)
+//					{
+//						i = ramp;
+//						break;
+//					}
+//					wait_ms(15, 1, t);
+//				}
+//			}
 
 void enable_motor_test(chanend c_commutation)
 {

@@ -181,7 +181,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 
 	while (1)
 	{
-#pragma xta endpoint "qei_loop"
+		#pragma xta endpoint "qei_loop"
 		#pragma ordered
 		select
 		{
@@ -198,9 +198,9 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 						if(qei_type == QEI_WITH_NO_INDEX)
 						{
 							{ v, position } = lmul(1, position, v, -5);
-							if(position > qei_params.real_counts )
+							if(position >= qei_params.real_counts )
 								position = 0;
-							else if(position < -qei_params.real_counts )
+							else if(position <= -qei_params.real_counts )
 								position = 0;
 						}
 						else
@@ -235,7 +235,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 							//xscope_probe_data(1, difference);
 							if( difference >= qei_crossover)
 							{
-								if(qei_params.sensor_polarity == IN_PHASE)
+								if(qei_params.sensor_polarity == NORMAL)
 									count = count - 1;
 								else
 									count = count + 1;
@@ -245,7 +245,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 							}
 							else if(difference <= -qei_crossover)
 							{
-								if(qei_params.sensor_polarity == IN_PHASE)
+								if(qei_params.sensor_polarity == NORMAL)
 									count = count + 1;
 								else
 									count = count - 1;
@@ -255,12 +255,12 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 							}
 							else if( difference <= 2 && difference > 0)
 							{
-								if(qei_params.sensor_polarity == IN_PHASE)
+								if(qei_params.sensor_polarity == NORMAL)
 								{
 									count = count + difference;
 									sync_out = sync_out + difference;
 								}
-								else if(qei_params.sensor_polarity == OUT_OF_PHASE)
+								else
 								{
 									count = count - difference;
 									sync_out = sync_out - difference;
@@ -269,12 +269,12 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 							}
 							else if( difference < 0 && difference >= -2)
 							{
-								if(qei_params.sensor_polarity == IN_PHASE)
+								if(qei_params.sensor_polarity == NORMAL)
 								{
 									count = count + difference;
 									sync_out = sync_out + difference;
 								}
-								else if(qei_params.sensor_polarity == OUT_OF_PHASE)
+								else
 								{
 									count = count - difference;
 									sync_out = sync_out - difference;

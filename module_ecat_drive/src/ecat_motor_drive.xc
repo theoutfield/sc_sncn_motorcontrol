@@ -187,9 +187,9 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	init_velocity_control_param(velocity_ctrl_params);
 	init_qei_velocity_params(qei_velocity_params);
 
-//#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope_main
 	xscope_initialise();
-//#endif
+#endif
 	t:>time;
 	while(1)
 	{
@@ -431,12 +431,12 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			if(sensor_select == HALL)
 			{
 				actual_velocity = get_hall_velocity(c_hall, hall_params);
-			//	send_actual_velocity(actual_velocity*polarity, InOut);
+				send_actual_velocity(actual_velocity*polarity, InOut);
 			}
 			else if(sensor_select == QEI)
 			{
 				actual_velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
-			//	send_actual_velocity(actual_velocity*polarity, InOut);
+				send_actual_velocity(actual_velocity*polarity, InOut);
 			}
 
 
@@ -842,8 +842,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							{
 								if(reset_counter == 0)
 								{
-									ack =1;//h_active = 1;
-									if(i < steps)//update_hall_param_ecat(hall_params, coe_out);
+									ack =1;
+									if(i < steps)
 									{
 										velocity_ramp = velocity_profile_generate(i);
 										set_velocity(velocity_ramp, c_velocity_ctrl);
@@ -852,12 +852,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 									home_state = read_gpio_digital_input(c_gpio, 0);
 									safety_state = read_gpio_digital_input(c_gpio, 1);
 									{capture_position, direction} = get_qei_position_absolute(c_qei);
-									//{home_state, safety_state, capture_position, direction} = get_home_state(c_home);
-//									if(i>=steps && end_state ==0)
-//									{
-//										home_state =1;//simulate switch
-//										{capture_position, direction} = get_qei_position_absolute(c_qei);
-//									}
+
 									if( (home_state == 1 || safety_state == 1 ) && end_state == 0)
 									{
 										actual_velocity = get_velocity(c_velocity_ctrl);
@@ -931,11 +926,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							//xscope_probe_data(0, actual_position);
 							//xscope_probe_data(1, target_position);
 					//	#endif
-							safety_state = read_gpio_digital_input(c_gpio, 1);     	// read port 1
+							//safety_state = read_gpio_digital_input(c_gpio, 1);     	// read port 1
 							//value = (port_3_value<<3 | port_2_value<<2 | port_1_value <<1| safety_state );  pack values if more than one port inputs
-			/*				send_actual_torque(safety_state, InOut);
-							drive_port_state = get_target_torque(InOut);
-							write_gpio_digital_output(c_gpio, 2, drive_port_state); // write port 2	*/
 						}
 						else if(op_mode == PP)
 						{

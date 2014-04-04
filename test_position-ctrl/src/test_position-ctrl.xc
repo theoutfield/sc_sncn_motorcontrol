@@ -5,8 +5,8 @@
  *
  * \brief Main project file
  *  Test illustrates usage of profile position control
- *
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
  * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
@@ -57,14 +57,10 @@
 #include <drive_config.h>
 #include <profile_control.h>
 #include <internal_config.h>
-#include <flash_somanet.h>
 #include "position_ctrl_client.h"
-#include <homing.h>
-#include <gpio_server.h>
-#include <gpio_client.h>
 #include <test.h>  //Unit Testing Position control (optional)
 
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -86,139 +82,40 @@ void xscope_initialise_1()
 /* Test Profile Position function */
 void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
 {
-	int init_state;
-	int actual_position = 0;			// ticks test purpose only
-	int target_position = 4000;		// ticks
-	int velocity 		= 3000;			// rpm
-	int acceleration 	= 3000;			// rpm/s
-	int deceleration 	= 3000;     		// rpm/s
-	//int turns = 1;
-	int tickss= 400000;
+	int actual_position = 0;			// ticks
+	int target_position = 1997;			// ticks
+	int velocity 		= 100;			// rpm
+	int acceleration 	= 100;			// rpm/s
+	int deceleration 	= 100;     		// rpm/s
 	int follow_error;
-	timer t; unsigned int time;
-	//ctrl_par position_ctrl_params;
+	timer t;
 	hall_par hall_params;
 	qei_par qei_params;
-	int position_ramp = 0; int steps; int i;
-	int ki = 0;
-	init_state = __check_position_init(c_position_ctrl);
 	init_qei_param(qei_params);
-		init_hall_param(hall_params);
-	while(init_state == INIT_BUSY)
-	{
-		set_position_sensor(SENSOR_USED, c_position_ctrl);
-		init_state = init_position_control(c_position_ctrl);
-		//if(init_state == INIT)
-		///	//printstrln("position control intialized");
-		//else
-			//printstrln("intialize position control failed");
-	}
-
-
+	init_hall_param(hall_params);
 
 
 	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_params, \
 			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
 
 #ifdef ENABLE_xscope_main
-	//xscope_initialise_1();
+	xscope_initialise_1();
 #endif
 
-	//set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, c_position_ctrl);
-	target_position = tickss;
-	while(ki <= 50)
-	{
-		actual_position = get_position(c_position_ctrl);
-		steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
+	set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, c_position_ctrl);
 
-		t :> time;
-		for(i = 0; i < steps; i++)
-		{
-		//	xscope_probe_data(0, position_ramp);
-			position_ramp = position_profile_generate(i);
-			set_position(position_ramp, c_position_ctrl);
-			actual_position = get_position(c_position_ctrl);
-			follow_error = position_ramp - actual_position;
-			t when timerafter(time + MSEC_STD) :> time;
-			//printintln(position_ramp);
+	actual_position = get_position(c_position_ctrl);
 
-		//	xscope_probe_data(1, actual_position);
-		//	xscope_probe_data(2, follow_error);
-
-		}
-		t when timerafter(time + 100*MSEC_STD) :> time;//*/
-		//printintln(target_position);
-		ki = ki + 1;
-		//target_position = target_position - 16000;
-		target_position = ki&1;
-		if(target_position == 0)
-			target_position = tickss;
-		else
-			target_position = -tickss;
-
-	}
-//	printintln(target_position);
-	printintln(actual_position);
-//	printstrln("done");
 	while(1)
 	{
-	//	actual_position = get_position(c_position_ctrl);
-		//printintln(actual_position);
-		follow_error = position_ramp - actual_position;
-		//xscope_probe_data(0, position_ramp);
-		//xscope_probe_data(1, actual_position);
-		//xscope_probe_data(2, follow_error);
-		t when timerafter(time + MSEC_STD) :> time;
-	}//*/
-				/*xscope_probe_data(0, actual_position);
-	//reset_qei_count(c_qei, -5260);  // reset_hall_count(c_hall, 40960);
-
-//	set_profile_position(target_position, velocity, acceleratio n, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
-
-//	set_profile_position(92, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
-	//reset_qei_count(c_qei, -5260);
-
-
-
-//	 init_position_control_param(position_ctrl_params);
-//	 init_hall_param(hall_params);
-//	 init_qei_param(qei_params);
-//	 set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
-//	 set_position_ctrl_hall_param(hall_params, c_position_ctrl);
-//	 set_position_ctrl_qei_param(qei_params, c_position_ctrl);
-//set_position_sensor(QEI, c_position_ctrl);
-	  //add sensor select to set position profile
-	//set_profile_position(92, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
-
-
-	//set_position_sensor(QEI, c_position_ctrl);
-
-/*	while(1)
-	{
-
 		actual_position = get_position(c_position_ctrl);
-		t when timerafter(time + MSEC_STD) :> time;
-		xscope_probe_data(0, actual_position);
-		xscope_probe_data(1, target_pos);
-
-	}*/
-	//set_qei_turns(c_qei, turns);
-	/*reset_qei_count(c_qei, 0);
-	shutdown_position_ctrl(c_position_ctrl);
-*/
-	//target_position = 350; 	//degree
-	//set_profile_position(target_position, velocity, acceleration, deceleration, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT, c_position_ctrl);
-}
-void gp(port gp_ifm[])
-{
-	int input;
-	//set_port_pull_down(gp_ifm[0]);
-	xscope_initialise_1();
-	while(1)
-	{
-	gp_ifm[0] :> input;
-	xscope_probe_data(0, input);
-
+		follow_error = target_position - actual_position;
+#ifdef ENABLE_xscope_main
+		xscope_probe_data(0, target_position);
+		xscope_probe_data(1, actual_position);
+		xscope_probe_data(2, follow_error);
+#endif
+		wait_ms(1, 1, t);
 	}
 }
 
@@ -232,35 +129,8 @@ int main(void)
 	chan c_position_ctrl;													// position control channel
 	chan c_watchdog; 														// watchdog channel
 
-	// EtherCat Communication channels
-	chan coe_in; 		//< CAN from module_ethercat to consumer
-	chan coe_out; 		//< CAN from consumer to module_ethercat
-	chan eoe_in; 		//< Ethernet from module_ethercat to consumer
-	chan eoe_out; 		//< Ethernet from consumer to module_ethercat
-	chan eoe_sig;
-	chan foe_in; 		//< File from module_ethercat to consumer
-	chan foe_out; 		//< File from consumer to module_ethercat
-	chan pdo_in;
-	chan pdo_out;
-	chan c_sig_1;
-
-	chan c_gpio_0, c_gpio_1;
 	par
 	{
-		/* Ethercat Communication Handler Loop */
-		on stdcore[0] :
-		{
-			//ecat_init();
-
-			//ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);
-		}
-
-		/* Firmware Update Loop */
-		on stdcore[0] :
-		{
-			//firmware_update_loop(foe_out, foe_in, c_sig_1); 		// firmware update over EtherCat
-		}
-
 		/* Test Profile Position function*/
 		on stdcore[1]:
 		{
@@ -294,8 +164,6 @@ int main(void)
 		{
 			par
 			{
-				//gpio_digital_server(p_ifm_ext_d, c_gpio_0, c_gpio_1);
-
 				/* PWM Loop */
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,\
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
@@ -330,7 +198,6 @@ int main(void)
 					init_qei_param(qei_params);
 					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  	// channel priority 1,2..5
 				}
-
 			}
 		}
 

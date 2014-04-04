@@ -5,7 +5,8 @@
  *
  * \brief Main project file
  *  Test illustrates usage of gpio digital i/o
- *
+ */
+/*
  *
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
@@ -64,7 +65,7 @@ void xscope_initialise_1()
 
 int main(void)
 {
-	/* gpio Communication channels */
+	/* GPIO Communication channels */
 	chan c_gpio_0, c_gpio_1;
 
 	par

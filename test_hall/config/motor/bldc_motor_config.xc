@@ -1,10 +1,8 @@
 
 /**
  *
- * \file bldc_motor_config.h
- *	QEI config file
- *
- *	Please define your the Incremental Encoder (QEI) specifications here
+ * \file bldc_motor_init.xc
+ *	Motor Control config declarations
  *
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
@@ -38,38 +36,47 @@
  *
  */
 
-#ifndef __DC_MOTOR_CONFIG__H__QEI_TEST
-#define __DC_MOTOR_CONFIG__H__QEI_TEST
-#include <print.h>
-#include <internal_config.h>
+#include <bldc_motor_config.h>
+#include "refclk.h"
 
-#pragma once
+void init_hall_param(hall_par &hall_params)
+{
+	int max = MAX_POSITION_LIMIT;
+	int min = MIN_POSITION_LIMIT;
+	hall_params.pole_pairs = POLE_PAIRS;
 
-/**
- * If you have any gears added, specify gear-ratio
- * and any additional encoders attached specify encoder resolution here (Mandatory)
- */
-#define GEAR_RATIO  				120		// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			4000	// 4 x Max count of Quadrature Encoder (4X decoding)
+	if(max >= 0 && min >= 0)
+	{
+		if(max > min)
+			hall_params.max_ticks = max;
+		else
+			hall_params.max_ticks = min;
+	}
+	else if(max <= 0 && min <= 0)
+	{
+		if(max < min)
+			hall_params.max_ticks = -max;
+		else
+			hall_params.max_ticks = -min;
+	}
+	else if(max > 0 && min < 0)
+	{
+		if(max > 0 - min)
+			hall_params.max_ticks = max;
+		else
+			hall_params.max_ticks = 0 - min;
+	}
+	else if(max < 0 && min > 0)
+	{
+		if(min > 0 - max)
+			hall_params.max_ticks = min;
+		else
+			hall_params.max_ticks = 0 - max;
+	}
+	hall_params.max_ticks_per_turn = POLE_PAIRS * 4096;
+	//printintln(hall_params.max_ticks);
+	hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
+	//printintln(hall_params.max_ticks);
 
-/* Define your Incremental Encoder type (QEI_INDEX/ QEI_NO_INDEX) */
-#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX
-
-/* Polarity is used to keep all position sensors to count ticks in the same direction
- *  (NORMAL/INVERTED) */
-#define QEI_SENSOR_POLARITY			INVERTED
-
-#define MAX_POSITION_LIMIT 			GEAR_RATIO*ENCODER_RESOLUTION		// ticks (max range: 2^30, limited for safe operation)
-#define MIN_POSITION_LIMIT 			-GEAR_RATIO*ENCODER_RESOLUTION		// ticks (min range: -2^30, limited for safe operation)
-
-
-/**
- * \brief initialize QEI sensor
- *
- * \param qei_params struct defines the resolution for quadrature encoder (QEI),
- * 			gear-ratio, poles, encoder type
- */
-void init_qei_param(qei_par &qei_params);
-
-
-#endif
+	return;
+}

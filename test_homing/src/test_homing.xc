@@ -1,10 +1,10 @@
 
 /**
  *
- * \file test_velocity-ctrl.xc
+ * \file test_homing-ctrl.xc
  *
  * \brief Main project file
- *  Test illustrates usage of profile velocity control
+ *  Test illustrates usage of homing mode
  *
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
@@ -59,7 +59,8 @@
 #include "velocity_ctrl_client.h"
 #include <flash_somanet.h>
 #include <qei_client.h>
-#include <homing.h>
+#include <gpio_server.h>
+#include <gpio_client.h>
 //#define ENABLE_xscope_main
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -67,172 +68,117 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-
-void xscope_initialise_1()
+/* Test homing function */
+void homing(chanend c_qei, chanend c_gpio, chanend c_velocity_ctrl)
 {
+	int homing_velocity = 1000;				// rpm
+	int homing_acceleration = 2000;			// rpm/s
+	int reset_counter = 0;
+	int velocity_ramp;
+	int actual_velocity;
+	int direction;
+	int i = 1;
+	timer t;
+	unsigned int time;
+	int steps;
+	int home_state;
+	int safety_state;
+	int capture_position = 0;
+	int current_position = 0;
+	int offset = 0;
+	int end_state = 0;
+	int init_state;
+	init_state = __check_velocity_init(c_velocity_ctrl);
+
+	/**< Configure gpio digital port 0 as Switch Input and active high */
+	config_gpio_digital_input(c_gpio, 0, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
+
+	/**< Configure gpio digital port 1 as Switch Input and active high */
+	config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
+
+	/**< End configuration of digital ports */
+	end_config_gpio(c_gpio);
+
+	while(1)
 	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
-
-		xscope_config_io(XSCOPE_IO_BASIC);
+		init_state = init_velocity_control(c_velocity_ctrl);
+		if(init_state == INIT)
+			break;
 	}
-	return;
+
+	i = 1;
+	actual_velocity = get_velocity(c_velocity_ctrl);
+	steps = init_velocity_profile(homing_velocity * HOMING_METHOD, actual_velocity, homing_acceleration, homing_acceleration, MAX_PROFILE_VELOCITY);
+	t :> time;
+	while(1)
+	{
+		select
+		{
+
+			case t when timerafter(time + MSEC_STD) :> time:
+				if(i < steps)
+				{
+					velocity_ramp = velocity_profile_generate(i);
+					i = i+1;
+				}
+				set_velocity(velocity_ramp, c_velocity_ctrl);
+				home_state = read_gpio_digital_input(c_gpio, 0);
+				safety_state = read_gpio_digital_input(c_gpio, 1);
+				{capture_position, direction} = get_qei_position_absolute(c_qei);
+
+				if(home_state == 1 || safety_state == 1)
+				{
+					actual_velocity = get_velocity(c_velocity_ctrl);
+					steps = init_velocity_profile(0, actual_velocity, homing_acceleration, homing_acceleration, MAX_PROFILE_VELOCITY);
+					for(i = 1; i < steps; i++)
+					{
+						velocity_ramp = velocity_profile_generate(i);
+						set_velocity(velocity_ramp, c_velocity_ctrl);
+						actual_velocity = get_velocity(c_velocity_ctrl);
+
+						t when timerafter(time + MSEC_STD) :> time;
+					}
+					end_state = 1;
+					shutdown_velocity_ctrl(c_velocity_ctrl);
+
+					if(home_state == 1)
+					{
+						{current_position, direction} = get_qei_position_absolute(c_qei);
+						offset = current_position - capture_position;
+						printstr("Homing offset ");
+						printintln(offset);
+						reset_qei_count(c_qei, offset);
+						reset_counter = 1;
+					}
+
+				}
+				break;
+		}
+		if(end_state == 1)
+			break;
+	}
+
+	if(reset_counter == 1)
+		printstrln("homing_success");
 }
-
-
-/* Test Profile Velocity function */
-void profile_velocity_test(chanend c_velocity_ctrl)
-{
-	int target_velocity = 1000;	 		// rpm
-	int acceleration 	= 1000;			// rpm/s
-	int deceleration 	= 1000;			// rpm/s
-
-#ifdef ENABLE_xscope_main
-	xscope_initialise_1();
-#endif
-
-	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
-
-	target_velocity = 0;				// rpm
-	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
-
-	/*target_velocity = -4000;				// rpm
-		set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
-
-		target_velocity = 0;				// rpm
-		set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);*/
-}
-
-
-
 
 int main(void)
 {
 	// Motor control channels
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6;					// qei channels
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;				// hall channels
-	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
-	chan c_pwm_ctrl, c_adctrig;												// pwm channels
-	chan c_velocity_ctrl;													// velocity control channel
-	chan c_watchdog; 														// watchdog channel
-
-	// EtherCat Comm channels
-	chan coe_in; 		// CAN from module_ethercat to consumer
-	chan coe_out; 		// CAN from consumer to module_ethercat
-	chan eoe_in; 		// Ethernet from module_ethercat to consumer
-	chan eoe_out; 		// Ethernet from consumer to module_ethercat
-	chan eoe_sig;
-	chan foe_in; 		// File from module_ethercat to consumer
-	chan foe_out; 		// File from consumer to module_ethercat
-	chan pdo_in;
-	chan pdo_out;
-	chan c_sig_1;
-	chan c_home;
+	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;				// commutation channels
+	chan c_pwm_ctrl, c_adctrig;															// pwm channels
+	chan c_velocity_ctrl;																// velocity control channel
+	chan c_watchdog; 																	// watchdog channel
+	chan c_gpio_p1, c_gpio_p2; 															// gpio Communication channels
 
 	par
 	{
-		on stdcore[3]:
-		{
-			track_home_positon( p_ifm_ext_d0, p_ifm_ext_d1, c_home, c_qei_p5, c_hall_p5);
-		}
-
-
-		/* Test Profile Velocity function */
+		/* Test homing function */
 		on stdcore[1]:
 		{
-			{
-				int target_velocity = 2000;
-				int acceleration = 3000;
-				int max_profile_velocity = 2000;
-				int limit_switch = 1; // positive negative limit switches
-
-				int reset_counter = 0;
-				int velocity_ramp;
-				int actual_velocity;
-				int direction;
-				int i = 1;
-				timer t;
-				unsigned int time;
-				int steps;
-				int home_state = 0;
-				int safety_state = 0;
-				int position = 0;
-				int current_position = 0;
-				int offset = 0;
-				int dirn;
-				int end_state = 0;
-				int init_state;
-				init_state = __check_velocity_init(c_velocity_ctrl);
-
-				set_home_switch_type(c_home, ACTIVE_HIGH);
-				while(1)
-				{
-					init_state = init_velocity_control(c_velocity_ctrl);
-					if(init_state == INIT)
-						break;
-				}
-
-				i = 1;
-				actual_velocity = get_velocity(c_velocity_ctrl);
-				steps = init_velocity_profile(target_velocity*limit_switch, actual_velocity, acceleration, acceleration, max_profile_velocity);
-				t :> time;
-				while(1)
-				{
-					select
-					{
-
-						case t when timerafter(time + MSEC_STD) :> time:
-							if(i < steps)
-							{
-								velocity_ramp = velocity_profile_generate(i);
-								i = i+1;
-							}
-							set_velocity(velocity_ramp, c_velocity_ctrl);
-							{home_state, safety_state, position, direction} = get_home_state(c_home);
-							if(home_state == 1 || safety_state == 1)
-							{
-								actual_velocity = get_velocity(c_velocity_ctrl);
-								steps = init_velocity_profile(0, actual_velocity, acceleration, acceleration, max_profile_velocity);
-								for(i = 1; i < steps; i++)
-								{
-									velocity_ramp = velocity_profile_generate(i);
-									set_velocity(velocity_ramp, c_velocity_ctrl);
-									actual_velocity = get_velocity(c_velocity_ctrl);
-
-									t when timerafter(time + MSEC_STD) :> time;
-
-								}
-								end_state = 1;
-								shutdown_velocity_ctrl(c_velocity_ctrl);
-								//printintln(position);
-								if(home_state == 1)
-								{
-									{current_position, direction} = get_qei_position_absolute(c_qei_p4);
-									printintln(current_position);
-									offset = current_position - position;
-									printintln(offset);
-									reset_qei_count(c_qei_p4, offset);
-									reset_counter = 1;
-								}
-
-							}
-
-							break;
-					}
-					if(end_state == 1)
-						break;
-				}
-				 xscope_initialise_1();
-					if(reset_counter == 1)
-								printstrln("homing_success");
-				while(1)
-				{
-					{current_position, direction} = get_qei_position_absolute(c_qei_p4);
-					wait_ms(1, 1, t);
-					xscope_probe_data(0, current_position);
-				}
-
-			}
+			homing(c_qei_p3, c_gpio_p1, c_velocity_ctrl);
 		}
 
 		on stdcore[2]:
@@ -246,11 +192,12 @@ int main(void)
 				qei_par qei_params;
 
 				init_velocity_control_param(velocity_ctrl_params);
-				init_sensor_filter_param(sensor_filter_params);				init_hall_param(hall_params);
+				init_sensor_filter_param(sensor_filter_params);
+				init_hall_param(hall_params);
 				init_qei_param(qei_params);
 
 				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, \
-					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p1, c_velocity_ctrl, c_commutation_p2);
+					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, c_commutation_p2);
 			}
 
 		}
@@ -262,6 +209,9 @@ int main(void)
 		{
 			par
 			{
+				/* GPIO Digital Server */
+				gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);
+
 				/* PWM Loop */
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,\
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
@@ -274,9 +224,10 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); 			// initialize commutation params
-					commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, \
-							c_commutation_p1, c_commutation_p2, c_commutation_p3, \
-							c_pwm_ctrl, hall_params, qei_params, commutation_params);
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
+								c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
+								p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
+								hall_params, qei_params, commutation_params);						// channel priority 1,2,3
 				}
 
 				/* Watchdog Server */
@@ -286,14 +237,14 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..5
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params); 	 // channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params); 	 // channel priority 1,2..6
 				}
 			}
 		}

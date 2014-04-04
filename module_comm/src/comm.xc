@@ -155,12 +155,12 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
 	{
 		case 0:
 			//printstr(" nor ");
-			sensor_polarity = IN_PHASE;
+			sensor_polarity = NORMAL;
 			break;
 
 		case 1:
 			//printstr(" inv ");
-			sensor_polarity = OUT_OF_PHASE;
+			sensor_polarity = INVERTED;
 			break;
 
 		default:
