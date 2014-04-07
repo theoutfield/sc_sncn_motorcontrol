@@ -129,7 +129,7 @@ void do_adc_calibration_ad7949(chanend c_adc, calib_data &I_calib)
 }
 
 
-{int, int} get_adc_external_potentiometer_ad7949(chanend c_adc)
+{int, int} get_adc_external_ad7949(chanend c_adc)
 {
 
 	int p1, p2;

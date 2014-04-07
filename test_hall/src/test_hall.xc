@@ -2,14 +2,16 @@
 /**
  *
  * \file test_hall.xc
+ * \brief Test illustrates usage of hall sensor to get position and velocity information
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date
  *
- * \brief Main project file
- *  Test illustrates usage of hall sensor for position and velocity information
- *
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
- * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
+ *  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -49,7 +51,7 @@
 #include <xscope.h>
 #include <bldc_motor_config.h>
 
-//#define ENABLE_xscope_main
+//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -67,7 +69,7 @@ void xscope_initialise_1()
 }
 
 
-/* hall sensor test function */
+/* Test Hall Sensor Client */
 void hall_test(chanend c_hall)
 {
 	int position;
@@ -78,16 +80,19 @@ void hall_test(chanend c_hall)
 	hall_par hall_params;
 	init_hall_param(hall_params);
 
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 	xscope_initialise_1();
 #endif
 
 	while(1)
 	{
+		/* get position from Hall Sensor */
 		{position, direction} = get_hall_position_absolute(c_hall);
+
+		/* get velocity from Hall Sensor */
 		velocity = get_hall_velocity(c_hall, hall_params);
 
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 		xscope_probe_data(0, position);
 		xscope_probe_data(1, velocity);
 #else
@@ -103,16 +108,13 @@ void hall_test(chanend c_hall)
 
 int main(void)
 {
-	chan c_adctrig, c_adc;													// adc channels
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
-	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
-	chan c_pwm_ctrl;														// pwm channels
 
 	par
 	{
 		on stdcore[1]:
 		{
-			/* Test hall sensor */
+			/* Test Hall Sensor Client */
 			par
 			{
 				hall_test(c_hall_p1);

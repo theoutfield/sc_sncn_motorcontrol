@@ -2,14 +2,17 @@
 /**
  *
  * \file test_qei.xc
+ * \brief Test illustrates usage of qei sensor to get position and velocity information
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date
  *
- * \brief Main project file
- *  Test illustrates usage of qei sensor for position and velocity information
- *
+ */
+/*
  *
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,16 +45,13 @@
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <ioports.h>
 #include <qei_client.h>
 #include <qei_server.h>
 #include <refclk.h>
 #include <xscope.h>
 #include <bldc_motor_config.h>
-#include <test.h>
-#define ENABLE_xscope_main
+//#define ENABLE_xscope
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -69,7 +69,7 @@ void xscope_initialise_1()
 	return;
 }
 
-/* qei sensor test function */
+/* Test QEI Sensor Client */
 void qei_test(chanend c_qei)
 {
 	int position;
@@ -84,17 +84,20 @@ void qei_test(chanend c_qei)
 	init_qei_param(qei_params);
 	init_qei_velocity_params(qei_velocity_params);
 
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 	xscope_initialise_1();
 #endif
 
 	while(1)
 	{
+		/* get position from QEI Sensor */
 		{position, direction} = get_qei_position_absolute(c_qei);
+
+		/* calculate velocity from QEI Sensor position */
 		velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
 
 		wait_ms(1, core_id, t);
-	#ifdef ENABLE_xscope_main
+	#ifdef ENABLE_xscope
 		xscope_probe_data(0, position);
 		xscope_probe_data(1, velocity);
 	#else
@@ -115,12 +118,8 @@ int main(void)
 	{
 		on stdcore[1]:
 		{
-			/* Test qei sensor */
-			par
-			{
-				qei_test(c_qei_p1);
-				//qei_unit_test();
-			}
+			/* Test QEI Sensor Client */
+			qei_test(c_qei_p1);
 		}
 
 		/************************************************************
@@ -128,14 +127,11 @@ int main(void)
 		 ************************************************************/
 		on stdcore[IFM_CORE]:
 		{
-			par
+			/* QEI Server Loop */
 			{
-				/* QEI Server */
-				{
-					qei_par qei_params;
-					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  		// channel priority 1,2..5
-				}
+				qei_par qei_params;
+				init_qei_param(qei_params);
+				run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  		// channel priority 1,2..6
 			}
 		}
 	}

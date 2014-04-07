@@ -41,14 +41,14 @@
 #include <adc_common.h>
 
 /**
- * \brief Get external potentiometer sensor value
+ * \brief Get external analog sensor value
  *
  * \channel c_adc the channel for communicating with the adc server
  *
- * \return External potentiometer input 1 value (raw in range 0 - 16383)
- * \return External potentiometer input 2 value (raw in range 0 - 16383)
+ * \return External analog input 1 value (raw range: 0 - 16383)
+ * \return External analog input 2 value (raw range: 0 - 16383)
  */
-{int, int} get_adc_external_potentiometer_ad7949(chanend c_adc);
+{int, int} get_adc_external_ad7949(chanend c_adc);
 
 
 /**

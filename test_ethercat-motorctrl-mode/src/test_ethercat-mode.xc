@@ -77,13 +77,13 @@ int main(void)
 	chan c_gpio_0, c_gpio_1;												// gpio digital channels
 
 	// EtherCat Communication channels
-	chan coe_in; 		// CAN from module_ethercat to consumer
-	chan coe_out; 		// CAN from consumer to module_ethercat
-	chan eoe_in; 		// Ethernet from module_ethercat to consumer
-	chan eoe_out; 		// Ethernet from consumer to module_ethercat
+	chan coe_in; 															// CAN from module_ethercat to consumer
+	chan coe_out; 															// CAN from consumer to module_ethercat
+	chan eoe_in; 															// Ethernet from module_ethercat to consumer
+	chan eoe_out; 															// Ethernet from consumer to module_ethercat
 	chan eoe_sig;
-	chan foe_in; 		// File from module_ethercat to consumer
-	chan foe_out; 		// File from consumer to module_ethercat
+	chan foe_in; 															// File from module_ethercat to consumer
+	chan foe_out; 															// File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
 	chan c_sig_1;
@@ -200,17 +200,17 @@ int main(void)
 				/* Hall Server */
 				{
 					hall_par hall_params;
-					hall_init_ecat(c_hall_p5, hall_params);   	//same as ecat drive channel
+					hall_init_ecat(c_hall_p5, hall_params);
 					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, \
-							p_ifm_hall, hall_params); 	// channel priority 1,2..5
+							p_ifm_hall, hall_params); 		// channel priority 1,2..6
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
-					qei_init_ecat(c_qei_p5, qei_params);  		//same as ecat drive channel
+					qei_init_ecat(c_qei_p5, qei_params);
 					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, \
-							qei_params);  		// channel priority 1,2..5
+							qei_params);  					// channel priority 1,2..6
 				}
 
 			}

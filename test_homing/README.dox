@@ -1,0 +1,24 @@
+/**
+
+\page apps
+\section test_homing
+
+This test application illustrates the implemtation of homing method based on limit switches and a home switch. In this application we have home switch on port 0 of GPIO D and positive limit 
+switch on port 1 of GPIO D. Here we use velocity controller to search for the home switch and reset the position counters with offset found. 
+
+The main application runs 6 threads in total. 2 of these threads are PWM Server and Commutation Server responsible for modulation and motor drive. 
+
+Other 2 threads used for position information are Hall Server thread required for BLDC motor commutation  and QEI Server thread for high precision position information. A watchdog server 
+is used to monitor CORE 3 and disable motor in case of emergency. A GPIO Server to monitor the input switches.
+
+All these 6 threads run on CORE 3 which has physical connection to the interface module (IFM). 
+
+Velocity Control Loop runs on CORE 2/1/0. Another thread for homing runs on core 0/1/2 which monitors the home and limit switches; and upon encountering the home switch, it stores the position, 
+stops the motor and updates the position counter with the offset from stop position.  
+
+More information about GPIO Server/ Client can be found under module_gpio Readme
+
+Dependencies: module_adc module_blocks module_common module_commutation module_ctrl_loops module_gpio module_hall module_profile module_pwm_common module_pwm_symmetrical module_qei module_sm 
+sc_somanet-base/module_nodeconfig
+
+*/

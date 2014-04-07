@@ -2,13 +2,16 @@
 /**
  *
  * \file test_torque-ctrl.xc
+ * \brief Test illustrates usage of profile torque control
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date
  *
- * \brief Main project file
- *  Test illustrates usage of profile torque control
- *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,8 +44,6 @@
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <ioports.h>
 #include <hall_server.h>
 #include <qei_server.h>
@@ -55,12 +56,12 @@
 #include <torque_ctrl_server.h>
 #include <profile_control.h>
 #include <internal_config.h>
-#include <flash_somanet.h>
 #include <drive_config.h>
 #include "torque_ctrl_client.h"
 #include <profile.h>
 #include <test.h>
-//#define ENABLE_xscope_main
+
+//#define ENABLE_xscope
 
 #define COM_CORE 0
 #define IFM_CORE 3
@@ -84,10 +85,11 @@ void profile_torque_test(chanend c_torque_ctrl)
 	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);
 
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 	xscope_initialise_1();
 #endif
 
+	/* Set new target torque for profile torque control */
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
 	target_torque = 0;
@@ -99,7 +101,7 @@ void profile_torque_test(chanend c_torque_ctrl)
 	{
 		actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
 		t when timerafter(time + MSEC_STD) :> time;
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 		xscope_probe_data(0, actual_torque);
 #endif
 	}

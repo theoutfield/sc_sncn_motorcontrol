@@ -1,0 +1,17 @@
+/**
+
+\page apps
+\section test_hall
+
+This test application illustrates usage of module_hall to get position and velocity informartion
+
+The main application has two threads and one of them is Hall server thread running on CORE 3 which has physical connection to the interface module (IFM) to which the Hall Sensors are connected. 
+
+Another thread for client functions is running on CORE 1 (can also be placed on CORE 0/2 but not on core 3 since the client function thread has prints which will slow the Hall Server thread). 
+The client reads position and velocity from HALL Server. The client function also shows how to make use of XSCOPE to probe/store data in real-time.
+
+More information about Hall Server/ Client can be found in module_hall Readme
+
+Dependencies: sc_somanet-base/module_nodeconfig, module_hall, module_blocks, module_common
+
+*/

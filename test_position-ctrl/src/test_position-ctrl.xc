@@ -2,14 +2,16 @@
 /**
  *
  * \file test_position-ctrl.xc
+ * \brief Test illustrates usage of profile position control
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date
  *
- * \brief Main project file
- *  Test illustrates usage of profile position control
  */
 /*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,8 +44,6 @@
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <ioports.h>
 #include <hall_server.h>
 #include <pwm_service_inv.h>
@@ -60,7 +60,7 @@
 #include "position_ctrl_client.h"
 #include <test.h>  //Unit Testing Position control (optional)
 
-//#define ENABLE_xscope_main
+//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -94,28 +94,30 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hal
 	init_qei_param(qei_params);
 	init_hall_param(hall_params);
 
-
+	/* Initialise Profile Limits for position profile generator and select position sensor */
 	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_params, \
 			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
 
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 	xscope_initialise_1();
 #endif
 
+	/* Set new target position for profile position control */
 	set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, c_position_ctrl);
 
+	/* Read actual position from the Position Control Server */
 	actual_position = get_position(c_position_ctrl);
 
 	while(1)
 	{
 		actual_position = get_position(c_position_ctrl);
 		follow_error = target_position - actual_position;
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 		xscope_probe_data(0, target_position);
 		xscope_probe_data(1, actual_position);
 		xscope_probe_data(2, follow_error);
 #endif
-		wait_ms(1, 1, t);
+		wait_ms(1, 1, t);  /* 1 ms wait */
 	}
 }
 
@@ -131,11 +133,11 @@ int main(void)
 
 	par
 	{
-		/* Test Profile Position function*/
+		/* Test Profile Position Client function*/
 		on stdcore[1]:
 		{
-			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		  	// test PPM on slave side
-			//position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 			// Unit test controller
+			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		// test PPM on slave side
+			//position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 	// Unit test controller
 		}
 
 
@@ -189,14 +191,14 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..5
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  	// channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  	// channel priority 1,2..6
 				}
 			}
 		}

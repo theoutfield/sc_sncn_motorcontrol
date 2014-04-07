@@ -3,13 +3,17 @@
  *
  * \file test_velocity-ctrl.xc
  *
- * \brief Main project file
- *  Test illustrates usage of profile velocity control
+ * \brief Test illustrates usage of profile velocity control
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date
+ *
  */
+
 /*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,8 +46,6 @@
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <ioports.h>
 #include <hall_server.h>
 #include <qei_server.h>

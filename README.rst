@@ -1,8 +1,8 @@
 SOFTWARE COMPONENT Sinusoidal Motor Control 
 ...........................................
 
-:Latest release: 0.9beta
-:Maintainer: support@synapticon.com
+:Latest release: 1.0
+:Maintainer: pkanajar@synapticon.com
 :Description: Implementation of Sinusoidal Motor Control for SOMANET devices.
 
 
@@ -17,6 +17,8 @@ Key Features
    * Support QEI sensor with Index/ no Index
    * Support Hall sensor
    * Support external Analog sensor 
+   * Support GPIO Digital
+   * Homing mode
 
 
 Known Issues

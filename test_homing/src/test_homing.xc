@@ -3,12 +3,16 @@
  *
  * \file test_homing-ctrl.xc
  *
- * \brief Main project file
- *  Test illustrates usage of homing mode
+ * \brief Test illustrates implementation of homing method with a positive limit switch and a home switch
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date
  *
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,8 +45,6 @@
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <ioports.h>
 #include <hall_server.h>
 #include <qei_server.h>
@@ -50,18 +52,16 @@
 #include <comm_loop_server.h>
 #include <refclk.h>
 #include <velocity_ctrl_server.h>
-#include <xscope.h>
 #include <profile.h>
 #include <internal_config.h>
 #include <bldc_motor_config.h>
 #include <drive_config.h>
 #include <profile_control.h>
 #include "velocity_ctrl_client.h"
-#include <flash_somanet.h>
 #include <qei_client.h>
 #include <gpio_server.h>
 #include <gpio_client.h>
-//#define ENABLE_xscope_main
+
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -90,10 +90,10 @@ void homing(chanend c_qei, chanend c_gpio, chanend c_velocity_ctrl)
 	int init_state;
 	init_state = __check_velocity_init(c_velocity_ctrl);
 
-	/**< Configure gpio digital port 0 as Switch Input and active high */
+	/**< Configure gpio digital port 0 as Switch Input and active high (Home Switch) */
 	config_gpio_digital_input(c_gpio, 0, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
 
-	/**< Configure gpio digital port 1 as Switch Input and active high */
+	/**< Configure gpio digital port 1 as Switch Input and active high (Safety Limit Switch) */
 	config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
 
 	/**< End configuration of digital ports */
@@ -223,11 +223,11 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); 			// initialize commutation params
+					init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); 						// initialize commutation params
 					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
 								c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
 								p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
-								hall_params, qei_params, commutation_params);						// channel priority 1,2,3
+								hall_params, qei_params, commutation_params);											// channel priority 1,2,3
 				}
 
 				/* Watchdog Server */

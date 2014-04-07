@@ -2,15 +2,17 @@
 /**
  *
  * \file test_gpio_digital.xc
+ * \brief Test illustrates configuration and usage of GPIO digital ports. Two ports are configured
+ *  as input switches and the remaining two ports are configured as digital out ports
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date
  *
- * \brief Main project file
- *  Test illustrates usage of gpio digital i/o
  */
 /*
  *
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -50,7 +52,7 @@
 #include <gpio_server.h>
 #include <gpio_client.h>
 
-//#define ENABLE_xscope_main
+//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -63,60 +65,67 @@ void xscope_initialise_1()
 	return;
 }
 
+/*
+ * Test GPIO Client Loop
+ */
+void gpio_test(chanend c_gpio_p1)
+{
+	int port_0_value;
+	int port_1_value;
+	int port_2_value = 0;
+	int port_3_value = 0;
+
+	#ifdef ENABLE_xscope
+		xscope_initialise_1();
+	#endif
+
+	/**< Configure gpio digital port 0 as Switch Input and active high */
+	config_gpio_digital_input(c_gpio_p1, 0, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
+
+	/**< Configure gpio digital port 1 as Switch Input and active high,
+	 * by default other gpio digital port configured as digital outputs */
+	config_gpio_digital_input(c_gpio_p1, 1, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
+
+	/**< End configuration of digital ports */
+	end_config_gpio(c_gpio_p1);
+
+	while(1)
+	{
+		/**< Read value on digital port 0 */
+		port_0_value = read_gpio_digital_input(c_gpio_p1, 0);
+
+		/**< Read value on digital port 1 */
+		port_1_value = read_gpio_digital_input(c_gpio_p1, 1);
+
+		#ifdef ENABLE_xscope
+			xscope_probe_data(0, port_0_value);
+			xscope_probe_data(1, port_1_value);
+		#else
+			printstr("Port 0 value ");
+			printint(port_0_value);
+			printstr(" Port 1 value ");
+			printintln(port_1_value);
+		#endif
+
+		/**< Write port_2_value to digital port 2 */
+		write_gpio_digital_output(c_gpio_p1, 2, port_2_value);
+
+		/**< Write port_3_value to digital port 3 */
+		write_gpio_digital_output(c_gpio_p1, 3, port_3_value);
+	}
+}
+
 int main(void)
 {
 	/* GPIO Communication channels */
-	chan c_gpio_0, c_gpio_1;
+	chan c_gpio_p1, c_gpio_p2;
 
 	par
 	{
-		/* Test GPIO Loop */
+		/* Test GPIO Client Loop */
 		on stdcore[1] :
 		{
-			{
-				int port_0_value;
-				int port_1_value;
-				int port_2_value = 0;
-				int port_3_value = 0;
-
-				#ifdef ENABLE_xscope_main
-				xscope_initialise_1();
-				#endif
-
-				/**< Configure gpio digital port 0 as Switch Input and active high */
-				config_gpio_digital_input(c_gpio_0, 0, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
-
-				/**< Configure gpio digital port 1 as Switch Input and active high,
-				 * by default other gpio digital port configured as digital outputs */
-				config_gpio_digital_input(c_gpio_0, 1, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
-
-				/**< End configuration of digital ports */
-				end_config_gpio(c_gpio_0);
-				while(1)
-				{
-					/**< Read value on digital port 0 */
-					port_0_value = read_gpio_digital_input(c_gpio_0, 0);
-
-					/**< Read value on digital port 1 */
-					port_1_value = read_gpio_digital_input(c_gpio_0, 1);
-
-					#ifdef ENABLE_xscope_main
-						xscope_probe_data(0, port_0_value);
-						xscope_probe_data(1, port_1_value);
-					#else
-						printstr("Port 0 value ");
-						printint(port_0_value);
-						printstr(" Port 1 value ");
-						printintln(port_1_value);
-					#endif
-
-					/**< Write port_2_value to digital port 2 */
-					write_gpio_digital_output(c_gpio_0, 2, port_2_value);
-
-					/**< Write port_3_value to digital port 3 */
-					write_gpio_digital_output(c_gpio_0, 3, port_3_value);
-				}
-			}
+			gpio_test(c_gpio_p1);
 		}
 
 		/************************************************************
@@ -125,7 +134,7 @@ int main(void)
 		on stdcore[IFM_CORE]:
 		{
 			/* GPIO Digital Server */
-			gpio_digital_server(p_ifm_ext_d, c_gpio_0, c_gpio_1);
+			gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);
 		}
 
 	}

@@ -1,15 +1,19 @@
 
 /**
  *
- * \file test_adc_ext_potentiometer.xc
+ * \file test_adc_external_input.xc
  *
- * \brief Main project file
- *  Test illustrates usage of adc to get external potentiometer sensor values
+ * \brief Test illustrates usage of adc to get external potentiometer sensor values.
+ *   By default the external inputs are configured as differential only.
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date
+ *
  */
 /*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -55,13 +59,14 @@
 #include <bldc_motor_config.h>
 #include <drive_config.h>
 
-//#define ENABLE_xscope_main
+//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
+/* xscope init */
 void xscope_initialise_1()
 {
 	{
@@ -72,31 +77,32 @@ void xscope_initialise_1()
 	return;
 }
 
-/* External potentiometer test function */
-void external_pot_test(chanend c_adc)
+/* ADC Client test function */
+void adc_test(chanend c_adc)
 {
-	int external_pot1;
-	int external_pot2;
+	int external_input_1;
+	int external_input_2;
 	int core_id = 1;
 	timer t;
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 	xscope_initialise_1();
 #endif
 
 	while(1)
 	{
-		{external_pot1 , external_pot2} = get_adc_external_potentiometer_ad7949(c_adc);
+		/* Read external analog input */
+		{external_input_1 , external_input_2} = get_adc_external_ad7949(c_adc);
 		wait_ms(1, core_id, t);
 
-#ifdef ENABLE_xscope_main
-		xscope_probe_data(0, external_pot1);
-		xscope_probe_data(1, external_pot2);
+#ifdef ENABLE_xscope
+		xscope_probe_data(0, external_input_1);
+		xscope_probe_data(1, external_input_2);
 #else
-		printstr("External pot1: ");
-		printint(external_pot1);
+		printstr(" Analog input 1: ");
+		printint(external_input_1);
 		printstr(" ");
-		printstr(" External pot2: ");
-		printintln(external_pot2);
+		printstr(" Analog input 2: ");
+		printintln(external_input_2);
 #endif
 	}
 }
@@ -110,17 +116,13 @@ int main(void)
 	chan c_qei;																// qei channel
 	chan c_watchdog;														// watchdog channel
 
-
 	par
 	{
 
 		on stdcore[1]:
 		{
-			/* Test external potentiometers */
-			par
-			{
-				external_pot_test(c_adc);
-			}
+			/* ADC Client test function */
+			adc_test(c_adc);
 		}
 
 
