@@ -1,14 +1,16 @@
 
 /**
- *
  * \file comm_loop_server.h
- *
- * Commutation Loop based on sinusoidal commutation method
- *
- * Copyright (c) 2013, Synapticon GmbH
+ * \brief Commutation Loop based on sinusoidal commutation method
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Ludwig Orgler <lorgler@synapticon.com>, Pavan Kanajar <pkanajar@synapticon.com>
- * 		   & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

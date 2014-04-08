@@ -149,10 +149,14 @@ int main(void)
 				 hall_par hall_params;
 				 qei_par qei_params;
 
+				 /* Initialize PID parameters for Position Control (defined in config/motor/bldc_motor_config.h) */
 				 init_position_control_param(position_ctrl_params);
+
+				 /* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 				 init_hall_param(hall_params);
 				 init_qei_param(qei_params);
 
+				 /* Control Loop */
 				 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, c_hall_p2,\
 						 c_qei_p2, c_position_ctrl, c_commutation_p3);
 			}

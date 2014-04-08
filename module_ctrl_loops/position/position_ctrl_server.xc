@@ -96,6 +96,10 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 	//	printintln(target_position);
 	//	printintln(actual_position);
 	}
+	/**
+	 * Or any other sensor interfaced to the IFM Module
+	 * place client functions here to acquire position
+	 */
 
 	ts:> time;
 
@@ -119,9 +123,10 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 							{actual_position, direction} =  get_qei_position_absolute(c_qei);
 							break;
 
-						/*case ANY_OTHER_SENSOR:
-							actual_position = get_position_sensor(c_sensor);
-							break;*/
+						/**
+						 * Or any other sensor interfaced to the IFM Module
+						 * place client functions here to acquire position
+						 */
 					}
 
 					/* PID Controller */
@@ -209,6 +214,10 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						{
 							{actual_position, direction} = get_qei_position_absolute(c_qei);
 						}
+						/**
+						 * Or any other sensor interfaced to the IFM Module
+						 * place client functions here to acquire position
+						 */
 						target_position = actual_position;
 						break;
 

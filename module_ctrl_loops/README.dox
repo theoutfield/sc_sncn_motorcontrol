@@ -1,0 +1,26 @@
+/**
+
+\page mods
+\section module_ctrl_loops
+
+This module provides three control loops for position, velocity and torque control. 
+Each of these control modes has separate Server loop and Client functions. The control 
+loops implemented are closed on data from sensors like position from hall sensor/qei 
+sensor for Position/Velocity Controller; torque from current sensors for Torque Controller. 
+
+The Client provides functions to check status of the controller; update sensor related 
+parameters needed by the controller; enable/shutdown controllers; set target values like
+position/velocity/torque for controllers; get actual values like position/velocity/torque.
+
+To include this module add module_ctrl_loops to USED_MODULES in the application/test
+makefile, and include the  following header files for: 
+	Velocity Control: velocity_ctrl_client.h and velocity_ctrl_server.h
+	Torque Control: torque_ctrl_client.h and torque_ctrl_server.h
+	Position Control: position_ctrl_client.h and position_ctrl_server.h
+
+Note: The controllers are not limited to only the sensors listed, for example if you 
+have a different type of position sensor and is interfaced to the IFM, all it needs
+is a specific sensor driver running on IFM Core and respective client functions to 
+read sensor information must be placed in controller implementation.   
+
+*/

@@ -1,13 +1,14 @@
 
 /**
- *
  * \file comm.h
- *
- * Ctrlproto data struct client
- *
- * Copyright (c) 2013, Synapticon GmbH
+ * \brief Ctrlproto data struct client
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -67,7 +68,7 @@ int get_target_velocity(ctrl_proto_values_t InOut);
  * \brief Get target position from Ethercat
  *
  *  Output
- * \return actual position from torque control in degree * 10000
+ * \return target position from Ethercat in ticks
  */
 int get_target_position(ctrl_proto_values_t InOut);
 
@@ -91,7 +92,7 @@ void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
  * \brief Send actual position to Ethercat
  *
  *  Input
- * \param actual_position sent to Ethercat in degree * 10000
+ * \param actual_position sent to Ethercat in ticks
  */
 void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
 

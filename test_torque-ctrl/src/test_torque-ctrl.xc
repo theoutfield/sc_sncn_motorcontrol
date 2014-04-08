@@ -138,9 +138,15 @@ int main(void)
 					ctrl_par torque_ctrl_params;
 					hall_par hall_params;
 					qei_par qei_params;
+
+					/* Initialize PID parameters for Torque Control (defined in config/motor/bldc_motor_config.h) */
+					init_torque_control_param(torque_ctrl_params);
+
+					/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 					init_qei_param(qei_params);
 					init_hall_param(hall_params);
-					init_torque_control_param(torque_ctrl_params);
+
+					/* Control Loop */
 					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
 							c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
 				}

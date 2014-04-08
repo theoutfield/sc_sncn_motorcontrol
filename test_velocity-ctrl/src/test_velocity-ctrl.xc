@@ -129,11 +129,17 @@ int main(void)
 				hall_par hall_params;
 				qei_par qei_params;
 
+				/* Initialize PID parameters for Velocity Control (defined in config/motor/bldc_motor_config.h) */
 				init_velocity_control_param(velocity_ctrl_params);
-				init_sensor_filter_param(sensor_filter_params);
+
+				/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 				init_hall_param(hall_params);
 				init_qei_param(qei_params);
 
+				/* Initialize sensor filter length */
+				init_sensor_filter_param(sensor_filter_params);
+
+				/* Control Loop */
 				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, \
 					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, c_commutation_p2);
 			}

@@ -1,14 +1,14 @@
 
 /**
- *
  * \file sine_table_big.c
- *	Sine Loopup tables
- *
- *
- * Copyright (c) 2013, Synapticon GmbH
+ * \brief Sine Loopup tables
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Authors: Ludwig Orgler <lorgler@synapticon.com>
- *
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

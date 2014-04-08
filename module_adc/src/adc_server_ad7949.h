@@ -1,13 +1,15 @@
 
 /**
- *
  * \file adc_server_ad7949.h
- *
- * 	ADC Server
- *
- * Copyright (c) 2013, Synapticon GmbH
+ * \brief ADC Server
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Martin Schwarz <mschwarz@synapticon.com> & Ludwig Orgler <lorgler@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

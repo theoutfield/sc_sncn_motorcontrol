@@ -2,15 +2,17 @@
 /**
  *
  * \file test_ethercat-mode.xc
+ * \brief Test illustrates usage of Motor Control with Ethercat
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date
  *
- * \brief Main project file
- *  Test illustrates usage of Motor Control with Ethercat
  */
 /*
  *
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -74,7 +76,7 @@ int main(void)
 	chan c_torque_ctrl;														// torque control channel
 	chan c_position_ctrl;													// position control channel
 	chan c_watchdog; 														// watchdog channel
-	chan c_gpio_0, c_gpio_1;												// gpio digital channels
+	chan c_gpio_p1, c_gpio_p2;												// gpio digital channels
 
 	// EtherCat Communication channels
 	chan coe_in; 															// CAN from module_ethercat to consumer
@@ -108,7 +110,7 @@ int main(void)
 		on stdcore[1] :
 		{
 			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5,\
-					c_torque_ctrl, c_velocity_ctrl, c_position_ctrl, c_gpio_0);
+					c_torque_ctrl, c_velocity_ctrl, c_position_ctrl, c_gpio_p1);
 		}
 
 		on stdcore[2]:
@@ -119,7 +121,6 @@ int main(void)
 				{
 					 ctrl_par position_ctrl_params;
 					 hall_par hall_params;
-
 					 qei_par qei_params;
 
 					 init_position_control_param(position_ctrl_params);
@@ -195,7 +196,7 @@ int main(void)
 				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
 				/* GPIO Digital Server */
-				gpio_digital_server(p_ifm_ext_d, c_gpio_0, c_gpio_1);
+				gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);
 
 				/* Hall Server */
 				{

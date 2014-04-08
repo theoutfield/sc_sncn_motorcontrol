@@ -1,14 +1,14 @@
 
 /**
- *
  * \file profile_velocity_quick-stop.c
- *
  * \brief Quick stop Profile Generation for Velocity
- *
- *
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
  * Copyright (c) 2013, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

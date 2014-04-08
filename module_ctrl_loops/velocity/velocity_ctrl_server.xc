@@ -159,6 +159,10 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					previous_position = position;
 					old_difference = difference;
 				}
+				/**
+				 * Or any other sensor interfaced to the IFM Module
+				 * place client functions here to acquire velocity/position
+				 */
 
 				actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
 
@@ -257,6 +261,10 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 							qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
 							target_velocity = actual_velocity;
 						}
+						/**
+						 * Or any other sensor interfaced to the IFM Module
+						 * place client functions here to acquire velocity/position
+						 */
 						break;
 
 					case ENABLE_VELOCITY_CTRL:

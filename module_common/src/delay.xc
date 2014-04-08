@@ -1,13 +1,15 @@
 
 /**
- *
  * \file delay.xc
- *
- *
- *
- * Copyright (c) 2013, Synapticon GmbH
+ * \brief Implementation of delay functions
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Martin Schwarz <mschwarz@synapticon.com> & Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

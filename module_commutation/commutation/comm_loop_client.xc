@@ -1,14 +1,18 @@
 
 /**
- *
  * \file comm_loop_client.xc
- *
+ * \brief Commutation Loop Client functions
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
  * Commutation Loop Client functions
  *
- * Copyright (c) 2013, Synapticon GmbH
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>, Ludwig Orgler <lorgler@synapticon.com>
- * 			& Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

@@ -3,6 +3,15 @@
 \page mods
 \section module_adc
 
+This module provides driver for the ADCs on the interface module (IFM).
+The module provides ADC server thread which drives the ADC and acquires analog 
+input data in a while loop; and provides client functions to get data from the 
+ADC server.
 
+To include this module add module_adc to USED_MODULES in the application/test
+makefile, and include header files: adc_server_ad7949.h and adc_client_ad7949.h
+
+Note: For C22 core module this server must be run on CORE 3 and for C21 core module on 
+CORE 1, since only these cores have physical connection to the IFM modules.
 
 */

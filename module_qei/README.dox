@@ -1,0 +1,19 @@
+/**
+
+\page mods
+\section module_qei
+
+This module provides driver for the Incremental Encoders connected to the interface 
+module (IFM). The module provides QEI server thread which acquires position 
+information from the Incremental encoder in quadrature mode in a while loop; and 
+provides client functions to configure QEI Server with encoder resolution, encoder 
+type, polarity and max ticks; get position from QEI Server and to calculate velocity 
+from the QEI position.
+
+To include this module add module_qei to USED_MODULES in the application/test
+makefile, and include header files: qei_server.h and qei_client.h
+
+Note: For C22 core module this server must be run on CORE 3 and for C21 core module on 
+CORE 1, since only these cores have physical connection to the IFM modules.
+
+*/

@@ -1,0 +1,19 @@
+/**
+
+\page mods
+\section module_hall
+
+This module provides driver for the Hall sensor connected to the interface module (IFM).
+The module provides Hall server thread which drives the Hall sensor, acquires position 
+information and calculates velocity in a while loop; and provides client functions to
+configure Hall Server with number of pole pairs and max ticks; get position and velocity 
+from the Hall server.
+
+To include this module add module_hall to USED_MODULES in the application/test
+makefile, and include header files: hall_server.h and hall_client.h
+
+Note: For C22 core module this server must be run on CORE 3 and for C21 core module on 
+CORE 1, since only these cores have physical connection to the IFM modules.
+
+
+*/

@@ -1,17 +1,17 @@
 
 /**
- *
  * \file profile.h
- *
  * \brief Profile Generation for Position, Velocity and Torque
  * 	Implements position profile based on Linear Function with
  * 	Parabolic Blends, velocity profile and torque profiles are
  * 	based on linear functions.
- *
- *
- * Copyright (c) 2013, Synapticon GmbH
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -255,8 +255,6 @@ typedef struct
 	float min_position;
 
 } 	profile_position_param;
-
-//void __initialize_position_profile_limits(int gear_ratio, int max_acceleration, int max_velocity, profile_position_param *profile_pos_params);
 
 void __initialize_position_profile_limits(int max_acceleration, int max_velocity,  \
 		int sensor_select, int max_position, int min_position, profile_position_param *profile_pos_params);
