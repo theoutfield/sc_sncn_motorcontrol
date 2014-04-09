@@ -3,10 +3,12 @@
 \page mods
 \section module_ecat_drive
 
-This module provides a communication bridge implementation between Ethercat and Motor
-drive System; and complex motor drive functionalities. The implemtation uses incoming 
-packets from the Ethercat handler; runs State Machine to decide upon actions to be 
-taken; signals/sends data to the Handler with outgoing packets.  
+This module provides a communication bridge between Ethercat and Motor drive System; 
+complex motor drive/control functionalities. The implemtation receives/sends data to 
+the Ethercat Master Application; monitors the state of the motor drive, sensor drive 
+and control servers; runs State Machine; initiates, starts and executes/shutsdown a 
+particular operation requested from the Ethercat Master Application; packs the sensor
+data information to be sent to Ethercat master application.  
 
 To include this module add module_ecat_drive to USED_MODULES in the application/test
 makefile, and include header files: ecat_motor_drive.h

@@ -1,13 +1,15 @@
 
 /**
- *
  * \file qei_client.xc
- *
- *	QEI Sensor Client Functions
- *
- * Copyright (c) 2013, Synapticon GmbH & XMOS Ltd
+ * \brief QEI Sensor Client Functions
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+/*
+ * Copyright (c) 2014, Synapticon GmbH & XMOS Ltd
  * All rights reserved.
- * Authors: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

@@ -7,7 +7,7 @@
  * \date 10/04/2014
  */
 /*
- * Copyright (c) 2013, Synapticon GmbH
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

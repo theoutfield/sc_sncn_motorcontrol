@@ -1,12 +1,10 @@
-/*
- *
+
+/**
  * \file test_watchdog.xc
- * \brief Main project file
- *
- *
- *
- * \author Martin Schwarz <mschwarz@synapticon.com>
- *
+ * \brief Watchdog test
+ * \author  Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
  */
 
 #include <xs1.h>

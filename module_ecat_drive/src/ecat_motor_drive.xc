@@ -131,7 +131,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 	int direction;
 
-	int comm_active = 0;
+	int communication_active = 0;
 	unsigned int comm_inactive_time_stamp;
 	unsigned int c_time;
 	unsigned int inactive_delay = 100*MSEC_STD;
@@ -194,9 +194,10 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 	while(1)
 	{
 //#pragma xta endpoint "ecatloop"
-		comm_active = ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
+		/* Read/Write packets to ethercat Master application */
+		communication_active = ctrlproto_protocol_handler_function(pdo_out, pdo_in, InOut);
 
-		if(comm_active == 0)
+		if(communication_active == 0)
 		{
 			if(comm_inactive_flag == 0)
 			{
@@ -215,15 +216,16 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				}
 			}
 		}
-		else if(comm_active >= 1)
+		else if(communication_active >= 1)
 		{
 			comm_inactive_flag = 0;
 			inactive_timeout_flag = 0;
 		}
 
+		/* If communication is inactive, trigger quick stop mode if motor is in motion */
 		if(inactive_timeout_flag == 1)
 		{
-
+			/* quick stop for torque mode */
 			if(op_mode == CST || op_mode == TQ)
 			{
 				actual_torque = get_torque(c_torque_ctrl);
@@ -245,7 +247,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 				}
 			}
-
+			/* quick stop for velocity mode */
 			if(op_mode == CSV || op_mode == PV)
 			{
 				actual_velocity = get_velocity(c_velocity_ctrl);
@@ -280,6 +282,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 				}
 
 			}
+			/* quick stop for position mode */
 			else if(op_mode == CSP || op_mode == PP)
 			{
 				actual_velocity = get_hall_velocity(c_hall, hall_params);
@@ -354,12 +357,19 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			op_mode = 256;
 		}
 
+		/* Ethercat communication is Active */
 		if(comm_inactive_flag == 0)
 		{
+			/* Read controlword from the received from Ethercat Master application */
 			controlword = InOut.control_word;
+
+			/* Check states of the motor drive, sensor drive and control servers */
 			update_checklist(checklist, mode, c_signal, c_hall, c_qei, c_dummy, c_torque_ctrl, c_velocity_ctrl, c_position_ctrl);
 
+			/* Update state machine */
 			state = get_next_state(state, checklist, controlword);
+
+			/* Update statusword sent to the Ethercat Master Application */
 			statusword = update_statusword(statusword, state, ack, quick_active, shutdown_ack);
 			InOut.status_word = statusword;
 			//printintln(controlword);
@@ -391,7 +401,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						InOut.operation_mode_display = 105;
 					}
 				}
-				if(controlword == 5)  /* Configuration of GPIOs follows here */
+				/* Read Motor Configuration sent from the Ethercat Master Application */
+				if(controlword == 5)
 				{
 					update_commutation_param_ecat(commutation_params, coe_out);
 					sensor_select = sensor_select_sdo(coe_out);
@@ -415,6 +426,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						limit_switch = -1;
 					else if(homing_method == HOMING_POSITIVE_SWITCH)
 						limit_switch = 1;
+
+					/* Configuration of GPIO Digital ports follows here */
 					config_gpio_digital_input(c_gpio, 0, SWITCH_INPUT_TYPE, limit_switch_type);
 					config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, limit_switch_type);
 					end_config_gpio(c_gpio);
@@ -427,7 +440,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 					op_set_flag = 0;
 				}
 			}
-
+			/* Read Position Sensor */
 			if(sensor_select == HALL)
 			{
 				actual_velocity = get_hall_velocity(c_hall, hall_params);
@@ -442,8 +455,10 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
 			if(mode_selected == 0)
 			{
+				/* Select an operation mode requested from Ethercat Master Application */
 				switch(InOut.operation_mode)
 				{
+					/* Homing Mode initialization */
 					case HM:
 						if(op_set_flag == 0)
 						{
@@ -471,6 +486,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 							InOut.operation_mode_display = HM;
 						}
 						break;
+
+					/* Profile Position Mode initialization */
 					case PP:
 						if(op_set_flag == 0)
 						{
@@ -516,6 +533,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						}
 						break;
 
+					/* Profile Torque Mode initialization */
 					case TQ:
 						//printstrln("TQ");
 						if(op_set_flag == 0)
@@ -560,6 +578,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						}
 						break;
 
+					/* Profile Velocity Mode initialization */
 					case PV:
 						//printstrln("pv");
 						if(op_set_flag == 0)
@@ -602,6 +621,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						}
 						break;
 
+					/* Cyclic synchronous position mode initialization */
 					case CSP:
 						if(op_set_flag == 0)
 						{
@@ -641,6 +661,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						}
 						break;
 
+					/* Cyclic synchronous velocity mode initialization */
 					case CSV: 	//csv mode index
 						if(op_set_flag == 0)
 						{
@@ -681,6 +702,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						}
 						break;
 
+					/* Cyclic synchronous torque mode initialization */
 					case CST:
 						//printstrln("op mode enabled on slave");
 						if(op_set_flag == 0)
@@ -736,10 +758,13 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			printstr("qactive ");
 			printhexln(quick_active);*/
 			//printhexln(statusword);
+			/* After operation mode is selected the loop enters a continuous operation
+			 * until the operation is shutdown */
 			if(mode_selected == 1)
 			{
 				switch(InOut.control_word)
 				{
+					/* quick stop controlword */
 					case 0x000b: //quick stop
 						if(op_mode == CST || op_mode == TQ)
 						{
@@ -801,6 +826,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						}
 						break;
 
+					/* continuous controlword */
 					case 0x000f: //switch on cyclic
 						//printstrln("cyclic");
 						if(op_mode == HM)
@@ -1059,6 +1085,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 						}
 						break;
 
+					/* Shutdown controlword */
 					case 0x0006: //shutdown
 						//deactivate
 						if(op_mode == CST || op_mode == TQ)
@@ -1111,7 +1138,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			printstr(" steps ");
 			printhexln(steps);*/
 
-
+			/* quick stop controlword routine */
 			else if(mode_selected == 3) // non interrupt
 			{
 				if(op_mode == CST || op_mode == TQ)
@@ -1297,7 +1324,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 			}
 
 
-
+			/* Read Troque and Position */
 			if(sensor_select == HALL)
 			{
 				{actual_position, direction} = get_hall_position_absolute(c_hall);
