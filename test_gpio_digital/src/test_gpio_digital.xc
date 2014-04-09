@@ -98,9 +98,9 @@ void gpio_test(chanend c_gpio_p1)
 			xscope_probe_data(0, port_0_value);
 			xscope_probe_data(1, port_1_value);
 		#else
-			printstr("Port 0 value ");
+			printstr("Port 0 value: ");
 			printint(port_0_value);
-			printstr(" Port 1 value ");
+			printstr(" Port 1 value: ");
 			printintln(port_1_value);
 		#endif
 

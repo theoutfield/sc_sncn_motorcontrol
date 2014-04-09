@@ -10,5 +10,4 @@ SOURCE_DIRS += $(MODULE_CONTROL_LOOPS_DIRS)
 INCLUDE_DIRS += $(MODULE_CONTROL_LOOPS_INCLUDE)
 
 XCC_FLAGS += -fsubword-select
-OPTIONAL_HEADERS += dc_motor_config.h refclk.h
-USED_MODULES += module_qei
+OPTIONAL_HEADERS += refclk.h

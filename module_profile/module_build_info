@@ -10,4 +10,4 @@ SOURCE_DIRS += $(MODULE_PROFILE_DIRS)
 INCLUDE_DIRS += $(MODULE_PROFILE_INCLUDE)
 
 XCC_FLAGS += -fsubword-select
-OPTIONAL_HEADERS += dc_motor_config.h refclk.h
+OPTIONAL_HEADERS += refclk.h
