@@ -6,7 +6,6 @@
  * \date 10/04/2014
  */
 /*
- *
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
  *

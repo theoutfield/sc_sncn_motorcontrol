@@ -1,18 +1,15 @@
 
 /**
- *
  * \file test_adc_external_input.xc
- *
  * \brief Test illustrates usage of adc to get external potentiometer sensor values.
  *   By default the analog inputs are configured as differential only.
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  * \author Martin Schwarz <mschwarz@synapticon.com>
  * \version 1.0
- * \date
- *
+ * \date 10/04/2014
  */
 /*
- * Copyright (c) 2013, Synapticon GmbH
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

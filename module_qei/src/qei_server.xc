@@ -1,20 +1,16 @@
 
 /**
- *
  * \file qei_server.xc
- *
- *	QEI Sensor Server
- *
- *	Server limits:
- *	  8800 rpm on 1000 count encoder
- *	  2200 rpm on 4000 count encoder
- *	  425 rpm on 20000 count encoder
+ * \brief QEI Sensor Server Implementation
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
  */
 
 /*
- * Copyright (c) 2013, Synapticon GmbH & XMOS Ltd
+ * Copyright (c) 2014, Synapticon GmbH & XMOS Ltd
  * All rights reserved.
- * Authors: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

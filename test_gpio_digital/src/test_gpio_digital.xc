@@ -1,17 +1,14 @@
 
 /**
- *
  * \file test_gpio_digital.xc
  * \brief Test illustrates configuration and usage of GPIO digital ports. Two ports are configured
  *  as input switches and the remaining two ports are configured as digital out ports
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  * \version 1.0
- * \date
- *
+ * \date 10/04/2014
  */
 /*
- *
- * Copyright (c) 2013, Synapticon GmbH
+ * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
