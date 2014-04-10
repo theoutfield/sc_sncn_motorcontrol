@@ -1,14 +1,15 @@
 
 /**
- *
  * \file bldc_motor_config.h
- *	Motor Control config file
- *
- *	Please define your the motor specifications here
- *
+ * \brief Motor Control config file (define your the motor specifications here)
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -45,47 +46,87 @@
 
 #pragma once
 
-/*
- * define Motor Specific Constants (found in motor specification sheet)
+/**
+ * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				8
-#define MAX_NOMINAL_SPEED  			5260				// rpm
-#define MAX_NOMINAL_CURRENT  		2					// A
-#define MOTOR_TORQUE_CONSTANT 		34    				// mNm/A
+#define POLE_PAIRS  				4				// Number of pole pairs
+#define MAX_NOMINAL_SPEED  			3000			// rpm
+#define MAX_NOMINAL_CURRENT  		6				// A
+#define MOTOR_TORQUE_CONSTANT 		38    			// mNm/A
 
-/* If you have any gears added specify gear-ratio
- * and any additional encoders attached specify encoder resolution here (optional)
+/**
+ * If you have any gears added, specify gear-ratio
+ * and any additional encoders attached specify encoder resolution here (Mandatory)
  */
-#define GEAR_RATIO  				26					// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			4000				// 4 x Max count of Quadrature Encoder (4X decoding)
+#define GEAR_RATIO  				120					// if no gears are attached - set to gear ratio to 1
+#define ENCODER_RESOLUTION 			4000				// 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
 
-/* Choose Position/Velocity Sensor */
-#define SENSOR_USED 				HALL 				// QEI
+/* Position Sensor Types (select your sensor type here)
+ * (HALL/ QEI) */
+#define SENSOR_USED 				QEI
 
-/*Define your Encoder type*/
-#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX		// QEI_WITH_NO_INDEX
+/* Define your Incremental Encoder type (QEI_INDEX/ QEI_NO_INDEX) */
+#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX
 
+/* Polarity is used to keep all position sensors to count ticks in the same direction
+ *  (NORMAL/INVERTED) */
+#define QEI_SENSOR_POLARITY			INVERTED
 
-/* Somanet IFM Internal Config */
-#define IFM_RESOLUTION				DC100_RESOLUTION 	 // DC300_RESOLUTION   /* Specifies the current sensor resolution/A */
+/* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
+ *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
+#define IFM_RESOLUTION				DC100_RESOLUTION
 
+/* Commutation offset (range 0-4095) (HALL sensor based commutation) */
+#define COMMUTATION_OFFSET_CLK		770
+#define COMMUTATION_OFFSET_CCLK		2644
 
-/*Changes direction of the motor drive*/
-#define POLARITY 					1					// 1 / -1
+/* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
+#define WINDING_TYPE				DELTA_WINDING
 
-/* Profile defines (optional) */
+/* Changes direction of the motor drive  (1 /-1) */
+#define POLARITY 					1
+
+/* Profile defines (Mandatory for profile modes) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
-#define PROFILE_VELOCITY			1001				// rpm
+#define PROFILE_VELOCITY			1000				// rpm
 #define MAX_ACCELERATION   			5000   				// rpm/s
-#define PROFILE_ACCELERATION		2002				// rpm/s
-#define PROFILE_DECELERATION  		2004				// rpm/s
-#define QUICK_STOP_DECELERATION 	2005				// rpm/s
+#define PROFILE_ACCELERATION		2000				// rpm/s
+#define PROFILE_DECELERATION  		2000				// rpm/s
+#define QUICK_STOP_DECELERATION 	2000				// rpm/s
 #define PROFILE_TORQUE_SLOPE		66					// (desired torque_slope/torque_constant)  * IFM resolution
 
 
 /* Control specific constants/variables */
-	/*Torque Control (Mandatory if Torque control used)*/
+	/* Position Control (Mandatory if Position control used)
+	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
+#if(SENSOR_USED == 1)				// PID gains for position control with Hall Sensor
+	#define POSITION_Kp_NUMERATOR 	 	2265
+	#define POSITION_Kp_DENOMINATOR  	1000
+	#define POSITION_Ki_NUMERATOR    	1
+	#define POSITION_Ki_DENOMINATOR  	5000
+	#define POSITION_Kd_NUMERATOR    	1
+	#define POSITION_Kd_DENOMINATOR  	1000
+
+	#define MAX_POSITION_LIMIT 			POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO		// ticks (max range: 2^30, limited for safe operation) qei/hall/any position sensor
+	#define MIN_POSITION_LIMIT 			-POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO		// ticks (min range: -2^30, limited for safe operation) qei/hall/any position sensor
+#endif
+#if(SENSOR_USED == 2) 				// PID gains for position control with Incremental Encoder
+	#define POSITION_Kp_NUMERATOR 	 	660
+	#define POSITION_Kp_DENOMINATOR  	80
+	#define POSITION_Ki_NUMERATOR    	1
+	#define POSITION_Ki_DENOMINATOR  	25384
+	#define POSITION_Kd_NUMERATOR    	0
+	#define POSITION_Kd_DENOMINATOR  	100
+
+	#define MAX_POSITION_LIMIT 			GEAR_RATIO*ENCODER_RESOLUTION	// ticks (max range: 2^30, limited for safe operation)
+	#define MIN_POSITION_LIMIT 			-GEAR_RATIO*ENCODER_RESOLUTION	// ticks (min range: -2^30, limited for safe operation)
+#endif
+
+	/* Torque Control (Mandatory if Torque control used)
+	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
 #define TORQUE_Kp_NUMERATOR 	   	20
 #define TORQUE_Kp_DENOMINATOR  		10
 #define TORQUE_Ki_NUMERATOR    		11
@@ -93,7 +134,9 @@
 #define TORQUE_Kd_NUMERATOR    		1
 #define TORQUE_Kd_DENOMINATOR  		10
 
-	/*Velocity Control (Mandatory if Velocity control used)*/
+	/* Velocity Control (Mandatory if Velocity control used)
+	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
 #define VELOCITY_Kp_NUMERATOR 	 	5
 #define VELOCITY_Kp_DENOMINATOR  	10
 #define VELOCITY_Ki_NUMERATOR    	5
@@ -103,126 +146,6 @@
 
 #define VELOCITY_FILTER_SIZE        8  	//default (could be changed upto 16)
 
-	/*Position Control (Mandatory if Position control used)*/
-#define POSITION_Kp_NUMERATOR 	 	180
-#define POSITION_Kp_DENOMINATOR  	2000
-#define POSITION_Ki_NUMERATOR    	50
-#define POSITION_Ki_DENOMINATOR  	102000
-#define POSITION_Kd_NUMERATOR    	100
-#define POSITION_Kd_DENOMINATOR  	10000
-
-#define MAX_POSITION_LIMIT 			350		// degree should not exceed 359
-#define MIN_POSITION_LIMIT 			-350	// degree should not exceed -359
-
-
-
-/**
- * \brief struct definition for PID Controller
- */
-typedef struct S_Control
-{
-	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
-	int Kd_n, Kd_d; //Kd = Kd_n/Kd_d
-	int Integral_limit;
-	int Control_limit;
-	int Loop_time;
-} ctrl_par;
-
-/**
- * \brief struct definition for velocity filter
- */
-typedef struct S_Filter_length
-{
-	int filter_length;
-} filter_par;
-
-/**
- * \brief struct definition for quadrature sensor
- */
-typedef struct S_QEI {
-	int max_count;
-	int real_counts;
-	int gear_ratio;
-	int index;   //no_index - 0 index - 1
-	int poles;
-} qei_par;
-
-/**
- * \brief struct definition for hall sensor
- */
-typedef struct S_Hall {
-	int pole_pairs;
-	int gear_ratio;
-} hall_par;
-
-/**
- * \brief struct definition for Synchronous torque param
- */
-typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
-{
-	int nominal_motor_speed;
-	int nominal_current;
-	int motor_torque_constant;
-	int max_torque;
-	int polarity;
-} cst_par;
-
-/**
- * \brief struct definition for Synchronous velocity param
- */
-typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
-{
-	int max_motor_speed;
-	int nominal_current;
-	int motor_torque_constant;
-	int polarity;
-	int max_acceleration;
-} csv_par;
-
-/**
- * \brief struct definition for Synchronous position param
- */
-typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
-{
-	csv_par base;
-	int max_following_error;
-	int max_position_limit;
-	int min_position_limit;
-} csp_par;
-
-/**
- * \brief struct definition for profile torque param
- */
-typedef struct PROFILE_TORQUE_PARAM
-{
-	int profile_slope;
-	int polarity;
-} pt_par;
-
-/**
- * \brief struct definition for profile velocity param
- */
-typedef struct PROFILE_VELOCITY_PARAM
-{
-	int max_profile_velocity;
-	int profile_acceleration;
-	int profile_deceleration;
-	int quick_stop_deceleration;
-	int polarity;
-} pv_par;
-
-/**
- * \brief struct definition for profile position param
- */
-typedef struct PROFILE_POSITION_PARAM
-{
-	pv_par base;
-	int profile_velocity;
-	int software_position_limit_min;
-	int software_position_limit_max;
-	int max_acceleration;
-} pp_par;
 
 /**
  * \brief initialize Velocity sensor filter

@@ -1,14 +1,16 @@
+
 /**
- *
  * \file adc_client_ad7949.xc
  * \brief ADC Client
- * \authors Martin Schwarz <mschwarz@synapticon.com>, Ludwig Orgler <lorgler@synapticon.com>
+ * \authors Martin Schwarz <mschwarz@synapticon.com>, Ludwig Orgler <lorgler@synapticon.com> 
+ * \version 1.0
+ * \date 10/04/2014
  */
 
 /*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- *  
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -39,7 +41,6 @@
 
 #include <adc_common.h>
 
-calib_data I_calib;
 #define ADC_CURRENT_REQ	1
 #define ADC_ALL_REQ	2
 #define ADC_CALIB_POINTS 64
@@ -76,7 +77,7 @@ calib_data I_calib;
 
 }
 
-void do_adc_calibration_ad7949( chanend c_adc )
+void do_adc_calibration_ad7949(chanend c_adc, calib_data &I_calib)
 {
 	unsigned int a, b;
 	int i = 0;
@@ -108,7 +109,7 @@ void do_adc_calibration_ad7949( chanend c_adc )
 //	printstr("ib_calibration ");   printint(I_calib.Ib_calib); printstr("\n");
 }
 
-{int, int} get_adc_calibrated_current_ad7949( chanend c_adc )
+{int, int} get_adc_calibrated_current_ad7949(chanend c_adc, calib_data &I_calib)
 {
 	// 0A equals 2.5V --> 9999
 	unsigned int a, b;
@@ -129,7 +130,7 @@ void do_adc_calibration_ad7949( chanend c_adc )
 }
 
 
-{int, int} get_adc_external_potentiometer_ad7949(chanend c_adc)
+{int, int} get_adc_external_ad7949(chanend c_adc)
 {
 
 	int p1, p2;

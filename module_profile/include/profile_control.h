@@ -1,16 +1,17 @@
 
 /**
- *
  * \file profile_control.h
- *
  * \brief Profile Control functions
  * 	Implements position profile control, velocity profile control
  * 	and torque profile control functions
- *
- *
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -51,25 +52,23 @@
 /**
  * \brief Set profile position with Position Control loop
  *
- *  Output channel
+ *  Output
  * \channel c_position_ctrl for communicating with the Position Control Server
  *
  *  Input
- * \param target_position is the new target position in (degree)
+ * \param target_position is the new target position in (ticks)
  * \param velocity in (rpm)
  * \param acceleration in (rpm/s)
  * \param deceleration in (rpm/s)
- * \param min position in (degree)
- * \param max position in (degree)
  *
  */
-void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,\
-		int max_position, int min_position, chanend c_position_ctrl);
+void set_profile_position(int target_position, int velocity, int acceleration, int deceleration, \
+		int sensor_select, chanend c_position_ctrl);
 
 /**
  * \brief Set profile velocity with Velocity Control loop
  *
- *  Output channel
+ *  Output
  * \channel c_velocity_ctrl for communicating with the Velocity Control Server
  *
  *  Input
@@ -84,7 +83,7 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 /**
  * \brief Set profile torque with Torque Control loop
  *
- *  Output channel
+ *  Output
  * \channel c_torque_ctrl for communicating with the Torque Control Server
  *
  *  Input

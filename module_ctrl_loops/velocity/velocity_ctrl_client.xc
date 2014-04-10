@@ -1,14 +1,15 @@
 
 /**
- *
  * \file velocity_ctrl_client.xc
- *
- *	Velocity Control Loop Client functions
- *
- *
+ * \brief Velocity Control Loop Client functions
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -115,17 +116,18 @@ void set_velocity_ctrl_param(ctrl_par &velocity_ctrl_params, chanend c_velocity_
 void set_velocity_ctrl_hall_param(hall_par &hall_params, chanend c_velocity_ctrl)
 {
 	VELOCITY_CTRL_WRITE(SET_VELOCITY_CTRL_HALL);
-	VELOCITY_CTRL_WRITE(hall_params.gear_ratio);
 	VELOCITY_CTRL_WRITE(hall_params.pole_pairs);
+	VELOCITY_CTRL_WRITE(hall_params.max_ticks);
+	VELOCITY_CTRL_WRITE(hall_params.max_ticks_per_turn);
 }
 
 void set_velocity_ctrl_qei_param(qei_par &qei_params, chanend c_velocity_ctrl)
 {
 	VELOCITY_CTRL_WRITE(SET_VELOCITY_CTRL_QEI);
-	VELOCITY_CTRL_WRITE(qei_params.gear_ratio);
+	VELOCITY_CTRL_WRITE(qei_params.max_ticks);
 	VELOCITY_CTRL_WRITE(qei_params.index);
 	VELOCITY_CTRL_WRITE(qei_params.real_counts);
-	VELOCITY_CTRL_WRITE(qei_params.max_count);
+	VELOCITY_CTRL_WRITE(qei_params.max_ticks_per_turn);
 	VELOCITY_CTRL_WRITE(qei_params.poles);
 }
 

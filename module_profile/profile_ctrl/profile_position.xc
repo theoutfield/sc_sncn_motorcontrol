@@ -1,15 +1,16 @@
 
 /**
- *
  * \file profile_position.xc
- *
  * \brief Profile Position Control functions
  * 	Implements position profile control function
- *
- *
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -45,11 +46,12 @@
 #include <xscope.h>
 #include <internal_config.h>
 #include <drive_config.h>
+#include "print.h"
 #include <profile.h>
 #include <profile_control.h>
 
 void set_profile_position(int target_position, int velocity, int acceleration, int deceleration, \
-		int max_position, int min_position, chanend c_position_ctrl)
+		int sensor_select, chanend c_position_ctrl)
 {
 	int i;
 	timer t;
@@ -60,23 +62,27 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 	int actual_position = 0;
 
 	int init_state = __check_position_init(c_position_ctrl);
-	if(init_state == INIT_BUSY)
+
+	while(init_state == INIT_BUSY)
 	{
+		set_position_sensor(sensor_select, c_position_ctrl);
 		init_state = init_position_control(c_position_ctrl);
+		/*if(init_state == INIT)
+			printstrln("position control intialized");
+		else
+			printstrln("intialize position control failed");*/
 	}
 
 	if(init_state == INIT)
 	{
-		target_position = position_limit(target_position, max_position, min_position);
-		actual_position = get_position(c_position_ctrl); //degree * 10000
-		steps = init_position_profile(target_position*10000, actual_position, velocity, acceleration, deceleration);
+		actual_position = get_position(c_position_ctrl);
+		steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
 		t :> time;
 		for(i = 1; i < steps; i++)
 		{
 			position_ramp = position_profile_generate(i);
 			set_position(position_ramp, c_position_ctrl);
 			actual_position = get_position(c_position_ctrl);
-
 			t when timerafter(time + MSEC_STD) :> time;
 			/*xscope_probe_data(0, actual_position);
 			xscope_probe_data(1, position_ramp);*/

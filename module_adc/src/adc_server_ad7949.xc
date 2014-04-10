@@ -1,15 +1,17 @@
+
 /**
- *
  * \file adc_server_ad7949.xc
- *
- * 	ADC Server
- *	Author: Martin Schwarz <mschwarz@synapticon.com> & Ludwig Orgler <lorgler@synapticon.com>
+ * \brief ADC Server
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
  */
 
 /*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- *  
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -43,9 +45,6 @@
 #include <xclib.h>
 #include "refclk.h"
 
-static unsigned int adc_data_a[5];
-static unsigned int adc_data_b[5];
-unsigned short adc_index = 0;
 
 #define ADC_CURRENT_REQ	1
 #define ADC_ALL_REQ	2
@@ -202,7 +201,10 @@ static void adc_ad7949_singleshot(buffered out port:32 p_sclk_conv_mosib_mosia,
 		   	   	   	   	   	   	  const unsigned int adc_config_mot,
 		   	   	   	   	   	   	  const unsigned int adc_config_other[],
 		   	   	   	   	   	   	  const unsigned int delay,
-		   	   	   	   	   	   	  timer t)
+		   	   	   	   	   	   	  timer t,
+		   	   	   	   	   	   	  unsigned int adc_data_a[],
+		   	   	   	   	   	   	  unsigned int adc_data_b[],
+		   	   	   	   	   	   	  unsigned short &adc_index)
 {
 
 		unsigned int ts;
@@ -223,7 +225,7 @@ static void adc_ad7949_singleshot(buffered out port:32 p_sclk_conv_mosib_mosia,
 
 
 	  	SPI_IDLE;
-//		p_ifm_ext_d3 <: 1;
+
 		output_adc_config_data(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_other[adc_index]);
 		SPI_IDLE;
 
@@ -238,7 +240,7 @@ static void adc_ad7949_singleshot(buffered out port:32 p_sclk_conv_mosib_mosia,
 
 		output_adc_config_data(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_mot);
 		SPI_IDLE;
-//	  	p_ifm_ext_d3 <: 0;
+
 
 		p_data_a :> data_raw_a;
 		adc_data_a[4] = convert(data_raw_a);
@@ -259,7 +261,7 @@ void adc_ad7949(chanend c_adc,
 {
 	timer tx;
 	unsigned ts;
-	int cmd;
+	int command;
 	int xCount = 100;
 
 
@@ -270,7 +272,9 @@ void adc_ad7949(chanend c_adc,
 										      0b11111011001001};   	// ADC Channel 5, unipolar, referenced to GND
 
 	const unsigned int delay = (11*USEC_FAST) / 3; 			// 3.7 us
-
+	unsigned int adc_data_a[5];
+	unsigned int adc_data_b[5];
+	unsigned short adc_index = 0;
 	configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
 	tx :> ts;
 
@@ -289,17 +293,18 @@ void adc_ad7949(chanend c_adc,
 								adc_config_mot,
 								adc_config_other,
 								delay,
-								tx);
+								tx,
+								adc_data_a,
+								adc_data_b,
+								adc_index);
 	//		xCount = 100;
 	//		tx :> ts;
 	//	}
-
-
-
-#pragma ordered
-	    select {
-	    	case c_adc :> cmd:
-	    		if(cmd == ADC_ALL_REQ)
+		#pragma ordered
+	    select
+	    {
+	    	case c_adc :> command:
+	    		if(command == ADC_ALL_REQ)
 	    		{
 					master
 					{
@@ -317,7 +322,7 @@ void adc_ad7949(chanend c_adc,
 					//	tx :> ts;
 					}
 	    		}
-	    		else if(cmd == ADC_EXTERNAL_POT)
+	    		else if(command == ADC_EXTERNAL_POT)
 				{
 					master
 					{
@@ -325,9 +330,7 @@ void adc_ad7949(chanend c_adc,
 						c_adc <: adc_data_b[3];
 					}
 				}
-	    	break;
-
-		default:  break;
+	    		break;
 	    }
 	}
 }
@@ -342,7 +345,7 @@ void adc_ad7949_triggered( chanend c_adc,
 {
 	timer t;
 	unsigned int ts;
-	int cmd;
+	int command;
 	unsigned char ct;
 	const unsigned int adc_config_mot     =   0b11110001001001;  	/* Motor current (ADC Channel 0), unipolar, referenced to GND */
 	const unsigned int adc_config_other[] = { 0b10110001001001,  	// Temperature
@@ -350,7 +353,9 @@ void adc_ad7949_triggered( chanend c_adc,
 											  0b11111001001001,  	// ADC Channel 4, unipolar, referenced to GND
 											  0b11111011001001};   	// ADC Channel 5, unipolar, referenced to GND
 	const unsigned int delay = (11*USEC_FAST) / 3; 			// 3.7 us
-
+	static unsigned int adc_data_a[5];
+	static unsigned int adc_data_b[5];
+	unsigned short adc_index = 0;
 	configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
 
 	while (1)
@@ -363,44 +368,48 @@ void adc_ad7949_triggered( chanend c_adc,
 				{
 					t :> ts;
 					t when timerafter(ts + 7080) :> ts; // 6200
-				//	adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b, clk );
 					adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b,	clk,
-										adc_config_mot,	adc_config_other, delay, t);
+										adc_config_mot,	adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
 				}
 				break;
 
-			case c_adc :> cmd:
-				if(cmd == ADC_CURRENT_REQ)
+			case c_adc :> command:
+				switch(command)
 				{
-					master
-					{
-						c_adc <: adc_data_a[4];
-						c_adc <: adc_data_b[4];
-					}
-				}
-				else if(cmd == ADC_ALL_REQ)
-				{
-					master
-					{
-						c_adc <: adc_data_a[0];
-						c_adc <: adc_data_a[1];
-						c_adc <: adc_data_a[2];
-						c_adc <: adc_data_a[3];
-						c_adc <: adc_data_a[4];
-						c_adc <: adc_data_b[0];
-						c_adc <: adc_data_b[1];
-						c_adc <: adc_data_b[2];
-						c_adc <: adc_data_b[3];
-						c_adc <: adc_data_b[4];
-					}
-				}
-				else if(cmd == ADC_EXTERNAL_POT)
-				{
-					master
-					{
-						c_adc <: adc_data_a[3];
-						c_adc <: adc_data_b[3];
-					}
+					case ADC_CURRENT_REQ:
+						master
+						{
+							c_adc <: adc_data_a[4];
+							c_adc <: adc_data_b[4];
+						}
+						break;
+
+					case ADC_ALL_REQ:
+						master
+						{
+							c_adc <: adc_data_a[0];
+							c_adc <: adc_data_a[1];
+							c_adc <: adc_data_a[2];
+							c_adc <: adc_data_a[3];
+							c_adc <: adc_data_a[4];
+							c_adc <: adc_data_b[0];
+							c_adc <: adc_data_b[1];
+							c_adc <: adc_data_b[2];
+							c_adc <: adc_data_b[3];
+							c_adc <: adc_data_b[4];
+						}
+						break;
+
+					case ADC_EXTERNAL_POT:
+						master
+						{
+							c_adc <: adc_data_a[3];
+							c_adc <: adc_data_b[3];
+						}
+						break;
+
+					default:
+						break;
 				}
 				break;
 		}

@@ -1,14 +1,15 @@
 
 /**
- *
  * \file  torque_ctrl_client.xc
- *
- *	Torque Control Loop Client functions
- *
- *
+ * \brief Torque Control Loop Client functions
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -76,9 +77,8 @@ int get_torque(chanend c_torque_ctrl)
 	return (torque);
 }
 
-void set_torque(int torque,  cst_par &cst_params, chanend c_torque_ctrl)
+void set_torque(int torque, chanend c_torque_ctrl)
 {
-	torque = torque;
 	TORQUE_CTRL_WRITE(SET_TORQUE_TOKEN);
 	TORQUE_CTRL_WRITE(torque);
 	return;
@@ -100,7 +100,7 @@ void send_torque_init_state(chanend c_torque_ctrl, int init_state)
 
 int torque_limit(int torque, int max_torque_limit)
 {
-	if(torque > max_torque_limit)
+	if(torque > max_torque_limit) //adc range // (5 * DC900_RESOLUTION)/2
 	{
 		return max_torque_limit;
 	}
@@ -117,7 +117,7 @@ int torque_limit(int torque, int max_torque_limit)
 void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl)
 {
 	set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity ,	\
-			cst_params.max_torque), cst_params , c_torque_ctrl);
+			cst_params.max_torque), c_torque_ctrl);
 }
 
 void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
@@ -135,18 +135,19 @@ void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
 void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_HALL);
-	TORQUE_CTRL_WRITE(hall_params.gear_ratio);
 	TORQUE_CTRL_WRITE(hall_params.pole_pairs);
+	TORQUE_CTRL_WRITE(hall_params.max_ticks);
+	TORQUE_CTRL_WRITE(hall_params.max_ticks_per_turn);
 }
 
 void set_torque_ctrl_qei_param(qei_par &qei_params, chanend c_torque_ctrl)
 {
 	TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_QEI);
-	TORQUE_CTRL_WRITE(qei_params.gear_ratio);
 	TORQUE_CTRL_WRITE(qei_params.index);
 	TORQUE_CTRL_WRITE(qei_params.real_counts);
-	TORQUE_CTRL_WRITE(qei_params.max_count);
+	TORQUE_CTRL_WRITE(qei_params.max_ticks_per_turn);
 	TORQUE_CTRL_WRITE(qei_params.poles);
+	TORQUE_CTRL_WRITE(qei_params.max_ticks);
 }
 void set_torque_sensor(int sensor_used, chanend c_torque_ctrl)
 {

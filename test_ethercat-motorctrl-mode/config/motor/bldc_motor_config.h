@@ -1,14 +1,15 @@
 
 /**
- *
  * \file bldc_motor_config.h
- *	Motor Control config file
- *
- *	Please define your the motor specifications here
- *
+ * \brief Motor Control config file (define your the motor specifications here)
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -66,11 +67,20 @@
 /*Define your Encoder type*/
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	// QEI_WITH_NO_INDEX
 
+#define QEI_SENSOR_POLARITY			INVERTED		// NORMAL
+
 /*Somanet IFM Internal Config*/
 #define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A
 
 /*Changes direction of the motor drive*/
 #define POLARITY 					1		// 1 / -1
+
+/*Commutation offset (range 0-4095) */
+#define COMMUTATION_OFFSET_CLK		683
+#define COMMUTATION_OFFSET_CCLK		2731
+
+/*Motor Winding type*/
+#define WINDING_TYPE				DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
 
 /* Profile defines (optional) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
@@ -97,124 +107,14 @@
 #define POSITION_KP	 				1474		//	(180/2000)  * 16384
 #define POSITION_KI   				8			//	(50/102000) * 16384
 #define POSITION_KD    				164			//	(100/10000) * 16384
-#define MAX_POSITION_LIMIT 			350			// degree should not exceed 359
-#define MIN_POSITION_LIMIT 			-350		// degree should not exceed 359
+#define MAX_POSITION_LIMIT 			359
+#define MIN_POSITION_LIMIT 			-359
 
 #define HALL 						1
 #define QEI_INDEX  					2
 #define QEI_NO_INDEX				3
 
 #define VELOCITY_FILTER_SIZE        8			//default (could be changed upto 16)
-
-/**
- * \brief struct definition for PID Controller
- */
-typedef struct S_Control
-{
-	int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
-	int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
-	int Kd_n, Kd_d; //Kd = Kd_n/Kd_d
-	int Integral_limit;
-	int Control_limit;
-	int Loop_time;
-} ctrl_par;
-
-/**
- * \brief struct definition for velocity filter
- */
-typedef struct S_Filter_length
-{
-	int filter_length;
-} filter_par;
-
-
-/**
- * \brief struct definition for quadrature sensor
- */
-typedef struct S_QEI {
-	int max_count;
-	int real_counts;
-	int gear_ratio;
-	int index;   //no_index - 0 index - 1
-	int poles;
-} qei_par;
-
-
-/**
- * \brief struct definition for hall sensor
- */
-typedef struct S_Hall {
-	int pole_pairs;
-	int gear_ratio;
-} hall_par;
-
-/**
- * \brief struct definition for Synchronous torque param
- */
-typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
-{
-	int nominal_motor_speed;
-	int nominal_current;
-	int motor_torque_constant;
-	int max_torque;
-	int polarity;
-} cst_par;
-
-/**
- * \brief struct definition for Synchronous velocity param
- */
-typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
-{
-	int max_motor_speed; // max motor speed
-	int nominal_current;
-	int motor_torque_constant;
-	int polarity;
-	int max_acceleration;
-} csv_par;
-
-/**
- * \brief struct definition for Synchronous position param
- */
-typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
-{
-	csv_par base;
-	int max_following_error;
-	int max_position_limit;
-	int min_position_limit;
-} csp_par;
-
-/**
- * \brief struct definition for profile torque param
- */
-typedef struct PROFILE_TORQUE_PARAM
-{
-	int profile_slope;
-	int polarity;
-} pt_par;
-
-/**
- * \brief struct definition for profile velocity param
- */
-typedef struct PROFILE_VELOCITY_PARAM
-{
-	int max_profile_velocity;
-	int profile_acceleration;
-	int profile_deceleration;
-	int quick_stop_deceleration;
-	int polarity;
-} pv_par;
-
-/**
- * \brief struct definition for profile position param
- */
-typedef struct PROFILE_POSITION_PARAM
-{
-	pv_par base;
-	int profile_velocity;
-	int software_position_limit_min;
-	int software_position_limit_max;
-	int max_acceleration;
-} pp_par;
 
 /**
  * \brief initialize Velocity sensor filter
@@ -302,3 +202,4 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 void init_position_control_param(ctrl_par &position_ctrl_params);
 
 #endif
+

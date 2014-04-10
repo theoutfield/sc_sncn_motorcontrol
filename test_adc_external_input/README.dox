@@ -1,0 +1,26 @@
+/**
+
+\page apps
+\section test_adc_external_input
+
+This test application illustrates usage of module_adc to get external analog sensor
+input values. By default all analog inputs are configured as differential only.
+
+The main application need to run only two threads and one of them is ADC Server 
+(adc_ad7949) and other is ADC Client thread, but if the user needs motor control 
+application to run we have a bunch of thread for motor drive/control along with 
+a different ADC Server (adc_ad7949_triggered) and same ADC Client thread. ADC server 
+thread runs on CORE 3 which has physical connection to the interface module (IFM) 
+having General purpose Analog input ports.
+
+Another thread for client functions is running on CORE 1 (can also be placed on 
+CORE 0/2 but not on core 3 since the client function thread has prints which will 
+slow ADC Server thread). The client reads analog input from ADC Server and prints 
+them. The client function also shows how to make use of XSCOPE to probe/store data 
+in real-time.
+
+Dependencies: module_adc module_blocks module_common module_commutation module_ctrl_loops 
+module_hall module_pwm_common module_pwm_symmetrical module_qei module_sm
+sc_somanet-base/module_nodeconfig
+
+*/

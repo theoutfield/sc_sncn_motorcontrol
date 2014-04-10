@@ -1,15 +1,16 @@
 
 /**
- *
  * \file profile_velocity.xc
- *
  * \brief Profile Velocity Control functions
  * 	Implements velocity profile control function
- *
- *
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,8 +45,10 @@
 #include <xscope.h>
 #include <internal_config.h>
 #include <drive_config.h>
+#include "print.h"
 #include <profile.h>
 #include <profile_control.h>
+#define debug_print
 
 
 void set_profile_velocity(int target_velocity, int acceleration, int deceleration, int max_profile_velocity, chanend c_velocity_ctrl)
@@ -57,10 +60,13 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 	int velocity_ramp;
 	int i;
 	int init_state = __check_velocity_init(c_velocity_ctrl);
-	if(init_state == INIT_BUSY)
+	while(init_state == INIT_BUSY)
 	{
 		init_state = init_velocity_control(c_velocity_ctrl);
-
+	/*	if(init_state == INIT)
+			printstrln("velocity control intialized");
+		else
+			printstrln("intialize velocity control failed");*/
 	}
 
 
@@ -77,7 +83,7 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 
 			t when timerafter(time + MSEC_STD) :> time;
 
-		/*	xscope_probe_data(0, actual_velocity);
+			/*xscope_probe_data(0, actual_velocity);
 			xscope_probe_data(1, velocity_ramp);*/
 		}
 		t when timerafter(time + 30 * MSEC_STD) :> time;

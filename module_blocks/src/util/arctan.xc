@@ -1,16 +1,17 @@
 
 /**
- *
  * \file arctan.xc
  * \brief Arc tangent calculations
- * \authors: Ludwig Orgler <lorgler@synapticon.com>, Pavan Kanajar <pkanajar@synapticon.com>
- *
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
  */
 
 /*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- *  
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -38,7 +39,6 @@
  * either expressed or implied, of the Synapticon GmbH.
  *
  */
-
 
 #include "sine_table_big.h"
 #include <print.h>

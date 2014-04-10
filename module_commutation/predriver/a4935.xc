@@ -1,14 +1,15 @@
 
 /**
- *
  * \file a4935.xc
- *
- *	Driver header file for motor
- *
- *
+ * \brief Driver file for motor
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,7 +44,7 @@
 #include <a4935.h>
 #include <print.h>
 
-void a4935_init(int configuration)
+void a4935_init(int configuration, out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn)
 {
 	timer timer1;
 	unsigned int time1;
@@ -54,7 +55,14 @@ void a4935_init(int configuration)
 	p_ifm_esf_rstn_pwml_pwmh <: configuration;
 
 	timer1 :> time1;
+	//timer1 when timerafter(time1 + A4935_AFTER_RESET_DELAY) :> time1;
 	timer1 when timerafter(time1 + (4 * USEC_FAST/*TICKS_US*/)) :> time1; // hold reset for at least 3.5us
+
+	/* enable pull-ups for ff1 and ff2, as these are open-drain outputs
+	 and configure as inputs as long as we are just waiting for an
+	 error to occur */
+	//configure_in_port_no_ready(p_ff1);
+	//configure_in_port_no_ready(p_ff2);
 
 	// release reset
 	p_ifm_esf_rstn_pwml_pwmh <: ( A4935_BIT_RSTN | configuration );
@@ -65,3 +73,4 @@ void a4935_init(int configuration)
 	// enable FETs redundant with watchdog
 	p_ifm_coastn <: 1;
 }
+

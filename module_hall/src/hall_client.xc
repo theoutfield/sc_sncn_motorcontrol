@@ -1,14 +1,17 @@
 
 /**
- *
  * \file hall_client.xc
- *
- *	Hall Sensor Client
- *
+ * \brief Hall Sensor Client Functions
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>, Ludwig Orgler <lorgler@synapticon.com>
- *         & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -63,6 +66,12 @@ int get_hall_velocity(chanend c_hall, hall_par &hall_params)
 	int velocity;
 	c_hall <: HALL_VELOCITY_REQ;
 	c_hall :> velocity;
-	velocity = ((velocity/FILTER_LENGTH_HALL) * 1000 * 60)/(hall_params.pole_pairs * 4095 *1);
+	velocity = ((velocity/FILTER_LENGTH_HALL) * 1000 * 60)/(hall_params.max_ticks_per_turn);
 	return velocity;
+}
+
+void reset_hall_count(chanend c_hall, int offset)
+{
+	c_hall <: RESET_HALL_COUNT;
+	c_hall <: offset;
 }

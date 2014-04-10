@@ -1,13 +1,15 @@
 
 /**
- *
  * \file drive_sys.xc
- *
- *	Motor Drive State Machine Implementation
- *
+ * \brief Motor Drive State Machine Implementation
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -133,7 +135,7 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
 {
 	bool check;
 	bool skip = true;
-	check =  check_list_param._commutation_init
+	check =  check_list_param._commutation_init // & check_list_param._fault check_list_param._adc_init &
 			& check_list_param._hall_init & check_list_param._qei_init;
 	switch(check)
 	{
@@ -188,7 +190,9 @@ int init_state(void) {
 	return 1;
 }
 
-
+/**
+ *
+ */
 int update_statusword(int current_status, int state_reached, int ack, int q_active, int shutdown_ack) {
 	int status_word;
 
@@ -238,6 +242,13 @@ int update_statusword(int current_status, int state_reached, int ack, int q_acti
 		return status_word|TARGET_REACHED;
 	else if(ack == 0)
 		return status_word & (~TARGET_REACHED);
+	/*if(h_active == 1)
+	{ printstrln("h_active");
+		return (status_word | 0x2000); //home active
+	}*/
+//	else if(h_active == 0)
+//		return status_word & (~(0x2000));
+
 	return status_word;
 }
 
@@ -336,7 +347,8 @@ int get_next_state(int in_state, check_list &checklist, int controlword) {
 	case 6:
 		if (checklist.fault == true)
 			out_state = 5;
-
+		//else
+		//	out_state = 2;
 #ifdef print_slave
 		printstr("updated state ");
 		printhexln(in_state);

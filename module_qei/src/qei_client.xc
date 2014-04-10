@@ -1,13 +1,16 @@
 
 /**
- *
  * \file qei_client.xc
- *
- *	QEI Sensor Client Functions
- *
+ * \brief QEI Sensor Client Functions
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH & XMOS Ltd
  * All rights reserved.
- * Authors: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -62,7 +65,7 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
 		c_qei :> position;
 		c_qei :> valid;
 	}
-	position &= (qei_params.max_count - 1);
+	position &= (qei_params.max_ticks_per_turn - 1);
 
 	return {position, valid};
 }
@@ -86,7 +89,7 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_v
 	int difference;
 	int count;
 	int direction;
-	int qei_crossover = qei_params.max_count - qei_params.max_count/10;
+	int qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
 	{count, direction} = get_qei_position_absolute(c_qei);
 	difference = count - qei_velocity_params.previous_position;
 	if(difference > qei_crossover)
@@ -119,4 +122,9 @@ void set_qei_sync_offset(chanend c_qei, int offset_forward, int offset_backward)
 	return;
 }
 
+void reset_qei_count(chanend c_qei, int offset)
+{
+	c_qei <: QEI_RESET_COUNT;
+	c_qei <: offset;
+}
 

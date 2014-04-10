@@ -1,7 +1,38 @@
+
 /**
 
 \page apps
 \section test_ethercat-motorctrl-mode
 
+This test application illustrates usage of Motor Control with Ethercat with advanced 
+features
+
+The main application runs 14 threads in total. 2 of these threads are PWM Server and 
+Commutation Server responsible for modulation and motor drive. 
+
+Other 2 threads used for position information are Hall Server thread required for BLDC 
+motor commutation and QEI Server thread for high precision position information. 
+A watchdog server monitors CORE 3 and disables motor in case of emergency. One ADC 
+Server thread to capture current in the motor phases. A GPIO Server to monitor the 
+digital input switches.
+
+All these 7 threads run on CORE 3 which has physical connection to the interface module (IFM).
+Now that we have the interface drive servers setup and running on CORE 3. We can run 
+Control Loops like Position/Velocity/Torque Loops on CORE 2/1. 
+
+Another 2 thread run on core 0: one for ethercat communication handling and other one 
+for firmware update over ethercat. Since Core 0 has physical connections to the ethercat 
+interface and flash spi interface.
+
+Another thread which forms a communication bridge between ethercat and motor drive 
+(ecat_motor_drive) runs on core 1. 
+
+More information about Control Server/Client can be found under module_ctrl_loops Readme;
+and about ecat_motor_drive under module_ecat_drive
+
+Dependencies: module_adc, module_blocks, module_comm, module_common, module_commutation 
+module_ctrl_loops, module_ecat_drive, module_gpio, module_hall, module_profile,
+module_pwm_common, module_pwm_symmetrical, module_qei, module_sm, sc_sncn_ctrlproto/module_ctrlproto, 
+sc_sncn_ethercat/module_ethercat, sc_somanet-base/module_fwupdate, sc_somanet-base/module_nodeconfig
 
 */

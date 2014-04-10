@@ -1,15 +1,17 @@
 
 /**
- *
  * \file delay.xc
- * \author: Martin Schwarz <mschwarz@synapticon.com>, Pavan Kanajar <pkanajar@synapticon.com>
- *
+ * \brief Implementation of delay functions
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
  */
 
 /*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- *  
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -38,7 +40,23 @@
  *
  */
 
+
 #include <refclk.h>
+
+void wait_micro_s(int microseconds, int core_id, timer t)
+{
+	unsigned int time;
+	t :> time;
+	if(core_id == 3)
+	{
+		t when timerafter(time + (microseconds * MSEC_FAST)/1000) :> time;
+	}
+	else
+	{
+		t when timerafter(time + (microseconds * MSEC_STD)/1000) :> time;
+	}
+	return;
+}
 
 void wait_ms(int milliseconds, int core_id, timer t)
 {
@@ -69,3 +87,4 @@ void wait_s(int seconds, int core_id, timer t)
 	}
 	return;
 }
+

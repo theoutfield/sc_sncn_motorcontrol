@@ -1,14 +1,15 @@
 
 /**
- *
  * \file  position_ctrl_client.xc
- *
- *	Position control Loop Client functions
- *
- *
+ * \brief Position control Loop Client functions
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -59,9 +60,9 @@ int init_position_control(chanend c_position_ctrl)
 		}
 		if(ctrl_state == INIT)
 		{
-#ifdef debug_print
+			#ifdef debug_print
 			printstrln("position control intialized");
-#endif
+			#endif
 			break;
 		}
 	}
@@ -105,8 +106,8 @@ void set_position_csp(csp_par &csp_params, int target_position, int position_off
 		              int torque_offset, chanend c_position_ctrl)
 {
 	set_position( position_limit( (target_position + position_offset) * csp_params.base.polarity ,	\
-								   csp_params.max_position_limit * 10000  , 						\
-								   csp_params.min_position_limit * 10000) , c_position_ctrl);
+								   csp_params.max_position_limit,	\
+								   csp_params.min_position_limit) , c_position_ctrl);
 }
 
 
@@ -125,17 +126,15 @@ void set_position_ctrl_param(ctrl_par &position_ctrl_params, chanend c_position_
 void set_position_ctrl_hall_param(hall_par &hall_params, chanend c_position_ctrl)
 {
 	c_position_ctrl <: SET_POSITION_CTRL_HALL;
-	c_position_ctrl <: hall_params.gear_ratio;
 	c_position_ctrl <: hall_params.pole_pairs;
 }
 
 void set_position_ctrl_qei_param(qei_par &qei_params, chanend c_position_ctrl)
 {
 	c_position_ctrl <: SET_POSITION_CTRL_QEI;
-	c_position_ctrl <: qei_params.gear_ratio;
 	c_position_ctrl <: qei_params.index;
 	c_position_ctrl <: qei_params.real_counts;
-	c_position_ctrl <: qei_params.max_count;
+	c_position_ctrl <: qei_params.max_ticks_per_turn;
 }
 
 
@@ -164,4 +163,3 @@ int check_position_ctrl_state(chanend c_position_ctrl)
 	POSITION_CTRL_READ(state);
 	return state;
 }
-

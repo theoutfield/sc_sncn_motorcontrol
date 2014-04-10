@@ -1,15 +1,16 @@
 
 /**
- *
  * \file test_hall.xc
- *
- * \brief Main project file
- *  Test illustrates usage of hall sensor for position and velocity information
- *
- *
+ * \brief Test illustrates usage of hall sensor to get position and velocity information
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com> & Martin Schwarz <mschwarz@synapticon.com>
+ *  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,17 +43,14 @@
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <ioports.h>
 #include <hall_client.h>
 #include <hall_server.h>
 #include <refclk.h>
 #include <xscope.h>
 #include <bldc_motor_config.h>
-#include <drive_config.h>
 
-//#define ENABLE_xscope_main
+//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
@@ -70,60 +68,57 @@ void xscope_initialise_1()
 }
 
 
-/* Hall Sensor Test Function */
+/* Test Hall Sensor Client */
 void hall_test(chanend c_hall)
 {
 	int position;
 	int velocity;
 	int core_id = 1;
 	timer t;
+	int direction;
 	hall_par hall_params;
 	init_hall_param(hall_params);
 
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 	xscope_initialise_1();
 #endif
 
 	while(1)
 	{
-		position = get_hall_position(c_hall);
-		velocity = get_hall_velocity(c_hall, hall_params);
-		wait_ms(1, core_id, t);
+		/* get position from Hall Sensor */
+		{position, direction} = get_hall_position_absolute(c_hall);
 
-#ifdef ENABLE_xscope_main
+		/* get velocity from Hall Sensor */
+		velocity = get_hall_velocity(c_hall, hall_params);
+
+#ifdef ENABLE_xscope
 		xscope_probe_data(0, position);
 		xscope_probe_data(1, velocity);
 #else
-		printstr("position");
+		printstr("Position: ");
 		printint(position);
-		printstr("velocity ");
+		printstr(" ");
+		printstr("Velocity: ");
 		printintln(velocity);
 #endif
+
 	}
 }
 
 int main(void)
 {
-	chan c_adctrig, c_adc;													// adc channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
-	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
-	chan c_pwm_ctrl;														// pwm channels
-	chan c_qei;																// qei channels
-
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
 
 	par
 	{
-
 		on stdcore[1]:
 		{
-			/* Test hall sensor */
+			/* Test Hall Sensor Client */
 			par
 			{
 				hall_test(c_hall_p1);
 			}
 		}
-
-
 
 		/************************************************************
 		 * IFM_CORE
@@ -136,7 +131,7 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
 				}
 			}
 		}

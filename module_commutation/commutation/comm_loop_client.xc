@@ -1,7 +1,18 @@
+
+/**
+ * \file comm_loop_client.xc
+ * \brief Commutation Loop Client functions
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
 /*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -29,15 +40,6 @@
  * either expressed or implied, of the Synapticon GmbH.
  */
 
-/**
- *
- * \file comm_loop_client.xc
- *
- * Commutation Loop Client functions
- * Author: Pavan Kanajar <pkanajar@synapticon.com>, Ludwig Orgler <lorgler@synapticon.com>
- * 			& Martin Schwarz <mschwarz@synapticon.com>
- *
- */
 
 #include "comm_loop_client.h"
 #include <xs1.h>
@@ -61,6 +63,9 @@ void init_commutation_param(commutation_par &commutation_params, hall_par &hall_
 		commutation_params.max_speed_reached = nominal_speed;
 		commutation_params.flag = 0;
 	}
+	commutation_params.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+	commutation_params.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+	commutation_params.winding_type = WINDING_TYPE;
 	commutation_params.qei_forward_offset = 0;
 	commutation_params.qei_backward_offset = 0;
 }
@@ -76,10 +81,11 @@ void commutation_sensor_select(chanend c_commutation, int sensor_select)
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params)
 {
 	c_commutation <: SET_COMMUTATION_PARAMS;
-	c_commutation <: commutation_params.angle_variance;
-	c_commutation <: commutation_params.max_speed_reached;
-	c_commutation <: commutation_params.offset_forward;
-	c_commutation <: commutation_params.offset_backward;
+	c_commutation :> commutation_params.angle_variance;
+	c_commutation :> commutation_params.max_speed_reached;
+	c_commutation :> commutation_params.hall_offset_clk;
+	c_commutation :> commutation_params.hall_offset_cclk;
+	c_commutation :> commutation_params.winding_type;
 }
 
 /* MAX Input value 13739 */
@@ -88,5 +94,25 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 	c_commutation <: 2;
 	c_commutation <: input_voltage;
 	return;
+}
+
+void disable_motor(chanend c_commutation)
+{
+	c_commutation <: DISABLE_FETS;
+	return;
+}
+
+void enable_motor(chanend c_commutation)
+{
+	c_commutation <: ENABLE_FETS;
+	return;
+}
+
+int check_fet_state(chanend c_commutation)
+{
+	int state;
+	c_commutation <: FETS_STATE;
+	c_commutation :> state;
+	return state;
 }
 

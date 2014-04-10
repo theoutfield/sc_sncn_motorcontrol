@@ -1,14 +1,17 @@
 
 /**
- *
  * \file comm_loop_client.h
- *
- * Commutation Loop Client functions
- *
+ * \brief Commutation Loop Client functions
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \author Ludwig Orgler <lorgler@synapticon.com>
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>, Ludwig Orgler <lorgler@synapticon.com>
- * 			& Martin Schwarz <mschwarz@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -57,7 +60,9 @@ typedef struct S_COMMUTATION {
 	int qei_forward_offset;
 	int qei_backward_offset;
 	int offset_forward;
-	int offset_backward;
+	int hall_offset_clk;
+	int hall_offset_cclk;
+	int winding_type;
 	int flag;
 } commutation_par;
 
@@ -108,3 +113,8 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params);
 
 
+void disable_motor(chanend c_commutation);
+
+void enable_motor(chanend c_commutation);
+
+int check_fet_state(chanend c_commutation);

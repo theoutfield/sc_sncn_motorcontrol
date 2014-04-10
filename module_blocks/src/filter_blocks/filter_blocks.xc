@@ -1,17 +1,16 @@
 
 /**
- *
  * \file filter_blocks.xc
  * \brief Moving Average Filter Implementation
- * \author: Pavan Kanajar <pkanajar@synapticon.com>
- *
- *
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
  */
 
 /*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- *  
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -39,7 +38,6 @@
  * either expressed or implied, of the Synapticon GmbH.
  *
  */
-
 
 #include "filter_blocks.h"
 
@@ -72,6 +70,7 @@ int filter(int filter_buffer[], int &index, int filter_length, int input)
 	filter_output = filter_output/ filter_length;
 	return filter_output;
 }
+
 
 int _modified_internal_filter(int filter_buffer[], int &index, int filter_length, int input)
 {

@@ -1,14 +1,15 @@
 
 /**
- *
  * \file profile_velocity_quick-stop.c
- *
  * \brief Quick stop Profile Generation for Velocity
- *
- *
+ * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * \version 1.0
+ * \date 10/04/2014
+ */
+
+/*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.
- * Author: Pavan Kanajar <pkanajar@synapticon.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,7 +41,7 @@
 
 #include <profile.h>
 
-struct QUICK_STOP_VELOCITY_PARAM
+struct
 {
 	float max_deceleration;		// max allowed deceleration
 	float u;					// initial velocity
@@ -62,7 +63,7 @@ int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceler
 
 	qstop_vel_params.t = 0 - qstop_vel_params.u/qstop_vel_params.a_d;		//default reduce velocity to zero  (v_d - u)/a_d;
 
-	qstop_vel_params.s_time = 0.001;
+	qstop_vel_params.s_time = 0.001; 											//
 	qstop_vel_params.T = qstop_vel_params.t/qstop_vel_params.s_time;
 
     if(qstop_vel_params.T<0)
@@ -78,3 +79,4 @@ int quick_stop_velocity_profile_generate(int step)
 {
    return (int) round( qstop_vel_params.u + qstop_vel_params.a_d * qstop_vel_params.s_time * step);
 }
+

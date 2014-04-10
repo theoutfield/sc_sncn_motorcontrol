@@ -1,0 +1,24 @@
+/**
+
+\page apps
+\section test_gpio_digital
+
+This test application illustrates usage of module_gpio to configure GPIO's and 
+read/write the digital ports.
+
+The main application runs two threads and one of them is GPIO Digital server thread 
+running on CORE 3 which has physical connection to the interface module (IFM) having 
+GPIO ports 
+
+Another thread for client functions is running on CORE 1 (can also be placed on 
+CORE 0/2 but not on core 3 since the client function thread has prints which will 
+slow the GPIO Server thread). The Client function configures port 0 and port 1 as 
+input switches and remaining 2 ports as outputs and shows how to read/write the 
+digital ports. The client function also shows how to make use of XSCOPE to probe/store 
+port data in real-time.
+
+More information about GPIO Server/ Client can be found in module_gpio Readme
+
+Dependencies: sc_somanet-base/module_nodeconfig, module_gpio, module_common
+
+*/
