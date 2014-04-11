@@ -50,22 +50,11 @@
 #include <xscope.h>
 #include <bldc_motor_config.h>
 
-//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
-
-void xscope_initialise_1()
-{
-	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 hall_position", XSCOPE_INT,	"n",
-				           XSCOPE_CONTINUOUS, "1 hall_velocity", XSCOPE_INT,	"n");
-		xscope_config_io(XSCOPE_IO_BASIC);
-	}
-	return;
-}
 
 
 /* Test Hall Sensor Client */
@@ -79,10 +68,6 @@ void hall_test(chanend c_hall)
 	hall_par hall_params;
 	init_hall_param(hall_params);
 
-#ifdef ENABLE_xscope
-	xscope_initialise_1();
-#endif
-
 	while(1)
 	{
 		/* get position from Hall Sensor */
@@ -91,17 +76,11 @@ void hall_test(chanend c_hall)
 		/* get velocity from Hall Sensor */
 		velocity = get_hall_velocity(c_hall, hall_params);
 
-#ifdef ENABLE_xscope
-		xscope_probe_data(0, position);
-		xscope_probe_data(1, velocity);
-#else
 		printstr("Position: ");
 		printint(position);
 		printstr(" ");
 		printstr("Velocity: ");
 		printintln(velocity);
-#endif
-
 	}
 }
 

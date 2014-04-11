@@ -57,23 +57,13 @@
 #include <bldc_motor_config.h>
 #include <drive_config.h>
 
-//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-/* xscope init */
-void xscope_initialise_1()
-{
-	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 external_pot", XSCOPE_INT,	"n",
-				           XSCOPE_CONTINUOUS, "1 external_pot1", XSCOPE_INT,	"n");
-		xscope_config_io(XSCOPE_IO_BASIC);
-	}
-	return;
-}
+
 
 /* ADC Client test function */
 void adc_test(chanend c_adc)
@@ -82,9 +72,6 @@ void adc_test(chanend c_adc)
 	int external_input_2;
 	int core_id = 1;
 	timer t;
-#ifdef ENABLE_xscope
-	xscope_initialise_1();
-#endif
 
 	while(1)
 	{
@@ -92,16 +79,12 @@ void adc_test(chanend c_adc)
 		{external_input_1 , external_input_2} = get_adc_external_ad7949(c_adc);
 		wait_ms(1, core_id, t);
 
-#ifdef ENABLE_xscope
-		xscope_probe_data(0, external_input_1);
-		xscope_probe_data(1, external_input_2);
-#else
+
 		printstr(" Analog input 1: ");
 		printint(external_input_1);
 		printstr(" ");
 		printstr(" Analog input 2: ");
 		printintln(external_input_2);
-#endif
 	}
 }
 

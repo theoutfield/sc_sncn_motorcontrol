@@ -49,18 +49,9 @@
 #include <gpio_server.h>
 #include <gpio_client.h>
 
-//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
-void xscope_initialise_1()
-{
-	xscope_register(2, XSCOPE_CONTINUOUS, "0 port_0", XSCOPE_INT,	"n",
-						XSCOPE_CONTINUOUS, "1 port_1", XSCOPE_INT, "n");
-
-	xscope_config_io(XSCOPE_IO_BASIC);
-	return;
-}
 
 /*
  * Test GPIO Client Loop
@@ -72,9 +63,6 @@ void gpio_test(chanend c_gpio_p1)
 	int port_2_value = 0;
 	int port_3_value = 0;
 
-	#ifdef ENABLE_xscope
-		xscope_initialise_1();
-	#endif
 
 	/**< Configure gpio digital port 0 as Switch Input and active high */
 	config_gpio_digital_input(c_gpio_p1, 0, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
@@ -94,15 +82,12 @@ void gpio_test(chanend c_gpio_p1)
 		/**< Read value on digital port 1 */
 		port_1_value = read_gpio_digital_input(c_gpio_p1, 1);
 
-		#ifdef ENABLE_xscope
-			xscope_probe_data(0, port_0_value);
-			xscope_probe_data(1, port_1_value);
-		#else
-			printstr("Port 0 value: ");
-			printint(port_0_value);
-			printstr(" Port 1 value: ");
-			printintln(port_1_value);
-		#endif
+
+		printstr("Port 0 value: ");
+		printint(port_0_value);
+		printstr(" Port 1 value: ");
+		printintln(port_1_value);
+
 
 		/**< Write port_2_value to digital port 2 */
 		write_gpio_digital_output(c_gpio_p1, 2, port_2_value);

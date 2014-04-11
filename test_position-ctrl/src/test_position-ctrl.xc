@@ -57,25 +57,12 @@
 #include <profile_control.h>
 #include <internal_config.h>
 #include "position_ctrl_client.h"
-#include <test.h>  //Unit Testing Position control (optional)
 
-//#define ENABLE_xscope
 #define COM_CORE 0
 #define IFM_CORE 3
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
-
-
-void xscope_initialise_1()
-{
-	xscope_register(3, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
-						XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n",
-						XSCOPE_CONTINUOUS, "2 follow_error", XSCOPE_INT, "n");
-
-	xscope_config_io(XSCOPE_IO_BASIC);
-	return;
-}
 
 
 /* Test Profile Position function */
@@ -97,27 +84,12 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hal
 	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_params, \
 			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
 
-#ifdef ENABLE_xscope
-	xscope_initialise_1();
-#endif
 
 	/* Set new target position for profile position control */
 	set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, c_position_ctrl);
 
 	/* Read actual position from the Position Control Server */
 	actual_position = get_position(c_position_ctrl);
-
-	while(1)
-	{
-		actual_position = get_position(c_position_ctrl);
-		follow_error = target_position - actual_position;
-#ifdef ENABLE_xscope
-		xscope_probe_data(0, target_position);
-		xscope_probe_data(1, actual_position);
-		xscope_probe_data(2, follow_error);
-#endif
-		wait_ms(1, 1, t);  /* 1 ms wait */
-	}
 }
 
 int main(void)
@@ -136,7 +108,6 @@ int main(void)
 		on stdcore[1]:
 		{
 			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		// test PPM on slave side
-			//position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 	// Unit test controller
 		}
 
 

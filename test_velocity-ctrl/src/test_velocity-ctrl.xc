@@ -57,26 +57,13 @@
 #include <bldc_motor_config.h>
 #include <drive_config.h>
 #include <profile_control.h>
-#include <test.h>
 #include <qei_client.h>
-//#define ENABLE_xscope_main
+
 #define COM_CORE 0
 #define IFM_CORE 3
 
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
-
-void xscope_initialise_1()
-{
-	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
-
-		xscope_config_io(XSCOPE_IO_BASIC);
-	}
-	return;
-}
-
 
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
@@ -84,10 +71,6 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 	int target_velocity =-450;	 		// rpm
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
-
-#ifdef ENABLE_xscope_main
-	xscope_initialise_1();
-#endif
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
@@ -113,7 +96,6 @@ int main(void)
 		on stdcore[1]:
 		{
 			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
-		//	velocity_ctrl_unit_test(c_velocity_ctrl, c_qei_p3, c_hall_p3);
 		}
 
 		on stdcore[2]:

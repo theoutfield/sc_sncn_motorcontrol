@@ -58,7 +58,6 @@
 #include <drive_config.h>
 #include "torque_ctrl_client.h"
 #include <profile.h>
-#include <test.h>
 
 //#define ENABLE_xscope
 
@@ -68,14 +67,6 @@
 on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
 on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
-void xscope_initialise_1()
-{
-	xscope_register(2, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
-						XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n");
-	xscope_config_io(XSCOPE_IO_BASIC);
-	return;
-}
-
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
@@ -83,10 +74,6 @@ void profile_torque_test(chanend c_torque_ctrl)
 	int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);
-
-#ifdef ENABLE_xscope
-	xscope_initialise_1();
-#endif
 
 	/* Set new target torque for profile torque control */
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
@@ -96,14 +83,7 @@ void profile_torque_test(chanend c_torque_ctrl)
 
 	target_torque = -200;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
-	while(1)
-	{
-		actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
-		t when timerafter(time + MSEC_STD) :> time;
-#ifdef ENABLE_xscope
-		xscope_probe_data(0, actual_torque);
-#endif
-	}
+
 }
 
 int main(void)
@@ -125,7 +105,6 @@ int main(void)
 		on stdcore[1]:
 		{
 			profile_torque_test(c_torque_ctrl);
-			//torque_ctrl_unit_test(c_torque_ctrl, c_qei_p4, c_hall_p4);
 		}
 
 		on stdcore[2]:
