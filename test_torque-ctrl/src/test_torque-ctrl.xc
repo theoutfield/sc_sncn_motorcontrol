@@ -50,7 +50,6 @@
 #include <adc_server_ad7949.h>
 #include <comm_loop_server.h>
 #include <refclk.h>
-#include <xscope.h>
 #include <bldc_motor_config.h>
 #include <torque_ctrl_server.h>
 #include <profile_control.h>
@@ -59,13 +58,12 @@
 #include "torque_ctrl_client.h"
 #include <profile.h>
 
-//#define ENABLE_xscope
 
-#define COM_CORE 0
-#define IFM_CORE 3
+#define COM_TILE 0
+#define IFM_TILE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
@@ -102,12 +100,12 @@ int main(void)
 	{
 
 		/* Test Profile Torque Function */
-		on stdcore[1]:
+		on stdcore[0]:
 		{
 			profile_torque_test(c_torque_ctrl);
 		}
 
-		on stdcore[2]:
+		on stdcore[0]:
 		{
 			par
 			{
@@ -132,9 +130,9 @@ int main(void)
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
 			par
 			{

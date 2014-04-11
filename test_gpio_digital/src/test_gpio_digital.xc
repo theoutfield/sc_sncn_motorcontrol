@@ -44,13 +44,12 @@
 #include <print.h>
 #include <ioports.h>
 #include <refclk.h>
-#include <xscope.h>
 #include <internal_config.h>
 #include <gpio_server.h>
 #include <gpio_client.h>
 
-#define COM_CORE 0
-#define IFM_CORE 3
+#define COM_TILE 0
+#define IFM_TILE 3
 
 
 /*
@@ -105,15 +104,15 @@ int main(void)
 	par
 	{
 		/* Test GPIO Client Loop */
-		on stdcore[1] :
+		on stdcore[0] :
 		{
 			gpio_test(c_gpio_p1);
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
 			/* GPIO Digital Server */
 			gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);

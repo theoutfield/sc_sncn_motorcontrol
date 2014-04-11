@@ -87,15 +87,11 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 	{
 		{actual_position, direction} = get_hall_position_absolute(c_hall);
 		target_position = actual_position;
-	//	printintln(target_position);
-	//	printintln(actual_position);
 	}
 	else if(sensor_used == QEI)
 	{
 		{actual_position, direction} = get_qei_position_absolute(c_qei);
 		target_position = actual_position;
-	//	printintln(target_position);
-	//	printintln(actual_position);
 	}
 	/**
 	 * Or any other sensor interfaced to the IFM Module
@@ -255,7 +251,6 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						error_position_I = 0;
 						previous_error = 0;
 						position_control_out = 0;
-						//	target_position = 0;
 						disable_motor(c_commutation);
 						wait_ms(30, 1, ts); //
 						#ifdef debug_print

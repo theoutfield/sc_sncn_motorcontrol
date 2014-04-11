@@ -47,14 +47,10 @@
 #include <hall_client.h>
 #include <hall_server.h>
 #include <refclk.h>
-#include <xscope.h>
 #include <bldc_motor_config.h>
 
-#define COM_CORE 0
-#define IFM_CORE 3
-
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+#define COM_TILE 0
+#define IFM_TILE 3
 
 
 /* Test Hall Sensor Client */
@@ -90,29 +86,25 @@ int main(void)
 
 	par
 	{
-		on stdcore[1]:
+		on stdcore[0]:
 		{
 			/* Test Hall Sensor Client */
-			par
-			{
-				hall_test(c_hall_p1);
-			}
+			hall_test(c_hall_p1);
+
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
-			par
+			/* Hall Server */
 			{
-				/* Hall Server */
-				{
-					hall_par hall_params;
-					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
-				}
+				hall_par hall_params;
+				init_hall_param(hall_params);
+				run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
 			}
+
 		}
 
 	}

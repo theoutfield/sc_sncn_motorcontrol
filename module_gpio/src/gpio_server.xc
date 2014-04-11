@@ -8,19 +8,7 @@
  */
 
 #include <gpio_server.h>
-#include <xscope.h>
 
-
-void xscope_initialise_2()
-{
-	xscope_register(4, XSCOPE_CONTINUOUS, "0 port 1", XSCOPE_INT,	"n",
-						XSCOPE_CONTINUOUS, "1 port 2", XSCOPE_INT, "n",
-						XSCOPE_CONTINUOUS, "2 port 3", XSCOPE_INT, "n",
-						XSCOPE_CONTINUOUS, "3 port 4", XSCOPE_INT, "n");
-
-	xscope_config_io(XSCOPE_IO_BASIC);
-	return;
-}
 //input types
 
 #define INPUT_PORT			1

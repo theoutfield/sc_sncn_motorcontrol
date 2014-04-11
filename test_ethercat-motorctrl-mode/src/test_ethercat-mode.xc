@@ -56,11 +56,12 @@
 #include <bldc_motor_config.h>
 #include <flash_somanet.h>
 #include <gpio_server.h>
-#define COM_CORE 0
-#define IFM_CORE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+#define COM_TILE 0
+#define IFM_TILE 3
+
+on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 int main(void)
 {
@@ -91,7 +92,7 @@ int main(void)
 	par
 	{
 		/* Ethercat Communication Handler Loop */
-		on stdcore[0] :
+		on stdcore[COM_TILE] :
 		{
 			ecat_init();
 			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,
@@ -99,7 +100,7 @@ int main(void)
 		}
 
 		/* Firmware Update Loop */
-		on stdcore[0] :
+		on stdcore[COM_TILE] :
 		{
 			firmware_update_loop(p_spi_flash, foe_out, foe_in, c_sig_1); // firmware update over Ethercat
 		}
@@ -163,9 +164,9 @@ int main(void)
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
 			par
 			{

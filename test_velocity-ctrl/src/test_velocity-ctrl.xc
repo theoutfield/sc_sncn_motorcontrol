@@ -51,7 +51,6 @@
 #include <refclk.h>
 #include <velocity_ctrl_client.h>
 #include <velocity_ctrl_server.h>
-#include <xscope.h>
 #include <profile.h>
 #include <internal_config.h>
 #include <bldc_motor_config.h>
@@ -59,11 +58,11 @@
 #include <profile_control.h>
 #include <qei_client.h>
 
-#define COM_CORE 0
-#define IFM_CORE 3
+#define COM_TILE 0
+#define IFM_TILE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
@@ -82,23 +81,23 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 int main(void)
 {
 	// Motor control channels
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_hall_p6, c_qei_p6;		// qei channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;				// hall channels
-	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
-	chan c_pwm_ctrl, c_adctrig;												// pwm channels
-	chan c_velocity_ctrl;													// velocity control channel
-	chan c_watchdog; 														// watchdog channel
+	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_hall_p6, c_qei_p6;	// qei channels
+	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5;					// hall channels
+	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;		// commutation channels
+	chan c_pwm_ctrl, c_adctrig;													// pwm channels
+	chan c_velocity_ctrl;														// velocity control channel
+	chan c_watchdog; 															// watchdog channel
 
 	par
 	{
 
 		/* Test Profile Velocity function */
-		on stdcore[1]:
+		on stdcore[0]:
 		{
 			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
 		}
 
-		on stdcore[2]:
+		on stdcore[0]:
 		{
 
 			/* Velocity Control Loop */
@@ -126,9 +125,9 @@ int main(void)
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
 			par
 			{
@@ -155,7 +154,6 @@ int main(void)
 				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
 				/* Hall Server */
-
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
@@ -163,7 +161,6 @@ int main(void)
 				}
 
 				/* QEI Server */
-
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);

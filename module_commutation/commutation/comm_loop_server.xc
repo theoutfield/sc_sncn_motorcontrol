@@ -150,19 +150,10 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 	int port_a, port_b, check_fet;
 	qei_velocity_par qei_velocity_params;
 	init_qei_velocity_params(qei_velocity_params);
-	//printintln(commutation_params.hall_offset_clk);
-	//printintln(commutation_params.hall_offset_cclk);
-	//printintln(commutation_params.winding_type);
-	//p_ifm_coastn :> check_fet;
+
 	//xscope_probe_data(2, check_fet);
 	while (1)
 	{
-		//p_ifm_coastn :> check_fet;
-		//p_ifm_ff1 :> port_a;
-		//		p_ifm_ff2 :> port_b;
-		//		xscope_probe_data(0, port_a);
-		//		xscope_probe_data(1, port_b);
-		//		xscope_probe_data(2, check_fet);
 		if(sensor_select == HALL) //hall only
 		{
 			speed = get_hall_velocity(c_hall, hall_params);
@@ -171,7 +162,6 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 		}
 		else if(sensor_select == QEI)
 		{
-			//angle = (get_sync_position(c_sync) << 12)/max_count_per_hall;
 			{angle, fw_flag, bw_flag} = get_qei_sync_position(c_qei);
 			angle = (angle << 12)/max_count_per_hall;
 			if(voltage >=0)
@@ -190,7 +180,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 			}
 			angle_rpm = (absolute(speed)*commutation_params.angle_variance)/commutation_params.max_speed_reached;
 		}
-//xscope_probe_data(0, direction);
+
 		if(voltage<0)
 			direction = -1;
 		else if(voltage >= 0)
@@ -297,20 +287,11 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 					}
 					commutation_params.qei_forward_offset = 0;
 					commutation_params.qei_backward_offset = 0;
-					//pwm[0] = 0;
-					//pwm[1] = 0;
-					//pwm[2] = 0;
-					// angle_pwm = 0;
-					// angle = 0;
-					// angle_rpm   = 0;
-					// speed = 0;
 					voltage = 0;
-					//direction = 0;
 					max_count_per_hall = qei_params.real_counts/hall_params.pole_pairs;
 					angle_offset = 682/(2*hall_params.pole_pairs);
 					fw_flag = 0;
 					bw_flag = 0;
-					//init_qei_velocity_params(qei_velocity_params);
 				}
 				break;
 
@@ -328,7 +309,6 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 		hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params)
 {
 		const unsigned t_delay = 300*USEC_FAST;
-	//const unsigned timeout = 2*SEC_FAST;
 		timer t;
 		unsigned int ts;
 		t_pwm_control pwm_ctrl;
@@ -351,17 +331,6 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 
 		p_ifm_coastn :> check_fet;
 		init_state = check_fet;
-						//if(check_fet == 1)
-							//printstrln("fet enabled");
-		//while(1)
-		//{
-		//	p_ifm_ff1 :> port_a;
-		//	p_ifm_ff2 :> port_b;
-		//
-		//	xscope_probe_data(0, port_a);
-		//	xscope_probe_data(1, port_b);
-		//}
-
 
 		commutation_sinusoidal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, HALL, pwm_ctrl, hall_params, qei_params, commutation_params, init_state,\
 				  c_hall, c_qei, c_pwm_ctrl, c_signal, c_commutation_p1, c_commutation_p2, \

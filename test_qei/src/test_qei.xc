@@ -50,11 +50,8 @@
 #include <xscope.h>
 #include <bldc_motor_config.h>
 
-#define COM_CORE 0
-#define IFM_CORE 3
-
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+#define COM_TILE 0
+#define IFM_TILE 3
 
 
 /* Test QEI Sensor Client */
@@ -96,7 +93,7 @@ int main(void)
 
 	par
 	{
-		on stdcore[1]:
+		on stdcore[0]:
 		{
 			/* Test QEI Sensor Client */
 			qei_test(c_qei_p1);
@@ -105,7 +102,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
 			/* QEI Server Loop */
 			{

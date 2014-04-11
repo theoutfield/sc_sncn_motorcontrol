@@ -59,11 +59,11 @@
 #include <gpio_server.h>
 #include <gpio_client.h>
 
-#define COM_CORE 0
-#define IFM_CORE 3
+#define COM_TILE 0
+#define IFM_TILE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 /* Test homing function */
 void homing(chanend c_qei, chanend c_gpio, chanend c_velocity_ctrl)
@@ -173,12 +173,12 @@ int main(void)
 	par
 	{
 		/* Test homing function */
-		on stdcore[1]:
+		on stdcore[0]:
 		{
 			homing(c_qei_p3, c_gpio_p1, c_velocity_ctrl);
 		}
 
-		on stdcore[2]:
+		on stdcore[0]:
 		{
 
 			/*Velocity Control Loop*/
@@ -206,9 +206,9 @@ int main(void)
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
 			par
 			{

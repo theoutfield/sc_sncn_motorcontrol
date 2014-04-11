@@ -58,11 +58,11 @@
 #include <internal_config.h>
 #include "position_ctrl_client.h"
 
-#define COM_CORE 0
-#define IFM_CORE 3
+#define COM_TILE 0
+#define IFM_TILE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 
 /* Test Profile Position function */
@@ -105,13 +105,13 @@ int main(void)
 	par
 	{
 		/* Test Profile Position Client function*/
-		on stdcore[1]:
+		on stdcore[0]:
 		{
 			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		// test PPM on slave side
 		}
 
 
-		on stdcore[2]:
+		on stdcore[0]:
 		{
 			/* Position Control Loop */
 			{
@@ -134,9 +134,9 @@ int main(void)
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
 			par
 			{

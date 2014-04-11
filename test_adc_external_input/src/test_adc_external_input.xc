@@ -53,15 +53,14 @@
 #include <pwm_service_inv.h>
 #include <comm_loop_server.h>
 #include <refclk.h>
-#include <xscope.h>
 #include <bldc_motor_config.h>
 #include <drive_config.h>
 
-#define COM_CORE 0
-#define IFM_CORE 3
+#define COM_TILE 0
+#define IFM_TILE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 
 
@@ -100,7 +99,7 @@ int main(void)
 	par
 	{
 
-		on stdcore[1]:
+		on stdcore[0]:
 		{
 			/* ADC Client test function */
 			adc_test(c_adc);
@@ -111,7 +110,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on stdcore[IFM_TILE]:
 		{
 			par
 			{
