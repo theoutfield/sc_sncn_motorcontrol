@@ -3,24 +3,60 @@
 \page apps
 \section test_adc_external_input
 
-This test application illustrates usage of module_adc to get external analog sensor
-input values. By default all analog inputs are configured as differential only.
+This test application illustrates usage of \ref module_adc to get external analog sensor input values. By default all analog inputs are configured as differential only.
 
-The main application need to run only two threads and one of them is ADC Server 
-(adc_ad7949) and other is ADC Client thread, but if the user needs motor control 
-application to run we have a bunch of thread for motor drive/control along with 
-a different ADC Server (adc_ad7949_triggered) and same ADC Client thread. ADC server 
-thread runs on CORE 3 which has physical connection to the interface module (IFM) 
-having General purpose Analog input ports.
+HW compatibility: 
+- \b COM: all (not used) 
+- \b CORE: C22 | C21-DX 
+- \b IFM: Drive DC 100 | Drive DC 300 
 
-Another thread for client functions is running on CORE 1 (can also be placed on 
-CORE 0/2 but not on core 3 since the client function thread has prints which will 
-slow ADC Server thread). The client reads analog input from ADC Server and prints 
-them. The client function also shows how to make use of XSCOPE to probe/store data 
-in real-time.
+It runs \b 2 \b THREADS in parallel. 
+- ADC Client Side, ADC Server Side
 
-Dependencies: module_adc module_blocks module_common module_commutation module_ctrl_loops 
-module_hall module_pwm_common module_pwm_symmetrical module_qei module_sm
-sc_somanet-base/module_nodeconfig
+It uses \b 2 \b TILES out of the \b CORE module.
 
+	#define TILE_ONE 0
+	#define IFM_TILE 3
+
+- TILE_ONE (0 by default). It takes care of the client side functions . Since these functios do not require any port access, any free \b TILE could run them.
+- IFM_TILE (3 by default). It executes the server side functions, controlling the ADC interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
+
+\b TILE_ONE:
+
+	on stdcore[TILE_ONE]:
+			{
+				par
+				{
+
+- \b Thread: ADC Client
+
+	adc_test(c_adc);
+
+Read and print on the console the readed values on both ADC ports. 
+
+\b IFM_TILE:
+
+	on stdcore[IFM_TILE]: 
+			{
+				par
+				{
+
+- \b Thread: ADC Server
+
+	adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
+
+Interfaces the ADC and provide the readed values to the client side thread.
+
+\b Please, do not forget to set properly your node and motor configuration when using this application.
+
+- <a href="">Configure your node</a> 
+- \ref how_configure_motors
+
+More information about Position Control Server/Client can be found at \ref module_ctrl_loops documentation.
+
+\b See \b also:
+
+- <a href="http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET">Getting started with SOMANET</a>  
 */
+
+
