@@ -4,32 +4,137 @@
 \page apps
 \section test_torque-ctrl
 
-This test application illustrates usage of module_ctrl_loops to do torque control 
-of motor 
 
-The main application runs 9 threads in total. 2 of these threads are PWM Server and 
-Commutation Server responsible for modulation and motor drive. 
+test_torque-ctrl.xc illustrates usage of \ref module_ctrl_loops to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
 
-Other 2 threads used for position information are Hall Server thread required for BLDC 
-motor commutation and/or Torque controller and QEI Server thread for high precision 
-position information for Torque control loop. One ADC Server thread to capture current
-in the motor phases. A watchdog server is used to monitor CORE 3 and disables motor 
-in case of emergency.
+HW compatibility: 
+- \b COM: (not used)
+- \b CORE: C22, C21-DX 
+- \b IFM: Drive DC 100, Drive DC 300 
 
-All these 6 threads run on CORE 3 which has physical connection to the interface module (IFM). 
-Now that we have the interface drive servers setup and running on CORE 3. We can run 
-Torque Control Loop on CORE 2/1/0. Torque Control consists of two threads one for phase
-currents filtering and other one for torque control loop. The controller calculates the
-torque.
+It runs \b 8 \b THREADS in parallel. 
+- Profile Torque Client, Torque Control Loop, PWM Server, ADC Server, Commutation Server, Hall Server, QEI Server, Watchdog Server
 
-Another thread for profile torque client runs on core 0/1/2. The client function shows
-how to set new target torque for the controller and read back actual torque. The client 
-function also shows how to make use of XSCOPE to probe/store data in real-time.
+It uses \b 2 \b TILES out of the \b CORE module.
 
-More information about Torque Control Server/ Client can be found under module_ctrl_loops Readme
+- TILE_ONE (0 by default). It takes care of the client side functions and control loop. Since these functios do not require any port access, any free \b TILE could run them.
+- IFM_TILE (3 by default). It executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
 
-Dependencies: module_adc module_blocks module_common module_commutation module_ctrl_loops
-module_hall module_profile module_pwm_common module_pwm_symmetrical module_qei module_sm 
-sc_somanet-base/module_nodeconfig
+	#define TILE_ONE 0
+	#define IFM_TILE 3
+
+\b TILE_ONE:
+
+	on stdcore[TILE_ONE]:
+			{
+				par
+				{
+
+- \b Thread: Profile Torque Client
+
+	profile_torque_test(c_torque_ctrl); // Test Torque Profile Mode on slave side
+
+Set new target torque for the controller. Communication between the profile position client and .... and the threads running on ..... are carried out over channels: ....
+
+
+- \b Thread: Torque Control Loop
+
+	{
+	 ctrl_par position_ctrl_params; //Var definition
+	 hall_par hall_params;
+	 qei_par qei_params;
+
+	init_torque_control_param(torque_ctrl_params); //Initialization
+	init_qei_param(qei_params);
+	init_hall_param(hall_params);
+
+	torque_control(torque_ctrl_params, hall_params, qei_params, SENSOR_USED, 
+			c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl); //Control loop
+	}
+		
+Read back actual torque of the motor. Communication between the Torque Control Loop thread and the threads running on the IFM_TILE are carried out over channels: ....
+
+\b IFM_TILE:
+
+	on stdcore[IFM_TILE]: 
+			{
+				par
+				{
+
+- \b Thread: PWM Server.
+
+	do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+
+Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by \b sc_pwm/module_pwm_symmetrical.
+
+- \b Thread: ADC Server.
+	
+	adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia,
+				p_ifm_adc_misoa, p_ifm_adc_misob);
+
+It captures current values in the motor phases.
+
+- \b Thread: Commutation Server 
+
+	
+	{
+	hall_par hall_params; //Var definition
+	qei_par qei_params;
+	commutation_par commutation_params;
+
+	init_hall_param(hall_params); //Initialization
+	init_qei_param(qei_params);
+	init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); 
+
+	commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, c_commutation_p1,
+				c_commutation_p2, c_commutation_p3, c_pwm_ctrl, hall_params,
+				qei_params, commutation_params); //Read feedback
+	}
+
+
+Responsible for motor ....
+
+- \b Thread: Hall Server
+
+	{
+	hall_par hall_params;
+	init_hall_param(hall_params);
+	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,
+			p_ifm_hall, hall_params); //Channel priority 1,2..5
+	}
+
+Required for BLDC motor commutation  ....
+
+- \b Thread: QEI Server
+
+	{
+	qei_par qei_params;
+	init_qei_param(qei_params);
+	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5,
+			p_ifm_encoder, qei_params);  	// channel priority 1,2..5
+	}
+
+For high precision information about position for position control loop.
+
+- \b Thread: Watchdog Server
+
+	run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
+
+A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency.
+
+\b Please, do not forget to set properly your node and motor configuration when using this application.
+
+- <a href="">Configure your node</a> 
+- \ref how_configure_motors
+
+More information about Position Control Server/Client can be found at \ref module_ctrl_loops documentation.
+
+\b Dependencies: \ref sc_pwm/module_pwm_common \ref sc_pwm/module_pwm_symmetrical \ref sc_somanet-base/module_nodeconfig
+\ref module_adc \ref module_blocks \ref module_common \ref module_commutation \ref module_ctrl_loops \ref module_hall
+\ref module_profile  \ref module_qei \ref module_sm 
+
+\b See \b also:
+
+- <a href="http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET">Getting started with SOMANET</a>  
 
 */

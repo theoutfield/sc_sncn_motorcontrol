@@ -1,38 +1,211 @@
-
 /**
 
 \page apps
 \section test_ethercat-motorctrl-mode
 
-This test application illustrates usage of Motor Control with Ethercat with advanced 
-features
+test_ethercat-mode.xc illustrates the usage of Motor Control over EtherCAT with advanced features.
 
-The main application runs 14 threads in total. 2 of these threads are PWM Server and 
-Commutation Server responsible for modulation and motor drive. 
+This example must be run..
 
-Other 2 threads used for position information are Hall Server thread required for BLDC 
-motor commutation and QEI Server thread for high precision position information. 
-A watchdog server monitors CORE 3 and disables motor in case of emergency. One ADC 
-Server thread to capture current in the motor phases. A GPIO Server to monitor the 
-digital input switches.
+(SPEAK ABOUT THE MASTER SIDE)
 
-All these 7 threads run on CORE 3 which has physical connection to the interface module (IFM).
-Now that we have the interface drive servers setup and running on CORE 3. We can run 
-Control Loops like Position/Velocity/Torque Loops on CORE 2/1. 
+HW compatibility: 
+- \b COM: EtherCAT 
+- \b CORE: C22
+- \b IFM: Drive DC 100 | Drive DC 300 
 
-Another 2 thread run on core 0: one for ethercat communication handling and other one 
-for firmware update over ethercat. Since Core 0 has physical connections to the ethercat 
-interface and flash spi interface.
+It runs \b 12 \b THREADS in parallel.
 
-Another thread which forms a communication bridge between ethercat and motor drive 
-(ecat_motor_drive) runs on core 1. 
+   - PWM Server, Commutation Server, Watchdog Server, ADC Server, Digital GPIO server, Hall Server, QEI Server, EtherCAT Communication Handling, EtherCAT-Motor Drive, Position Control Loop, Velocity Control Loop, and Torque Control Loop.
 
-More information about Control Server/Client can be found under module_ctrl_loops Readme;
-and about ecat_motor_drive under module_ecat_drive
+It uses \b 4 \b TILES out of the \b CORE module.
 
-Dependencies: module_adc, module_blocks, module_comm, module_common, module_commutation 
-module_ctrl_loops, module_ecat_drive, module_gpio, module_hall, module_profile,
-module_pwm_common, module_pwm_symmetrical, module_qei, module_sm, sc_sncn_ctrlproto/module_ctrlproto, 
-sc_sncn_ethercat/module_ethercat, sc_somanet-base/module_fwupdate, sc_somanet-base/module_nodeconfig
+
+	
+	#define COM_TILE 0
+	#define IFM_TILE 3
+	#define TILE_ONE 1
+	#define TILE_TWO 2
+
+- COM_TILE. It runs threads responsible for communication. They need to access the Communication Module (COM), just a tile that provides access to the \b COM ports can run these functions.
+- TILE_ONE (0 by default). Communication bridge between EtherCAT and motor drive. Since these functios do not require any port access, any free \b TILE could run them.
+- TILE_TWO (1 by default). This tile will execute the different mode control loops. Since these functios do not require any port access, any free \b TILE could run them.
+- IFM_TILE (3 by default). It executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
+	
+\b COM_TILE:
+
+    on stdcore[COM_TILE] :
+	{
+
+- \b Thread: Ethercat Communication Handling
+
+	{
+	ecat_init();
+
+	ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,
+		      foe_in, pdo_out, pdo_in);
+	}
+
+Ethercat communication handler loop. Ref: sc_sncn_ethercat/module_ethercat
+
+\b TILE_ONE:
+
+	on stdcore[TILE_ONE]:
+
+- \b Thread: EtherCAT-Motor Drive
+	
+	{
+	ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5,
+	c_torque_ctrl, c_velocity_ctrl, c_position_ctrl, c_gpio_p1);
+	}
+
+It forms a communication bridge between EtherCAT and motor drive. \ref module_ecat_drive
+
+\b TILE_TWO:
+
+	on stdcore[TILE_TWO]:
+	{
+		par
+		{
+
+- \b Thread: Position Control Loop
+
+	{
+	ctrl_par position_ctrl_params; //Var definition
+	hall_par hall_params;
+	qei_par qei_params;
+
+	init_position_control_param(position_ctrl_params); //Initialization
+	init_hall_param(hall_params);
+	init_qei_param(qei_params);
+
+	position_control(position_ctrl_params, hall_params, qei_params,
+		              SENSOR_USED, c_hall_p2, c_qei_p1,       
+		              c_position_ctrl, c_commutation_p3); //Control loop
+	}
+
+- \b Thread: Velocity Control Loop
+
+	{
+	ctrl_par velocity_ctrl_params; //Var definition
+	filter_par sensor_filter_params;
+	hall_par hall_params;
+	qei_par qei_params;
+
+	init_velocity_control_param(velocity_ctrl_params); //Initialization
+	init_sensor_filter_param(sensor_filter_params);
+	init_hall_param(hall_params);
+	init_qei_param(qei_params);
+
+	velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,
+			qei_params, SENSOR_USED, c_hall_p3, c_qei_p3, 
+			c_velocity_ctrl, c_commutation_p2); //Control loop
+	}
+
+- \b Thread: Torque Control Loop
+
+      {
+	ctrl_par torque_ctrl_params; //Var definition
+	hall_par hall_params;
+	qei_par qei_params;
+
+	init_qei_param(qei_params); //Initialization
+	init_hall_param(hall_params);
+	init_torque_control_param(torque_ctrl_params);
+
+	torque_control( torque_ctrl_params, hall_params, qei_params,
+			SENSOR_USED, c_adc, c_commutation_p1, 
+			c_hall_p2, c_qei_p2, c_torque_ctrl); //Control loop
+      }
+
+\b IFM_TILE:
+
+    on stdcore[IFM_CORE]: 
+                    {
+                            par
+                            {
+
+We need to run this threads over IFM_TILE since this is the only tile accessing the interface module (IFM). And these threads, responsible for motor control, require for this access.
+
+- \b Thread: PWM Server.
+
+      do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+
+Responsible for (specify why do we use inv_triggered pwm). \ref module_pwm_symmetrical
+
+- \b Thread: Commutation Server
+
+	{
+	hall_par hall_params; //Var definition
+	qei_par qei_params;
+	commutation_par commutation_params;
+
+	init_hall_param(hall_params); //Initialization
+	init_qei_param(qei_params);
+	init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);     
+
+	commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog,  //Commutation       
+	c_commutation_p1, c_commutation_p2, c_commutation_p3, 
+	c_pwm_ctrl, hall_params, qei_params, commutation_params);
+	}
+
+Responsible for motor .... . \ref module_commutation
+
+- \b Thread: Hall Server
+
+	{
+	hall_par hall_params;
+	init_hall_param(hall_params);
+	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, 
+		      p_ifm_hall, hall_params); // channel priority 1,2..5
+	}
+
+Required for BLDC motor commutation .... \ref module_hall
+
+- \b Thread: QEI Server
+
+	{
+	qei_par qei_params;
+	init_qei_param(qei_params);
+	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, 
+		      p_ifm_encoder, qei_params);     // channel priority 1,2..5
+	}
+
+For high precision information about position for position control loop. \ref module_qei
+
+- \b Thread: Watchdog server
+
+      run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
+
+A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency.
+
+- \b Thread: ADC Server
+
+	adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, 173  p_ifm_adc_sclk_conv_mosib_mosia, 
+      				p_ifm_adc_misoa, p_ifm_adc_misob); 
+
+It captures current in the motor phases.\ref module_adc
+
+- \b Thread: Digital GPIO Server
+
+      gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);
+
+It monitors the digital input switches. \ref module_gpio
+
+\b Please, do not forget to set properly your node and motor configuration when using this application.
+
+- <a href="">Configure your node</a> 
+- \ref how_configure_motors
+
+
+More information about Server/Client Control can be found on \ref module_ctrl_loops. And more information about motor control over EtherCAT on \ref module_ecat_drive.
+
+Dependencies: module_blocks module_comm module_common module_profile module_pwm_common module_sm sc_sncn_ctrlproto/module_ctrlproto 
+sc_somanet-base/module_nodeconfig
+
+See also:
+
+- <a href="http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET">Getting started with SOMANET</a>  
 
 */
+

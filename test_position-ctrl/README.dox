@@ -1,35 +1,130 @@
-
 /**
 
 \page apps
 \section test_position-ctrl
 
-This test application illustrates usage of module_ctrl_loops to do position control 
-of motor 
+test_position-ctrl.xc illustrates usage of \ref module_ctrl_loops to do position control of a motor. Position loop can be closed with position from either HALL sensor/ QEI Sensor or any other position sensor (if a drive server runs on IFM tile).
 
-The main application runs 7 threads in total. 2 of these threads are PWM Server and 
-Commutation Server responsible for modulation and motor drive. 
+HW compatibility: 
+- \b COM: all (not used) 
+- \b CORE: C22 | C21-DX 
+- \b IFM: Drive DC 100 | Drive DC 300 
 
-Other 2 threads used for position information are Hall Server thread required for BLDC 
-motor commutation and/or Position control and QEI Server thread for high precision 
-position information for position control loop. A watchdog server is used to monitor
-CORE 3 and disables motor in case of emergency.
+It runs \b 7 \b THREADS in parallel. 
+- Profile Position Client, Position Control Loop, PWM Server, Commutation Server, Hall Server, QEI Server, Watchdog Server
 
-All these 5 threads run on CORE 3 which has physical connection to the interface module (IFM).
-Now that we have the interface drive servers setup and running on CORE 3. We can run 
-Position Control Loop on CORE 2/1/0. Position Loop can be closed with position from 
-either HALL sensor/ QEI Sensor or any other position sensor (if a drive server runs 
-on IFM CORE).
+It uses \b 2 \b TILES out of the \b CORE module.
 
-Another thread for profile position client runs on core 0/1/2. The client function 
-shows how to set new target position for the controller and read back actual position. 
-The client function also shows how to make use of XSCOPE to probe/store data in 
-real-time.
+	#define TILE_ONE 0
+	#define IFM_TILE 3
 
-More information about Position Control Server/Client can be found under module_ctrl_loops Readme
+- TILE_ONE (0 by default). It takes care of the client side functions and control loop. Since these functios do not require any port access, any free \b TILE could run them.
+- IFM_TILE (3 by default). It executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
 
-Dependencies: module_adc module_blocks module_common module_commutation module_ctrl_loops
-module_hall module_profile module_pwm_common module_pwm_symmetrical module_qei module_sm 
-sc_somanet-base/module_nodeconfig
+\b TILE_ONE:
 
+	on stdcore[TILE_ONE]:
+			{
+				par
+				{
+
+- \b Thread: Profile Position Client
+
+	position_profile_test(c_position_ctrl); // Test Position Profile Mode on slave side
+
+Set new target position for the controller. Communication between the profile position client and .... and the threads running on ..... are carried out over channels: ....
+
+- \b Thread: Position Control Loop
+
+	{
+	 ctrl_par position_ctrl_params; //Var definition
+	 hall_par hall_params;
+	 qei_par qei_params;
+
+	 init_position_control_param(position_ctrl_params); //Initialization
+	 init_hall_param(hall_params);
+	 init_qei_param(qei_params);
+
+	 position_control(position_ctrl_params, hall_params, qei_params, 
+				SENSOR_USED, c_hall_p2, c_qei_p1,
+				c_position_ctrl, c_commutation_p3); //Control loop
+	}
+		
+Read back actual position of the motor. Communication between the Position Control Loop thread and the threads running on the IFM_TILE are carried out over channels: ....
+
+\b IFM_TILE:
+
+	on stdcore[IFM_TILE]: 
+			{
+				par
+				{
+
+- \b Thread: PWM Server.
+
+	do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+
+Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by \b sc_pwm/module_pwm_symmetrical. 
+
+- \b Thread: Commutation Server 
+
+	
+	{
+	hall_par hall_params; //Var definition
+	qei_par qei_params;
+	commutation_par commutation_params;
+
+	init_hall_param(hall_params); //Initialization
+	init_qei_param(qei_params);
+	init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED); 
+
+	commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, c_commutation_p1,
+				c_commutation_p2, c_commutation_p3, c_pwm_ctrl, hall_params,
+				qei_params, commutation_params); //Read feedback
+	}
+
+
+Responsible for motor ....
+
+- \b Thread: Hall Server
+
+	{
+	hall_par hall_params;
+	init_hall_param(hall_params);
+	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,
+			p_ifm_hall, hall_params); //Channel priority 1,2..5
+	}
+
+Required for BLDC motor commutation  ....
+
+- \b Thread: QEI Server
+
+	{
+	qei_par qei_params;
+	init_qei_param(qei_params);
+	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5,
+			p_ifm_encoder, qei_params);  	// channel priority 1,2..5
+	}
+
+For high precision information about position for position control loop.
+
+- \b Thread: Watchdog Server
+
+	run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
+
+A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency.
+
+\b Please, do not forget to set properly your node and motor configuration when using this application.
+
+- <a href="">Configure your node</a> 
+- \ref how_configure_motors
+
+More information about Position Control Server/Client can be found at \ref module_ctrl_loops documentation.
+
+\b Dependencies: \ref sc_pwm/module_pwm_common \ref sc_pwm/module_pwm_symmetrical \ref sc_somanet-base/module_nodeconfig
+\ref module_adc \ref module_blocks \ref module_common \ref module_commutation \ref module_ctrl_loops \ref module_hall
+\ref module_profile  \ref module_qei \ref module_sm 
+
+\b See \b also:
+
+- <a href="http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET">Getting started with SOMANET</a>  
 */
