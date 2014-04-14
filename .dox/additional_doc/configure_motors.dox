@@ -3,5 +3,51 @@
 \page how
 \section how_configure_motors How to configure your motors
 
+For Bldc motors:
+	
+The mandatory parameters to be set to get started with the motor: pole pairs, max nominal speed and winding type*.
+
+For Velocity Control applications: max profile velocity must be defined.
+
+	The sensor used for the control must be specified : HALL / QEI.
+
+	For QEI: Encoder resolution, QEI_SENSOR_TYPE: the sensor type with index or no index must be specified,
+QEI_SENSOR_POLARITY: Polarity is used to keep sensors to count ticks in the same direction as hall sensor
+	
+
+	For tuning the Controller (PID):
+		Kp = VELOCITY_Kp_NUMERATOR/ VELOCITY_Kp_DENOMINATOR
+		Ki = VELOCITY_Ki_NUMERATOR/ VELOCITY_Ki_DENOMINATOR
+		Kd = VELOCITY_Kd_NUMERATOR/ VELOCITY_Kd_DENOMINATOR
+
+For Position Control applications: max and min position limits for either hall/qei position sensor; max profile velocity;
+max acceleration must be defined.
+
+	The sensor used for the control must be specified : HALL / QEI.
+
+	For QEI: Encoder resolution, QEI_SENSOR_TYPE: the sensor type with index or no index must be specified,
+QEI_SENSOR_POLARITY: Polarity is used to keep sensors to count ticks in the same direction as hall sensor
+	
+
+	For tuning the Controller (PID):
+		Kp = POSITION_Kp_NUMERATOR/ POSITION_Kp_DENOMINATOR
+		Ki = POSITION_Ki_NUMERATOR/ POSITION_Ki_DENOMINATOR 
+		Kd = POSITION_Kd_NUMERATOR/ POSITION_Kd_DENOMINATOR
+
+For Torque Control applications: ifm resoultion, motor torque constant, profile_torque must be defined
+	
+	The sensor used for the control must be specified : HALL / QEI.
+
+	For QEI: Encoder resolution, QEI_SENSOR_TYPE: the sensor type with index or no index must be specified,
+QEI_SENSOR_POLARITY: Polarity is used to keep sensors to count ticks in the same direction as hall sensor
+
+	For tuning the Controller (PID):
+		Kp = TORQUE_Kp_NUMERATOR/ TORQUE_Kp_DENOMINATOR
+		Ki = TORQUE_Ki_NUMERATOR/ TORQUE_Ki_DENOMINATOR 
+		Kd = TORQUE_Kd_NUMERATOR/ TORQUE_Kd_DENOMINATOR
+	
+
+* Commutation offset parameters should be adjusted in the range (0 - 4095) for less power drain. 
+* Gear ratio if you have any please specify else set it to 1
 
 */

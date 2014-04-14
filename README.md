@@ -28,6 +28,7 @@ Key Features
    * Support QEI sensor with Index/ no Index
    * Support Hall sensor
    * Support Analog sensor 
+   * Support GPIO Digital
 
 
 Further information
