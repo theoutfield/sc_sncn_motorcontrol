@@ -52,14 +52,14 @@
 /**
  * If you have any gears added, specify gear-ratio
  */
-#define GEAR_RATIO 					120		// if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO 					10		// if no gears are attached - set to gear ratio to 1
 
 /* Define your Incremental Encoder type (QEI_INDEX/ QEI_NO_INDEX) */
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
  *  (NORMAL/INVERTED) */
-#define QEI_SENSOR_POLARITY			INVERTED
+#define QEI_SENSOR_POLARITY			NORMAL
 
 #define MAX_POSITION_LIMIT 			POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO		// ticks (max range: 2^30, limited for safe operation)
 #define MIN_POSITION_LIMIT 			-POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO		// ticks (min range: -2^30, limited for safe operation)
