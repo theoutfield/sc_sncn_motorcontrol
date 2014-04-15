@@ -4,37 +4,57 @@
 \page apps
 \section test_torque-ctrl
 
-
 test_torque-ctrl.xc illustrates usage of \ref module_ctrl_loops to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
 
-HW compatibility: 
-- \b COM: (not used)
-- \b CORE: C22, C21-DX 
-- \b IFM: Drive DC 100, Drive DC 300 
+<table class="core_usage" align="center" cellpadding="5" width="20%">
+<tr>
+    <th colspan="2">CORE use</th>
+</tr>
+<tr>
+    <td>Parallel \b THREADS</td>
+    <td width="30px" align="center"> 8 </td>
+</tr>
+<tr>
+    <td>\b TILES used</td>
+    <td width="30px" align="center"> 2 </td>
+ </tr>
+</table>
 
-It runs \b 8 \b THREADS in parallel. 
-- Profile Torque Client, Torque Control Loop, PWM Server, ADC Server, Commutation Server, Hall Server, QEI Server, Watchdog Server
+<table  class="hw_comp" align="center" cellpadding="2" width="50%">
+<tr align="center">
+    <th colspan="3">HW compatibility</th>
+  <tr align="center">
+    <th>COM</th>
+    <th>CORE</th>
+    <th>IFM</th>
+  </tr>
+  <tr align="center">
+    <td>*</td>
+    <td>C21-DX</td>
+   <td>Drive DC 100</td>
+ </tr>
+  <tr align="center">
+    <td></td>
+    <td>C22</td>
+    <td>Drive DC 300</td>
+  </tr>
+</table>
 
-It uses \b 2 \b TILES out of the \b CORE module.
-
-- TILE_ONE (0 by default). It takes care of the client side functions and control loop. Since these functios do not require any port access, any free \b TILE could run them.
-- IFM_TILE (3 by default). It executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
+- \b THREADS: Profile Torque Client, Torque Control Loop, PWM Server, ADC Server, Commutation Server, Hall Server, QEI Server, Watchdog Server.
+- \b TILES:
 
 	#define TILE_ONE 0
 	#define IFM_TILE 3
 
-\b TILE_ONE:
+\b TILE_ONE: It takes care of the client side functions and control loop. Since these functions do not require any port access, any free TILE could run them.
 
 	on stdcore[TILE_ONE]:
-			{
-				par
-				{
 
 - \b Thread: Profile Torque Client
 
 	profile_torque_test(c_torque_ctrl); // Test Torque Profile Mode on slave side
 
-Set new target torque for the controller. Communication between the profile position client and .... and the threads running on ..... are carried out over channels: ....
+Set new target torque for the controller. Read more at \ref module_profile.
 
 
 - \b Thread: Torque Control Loop
@@ -52,30 +72,26 @@ Set new target torque for the controller. Communication between the profile posi
 			c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl); //Control loop
 	}
 		
-Read back actual torque of the motor. Communication between the Torque Control Loop thread and the threads running on the IFM_TILE are carried out over channels: ....
+Read back actual torque of the motor. Read more at \ref module_ctrl_loops.
 
-\b IFM_TILE:
+\b IFM_TILE (3 by default): It executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
 
 	on stdcore[IFM_TILE]: 
-			{
-				par
-				{
 
 - \b Thread: PWM Server.
 
 	do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
-Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by \b sc_pwm/module_pwm_symmetrical.
+Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the \b module_pwm_symmetrical at PWM software component \b sc_pwm.
 
 - \b Thread: ADC Server.
 	
 	adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia,
 				p_ifm_adc_misoa, p_ifm_adc_misob);
 
-It captures current values in the motor phases.
+It captures current values in the motor phases. Read more at \ref module_adc.
 
 - \b Thread: Commutation Server 
-
 	
 	{
 	hall_par hall_params; //Var definition
@@ -92,7 +108,7 @@ It captures current values in the motor phases.
 	}
 
 
-Responsible for motor ....
+Responsible for proper BLDC motor drive. Read more at \ref module_commutation.
 
 - \b Thread: Hall Server
 
@@ -103,7 +119,7 @@ Responsible for motor ....
 			p_ifm_hall, hall_params); //Channel priority 1,2..5
 	}
 
-Required for BLDC motor commutation  ....
+To obtain information about motor position for position control loop in case a Hall sensor is used. Read more at \ref module_hall.
 
 - \b Thread: QEI Server
 
@@ -114,13 +130,13 @@ Required for BLDC motor commutation  ....
 			p_ifm_encoder, qei_params);  	// channel priority 1,2..5
 	}
 
-For high precision information about position for position control loop.
+To obtain high precision information about motor position for position control loop in case a Quadrature Encoder sensor is used. Read more at \ref module_qei.
 
 - \b Thread: Watchdog Server
 
 	run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 
-A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency.
+A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at \ref module_watchdog.
 
 \b Please, do not forget to set properly your node and motor configuration when using this application.
 
@@ -129,9 +145,7 @@ A watchdog server is used to monitor IFM_TILE and disables motor in case of emer
 
 More information about Position Control Server/Client can be found at \ref module_ctrl_loops documentation.
 
-\b Dependencies: \ref sc_pwm/module_pwm_common \ref sc_pwm/module_pwm_symmetrical \ref sc_somanet-base/module_nodeconfig
-\ref module_adc \ref module_blocks \ref module_common \ref module_commutation \ref module_ctrl_loops \ref module_hall
-\ref module_profile  \ref module_qei \ref module_sm 
+Other dependencies: \ref sc_somanet-base/module_nodeconfig \ref module_blocks \ref module_common \ref module_sm 
 
 \b See \b also:
 

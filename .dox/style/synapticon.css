@@ -1,5 +1,8 @@
 /* The standard CSS for doxygen 1.8.3.1 */
 
+* {
+	font-family:Helvetica;
+}
 
 /* @group Heading Levels */
 
@@ -28,7 +31,7 @@ div.line.glow {
     width: 100%;
     z-index: 101;
     font-size: 13px;
-    font-family: 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
+    font-family: Helvetica,'Lucida Grande',Geneva,Arial,sans-serif;
 
 }
 
@@ -164,7 +167,7 @@ div.line.glow {
     display: block;
     outline: medium none;
     color: rgb(255, 255, 255);
-    font-family: 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
+    font-family: Helvetica,'Lucida Grande',Geneva,Arial,sans-serif;
     text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.9);
     text-decoration: none;
 }
@@ -218,4 +221,14 @@ td, th {
 
 table {
     border-collapse: collapse;
+}
+
+table.hw_comp {
+    float:left;
+ margin:20px 60px;
+}
+
+table.core_usage {
+    float:left;
+ margin:20px 60px;
 }

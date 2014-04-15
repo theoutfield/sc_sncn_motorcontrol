@@ -24,7 +24,7 @@
 #include <internal_config.h>
 #include "position_ctrl_client.h"
 
-#define COM_TILE 0
+#define TILE_ONE 0
 #define IFM_TILE 3
 
 on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
@@ -71,13 +71,13 @@ int main(void)
 	par
 	{
 		/* Test Profile Position Client function*/
-		on stdcore[0]:
+		on stdcore[TILE_ONE]:
 		{
 			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		// test PPM on slave side
 		}
 
 
-		on stdcore[0]:
+		on stdcore[TILE_ONE]:
 		{
 			/* Position Control Loop */
 			{
