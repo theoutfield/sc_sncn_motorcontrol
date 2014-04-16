@@ -49,10 +49,10 @@
  * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				8				// Number of pole pairs
-#define MAX_NOMINAL_SPEED  			5260			// rpm
-#define MAX_NOMINAL_CURRENT  		2				// A
-#define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
+#define POLE_PAIRS  				4				// Number of pole pairs
+#define MAX_NOMINAL_SPEED  			3000			// rpm
+#define MAX_NOMINAL_CURRENT  		6				// A
+#define MOTOR_TORQUE_CONSTANT 		112    			// mNm/A
 
 /**
  * If you have any gears added, specify gear-ratio
@@ -74,14 +74,14 @@
 
 /* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
  *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
-#define IFM_RESOLUTION				DC100_RESOLUTION
+#define IFM_RESOLUTION				DC300_RESOLUTION
 
 /*Commutation offset (range 0-4095) should be adjusted for less power drain */
-#define COMMUTATION_OFFSET_CLK		COMMUTATION_FORWARD_CONSTANT
-#define COMMUTATION_OFFSET_CCLK		COMMUTATION_REVERSE_CONSTANT
+#define COMMUTATION_OFFSET_CLK		770//COMMUTATION_FORWARD_CONSTANT
+#define COMMUTATION_OFFSET_CCLK		2644//COMMUTATION_REVERSE_CONSTANT
 
 /* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
-#define WINDING_TYPE				STAR_WINDING
+#define WINDING_TYPE				DELTA_WINDING
 
 /* Changes direction of the motor drive  (1 /-1) */
 #define POLARITY 					1

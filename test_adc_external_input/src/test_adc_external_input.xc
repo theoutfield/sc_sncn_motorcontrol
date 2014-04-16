@@ -74,8 +74,8 @@ void xscope_initialise_1()
 	return;
 }
 
-/* ADC Client test function */
-void adc_test(chanend c_adc)
+/* Analog Input test function */
+void analog_input_test(chanend c_adc)
 {
 	int external_input_1;
 	int external_input_2;
@@ -118,8 +118,8 @@ int main(void)
 
 		on stdcore[1]:
 		{
-			/* ADC Client test function */
-			adc_test(c_adc);
+			/* Analog Input test function */
+			analog_input_test(c_adc);
 		}
 
 
@@ -132,7 +132,7 @@ int main(void)
 			par
 			{
 				/* ADC loop (only if motor control is not used) */
-		//		adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
+			//	adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );
 
 
 				/* ADC triggered loop (only if motor control is used) */
