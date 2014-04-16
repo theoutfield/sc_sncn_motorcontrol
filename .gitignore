@@ -1,5 +1,6 @@
 ## ignore XDE(ecipse) files
 .metadata/
+.settings/
 
 ## generic files to ignore
 *~
@@ -19,5 +20,5 @@ bin/
 ## ignore KDE files
 .directory
 
-## ignore doxygen sources
-dox
+## ignore doxygen outputs
+.dox/gen
