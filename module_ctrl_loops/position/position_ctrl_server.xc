@@ -39,6 +39,7 @@
  */
 
 #include <position_ctrl_server.h>
+#include "brushed_dc_client.h"
 #include <xscope.h>
 #include <print.h>
 #include <drive_config.h>
@@ -157,7 +158,11 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 						position_control_out = 0 - position_ctrl_params.Control_limit;
 					}
 
+				#ifndef BDC
 					set_commutation_sinusoidal(c_commutation, position_control_out);
+				#else
+					set_bdc_voltage(c_commutation, position_control_out);
+				#endif
 
 					#ifdef DEBUG
 						xscope_probe_data(0, actual_position);

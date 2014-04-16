@@ -39,6 +39,7 @@
  */
 
 #include "velocity_ctrl_server.h"
+#include "brushed_dc_client.h"
 #include "refclk.h"
 #include "qei_client.h"
 #include "hall_client.h"
@@ -88,7 +89,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 	int deactivate = 0;
 	int activate = 0;
 	int init_state = INIT_BUSY;
-	int qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
+	int qei_crossover = qei_params.real_counts - qei_params.real_counts/10;
 	int hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
 	int compute_flag = 0;
 	int fet_state = 0;
@@ -166,7 +167,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 				 */
 
 				actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
-
 			}
 				if(activate == 1)
 				{
@@ -194,8 +194,11 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 					else if(velocity_control_out < -velocity_ctrl_params.Control_limit)
 						velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
 
-
+#ifndef BDC
 					set_commutation_sinusoidal(c_commutation, velocity_control_out);
+#else
+					set_bdc_voltage(c_commutation, velocity_control_out);
+#endif
 
 					previous_error = error_velocity;
 

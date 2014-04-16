@@ -1,0 +1,18 @@
+
+/**
+
+\page mods
+\section module_brushed_dc
+
+This module provides driver for the Brushed DC Motor connected to the interface module (IFM). 
+The module consists of motor drive which internally makes use of the predriver to drive fets 
+and configurations under pwm. The module provides client functions to set input voltage for 
+the brushed dc motor, get fet_state from the Drive Server.
+
+To include this module add module_brushed_dc to USED_MODULES in the application/test makefile, 
+and include header files: brushed_dc_client.h and brushed_dc_server.h 
+
+Note: For C22 core modules this server must be run on TILE 3 and for C21 core modules 
+on TILE 1, since only these TILEs have physical connection to the IFM modules.
+
+*/

@@ -92,8 +92,8 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
 
-	target_velocity = 0;				// rpm
-	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+	//target_velocity = 0;				// rpm
+	//set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 }
 
 int main(void)

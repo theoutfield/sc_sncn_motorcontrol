@@ -98,23 +98,3 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 	c_commutation <: input_voltage;
 	return;
 }
-
-void disable_motor(chanend c_commutation)
-{
-	c_commutation <: DISABLE_FETS;
-	return;
-}
-
-void enable_motor(chanend c_commutation)
-{
-	c_commutation <: ENABLE_FETS;
-	return;
-}
-
-int check_fet_state(chanend c_commutation)
-{
-	int state;
-	c_commutation <: FETS_STATE;
-	c_commutation :> state;
-	return state;
-}

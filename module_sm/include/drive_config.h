@@ -147,6 +147,8 @@ typedef struct S_Check_list
 
 }check_list;
 
+
+bool __check_bdc_init(chanend c_signal);
 /**
  * \brief Check commutation initialization
  *

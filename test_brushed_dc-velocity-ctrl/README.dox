@@ -1,0 +1,35 @@
+/**
+
+\page apps
+\section test_velocity-ctrl
+
+This test application illustrates usage of module_ctrl_loops to do velocity control 
+of brushed dc motor 
+
+The main application runs 7 threads in total. 2 of these threads are PWM Server and 
+Brushed Motor Drive Server responsible for modulation and motor drive. 
+
+Other 2 threads used for position information are Hall Server thread required for 
+position information; QEI Server thread for high precision position information for 
+Velocity control loop. A watchdog server is used to monitor TILE 3 and disables motor 
+in case of emergency.
+
+All these 5 threads run on TILE 3 which has physical connection to the interface module (IFM). 
+Now that we have the interface drive servers setup and running on CORE 3. We can run 
+Velocity Control Loop on TILE 2/1/0. Velocity Loop can be closed with position from 
+either HALL sensor/ QEI Sensor or any other position sensor (if a drive server runs 
+on IFM CORE). Controller calculates velocity from the position info. internally.
+
+Another thread for profile velocity client runs on TILE 0/1/2. The client function 
+shows how to set new target velocity for the controller and read back actual velocity.
+The client function also shows how to make use of XSCOPE to probe/store data in real-time.
+
+More information about Velocity Control Server/ Client can be found under module_ctrl_loops Readme
+
+Dependencies: module_adc module_blocks module_brushed_dc module_common module_commutation 
+module_ctrl_loops module_hall module_profile module_pwm_common module_pwm_symmetrical 
+module_qei module_sm sc_somanet-base/module_nodeconfig
+
+Note: The motor configuration must be defined in config/motor/bldc_motor_config.h 
+
+*/

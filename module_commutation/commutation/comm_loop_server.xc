@@ -48,7 +48,7 @@
 #include <stdint.h>
 #include <pwm_config.h>
 #include "pwm_cli_inv.h"
-#include "predriver/a4935.h"
+#include "a4935.h"
 #include "sine_table_big.h"
 #include "adc_client_ad7949.h"
 #include "hall_client.h"

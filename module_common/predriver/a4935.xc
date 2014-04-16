@@ -41,6 +41,7 @@
 #include <xs1.h>
 #include <platform.h>
 #include <a4935.h>
+#include <internal_config.h>
 #include <print.h>
 
 void a4935_init(int configuration, out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn)
@@ -71,4 +72,24 @@ void a4935_init(int configuration, out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm
 
 	// enable FETs redundant with watchdog
 	p_ifm_coastn <: 1;
+}
+
+void disable_motor(chanend c_commutation)
+{
+	c_commutation <: DISABLE_FETS;
+	return;
+}
+
+void enable_motor(chanend c_commutation)
+{
+	c_commutation <: ENABLE_FETS;
+	return;
+}
+
+int check_fet_state(chanend c_commutation)
+{
+	int state;
+	c_commutation <: FETS_STATE;
+	c_commutation :> state;
+	return state;
 }

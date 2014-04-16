@@ -59,6 +59,14 @@ int read_controlword_fault_reset(int control_word) {
 	return (control_word & FAULT_RESET_CONTROL) >> 7;
 }
 
+bool __check_bdc_init(chanend c_signal)
+{
+	bool init_state;
+	c_signal <: CHECK_BUSY;
+	c_signal :> init_state;
+	return init_state;
+}
+
 bool __check_commutation_init(chanend c_signal)
 {
 	bool init_state;

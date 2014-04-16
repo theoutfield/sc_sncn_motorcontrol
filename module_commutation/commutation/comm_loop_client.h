@@ -44,7 +44,7 @@
 
 #include <pwm_config.h>
 #include "pwm_cli_inv.h"
-#include "predriver/a4935.h"
+#include "a4935.h"
 #include "sine_table_big.h"
 #include "adc_client_ad7949.h"
 #include "hall_client.h"
@@ -111,9 +111,9 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
  */
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params);
 
-
-void disable_motor(chanend c_commutation);
-
-void enable_motor(chanend c_commutation);
-
-int check_fet_state(chanend c_commutation);
+//
+//void disable_motor(chanend c_commutation);
+//
+//void enable_motor(chanend c_commutation);
+//
+//int check_fet_state(chanend c_commutation);

@@ -1,5 +1,5 @@
 
-MODULE_COMMUTATION_DIRS += predriver pwm commutation
+MODULE_COMMUTATION_DIRS += commutation
 
 XCC_FLAGS += -fsubword-select
-OPTIONAL_HEADERS += refclk.h
+OPTIONAL_HEADERS += refclk.h a4935.h pwm_config.h

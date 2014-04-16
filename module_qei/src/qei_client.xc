@@ -88,7 +88,7 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_v
 	int difference;
 	int count;
 	int direction;
-	int qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
+	int qei_crossover = qei_params.real_counts - qei_params.real_counts/10;
 	{count, direction} = get_qei_position_absolute(c_qei);
 	difference = count - qei_velocity_params.previous_position;
 	if(difference > qei_crossover)
