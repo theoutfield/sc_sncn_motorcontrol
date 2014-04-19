@@ -3,7 +3,7 @@
 \page apps
 \section test_homing
 
-This test application illustrates the usage of \ref module_homing. A homing implementation based on limit switches and a home switch.
+test_homing.xc illustrates the usage of \ref module_homing. A homing implementation based on limit switches and a home switch.
 In this application we have home switch on port 0 of GPIO D and positive limit switch on port 1 of GPIO D. Here we use velocity controller to search for the home switch and reset the position counters with offset found.
 
 <table class="core_usage" align="center" cellpadding="5" width="20%">
@@ -40,11 +40,16 @@ In this application we have home switch on port 0 of GPIO D and positive limit s
   </tr>
 </table>
 
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
 - \b THREADS: Homing Test, Velocity Control Loop, PWM Server, ADC Server, Commutation Server, Hall Server, QEI Server, Watchdog Server, GPIO Server . 
 
-
-- \b TILES
+- \b TILES:
 
 	#define TILE_ONE 0
 	#define IFM_TILE 3 
@@ -61,7 +66,6 @@ It monitors the home and limit switches; and upon encountering the home switch, 
 
 - \b Thread: Velocity Control Loop
 
-	{
 	ctrl_par velocity_ctrl_params; //Var definition
 	filter_par sensor_filter_params;
 	hall_par hall_params;
@@ -75,10 +79,8 @@ It monitors the home and limit switches; and upon encountering the home switch, 
 	velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, 
 			qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, 
 			c_velocity_ctrl, c_commutation_p2); //Control loop
-	}
 		
 Read back actual velocity of the motor. Read more at \ref module_ctrl_loops or \ref module_blocks.
-#CHANNELS. 
 
 \b IFM_TILE (3 by default): It executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
 
@@ -107,8 +109,6 @@ See more at \ref module_gpio.
 
 - \b Thread: Commutation Server 
 
-	
-	{
 	hall_par hall_params; //Var definition
 	qei_par qei_params;
 	commutation_par commutation_params;
@@ -120,30 +120,24 @@ See more at \ref module_gpio.
 	commutation_sinusoidal(c_hall_p1,  c_qei_p2, c_signal, c_watchdog, c_commutation_p1,
 				c_commutation_p2, c_commutation_p3, c_pwm_ctrl, hall_params,
 				qei_params, commutation_params); //Read feedback
-	}
-
 
 Responsible for proper BLDC motor drive. Read more at \ref module_commutation.
 
 - \b Thread: Hall Sensor Server
 
-	{
 	hall_par hall_params;
 	init_hall_param(hall_params);
 	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,
 		c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
-	}
 
 To obtain information about motor position for position control loop in case a Hall sensor is used. Read more at \ref module_hall.
 
 - \b Thread: QEI Server
 
-	{
 	qei_par qei_params;
 	init_qei_param(qei_params);
 	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5,
 			p_ifm_encoder, qei_params);  	// channel priority 1,2..5
-	}
 
 To obtain high precision information about motor position for position control loop in case a Quadrature Encoder sensor is used. Read more at \ref module_qei.
 

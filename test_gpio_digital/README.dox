@@ -41,6 +41,13 @@ read/write the digital ports.
   </tr>
 </table>
 
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
 - \b THREADS: GPIO Server, GPIO Client 
 
 - \b TILES:
@@ -69,7 +76,7 @@ It is not recommended  to run this thread in IFM_TILE together with the Server t
 			
 	gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);
 
-See more at \ref module_gpio.
+It access the GPIO ports at the IFM module. See more at \ref module_gpio.
 
 
 \b Please, do not forget to set properly your node and motor configuration when using this application.

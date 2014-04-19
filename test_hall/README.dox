@@ -41,9 +41,16 @@ test_hall.xc illustrates usage of \ref module_hall to get position and velocity 
   </tr>
 </table>
 
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
 - \b THREADS: Hall Sensor Server, Hall Sensor Client
 
-- \b TILES: 2
+- \b TILES:
 
 	#define TILE_ONE 0
 	#define IFM_TILE 3 
@@ -66,12 +73,10 @@ It is not recommended  to run this thread in IFM_TILE together with the Server t
 
 - \b Thread: Hall Sensor Server
 
-	{
 	hall_par hall_params;
 	init_hall_param(hall_params);
 	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,
 		c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
-	}
 
 The Hall Server captures signal values from the sensors. See more at \ref module_hall.
 

@@ -24,7 +24,7 @@
 #include <profile_control.h>
 #include <qei_client.h>
 
-#define COM_TILE 0
+#define TILE_ONE 0
 #define IFM_TILE 3
 
 on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
@@ -33,7 +33,7 @@ on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity =-450;	 		// rpm
+	int target_velocity 	=-450;	 		// rpm
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
 
@@ -58,12 +58,12 @@ int main(void)
 	{
 
 		/* Test Profile Velocity function */
-		on stdcore[0]:
+		on stdcore[TILE_ONE]:
 		{
 			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
 		}
 
-		on stdcore[0]:
+		on stdcore[TILE_ONE]:
 		{
 
 			/* Velocity Control Loop */

@@ -26,7 +26,7 @@
 #include <gpio_server.h>
 #include <gpio_client.h>
 
-#define COM_TILE 0
+#define TILE_ONE 0
 #define IFM_TILE 3
 
 on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
@@ -140,12 +140,12 @@ int main(void)
 	par
 	{
 		/* Test homing function */
-		on stdcore[0]:
+		on stdcore[TILE_ONE]:
 		{
 			homing(c_qei_p3, c_gpio_p1, c_velocity_ctrl);
 		}
 
-		on stdcore[0]:
+		on stdcore[TILE_ONE]:
 		{
 
 			/*Velocity Control Loop*/

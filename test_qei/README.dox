@@ -1,4 +1,3 @@
-
 /**
 
 \page apps
@@ -40,6 +39,13 @@ test_qei.xc illustrates the usage of \ref module_qei to get position and calcula
   </tr>
 </table>
 
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
 - \b THREADS: QEI Server, QEI Client.
 - \b TILES:
 
@@ -62,12 +68,10 @@ The client reads position fron QEI Server and calculates velocity from the posit
 
 - \b Thread: QEI Server
 
-	{
 	qei_par qei_params;
 	init_qei_param(qei_params);
 	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, 
 		c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params); // channel priority 1,2..6
-	}
 
 QEI Server that captures the signals on the sensor. Read more at \ref module_qei.
 
