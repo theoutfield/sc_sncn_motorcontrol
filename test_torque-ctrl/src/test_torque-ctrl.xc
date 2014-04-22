@@ -7,37 +7,6 @@
  * \version 1.0
  * \date 10/04/2014
  */
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
 
 #include <xs1.h>
 #include <platform.h>
@@ -59,20 +28,19 @@
 #include <profile.h>
 #include <test.h>
 
-//#define ENABLE_xscope
+#define ENABLE_xscope
 
-#define COM_CORE 0
-#define IFM_CORE 3
+#define COM_TILE 0
+#define IFM_TILE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
-	xscope_register(2, XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
-						XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n");
-	xscope_config_io(XSCOPE_IO_BASIC);
-	return;
+	xscope_register(2,
+	        XSCOPE_CONTINUOUS, "0 target_torque", XSCOPE_INT, "n",
+			XSCOPE_CONTINUOUS, "1 actual_torque", XSCOPE_INT, "n");
 }
 
 /* Test Profile Torque Function */
@@ -95,19 +63,19 @@ void profile_torque_test(chanend c_torque_ctrl)
 
 	target_torque = -200;
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+	t:>time;
 	while(1)
 	{
 		actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
 		t when timerafter(time + MSEC_STD) :> time;
 #ifdef ENABLE_xscope
-		xscope_probe_data(0, actual_torque);
+		xscope_int(0, actual_torque);
 #endif
 	}
 }
 
 int main(void)
 {
-
 	// Motor control channels
 	chan c_adc, c_adctrig;													// adc channels
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6 ; 		// qei channels
@@ -121,13 +89,13 @@ int main(void)
 	{
 
 		/* Test Profile Torque Function */
-		on stdcore[1]:
+		on tile[0]:
 		{
 			profile_torque_test(c_torque_ctrl);
 			//torque_ctrl_unit_test(c_torque_ctrl, c_qei_p4, c_hall_p4);
 		}
 
-		on stdcore[2]:
+		on tile[2]:
 		{
 			par
 			{
@@ -152,9 +120,9 @@ int main(void)
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on tile[IFM_TILE]:
 		{
 			par
 			{

@@ -113,8 +113,8 @@ void positioning_accuracy(chanend c_position_ctrl, chanend c_qei, chanend c_hall
 			actual_position = get_position(c_position_ctrl);
 			follow_error = position_ramp - actual_position;
 			t when timerafter(time + MSEC_STD) :> time;
-		//	xscope_probe_data(1, actual_position);
-		//	xscope_probe_data(2, follow_error);
+		//	xscope_int(1, actual_position);
+		//	xscope_int(2, follow_error);
 
 		}
 		t when timerafter(time + 100*MSEC_STD) :> time;
@@ -138,8 +138,8 @@ void positioning_accuracy(chanend c_position_ctrl, chanend c_qei, chanend c_hall
 		//printintln(actual_position);
 		follow_error = target_position - actual_position;
 		//xscope_probe_data(0, position_ramp);
-		xscope_probe_data(1, actual_position);
-		xscope_probe_data(2, follow_error);
+		xscope_int(1, actual_position);
+		xscope_int(2, follow_error);
 		t when timerafter(time + MSEC_STD) :> time;
 	}
 }

@@ -11,7 +11,7 @@
 #include <xscope.h>
 
 
-void xscope_initialise_2()
+/*void xscope_initialise_2()
 {
 	xscope_register(4, XSCOPE_CONTINUOUS, "0 port 1", XSCOPE_INT,	"n",
 						XSCOPE_CONTINUOUS, "1 port 2", XSCOPE_INT, "n",
@@ -20,7 +20,7 @@ void xscope_initialise_2()
 
 	xscope_config_io(XSCOPE_IO_BASIC);
 	return;
-}
+}*/
 //input types
 
 #define INPUT_PORT			1

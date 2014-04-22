@@ -7,59 +7,26 @@
  * \version 1.0
  * \date 10/04/2014
  */
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
 
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
 #include <ioports.h>
 #include <refclk.h>
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include <internal_config.h>
+
 #include <gpio_server.h>
 #include <gpio_client.h>
 
-//#define ENABLE_xscope
-#define COM_CORE 0
-#define IFM_CORE 3
+#define ENABLE_xscope
+#define COM_TILE 0
+#define IFM_TILE 3
 
-void xscope_initialise_1()
+void xscope_initialise_1(void)
 {
 	xscope_register(2, XSCOPE_CONTINUOUS, "0 port_0", XSCOPE_INT,	"n",
 						XSCOPE_CONTINUOUS, "1 port_1", XSCOPE_INT, "n");
-
-	xscope_config_io(XSCOPE_IO_BASIC);
-	return;
 }
 
 /*
@@ -71,7 +38,7 @@ void gpio_test(chanend c_gpio_p1)
 	int port_1_value;
 	int port_2_value = 0;
 	int port_3_value = 0;
-
+timer t;
 	#ifdef ENABLE_xscope
 		xscope_initialise_1();
 	#endif
@@ -95,8 +62,9 @@ void gpio_test(chanend c_gpio_p1)
 		port_1_value = read_gpio_digital_input(c_gpio_p1, 1);
 
 		#ifdef ENABLE_xscope
-			xscope_probe_data(0, port_0_value);
-			xscope_probe_data(1, port_1_value);
+			xscope_int(0, port_0_value);
+			xscope_int(1, port_1_value);
+			wait_ms(1, 1, t);
 		#else
 			printstr("Port 0 value: ");
 			printint(port_0_value);
@@ -120,7 +88,7 @@ int main(void)
 	par
 	{
 		/* Test GPIO Client Loop */
-		on stdcore[1] :
+		on tile[0] :
 		{
 			gpio_test(c_gpio_p1);
 		}
@@ -128,7 +96,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on tile[IFM_TILE]:
 		{
 			/* GPIO Digital Server */
 			gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);

@@ -20,7 +20,7 @@
  * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define MAX_NOMINAL_SPEED  			7730			// rpm
+#define MAX_NOMINAL_SPEED  			3000			// rpm
 
 /* Position/Velocity Sensor Types (select your sensor type here)
  * (HALL/ QEI) */

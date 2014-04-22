@@ -26,21 +26,17 @@
 #include <drive_config.h>
 #include <profile_control.h>
 #include <qei_client.h>
-//#define ENABLE_xscope_main
+//#define ENABLE_xscope
 
 #define IFM_TILE 3
 
-on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
+on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
-	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
-							XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
-
-		xscope_config_io(XSCOPE_IO_BASIC);
-	}
+    xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
+                        XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
 	return;
 }
 
@@ -52,7 +48,7 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
 
-#ifdef ENABLE_xscope_main
+#ifdef ENABLE_xscope
 	xscope_initialise_1();
 #endif
 
@@ -77,12 +73,12 @@ int main(void)
 	{
 
 		/* Test Profile Velocity function */
-		on stdcore[0]:
+		on tile[0]:
 		{
 			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
 		}
 
-		on stdcore[0]:
+		on tile[0]:
 		{
 			/* Velocity Control Loop */
 			{
@@ -109,7 +105,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on stdcore[IFM_TILE]:
+		on tile[IFM_TILE]:
 		{
 			par
 			{

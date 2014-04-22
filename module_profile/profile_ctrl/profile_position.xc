@@ -83,8 +83,8 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 			set_position(position_ramp, c_position_ctrl);
 			actual_position = get_position(c_position_ctrl);
 			t when timerafter(time + MSEC_STD) :> time;
-			/*xscope_probe_data(0, actual_position);
-			xscope_probe_data(1, position_ramp);*/
+			/*xscope_int(0, actual_position);
+			xscope_int(1, position_ramp);*/
 		}
 		t when timerafter(time + 30 * MSEC_STD) :> time;
 	}

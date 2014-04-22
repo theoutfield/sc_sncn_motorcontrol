@@ -50,7 +50,7 @@
 /* Profile defines (Mandatory for profile modes) */
 #define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY			1001				// rpm
-#define MAX_ACCELERATION   			7730    			// rpm/s
+#define MAX_ACCELERATION   			3000    			// rpm/s
 #define PROFILE_ACCELERATION		2002				// rpm/s
 #define PROFILE_DECELERATION  		2004				// rpm/s
 #define QUICK_STOP_DECELERATION 	2005				// rpm/s

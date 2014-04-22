@@ -149,7 +149,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 	int status = 0;
 	int nominal_speed;
 	int shutdown = 0; //Disable FETS
-	int port_a, port_b, check_fet;
+	int port_a=0, port_b, check_fet;
 	qei_velocity_par qei_velocity_params;
 	init_qei_velocity_params(qei_velocity_params);
 	//printintln(commutation_params.hall_offset_clk);
@@ -162,7 +162,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 		//p_ifm_coastn :> check_fet;
 		//p_ifm_ff1 :> port_a;
 		//		p_ifm_ff2 :> port_b;
-		//		xscope_probe_data(0, port_a);
+		//		xscope_core_int(0, port_a);
 		//		xscope_probe_data(1, port_b);
 		//		xscope_probe_data(2, check_fet);
 		if(sensor_select == HALL) //hall only

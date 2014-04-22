@@ -78,8 +78,8 @@ void set_profile_torque(int target_torque, int torque_slope, cst_par &cst_params
 		set_torque( torque_ramp, c_torque_ctrl);
 		actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
 		t when timerafter(time + MSEC_STD) :> time;
-		/*xscope_probe_data(1, actual_torque);
-		xscope_probe_data(0, torque_ramp);*/
+		/*xscope_int(0, actual_torque);
+		xscope_int(1, torque_ramp);*/
 	}
 	t when timerafter(time + 30 * MSEC_STD) :> time;
 }

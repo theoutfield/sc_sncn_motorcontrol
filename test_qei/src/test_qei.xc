@@ -48,20 +48,17 @@
 #include <refclk.h>
 #include <xscope.h>
 #include <bldc_motor_config.h>
-//#define ENABLE_xscope
+#define ENABLE_xscope
 
 #define COM_CORE 0
 #define IFM_CORE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
 	{
 		xscope_register(2, XSCOPE_CONTINUOUS, "0 qei_position", XSCOPE_INT,	"n",
 				           XSCOPE_CONTINUOUS, "1 qei_velocity", XSCOPE_INT,	"n");
-		xscope_config_io(XSCOPE_IO_BASIC);
 	}
 	return;
 }
@@ -95,8 +92,8 @@ void qei_test(chanend c_qei)
 
 		wait_ms(1, core_id, t);
 	#ifdef ENABLE_xscope
-		xscope_probe_data(0, position);
-		xscope_probe_data(1, velocity);
+		xscope_core_int(0, position);
+		xscope_core_int(1, velocity);
 	#else
 		printstr("Position: ");
 		printint(position);
@@ -113,7 +110,7 @@ int main(void)
 
 	par
 	{
-		on stdcore[1]:
+		on tile[0]:
 		{
 			/* Test QEI Sensor Client */
 			qei_test(c_qei_p1);
@@ -122,7 +119,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on tile[IFM_CORE]:
 		{
 			/* QEI Server Loop */
 			{

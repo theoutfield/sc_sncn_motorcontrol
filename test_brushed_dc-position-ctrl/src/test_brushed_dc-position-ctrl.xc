@@ -33,17 +33,14 @@
 
 #define IFM_TILE 3
 
-on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
+on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 void xscope_initialise_1()
 {
 	xscope_register(3, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,	"n",
 						XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n",
 						XSCOPE_CONTINUOUS, "2 follow_error", XSCOPE_INT, "n");
-
-	xscope_config_io(XSCOPE_IO_BASIC);
-	return;
 }
 
 
@@ -98,13 +95,13 @@ int main(void)
 	{
 
 		/* Test Profile Position Client function*/
-		on stdcore[0]:
+		on tile[0]:
 		{
 			position_profile_test(c_position_ctrl, c_qei_p5, c_hall_p5);		// test PPM on slave side
 		}
 
 
-		on stdcore[0]:
+		on tile[0]:
 		{
 			/* Position Control Loop */
 			{
@@ -128,7 +125,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on stdcore[IFM_TILE]:
+		on tile[IFM_TILE]:
 		{
 			par
 			{

@@ -264,108 +264,112 @@ int get_next_state(int in_state, check_list &checklist, int controlword) {
 	int ctrl_input;
 
 	switch (in_state) {
-	case 1:
+        case 1:
 
-		if (checklist.fault == true)
-			out_state = 5;
-		else if (checklist.ready == false)
-			out_state = 2;
-		else if (checklist.ready == true)
-			out_state = 7;
-#ifdef print_slave
-		printstr("updated state ");
-		printhexln(in_state);
-#endif
-		break;
+            if (checklist.fault == true)
+                out_state = 5;
+            else if (checklist.ready == false)
+                out_state = 2;
+            else if (checklist.ready == true)
+                out_state = 7;
+    #ifdef print_slave
+            printstr("updated state ");
+            printhexln(in_state);
+    #endif
+            break;
 
-	case 2:
-		if (checklist.fault == true)
-			out_state = 5;
-		else if (checklist.ready == false)
-			out_state = 1;
-		else if (checklist.ready == true)
-			out_state = 7;
-#ifdef print_slave
-		printstr("updated state ");
-		printhexln(in_state);
-#endif
-		break;
+        case 2:
+            if (checklist.fault == true)
+                out_state = 5;
+            else if (checklist.ready == false)
+                out_state = 1;
+            else if (checklist.ready == true)
+                out_state = 7;
+    #ifdef print_slave
+            printstr("updated state ");
+            printhexln(in_state);
+    #endif
+            break;
 
-	case 7:
-		ctrl_input = read_controlword_switch_on(controlword);
-		if (checklist.fault == true)
-			out_state = 5;
-		else if (checklist.switch_on == false)
-			out_state = 7;
-		else if (checklist.switch_on == true)
-			if (ctrl_input == false)
-				out_state = 7;
-			else if (ctrl_input == true)
-				out_state = 3;
-#ifdef print_slave
-		printstr("updated state ");
-		printhexln(in_state);
-#endif
-		break;
+        case 7:
+            ctrl_input = read_controlword_switch_on(controlword);
+            if (checklist.fault == true)
+                out_state = 5;
+            else if (checklist.switch_on == false)
+                out_state = 7;
+            else if (checklist.switch_on == true)
+            {
+                if (ctrl_input == false)
+                    out_state = 7;
+                else if (ctrl_input == true)
+                    out_state = 3;
+            }
+    #ifdef print_slave
+            printstr("updated state ");
+            printhexln(in_state);
+    #endif
+            break;
 
-	case 3:
-		ctrl_input = read_controlword_enable_op(controlword);
-		if (checklist.fault == true)
-			out_state = 5;
-		else if (checklist.switch_on == false)
-			out_state = 3;
-		else if (checklist.switch_on == true)
-			if (ctrl_input == false)
-				out_state = 3;
-			else if (ctrl_input == true)
-				out_state = 4;
-#ifdef print_slave
-		printstr("updated state ");
-		printhexln(in_state);
-#endif
-		break;
+        case 3:
+            ctrl_input = read_controlword_enable_op(controlword);
+            if (checklist.fault == true)
+                out_state = 5;
+            else if (checklist.switch_on == false)
+                out_state = 3;
+            else if (checklist.switch_on == true)
+            {
+                if (ctrl_input == false)
+                    out_state = 3;
+                else if (ctrl_input == true)
+                    out_state = 4;
+            }
+    #ifdef print_slave
+            printstr("updated state ");
+            printhexln(in_state);
+    #endif
+            break;
 
-	case 4:
-		ctrl_input = read_controlword_quick_stop(controlword); //quick stop
-		if (checklist.fault == true)
-			out_state = 5;
-		else if (ctrl_input == false)
-			out_state = 4;
-		else if (ctrl_input == true) /*quick stop*/
-			out_state = 6;
-#ifdef print_slave
-		printstr("updated state ");
-		printhexln(in_state);
-#endif
-		break;
+        case 4:
+            ctrl_input = read_controlword_quick_stop(controlword); //quick stop
+            if (checklist.fault == true)
+                out_state = 5;
+            else if (ctrl_input == false)
+                out_state = 4;
+            else if (ctrl_input == true) /*quick stop*/
+                out_state = 6;
+    #ifdef print_slave
+            printstr("updated state ");
+            printhexln(in_state);
+    #endif
+            break;
 
-	case 5:
-		ctrl_input = read_controlword_fault_reset(controlword);
-		if (ctrl_input == false)
-			out_state = 5;
-		else if (ctrl_input == true)
-			out_state = 2;
-#ifdef print_slave
-		printstr("updated state ");
-		printhexln(in_state);
-#endif
-		break;
+        case 5:
+            ctrl_input = read_controlword_fault_reset(controlword);
+            if (ctrl_input == false)
+                out_state = 5;
+            else if (ctrl_input == true)
+                out_state = 2;
+    #ifdef print_slave
+            printstr("updated state ");
+            printhexln(in_state);
+    #endif
+            break;
 
-	case 6:
-		if (checklist.fault == true)
-			out_state = 5;
-		//else
-		//	out_state = 2;
-#ifdef print_slave
-		printstr("updated state ");
-		printhexln(in_state);
-#endif
-		break;
+        case 6:
+            if (checklist.fault == true)
+                out_state = 5;
+            //else
+            //	out_state = 2;
+    #ifdef print_slave
+            printstr("updated state ");
+            printhexln(in_state);
+    #endif
+            break;
 
-	default:
-		if (checklist.fault == true)
-			out_state = 5;
-		break;
+        default:
+            if (checklist.fault == true)
+                out_state = 5;
+            break;
 	}
 	return out_state;
 }
