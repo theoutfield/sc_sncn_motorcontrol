@@ -3,51 +3,50 @@
 \page how
 \section how_configure_motors How to configure your motors
 
-For Bldc motors:
+Any application that uses this software component must contain a motor configuration file.
+This file, called bldc_motor_config.h, must be located at the folder \b config/motor/ on your application.
+Since It defines the features of your BLDC motor, it is important to set it prperly before running any motor control application. 
+
+You can find many examples of this file at the different application examples provided.
+
+The main parameters to define in our configuration file will be:
+
+- Number of pole pairs:
+
+	 #define POLE_PAIRS	n  //e.g. 8
+
+- Maximum nominal speed (in rpms):
+
+	#define MAX_NOMINAL_SPEED 	n //e.g. 4000
+
+- Maximum nominal current (A):
+
+	#define MAX_NOMINAL_CURRENT	n //e.g. 2
+
+- Motor torque constant (required for torque control):
+
+	#define MOTOR_TORQUE_CONSTANT 34 // mNm/A
+
+- Your motor winding type (star or delta):
 	
-The mandatory parameters to be set to get started with the motor: pole pairs, max nominal speed and winding type*.
+	#define WINDING_TYPE	DELTA_WINDING // or STAR_WINDING
 
-For Velocity Control applications: max profile velocity must be defined.
+- Your DC board (DC100 or DC300):
 
-	The sensor used for the control must be specified : HALL / QEI.
+	#define IFM_RESOLUTION	DC100_RESOLUTION //or DC300_RESOLUTION
 
-	For QEI: Encoder resolution, QEI_SENSOR_TYPE: the sensor type with index or no index must be specified,
-QEI_SENSOR_POLARITY: Polarity is used to keep sensors to count ticks in the same direction as hall sensor
+- Sensor used for control (Hall or Quadrature Encoder):
+
+	#define SENSOR_USED	HALL // or QEI
+
+- If QEI sensor is used then set the type (w/ or w/o index), resolution, or polarity (to match the hall sensor polarity):
+
 	
+	#define QEI_SENSOR_POLARITY	NORMAL //or NORMAL
+	#define ENCODER_RESOLUTION	4000 // 4 x Max count of Quadrature Encoder
+	#define QEI_SENSOR_POLARITY	NORMAL // NORMAL
 
-	For tuning the Controller (PID):
-		Kp = VELOCITY_Kp_NUMERATOR/ VELOCITY_Kp_DENOMINATOR
-		Ki = VELOCITY_Ki_NUMERATOR/ VELOCITY_Ki_DENOMINATOR
-		Kd = VELOCITY_Kd_NUMERATOR/ VELOCITY_Kd_DENOMINATOR
+- If you are using a gear, specify the ratio, otherwise set to 1:
 
-For Position Control applications: max and min position limits for either hall/qei position sensor; max profile velocity;
-max acceleration must be defined.
-
-	The sensor used for the control must be specified : HALL / QEI.
-
-	For QEI: Encoder resolution, QEI_SENSOR_TYPE: the sensor type with index or no index must be specified,
-QEI_SENSOR_POLARITY: Polarity is used to keep sensors to count ticks in the same direction as hall sensor
-	
-
-	For tuning the Controller (PID):
-		Kp = POSITION_Kp_NUMERATOR/ POSITION_Kp_DENOMINATOR
-		Ki = POSITION_Ki_NUMERATOR/ POSITION_Ki_DENOMINATOR 
-		Kd = POSITION_Kd_NUMERATOR/ POSITION_Kd_DENOMINATOR
-
-For Torque Control applications: ifm resoultion, motor torque constant, profile_torque must be defined
-	
-	The sensor used for the control must be specified : HALL / QEI.
-
-	For QEI: Encoder resolution, QEI_SENSOR_TYPE: the sensor type with index or no index must be specified,
-QEI_SENSOR_POLARITY: Polarity is used to keep sensors to count ticks in the same direction as hall sensor
-
-	For tuning the Controller (PID):
-		Kp = TORQUE_Kp_NUMERATOR/ TORQUE_Kp_DENOMINATOR
-		Ki = TORQUE_Ki_NUMERATOR/ TORQUE_Ki_DENOMINATOR 
-		Kd = TORQUE_Kd_NUMERATOR/ TORQUE_Kd_DENOMINATOR
-	
-
-* Commutation offset parameters should be adjusted in the range (0 - 4095) for less power drain. 
-* Gear ratio if you have any please specify else set it to 1
-
+	#define GEAR_RATIO	n //e.g. 26, or 1 if no gear is attached
 */
