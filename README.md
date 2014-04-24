@@ -6,8 +6,6 @@ Sinusoidal Motor Control SOFTWARE COMPONENT
 
 Implementation of Sinusoidal Motor Control for BLDC drives on SOMANET devices.
 
-  * See the [MANUAL](http://synapticon.github.io/sc_sncn_motorctrl_sin/)
-
 <table>
 <tr>
   <td width="150px" height="30px">Latest release: </td>
@@ -54,4 +52,4 @@ Changelog
 License
 ---------
 
-Please see [LICENSE](http://synapticon.github.io/sc_sncn_motorctrl_sin/legal.html).
+Please see [LICENSE](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/LICENSE.md).

@@ -2,10 +2,19 @@ Torque Control Test
 ===============
 **test_torque-ctrl.xc** illustrates usage of [module_ctrl_loops]() to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
 
-|Parallel **THREADS** | 8 |
----------------------------|-----------------------|
-|**TILES** used | 2 |
-    
+<table class="core_usage" align="center" cellpadding="5" width="20%">
+<tr>
+    <th colspan="2">CORE use</th>
+</tr>
+<tr>
+    <td>Parallel THREADS</td>
+    <td width="30px" align="center"> 8 </td>
+</tr>
+<tr>
+    <td> TILES used</td>
+    <td width="30px" align="center"> 2 </td>
+ </tr>
+</table>
 
 <table  class="hw_comp" align="center" cellpadding="2" width="50%">
 <tr align="center">
@@ -42,7 +51,7 @@ Torque Control Test
 
 
 ### **TILE_ONE**
-It takes care of the client side functions and control loop. Since these functions do not require any port access, any free TILE could run them.
+This tile (0 by default) takes care of the client side functions and control loop. Since these functions do not require any port access, any free TILE could run them.
 ```
 	on stdcore[TILE_ONE]:
 ```

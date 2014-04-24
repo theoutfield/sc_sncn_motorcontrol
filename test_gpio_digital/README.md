@@ -1,3 +1,6 @@
+Digital GPIO Test
+====================
+
 test_gpio_digital.xc illustrates the usage of \ref module_gpio to configure GPIO's and 
 read/write the digital ports. 
 
@@ -49,6 +52,11 @@ read/write the digital ports.
 	#define TILE_ONE 0
 	#define IFM_TILE 3  
 
+> **Do not forget to set properly your node and motor configuration when using this application**.
+
+- [Configure your node]() 
+- [How to configure your motors](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md)
+
 \b TILE_ONE (0 by default): It takes care of the client side functions andcontrol loop. Since these functios do not require any port access, any free TILE could run them.
 
 	on stdcore[TILE_ONE]:
@@ -73,16 +81,8 @@ It is not recommended  to run this thread in IFM_TILE together with the Server t
 It access the GPIO ports at the IFM module. See more at \ref module_gpio.
 
 
-\b Please, do not forget to set properly your node and motor configuration when using this application.
-
-- <a href="">Configure your node</a> 
-- \ref how_configure_motors
-
-More information about GPIO Server/ Client can be found at \ref module_gpio documentation.
-
-
 Other dependencies: sc_somanet-base/module_nodeconfig \ref module_common
 
 \b See \b also:
 
-- <a href="http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET">Getting started with SOMANET</a>  
+- [Getting started with SOMANET](http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET)  
