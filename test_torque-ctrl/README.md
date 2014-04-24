@@ -1,6 +1,6 @@
 Torque Control Test
 ===============
-test_torque-ctrl.xc illustrates usage of \ref module_ctrl_loops to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
+**test_torque-ctrl.xc** illustrates usage of [module_ctrl_loops]() to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
 
 |Parallel **THREADS** | 8 |
 ---------------------------|-----------------------|
@@ -27,8 +27,6 @@ test_torque-ctrl.xc illustrates usage of \ref module_ctrl_loops to do torque con
   </tr>
 </table>
 
-
-
 - **THREADS**: Profile Torque Client, Torque Control Loop, PWM Server, ADC Server, Commutation Server, Hall Server, QEI Server, Watchdog Server.
 
 - **TILES**:
@@ -38,14 +36,14 @@ test_torque-ctrl.xc illustrates usage of \ref module_ctrl_loops to do torque con
 ```
 ### **TILE_ONE**
 It takes care of the client side functions and control loop. Since these functions do not require any port access, any free TILE could run them.
-
+```
 	on stdcore[TILE_ONE]:
-
+```
 - **Thread**: Profile Torque Client
 ```
 	profile_torque_test(c_torque_ctrl); // Test Torque Profile Mode on slave side
 ```
-Set new target torque for the controller. Read more at [module_profile].
+Set new target torque for the controller. Read more at [module_profile]().
 
 
 - **Thread**: Torque Control Loop
@@ -62,7 +60,7 @@ Set new target torque for the controller. Read more at [module_profile].
 	torque_control(torque_ctrl_params, hall_params, qei_params, SENSOR_USED, 
 			c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl); //Control loop
 ```		
-Read back actual torque of the motor. Read more at \ref module_ctrl_loops.
+Read back actual torque of the motor. Read more at [module_ctrl_loops]().
 
 ### **IFM_TILE** 
 (3 by default)
@@ -75,14 +73,14 @@ It executes the server side functions, controlling the interfaces. These functio
 ```
 	do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 ```
-Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the [module_pwm_symmetrical] at PWM software component \b sc_pwm.
+Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the [module_pwm_symmetrical]() at PWM software component \b sc_pwm.
 
 - **Thread**: ADC Server.
 ```	
 	adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia,
 				p_ifm_adc_misoa, p_ifm_adc_misob);
 ```
-It captures current values in the motor phases. Read more at [module_adc].
+It captures current values in the motor phases. Read more at [module_adc]().
 
 - **Thread**: Commutation Server 
 ```
@@ -111,28 +109,28 @@ Responsible for proper BLDC motor drive. Read more at [module_commutation]().
 To obtain information about motor position for position control loop, its use is mandatory since the motor commutation is Hall-based. Read more at [module_hall]().
 
 - **Thread**: QEI Server
-
+```
 	qei_par qei_params;
 	init_qei_param(qei_params);
 	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5,
 			p_ifm_encoder, qei_params);  	// channel priority 1,2..5
-
+```
 To obtain high precision information about motor position. Read more at [module_qei]().
 
 - **Thread**: Watchdog Server
-
+```
 	run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
+```
+A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at [module_watchdog]().
 
-A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at [module_watchdog].
-
- > **Please, do not forget to set properly your node and motor configuration when using this application**.
+### > **Do not forget to set properly your node and motor configuration when using this application**.
 
 - [Configure your node]() 
 - [How to configure your motors]()
 
 More information about Position Control Server/Client can be found at [module_ctrl_loops]() documentation.
 
-Other dependencies: \ref sc_somanet-base/module_nodeconfig \ref module_blocks \ref module_common \ref module_sm 
+Other dependencies:  [sc_somanet-base/module_nodeconfig]() [module_blocks]() [module_common]() [module_sm]() 
 
 **See also**:
 
