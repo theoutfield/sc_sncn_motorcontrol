@@ -32,25 +32,25 @@ test_torque-ctrl.xc illustrates usage of \ref module_ctrl_loops to do torque con
 - **THREADS**: Profile Torque Client, Torque Control Loop, PWM Server, ADC Server, Commutation Server, Hall Server, QEI Server, Watchdog Server.
 
 - **TILES**:
-´´´
+```
 	#define TILE_ONE 0
 	#define IFM_TILE 3
-´´´
+```
 ### **TILE_ONE**
 It takes care of the client side functions and control loop. Since these functions do not require any port access, any free TILE could run them.
 
 	on stdcore[TILE_ONE]:
 
 - **Thread**: Profile Torque Client
-´´´
+```
 	profile_torque_test(c_torque_ctrl); // Test Torque Profile Mode on slave side
-
+```
 Set new target torque for the controller. Read more at [module_profile].
 
 
 - **Thread**: Torque Control Loop
 
-´´´
+```
 	 ctrl_par position_ctrl_params; //Var definition
 	 hall_par hall_params;
 	 qei_par qei_params;
@@ -68,24 +68,24 @@ Read back actual torque of the motor. Read more at \ref module_ctrl_loops.
 (3 by default)
 It executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
 
-´´´
+```
 	on stdcore[IFM_TILE]: 
-
+```
 - **Thread**: PWM Server.
-´´´
+```
 	do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 ```
 Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the [module_pwm_symmetrical] at PWM software component \b sc_pwm.
 
 - **Thread**: ADC Server.
-´´´	
+```	
 	adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia,
 				p_ifm_adc_misoa, p_ifm_adc_misob);
 ```
 It captures current values in the motor phases. Read more at [module_adc].
 
 - **Thread**: Commutation Server 
-´´´
+```
 	hall_par hall_params; //Var definition
 	qei_par qei_params;
 	commutation_par commutation_params;
@@ -99,16 +99,16 @@ It captures current values in the motor phases. Read more at [module_adc].
 				qei_params, commutation_params); //Read feedback
 ```
 
-Responsible for proper BLDC motor drive. Read more at [module_commutation].
+Responsible for proper BLDC motor drive. Read more at [module_commutation]().
 
 - **Thread**: Hall Server
-
+```
 	hall_par hall_params;
 	init_hall_param(hall_params);
 	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,
 			p_ifm_hall, hall_params); //Channel priority 1,2..5
 ```
-To obtain information about motor position for position control loop, its use is mandatory since the motor commutation is Hall-based. Read more at [module_hall].
+To obtain information about motor position for position control loop, its use is mandatory since the motor commutation is Hall-based. Read more at [module_hall]().
 
 - **Thread**: QEI Server
 
@@ -117,7 +117,7 @@ To obtain information about motor position for position control loop, its use is
 	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5,
 			p_ifm_encoder, qei_params);  	// channel priority 1,2..5
 
-To obtain high precision information about motor position. Read more at [module_qei].
+To obtain high precision information about motor position. Read more at [module_qei]().
 
 - **Thread**: Watchdog Server
 
@@ -130,7 +130,7 @@ A watchdog server is used to monitor IFM_TILE and disables motor in case of emer
 - [Configure your node]() 
 - [How to configure your motors]()
 
-More information about Position Control Server/Client can be found at [module_ctrl_loops] documentation.
+More information about Position Control Server/Client can be found at [module_ctrl_loops]() documentation.
 
 Other dependencies: \ref sc_somanet-base/module_nodeconfig \ref module_blocks \ref module_common \ref module_sm 
 
