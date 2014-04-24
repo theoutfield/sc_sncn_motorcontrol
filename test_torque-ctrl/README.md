@@ -2,8 +2,9 @@ Torque Control Test
 ===============
 test_torque-ctrl.xc illustrates usage of \ref module_ctrl_loops to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
 
-:Parallel **THREADS** : 8
-:**TILES** used : 2
+|Parallel **THREADS** | 8 |
+---------------------------|-----------------------|
+|**TILES** used | 2 |
     
 
 <table  class="hw_comp" align="center" cellpadding="2" width="50%">
@@ -31,17 +32,17 @@ test_torque-ctrl.xc illustrates usage of \ref module_ctrl_loops to do torque con
 - **THREADS**: Profile Torque Client, Torque Control Loop, PWM Server, ADC Server, Commutation Server, Hall Server, QEI Server, Watchdog Server.
 
 - **TILES**:
-
+´´´
 	#define TILE_ONE 0
 	#define IFM_TILE 3
-
+´´´
 ### **TILE_ONE**
 It takes care of the client side functions and control loop. Since these functions do not require any port access, any free TILE could run them.
 
 	on stdcore[TILE_ONE]:
 
 - **Thread**: Profile Torque Client
-´´´Objective-C
+´´´
 	profile_torque_test(c_torque_ctrl); // Test Torque Profile Mode on slave side
 
 Set new target torque for the controller. Read more at [module_profile].
@@ -49,7 +50,7 @@ Set new target torque for the controller. Read more at [module_profile].
 
 - **Thread**: Torque Control Loop
 
-´´´Objective-C
+´´´
 	 ctrl_par position_ctrl_params; //Var definition
 	 hall_par hall_params;
 	 qei_par qei_params;
@@ -71,20 +72,20 @@ It executes the server side functions, controlling the interfaces. These functio
 	on stdcore[IFM_TILE]: 
 
 - **Thread**: PWM Server.
-´´´Objective-C
+´´´
 	do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 ```
 Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the [module_pwm_symmetrical] at PWM software component \b sc_pwm.
 
 - **Thread**: ADC Server.
-´´´Objective-C	
+´´´	
 	adc_ad7949_triggered(c_adc, c_adctrig, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia,
 				p_ifm_adc_misoa, p_ifm_adc_misob);
 ```
 It captures current values in the motor phases. Read more at [module_adc].
 
 - **Thread**: Commutation Server 
-´´´Objective-C	
+´´´
 	hall_par hall_params; //Var definition
 	qei_par qei_params;
 	commutation_par commutation_params;
