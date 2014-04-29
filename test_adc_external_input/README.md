@@ -3,6 +3,8 @@ External ADC Input Test
 <a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
 <img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
 </a>
+<br/>
+<br/>
 
 [test_adc_external_input.xc][https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_adc_external_input/src/test_adc_external_input.xc] illustrates usage of [module_adc][module_adc] to get external analog sensor input values. By default all analog inputs are configured as differential only.
 
@@ -40,7 +42,7 @@ External ADC Input Test
 > **Do not forget to set properly your node and motor configuration when using this application**.
 
 - [Configure your node]() 
-- [How to configure your motors](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md)
+- [How to configure your motors][how_to_configure_motors]
 
 ###TILE_ONE
 This tile (0 by default) takes care of the client side functions . Since these functions do not require any port access, any free TILE could run them.
@@ -68,6 +70,9 @@ More information about ADC module can be found at [module_adc][module_adc] docum
 
 **See also**:
 
-- [Getting started with SOMANET](http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET)   
+- [Getting started with SOMANET][getting_started_somanet]    
 
 [module_adc]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc
+
+[how_to_configure_motors]: https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md
+[getting_started_somanet]: http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET

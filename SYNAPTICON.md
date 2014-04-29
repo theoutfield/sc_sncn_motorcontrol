@@ -4,14 +4,14 @@
 <br/>
 <br/>
 
-<b>Synapticon GmbH</b>
-Hohlbachweg 2
-73344 Gruibingen
-Germany
+<b>Synapticon GmbH</b><br/> 
+Hohlbachweg 2<br/> 
+73344 Gruibingen<br/> 
+Germany<br/> 
 
 <a href="http://www.synapticon.com">www.synapticon.com</a> 
 
-Phone:  +49 (0) 7335 / 186 999 0
+Phone:  +49 (0) 7335 / 186 999 0<br/> 
 Fax: +49 (0) 7335 / 186 999 1 
 
 Copyright 2013 Synapticon GmbH
