@@ -6,11 +6,13 @@ External ADC Input Test
 <table style="float: left" class="core_usage" align="center" cellpadding="5" width="80%">
 <tr>
     <th colspan="2">CORE use</th>
+    <td rowspan="3" width="30px"></td>
     <th colspan="3">HW compatibility</th>
 </tr>
 <tr>
     <td>Parallel THREADS</td>
     <td width="30px" align="center"> 2 </td>
+
     <th align="center">COM</th>
     <th align="center">CORE</th>
     <th align="center">IFM</th>
@@ -18,6 +20,7 @@ External ADC Input Test
 <tr>
     <td>TILES used</td>
     <td width="30px" align="center"> 2 </td>
+
     <td rowspan="2" align="center">*</td>
     <td rowspan="2" align="center">C21-DX <br/> C22 </td>
     <td rowspan="2" align="center">Drive DC 100 <br/> Drive DC 300</td>
