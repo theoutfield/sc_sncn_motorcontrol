@@ -4,12 +4,12 @@ Sinusoidal Motor Control SOFTWARE COMPONENT
 <br/>
 <br/>
 
-Implementation of Sinusoidal Motor Control for SOMANET devices.
+Implementation of Sinusoidal Motor Control for BLDC drives on SOMANET devices.
 
-<table >
+<table>
 <tr>
   <td width="150px" height="30px">Latest release: </td>
-  <td width="300px"><a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/releases/tag/v0.9-beta">0.9beta</a></td>
+  <td width="300px"><a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/releases/tag/v1.0">1.0</a></td>
 </tr>
 <tr>
   <td height="30px">Maintainer:</td>
@@ -23,15 +23,13 @@ Key Features
    * Profile Position Control 
    * Profile Velocity Control
    * Profile Torque Control
+   * Homing feature
    * Ethercat Operating Modes
    * Support QEI sensor with Index/ no Index
    * Support Hall sensor
-   * Support external Analog sensor 
-
-
-Further information
----------
-  * sc_sncn_motorctrl_sin [DOCUMENTATION](http://synapticon.github.io/sc_sncn_motorctrl_sin/)
+   * Support Analog sensor 
+   * Support GPIO Digital
+   * Precise position control based on position sensor ticks
 
 Known Issues
 ---------
@@ -45,10 +43,13 @@ Required software (dependencies)
 
 Changelog
 ---------
-
+  * [1.0](https://github.com/synapticon/sc_sncn_motorctrl_sin/releases/tag/v1.0) (2014-04-17)
+	* Support GPIO Digital ports
+	* Homing feature
+	* Precise Position Control based on position sensor ticks
   * [0.9beta](https://github.com/synapticon/sc_sncn_ctrlproto/releases/tag/v0.9-beta) (2013-01-24)
 
 License
 ---------
 
-Please see [LICENSE](http://synapticon.github.io/sc_sncn_motorctrl_sin/legal.html).
+Please see [LICENSE](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/LICENSE.md).

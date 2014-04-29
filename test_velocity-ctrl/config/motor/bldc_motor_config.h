@@ -71,15 +71,15 @@
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
  *  (NORMAL/INVERTED) */
-#define QEI_SENSOR_POLARITY			INVERTED
+#define QEI_SENSOR_POLARITY			NORMAL
 
 /* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
  *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
 #define IFM_RESOLUTION				DC300_RESOLUTION
 
 /* Commutation offset (range 0-4095) (HALL sensor based commutation) */
-#define COMMUTATION_OFFSET_CLK		770		// com neg
-#define COMMUTATION_OFFSET_CCLK		2601    //com pos
+#define COMMUTATION_OFFSET_CLK		683
+#define COMMUTATION_OFFSET_CCLK		2731
 
 /* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
 #define WINDING_TYPE				DELTA_WINDING
