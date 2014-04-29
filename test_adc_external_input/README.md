@@ -3,10 +3,11 @@ External ADC Input Test
 
 **test_adc_external_input.xc** illustrates usage of [module_adc]() to get external analog sensor input values. By default all analog inputs are configured as differential only.
 
-<table style="float: left" class="core_usage" align="center" cellpadding="5" width="80%">
+<p align="center">
+<table class="core_usage" align="center" cellpadding="5" width="80%">
 <tr>
     <th colspan="2">CORE use</th>
-    <td rowspan="3" width="30px"></td>
+    <td rowspan="3" width="15px"></td>
     <th colspan="3">HW compatibility</th>
 </tr>
 <tr>
@@ -26,6 +27,7 @@ External ADC Input Test
     <td rowspan="2" align="center">Drive DC 100 <br/> Drive DC 300</td>
 </tr>
 </table>
+</p>
 
 
 - **THREADS**: ADC Client Side, ADC Server Side.
