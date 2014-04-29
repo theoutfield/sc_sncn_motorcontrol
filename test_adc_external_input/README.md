@@ -1,7 +1,7 @@
 External ADC Input Test
 ============================
 
-[test_adc_external_input.xc][src/test_adc_external_input.xc] illustrates usage of [module_adc][module_adc] to get external analog sensor input values. By default all analog inputs are configured as differential only.
+[test_adc_external_input.xc][/src/test_adc_external_input.xc] illustrates usage of [module_adc][module_adc] to get external analog sensor input values. By default all analog inputs are configured as differential only.
 
 <p align="center">
 <table class="core_usage" align="center" cellpadding="5" width="80%">
