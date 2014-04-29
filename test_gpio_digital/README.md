@@ -6,7 +6,7 @@ Digital GPIO Test
 <br/>
 <br/>
 
-test_gpio_digital.xc illustrates the usage of \ref module_gpio to configure GPIO's and read/write the digital ports. 
+test_gpio_digital.xc illustrates the usage of [module_gpio][module_gpio] to configure GPIO's and read/write the digital ports. 
 
 <table align="center" cellpadding="5" width="80%">
 <tr>

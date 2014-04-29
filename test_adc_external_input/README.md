@@ -6,7 +6,7 @@ External ADC Input Test
 <br/>
 <br/>
 
-[test_adc_external_input.xc][https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_adc_external_input/src/test_adc_external_input.xc] illustrates usage of [module_adc][module_adc] to get external analog sensor input values. By default all analog inputs are configured as differential only.
+[test_adc_external_input][https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_adc_external_input/src/test_adc_external_input.xc] illustrates usage of [module_adc][module_adc] to get external analog sensor input values. By default all analog inputs are configured as differential only.
 
 <table align="center" cellpadding="5" width="80%">
 <tr>
