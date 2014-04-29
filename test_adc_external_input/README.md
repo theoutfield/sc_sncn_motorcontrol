@@ -1,10 +1,12 @@
 External ADC Input Test
 ============================
+<a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
+<img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
+</a>
 
-[test_adc_external_input.xc][/src/test_adc_external_input.xc] illustrates usage of [module_adc][module_adc] to get external analog sensor input values. By default all analog inputs are configured as differential only.
+[test_adc_external_input.xc][https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_adc_external_input/src/test_adc_external_input.xc] illustrates usage of [module_adc][module_adc] to get external analog sensor input values. By default all analog inputs are configured as differential only.
 
-<p align="center">
-<table class="core_usage" align="center" cellpadding="5" width="80%">
+<table align="center" cellpadding="5" width="80%">
 <tr>
     <th colspan="2">CORE use</th>
     <td rowspan="3" width="1px"></td>
@@ -27,7 +29,7 @@ External ADC Input Test
     <td rowspan="2" align="center">Drive DC 100 <br/> Drive DC 300</td>
 </tr>
 </table>
-</p>
+
 
 - **THREADS**: ADC Client Side, ADC Server Side.
 - **TILES**:
