@@ -7,7 +7,7 @@ External ADC Input Test
 <table class="core_usage" align="center" cellpadding="5" width="80%">
 <tr>
     <th colspan="2">CORE use</th>
-    <td rowspan="3" width="15px"></td>
+    <td rowspan="3" width="5px"></td>
     <th colspan="3">HW compatibility</th>
 </tr>
 <tr>
