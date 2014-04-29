@@ -63,7 +63,7 @@ This tile (0 by default) runs threads responsible for handling communication ove
 	ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,
 		      foe_in, pdo_out, pdo_in);
 ```
-Ethercat communication handler loop. Read more at [module_ethercat] at [EtherCAT software component][sc_sncn_ethercat].
+Ethercat communication handler loop. Read more at [module_ethercat][module_ethercat] at [EtherCAT software component][sc_sncn_ethercat].
 
 ###TILE_ONE 
 This tile (1 by default) executes a communication bridge between RX EtherCAT and motor drive. Since these functions do not require any port access, any free TILE could run them.
@@ -117,7 +117,7 @@ Read back actual position of the motor. Read more at [module_ctrl_loops][module_
 Read back actual velocity of the motor. Read more at [module_ctrl_loops][module_ctrl_loops] or [module_blocks][module_blocks].
 
 - **Thread**: Torque Control Loop
-```objectivec 
+```
 	ctrl_par torque_ctrl_params; //Var definition
 	hall_par hall_params;
 	qei_par qei_params;
@@ -134,19 +134,20 @@ Read back actual torque of the motor. Read more at [module_ctrl_loops][module_ct
 
 ###IFM_TILE 
 This tile (3 by default) executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the IFM ports can run these functions.  
-```objectivec 
+``` 
     on stdcore[IFM_CORE]: 
 ```                   
 We need to run this threads over IFM_TILE since this is the only tile accessing the interface module (IFM). And these threads, responsible for motor control, require for this access.
 
 - **Thread**: PWM Server.
-```objectivec 
-      do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+```
+      do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
+			p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 ```
 Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the [module_pwm_symmetrical][module_pwm_symmetrical] at [PWM software component][sc_pwm].
 
 - **Thread**: Commutation Server
-```objectivec 
+```cpp
 	hall_par hall_params; //Var definition
 	qei_par qei_params;
 	commutation_par commutation_params;
@@ -220,6 +221,8 @@ See also:
 [module_qei]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_qei
 [module_commutation]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_commutation
 [module_gpio]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_gpio
+
+[module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
 
 [how_to_configure_motors]: https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md
 [getting_started_somanet]: http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET
