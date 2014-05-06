@@ -32,8 +32,8 @@ void adc_ad7949( chanend c_adc, clock clk, buffered out port:32 p_sclk_conv_mosi
 		     in buffered port:32 p_data_a, in buffered port:32 p_data_b );
 ```
 Parameters
-	- c_adc
-	- clk
+	* c_adc
+	* clk
 	* p_sclk_conv_mosib_mosia
 	* p_data_a
 	* p_data_b
