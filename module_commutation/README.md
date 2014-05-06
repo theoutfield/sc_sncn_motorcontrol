@@ -1,3 +1,11 @@
+Commutation Module
+=======================
+<a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
+<img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
+</a>
+<br/>
+<br/>
+
 This module provides driver for the BLDC Motor connected to the interface module (IFM). 
 The module consists of commutation which internally makes use of the predriver to 
 drive fets and configurations under pwm. The module provides Commutation server thread 

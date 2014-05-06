@@ -1,3 +1,11 @@
+Blocks Module
+=======================
+<a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
+<img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
+</a>
+<br/>
+<br/>
+
 This module provides watchdog server, filter implementation and drive utilities. 
 The watchdog server monitors CORE 3 and disables motor phases in case of emergency.
 A moving average filter implementation is provided under filter_blockd for sensor

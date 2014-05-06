@@ -1,3 +1,11 @@
+Quadrature Encoder Interface Module
+=======================
+<a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
+<img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
+</a>
+<br/>
+<br/>
+
 This module provides driver for the Incremental Encoders connected to the interface 
 module (IFM). The module provides QEI server thread which acquires position 
 information from the Incremental encoder in quadrature mode in a while loop; and 
