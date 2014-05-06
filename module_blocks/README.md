@@ -26,15 +26,20 @@ For a better review of all the available functions, check the header files.
 * [filter_blocks.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_blocks/include/filter_blocks.h)
 
 #### **watchdog.h**####
+
+- **Watchdog Initialization function:** Run the watchdog timer server
+
 > TILE constrains: IFM* (need access to IFM ports)
 
 ```
 void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds_wden);
 ```
 #### **filter_blocks.h**####
+- **Filter Initialization function:** Initialise Moving Average Filter Parameters
 ```
 void init_filter(int filter_buffer[], int &index, int filter_length);
 ```
+- **Filter function:** 
 ```
 int filter(int filter_buffer[], int &index, int filter_length, int input);
 ```
