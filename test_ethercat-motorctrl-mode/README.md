@@ -7,9 +7,9 @@ Ethercat Mode Test
 <br/>
 
 [test_ethercat-mode.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_ethercat-motorctrl-mode/src/test_ethercat-mode.xc) illustrates the usage of Motor Control over EtherCAT with advanced features.
-
+<!--
 This example must be run..
-
+-->
 (SPEAK ABOUT THE MASTER SIDE)
 
 <table align="center" cellpadding="5" width="80%">
