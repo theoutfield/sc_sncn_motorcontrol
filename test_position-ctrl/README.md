@@ -6,7 +6,7 @@ Position Control Demo
 <br/>
 <br/>
 
-[test_position-ctrl.xc]() illustrates usage of [module_ctrl_loops][module_ctrl_loops] to do position control of a motor. Position loop can be closed with position from either HALL sensor/ QEI Sensor or any other position sensor (if a drive server runs on IFM tile).
+[test_position-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_position-ctrl/src/test_position-ctrl.xc) illustrates usage of [module_ctrl_loops][module_ctrl_loops] to do position control of a motor. Position loop can be closed with position from either HALL sensor/ QEI Sensor or any other position sensor (if a drive server runs on IFM tile).
 
 
 <table align="center" cellpadding="5" width="80%">
