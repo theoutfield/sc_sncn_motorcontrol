@@ -1,39 +1,29 @@
 Torque Control Test
 ===============
-[test_torque-ctrl.xc]() illustrates usage of [module_ctrl_loops]() to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
+[test_torque-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_torque-ctrl/src/test_torque-ctrl.xc) illustrates usage of [module_ctrl_loops][module_ctrl_loops] to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
 
-<table class="core_usage" align="center" cellpadding="5" width="20%">
+<table align="center" cellpadding="5" width="80%">
 <tr>
     <th colspan="2">CORE use</th>
+    <td rowspan="3" width="1px"></td>
+    <th colspan="3">HW compatibility</th>
 </tr>
 <tr>
     <td>Parallel THREADS</td>
     <td width="30px" align="center"> 8 </td>
+
+    <th align="center">COM</th>
+    <th align="center">CORE</th>
+    <th align="center">IFM</th>
 </tr>
 <tr>
-    <td> TILES used</td>
+    <td>TILES used</td>
     <td width="30px" align="center"> 2 </td>
- </tr>
-</table>
 
-<table  class="hw_comp" align="center" cellpadding="2" width="50%">
-<tr align="center">
-    <th colspan="3">HW compatibility</th>
-  <tr align="center">
-    <th>COM</th>
-    <th>CORE</th>
-    <th>IFM</th>
-  </tr>
-  <tr align="center">
-    <td>*</td>
-    <td>C21-DX</td>
-   <td>Drive DC 100</td>
- </tr>
-  <tr align="center">
-    <td></td>
-    <td>C22</td>
-    <td>Drive DC 300</td>
-  </tr>
+    <td rowspan="2" align="center">*</td>
+    <td rowspan="2" align="center">C21-DX <br/> C22 </td>
+    <td rowspan="2" align="center">Drive DC 100 <br/> Drive DC 300</td>
+</tr>
 </table>
 
 - **THREADS**: Profile Torque Client, Torque Control Loop, PWM Server, ADC Server, Commutation Server, Hall Server, QEI Server, Watchdog Server.
@@ -44,10 +34,10 @@ Torque Control Test
 	#define IFM_TILE 3
 ```
 
-> **Do not forget to set properly your node and motor configuration when using this application**.
+> **Do not forget to set properly motor configuration when using this application**.
 
 - [Configure your node]() 
-- [How to configure your motors](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md)
+- [How to configure your motors][how_to_configure_motors]
 
 
 ### **TILE_ONE**
@@ -121,7 +111,7 @@ Responsible for proper BLDC motor drive. Read more at [module_commutation][modul
 	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,
 			p_ifm_hall, hall_params); //Channel priority 1,2..5
 ```
-To obtain information about motor position for position control loop, its use is mandatory since the motor commutation is Hall-based. Read more at [module_hall]().
+To obtain information about motor position for position control loop, its use is mandatory since the motor commutation is Hall-based. Read more at [module_hall][module_hall].
 
 - **Thread**: QEI Server
 ```
@@ -136,7 +126,7 @@ To obtain high precision information about motor position. Read more at [module_
 ```
 	run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 ```
-A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at [module_watchdog]().
+A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at [module_watchdog][module_watchdog].
 
 
 More information about Position Control Server/Client can be found at [module_ctrl_loops][module_ctrl_loops] documentation.

@@ -46,9 +46,9 @@ This example must be run..
 	#define IFM_TILE 3
 ```
 
-> **Do not forget to set properly your node and motor configuration when using this application**.
+> **Do not forget to set properly your motor configuration when using this application**.
 
-- [Configure your node]() 
+<!-- - [Configure your node]() -->
 - [How to configure your motors][how_to_configure_motors]
 
 ###COM_TILE 
