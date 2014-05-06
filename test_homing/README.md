@@ -41,6 +41,11 @@ In this application we have home switch on port 0 of GPIO D and positive limit s
 	#define IFM_TILE 3
 ```
 
+> **Do not forget to set properly your motor configuration when using this application**.
+
+<!-- - [Configure your node]() -->
+- [How to configure your motors][how_to_configure_motors]
+
 ###**TILE_ONE** 
 This tile (0 by default) takes care of the test function and control loop. Since these functions do not require any port access, any free TILE could run them.
 ```
@@ -71,7 +76,8 @@ It monitors the home and limit switches; and upon encountering the home switch, 
 
 Read back actual velocity of the motor. Read more at [module_ctrl_loops][module_ctrl_loops] or [module_blocks][module_blocks].
 
-\b IFM_TILE (3 by default): It executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the IFM ports can run these functions.  
+**IFM_TILE** 
+This tile (3 by default) executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the IFM ports can run these functions.  
 
 ```
 	on stdcore[IFM_TILE]:
@@ -139,8 +145,7 @@ A watchdog server is used to monitor IFM_TILE and disables motor in case of emer
 
 More information about GPIO Server/ Client can be found at [module_gpio][module_gpio] documentation.
 
-Other dependencies: [module_common][module_common] [module_profile][module_profile] [module_sm][module_sm]
- [module_nodeconfig][module_nodeconfig]@[sc_somanet-base][sc_somanet-base]
+Other dependencies: [module_common][module_common] [module_profile][module_profile] [module_sm][module_sm] [module_nodeconfig][module_nodeconfig]@[sc_somanet-base][sc_somanet-base]
 
 **See also**:
 
@@ -162,7 +167,7 @@ Other dependencies: [module_common][module_common] [module_profile][module_profi
 [module_gpio]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_gpio
 [module_common]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_common
 [module_sm]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_sm
-[module_homing]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_homing
+[module_homing]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_homing
 [module_profile]:https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_profile
 
 [module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
