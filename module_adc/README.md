@@ -13,30 +13,29 @@ The module also  and provides client functions to obtain data from the existing 
 
 TILE constrains: IFM* (need access to IFM ports)
 
-Header files:
-
-* [adc_server_ad7949.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_adc/include/adc_server_ad7949.h) - To access the server side functions.
-* [adc_client_ad7949.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_adc/include/adc_client_ad7949.h) - To access the client side functions.
-
 Demos:
 - [test_adc_external_input.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_adc_external_input/src/test_adc_external_input.xc)
 
 ###**QUICK API** 
+For a better review of all the available functions, check the header files.
 
-- **adc_server_ad7949.h**:
+* [adc_server_ad7949.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_adc/include/adc_server_ad7949.h) - To access the server side functions.
+* [adc_client_ad7949.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_adc/include/adc_client_ad7949.h) - To access the client side functions.
 
+#### **adc_server_ad7949.h**####
+
+- **Server Initialization function:**
 ```
 void adc_ad7949( chanend c_adc, clock clk, buffered out port:32 p_sclk_conv_mosib_mosia,
 		     in buffered port:32 p_data_a, in buffered port:32 p_data_b );
 ```
-```
-void adc_ad7949_triggered( chanend c_adc, chanend c_trig, clock clk,
-			   buffered out port:32 p_sclk_conv_mosib_mosia,
-			   in buffered port:32 p_data_a, in buffered port:32 p_data_b );
-```
-- **adc_client_ad7949.h**:
 
+#### **adc_client_ad7949.h**####
 
+- **Client function**:
+```
+{int, int} get_adc_external_ad7949(chanend c_adc);
+```
 **See also**:
 
 - [How to include a module in your application]()
@@ -44,6 +43,6 @@ void adc_ad7949_triggered( chanend c_adc, chanend c_trig, clock clk,
 
 
 
-*For Core C22, IFM tile is located on CORE 3. For Core C21, IFM tile is on 
-CORE 1.
+*For Core C22, IFM Tile is located on TILE 3. For Core C21, IFM Tile is on TILE 1.
 
+[getting_started_somanet]: http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET
