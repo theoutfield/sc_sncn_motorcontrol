@@ -39,10 +39,17 @@ void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds
 ```
 void init_filter(int filter_buffer[], int &index, int filter_length);
 ```
+* Parameters
+	
+* Return 
+
 - **Filter function:** 
 ```
 int filter(int filter_buffer[], int &index, int filter_length, int input);
 ```
+* Parameters
+	
+* Return 
 
 ####**See also**:
 
