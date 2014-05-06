@@ -6,7 +6,7 @@ Digital GPIO Test
 <br/>
 <br/>
 
-test_gpio_digital.xc illustrates the usage of [module_gpio][module_gpio] to configure GPIO's and read/write the digital ports. 
+[test_gpio_digital.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_gpio_digital/src/test_gpio_digital.xc) illustrates the usage of [module_gpio][module_gpio] to configure GPIO's and read/write the digital ports. 
 
 <table align="center" cellpadding="5" width="80%">
 <tr>
@@ -36,10 +36,10 @@ test_gpio_digital.xc illustrates the usage of [module_gpio][module_gpio] to conf
 - **THREADS**: GPIO Server, GPIO Client 
 
 - **TILES**:
-
+```
 	#define TILE_ONE 0
 	#define IFM_TILE 3  
-
+```
 > **Do not forget to set properly your node and motor configuration when using this application**.
 
 - [Configure your node]() 
@@ -47,31 +47,31 @@ test_gpio_digital.xc illustrates the usage of [module_gpio][module_gpio] to conf
 
 **TILE_ONE** 
 This tile (0 by default) takes care of the client side functions andcontrol loop. Since these functios do not require any port access, any free TILE could run them.
-
+```
 	on stdcore[TILE_ONE]:
-
+```
 - **Thread**: GPIO Client
-	
+```	
 	gpio_test(c_gpio_p1);
-
+```
 The Client function configures port 0 and port 1 as input switches and remaining 2 ports as outputs and shows how to read/write the 
-digital ports. See more at \ref module_gpio.
+digital ports. See more at [module_gpio][module_gpio].
 
 It is not recommended  to run this thread in IFM_TILE together with the Server thread since the terminal output will slow down the GPIO Server thread and affect its performance.
 
 **IFM_TILE** 
-This tile, 3 by default, executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the \b IFM ports can run these functions.  
-
+This tile, 3 by default, executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the IFM ports can run these functions.  
+```
 	on stdcore[IFM_TILE]: 
-
+```
 - **Thread**: GPIO Server
-			
+```			
 	gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);
+```
+It access the GPIO ports at the IFM module. See more at [module_gpio][module_gpio].
 
-It access the GPIO ports at the IFM module. See more at \ref module_gpio.
 
-
-Other dependencies: sc_somanet-base/module_nodeconfig \ref module_common
+Other dependencies: module_common module_nodeconfig@sc_somanet-base
 
 **See also**:
 
