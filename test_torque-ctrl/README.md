@@ -1,4 +1,4 @@
-Torque Control Test
+Torque Control Demo
 ===============
 [test_torque-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_torque-ctrl/src/test_torque-ctrl.xc) illustrates usage of [module_ctrl_loops][module_ctrl_loops] to do torque control of a motor. Position loop is closed with information from the current on the motor phases, measured by ADC sensors.
 
@@ -34,9 +34,9 @@ Torque Control Test
 	#define IFM_TILE 3
 ```
 
-> **Do not forget to set properly motor configuration when using this application**.
+> **Do not forget to set properly your motor configuration when using this application**.
 
-- [Configure your node]() 
+<!-- - [Configure your node]() -->
 - [How to configure your motors][how_to_configure_motors]
 
 

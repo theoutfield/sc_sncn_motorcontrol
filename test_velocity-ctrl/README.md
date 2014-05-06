@@ -1,7 +1,12 @@
-Velocity Control Test
+Velocity Control Demo
 =======================
+<a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
+<img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
+</a>
+<br/>
+<br/>
 
-test_velocity-ctrl.xc illustrates usage of \ref module_ctrl_loops to do velocity control of a motor. Velocity Loop can be closed with position from either HALL sensor/ QEI Sensor or any other position sensor (if a drive server runs on IFM tile).
+[test_velocity-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_velocity-ctrl/src) illustrates usage of [module_ctrl_loops][module_ctrl_loops] to do velocity control of a motor. Velocity Loop can be closed with position from either HALL sensor/ QEI Sensor or any other position sensor (if a drive server runs on IFM tile).
 
 <table class="core_usage" align="center" cellpadding="5" width="20%">
 <tr>
@@ -37,12 +42,6 @@ test_velocity-ctrl.xc illustrates usage of \ref module_ctrl_loops to do velocity
   </tr>
 </table>
 
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 
 - **THREADS**: Profile Velocity, Velocity Control Loop, PWM Server, Commutation Server, Hall Server, QEI Server, Watchdog Server
 
@@ -53,14 +52,13 @@ test_velocity-ctrl.xc illustrates usage of \ref module_ctrl_loops to do velocity
 	#define IFM_TILE 3
 ```
 
-> **Do not forget to set properly your node and motor configuration when using this application**.
+> **Do not forget to set properly your motor configuration when using this application**.
 
-- [Configure your node]() 
+<!-- - [Configure your node]() -->
 - [How to configure your motors](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md)
 
 
 ###**TILE_ONE** 
-
 This tile (0 by default) takes care of the client side functions and control loop. Since these functions do not require any port access, any free TILE could run them.
 ```
 	on stdcore[TILE_ONE]:
@@ -69,7 +67,7 @@ This tile (0 by default) takes care of the client side functions and control loo
 ```
 	profile_velocity_test(c_velocity_ctrl);	// Test Velocity Profile Mode on slave side
 ```
-Set new target velocity for the controller. Read more at \ref module_profile.
+Set new target velocity for the controller. Read more at [module_profile][module_profile].
 
 
 - **Thread**: Velocity Control Loop
@@ -88,10 +86,10 @@ Set new target velocity for the controller. Read more at \ref module_profile.
 			qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, 
 			c_velocity_ctrl, c_commutation_p2); //Control loop
 ```		
-Read back actual velocity of the motor. Read more at \ref module_ctrl_loops or \ref module_blocks.
+Read back actual velocity of the motor. Read more at [module_ctrl_loops][module_ctrl_loops] or [module_blocks][module_blocks].
 
 ###IFM_TILE 
-This tile (3 by default) executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the **IFM ports can run these functions.  
+This tile (3 by default) executes the server side functions, controlling the interfaces. These functions need access to the Interface Module (IFM), just the tile that provides access to the IFM ports can run these functions.  
 ```
 	on stdcore[IFM_TILE]:
 ```				
@@ -99,7 +97,7 @@ This tile (3 by default) executes the server side functions, controlling the int
 ```
 	do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 ```
-Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the **module_pwm_symmetrical at PWM software component **sc_pwm.
+Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the [module_pwm_symmetrical][module_pwm_symmetrical]@[sc_pwm][sc_pwm].
 
 - **Thread**: Commutation Server 
 
@@ -117,7 +115,7 @@ Responsible for generating a Pulse-Width Modulation signal that drives the motor
 				qei_params, commutation_params); //Read feedback
 ```
 
-Responsible for proper BLDC motor drive. Read more at \ref module_commutation.
+Responsible for proper BLDC motor drive. Read more at [module_commutation][module_commutation].
 
 - **Thread**: Hall Server
 ```
@@ -126,7 +124,7 @@ Responsible for proper BLDC motor drive. Read more at \ref module_commutation.
 	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,
 			p_ifm_hall, hall_params); //Channel priority 1,2..5
 ```
-To obtain information about motor position for position control loop, its use is mandatory since the motor commutation is Hall-based. Read more at \ref module_hall.
+To obtain information about motor position for position control loop, its use is mandatory since the motor commutation is Hall-based. Read more at [module_hall][module_hall].
 
 - **Thread**: QEI Server
 ```
@@ -135,19 +133,45 @@ To obtain information about motor position for position control loop, its use is
 	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5,
 			p_ifm_encoder, qei_params);  	// channel priority 1,2..5
 ```
-To obtain high precision information about motor position. Read more at \ref module_qei.
+To obtain high precision information about motor position. Read more at [module_qei][module_qei].
 
 - **Thread**: Watchdog Server
 ```
 	run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 ```
-A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at \ref module_watchdog.
+A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at [module_watchdog][module_watchdog].
 
 
-More information about Velocity Control Server/Client can be found at \ref module_ctrl_loops documentation.
+More information about Velocity Control Server/Client can be found at [module_ctrl_loops][module_ctrl_loops] documentation.
 
-Other dependencies: \ref sc_pwm/module_pwm_common \ref sc_somanet-base/module_nodeconfig \ref module_common  \ref module_sm 
+Other dependencies: [module_nodeconfig][module_nodeconfig]@[sc_somanet-base][sc_somanet-base] [module_common][module_common] [module_sm][module_sm] 
 
 **See also**:
 
-- [Getting started with SOMANET](http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET)  
+- [Getting started with SOMANET][getting_started_somanet]    
+
+
+[sc_sncn_ethercat]:https://github.com/synapticon/sc_sncn_ethercat
+[sc_pwm]: https://github.com/synapticon/sc_pwm
+[sc_somanet-base]: https://github.com/synapticon/sc_somanet-base
+
+[module_adc]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc
+[module_hall]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_hall
+[module_watchdog]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_watchdog
+[modle_ecat_drive]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_ecat_drive
+[module_ctrl_loops]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_ctrl_loops
+[module_blocks]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_blocks
+[module_qei]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_qei
+[module_commutation]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_commutation
+[module_gpio]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_gpio
+[module_common]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_common
+[module_sm]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_sm
+
+[module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
+
+[module_pwm_symmetrical]: https://github.com/synapticon/sc_pwm/tree/master/module_pwm_symmetrical
+
+[module_nodeconfig]: https://github.com/synapticon/sc_somanet-base/tree/master/module_nodeconfig
+
+[how_to_configure_motors]: https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md
+[getting_started_somanet]: http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET

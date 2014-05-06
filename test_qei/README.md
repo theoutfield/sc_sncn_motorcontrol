@@ -1,4 +1,12 @@
-[test_qei.xc]() illustrates the usage of [module_qei][module_qei] to get position and calculate velocity information.
+QEI Demo
+===============
+<a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
+<img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
+</a>
+<br/>
+<br/>
+
+[test_qei.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_qei/src/test_qei.xc) illustrates the usage of [module_qei][module_qei] to get position and calculate velocity information.
 <table align="center" cellpadding="5" width="80%">
 <tr>
     <th colspan="2">CORE use</th>
