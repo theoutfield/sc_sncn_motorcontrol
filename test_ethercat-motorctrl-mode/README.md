@@ -210,6 +210,7 @@ See also:
 
 [sc_sncn_ethercat]:https://github.com/synapticon/sc_sncn_ethercat
 [sc_pwm]: https://github.com/synapticon/sc_pwm
+[sc_somanet-base]: https://github.com/synapticon/sc_somanet-base
 
 [module_adc]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc
 [module_hall]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_hall
@@ -220,10 +221,14 @@ See also:
 [module_qei]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_qei
 [module_commutation]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_commutation
 [module_gpio]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_gpio
+[module_common]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_common
+[module_sm]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_sm
 
 [module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
 
 [module_pwm_symmetrical]: https://github.com/synapticon/sc_pwm/tree/master/module_pwm_symmetrical
+
+[module_nodeconfig]: https://github.com/synapticon/sc_somanet-base/tree/master/module_nodeconfig
 
 [how_to_configure_motors]: https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md
 [getting_started_somanet]: http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET
