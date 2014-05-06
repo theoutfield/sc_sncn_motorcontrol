@@ -139,7 +139,8 @@ A watchdog server is used to monitor IFM_TILE and disables motor in case of emer
 
 More information about GPIO Server/ Client can be found at [module_gpio][module_gpio] documentation.
 
-Other dependencies: [module_common][module_common] [module_profile][module_profile] [module_sm][module_sm] [module_nodeconfig][module_nodeconfig]@[sc_somanet-base][sc_somanet-base]
+Other dependencies: [module_common][module_common] [module_profile][module_profile] [module_sm][module_sm]
+ [module_nodeconfig][module_nodeconfig]@[sc_somanet-base][sc_somanet-base]
 
 **See also**:
 
