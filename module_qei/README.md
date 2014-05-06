@@ -46,10 +46,11 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 - **Obtain Position**: 
 ```
 {unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params);
+```
 * Parameters
 	
 * Return 
-```
+
 - **Obtain Velocity**: 
 ```
 int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params);
