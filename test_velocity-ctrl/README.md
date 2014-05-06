@@ -8,38 +8,28 @@ Velocity Control Demo
 
 [test_velocity-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_velocity-ctrl/src) illustrates usage of [module_ctrl_loops][module_ctrl_loops] to do velocity control of a motor. Velocity Loop can be closed with position from either HALL sensor/ QEI Sensor or any other position sensor (if a drive server runs on IFM tile).
 
-<table class="core_usage" align="center" cellpadding="5" width="20%">
+<table align="center" cellpadding="5" width="80%">
 <tr>
     <th colspan="2">CORE use</th>
+    <td rowspan="3" width="1px"></td>
+    <th colspan="3">HW compatibility</th>
 </tr>
 <tr>
     <td>Parallel THREADS</td>
     <td width="30px" align="center"> 7 </td>
+
+    <th align="center">COM</th>
+    <th align="center">CORE</th>
+    <th align="center">IFM</th>
 </tr>
 <tr>
-    <td> TILES used</td>
+    <td>TILES used</td>
     <td width="30px" align="center"> 2 </td>
- </tr>
-</table>
 
-<table  class="hw_comp" align="center" cellpadding="2" width="50%">
-<tr align="center">
-    <th colspan="3">HW compatibility</th>
-  <tr align="center">
-    <th>COM</th>
-    <th>CORE</th>
-    <th>IFM</th>
-  </tr>
-  <tr align="center">
-    <td>*</td>
-    <td>C21-DX</td>
-   <td>Drive DC 100</td>
- </tr>
-  <tr align="center">
-    <td></td>
-    <td>C22</td>
-    <td>Drive DC 300</td>
-  </tr>
+    <td rowspan="2" align="center">*</td>
+    <td rowspan="2" align="center">C21-DX <br/> C22 </td>
+    <td rowspan="2" align="center">Drive DC 100 <br/> Drive DC 300</td>
+</tr>
 </table>
 
 
@@ -63,7 +53,7 @@ This tile (0 by default) takes care of the client side functions and control loo
 ```
 	on stdcore[TILE_ONE]:
 ```
-- **Thread**: Homing Test
+- **Thread**: Profile Velocity client
 ```
 	profile_velocity_test(c_velocity_ctrl);	// Test Velocity Profile Mode on slave side
 ```
