@@ -25,10 +25,19 @@ For a better review of all the available functions, check the header files.
 #### **adc_server_ad7949.h**####
 
 - **Server Initialization function:**
+This is the interface to AD7949 ADC devices. It controls two devices so that two channels can be sampled simultaneously. This server is not intended to be used for motor control. 
+
 ```
 void adc_ad7949( chanend c_adc, clock clk, buffered out port:32 p_sclk_conv_mosib_mosia,
 		     in buffered port:32 p_data_a, in buffered port:32 p_data_b );
 ```
+	* Parameters
+		* c_adc
+		* clk
+		* p_sclk_conv_mosib_mosia
+		* p_data_a
+		* p_data_b
+
 
 #### **adc_client_ad7949.h**####
 
