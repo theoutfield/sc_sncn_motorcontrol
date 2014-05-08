@@ -33,9 +33,9 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 	out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2,
 	hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params);
 ```
-	* Parameters
-	
-	* Return 
+   * Parameters
+   
+   * Return 
 
 #### **comm_loop_client.h**####
 
