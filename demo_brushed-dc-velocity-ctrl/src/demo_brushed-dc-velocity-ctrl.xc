@@ -37,15 +37,14 @@ void xscope_initialise_1()
 {
     xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_velocity", XSCOPE_INT,	"n",
                         XSCOPE_CONTINUOUS, "1 target_velocity", XSCOPE_INT, "n");
-	return;
 }
 
 
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity = 300;	 		// rpm
-	int acceleration 	= 100;			// rpm/s
+	int target_velocity = 500;	 		// rpm
+	int acceleration 	= 500;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
 
 #ifdef ENABLE_xscope
@@ -54,9 +53,8 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
-
-	target_velocity = 0;				// rpm
-	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+	//target_velocity = 0;				// rpm
+	//set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 }
 
 int main(void)
@@ -71,7 +69,6 @@ int main(void)
 
 	par
 	{
-
 		/* Test Profile Velocity function */
 		on tile[0]:
 		{
@@ -114,10 +111,10 @@ int main(void)
 						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 
 				/* Brushed Motor Drive loop */
-				{
-					bdc_loop(c_watchdog, c_signal, c_voltage_p1, c_voltage_p2, c_voltage_p3, c_pwm_ctrl,\
-							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2);
-				}
+
+                bdc_loop(c_watchdog, c_signal, c_voltage_p1, c_voltage_p2, c_voltage_p3, c_pwm_ctrl,\
+                        p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2);
+
 
 				/* Watchdog Server */
 				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
@@ -126,14 +123,14 @@ int main(void)
 				{
 					hall_par hall_params;
 					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..5
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params);    // channel priority 1,2..5
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  		 // channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);         // channel priority 1,2..5
 				}
 
 			}

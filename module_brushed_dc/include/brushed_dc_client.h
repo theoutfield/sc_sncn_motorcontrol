@@ -5,7 +5,7 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  * \author Martin Schwarz <mschwarz@synapticon.com>
  * \version 0.9beta
- * \date 10/04/2014
+ * \date 8/05/2014
  */
 
 #pragma once
@@ -24,7 +24,7 @@
  * 	\channel c_voltage channel to send out motor voltage input value
  *
  * 	 Input
- * 	\param input_voltage is motor voltage input value to be set range allowed [-(CONTROL_LIMIT_PWM-150) to (CONTROL_LIMIT_PWM+150)]
+ * 	\param input_voltage is motor voltage input value to be set range allowed [-BDC_PWM_CONTROL_LIMIT to BDC_PWM_CONTROL_LIMIT]
  */
 void set_bdc_voltage(chanend c_voltage, int input_voltage);
 

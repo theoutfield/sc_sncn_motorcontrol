@@ -8,11 +8,8 @@
  * \date 10/04/2014
  */
 
-
-
 #include "brushed_dc_server.h"
 #include <xs1.h>
-#include <stdint.h>
 #include <pwm_config.h>
 #include "pwm_cli_inv.h"
 #include "a4935.h"
@@ -70,13 +67,12 @@ void __bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn, t_p
 	unsigned int pwm[3] = { 0, 0, 0 };
 	int voltage = 0;
 	int direction = 0;
-	int pwm_half = PWM_MAX_VALUE>>1;
-
-	int shutdown = 0; //Disable FETS
+	int shutdown = 0; // Disable FETS
+	int pwm_half = (PWM_MAX_VALUE - PWM_DEAD_TIME) >> 1;
 
 	while (1)
 	{
-//xscope_probe_data(0, direction);
+
 		if(voltage < 0)
 			direction = -1;
 		else if(voltage >= 0)
@@ -92,15 +88,33 @@ void __bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn, t_p
 		{
 			if (direction == 1)
 			{
-				pwm[0] = voltage + pwm_half;
-				pwm[1] = pwm_half;
-				pwm[2] = pwm_half;
+                if(voltage <= pwm_half)
+                {
+                    pwm[0] = pwm_half + voltage;
+                    pwm[1] = pwm_half;
+                    pwm[2] = pwm_half;
+                }
+                else if(voltage > pwm_half && voltage < BDC_PWM_CONTROL_LIMIT)
+                {
+                    pwm[0] = pwm_half + pwm_half;
+                    pwm[1] = pwm_half - (voltage - pwm_half);
+                    pwm[2] = pwm_half;
+                }
 			}
 			else if (direction == -1)
 			{
-				pwm[0] = pwm_half;
-				pwm[1] = 0 - voltage + pwm_half;
-				pwm[2] = pwm_half;
+                if(-voltage <= pwm_half)
+                {
+                    pwm[0] = pwm_half;
+                    pwm[1] = pwm_half - voltage;
+                    pwm[2] = pwm_half;
+                }
+                else if(-voltage > pwm_half && -voltage < BDC_PWM_CONTROL_LIMIT)
+                {
+                    pwm[0] = pwm_half - (-voltage - pwm_half);
+                    pwm[1] = pwm_half + pwm_half;
+                    pwm[2] = pwm_half;
+                }
 			}
 
 			if(pwm[0] < PWM_MIN_LIMIT)
@@ -154,7 +168,6 @@ void bdc_loop(chanend c_watchdog, chanend c_signal, chanend  c_voltage_p1, chane
 		t_pwm_control pwm_ctrl;
 		int check_fet;
 		int init_state = INIT_BUSY;
-		int port_a, port_b;
 
 		pwm_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 

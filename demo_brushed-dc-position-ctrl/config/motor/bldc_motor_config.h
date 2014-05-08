@@ -7,20 +7,20 @@
  * \date 10/04/2014
  */
 
-
-#ifndef __DC_MOTOR_CONFIG__H__VELOCITY
-#define __DC_MOTOR_CONFIG__H__VELOCITY
+#ifndef __BDC_MOTOR_CONFIG__H__POSITION
+#define __BDC_MOTOR_CONFIG__H__POSITION
 #include <print.h>
 #include <internal_config.h>
 
 #pragma once
 
 #define BDC 1						// Brushed DC
+
 /**
  * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define MAX_NOMINAL_SPEED  			3000			// rpm
+#define MAX_NOMINAL_SPEED  			7000			// rpm
 
 /* Position/Velocity Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
@@ -40,8 +40,9 @@
  *  (NORMAL/INVERTED) */
 #define QEI_SENSOR_POLARITY			NORMAL
 
-#define MAX_POSITION_LIMIT 			GEAR_RATIO*ENCODER_RESOLUTION				// ticks (max range: 2^30, limited for safe operation)
-#define MIN_POSITION_LIMIT 			-GEAR_RATIO*ENCODER_RESOLUTION				// ticks (min range: -2^30, limited for safe operation)
+
+#define MAX_POSITION_LIMIT 			GEAR_RATIO*ENCODER_RESOLUTION		// ticks (max range: 2^30, limited for safe operation)
+#define MIN_POSITION_LIMIT 			-GEAR_RATIO*ENCODER_RESOLUTION		// ticks (min range: -2^30, limited for safe operation)
 
 /* Changes direction of the motor drive  (1 /-1) */
 #define POLARITY 					1
@@ -54,6 +55,35 @@
 #define PROFILE_DECELERATION  		2004				// rpm/s
 #define QUICK_STOP_DECELERATION 	2005				// rpm/s
 #define PROFILE_TORQUE_SLOPE		66					// (desired torque_slope/torque_constant)  * IFM resolution
+
+
+/* Control specific constants/variables */
+	/* Position Control (Mandatory if Position control used)
+	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
+#define POSITION_Kp_NUMERATOR 	 	130
+#define POSITION_Kp_DENOMINATOR  	20
+#define POSITION_Ki_NUMERATOR    	1
+#define POSITION_Ki_DENOMINATOR  	10000
+#define POSITION_Kd_NUMERATOR    	0
+#define POSITION_Kd_DENOMINATOR  	10000
+
+/*Non Mandatory parameters follow*/
+#define POLE_PAIRS  				4				// Number of pole pairs
+#define MAX_NOMINAL_CURRENT  		2				// A
+#define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
+
+/* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
+ *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
+#define IFM_RESOLUTION				DC300_RESOLUTION
+
+/* Commutation offset (range 0-4095) (HALL sensor based commutation for BLDC only) */
+#define COMMUTATION_OFFSET_CLK		683
+#define COMMUTATION_OFFSET_CCLK		2731
+
+/* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
+#define WINDING_TYPE				DELTA_WINDING
+
 
 /* Control specific constants/variables */
 	/* Velocity Control (Mandatory if Velocity control used)
@@ -68,26 +98,6 @@
 
 #define VELOCITY_FILTER_SIZE        8  	//default (could be changed upto 128)
 
-
-
-
-/*Non Mandatory parameters follow*/
-
-#define POLE_PAIRS  				4				// Number of pole pairs
-#define MAX_NOMINAL_CURRENT  		2				// A
-#define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
-
-/* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
- *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
-#define IFM_RESOLUTION				DC300_RESOLUTION
-
-/* Commutation offset (range 0-4095) (HALL sensor based commutation for BLDC only)*/
-#define COMMUTATION_OFFSET_CLK		683
-#define COMMUTATION_OFFSET_CCLK		2731
-
-/* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
-#define WINDING_TYPE				DELTA_WINDING
-
 	/* Torque Control (Mandatory if Torque control used)
 	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
 	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
@@ -97,18 +107,6 @@
 #define TORQUE_Ki_DENOMINATOR  		110
 #define TORQUE_Kd_NUMERATOR    		1
 #define TORQUE_Kd_DENOMINATOR  		10
-
-	/* Position Control (Mandatory if Position control used)
-	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
-	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define POSITION_Kp_NUMERATOR 	 	180
-#define POSITION_Kp_DENOMINATOR  	2000
-#define POSITION_Ki_NUMERATOR    	50
-#define POSITION_Ki_DENOMINATOR  	102000
-#define POSITION_Kd_NUMERATOR    	100
-#define POSITION_Kd_DENOMINATOR  	10000
-
-
 
 
 

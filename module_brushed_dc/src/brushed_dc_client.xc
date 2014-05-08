@@ -16,8 +16,7 @@
 #include <internal_config.h>
 
 
-
-/* MAX Input value CONTROL_LIMIT_PWM */
+/* MAX Input value BDC_PWM_CONTROL_LIMIT */
 void set_bdc_voltage(chanend c_voltage, int input_voltage)
 {
 	c_voltage <: 2;
