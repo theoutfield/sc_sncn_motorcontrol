@@ -164,7 +164,7 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 	velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
 	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - core timer value //CORE 2/1/0 default
 
-	velocity_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150;		// PWM resolution
+	velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT;		// PWM resolution
 
 	if(velocity_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
@@ -185,7 +185,7 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
 	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - for CORE 2/1/0 only default
 
-	position_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; 		// PWM resolution
+	position_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; 		// PWM resolution
 
 	if(position_ctrl_params.Ki_n != 0)				// auto calculated using control_limit
 	{
@@ -209,7 +209,7 @@ void init_torque_control_param(ctrl_par &torque_ctrl_params)
 	torque_ctrl_params.Kd_d = TORQUE_Kd_DENOMINATOR;
 	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  	// units - for CORE 2/1/0 only default
 
-	torque_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; 		// PWM resolution
+	torque_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; 		// PWM resolution
 
 	if(torque_ctrl_params.Ki_n != 0)				// auto calculated using control_limit
 	{

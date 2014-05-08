@@ -6,37 +6,7 @@
  * \version 1.0
  * \date 10/04/2014
  */
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
+
 
 #include <bldc_motor_config.h>
 #include "refclk.h"
@@ -203,7 +173,7 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 	velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
 	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  	// units - core timer value //CORE 2/1/0 default
 
-	velocity_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; 	// PWM resolution
+	velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; 	// PWM resolution
 
 	if(velocity_ctrl_params.Ki_n != 0)    				// auto calculated using control_limit
 		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
@@ -223,7 +193,7 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
 	position_ctrl_params.Loop_time = 1 * MSEC_STD;  	// units - for CORE 2/1/0 only default
 
-	position_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; 	// PWM resolution
+	position_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; 	// PWM resolution
 
 	if(position_ctrl_params.Ki_n != 0)					// auto calculated using control_limit
 	{
@@ -249,7 +219,7 @@ void init_torque_control_param(ctrl_par &torque_ctrl_params)
 	torque_ctrl_params.Kd_d = TORQUE_Kd_DENOMINATOR;
 	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  	// units - for CORE 2/1/0 only default
 
-	torque_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; 	// PWM resolution
+	torque_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; 	// PWM resolution
 
 	if(torque_ctrl_params.Ki_n != 0)				// auto calculated using control_limit
 	{

@@ -27,7 +27,7 @@
 #include "position_ctrl_client.h"
 #include <test.h>  //Unit Testing Position control (optional)
 
-#define ENABLE_xscope
+//#define ENABLE_xscope
 #define COM_TILE 0
 #define IFM_TILE 3
 

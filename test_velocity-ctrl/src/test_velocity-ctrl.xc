@@ -8,7 +8,6 @@
  * \date 10/04/2014
  */
 
-
 #include <xs1.h>
 #include <platform.h>
 #include <print.h>
@@ -28,7 +27,7 @@
 #include <profile_control.h>
 #include <test.h>
 #include <qei_client.h>
-#define ENABLE_xscope_main
+//#define ENABLE_xscope_main
 #define COM_TILE 0
 #define IFM_TILE 3
 
@@ -49,7 +48,7 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 	int target_velocity =-450;	 		// rpm
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
-int actual_velocity; timer t; unsigned int time;
+	int actual_velocity; timer t; unsigned int time;
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif

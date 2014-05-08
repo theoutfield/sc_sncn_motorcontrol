@@ -28,7 +28,7 @@
 #include <profile.h>
 #include <test.h>
 
-#define ENABLE_xscope
+//#define ENABLE_xscope
 
 #define COM_TILE 0
 #define IFM_TILE 3

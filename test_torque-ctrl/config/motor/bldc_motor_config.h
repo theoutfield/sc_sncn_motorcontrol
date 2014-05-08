@@ -32,9 +32,9 @@
 
 /* Position/Velocity Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
-#define SENSOR_USED 				HALL
+#define SENSOR_USED 				QEI
 
-/* Define your Incremental Encoder type (QEI_INDEX/ QEI_NO_INDEX) */
+/* Define your Incremental Encoder type (QEI_WITH_INDEX/ QEI_WITH_NO_INDEX) */
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
@@ -72,9 +72,9 @@
 	/* Torque Control (Mandatory if Torque control used)
 	 * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
 	 * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define TORQUE_Kp_NUMERATOR 	   	20
-#define TORQUE_Kp_DENOMINATOR  		10
-#define TORQUE_Ki_NUMERATOR    		11
+#define TORQUE_Kp_NUMERATOR 	   	8
+#define TORQUE_Kp_DENOMINATOR  		20
+#define TORQUE_Ki_NUMERATOR    		1
 #define TORQUE_Ki_DENOMINATOR  		110
 #define TORQUE_Kd_NUMERATOR    		0
 #define TORQUE_Kd_DENOMINATOR  		10
