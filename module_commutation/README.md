@@ -34,8 +34,13 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 	hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params);
 ```
    * Parameters
-   
-   * Return 
+	* c_hall
+	* c_qei
+	* c_singal
+	* c_watchdog
+	* c_commutation_p1
+	* c_commutation_p2
+	* c_commutation_p3
 
 #### **comm_loop_client.h**####
 
@@ -45,11 +50,9 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
 ```
 * Parameters
-
 	* commutation_params
 	* hall_params
-* Return 
-	*
+
 **Commutation loop initialization:**
 ```
 int init_commutation(chanend c_signal);

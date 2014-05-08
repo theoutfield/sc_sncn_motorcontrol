@@ -23,7 +23,7 @@ For a better review of all the available functions, check the header files.
 
 #### **gpio_server.h**####
 
-- **Server loop:** 
+**Server loop:** 
 
 > TILE constrains: IFM* (need access to IFM ports)
 
