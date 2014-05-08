@@ -33,9 +33,9 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 	out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2,
 	hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params);
 ```
-* Parameters
+	* Parameters
 	
-* Return 
+	* Return 
 
 #### **comm_loop_client.h**####
 
@@ -44,18 +44,18 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 ```
 void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
 ```
-* Parameters
+	* Parameters
 	
-* Return 
+	* Return 
 
 - **Commutation loop initialization:**
 ```
 int init_commutation(chanend c_signal);
 
 ```
-* Parameters
+	* Parameters
 	
-* Return 
+	* Return 
 
 For a better review of all the available functions, check the header files.
 
