@@ -8,37 +8,6 @@
  * \version 1.0
  * \date 10/04/2014
  */
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
 
 #include "hall_server.h"
 //#pragma xta command "analyze loop hall_loop"
@@ -121,19 +90,19 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 	timer t1;
 	int time1;
 	int init_velocity = 0;
-	int position1 = 0;
+
 	int previous_position1 = 0;
 	int velocity = 0;
 	int difference1 = 0;
 	int old_difference = 0;
 	int filter_length = FILTER_LENGTH_HALL;
-	int filter_buffer[FILTER_LENGTH_HALL];
+	int filter_buffer[FILTER_LENGTH_HALL] = {0};
 	int index = 0;
 	int raw_velocity = 0;
 	int hall_crossover = (4096 * 9 )/10;
 	int status = 0; //1 changed
 
-	init_filter(filter_buffer, index, filter_length);
+	//init_filter(filter_buffer, index, filter_length);
 #ifdef DEBUG
 	{
 		xscope_register(3, XSCOPE_CONTINUOUS, "0 hall_position", XSCOPE_INT,	"n",
@@ -334,7 +303,6 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 			case tx when timerafter(time1 + MSEC_FAST) :> time1:
 					if(init_velocity == 0)
 					{
-						//position1 = count;
 						if(count > 2049)
 						{
 							init_velocity = 1;

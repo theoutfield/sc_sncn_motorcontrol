@@ -6,7 +6,7 @@
  * \date 10/04/2014
  */
 
-#include <stdio.h>
+
 #include <math.h>
 
 extern int __qei_max_counts(int real_counts)
