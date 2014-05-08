@@ -22,7 +22,7 @@ For a better review of all the available functions, check the header files.
 
 #### **adc_server_ad7949.h**####
 
-- **Server Loop:** This is the interface to AD7949 ADC devices. It controls two devices so that two channels can be sampled simultaneously. This server is not intended to be used for motor control. 
+**Server Loop:** This is the interface to AD7949 ADC devices. It controls two devices so that two channels can be sampled simultaneously. This server is not intended to be used for motor control. 
 
 > TILE constrains: IFM* (need access to IFM ports)
 
@@ -40,7 +40,7 @@ void adc_ad7949( chanend c_adc, clock clk, buffered out port:32 p_sclk_conv_mosi
 
 #### **adc_client_ad7949.h**####
 
-- **Client function**: Get external analog sensor value from the server
+**Client function**: Get external analog sensor value from the server
 ```
 {int, int} get_adc_external_ad7949(chanend c_adc);
 ```

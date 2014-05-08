@@ -36,15 +36,16 @@ void gpio_digital_server(port p_ifm_ext_d[], chanend c_gpio_0, chanend c_gpio_1)
 
 #### **gpio_client.h**####
 
-- **Read on GPIO:** 
+**Read on GPIO:** 
 ```
 int read_gpio_digital_input(chanend c_gpio, int port_number);
 ```
 * Parameters
 	
-* Return 
+	* c_gpio
+	* port_number
 
-- **Write on GPIO:** 
+**Write on GPIO:** 
 ```
 void write_gpio_digital_output(chanend c_gpio, int port_number, int port_value);
 ```

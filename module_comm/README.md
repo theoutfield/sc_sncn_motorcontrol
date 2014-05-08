@@ -15,7 +15,7 @@ Servers running on interface module (IFM_CORE).
 
 #### **comm.h**####
 
-- **Target velocity from EtherCAT:** 
+**Target velocity from EtherCAT:** 
 
 > TILE constrains: IFM* (need access to IFM ports)
 
@@ -28,7 +28,7 @@ int get_target_velocity(ctrl_proto_values_t InOut);
 * Return 
 
 
-- **Target position from EtherCAT:** 
+**Target position from EtherCAT:** 
 ```
 int get_target_position(ctrl_proto_values_t InOut);
 
@@ -38,7 +38,7 @@ int get_target_position(ctrl_proto_values_t InOut);
 * Return 
 
 
-- **Target torque from EtherCAT:** 
+**Target torque from EtherCAT:** 
 ```
 int get_target_position(ctrl_proto_values_t InOut);
 
@@ -48,7 +48,7 @@ int get_target_position(ctrl_proto_values_t InOut);
 * Return 
 
 
-- **Send actual torque value:** 
+**Send actual torque value:** 
 ```
 void send_actual_torque(int actual_torque, ctrl_proto_values_t &InOut);
 ```
@@ -56,7 +56,7 @@ void send_actual_torque(int actual_torque, ctrl_proto_values_t &InOut);
 	
 * Return 
 
-- **Send actual velocity value:** 
+**Send actual velocity value:** 
 ```
 void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
 
@@ -65,7 +65,7 @@ void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
 	
 * Return 
 
-- **Send actual position value:** 
+**Send actual position value:** 
 ```
 void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
 

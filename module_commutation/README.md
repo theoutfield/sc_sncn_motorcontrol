@@ -23,7 +23,7 @@ Demos:
 
 #### **comm_loop_server.h**####
 
-- **Server loop:** 
+**Server loop:** 
 
 > TILE constrains: IFM* (need access to IFM ports)
 
@@ -40,22 +40,24 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
 #### **comm_loop_client.h**####
 
 
-- **Parameters initialization:** 
+**Parameters initialization:** 
 ```
 void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
 ```
-	* Parameters
-	
-	* Return 
+* Parameters
 
-- **Commutation loop initialization:**
+	* commutation_params
+	* hall_params
+* Return 
+	*
+**Commutation loop initialization:**
 ```
 int init_commutation(chanend c_signal);
 
 ```
-	* Parameters
+* Parameters
 	
-	* Return 
+* Return 
 
 For a better review of all the available functions, check the header files.
 
