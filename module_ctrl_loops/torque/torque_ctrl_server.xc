@@ -41,8 +41,8 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 	int phase_b_raw = 0;
 	int actual_speed = 0;
 	int command;
-	int buffer_phase_a[FILTER_LENGTH_ADC];
-	int	buffer_phase_b[FILTER_LENGTH_ADC];
+	int buffer_phase_a[FILTER_LENGTH_ADC] = {0};
+	int	buffer_phase_b[FILTER_LENGTH_ADC] = {0};
 	timer ts;
 	timer tc;
 	unsigned int time;
@@ -76,8 +76,8 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 	do_adc_calibration_ad7949(c_adc, I_calib);
 
 	c_current<:1; // adc calib done
-	init_buffer(buffer_phase_a, FILTER_LENGTH_ADC);
-	init_buffer(buffer_phase_b, FILTER_LENGTH_ADC);
+	//init_buffer(buffer_phase_a, FILTER_LENGTH_ADC);
+	//init_buffer(buffer_phase_b, FILTER_LENGTH_ADC);
 	ts :> time;
 	tc :> time1;
 
@@ -187,8 +187,8 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	int phase_a = 0;
 	int phase_b = 0;
 	int filter_length = FILTER_LENGTH_TORQUE;
-	int buffer_Id[FILTER_LENGTH_TORQUE];
-	int buffer_Iq[FILTER_LENGTH_TORQUE];
+	int buffer_Id[FILTER_LENGTH_TORQUE] = {0};
+	int buffer_Iq[FILTER_LENGTH_TORQUE] = {0};
 
 	int i1 = 0;
 	int j1 = 0;
@@ -230,8 +230,9 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 	if(filter_length_variance < 10)
 		filter_length_variance = 10;
 	qei_counts_per_hall= qei_params.real_counts/ hall_params.pole_pairs;
-	init_buffer(buffer_Id, filter_length);
-	init_buffer(buffer_Iq, filter_length);
+
+	//init_buffer(buffer_Id, filter_length);
+	//init_buffer(buffer_Iq, filter_length);
 
 
 	tc :> time1;
