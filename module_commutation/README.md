@@ -17,6 +17,40 @@ set input voltage for the motor, get fet_state from the Commutation Server.
 To include this module add module_commutation to USED_MODULES in the application/test
 makefile, and include header files: comm_loop_server.h and comm_loop_client.h
 
-Note: For C22 core modules this server must be run on CORE 3 and for C21 core modules 
-on CORE 1, since only these cores have physical connection to the IFM modules.
+###**Quick API** 
 
+#### **comm_loop_server.h**####
+
+
+
+#### **comm_loop_client.h**####
+
+
+- **Initialization function:** Initialize commutation parameters
+```
+void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
+```
+* Parameters
+	
+* Return 
+
+
+```
+int init_commutation(chanend c_signal);
+
+```
+* Parameters
+	
+* Return 
+
+
+####**See also**:
+
+- [How to include a module in your application]()
+- [Getting started with SOMANET][getting_started_somanet]    
+
+
+
+*For Core C22, IFM Tile is located on TILE 3. For Core C21, IFM Tile is on TILE 1.
+
+[getting_started_somanet]: http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET
