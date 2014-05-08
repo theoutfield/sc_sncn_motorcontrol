@@ -18,7 +18,7 @@ set input voltage for the motor, get fet_state from the Commutation Server.
 
 #### **comm_loop_server.h**####
 
-- **Commutation server:** 
+- **Server loop:** 
 
 > TILE constrains: IFM* (need access to IFM ports)
 

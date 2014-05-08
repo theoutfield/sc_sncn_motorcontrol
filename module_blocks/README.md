@@ -20,14 +20,10 @@ Demos:
 - [test_velocity-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_velocity-ctrl/src)
 
 ###**Quick API** 
-For a better review of all the available functions, check the header files.
-
-* [watchdog.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_blocks/include/watchdog.h)
-* [filter_blocks.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_blocks/include/filter_blocks.h)
 
 #### **watchdog.h**####
 
-- **Watchdog Initialization function:** Run the watchdog timer server
+- **Server loop:** Run the watchdog timer server
 
 > TILE constrains: IFM* (need access to IFM ports)
 
@@ -50,6 +46,11 @@ int filter(int filter_buffer[], int &index, int filter_length, int input);
 * Parameters
 	
 * Return 
+
+For a better review of all the available functions, check the header files.
+
+* [watchdog.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_blocks/include/watchdog.h)
+* [filter_blocks.h](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/module_blocks/include/filter_blocks.h)
 
 ####**See also**:
 
