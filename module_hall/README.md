@@ -12,6 +12,9 @@ information and calculates velocity in a while loop; and provides client functio
 configure Hall Server with number of pole pairs and max ticks; get position and velocity 
 from the Hall server.
 
+Demos:
+- [test_hall.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_hall/src/test_hall.xc)
+
 ###**Quick API** 
 
 #### **hall_server.h**####

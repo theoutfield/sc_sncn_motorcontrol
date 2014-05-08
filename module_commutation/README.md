@@ -14,6 +14,11 @@ in a while loop; and provides client functions to optimize motor commutation wit
 commutation offsets, motor winding types, nominal motor speed and number of pole pairs; 
 set input voltage for the motor, get fet_state from the Commutation Server.
 
+Demos:
+- [test_position-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_position-ctrl/src/test_position-ctrl.xc)
+- [test_torque-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_torque-ctrl/src/test_torque-ctrl.xc)
+- [test_velocity-ctrl.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_velocity-ctrl/src)
+
 ###**Quick API** 
 
 #### **comm_loop_server.h**####
