@@ -35,11 +35,11 @@ Key Features
    * Support GPIO Digital
    * Precise position control based on position sensor ticks
 
-Components
+Content
 ---------
 
 | Module        				| Demo          						|
-| :-------------: 				|:-------------						|
+| :-------------: 				|:-------------							|
 | [module_adc][module_adc]      		| [test_adc_external_input][test_adc_external_input] 		|
 | [module_blocks][module_blocks] 		|       							|
 | [module_comm][module_comm]	 		|     								|
