@@ -56,7 +56,6 @@ void init_commutation_param(commutation_par &commutation_params, hall_par &hall_
 **Commutation loop initialization:**
 ```
 int init_commutation(chanend c_signal);
-
 ```
 * Parameters
 	

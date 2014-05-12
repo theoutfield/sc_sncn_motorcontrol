@@ -38,14 +38,14 @@ Position Control Demo
 <!-- - [Configure your node]() -->
 - [How to configure your motors][how_to_configure_motors]
 
-- \b THREADS: Profile Position Client, Position Control Loop, PWM Server, Commutation Server, Hall Server, QEI Server, Watchdog Server
-
-- \b TILES:
+- **THREADS**: Profile Position Client, Position Control Loop, PWM Server, Commutation Server, Hall Server, QEI Server, Watchdog Server
+- **TILES**:
 ```
 	#define TILE_ONE 0
 	#define IFM_TILE 3  
 ```
-\b TILE_ONE (0 by default): It takes care of the client side functions and control loop. Since these functions do not require any port access, any free \b TILE could run them.
+### **TILE_ONE**
+This tile (0 by default) takes care of the client side functions and control loop. Since these functions do not require any port access, any free TILE could run them.
 ```
 	on stdcore[TILE_ONE]:
 ```
@@ -53,7 +53,7 @@ Position Control Demo
 ```
 	position_profile_test(c_position_ctrl); // Test Position Profile Mode on slave side
 ```
-Set new target position for the controller. Read more at \ref module_profile.
+Set new target position for the controller. Read more at [module_profile][module_profile].
 
 - **Thread**: Position Control Loop
 ```
@@ -80,7 +80,7 @@ This tile (3 by default) executes the server side functions, controlling the int
 ```
 	do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
 ```
-Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by the \b module_pwm_symmetrical at PWM software component \b sc_pwm.
+Responsible for generating a Pulse-Width Modulation signal that drives the motors. Provided by [module_pwm_symmetrical][module_pwm_symmetrical]@[sc_pwm][sc_pwm].
 
 - **Thread**: Commutation Server 
 ```
@@ -96,7 +96,7 @@ Responsible for generating a Pulse-Width Modulation signal that drives the motor
 				c_commutation_p2, c_commutation_p3, c_pwm_ctrl, hall_params,
 				qei_params, commutation_params); //Read feedback
 ```
-Responsible for proper BLDC motor drive. Read more at \ref module_commutation.
+Responsible for proper BLDC motor drive. Read more at [module_commutation][module_commutation].
 
 - **Thread**: Hall Server
 ```
@@ -105,7 +105,7 @@ Responsible for proper BLDC motor drive. Read more at \ref module_commutation.
 	run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,
 			p_ifm_hall, hall_params); //Channel priority 1,2..5
 ```
-To obtain information about motor position for position control loop in case a Hall sensor is used. Read more at \ref module_hall.
+To obtain information about motor position for position control loop in case a Hall sensor is used. Read more at [module_hall][module_hall].
 
 - **Thread**: QEI Server
 ```
@@ -114,18 +114,18 @@ To obtain information about motor position for position control loop in case a H
 	run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5,
 			p_ifm_encoder, qei_params);  	// channel priority 1,2..5
 ```
-To obtain high precision information about motor position for position control loop in case a Quadrature Encoder sensor is used. Read more at \ref module_qei.
+To obtain high precision information about motor position for position control loop in case a Quadrature Encoder sensor is used. Read more at [module_qei][module_qei].
 
 - **Thread**: Watchdog Server
 ```
 	run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 ```
-A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at \ref module_watchdog.
+A watchdog server is used to monitor IFM_TILE and disables motor in case of emergency. Read more at [module_watchdog][module_watchdog].
 
 
 More information about Position Control Server/Client can be found at [module_ctrl_loops][module_ctrl_loops] documentation.
 
-Other dependencies: \ref sc_somanet-base/module_nodeconfig \ref module_adc \ref module_blocks \ref module_common \ref module_profile \ref module_sm 
+Other dependencies: [module_nodeconfig][module_nodeconfig]@[sc_somanet-base][sc_somanet-base] [module_blocks][module_blocks] [module_common][module_common] [module_sm][module_sm] 
 
 **See also**:
 
