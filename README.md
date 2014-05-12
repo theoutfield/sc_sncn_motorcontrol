@@ -45,7 +45,7 @@ Components
 | [module_comm][module_comm]	 		|     								|
 | [module_common][module_common]		|     								|
 | [module_commutation][module_commutation]	|								|
-| [module_ctrl_loops][module_ctrl_loops]	| [test_position-ctrl][test_position-ctrl] [test_velocity-ctrl][test_velocity-ctrl]	|
+| [module_ctrl_loops][module_ctrl_loops]	| [test_position-ctrl][test_position-ctrl] [test_velocity-ctrl][test_velocity-ctrl] [test_torque-ctrl][test_torque-ctrl]	|
 | [module_ecat_drive][module_ecat_drive]	| [test_ethercat-motorctrl-mode][test_ethercat-motorctrl-mode]	|
 | [module_gpio][module_gpio]			| [test_gpio_digital][test_gpio_digital] [test_homing][test_homing] 	|
 | [module_hall][module_hall]			| [test_hall][test_hall]					|
@@ -101,6 +101,7 @@ Please see [LICENSE](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/ma
 [test_qei]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_qei
 [test_homing]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_homing
 [test_ethercat-motorctrl-mode]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_ethercat-motorctrl-mode
+[test_torque-ctrl]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_torque-ctrl
 
 [module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
 
