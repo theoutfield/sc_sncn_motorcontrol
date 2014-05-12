@@ -93,6 +93,8 @@ Other dependancies: [module_nodeconfig][module_nodeconfig]@[sc_somanet-base][sc_
 [module_gpio]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_gpio
 [module_common]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_common
 [module_sm]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_sm
+[module_homing]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_homing
+[module_profile]:https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_profile
 
 [module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
 

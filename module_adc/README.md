@@ -50,9 +50,6 @@ void adc_ad7949( chanend c_adc, clock clk, buffered out port:32 p_sclk_conv_mosi
 	* Sensed value on channel 0
 	* Sensed value on channel 1
 
-
-
-
 ####**See also**:
 
 - [How to include a module in your application]()
