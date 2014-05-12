@@ -39,7 +39,7 @@ Components
 ---------
 
 | Module        				| Demo          						|
-| ------------- 				|:-------------:						|
+| :-------------: 				|:-------------						|
 | [module_adc][module_adc]      		| [test_adc_external_input][test_adc_external_input] 		|
 | [module_blocks][module_blocks] 		|       							|
 | [module_comm][module_comm]	 		|     								|
@@ -100,6 +100,7 @@ Please see [LICENSE](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/ma
 [test_hall]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_hall
 [test_qei]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_qei
 [test_homing]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_homing
+[test_ethercat-motorctrl-mode]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_ethercat-motorctrl-mode
 
 [module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
 
