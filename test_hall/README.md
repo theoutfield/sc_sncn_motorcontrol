@@ -1,4 +1,4 @@
-Hall Sensor Test
+Hall Sensor Demo
 =========================
 <a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
 <img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
@@ -6,7 +6,7 @@ Hall Sensor Test
 <br/>
 <br/>
 
-[test_hall.xc]() illustrates usage of [module_hall][module_hall] to get position and velocity information.
+[test_hall.xc](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_hall/src/test_hall.xc) illustrates usage of [module_hall][module_hall] to get position and velocity information.
 
 <table align="center" cellpadding="5" width="80%">
 <tr>
@@ -32,9 +32,8 @@ Hall Sensor Test
 </tr>
 </table>
 
-- \b THREADS: Hall Sensor Server, Hall Sensor Client
-
-- \b TILES:
+- **THREADS**: Hall Sensor Server, Hall Sensor Client
+- **TILES**:
 ```
 	#define TILE_ONE 0
 	#define IFM_TILE 3 

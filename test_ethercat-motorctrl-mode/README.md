@@ -201,21 +201,17 @@ It access the GPIO ports at the IFM module. See more at [module_gpio][module_gpi
 
 More information about Server/Client Control can be found on [module_ctrl_loops][module_ctrl_loops]. And more information about motor control over EtherCAT on [module_ecat_drive][module_ecat_drive].
 
-Other dependencies: module_comm module_common module_sm module_ctrlproto@sc_sncn_ctrlproto module_nodeconfig@sc_somanet-base
+Other dependencies: [module_comm][module_comm] [module_common][module_common] [module_sm][module_sm] [module_ctrlproto][module_ctrlproto]@[sc_sncn_ctrlproto][sc_sncn_ctrlproto] [module_nodeconfig][module_nodeconfig]@[sc_somanet-base][sc_somanet-base]
 
 See also:
 
 - [Getting started with SOMANET][getting_started_somanet]    
 
 
-[sc_sncn_ethercat]:https://github.com/synapticon/sc_sncn_ethercat
-[sc_pwm]: https://github.com/synapticon/sc_pwm
-[sc_somanet-base]: https://github.com/synapticon/sc_somanet-base
-
 [module_adc]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc
 [module_hall]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_hall
 [module_watchdog]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_watchdog
-[modle_ecat_drive]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_ecat_drive
+[module_ecat_drive]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_ecat_drive
 [module_ctrl_loops]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_ctrl_loops
 [module_blocks]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_blocks
 [module_qei]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_qei
@@ -223,12 +219,19 @@ See also:
 [module_gpio]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_gpio
 [module_common]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_common
 [module_sm]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_sm
+[module_comm]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_comm
 
+[sc_sncn_ethercat]:https://github.com/synapticon/sc_sncn_ethercat
 [module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
 
+[sc_pwm]: https://github.com/synapticon/sc_pwm
 [module_pwm_symmetrical]: https://github.com/synapticon/sc_pwm/tree/master/module_pwm_symmetrical
 
+[sc_somanet-base]: https://github.com/synapticon/sc_somanet-base
 [module_nodeconfig]: https://github.com/synapticon/sc_somanet-base/tree/master/module_nodeconfig
+
+[sc_sncn_ctrlproto]:https://github.com/synapticon/sc_sncn_ctrlproto
+[module_ctrlproto]: https://github.com/synapticon/sc_sncn_ctrlproto/tree/master/module_ctrlproto
 
 [how_to_configure_motors]: https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md
 [getting_started_somanet]: http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET
