@@ -33,7 +33,7 @@
 #define GEAR_RATIO  				100				// if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION 			4096			// 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
 
-/* Define your Incremental Encoder type (QEI_INDEX/ QEI_NO_INDEX) */
+/* Define your Incremental Encoder type (QEI_WITH_INDEX/ QEI_WITH_NO_INDEX) */
 #define QEI_SENSOR_TYPE  			QEI_WITH_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
