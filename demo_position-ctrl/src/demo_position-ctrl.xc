@@ -48,10 +48,10 @@ void xscope_initialise_1()
 void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
 {
 	int actual_position = 0;			// ticks
-	int target_position = 1997;			// ticks
+	int target_position = 4700;		// ticks
 	int velocity 		= 100;			// rpm
 	int acceleration 	= 100;			// rpm/s
-	int deceleration 	= 100;     		// rpm/s
+	int deceleration 	= 100;     	// rpm/s
 	int follow_error;
 	timer t;
 	hall_par hall_params;
@@ -78,8 +78,8 @@ void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hal
 		actual_position = get_position(c_position_ctrl);
 		follow_error = target_position - actual_position;
 #ifdef ENABLE_xscope
-		xscope_int(0, target_position);
-		xscope_int(1, actual_position);
+		xscope_int(0, actual_position);
+		xscope_int(1, target_position);
 		xscope_int(2, follow_error);
 #endif
 		wait_ms(1, 1, t);  /* 1 ms wait */

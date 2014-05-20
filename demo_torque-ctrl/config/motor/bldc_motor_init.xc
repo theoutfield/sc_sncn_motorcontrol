@@ -47,7 +47,7 @@ void init_hall_param(hall_par &hall_params)
 			hall_params.max_ticks = 0 - max;
 	}
 	hall_params.max_ticks_per_turn = POLE_PAIRS * 4096;
-	printintln(hall_params.max_ticks);
+	//printintln(hall_params.max_ticks);
 	hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
 	//printintln(hall_params.max_ticks);
 

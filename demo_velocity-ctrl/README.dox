@@ -4,7 +4,7 @@
 \section test_velocity-ctrl
 
 This test application illustrates usage of module_ctrl_loops to do velocity control 
-of motor 
+of brushless dc motor 
 
 The main application runs 7 threads in total. 2 of these threads are PWM Server and 
 Commutation Server responsible for modulation and motor drive. 

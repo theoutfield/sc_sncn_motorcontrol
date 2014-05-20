@@ -27,6 +27,7 @@
 #include <profile_control.h>
 #include <test.h>
 #include <qei_client.h>
+
 //#define ENABLE_xscope_main
 #define COM_TILE 0
 #define IFM_TILE 3
@@ -45,29 +46,18 @@ void xscope_initialise_1()
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity =-450;	 		// rpm
+	int target_velocity =-400;	 		// rpm
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;			// rpm/s
-	int actual_velocity; timer t; unsigned int time;
+
 #ifdef ENABLE_xscope_main
 	xscope_initialise_1();
 #endif
 
 	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 
-	t :> time;
-	while(1)
-	{
-	    actual_velocity = get_velocity(c_velocity_ctrl);
-
-        t when timerafter(time) :> void;
-        time = time + MSEC_STD;
-
-        xscope_int(0, actual_velocity);
-	}
-
-	//target_velocity = 0;				// rpm
-	//set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+	target_velocity = 0;				// rpm
+	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
 }
 
 int main(void)

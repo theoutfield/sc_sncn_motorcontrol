@@ -4,7 +4,7 @@
 \section test_torque-ctrl
 
 This test application illustrates usage of module_ctrl_loops to do torque control 
-of motor 
+of brushless dc motor 
 
 The main application runs 9 threads in total. 2 of these threads are PWM Server and 
 Commutation Server responsible for modulation and motor drive. 
