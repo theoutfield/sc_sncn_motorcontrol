@@ -13,13 +13,12 @@
 #include <print.h>
 #include <ioports.h>
 #include <refclk.h>
-#include <xscope_wrapper.h>
 #include <internal_config.h>
-
+#include <xscope.h>
 #include <gpio_server.h>
 #include <gpio_client.h>
 
-#define ENABLE_xscope
+//#define ENABLE_xscope
 #define COM_TILE 0
 #define IFM_TILE 3
 

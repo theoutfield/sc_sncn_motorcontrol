@@ -77,7 +77,7 @@ void init_hall_param(hall_par &hall_params)
 			hall_params.max_ticks = 0 - max;
 	}
 	hall_params.max_ticks_per_turn = POLE_PAIRS * 4096;
-	printintln(hall_params.max_ticks);
+	//printintln(hall_params.max_ticks);
 	hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
 	//printintln(hall_params.max_ticks);
 
@@ -127,8 +127,8 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_ticks_per_turn = __qei_max_counts(qei_params.real_counts);
 	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
-	printintln(qei_params.max_ticks_per_turn);
-	printintln(qei_params.max_ticks);
+	//printintln(qei_params.max_ticks_per_turn);
+	//printintln(qei_params.max_ticks);
 	qei_params.poles = 1;
 	qei_params.sensor_polarity = QEI_SENSOR_POLARITY;
 	return;

@@ -48,8 +48,9 @@ void analog_input_test(chanend c_adc)
 	int tile_id = 1;
 	timer t;
 
+#ifdef USE_XSCOPE
 	xscope_initialise_1();
-
+#endif
 
 	while(1)
 	{
@@ -57,16 +58,17 @@ void analog_input_test(chanend c_adc)
 		{analog_input_1 , analog_input_2} = get_adc_external_ad7949(c_adc);
 		wait_ms(1, tile_id, t);
 
-
+#ifdef USE_XSCOPE
 		xscope_core_int(0, analog_input_1);
 		xscope_core_int(1, analog_input_2);
-/*
+#else
+
 		printstr(" Analog input 1: ");
 		printint(analog_input_1);
 		printstr(" ");
 		printstr(" Analog input 2: ");
 		printintln(analog_input_2);
-*/
+#endif
 	}
 }
 
