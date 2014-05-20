@@ -72,11 +72,11 @@ void send_actual_position(int actual_position, ctrl_proto_values_t &InOut)
 	InOut.position_actual = actual_position;
 }
 
-void update_hall_param_ecat(hall_par &hall_params, chanend coe_out)
+void update_hall_param_ecat(hall_par &hall_params, chanend coe_out, int min, int max, int sdo_update)
 {
-	int min;
-	int max;
-	{hall_params.pole_pairs, max, min} = hall_sdo_update(coe_out);
+	if(sdo_update == 1)
+	    {hall_params.pole_pairs, max, min} = hall_sdo_update(coe_out);
+
 	if(max >= 0 && min >= 0)
 	{
 		if(max > min)
@@ -109,12 +109,10 @@ void update_hall_param_ecat(hall_par &hall_params, chanend coe_out)
 	hall_params.max_ticks += hall_params.max_ticks_per_turn;
 }
 
-void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
+void update_qei_param_ecat(qei_par &qei_params, chanend coe_out, int min, int max, int sensor_polarity, int sdo_update)
 {
-	int min;
-	int max;
-	int sensor_polarity;
-	{qei_params.real_counts, max, min, qei_params.index, sensor_polarity} = qei_sdo_update(coe_out);
+	if(sdo_update == 1)
+	    {qei_params.real_counts, max, min, qei_params.index, sensor_polarity} = qei_sdo_update(coe_out);
 
 	if(max >= 0 && min >= 0)
 	{
@@ -238,16 +236,19 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
 		pp_params.max_acceleration} = pp_sdo_update(coe_out);
 }
 
-void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out)
+void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out, int sdo_update)
 {
-	{torque_ctrl_params.Kp_n, torque_ctrl_params.Ki_n, torque_ctrl_params.Kd_n} = torque_sdo_update(coe_out);
+    if(sdo_update == 1)
+    {
+        {torque_ctrl_params.Kp_n, torque_ctrl_params.Ki_n, torque_ctrl_params.Kd_n} = torque_sdo_update(coe_out);
+    }
 	torque_ctrl_params.Kp_d = 65536; 				// 16 bit precision PID gains
 	torque_ctrl_params.Ki_d = 65536;
 	torque_ctrl_params.Kd_d = 65536;
 
 	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  	// units - core timer value //CORE 2/1/0 default
 
-	torque_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150;  // PWM resolution
+	torque_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT;  // PWM resolution
 
 	if(torque_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		torque_ctrl_params.Integral_limit = torque_ctrl_params.Control_limit * (torque_ctrl_params.Ki_d/torque_ctrl_params.Ki_n) ;
@@ -257,16 +258,19 @@ void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out
 }
 
 
-void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out)
+void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out, int sdo_update)
 {
-	{velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);
+    if(sdo_update == 1)
+    {
+        {velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);
+    }
 	velocity_ctrl_params.Kp_d = 65536; 				// 16 bit precision PID gains
 	velocity_ctrl_params.Ki_d = 65536;
 	velocity_ctrl_params.Kd_d = 65536;
 
 	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - core timer value //CORE 2/1/0 default
 
-	velocity_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; // PWM resolution
+	velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
 
 	if(velocity_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
@@ -275,16 +279,19 @@ void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe
 	return;
 }
 
-void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out)
+void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out, int sdo_update)
 {
-	{position_ctrl_params.Kp_n, position_ctrl_params.Ki_n, position_ctrl_params.Kd_n} = position_sdo_update(coe_out);
+    if(sdo_update == 1)
+    {
+        {position_ctrl_params.Kp_n, position_ctrl_params.Ki_n, position_ctrl_params.Kd_n} = position_sdo_update(coe_out);
+    }
 	position_ctrl_params.Kp_d = 65536; 				// 16 bit precision PID gains
 	position_ctrl_params.Ki_d = 65536;
 	position_ctrl_params.Kd_d = 65536;
 
 	position_ctrl_params.Loop_time = 1 * MSEC_STD;  // units - core timer value //CORE 2/1/0 default
 
-	position_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; // PWM resolution
+	position_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
 
 	if(position_ctrl_params.Ki_n != 0)    			// auto calculated using control_limit
 		position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n) ;

@@ -67,8 +67,9 @@
  * \channel c_gpio channel to config/read/drive GPIO digital ports
  *
  */
-void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
-		chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio);
+void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_flash_data,
+        chanend c_signal, chanend c_hall, chanend c_qei, chanend c_torque_ctrl,
+        chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio);
 
 int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation);
 #endif /* ECAT_MOTOR_DRIVE_H_ */
