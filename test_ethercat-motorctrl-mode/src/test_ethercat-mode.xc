@@ -7,37 +7,6 @@
  * \version 1.0
  * \date 10/04/2014
  */
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
 
 #include <xs1.h>
 #include <platform.h>
@@ -55,15 +24,16 @@
 #include <bldc_motor_config.h>
 #include <flash_somanet.h>
 #include <gpio_server.h>
-#define COM_CORE 0
-#define IFM_CORE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+#define COM_TILE    0
+#define IFM_TILE    3
+
+on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
+on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 int main(void)
 {
-	// Motor control channels
+	/* Motor control channels */
 	chan c_adc, c_adctrig;													// adc channels
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6 ;		// qei channels
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
@@ -75,7 +45,7 @@ int main(void)
 	chan c_watchdog; 														// watchdog channel
 	chan c_gpio_p1, c_gpio_p2;												// gpio digital channels
 
-	// EtherCat Communication channels
+	/* EtherCat Communication channels */
 	chan coe_in; 															// CAN from module_ethercat to consumer
 	chan coe_out; 															// CAN from consumer to module_ethercat
 	chan eoe_in; 															// Ethernet from module_ethercat to consumer
@@ -85,32 +55,38 @@ int main(void)
 	chan foe_out; 															// File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
-	chan c_sig_1;
+	chan c_nodes[1], c_flash_data, c_sig_1;                                 // Firmware channels
 
 	par
 	{
+        /************************************************************
+         *                          COM_TILE
+         ************************************************************/
+
 		/* Ethercat Communication Handler Loop */
-		on stdcore[0] :
+		on tile[COM_TILE] :
 		{
 			ecat_init();
 			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out,
 					foe_in, pdo_out, pdo_in);
 		}
 
-		/* Firmware Update Loop */
-		on stdcore[0] :
+		/* Firmware Update Loop over Ethercat */
+		on tile[COM_TILE] :
 		{
-			firmware_update_loop(p_spi_flash, foe_out, foe_in, c_sig_1); // firmware update over Ethercat
+			firmware_update_loop(p_spi_flash, foe_out, foe_in, c_flash_data,\
+                    c_nodes, c_sig_1);
 		}
 
 		/* Ethercat Motor Drive Loop */
-		on stdcore[1] :
+		on tile[1] :
 		{
-			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_signal, c_hall_p5, c_qei_p5,\
-					c_torque_ctrl, c_velocity_ctrl, c_position_ctrl, c_gpio_p1);
+			ecat_motor_drive(pdo_out, pdo_in, coe_out, c_flash_data, c_signal,\
+			        c_hall_p5, c_qei_p5, c_torque_ctrl, c_velocity_ctrl,\
+			        c_position_ctrl, c_gpio_p1);
 		}
 
-		on stdcore[2]:
+		on tile[2]:
 		{
 			par
 			{
@@ -124,8 +100,8 @@ int main(void)
 					 init_hall_param(hall_params);
 					 init_qei_param(qei_params);
 
-					 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, c_hall_p4,\
-							 c_qei_p4, c_position_ctrl, c_commutation_p3);
+					 position_control(position_ctrl_params, hall_params, qei_params,\
+					         SENSOR_USED, c_hall_p4, c_qei_p4, c_position_ctrl, c_commutation_p3);
 				}
 
 				/* Velocity Control Loop */
@@ -154,17 +130,18 @@ int main(void)
 					init_hall_param(hall_params);
 					init_torque_control_param(torque_ctrl_params);
 
-					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED, c_adc, \
-							c_commutation_p1,  c_hall_p2,  c_qei_p2, c_torque_ctrl);
+					torque_control( torque_ctrl_params, hall_params, qei_params,\
+					        SENSOR_USED, c_adc, c_commutation_p1, c_hall_p2,c_qei_p2,\
+					        c_torque_ctrl);
 				}
 
 			}
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 *                          IFM_TILE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on tile[IFM_TILE]:
 		{
 			par
 			{
@@ -183,10 +160,10 @@ int main(void)
 					qei_par qei_params;
 					commutation_par commutation_params;
 					commutation_init_ecat(c_signal, hall_params, qei_params, commutation_params);
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog,\
 						c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
 						p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
-						hall_params, qei_params, commutation_params);						// channel priority 1,2,3
+						hall_params, qei_params, commutation_params);   // channel priority 1,2,3
 				}
 
 				/* Watchdog Server */
@@ -195,26 +172,25 @@ int main(void)
 				/* GPIO Digital Server */
 				gpio_digital_server(p_ifm_ext_d, c_gpio_p1, c_gpio_p2);
 
-				/* Hall Server */
+				 /* Hall Server */
 				{
 					hall_par hall_params;
 					hall_init_ecat(c_hall_p5, hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, \
-							p_ifm_hall, hall_params); 		// channel priority 1,2..6
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,\
+					        c_hall_p6, p_ifm_hall, hall_params);    // channel priority 1,2..6
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					qei_init_ecat(c_qei_p5, qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, \
-							qei_params);  					// channel priority 1,2..6
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6,\
+					        p_ifm_encoder, qei_params);             // channel priority 1,2..6
 				}
 
 			}
 		}
 
 	}
-
 	return 0;
 }

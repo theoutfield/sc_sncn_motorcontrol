@@ -6,37 +6,6 @@
  * \version 1.0
  * \date 10/04/2014
  */
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
 
 #include <bldc_motor_config.h>
 #include "refclk.h"
@@ -125,7 +94,6 @@ void init_qei_param(qei_par &qei_params)
 	qei_params.index = QEI_SENSOR_TYPE;
 	qei_params.max_ticks_per_turn = __qei_max_counts(qei_params.real_counts);
 	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
-	//printintln(qei_params.max_ticks);
 	qei_params.poles = POLE_PAIRS;
 	qei_params.sensor_polarity = QEI_SENSOR_POLARITY;
 	return;
@@ -136,7 +104,6 @@ void init_sensor_filter_param(filter_par &sensor_filter_par) //optional for user
 	sensor_filter_par.filter_length = VELOCITY_FILTER_SIZE;
 	return;
 }
-
 
 void init_csv_param(csv_par &csv_params)
 {
@@ -195,35 +162,39 @@ void init_pt_params(pt_par &pt_params)
 
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params)
 {
-	velocity_ctrl_params.Kp_n = VELOCITY_KP;
-	velocity_ctrl_params.Kp_d = 16384;
-	velocity_ctrl_params.Ki_n = VELOCITY_KI;
-	velocity_ctrl_params.Ki_d = 16384;
-	velocity_ctrl_params.Kd_n = VELOCITY_KD;
-	velocity_ctrl_params.Kd_d = 16384;
+	velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;
+	velocity_ctrl_params.Kp_d = VELOCITY_Kp_DENOMINATOR;
+	velocity_ctrl_params.Ki_n = VELOCITY_Ki_NUMERATOR;
+	velocity_ctrl_params.Ki_d = VELOCITY_Ki_DENOMINATOR;
+	velocity_ctrl_params.Kd_n = VELOCITY_Kd_NUMERATOR;
+	velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
 	velocity_ctrl_params.Loop_time = 1 * MSEC_STD;  				//units - core timer value //CORE 2/1/0 default
 
-	velocity_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150; 	//default
+	velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; 	//default
 
 	if(velocity_ctrl_params.Ki_n != 0)    							//auto calculated using control_limit
+	{
 		velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n );
+	}
 	else
+	{
 		velocity_ctrl_params.Integral_limit = 0;
+	}
 
 	return;
 }
 
 void init_position_control_param(ctrl_par &position_ctrl_params)
 {
-	position_ctrl_params.Kp_n = POSITION_KP;
-	position_ctrl_params.Kp_d = 16384;
-	position_ctrl_params.Ki_n = POSITION_KI;
-	position_ctrl_params.Ki_d = 16384;
-	position_ctrl_params.Kd_n = POSITION_KD;
-	position_ctrl_params.Kd_d = 16384;
+	position_ctrl_params.Kp_n = POSITION_Kp_NUMERATOR;
+	position_ctrl_params.Kp_d = POSITION_Kp_DENOMINATOR;
+	position_ctrl_params.Ki_n = POSITION_Ki_NUMERATOR;
+	position_ctrl_params.Ki_d = POSITION_Ki_DENOMINATOR;
+	position_ctrl_params.Kd_n = POSITION_Kd_NUMERATOR;
+	position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
 	position_ctrl_params.Loop_time = 1 * MSEC_STD;  				// units - for CORE 2/1/0 only default
 
-	position_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150;	// default do not change
+	position_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT;	// default do not change
 
 	if(position_ctrl_params.Ki_n != 0)								// auto calculated using control_limit
 	{
@@ -239,15 +210,15 @@ void init_position_control_param(ctrl_par &position_ctrl_params)
 
 void init_torque_control_param(ctrl_par &torque_ctrl_params)
 {
-	torque_ctrl_params.Kp_n = TORQUE_KP;
-	torque_ctrl_params.Kp_d = 16384;
-	torque_ctrl_params.Ki_n = TORQUE_KI;
-	torque_ctrl_params.Ki_d = 16384;
-	torque_ctrl_params.Kd_n = TORQUE_KD;
-	torque_ctrl_params.Kd_d = 16384;
+	torque_ctrl_params.Kp_n = TORQUE_Kp_NUMERATOR ;
+	torque_ctrl_params.Kp_d = TORQUE_Kp_DENOMINATOR ;
+	torque_ctrl_params.Ki_n = TORQUE_Ki_NUMERATOR ;
+	torque_ctrl_params.Ki_d = TORQUE_Ki_DENOMINATOR;
+	torque_ctrl_params.Kd_n = TORQUE_Kd_NUMERATOR ;
+	torque_ctrl_params.Kd_d = TORQUE_Kd_DENOMINATOR;
 	torque_ctrl_params.Loop_time = 1 * MSEC_STD;  				// default do not change - for CORES 2/1/0 only
 
-	torque_ctrl_params.Control_limit = CONTROL_LIMIT_PWM - 150;	// default do not change
+	torque_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT;	// default do not change
 
 	if(torque_ctrl_params.Ki_n != 0)							// auto calculated using control_limit
 	{

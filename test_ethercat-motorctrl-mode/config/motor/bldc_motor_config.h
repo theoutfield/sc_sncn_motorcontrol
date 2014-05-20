@@ -7,38 +7,6 @@
  * \date 10/04/2014
  */
 
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
-
 #ifndef __DC_MOTOR_CONFIG__H__ETHERCAT_MOTOR_DRIVE
 #define __DC_MOTOR_CONFIG__H__ETHERCAT_MOTOR_DRIVE
 #include <print.h>
@@ -93,28 +61,45 @@
 #define MAX_TORQUE					MOTOR_TORQUE_CONSTANT * IFM_RESOLUTION * MAX_NOMINAL_CURRENT
 
 /* Control specific constants/variables */
-	/*Torque Control (Mandatory if Torque control used)*/
-#define TORQUE_KP					81920		//	(50/10)  * 16384
-#define TORQUE_KI					1638		//	(11/110) * 16384
-#define TORQUE_KD					1638		//	(1/10)   * 16384
 
-	/*Velocity Control (Mandatory if Velocity control used)*/
-#define VELOCITY_KP				 	8192       	//  (5/10)   * 16384
-#define VELOCITY_KI    				819			//  (5/100)  * 16384
-#define VELOCITY_KD				   	0			//	(0)      * 16384
+    /* Velocity Control (Mandatory if Velocity control used)
+     * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+     * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
+#define VELOCITY_Kp_NUMERATOR       5
+#define VELOCITY_Kp_DENOMINATOR     10
+#define VELOCITY_Ki_NUMERATOR       5
+#define VELOCITY_Ki_DENOMINATOR     100
+#define VELOCITY_Kd_NUMERATOR       0
+#define VELOCITY_Kd_DENOMINATOR     1
 
-	/*Position Control (Mandatory if Position control used)*/
-#define POSITION_KP	 				1474		//	(180/2000)  * 16384
-#define POSITION_KI   				8			//	(50/102000) * 16384
-#define POSITION_KD    				164			//	(100/10000) * 16384
+#define VELOCITY_FILTER_SIZE        24      //default (could be changed upto 128)
+
+    /* Torque Control (Mandatory if Torque control used)
+     * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+     * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
+#define TORQUE_Kp_NUMERATOR         50
+#define TORQUE_Kp_DENOMINATOR       10
+#define TORQUE_Ki_NUMERATOR         11
+#define TORQUE_Ki_DENOMINATOR       110
+#define TORQUE_Kd_NUMERATOR         1
+#define TORQUE_Kd_DENOMINATOR       10
+
+    /* Position Control (Mandatory if Position control used)
+     * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
+     * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
+#define POSITION_Kp_NUMERATOR       180
+#define POSITION_Kp_DENOMINATOR     2000
+#define POSITION_Ki_NUMERATOR       50
+#define POSITION_Ki_DENOMINATOR     102000
+#define POSITION_Kd_NUMERATOR       100
+#define POSITION_Kd_DENOMINATOR     10000
+
 #define MAX_POSITION_LIMIT 			359
 #define MIN_POSITION_LIMIT 			-359
 
 #define HALL 						1
 #define QEI_INDEX  					2
 #define QEI_NO_INDEX				3
-
-#define VELOCITY_FILTER_SIZE        8			//default (could be changed upto 16)
 
 /**
  * \brief initialize Velocity sensor filter
