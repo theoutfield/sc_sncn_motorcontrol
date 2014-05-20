@@ -14,7 +14,6 @@
 #include "pwm_cli_inv.h"
 #include "a4935.h"
 #include "hall_client.h"
-#include <bldc_motor_config.h>
 
 
 /**

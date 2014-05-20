@@ -12,7 +12,6 @@
 #include <print.h>
 #include <drive_config.h>
 #include <internal_config.h>
-#include <bldc_motor_config.h>
 //#define debug_print
 
 int init_torque_control(chanend c_torque_ctrl)

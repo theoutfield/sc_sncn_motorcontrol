@@ -9,7 +9,6 @@
  */
 
 
-#include <bldc_motor_config.h>
 #include <watchdog.h>
 
 /**

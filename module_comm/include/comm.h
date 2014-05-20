@@ -41,7 +41,6 @@
 #ifndef COMM_H_
 #define COMM_H_
 #pragma once
-#include <bldc_motor_config.h>
 #include <refclk.h>
 #include <ctrlproto.h>
 #include <qei_client.h>

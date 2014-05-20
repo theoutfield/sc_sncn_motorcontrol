@@ -42,7 +42,6 @@
 #ifndef __QEI_SERVER_H__
 #define __QEI_SERVER_H__
 #include <xs1.h>
-#include <bldc_motor_config.h>
 #include "qei_config.h"
 #include "internal_config.h"
 #include <refclk.h>

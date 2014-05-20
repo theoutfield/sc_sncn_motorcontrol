@@ -1,7 +1,6 @@
 #ifndef AUTO_CALIB_QEI_H_
 #define AUTO_CALIB_QEI_H_
 
-#include <bldc_motor_config.h>
 #include "hall_client.h"
 #include "qei_client.h"
 #include "comm_loop_client.h"

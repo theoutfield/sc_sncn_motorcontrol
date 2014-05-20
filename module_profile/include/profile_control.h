@@ -46,7 +46,6 @@
 
 #include <xs1.h>
 #include <platform.h>
-#include <bldc_motor_config.h>
 
 /**
  * \brief Set profile position with Position Control loop

@@ -9,7 +9,6 @@
  * \date 10/04/2014
  */
 
-#include <bldc_motor_config.h>
 #include "comm_loop_client.h"
 #include <watchdog.h>
 

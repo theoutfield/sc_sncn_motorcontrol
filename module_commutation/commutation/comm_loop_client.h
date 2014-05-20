@@ -17,7 +17,6 @@
 #include "sine_table_big.h"
 #include "adc_client_ad7949.h"
 #include "hall_client.h"
-#include <bldc_motor_config.h>
 
 /**
  * \brief Struct for commutation parameters

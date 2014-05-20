@@ -7,7 +7,6 @@
  * \date 10/04/2014
  */
 
-#include <bldc_motor_config.h>
 #include <internal_config.h>
 #include "refclk.h"
 #include "qei_client.h"
