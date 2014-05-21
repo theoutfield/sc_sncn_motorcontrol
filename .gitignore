@@ -18,3 +18,4 @@ bin/
 
 ## ignore KDE files
 .directory
+/.settings/org.eclipse.cdt.core.prefs
