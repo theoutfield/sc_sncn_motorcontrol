@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>test_auto-calib</name>
+	<name>app_test_adc_external_input</name>
 	<comment></comment>
 	<projects>
+		<project>sc_pwm</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
