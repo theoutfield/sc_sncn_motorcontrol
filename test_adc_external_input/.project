@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>test_hall-qei-fusion</name>
+	<name>test_adc_external_input</name>
 	<comment></comment>
 	<projects>
+		<project>sc_pwm</project>
 	</projects>
 	<buildSpec>
-		<buildCommand>
-			<name>com.xmos.cdt.core.ModulePathBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
 			<triggers>clean,full,incremental,</triggers>
