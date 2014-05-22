@@ -219,12 +219,7 @@ int16_t update_statusword(int current_status, int state_reached, int ack, int q_
 		return status_word|TARGET_REACHED;
 	else if(ack == 0)
 		return status_word & (~TARGET_REACHED);
-	/*if(h_active == 1)
-	{ printstrln("h_active");
-		return (status_word | 0x2000); //home active
-	}*/
-//	else if(h_active == 0)
-//		return status_word & (~(0x2000));
+
 
 	return status_word;
 }

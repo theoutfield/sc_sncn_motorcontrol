@@ -4,8 +4,6 @@
  * \brief Test illustrates usage of qei sensor to get position and velocity information
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
 #include <xs1.h>
@@ -17,10 +15,6 @@
 #include <refclk.h>
 #include <xscope.h>
 #include <bldc_motor_config.h>
-//#define ENABLE_xscope
-
-#define COM_CORE 0
-#define IFM_CORE 3
 
 
 void xscope_initialise_1()
@@ -47,10 +41,6 @@ void qei_test(chanend c_qei)
 	init_qei_param(qei_params);
 	init_qei_velocity_params(qei_velocity_params);
 
-#ifdef ENABLE_xscope
-	xscope_initialise_1();
-#endif
-
 	while(1)
 	{
 		/* get position from QEI Sensor */
@@ -60,6 +50,7 @@ void qei_test(chanend c_qei)
 		velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
 
 		wait_ms(1, core_id, t);
+
 	#ifdef ENABLE_xscope
 		xscope_core_int(0, position);
 		xscope_core_int(1, velocity);
@@ -69,7 +60,7 @@ void qei_test(chanend c_qei)
 		printstr(" ");
 		printstr("Velocity: "); // with print velocity information will be corrupt (use xscope)
 		printintln(velocity);
-	#endif
+    #endif
 	}
 }
 
@@ -88,7 +79,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on tile[IFM_CORE]:
+		on tile[3]:
 		{
 			/* QEI Server Loop */
 			{

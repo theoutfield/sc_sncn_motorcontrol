@@ -4,8 +4,6 @@
  * \brief Test illustrates configuration and usage of GPIO digital ports. Two ports are configured
  *  as input switches and the remaining two ports are configured as digital out ports
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
 #include <xs1.h>
@@ -41,6 +39,7 @@ timer t;
 	#ifdef ENABLE_xscope
 		xscope_initialise_1();
 	#endif
+
 
 	/**< Configure gpio digital port 0 as Switch Input and active high */
 	config_gpio_digital_input(c_gpio_p1, 0, SWITCH_INPUT_TYPE, ACTIVE_HIGH);
@@ -93,7 +92,7 @@ int main(void)
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
 		on tile[IFM_TILE]:
 		{

@@ -35,3 +35,4 @@
  */
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used, \
 		              chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation);
+

@@ -96,3 +96,4 @@ void reset_qei_count(chanend c_qei, int offset)
 	c_qei <: QEI_RESET_COUNT;
 	c_qei <: offset;
 }
+

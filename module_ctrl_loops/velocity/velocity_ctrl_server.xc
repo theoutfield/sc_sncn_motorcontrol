@@ -8,7 +8,9 @@
  */
 
 #include "velocity_ctrl_server.h"
+#ifdef BDC
 #include "brushed_dc_client.h"
+#endif
 #include "refclk.h"
 #include "qei_client.h"
 #include "hall_client.h"
@@ -190,8 +192,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 						VELOCITY_CTRL_READ(hall_params.pole_pairs);
 						VELOCITY_CTRL_READ(hall_params.max_ticks);
 						VELOCITY_CTRL_READ(hall_params.max_ticks_per_turn);
-					//	speed_factor_hall = hall_params.pole_pairs*4095*(velocity_ctrl_params.Loop_time/MSEC_STD);
-					//	hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
+
 						break;
 
 					case SET_VELOCITY_CTRL_QEI:
@@ -200,8 +201,7 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 						VELOCITY_CTRL_READ(qei_params.real_counts);
 						VELOCITY_CTRL_READ(qei_params.max_ticks_per_turn);
 						VELOCITY_CTRL_READ(qei_params.poles);
-					//	speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);
-					//	qei_crossover = qei_params.max_ticks_per_turn - qei_params.max_ticks_per_turn/10;
+
 						break;
 
 					case SET_VELOCITY_FILTER:
@@ -272,7 +272,6 @@ void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_
 						error_velocity_I = 0;
 						previous_error = 0;
 						velocity_control_out = 0;
-						//target_velocity = 0;
 						set_commutation_sinusoidal(c_commutation, 0);
 						disable_motor(c_commutation);
 						wait_ms(30, 1, ts);

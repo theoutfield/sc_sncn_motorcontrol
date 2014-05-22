@@ -13,7 +13,9 @@
 #include <print.h>
 #include <drive_config.h>
 #include <internal_config.h>
+#ifdef BDC
 #include "brushed_dc_client.h"
+#endif
 #include "adc_client_ad7949.h"
 #include "qei_client.h"
 #include "hall_client.h"
@@ -251,7 +253,6 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					}
 					else if(sensor_used == QEI)
 					{
-						//angle = (get_sync_position ( sync_output ) <<10)/qei_counts_per_hall; //synced input old
 						{angle, offset_fw_flag, offset_bw_flag} = get_qei_sync_position(c_qei);
 						angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
 						actual_speed = get_qei_velocity( c_qei, qei_params, qei_velocity_params);
@@ -492,21 +493,11 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 					case SHUTDOWN_TORQUE_CTRL:
 						TORQUE_CTRL_READ(activate);
 						activate = UNSET;
-						//c_current <: 11;
-						//set_commutation_sinusoidal(c_commutation, 0);
-						//i1 = 0;
-						//j1 = 0;
-						//mod1 = 0;
-						//buffer_index = 0;
 						error_torque = 0;
 						error_torque_integral = 0;
 						error_torque_derivative = 0;
 						error_torque_previous = 0;
 						torque_control_output = 0;
-						//init_qei_velocity_params(qei_velocity_params);
-						//init_buffer(buffer_Id, filter_length);
-						//init_buffer(buffer_Iq, filter_length);
-						//target_torque = 0;
 						set_commutation_sinusoidal(c_commutation, 0);
 						disable_motor(c_commutation);
 						wait_ms(30, 1, tc);

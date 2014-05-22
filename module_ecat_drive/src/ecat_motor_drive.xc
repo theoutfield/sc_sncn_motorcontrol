@@ -1,4 +1,3 @@
-
 /**
  * \file ecat_motor_drive.xc
  * \brief Ethercat Motor Drive Server

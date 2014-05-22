@@ -43,8 +43,8 @@ int checkout = 0;
 #define COM_CORE 0
 #define IFM_CORE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+on tile[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
+on tile[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 //#define print_slave
 
@@ -79,24 +79,24 @@ int main(void)
 	//
 	par
 	{
-	/*	on stdcore[0] :
+	/*	on tile[0] :
 		{
 			ecat_init();
 
 			ecat_handler(coe_out, coe_in, eoe_out, eoe_in, eoe_sig, foe_out, foe_in, pdo_out, pdo_in);
 		}
-		on stdcore[0] :
+		on tile[0] :
 		{
 			//firmware_update(foe_out, foe_in, c_sig_1); // firmware update
 		}*/
 
-		on stdcore[2] :
+		on tile[2] :
 		{
 			ecat_motor_test( pdo_out,  pdo_in,  coe_out,  c_signal,  c_hall_p1,\
 					 c_qei_p1,  c_home,  c_torque_ctrl,  c_velocity_ctrl,  c_position_ctrl);
 		}
 
-/*		on stdcore[1]:
+/*		on tile[1]:
 		{
 			timer t;
 			unsigned int time;
@@ -128,7 +128,7 @@ int main(void)
 			}
 		}*/
 
-		on stdcore[3]:
+		on tile[3]:
 		{
 
 
@@ -169,7 +169,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on tile[IFM_CORE]:
 		{
 //			par
 //			{

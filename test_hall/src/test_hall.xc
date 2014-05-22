@@ -4,8 +4,6 @@
  * \brief Test illustrates usage of hall sensor to get position and velocity information
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
 #include <xs1.h>
@@ -15,7 +13,6 @@
 #include <hall_client.h>
 #include <hall_server.h>
 #include <refclk.h>
-#include <xscope.h>
 #include <bldc_motor_config.h>
 
 //#define ENABLE_xscope
@@ -42,10 +39,6 @@ void hall_test(chanend c_hall)
 	hall_par hall_params;
 	init_hall_param(hall_params);
 
-#ifdef ENABLE_xscope
-	xscope_initialise_1();
-#endif
-
 	while(1)
 	{
 		/* get position from Hall Sensor */
@@ -64,7 +57,6 @@ void hall_test(chanend c_hall)
 		printstr("Velocity: ");
 		printintln(velocity);
 #endif
-
 	}
 }
 
@@ -98,19 +90,17 @@ int main(void)
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
 		on tile[IFM_CORE]:
 		{
-			par
+			/* Hall Server */
 			{
-				/* Hall Server */
-				{
-					hall_par hall_params;
-					init_hall_param(hall_params);
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
-				}
+				hall_par hall_params;
+				init_hall_param(hall_params);
+				run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
 			}
+
 		}
 
 	}

@@ -6,6 +6,7 @@
  * \version 1.0
  * \date 10/04/2014
  */
+
 /*
  * Copyright (c) 2014, Synapticon GmbH & XMOS Ltd
  * All rights reserved.

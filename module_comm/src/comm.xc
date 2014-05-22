@@ -7,37 +7,7 @@
  * \date 10/04/2014
  */
 
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
+ 
 
 #include <comm.h>
 
@@ -146,27 +116,24 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out, int min, int ma
 	qei_params.max_ticks_per_turn = __qei_max_counts(qei_params.real_counts);
 	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
 
-	//printstr(" value ");
-	//printintln(qei_params.max_ticks_per_turn );
-	//printintln(qei_params.max_ticks);
 	sensor_polarity = sensor_polarity&0x01;
 
 	switch(sensor_polarity)
 	{
 		case 0:
-			//printstr(" nor ");
+
 			sensor_polarity = NORMAL;
 			break;
 
 		case 1:
-			//printstr(" inv ");
+
 			sensor_polarity = INVERTED;
 			break;
 
 		default:
 			break;
 	}
-	//printintln(sensor_polarity);
+
 	qei_params.sensor_polarity = sensor_polarity;
 }
 
@@ -190,7 +157,7 @@ void update_csv_param_ecat(csv_par &csv_params, chanend coe_out)
 {
 	{csv_params.max_motor_speed, csv_params.nominal_current, csv_params.polarity, \
 		csv_params.max_acceleration, csv_params.motor_torque_constant} = csv_sdo_update(coe_out);
-		//return {max_motor_speed, nominal_current, polarity, max_acceleration, motor_torque_constant};
+
 	if(csv_params.polarity >= 0)
 		csv_params.polarity = 1;
 	else if(csv_params.polarity < 0)
@@ -327,7 +294,7 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
 		select
 		{
 			case c_signal :> command:
-				//printintln(command);
+
 				if(command == CHECK_BUSY)
 				{
 					c_signal <: init_state;
@@ -357,11 +324,7 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
 					}
 					commutation_params.qei_forward_offset = 0;
 					commutation_params.qei_backward_offset = 0;
-					//printstrln("ecat");
-//					printintln(hall_params.gear_ratio);
-//					printintln(hall_params.pole_pairs);
-//					printintln(commutation_params.max_speed_reached );
-//										printintln(commutation_params.angle_variance);
+
 
 				}
 				break;
@@ -382,8 +345,6 @@ void set_hall_param_ecat(chanend c_hall, hall_par &hall_params)
 	c_hall <: hall_params.pole_pairs;
 	c_hall <: hall_params.max_ticks;
 	c_hall <: hall_params.max_ticks_per_turn;
-	//hall_params.
-
 }
 
 void hall_init_ecat(chanend c_hall, hall_par &hall_params)
@@ -408,8 +369,6 @@ void hall_init_ecat(chanend c_hall, hall_par &hall_params)
 					c_hall :> hall_params.max_ticks_per_turn;
 					flag = 1;
 
-					//printintln(hall_params.max_ticks);
-					//printintln(hall_params.pole_pairs);
 
 				}
 				break;
@@ -459,10 +418,6 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
 					c_qei :> qei_params.sensor_polarity;
 					flag = 1;
 
-//					printintln(qei_params.gear_ratio);
-//					printintln(qei_params.index);
-//					printintln(qei_params.max_ticks_per_turn);
-//					printintln(qei_params.real_counts);
 				}
 				break;
 

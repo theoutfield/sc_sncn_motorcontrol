@@ -7,37 +7,7 @@
  * \date 10/04/2014
  */
 
-/*
- * Copyright (c) 2014, Synapticon GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. Execution of this software or parts of it exclusively takes place on hardware
- *    produced by Synapticon GmbH.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies,
- * either expressed or implied, of the Synapticon GmbH.
- *
- */
+ 
 
 #ifndef MOTOR_H_
 #define MOTOR_H_
@@ -48,8 +18,80 @@
 
 #pragma once
 
+<<<<<<< HEAD:module_motors/src/motor.h
 #define IFM_RESOLUTION              DC100_RESOLUTION
 #define VELOCITY_FILTER_SIZE        24      //default (could be changed upto 128)
+=======
+/*
+ * define Motor Specific Constants (found in motor specification sheet)
+ * Mandatory constants to be set
+ */
+#define POLE_PAIRS  				8
+#define MAX_NOMINAL_SPEED  			4000	// rpm
+#define MAX_NOMINAL_CURRENT  		2		// A
+#define MOTOR_TORQUE_CONSTANT 		34    	// mNm/A
+
+/* If you have any gears added specify gear-ratio
+ * and any additional encoders attached specify encoder resolution here (optional)
+ */
+#define GEAR_RATIO  				26		// if no gears are attached - set to gear ratio to 1
+#define ENCODER_RESOLUTION 			4000	// 4 x Max count of Quadrature Encoder (4X decoding)
+
+/* Choose Position/Velocity Sensor */
+#define SENSOR_USED 				HALL 	// QEI
+
+/*Define your Encoder type*/
+#define QEI_SENSOR_TYPE  			QEI_WITH_INDEX	// QEI_WITH_NO_INDEX
+
+#define QEI_SENSOR_POLARITY			NORMAL		// NORMAL
+
+/*Somanet IFM Internal Config*/
+#define IFM_RESOLUTION				DC100_RESOLUTION  // DC300_RESOLUTION   /* Specifies the current sensor resolution/A
+
+/*Changes direction of the motor drive*/
+#define POLARITY 					1		// 1 / -1
+
+/*Commutation offset (range 0-4095) */
+#define COMMUTATION_OFFSET_CLK		683
+#define COMMUTATION_OFFSET_CCLK		2731
+
+/*Motor Winding type*/
+#define WINDING_TYPE				DELTA_WINDING		// 1: star-type(Y) or 2: delta-type STAR_WINDING//
+
+/* Profile defines (optional) */
+#define MAX_PROFILE_VELOCITY  		MAX_NOMINAL_SPEED
+#define PROFILE_VELOCITY 			1000	// rpm
+#define MAX_ACCELERATION   			5000    // rpm/s
+#define PROFILE_ACCELERATION		2000	// rpm/s
+#define PROFILE_DECELERATION   		2000	// rpm/s
+#define QUICK_STOP_DECELERATION 	2000	// rpm/s
+#define PROFILE_TORQUE_SLOPE		200		// (desired torque_slope/torque_constant)  * IFM resolution
+#define MAX_TORQUE					MOTOR_TORQUE_CONSTANT * IFM_RESOLUTION * MAX_NOMINAL_CURRENT
+
+/* Control specific constants/variables */
+	/*Torque Control (Mandatory if Torque control used)*/
+#define TORQUE_KP					81920		//	(50/10)  * 16384
+#define TORQUE_KI					1638		//	(11/110) * 16384
+#define TORQUE_KD					1638		//	(1/10)   * 16384
+
+	/*Velocity Control (Mandatory if Velocity control used)*/
+#define VELOCITY_KP				 	8192       	//  (5/10)   * 16384
+#define VELOCITY_KI    				819			//  (5/100)  * 16384
+#define VELOCITY_KD				   	0			//	(0)      * 16384
+
+	/*Position Control (Mandatory if Position control used)*/
+#define POSITION_KP	 				1474		//	(180/2000)  * 16384
+#define POSITION_KI   				8			//	(50/102000) * 16384
+#define POSITION_KD    				164			//	(100/10000) * 16384
+#define MAX_POSITION_LIMIT 			359
+#define MIN_POSITION_LIMIT 			-359
+
+#define HALL 						1
+#define QEI_INDEX  					2
+#define QEI_NO_INDEX				3
+
+#define VELOCITY_FILTER_SIZE        8			//default (could be changed upto 16)
+>>>>>>> master:test_ethercat-motorctrl-mode/config/motor/bldc_motor_config.h
 
 /**
  * \brief Initialize Velocity sensor filter
@@ -137,3 +179,4 @@ void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 void init_position_control_param(ctrl_par &position_ctrl_params);
 
 #endif
+

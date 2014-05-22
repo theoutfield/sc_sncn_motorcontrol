@@ -1,8 +1,3 @@
-/**
-
-\page mods
-\section module_ctrl_loops
-
 This module provides three control loops for position, velocity and torque control. 
 Each of these control modes has separate Server loop and Client functions. The control 
 loops implemented are closed on data from sensors like position from hall sensor/qei 
@@ -22,5 +17,3 @@ Note: The controllers are not limited to only the sensors listed, for example if
 have a different type of position sensor and is interfaced to the IFM, all it needs
 is a specific sensor driver running on IFM Core and respective client functions to 
 read sensor information must be placed in controller implementation.   
-
-*/

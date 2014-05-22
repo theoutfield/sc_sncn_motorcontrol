@@ -18,8 +18,8 @@
 #define COM_CORE 0
 #define IFM_CORE 3
 
-on stdcore[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
-on stdcore[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
+on tile[IFM_CORE]: clock clk_adc = XS1_CLKBLK_1;
+on tile[IFM_CORE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 
 int main(void)
@@ -30,7 +30,7 @@ int main(void)
 	par
 	{
 
-		on stdcore[1]:
+		on tile[1]:
 		{
 			timer t;
 			unsigned int time;
@@ -45,7 +45,7 @@ int main(void)
 		/************************************************************
 		 * IFM_CORE
 		 ************************************************************/
-		on stdcore[IFM_CORE]:
+		on tile[IFM_CORE]:
 		{
 			run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
 		}
