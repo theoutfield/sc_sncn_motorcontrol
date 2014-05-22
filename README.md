@@ -1,19 +1,19 @@
-Sinusoidal Motor Control SOFTWARE COMPONENT 
+SOMANET Motor Control Software 
 ===============
-<a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/SYNAPTICON.md">
+<a href="https://github.com/synapticon/sc_sncn_motorcontrol/blob/master/SYNAPTICON.md">
 <img align="left" src="https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png"/>
 </a>
 <br/>
 <br/>
 
-Implementation of Sinusoidal Motor Control for BLDC drives on SOMANET devices.
+BLDC/Brushed DC Motor Control Software for SOMANET devices.
 
-* [How to?](https://github.com/synapticon/sc_sncn_motorctrl/tree/master/howto)
+* [How to?](https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/howto)
 
 <table>
 <tr>
   <td width="150px" height="30px">Latest release: </td>
-  <td width="300px"><a href="https://github.com/synapticon/sc_sncn_motorctrl_sin/releases/tag/v1.0">1.0</a></td>
+  <td width="300px"><a href="https://github.com/synapticon/sc_sncn_motorcontrol/releases/tag/v1.0">1.0</a></td>
 </tr>
 <tr>
   <td height="30px">Maintainer:</td>
@@ -23,7 +23,7 @@ Implementation of Sinusoidal Motor Control for BLDC drives on SOMANET devices.
 
 Key Features
 ---------
-   * Sinusoidal Commutation
+   * Commutation (sinusoidal)
    * Profile Position Control 
    * Profile Velocity Control
    * Profile Torque Control
@@ -62,7 +62,7 @@ Required software (dependencies)
 
 Changelog
 ---------
-  * [1.0](https://github.com/synapticon/sc_sncn_motorctrl_sin/releases/tag/v1.0) (2014-04-17)
+  * [1.0](https://github.com/synapticon/sc_sncn_motorcontrol/releases/tag/v1.0) (2014-04-17)
 	* Support GPIO Digital ports
 	* Homing feature
 	* Precise Position Control based on position sensor ticks
@@ -71,37 +71,37 @@ Changelog
 License
 ---------
 
-Please see [LICENSE](https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/LICENSE.md).
+Please see [LICENSE](https://github.com/synapticon/sc_sncn_motorcontrol/blob/master/LICENSE.md).
 
 
 [sc_sncn_ethercat]:https://github.com/synapticon/sc_sncn_ethercat
 [sc_pwm]: https://github.com/synapticon/sc_pwm
 [sc_somanet-base]: https://github.com/synapticon/sc_somanet-base
 
-[module_adc]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc
-[module_hall]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_hall
-[module_watchdog]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_watchdog
-[module_ecat_drive]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_ecat_drive
-[module_ctrl_loops]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_ctrl_loops
-[module_blocks]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_blocks
-[module_qei]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_qei
-[module_commutation]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_commutation
-[module_gpio]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_gpio
-[module_common]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_common
-[module_sm]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_sm
-[module_homing]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_homing
-[module_profile]:https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_profile
-[module_comm]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_comm
+[module_adc]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_adc
+[module_hall]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_hall
+[module_watchdog]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_watchdog
+[module_ecat_drive]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_ecat_drive
+[module_ctrl_loops]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_ctrl_loops
+[module_blocks]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_blocks
+[module_qei]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_qei
+[module_commutation]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_commutation
+[module_gpio]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_gpio
+[module_common]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_common
+[module_sm]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_sm
+[module_homing]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_homing
+[module_profile]:https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_profile
+[module_comm]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_comm
 
-[test_adc_external_input]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_ecat_drive
-[test_position-ctrl]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_position-ctrl
-[test_velocity-ctrl]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_velocity-ctrl
-[test_gpio_digital]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_gpio_digital
-[test_hall]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_hall
-[test_qei]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_qei
-[test_homing]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_homing
-[test_ethercat-motorctrl-mode]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_ethercat-motorctrl-mode
-[test_torque-ctrl]: https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/test_torque-ctrl
+[test_adc_external_input]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_ecat_drive
+[test_position-ctrl]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/test_position-ctrl
+[test_velocity-ctrl]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/test_velocity-ctrl
+[test_gpio_digital]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/test_gpio_digital
+[test_hall]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/test_hall
+[test_qei]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/test_qei
+[test_homing]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/test_homing
+[test_ethercat-motorctrl-mode]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/test_ethercat-motorctrl-mode
+[test_torque-ctrl]: https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/test_torque-ctrl
 
 [module_ethercat]: https://github.com/synapticon/sc_sncn_ethercat/tree/master/module_ethercat
 
