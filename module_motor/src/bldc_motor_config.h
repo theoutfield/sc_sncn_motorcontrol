@@ -12,28 +12,28 @@
  * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS                  7               // Number of pole pairs
-#define MAX_NOMINAL_SPEED           3740            // rpm
-#define MAX_NOMINAL_CURRENT         5               // A
-#define MOTOR_TORQUE_CONSTANT       53              // mNm/A
+#define POLE_PAIRS                  3               // Number of pole pairs
+#define MAX_NOMINAL_SPEED           4000            // rpm
+#define MAX_NOMINAL_CURRENT         2               // A
+#define MOTOR_TORQUE_CONSTANT       72              // mNm/A
 
 /**
  * If you have any gears added, specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (Mandatory)
  */
-#define GEAR_RATIO                  4                   // if no gears are attached - set to gear ratio to 1
+#define GEAR_RATIO                  1                    // if no gears are attached - set to gear ratio to 1
 #define ENCODER_RESOLUTION          16384               // 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
 
 /* Position Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
-#define SENSOR_USED                 QEI
+#define SENSOR_USED                 HALL
 
 /* Define your Incremental Encoder type (QEI_INDEX/ QEI_WITH_NO_INDEX) */
-#define QEI_SENSOR_TYPE             QEI_WITH_NO_INDEX
+#define QEI_SENSOR_TYPE             QEI_WITH_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
  *  (NORMAL/INVERTED) */
-#define QEI_SENSOR_POLARITY         INVERTED
+#define QEI_SENSOR_POLARITY         NORMAL
 
 /* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
  *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
@@ -44,7 +44,7 @@
 #define COMMUTATION_OFFSET_CCLK     2731
 
 /* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
-#define WINDING_TYPE                STAR_WINDING
+#define WINDING_TYPE                DELTA_WINDING
 
 /* Changes direction of the motor drive  (1 /-1) */
 #define POLARITY                    1
@@ -52,7 +52,7 @@
 /* Profile defines (Mandatory for profile modes) */
 #define MAX_PROFILE_VELOCITY        MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY            1000                // rpm
-#define MAX_ACCELERATION            5000                // rpm/s
+#define MAX_ACCELERATION            4000                // rpm/s
 #define PROFILE_ACCELERATION        2000                // rpm/s
 #define PROFILE_DECELERATION        2000                // rpm/s
 #define QUICK_STOP_DECELERATION     2000                // rpm/s
@@ -64,11 +64,11 @@
 /* Position Control (Mandatory if Position control used)
  * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
  * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define POSITION_Kp_NUMERATOR       160
+#define POSITION_Kp_NUMERATOR       100
 #define POSITION_Kp_DENOMINATOR     1000
 #define POSITION_Ki_NUMERATOR       1
-#define POSITION_Ki_DENOMINATOR     10000
-#define POSITION_Kd_NUMERATOR       1
+#define POSITION_Ki_DENOMINATOR     1200
+#define POSITION_Kd_NUMERATOR       0
 #define POSITION_Kd_DENOMINATOR     1000
 
 #if(SENSOR_USED == HALL)
@@ -83,7 +83,7 @@
 /* Torque Control (Mandatory if Torque control used)
  * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
  * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define TORQUE_Kp_NUMERATOR         8
+#define TORQUE_Kp_NUMERATOR         5
 #define TORQUE_Kp_DENOMINATOR       20
 #define TORQUE_Ki_NUMERATOR         1
 #define TORQUE_Ki_DENOMINATOR       110
