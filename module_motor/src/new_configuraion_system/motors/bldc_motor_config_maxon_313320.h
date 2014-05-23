@@ -1,6 +1,6 @@
 /**
- * \file motor_generic_bldc.h
- * \brief Motor parameters for a generic BLDC motor (Please set your motor parameter here)
+ * \file motor_maxon_313320.h
+ * \brief Motor parameters for the maxon EC-i 40, brushless, 50 Watt motor with Hall sensors (Part Number: 313320)
  * \author Andrija Feher <afeher@synapticon.com>
  * \version 1.0
  * \date 14/05/2014
@@ -10,17 +10,17 @@
  * Define Motor Specific Constants (found in specification sheet of your motor)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS  				0				// Number of pole pairs
-#define MAX_NOMINAL_SPEED  			0			    // rpm
-#define MAX_NOMINAL_CURRENT  		0				// A
-#define MOTOR_TORQUE_CONSTANT 		0    			// mNm/A
+#define POLE_PAIRS  				8				// Number of pole pairs
+#define MAX_NOMINAL_SPEED  			5260			// rpm
+#define MAX_NOMINAL_CURRENT  		2				// A
+#define MOTOR_TORQUE_CONSTANT 		34    			// mNm/A
 
 /**
  * If you have any gears added, specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (Mandatory)
  */
 #define GEAR_RATIO  				1				// if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION 			0			// 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
+#define ENCODER_RESOLUTION 			4000			// 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
 
 /* Position/Velocity Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
@@ -86,3 +86,104 @@
 #define POSITION_Ki_DENOMINATOR  	102000
 #define POSITION_Kd_NUMERATOR    	100
 #define POSITION_Kd_DENOMINATOR  	10000
+
+#define VELOCITY_FILTER_SIZE        8   //default (could be changed upto 16)
+
+/* Define Homing method (HOMING_POSITIVE_SWITCH/HOMING_NEGATIVE_SWITCH)
+ * this specifies direction for the node to find the home switch */
+#define HOMING_METHOD               HOMING_POSITIVE_SWITCH
+
+
+
+
+
+/*  DO NOT EDIT FROM HERE !!!*/
+
+
+
+
+
+/**
+ * \brief initialize Velocity sensor filter
+ *
+ * \param sensor_filter_par struct defines the velocity filter params
+ */
+void init_sensor_filter_param(filter_par &sensor_filter_par) ;
+
+/**
+ * \brief initialize QEI sensor
+ *
+ * \param qei_params struct defines the resolution for quadrature encoder (QEI),
+ *          gear-ratio, poles, encoder type
+ */
+void init_qei_param(qei_par &qei_params);
+
+/**
+ * \brief initialize hall sensor
+ *
+ * \param hall_params struct defines the pole-pairs and gear ratio
+ */
+void init_hall_param(hall_par &hall_params);
+
+/**
+ * \brief initialize cyclic synchronous velocity params
+ *
+ * \param csv_params struct defines cyclic synchronous velocity params
+ */
+void init_csv_param(csv_par &csv_params);
+
+/**
+ * \brief initialize cyclic synchronous position params
+ *
+ * \param csp_params struct defines cyclic synchronous position params
+ */
+void init_csp_param(csp_par &csp_params);
+
+/**
+ * \brief initialize cyclic synchronous torque params
+ *
+ * \param cst_params struct defines cyclic synchronous torque params
+ */
+void init_cst_param(cst_par &cst_params);
+
+/**
+ * \brief initialize profile position params
+ *
+ * \param pp_params struct defines profileposition params
+ */
+void init_pp_params(pp_par &pp_params);
+
+/**
+ * \brief initialize profile velocity params
+ *
+ * \param pv_params struct defines profile velocity params
+ */
+void init_pv_params(pv_par &pv_params);
+
+/**
+ * \brief initialize profile torque params
+ *
+ * \param pt_params struct defines profile torque params
+ */
+void init_pt_params(pt_par &pt_params);
+
+/**
+ * \brief initialize torque control PID params
+ *
+ * \param torque_ctrl_params struct defines torque control PID params
+ */
+void init_torque_control_param(ctrl_par &torque_ctrl_params);
+
+/**
+ * \brief initialize velocity control PID params
+ *
+ * \param velocity_ctrl_params struct defines velocity control PID params
+ */
+void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
+
+/**
+ * \brief initialize position control PID params
+ *
+ * \param position_ctrl_params struct defines position control PID params
+ */
+void init_position_control_param(ctrl_par &position_ctrl_params);
