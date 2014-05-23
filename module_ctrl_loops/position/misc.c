@@ -1,4 +1,3 @@
-
 /**
  * \file misc.xc
  * \author Pavan Kanajar <pkanajar@synapticon.com>
@@ -12,6 +11,6 @@
 float result_sqrt;
 int root_function(int arg)
 {
-	result_sqrt = (float) arg;
-	return (int) round(sqrt(result_sqrt));
+    result_sqrt = (float) arg;
+    return (int) round(sqrt(result_sqrt));
 }

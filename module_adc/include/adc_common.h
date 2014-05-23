@@ -1,4 +1,3 @@
-
 /**
  * \file adc_common.h
  * \brief ADC Common Definitions
@@ -6,10 +5,7 @@
  * \author Ludwig Orgler <lorgler@synapticon.com>
 */
 
- 
-
-#ifndef __ADC_COMMON_H__
-#define __ADC_COMMON_H__
+#pragma once
 
 typedef struct calibration {
 	int Ia_calib;
@@ -17,4 +13,3 @@ typedef struct calibration {
 	int Ic_calib;
 } calib_data;
 
-#endif /* __ADC_COMMON_H__ */

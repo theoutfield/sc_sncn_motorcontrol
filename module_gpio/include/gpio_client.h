@@ -1,9 +1,10 @@
-
 /**
  * \file gpio_client.h
  * \brief General Purpose IO Digital Client Functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
+
+#pragma once
 
 #include <xs1.h>
 #include <internal_config.h>

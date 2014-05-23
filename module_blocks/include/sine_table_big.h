@@ -1,4 +1,3 @@
-
 /**
  * \file sine_table_big.h
  * \brief Sine Loopup table declarations
@@ -6,7 +5,7 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
  */
 
- 
+#pragma once 
 
 int arctg1(int Real, int Imag);
 

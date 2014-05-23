@@ -1,15 +1,14 @@
-
 /**
  * \file gpio_server.h
  * \brief General Purpose IO Digital Server Implementation
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
+#pragma once
+
 #include <xs1.h>
 #include <internal_config.h>
 #include <platform.h>
-
-
 
 /**
  *	\fn gpio_digital_server(port p_ifm_ext_d0, port p_ifm_ext_d1, port p_ifm_ext_d2, port p_ifm_ext_d3,

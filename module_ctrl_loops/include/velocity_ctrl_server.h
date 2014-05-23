@@ -1,9 +1,10 @@
-
 /**
  * \file velocity_ctrl_server.h
  * \brief Velocity Control Loop Server Implementation
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
+
+#pragma once
 
 #include <internal_config.h>
 
@@ -26,6 +27,6 @@
  * \channel c_commutation channel to send motor voltage input value
  *
  */
-void velocity_control(ctrl_par &velocity_ctrl_params, filter_par &sensor_filter_params, hall_par &hall_params, qei_par &qei_params, \
-	 	 	 int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation);
+void velocity_control(ctrl_par & velocity_ctrl_params, filter_par & sensor_filter_params, hall_par & hall_params, qei_par & qei_params,
+                      int sensor_used, chanend c_hall, chanend c_qei, chanend c_velocity_ctrl, chanend c_commutation);
 

@@ -1,32 +1,32 @@
-
 /**
  * \file drive_config.h
  * \brief Motor Drive defines and configurations
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
- 
-
-#ifndef DRIVE_CONFIG_H_
-#define DRIVE_CONFIG_H_
 #pragma once
+
 #include <stdint.h>
 /**
  * \brief Modes of Operation (CiA402 Standard)
  *
- * 	M - Mandatory, C - Conditional, R - Recommended, O - optional , FG - Function Group
+ *  [M] - Mandatory
+ *  [C] - Conditional
+ *  [R] - Recommended
+ *  [O] - optional
+ *  [FG] - Function Group
  */
 
-#define	PP		1 	/* Profile Position mode 									O*/
-#define VL 		2	/* Velocity mode (frequency converter) 						O*/
-#define PV 		3   /* Profile velocity mode 									O*/
-#define TQ 		4   /* Torque profile mode 										O*/
-#define HM 		6	/* Homing mode 												O*/
-#define IP 		7	/* Interpolated position mode 								O*/
-#define CSP 	8	/* Cyclic synchronous position mode 						C*/
-#define CSV 	9	/* Cyclic synchronous velocity mode 						C*/
-#define CST 	10	/* Cyclic synchronous torque mode 							C*/
-#define CSTCA 	11	/* Cyclic synchronous torque mode with commutation angle 	O*/
+#define PP      1   /* [O] Profile Position mode */
+#define VL      2   /* [O] Velocity mode (frequency converter) */
+#define PV      3   /* [O] Profile velocity mode */
+#define TQ      4   /* [O] Torque profile mode */
+#define HM      6   /* [O] Homing mode */
+#define IP      7   /* [O] Interpolated position mode */
+#define CSP     8   /* [C] Cyclic synchronous position mode */
+#define CSV     9   /* [C] Cyclic synchronous velocity mode */
+#define CST     10  /* [C] Cyclic synchronous torque mode */
+#define CSTCA   11  /* [O] Cyclic synchronous torque mode with commutation angle */
 
 /* Manufacturer specific mode -128...-1 optional */
 
@@ -34,87 +34,85 @@
 
 //Common for all Modes of Operation (CiA402)
 
-#define SHUTDOWN				0x0006
-#define SWITCH_ON				0x000F
-#define QUICK_STOP  			0x000B
-#define CLEAR_FAULT 			0x0080
+#define SHUTDOWN                0x0006
+#define SWITCH_ON               0x000F
+#define QUICK_STOP              0x000B
+#define CLEAR_FAULT             0x0080
 
 //Operation Mode specific control words (complies with CiA402)
 
 /* Homing mode */
-#define START_HOMING 			0x001F
-#define HALT_HOMING  			0x011F
+#define START_HOMING            0x001F
+#define HALT_HOMING             0x011F
 
 /* Profile Position Mode */
-#define ABSOLUTE_POSITIONING 	0x001F
-#define RELATIVE_POSITIONING 	0x005F   	// supported currently
-#define STOP_POSITIONING		0x010F
+#define ABSOLUTE_POSITIONING    0x001F
+#define RELATIVE_POSITIONING    0x005F   // supported currently
+#define STOP_POSITIONING        0x010F
 
 /*Profile Velocity Mode*/
-#define HALT_PROFILE_VELOCITY	0x010F
+#define HALT_PROFILE_VELOCITY   0x010F
 
 /* Statusword */
 //state defined is ORed with current state
 
-#define TARGET_REACHED 			0x0400
+#define TARGET_REACHED          0x0400
 
 /* Homing Mode */
-#define HOMING_ATTAINED			0x1000
+#define HOMING_ATTAINED         0x1000
 
 /* Profile Position Mode */
-#define SET_POSITION_ACK	  	0x1000
+#define SET_POSITION_ACK        0x1000
 
 /* Profile Velocity Mode */
 #define TARGET_VELOCITY_REACHED 0x0400
 
 /*Controlword Bits*/
-#define SWITCH_ON_CONTROL					0x1
-#define ENABLE_VOLTAGE_CONTROL				0x2
-#define QUICK_STOP_CONTROL					0x4
-#define ENABLE_OPERATION_CONTROL			0x8
-#define OPERATION_MODES_SPECIFIC_CONTROL	0x70  /*3 bits*/
-#define FAULT_RESET_CONTROL					0x80
-#define HALT_CONTROL						0x100
-#define OPERATION_MODE_SPECIFIC_CONTROL		0x200
-#define RESERVED_CONTROL					0x400
-#define MANUFACTURER_SPECIFIC_CONTROL		0xf800
+#define SWITCH_ON_CONTROL                 0x1
+#define ENABLE_VOLTAGE_CONTROL            0x2
+#define QUICK_STOP_CONTROL                0x4
+#define ENABLE_OPERATION_CONTROL          0x8
+#define OPERATION_MODES_SPECIFIC_CONTROL  0x70  /*3 bits*/
+#define FAULT_RESET_CONTROL               0x80
+#define HALT_CONTROL                      0x100
+#define OPERATION_MODE_SPECIFIC_CONTROL   0x200
+#define RESERVED_CONTROL                  0x400
+#define MANUFACTURER_SPECIFIC_CONTROL     0xf800
 
 /*Statusword Bits*/
-#define READY_TO_SWITCH_ON_STATE	  		0X1
-#define SWITCHED_ON_STATE					0X2
-#define OPERATION_ENABLED_STATE				0X4
-#define FAULT_STATE							0X8
-#define VOLTAGE_ENABLED_STATE				0X10
-#define QUICK_STOP_STATE					0X20
-#define SWITCH_ON_DISABLED_STATE			0X40
-#define WARNING_STATE						0X80
-#define MANUFACTURER_SPECIFIC_STATE			0X100
-#define REMOTE_STATE						0X200
-#define TARGET_REACHED_OR_RESERVED_STATE	0X400
-#define INTERNAL_LIMIT_ACTIVE_STATE			0X800
-#define OPERATION_MODE_SPECIFIC_STATE		0X1000	// 12 CSP/CSV/CST  13
-#define MANUFACTURER_SPECIFIC_STATES   		0XC000	// 14-15
+#define READY_TO_SWITCH_ON_STATE          0x1
+#define SWITCHED_ON_STATE                 0x2
+#define OPERATION_ENABLED_STATE           0x4
+#define FAULT_STATE                       0x8
+#define VOLTAGE_ENABLED_STATE             0x10
+#define QUICK_STOP_STATE                  0x20
+#define SWITCH_ON_DISABLED_STATE          0x40
+#define WARNING_STATE                     0x80
+#define MANUFACTURER_SPECIFIC_STATE       0x100
+#define REMOTE_STATE                      0x200
+#define TARGET_REACHED_OR_RESERVED_STATE  0x400
+#define INTERNAL_LIMIT_ACTIVE_STATE       0x800
+#define OPERATION_MODE_SPECIFIC_STATE     0x1000  // 12 CSP/CSV/CST  13
+#define MANUFACTURER_SPECIFIC_STATES      0xC000  // 14-15
 
 typedef int bool;
 enum { false, true };
 
-typedef struct S_Check_list
-{
-	bool ready;
-	bool switch_on;
-	bool operation_enable;
-	bool mode_op;
-	bool fault;
+typedef struct S_Check_list {
+    bool ready;
+    bool switch_on;
+    bool operation_enable;
+    bool mode_op;
+    bool fault;
 
-	bool _commutation_init;
-	bool _hall_init;
-	bool _qei_init;
-	bool _adc_init;
-	bool _torque_init;
-	bool _velocity_init;
-	bool _position_init;
-
-}check_list;
+    bool _commutation_init;
+    bool _hall_init;
+    bool _qei_init;
+    bool _adc_init;
+    bool _torque_init;
+    bool _velocity_init;
+    bool _position_init;
+} check_list;
 
 
 bool __check_bdc_init(chanend c_signal);
@@ -196,14 +194,14 @@ check_list init_checklist(void);
  * \channel c_velocity_ctrl for communicating with the velocity control server
  * \channel c_position_ctrl for communicating with the position control server
  *
- * 	Input
+ *  Input
  * \param mode sets mode of operation
  *
  *  Output
  * \return check_list_param updated checklist parameters
  */
-void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
-		chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
+void update_checklist(check_list & check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
+                      chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
 int16_t update_statusword(int current_status, int state_reached, int ack, int q_active, int shutdown_ack);
 
@@ -217,4 +215,3 @@ int read_controlword_enable_op(int control_word);
 
 int read_controlword_fault_reset(int control_word);
 
-#endif /* DRIVE_CONFIG_H_*/

@@ -1,14 +1,15 @@
-
 /**
  * \file watchdog.h
  * \brief Watchdog Implementation
  * \author Victor de la Cruz <vdelacruz@synapticon.com>
  */
 
-#define WD_CMD_EN_MOTOR		1
-#define WD_CMD_DIS_MOTOR	2
-#define WD_CMD_TICK			3
-#define WD_CMD_START		4
+#pragma once
+
+#define WD_CMD_EN_MOTOR  1
+#define WD_CMD_DIS_MOTOR 2
+#define WD_CMD_TICK      3
+#define WD_CMD_START     4
 
 /** \brief Run the watchdog timer server
  *

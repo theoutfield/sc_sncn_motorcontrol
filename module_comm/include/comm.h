@@ -1,15 +1,11 @@
-
 /**
  * \file comm.h
  * \brief Ctrlproto data struct client
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
- 
-
-#ifndef COMM_H_
-#define COMM_H_
 #pragma once
+
 #include <refclk.h>
 #include <ctrlproto.h>
 #include <qei_client.h>
@@ -233,4 +229,3 @@ void hall_init_ecat(chanend c_hall, hall_par &hall_params);
  */
 void qei_init_ecat(chanend c_qei, qei_par &qei_params);
 
-#endif /* COMM_H_ */

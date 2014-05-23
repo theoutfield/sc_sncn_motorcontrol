@@ -1,4 +1,3 @@
-
 /**
  * \file delay.xc
  * \brief Implementation of delay functions
@@ -6,49 +5,43 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include <refclk.h>
+#include "refclk.h"
 
-void wait_micro_s(int microseconds, int tile_id, timer t)
+void wait_micro_s(unsigned microseconds, int tile_id, timer t)
 {
-	unsigned int time;
-	t :> time;
-	if(tile_id == 3)
-	{
-		t when timerafter(time + (microseconds * MSEC_FAST)/1000) :> time;
-	}
-	else
-	{
-		t when timerafter(time + (microseconds * MSEC_STD)/1000) :> time;
-	}
-	return;
+    unsigned time;
+
+    t :> time;
+    if(tile_id == 3) {
+        t when timerafter(time + (microseconds * USEC_FAST)) :> time;
+    } else {
+        t when timerafter(time + (microseconds * USEC_STD)) :> time;
+    }
+    return;
 }
 
-void wait_ms(int milliseconds, int tile_id, timer t)
+void wait_ms(unsigned milliseconds, int tile_id, timer t)
 {
-	unsigned int time;
-	t :> time;
-	if(tile_id == 3)
-	{
-		t when timerafter(time + milliseconds * MSEC_FAST) :> time;
-	}
-	else
-	{
-		t when timerafter(time + milliseconds * MSEC_STD) :> time;
-	}
-	return;
+    unsigned time;
+
+    t :> time;
+    if(tile_id == 3) {
+        t when timerafter(time + milliseconds * MSEC_FAST) :> time;
+    } else {
+        t when timerafter(time + milliseconds * MSEC_STD) :> time;
+    }
+    return;
 }
 
-void wait_s(int seconds, int tile_id, timer t)
+void wait_s(unsigned seconds, int tile_id, timer t)
 {
-	unsigned int time;
-	t :> time;
-	if(tile_id == 3)
-	{
-		t when timerafter(time + seconds * SEC_FAST) :> time;
-	}
-	else
-	{
-		t when timerafter(time + seconds * SEC_STD) :> time;
-	}
-	return;
+    unsigned time;
+
+    t :> time;
+    if(tile_id == 3) {
+        t when timerafter(time + seconds * SEC_FAST) :> time;
+    } else {
+        t when timerafter(time + seconds * SEC_STD) :> time;
+    }
+    return;
 }

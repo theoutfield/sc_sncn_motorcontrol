@@ -1,4 +1,3 @@
-
 /**
  * \file comm_loop_server.h
  * \brief Commutation Loop based on sinusoidal commutation method
@@ -6,6 +5,8 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  * \author Martin Schwarz <mschwarz@synapticon.com>
  */
+
+#pragma once
 
 #include "comm_loop_client.h"
 #include <watchdog.h>
@@ -31,8 +32,8 @@
  * \port p_ifm_coastn port to enable motor FET driver
  *
  */
-void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, chanend c_watchdog, \
-		chanend  c_commutation_p1, chanend  c_commutation_p2, chanend  c_commutation_p3, chanend c_pwm_ctrl,\
-		out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2,\
-		hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params);
+void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, chanend c_watchdog,
+                            chanend c_commutation_p1, chanend c_commutation_p2, chanend c_commutation_p3, chanend c_pwm_ctrl,
+                            out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2,
+                            hall_par & hall_params, qei_par & qei_params, commutation_par & commutation_params);
 

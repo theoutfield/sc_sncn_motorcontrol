@@ -1,10 +1,10 @@
-
 /**
  * \file filter_blocks.h
  * \brief Moving Average Filter Implementation
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
+#pragma once
 
 /**
  * \brief Initialise Moving Average Filter Parameters
@@ -15,7 +15,7 @@
  * \param filter_length defines the length of the filter
  *
  */
-void init_filter(int filter_buffer[], int &index, int filter_length);
+void init_filter(int filter_buffer[], int & index, int filter_length);
 
 /**
  * \brief Get moving average filtered output by passing
@@ -30,9 +30,9 @@ void init_filter(int filter_buffer[], int &index, int filter_length);
  * Output
  * \return filtered output
  */
-int filter(int filter_buffer[], int &index, int filter_length, int input);
+int filter(int filter_buffer[], int & index, int filter_length, int input);
 
 
 /* Internal function */
-int _modified_internal_filter(int filter_buffer[], int &index, int filter_length, int input);
+int _modified_internal_filter(int filter_buffer[], int & index, int filter_length, int input);
 

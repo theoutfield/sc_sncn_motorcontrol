@@ -1,12 +1,12 @@
-
 /**
  * \file velocity_ctrl_client.h
  * \brief Velocity Control Loop Client functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
-#include <internal_config.h>
+#pragma once
 
+#include <internal_config.h>
 
 /**
  * \brief Initialise Velocity Control Loop
@@ -68,7 +68,7 @@ int get_velocity(chanend c_velocity_ctrl);
  *  Input
  * \param velocity_ctrl_params struct defines the velocity control PID parameters
  */
-void set_velocity_ctrl_param(ctrl_par &velocity_ctrl_params, chanend c_velocity_ctrl);
+void set_velocity_ctrl_param(ctrl_par & velocity_ctrl_params, chanend c_velocity_ctrl);
 
 /**
  * \brief Set hall sensor parameters for Velocity Control
@@ -76,7 +76,7 @@ void set_velocity_ctrl_param(ctrl_par &velocity_ctrl_params, chanend c_velocity_
  *	Input
  * \param hall_params struct defines the pole-pairs and gear ratio
  */
-void set_velocity_ctrl_hall_param(hall_par &hall_params, chanend c_velocity_ctrl);
+void set_velocity_ctrl_hall_param(hall_par & hall_params, chanend c_velocity_ctrl);
 
 /**
  * \brief Set QEI sensor for Velocity Control
@@ -85,7 +85,7 @@ void set_velocity_ctrl_hall_param(hall_par &hall_params, chanend c_velocity_ctrl
  * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
  */
-void set_velocity_ctrl_qei_param(qei_par &qei_params, chanend c_velocity_ctrl);
+void set_velocity_ctrl_qei_param(qei_par & qei_params, chanend c_velocity_ctrl);
 
 /**
  * \brief Sets the sensor used for Velocity Control
@@ -109,7 +109,6 @@ void enable_velocity_ctrl(chanend c_velocity_ctrl);
  */
 void shutdown_velocity_ctrl(chanend c_velocity_ctrl);
 
-
 /**
  * \brief Set new target velocity for velocity control (advanced function)
  *
@@ -122,7 +121,7 @@ void shutdown_velocity_ctrl(chanend c_velocity_ctrl);
  * \param velocity_offset defines offset in velocity
  * \param torque_offset defines offset in torque
  */
-void set_velocity_csv(csv_par &csv_params, int target_velocity,
-		int velocity_offset, int torque_offset, chanend c_velocity_ctrl);
+void set_velocity_csv(csv_par & csv_params, int target_velocity,
+                      int velocity_offset, int torque_offset, chanend c_velocity_ctrl);
 
 

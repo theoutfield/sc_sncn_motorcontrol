@@ -1,4 +1,3 @@
-
 /**
  * \file a4935.h
  * \brief Driver header file for motor
@@ -47,11 +46,10 @@
 #define A4935_BIT_PWML 0x2
 #define A4935_BIT_PWMH 0x1
 
-#define A4935_AFTER_RESET_DELAY (200 * MSEC_FAST/*TICKS_MS*/) // 200ms
+#define A4935_AFTER_RESET_DELAY (200 * MSEC_FAST)
 
 /* e.g. a4935_init(p_mgmt, p_coast, A4935_BIT_PWMH | A4935_BIT_PWML); */
 void a4935_init(int configuration, out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn);
-
 
 void disable_motor(chanend c_commutation);
 

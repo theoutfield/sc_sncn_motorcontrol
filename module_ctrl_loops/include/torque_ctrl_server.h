@@ -1,13 +1,13 @@
-
 /**
  * \file  torque_ctrl_server.h
  * \brief Torque Control Loop Server Implementation
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
+#pragma once
+
 #include "comm_loop_client.h"
 #include <internal_config.h>
-
 
 /**
  * \brief Torque Control Loop
@@ -29,7 +29,6 @@
  *
  */
 
-void torque_control(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
-		int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
-
+void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
+                    int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
 

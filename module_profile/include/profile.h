@@ -2,19 +2,17 @@
 /**
  * \file profile.h
  * \brief Profile Generation for Position, Velocity and Torque
- * 	Implements position profile based on Linear Function with
- * 	Parabolic Blends, velocity profile and torque profiles are
- * 	based on linear functions.
+ *      Implements position profile based on Linear Function with
+ *      Parabolic Blends, velocity profile and torque profiles are
+ *      based on linear functions.
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
- 
+#pragma once 
 
 #include <stdio.h>
 #include <math.h>
 #include <internal_config.h>
-#ifndef _PROFILE_H_
-#define _PROFILE_H_
 
 /*Profile Velocity Quick Stop*/
 
@@ -81,7 +79,7 @@ extern int velocity_profile_generate(int step);
  *
  */
 extern void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params, \
-		hall_par hall_params, int sensor_select, int max_position, int min_position);
+                                         hall_par hall_params, int sensor_select, int max_position, int min_position);
 
 /**
  * \brief Initialise Position Profile
@@ -96,8 +94,8 @@ extern void init_position_profile_limits(int max_acceleration, int max_velocity,
  * Output
  * \return no. of steps for position profile : range [1 - steps]
  */
-extern int init_position_profile(int target_position, int actual_position,	int velocity, int acceleration, \
-        						 int deceleration);
+extern int init_position_profile(int target_position, int actual_position,      int velocity, int acceleration, \
+                                 int deceleration);
 
 /**
  * \brief Generate Position Profile
@@ -167,108 +165,108 @@ extern int linear_profile_generate(int step);
 
 typedef struct
 {
-	float max_acceleration;     // max acceleration
-	float max_velocity;
+    float max_acceleration;     // max acceleration
+    float max_velocity;
 
-	/*User Inputs*/
+    /* User Inputs */
 
-	float acc;					// acceleration
-	float dec; 					// deceleration
-	float vi;					// velocity
-	float qi;					// initial position
-	float qf; 				    // final position
+    float acc;                  // acceleration
+    float dec;                  // deceleration
+    float vi;                   // velocity
+    float qi;                   // initial position
+    float qf;                   // final position
 
-	/*Profile time*/
+    /* Profile time */
 
-	float T;    				// total no. of Samples
-	float s_time; 				// sampling time
+    float T;                    // total no. of Samples
+    float s_time;               // sampling time
 
-	int direction;
-	int acc_too_low;			// flag for low acceleration constraint
-	float acc_min;				// constraint minimum acceleration
-	float limit_factor;			// max acceleration constraint
+    int direction;
+    int acc_too_low;            // flag for low acceleration constraint
+    float acc_min;              // constraint minimum acceleration
+    float limit_factor;         // max acceleration constraint
 
-	/*LFPB motion profile constants*/
+    /*LFPB motion profile constants*/
 
-	float ai;
-	float bi;
-	float ci;
-	float di;
-	float ei;
-	float fi;
-	float gi;
+    float ai;
+    float bi;
+    float ci;
+    float di;
+    float ei;
+    float fi;
+    float gi;
 
-	/*internal velocity variables*/
+    /*internal velocity variables*/
 
-	float qid;					// initial velocity
-	float qfd;					// final velocity
+    float qid;                  // initial velocity
+    float qfd;                  // final velocity
 
-	float distance_cruise;
-	float total_distance;
-	float distance_acc;			// distance covered during acceleration
-	float distance_dec;			// distance covered during deceleration
-	float distance_left;		// distance left for cruise velocity
+    float distance_cruise;
+    float total_distance;
+    float distance_acc;         // distance covered during acceleration
+    float distance_dec;         // distance covered during deceleration
+    float distance_left;        // distance left for cruise velocity
 
-	float tb_acc;				// blend time for acceleration profile
-	float tb_dec;				// blend time for deceleration profile
-	float tf;					// total time for profile
-	float t_cruise;				// time for cruise velocity profile
-	float ts;					// variable to hold current sample time
+    float tb_acc;               // blend time for acceleration profile
+    float tb_dec;               // blend time for deceleration profile
+    float tf;                   // total time for profile
+    float t_cruise;             // time for cruise velocity profile
+    float ts;                   // variable to hold current sample time
 
-	float q;					// position profile
+    float q;                    // position profile
 
-	qei_par qei_params;
-	hall_par hall_params;
-	int sensor_used;
-	float max_position;
-	float min_position;
+    qei_par qei_params;
+    hall_par hall_params;
+    int sensor_used;
+    float max_position;
+    float min_position;
 
-} 	profile_position_param;
+}       profile_position_param;
 
-void __initialize_position_profile_limits(int max_acceleration, int max_velocity,  \
-		int sensor_select, int max_position, int min_position, profile_position_param *profile_pos_params);
+void __initialize_position_profile_limits( int max_acceleration, int max_velocity,
+                                           int sensor_select, int max_position, int min_position,
+                                           profile_position_param *profile_pos_params );
 
-int __initialize_position_profile(int target_position, int actual_position, int velocity, int acceleration, \
-		                  int deceleration, profile_position_param *profile_pos_params);
+int __initialize_position_profile( int target_position, int actual_position, int velocity, int acceleration,
+                                   int deceleration, profile_position_param *profile_pos_params );
 
 int __position_profile_generate_in_steps(int step, profile_position_param *profile_pos_params);
 
 typedef struct
 {
-	float max_acceleration, max_deceleration;	// max allowed acceleration & deceleration
-	float acc, dec;								// acceleration & deceleration input
-	float u;									// initial value
-	float v_d;									// desired value
-	float a_d;									// desired acceleration
-	float t; 									// time
-	float T;									// total no. of Samples
-	float s_time;								// sampling time
-	int oldst;									// old state of acc/dec
+    float max_acceleration, max_deceleration;   // max allowed acceleration & deceleration
+    float acc, dec;                             // acceleration & deceleration input
+    float u;                                    // initial value
+    float v_d;                                  // desired value
+    float a_d;                                  // desired acceleration
+    float t;                                    // time
+    float T;                                    // total no. of Samples
+    float s_time;                               // sampling time
+    int oldst;                                  // old state of acc/dec
 } profile_linear_param;
 
-int __init_linear_profile_float(float target_value, float actual_value, float acceleration,\
-		float deceleration, float max_value, profile_linear_param *profile_linear_params);
+int __init_linear_profile_float( float target_value, float actual_value, float acceleration,
+                                 float deceleration, float max_value, profile_linear_param * profile_linear_params );
 
-float __linear_profile_generate_float(int step, profile_linear_param *profile_linear_params);
+float __linear_profile_generate_float( int step, profile_linear_param *profile_linear_params );
 
 typedef struct
 {
-	float max_acceleration, max_deceleration;	// max allowed acceleration & deceleration
-	float acc, dec;								// acceleration & deceleration input
-	float u;									// initial velocity
-	float v_d;									// desired velocity
-	float a_d;									// desired acceleration
-	float t; 									// time
-	float T;									// total no. of Samples
-	float s_time;								// sampling time
-	int oldst;									// old state of acc/dec
+    float max_acceleration, max_deceleration;   // max allowed acceleration & deceleration
+    float acc, dec;                             // acceleration & deceleration input
+    float u;                                    // initial velocity
+    float v_d;                                  // desired velocity
+    float a_d;                                  // desired acceleration
+    float t;                                    // time
+    float T;                                    // total no. of Samples
+    float s_time;                               // sampling time
+    int oldst;                                  // old state of acc/dec
 } profile_velocity_param;
 
-int __initialize_velocity_profile(int target_velocity, int actual_velocity, int acceleration, \
-		int deceleration, int max_velocity, profile_velocity_param *profile_velocity_params);
+int __initialize_velocity_profile( int target_velocity, int actual_velocity, int acceleration,
+                                   int deceleration, int max_velocity, profile_velocity_param *profile_velocity_params );
 
-int __velocity_profile_generate_in_steps(int step, profile_velocity_param *profile_velocity_params);
+int __velocity_profile_generate_in_steps( int step, profile_velocity_param *profile_velocity_params );
 
-#endif
+#endif  /* ifndef __XC__ */
 
-#endif /* _PROFILE_H_ */

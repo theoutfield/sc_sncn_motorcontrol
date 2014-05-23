@@ -1,4 +1,3 @@
-
 /** 
  * \file adc_client_ad7949.h
  * \brief ADC Client
@@ -7,10 +6,11 @@
  */
 
 #pragma once
+
 #include <adc_common.h>
 
 
-/*!
+/**
  * \fn {int, int} get_adc_external_ad7949(chanend c_adc)
  * 
  * \brief Get external analog sensor value 
@@ -23,7 +23,7 @@
 {int, int} get_adc_external_ad7949(chanend c_adc);
 
 
-/*!
+/**
  * \fn {int, int, int, int, int, int, int, int} get_adc_all_ad7949( chanend c_adc)
  * \brief Get all ADC values
  *
@@ -41,7 +41,7 @@
 {int, int, int, int, int, int, int, int} get_adc_all_ad7949( chanend c_adc);
 
 
-/*!
+/**
  * \brief ADC current calibration sequence for Triggered ADC server
  *
  * \param c_adc the channel for communicating with the adc server
@@ -49,7 +49,7 @@
  */
 void do_adc_calibration_ad7949(chanend c_adc, calib_data &I_calib);
 
-/*!
+/**
  * \fn {int, int} get_adc_calibrated_current_ad7949( chanend c_adc )
  * \brief Get Calibrated current of two phases from the Triggered ADC server
  *

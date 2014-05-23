@@ -1,14 +1,11 @@
-
 /**
  * \file ecat_motor_drive.h
  * \brief Ethercat Motor Drive Server
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
- 
+#pragma once
 
-#ifndef ECAT_MOTOR_DRIVE_H_
-#define ECAT_MOTOR_DRIVE_H_
 #include <comm.h>
 #include <drive_config.h>
 #include <velocity_ctrl_client.h>
@@ -37,8 +34,8 @@
  *
  */
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_flash_data,
-        chanend c_signal, chanend c_hall, chanend c_qei, chanend c_torque_ctrl,
-        chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio);
+                      chanend c_signal, chanend c_hall, chanend c_qei, chanend c_torque_ctrl,
+                      chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio);
 
 int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation);
-#endif /* ECAT_MOTOR_DRIVE_H_ */
+

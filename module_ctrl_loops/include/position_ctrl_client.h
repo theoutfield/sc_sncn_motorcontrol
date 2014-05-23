@@ -5,11 +5,12 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
+#pragma once
+
 #include <internal_config.h>
 #include "refclk.h"
 #include "qei_client.h"
 #include "hall_client.h"
-
 
 /**
  * \brief Initialise Position Control Loop
@@ -123,7 +124,7 @@ void shutdown_position_ctrl(chanend c_position_ctrl);
  * \param velocity_offset defines offset in velocity
  * \param torque_offset defines offset in torque
  */
-void set_position_csp(csp_par &csp_params, int target_position, int position_offset, int velocity_offset,\
-		              int torque_offset, chanend c_position_ctrl);
+void set_position_csp(csp_par & csp_params, int target_position, int position_offset, int velocity_offset,
+                      int torque_offset, chanend c_position_ctrl);
 
 

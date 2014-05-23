@@ -114,8 +114,6 @@
 
 
 
-
-
 /**
  * \brief initialize Velocity sensor filter
  *

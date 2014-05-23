@@ -1,4 +1,3 @@
-
 /**
  * \file comm_loop_client.h
  * \brief Commutation Loop Client functions
@@ -20,15 +19,15 @@
  * \brief Struct for commutation parameters
  */
 typedef struct S_COMMUTATION {
-	int angle_variance;
-	int max_speed_reached;
-	int qei_forward_offset;
-	int qei_backward_offset;
-	int offset_forward;
-	int hall_offset_clk;
-	int hall_offset_cclk;
-	int winding_type;
-	int flag;
+    int angle_variance;
+    int max_speed_reached;
+    int qei_forward_offset;
+    int qei_backward_offset;
+    int offset_forward;
+    int hall_offset_clk;
+    int hall_offset_cclk;
+    int winding_type;
+    int flag;
 } commutation_par;
 
 /**
@@ -38,7 +37,7 @@ typedef struct S_COMMUTATION {
  * \param hall_params struct defines the pole-pairs and gear ratio
  * \param nominal speed is the rated speed for the motor given on specs sheet
  */
-void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
+void init_commutation_param(commutation_par & commutation_params, hall_par & hall_params, int nominal_speed);
 
 /**
  * \brief Initialize commutation loop
@@ -75,7 +74,7 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
  * 	 Input
  * 	\param commutation_params struct defines the commutation angle parameters
  */
-void set_commutation_params(chanend c_commutation, commutation_par &commutation_params);
+void set_commutation_params(chanend c_commutation, commutation_par & commutation_params);
 
 //
 //void disable_motor(chanend c_commutation);

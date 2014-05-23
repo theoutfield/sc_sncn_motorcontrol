@@ -2,16 +2,12 @@
 /**
  * \file profile_control.h
  * \brief Profile Control functions
- * 	Implements position profile control, velocity profile control
- * 	and torque profile control functions
+ *  Implements position profile control, velocity profile control
+ *  and torque profile control functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
- 
-
-#ifndef _PROFILE_CONTROL_H_
-#define _PROFILE_CONTROL_H_
-
+#pragma once
 
 #include <xs1.h>
 #include <platform.h>
@@ -29,8 +25,8 @@
  * \param deceleration in (rpm/s)
  *
  */
-void set_profile_position(int target_position, int velocity, int acceleration, int deceleration, \
-		int sensor_select, chanend c_position_ctrl);
+void set_profile_position( int target_position, int velocity, int acceleration, int deceleration,
+                           int sensor_select, chanend c_position_ctrl );
 
 /**
  * \brief Set profile velocity with Velocity Control loop
@@ -45,7 +41,8 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
  * \param max_profile_velocity is max velocity for the profile in (rpm)
  *
  */
-void set_profile_velocity(int target_velocity, int acceleration, int deceleration, int max_profile_velocity, chanend c_velocity_ctrl);
+void set_profile_velocity( int target_velocity, int acceleration, int deceleration,
+                           int max_profile_velocity, chanend c_velocity_ctrl );
 
 /**
  * \brief Set profile torque with Torque Control loop
@@ -59,6 +56,6 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
  * \param cst_params struct defines cyclic synchronous torque params
  *
  */
-void set_profile_torque(int target_torque, int torque_slope, cst_par &cst_params, chanend c_torque_ctrl);
+void set_profile_torque( int target_torque, int torque_slope,
+                         cst_par & cst_params, chanend c_torque_ctrl );
 
-#endif /* _PROFILE_CONTROL_H_ */

@@ -1,10 +1,12 @@
 /**
  * \file adc_server_ad7949.h
  * \brief ADC Server
- * \authors Martin Schwarz <mschwarz@synapticon.com>, Ludwig Orgler <lorgler@synapticon.com> 
+ * \author Martin Schwarz <mschwarz@synapticon.com>
+ * \author Ludwig Orgler <lorgler@synapticon.com> 
  */
 
 #pragma once
+
 #include <xs1.h>
 #include <xclib.h>
 #include "adc_common.h"
@@ -25,10 +27,10 @@
  *
  */
 void adc_ad7949( chanend c_adc,
-			     clock clk,
-			     buffered out port:32 p_sclk_conv_mosib_mosia,
-			     in buffered port:32 p_data_a,
-			     in buffered port:32 p_data_b );
+                 clock clk,
+                 buffered out port:32 p_sclk_conv_mosib_mosia,
+                 in buffered port:32 p_data_a,
+                 in buffered port:32 p_data_b );
 
 
 /**
@@ -50,8 +52,8 @@ void adc_ad7949( chanend c_adc,
  *
  */
 void adc_ad7949_triggered( chanend c_adc,
-			   	   	   	   chanend c_trig,
-			   	   	   	   clock clk,
-			   	   	   	   buffered out port:32 p_sclk_conv_mosib_mosia,
-			   	   	   	   in buffered port:32 p_data_a,
-			   	   	   	   in buffered port:32 p_data_b );
+                           chanend c_trig,
+                           clock clk,
+                           buffered out port:32 p_sclk_conv_mosib_mosia,
+                           in buffered port:32 p_data_a,
+                           in buffered port:32 p_data_b );

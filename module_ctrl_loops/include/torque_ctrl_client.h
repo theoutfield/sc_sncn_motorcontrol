@@ -1,9 +1,10 @@
-
 /**
  * \file  torque_ctrl_client.h
  * \brief Torque Control Loop Client functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
+
+#pragma once
 
 #include <internal_config.h>
 
@@ -66,14 +67,14 @@ void set_torque(int torque, chanend c_torque_ctrl);
  *  Input
  * \param torque_ctrl_params struct defines the torque control PID parameters
  */
-void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl);
+void set_torque_ctrl_param(ctrl_par & torque_ctrl_params, chanend c_torque_ctrl);
 
 /**
  * \brief Set hall sensor parameters for Torque Control
  *
  * \param hall_params struct defines the pole-pairs and gear ratio
  */
-void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl);
+void set_torque_ctrl_hall_param(hall_par & hall_params, chanend c_torque_ctrl);
 
 /**
  * \brief Set QEI sensor parameters for Torque Control
@@ -81,7 +82,7 @@ void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl);
  * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
  */
-void set_torque_ctrl_qei_param(qei_par &qei_params, chanend c_torque_ctrl);
+void set_torque_ctrl_qei_param(qei_par & qei_params, chanend c_torque_ctrl);
 
 /**
  * \brief Sets the sensor used for Torque Control
@@ -104,7 +105,6 @@ void enable_torque_ctrl(chanend c_torque_ctrl);
  */
 void shutdown_torque_ctrl(chanend c_torque_ctrl);
 
-
 /**
  * \brief Set new target torque for torque control (advanced function)
  *
@@ -116,5 +116,5 @@ void shutdown_torque_ctrl(chanend c_torque_ctrl);
  * \param target_torque is the new target torque
  * \param torque_offset defines offset in torque
  */
-void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl);
+void set_torque_cst(cst_par & cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl);
 

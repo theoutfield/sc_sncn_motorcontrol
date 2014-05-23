@@ -6,8 +6,7 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
  */
 
-#ifndef __QEI_CLIENT_H__
-#define __QEI_CLIENT_H__
+#pragma once
 
 #include <bldc_motor_config.h>
 #include "filter_blocks.h"
@@ -107,4 +106,3 @@ void set_qei_sync_offset(chanend c_qei, int offset_forward, int offset_backward)
 
 void reset_qei_count(chanend c_qei, int offset);
 
-#endif /* __QEI_CLIENT_H__ */

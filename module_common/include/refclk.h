@@ -1,14 +1,12 @@
-
 /**
  * \file refclk.h
- * \brief Reference Core Clock definitions
+ * \brief Reference Clock definitions
  * \author Martin Schwarz <mschwarz@synapticon.com>
  */
 
- 
 
 #pragma once
-//#include "platform.h"
+
 #include <xs1.h>
 
 /* 10NSEC_STD --> 1 */
@@ -41,7 +39,7 @@
  * \param core_id specify the core number in which the function is called
  * \param t timer used to calculate the microseconds elapsed
  */
-void wait_micro_s(int microseconds, int core_id, timer t);
+void wait_micro_s(unsigned microseconds, int core_id, timer t);
 
 /**
  * \brief Delay function in milliseconds
@@ -51,7 +49,7 @@ void wait_micro_s(int microseconds, int core_id, timer t);
  * \param core_id specify the core number in which the function is called
  * \param t timer used to calculate the milliseconds elapsed
  */
-void wait_ms(int milliseconds, int core_id, timer t);
+void wait_ms(unsigned milliseconds, int core_id, timer t);
 
 
 /**
@@ -62,4 +60,4 @@ void wait_ms(int milliseconds, int core_id, timer t);
  * \param core_id specify the core number in which the function is called
  * \param t timer used to calculate the seconds elapsed
  */
-void wait_s(int seconds, int core_id, timer t);
+void wait_s(unsigned seconds, int core_id, timer t);
