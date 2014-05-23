@@ -12,7 +12,6 @@ APP_NAME =
 
 USED_MODULES = module_common module_gpio sc_somanet-base/module_nodeconfig
 
-#
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

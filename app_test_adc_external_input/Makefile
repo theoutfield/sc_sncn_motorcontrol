@@ -10,8 +10,7 @@ APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 
-USED_MODULES = module_adc module_blocks module_brushed_dc module_common module_commutation module_ctrl_loops module_hall module_pwm_common module_pwm_symmetrical module_qei module_sm sc_somanet-base/module_nodeconfig sc_somanet-base/module_xscope-wrapper
-
+USED_MODULES = module_adc module_blocks module_brushed_dc module_common module_commutation module_ctrl_loops module_hall module_motor module_pwm_common module_pwm_symmetrical module_qei module_sm sc_somanet-base/module_nodeconfig sc_somanet-base/module_xscope-wrapper
 
 
 # The flags passed to xcc when building the application
