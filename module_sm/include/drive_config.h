@@ -3,9 +3,7 @@
  * \file drive_config.h
  * \brief Motor Drive defines and configurations
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
  
 

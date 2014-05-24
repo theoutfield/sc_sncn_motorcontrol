@@ -3,9 +3,7 @@
  * \file profile_position_quick-stop.c
  * \brief Quick stop Profile Generation for Position
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
  
 

@@ -3,9 +3,7 @@
  * \file drive_sys.xc
  * \brief Motor Drive State Machine Implementation
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #include <drive_config.h>
 #include <internal_config.h>

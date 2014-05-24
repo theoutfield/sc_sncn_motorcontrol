@@ -4,9 +4,7 @@
  * \brief ADC Server
  * \author Martin Schwarz <mschwarz@synapticon.com>
  * \author Ludwig Orgler <lorgler@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
  
 

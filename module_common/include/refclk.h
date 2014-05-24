@@ -3,8 +3,6 @@
  * \file refclk.h
  * \brief Reference Core Clock definitions
  * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
  

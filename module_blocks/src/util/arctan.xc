@@ -4,9 +4,7 @@
  * \brief Arc tangent calculations
  * \author Ludwig Orgler <lorgler@synapticon.com>
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
  
 

@@ -3,8 +3,6 @@
  * \file  torque_ctrl_server.h
  * \brief Torque Control Loop Server Implementation
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
 #include "comm_loop_client.h"

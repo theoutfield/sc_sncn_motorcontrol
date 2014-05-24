@@ -3,9 +3,7 @@
  * \file gpio_server.xc
  * \brief General Purpose IO Digital Server Implementation
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #include <gpio_server.h>
 

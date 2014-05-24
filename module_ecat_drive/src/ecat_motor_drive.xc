@@ -2,9 +2,7 @@
  * \file ecat_motor_drive.xc
  * \brief Ethercat Motor Drive Server
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #include <ecat_motor_drive.h>
 #include <xscope.h>

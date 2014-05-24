@@ -3,9 +3,7 @@
  * \file a4935.h
  * \brief Driver header file for motor
  * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 /*
  * Copyright (c) 2014, Synapticon GmbH
  * All rights reserved.

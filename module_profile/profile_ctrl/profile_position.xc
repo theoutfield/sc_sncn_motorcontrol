@@ -4,9 +4,7 @@
  * \brief Profile Position Control functions
  * 	Implements position profile control function
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #include "position_ctrl_client.h"
 #include "refclk.h"

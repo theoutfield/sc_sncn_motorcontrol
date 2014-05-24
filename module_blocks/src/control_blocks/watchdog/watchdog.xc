@@ -3,8 +3,6 @@
  * \file watchdog.xc
  * \brief Watchdog Implementation
  * \author Victor de la Cruz <vdelacruz@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
 /*

@@ -1,0 +1,127 @@
+External ADC Input Demo
+=======================
+
+.. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
+   :align: center
+   :alt: SYNAPTICON
+
+   SYNAPTICON
+`test\_adc\_external\_input.xc <https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_adc_external_input/src/test_adc_external_input.xc>`_
+illustrates usage of
+`module\_adc <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc>`_
+to get external analog sensor input values. By default all analog inputs
+are configured as differential only.
+
+.. raw:: html
+
+   <table align="center" cellpadding="5" width="80%">
+   <tr>
+       <th colspan="2">
+
+CORE use
+
+.. raw:: html
+
+   </th>
+       <td rowspan="3" width="1px"></td>
+       <th colspan="3">
+
+HW compatibility
+
+.. raw:: html
+
+   </th>
+   </tr>
+   <tr>
+       <td>
+
+Parallel THREADS
+
+.. raw:: html
+
+   </td>
+       <td width="30px" align="center"> 
+
+2
+
+.. raw:: html
+
+   </td>
+
+::
+
+    <th align="center">COM</th>
+    <th align="center">CORE</th>
+    <th align="center">IFM</th>
+
+.. raw:: html
+
+   </tr>
+   <tr>
+       <td>
+
+TILES used
+
+.. raw:: html
+
+   </td>
+       <td width="30px" align="center"> 
+
+2
+
+.. raw:: html
+
+   </td>
+
+::
+
+    <td rowspan="2" align="center">*</td>
+    <td rowspan="2" align="center">C21-DX <br/> C22 </td>
+    <td rowspan="2" align="center">Drive DC 100 <br/> Drive DC 300</td>
+
+.. raw:: html
+
+   </tr>
+   </table>
+
+-  **THREADS**: ADC Client Side, ADC Server Side.
+-  **TILES**:
+   ``objectivec      #define TILE_ONE 0     #define IFM_TILE 3`` > **Do
+   not forget to set properly your motor configuration when using this
+   application**.
+
+ - `How to configure your
+motors <https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md>`_
+
+TILE\_ONE
+~~~~~~~~~
+
+This tile (0 by default) takes care of the client side functions . Since
+these functions do not require any port access, any free TILE could run
+them. ``objectivec      on stdcore[TILE_ONE]:`` - **Thread**: ADC Client
+``objectivec      adc_test(c_adc);`` Read and print on the console the
+readed values on both ADC ports. Read more at
+`module\_adc <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc>`_.
+
+IFM\_TILE
+~~~~~~~~~
+
+This tile (3 by default) executes the server side functions, controlling
+the interfaces. These functions need access to the Interface Module
+(IFM), just the tile that provides access to the IFM ports can run these
+functions. ``objectivec      on stdcore[IFM_TILE]:`` - **Thread**: ADC
+Server
+``objectivec      adc_ad7949( c_adc, clk_adc, p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa, p_ifm_adc_misob );``
+Interfaces the ADC and provide the readed values to the client side
+thread. Read more at
+`module\_adc <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc>`_.
+
+More information about ADC module can be found at
+`module\_adc <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_adc>`_
+documentation.
+
+**See also**:
+
+-  `Getting started with
+   SOMANET <http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET>`_
+

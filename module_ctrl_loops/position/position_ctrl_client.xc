@@ -3,9 +3,7 @@
  * \file  position_ctrl_client.xc
  * \brief Position control Loop Client functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #include <position_ctrl_client.h>
 #include <print.h>

@@ -3,8 +3,6 @@
  * \file sine_table_big.c
  * \brief Sine Loopup tables
  * \author Ludwig Orgler <lorgler@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
  

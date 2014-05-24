@@ -5,9 +5,7 @@
  * 	Implements position profile control, velocity profile control
  * 	and torque profile control functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
  
 

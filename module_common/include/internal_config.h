@@ -3,9 +3,7 @@
  * \file internal_config.h
  * \brief Internal Definitions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #ifndef INTERNAL_CONFIG_H_
 #define INTERNAL_CONFIG_H_

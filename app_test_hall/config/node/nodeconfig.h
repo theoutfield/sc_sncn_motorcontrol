@@ -3,9 +3,7 @@
  * \file nodeconfig.h
  * \brief Node config file
  * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
  
 
 #ifndef __NODECONFIG_H__

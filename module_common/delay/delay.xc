@@ -4,9 +4,7 @@
  * \brief Implementation of delay functions
  * \author Martin Schwarz <mschwarz@synapticon.com>
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #include <refclk.h>
 

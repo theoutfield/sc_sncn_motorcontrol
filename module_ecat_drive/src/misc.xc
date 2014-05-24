@@ -2,9 +2,7 @@
 /**
  * \file misc.xc
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
  
 

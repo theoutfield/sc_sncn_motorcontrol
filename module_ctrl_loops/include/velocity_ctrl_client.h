@@ -3,8 +3,6 @@
  * \file velocity_ctrl_client.h
  * \brief Velocity Control Loop Client functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
 #include <internal_config.h>

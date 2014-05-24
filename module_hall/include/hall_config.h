@@ -4,9 +4,7 @@
  * \brief Hall Sensor Config Definitions
  * \author Ludwig Orgler <lorgler@synapticon.com>
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #ifndef __HALL_CONFIG_H__
 #define __HALL_CONFIG_H__

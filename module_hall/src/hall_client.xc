@@ -5,9 +5,7 @@
  * \author Ludwig Orgler <lorgler@synapticon.com>
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
 #include "hall_client.h"
 

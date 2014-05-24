@@ -3,9 +3,7 @@
  * \file profile_velocity_quick-stop.c
  * \brief Quick stop Profile Generation for Velocity
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
- */
+*/
 
  
 

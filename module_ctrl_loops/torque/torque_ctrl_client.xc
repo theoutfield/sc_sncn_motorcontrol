@@ -3,8 +3,6 @@
  * \file  torque_ctrl_client.xc
  * \brief Torque Control Loop Client functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
 
 #include "torque_ctrl_client.h"
