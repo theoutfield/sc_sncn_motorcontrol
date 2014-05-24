@@ -24,7 +24,6 @@ void hall_test(chanend c_hall)
 {
 	int position;
 	int velocity;
-	int core_id = 1;
 	timer t;
 	int direction;
 	hall_par hall_params;

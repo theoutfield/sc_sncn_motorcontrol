@@ -3,8 +3,6 @@
  * \file bldc_motor_init.xc
  * \brief Motor Control config initialization functions
  * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
  */
  
 
