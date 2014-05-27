@@ -5,9 +5,6 @@
  */
 
 #include "velocity_ctrl_server.h"
-#ifdef BDC
-#include "brushed_dc_client.h"
-#endif
 #include "refclk.h"
 #include "qei_client.h"
 #include "hall_client.h"
@@ -17,6 +14,10 @@
 #include <internal_config.h>
 #include <drive_config.h>
 #include "print.h"
+
+#ifdef BDC
+#include "brushed_dc_client.h"
+#endif
 
 //#define Debug_velocity_ctrl
 //#define debug_print
@@ -161,10 +162,10 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                 } else if (velocity_control_out < -velocity_ctrl_params.Control_limit) {
                     velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
                 }
-#ifndef BDC
-                set_commutation_sinusoidal(c_commutation, velocity_control_out);
+#ifdef BDC
+                set_bdc_voltage(c_commutation, velocity_control_out);                
 #else
-                set_bdc_voltage(c_commutation, velocity_control_out);
+                set_commutation_sinusoidal(c_commutation, velocity_control_out);
 #endif
                 previous_error = error_velocity;
             }

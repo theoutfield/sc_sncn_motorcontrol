@@ -9,6 +9,7 @@
 #include <print.h>
 #include <gpio_client.h>
 #include <flash_somanet.h>
+
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 void xscope_initialise()
@@ -154,7 +155,7 @@ void start_torque_acquistion(int ctrl_state, chanend c_torque_ctrl)
 /*core 0/1/2 only*/
 //#define ENABLE_xscope_main
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_flash_data, chanend c_signal, chanend c_hall,
-                      chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl,   chanend c_gpio)
+                      chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio)
 {
     int i = 0;
     int mode = 40;

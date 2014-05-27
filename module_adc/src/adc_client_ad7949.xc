@@ -4,7 +4,6 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
  * \author Ludwig Orgler <lorgler@synapticon.com> 
  */
->>>>>>> mainly cosmetic changes
 
 #include <adc_common.h>
 

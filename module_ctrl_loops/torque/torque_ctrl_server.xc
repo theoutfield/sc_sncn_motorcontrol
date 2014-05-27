@@ -10,9 +10,6 @@
 #include <print.h>
 #include <drive_config.h>
 #include <internal_config.h>
-#ifdef BDC
-#include "brushed_dc_client.h"
-#endif
 #include "adc_client_ad7949.h"
 #include "qei_client.h"
 #include "hall_client.h"

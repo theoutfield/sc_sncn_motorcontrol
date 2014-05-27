@@ -173,6 +173,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src/motors}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src/motors}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1089778898" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -300,6 +302,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src/motors}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src/motors}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1405597733" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -433,6 +437,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src/motors}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src/motors}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1957181808" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -444,6 +450,7 @@
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 		</cconfiguration>
 		<cconfiguration id="com.xmos.cdt.toolchain.1116943181">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.1116943181" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -616,6 +623,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src/motors}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src/motors}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1375971927" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -743,6 +752,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src/motors}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src/motors}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1840540910" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -876,6 +887,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motor/src/motors}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motor/src/motors}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1553070567" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -888,6 +901,7 @@
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">

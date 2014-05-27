@@ -581,7 +581,7 @@ int __position_profile_generate_in_steps(int step, profile_position_param *profi
                 (profile_pos_params->ts <= profile_pos_params->tf) ) {
         profile_pos_params->q = (profile_pos_params->ei + (profile_pos_params->ts - profile_pos_params->tf) *
                                  profile_pos_params->fi + (profile_pos_params->ts - profile_pos_params->tf) *
-                                 (profile_pos_params->ts - profile_pos_params->tf) * profile_pos_params->gi;
+                                 (profile_pos_params->ts - profile_pos_params->tf) * profile_pos_params->gi);
     }
 
     return (int) round(profile_pos_params->q);

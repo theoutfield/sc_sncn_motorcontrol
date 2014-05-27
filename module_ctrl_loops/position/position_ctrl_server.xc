@@ -5,12 +5,13 @@
 */
 
 #include <position_ctrl_server.h>
-#ifdef BDC
-#include "brushed_dc_client.h"
-#endif
 #include <xscope.h>
 #include <print.h>
 #include <drive_config.h>
+
+#ifdef BDC
+#include "brushed_dc_client.h"
+#endif
 
 //#define DEBUG
 //#define debug_print
@@ -108,10 +109,10 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                     position_control_out = 0 - position_ctrl_params.Control_limit;
                 }
 
-#ifndef BDC
-                set_commutation_sinusoidal(c_commutation, position_control_out);
-#else
+#ifdef BDC
                 set_bdc_voltage(c_commutation, position_control_out);
+#else
+                set_commutation_sinusoidal(c_commutation, position_control_out);
 #endif
 
 #ifdef DEBUG
