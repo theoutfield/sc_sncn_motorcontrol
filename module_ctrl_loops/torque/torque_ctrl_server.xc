@@ -6,7 +6,7 @@
 
 #include "torque_ctrl_server.h"
 #include <refclk.h>
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include <print.h>
 #include <drive_config.h>
 #include <internal_config.h>

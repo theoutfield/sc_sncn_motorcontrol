@@ -10,21 +10,18 @@ APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 
-USED_MODULES = module_blocks module_common sc_somanet-base/module_nodeconfig
-
-#
+USED_MODULES = module_blocks module_motorcontrol_common module_nodeconfig
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O0 -Wcodes -Xmapper -Wcodes -lxscope
-XCC_FLAGS_Release = -g -O3 -Wcodes -Xmapper -Wcodes -lxscope
+XCC_FLAGS_Debug = -g -O0 -lxscope
+XCC_FLAGS_Release = -g -O3 -lxscope
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
 VERBOSE = 0
-AUTO_ECLIPSE = 0
 
 XMOS_MAKE_PATH ?= ../..
 -include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common

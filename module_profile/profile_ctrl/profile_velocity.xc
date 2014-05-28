@@ -7,7 +7,7 @@
 
 #include "velocity_ctrl_client.h"
 #include "refclk.h"
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include <internal_config.h>
 #include <drive_config.h>
 #include "print.h"

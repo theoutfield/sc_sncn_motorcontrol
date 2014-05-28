@@ -12,7 +12,6 @@
 #include "comm_loop_client.h"
 #include "refclk.h"
 #include "velocity_ctrl_client.h"
-#include <xscope.h>
 #include <internal_config.h>
 #include <drive_config.h>
 

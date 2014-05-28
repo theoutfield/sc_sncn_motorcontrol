@@ -12,7 +12,7 @@
 #include <ioports.h>
 #include <refclk.h>
 #include <internal_config.h>
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include <gpio_server.h>
 #include <gpio_client.h>
 

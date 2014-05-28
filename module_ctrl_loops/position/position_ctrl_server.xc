@@ -5,7 +5,7 @@
 */
 
 #include <position_ctrl_server.h>
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include <print.h>
 #include <drive_config.h>
 

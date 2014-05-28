@@ -9,18 +9,20 @@ TARGET = SOMANET-C22-Motor_control-XScope_v13
 APP_NAME = 
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_motor module_adc module_blocks module_comm module_common module_commutation module_ctrl_loops module_hall module_profile module_qei module_sm sc_pwm/module_pwm_symmetrical sc_sncn_ctrlproto/module_ctrlproto sc_sncn_ethercat/module_ethercat sc_somanet-base/module_fwupdate sc_somanet-base/module_nodeconfig
-
+USED_MODULES = module_motor module_adc module_blocks module_motorcontrol_api \
+               module_motorcontrol_common module_commutation module_ctrl_loops module_hall \
+               module_profile module_qei module_sm module_pwm_symmetrical module_ctrlproto \
+               module_ethercat module_ethercat_fwupdate module_nodeconfig \
+               module_xscope-wrapper
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O3 -Wcodes -Xmapper -Wcodes -lxscope
-XCC_FLAGS_Release = -g -O3 -Wcodes -Xmapper -Wcodes -lxscope
+XCC_FLAGS_Debug = -g -O3 -fxscope
+XCC_FLAGS_Release = -g -O3 -fxscope
 
-AUTO_ECLIPSE = 0
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
 VERBOSE = 0
 

@@ -5,7 +5,7 @@
 */
 
 #include <ecat_motor_drive.h>
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include <print.h>
 #include <gpio_client.h>
 #include <flash_somanet.h>

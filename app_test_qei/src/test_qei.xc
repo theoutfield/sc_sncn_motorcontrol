@@ -1,4 +1,3 @@
-
 /**
  * \file test_qei.xc
  * \brief Test illustrates usage of qei sensor to get position and velocity information
@@ -13,7 +12,7 @@
 #include <qei_client.h>
 #include <qei_server.h>
 #include <refclk.h>
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include <bldc_motor_config.h>
 
 

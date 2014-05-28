@@ -1,5 +1,5 @@
-MODULE_COMMUTATION_DIRS += predriver commutation
-MODULE_CONMMUTATION_INCLUDE += include
+MODULE_COMMUTATION_DIRS += commutation
+MODULE_CONMMUTATION_INCLUDE += include auto-calib
 
 XCC_FLAGS += -fsubword-select
 OPTIONAL_HEADERS += refclk.h a4935.h pwm_config.h

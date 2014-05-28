@@ -1,5 +1,4 @@
 /*
- *
  * \file
  * \brief Main project file
  *
@@ -23,7 +22,7 @@
 #include "comm_loop_server.h"
 #include "refclk.h"
 #include "velocity_ctrl_server.h"
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include "qei_client.h"
 #include "qei_server.h"
 #include <bldc_motor_config.h>

@@ -34,7 +34,7 @@
 #include <internal_config.h>
 #include <bldc_motor_config.h>
 #include <comm.h>
-#include <xscope.h>
+#include <xscope_wrapper.h>
 #include <print.h>
 #include <test1.h>
 

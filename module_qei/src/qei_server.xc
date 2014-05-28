@@ -7,7 +7,7 @@
 
 
 #include "qei_server.h"
-#include <xscope.h>
+#include <xscope_wrapper.h>
 //#pragma xta command "analyze loop qei_loop"
 //#pragma xta command "set required - 1.0 us"
 // Order is 00 -> 10 -> 11 -> 01
