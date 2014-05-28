@@ -17,12 +17,10 @@
 //#define ENABLE_xscope_torq
 //#define debug_print
 
-int root_function(int arg);
-
 void init_buffer(int buffer[], int length)
 {
     int i;
-    for(i = 0; i < length; i++) {
+    for (i = 0; i < length; i++) {
         buffer[i] = 0;
     }
     return;
@@ -54,7 +52,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
     int adc_calib_start = 0;
     calib_data I_calib;
 
-    while(1) {
+    while (1) {
         select {
         case c_current :> command:
             //printstrln("start adc calibration");
@@ -178,7 +176,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
     int iq_filtered = 0;
     int id_filtered = 0;
     int buffer_index = 0;
-    int filter_length_variance = filter_length/hall_params.pole_pairs;
+    int filter_length_variance = filter_length / hall_params.pole_pairs;
 
 
     int actual_torque = 0;
@@ -222,15 +220,15 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 #pragma ordered
         select {
         case tc when timerafter(time1 + MSEC_STD - 100) :> time1:
-            if(compute_flag == 1) {
-                if(sensor_used == HALL) {
+            if (compute_flag == 1) {
+                if (sensor_used == HALL) {
                     angle = (get_hall_position(c_hall) >> 2) & 0x3ff; //  << 10 ) >> 12
                     //xscope_probe_data(0, angle);
                     actual_speed = get_hall_velocity(c_hall, hall_params);
-                } else if(sensor_used == QEI) {
-                    {angle, offset_fw_flag, offset_bw_flag} = get_qei_sync_position(c_qei);
+                } else if (sensor_used == QEI) {
+                    { angle, offset_fw_flag, offset_bw_flag } = get_qei_sync_position(c_qei);
                     angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
-                    actual_speed = get_qei_velocity( c_qei, qei_params, qei_velocity_params);
+                    actual_speed = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
                 }
 
                 c_current <: 2;
@@ -253,14 +251,14 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
                 /* Park transform */
                 sin = sine_table_expanded(angle);
-                cos = sine_table_expanded((256 - angle)& 0x3ff);
+                cos = sine_table_expanded((256 - angle) & 0x3ff);
 
-                Id = ( alpha * cos + beta * sin ) /16384;
-                Iq = ( beta * cos  - alpha * sin ) /16384;
+                Id = ( alpha * cos + beta * sin ) / 16384;
+                Iq = ( beta * cos  - alpha * sin ) / 16384;
 
                 buffer_Id[buffer_index] = Id;
                 buffer_Iq[buffer_index] = Iq;
-                buffer_index = (buffer_index+1) % filter_length;
+                buffer_index = (buffer_index + 1) % filter_length;
 
                 id_filtered = 0;
                 iq_filtered = 0;
@@ -277,11 +275,10 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
                 id_filtered /= filter_length_variance;
                 iq_filtered /= filter_length_variance;
 
-                // TODO: find out if actual_torque = iq_filtered; suffices
-                actual_torque = root_function(iq_filtered * iq_filtered + id_filtered * id_filtered);
+                actual_torque = iq_filtered;
             }
 
-            if(activate == 1) {
+            if (activate == 1) {
 #ifdef ENABLE_xscope_torq
                 xscope_probe_data(1, actual_torque);
 #endif
@@ -298,7 +295,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
                 if (error_torque_integral > torque_ctrl_params.Integral_limit) {
                     error_torque_integral = torque_ctrl_params.Integral_limit;
-                } else if(error_torque_integral < 0-torque_ctrl_params.Integral_limit) {
+                } else if (error_torque_integral < 0-torque_ctrl_params.Integral_limit) {
                     error_torque_integral = 0 - torque_ctrl_params.Integral_limit;
                 }
 
@@ -309,7 +306,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
                 error_torque_previous = error_torque;
 
-                if (target_torque >=0) {
+                if (target_torque >= 0) {
                     if (torque_control_output >= torque_ctrl_params.Control_limit) {
                         torque_control_output = torque_ctrl_params.Control_limit;
                     } else if (torque_control_output < 0) {
@@ -391,7 +388,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
                     if (filter_length_variance < 10)
                         filter_length_variance = 10;
                     target_torque = actual_torque;
-                } else if(sensor_used == QEI) {
+                } else if (sensor_used == QEI) {
                     qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
                     filter_length_variance =  filter_length/qei_params.poles;
                     if (filter_length_variance < 10)
@@ -428,7 +425,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
                                 case c_torque_ctrl :> command:
                                     if (command == CHECK_BUSY) {
                                         c_torque_ctrl <: init_state;
-                                    } else if(command == TORQUE_CTRL_STATUS) {
+                                    } else if (command == TORQUE_CTRL_STATUS) {
                                         TORQUE_CTRL_WRITE(init_state);
                                     }
                                     break;
@@ -472,13 +469,14 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 }
 
 /* TODO: do we really need 2 threads for this? */
-void torque_control(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params, \
+void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
                     int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
     chan c_current, c_speed;
     par {
         current_filter(c_adc, c_current, c_speed);
-        _torque_ctrl(torque_ctrl_params, hall_params, qei_params, sensor_used, c_current, c_speed, c_commutation, c_hall, c_qei, c_torque_ctrl);
+        _torque_ctrl(torque_ctrl_params, hall_params, qei_params, sensor_used,
+                     c_current, c_speed, c_commutation, c_hall, c_qei, c_torque_ctrl);
     }
 }
 
