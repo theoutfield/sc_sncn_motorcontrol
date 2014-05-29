@@ -10,7 +10,7 @@ APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 
-USED_MODULES = module_motor module_adc module_blocks module_motorcontrol_api \
+USED_MODULES = module_motor module_adc module_blocks module_communication \
                module_motorcontrol_common module_commutation module_ctrl_loops module_hall \
                module_profile module_pwm_common module_pwm_symmetrical module_qei module_sm \
                module_ctrlproto module_ethercat module_ethercat_fwupdate module_nodeconfig \

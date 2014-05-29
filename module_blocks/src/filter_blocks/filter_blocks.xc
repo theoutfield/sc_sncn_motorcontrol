@@ -6,7 +6,7 @@
 
 #include "filter_blocks.h"
 
-/* initialization for fixed length digital filter (moving average filter)*/
+/* initialization for fixed length digital filter (moving average filter) */
 void init_filter(int filter_buffer[], int &index, int filter_length)
 {
     int i;
@@ -16,7 +16,7 @@ void init_filter(int filter_buffer[], int &index, int filter_length)
     index = 0;
 }
 
-/* fixed length digital filter (moving average filter)*/
+/* fixed length digital filter (moving average filter) */
 int filter(int filter_buffer[], int &index, int filter_length, int input)
 {
     int i, j = 0, mod, filter_output =0;
