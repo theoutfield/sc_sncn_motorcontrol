@@ -4,6 +4,7 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
+#include <math.h>
 #include "torque_ctrl_server.h"
 #include <refclk.h>
 #include <xscope_wrapper.h>
@@ -275,7 +276,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
                 id_filtered /= filter_length_variance;
                 iq_filtered /= filter_length_variance;
 
-                actual_torque = iq_filtered;
+                actual_torque = round( sqrt( iq_filtered * iq_filtered + id_filtered * id_filtered ) );
             }
 
             if (activate == 1) {
