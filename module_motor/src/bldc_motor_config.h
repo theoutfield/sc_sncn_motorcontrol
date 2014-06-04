@@ -83,7 +83,7 @@
 /* Torque Control (Mandatory if Torque control used)
  * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
  * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define TORQUE_Kp_NUMERATOR         5
+#define TORQUE_Kp_NUMERATOR         2
 #define TORQUE_Kp_DENOMINATOR       20
 #define TORQUE_Ki_NUMERATOR         1
 #define TORQUE_Ki_DENOMINATOR       110
@@ -93,9 +93,9 @@
 /* Velocity Control (Mandatory if Velocity control used)
  * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
  * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define VELOCITY_Kp_NUMERATOR       5
-#define VELOCITY_Kp_DENOMINATOR     10
-#define VELOCITY_Ki_NUMERATOR       5
+#define VELOCITY_Kp_NUMERATOR       1
+#define VELOCITY_Kp_DENOMINATOR     15
+#define VELOCITY_Ki_NUMERATOR       2
 #define VELOCITY_Ki_DENOMINATOR     100
 #define VELOCITY_Kd_NUMERATOR       0
 #define VELOCITY_Kd_DENOMINATOR     1
