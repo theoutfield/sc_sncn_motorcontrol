@@ -66,7 +66,7 @@ Changelog
 	* Support GPIO Digital ports
 	* Homing feature
 	* Precise Position Control based on position sensor ticks
-  * [0.9beta](https://github.com/synapticon/sc_sncn_ctrlproto/releases/tag/v0.9-beta) (2013-01-24)
+  * [0.9beta](https://github.com/synapticon/sc_sncn_motorctrl_sin/releases/tag/v0.9-beta) (2013-01-24)
 
 License
 ---------
