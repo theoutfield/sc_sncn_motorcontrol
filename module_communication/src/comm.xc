@@ -36,71 +36,77 @@ void send_actual_position(int actual_position, ctrl_proto_values_t &InOut)
     InOut.position_actual = actual_position;
 }
 
-void update_hall_param_ecat(hall_par &hall_params, chanend coe_out, int min, int max, int sdo_update)
+void update_hall_param_ecat(hall_par &hall_params, chanend coe_out)
 {
-    if (sdo_update == 1) {
-        { hall_params.pole_pairs, max, min } = hall_sdo_update(coe_out);
+    int min;
+    int max;
+    {hall_params.pole_pairs, max, min} = hall_sdo_update(coe_out);
+    if(max >= 0 && min >= 0)
+    {
+        if(max > min)
+            hall_params.max_ticks = max;
+        else
+            hall_params.max_ticks = min;
     }
-    /* TODO: review conditions */
-    if (max >= 0 && min >= 0) {
-        if (max > min) {
-            hall_params.max_ticks = max;
-        } else {
-            hall_params.max_ticks = min;
-        }
-    } else if (max <= 0 && min <= 0) {
-        if (max < min) {
+    else if(max <= 0 && min <= 0)
+    {
+        if(max < min)
             hall_params.max_ticks = 0 - max;
-        } else {
+        else
             hall_params.max_ticks = 0 - min;
-        }
-    } else if (max > 0 && min < 0) {
-        if (max > 0 - min) {
+    }
+    else if(max > 0 && min < 0)
+    {
+        if(max > 0 - min)
             hall_params.max_ticks = max;
-        } else {
+        else
             hall_params.max_ticks = 0 - min;
-        }
-    } else if (max < 0 && min > 0) {
-        if (min > 0 - max) {
+    }
+    else if(max < 0 && min > 0)
+    {
+        if(min > 0 - max)
             hall_params.max_ticks = min;
-        } else {
+        else
             hall_params.max_ticks = 0 - max;
-        }
     }
     hall_params.max_ticks_per_turn = hall_params.pole_pairs * 4096;
     hall_params.max_ticks += hall_params.max_ticks_per_turn;
 }
 
-void update_qei_param_ecat(qei_par &qei_params, chanend coe_out, int min, int max, int sensor_polarity, int sdo_update)
+void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
 {
-    if (sdo_update == 1) {
-        {qei_params.real_counts, max, min, qei_params.index, sensor_polarity} = qei_sdo_update(coe_out);
-    }
+    int min;
+    int max;
+    int sensor_polarity;
+    {qei_params.real_counts, max, min, qei_params.index, sensor_polarity} = qei_sdo_update(coe_out);
 
-    if (max >= 0 && min >= 0) {
-        if (max > min) {
+    if(max >= 0 && min >= 0)
+    {
+        if(max > min)
             qei_params.max_ticks = max;
-        } else {
+        else
             qei_params.max_ticks = min;
-        }
-    } else if(max <= 0 && min <= 0) {
-        if(max < min) {
+    }
+    else if(max <= 0 && min <= 0)
+    {
+        if(max < min)
             qei_params.max_ticks = 0 - max;
-        } else {
+        else
             qei_params.max_ticks = 0 - min;
-        }
-    } else if (max > 0 && min < 0) {
-        if (max > 0 - min) {
+    }
+    else if(max > 0 && min < 0)
+    {
+        if(max > 0 - min)
             qei_params.max_ticks = max;
-        } else {
+        else
             qei_params.max_ticks = 0 - min;
-        }
-    } else if (max < 0 && min > 0) {
-        if (min > 0 - max) {
+    }
+    else if(max < 0 && min > 0)
+    {
+        if(min > 0 - max)
             qei_params.max_ticks = min;
-        } else {
+        else
             qei_params.max_ticks = 0 - max;
-        }
     }
 
     qei_params.max_ticks_per_turn = __qei_max_counts(qei_params.real_counts);
@@ -108,19 +114,19 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out, int min, int ma
 
     sensor_polarity = sensor_polarity&0x01;
 
-    switch (sensor_polarity) {
-    case 0:
-        sensor_polarity = NORMAL;
-        break;
+    switch(sensor_polarity)
+    {
+        case 0:
+            sensor_polarity = NORMAL;
+            break;
 
-    case 1:
-        sensor_polarity = INVERTED;
-        break;
+        case 1:
+            sensor_polarity = INVERTED;
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
-
     qei_params.sensor_polarity = sensor_polarity;
 }
 
@@ -194,13 +200,10 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
             pp_params.max_acceleration} = pp_sdo_update(coe_out);
 }
 
-void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out, int sdo_update)
+void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out)
 {
-    if (sdo_update == 1) {
-        {torque_ctrl_params.Kp_n, torque_ctrl_params.Ki_n, torque_ctrl_params.Kd_n} = torque_sdo_update(coe_out);
-    }
-
-    torque_ctrl_params.Kp_d = 65536;                                // 16 bit precision PID gains
+    {torque_ctrl_params.Kp_n, torque_ctrl_params.Ki_n, torque_ctrl_params.Kd_n} = torque_sdo_update(coe_out);
+    torque_ctrl_params.Kp_d = 65536;                // 16 bit precision PID gains
     torque_ctrl_params.Ki_d = 65536;
     torque_ctrl_params.Kd_d = 65536;
 
@@ -208,22 +211,18 @@ void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out
 
     torque_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT;  // PWM resolution
 
-    if (torque_ctrl_params.Ki_n != 0) {                       // auto calculated using control_limit
+    if(torque_ctrl_params.Ki_n != 0)                // auto calculated using control_limit
         torque_ctrl_params.Integral_limit = torque_ctrl_params.Control_limit * (torque_ctrl_params.Ki_d/torque_ctrl_params.Ki_n) ;
-    } else {
+    else
         torque_ctrl_params.Integral_limit = 0;
-    }
-
     return;
 }
 
 
-void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out, int sdo_update)
+void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out)
 {
-    if (sdo_update == 1) {
-        {velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);
-    }
-    velocity_ctrl_params.Kp_d = 65536;                              // 16 bit precision PID gains
+    {velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);
+    velocity_ctrl_params.Kp_d = 65536;              // 16 bit precision PID gains
     velocity_ctrl_params.Ki_d = 65536;
     velocity_ctrl_params.Kd_d = 65536;
 
@@ -231,21 +230,17 @@ void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe
 
     velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
 
-    if (velocity_ctrl_params.Ki_n != 0) {                     // auto calculated using control_limit
+    if(velocity_ctrl_params.Ki_n != 0)              // auto calculated using control_limit
         velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
-    } else {
+    else
         velocity_ctrl_params.Integral_limit = 0;
-    }
     return;
 }
 
-void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out, int sdo_update)
+void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out)
 {
-    if (sdo_update == 1) {
-        {position_ctrl_params.Kp_n, position_ctrl_params.Ki_n, position_ctrl_params.Kd_n} = position_sdo_update(coe_out);
-    }
-
-    position_ctrl_params.Kp_d = 65536;                              // 16 bit precision PID gains
+    {position_ctrl_params.Kp_n, position_ctrl_params.Ki_n, position_ctrl_params.Kd_n} = position_sdo_update(coe_out);
+    position_ctrl_params.Kp_d = 65536;              // 16 bit precision PID gains
     position_ctrl_params.Ki_d = 65536;
     position_ctrl_params.Kd_d = 65536;
 
@@ -253,11 +248,10 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
 
     position_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
 
-    if (position_ctrl_params.Ki_n != 0) {                     // auto calculated using control_limit
+    if(position_ctrl_params.Ki_n != 0)              // auto calculated using control_limit
         position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n) ;
-    } else {
+    else
         position_ctrl_params.Integral_limit = 0;
-    }
     return;
 }
 

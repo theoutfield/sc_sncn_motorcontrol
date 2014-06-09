@@ -64,18 +64,17 @@ void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
  * \brief Update Hall sensor parameters from Ethercat
  *
  * \param hall_params struct defines the pole-pairs and gear ratio
- * \param sdo_update_flag: 1 - fetch config from EtherCAT, 0 - fetch config from struct
+ *
  */
-void update_hall_param_ecat(hall_par &hall_params, chanend coe_out, int min, int max, int sdo_update_flag);
+void update_hall_param_ecat(hall_par &hall_params, chanend coe_out);
 
 /**
 * \brief Update QEI sensor parameters from Ethercat
 *
 * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
-* 	 gear-ratio used for the motor
-* \param sdo_update_flag: 1 - fetch config from EtherCAT, 0 - fetch config from struct and parameters
+*    gear-ratio used for the motor
 */
-void update_qei_param_ecat(qei_par &qei_params, chanend coe_out, int min, int max, int sensor_polarity, int sdo_update);
+void update_qei_param_ecat(qei_par &qei_params, chanend coe_out);
 
 void update_commutation_param_ecat(commutation_par &commutation_params, chanend coe_out);
 
@@ -131,25 +130,22 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out);
  * \brief Update torque control PID parameters from Ethercat
  *
  * \param torque_ctrl_params struct defines torque control PID params
- * \param sdo_update_flag: 1 - fetch config from EtherCAT, 0 - fetch config from struct
  */
-void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out, int sdo_update_flag);
+void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out);
 
 /**
  * \brief Update velocity control PID parameters from Ethercat
  *
  * \param velocity_ctrl_params struct defines velocity control PID params
- * \param sdo_update_flag: 1 - fetch config from EtherCAT, 0 - fetch config from struct
  */
-void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out, int sdo_update_flag);
+void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out);
 
 /**
  * \brief Update position control PID params from Ethercat
  *
  * \param position_ctrl_params struct defines position control PID params
- * \param sdo_update_flag: 1 - fetch config from EtherCAT, 0 - fetch config from struct
  */
-void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out, int sdo_update_flag);
+void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out);
 
 /**
  * \brief Set commutation parameters from Ethercat communication loop
