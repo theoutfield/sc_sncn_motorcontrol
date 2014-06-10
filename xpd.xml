@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<xpd>
+    <components>
+        <component description = "Hall sensor interface" type = "demoCode" scope = "General Use" path = "module_hall" local = "false" id = "module_hall" name = "SOMANET Motor Control Hall Sensor Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET Motorcontrol utility functions" type = "demoCode" scope = "General Use" path = "module_blocks" local = "false" id = "module_blocks" name = "Blocks Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET Motor Control Commutation module" type = "demoCode" scope = "General Use" path = "module_commutation" local = "false" id = "module_commutation" name = "Commutation Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "EtherCAT communication bridge for Motor Control" type = "demoCode" scope = "General Use" path = "module_ecat_drive" local = "false" id = "module_ecat_drive" name = "SOMANET EtherCAT Drive Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET Motor Control Motion Profile tools" type = "demoCode" scope = "General Use" path = "module_profile" local = "false" id = "module_profile" name = "SOMANET Motor Control Profile Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET Motor Control communication module" type = "demoCode" scope = "General Use" path = "module_communication" local = "false" id = "module_communication" name = "SOMANET Motor Control Communication Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "Common configurations and utilities" type = "demoCode" scope = "General Use" path = "module_motorcontrol_common" local = "false" id = "module_motorcontrol_common" name = "SOMANET Motor Control Common Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET motor configurations" type = "demoCode" scope = "General Use" path = "module_motor" local = "false" id = "module_motor" name = "SOMANET Motor Configuration Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "ADC interface for SOMANET IFM DC100/300" type = "demoCode" scope = "General Use" path = "module_adc" local = "false" id = "module_adc" name = "SOMANET Motor Control ADC Interface">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET Motor Control Quadrature Encoder Interface" type = "demoCode" scope = "General Use" path = "module_qei" local = "false" id = "module_qei" name = "Quadrature Encoder Interface Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "Control loops for position, velocity, and torque control" type = "demoCode" scope = "General Use" path = "module_ctrl_loops" local = "false" id = "module_ctrl_loops" name = "Control loops for SOMANET Motor Control">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET Motor Control State Machine for CiA 402 control modes" type = "demoCode" scope = "General Use" path = "module_sm" local = "false" id = "module_sm" name = "State Machine Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET GPIO utility functions" type = "demoCode" scope = "General Use" path = "module_gpio" local = "false" id = "module_gpio" name = "SOMANET Motor Control General Purpose I/O Module">
+            <board>SOMANET IFM-DC100</board>
+            <board>SOMANET IFM-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+    </components>
+    <description>BLDC/Brushed DC Motor Control Software for SOMANET devices</description>
+    <exclude_dir>module_brushed_dc</exclude_dir>
+    <exclude_dir>app_test_hall</exclude_dir>
+    <exclude_dir>app_test_qei</exclude_dir>
+    <location>https://github.com/synapticon/sc_sncn_motorcontrol.git</location>
+    <name>sc_sncn_motorcontrol</name>
+    <maintainer>Synapticon</maintainer>
+    <partnumber>XM-005823-DH</partnumber>
+    <subpartnumber>XM-005824-SM</subpartnumber>
+    <vendor>XMOS</vendor>
+    <version_defines></version_defines>
+    <xcore_repo>git://github.com/xcore/sc_sncn_motorcontrol.git</xcore_repo>
+    <xpd_version>1.0</xpd_version>
+</xpd>
