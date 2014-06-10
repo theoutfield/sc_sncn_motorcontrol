@@ -9,8 +9,7 @@ TARGET = SOMANET-C22-Motor_control-XScope_v13
 APP_NAME = 
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_motor module_blocks module_motorcontrol_common module_qei module_nodeconfig \
-               module_xscope-wrapper
+USED_MODULES = module_motor module_blocks module_motorcontrol_common module_qei module_nodeconfig module_xscope-wrapper
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
