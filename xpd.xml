@@ -3,7 +3,8 @@
     <components></components>
     <location>https://github.com/synapticon/sc_sncn_motorcontrol.git</location>
     <name>sc_sncn_motorcontrol</name>
-    <release parenthash = "68d82fd56390d5aaccd0820cec44cd163fdb244e" version = "1.0.0beta0"></release>
+    <release parenthash = "68d82fd56390d5aaccd0820cec44cd163fdb244e" version = "1.0.0beta0" githash = "cc728625c1c00178a40a8a642985f5df06f81eec"></release>
+    <release parenthash = "215f5aaf4f9c7e728ca1510d4e064c86360d0bd9" version = "1.0.0beta1"></release>
     <version_defines></version_defines>
     <xpd_version>1.0</xpd_version>
 </xpd>
