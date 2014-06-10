@@ -11,7 +11,7 @@
             <board>SOMANET IFM-DC300</board>
             <keyword>SOMANET</keyword>
         </component>
-        <component description = "SOMANET Motor Control Commutation module" type = "demoCode" scope = "General Use" path = "module_commutation" local = "false" id = "module_commutation" name = "Commutation Module">
+        <component description = "SOMANET Motor Control Commutation module" type = "demoCode" scope = "General Use" path = "module_commutation" local = "false" id = "module_commutation" name = "SOMANET Commutation Module">
             <board>SOMANET IFM-DC100</board>
             <board>SOMANET IFM-DC300</board>
             <keyword>SOMANET</keyword>
@@ -46,17 +46,17 @@
             <board>SOMANET IFM-DC300</board>
             <keyword>SOMANET</keyword>
         </component>
-        <component description = "SOMANET Motor Control Quadrature Encoder Interface" type = "demoCode" scope = "General Use" path = "module_qei" local = "false" id = "module_qei" name = "Quadrature Encoder Interface Module">
+        <component description = "SOMANET Motor Control Quadrature Encoder Interface" type = "demoCode" scope = "General Use" path = "module_qei" local = "false" id = "module_qei" name = "SOMANET Quadrature Encoder Interface Module">
             <board>SOMANET IFM-DC100</board>
             <board>SOMANET IFM-DC300</board>
             <keyword>SOMANET</keyword>
         </component>
-        <component description = "Control loops for position, velocity, and torque control" type = "demoCode" scope = "General Use" path = "module_ctrl_loops" local = "false" id = "module_ctrl_loops" name = "Control loops for SOMANET Motor Control">
+        <component description = "Control loops for position, velocity, and torque control" type = "demoCode" scope = "General Use" path = "module_ctrl_loops" local = "false" id = "module_ctrl_loops" name = "SOMANET Motor Control loops">
             <board>SOMANET IFM-DC100</board>
             <board>SOMANET IFM-DC300</board>
             <keyword>SOMANET</keyword>
         </component>
-        <component description = "SOMANET Motor Control State Machine for CiA 402 control modes" type = "demoCode" scope = "General Use" path = "module_sm" local = "false" id = "module_sm" name = "State Machine Module">
+        <component description = "SOMANET Motor Control State Machine for CiA 402 control modes" type = "demoCode" scope = "General Use" path = "module_sm" local = "false" id = "module_sm" name = "SOMANET State Machine Module">
             <board>SOMANET IFM-DC100</board>
             <board>SOMANET IFM-DC300</board>
             <keyword>SOMANET</keyword>
@@ -75,7 +75,8 @@
     <name>sc_sncn_motorcontrol</name>
     <maintainer>Synapticon</maintainer>
     <partnumber>XM-005823-DH</partnumber>
-    <release parenthash = "68d82fd56390d5aaccd0820cec44cd163fdb244e" version = "1.0.0beta0"></release>
+    <release parenthash = "68d82fd56390d5aaccd0820cec44cd163fdb244e" version = "1.0.0beta0" githash = "cc728625c1c00178a40a8a642985f5df06f81eec"></release>
+    <release parenthash = "215f5aaf4f9c7e728ca1510d4e064c86360d0bd9" version = "1.0.0beta1"></release>
     <subpartnumber>XM-005824-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <version_defines></version_defines>
