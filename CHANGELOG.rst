@@ -8,7 +8,7 @@ sc_sncn_ethercat Change Log
   * Homing feature
   * Precise Position Control based on position sensor ticks
   
-0.9.0beta
+0.9.0
 -----
 
   * Initial Version
