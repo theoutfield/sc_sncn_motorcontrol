@@ -1,11 +1,18 @@
-Common Module
-=============
+SOMANET Motor Control Common Module
+===================================
+
+:scope: General Use
+:description: Common configurations and utilities
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
 
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center
    :alt: SYNAPTICON
 
-   SYNAPTICON
+Description
+-----------
+
 This module provides library for wait functions and has internal
 configurations and defines used across most modules and test
 applications.

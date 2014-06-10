@@ -1,11 +1,18 @@
-General Purpose I/O Module
-==========================
+SOMANET Motor Control General Purpose I/O Module
+================================================
+
+:scope: General Use
+:description: SOMANET GPIO utility functions
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
 
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center
    :alt: SYNAPTICON
 
-   SYNAPTICON
+Description
+-----------
+
 This module provides driver for the GPIO digital ports on the interface
 module (IFM). The module provides GPIO server thread which configures
 the GPIO ports; read/write GPIO digital ports in a while loop; and

@@ -1,6 +1,11 @@
 State Machine Module
 ====================
 
+:scope: General Use
+:description: SOMANET Motor Control State Machine for CiA 402 control modes
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center
    :alt: SYNAPTICON

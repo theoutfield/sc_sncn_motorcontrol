@@ -1,11 +1,25 @@
 Blocks Module
 =============
 
+:scope: General Use
+:description: SOMANET Motorcontrol utility functions
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center
    :alt: SYNAPTICON
 
-   SYNAPTICON
+Key Features
+------------
+
+  * Watchdog
+  * Filter functions
+  * Sine lookup tables
+
+Description
+-----------
+
 This module provides watchdog server, filter implementation and drive
 utilities.
 

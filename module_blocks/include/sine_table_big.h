@@ -7,13 +7,15 @@
 
 #pragma once 
 
+#include <stdint.h>
+
 int arctg1(int Real, int Imag);
 
-extern short arctg_table[];
+extern uint16_t arctg_table[];
 
-extern short sine_third[257];
+extern uint16_t sine_third[257];
 
-extern short sine_table[257];
+extern uint16_t sine_table[257];
 
 int sine_third_expanded(int angle);
 

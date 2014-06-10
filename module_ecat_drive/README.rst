@@ -1,11 +1,18 @@
-EtherCAT Drive Module
-=====================
+SOMANET EtherCAT Drive Module
+=============================
+
+:scope: General Use
+:description: EtherCAT communication bridge for Motor Control
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
 
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center
    :alt: SYNAPTICON
 
-   SYNAPTICON
+Description
+-----------
+
 This module provides a communication bridge between Ethercat and Motor
 drive System; complex motor drive/control functionalities. The
 implemtation receives/sends data to the Ethercat Master Application;

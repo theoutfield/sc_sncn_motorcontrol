@@ -1,13 +1,20 @@
-Communication Module
-====================
+SOMANET Motor Control Communication Module
+============================
+
+:scope: General Use
+:description: SOMANET Motor Control communication module
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
 
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center
    :alt: SYNAPTICON
 
-   SYNAPTICON
+Description
+-----------
+
 This module provides functions to read/write data to ctrlproto data
-structure which inturn is passed to ethercat Master applications;
+structure which in turn is passed to EtherCAT Master applications;
 functions to read SDO (software defined objects used for motor/sensor
 configuration); functions to update respective Servers running on
 interface module (IFM\_CORE).

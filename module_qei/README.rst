@@ -1,11 +1,18 @@
 Quadrature Encoder Interface Module
 ===================================
 
+:scope: General Use
+:description: SOMANET Motor Control Quadrature Encoder Interface
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center
    :alt: SYNAPTICON
 
-   SYNAPTICON
+Description
+-----------
+
 This module provides driver for the Incremental Encoders connected to
 the interface module (IFM). The module provides QEI server thread which
 acquires position information from the Incremental encoder in quadrature

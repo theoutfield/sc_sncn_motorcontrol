@@ -1,10 +1,10 @@
-ADC Module
-==========
+SOMANET Motor Control ADC Interface
+===================================
 
 :scope: General Use
 :description: ADC interface for SOMANET IFM DC100/300
-:keywords: SOMANET, ADC, Motor Control
-:boards: 
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
 
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center

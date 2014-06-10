@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <print.h>
+
 #define COMMUTATION 1
 #define SINE_TABLE  2
 
@@ -138,6 +139,35 @@ int sine_expanded(int angle, int select_mode)
             return sine_table[angle];
     }
 }
+
+#if 0
+/*  */
+uint16_t lookup_map256(int angle, uint16_t lut[]) {
+    uint16_t lut_value;
+
+    angle &= 0x3ff;             /* mod 1024 */
+
+    if (angle <= 255) {         /*   0   1 .. 254 255  ==>    0   1 .. 254 255 */
+        lut_value = lut[angle];
+    } else if (angle < 511) {   /* 255 256 .. 509 510  ==>  255 254 ..   2   1 */
+        lut_value = lut[511-angle];
+    } else if (angle <= 767) {
+        lut_value = lut[angle-511]
+    }
+
+    if (angle > 767) {          /* 768 <= angle <= 1023 */
+        lut_value = -lut[255-(x-768)];
+    } else if (angle > 511) {   /* 511 <= angle <= 767 */
+        lut_value = -lut[x-512];
+    } else if (angle > 255) {   /* 256 <= angle <= 511 */
+        lut_value = lut[255 - angle];
+    } else {                    /* 0 <= angle <= 255 */
+        lut_value = lut[angle];
+    }
+     
+    return sine;   
+}
+#endif
 
 /* use LUT with 3rd harmonics included */
 int sine_third_expanded(int angle)

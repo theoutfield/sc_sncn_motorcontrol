@@ -1,3 +1,15 @@
+Control loops for SOMANET Motor Control
+=======================================
+
+:scope: General Use
+:description: Control loops for position, velocity, and torque control
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+
+
+Description
+-----------
+
 This module provides three control loops for position, velocity and
 torque control. Each of these control modes has separate Server loop and
 Client functions. The control loops implemented are closed on data from
