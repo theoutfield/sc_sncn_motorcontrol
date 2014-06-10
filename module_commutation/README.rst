@@ -1,11 +1,18 @@
 Commutation Module
 ==================
 
+:scope: General Use
+:description: SOMANET Motor Control Commutation module
+:keywords: SOMANET
+:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+
 .. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: center
    :alt: SYNAPTICON
 
-   SYNAPTICON
+Description
+-----------
+
 This module provides driver for the BLDC Motor connected to the
 interface module (IFM). The module consists of commutation which
 internally makes use of the predriver to drive fets and configurations
