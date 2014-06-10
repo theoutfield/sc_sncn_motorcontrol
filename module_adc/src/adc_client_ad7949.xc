@@ -2,7 +2,7 @@
  * \file adc_client_ad7949.xc
  * \brief ADC Client
  * \author Martin Schwarz <mschwarz@synapticon.com>
- * \author Ludwig Orgler <lorgler@synapticon.com> 
+ * \author Ludwig Orgler <lorgler@synapticon.com>
  */
 
 #include <adc_common.h>

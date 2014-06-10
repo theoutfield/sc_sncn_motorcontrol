@@ -193,7 +193,7 @@ int init_position_profile(int target_position, int actual_position, int velocity
 
     if (profile_pos_params.distance_left < 0) {
         profile_pos_params.acc_too_low = 1;
-        
+
         // acc too low to meet distance/vel constraint
 
         if (profile_pos_params.vi > profile_pos_params.total_distance) {
@@ -232,7 +232,7 @@ int init_position_profile(int target_position, int actual_position, int velocity
 
         profile_pos_params.distance_left = (profile_pos_params.total_distance -
                                             profile_pos_params.distance_acc - profile_pos_params.distance_dec);
-        
+
     } else if (profile_pos_params.distance_left > 0) {
         profile_pos_params.acc_too_low = 0;
     }
@@ -242,7 +242,7 @@ int init_position_profile(int target_position, int actual_position, int velocity
 
     if (profile_pos_params.distance_left < 0) {
         profile_pos_params.acc_too_low = 1;
-        
+
         // acc too low to meet distance/velocity constraint
 
         profile_pos_params.acc_min = profile_pos_params.vi;
@@ -320,7 +320,7 @@ int position_profile_generate(int step)
 
     } else if ( (profile_pos_params.tb_acc <= profile_pos_params.ts) &&
                 (profile_pos_params.ts < (profile_pos_params.tf - profile_pos_params.tb_dec)) ) {
-        
+
         profile_pos_params.q = profile_pos_params.di + profile_pos_params.vi * profile_pos_params.ts;
 
     } else if ( ((profile_pos_params.tf - profile_pos_params.tb_dec) <= profile_pos_params.ts) &&
@@ -445,7 +445,7 @@ int __initialize_position_profile(int target_position, int actual_position, int 
 
     profile_pos_params->distance_left = (profile_pos_params->total_distance -
                                          profile_pos_params->distance_acc - profile_pos_params->distance_dec);
-    
+
 
     /*check velocity and distance constraint*/
 
@@ -532,7 +532,7 @@ int __initialize_position_profile(int target_position, int actual_position, int 
 
     profile_pos_params->t_cruise = (profile_pos_params->distance_cruise) / profile_pos_params->vi;
 
-    profile_pos_params->tf = (profile_pos_params->tb_acc + 
+    profile_pos_params->tf = (profile_pos_params->tb_acc +
                               profile_pos_params->tb_dec + profile_pos_params->t_cruise);
 
     if (profile_pos_params->direction == -1) {

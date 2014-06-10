@@ -5,7 +5,7 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
  */
 
-#pragma once 
+#pragma once
 
 #include <stdint.h>
 

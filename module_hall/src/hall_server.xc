@@ -197,7 +197,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
             case 1:
                 angle1 = 3413;
                 uHallNext=3;
-                uHallPrevious=5; 
+                uHallPrevious=5;
                 break; // 300 degree
             default:
                 iHallError++;
@@ -280,7 +280,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
         if (count > hall_max_count || count < -hall_max_count) {
             count = 0;
         }
-        
+
 #ifdef DEBUG
         xscope_probe_data(0, angle);
         xscope_probe_data(1, count);

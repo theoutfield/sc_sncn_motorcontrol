@@ -1,4 +1,4 @@
-/** 
+/**
  * \file adc_client_ad7949.h
  * \brief ADC Client
  * \author Martin Schwarz <mschwarz@synapticon.com>
@@ -12,8 +12,8 @@
 
 /**
  * \fn {int, int} get_adc_external_ad7949(chanend c_adc)
- * 
- * \brief Get external analog sensor value 
+ *
+ * \brief Get external analog sensor value
  *
  * \param c_adc Channel for communicating with the adc server
  *

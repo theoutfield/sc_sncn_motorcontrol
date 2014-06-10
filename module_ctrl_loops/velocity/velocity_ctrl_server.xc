@@ -163,7 +163,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                     velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
                 }
 #ifdef BDC
-                set_bdc_voltage(c_commutation, velocity_control_out);                
+                set_bdc_voltage(c_commutation, velocity_control_out);
 #else
                 set_commutation_sinusoidal(c_commutation, velocity_control_out);
 #endif

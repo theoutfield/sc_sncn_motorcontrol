@@ -4,7 +4,7 @@
  *      Implements Torque profile based on linear functions.
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
- 
+
 #include <profile.h>
 #include <stdio.h>
 
@@ -160,7 +160,7 @@ int __init_linear_profile_float(float target_value, float actual_value, float ac
             profile_linear_params->oldst= 2;
         }
     } else if (profile_linear_params->u<0 && profile_linear_params->v_d>0) {
-        /*initial and desired velocity - transition from -ve to +ve case*/ 
+        /*initial and desired velocity - transition from -ve to +ve case*/
         if (profile_linear_params->oldst==-1) {
             profile_linear_params->a_d = -profile_linear_params->dec;
             profile_linear_params->oldst=-2;

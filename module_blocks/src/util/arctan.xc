@@ -60,13 +60,13 @@ int arctg1(int Real, int Imag)
         iAngleResult = 1024 - iAngleResult;
     }
 
-    if (Real >= 0) {   
+    if (Real >= 0) {
         // 1. or 4. quadrant
         if (Imag  <  0) {
             iAngleResult = 4096 - iAngleResult;     // 4. quadrant
         }
         // if 1. quadrant everything is okay
-    } else { 
+    } else {
         // if negativ 2. or 3. quadrant
         if (Imag < 0) {
             iAngleResult += 2048;                   // 3. quadrant
@@ -164,8 +164,8 @@ uint16_t lookup_map256(int angle, uint16_t lut[]) {
     } else {                    /* 0 <= angle <= 255 */
         lut_value = lut[angle];
     }
-     
-    return sine;   
+
+    return sine;
 }
 #endif
 

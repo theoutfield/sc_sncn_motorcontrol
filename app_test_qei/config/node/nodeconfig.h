@@ -4,7 +4,7 @@
  * \brief Node config file
  * \author Martin Schwarz <mschwarz@synapticon.com>
 */
- 
+
 
 #ifndef __NODECONFIG_H__
 #define __NODECONFIG_H__

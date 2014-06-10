@@ -20,7 +20,7 @@ void gpio_config_handler(chanend c_gpio, port p_ifm_ext_d[], int port_function[]
     int switch_type;
     int port_number;
     int i;
-    
+
     c_gpio :> port_number;
     c_gpio :> input_type;
     c_gpio :> switch_type;
