@@ -1,5 +1,5 @@
-Commutation Module
-==================
+SOMANET Commutation Module
+==========================
 
 :scope: General Use
 :description: SOMANET Motor Control Commutation module

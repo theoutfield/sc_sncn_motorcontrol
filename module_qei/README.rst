@@ -1,5 +1,5 @@
-Quadrature Encoder Interface Module
-===================================
+SOMANET Quadrature Encoder Interface Module
+===========================================
 
 :scope: General Use
 :description: SOMANET Motor Control Quadrature Encoder Interface

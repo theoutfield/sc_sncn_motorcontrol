@@ -6,9 +6,6 @@ SOMANET Motor Control Software
 :Description: BLDC/Brushed DC Motor Control Software for SOMANET devices
 
 
-.. image:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
-   :align: left
-
 Key Features
 ============
 

@@ -1,5 +1,5 @@
-State Machine Module
-====================
+SOMANET State Machine Module
+============================
 
 :scope: General Use
 :description: SOMANET Motor Control State Machine for CiA 402 control modes

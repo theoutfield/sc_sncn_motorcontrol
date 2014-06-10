@@ -1,5 +1,5 @@
-Control loops for SOMANET Motor Control
-=======================================
+SOMANET Motor Control loops
+===========================
 
 :scope: General Use
 :description: Control loops for position, velocity, and torque control
