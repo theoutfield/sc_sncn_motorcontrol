@@ -1,9 +1,10 @@
 SOMANET Motor Control Software
 ..............................
 
-:Latest release: 1.0.0beta1
+:Latest release: 1.0.0beta0
 :Maintainer: Synapticon
-:Description: BLDC Motor Control Software for SOMANET devices.
+:Description: BLDC/Brushed DC Motor Control Software for SOMANET devices
+
 
 .. image:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
    :align: left
@@ -26,12 +27,8 @@ Key Features
 Firmware overview
 =================
 
-
-
 Known Issues
 ============
-
-
 
 Support
 =======
@@ -41,7 +38,5 @@ Issues may be submitted via the Issues tab in this github repo. Response to any 
 Required software (dependencies)
 ================================
 
-  * sc_somanet-base (git@github.com:synapticon/sc_somanet-base.git)
-  * sc_pwm (git@github.com:synapticon/sc_pwm.git)
-  * sc_sncn_ethercat (git@github.com:synapticon/sc_sncn_ethercat.git)
+  * None
 

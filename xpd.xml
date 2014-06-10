@@ -75,6 +75,7 @@
     <name>sc_sncn_motorcontrol</name>
     <maintainer>Synapticon</maintainer>
     <partnumber>XM-005823-DH</partnumber>
+    <release parenthash = "68d82fd56390d5aaccd0820cec44cd163fdb244e" version = "1.0.0beta0"></release>
     <subpartnumber>XM-005824-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <version_defines></version_defines>
