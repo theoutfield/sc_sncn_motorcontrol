@@ -1,20 +1,12 @@
-SOMANET Commutation Module
-==========================
+SOMANET BLDC Commutation Component
+==================================
 
 :scope: General Use
 :description: SOMANET Motor Control Commutation module
-:keywords: SOMANET
-:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+:keywords: SOMANET, BLDC, motor, driver, sinusoidal, commutation
+:boards: SOMANET IFM Drive DC100, SOMANET IFM Drive DC300
 
 Description
 -----------
 
-This module provides driver for the BLDC Motor connected to the
-interface module (IFM). The module consists of commutation which
-internally makes use of the predriver to drive fets and configurations
-under pwm. The module provides Commutation server thread which acquires
-position information from the Hall server and commutates the motor in a
-while loop; and provides client functions to optimize motor commutation
-with commutation offsets, motor winding types, nominal motor speed and
-number of pole pairs; set input voltage for the motor, get fet\_state
-from the Commutation Server.
+The BLDC Commutation Component provides a driver for BLDC motors, featuring an efficient sinusoidal commutation method. The module implements a Commutation-Server which requires motor angle information provided by a Hall effect sensor (see HALL server in module_hall) and commutates the motor. This component can be easily interfaced and used as a foundation for a custom motor control application. The component can be configured with several parameters like: commutation offset, motor winding type, nominal motor speed and number of pole pairs.
