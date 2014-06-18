@@ -15,10 +15,10 @@
 /**
  * \brief Set profile position with Position Control loop
  *
- *  Output
- * \channel c_position_ctrl for communicating with the Position Control Server
+ * \Output
+ * \param c_position_ctrl for communicating with the Position Control Server
  *
- *  Input
+ * \Input
  * \param target_position is the new target position in (ticks)
  * \param velocity in (rpm)
  * \param acceleration in (rpm/s)
@@ -31,10 +31,10 @@ void set_profile_position( int target_position, int velocity, int acceleration, 
 /**
  * \brief Set profile velocity with Velocity Control loop
  *
- *  Output
- * \channel c_velocity_ctrl for communicating with the Velocity Control Server
+ * \Output
+ * \param c_velocity_ctrl for communicating with the Velocity Control Server
  *
- *  Input
+ * \Input
  * \param target_velocity is the new target velocity in (rpm)
  * \param acceleration in (rpm/s)
  * \param deceleration in (rpm/s)
@@ -47,10 +47,10 @@ void set_profile_velocity( int target_velocity, int acceleration, int decelerati
 /**
  * \brief Set profile torque with Torque Control loop
  *
- *  Output
- * \channel c_torque_ctrl for communicating with the Torque Control Server
+ * \Output
+ * \param c_torque_ctrl for communicating with the Torque Control Server
  *
- *  Input
+ * \Input
  * \param target_torque is the new target torque in (mNm * current resolution)
  * \param torque_slope in (mNm/s * current resolution)
  * \param cst_params struct defines cyclic synchronous torque params

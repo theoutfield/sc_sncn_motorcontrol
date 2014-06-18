@@ -12,20 +12,20 @@
 /**
  * \brief Torque Control Loop
  *
- *  Input
+ * \Input
  * \param torque_ctrl_params struct defines the torque control parameters
  * \param hall_params struct defines the poles for hall sensor and gear-ratio
  * \param qei_params struct defines the resolution for qei sensor and gear-ratio
  * \param sensor_select specify the sensor to use via HALL/QEI defines
  *
- *  Input Channel
- * \channel c_adc channel to receive to torque information from current sensor
- * \channel c_hall channel to receive position information from hall
- * \channel c_qei channel to receive position information from qei
- * \channel c_torque channel to receive/send torque control information
+ * \Input Channel
+ * \param c_adc channel to receive to torque information from current sensor
+ * \param c_hall channel to receive position information from hall
+ * \param c_qei channel to receive position information from qei
+ * \param c_torque channel to receive/send torque control information
  *
- *  Output Channel
- * \channel c_commutation channel to send motor voltage input value
+ * \Output Channel
+ * \param c_commutation channel to send motor voltage input value
  *
  */
 

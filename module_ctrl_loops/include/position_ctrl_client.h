@@ -15,18 +15,18 @@
 /**
  * \brief Initialise Position Control Loop
  *
- *  Input Channel
- * \channel c_position_ctrl channel to signal initialisation
+ * \Input Channel
+ * \param c_position_ctrl channel to signal initialisation
  */
 int init_position_control(chanend c_position_ctrl);
 
 /**
  * \brief Checks Position Control Loop Status
  *
- *  Input Channel
- * \channel c_position_ctrl channel to get state of control loop
+ * \Input Channel
+ * \param c_position_ctrl channel to get state of control loop
  *
- *  Output
+ * \Output
  * \return state of the control loop : 1 - active, 0 - inactive
  */
 int check_position_ctrl_state(chanend c_position_ctrl);
@@ -34,12 +34,12 @@ int check_position_ctrl_state(chanend c_position_ctrl);
 /**
  * \brief Position Limiter
  *
- *  Input
+ * \Input
  * \param position is the input position to be limited in range
  * \param max_position_limit is the max position that can be reached
  * \param min_position_limit is the min position that can be reached
  *
- *  Output
+ * \Output
  * \return position in the range [min_position_limit - max_position_limit]
  */
 int position_limit(int position, int max_position_limit, int min_position_limit);
@@ -48,10 +48,10 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 /**
  * \brief Set new target position for position control
  *
- *  Input Channel
- * \channel c_position_ctrl channel to signal new target position
+ * \Input Channel
+ * \param c_position_ctrl channel to signal new target position
  *
- *  Input
+ * \Input
  * \param target_position is the new target position
  */
 void set_position(int target_position, chanend c_position_ctrl);
@@ -59,10 +59,10 @@ void set_position(int target_position, chanend c_position_ctrl);
 /**
  * \brief Get actual position from position control
  *
- *  Output Channel
- * \channel c_position_ctrl channel to receive actual position
+ * \Output Channel
+ * \param c_position_ctrl channel to receive actual position
  *
- *  Output
+ * \Output
  * \return actual position from position control
  */
 int get_position(chanend c_position_ctrl);
@@ -70,7 +70,7 @@ int get_position(chanend c_position_ctrl);
 /**
  * \brief Set Position Control PID Parameters
  *
- *  Input
+ * \Input
  * \param position_ctrl_params struct defines the position control PID parameters
  */
 void set_position_ctrl_param(ctrl_par &position_ctrl_params, chanend c_position_ctrl);
@@ -100,24 +100,24 @@ void set_position_sensor(int sensor_used, chanend c_position_ctrl);
 /**
  * \brief Enables Position Control mode operation
  *
- * \channel c_position_ctrl channel to signal enable position control
+ * \param c_position_ctrl channel to signal enable position control
  */
 void enable_position_ctrl(chanend c_position_ctrl);
 
 /**
  * \brief Shutdown Position Control mode operation
  *
- * \channel c_position_ctrl channel to signal shutdown of position control
+ * \param c_position_ctrl channel to signal shutdown of position control
  */
 void shutdown_position_ctrl(chanend c_position_ctrl);
 
 /**
  * \brief Set new target position for position control (advanced function)
  *
- *  Input Channel
- * \channel c_position_ctrl channel to signal new target position
+ * \Input Channel
+ * \param c_position_ctrl channel to signal new target position
  *
- *  Input
+ * \Input
  * \param csp_param struct defines the motor parameters and position limits
  * \param target_position is the new target position
  * \param position_offset defines offset in position

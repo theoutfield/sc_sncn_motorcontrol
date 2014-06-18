@@ -33,7 +33,7 @@ bool __check_bdc_init(chanend c_signal);
 /**
  * \brief Check commutation initialization
  *
- *  Output
+ * \Output
  * \return init state of the commutation loop
  */
 bool __check_commutation_init(chanend c_signal);
@@ -41,7 +41,7 @@ bool __check_commutation_init(chanend c_signal);
 /**
  * \brief Check hall initialization
  *
- *  Output
+ * \Output
  * \return init state of the hall loop
  */
 bool __check_hall_init(chanend c_hall);
@@ -49,7 +49,7 @@ bool __check_hall_init(chanend c_hall);
 /**
  * \brief Check qei initialization
  *
- *  Output
+ * \Output
  * \return init state of the qei loop
  */
 bool __check_qei_init(chanend c_qei);
@@ -57,7 +57,7 @@ bool __check_qei_init(chanend c_qei);
 /**
  * \brief Check adc initialization
  *
- *  Output
+ * \Output
  * \return init state of the adc loop
  */
 bool __check_adc_init();
@@ -65,7 +65,7 @@ bool __check_adc_init();
 /**
  * \brief Check torque control initialization
  *
- *  Output
+ * \Output
  * \return init state of the torque control loop
  */
 bool __check_torque_init(chanend c_torque_ctrl);
@@ -73,7 +73,7 @@ bool __check_torque_init(chanend c_torque_ctrl);
 /**
  * \brief Check velocity control initialization
  *
- *  Output
+ * \Output
  * \return init state of the velocity control loop
  */
 bool __check_velocity_init(chanend c_velocity_ctrl);
@@ -81,7 +81,7 @@ bool __check_velocity_init(chanend c_velocity_ctrl);
 /**
  * \brief Check position control initialization
  *
- *  Output
+ * \Output
  * \return init state of the position control loop
  */
 bool __check_position_init(chanend c_position_ctrl);
@@ -91,7 +91,7 @@ int init_state(void);
 /**
  * \brief Initialize checklist params
  *
- *  Output
+ * \Output
  * \return check_list initialised checklist parameters
  */
 check_list init_checklist(void);
@@ -99,19 +99,19 @@ check_list init_checklist(void);
 /**
  * \brief Update Checklist
  *
- *  Input channel
- * \channel c_commutation for communicating with the commutation server
- * \channel c_hall for communicating with the hall server
- * \channel c_qei for communicating with the qei server
- * \channel c_adc for communicating with the adc server
- * \channel c_torque_ctrl for communicating with the torque control server
- * \channel c_velocity_ctrl for communicating with the velocity control server
- * \channel c_position_ctrl for communicating with the position control server
+ * \Input channel
+ * \param c_commutation for communicating with the commutation server
+ * \param c_hall for communicating with the hall server
+ * \param c_qei for communicating with the qei server
+ * \param c_adc for communicating with the adc server
+ * \param c_torque_ctrl for communicating with the torque control server
+ * \param c_velocity_ctrl for communicating with the velocity control server
+ * \param c_position_ctrl for communicating with the position control server
  *
- *  Input
+ * \Input
  * \param mode sets mode of operation
  *
- *  Output
+ * \Output
  * \return check_list_param updated checklist parameters
  */
 void update_checklist(check_list & check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,

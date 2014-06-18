@@ -9,7 +9,7 @@
 /**
  * \brief Initialise Moving Average Filter Parameters
  *
- *  Input
+ * \Input
  * \param filter_buffer array to initialized
  * \param index
  * \param filter_length defines the length of the filter
@@ -21,13 +21,13 @@ void init_filter(int filter_buffer[], int & index, int filter_length);
  * \brief Get moving average filtered output by passing
  *  the sampled data to be filtered as input
  *
- *  Input
+ * \Input
  * \param filter_buffer
  * \param index
  * \param filter_length defines the length of the filter
  * \param input data sampled at fixed time
  *
- * Output
+ * \Output
  * \return filtered output
  */
 int filter(int filter_buffer[], int & index, int filter_length, int input);

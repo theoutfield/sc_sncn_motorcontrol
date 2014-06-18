@@ -19,13 +19,13 @@
 /**
  * \brief Get position from QEI Server
  *
- *  Output channel
- * \channel c_qei for communicating with the QEI Server
+ * \Output channel
+ * \param c_qei for communicating with the QEI Server
  *
- *  Input
+ * \Input
  * \param qei_params the struct defines sensor type and resolution parameters for qei
  *
- *  Output
+ * \Output
  * \return  position from qei sensor in the range [0 - log(encoder_resolution)/log(2)]
  * \return  valid for qei with index sensors: not valid - 0/ valid - 1
  */
@@ -33,10 +33,10 @@
 
 
 /**
- *  \brief Get absolute position from QEI Server
+ * \brief Get absolute position from QEI Server
  *
- *  Output channel
- * \channel c_qei for communicating with the QEI Server
+ * \Output channel
+ * \param c_qei for communicating with the QEI Server
  *
  *	Output
  * \return  counted up position from qei sensor (incorporates set max ticks)
@@ -72,13 +72,13 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params);
  * \brief Calculates the velocity from QEI sensor in 1 ms loop
  *
  *	Output channel
- * \channel c_qei for communicating with the QEI Server
+ * \param c_qei for communicating with the QEI Server
  *
- *  Input
+ * \Input
  * \qei_params the struct defines sensor type and resolution parameters for qei
  * \qei_velocity_params struct for velocity calculation
  *
- *  Output
+ * \Output
  * \return velocity from qei sensor in rpm
  */
 int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params);
@@ -86,10 +86,10 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_v
 /**
  * \brief Internal function to calculate QEI position information
  *
- *  Input
+ * \Input
  * \real_counts qei counts per rotation
  *
- *  Output
+ * \Output
  * \return  max position from qei sensor
  */
 extern int __qei_max_counts(int real_counts);

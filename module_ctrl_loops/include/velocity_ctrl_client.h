@@ -11,18 +11,18 @@
 /**
  * \brief Initialise Velocity Control Loop
  *
- *  Input Channel
- * \channel c_velocity_ctrl channel to signal initialisation
+ * \Input Channel
+ * \param c_velocity_ctrl channel to signal initialisation
  */
 int init_velocity_control(chanend c_velocity_ctrl);
 
 /**
  * \brief Checks Velocity Control Loop Status
  *
- *  Input Channel
- * \channel c_velocity_ctrl channel to get state of control loop
+ * \Input Channel
+ * \param c_velocity_ctrl channel to get state of control loop
  *
- *  Output
+ * \Output
  * \return state of the control loop : 1 - active, 0 - inactive
  */
 int check_velocity_ctrl_state(chanend c_velocity_ctrl);
@@ -30,11 +30,11 @@ int check_velocity_ctrl_state(chanend c_velocity_ctrl);
 /**
  * \brief Velocity Limiter
  *
- *  Input
+ * \Input
  * \param velocity is the input velocity to be limited in range
  * \param max_speed is the max speed that can be reached
  *
- *  Output
+ * \Output
  * \return velocity in the range [-max_speed to max_speed] (rpm)
  */
 int max_speed_limit(int velocity, int max_speed);
@@ -42,10 +42,10 @@ int max_speed_limit(int velocity, int max_speed);
 /**
  * \brief Set new target velocity for Velocity Control Loop
  *
- *  Input Channel
- * \channel c_velocity_ctrl channel to signal new target velocity
+ * \Input Channel
+ * \param c_velocity_ctrl channel to signal new target velocity
  *
- *  Input
+ * \Input
  * \param target_velocity is the new target velocity (rpm)
  */
 void set_velocity(int target_velocity, chanend c_velocity_ctrl);
@@ -54,10 +54,10 @@ void set_velocity(int target_velocity, chanend c_velocity_ctrl);
 /**
  * \brief Get actual velocity from Velocity Control Loop
  *
- *  Output Channel
- * \channel c_velocity_ctrl channel to receive actual velocity
+ * \Output Channel
+ * \param c_velocity_ctrl channel to receive actual velocity
  *
- *  Output
+ * \Output
  * \return actual velocity from velocity control (rpm)
  */
 int get_velocity(chanend c_velocity_ctrl);
@@ -65,7 +65,7 @@ int get_velocity(chanend c_velocity_ctrl);
 /**
  * \brief Set Velocity Control PID Parameters
  *
- *  Input
+ * \Input
  * \param velocity_ctrl_params struct defines the velocity control PID parameters
  */
 void set_velocity_ctrl_param(ctrl_par & velocity_ctrl_params, chanend c_velocity_ctrl);
@@ -90,7 +90,7 @@ void set_velocity_ctrl_qei_param(qei_par & qei_params, chanend c_velocity_ctrl);
 /**
  * \brief Sets the sensor used for Velocity Control
  *
- *  Input
+ * \Input
  * \param sensor_used defines the sensor to be used (HALL/QEI) for Velocity Control
  */
 void set_velocity_sensor(int sensor_used, chanend c_velocity_ctrl);
@@ -98,24 +98,24 @@ void set_velocity_sensor(int sensor_used, chanend c_velocity_ctrl);
 /**
  * \brief Enables Velocity Control mode operation
  *
- * \channel c_velocity_ctrl channel to signal enable velocity control
+ * \param c_velocity_ctrl channel to signal enable velocity control
  */
 void enable_velocity_ctrl(chanend c_velocity_ctrl);
 
 /**
  * \brief Shutdown Velocity Control mode operation
  *
- * \channel c_velocity_ctrl channel to signal shutdown of velocity control
+ * \param c_velocity_ctrl channel to signal shutdown of velocity control
  */
 void shutdown_velocity_ctrl(chanend c_velocity_ctrl);
 
 /**
  * \brief Set new target velocity for velocity control (advanced function)
  *
- *  Input Channel
- * \channel c_velocity_ctrl channel to signal new target velocity input
+ * \Input Channel
+ * \param c_velocity_ctrl channel to signal new target velocity input
  *
- *  Input
+ * \Input
  * \param csv_param struct defines the motor parameters and velocity limits
  * \param target_velocity is the new target velocity
  * \param velocity_offset defines offset in velocity

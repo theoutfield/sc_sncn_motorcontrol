@@ -25,11 +25,11 @@
  *  This implements the basic hall sensor server
  *
  *      Output channel
- *  \channel c_hall_p1 the control channel for reading hall position in order of priority (highest) 1 ... (lowest) 5
- *  \channel c_hall_p2 the control channel for reading hall position (priority 2)
- *  \channel c_hall_p3 the control channel for reading hall position (priority 3)
- *  \channel c_hall_p4 the control channel for reading hall position (priority 4)
- *  \channel c_hall_p5 the control channel for reading hall position (priority 5)
+ * \param c_hall_p1 the control channel for reading hall position in order of priority (highest) 1 ... (lowest) 5
+ * \param c_hall_p2 the control channel for reading hall position (priority 2)
+ * \param c_hall_p3 the control channel for reading hall position (priority 3)
+ * \param c_hall_p4 the control channel for reading hall position (priority 4)
+ * \param c_hall_p5 the control channel for reading hall position (priority 5)
  *
  *      Input port
  *      \port p_hall the port for reading the hall sensor data

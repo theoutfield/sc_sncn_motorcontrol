@@ -24,33 +24,33 @@ typedef struct S_COMMUTATION {
 } commutation_par;
 
 /**
- *  \brief Sets input voltage for commutation loop
+ * \brief Sets input voltage for commutation loop
  *
- *   Output Channels
- * 	\channel c_commutation channel to commutation thread
+ * \Output
+ * \param c_commutation A chanend connected to commutation server
  *
- * 	 Input
- * 	\param input_voltage Motor input voltage (range: -13739 to 13739)
+ * \Input
+ * \param input_voltage Motor input voltage (range: -13739 to 13739)
  */
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
 
 /**
- *  \brief Internal function used to set the commutation parameters
+ * \brief Internal function used to set the commutation parameters
  *
- *   Output Channels
- *  \channel c_commutation channel to commutation thread
+ * \Output
+ * \param c_commutation A chanend connected to commutation server
  *
- *   Input
- *  \param commutation_params struct defines the commutation angle parameters
+ * \Input
+ * \param commutation_params struct defines the commutation angle parameters
  */
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params);
 
 /**
  * \brief Selects the sensor type used for commutation (Hall sensor or quadrature encoder)
  *
- * \channel c_commutation channel to commutation thread
+ * \param c_commutation A chanend connected to commutation server
  *
- *  Input
+ * \Input
  * \param sensor_select Sensor type, specify by using define HALL or QEI
  */
 void set_commutation_sensor(chanend c_commutation, int sensor_select);

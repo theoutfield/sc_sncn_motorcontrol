@@ -18,12 +18,12 @@
  * \brief Implementation of the QEI server thread (for sensor with index/no index)
  *
  *	Output channel
- * \channel c_qei_p1 the control channel for reading qei position in order of priority (highest) 1 ... (lowest) 5
- * \channel c_qei_p2 the control channel for reading qei position priority - 2
- * \channel c_qei_p3 the control channel for reading qei position priority - 3
- * \channel c_qei_p4 the control channel for reading qei position priority - 4
- * \channel c_qei_p5 the control channel for reading qei position priority - 5
- * \channel c_qei_p6 the control channel for reading qei position priority - 6
+ * \param c_qei_p1 the control channel for reading qei position in order of priority (highest) 1 ... (lowest) 5
+ * \param c_qei_p2 the control channel for reading qei position priority - 2
+ * \param c_qei_p3 the control channel for reading qei position priority - 3
+ * \param c_qei_p4 the control channel for reading qei position priority - 4
+ * \param c_qei_p5 the control channel for reading qei position priority - 5
+ * \param c_qei_p6 the control channel for reading qei position priority - 6
  *
  *	Input port
  * \port p_qei the hardware port where the quadrature encoder is located

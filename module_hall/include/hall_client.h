@@ -17,10 +17,10 @@
 /**
  * \brief Get position from Hall Server
  *
- *  Output channel
- * \channel c_hall for communicating with the Hall Server
+ * \Output channel
+ * \param c_hall for communicating with the Hall Server
  *
- *  Output
+ * \Output
  * \return the position in the range [0 - 4095] which maps to [0 - 359]/pole-pairs
  */
 int get_hall_position(chanend c_hall);
@@ -28,10 +28,10 @@ int get_hall_position(chanend c_hall);
 /**
  * \brief Get absolute position from Hall Server
  *
- * Output channel
- * \channel c_hall for communicating with the Hall Server
+ * \Output channel
+ * \param c_hall for communicating with the Hall Server
  *
- *  Output
+ * \Output
  * \return the counted up position (compensates for pole-pairs)
  * 		   in the range [0 - 4095] * pole-pairs
  */
@@ -40,13 +40,13 @@ int get_hall_position(chanend c_hall);
 /**
  * \brief Get Velocity from Hall Server
  *
- * Output channel
- * \channel c_hall for communicating with the Hall Server
+ * \Output channel
+ * \param c_hall for communicating with the Hall Server
  *
- *  Input
+ * \Input
  * \param hall_params struct defines the pole-pairs
  *
- *  Output
+ * \Output
  * \return the velocity in rpm from Hall Sensor
  */
 int get_hall_velocity(chanend c_hall, hall_par &hall_params);

@@ -15,7 +15,7 @@
 /**
  * \brief Get target torque from Ethercat
  *
- *  Output
+ * \Output
  * \return target torque from Ethercat in range [0 - mNm * Current Resolution]
  */
 int get_target_torque(ctrl_proto_values_t InOut);
@@ -23,7 +23,7 @@ int get_target_torque(ctrl_proto_values_t InOut);
 /**
  * \brief Get target velocity from Ethercat
  *
- *  Output
+ * \Output
  * \return target velocity from Ethercat in rpm
  */
 int get_target_velocity(ctrl_proto_values_t InOut);
@@ -31,7 +31,7 @@ int get_target_velocity(ctrl_proto_values_t InOut);
 /**
  * \brief Get target position from Ethercat
  *
- *  Output
+ * \Output
  * \return target position from Ethercat in ticks
  */
 int get_target_position(ctrl_proto_values_t InOut);
@@ -39,7 +39,7 @@ int get_target_position(ctrl_proto_values_t InOut);
 /**
  * \brief Send actual torque to Ethercat
  *
- *  Input
+ * \Input
  * \param actual_torque sent to Ethercat in range [0 - mNm * Current Resolution]
  */
 void send_actual_torque(int actual_torque, ctrl_proto_values_t &InOut);
@@ -47,7 +47,7 @@ void send_actual_torque(int actual_torque, ctrl_proto_values_t &InOut);
 /**
  * \brief Send actual velocity to Ethercat
  *
- *  Input
+ * \Input
  * \param actual_velocity sent to Ethercat in rpm
  */
 void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
@@ -55,7 +55,7 @@ void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
 /**
  * \brief Send actual position to Ethercat
  *
- *  Input
+ * \Input
  * \param actual_position sent to Ethercat in ticks
  */
 void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
@@ -150,10 +150,10 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
 /**
  * \brief Set commutation parameters from Ethercat communication loop
  *
- * Output Channel
- * \channel c_signal channel to signal Commutation loop
+ * \Output Channel
+ * \param c_signal channel to signal Commutation loop
  *
- * Input
+ * \Input
  * \param hall_params struct defines the pole-pairs and gear ratio
  * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
@@ -165,10 +165,10 @@ void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par
 /**
  * \brief Set hall sensor parameters from Ethercat communication loop
  *
- * Output Channel
- * \channel c_hall channel to signal Hall acquisition loop
+ * \Output Channel
+ * \param c_hall channel to signal Hall acquisition loop
  *
- * Input
+ * \Input
  * \param hall_params struct defines the pole-pairs and gear ratio
  */
 void set_hall_param_ecat(chanend c_hall, hall_par &hall_params);
@@ -176,10 +176,10 @@ void set_hall_param_ecat(chanend c_hall, hall_par &hall_params);
 /**
  * \brief Set QEI sensor parameters from Ethercat communication loop
  *
- * Output Channel
- * \channel c_qei channel to signal QEI acquisition loop
+ * \Output Channel
+ * \param c_qei channel to signal QEI acquisition loop
  *
- * Input
+ * \Input
  * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
  */
@@ -189,10 +189,10 @@ void set_qei_param_ecat(chanend c_qei, qei_par &qei_params);
  * \brief Initialize commutation parameters from Ethercat communication loop
  * 			(call before start-up of Commutation loop)
  *
- * Output Channel
- * \channel c_signal channel to signal Commutation loop
+ * \Output Channel
+ * \param c_signal channel to signal Commutation loop
  *
- * Input
+ * \Input
  * \param hall_params struct defines the pole-pairs and gear ratio
  * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
@@ -204,10 +204,10 @@ void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei
  * \brief Initialize hall sensor parameters from Ethercat communication loop
  * 			(call before start-up of Hall acquisition loop)
  *
- * Output Channel
- * \channel c_hall channel to signal Hall acquisition loop
+ * \Output Channel
+ * \param c_hall channel to signal Hall acquisition loop
  *
- * Input
+ * \Input
  * \param hall_params struct defines the pole-pairs and gear ratio
  */
 void hall_init_ecat(chanend c_hall, hall_par &hall_params);
@@ -216,10 +216,10 @@ void hall_init_ecat(chanend c_hall, hall_par &hall_params);
  * \brief Initialize QEI sensor parameters from Ethercat communication loop
  *			(call before start-up of QEI acquisition loop)
  *
- * Output Channel
- * \channel c_qei channel to signal QEI acquisition loop
+ * \Output Channel
+ * \param c_qei channel to signal QEI acquisition loop
  *
- * Input
+ * \Input
  * \param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
  */

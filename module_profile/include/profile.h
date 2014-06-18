@@ -19,11 +19,11 @@
 /**
  * \brief Initialise Quick Stop Velocity Profile
  *
- *  Input
+ * \Input
  * \param actual_velocity
  * \param quick_stop_deceleration defines the deceleration for quick stop profile
  *
- * Output
+ * \Output
  * \return no. of steps for quick stop profile : range [1 - steps]
  */
 extern int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceleration);
@@ -31,10 +31,10 @@ extern int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_
 /**
  * \brief Generate Quick Stop Velocity Profile
  *
- *  Input
+ * \Input
  * \param step current step of the profile
  *
- * Output
+ * \Output
  * \return corresponding target velocity at the step input
  */
 extern int quick_stop_velocity_profile_generate(int step);
@@ -44,14 +44,14 @@ extern int quick_stop_velocity_profile_generate(int step);
 /**
  * \brief Initialise Velocity Profile
  *
- *  Input
+ * \Input
  * \param target_velocity
  * \param actual_velocity
  * \param acceleration for the velocity profile
  * \param deceleration for the velocity profile
  * \param max_velocity for the velocity profile
  *
- * Output
+ * \Output
  * \return no. of steps for velocity profile : range [1 - steps]
  */
 extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration, int max_velocity);
@@ -59,10 +59,10 @@ extern int init_velocity_profile(int target_velocity, int actual_velocity, int a
 /**
  * \brief Generate Velocity Profile
  *
- *  Input
+ * \Input
  * \param step current step of the profile
  *
- * Output
+ * \Output
  * \return corresponding target velocity at the step input
  */
 extern int velocity_profile_generate(int step);
@@ -72,7 +72,7 @@ extern int velocity_profile_generate(int step);
 /**
  * \brief Initialise Position Profile Limits
  *
- *  Input
+ * \Input
  * \param gear_ratio
  * \param max_acceleration for the position profile
  * \param max_velocity for the position profile
@@ -84,14 +84,14 @@ extern void init_position_profile_limits(int max_acceleration, int max_velocity,
 /**
  * \brief Initialise Position Profile
  *
- *  Input
+ * \Input
  * \param target_position
  * \param actual_position
  * \param velocity for the position profile
  * \param acceleration for the position profile
  * \param deceleration for the position profile
  *
- * Output
+ * \Output
  * \return no. of steps for position profile : range [1 - steps]
  */
 extern int init_position_profile(int target_position, int actual_position,      int velocity, int acceleration, \
@@ -100,10 +100,10 @@ extern int init_position_profile(int target_position, int actual_position,      
 /**
  * \brief Generate Position Profile
  *
- *  Input
+ * \Input
  * \param step current step of the profile
  *
- * Output
+ * \Output
  * \return corresponding target position at the step input
  */
 extern int position_profile_generate(int step);
@@ -113,12 +113,12 @@ extern int position_profile_generate(int step);
 /**
  * \brief Initialise Quick Stop Position Profile
  *
- *  Input
+ * \Input
  * \param actual_velocity
  * \param actual_position
  * \param max_acceleration defines the deceleration for quick stop profile
  *
- * Output
+ * \Output
  * \return no. of steps for quick stop profile : range [1 - steps]
  */
 extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int max_deceleration) ;
@@ -126,11 +126,11 @@ extern int init_quick_stop_position_profile(int actual_velocity, int actual_posi
 /**
  * \brief Generate Quick Stop Position Profile
  *
- *  Input
+ * \Input
  * \param step current step of the profile
  * \param actual_velocity
  *
- * Output
+ * \Output
  * \return corresponding target position at the step input
  */
 extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
@@ -138,14 +138,14 @@ extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
 /**
  * \brief Initialise Linear Profile
  *
- *  Input
+ * \Input
  * \param target_value
  * \param actual_value
  * \param acceleration for the Linear profile
  * \param deceleration for the Linear profile
  * \param max_value for the Linear profile
  *
- * Output
+ * \Output
  * \return no. of steps for linear profile : range [1 - steps]
  */
 extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value);
@@ -153,10 +153,10 @@ extern int init_linear_profile(int target_value, int actual_value, int accelerat
 /**
  * \brief Generate Linear Profile
  *
- *  Input
+ * \Input
  * \param step current step of the profile
  *
- * Output
+ * \Output
  * \return corresponding target value at the step input
  */
 extern int linear_profile_generate(int step);

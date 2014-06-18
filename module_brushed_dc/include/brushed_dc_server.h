@@ -14,15 +14,15 @@
 /**
  * \brief Brushed DC Drive Loop
  *
- * Input
- * \channel c_watchdog channel for controlling the watchdog
- * \channel c_signal channel for signaling after initialization of drive loop
- * \channel c_voltage_p1 channel to receive motor voltage input value - priority 1 (highest) 1 ... (lowest) 3
- * \channel c_voltage_p2 channel to receive motor voltage input value - priority 2
- * \channel c_voltage_p3 channel to receive motor voltage input value - priority 3
+ * \Input
+ * \param c_watchdog channel for controlling the watchdog
+ * \param c_signal channel for signaling after initialization of drive loop
+ * \param c_voltage_p1 channel to receive motor voltage input value - priority 1 (highest) 1 ... (lowest) 3
+ * \param c_voltage_p2 channel to receive motor voltage input value - priority 2
+ * \param c_voltage_p3 channel to receive motor voltage input value - priority 3
  *
- * Output
- * \channel c_pwm_ctrl channel to set pwm level output to motor phases
+ * \Output
+ * \param c_pwm_ctrl channel to set pwm level output to motor phases
  * \port p_ifm_esf_rstn_pwml_pwmh port to configure motor FET driver
  * \port p_ifm_coastn port to enable motor FET driver
  * \port p_ifm_ff1 FET driver fault flag 1

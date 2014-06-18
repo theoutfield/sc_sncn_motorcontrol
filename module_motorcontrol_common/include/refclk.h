@@ -34,7 +34,7 @@
 /**
  * \brief Delay function in microseconds
  *
- *  Input
+ * \Input
  * \param microseconds specify the delay in microseconds
  * \param core_id specify the core number in which the function is called
  * \param t timer used to calculate the microseconds elapsed
@@ -44,7 +44,7 @@ void wait_micro_s(unsigned microseconds, int core_id, timer t);
 /**
  * \brief Delay function in milliseconds
  *
- *  Input
+ * \Input
  * \param milliseconds specify the delay in milliseconds
  * \param core_id specify the core number in which the function is called
  * \param t timer used to calculate the milliseconds elapsed
@@ -55,7 +55,7 @@ void wait_ms(unsigned milliseconds, int core_id, timer t);
 /**
  * \brief Delay function in seconds
  *
- *  Input
+ * \Input
  * \param seconds specify the delay in seconds
  * \param core_id specify the core number in which the function is called
  * \param t timer used to calculate the seconds elapsed
