@@ -14,7 +14,7 @@ Key Features
   * Profile Velocity Control
   * Profile Torque Control
   * Homing feature
-  * Ethercat Operating Modes
+  * EtherCAT Operating Modes
   * Support QEI sensor with Index/ no Index
   * Support Hall sensor
   * Support Analog sensor
@@ -30,7 +30,7 @@ Known Issues
 Support
 =======
 
-Issues may be submitted via the Issues tab in this github repo. Response to any issues submitted is at the discretion of the maintainer for this line.
+Issues may be submitted via the Issues tab in this GitHub repository. Response to any issues submitted is at the discretion of the maintainer for this line.
 
 Required software (dependencies)
 ================================
