@@ -15,10 +15,10 @@ Key Features
   * Profile Torque Control
   * Homing feature
   * EtherCAT Operating Modes
-  * Support QEI sensor with Index/ no Index
-  * Support Hall sensor
-  * Support Analog sensor
-  * Support GPIO Digital
+  * QEI sensor (Index/ no Index) support
+  * Hall sensor sensor
+  * Analog sensor sensor
+  * GPIO Digital sensor
   * Precise position control based on position sensor ticks
 
 Firmware overview
