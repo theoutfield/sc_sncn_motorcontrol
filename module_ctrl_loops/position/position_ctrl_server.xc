@@ -8,6 +8,7 @@
 #include <xscope_wrapper.h>
 #include <print.h>
 #include <drive_config.h>
+#include "a4935.h"
 
 #ifdef BDC
 #include "brushed_dc_client.h"
@@ -34,7 +35,6 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
     unsigned int time;
 
     int command = 0;
-    int deactivate = 0;
     int activate = 0;
     int direction = 0;
 

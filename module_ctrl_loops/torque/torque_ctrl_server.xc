@@ -14,6 +14,8 @@
 #include "adc_client_ad7949.h"
 #include "qei_client.h"
 #include "hall_client.h"
+#include "sine_table_big.h"
+#include "a4935.h"
 
 //#define ENABLE_xscope_torq
 //#define debug_print
@@ -151,7 +153,6 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
     int command;
 
     timer tc;
-    unsigned int time;
     unsigned int time1;
     int phase_a_filtered = 0;
     int phase_b_filtered = 0;
@@ -190,9 +191,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
     int error_torque_previous = 0;
     int torque_control_output = 0;
 
-    unsigned int received_command = 0;
     int init_state = INIT_BUSY;
-    int commutation_init = INIT_BUSY;
 
     int compute_flag = 0;
     int qei_counts_per_hall;
@@ -201,7 +200,6 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
     int offset_fw_flag = 0;
     int offset_bw_flag = 0;
     int fet_state = 0;
-    int deactivate = 0;
     int activate = 0;
 
     init_qei_velocity_params(qei_velocity_params);

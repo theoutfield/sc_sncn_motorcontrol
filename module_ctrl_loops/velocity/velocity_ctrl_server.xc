@@ -14,6 +14,7 @@
 #include <internal_config.h>
 #include <drive_config.h>
 #include "print.h"
+#include "a4935.h"
 
 #ifdef BDC
 #include "brushed_dc_client.h"
@@ -62,14 +63,12 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
     int speed_factor_qei  = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);       // variable qei_real_max  core 2/1/0 only
 
     int command;
-    int deactivate = 0;
     int activate = 0;
     int init_state = INIT_BUSY;
     int qei_crossover = qei_params.real_counts - qei_params.real_counts/10;
     int hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
     int compute_flag = 0;
     int fet_state = 0;
-    int valid;
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 
     ts :> time;

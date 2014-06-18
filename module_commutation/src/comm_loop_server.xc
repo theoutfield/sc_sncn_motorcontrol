@@ -7,19 +7,18 @@
  */
 
 #include "comm_loop_server.h"
+#include <watchdog.h>
 #include <xs1.h>
-#include <stdint.h>
 #include <pwm_config.h>
 #include "pwm_cli_inv.h"
 #include "a4935.h"
 #include "sine_table_big.h"
 #include "adc_client_ad7949.h"
-#include "hall_client.h"
-#include <xscope_wrapper.h>
 #include "refclk.h"
 #include "qei_client.h"
-#include <internal_config.h>
-#include "print.h"
+#include "hall_client.h"
+
+#include <xscope_wrapper.h>
 
 void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
@@ -95,21 +94,16 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     int angle = 0;
     int angle_rpm   = 0;
     int speed = 0;
-    timer t;
-    unsigned int ts;
     int voltage = 0;
     int direction = 0;
-    //int init_state = INIT;
     int pwm_half = PWM_MAX_VALUE>>1;
     int max_count_per_hall = qei_params.real_counts/hall_params.pole_pairs;
     int angle_offset = 682/(2*hall_params.pole_pairs);
 
     int fw_flag = 0;
     int bw_flag = 0;
-    int status = 0;
     int nominal_speed;
     int shutdown = 0; //Disable FETS
-    int port_a=0, port_b, check_fet;
     qei_velocity_par qei_velocity_params;
     init_qei_velocity_params(qei_velocity_params);
 
@@ -255,7 +249,6 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
     t_pwm_control pwm_ctrl;
     int check_fet;
     int init_state = INIT_BUSY;
-    int port_a, port_b;
 
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
@@ -278,3 +271,19 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
                                 c_commutation_p3);
 }
 
+void init_commutation_param(commutation_par &commutation_params, hall_par & hall_params, int nominal_speed)
+{
+    commutation_params.angle_variance = 1024/(hall_params.pole_pairs * 3); // (60 * 4096)/( POLE_PAIRS * 2 *360)
+    if(hall_params.pole_pairs < 4) {
+        commutation_params.max_speed_reached = nominal_speed * 4;
+        commutation_params.flag = 1;
+    } else if (hall_params.pole_pairs >= 4) {
+        commutation_params.max_speed_reached = nominal_speed;
+        commutation_params.flag = 0;
+    }
+    commutation_params.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+    commutation_params.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+    commutation_params.winding_type = WINDING_TYPE;
+    commutation_params.qei_forward_offset = 0;
+    commutation_params.qei_backward_offset = 0;
+}
