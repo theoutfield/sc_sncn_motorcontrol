@@ -13,6 +13,6 @@ Server API
 .. doxygenfunction:: commutation_sinusoidal
 
 Types
-=====
+-----
 
 .. doxygenstruct:: S_COMMUTATION
