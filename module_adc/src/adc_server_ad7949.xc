@@ -225,7 +225,6 @@ void adc_ad7949( chanend c_adc,
     timer tx;
     unsigned ts;
     int command;
-    int xCount = 100;
 
     const unsigned int adc_config_mot     =   0b11110001001001;  	/* Motor current (ADC Channel 0), unipolar, referenced to GND */
     const unsigned int adc_config_other[] = { 0b10110001001001,  	// Temperature

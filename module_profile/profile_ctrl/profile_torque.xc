@@ -23,7 +23,6 @@ void set_profile_torque(int target_torque, int torque_slope, cst_par &cst_params
     int actual_torque;
     timer t;
     unsigned int time;
-    int init = INIT_BUSY;
 
     int init_state = __check_torque_init(c_torque_ctrl);
     if (init_state == INIT_BUSY) {

@@ -110,7 +110,6 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
     unsigned int new_pins;
 
     int command;
-    int current_pos = 0;
     int previous_position = 0;
     int count = 0;
     int first = 1;
