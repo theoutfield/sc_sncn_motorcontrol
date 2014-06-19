@@ -60,11 +60,9 @@ Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interfac
 
         par
         {
-            on tile[0]:
-            {
-                set_commutation_sinusoidal(c_commutation_p1, 2000);
-            }
-    
+
+        	...
+
             on tile[IFM_TILE]:
             {
                 par
@@ -112,11 +110,22 @@ Applying output voltage to the motor
 -------------------------------------
 A motor voltage can be applied by a simple function call:
 ::
-
-    on tile[0]: // Can be any tile
+    int main(void)
     {
-        //Set commutation value to 100
-        set_commutation_sinusoidal(c_commutation_p1, 100);
+
+    ...
+
+        par
+        {
+		    on tile[0]: // Can be any tile
+		    {
+		        //Set commutation value to 100
+		        set_commutation_sinusoidal(c_commutation_p1, 100);
+		    }
+	    }
+    
+    ...
+
     }
 
 .. tip:: Start by applying lower values like e.g. 20 before causing any demage to your motor or driver.
