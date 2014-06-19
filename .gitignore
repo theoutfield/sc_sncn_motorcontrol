@@ -23,3 +23,7 @@ bin/
 
 ## ignore doxygen outputs
 .dox/gen
+
+## ignore xdoc outputs
+_build
+run_xdoc.log
