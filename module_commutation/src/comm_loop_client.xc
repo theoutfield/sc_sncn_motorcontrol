@@ -12,7 +12,7 @@
 /* MAX Input value 13739 */
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 {
-    c_commutation <: 2;
+    c_commutation <: SET_VOLTAGE;
     c_commutation <: input_voltage;
     return;
 }
