@@ -29,7 +29,6 @@
 #define QEI                                 2
 #define QEI_1                               3
 
-
 #define QEI_WITH_INDEX                      1
 #define QEI_WITH_NO_INDEX                   0
 
@@ -49,7 +48,6 @@
 #define SET_QEI_PARAM_ECAT                  22
 #define SET_POSITION_CTRL_HALL              23
 #define SET_POSITION_CTRL_QEI               24
-
 
 #define SET_VELOCITY_CTRL_HALL              25
 #define SET_VELOCITY_CTRL_QEI               26
@@ -100,7 +98,6 @@
 #define NORMAL                              1
 #define INVERTED                            -1
 #define HALL_POSITION_INTERPOLATED_RANGE    4096
-
 
 #define CONFIG_DIO_INPUT                    10
 #define CONFIG_DIO_DONE                     15
@@ -224,4 +221,3 @@ typedef struct PROFILE_POSITION_PARAM
     int software_position_limit_max;
     int max_acceleration;
 } pp_par;
-

@@ -1,3 +1,5 @@
+.. _commutation_programming_label:
+
 Programming Guide
 =================
 
@@ -5,7 +7,7 @@ Running the commutation server
 ------------------------------
 
 Step 1: Include the required headers
-....................................
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -22,7 +24,7 @@ Step 1: Include the required headers
     #include <bldc_motor_config.h>
 
 Step 2: Define the clocks
-.........................
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -30,7 +32,7 @@ Step 2: Define the clocks
     on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 Step 3: Define motor control channels
-......................................
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -47,9 +49,9 @@ Step 3: Define motor control channels
 
 
 Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interface
-..................................................................................
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. important:: Please note that all these tasks must be executed on a tile with access to I/O of a Synapticon SOMANET IFM Drive DC board
+.. important:: Please note that all these tasks must be executed on a tile with access to I/O of a Synapticon SOMANET IFM Drive DC board. 
 
 ::
 
