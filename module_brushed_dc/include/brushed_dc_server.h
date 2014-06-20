@@ -23,10 +23,10 @@
  *
  * \Output
  * \param c_pwm_ctrl channel to set pwm level output to motor phases
- * \port p_ifm_esf_rstn_pwml_pwmh port to configure motor FET driver
- * \port p_ifm_coastn port to enable motor FET driver
- * \port p_ifm_ff1 FET driver fault flag 1
- * \port p_ifm_ff2 FET driver fault flag 2
+ * \param p_ifm_esf_rstn_pwml_pwmh port to configure motor FET driver
+ * \param p_ifm_coastn port to enable motor FET driver
+ * \param p_ifm_ff1 FET driver fault flag 1
+ * \param p_ifm_ff2 FET driver fault flag 2
  */
 void bdc_loop(chanend c_watchdog, chanend c_signal,
               chanend c_voltage_p1, chanend  c_voltage_p2, chanend  c_voltage_p3,

@@ -29,8 +29,8 @@
  *
  * \Output
  * \param c_pwm_ctrl channel to set PWM level output to motor phases
- * \port p_ifm_esf_rstn_pwml_pwmh port to configure motor FET driver
- * \port p_ifm_coastn port to enable motor FET driver
+ * \param p_ifm_esf_rstn_pwml_pwmh port to configure motor FET driver
+ * \param p_ifm_coastn port to enable motor FET driver
  *
  */
 void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, chanend c_watchdog,

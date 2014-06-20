@@ -32,10 +32,10 @@
  * \param c_hall_p5 the control channel for reading hall position (priority 5)
  *
  *      Input port
- *      \port p_hall the port for reading the hall sensor data
  *
  *       Input
  *      \param hall_params struct defines the pole-pairs and gear ratio
+ * \param p_hall the port for reading the hall sensor data
  */
 void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
               chanend c_hall_p5, chanend c_hall_p6, port in p_hall, hall_par &hall_params);

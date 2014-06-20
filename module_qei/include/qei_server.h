@@ -26,7 +26,7 @@
  * \param c_qei_p6 the control channel for reading qei position priority - 6
  *
  *	Input port
- * \port p_qei the hardware port where the quadrature encoder is located
+ * \param p_qei the hardware port where the quadrature encoder is located
  *
  *	Input
  * \param qei_params the struct defines sensor type and resolution parameters for qei
