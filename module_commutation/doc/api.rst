@@ -15,4 +15,4 @@ Server API
 Types
 -----
 
-.. doxygenstruct:: S_COMMUTATION
+.. doxygenstruct:: commutation_par

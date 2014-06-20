@@ -11,7 +11,7 @@
 /**
  * \brief Struct for commutation parameters
  */
-typedef struct S_COMMUTATION {
+typedef struct {
     int angle_variance;
     int max_speed_reached;
     int qei_forward_offset;
