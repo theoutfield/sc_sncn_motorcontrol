@@ -132,13 +132,6 @@ void init_sensor_filter_param(filter_par &sensor_filter_par) ;
 void init_qei_param(qei_par &qei_params);
 
 /**
- * \brief initialize hall sensor
- *
- * \param hall_params struct defines the pole-pairs and gear ratio
- */
-void init_hall_param(hall_par &hall_params);
-
-/**
  * \brief initialize cyclic synchronous velocity params
  *
  * \param csv_params struct defines cyclic synchronous velocity params

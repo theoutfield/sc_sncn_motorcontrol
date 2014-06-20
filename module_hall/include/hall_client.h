@@ -8,45 +8,49 @@
 */
 
 #pragma once
-#include <stdint.h>
-#include <bldc_motor_config.h>
 #include "hall_config.h"
 #include <xs1.h>
 
+/**
+ * \brief struct definition for hall sensor
+ */
+typedef struct {
+    int pole_pairs;
+    int max_ticks_per_turn;
+    int max_ticks;
+    int sensor_polarity;
+} hall_par;
 
 /**
- * \brief Get position from Hall Server
- *
- * \Output channel
- * \param c_hall for communicating with the Hall Server
+ * \brief Gets position from Hall Server
  *
  * \Output
+ * \param c_hall A chanend connected to Hall Server
+ *
  * \return the position in the range [0 - 4095] which maps to [0 - 359]/pole-pairs
  */
 int get_hall_position(chanend c_hall);
 
 /**
- * \brief Get absolute position from Hall Server
- *
- * \Output channel
- * \param c_hall for communicating with the Hall Server
+ * \brief Gets absolute position from Hall Server
  *
  * \Output
+ * \param c_hall A chanend connected to Hall Server
+ *
  * \return the counted up position (compensates for pole-pairs)
  * 		   in the range [0 - 4095] * pole-pairs
  */
 {int , int} get_hall_position_absolute(chanend c_hall);
 
 /**
- * \brief Get Velocity from Hall Server
- *
- * \Output channel
- * \param c_hall for communicating with the Hall Server
- *
- * \Input
- * \param hall_params struct defines the pole-pairs
+ * \brief Gets velocity from Hall Server
  *
  * \Output
+ * \param c_hall A chanend connected to Hall Server
+ *
+ * \Input
+ * \param hall_params Structure holding parameters like e.g. "number of pole-pairs"
+ *
  * \return the velocity in rpm from Hall Sensor
  */
 int get_hall_velocity(chanend c_hall, hall_par &hall_params);

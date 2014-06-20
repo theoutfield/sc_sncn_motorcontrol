@@ -145,16 +145,6 @@ typedef struct S_QEI {
 } qei_par;
 
 /**
- * \brief struct definition for hall sensor
- */
-typedef struct S_Hall {
-    int pole_pairs;
-    int max_ticks_per_turn;
-    int max_ticks;
-    int sensor_polarity;
-} hall_par;
-
-/**
  * \brief struct definition for Synchronous torque param
  */
 typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM

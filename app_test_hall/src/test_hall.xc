@@ -94,7 +94,6 @@ int main(void)
             /* Hall Server */
             {
                 hall_par hall_params;
-                init_hall_param(hall_params);
                 run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6,
                          p_ifm_hall, hall_params); // channel priority 1,2..6
             }

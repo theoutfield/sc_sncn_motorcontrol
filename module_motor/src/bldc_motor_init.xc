@@ -9,20 +9,6 @@
 #include <stdlib.h>
 #include "refclk.h"
 
-void init_hall_param(hall_par &hall_params)
-{
-	hall_params.pole_pairs = POLE_PAIRS;
-
-    // Find absolute maximum position deviation from origin
-    hall_params.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
-
-	hall_params.max_ticks_per_turn = POLE_PAIRS * HALL_POSITION_INTERPOLATED_RANGE;
-	hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
-        //hall_params.sensor_polarity = -1;
-
-	return;
-}
-
 void init_qei_param(qei_par &qei_params)
 {
 

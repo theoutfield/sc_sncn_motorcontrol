@@ -7,6 +7,7 @@
 */
 
 #include "hall_server.h"
+#include <bldc_motor_config.h>
 //#pragma xta command "analyze loop hall_loop"
 //#pragma xta command "set required - 10.0 us"
 //#define DEBUG
@@ -46,6 +47,20 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
     default:
         break;
     }
+}
+
+void init_hall_param(hall_par &hall_params)
+{
+    hall_params.pole_pairs = POLE_PAIRS;
+
+    // Find absolute maximum position deviation from origin
+    hall_params.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
+
+    hall_params.max_ticks_per_turn = POLE_PAIRS * HALL_POSITION_INTERPOLATED_RANGE;
+    hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
+        //hall_params.sensor_polarity = -1;
+
+    return;
 }
 
 void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
@@ -107,6 +122,9 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
         xscope_config_io(XSCOPE_IO_BASIC);
     }
 #endif
+
+    init_hall_param(hall_params);
+
     /* Init hall sensor */
     p_hall :> pin_state;
     switch(pin_state) {

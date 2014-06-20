@@ -7,6 +7,7 @@
 */
 
 #include "hall_client.h"
+#include <bldc_motor_config.h>
 
 int get_hall_position(chanend c_hall)
 {
