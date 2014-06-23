@@ -78,8 +78,6 @@ Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interfac
                         hall_par hall_params;
                         qei_par qei_params;
                         commutation_par commutation_params;
-                        init_hall_param(hall_params);
-                        init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);             // initialize commutation params
                         commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog,  \
                                 c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
                                 p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
@@ -92,7 +90,6 @@ Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interfac
                     /* Hall Server */
                     {
                         hall_par hall_params;
-                        init_hall_param(hall_params);
                         run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
                     }
                 }

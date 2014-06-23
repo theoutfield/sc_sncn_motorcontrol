@@ -16,7 +16,6 @@
 #include "adc_client_ad7949.h"
 #include "refclk.h"
 #include "qei_client.h"
-#include "hall_client.h"
 
 #include <xscope_wrapper.h>
 
@@ -88,6 +87,9 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
                                  commutation_par &commutation_params, int init_state, chanend c_hall, chanend c_qei, chanend c_pwm_ctrl,
                                  chanend c_signal, chanend  c_commutation_p1, chanend c_commutation_p2, chanend c_commutation_p3)
 {
+
+    init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
+
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
     int angle_pwm = 0;
@@ -98,7 +100,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     int direction = 0;
     int pwm_half = PWM_MAX_VALUE>>1;
     int max_count_per_hall = qei_params.real_counts/hall_params.pole_pairs;
-    int angle_offset = 682/(2*hall_params.pole_pairs);
+    int angle_offset = (4096 / 6) / (2 * hall_params.pole_pairs);
 
     int fw_flag = 0;
     int bw_flag = 0;
@@ -106,6 +108,8 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     int shutdown = 0; //Disable FETS
     qei_velocity_par qei_velocity_params;
     init_qei_velocity_params(qei_velocity_params);
+
+
 
     //xscope_probe_data(2, check_fet);
     while (1) {
@@ -224,7 +228,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
                 commutation_params.qei_backward_offset = 0;
                 voltage = 0;
                 max_count_per_hall = qei_params.real_counts / hall_params.pole_pairs;
-                angle_offset = 682 / (2 * hall_params.pole_pairs);
+                angle_offset = (4096 / 6) / (2 * hall_params.pole_pairs);
                 fw_flag = 0;
                 bw_flag = 0;
             }
@@ -271,6 +275,7 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
                                 c_commutation_p3);
 }
 
+//TOFO rename to validate_commutation_param
 void init_commutation_param(commutation_par &commutation_params, hall_par & hall_params, int nominal_speed)
 {
     commutation_params.angle_variance = 1024/(hall_params.pole_pairs * 3); // (60 * 4096)/( POLE_PAIRS * 2 *360)

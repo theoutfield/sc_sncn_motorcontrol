@@ -10,7 +10,8 @@
 
 #include "comm_loop_client.h"
 #include <watchdog.h>
-#include <internal_config.h>
+#include "hall_client.h"
+#include <bldc_motor_config.h>
 
 /**
  * \brief Sinusoidal based Commutation Loop
