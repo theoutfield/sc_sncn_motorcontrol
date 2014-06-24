@@ -6,6 +6,7 @@
 
 #include <torque_ctrl_server.h>
 #include <math.h>
+#include <stdlib.h>
 #include <refclk.h>
 #include <xscope_wrapper.h>
 #include <print.h>
@@ -110,9 +111,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
                 filter_count = 0;
 
                 //xscope_probe_data(0, actual_speed);
-                abs_speed = actual_speed;
-                if (actual_speed < 0)
-                    abs_speed = 0 - actual_speed;
+                abs_speed = abs(actual_speed);
 
                 if (abs_speed <= 100) {
                     filter_length_variance = 50;

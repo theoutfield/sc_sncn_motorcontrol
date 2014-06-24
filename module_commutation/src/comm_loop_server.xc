@@ -9,6 +9,7 @@
 #include "comm_loop_server.h"
 #include <watchdog.h>
 #include <xs1.h>
+#include <stdlib.h>
 #include <pwm_config.h>
 #include "pwm_cli_inv.h"
 #include "a4935.h"
@@ -24,15 +25,6 @@ void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
     unsigned int pwm[3] = {0, 0, 0};  // PWM OFF
     pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
-}
-
-/* FIXME: use C library function abs() instead */
-int absolute(int var)
-{
-    if(var < 0) {
-        var = 0 - var;
-    }
-    return var;
 }
 
 
@@ -117,7 +109,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
             //hall only
             speed = get_hall_velocity(c_hall, hall_params);
             angle = get_hall_position(c_hall);
-            angle_rpm = (absolute(speed)*commutation_params.angle_variance) / commutation_params.max_speed_reached;
+            angle_rpm = (abs(speed)*commutation_params.angle_variance) / commutation_params.max_speed_reached;
         } else if(sensor_select == QEI) {
             { angle, fw_flag, bw_flag } = get_qei_sync_position(c_qei);
             angle = (angle << 12) / max_count_per_hall;
@@ -130,7 +122,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
                     angle = get_hall_position(c_hall);
                 }
             }
-            angle_rpm = (absolute(speed)*commutation_params.angle_variance) / commutation_params.max_speed_reached;
+            angle_rpm = (abs(speed)*commutation_params.angle_variance) / commutation_params.max_speed_reached;
         }
 
         if (voltage < 0) {
