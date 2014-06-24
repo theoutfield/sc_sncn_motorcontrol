@@ -217,10 +217,13 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
 
 
     tc :> time1;
+    time1 += MSEC_STD - 100;
+
     while(1) {
 #pragma ordered
         select {
-        case tc when timerafter(time1 + MSEC_STD - 100) :> time1:
+        case tc when timerafter(time1) :> void:
+            time1 += MSEC_STD - 100;
             if (compute_flag == 1) {
                 if (sensor_used == HALL) {
                     angle = (get_hall_position(c_hall) >> 2) & 0x3ff; //  << 10 ) >> 12

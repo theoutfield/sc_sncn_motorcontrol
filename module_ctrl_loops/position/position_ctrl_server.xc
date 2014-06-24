@@ -69,12 +69,14 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
      * place client functions here to acquire position
      */
 
-    ts:> time;
+    ts :> time;
+    time += position_ctrl_params.Loop_time;
 
     while(1) {
 #pragma ordered
         select {
-        case ts when timerafter(time + position_ctrl_params.Loop_time) :> time: // 1 ms
+        case ts when timerafter(time) :> void:
+            time += position_ctrl_params.Loop_time;
             if (activate == 1) {
                 /* acquire actual position hall/qei/sensor */
                 switch (sensor_used) {

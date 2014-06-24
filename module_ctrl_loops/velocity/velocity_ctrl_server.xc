@@ -76,12 +76,14 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 
     ts :> time;
+    time += velocity_ctrl_params.Loop_time;
 
     init_state = INIT;
     while (1) {
 #pragma ordered
         select {
-        case ts when timerafter (time + velocity_ctrl_params.Loop_time) :> time: /* FIXME: add loop_time to time instead of reading from timer */
+        case ts when timerafter (time) :> void:
+            time += velocity_ctrl_params.Loop_time;
             if (compute_flag == 1) {
                 /* calculate actual velocity from hall/qei with filter*/
                 if (sensor_used == HALL) {
