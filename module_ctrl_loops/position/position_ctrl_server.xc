@@ -18,6 +18,10 @@
 //#define DEBUG
 //#define debug_print
 
+#define POSITION_CTRL_WRITE(x)  c_position_ctrl <: (x)
+#define POSITION_CTRL_READ(x)   c_position_ctrl :> (x)
+
+
 //extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used,

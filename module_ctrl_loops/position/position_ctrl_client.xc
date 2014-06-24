@@ -11,6 +11,9 @@
 
 //#define debug_print
 
+#define POSITION_CTRL_WRITE(x)  c_position_ctrl <: (x)
+#define POSITION_CTRL_READ(x)   c_position_ctrl :> (x)
+
 int init_position_control(chanend c_position_ctrl)
 {
     int ctrl_state = INIT_BUSY;

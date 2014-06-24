@@ -10,15 +10,6 @@
 #define BLDC_PWM_CONTROL_LIMIT              6794
 #define BDC_PWM_CONTROL_LIMIT               13589
 
-#define TORQUE_CTRL_READ(x)     c_torque_ctrl :> x
-#define TORQUE_CTRL_WRITE(x)    c_torque_ctrl <: x
-
-#define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> x
-#define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: x
-
-#define POSITION_CTRL_READ(x)   c_position_ctrl :> x
-#define POSITION_CTRL_WRITE(x)  c_position_ctrl <: x
-
 #define SIGNAL_READ(x)          c_signal :> x
 #define SIGNAL_WRITE(x)         c_signal <: x
 
@@ -108,6 +99,7 @@
 #define GP_INPUT_TYPE                       40
 #define SWITCH_INPUT_TYPE                   50
 
+/* TODO: when / where / why are those used? */
 #define COMMUTATION_FORWARD_CONSTANT        683     // 60  deg
 #define COMMUTATION_REVERSE_CONSTANT        2731    // 240 deg
 

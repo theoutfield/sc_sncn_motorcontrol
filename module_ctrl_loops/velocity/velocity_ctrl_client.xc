@@ -13,6 +13,9 @@
 
 //#define debug_print
 
+#define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
+#define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> (x)
+
 int init_velocity_control(chanend c_velocity_ctrl)
 {
     int ctrl_state = INIT_BUSY;

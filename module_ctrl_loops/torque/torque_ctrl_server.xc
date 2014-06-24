@@ -19,6 +19,10 @@
 //#define ENABLE_xscope_torq
 //#define debug_print
 
+#define TORQUE_CTRL_WRITE(x)    c_torque_ctrl <: (x)
+#define TORQUE_CTRL_READ(x)     c_torque_ctrl :> (x)
+
+
 void init_buffer(int buffer[], int length)
 {
     int i;

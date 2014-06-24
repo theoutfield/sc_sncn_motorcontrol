@@ -11,6 +11,9 @@
 #include <drive_modes.h>
 //#define debug_print
 
+#define TORQUE_CTRL_WRITE(x)    c_torque_ctrl <: (x)
+#define TORQUE_CTRL_READ(x)     c_torque_ctrl :> (x)
+
 int init_torque_control(chanend c_torque_ctrl)
 {
     int ctrl_state = INIT_BUSY;
