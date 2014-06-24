@@ -4,12 +4,12 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
-#include "velocity_ctrl_client.h"
-#include "refclk.h"
+#include <velocity_ctrl_client.h>
+#include <refclk.h>
 #include <internal_config.h>
-#include "print.h"
 #include <statemachine.h>
 #include <drive_modes.h>
+#include <print.h>
 
 //#define debug_print
 

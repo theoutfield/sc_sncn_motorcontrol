@@ -14,3 +14,13 @@
 #define HALL_ABSOLUTE_POS_REQ 					3
 #define FILTER_LENGTH_HALL 						16
 #define RESET_HALL_COUNT						9
+
+ /**
+ * \brief struct definition for hall sensor
+ */
+typedef struct {
+    int pole_pairs;
+    int max_ticks_per_turn;
+    int max_ticks;
+    int sensor_polarity;
+} hall_par;

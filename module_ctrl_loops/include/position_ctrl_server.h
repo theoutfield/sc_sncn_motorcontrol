@@ -7,10 +7,10 @@
 #pragma once
 
 #include <internal_config.h>
-#include "refclk.h"
-#include "qei_client.h"
-#include "hall_client.h"
-#include "comm_loop_client.h"
+#include <refclk.h>
+#include <qei_client.h>
+#include <hall_client.h>
+#include <comm_loop_client.h>
 
 /**
  * \brief Position Control Loop

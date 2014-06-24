@@ -8,6 +8,9 @@
 
 #include "qei_server.h"
 #include <xscope_wrapper.h>
+#include <bldc_motor_config.h>
+#include <stdlib.h>
+
 //#pragma xta command "analyze loop qei_loop"
 //#pragma xta command "set required - 1.0 us"
 // Order is 00 -> 10 -> 11 -> 01
@@ -97,10 +100,31 @@ void qei_client_hanlder(chanend c_qei, int command, int position, int ok, int &c
     }
 }
 
+//FIXME rename to check_qei_parameters();
+void init_qei_param(qei_par &qei_params)
+{
+
+    qei_params.real_counts = ENCODER_RESOLUTION;
+
+    // Find absolute maximum position deviation from origin
+    qei_params.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
+
+
+    qei_params.index = QEI_SENSOR_TYPE;
+    qei_params.max_ticks_per_turn = qei_params.real_counts;
+    qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
+    qei_params.poles = POLE_PAIRS;
+    qei_params.sensor_polarity = QEI_SENSOR_POLARITY;
+    return;
+}
+
 #pragma unsafe arrays
 void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, chanend c_qei_p5, \
              chanend c_qei_p6, port in p_qei, qei_par &qei_params)
 {
+
+    init_qei_param(qei_params);
+
     int position = 0;
     unsigned int v;
 

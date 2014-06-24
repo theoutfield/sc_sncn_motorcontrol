@@ -8,9 +8,9 @@
 #pragma once
 
 #include <internal_config.h>
-#include "refclk.h"
-#include "qei_client.h"
-#include "hall_client.h"
+#include <refclk.h>
+#include <qei_client.h>
+#include <hall_client.h>
 
 /**
  * \brief Initialise Position Control Loop

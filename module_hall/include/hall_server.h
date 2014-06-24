@@ -17,7 +17,6 @@
 #include <stdint.h>
 #include "refclk.h"
 #include "hall_config.h"
-#include <hall_client.h>
 
 /**
  * \brief initialize hall sensor

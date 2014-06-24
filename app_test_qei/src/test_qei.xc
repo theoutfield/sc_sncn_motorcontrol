@@ -83,7 +83,6 @@ int main(void)
 			/* QEI Server Loop */
 			{
 				qei_par qei_params;
-				init_qei_param(qei_params);
 				run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  		// channel priority 1,2..6
 			}
 		}

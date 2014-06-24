@@ -15,6 +15,14 @@
 #include "filter_blocks.h"
 
 /**
+ * \brief initialize QEI sensor
+ *
+ * \param qei_params struct defines the resolution for quadrature encoder (QEI),
+ *          gear-ratio, poles, encoder type
+ */
+void init_qei_param(qei_par &qei_params);
+
+/**
  * \brief Implementation of the QEI server thread (for sensor with index/no index)
  *
  *	Output channel

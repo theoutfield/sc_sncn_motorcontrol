@@ -7,12 +7,12 @@
 #include <position_ctrl_server.h>
 #include <xscope_wrapper.h>
 #include <print.h>
-#include "a4935.h"
 #include <statemachine.h>
 #include <drive_modes.h>
+#include <a4935.h>
 
 #ifdef BDC
-#include "brushed_dc_client.h"
+#include <brushed_dc_client.h>
 #endif
 
 //#define DEBUG

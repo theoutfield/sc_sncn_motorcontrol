@@ -7,6 +7,8 @@
 #pragma once
 
 #include <internal_config.h>
+#include <hall_client.h>
+#include <qei_client.h>
 
 /**
  * \brief Initialise Torque Control Loop

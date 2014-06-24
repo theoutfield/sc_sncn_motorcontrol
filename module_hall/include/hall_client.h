@@ -12,16 +12,6 @@
 #include <xs1.h>
 
 /**
- * \brief struct definition for hall sensor
- */
-typedef struct {
-    int pole_pairs;
-    int max_ticks_per_turn;
-    int max_ticks;
-    int sensor_polarity;
-} hall_par;
-
-/**
  * \brief Gets position from Hall Server
  *
  * \Output

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hall_client.h>
+#include <qei_client.h>
 #include <internal_config.h>
 
 /**

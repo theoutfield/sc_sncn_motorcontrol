@@ -4,18 +4,17 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
-#include "velocity_ctrl_server.h"
-#include "refclk.h"
-#include "qei_client.h"
-#include "hall_client.h"
-#include "comm_loop_client.h"
-#include "filter_blocks.h"
+#include <velocity_ctrl_server.h>
+#include <refclk.h>
+#include <qei_client.h>
+#include <comm_loop_client.h>
+#include <filter_blocks.h>
 #include <xscope_wrapper.h>
 #include <internal_config.h>
-#include "print.h"
-#include "a4935.h"
 #include <statemachine.h>
 #include <drive_modes.h>
+#include <print.h>
+#include <a4935.h>
 
 #ifdef BDC
 #include "brushed_dc_client.h"

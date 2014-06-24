@@ -9,11 +9,11 @@
 #pragma once
 
 #include <bldc_motor_config.h>
-#include "filter_blocks.h"
+#include <filter_blocks.h>
 #include <print.h>
 #include <xs1.h>
 #include <stdio.h>
-#include "qei_config.h"
+#include <qei_config.h>
 
 
 /**

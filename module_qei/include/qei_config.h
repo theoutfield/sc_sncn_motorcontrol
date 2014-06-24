@@ -21,3 +21,15 @@
 #define SET_OFFSET               6
 #define QEI_RESET_COUNT          7
 
+/**
+ * \brief struct definition for quadrature sensor
+ */
+typedef struct {
+    int max_ticks_per_turn;
+    int real_counts;
+    int max_ticks;      // paramater allows for more turns
+    int index;          // no_index - 0 index - 1
+    int poles;
+    int sensor_polarity;
+} qei_par;
+

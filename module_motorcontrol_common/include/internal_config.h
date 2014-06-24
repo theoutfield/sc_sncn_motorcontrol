@@ -133,18 +133,6 @@ typedef struct S_Filter_length
 } filter_par;
 
 /**
- * \brief struct definition for quadrature sensor
- */
-typedef struct S_QEI {
-    int max_ticks_per_turn;
-    int real_counts;
-    int max_ticks;      // paramater allows for more turns
-    int index;          // no_index - 0 index - 1
-    int poles;
-    int sensor_polarity;
-} qei_par;
-
-/**
  * \brief struct definition for Synchronous torque param
  */
 typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM

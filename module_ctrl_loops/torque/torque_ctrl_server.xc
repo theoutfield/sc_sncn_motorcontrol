@@ -4,19 +4,17 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
+#include <torque_ctrl_server.h>
 #include <math.h>
-#include "torque_ctrl_server.h"
 #include <refclk.h>
 #include <xscope_wrapper.h>
 #include <print.h>
-#include <internal_config.h>
-#include "adc_client_ad7949.h"
-#include "qei_client.h"
-#include "hall_client.h"
-#include "sine_table_big.h"
-#include "a4935.h"
 #include <statemachine.h>
 #include <drive_modes.h>
+#include <adc_client_ad7949.h>
+#include <qei_client.h>
+#include <sine_table_big.h>
+#include <a4935.h>
 
 //#define ENABLE_xscope_torq
 //#define debug_print

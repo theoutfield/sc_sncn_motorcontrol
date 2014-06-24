@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <internal_config.h>
+#include <hall_config.h>
+#include <qei_config.h>
 
 /*Profile Velocity Quick Stop*/
 

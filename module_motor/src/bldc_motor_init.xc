@@ -6,26 +6,7 @@
 
 #include <bldc_motor_config.h>
 #include <internal_config.h>
-#include <stdlib.h>
 #include "refclk.h"
-
-void init_qei_param(qei_par &qei_params)
-{
-
-	qei_params.real_counts = ENCODER_RESOLUTION;
-        //qei_params.gear_ratio = GEAR_RATIO;
-
-    // Find absolute maximum position deviation from origin
-    qei_params.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
-
-
-	qei_params.index = QEI_SENSOR_TYPE;
-	qei_params.max_ticks_per_turn = qei_params.real_counts;
-	qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
-	qei_params.poles = POLE_PAIRS;
-	qei_params.sensor_polarity = QEI_SENSOR_POLARITY;
-	return;
-}
 
 void init_csv_param(csv_par &csv_params)
 {

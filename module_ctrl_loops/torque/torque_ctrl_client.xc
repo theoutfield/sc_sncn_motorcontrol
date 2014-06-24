@@ -4,10 +4,9 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
-#include "torque_ctrl_client.h"
+#include <torque_ctrl_client.h>
 #include <refclk.h>
 #include <print.h>
-#include <internal_config.h>
 #include <statemachine.h>
 #include <drive_modes.h>
 //#define debug_print
