@@ -208,7 +208,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
                 c_signal :> commutation_params.hall_offset_clk;
                 c_signal :> commutation_params.hall_offset_cclk;
                 c_signal :> commutation_params.winding_type;
-                commutation_params.angle_variance = 1024 / (hall_params.pole_pairs * 3);
+                commutation_params.angle_variance = (60 * 4096) / (hall_params.pole_pairs * 2 * 360);
                 if (hall_params.pole_pairs < 4) {
                     commutation_params.max_speed_reached = nominal_speed * 4;
                 } else if (hall_params.pole_pairs >= 4) {
@@ -265,10 +265,10 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
                                 c_commutation_p3);
 }
 
-//TOFO rename to validate_commutation_param
+//TODO rename to validate_commutation_param
 void init_commutation_param(commutation_par &commutation_params, hall_par & hall_params, int nominal_speed)
 {
-    commutation_params.angle_variance = 1024/(hall_params.pole_pairs * 3); // (60 * 4096)/( POLE_PAIRS * 2 *360)
+    commutation_params.angle_variance = (60 * 4096) / (hall_params.pole_pairs * 2 * 360);
     if(hall_params.pole_pairs < 4) {
         commutation_params.max_speed_reached = nominal_speed * 4;
     } else if (hall_params.pole_pairs >= 4) {
