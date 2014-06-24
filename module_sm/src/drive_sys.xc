@@ -4,7 +4,8 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include <drive_config.h>
+#include <statemachine.h>
+#include <drive_modes.h>
 #include <internal_config.h>
 #include <print.h>
 

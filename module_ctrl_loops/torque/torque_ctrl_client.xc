@@ -7,8 +7,9 @@
 #include "torque_ctrl_client.h"
 #include <refclk.h>
 #include <print.h>
-#include <drive_config.h>
 #include <internal_config.h>
+#include <statemachine.h>
+#include <drive_modes.h>
 //#define debug_print
 
 int init_torque_control(chanend c_torque_ctrl)

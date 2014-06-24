@@ -9,13 +9,14 @@
 #include <refclk.h>
 #include <xscope_wrapper.h>
 #include <print.h>
-#include <drive_config.h>
 #include <internal_config.h>
 #include "adc_client_ad7949.h"
 #include "qei_client.h"
 #include "hall_client.h"
 #include "sine_table_big.h"
 #include "a4935.h"
+#include <statemachine.h>
+#include <drive_modes.h>
 
 //#define ENABLE_xscope_torq
 //#define debug_print

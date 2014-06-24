@@ -7,12 +7,13 @@
 #pragma once
 
 #include <comm.h>
-#include <drive_config.h>
+#include <statemachine.h>
+#include <drive_modes.h>
 #include <velocity_ctrl_client.h>
 #include <position_ctrl_client.h>
 #include <torque_ctrl_client.h>
-#include <hall_client.h>
-#include <qei_client.h>
+#include <hall_server.h>
+#include <qei_server.h>
 #include <profile.h>
 
 /**

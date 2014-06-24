@@ -6,7 +6,8 @@
 
 #include <position_ctrl_client.h>
 #include <print.h>
-#include <drive_config.h>
+#include <statemachine.h>
+#include <drive_modes.h>
 
 //#define debug_print
 

@@ -6,7 +6,8 @@
 #include "refclk.h"
 #include "velocity_ctrl_client.h"
 #include <internal_config.h>
-#include <drive_config.h>
+#include <statemachine.h>
+#include <drive_modes.h>
 #include <auto_calib_hall.h>
 #include "hall_qei.h"
 
