@@ -6,7 +6,9 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
 */
 
-#include "hall_client.h"
+#include <hall_config.h>
+
+//TODO remove these dependencies
 #include <bldc_motor_config.h>
 
 int get_hall_position(chanend c_hall)

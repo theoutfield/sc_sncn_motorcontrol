@@ -6,8 +6,16 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
 */
 
-#include "hall_server.h"
+#include <hall_config.h>
+#include <filter_blocks.h>
+#include <refclk.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <refclk.h>
+
+//TODO remove these dependencies
 #include <bldc_motor_config.h>
+
 //#pragma xta command "analyze loop hall_loop"
 //#pragma xta command "set required - 10.0 us"
 //#define DEBUG
@@ -49,6 +57,7 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
     }
 }
 
+//FIXME rename to check_hall_parameters();
 void init_hall_param(hall_par &hall_params)
 {
     hall_params.pole_pairs = POLE_PAIRS;

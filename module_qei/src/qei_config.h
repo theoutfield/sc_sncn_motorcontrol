@@ -33,3 +33,14 @@ typedef struct {
     int sensor_polarity;
 } qei_par;
 
+/**
+ * \brief struct definition for velocity calculation from qei sensor
+ */
+typedef struct QEI_VELOCITY_PARAM
+{
+    int previous_position;
+    int old_difference;
+    int filter_buffer[8];
+    int index;
+    int filter_length;
+} qei_velocity_par;

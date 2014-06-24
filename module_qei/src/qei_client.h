@@ -8,13 +8,7 @@
 
 #pragma once
 
-#include <bldc_motor_config.h>
-#include <filter_blocks.h>
-#include <print.h>
-#include <xs1.h>
-#include <stdio.h>
 #include <qei_config.h>
-
 
 /**
  * \brief Get position from QEI Server
@@ -44,20 +38,6 @@
  * \return  direction of rotation, clockwise : 1 / anti-clockwise : -1
  */
 {int, int} get_qei_position_absolute(chanend c_qei);
-
-
-/**
- * \brief struct definition for velocity calculation from qei sensor
- */
-typedef struct QEI_VELOCITY_PARAM
-{
-	int previous_position;
-	int old_difference;
-	int filter_buffer[8];
-	int index;
-	int filter_length;
-} qei_velocity_par;
-
 
 /**
  * \brief Initialize struct for velocity calculation from QEI sensor

@@ -8,7 +8,8 @@
 */
 
 #pragma once
-#include "hall_config.h"
+
+#include <hall_config.h>
 #include <xs1.h>
 
 /**

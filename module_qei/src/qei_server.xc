@@ -6,10 +6,15 @@
 */
 
 
-#include "qei_server.h"
-#include <xscope_wrapper.h>
-#include <bldc_motor_config.h>
+#include <qei_config.h>
 #include <stdlib.h>
+#include <xs1.h>
+#include <refclk.h>
+#include <filter_blocks.h>
+#include <xscope_wrapper.h>
+
+//TODO remove these dependencies
+#include <bldc_motor_config.h>
 
 //#pragma xta command "analyze loop qei_loop"
 //#pragma xta command "set required - 1.0 us"

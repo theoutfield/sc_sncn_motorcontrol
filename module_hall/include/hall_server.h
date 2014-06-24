@@ -9,14 +9,7 @@
 #pragma once
 
 #include <xs1.h>
-#include <bldc_motor_config.h>
-#include <filter_blocks.h>
-#include <refclk.h>
-#include <stdlib.h>
-#include <print.h>
-#include <stdint.h>
-#include "refclk.h"
-#include "hall_config.h"
+#include <hall_config.h>
 
 /**
  * \brief initialize hall sensor

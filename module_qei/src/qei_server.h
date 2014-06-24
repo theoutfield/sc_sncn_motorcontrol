@@ -8,11 +8,7 @@
 
 #pragma once
 
-#include <xs1.h>
-#include "qei_config.h"
-#include "internal_config.h"
-#include <refclk.h>
-#include "filter_blocks.h"
+#include <qei_config.h>
 
 /**
  * \brief initialize QEI sensor

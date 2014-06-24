@@ -5,7 +5,14 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
 */
 
-#include "qei_client.h"
+#include <qei_config.h>
+#include <filter_blocks.h>
+#include <xs1.h>
+#include <stdio.h>
+
+//TODO remove these dependencies
+#include <bldc_motor_config.h>
+#include <internal_config.h>
 
 void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
 {
