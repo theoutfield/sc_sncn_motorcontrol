@@ -298,10 +298,8 @@ void commutation_init_ecat(chanend c_signal, hall_par & hall_params, qei_par & q
                 commutation_params.angle_variance = 1024 / (hall_params.pole_pairs * 3);
                 if (hall_params.pole_pairs < 4) {
                     commutation_params.max_speed_reached = nominal_speed*4;
-                    commutation_params.flag = 1;
                 } else if (hall_params.pole_pairs >= 4) {
                     commutation_params.max_speed_reached = nominal_speed;
-                    commutation_params.flag = 0;
                 }
                 commutation_params.qei_forward_offset = 0;
                 commutation_params.qei_backward_offset = 0;
@@ -344,7 +342,7 @@ void hall_init_ecat(chanend c_hall, hall_par & hall_params)
                 c_hall :> hall_params.pole_pairs;
                 c_hall :> hall_params.max_ticks;
                 c_hall :> hall_params.max_ticks_per_turn;
-                flag = 1;
+                flag = 1;       /* TODO: is the intention to just "return" from this function? */
             }
             break;
 

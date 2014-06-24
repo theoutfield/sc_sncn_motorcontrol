@@ -219,10 +219,8 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
                 commutation_params.angle_variance = 1024 / (hall_params.pole_pairs * 3);
                 if (hall_params.pole_pairs < 4) {
                     commutation_params.max_speed_reached = nominal_speed * 4;
-                    commutation_params.flag = 1;
                 } else if (hall_params.pole_pairs >= 4) {
                     commutation_params.max_speed_reached = nominal_speed;
-                    commutation_params.flag = 0;
                 }
                 commutation_params.qei_forward_offset = 0;
                 commutation_params.qei_backward_offset = 0;
@@ -281,10 +279,8 @@ void init_commutation_param(commutation_par &commutation_params, hall_par & hall
     commutation_params.angle_variance = 1024/(hall_params.pole_pairs * 3); // (60 * 4096)/( POLE_PAIRS * 2 *360)
     if(hall_params.pole_pairs < 4) {
         commutation_params.max_speed_reached = nominal_speed * 4;
-        commutation_params.flag = 1;
     } else if (hall_params.pole_pairs >= 4) {
         commutation_params.max_speed_reached = nominal_speed;
-        commutation_params.flag = 0;
     }
     commutation_params.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
     commutation_params.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;

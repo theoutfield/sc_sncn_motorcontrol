@@ -12,15 +12,13 @@
  * \brief Struct for commutation parameters
  */
 typedef struct {
-    int angle_variance;
-    int max_speed_reached;
+    int angle_variance;         /* max allowed variance depending on speed */
+    int max_speed_reached;      /* FIXME: should be named rated_speed */
     int qei_forward_offset;
     int qei_backward_offset;
-    int offset_forward;
     int hall_offset_clk;
     int hall_offset_cclk;
     int winding_type;
-    int flag;
 } commutation_par;
 
 /**
