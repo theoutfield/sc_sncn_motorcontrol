@@ -28,7 +28,7 @@ void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-void bdc_client_hanlder(chanend c_voltage, int command, int & voltage, int init_state, int & shutdown)
+void bdc_client_handler(chanend c_voltage, int command, int & voltage, int init_state, int & shutdown)
 {
     switch (command) {
     case SET_VOLTAGE:
@@ -57,8 +57,10 @@ void bdc_client_hanlder(chanend c_voltage, int command, int & voltage, int init_
     }
 }
 
-void __bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn, t_pwm_control &pwm_ctrl, int init_state,
-                          chanend c_pwm_ctrl, chanend c_signal, chanend c_voltage_p1, chanend c_voltage_p2, chanend c_voltage_p3)
+static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
+                               t_pwm_control &pwm_ctrl, int init_state,
+                               chanend c_pwm_ctrl, chanend c_signal,
+                               chanend c_voltage_p1, chanend c_voltage_p2, chanend c_voltage_p3)
 {
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
@@ -115,17 +117,17 @@ void __bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn, t_p
 #pragma ordered
         select {
         case c_voltage_p1 :> command:
-            bdc_client_hanlder( c_voltage_p1, command, voltage,
+            bdc_client_handler( c_voltage_p1, command, voltage,
                                 init_state, shutdown );
             break;
 
         case c_voltage_p2 :> command:
-            bdc_client_hanlder( c_voltage_p2, command, voltage,
+            bdc_client_handler( c_voltage_p2, command, voltage,
                                 init_state, shutdown );
             break;
 
         case c_voltage_p3 :> command:
-            bdc_client_hanlder( c_voltage_p3, command, voltage,
+            bdc_client_handler( c_voltage_p3, command, voltage,
                                 init_state, shutdown );
             break;
 
@@ -139,9 +141,10 @@ void __bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn, t_p
 }
 
 
-void bdc_loop(chanend c_watchdog, chanend c_signal, chanend  c_voltage_p1, chanend  c_voltage_p2, \
-              chanend  c_voltage_p3, chanend c_pwm_ctrl,      out port p_ifm_esf_rstn_pwml_pwmh, \
-              port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2)
+void bdc_loop(chanend c_watchdog, chanend c_signal,
+              chanend c_voltage_p1, chanend c_voltage_p2, chanend c_voltage_p3,
+              chanend c_pwm_ctrl,
+              out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2)
 {
     const unsigned t_delay = 300*USEC_FAST;
     timer t;
@@ -166,7 +169,7 @@ void bdc_loop(chanend c_watchdog, chanend c_signal, chanend  c_voltage_p1, chane
     p_ifm_coastn :> check_fet;
     init_state = check_fet;
 
-    __bldc_internal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, pwm_ctrl, init_state,\
+    bldc_internal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, pwm_ctrl, init_state,\
                          c_pwm_ctrl, c_signal, c_voltage_p1, c_voltage_p2, c_voltage_p3);
 }
 

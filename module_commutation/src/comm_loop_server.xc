@@ -38,7 +38,7 @@ int absolute(int var)
 
 /* Sinusoidal based commutation functions */
 
-void commutation_client_hanlder(chanend c_commutation, int command, commutation_par &commutation_params, \
+void commutation_client_handler(chanend c_commutation, int command, commutation_par &commutation_params, \
                                 int &voltage, int &sensor_select, int init_state, int &shutdown)
 {
     switch (command) {
@@ -190,17 +190,17 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 #pragma ordered
         select {
         case c_commutation_p1 :> command:
-            commutation_client_hanlder( c_commutation_p1, command, commutation_params, voltage,
+            commutation_client_handler( c_commutation_p1, command, commutation_params, voltage,
                                         sensor_select, init_state, shutdown);
             break;
 
         case c_commutation_p2 :> command:
-            commutation_client_hanlder( c_commutation_p2, command, commutation_params, voltage,
+            commutation_client_handler( c_commutation_p2, command, commutation_params, voltage,
                                         sensor_select, init_state, shutdown);
             break;
 
         case c_commutation_p3 :> command:
-            commutation_client_hanlder( c_commutation_p3, command, commutation_params, voltage,
+            commutation_client_handler( c_commutation_p3, command, commutation_params, voltage,
                                         sensor_select, init_state, shutdown);
             break;
 
