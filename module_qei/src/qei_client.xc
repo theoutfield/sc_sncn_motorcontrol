@@ -1,8 +1,8 @@
 /**
- * \file qei_client.xc
- * \brief QEI Sensor Client Functions
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file qei_client.xc
+ * @brief QEI Sensor Client Functions
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
 */
 
 #include <qei_config.h>

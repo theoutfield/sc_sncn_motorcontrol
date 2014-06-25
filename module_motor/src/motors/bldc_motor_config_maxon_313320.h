@@ -1,9 +1,9 @@
 /**
- * \file motor_maxon_313320.h
- * \brief Motor parameters for the maxon EC-i 40, brushless, 50 Watt motor with Hall sensors (Part Number: 313320)
- * \author Andrija Feher <afeher@synapticon.com>
- * \version 1.0
- * \date 14/05/2014
+ * @file motor_maxon_313320.h
+ * @brief Motor parameters for the maxon EC-i 40, brushless, 50 Watt motor with Hall sensors (Part Number: 313320)
+ * @author Andrija Feher <afeher@synapticon.com>
+ * @version 1.0
+ * @date 14/05/2014
  */
 
 /**
@@ -102,87 +102,87 @@
 
 
 /**
- * \brief initialize Velocity sensor filter
+ * @brief initialize Velocity sensor filter
  *
- * \param sensor_filter_par struct defines the velocity filter params
+ * @param sensor_filter_par struct defines the velocity filter params
  */
 void init_sensor_filter_param(filter_par &sensor_filter_par) ;
 
 /**
- * \brief initialize QEI sensor
+ * @brief initialize QEI sensor
  *
- * \param qei_params struct defines the resolution for quadrature encoder (QEI),
+ * @param qei_params struct defines the resolution for quadrature encoder (QEI),
  *          gear-ratio, poles, encoder type
  */
 void init_qei_param(qei_par &qei_params);
 
 /**
- * \brief initialize hall sensor
+ * @brief initialize hall sensor
  *
- * \param hall_params struct defines the pole-pairs and gear ratio
+ * @param hall_params struct defines the pole-pairs and gear ratio
  */
 void init_hall_param(hall_par &hall_params);
 
 /**
- * \brief initialize cyclic synchronous velocity params
+ * @brief initialize cyclic synchronous velocity params
  *
- * \param csv_params struct defines cyclic synchronous velocity params
+ * @param csv_params struct defines cyclic synchronous velocity params
  */
 void init_csv_param(csv_par &csv_params);
 
 /**
- * \brief initialize cyclic synchronous position params
+ * @brief initialize cyclic synchronous position params
  *
- * \param csp_params struct defines cyclic synchronous position params
+ * @param csp_params struct defines cyclic synchronous position params
  */
 void init_csp_param(csp_par &csp_params);
 
 /**
- * \brief initialize cyclic synchronous torque params
+ * @brief initialize cyclic synchronous torque params
  *
- * \param cst_params struct defines cyclic synchronous torque params
+ * @param cst_params struct defines cyclic synchronous torque params
  */
 void init_cst_param(cst_par &cst_params);
 
 /**
- * \brief initialize profile position params
+ * @brief initialize profile position params
  *
- * \param pp_params struct defines profileposition params
+ * @param pp_params struct defines profileposition params
  */
 void init_pp_params(pp_par &pp_params);
 
 /**
- * \brief initialize profile velocity params
+ * @brief initialize profile velocity params
  *
- * \param pv_params struct defines profile velocity params
+ * @param pv_params struct defines profile velocity params
  */
 void init_pv_params(pv_par &pv_params);
 
 /**
- * \brief initialize profile torque params
+ * @brief initialize profile torque params
  *
- * \param pt_params struct defines profile torque params
+ * @param pt_params struct defines profile torque params
  */
 void init_pt_params(pt_par &pt_params);
 
 /**
- * \brief initialize torque control PID params
+ * @brief initialize torque control PID params
  *
- * \param torque_ctrl_params struct defines torque control PID params
+ * @param torque_ctrl_params struct defines torque control PID params
  */
 void init_torque_control_param(ctrl_par &torque_ctrl_params);
 
 /**
- * \brief initialize velocity control PID params
+ * @brief initialize velocity control PID params
  *
- * \param velocity_ctrl_params struct defines velocity control PID params
+ * @param velocity_ctrl_params struct defines velocity control PID params
  */
 void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 
 /**
- * \brief initialize position control PID params
+ * @brief initialize position control PID params
  *
- * \param position_ctrl_params struct defines position control PID params
+ * @param position_ctrl_params struct defines position control PID params
  */
 void init_position_control_param(ctrl_par &position_ctrl_params);
 

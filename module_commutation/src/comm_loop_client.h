@@ -1,15 +1,15 @@
 /**
- * \file comm_loop_client.h
- * \brief Commutation Loop Client functions
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \author Ludwig Orgler <lorgler@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file comm_loop_client.h
+ * @brief Commutation Loop Client functions
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
 #pragma once
 
 /**
- * \brief Struct for commutation parameters
+ * @brief Struct for commutation parameters
  */
 typedef struct {
     int angle_variance;         /* max allowed variance depending on speed */
@@ -22,33 +22,28 @@ typedef struct {
 } commutation_par;
 
 /**
- * \brief Sets input voltage for commutation loop
+ * @brief Sets input voltage for commutation loop
  *
- * \Output
- * \param c_commutation A chanend connected to commutation server
+ * @param[out] c_commutation A chanend connected to commutation server
  *
- * \Input
- * \param input_voltage Motor input voltage (range: -13739 to 13739)
+ * @param[in] input_voltage Motor input voltage (range: -13739 to 13739)
  */
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
 
 /**
- * \brief Internal function used to set the commutation parameters
+ * @brief Internal function used to set the commutation parameters
  *
- * \Output
- * \param c_commutation A chanend connected to commutation server
+ * @param[out] c_commutation A chanend connected to commutation server
  *
- * \Input
- * \param commutation_params struct defines the commutation angle parameters
+ * @param[in] commutation_params struct defines the commutation angle parameters
  */
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params);
 
 /**
- * \brief Selects the sensor type used for commutation (Hall sensor or quadrature encoder)
+ * @brief Selects the sensor type used for commutation (Hall sensor or quadrature encoder)
  *
- * \param c_commutation A chanend connected to commutation server
+ * @param[out] c_commutation A chanend connected to commutation server
  *
- * \Input
- * \param sensor_select Sensor type, specify by using define HALL or QEI
+ * @param[in] sensor_select Sensor type, specify by using define HALL or QEI
  */
 void set_commutation_sensor(chanend c_commutation, int sensor_select);

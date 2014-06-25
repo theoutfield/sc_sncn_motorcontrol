@@ -1,9 +1,9 @@
 /**
- * \file profile_position.c
- * \brief Profile Generation for Position
+ * @file profile_position.c
+ * @brief Profile Generation for Position
  * Implements position profile based on Linear Function with
  * Parabolic Blends.
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
 #include <profile.h>

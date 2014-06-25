@@ -1,8 +1,8 @@
 
 /**
- * \file nodeconfig.h
- * \brief Node config file
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file nodeconfig.h
+ * @brief Node config file
+ * @author Martin Schwarz <mschwarz@synapticon.com>
 */
 
 #pragma once

@@ -1,7 +1,7 @@
 /**
- * \file  torque_ctrl_client.xc
- * \brief Torque Control Loop Client functions
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file  torque_ctrl_client.xc
+ * @brief Torque Control Loop Client functions
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
 #include <torque_ctrl_client.h>

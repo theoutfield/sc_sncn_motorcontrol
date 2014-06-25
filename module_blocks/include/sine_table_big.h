@@ -1,8 +1,8 @@
 /**
- * \file sine_table_big.h
- * \brief Sine Loopup table declarations
- * \author Ludwig Orgler <lorgler@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file sine_table_big.h
+ * @brief Sine Loopup table declarations
+ * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
 #pragma once

@@ -1,7 +1,7 @@
 /**
- * \file ecat_motor_drive.xc
- * \brief Ethercat Motor Drive Server
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file ecat_motor_drive.xc
+ * @brief Ethercat Motor Drive Server
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
 #include <comm.h>

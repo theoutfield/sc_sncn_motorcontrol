@@ -1,7 +1,7 @@
 /**
- * \file  torque_ctrl_server.xc
- * \brief Torque Control Loop Server Implementation
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file  torque_ctrl_server.xc
+ * @brief Torque Control Loop Server Implementation
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
 #include <torque_ctrl_server.h>

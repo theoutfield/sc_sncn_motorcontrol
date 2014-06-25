@@ -1,7 +1,7 @@
 /**
- * \file watchdog.xc
- * \brief Watchdog Implementation
- * \author Victor de la Cruz <vdelacruz@synapticon.com>
+ * @file watchdog.xc
+ * @brief Watchdog Implementation
+ * @author Victor de la Cruz <vdelacruz@synapticon.com>
  */
 
 /*

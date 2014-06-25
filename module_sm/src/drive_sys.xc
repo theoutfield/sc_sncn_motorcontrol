@@ -1,7 +1,7 @@
 /**
- * \file drive_sys.xc
- * \brief Motor Drive State Machine Implementation
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file drive_sys.xc
+ * @brief Motor Drive State Machine Implementation
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
 #include <statemachine.h>

@@ -1,8 +1,8 @@
 /**
- * \file adc_common.h
- * \brief ADC Common Definitions
- * \author Martin Schwarz <mschwarz@synapticon.com>
- * \author Ludwig Orgler <lorgler@synapticon.com>
+ * @file adc_common.h
+ * @brief ADC Common Definitions
+ * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Ludwig Orgler <lorgler@synapticon.com>
 */
 
 #pragma once

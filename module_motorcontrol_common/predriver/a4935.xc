@@ -1,7 +1,7 @@
 /**
- * \file a4935.xc
- * \brief Driver file for motor
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file a4935.xc
+ * @brief Driver file for motor
+ * @author Martin Schwarz <mschwarz@synapticon.com>
 */
 
 

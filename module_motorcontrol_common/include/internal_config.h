@@ -1,7 +1,7 @@
 /**
- * \file internal_config.h
- * \brief Internal Definitions
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file internal_config.h
+ * @brief Internal Definitions
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
 #pragma once
@@ -104,7 +104,7 @@
 #define COMMUTATION_REVERSE_CONSTANT        2731    // 240 deg
 
 /**
- * \brief struct definition for PID Controller
+ * @brief struct definition for PID Controller
  */
 typedef struct S_Control
 {
@@ -117,7 +117,7 @@ typedef struct S_Control
 } ctrl_par;
 
 /**
- * \brief struct definition for velocity filter
+ * @brief struct definition for velocity filter
  */
 typedef struct S_Filter_length
 {
@@ -125,7 +125,7 @@ typedef struct S_Filter_length
 } filter_par;
 
 /**
- * \brief struct definition for Synchronous torque param
+ * @brief struct definition for Synchronous torque param
  */
 typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
 {
@@ -137,7 +137,7 @@ typedef struct CYCLIC_SYNCHRONOUS_TORQUE_PARAM
 } cst_par;
 
 /**
- * \brief struct definition for Synchronous velocity param
+ * @brief struct definition for Synchronous velocity param
  */
 typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 {
@@ -149,7 +149,7 @@ typedef struct CYCLIC_SYNCHRONOUS_VELOCITY_PARAM
 } csv_par;
 
 /**
- * \brief struct definition for Synchronous position param
+ * @brief struct definition for Synchronous position param
  */
 typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 {
@@ -160,7 +160,7 @@ typedef struct CYCLIC_SYNCHRONOUS_POSITION_PARAM
 } csp_par;
 
 /**
- * \brief struct definition for profile torque param
+ * @brief struct definition for profile torque param
  */
 typedef struct PROFILE_TORQUE_PARAM
 {
@@ -169,7 +169,7 @@ typedef struct PROFILE_TORQUE_PARAM
 } pt_par;
 
 /**
- * \brief struct definition for profile velocity param
+ * @brief struct definition for profile velocity param
  */
 typedef struct PROFILE_VELOCITY_PARAM
 {
@@ -181,7 +181,7 @@ typedef struct PROFILE_VELOCITY_PARAM
 } pv_par;
 
 /**
- * \brief struct definition for profile position param
+ * @brief struct definition for profile position param
  */
 typedef struct PROFILE_POSITION_PARAM
 {

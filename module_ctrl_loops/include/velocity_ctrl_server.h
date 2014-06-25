@@ -1,7 +1,7 @@
 /**
- * \file velocity_ctrl_server.h
- * \brief Velocity Control Loop Server Implementation
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file velocity_ctrl_server.h
+ * @brief Velocity Control Loop Server Implementation
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
 #pragma once
@@ -11,22 +11,22 @@
 #include <internal_config.h>
 
 /**
- * \brief Velocity Control Loop
+ * @brief Velocity Control Loop
  *
- * \Input
- * \param velocity_ctrl_params struct defines the velocity control parameters
- * \param sensor_filter_par struct defines the filter parameters
- * \param hall_params struct defines the poles for hall sensor and gear-ratio
- * \param qei_params struct defines the resolution for qei sensor and gear-ratio
- * \param sensor_used specify the sensors to used via HALL/QEI defines
+ * @Input
+ * @param velocity_ctrl_params struct defines the velocity control parameters
+ * @param sensor_filter_par struct defines the filter parameters
+ * @param hall_params struct defines the poles for hall sensor and gear-ratio
+ * @param qei_params struct defines the resolution for qei sensor and gear-ratio
+ * @param sensor_used specify the sensors to used via HALL/QEI defines
  *
- * \Input Channel
- * \param c_hall channel to receive position information from hall
- * \param c_qei channel to receive position information from qei
- * \param c_velocity_ctrl channel to receive/send velocity control information
+ * @Input Channel
+ * @param c_hall channel to receive position information from hall
+ * @param c_qei channel to receive position information from qei
+ * @param c_velocity_ctrl channel to receive/send velocity control information
  *
- * \Output Channel
- * \param c_commutation channel to send motor voltage input value
+ * @Output Channel
+ * @param c_commutation channel to send motor voltage input value
  *
  */
 void velocity_control(ctrl_par & velocity_ctrl_params, filter_par & sensor_filter_params, hall_par & hall_params, qei_par & qei_params,

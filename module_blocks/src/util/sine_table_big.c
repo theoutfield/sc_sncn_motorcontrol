@@ -1,7 +1,7 @@
 /**
- * \file sine_table_big.c
- * \brief Sine Loopup tables
- * \author Ludwig Orgler <lorgler@synapticon.com>
+ * @file sine_table_big.c
+ * @brief Sine Loopup tables
+ * @author Ludwig Orgler <lorgler@synapticon.com>
  */
 
 /* FIXME: try to use SVPWM */

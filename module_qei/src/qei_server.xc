@@ -1,8 +1,8 @@
 /**
- * \file qei_server.xc
- * \brief QEI Sensor Server Implementation
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file qei_server.xc
+ * @brief QEI Sensor Server Implementation
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
 */
 
 

@@ -1,7 +1,7 @@
 /**
- * \file pwm_config.h
- * \brief PWM configuration file
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file pwm_config.h
+ * @brief PWM configuration file
+ * @author Martin Schwarz <mschwarz@synapticon.com>
 */
 
 #pragma once

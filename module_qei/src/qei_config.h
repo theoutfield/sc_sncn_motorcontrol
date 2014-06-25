@@ -1,8 +1,8 @@
 /**
- * \file qei_config.h
- * \brief QEI Sensor Config Definitions
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file qei_config.h
+ * @brief QEI Sensor Config Definitions
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
 #pragma once
@@ -22,7 +22,7 @@
 #define QEI_RESET_COUNT          7
 
 /**
- * \brief struct definition for quadrature sensor
+ * @brief struct definition for quadrature sensor
  */
 typedef struct {
     int max_ticks_per_turn;
@@ -34,7 +34,7 @@ typedef struct {
 } qei_par;
 
 /**
- * \brief struct definition for velocity calculation from qei sensor
+ * @brief struct definition for velocity calculation from qei sensor
  */
 typedef struct QEI_VELOCITY_PARAM
 {

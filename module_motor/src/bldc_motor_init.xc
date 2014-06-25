@@ -1,7 +1,7 @@
 /**
- * \file bldc_motor_init.xc
- * \brief Motor Control config initialization functions implementation
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file bldc_motor_init.xc
+ * @brief Motor Control config initialization functions implementation
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
 #include <bldc_motor_config.h>

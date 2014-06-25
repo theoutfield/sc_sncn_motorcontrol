@@ -1,7 +1,7 @@
 /**
- * \file  position_ctrl_server.xc
- * \brief Position Control Loop Server Implementation
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file  position_ctrl_server.xc
+ * @brief Position Control Loop Server Implementation
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
 #include <position_ctrl_server.h>

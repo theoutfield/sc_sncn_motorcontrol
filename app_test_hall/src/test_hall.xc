@@ -1,9 +1,9 @@
 
 /**
- * \file test_hall.xc
- * \brief Test illustrates usage of hall sensor to get position and velocity information
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file test_hall.xc
+ * @brief Test illustrates usage of hall sensor to get position and velocity information
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
 #include <xs1.h>

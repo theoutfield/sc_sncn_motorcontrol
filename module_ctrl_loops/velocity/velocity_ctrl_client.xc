@@ -1,7 +1,7 @@
 /**
- * \file velocity_ctrl_client.xc
- * \brief Velocity Control Loop Client functions
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file velocity_ctrl_client.xc
+ * @brief Velocity Control Loop Client functions
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
 #include <velocity_ctrl_client.h>

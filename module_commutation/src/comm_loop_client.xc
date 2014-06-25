@@ -1,9 +1,9 @@
 /**
- * \file comm_loop_client.xc
- * \brief Commutation Loop Client functions
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \author Ludwig Orgler <lorgler@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file comm_loop_client.xc
+ * @brief Commutation Loop Client functions
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
 #include <comm_loop_client.h>

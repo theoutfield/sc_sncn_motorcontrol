@@ -1,8 +1,8 @@
 /**
- * \file arctan.xc
- * \brief Arc tangent calculations
- * \author Ludwig Orgler <lorgler@synapticon.com>
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file arctan.xc
+ * @brief Arc tangent calculations
+ * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
 #include <sine_table_big.h>

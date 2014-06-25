@@ -1,13 +1,13 @@
 /**
- * \file drive_config.h
- * \brief Drive mode definitions
- * \author Pavan Kanajar <pkanajar@synapticon.com>
+ * @file drive_config.h
+ * @brief Drive mode definitions
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
 #pragma once
 
 /*
- * \brief Modes of Operation (CiA402 Standard)
+ * @brief Modes of Operation (CiA402 Standard)
  *
  *  [M] - Mandatory
  *  [C] - Conditional
