@@ -3,38 +3,39 @@
 Programming Guide
 =================
 
-Running the hall server
-------------------------------
+Getting position and velocity information from your Hall sensor
+---------------------------------------------------------------
 
-Step 1: Include the required headers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Step 1: Include the required modules & headers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Make sure you Makefile contains at least these module
+
+::
+
+    USED_MODULES = module_blocks module_hall module_motor module_motorcontrol_common module_nodeconfig
+
+Make sure you include these files in your main.xc file
 
 ::
 
     #include <xs1.h>
     #include <platform.h>
     #include <ioports.h>
+    #include <hall_client.h>
     #include <hall_server.h>
-    #include <pwm_service_inv.h>
-    #include <comm_loop_server.h>
-    #include <refclk.h>
-    #include <drive_modes.h>
-    #include <statemachine.h>
-    #include <internal_config.h>
-    #include <bldc_motor_config.h>
 
 
-Step 2: Define required channels
+Step 2: Define required channel
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+A channel is required to transport data from the hall_server task to your custom client's task
 
 ::
 
-	int main(void)
-	{
-		chan c_hall
-
-		...
-	}
+    int main(void)
+    {
+        chan c_hall
+        ...
+    }
 
 
 Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interface
@@ -46,13 +47,11 @@ Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interfac
 
     int main(void)
     {
-
     ...
 
         par
         {
-
-        	...
+        ...
 
             on tile[IFM_TILE]:
             {
@@ -65,29 +64,27 @@ Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interfac
                     }
                 }
             }
-    
+            ...
+
         }
-
-
-        ...
-    
 
         return 0;
     }
 
 
-Getting velocity/position information from sensor server
---------------------------------------------------------
+Using hall_client to get velocity/position information
+------------------------------------------------------
 Getting velocity and position information from the hall server is easy:
 ::
 
     int main(void)
     {
-
     ...
 
         par
         {
+            ...
+
             on tile[0]: // Can be any tile
             {
                 /* Get position from Hall Sensor */
@@ -97,7 +94,5 @@ Getting velocity and position information from the hall server is easy:
                 velocity = get_hall_velocity(c_hall);
             }
         }
-
-    ...
-
+        return 0;
     }
