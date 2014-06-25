@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <refclk.h>
-#include <ctrlproto.h>
-#include <qei_client.h>
+#include <hall_config.h>
+#include <qei_config.h>
 #include <internal_config.h>
+#include <ctrlproto.h>
 #include <comm_loop_client.h>
 
 /**
@@ -49,6 +49,7 @@ void send_actual_torque(int actual_torque, ctrl_proto_values_t &InOut);
  *
  * \Input
  * \param actual_velocity sent to Ethercat in rpm
+ * \param ctrl_proto_values_t
  */
 void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
 
@@ -57,6 +58,7 @@ void send_actual_velocity(int actual_velocity, ctrl_proto_values_t &InOut);
  *
  * \Input
  * \param actual_position sent to Ethercat in ticks
+ * \param ctrl_proto_values_t
  */
 void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
 
@@ -64,7 +66,7 @@ void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
  * \brief Update Hall sensor parameters from Ethercat
  *
  * \param hall_params struct defines the pole-pairs and gear ratio
- *
+ * \param coe_out
  */
 void update_hall_param_ecat(hall_par &hall_params, chanend coe_out);
 
@@ -82,7 +84,7 @@ void update_commutation_param_ecat(commutation_par &commutation_params, chanend 
 * \brief Update cyclic synchronous torque parameters from Ethercat
 *
 * \param cst_params struct defines the cyclic synchronous torque params
-*
+* \param coe_out
 */
 void update_cst_param_ecat(cst_par &cst_params, chanend coe_out);
 
@@ -90,6 +92,7 @@ void update_cst_param_ecat(cst_par &cst_params, chanend coe_out);
 * \brief Update cyclic synchronous velocity parameters from Ethercat
 *
 * \param csv_params struct defines the cyclic synchronous velocity params
+* \param coe_out
 *
 */
 void update_csv_param_ecat(csv_par &csv_params, chanend coe_out);
@@ -98,7 +101,7 @@ void update_csv_param_ecat(csv_par &csv_params, chanend coe_out);
 * \brief Update cyclic synchronous position parameters from Ethercat
 *
 * \param csp_params struct defines the cyclic synchronous position params
-*
+* \param coe_out
 */
 void update_csp_param_ecat(csp_par &csp_params, chanend coe_out);
 
@@ -106,7 +109,7 @@ void update_csp_param_ecat(csp_par &csp_params, chanend coe_out);
 * \brief Update profile torque parameters from Ethercat
 *
 * \param pt_params struct defines the profile torque params
-*
+* \param coe_out
 */
 void update_pt_param_ecat(pt_par &pt_params, chanend coe_out);
 
@@ -114,7 +117,7 @@ void update_pt_param_ecat(pt_par &pt_params, chanend coe_out);
 * \brief Update profile velocity parameters from Ethercat
 *
 * \param pv_params struct defines the profile velocity params
-*
+* \param coe_out
 */
 void update_pv_param_ecat(pv_par &pv_params, chanend coe_out);
 
@@ -122,7 +125,7 @@ void update_pv_param_ecat(pv_par &pv_params, chanend coe_out);
 * \brief Update profile position parameters from Ethercat
 *
 * \param pp_params struct defines the profile position params
-*
+* \param coe_out
 */
 void update_pp_param_ecat(pp_par &pp_params, chanend coe_out);
 

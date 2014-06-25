@@ -4,11 +4,24 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include <ecat_motor_drive.h>
+#include <comm.h>
+#include <statemachine.h>
+#include <drive_modes.h>
+#include <velocity_ctrl_client.h>
+#include <position_ctrl_client.h>
+#include <torque_ctrl_client.h>
+#include <hall_server.h>
+#include <qei_server.h>
+#include <hall_config.h>
+#include <qei_config.h>
+#include <profile.h>
 #include <xscope_wrapper.h>
 #include <print.h>
 #include <gpio_client.h>
 #include <flash_somanet.h>
+
+#include <comm_loop_client.h>
+#include <bldc_motor_init.h>
 
 extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 

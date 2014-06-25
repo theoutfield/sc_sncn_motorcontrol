@@ -4,7 +4,12 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include <comm.h>
+#include <refclk.h>
+#include <ctrlproto.h>
+#include <comm_loop_client.h>
+#include <hall_config.h>
+#include <qei_config.h>
+#include <bldc_motor_config.h>
 
 int get_target_torque(ctrl_proto_values_t InOut)
 {
@@ -109,7 +114,6 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
             qei_params.max_ticks = 0 - max;
     }
 
-    qei_params.max_ticks_per_turn = __qei_max_counts(qei_params.real_counts);
     qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
 
     sensor_polarity = sensor_polarity&0x01;

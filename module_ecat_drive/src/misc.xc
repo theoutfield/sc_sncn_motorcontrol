@@ -9,7 +9,9 @@
 #include <comm_loop_client.h>
 #include <statemachine.h>
 #include <drive_modes.h>
-#include <qei_config.h>
+#include <qei_client.h>
+#include <internal_config.h>
+#include <print.h>
 
 int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation)
 {
