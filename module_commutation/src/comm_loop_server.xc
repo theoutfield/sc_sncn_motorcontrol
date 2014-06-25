@@ -107,7 +107,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     while (1) {
         if(sensor_select == HALL) {
             //hall only
-            speed = get_hall_velocity(c_hall, hall_params);
+            speed = get_hall_velocity(c_hall);
             angle = get_hall_position(c_hall);
             angle_rpm = (abs(speed)*commutation_params.angle_variance) / commutation_params.max_speed_reached;
         } else if(sensor_select == QEI) {

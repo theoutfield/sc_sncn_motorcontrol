@@ -1,9 +1,9 @@
 /**
- * \file hall_client.xc
- * \brief Hall Sensor Client Functions
- * \author Ludwig Orgler <lorgler@synapticon.com>
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file hall_client.xc
+ * @brief Hall Sensor Client Functions
+ * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
 */
 
 #include <hall_config.h>
@@ -29,12 +29,22 @@ int get_hall_position(chanend c_hall)
     return {position, direction};
 }
 
-int get_hall_velocity(chanend c_hall, hall_par &hall_params)
+int get_hall_velocity(chanend c_hall)
 {
     int velocity;
+    int max_ticks_per_turn;
+
+    //Get velocity
     c_hall <: HALL_VELOCITY_REQ;
     c_hall :> velocity;
-    velocity = ((velocity/FILTER_LENGTH_HALL) * 1000 * 60) / (hall_params.max_ticks_per_turn);
+
+    //Get velocity filter parameters FIXME: filtering schould be done in server
+    c_hall <: HALL_FILTER_PARAM_REQ;
+    c_hall :> max_ticks_per_turn;
+
+    //Apply filter to velocity FIXME: filtering schould be done in server
+    velocity = ((velocity/FILTER_LENGTH_HALL) * 1000 * 60) / (max_ticks_per_turn);
+
     return velocity;
 }
 

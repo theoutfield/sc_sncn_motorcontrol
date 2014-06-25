@@ -228,7 +228,7 @@ void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &
                 if (sensor_used == HALL) {
                     angle = (get_hall_position(c_hall) >> 2) & 0x3ff; //  << 10 ) >> 12
                     //xscope_probe_data(0, angle);
-                    actual_speed = get_hall_velocity(c_hall, hall_params);
+                    actual_speed = get_hall_velocity(c_hall);
                 } else if (sensor_used == QEI) {
                     { angle, offset_fw_flag, offset_bw_flag } = get_qei_sync_position(c_qei);
                     angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;

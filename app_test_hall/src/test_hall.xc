@@ -29,8 +29,6 @@ void hall_test(chanend c_hall)
     //int core_id = 1;
     //timer t;
     int direction;
-    hall_par hall_params;
-    init_hall_param(hall_params);
 
     while(1)
     {
@@ -38,7 +36,7 @@ void hall_test(chanend c_hall)
         {position, direction} = get_hall_position_absolute(c_hall);
 
         /* get velocity from Hall Sensor */
-        velocity = get_hall_velocity(c_hall, hall_params);
+        velocity = get_hall_velocity(c_hall);
 
 #ifdef ENABLE_xscope
         xscope_core_int(0, position);

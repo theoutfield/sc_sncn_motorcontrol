@@ -1,9 +1,9 @@
 /**
- * \file hall_server.xc
- * \brief Hall Sensor Server Implementation
- * \author Ludwig Orgler <lorgler@synapticon.com>
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
+ * @file hall_server.xc
+ * @brief Hall Sensor Server Implementation
+ * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
 */
 
 #include <hall_config.h>
@@ -50,6 +50,10 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
 
     case RESET_HALL_COUNT:
         c_hall :> count;
+        break;
+
+    case HALL_FILTER_PARAM_REQ:
+        c_hall <: hall_params.max_ticks_per_turn;
         break;
 
     default:

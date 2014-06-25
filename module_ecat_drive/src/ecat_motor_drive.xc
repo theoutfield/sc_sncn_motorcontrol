@@ -254,7 +254,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
             /* quick stop for position mode */
             else if(op_mode == CSP || op_mode == PP)
             {
-                actual_velocity = get_hall_velocity(c_hall, hall_params);
+                actual_velocity = get_hall_velocity(c_hall);
                 actual_position = get_position(c_position_ctrl);
 
                 if(!(actual_velocity<500 && actual_velocity>500))
@@ -412,7 +412,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
             /* Read Position Sensor */
             if(sensor_select == HALL)
             {
-                actual_velocity = get_hall_velocity(c_hall, hall_params);
+                actual_velocity = get_hall_velocity(c_hall);
                 send_actual_velocity(actual_velocity*polarity, InOut);
             }
             else if(sensor_select == QEI)
@@ -756,7 +756,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         }
                         else if(op_mode == CSP || op_mode == PP)
                         {
-                            actual_velocity = get_hall_velocity(c_hall, hall_params);
+                            actual_velocity = get_hall_velocity(c_hall);
                             actual_position = get_position(c_position_ctrl);
 
                             if(!(actual_velocity<500 && actual_velocity>-500))
@@ -1237,7 +1237,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                     }
                     if(i >=steps )
                     {
-                        actual_velocity = get_hall_velocity(c_hall, hall_params);
+                        actual_velocity = get_hall_velocity(c_hall);
                         if(actual_velocity < 50 || actual_velocity > -50)
                         {
                             mode_selected = 100;

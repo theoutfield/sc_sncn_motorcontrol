@@ -44,6 +44,6 @@ int get_hall_position(chanend c_hall);
  *
  * \return the velocity in rpm from Hall Sensor
  */
-int get_hall_velocity(chanend c_hall, hall_par &hall_params);
+int get_hall_velocity(chanend c_hall);
 
 void reset_hall_count(chanend c_hall, int offset);

@@ -94,7 +94,7 @@ Getting velocity and position information from the hall server is easy:
                 {position, direction} = get_hall_position_absolute(c_hall);
 
                 /* Get velocity from Hall Sensor */
-                velocity = get_hall_velocity(c_hall, hall_params);
+                velocity = get_hall_velocity(c_hall);
             }
         }
 
