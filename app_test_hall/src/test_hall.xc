@@ -12,8 +12,6 @@
 #include <ioports.h>
 #include <hall_client.h>
 #include <hall_server.h>
-#include <refclk.h>
-#include <bldc_motor_config.h>
 #include <xscope_wrapper.h>
 
 //#define ENABLE_xscope
@@ -24,10 +22,8 @@
 /* Test Hall Sensor Client */
 void hall_test(chanend c_hall)
 {
-    int position;
-    int velocity;
-    //int core_id = 1;
-    //timer t;
+    int position = 0;
+    int velocity = 0;
     int direction;
 
     while(1)
@@ -63,24 +59,6 @@ int main(void)
             par
             {
                 hall_test(c_hall_p1);
-                /* {
-                   int i = 0;
-                   timer t;
-
-                   xscope_register(2,
-                   XSCOPE_CONTINUOUS, "0 hall_position", XSCOPE_INT, "n",
-                   XSCOPE_CONTINUOUS, "1 hall_velocity", XSCOPE_INT, "n");
-
-                   while(1)
-                   {
-                   //  printintln(i);
-                   //i = (i + 1) % 100;
-
-                   //wait_ms(1, 1, t);
-                   // xscope_int(0, i);
-                   }
-
-                   }*/
             }
         }
 
