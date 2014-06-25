@@ -37,7 +37,7 @@
  */
 
 
-#include "watchdog.h"
+#include <watchdog.h>
 #include <xs1.h>
 
 

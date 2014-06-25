@@ -7,10 +7,10 @@
  * \date 10/04/2014
  */
 
-#include "brushed_dc_client.h"
+#include <brushed_dc_client.h>
 #include <xs1.h>
 #include <bldc_motor_config.h>
-#include "refclk.h"
+#include <refclk.h>
 #include <internal_config.h>
 
 /* MAX Input value BDC_PWM_CONTROL_LIMIT */

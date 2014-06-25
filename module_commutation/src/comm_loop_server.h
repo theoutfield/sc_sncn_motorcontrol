@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "comm_loop_client.h"
+#include <comm_loop_client.h>
 #include <watchdog.h>
 #include <hall_client.h>
 #include <qei_client.h>

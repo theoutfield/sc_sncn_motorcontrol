@@ -4,7 +4,7 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include "filter_blocks.h"
+#include <filter_blocks.h>
 
 /* initialization for fixed length digital filter (moving average filter) */
 void init_filter(int filter_buffer[], int &index, int filter_length)

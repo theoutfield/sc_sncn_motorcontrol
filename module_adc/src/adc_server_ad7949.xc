@@ -8,7 +8,7 @@
 #include <xs1.h>
 #include <stdint.h>
 #include <xclib.h>
-#include "refclk.h"
+#include <refclk.h>
 
 #define ADC_CURRENT_REQ	1
 #define ADC_ALL_REQ	2

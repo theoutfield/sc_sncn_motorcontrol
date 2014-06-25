@@ -1,15 +1,15 @@
 #pragma once
 
-#include "hall_client.h"
-#include "qei_client.h"
-#include "comm_loop_client.h"
-#include "refclk.h"
-#include "velocity_ctrl_client.h"
+#include <hall_client.h>
+#include <qei_client.h>
+#include <comm_loop_client.h>
+#include <refclk.h>
+#include <velocity_ctrl_client.h>
 #include <internal_config.h>
 #include <statemachine.h>
 #include <drive_modes.h>
 #include <auto_calib_hall.h>
-#include "hall_qei.h"
+#include <hall_qei.h>
 
 void qei_calibrate(chanend c_commutation, commutation_par & commutation_params,
                    hall_par & hall_params, qei_par & qei_params,

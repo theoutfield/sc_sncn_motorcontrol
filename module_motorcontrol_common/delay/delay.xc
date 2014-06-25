@@ -5,7 +5,7 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include "refclk.h"
+#include <refclk.h>
 
 void wait_micro_s(unsigned microseconds, int tile_id, timer t)
 {

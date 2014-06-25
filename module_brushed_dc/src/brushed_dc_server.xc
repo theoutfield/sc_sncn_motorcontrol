@@ -7,19 +7,19 @@
  * \date 10/04/2014
  */
 
-#include "brushed_dc_server.h"
+#include <brushed_dc_server.h>
 #include <xs1.h>
 #include <pwm_config.h>
-#include "pwm_cli_inv.h"
-#include "a4935.h"
-#include "sine_table_big.h"
-#include "adc_client_ad7949.h"
-#include "hall_client.h"
+#include <pwm_cli_inv.h>
+#include <a4935.h>
+#include <sine_table_big.h>
+#include <adc_client_ad7949.h>
+#include <hall_client.h>
 #include <xscope_wrapper.h>
-#include "refclk.h"
-#include "qei_client.h"
+#include <refclk.h>
+#include <qei_client.h>
 #include <internal_config.h>
-#include "print.h"
+#include <print.h>
 
 void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 {

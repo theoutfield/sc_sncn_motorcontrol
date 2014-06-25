@@ -5,13 +5,13 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include "position_ctrl_client.h"
-#include "refclk.h"
+#include <position_ctrl_client.h>
+#include <refclk.h>
 #include <xscope_wrapper.h>
 #include <internal_config.h>
 #include <statemachine.h>
 #include <drive_modes.h>
-#include "print.h"
+#include <print.h>
 #include <profile.h>
 #include <profile_control.h>
 

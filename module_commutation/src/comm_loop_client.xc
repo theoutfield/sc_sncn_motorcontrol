@@ -6,7 +6,7 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
  */
 
-#include "comm_loop_client.h"
+#include <comm_loop_client.h>
 #include <internal_config.h>
 
 /* MAX Input value 13739 */

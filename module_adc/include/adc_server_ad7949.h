@@ -9,7 +9,7 @@
 
 #include <xs1.h>
 #include <xclib.h>
-#include "adc_common.h"
+#include <adc_common.h>
 
 /**
  * \brief Non triggered ADC server

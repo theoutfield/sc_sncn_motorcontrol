@@ -6,7 +6,7 @@
 
 #include <bldc_motor_config.h>
 #include <internal_config.h>
-#include "refclk.h"
+#include <refclk.h>
 
 void init_csv_param(csv_par &csv_params)
 {

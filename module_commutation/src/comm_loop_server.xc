@@ -6,17 +6,17 @@
  * \author Martin Schwarz <mschwarz@synapticon.com>
  */
 
-#include "comm_loop_server.h"
+#include <comm_loop_server.h>
 #include <watchdog.h>
 #include <xs1.h>
 #include <stdlib.h>
 #include <pwm_config.h>
-#include "pwm_cli_inv.h"
-#include "a4935.h"
-#include "sine_table_big.h"
-#include "adc_client_ad7949.h"
-#include "refclk.h"
-#include "qei_client.h"
+#include <pwm_cli_inv.h>
+#include <a4935.h>
+#include <sine_table_big.h>
+#include <adc_client_ad7949.h>
+#include <refclk.h>
+#include <qei_client.h>
 
 #include <xscope_wrapper.h>
 

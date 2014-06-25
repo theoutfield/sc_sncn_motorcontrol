@@ -5,7 +5,7 @@
  * \author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include "sine_table_big.h"
+#include <sine_table_big.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <print.h>

@@ -17,7 +17,7 @@
 #include <a4935.h>
 
 #ifdef BDC
-#include "brushed_dc_client.h"
+#include <brushed_dc_client.h>
 #endif
 
 //#define Debug_velocity_ctrl
