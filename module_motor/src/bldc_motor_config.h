@@ -41,8 +41,8 @@
 #define IFM_RESOLUTION              DC100_RESOLUTION
 
 /* Commutation offset (range 0-4095) (HALL sensor based commutation) */
-#define COMMUTATION_OFFSET_CLK      683
-#define COMMUTATION_OFFSET_CCLK     2731
+#define COMMUTATION_OFFSET_CLK      910//683
+#define COMMUTATION_OFFSET_CCLK     2460//2731
 
 /* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
 #define WINDING_TYPE                DELTA_WINDING
