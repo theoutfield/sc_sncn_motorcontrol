@@ -22,7 +22,7 @@
 
 void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
-    unsigned int pwm[3] = {0, 0, 0};  // PWM OFF
+    unsigned int pwm[3] = {0, 0, 0};  // PWM OFF (break mode; short all phases)
     pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
@@ -89,7 +89,6 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     int angle_rpm   = 0;
     int speed = 0;
     int voltage = 0;
-    int direction = 0;
     int pwm_half = PWM_MAX_VALUE>>1;
     int max_count_per_hall = qei_params.real_counts/hall_params.pole_pairs;
     int angle_offset = (4096 / 6) / (2 * hall_params.pole_pairs);
@@ -99,11 +98,9 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     int nominal_speed;
     int shutdown = 0; //Disable FETS
     qei_velocity_par qei_velocity_params;
+
     init_qei_velocity_params(qei_velocity_params);
 
-
-
-    //xscope_probe_data(2, check_fet);
     while (1) {
         if(sensor_select == HALL) {
             //hall only
@@ -113,55 +110,41 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
         } else if(sensor_select == QEI) {
             { angle, fw_flag, bw_flag } = get_qei_sync_position(c_qei);
             angle = (angle << 12) / max_count_per_hall;
-            if (voltage >= 0) {
-                if (fw_flag == 0) {
-                    angle = get_hall_position(c_hall);
-                }
-            } else if (voltage < 0) {
-                if (bw_flag == 0) {
-                    angle = get_hall_position(c_hall);
-                }
+            if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0 )) {
+                angle = get_hall_position(c_hall);
             }
             angle_rpm = (abs(speed)*commutation_params.angle_variance) / commutation_params.max_speed_reached;
         }
 
-        if (voltage < 0) {
-            direction = -1;
-        } else if (voltage >= 0) {
-            direction = 1;
-        }
-
-        if (shutdown == 1) {
+        if (shutdown == 1) {    /* stop PWM (coast) */
             pwm[0] = -1;
             pwm[1] = -1;
             pwm[2] = -1;
         } else {
-            if (direction == 1) {
+            if (voltage >= 0) {
                 if (sensor_select == HALL) {
                     angle_pwm = (((angle + angle_rpm + commutation_params.hall_offset_clk -
                                    commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
                 } else if(sensor_select == QEI) {
-                    angle_pwm = (((angle + commutation_params.qei_forward_offset) & 0x0fff) >> 2)&0x3ff;    //512
+                    angle_pwm = ((angle + commutation_params.qei_forward_offset) >> 2) & 0x3ff; //512
                 }
-                pwm[0] = ((sine_third_expanded(angle_pwm))*voltage)/pwm_half + pwm_half;                    // 6944 -- 6867range
-                angle_pwm = (angle_pwm + 341) & 0x3ff;
-
-                pwm[1] = ((sine_third_expanded(angle_pwm))*voltage)/pwm_half + pwm_half;
+                pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
+                angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
+                pwm[1] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half;
                 angle_pwm = (angle_pwm + 342) & 0x3ff;
-                pwm[2] = ((sine_third_expanded(angle_pwm))*voltage)/pwm_half + pwm_half;
-            } else if (direction == -1) {
+                pwm[2] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half;
+            } else { /* voltage < 0 */
                 if (sensor_select == HALL) {
                     angle_pwm = (((angle - angle_rpm + commutation_params.hall_offset_cclk +
                                    commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
                 } else if(sensor_select == QEI) {
-                    angle_pwm = (((angle  + commutation_params.qei_backward_offset ) & 0x0fff) >> 2)&0x3ff; //3100
+                    angle_pwm = ((angle + commutation_params.qei_backward_offset) >> 2) & 0x3ff; //3100
                 }
-                pwm[0] = ((sine_third_expanded(angle_pwm))*-voltage)/pwm_half + pwm_half;
+                pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
                 angle_pwm = (angle_pwm + 341) & 0x3ff;
-
-                pwm[1] = ((sine_third_expanded(angle_pwm))*-voltage)/pwm_half + pwm_half;
+                pwm[1] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
                 angle_pwm = (angle_pwm + 342) & 0x3ff;
-                pwm[2] = ((sine_third_expanded(angle_pwm))*-voltage)/pwm_half + pwm_half;
+                pwm[2] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
             }
 
             if(pwm[0] < PWM_MIN_LIMIT) {

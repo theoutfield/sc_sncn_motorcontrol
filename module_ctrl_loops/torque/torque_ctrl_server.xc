@@ -146,9 +146,9 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 
 
 
-void _torque_ctrl(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params,
-                  int sensor_used, chanend c_current, chanend c_speed, chanend c_commutation,
-                  chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
+static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params,
+                        int sensor_used, chanend c_current, chanend c_speed, chanend c_commutation,
+                        chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
 #define FILTER_LENGTH_TORQUE 80
     int actual_speed = 0;
@@ -479,8 +479,8 @@ void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_p
     chan c_current, c_speed;
     par {
         current_filter(c_adc, c_current, c_speed);
-        _torque_ctrl(torque_ctrl_params, hall_params, qei_params, sensor_used,
-                     c_current, c_speed, c_commutation, c_hall, c_qei, c_torque_ctrl);
+        torque_ctrl_loop(torque_ctrl_params, hall_params, qei_params, sensor_used,
+                         c_current, c_speed, c_commutation, c_hall, c_qei, c_torque_ctrl);
     }
 }
 

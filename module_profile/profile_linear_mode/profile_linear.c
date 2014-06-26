@@ -25,7 +25,6 @@ struct
 int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value)
 {
     profile_linear_params.u = (float) actual_value;
-    //profile_linear_params.v_d = (float) target_value;
     profile_linear_params.acc = (float) acceleration;
     profile_linear_params.dec = (float) deceleration;
 
