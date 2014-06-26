@@ -86,8 +86,6 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     unsigned int pwm[3] = { 0, 0, 0 };
     int angle_pwm = 0;
     int angle = 0;
-    int angle_rpm   = 0;
-    int speed = 0;
     int voltage = 0;
     int pwm_half = PWM_MAX_VALUE>>1;
     int max_count_per_hall = qei_params.real_counts/hall_params.pole_pairs;
@@ -104,16 +102,13 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     while (1) {
         if(sensor_select == HALL) {
             //hall only
-            speed = get_hall_velocity(c_hall);
             angle = get_hall_position(c_hall);
-            angle_rpm = (abs(speed)*commutation_params.angle_variance) / commutation_params.max_speed_reached;
         } else if(sensor_select == QEI) {
             { angle, fw_flag, bw_flag } = get_qei_sync_position(c_qei);
             angle = (angle << 12) / max_count_per_hall;
             if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0 )) {
                 angle = get_hall_position(c_hall);
             }
-            angle_rpm = (abs(speed)*commutation_params.angle_variance) / commutation_params.max_speed_reached;
         }
 
         if (shutdown == 1) {    /* stop PWM (coast) */
@@ -123,8 +118,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
         } else {
             if (voltage >= 0) {
                 if (sensor_select == HALL) {
-                    angle_pwm = (((angle + angle_rpm + commutation_params.hall_offset_clk -
-                                   commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
+                    angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
                 } else if(sensor_select == QEI) {
                     angle_pwm = ((angle + commutation_params.qei_forward_offset) >> 2) & 0x3ff; //512
                 }
@@ -135,8 +129,7 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
                 pwm[2] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half;
             } else { /* voltage < 0 */
                 if (sensor_select == HALL) {
-                    angle_pwm = (((angle - angle_rpm + commutation_params.hall_offset_cclk +
-                                   commutation_params.angle_variance) & 0x0fff) >> 2)&0x3ff;
+                    angle_pwm = ((angle + commutation_params.hall_offset_cclk) >> 2) & 0x3ff;
                 } else if(sensor_select == QEI) {
                     angle_pwm = ((angle + commutation_params.qei_backward_offset) >> 2) & 0x3ff; //3100
                 }
