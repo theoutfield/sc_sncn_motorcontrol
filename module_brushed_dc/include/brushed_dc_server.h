@@ -3,8 +3,6 @@
  * @brief Brushed Motor Drive Server
  * @author Pavan Kanajar <pkanajar@synapticon.com>
  * @author Martin Schwarz <mschwarz@synapticon.com>
- * @version 0.9beta
- * @date 8/05/2014
  */
 
 #pragma once

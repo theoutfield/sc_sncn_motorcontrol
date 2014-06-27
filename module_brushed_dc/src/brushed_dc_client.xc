@@ -3,9 +3,7 @@
  * @brief Brushed Motor Drive Client function
  * @author Pavan Kanajar <pkanajar@synapticon.com>
  * @author Martin Schwarz <mschwarz@synapticon.com>
- * @version 0.9beta
- * @date 10/04/2014
- */
+*/
 
 #include <brushed_dc_client.h>
 #include <xs1.h>
