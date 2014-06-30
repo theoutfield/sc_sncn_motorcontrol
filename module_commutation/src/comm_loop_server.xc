@@ -19,6 +19,7 @@
 #include <qei_client.h>
 
 #include <xscope_wrapper.h>
+#include <print.h>
 
 void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
@@ -81,6 +82,17 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
 {
 
     init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
+
+    printstrln("");
+    printstrln("*************************************");
+    printstrln("    COMMUTATION SERVER STARTING");
+    printstr("      hall_offset_clk: ");
+    printintln(commutation_params.hall_offset_clk);
+    printstr("      hall_offset_cclk: ");
+    printintln(commutation_params.hall_offset_cclk);
+    printintln(hall_params.sensor_polarity);
+    printstrln("*************************************");
+
 
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
