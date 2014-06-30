@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <refclk.h>
+#include <print.h>
 
 //TODO remove these dependencies
 #include <bldc_motor_config.h>
@@ -48,7 +49,7 @@ void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocit
         status = 1;
         break;
 
-    case RESET_HALL_COUNT:
+    case HALL_RESET_COUNT_REQ:
         c_hall :> count;
         break;
 
@@ -71,7 +72,7 @@ void init_hall_param(hall_par &hall_params)
 
     hall_params.max_ticks_per_turn = POLE_PAIRS * HALL_POSITION_INTERPOLATED_RANGE;
     hall_params.max_ticks += hall_params.max_ticks_per_turn ;  // tolerance
-        //hall_params.sensor_polarity = -1;
+    hall_params.sensor_polarity = POLARITY;
 
     return;
 }
@@ -79,6 +80,19 @@ void init_hall_param(hall_par &hall_params)
 void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
               chanend c_hall_p5, chanend c_hall_p6, port in p_hall, hall_par &hall_params)
 {
+    init_hall_param(hall_params);
+
+    printstrln("");
+    printstrln("*************************************");
+    printstrln("    HALL SENSOR SERVER STARTING");
+    printstr("        pole_pairs: ");
+    printintln(hall_params.pole_pairs);
+    printstr("        max_ticks: ");
+    printintln(hall_params.max_ticks);
+    printstr("        max_ticks_per_turn: ");
+    printintln(hall_params.max_ticks_per_turn);
+    printstrln("*************************************");
+
     timer tx;
     unsigned int ts;
     unsigned int command;
@@ -135,8 +149,6 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
         xscope_config_io(XSCOPE_IO_BASIC);
     }
 #endif
-
-    init_hall_param(hall_params);
 
     /* Init hall sensor */
     p_hall :> pin_state;

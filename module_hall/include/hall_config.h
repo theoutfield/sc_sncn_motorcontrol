@@ -7,18 +7,21 @@
 
 #pragma once
 
-#define RPM_CONST 						 60000000  		// 60s / 1us
-#define FILTER_LENGTH_HALL 						16
-#define RESET_HALL_COUNT						9
+#define RPM_CONST           60000000 // 60s / 1us
+#define FILTER_LENGTH_HALL  16
 
-typedef enum {
-    HALL_POS_REQ,
-    HALL_VELOCITY_REQ,
-    HALL_ABSOLUTE_POS_REQ,
-    HALL_FILTER_PARAM_REQ,
-} hall_command_t;
+/**
+ * Client/server interaction commands/tokens
+ */
+enum {
+    HALL_POS_REQ,         //!< Position request token
+    HALL_ABSOLUTE_POS_REQ,//!< Position request token
+    HALL_VELOCITY_REQ,    //!< Velocity request token
+    HALL_RESET_COUNT_REQ,     //!< Reset hall server ticks count
+    HALL_FILTER_PARAM_REQ,//!< Filter length request token
+};
 
- /**
+/**
  * @brief Structure definition for hall sensor
  */
 typedef struct {

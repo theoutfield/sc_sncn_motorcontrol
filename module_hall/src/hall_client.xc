@@ -50,6 +50,6 @@ int get_hall_velocity(chanend c_hall)
 
 void reset_hall_count(chanend c_hall, int offset)
 {
-    c_hall <: RESET_HALL_COUNT;
+    c_hall <: HALL_RESET_COUNT_REQ;
     c_hall <: offset;
 }
