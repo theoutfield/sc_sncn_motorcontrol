@@ -114,8 +114,6 @@ void gpio_digital_server(port p_ifm_ext_d[], chanend c_gpio_0, chanend c_gpio_1)
     int port_switch_states[NUMBER_OF_IO_PORTS];
     int active_states[NUMBER_OF_IO_PORTS];
     int input_types[NUMBER_OF_IO_PORTS];
-    int input_type;
-    int switch_type;
     int all_ports_input = 0;
     timer t;
     unsigned int time;
