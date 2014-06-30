@@ -60,7 +60,6 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 {
     int i = 0;
     int mode=40;
-    int core_id = 0;
     int steps = 0;
     chan c_dummy;
 
@@ -116,7 +115,6 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
     int communication_active = 0;
     unsigned int comm_inactive_time_stamp;
     unsigned int c_time;
-    unsigned int inactive_delay = 100*MSEC_STD;
     int comm_inactive_flag = 0;
     int inactive_timeout_flag = 0;
 
@@ -127,8 +125,6 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
     int status=0;
     int tmp=0;
-    int precision;
-    int precision_factor;
 
     int torque_offstate = 0;
     int mode_selected = 0;
@@ -136,19 +132,16 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
     int home_velocity = 0;
     int home_acceleration = 0;
-    int h_active = 0;
 
     int limit_switch = -1;                  // positive negative limit switches
     int reset_counter = 0;
 
-    unsigned int h_time;
     int home_state = 0;
     int safety_state = 0;
     int capture_position = 0;
     int current_position = 0;
     int home_offset = 0;
     int end_state = 0;
-    int drive_port_state = 0;
     int ctrl_state;
     int limit_switch_type;
     int homing_method;
