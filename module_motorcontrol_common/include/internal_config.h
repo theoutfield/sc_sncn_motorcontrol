@@ -10,9 +10,6 @@
 #define BLDC_PWM_CONTROL_LIMIT              6794
 #define BDC_PWM_CONTROL_LIMIT               13589
 
-#define SIGNAL_READ(x)          c_signal :> x
-#define SIGNAL_WRITE(x)         c_signal <: x
-
 #define SET                                 1
 #define UNSET                               0
 

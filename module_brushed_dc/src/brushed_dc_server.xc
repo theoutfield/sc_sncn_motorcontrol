@@ -13,11 +13,11 @@
 #include <sine_table_big.h>
 #include <adc_client_ad7949.h>
 #include <hall_client.h>
-#include <xscope_wrapper.h>
 #include <refclk.h>
 #include <qei_client.h>
+#include <brushed_dc_common.h>
 #include <internal_config.h>
-#include <print.h>
+#include <watchdog.h>
 
 void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 {
@@ -29,24 +29,24 @@ void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 void bdc_client_handler(chanend c_voltage, int command, int & voltage, int init_state, int & shutdown)
 {
     switch (command) {
-    case SET_VOLTAGE:
+    case BDC_CMD_SET_VOLTAGE:
         c_voltage :> voltage; //TODO if any winding type differences?
         break;
 
-    case CHECK_BUSY:                // init signal
+    case BDC_CMD_CHECK_BUSY:                // init signal
         c_voltage <: init_state;
         break;
 
-    case DISABLE_FETS:
+    case BDC_CMD_DISABLE_FETS:
         shutdown = 1;
         break;
 
-    case ENABLE_FETS:
+    case BDC_CMD_ENABLE_FETS:
         shutdown = 0;
         voltage = 0;
         break;
 
-    case FETS_STATE:
+    case BDC_CMD_FETS_STATE:
         c_voltage <: shutdown;
         break;
 
@@ -63,24 +63,16 @@ static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
     int voltage = 0;
-    int direction = 0;
     int shutdown = 0; // Disable FETS
     int pwm_half = (PWM_MAX_VALUE - PWM_DEAD_TIME) >> 1;
 
     while (1) {
-
-        if(voltage < 0) {
-            direction = -1;
-        } else if(voltage >= 0) {
-            direction = 1;
-        }
-
         if (shutdown == 1) {
             pwm[0] = -1;
             pwm[1] = -1;
             pwm[2] = -1;
         } else {
-            if (direction == 1) {
+            if (voltage >= 0) {
                 if (voltage <= pwm_half) {
                     pwm[0] = pwm_half + voltage;
                     pwm[1] = pwm_half;
@@ -90,7 +82,7 @@ static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn
                     pwm[1] = pwm_half - (voltage - pwm_half);
                     pwm[2] = pwm_half;
                 }
-            } else if (direction == -1) {
+            } else {
                 if (-voltage <= pwm_half) {
                     pwm[0] = pwm_half;
                     pwm[1] = pwm_half - voltage;
@@ -130,7 +122,7 @@ static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn
             break;
 
         case c_signal :> command:
-            if (command == CHECK_BUSY) {         // init signal
+            if (command == CHECK_BUSY) { // init signal
                 c_signal <: init_state;
             }
             break;
@@ -167,7 +159,7 @@ void bdc_loop(chanend c_watchdog, chanend c_signal,
     p_ifm_coastn :> check_fet;
     init_state = check_fet;
 
-    bldc_internal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, pwm_ctrl, init_state,\
-                         c_pwm_ctrl, c_signal, c_voltage_p1, c_voltage_p2, c_voltage_p3);
+    bldc_internal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, pwm_ctrl, init_state,
+                       c_pwm_ctrl, c_signal, c_voltage_p1, c_voltage_p2, c_voltage_p3);
 }
 

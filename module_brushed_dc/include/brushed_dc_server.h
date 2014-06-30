@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <watchdog.h>
-
 /**
  * @brief Brushed DC Drive Loop
  *
