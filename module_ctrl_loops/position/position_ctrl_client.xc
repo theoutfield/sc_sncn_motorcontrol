@@ -53,12 +53,11 @@ int get_position(chanend c_position_ctrl)
 int position_limit(int position, int max_position_limit, int min_position_limit)
 {
     if (position > max_position_limit) {
-        return max_position_limit;
+        position = max_position_limit;
     } else if (position < min_position_limit) {
-        return min_position_limit;
-    } else if (position >= min_position_limit && position <= max_position_limit) {
-        return position;
+        position = min_position_limit;
     }
+    return position;
 }
 
 //csp mode function

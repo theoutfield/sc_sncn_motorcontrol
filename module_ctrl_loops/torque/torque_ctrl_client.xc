@@ -65,12 +65,11 @@ void send_torque_init_state(chanend c_torque_ctrl, int init_state)
 int torque_limit(int torque, int max_torque_limit)
 {
     if (torque > max_torque_limit) { //adc range // (5 * DC900_RESOLUTION)/2
-        return max_torque_limit;
-    } else if(torque < 0 - max_torque_limit) {
-        return (0 - max_torque_limit);
-    } else if (torque >= -max_torque_limit && torque <= max_torque_limit) {
-        return torque;
+        torque = max_torque_limit;
+    } else if (torque < -max_torque_limit) {
+        torque = -max_torque_limit;
     }
+    return torque;
 }
 
 void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, chanend c_torque_ctrl)

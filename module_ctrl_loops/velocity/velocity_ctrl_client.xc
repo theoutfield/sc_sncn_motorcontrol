@@ -52,13 +52,10 @@ int get_velocity(chanend c_velocity_ctrl) {
 int max_speed_limit(int velocity, int max_speed) {
     if (velocity > max_speed) {
         velocity = max_speed;
-        return velocity;
     } else if (velocity < -max_speed) {
         velocity = -max_speed;
-        return velocity;
-    } else if ( (velocity >= -max_speed) && (velocity <= max_speed) ) {
-        return velocity;
     }
+    return velocity;
 }
 
 //csv mode function
