@@ -1,5 +1,5 @@
-Hall Sensor Demo
-================
+Hall Sensor Test App
+====================
 
 `test\_hall.xc <https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_hall/src/test_hall.xc>`_
 illustrates usage of
