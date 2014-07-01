@@ -90,7 +90,6 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
     printintln(commutation_params.hall_offset_clk);
     printstr("      hall_offset_cclk: ");
     printintln(commutation_params.hall_offset_cclk);
-    printintln(hall_params.sensor_polarity);
     printstrln("*************************************");
 
 

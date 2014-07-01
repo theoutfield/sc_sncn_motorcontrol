@@ -89,8 +89,6 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
     printintln(hall_params.pole_pairs);
     printstr("        max_ticks: ");
     printintln(hall_params.max_ticks);
-    printstr("        max_ticks_per_turn: ");
-    printintln(hall_params.max_ticks_per_turn);
     printstrln("*************************************");
 
     timer tx;
