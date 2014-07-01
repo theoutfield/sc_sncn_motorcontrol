@@ -2,7 +2,7 @@ Blocks Module
 =============
 
 :scope: General Use
-:description: SOMANET Motorcontrol utility functions
+:description: SOMANET Motor Control utility functions
 :keywords: SOMANET
 :boards: SOMANET IFM-DC100, SOMANET IFM-DC300
 

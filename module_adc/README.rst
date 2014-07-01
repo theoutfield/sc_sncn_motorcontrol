@@ -2,7 +2,7 @@ SOMANET Motor Control ADC Interface
 ===================================
 
 :scope: General Use
-:description: ADC interface for SOMANET IFM DC100/300
+:description: ADC interface for SOMANET IFM-DC100/300
 :keywords: SOMANET
 :boards: SOMANET IFM-DC100, SOMANET IFM-DC300
 
