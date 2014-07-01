@@ -4,7 +4,7 @@ SOMANET Motor Control General Purpose I/O Module
 :scope: General Use
 :description: SOMANET GPIO utility functions
 :keywords: SOMANET
-:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+:boards: SOMANET IFM-Drive-DC100, SOMANET IFM-Drive-DC300
 
 
 Description

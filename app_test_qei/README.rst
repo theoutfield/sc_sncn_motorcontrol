@@ -1,11 +1,6 @@
 QEI Demo
 ========
 
-.. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
-   :align: center
-   :alt: SYNAPTICON
-
-   SYNAPTICON
 `test\_qei.xc <https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_qei/src/test_qei.xc>`_
 illustrates the usage of
 `module\_qei <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_qei>`_
@@ -76,7 +71,7 @@ TILES used
 
     <td rowspan="2" align="center">*</td>
     <td rowspan="2" align="center">C21-DX <br/> C22 </td>
-    <td rowspan="2" align="center">Drive DC 100 <br/> Drive DC 300</td>
+    <td rowspan="2" align="center">Drive-DC100 <br/> Drive-DC300</td>
 
 .. raw:: html
 

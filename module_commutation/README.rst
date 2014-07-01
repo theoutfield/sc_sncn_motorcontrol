@@ -4,7 +4,7 @@ SOMANET BLDC Commutation Component
 :scope: General Use
 :description: SOMANET Motor Control Commutation module
 :keywords: SOMANET, BLDC, motor, driver, sinusoidal, commutation
-:boards: SOMANET IFM Drive DC100, SOMANET IFM Drive DC300
+:boards: SOMANET IFM-Drive-DC100, SOMANET IFM-Drive-DC300
 
 Description
 -----------

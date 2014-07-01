@@ -4,7 +4,7 @@ SOMANET Motor Control Hall Sensor Module
 :scope: General Use
 :description: Hall sensor interface
 :keywords: SOMANET
-:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+:boards: SOMANET IFM-Drive-DC100, SOMANET IFM-Drive-DC300
 
 Description
 -----------

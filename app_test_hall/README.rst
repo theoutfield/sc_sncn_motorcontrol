@@ -1,11 +1,6 @@
 Hall Sensor Demo
 ================
 
-.. figure:: https://s3-eu-west-1.amazonaws.com/synapticon-resources/images/logos/synapticon_fullname_blackoverwhite_280x48.png
-   :align: center
-   :alt: SYNAPTICON
-
-   SYNAPTICON
 `test\_hall.xc <https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_hall/src/test_hall.xc>`_
 illustrates usage of
 `module\_hall <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_hall>`_
@@ -76,7 +71,7 @@ TILES used
 
     <td rowspan="2" align="center">*</td>
     <td rowspan="2" align="center">C21-DX <br/> C22 </td>
-    <td rowspan="2" align="center">Drive DC 100 <br/> Drive DC 300</td>
+    <td rowspan="2" align="center">Drive-DC100 <br/> Drive-DC300</td>
 
 .. raw:: html
 

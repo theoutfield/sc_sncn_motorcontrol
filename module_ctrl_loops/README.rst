@@ -4,7 +4,7 @@ SOMANET Motor Control loops
 :scope: General Use
 :description: Control loops for position, velocity, and torque control
 :keywords: SOMANET
-:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+:boards: SOMANET IFM-Drive-DC100, SOMANET IFM-Drive-DC300
 
 
 Description

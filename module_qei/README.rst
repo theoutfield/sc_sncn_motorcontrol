@@ -4,7 +4,7 @@ SOMANET Quadrature Encoder Interface Module
 :scope: General Use
 :description: SOMANET Motor Control Quadrature Encoder Interface
 :keywords: SOMANET
-:boards: SOMANET IFM-DC100, SOMANET IFM-DC300
+:boards: SOMANET IFM-Drive-DC100, SOMANET IFM-Drive-DC300
 
 
 Description
