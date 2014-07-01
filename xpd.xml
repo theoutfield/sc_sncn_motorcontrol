@@ -71,6 +71,11 @@
     <exclude_dir>module_brushed_dc</exclude_dir>
     <exclude_dir>app_test_hall</exclude_dir>
     <exclude_dir>app_test_qei</exclude_dir>
+    <docdir>howto</docdir>
+    <docdir>module_commutation/doc</docdir>
+    <docdir>module_qei/doc</docdir>
+    <docdir>module_hall/doc</docdir>
+    <docdir>module_commutation/doc</docdir>
     <location>https://github.com/synapticon/sc_sncn_motorcontrol.git</location>
     <name>sc_sncn_motorcontrol</name>
     <maintainer>Synapticon</maintainer>

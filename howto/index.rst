@@ -1,5 +1,5 @@
-Motor Control How-Tos
-=====================
+SOMANET Motor Configuration and Tuning how-to Guide
+===================================================
 
 .. toctree::
 

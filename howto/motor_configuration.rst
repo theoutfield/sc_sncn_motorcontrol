@@ -75,4 +75,4 @@ The main parameters to define in our configuration file will be:
 Tuning the commutation offset angles
 +++++++++++++++++++++++++++++++++++++
 
-Please refer to the :ref:`BLDC Motor Tuning Guide <motor_tuning_label:>`
+Please refer to the :ref:``BLDC Motor Tuning Guide <motor_tuning_label:>`
