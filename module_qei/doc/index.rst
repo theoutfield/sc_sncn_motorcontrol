@@ -1,5 +1,5 @@
-SOMANET BLDC Commutation Component
-==================================
+SOMANET Encoder Interface Component
+===================================
 
 .. toctree::
 
