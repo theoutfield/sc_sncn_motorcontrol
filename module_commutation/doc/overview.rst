@@ -11,7 +11,7 @@ Like shown in the core diagram below, 4 timing critical task are executed on the
 As shown, custom controllers should run in a different tile to avoid influencing the performance of motor control. Please refer to the :ref:`commutation_programming_label`
 
 
-.. figure:: images/core-diagram-commutation.*
+.. figure:: images/core-diagram-commutation.png
    :width: 100%
 
    Custom control application core diagram
