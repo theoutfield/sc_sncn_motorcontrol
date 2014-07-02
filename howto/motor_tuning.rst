@@ -3,7 +3,7 @@
 BLDC Motor Tuning Guide 
 =======================
 
-After you have set up most of your motor parameters according to :ref:``motor_configuration_label` you can further fine tune your motors efficiency and performance. Inside the bldc_motor_config file you will find following lines::
+After you have set up most of your motor parameters according to :ref:`motor_configuration_label` you can further fine tune your motors efficiency and performance. Inside the bldc_motor_config file you will find following lines::
 
     #define COMMUTATION_OFFSET_CLK      683
     #define COMMUTATION_OFFSET_CCLK     2731
