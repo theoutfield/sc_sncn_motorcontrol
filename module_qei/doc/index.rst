@@ -1,4 +1,4 @@
-SOMANET BLDC Quadrature Encoder Interface Component
+SOMANET Quadrature Encoder Interface Component
 ===================================================
 
 .. toctree::

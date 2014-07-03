@@ -1,5 +1,5 @@
-SOMANET BLDC Hall Sensor Interface Component
-============================================
+SOMANET Hall Sensor Interface Component
+=======================================
 
 .. toctree::
 

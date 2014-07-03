@@ -1,5 +1,5 @@
-Blocks Module
-=============
+SOMANET Motor Control Blocks Module
+===================================
 
 :scope: General Use
 :description: SOMANET Motor Control utility functions
