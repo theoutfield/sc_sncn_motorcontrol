@@ -47,3 +47,9 @@ void set_commutation_params(chanend c_commutation, commutation_par &commutation_
  * @param[in] sensor_select Sensor type, specify by using define HALL or QEI
  */
 void set_commutation_sensor(chanend c_commutation, int sensor_select);
+
+void disable_motor(chanend c_commutation);
+
+void enable_motor(chanend c_commutation);
+
+int check_fet_state(chanend c_commutation);

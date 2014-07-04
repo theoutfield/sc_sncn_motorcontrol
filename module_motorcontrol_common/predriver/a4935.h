@@ -16,11 +16,5 @@
 
 #define A4935_AFTER_RESET_DELAY (200 * MSEC_FAST)
 
-/* e.g. a4935_init(p_mgmt, p_coast, A4935_BIT_PWMH | A4935_BIT_PWML); */
 void a4935_init(int configuration, out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn);
 
-void disable_motor(chanend c_commutation);
-
-void enable_motor(chanend c_commutation);
-
-int check_fet_state(chanend c_commutation);
