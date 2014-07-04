@@ -7,19 +7,19 @@
  */
 
 #include <commutation_client.h>
-#include <internal_config.h>
+#include <commutation_common.h>
 
 /* MAX Input value 13739 */
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 {
-    c_commutation <: SET_VOLTAGE;
+    c_commutation <: COMMUTATION_CMD_SET_VOLTAGE;
     c_commutation <: input_voltage;
     return;
 }
 
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params)
 {
-    c_commutation <: SET_COMMUTATION_PARAMS;
+    c_commutation <: COMMUTATION_CMD_SET_PARAMS;
     c_commutation :> commutation_params.angle_variance;
     c_commutation :> commutation_params.max_speed_reached;
     c_commutation :> commutation_params.hall_offset_clk;
@@ -29,7 +29,7 @@ void set_commutation_params(chanend c_commutation, commutation_par &commutation_
 
 void set_commutation_sensor(chanend c_commutation, int sensor_select)
 {
-    c_commutation <: SENSOR_SELECT;
+    c_commutation <: COMMUTATION_CMD_SENSOR_SELECT;
     c_commutation <: sensor_select;
     return;
 }
@@ -37,20 +37,20 @@ void set_commutation_sensor(chanend c_commutation, int sensor_select)
 int check_fet_state(chanend c_commutation)
 {
     int state;
-    c_commutation <: FETS_STATE;
+    c_commutation <: COMMUTATION_CMD_FETS_STATE;
     c_commutation :> state;
     return state;
 }
 
 void disable_motor(chanend c_commutation)
 {
-    c_commutation <: DISABLE_FETS;
+    c_commutation <: COMMUTATION_CMD_DISABLE_FETS;
     return;
 }
 
 void enable_motor(chanend c_commutation)
 {
-    c_commutation <: ENABLE_FETS;
+    c_commutation <: COMMUTATION_CMD_ENABLE_FETS;
     return;
 }
 

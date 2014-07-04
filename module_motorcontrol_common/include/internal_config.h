@@ -65,12 +65,6 @@
 #define SHUTDOWN_POSITION_CTRL              201
 #define ENABLE_POSITION_CTRL                251
 
-#define SET_VOLTAGE                         2
-#define SET_COMMUTATION_PARAMS              3
-#define DISABLE_FETS                        4
-#define ENABLE_FETS                         5
-#define FETS_STATE                          6
-
 #define SET_CTRL_PARAMETER                  100
 #define SENSOR_SELECT                       150
 

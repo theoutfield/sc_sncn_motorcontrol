@@ -7,6 +7,7 @@
  */
 
 #include <commutation_server.h>
+#include <commutation_common.h>
 #include <watchdog.h>
 #include <xs1.h>
 #include <stdlib.h>
@@ -31,18 +32,18 @@ void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 
 /* Sinusoidal based commutation functions */
 
-void commutation_client_handler(chanend c_commutation, int command, commutation_par &commutation_params, \
+void commutation_client_handler(chanend c_commutation, int command, commutation_par &commutation_params,
                                 int &voltage, int &sensor_select, int init_state, int &shutdown)
 {
     switch (command) {
-    case SET_VOLTAGE:                // set voltage
+    case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
         c_commutation :> voltage;    //STAR_WINDING
         if (commutation_params.winding_type == DELTA_WINDING) {
-            voltage = 0 - voltage;
+            voltage = -voltage;
         }
         break;
 
-    case SET_COMMUTATION_PARAMS:
+    case COMMUTATION_CMD_SET_PARAMS:
         c_commutation :> commutation_params.angle_variance;
         c_commutation :> commutation_params.max_speed_reached;
         c_commutation :> commutation_params.hall_offset_clk;
@@ -50,7 +51,7 @@ void commutation_client_handler(chanend c_commutation, int command, commutation_
         c_commutation :> commutation_params.winding_type;
         break;
 
-    case SENSOR_SELECT:
+    case COMMUTATION_CMD_SENSOR_SELECT:
         c_commutation :> sensor_select;
         break;
 
@@ -58,16 +59,16 @@ void commutation_client_handler(chanend c_commutation, int command, commutation_
         c_commutation <: init_state;
         break;
 
-    case DISABLE_FETS:
+    case COMMUTATION_CMD_DISABLE_FETS:
         shutdown = 1;
         break;
 
-    case ENABLE_FETS:
+    case COMMUTATION_CMD_ENABLE_FETS:
         shutdown = 0;
         voltage = 0;
         break;
 
-    case FETS_STATE:
+    case COMMUTATION_CMD_FETS_STATE:
         c_commutation <: shutdown;
         break;
 
