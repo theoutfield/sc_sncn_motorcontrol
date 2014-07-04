@@ -6,7 +6,7 @@
 #include <refclk.h>
 #include <qei_client.h>
 #include <hall_client.h>
-#include <comm_loop_client.h>
+#include <commutation_client.h>
 #include <statemachine.h>
 #include <drive_modes.h>
 #include <qei_client.h>

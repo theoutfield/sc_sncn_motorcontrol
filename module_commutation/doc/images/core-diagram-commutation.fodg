@@ -398,7 +398,7 @@
      <text:p text:style-name="P2"><text:span text:style-name="T1"/></text:p>
      <text:p text:style-name="P2"><text:span text:style-name="T1"/></text:p>
      <text:p text:style-name="P2"><text:span text:style-name="T1"/></text:p>
-     <text:p text:style-name="P2"><text:span text:style-name="T2">Custom Controller Client</text:span><text:span text:style-name="T1"><text:line-break/></text:span><text:span text:style-name="T1">(uses comm_loop_client.h)</text:span></text:p>
+     <text:p text:style-name="P2"><text:span text:style-name="T2">Custom Controller Client</text:span><text:span text:style-name="T1"><text:line-break/></text:span><text:span text:style-name="T1">(uses commutation_client.h)</text:span></text:p>
      <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3163 3163 0 10800 3163 18437 10800 21600 18437 18437 21600 10800 18437 3163" draw:text-areas="3163 3163 18437 18437" draw:type="ellipse" draw:enhanced-path="U 10800 10800 10800 10800 0 360 Z N"/>
     </draw:custom-shape>
     <draw:connector draw:style-name="gr4" draw:text-style-name="P1" draw:layer="layout" draw:type="line" svg:x1="10.56cm" svg:y1="10.681cm" svg:x2="14.381cm" svg:y2="10.681cm" draw:start-shape="id1" draw:start-glue-point="10" draw:end-shape="id2" draw:end-glue-point="6" svg:d="m10560 10681h3821" svg:viewBox="0 0 3822 1">

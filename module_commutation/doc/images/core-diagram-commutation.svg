@@ -193,7 +193,7 @@
                      id="tspan97"><tspan
                        font-weight="400"
                        id="tspan99"
-                       style="font-weight:400;fill:#000000;stroke:none">(uses comm_loop_client.h)</tspan></tspan></tspan></text>
+                       style="font-weight:400;fill:#000000;stroke:none">(uses commutation_client.h)</tspan></tspan></tspan></text>
 </g></g><g
              class="com.sun.star.drawing.ConnectorShape"
              id="g101"><g

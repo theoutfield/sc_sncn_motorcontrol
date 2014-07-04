@@ -10,7 +10,7 @@
 #include <qei_config.h>
 #include <internal_config.h>
 #include <ctrlproto.h>
-#include <comm_loop_client.h>
+#include <commutation_client.h>
 
 /**
  * @brief Get target torque from Ethercat

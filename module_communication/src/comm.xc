@@ -6,7 +6,7 @@
 
 #include <refclk.h>
 #include <ctrlproto.h>
-#include <comm_loop_client.h>
+#include <commutation_client.h>
 #include <hall_config.h>
 #include <qei_config.h>
 #include <bldc_motor_config.h>

@@ -1,6 +1,6 @@
 /**
- * @file comm_loop_client.h
- * @brief Commutation Loop Client functions
+ * @file commutation_client.h
+ * @brief Commutation Client functions
  * @author Pavan Kanajar <pkanajar@synapticon.com>
  * @author Ludwig Orgler <lorgler@synapticon.com>
  * @author Martin Schwarz <mschwarz@synapticon.com>

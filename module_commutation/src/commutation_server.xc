@@ -6,7 +6,7 @@
  * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
-#include <comm_loop_server.h>
+#include <commutation_server.h>
 #include <watchdog.h>
 #include <xs1.h>
 #include <stdlib.h>

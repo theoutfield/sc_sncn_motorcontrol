@@ -1,5 +1,5 @@
 /**
- * @file comm_loop_server.h
+ * @file commutation_server.h
  * @brief Commutation Loop based on sinusoidal commutation method
  * @author Ludwig Orgler <lorgler@synapticon.com>
  * @author Pavan Kanajar <pkanajar@synapticon.com>
@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <comm_loop_client.h>
+#include <commutation_client.h>
 #include <watchdog.h>
 #include <hall_client.h>
 #include <qei_client.h>
