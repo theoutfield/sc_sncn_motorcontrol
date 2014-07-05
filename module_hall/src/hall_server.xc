@@ -82,14 +82,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 {
     init_hall_param(hall_params);
 
-    printstrln("");
-    printstrln("*************************************");
-    printstrln("    HALL SENSOR SERVER STARTING");
-    printstr("        pole_pairs: ");
-    printintln(hall_params.pole_pairs);
-    printstr("        max_ticks: ");
-    printintln(hall_params.max_ticks);
-    printstrln("*************************************");
+    printstr("*************************************\n    HALL SENSOR SERVER STARTING\n*************************************\n");
 
     timer tx;
     unsigned int ts;

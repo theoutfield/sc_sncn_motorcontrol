@@ -75,6 +75,8 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
     int fet_state = 0;
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 
+    printstr("*************************************\n    VELOCITY CONTROLLER STARTING\n*************************************\n");
+
     ts :> time;
     time += velocity_ctrl_params.Loop_time;
 
@@ -167,13 +169,16 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                 } else if (velocity_control_out < -velocity_ctrl_params.Control_limit) {
                     velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
                 }
+
 #ifdef BDC
                 set_bdc_voltage(c_commutation, velocity_control_out);
 #else
                 set_commutation_sinusoidal(c_commutation, velocity_control_out);
 #endif
                 previous_error = error_velocity;
+
             }
+
             break;
 
             /* acq target velocity etherCAT */

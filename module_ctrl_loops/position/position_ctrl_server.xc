@@ -46,6 +46,8 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
     int fet_state = 0;
     int init_state = INIT_BUSY; /* check commutation init */
 
+    printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
+
 #ifdef DEBUG
     {
         xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,  "n",

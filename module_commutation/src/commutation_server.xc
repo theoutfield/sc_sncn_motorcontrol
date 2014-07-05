@@ -82,18 +82,6 @@ void commutation_sinusoidal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coas
                                  chanend c_signal, chanend  c_commutation_p1, chanend c_commutation_p2, chanend c_commutation_p3)
 {
 
-    init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
-
-    printstrln("");
-    printstrln("*************************************");
-    printstrln("    COMMUTATION SERVER STARTING");
-    printstr("      hall_offset_clk: ");
-    printintln(commutation_params.hall_offset_clk);
-    printstr("      hall_offset_cclk: ");
-    printintln(commutation_params.hall_offset_cclk);
-    printstrln("*************************************");
-
-
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
     int angle_pwm = 0;
@@ -231,6 +219,10 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
     t_pwm_control pwm_ctrl;
     int check_fet;
     int init_state = INIT_BUSY;
+
+    init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
+
+    printstr("*************************************\n    COMMUTATION SERVER STARTING\n*************************************\n");
 
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 

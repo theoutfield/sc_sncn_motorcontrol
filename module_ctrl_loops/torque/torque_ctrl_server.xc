@@ -204,6 +204,8 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
     int fet_state = 0;
     int activate = 0;
 
+    printstr("*************************************\n    TORQUE CONTROLLER STARTING\n*************************************\n");
+
     init_qei_velocity_params(qei_velocity_params);
 
     filter_length_variance = filter_length/hall_params.pole_pairs;
