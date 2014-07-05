@@ -1,5 +1,5 @@
-QEI Demo
-========
+ENcoder Test App
+=================
 
 `test\_qei.xc <https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/test_qei/src/test_qei.xc>`_
 illustrates the usage of

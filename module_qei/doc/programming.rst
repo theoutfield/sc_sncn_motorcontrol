@@ -1,4 +1,4 @@
-.. _commutation_programming_label:
+.. _qei_programming_label:
 
 Programming Guide
 =================

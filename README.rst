@@ -1,7 +1,7 @@
 SOMANET Motor Control Software
 ..............................
 
-:Latest release: 1.0.0rc0
+:Latest release: 1.0.1rc1
 :Maintainer: Synapticon
 :Description: BLDC/Brushed DC Motor Control Software for SOMANET devices
 
