@@ -1,8 +1,8 @@
-SOMANET Motor Control Communication Module
-============================
+SOMANET Motor Control Communication Library
+===========================================
 
 :scope: General Use
-:description: SOMANET Motor Control communication module
+:description: SOMANET Motor Control communication library
 :keywords: SOMANET
 :boards: SOMANET IFM-Drive-DC100, SOMANET IFM-Drive-DC300
 
