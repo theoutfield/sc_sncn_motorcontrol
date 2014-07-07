@@ -1,5 +1,5 @@
-SOMANET Motor Control ADC Interface
-===================================
+SOMANET Motor Control ADC Interface Component
+=============================================
 
 :scope: General Use
 :description: ADC interface for SOMANET IFM-Drive-DC100/300
@@ -15,7 +15,6 @@ Key Features
 Description
 -----------
 
-The module provides an ADC server which drives the ADC of the IFM
-Drive-DC100/300 boards. The server acquires analog input data
-in a loop.
-The module also provides client functions to obtain data from the ADC server.
+The component provides an ADC server which drives the ADC of the IFM
+Drive-DC100/300 boards. The server acquires analog input data in a loop.
+The component also provides client functions to obtain data from the ADC server.
