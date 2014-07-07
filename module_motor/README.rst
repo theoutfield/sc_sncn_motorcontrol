@@ -9,8 +9,7 @@ SOMANET Motor Configuration Files
 Description
 -----------
 
-This library provides a motor configuration file (bldc\_motor\_config.h)
-and a collection of pre-tuned motor configurations.
+This library provides a motor configuration file (bldc\_motor\_config.h) and a collection of pre-tuned motor configurations.
 
 Usage
 -----

@@ -9,9 +9,6 @@ SOMANET Motor Control Common Library
 Description
 -----------
 
-This library provides wait functions, internal
-configurations and defines used across most modules and test
-applications.
+This library provides wait functions, internal configurations and defines used across most modules and test applications.
 
-To include this module add module\_common to USED\_MODULES in the
-application/test makefile, and include header file refclk.h
+To include this module add module\_common to USED\_MODULES in the application/test makefile, and include header file refclk.h
