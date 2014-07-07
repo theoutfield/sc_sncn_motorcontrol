@@ -90,10 +90,6 @@
 #define GP_INPUT_TYPE                       40
 #define SWITCH_INPUT_TYPE                   50
 
-/* TODO: when / where / why are those used? */
-#define COMMUTATION_FORWARD_CONSTANT        683     // 60  deg
-#define COMMUTATION_REVERSE_CONSTANT        2731    // 240 deg
-
 /**
  * @brief struct definition for PID Controller
  */
