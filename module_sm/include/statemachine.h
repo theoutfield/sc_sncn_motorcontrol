@@ -7,10 +7,7 @@
 #pragma once
 
 #include <stdint.h>
-
-
-typedef int bool;
-enum { false, true };
+#include <stdbool_xc.h>
 
 typedef struct S_Check_list {
     bool ready;

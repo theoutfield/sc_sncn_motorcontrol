@@ -41,7 +41,7 @@ int read_gpio_digital_input(chanend c_gpio, int port_number)
     return port_value;
 }
 
-void write_gpio_digital_output(chanend c_gpio, int port_number, int port_value)//bool
+void write_gpio_digital_output(chanend c_gpio, int port_number, int port_value)
 {
     c_gpio <: port_number;
     c_gpio <: GPIO_OUTPUT;

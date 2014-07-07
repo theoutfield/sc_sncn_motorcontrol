@@ -7,6 +7,7 @@
 #include <statemachine.h>
 #include <drive_modes.h>
 #include <internal_config.h>
+#include <stdbool_xc.h>
 #include <print.h>
 
 //#define print_slave
