@@ -1,5 +1,5 @@
-SOMANET Motor Control Common Module
-===================================
+SOMANET Motor Control Common Library
+====================================
 
 :scope: General Use
 :description: Common configurations and utilities
@@ -9,7 +9,7 @@ SOMANET Motor Control Common Module
 Description
 -----------
 
-This module provides library for wait functions and has internal
+This library provides wait functions, internal
 configurations and defines used across most modules and test
 applications.
 
