@@ -1,8 +1,8 @@
-SOMANET Motor Control Profile Module
-====================================
+SOMANET Simple Motion Profile Generation Library
+================================================
 
 :scope: General Use
-:description: SOMANET Motor Control Motion Profile tools
+:description: SOMANET Simple Motion Profile Generation Algorithms
 :keywords: SOMANET
 :boards: SOMANET IFM-Drive-DC100, SOMANET IFM-Drive-DC300
 
