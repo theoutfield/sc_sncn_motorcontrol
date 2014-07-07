@@ -10,6 +10,8 @@
 #include <hall_config.h>
 #include <qei_config.h>
 #include <bldc_motor_config.h>
+#include <internal_config.h>
+#include <stdlib.h>
 
 int get_target_torque(ctrl_proto_values_t InOut)
 {
@@ -45,36 +47,15 @@ void update_hall_param_ecat(hall_par &hall_params, chanend coe_out)
 {
     int min;
     int max;
+
     {hall_params.pole_pairs, max, min} = hall_sdo_update(coe_out);
-    if(max >= 0 && min >= 0)
-    {
-        if(max > min)
-            hall_params.max_ticks = max;
-        else
-            hall_params.max_ticks = min;
-    }
-    else if(max <= 0 && min <= 0)
-    {
-        if(max < min)
-            hall_params.max_ticks = 0 - max;
-        else
-            hall_params.max_ticks = 0 - min;
-    }
-    else if(max > 0 && min < 0)
-    {
-        if(max > 0 - min)
-            hall_params.max_ticks = max;
-        else
-            hall_params.max_ticks = 0 - min;
-    }
-    else if(max < 0 && min > 0)
-    {
-        if(min > 0 - max)
-            hall_params.max_ticks = min;
-        else
-            hall_params.max_ticks = 0 - max;
-    }
-    hall_params.max_ticks_per_turn = hall_params.pole_pairs * 4096;
+
+    min = abs(min);
+    max = abs(max);
+
+    hall_params.max_ticks = (max > min) ? max : min;
+
+    hall_params.max_ticks_per_turn = hall_params.pole_pairs * HALL_POSITION_INTERPOLATED_RANGE;
     hall_params.max_ticks += hall_params.max_ticks_per_turn;
 }
 
@@ -83,40 +64,17 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
     int min;
     int max;
     int sensor_polarity;
+
     {qei_params.real_counts, max, min, qei_params.index, sensor_polarity} = qei_sdo_update(coe_out);
 
-    if(max >= 0 && min >= 0)
-    {
-        if(max > min)
-            qei_params.max_ticks = max;
-        else
-            qei_params.max_ticks = min;
-    }
-    else if(max <= 0 && min <= 0)
-    {
-        if(max < min)
-            qei_params.max_ticks = 0 - max;
-        else
-            qei_params.max_ticks = 0 - min;
-    }
-    else if(max > 0 && min < 0)
-    {
-        if(max > 0 - min)
-            qei_params.max_ticks = max;
-        else
-            qei_params.max_ticks = 0 - min;
-    }
-    else if(max < 0 && min > 0)
-    {
-        if(min > 0 - max)
-            qei_params.max_ticks = min;
-        else
-            qei_params.max_ticks = 0 - max;
-    }
+    min = abs(min);
+    max = abs(max);
+
+    qei_params.max_ticks = (max > min) ? max : min;
 
     qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
 
-    sensor_polarity = sensor_polarity&0x01;
+    sensor_polarity = sensor_polarity & 0x01;
 
     switch(sensor_polarity)
     {
@@ -279,15 +237,13 @@ void commutation_init_ecat(chanend c_signal, hall_par & hall_params, qei_par & q
     int command;
     int nominal_speed;
     int flag = 0;
-    int init_state = INIT_BUSY;
-    while (1)
-    {
-#pragma ordered
+
+    while (flag == 0) {
         select {
         case c_signal :> command:
 
             if (command == CHECK_BUSY) {
-                c_signal <: init_state;
+                c_signal <: INIT_BUSY;
             } else if (command == SET_COMM_PARAM_ECAT) {
                 c_signal :> hall_params.pole_pairs;
                 c_signal :> qei_params.index;
@@ -309,13 +265,6 @@ void commutation_init_ecat(chanend c_signal, hall_par & hall_params, qei_par & q
                 commutation_params.qei_backward_offset = 0;
             }
             break;
-
-        default:
-            break;
-        }
-
-        if (flag == 1) {
-            break;
         }
     }
 }
@@ -332,29 +281,19 @@ void set_hall_param_ecat(chanend c_hall, hall_par & hall_params)
 void hall_init_ecat(chanend c_hall, hall_par & hall_params)
 {
     int command;
-    int init_state = INIT_BUSY;
     int flag = 0;
 
-    while (1) {
-
-#pragma ordered
+    while (flag == 0) {
         select {
         case c_hall :> command:
             if (command == CHECK_BUSY) {
-                c_hall <: init_state;
+                c_hall <: INIT_BUSY;
             } else if (command == SET_HALL_PARAM_ECAT) {
                 c_hall :> hall_params.pole_pairs;
                 c_hall :> hall_params.max_ticks;
                 c_hall :> hall_params.max_ticks_per_turn;
-                flag = 1;       /* TODO: is the intention to just "return" from this function? */
+                flag = 1;
             }
-            break;
-
-        default:
-            break;
-        }
-
-        if (flag == 1) {
             break;
         }
     }
@@ -374,15 +313,13 @@ void set_qei_param_ecat(chanend c_qei, qei_par &qei_params)
 void qei_init_ecat(chanend c_qei, qei_par &qei_params)
 {
     int command;
-    int init_state = INIT_BUSY;
     int flag = 0;
 
-    while(1) {
-#pragma ordered
+    while (flag == 0) {
         select {
         case c_qei :> command:
             if (command == CHECK_BUSY) {
-                c_qei <: init_state;
+                c_qei <: INIT_BUSY;
             } else if (command == SET_QEI_PARAM_ECAT) {
                 c_qei :> qei_params.index;
                 c_qei :> qei_params.max_ticks_per_turn;
@@ -392,13 +329,6 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
                 c_qei :> qei_params.sensor_polarity;
                 flag = 1;
             }
-            break;
-
-        default:
-            break;
-        }
-
-        if (flag == 1) {
             break;
         }
     }
