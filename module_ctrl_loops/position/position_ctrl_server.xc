@@ -5,6 +5,7 @@
 */
 
 #include <position_ctrl_server.h>
+#include <position_ctrl_common.h>
 #include <xscope_wrapper.h>
 #include <print.h>
 #include <statemachine.h>
@@ -136,11 +137,11 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
         case POSITION_CTRL_READ(command):
             switch (command) {
-            case SET_POSITION_TOKEN:
+            case PCTRL_CMD_SET_POSITION:
                 POSITION_CTRL_READ(target_position);
                 break;
 
-            case GET_POSITION_TOKEN:
+            case PCTRL_CMD_GET_POSITION:
                 POSITION_CTRL_WRITE(actual_position);
                 break;
 
@@ -148,7 +149,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 POSITION_CTRL_WRITE(activate);
                 break;
 
-            case SET_CTRL_PARAMETER:
+            case PCTRL_CMD_SET_PARAMS:
                 POSITION_CTRL_READ(position_ctrl_params.Kp_n);
                 POSITION_CTRL_READ(position_ctrl_params.Kp_d);
                 POSITION_CTRL_READ(position_ctrl_params.Ki_n);
@@ -158,11 +159,11 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 POSITION_CTRL_READ(position_ctrl_params.Integral_limit);
                 break;
 
-            case SET_POSITION_CTRL_HALL:
+            case PCTRL_CMD_SET_HALL:
                 c_position_ctrl :> hall_params.pole_pairs;
                 break;
 
-            case SET_POSITION_CTRL_QEI:
+            case PCTRL_CMD_SET_QEI:
                 c_position_ctrl :> qei_params.index;
                 c_position_ctrl :> qei_params.real_counts;
                 c_position_ctrl :> qei_params.max_ticks_per_turn;
@@ -182,7 +183,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 target_position = actual_position;
                 break;
 
-            case ENABLE_POSITION_CTRL:
+            case PCTRL_CMD_ENABLE:
                 POSITION_CTRL_READ(activate);
                 activate = SET;
                 while (1) {
@@ -204,7 +205,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 #endif
                 break;
 
-            case SHUTDOWN_POSITION_CTRL:    // SHUTDOWN_POSITION_CTRL
+            case PCTRL_CMD_SHUTDOWN:
                 POSITION_CTRL_READ(activate);
                 set_commutation_sinusoidal(c_commutation, 0);
                 error_position = 0;
@@ -219,7 +220,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 #endif
                 break;
 
-            case POSITION_CTRL_STATUS: //check active state
+            case PCTRL_CMD_GET_STATUS: //check active state
                 POSITION_CTRL_WRITE(activate);
                 break;
 

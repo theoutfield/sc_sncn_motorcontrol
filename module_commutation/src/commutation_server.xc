@@ -21,6 +21,7 @@
 
 #include <xscope_wrapper.h>
 #include <print.h>
+#include <internal_config.h>
 
 void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {

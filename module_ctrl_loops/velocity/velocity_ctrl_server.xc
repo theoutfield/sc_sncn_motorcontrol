@@ -5,6 +5,7 @@
  */
 
 #include <velocity_ctrl_server.h>
+#include <velocity_ctrl_common.h>
 #include <refclk.h>
 #include <qei_client.h>
 #include <commutation_client.h>
@@ -184,22 +185,22 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
             /* acq target velocity etherCAT */
         case VELOCITY_CTRL_READ(command):
             switch (command) {
-            case SET_VELOCITY_TOKEN:
+            case VCTRL_CMD_SET_VELOCITY:
                 VELOCITY_CTRL_READ(target_velocity);
                 break;
 
-            case GET_VELOCITY_TOKEN:
+            case VCTRL_CMD_GET_VELOCITY:
                 VELOCITY_CTRL_WRITE(actual_velocity);
                 break;
 
-            case SET_VELOCITY_CTRL_HALL:
+            case VCTRL_CMD_SET_HALL:
                 VELOCITY_CTRL_READ(hall_params.pole_pairs);
                 VELOCITY_CTRL_READ(hall_params.max_ticks);
                 VELOCITY_CTRL_READ(hall_params.max_ticks_per_turn);
 
                 break;
 
-            case SET_VELOCITY_CTRL_QEI:
+            case VCTRL_CMD_SET_QEI:
                 VELOCITY_CTRL_READ(qei_params.max_ticks);
                 VELOCITY_CTRL_READ(qei_params.index);
                 VELOCITY_CTRL_READ(qei_params.real_counts);
@@ -241,7 +242,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                  */
                 break;
 
-            case ENABLE_VELOCITY_CTRL:
+            case VCTRL_CMD_ENABLE:
                 VELOCITY_CTRL_READ(activate);
                 activate = SET;
                 while (1) {
@@ -263,7 +264,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
 #endif
                 break;
 
-            case SHUTDOWN_VELOCITY_CTRL:
+            case VCTRL_CMD_SHUTDOWN:
                 VELOCITY_CTRL_READ(activate);
                 error_velocity = 0;
                 error_velocity_D = 0;
@@ -279,7 +280,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                 VELOCITY_CTRL_WRITE(activate);
                 break;
 
-            case VELOCITY_CTRL_STATUS:
+            case VCTRL_CMD_GET_STATUS:
                 VELOCITY_CTRL_WRITE(activate);
                 break;
 

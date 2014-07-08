@@ -6,80 +6,44 @@
 
 #pragma once
 
-// default internal definitions (do not change)
+#include <mc_constants.h>
+
 #define BLDC_PWM_CONTROL_LIMIT              6794
 #define BDC_PWM_CONTROL_LIMIT               13589
 
-#define SET                                 1
-#define UNSET                               0
+#define HALL_POSITION_INTERPOLATED_RANGE    4096
 
-#define HALL                                1
-#define QEI                                 2
-#define QEI_1                               3
-
-#define QEI_WITH_INDEX                      1
-#define QEI_WITH_NO_INDEX                   0
-
+/* FIXME: those should be moved to board support packages */
 #define DC100_RESOLUTION                    740
 #define DC300_RESOLUTION                    400
 #define OLD_DC300_RESOLUTION                264
 
-#define STAR_WINDING                        1
-#define DELTA_WINDING                       2
+
+
 
 #define INIT_BUSY                           0
 #define INIT                                1
 #define CHECK_BUSY                          10
 
+#define SENSOR_SELECT                       150
+
+#define FILTER_SIZE                         8   // default (but used anywhere)
+#define FILTER_SIZE_MAX                     128 // max size
+
 #define SET_COMM_PARAM_ECAT                 20
 #define SET_HALL_PARAM_ECAT                 21
 #define SET_QEI_PARAM_ECAT                  22
-#define SET_POSITION_CTRL_HALL              23
-#define SET_POSITION_CTRL_QEI               24
 
-#define SET_VELOCITY_CTRL_HALL              25
-#define SET_VELOCITY_CTRL_QEI               26
 #define INIT_VELOCITY_CTRL                  29
 #define SET_VELOCITY_FILTER                 30
-#define FILTER_SIZE                         8   // default
-#define FILTER_SIZE_MAX                     128 // max size
-#define SET_VELOCITY_TOKEN                  50
-#define GET_VELOCITY_TOKEN                  60
-#define VELOCITY_CTRL_STATUS                71
-#define SHUTDOWN_VELOCITY_CTRL              200
-#define ENABLE_VELOCITY_CTRL                250
 
-#define SET_TORQUE_CTRL_HALL                27
-#define SET_TORQUE_CTRL_QEI                 28
-#define SET_TORQUE_TOKEN                    40
-#define GET_TORQUE_TOKEN                    41
-#define TORQUE_CTRL_STATUS                  71
-#define SHUTDOWN_TORQUE_CTRL                201
-#define ENABLE_TORQUE_CTRL                  251
-
-#define SET_POSITION_TOKEN                  40
-#define GET_POSITION_TOKEN                  41
 #define HALL_PRECISION                      2
 #define QEI_PRECISION                       512
-#define POSITION_CTRL_STATUS                71
-#define SHUTDOWN_POSITION_CTRL              201
-#define ENABLE_POSITION_CTRL                251
 
 #define SET_CTRL_PARAMETER                  100
-#define SENSOR_SELECT                       150
-
-#define ACTIVE_HIGH                         1
-#define ACTIVE_LOW                          2
-
-#define HOMING_NEGATIVE_SWITCH              1
-#define HOMING_POSITIVE_SWITCH              2
-
-#define SUCCESS                             1
-#define ERROR                               0
 
 #define NORMAL                              1
 #define INVERTED                            -1
-#define HALL_POSITION_INTERPOLATED_RANGE    4096
 
 #define CONFIG_DIO_INPUT                    10
 #define CONFIG_DIO_DONE                     15

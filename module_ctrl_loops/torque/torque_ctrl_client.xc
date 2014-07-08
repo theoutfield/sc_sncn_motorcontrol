@@ -5,6 +5,7 @@
  */
 
 #include <torque_ctrl_client.h>
+#include <torque_ctrl_common.h>
 #include <refclk.h>
 #include <print.h>
 #include <statemachine.h>
@@ -37,14 +38,14 @@ int init_torque_control(chanend c_torque_ctrl)
 int get_torque(chanend c_torque_ctrl)
 {
     int torque;
-    TORQUE_CTRL_WRITE(GET_TORQUE_TOKEN);
+    TORQUE_CTRL_WRITE(TCTRL_CMD_GET_TORQUE);
     TORQUE_CTRL_READ(torque);
     return (torque);
 }
 
 void set_torque(int torque, chanend c_torque_ctrl)
 {
-    TORQUE_CTRL_WRITE(SET_TORQUE_TOKEN);
+    TORQUE_CTRL_WRITE(TCTRL_CMD_SET_TORQUE);
     TORQUE_CTRL_WRITE(torque);
     return;
 }
@@ -93,7 +94,7 @@ void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
 
 void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl)
 {
-    TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_HALL);
+    TORQUE_CTRL_WRITE(TCTRL_CMD_SET_HALL);
     TORQUE_CTRL_WRITE(hall_params.pole_pairs);
     TORQUE_CTRL_WRITE(hall_params.max_ticks);
     TORQUE_CTRL_WRITE(hall_params.max_ticks_per_turn);
@@ -101,7 +102,7 @@ void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl)
 
 void set_torque_ctrl_qei_param(qei_par &qei_params, chanend c_torque_ctrl)
 {
-    TORQUE_CTRL_WRITE(SET_TORQUE_CTRL_QEI);
+    TORQUE_CTRL_WRITE(TCTRL_CMD_SET_QEI);
     TORQUE_CTRL_WRITE(qei_params.index);
     TORQUE_CTRL_WRITE(qei_params.real_counts);
     TORQUE_CTRL_WRITE(qei_params.max_ticks_per_turn);
@@ -116,20 +117,20 @@ void set_torque_sensor(int sensor_used, chanend c_torque_ctrl)
 
 void enable_torque_ctrl(chanend c_torque_ctrl)
 {
-    TORQUE_CTRL_WRITE(ENABLE_TORQUE_CTRL);
+    TORQUE_CTRL_WRITE(TCTRL_CMD_ENABLE);
     TORQUE_CTRL_WRITE(1);
 }
 
 void shutdown_torque_ctrl(chanend c_torque_ctrl)
 {
-    TORQUE_CTRL_WRITE(SHUTDOWN_TORQUE_CTRL);
+    TORQUE_CTRL_WRITE(TCTRL_CMD_SHUTDOWN);
     TORQUE_CTRL_WRITE(0);
 }
 
 int check_torque_ctrl_state(chanend c_torque_ctrl)
 {
     int state;
-    TORQUE_CTRL_WRITE(TORQUE_CTRL_STATUS);
+    TORQUE_CTRL_WRITE(TCTRL_CMD_GET_STATUS);
     TORQUE_CTRL_READ(state);
     return state;
 }

@@ -5,6 +5,7 @@
  */
 
 #include <torque_ctrl_server.h>
+#include <torque_ctrl_common.h>
 #include <math.h>
 #include <stdlib.h>
 #include <refclk.h>
@@ -334,14 +335,14 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 
         case c_torque_ctrl:> command:
             switch (command) {
-            case SET_TORQUE_TOKEN:
+            case TCTRL_CMD_SET_TORQUE:
                 TORQUE_CTRL_READ(target_torque);
 #ifdef ENABLE_xscope_torq
                 xscope_probe_data(2, target_torque);
 #endif
                 break;
 
-            case GET_TORQUE_TOKEN:
+            case TCTRL_CMD_GET_TORQUE:
                 if (torque_control_output >= 0) {
                     TORQUE_CTRL_WRITE(actual_torque);
                 } else {
@@ -363,7 +364,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 TORQUE_CTRL_READ(torque_ctrl_params.Integral_limit);
                 break;
 
-            case SET_TORQUE_CTRL_HALL:
+            case TCTRL_CMD_SET_HALL:
                 TORQUE_CTRL_READ(hall_params.pole_pairs);
                 TORQUE_CTRL_READ(hall_params.max_ticks);
                 TORQUE_CTRL_READ(hall_params.max_ticks_per_turn);
@@ -374,7 +375,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 }
                 break;
 
-            case SET_TORQUE_CTRL_QEI:
+            case TCTRL_CMD_SET_QEI:
                 TORQUE_CTRL_READ(qei_params.index);
                 TORQUE_CTRL_READ(qei_params.real_counts);
                 TORQUE_CTRL_READ(qei_params.max_ticks_per_turn);
@@ -403,7 +404,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 }
                 break;
 
-            case ENABLE_TORQUE_CTRL:
+            case TCTRL_CMD_ENABLE:
                 TORQUE_CTRL_READ(activate);
                 activate = SET;
                 while (1) {
@@ -431,7 +432,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                                 case c_torque_ctrl :> command:
                                     if (command == CHECK_BUSY) {
                                         c_torque_ctrl <: init_state;
-                                    } else if (command == TORQUE_CTRL_STATUS) {
+                                    } else if (command == TCTRL_CMD_GET_STATUS) {
                                         TORQUE_CTRL_WRITE(init_state);
                                     }
                                     break;
@@ -449,7 +450,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 #endif
                 break;
 
-            case SHUTDOWN_TORQUE_CTRL:
+            case TCTRL_CMD_SHUTDOWN:
                 TORQUE_CTRL_READ(activate);
                 activate = UNSET;
                 error_torque = 0;
@@ -462,7 +463,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 wait_ms(30, 1, tc);
                 break;
 
-            case TORQUE_CTRL_STATUS:
+            case TCTRL_CMD_GET_STATUS:
                 TORQUE_CTRL_WRITE(activate);
                 break;
 

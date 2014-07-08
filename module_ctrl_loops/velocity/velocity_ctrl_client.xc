@@ -5,6 +5,7 @@
  */
 
 #include <velocity_ctrl_client.h>
+#include <velocity_ctrl_common.h>
 #include <refclk.h>
 #include <internal_config.h>
 #include <statemachine.h>
@@ -38,13 +39,13 @@ int init_velocity_control(chanend c_velocity_ctrl)
 
 //internal
 void set_velocity(int target_velocity, chanend c_velocity_ctrl) {
-    VELOCITY_CTRL_WRITE(SET_VELOCITY_TOKEN);
+    VELOCITY_CTRL_WRITE(VCTRL_CMD_SET_VELOCITY);
     VELOCITY_CTRL_WRITE(target_velocity);
 }
 
 int get_velocity(chanend c_velocity_ctrl) {
     int velocity;
-    VELOCITY_CTRL_WRITE(GET_VELOCITY_TOKEN);
+    VELOCITY_CTRL_WRITE(VCTRL_CMD_GET_VELOCITY);
     VELOCITY_CTRL_READ(velocity);
     return velocity;
 }
@@ -81,7 +82,7 @@ void set_velocity_ctrl_param(ctrl_par & velocity_ctrl_params, chanend c_velocity
 
 void set_velocity_ctrl_hall_param(hall_par & hall_params, chanend c_velocity_ctrl)
 {
-    VELOCITY_CTRL_WRITE(SET_VELOCITY_CTRL_HALL);
+    VELOCITY_CTRL_WRITE(VCTRL_CMD_SET_HALL);
     VELOCITY_CTRL_WRITE(hall_params.pole_pairs);
     VELOCITY_CTRL_WRITE(hall_params.max_ticks);
     VELOCITY_CTRL_WRITE(hall_params.max_ticks_per_turn);
@@ -89,7 +90,7 @@ void set_velocity_ctrl_hall_param(hall_par & hall_params, chanend c_velocity_ctr
 
 void set_velocity_ctrl_qei_param(qei_par & qei_params, chanend c_velocity_ctrl)
 {
-    VELOCITY_CTRL_WRITE(SET_VELOCITY_CTRL_QEI);
+    VELOCITY_CTRL_WRITE(VCTRL_CMD_SET_QEI);
     VELOCITY_CTRL_WRITE(qei_params.max_ticks);
     VELOCITY_CTRL_WRITE(qei_params.index);
     VELOCITY_CTRL_WRITE(qei_params.real_counts);
@@ -111,20 +112,20 @@ void set_velocity_filter(chanend c_velocity_ctrl, filter_par & filter_params)
 
 void enable_velocity_ctrl(chanend c_velocity_ctrl)
 {
-    VELOCITY_CTRL_WRITE(ENABLE_VELOCITY_CTRL);
+    VELOCITY_CTRL_WRITE(VCTRL_CMD_ENABLE);
     VELOCITY_CTRL_WRITE(1);
 }
 
 void shutdown_velocity_ctrl(chanend c_velocity_ctrl)
 {
-    VELOCITY_CTRL_WRITE(SHUTDOWN_VELOCITY_CTRL);
+    VELOCITY_CTRL_WRITE(VCTRL_CMD_SHUTDOWN);
     VELOCITY_CTRL_WRITE(0);
 }
 
 int check_velocity_ctrl_state(chanend c_velocity_ctrl)
 {
     int state;
-    VELOCITY_CTRL_WRITE(VELOCITY_CTRL_STATUS);
+    VELOCITY_CTRL_WRITE(VCTRL_CMD_GET_STATUS);
     VELOCITY_CTRL_READ(state);
     return state;
 }

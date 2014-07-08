@@ -5,6 +5,7 @@
 */
 
 #include <position_ctrl_client.h>
+#include <position_ctrl_common.h>
 #include <print.h>
 #include <statemachine.h>
 #include <drive_modes.h>
@@ -37,7 +38,7 @@ int init_position_control(chanend c_position_ctrl)
 //internal functions
 void set_position(int target_position, chanend c_position_ctrl)
 {
-    POSITION_CTRL_WRITE(SET_POSITION_TOKEN);
+    POSITION_CTRL_WRITE(PCTRL_CMD_SET_POSITION);
     POSITION_CTRL_WRITE(target_position);
 }
 
@@ -45,7 +46,7 @@ void set_position(int target_position, chanend c_position_ctrl)
 int get_position(chanend c_position_ctrl)
 {
     int position;
-    POSITION_CTRL_WRITE(GET_POSITION_TOKEN);
+    POSITION_CTRL_WRITE(PCTRL_CMD_GET_POSITION);
     POSITION_CTRL_READ(position);
     return position;
 }
@@ -73,7 +74,7 @@ void set_position_csp( csp_par & csp_params, int target_position, int position_o
 
 void set_position_ctrl_param(ctrl_par & position_ctrl_params, chanend c_position_ctrl)
 {
-    POSITION_CTRL_WRITE(SET_CTRL_PARAMETER);
+    POSITION_CTRL_WRITE(PCTRL_CMD_SET_PARAMS);
     POSITION_CTRL_WRITE(position_ctrl_params.Kp_n);
     POSITION_CTRL_WRITE(position_ctrl_params.Kp_d);
     POSITION_CTRL_WRITE(position_ctrl_params.Ki_n);
@@ -85,13 +86,13 @@ void set_position_ctrl_param(ctrl_par & position_ctrl_params, chanend c_position
 
 void set_position_ctrl_hall_param(hall_par & hall_params, chanend c_position_ctrl)
 {
-    c_position_ctrl <: SET_POSITION_CTRL_HALL;
+    c_position_ctrl <: PCTRL_CMD_SET_HALL;
     c_position_ctrl <: hall_params.pole_pairs;
 }
 
 void set_position_ctrl_qei_param(qei_par & qei_params, chanend c_position_ctrl)
 {
-    c_position_ctrl <: SET_POSITION_CTRL_QEI;
+    c_position_ctrl <: PCTRL_CMD_SET_QEI;
     c_position_ctrl <: qei_params.index;
     c_position_ctrl <: qei_params.real_counts;
     c_position_ctrl <: qei_params.max_ticks_per_turn;
@@ -106,20 +107,20 @@ void set_position_sensor(int sensor_used, chanend c_position_ctrl)
 
 void enable_position_ctrl(chanend c_position_ctrl)
 {
-    POSITION_CTRL_WRITE(ENABLE_POSITION_CTRL);
+    POSITION_CTRL_WRITE(PCTRL_CMD_ENABLE);
     POSITION_CTRL_WRITE(1);
 }
 
 void shutdown_position_ctrl(chanend c_position_ctrl)
 {
-    POSITION_CTRL_WRITE(SHUTDOWN_POSITION_CTRL);
+    POSITION_CTRL_WRITE(PCTRL_CMD_SHUTDOWN);
     POSITION_CTRL_WRITE(0);
 }
 
 int check_position_ctrl_state(chanend c_position_ctrl)
 {
     int state;
-    POSITION_CTRL_WRITE(POSITION_CTRL_STATUS);
+    POSITION_CTRL_WRITE(PCTRL_CMD_GET_STATUS);
     POSITION_CTRL_READ(state);
     return state;
 }
