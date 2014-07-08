@@ -28,8 +28,8 @@
 #define QEI_SENSOR_TYPE             QEI_WITH_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
- *  (NORMAL/INVERTED) */
-#define QEI_SENSOR_POLARITY         NORMAL
+ *  (QEI_POLARITY_NORMAL/QEI_POLARITY_INVERTED) */
+#define QEI_SENSOR_POLARITY         QEI_POLARITY_NORMAL
 
 /* Commutation offset (range 0-4095) (HALL sensor based commutation) */
 #define COMMUTATION_OFFSET_CLK      683

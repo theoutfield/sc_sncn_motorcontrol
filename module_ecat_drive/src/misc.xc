@@ -73,22 +73,22 @@ int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation
     printintln(sum_h);
     printintln(avg_q);
     if ( (avg_q > 0) && (sum_h < 0 ) ) {
-        sensor_placement_type = INVERTED;
+        sensor_placement_type = QEI_POLARITY_INVERTED;
         printstrln("inverted case1");
     }
 
     if ( (avg_q < 0) && (sum_h > 0) ) {
-        sensor_placement_type = INVERTED;
+        sensor_placement_type = QEI_POLARITY_INVERTED;
         printstrln("inverted case2");
     }
 
     if ( (avg_q > 0) && (sum_h > 0) ) {
-        sensor_placement_type = NORMAL;
+        sensor_placement_type = QEI_POLARITY_NORMAL;
         printstrln("normal case1");
     }
 
     if ( (avg_q < 0) && (sum_h < 0) ) {
-        sensor_placement_type = NORMAL;
+        sensor_placement_type = QEI_POLARITY_NORMAL;
         printstrln("normal case2");
     }
 

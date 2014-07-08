@@ -32,8 +32,8 @@
 #define QEI_SENSOR_TYPE             QEI_WITH_NO_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
- *  (NORMAL/INVERTED) */
-#define QEI_SENSOR_POLARITY         INVERTED
+ *  (QEI_POLARITY_NORMAL/QEI_POLARITY_INVERTED) */
+#define QEI_SENSOR_POLARITY         QEI_POLARITY_INVERTED
 
 /* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
  *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */

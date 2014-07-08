@@ -213,7 +213,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
                         difference = position - previous_position;
                         //xscope_probe_data(1, difference);
                         if (difference >= qei_crossover) {
-                            if (qei_params.sensor_polarity == NORMAL) {
+                            if (qei_params.sensor_polarity == QEI_POLARITY_NORMAL) {
                                 count = count - 1;
                             } else {
                                 count = count + 1;
@@ -223,7 +223,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
                             direction = -1;
                         }
                         else if (difference <= -qei_crossover) {
-                            if (qei_params.sensor_polarity == NORMAL) {
+                            if (qei_params.sensor_polarity == QEI_POLARITY_NORMAL) {
                                 count = count + 1;
                             } else {
                                 count = count - 1;
@@ -233,7 +233,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
                             direction = +1;
                         }
                         else if (difference <= 2 && difference > 0) {
-                            if (qei_params.sensor_polarity == NORMAL) {
+                            if (qei_params.sensor_polarity == QEI_POLARITY_NORMAL) {
                                 count = count + difference;
                                 sync_out = sync_out + difference;
                             } else {
@@ -243,7 +243,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
                             direction = -1;
                         }
                         else if (difference < 0 && difference >= -2) {
-                            if (qei_params.sensor_polarity == NORMAL) {
+                            if (qei_params.sensor_polarity == QEI_POLARITY_NORMAL) {
                                 count = count + difference;
                                 sync_out = sync_out + difference;
                             } else {

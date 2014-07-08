@@ -42,9 +42,6 @@
 
 #define SET_CTRL_PARAMETER                  100
 
-#define NORMAL                              1
-#define INVERTED                            -1
-
 #define CONFIG_DIO_INPUT                    10
 #define CONFIG_DIO_DONE                     15
 #define GPIO_INPUT                          20

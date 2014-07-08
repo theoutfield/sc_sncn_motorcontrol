@@ -79,11 +79,11 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
     switch(sensor_polarity)
     {
         case 0:
-            sensor_polarity = NORMAL;
+            sensor_polarity = QEI_POLARITY_NORMAL;
             break;
 
         case 1:
-            sensor_polarity = INVERTED;
+            sensor_polarity = QEI_POLARITY_INVERTED;
             break;
 
         default:

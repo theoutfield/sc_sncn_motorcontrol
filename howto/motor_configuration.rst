@@ -61,9 +61,9 @@ The main parameters to define in our configuration file will be:
 
 ::
 
-    #define QEI_SENSOR_POLARITY NORMAL // or NORMAL
+    #define QEI_SENSOR_POLARITY QEI_POLARITY_NORMAL // or QEI_POLARITY_NORMAL
     #define ENCODER_RESOLUTION 4000 // 4 x Max count of Quadrature Encoder
-    #define QEI_SENSOR_POLARITY NORMAL // NORMAL
+    #define QEI_SENSOR_POLARITY QEI_POLARITY_NORMAL // QEI_POLARITY_NORMAL
 
 -  If you are using a gear, specify the ratio, otherwise set to 1:
 
