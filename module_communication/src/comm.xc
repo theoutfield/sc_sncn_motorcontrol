@@ -63,33 +63,14 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
 {
     int min;
     int max;
-    int sensor_polarity;
 
-    {qei_params.real_counts, max, min, qei_params.index, sensor_polarity} = qei_sdo_update(coe_out);
+    { qei_params.real_counts, max, min, qei_params.index, qei_params.sensor_polarity } = qei_sdo_update(coe_out);
 
     min = abs(min);
     max = abs(max);
 
     qei_params.max_ticks = (max > min) ? max : min;
-
     qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
-
-    sensor_polarity = sensor_polarity & 0x01;
-
-    switch(sensor_polarity)
-    {
-        case 0:
-            sensor_polarity = QEI_POLARITY_NORMAL;
-            break;
-
-        case 1:
-            sensor_polarity = QEI_POLARITY_INVERTED;
-            break;
-
-        default:
-            break;
-    }
-    qei_params.sensor_polarity = sensor_polarity;
 }
 
 void update_commutation_param_ecat(commutation_par &commutation_params, chanend coe_out)
