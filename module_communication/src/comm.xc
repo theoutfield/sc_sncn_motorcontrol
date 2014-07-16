@@ -238,9 +238,9 @@ void commutation_init_ecat(chanend c_signal, hall_par & hall_params, qei_par & q
 
                 commutation_params.angle_variance = 1024 / (hall_params.pole_pairs * 3);
                 if (hall_params.pole_pairs < 4) {
-                    commutation_params.max_speed_reached = nominal_speed*4;
+                    commutation_params.nominal_speed = nominal_speed*4;
                 } else if (hall_params.pole_pairs >= 4) {
-                    commutation_params.max_speed_reached = nominal_speed;
+                    commutation_params.nominal_speed = nominal_speed;
                 }
                 commutation_params.qei_forward_offset = 0;
                 commutation_params.qei_backward_offset = 0;

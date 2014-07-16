@@ -13,7 +13,7 @@
  */
 typedef struct {
     int angle_variance;         /* max allowed variance depending on speed */
-    int max_speed_reached;      /* FIXME: should be named rated_speed */
+    int nominal_speed;
     int qei_forward_offset;
     int qei_backward_offset;
     int hall_offset_clk;

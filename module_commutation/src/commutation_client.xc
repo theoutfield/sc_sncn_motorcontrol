@@ -21,7 +21,7 @@ void set_commutation_params(chanend c_commutation, commutation_par &commutation_
 {
     c_commutation <: COMMUTATION_CMD_SET_PARAMS;
     c_commutation :> commutation_params.angle_variance;
-    c_commutation :> commutation_params.max_speed_reached;
+    c_commutation :> commutation_params.nominal_speed;
     c_commutation :> commutation_params.hall_offset_clk;
     c_commutation :> commutation_params.hall_offset_cclk;
     c_commutation :> commutation_params.winding_type;
