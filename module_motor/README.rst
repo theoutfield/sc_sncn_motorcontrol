@@ -1,4 +1,4 @@
-SOMANET Motor Configuration Module
+SOMANET Motor Configuration Files
 ==================================
 
 :scope: General Use
@@ -9,8 +9,7 @@ SOMANET Motor Configuration Module
 Description
 -----------
 
-This Module Provides a motor configuration file (bldc\_motor\_config.h)
-and a collection of pre-tuned motor configurations.
+This library provides a motor configuration file (bldc\_motor\_config.h) and a collection of pre-tuned motor configurations.
 
 Usage
 -----
@@ -22,5 +21,5 @@ Pre-tuned motors
 
 The collection of pre-tuned motors currently contains:
 
-*Maxon 313320 (50 Watt BLDC Motor)*Maxon 456688 (100 Watt BLDC Motor
-incl. gear)
+  * Maxon 313320 (50 Watt BLDC Motor)
+  * Maxon 456688 (100 Watt BLDC Motor incl. gear)
