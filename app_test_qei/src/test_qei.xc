@@ -55,7 +55,7 @@ void qei_test(chanend c_qei)
 		xscope_core_int(1, velocity);
 	#else
 		printstr("Position: ");
-		printint(position);
+		printintln(position);
 //		printstr(" ");
 //		printstr("Velocity: "); // with print velocity information will be corrupt (use xscope)
 //		printintln(velocity);
