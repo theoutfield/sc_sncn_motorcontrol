@@ -56,9 +56,9 @@ void qei_test(chanend c_qei)
 	#else
 		printstr("Position: ");
 		printint(position);
-		printstr(" ");
-		printstr("Velocity: "); // with print velocity information will be corrupt (use xscope)
-		printintln(velocity);
+//		printstr(" ");
+//		printstr("Velocity: "); // with print velocity information will be corrupt (use xscope)
+//		printintln(velocity);
     #endif
 	}
 }
