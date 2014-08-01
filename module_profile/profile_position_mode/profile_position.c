@@ -97,7 +97,7 @@ void init_position_profile_limits(int max_acceleration, int max_velocity, qei_pa
     if (profile_pos_params.sensor_used == HALL) {
         profile_pos_params.max_acceleration =  rpm_to_ticks_hall(max_acceleration, hall_params);
         profile_pos_params.max_velocity = rpm_to_ticks_hall(max_velocity, hall_params);
-    } else if (profile_pos_params.sensor_used == QEI) {
+    } else if (profile_pos_params.sensor_used >= QEI) {
         profile_pos_params.max_acceleration =  rpm_to_ticks_qei(max_acceleration, qei_params);
         profile_pos_params.max_velocity = rpm_to_ticks_qei(max_velocity, qei_params);
     } else {
@@ -118,7 +118,7 @@ int init_position_profile(int target_position, int actual_position, int velocity
     else if (profile_pos_params.qf < profile_pos_params.min_position)
         profile_pos_params.qf = profile_pos_params.min_position;
 
-    if (profile_pos_params.sensor_used == QEI) {
+    if (profile_pos_params.sensor_used >= QEI) {
         profile_pos_params.vi = rpm_to_ticks_qei(velocity, profile_pos_params.qei_params);
         profile_pos_params.acc =  rpm_to_ticks_qei(acceleration, profile_pos_params.qei_params);
         profile_pos_params.dec =  rpm_to_ticks_qei(deceleration, profile_pos_params.qei_params);
@@ -346,7 +346,7 @@ void __initialize_position_profile_limits(int max_acceleration, int max_velocity
     if (profile_pos_params->sensor_used == HALL) {
         profile_pos_params->max_acceleration =  rpm_to_ticks_hall(max_acceleration , profile_pos_params->hall_params);
         profile_pos_params->max_velocity = rpm_to_ticks_hall(max_velocity, profile_pos_params->hall_params);
-    } else if (profile_pos_params->sensor_used == QEI) {
+    } else if (profile_pos_params->sensor_used >= QEI) {
         profile_pos_params->max_acceleration =  rpm_to_ticks_qei(max_acceleration , profile_pos_params->qei_params);
         profile_pos_params->max_velocity = rpm_to_ticks_qei(max_velocity, profile_pos_params->qei_params);
     } else {
@@ -376,7 +376,7 @@ int __initialize_position_profile(int target_position, int actual_position, int 
         profile_pos_params->qf = profile_pos_params->min_position;
     }
 
-    if (profile_pos_params->sensor_used == QEI) {
+    if (profile_pos_params->sensor_used >= QEI) {
         profile_pos_params->vi = rpm_to_ticks_qei(velocity, profile_pos_params->qei_params);
         profile_pos_params->acc =  rpm_to_ticks_qei(acceleration, profile_pos_params->qei_params);
         profile_pos_params->dec =  rpm_to_ticks_qei(deceleration, profile_pos_params->qei_params);

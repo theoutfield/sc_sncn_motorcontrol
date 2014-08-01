@@ -386,7 +386,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                     //{
                         update_hall_param_ecat(hall_params, coe_out);
                     //}
-                    if(sensor_select == QEI || sensor_select == QEI_1)
+                    if(sensor_select >= QEI) /* FIXME QEI with Index defined as 2 and without Index as 3  */
                     {
                         update_qei_param_ecat(qei_params, coe_out);
                     }
