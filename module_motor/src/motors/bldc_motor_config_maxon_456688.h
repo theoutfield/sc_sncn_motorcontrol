@@ -29,7 +29,7 @@
  * (HALL/ QEI) */
 #define SENSOR_USED                 QEI
 
-/* Define your Incremental Encoder type (QEI_INDEX/ QEI_WITH_NO_INDEX) */
+/* Define your Incremental Encoder type (QEI_WITH_INDEX/ QEI_WITH_NO_INDEX) */
 #define QEI_SENSOR_TYPE             QEI_WITH_NO_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
