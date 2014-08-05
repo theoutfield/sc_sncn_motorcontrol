@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Component Overview &mdash; SOMANET Motor Control Software v documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SOMANET Motor Control Software v documentation" href="../../index.html"/>
+        <link rel="up" title="SOMANET BLDC Commutation Component" href="index.html"/>
+        <link rel="next" title="Programming Guide" href="programming.html"/>
+        <link rel="prev" title="SOMANET BLDC Commutation Component" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../../index.html" class="fa fa-home"> SOMANET Motor Control Software</a>
+        
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Commutation Component</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">Commutation API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_hall/doc/index.html">Hall Interface Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/api.html">Hall Interface API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_qei/doc/index.html">QEI Interface Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../module_qei/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_qei/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_qei/doc/api.html">qei Interface API</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SOMANET Motor Control Software</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">SOMANET BLDC Commutation Component</a> &raquo;</li>
+      
+    <li>Component Overview</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="component-overview">
+<h1>Component Overview<a class="headerlink" href="#component-overview" title="Permalink to this headline">¶</a></h1>
+<p>Like shown in the core diagram below, 4 timing critical task are executed on the SOMANET IFM Tile:</p>
+<ul class="simple">
+<li><strong>Commutation Server</strong> - Executes sinusoidal commutation software</li>
+<li><strong>PWM Server</strong> - Generates PWM signals</li>
+<li><strong>Hall Server</strong> - Delivers rotor angle information required for sinusoidal commutation</li>
+<li><strong>Watchdog Server</strong> - Provides WDT (Watchdog timer) functionality</li>
+</ul>
+<p>As shown, custom controllers should run in a different tile to avoid influencing the performance of motor control. Please refer to the <a class="reference internal" href="programming.html#commutation-programming-label"><span>Programming Guide</span></a></p>
+<div class="figure">
+<img alt="../../_images/core-diagram-commutation.png" src="../../_images/core-diagram-commutation.png" style="width: 100%;" />
+<p class="caption">Custom control application core diagram</p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="programming.html" class="btn btn-neutral float-right" title="Programming Guide">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="SOMANET BLDC Commutation Component"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

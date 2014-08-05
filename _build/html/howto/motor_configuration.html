@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to configure your motors &mdash; SOMANET Motor Control Software v documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SOMANET Motor Control Software v documentation" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../index.html" class="fa fa-home"> SOMANET Motor Control Software</a>
+        
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../module_commutation/doc/index.html">Commutation Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../module_commutation/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../module_commutation/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../module_commutation/doc/api.html">Commutation API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../module_hall/doc/index.html">Hall Interface Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../module_hall/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../module_hall/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../module_hall/doc/api.html">Hall Interface API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../module_qei/doc/index.html">QEI Interface Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../module_qei/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../module_qei/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../module_qei/doc/api.html">qei Interface API</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">SOMANET Motor Control Software</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>How to configure your motors</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="how-to-configure-your-motors">
+<span id="motor-configuration-label"></span><h1>How to configure your motors<a class="headerlink" href="#how-to-configure-your-motors" title="Permalink to this headline">¶</a></h1>
+<p>Any application that uses this software component must contain a motor
+configuration file. This file, called <strong>bldc_motor_config.h</strong>, must be
+located at the folder <strong>config/motor/</strong> on your application. Since It
+defines the features of your BLDC motor, it is important to set it
+properly before running any motor control application.</p>
+<p>You can find many examples of this file at the different application
+examples provided.</p>
+<p>The main parameters to define in our configuration file will be:</p>
+<ul>
+<li><p class="first">Number of pole pairs:</p>
+<div class="highlight-none"><pre>#define POLE_PAIRS n // e.g. 8</pre>
+</div>
+</li>
+<li><p class="first">Maximum nominal speed (in rpms):</p>
+<div class="highlight-none"><pre>#define MAX_NOMINAL_SPEED n // e.g. 4000</pre>
+</div>
+</li>
+<li><p class="first">Maximum nominal current (A):</p>
+<div class="highlight-none"><pre>#define MAX_NOMINAL_CURRENT n // e.g. 2</pre>
+</div>
+</li>
+<li><p class="first">Motor torque constant (required for torque control):</p>
+<div class="highlight-none"><pre>#define MOTOR_TORQUE_CONSTANT 34 // mNm/A</pre>
+</div>
+</li>
+<li><p class="first">Your motor winding type (star or delta):</p>
+<div class="highlight-none"><pre>#define WINDING_TYPE DELTA_WINDING // or STAR_WINDING</pre>
+</div>
+</li>
+<li><p class="first">Your DC board (DC100 or DC300):</p>
+<div class="highlight-none"><pre>#define IFM_RESOLUTION DC100_RESOLUTION // or DC300_RESOLUTION</pre>
+</div>
+</li>
+<li><p class="first">Sensor used for control (Hall or Quadrature Encoder):</p>
+<div class="highlight-none"><pre>#define SENSOR_USED HALL // or QEI</pre>
+</div>
+</li>
+<li><p class="first">If QEI sensor is used then set the type (w/ or w/o index),
+resolution, or polarity (to match the hall sensor polarity):</p>
+</li>
+</ul>
+<div class="highlight-none"><pre>#define QEI_SENSOR_POLARITY QEI_POLARITY_NORMAL // or QEI_POLARITY_NORMAL
+#define ENCODER_RESOLUTION 4000 // 4 x Max count of Quadrature Encoder
+#define QEI_SENSOR_POLARITY QEI_POLARITY_NORMAL // QEI_POLARITY_NORMAL</pre>
+</div>
+<ul>
+<li><p class="first">If you are using a gear, specify the ratio, otherwise set to 1:</p>
+<div class="highlight-none"><pre>#define GEAR_RATIO n // e.g. 26, or 1 if no gear is attached</pre>
+</div>
+</li>
+</ul>
+<div class="section" id="tuning-the-commutation-offset-angles">
+<h2>Tuning the commutation offset angles<a class="headerlink" href="#tuning-the-commutation-offset-angles" title="Permalink to this headline">¶</a></h2>
+<p>Please refer to the <a class="reference internal" href="motor_tuning.html#motor-tuning-label"><span>BLDC Motor Tuning Guide</span></a></p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,304 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Commutation API &mdash; SOMANET Motor Control Software v documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SOMANET Motor Control Software v documentation" href="../../index.html"/>
+        <link rel="up" title="SOMANET BLDC Commutation Component" href="index.html"/>
+        <link rel="next" title="SOMANET Hall Sensor Interface Component" href="../../module_hall/doc/index.html"/>
+        <link rel="prev" title="Programming Guide" href="programming.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../../index.html" class="fa fa-home"> SOMANET Motor Control Software</a>
+        
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Commutation Component</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="programming.html">Programming Guide</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Commutation API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_hall/doc/index.html">Hall Interface Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/api.html">Hall Interface API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_qei/doc/index.html">QEI Interface Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../module_qei/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_qei/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_qei/doc/api.html">qei Interface API</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SOMANET Motor Control Software</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">SOMANET BLDC Commutation Component</a> &raquo;</li>
+      
+    <li>Commutation API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="commutation-api">
+<h1>Commutation API<a class="headerlink" href="#commutation-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="client-api">
+<h2>Client API<a class="headerlink" href="#client-api" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="set_commutation_sinusoidal">
+void <tt class="descname">set_commutation_sinusoidal</tt><big>(</big>chanend<em>&nbsp;c_commutation</em>, int<em>&nbsp;input_voltage</em><big>)</big><a class="headerlink" href="#set_commutation_sinusoidal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets input voltage for commutation loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>c_commutation</strong> &#8211; A chanend connected to commutation server</li>
+<li><strong>input_voltage</strong> &#8211; Motor input voltage (range: -13739 to 13739)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="server-api">
+<h2>Server API<a class="headerlink" href="#server-api" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="init_commutation_param">
+void <tt class="descname">init_commutation_param</tt><big>(</big><a class="reference internal" href="#commutation_par" title="commutation_par"><span>commutation_par</span></a><em>&nbsp;&amp;commutation_params</em>, <a class="reference internal" href="../../module_hall/doc/api.html#hall_par" title="hall_par"><span>hall_par</span></a><em>&nbsp;&amp;hall_params</em>, int<em>&nbsp;nominal_speed</em><big>)</big><a class="headerlink" href="#init_commutation_param" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize commutation parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>commutation_params</strong> &#8211; struct defines the commutation angle parameters</li>
+<li><strong>hall_params</strong> &#8211; struct defines the pole-pairs and gear ratio</li>
+<li><strong>nominal_speed</strong> &#8211; is the rated speed for the motor given on specs sheet</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="commutation_sinusoidal">
+void <tt class="descname">commutation_sinusoidal</tt><big>(</big>chanend<em>&nbsp;c_hall</em>, chanend<em>&nbsp;c_qei</em>, chanend<em>&nbsp;c_signal</em>, chanend<em>&nbsp;c_watchdog</em>, chanend<em>&nbsp;c_commutation_p1</em>, chanend<em>&nbsp;c_commutation_p2</em>, chanend<em>&nbsp;c_commutation_p3</em>, chanend<em>&nbsp;c_pwm_ctrl</em>, out port<em>&nbsp;p_ifm_esf_rstn_pwml_pwmh</em>, port<em>&nbsp;p_ifm_coastn</em>, port<em>&nbsp;p_ifm_ff1</em>, port<em>&nbsp;p_ifm_ff2</em>, <a class="reference internal" href="../../module_hall/doc/api.html#hall_par" title="hall_par"><span>hall_par</span></a><em>&nbsp;&amp;hall_params</em>, <a class="reference internal" href="../../module_qei/doc/api.html#qei_par" title="qei_par"><span>qei_par</span></a><em>&nbsp;&amp;qei_params</em>, <a class="reference internal" href="#commutation_par" title="commutation_par"><span>commutation_par</span></a><em>&nbsp;&amp;commutation_params</em><big>)</big><a class="headerlink" href="#commutation_sinusoidal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sinusoidal based Commutation Loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>c_hall</strong> &#8211; A chanend connected to the hall server</li>
+<li><strong>c_qei</strong> &#8211; A chanend connected to the qei server (QEI)</li>
+<li><strong>c_signal</strong> &#8211; A chanend for signaling after initialization of commutation loop</li>
+<li><strong>c_watchdog</strong> &#8211; A chanend connected to the watchdog</li>
+<li><strong>c_commutation_p1</strong> &#8211; channel for receiving motor voltage input value - priority 1 (highest) 1 ... (lowest) 3</li>
+<li><strong>c_commutation_p2</strong> &#8211; channel for receiving motor voltage input value - priority 2</li>
+<li><strong>c_commutation_p3</strong> &#8211; channel for receiving motor voltage input value - priority 3</li>
+<li><strong>c_pwm_ctrl</strong> &#8211; channel to set PWM level output to motor phases</li>
+<li><strong>p_ifm_esf_rstn_pwml_pwmh</strong> &#8211; port to configure motor FET driver</li>
+<li><strong>p_ifm_coastn</strong> &#8211; port to enable motor FET driver</li>
+<li><strong>p_ifm_ff1</strong> &#8211; </li>
+<li><strong>p_ifm_ff2</strong> &#8211; </li>
+<li><strong>hall_params</strong> &#8211; struct defines the pole-pairs and gear ratio</li>
+<li><strong>qei_params</strong> &#8211; the struct defines sensor type and resolution parameters for QEI</li>
+<li><strong>commutation_params</strong> &#8211; struct defines the commutation angle parameters</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="types">
+<h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="commutation_par">
+<tt class="descname">commutation_par</tt><a class="headerlink" href="#commutation_par" title="Permalink to this definition">¶</a></dt>
+<dd><p>Struct for commutation parameters.</p>
+<p><strong>Structure Members:</strong></p>
+<dl class="member">
+<dt id="commutation_par.angle_variance">
+int <tt class="descname">angle_variance</tt><a class="headerlink" href="#commutation_par.angle_variance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="commutation_par.nominal_speed">
+int <tt class="descname">nominal_speed</tt><a class="headerlink" href="#commutation_par.nominal_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="commutation_par.qei_forward_offset">
+int <tt class="descname">qei_forward_offset</tt><a class="headerlink" href="#commutation_par.qei_forward_offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="commutation_par.qei_backward_offset">
+int <tt class="descname">qei_backward_offset</tt><a class="headerlink" href="#commutation_par.qei_backward_offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="commutation_par.hall_offset_clk">
+int <tt class="descname">hall_offset_clk</tt><a class="headerlink" href="#commutation_par.hall_offset_clk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="commutation_par.hall_offset_cclk">
+int <tt class="descname">hall_offset_cclk</tt><a class="headerlink" href="#commutation_par.hall_offset_cclk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="commutation_par.winding_type">
+int <tt class="descname">winding_type</tt><a class="headerlink" href="#commutation_par.winding_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../module_hall/doc/index.html" class="btn btn-neutral float-right" title="SOMANET Hall Sensor Interface Component">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="programming.html" class="btn btn-neutral" title="Programming Guide"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

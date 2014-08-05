@@ -1,0 +1,267 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Programming Guide &mdash; SOMANET Motor Control Software v documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SOMANET Motor Control Software v documentation" href="../../index.html"/>
+        <link rel="up" title="SOMANET Quadrature Encoder Interface Component" href="index.html"/>
+        <link rel="next" title="qei Interface API" href="api.html"/>
+        <link rel="prev" title="Component Overview" href="overview.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../../index.html" class="fa fa-home"> SOMANET Motor Control Software</a>
+        
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../module_commutation/doc/index.html">Commutation Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../module_commutation/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_commutation/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_commutation/doc/api.html">Commutation API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_hall/doc/index.html">Hall Interface Component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/overview.html">Component Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/programming.html">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../module_hall/doc/api.html">Hall Interface API</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">QEI Interface Component</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Component Overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Programming Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">qei Interface API</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SOMANET Motor Control Software</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">SOMANET Quadrature Encoder Interface Component</a> &raquo;</li>
+      
+    <li>Programming Guide</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="programming-guide">
+<span id="qei-programming-label"></span><h1>Programming Guide<a class="headerlink" href="#programming-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="getting-position-and-velocity-information-from-your-quadrature-encoder">
+<h2>Getting position and velocity information from your Quadrature Encoder<a class="headerlink" href="#getting-position-and-velocity-information-from-your-quadrature-encoder" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="step-1-include-the-required-modules-headers">
+<h3>Step 1: Include the required modules &amp; headers<a class="headerlink" href="#step-1-include-the-required-modules-headers" title="Permalink to this headline">¶</a></h3>
+<p>Make sure you Makefile contains at least these module</p>
+<div class="highlight-none"><pre>USED_MODULES = module_blocks module_qei module_motor module_motorcontrol_common module_nodeconfig</pre>
+</div>
+<p>Make sure you include these files in your main.xc file</p>
+<div class="highlight-none"><pre>#include &lt;xs1.h&gt;
+#include &lt;platform.h&gt;
+#include &lt;ioports.h&gt;
+#include &lt;qei_client.h&gt;
+#include &lt;qei_server.h&gt;</pre>
+</div>
+</div>
+<div class="section" id="step-2-define-required-channels">
+<h3>Step 2: Define required channels<a class="headerlink" href="#step-2-define-required-channels" title="Permalink to this headline">¶</a></h3>
+<p>A channel is required to transport data from the qei_server task to your custom client&#8217;s task</p>
+<div class="highlight-none"><pre>int main(void)
+{
+        chan c_qei
+        ...
+}</pre>
+</div>
+</div>
+<div class="section" id="step-4-run-required-tasks-servers-pwm-commutation-watchdog-and-quadrature-encoder-interface">
+<h3>Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Quadrature Encoder Interface<a class="headerlink" href="#step-4-run-required-tasks-servers-pwm-commutation-watchdog-and-quadrature-encoder-interface" title="Permalink to this headline">¶</a></h3>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Please note that all these tasks must be executed on a tile with access to I/O of a Synapticon SOMANET IFM Drive DC board.</p>
+</div>
+<div class="highlight-none"><pre>int main(void)
+{
+...
+
+    par
+    {
+    ...
+
+        on tile[IFM_TILE]:
+        {
+            par
+            {
+                /* QEI Server */
+                {
+                    qei_par qei_params;
+                    run_qei(c_qei, NULL, NULL, NULL, NULL, NULL, p_ifm_encoder, qei_params);
+                }
+            }
+        }
+        ...
+
+    }
+
+    return 0;
+}</pre>
+</div>
+</div>
+</div>
+<div class="section" id="getting-velocity-position-information-from-sensor-server">
+<h2>Getting velocity/position information from sensor server<a class="headerlink" href="#getting-velocity-position-information-from-sensor-server" title="Permalink to this headline">¶</a></h2>
+<p>While the QEI server is running and constantly monitoring, the velocity and position can be aquired by a simple API call:</p>
+<div class="highlight-none"><pre>int main(void)
+{
+...
+
+    par
+    {
+        on tile[0]: // Can be any tile
+        {
+            /* Get encoder absolute position */
+            {position, direction} = get_qei_position_absolute(c_qei);
+
+            /* Get current velocity */
+            velocity = get_qei_velocity(c_qei,);
+        }
+    }
+...
+
+}</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="qei Interface API">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral" title="Component Overview"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

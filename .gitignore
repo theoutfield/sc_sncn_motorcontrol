@@ -25,5 +25,10 @@ bin/
 .dox/gen
 
 ## ignore xdoc outputs
-_build
+_build/
+!/_build/
+/_build/.doxygen
+/_build/doxygen
+/_build/.sources
+/_build/_sources
 run_xdoc.log

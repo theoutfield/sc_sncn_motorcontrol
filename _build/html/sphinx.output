@@ -1,0 +1,131 @@
+Running Sphinx v1.0.7
+Found and adding aafig extension
+!!!!!!!
+/opt/XMOS/xSoftIPTools/1.0.22/xdoc/docutils/writers/html4css1/html4css1.css
+Found and adding aafig extension
+Running XMOS Documentation setup:html
+loading pickled environment... not yet created
+building [html]: targets for 34 source files that are out of date
+updating environment: 34 added, 0 changed, 0 removed
+reading sources... [  2%] CHANGELOG
+reading sources... [  5%] README
+reading sources... [  8%] app_test_hall/README
+reading sources... [ 11%] app_test_qei/README
+reading sources... [ 14%] howto/index
+reading sources... [ 17%] howto/motor_configuration
+reading sources... [ 20%] howto/motor_tuning
+reading sources... [ 23%] index
+reading sources... [ 26%] module_adc/README
+reading sources... [ 29%] module_blocks/README
+reading sources... [ 32%] module_brushed_dc/README
+reading sources... [ 35%] module_communication/README
+reading sources... [ 38%] module_commutation/README
+reading sources... [ 41%] module_commutation/doc/api
+Rendering Doxygen function void set_commutation_sinusoidal
+Rendering Doxygen function void init_commutation_param
+Rendering Doxygen function void commutation_sinusoidal
+struct
+Rendering Doxygen struct commutation_par
+reading sources... [ 44%] module_commutation/doc/index
+reading sources... [ 47%] module_commutation/doc/overview
+reading sources... [ 50%] module_commutation/doc/programming
+reading sources... [ 52%] module_ctrl_loops/README
+reading sources... [ 55%] module_ecat_drive/README
+reading sources... [ 58%] module_gpio/README
+reading sources... [ 61%] module_hall/README
+reading sources... [ 64%] module_hall/doc/api
+Rendering Doxygen function int get_hall_position
+Rendering Doxygen function __multret__obraceintspacecommaspaceintcbracespaceg get_hall_position_absolute
+Rendering Doxygen function int get_hall_velocity
+Rendering Doxygen function void reset_hall_count
+Rendering Doxygen function void run_hall
+struct
+Rendering Doxygen struct hall_par
+reading sources... [ 67%] module_hall/doc/index
+reading sources... [ 70%] module_hall/doc/overview
+reading sources... [ 73%] module_hall/doc/programming
+reading sources... [ 76%] module_motor/README
+reading sources... [ 79%] module_motorcontrol_common/README
+reading sources... [ 82%] module_profile/README
+reading sources... [ 85%] module_qei/README
+reading sources... [ 88%] module_qei/doc/api
+Rendering Doxygen function __multret__obraceunsignedspaceintcommaspaceunsignedspaceintcbracespaceg get_qei_position
+Rendering Doxygen function __multret__obraceintcommaspaceintcbracespaceg get_qei_position_absolute
+Rendering Doxygen function int get_qei_velocity
+Rendering Doxygen function void run_qei
+struct
+Rendering Doxygen struct qei_par
+reading sources... [ 91%] module_qei/doc/index
+reading sources... [ 94%] module_qei/doc/overview
+reading sources... [ 97%] module_qei/doc/programming
+reading sources... [100%] module_sm/README
+
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/app_test_hall/README.rst:91: (ERROR/3) Unknown target name: "configure your node <>".
+
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... /home/afeher/workspace-xmos/sc_sncn_motorcontrol/CHANGELOG.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/app_test_hall/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/app_test_qei/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/howto/index.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_adc/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_blocks/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_brushed_dc/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_communication/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_commutation/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_ctrl_loops/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_ecat_drive/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_gpio/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_hall/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_motor/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_motorcontrol_common/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_profile/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_qei/README.rst:: WARNING: document isn't included in any toctree
+/home/afeher/workspace-xmos/sc_sncn_motorcontrol/module_sm/README.rst:: WARNING: document isn't included in any toctree
+done
+preparing documents... done
+writing output... [  2%] CHANGELOG
+writing output... [  5%] README
+writing output... [  8%] app_test_hall/README
+writing output... [ 11%] app_test_qei/README
+writing output... [ 14%] howto/index
+writing output... [ 17%] howto/motor_configuration
+writing output... [ 20%] howto/motor_tuning
+writing output... [ 23%] index
+writing output... [ 26%] module_adc/README
+writing output... [ 29%] module_blocks/README
+writing output... [ 32%] module_brushed_dc/README
+writing output... [ 35%] module_communication/README
+writing output... [ 38%] module_commutation/README
+writing output... [ 41%] module_commutation/doc/api
+writing output... [ 44%] module_commutation/doc/index
+writing output... [ 47%] module_commutation/doc/overview
+writing output... [ 50%] module_commutation/doc/programming
+writing output... [ 52%] module_ctrl_loops/README
+writing output... [ 55%] module_ecat_drive/README
+writing output... [ 58%] module_gpio/README
+writing output... [ 61%] module_hall/README
+writing output... [ 64%] module_hall/doc/api
+writing output... [ 67%] module_hall/doc/index
+writing output... [ 70%] module_hall/doc/overview
+writing output... [ 73%] module_hall/doc/programming
+writing output... [ 76%] module_motor/README
+writing output... [ 79%] module_motorcontrol_common/README
+writing output... [ 82%] module_profile/README
+writing output... [ 85%] module_qei/README
+writing output... [ 88%] module_qei/doc/api
+writing output... [ 91%] module_qei/doc/index
+writing output... [ 94%] module_qei/doc/overview
+writing output... [ 97%] module_qei/doc/programming
+writing output... [100%] module_sm/README
+
+writing additional files... genindex search
+copying images... [ 33%] module_hall/doc/images/core-diagram-hall-interface.png
+copying images... [ 66%] module_commutation/doc/images/core-diagram-commutation.png
+copying images... [100%] module_qei/doc/images/core-diagram-qe-interface.png
+
+copying static files... done
+dumping search index... done
+dumping object inventory... done
+build succeeded, 20 warnings.
