@@ -36,4 +36,10 @@ Required software (dependencies)
 ================================
 
   * None
+  
+Documentation
+=============
+`Extensive documentation`_
+
+.. _Extensive documentation: https://synapticon.github.io/sc_sncn_motorcontrol/_build/html/index.html
 
