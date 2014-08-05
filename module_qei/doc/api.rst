@@ -1,5 +1,5 @@
-qei Interface API
-==================
+Quadrature Encoder Interface API
+================================
 
 Client API
 ----------
