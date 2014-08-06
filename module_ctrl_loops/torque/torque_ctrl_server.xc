@@ -222,6 +222,8 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
     tc :> time1;
     time1 += MSEC_STD - 100;
 
+    enable_adc(c_current);
+
     while(1) {
 #pragma ordered
         select {
@@ -402,6 +404,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                         filter_length_variance = 10;
                     target_torque = actual_torque;
                 }
+                compute_flag = 1;
                 break;
 
             case TCTRL_CMD_ENABLE:
@@ -442,6 +445,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                                 }
                             }
                         }
+
                         break;
                     }
                 }
@@ -487,3 +491,16 @@ void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_p
     }
 }
 
+void enable_adc(chanend c_current)
+{
+    int command, enabled = 0;
+    c_current <: 1;
+    while (!enabled)
+    {
+        select {
+           case c_current :> command: //enable adc
+                enabled = 1;
+                break;
+          }
+    }
+}
