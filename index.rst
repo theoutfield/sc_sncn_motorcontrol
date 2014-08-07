@@ -1,9 +1,6 @@
 SOMANET Motor Control Software
 ==============================
 
-Welcome to the SOMANET Motor Control Software documentation
-***********************************************************
-
 .. toctree::
 	:maxdepth: 1
 
