@@ -477,6 +477,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                             }
                             set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
                             set_position_sensor(sensor_select, c_position_ctrl);
+                            set_velocity_sensor(sensor_select, c_velocity_ctrl);
+                            set_torque_sensor(sensor_select, c_torque_ctrl);
 
                             ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
                             if(ctrl_state == 1)
@@ -520,6 +522,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                             set_torque_ctrl_param(torque_ctrl_params, c_torque_ctrl);
                             set_torque_sensor(sensor_select, c_torque_ctrl);
+                            set_velocity_sensor(sensor_select, c_velocity_ctrl);
+                            set_position_sensor(sensor_select, c_position_ctrl);
 
                             ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
                             if(ctrl_state == 1)
@@ -565,6 +569,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                             set_velocity_ctrl_param(velocity_ctrl_params, c_velocity_ctrl);
                             set_velocity_sensor(sensor_select, c_velocity_ctrl);
+                            set_torque_sensor(sensor_select, c_torque_ctrl);
+                            set_position_sensor(sensor_select, c_position_ctrl);
 
                             ctrl_state = check_position_ctrl_state(c_position_ctrl);
                             if(ctrl_state == 1)
@@ -603,6 +609,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                             }
                             set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
                             set_position_sensor(sensor_select, c_position_ctrl);
+                            set_velocity_sensor(sensor_select, c_velocity_ctrl);
+                            set_torque_sensor(sensor_select, c_torque_ctrl);
 
                             ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
                             if(ctrl_state == 1)
@@ -642,6 +650,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                             set_velocity_ctrl_param(velocity_ctrl_params, c_velocity_ctrl);
                             set_velocity_sensor(sensor_select, c_velocity_ctrl);
                             set_torque_sensor(sensor_select, c_torque_ctrl);
+                            set_position_sensor(sensor_select, c_position_ctrl);
                             ctrl_state = check_position_ctrl_state(c_position_ctrl);
                             if(ctrl_state == 1)
                                 shutdown_position_ctrl(c_position_ctrl);
@@ -680,6 +689,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                             set_torque_ctrl_param(torque_ctrl_params, c_torque_ctrl);
                             set_torque_sensor(sensor_select, c_torque_ctrl);
+                            set_velocity_sensor(sensor_select, c_velocity_ctrl);
+                            set_position_sensor(sensor_select, c_position_ctrl);
 
                             ctrl_state = check_velocity_ctrl_state(c_velocity_ctrl);
                             if(ctrl_state == 1)
