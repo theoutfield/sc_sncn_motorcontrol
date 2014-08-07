@@ -222,8 +222,6 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
     tc :> time1;
     time1 += MSEC_STD - 100;
 
-    enable_adc(c_current);
-
     while(1) {
 #pragma ordered
         select {
@@ -390,7 +388,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 }
                 break;
 
-            case SENSOR_SELECT:
+            case SENSOR_SELECT://sensor select from EtherCAT master
                 TORQUE_CTRL_READ(sensor_used);
                 if (sensor_used == HALL) {
                     filter_length_variance =  filter_length/hall_params.pole_pairs;
@@ -404,7 +402,11 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                         filter_length_variance = 10;
                     target_torque = actual_torque;
                 }
-                compute_flag = 1;
+                if (!compute_flag)
+                {
+                    enable_adc(c_current);
+                    compute_flag = 1;
+                }
                 break;
 
             case TCTRL_CMD_ENABLE:
