@@ -84,7 +84,6 @@ TILES used
     **Do not forget to set properly your node and motor configuration
     when using this application**.
 
--  `Configure your node <>`_
 -  `How to configure your
    motors <https://github.com/synapticon/sc_sncn_motorctrl_sin/blob/master/howto/HOW_TO_CONFIGURE_MOTORS.md>`_
 
