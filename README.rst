@@ -41,5 +41,5 @@ Documentation
 =============
 `Extensive documentation`_
 
-.. _Extensive documentation: https://synapticon.github.io/sc_sncn_motorcontrol/_build/html/index.html
+.. _Extensive documentation: http://85.214.233.250:90/codedocs/somanet/sc_sncn_motorcontrol/index.html
 
