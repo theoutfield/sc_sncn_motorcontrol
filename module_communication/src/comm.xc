@@ -212,7 +212,7 @@ void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par
     c_signal <: commutation_params.hall_offset_cclk;
     c_signal <: commutation_params.winding_type;
 }
-
+/* FIXME remove completely when verified. Initialization is accepted by the coomutation thread.
 void commutation_init_ecat(chanend c_signal, hall_par & hall_params, qei_par & qei_params, commutation_par & commutation_params)
 {
     int command;
@@ -249,7 +249,7 @@ void commutation_init_ecat(chanend c_signal, hall_par & hall_params, qei_par & q
         }
     }
 }
-
+*/
 
 void set_hall_param_ecat(chanend c_hall, hall_par & hall_params)
 {

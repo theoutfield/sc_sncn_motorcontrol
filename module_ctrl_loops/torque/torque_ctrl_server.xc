@@ -388,7 +388,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 }
                 break;
 
-            case SENSOR_SELECT:
+            case SENSOR_SELECT://sensor select from EtherCAT master
                 TORQUE_CTRL_READ(sensor_used);
                 if (sensor_used == HALL) {
                     filter_length_variance =  filter_length/hall_params.pole_pairs;
@@ -401,6 +401,11 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                     if (filter_length_variance < 10)
                         filter_length_variance = 10;
                     target_torque = actual_torque;
+                }
+                if (!compute_flag)
+                {
+                    enable_adc(c_current);
+                    compute_flag = 1;
                 }
                 break;
 
@@ -442,6 +447,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                                 }
                             }
                         }
+
                         break;
                     }
                 }
@@ -487,3 +493,16 @@ void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_p
     }
 }
 
+void enable_adc(chanend c_current)
+{
+    int command, enabled = 0;
+    c_current <: 1;
+    while (!enabled)
+    {
+        select {
+           case c_current :> command: //enable adc
+                enabled = 1;
+                break;
+          }
+    }
+}
