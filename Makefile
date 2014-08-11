@@ -18,4 +18,4 @@ DOXYGEN_DIRS+=$(REPO)/module_qei
 DOXYGEN_DIRS+=$(REPO)/module_commutation
 SOURCE_INCLUDE_DIRS=$(REPO)
 XDOC_DIR ?= ../xdoc
-include $(XDOC_DIR)/Makefile.inc
+-include $(XDOC_DIR)/Makefile.inc
