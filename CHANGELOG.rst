@@ -1,10 +1,14 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+1.0.2
+
+  * Rename module_sm to module_statemachine
+
 1.0.1
 -----
   * Remove initialization functions from commutation_server, hall_server and qei_server API (now executed internally)
-  *	Resolve unnecessary dependencies
+  * Resolve unnecessary dependencies
   * Reduced code size and readability
   * Improve documentation
 
