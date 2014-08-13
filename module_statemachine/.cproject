@@ -45,9 +45,9 @@
 								<option id="com.xmos.xc.compiler.option.include.paths.80467835" name="com.xmos.xc.compiler.option.include.paths" superClass="com.xmos.xc.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/gcc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/xc&quot;"/>
 								</option>
 								<option id="com.xmos.xc.compiler.option.defined.symbols.1504904193" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
@@ -271,9 +271,9 @@
 								<option id="com.xmos.c.compiler.option.include.paths.16692604" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/gcc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.37725164" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -391,9 +391,9 @@
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/gcc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/c++/4.2.1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/c++/4.2.1/xcore-xmos-elf&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_sm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_statemachine}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.95643454" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -493,6 +493,6 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="module_sm.null.25009635" name="module_sm"/>
+		<project id="module_statemachine.null.25009635" name="module_statemachine"/>
 	</storageModule>
 </cproject>

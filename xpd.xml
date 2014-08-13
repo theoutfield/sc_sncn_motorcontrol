@@ -62,7 +62,7 @@
             <board>SOMANET IFM-Drive-DC300</board>
             <keyword>SOMANET</keyword>
         </component>
-        <component description = "SOMANET Motor Control State Machine for CiA 402 control modes" type = "demoCode" scope = "General Use" path = "module_sm" local = "false" id = "module_sm" name = "SOMANET State Machine Library">
+        <component description = "SOMANET Motor Control State Machine for CiA 402 control modes" type = "demoCode" scope = "General Use" path = "module_statemachine" local = "false" id = "module_statemachine" name = "SOMANET State Machine Library">
             <board>SOMANET IFM-Drive-DC100</board>
             <board>SOMANET IFM-Drive-DC300</board>
             <keyword>SOMANET</keyword>
