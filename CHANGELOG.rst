@@ -4,6 +4,8 @@ sc_sncn_motorcontrol Change Log
 1.0.2
 
   * Rename module_sm to module_statemachine
+  * Fixed torque calculation initialisation 
+  * Update diagrams for modules commutation, hall, and qei 
 
 1.0.1
 -----
