@@ -36,10 +36,4 @@ Required software (dependencies)
 ================================
 
   * None
-  
-Documentation
-=============
-`Extensive documentation`_
-
-.. _Extensive documentation: http://85.214.233.250:90/codedocs/develop/sc_sncn_motorcontrol/index.html
 
