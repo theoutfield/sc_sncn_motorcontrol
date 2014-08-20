@@ -6,10 +6,7 @@
  * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
-#include <xs1.h>
-#include <platform.h>
 #include <print.h>
-#include <ioports.h>
 #include <hall_client.h>
 #include <hall_server.h>
 #include <xscope_wrapper.h>

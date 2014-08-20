@@ -5,15 +5,11 @@
  * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
-#include <xs1.h>
-#include <platform.h>
 #include <print.h>
-#include <ioports.h>
 #include <qei_client.h>
 #include <qei_server.h>
 #include <refclk.h>
 #include <xscope_wrapper.h>
-#include <bldc_motor_config.h>
 
 void xscope_initialise_1()
 {
