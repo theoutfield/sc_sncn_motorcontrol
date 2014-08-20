@@ -15,9 +15,6 @@
 #include <xscope_wrapper.h>
 
 //#define ENABLE_xscope
-#define COM_CORE 0
-#define IFM_CORE 3
-
 
 /* Test Hall Sensor Client */
 void hall_test(chanend c_hall)
@@ -53,7 +50,7 @@ int main(void)
 
     par
     {
-        on tile[0]:
+        on tile[COM_TILE]:
         {
             /* Test Hall Sensor Client */
             par
@@ -65,7 +62,7 @@ int main(void)
         /************************************************************
          * IFM_TILE
          ************************************************************/
-        on tile[IFM_CORE]:
+        on tile[IFM_TILE]:
         {
             /* Hall Server */
             {

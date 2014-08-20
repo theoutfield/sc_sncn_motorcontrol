@@ -15,7 +15,6 @@
 #include <xscope_wrapper.h>
 #include <bldc_motor_config.h>
 
-
 void xscope_initialise_1()
 {
 	{
@@ -69,16 +68,16 @@ int main(void)
 
 	par
 	{
-		on tile[0]:
+		on tile[COM_TILE]:
 		{
 			/* Test QEI Sensor Client */
 			qei_test(c_qei_p1);
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on tile[3]:
+		on tile[IFM_TILE]:
 		{
 			/* QEI Server Loop */
 			{
