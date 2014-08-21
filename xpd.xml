@@ -1,28 +1,12 @@
 <?xml version="1.0" ?>
 <xpd>
     <components>
-        <component description = "Hall sensor interface" type = "demoCode" scope = "General Use" path = "module_hall" local = "false" id = "module_hall" name = "SOMANET Motor Control Hall Sensor Component">
+        <component description = "SOMANET Motor Control Quadrature Encoder Interface" type = "demoCode" scope = "General Use" path = "module_qei" local = "false" id = "module_qei" name = "SOMANET Quadrature Encoder Interface Module">
             <board>SOMANET IFM-Drive-DC100</board>
             <board>SOMANET IFM-Drive-DC300</board>
             <keyword>SOMANET</keyword>
         </component>
-        <component description = "SOMANET Motor Control utility functions" type = "demoCode" scope = "General Use" path = "module_blocks" local = "false" id = "module_blocks" name = "SOMANET Motor Control Blocks Module">
-            <board>SOMANET IFM-Drive-DC100</board>
-            <board>SOMANET IFM-Drive-DC300</board>
-            <keyword>SOMANET</keyword>
-        </component>
-        <component description = "SOMANET Motor Control Commutation component" type = "demoCode" scope = "General Use" path = "module_commutation" local = "false" id = "module_commutation" name = "SOMANET BLDC Commutation Component">
-            <board>SOMANET IFM-Drive-DC100</board>
-            <board>SOMANET IFM-Drive-DC300</board>
-            <keyword>SOMANET</keyword>
-            <keyword>BLDC</keyword>
-            <keyword>motor</keyword>
-            <keyword>driver</keyword>
-            <keyword>sinusoidal</keyword>
-            <keyword>commutation</keyword>
-        </component>
-        <component description = "EtherCAT communication bridge for Motor Control" type = "demoCode" scope = "General Use" path = "module_ecat_drive" local = "false" id = "module_ecat_drive" name = "SOMANET EtherCAT Drive Component">
-            <board>SOMANET COM-EtherCAT</board>
+        <component description = "SOMANET motor configurations" type = "demoCode" scope = "General Use" path = "module_motor" local = "false" id = "module_motor" name = "SOMANET Motor Configuration Files">
             <board>SOMANET IFM-Drive-DC100</board>
             <board>SOMANET IFM-Drive-DC300</board>
             <keyword>SOMANET</keyword>
@@ -37,26 +21,6 @@
             <board>SOMANET IFM-Drive-DC300</board>
             <keyword>SOMANET</keyword>
         </component>
-        <component description = "Common configurations and utilities" type = "demoCode" scope = "General Use" path = "module_motorcontrol_common" local = "false" id = "module_motorcontrol_common" name = "SOMANET Motor Control Common Library">
-            <board>SOMANET IFM-Drive-DC100</board>
-            <board>SOMANET IFM-Drive-DC300</board>
-            <keyword>SOMANET</keyword>
-        </component>
-        <component description = "SOMANET motor configurations" type = "demoCode" scope = "General Use" path = "module_motor" local = "false" id = "module_motor" name = "SOMANET Motor Configuration Files">
-            <board>SOMANET IFM-Drive-DC100</board>
-            <board>SOMANET IFM-Drive-DC300</board>
-            <keyword>SOMANET</keyword>
-        </component>
-        <component description = "ADC interface for SOMANET IFM-Drive-DC100/300" type = "demoCode" scope = "General Use" path = "module_adc" local = "false" id = "module_adc" name = "SOMANET Motor Control ADC Interface Component">
-            <board>SOMANET IFM-Drive-DC100</board>
-            <board>SOMANET IFM-Drive-DC300</board>
-            <keyword>SOMANET</keyword>
-        </component>
-        <component description = "SOMANET Motor Control Quadrature Encoder Interface" type = "demoCode" scope = "General Use" path = "module_qei" local = "false" id = "module_qei" name = "SOMANET Quadrature Encoder Interface Module">
-            <board>SOMANET IFM-Drive-DC100</board>
-            <board>SOMANET IFM-Drive-DC300</board>
-            <keyword>SOMANET</keyword>
-        </component>
         <component description = "Control loops for position, velocity, and torque control" type = "demoCode" scope = "General Use" path = "module_ctrl_loops" local = "false" id = "module_ctrl_loops" name = "SOMANET Motor Control Loops Component">
             <board>SOMANET IFM-Drive-DC100</board>
             <board>SOMANET IFM-Drive-DC300</board>
@@ -67,12 +31,48 @@
             <board>SOMANET IFM-Drive-DC300</board>
             <keyword>SOMANET</keyword>
         </component>
+        <component description = "SOMANET Motor Control Commutation component" type = "demoCode" scope = "General Use" path = "module_commutation" local = "false" id = "module_commutation" name = "SOMANET BLDC Commutation Component">
+            <board>SOMANET IFM-Drive-DC100</board>
+            <board>SOMANET IFM-Drive-DC300</board>
+            <keyword>SOMANET</keyword>
+            <keyword>BLDC</keyword>
+            <keyword>motor</keyword>
+            <keyword>driver</keyword>
+            <keyword>sinusoidal</keyword>
+            <keyword>commutation</keyword>
+        </component>
+        <component description = "Hall sensor interface" type = "demoCode" scope = "General Use" path = "module_hall" local = "false" id = "module_hall" name = "SOMANET Motor Control Hall Sensor Component">
+            <board>SOMANET IFM-Drive-DC100</board>
+            <board>SOMANET IFM-Drive-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "Common configurations and utilities" type = "demoCode" scope = "General Use" path = "module_motorcontrol_common" local = "false" id = "module_motorcontrol_common" name = "SOMANET Motor Control Common Library">
+            <board>SOMANET IFM-Drive-DC100</board>
+            <board>SOMANET IFM-Drive-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "ADC interface for SOMANET IFM-Drive-DC100/300" type = "demoCode" scope = "General Use" path = "module_adc" local = "false" id = "module_adc" name = "SOMANET Motor Control ADC Interface Component">
+            <board>SOMANET IFM-Drive-DC100</board>
+            <board>SOMANET IFM-Drive-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
         <component description = "SOMANET GPIO utility functions" type = "demoCode" scope = "General Use" path = "module_gpio" local = "false" id = "module_gpio" name = "SOMANET Motor Control General Purpose I/O Component">
             <board>SOMANET IFM-Drive-DC100</board>
             <board>SOMANET IFM-Drive-DC300</board>
             <keyword>SOMANET</keyword>
             <keyword>GPIO</keyword>
             <keyword>Motor Control</keyword>
+        </component>
+        <component description = "EtherCAT communication bridge for Motor Control" type = "demoCode" scope = "General Use" path = "module_ecat_drive" local = "false" id = "module_ecat_drive" name = "SOMANET EtherCAT Drive Component">
+            <board>SOMANET COM-EtherCAT</board>
+            <board>SOMANET IFM-Drive-DC100</board>
+            <board>SOMANET IFM-Drive-DC300</board>
+            <keyword>SOMANET</keyword>
+        </component>
+        <component description = "SOMANET Motor Control utility functions" type = "demoCode" scope = "General Use" path = "module_blocks" local = "false" id = "module_blocks" name = "SOMANET Motor Control Blocks Module">
+            <board>SOMANET IFM-Drive-DC100</board>
+            <board>SOMANET IFM-Drive-DC300</board>
+            <keyword>SOMANET</keyword>
         </component>
     </components>
     <description>BLDC/Brushed DC Motor Control Software for SOMANET devices</description>
@@ -93,7 +93,8 @@
     <release parenthash = "82c26ceba659f5e52d6a58da75f470da5d2d5a18" version = "1.0.1rc0" githash = "f2f85b918399844af1f856507d0a921a24bd8540"></release>
     <release parenthash = "6fcfbcd382a321daed453c4e748ea85da91e3844" version = "1.0.1rc1" githash = "20f02ffe4a026217fe683b3c6c1d2a88c269c36b"></release>
     <release parenthash = "d3d7455c1b26c5f3279a09fed59a4813ce7dd7f2" version = "1.0.1rc2" githash = "a6e52bf711aee5b1b20400dcd851028fae0b856d 4eb2983caebfc2074b3be61117bd7c319c2980b2"></release>
-    <release parenthash = "7f113900ec3a02c7f17f4cf089ee705cb1659ead" version = "1.0.1rc3"></release>
+    <release parenthash = "7f113900ec3a02c7f17f4cf089ee705cb1659ead" version = "1.0.1rc3" githash = "88f41d1317ab6a16bdf5166f765d62c72ddc54c8"></release>
+    <release parenthash = "c65f2d985346998b1fe3b48e82c79ea33ad9a1b7" version = "1.0.2beta0"></release>
     <subpartnumber>XM-005824-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <version_defines></version_defines>
