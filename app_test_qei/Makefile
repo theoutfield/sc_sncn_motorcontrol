@@ -1,7 +1,10 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = SOMANET-C22-Motor_control-XScope_v13
+#TARGET = SOMANET-C22
+#TARGET = SOMANET-C22-Motor_control-XScope_v13
+#TARGET = SOMANET-C21-DX
+#TARGET = SOMANET-C21-DX-Motor_control-XScope_v13
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -9,7 +12,7 @@ TARGET = SOMANET-C22-Motor_control-XScope_v13
 APP_NAME = 
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_motor module_blocks module_motorcontrol_common module_qei module_nodeconfig module_xscope-wrapper
+USED_MODULES = module_blocks module_motor module_motorcontrol_common module_nodeconfig module_qei module_xscope-wrapper
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

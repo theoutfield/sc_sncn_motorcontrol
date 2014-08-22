@@ -1,3 +1,7 @@
+/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IMF_BOARD_REQUIRED" WIT A APPROPRIATE BOARD SUPPORT FILE */
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
+
 /**
  * @file test_qei.xc
  * @brief Test illustrates usage of qei sensor to get position and velocity information
