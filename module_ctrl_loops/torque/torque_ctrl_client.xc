@@ -10,10 +10,36 @@
 #include <print.h>
 #include <statemachine.h>
 #include <drive_modes.h>
+
+/* TODO: remove dependency (at the moment required for PID params) */
+#include <bldc_motor_config.h>
+
 //#define debug_print
 
 #define TORQUE_CTRL_WRITE(x)    c_torque_ctrl <: (x)
 #define TORQUE_CTRL_READ(x)     c_torque_ctrl :> (x)
+
+void init_torque_control_param(ctrl_par &torque_ctrl_params)
+{
+    torque_ctrl_params.Kp_n = TORQUE_Kp_NUMERATOR;
+    torque_ctrl_params.Kp_d = TORQUE_Kp_DENOMINATOR;
+    torque_ctrl_params.Ki_n = TORQUE_Ki_NUMERATOR;
+    torque_ctrl_params.Ki_d = TORQUE_Ki_DENOMINATOR;
+    torque_ctrl_params.Kd_n = TORQUE_Kd_NUMERATOR;
+    torque_ctrl_params.Kd_d = TORQUE_Kd_DENOMINATOR;
+    torque_ctrl_params.Loop_time = 1 * MSEC_STD; // units - for CORE 2/1/0 only default
+
+    torque_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
+
+    if(torque_ctrl_params.Ki_n != 0) {
+        // auto calculated using control_limit
+        torque_ctrl_params.Integral_limit = (torque_ctrl_params.Control_limit * torque_ctrl_params.Ki_d) / torque_ctrl_params.Ki_n;
+    } else {
+        torque_ctrl_params.Integral_limit = 0;
+    }
+
+    return;
+}
 
 int init_torque_control(chanend c_torque_ctrl)
 {

@@ -6,9 +6,17 @@
 
 #pragma once
 
-#include <internal_config.h>
 #include <hall_client.h>
 #include <qei_client.h>
+#include <internal_config.h>
+#include "control_loops_common.h"
+
+/**
+ * @brief initialize torque control PID params
+ *
+ * @param torque_ctrl_params struct defines torque control PID params
+ */
+void init_torque_control_param(ctrl_par &torque_ctrl_params);
 
 /**
  * @brief Initialise Torque Control Loop

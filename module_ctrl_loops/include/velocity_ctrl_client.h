@@ -9,6 +9,14 @@
 #include <hall_client.h>
 #include <qei_client.h>
 #include <internal_config.h>
+#include "control_loops_common.h"
+
+/**
+ * @brief Initialise velocity control PID params
+ *
+ * @param velocity_ctrl_params struct defines velocity control PID params
+ */
+void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 
 /**
  * @brief Initialise Velocity Control Loop

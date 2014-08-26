@@ -9,6 +9,8 @@
 #include <hall_client.h>
 #include <qei_client.h>
 #include <internal_config.h>
+#include "control_loops_common.h"
+#include "velocity_ctrl_client.h"
 
 /**
  * @brief Velocity Control Loop

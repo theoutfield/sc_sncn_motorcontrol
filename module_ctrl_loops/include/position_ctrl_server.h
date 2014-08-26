@@ -6,11 +6,12 @@
 
 #pragma once
 
-#include <internal_config.h>
-#include <refclk.h>
+#include <control_loops_common.h>
 #include <qei_client.h>
 #include <hall_client.h>
 #include <commutation_client.h>
+#include "control_loops_common.h"
+#include "position_ctrl_client.h"
 
 /**
  * @brief Position Control Loop

@@ -4,13 +4,15 @@
  * @author Pavan Kanajar <pkanajar@synapticon.com>
 */
 
-#include <position_ctrl_server.h>
-#include <position_ctrl_common.h>
 #include <xscope_wrapper.h>
 #include <print.h>
+
+#include <position_ctrl_server.h>
+#include <position_ctrl_common.h>
 #include <statemachine.h>
 #include <drive_modes.h>
 #include <a4935.h>
+#include <internal_config.h>
 
 #ifdef BDC
 #include <brushed_dc_client.h>
@@ -21,7 +23,6 @@
 
 #define POSITION_CTRL_WRITE(x)  c_position_ctrl <: (x)
 #define POSITION_CTRL_READ(x)   c_position_ctrl :> (x)
-
 
 //extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 

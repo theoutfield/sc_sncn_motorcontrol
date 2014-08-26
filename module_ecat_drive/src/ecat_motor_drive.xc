@@ -19,11 +19,11 @@
 #include <print.h>
 #include <gpio_client.h>
 #include <flash_somanet.h>
+#include <refclk.h>
 
 #include <commutation_client.h>
 #include <bldc_motor_init.h>
 
-extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 void xscope_initialise()
 {

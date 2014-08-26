@@ -7,10 +7,17 @@
 
 #pragma once
 
-#include <internal_config.h>
-#include <refclk.h>
 #include <qei_client.h>
 #include <hall_client.h>
+#include <internal_config.h>
+#include "control_loops_common.h"
+
+/**
+ * @brief initialize position control PID params
+ *
+ * @param position_ctrl_params struct defines position control PID params
+ */
+void init_position_control_param(ctrl_par & position_ctrl_params);
 
 /**
  * @brief Initialise Position Control Loop

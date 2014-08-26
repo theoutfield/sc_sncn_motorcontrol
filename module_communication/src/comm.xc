@@ -9,7 +9,7 @@
 #include <commutation_client.h>
 #include <hall_config.h>
 #include <qei_config.h>
-#include <bldc_motor_config.h>
+#include <control_loops_common.h>
 #include <internal_config.h>
 #include <stdlib.h>
 

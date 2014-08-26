@@ -27,7 +27,6 @@
 #define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
 #define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> (x)
 
-
 void velocity_control( ctrl_par & velocity_ctrl_params,
                        filter_par & sensor_filter_params,
                        hall_par &hall_params,
