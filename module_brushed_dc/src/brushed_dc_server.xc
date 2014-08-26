@@ -81,7 +81,12 @@ static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn
                     pwm[0] = pwm_half + pwm_half;
                     pwm[1] = pwm_half - (voltage - pwm_half);
                     pwm[2] = pwm_half;
-                }
+                } else if(voltage >= BDC_PWM_CONTROL_LIMIT)
++                {
++                    pwm[0] = pwm_half + pwm_half;
++                    pwm[1] = PWM_MIN_LIMIT;
++                    pwm[2] = pwm_half;
++                }
             } else {
                 if (-voltage <= pwm_half) {
                     pwm[0] = pwm_half;
@@ -91,7 +96,12 @@ static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn
                     pwm[0] = pwm_half - (-voltage - pwm_half);
                     pwm[1] = pwm_half + pwm_half;
                     pwm[2] = pwm_half;
-                }
+                } else if(-voltage >= BDC_PWM_CONTROL_LIMIT)
++                {
++                    pwm[0] = PWM_MIN_LIMIT;
++                    pwm[1] = pwm_half + pwm_half;
++                    pwm[2] = pwm_half;
++                }
             }
 
             if(pwm[0] < PWM_MIN_LIMIT)
