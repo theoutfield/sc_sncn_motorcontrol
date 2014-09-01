@@ -10,7 +10,7 @@
 // For 250 MHz Reference Clock: dead time = PWM_DEAD_TIME * 4ns
 #define PWM_DEAD_TIME 300
 #define PWM_MAX_VALUE 13889 /* 18 kHz */
-#define PWM_MIN_LIMIT 250
+#define PWM_MIN_LIMIT 250   /* FIXME: is this still used? */
 #define PWM_MAX_LIMIT (PWM_MAX_VALUE - PWM_DEAD_TIME)
 
 // Define if ADC sampling is locked to PWM switching. The ADC sampling will occur

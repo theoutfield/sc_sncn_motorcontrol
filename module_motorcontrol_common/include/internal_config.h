@@ -7,9 +7,12 @@
 #pragma once
 
 #include <mc_constants.h>
+#include <pwm_config.h>
 
-#define BLDC_PWM_CONTROL_LIMIT              6794
-#define BDC_PWM_CONTROL_LIMIT               13589
+/* TODO: output of control loops shouldn't (directly) depend on
+ * PWM_MAX_VALUE, etc. */
+#define BLDC_PWM_CONTROL_LIMIT              (((PWM_MAX_VALUE) - (PWM_DEAD_TIME)) / 2)
+#define BDC_PWM_CONTROL_LIMIT               ((PWM_MAX_VALUE) - (PWM_DEAD_TIME))
 
 #define HALL_POSITION_INTERPOLATED_RANGE    4096
 

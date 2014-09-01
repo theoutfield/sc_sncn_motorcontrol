@@ -7,7 +7,6 @@
 
 #include <brushed_dc_server.h>
 #include <xs1.h>
-#include <pwm_config.h>
 #include <pwm_cli_inv.h>
 #include <a4935.h>
 #include <sine_table_big.h>
@@ -19,21 +18,23 @@
 #include <internal_config.h>
 #include <watchdog.h>
 
-void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
+static int init_state;
+
+static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 {
     unsigned int pwm[3] = {0, 0, 0};  // PWM OFF
     pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-void bdc_client_handler(chanend c_voltage, int command, int & voltage, int init_state, int & shutdown)
+static void bdc_client_handler(chanend c_voltage, int command, int & voltage, int & shutdown)
 {
     switch (command) {
     case BDC_CMD_SET_VOLTAGE:
-        c_voltage :> voltage; //TODO if any winding type differences?
+        c_voltage :> voltage;
         break;
 
-    case BDC_CMD_CHECK_BUSY:                // init signal
+    case BDC_CMD_CHECK_BUSY:    // init signal
         c_voltage <: init_state;
         break;
 
@@ -55,8 +56,8 @@ void bdc_client_handler(chanend c_voltage, int command, int & voltage, int init_
     }
 }
 
-static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
-                               t_pwm_control &pwm_ctrl, int init_state,
+static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
+                               t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl, chanend c_signal,
                                chanend c_voltage_p1, chanend c_voltage_p2, chanend c_voltage_p3)
 {
@@ -64,7 +65,6 @@ static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn
     unsigned int pwm[3] = { 0, 0, 0 };
     int voltage = 0;
     int shutdown = 0; // Disable FETS
-    int pwm_half = (PWM_MAX_VALUE - PWM_DEAD_TIME) >> 1;
 
     while (1) {
         if (shutdown == 1) {
@@ -73,62 +73,32 @@ static void bldc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn
             pwm[2] = -1;
         } else {
             if (voltage >= 0) {
-                if (voltage <= pwm_half) {
-                    pwm[0] = pwm_half + voltage;
-                    pwm[1] = pwm_half;
-                    pwm[2] = pwm_half;
-                } else if (voltage > pwm_half && voltage < BDC_PWM_CONTROL_LIMIT) {
-                    pwm[0] = pwm_half + pwm_half;
-                    pwm[1] = pwm_half - (voltage - pwm_half);
-                    pwm[2] = pwm_half;
-                } else if(voltage >= BDC_PWM_CONTROL_LIMIT)
-+                {
-+                    pwm[0] = pwm_half + pwm_half;
-+                    pwm[1] = PWM_MIN_LIMIT;
-+                    pwm[2] = pwm_half;
-+                }
+                pwm[0] = voltage;
+                pwm[1] = 0;
             } else {
-                if (-voltage <= pwm_half) {
-                    pwm[0] = pwm_half;
-                    pwm[1] = pwm_half - voltage;
-                    pwm[2] = pwm_half;
-                } else if ( (-voltage > pwm_half) && (-voltage < BDC_PWM_CONTROL_LIMIT) ) {
-                    pwm[0] = pwm_half - (-voltage - pwm_half);
-                    pwm[1] = pwm_half + pwm_half;
-                    pwm[2] = pwm_half;
-                } else if(-voltage >= BDC_PWM_CONTROL_LIMIT)
-+                {
-+                    pwm[0] = PWM_MIN_LIMIT;
-+                    pwm[1] = pwm_half + pwm_half;
-+                    pwm[2] = pwm_half;
-+                }
+                pwm[0] = 0;
+                pwm[1] = -voltage;
             }
 
-            if(pwm[0] < PWM_MIN_LIMIT)
-                pwm[0] = 0;
-            if(pwm[1] < PWM_MIN_LIMIT)
-                pwm[1] = 0;
-            if(pwm[2] < PWM_MIN_LIMIT)
-                pwm[2] = 0;
+            pwm[2] = 0;
         }
 
+        /* Limiting PWM values (and suppression of short pulses) is done in
+         * update_pwm_inv() */
         update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
 #pragma ordered
         select {
         case c_voltage_p1 :> command:
-            bdc_client_handler( c_voltage_p1, command, voltage,
-                                init_state, shutdown );
+            bdc_client_handler( c_voltage_p1, command, voltage, shutdown );
             break;
 
         case c_voltage_p2 :> command:
-            bdc_client_handler( c_voltage_p2, command, voltage,
-                                init_state, shutdown );
+            bdc_client_handler( c_voltage_p2, command, voltage, shutdown );
             break;
 
         case c_voltage_p3 :> command:
-            bdc_client_handler( c_voltage_p3, command, voltage,
-                                init_state, shutdown );
+            bdc_client_handler( c_voltage_p3, command, voltage, shutdown );
             break;
 
         case c_signal :> command:
@@ -150,8 +120,8 @@ void bdc_loop(chanend c_watchdog, chanend c_signal,
     timer t;
     unsigned int ts;
     t_pwm_control pwm_ctrl;
-    int check_fet;
-    int init_state = INIT_BUSY;
+    
+    init_state = INIT_BUSY;
 
     pwm_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
@@ -163,13 +133,12 @@ void bdc_loop(chanend c_watchdog, chanend c_signal,
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;
 
-    a4935_init(A4935_BIT_PWML | A4935_BIT_PWMH, p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn);
+    a4935_initialize(p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, A4935_BIT_PWML | A4935_BIT_PWMH);
     t when timerafter (ts + t_delay) :> ts;
 
-    p_ifm_coastn :> check_fet;
-    init_state = check_fet;
+    p_ifm_coastn :> init_state;
 
-    bldc_internal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, pwm_ctrl, init_state,
-                       c_pwm_ctrl, c_signal, c_voltage_p1, c_voltage_p2, c_voltage_p3);
+    bdc_internal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, pwm_ctrl, c_pwm_ctrl,
+                      c_signal, c_voltage_p1, c_voltage_p2, c_voltage_p3);
 }
 
