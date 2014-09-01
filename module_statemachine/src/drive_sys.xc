@@ -1,8 +1,8 @@
 /**
  * @file drive_sys.xc
  * @brief Motor Drive State Machine Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
-*/
+ * @author Synapticon GmbH <support@synapticon.com>
+ */
 
 #include <statemachine.h>
 #include <drive_modes.h>
@@ -107,7 +107,7 @@ check_list init_checklist(void)
 }
 
 void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
-                      chanend c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
+                      chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
 {
     bool check;
     bool skip = true;
