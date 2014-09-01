@@ -212,44 +212,6 @@ void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par
     c_signal <: commutation_params.hall_offset_cclk;
     c_signal <: commutation_params.winding_type;
 }
-/* FIXME remove completely when verified. Initialization is accepted by the coomutation thread.
-void commutation_init_ecat(chanend c_signal, hall_par & hall_params, qei_par & qei_params, commutation_par & commutation_params)
-{
-    int command;
-    int nominal_speed;
-    int flag = 0;
-
-    while (flag == 0) {
-        select {
-        case c_signal :> command:
-
-            if (command == CHECK_BUSY) {
-                c_signal <: INIT_BUSY;
-            } else if (command == SET_COMM_PARAM_ECAT) {
-                c_signal :> hall_params.pole_pairs;
-                c_signal :> qei_params.index;
-                c_signal :> qei_params.max_ticks_per_turn;
-                c_signal :> qei_params.real_counts;
-                c_signal :> nominal_speed;
-                c_signal :> commutation_params.hall_offset_clk;
-                c_signal :> commutation_params.hall_offset_cclk;
-                c_signal :> commutation_params.winding_type;
-                flag = 1;
-
-                commutation_params.angle_variance = 1024 / (hall_params.pole_pairs * 3);
-                if (hall_params.pole_pairs < 4) {
-                    commutation_params.nominal_speed = nominal_speed*4;
-                } else if (hall_params.pole_pairs >= 4) {
-                    commutation_params.nominal_speed = nominal_speed;
-                }
-                commutation_params.qei_forward_offset = 0;
-                commutation_params.qei_backward_offset = 0;
-            }
-            break;
-        }
-    }
-}
-*/
 
 void set_hall_param_ecat(chanend c_hall, hall_par & hall_params)
 {

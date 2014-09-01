@@ -177,19 +177,6 @@ void set_hall_param_ecat(chanend c_hall, hall_par &hall_params);
 void set_qei_param_ecat(chanend c_qei, qei_par &qei_params);
 
 /**
- * @brief Initialize commutation parameters from Ethercat communication loop
- * 			(call before start-up of Commutation loop)
- *
- * @param[out] c_signal channel to signal Commutation loop
- *
- * @param hall_params struct defines the pole-pairs and gear ratio
- * @param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
- * 	 gear-ratio used for the motor
- * @param nominal_speed defines nominal speed for the motor
- */
-void commutation_init_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, commutation_par &commutation_params);
-
-/**
  * @brief Initialize hall sensor parameters from Ethercat communication loop
  * 			(call before start-up of Hall acquisition loop)
  *
