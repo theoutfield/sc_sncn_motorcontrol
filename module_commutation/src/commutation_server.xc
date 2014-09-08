@@ -33,31 +33,33 @@ void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 
 /* Sinusoidal based commutation functions */
 
-void commutation_client_handler(chanend c_commutation, int command, commutation_par &commutation_params,
-                                int &voltage, int &sensor_select, int init_state, int &shutdown)
+
+static select on_client_request(chanend c_client, commutation_par & commutation_params, int & voltage,
+                         int & sensor_select, int init_state, int & shutdown)
 {
+case c_client :> int command:
     switch (command) {
     case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
-        c_commutation :> voltage;    //STAR_WINDING
+        c_client :> voltage;    //STAR_WINDING
         if (commutation_params.winding_type == DELTA_WINDING) {
             voltage = -voltage;
         }
         break;
 
     case COMMUTATION_CMD_SET_PARAMS:
-        c_commutation :> commutation_params.angle_variance;
-        c_commutation :> commutation_params.nominal_speed;
-        c_commutation :> commutation_params.hall_offset_clk;
-        c_commutation :> commutation_params.hall_offset_cclk;
-        c_commutation :> commutation_params.winding_type;
+        c_client :> commutation_params.angle_variance;
+        c_client :> commutation_params.nominal_speed;
+        c_client :> commutation_params.hall_offset_clk;
+        c_client :> commutation_params.hall_offset_cclk;
+        c_client :> commutation_params.winding_type;
         break;
 
     case COMMUTATION_CMD_SENSOR_SELECT:
-        c_commutation :> sensor_select;
+        c_client :> sensor_select;
         break;
 
-    case CHECK_BUSY:                 // init signal
-        c_commutation <: init_state;
+    case CHECK_BUSY:            // init signal
+        c_client <: init_state;
         break;
 
     case COMMUTATION_CMD_DISABLE_FETS:
@@ -70,19 +72,22 @@ void commutation_client_handler(chanend c_commutation, int command, commutation_
         break;
 
     case COMMUTATION_CMD_FETS_STATE:
-        c_commutation <: shutdown;
+        c_client <: shutdown;
         break;
 
     default:
         break;
     }
+    break;
 }
 
-void commutation_sinusoidal_loop(port ? p_ifm_ff1, port ? p_ifm_ff2, port p_ifm_coastn, int sensor_select, t_pwm_control & pwm_ctrl, hall_par & hall_params, qei_par & qei_params,
-                                 commutation_par &commutation_params, int init_state, chanend c_hall, chanend c_qei, chanend c_pwm_ctrl,
-                                 chanend c_signal, chanend  c_commutation_p1, chanend c_commutation_p2, chanend c_commutation_p3)
+void commutation_sinusoidal_loop(port ? p_ifm_ff1, port ? p_ifm_ff2, port p_ifm_coastn,
+                                 int sensor_select, t_pwm_control & pwm_ctrl, hall_par & hall_params,
+                                 qei_par & qei_params, commutation_par & commutation_params,
+                                 int init_state, chanend c_hall, chanend c_qei, chanend c_pwm_ctrl,
+                                 chanend c_signal, chanend  c_commutation_p1,
+                                 chanend c_commutation_p2, chanend c_commutation_p3)
 {
-
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
     int angle_pwm = 0;
@@ -156,23 +161,16 @@ void commutation_sinusoidal_loop(port ? p_ifm_ff1, port ? p_ifm_ff2, port p_ifm_
 
         update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
-#pragma ordered
+/* FIXME: uncomment #pragma ordered once it is possible to use it in combination with
+   select-functions */
+//#pragma ordered
         select {
-        case c_commutation_p1 :> command:
-            commutation_client_handler( c_commutation_p1, command, commutation_params, voltage,
-                                        sensor_select, init_state, shutdown);
-            break;
-
-        case c_commutation_p2 :> command:
-            commutation_client_handler( c_commutation_p2, command, commutation_params, voltage,
-                                        sensor_select, init_state, shutdown);
-            break;
-
-        case c_commutation_p3 :> command:
-            commutation_client_handler( c_commutation_p3, command, commutation_params, voltage,
-                                        sensor_select, init_state, shutdown);
-            break;
-
+        case on_client_request(c_commutation_p1, commutation_params, voltage, sensor_select,
+                               init_state, shutdown);
+        case on_client_request(c_commutation_p2, commutation_params, voltage, sensor_select,
+                               init_state, shutdown);
+        case on_client_request(c_commutation_p3, commutation_params, voltage, sensor_select,
+                               init_state, shutdown);
         case c_signal :> command:
             if (command == CHECK_BUSY) {      // init signal
                 c_signal <: init_state;

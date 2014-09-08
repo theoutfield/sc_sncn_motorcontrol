@@ -21,45 +21,48 @@
 //#pragma xta command "set required - 10.0 us"
 //#define DEBUG
 
-void hall_client_handler(chanend c_hall, int command, int angle, int raw_velocity, int init_state,
-                         int &count, int direction, hall_par &hall_params, int &status)
+static select on_client_request(chanend c_client, int angle, int raw_velocity,
+                                int init_state, int & count, int direction,
+                                hall_par & hall_params, int & status)
 {
+case c_client :> int command:
     switch(command) {
     case HALL_POS_REQ:
-        c_hall <: angle;
+        c_client <: angle;
         break;
 
     case HALL_VELOCITY_REQ:
-        c_hall <: raw_velocity;
+        c_client <: raw_velocity;
         break;
 
     case HALL_ABSOLUTE_POS_REQ:
-        c_hall <: count;
-        c_hall <: direction;
+        c_client <: count;
+        c_client <: direction;
         break;
 
     case CHECK_BUSY:
-        c_hall <: init_state;
+        c_client <: init_state;
         break;
 
     case SET_HALL_PARAM_ECAT:
-        c_hall :> hall_params.pole_pairs;
-        c_hall :> hall_params.max_ticks;
-        c_hall :> hall_params.max_ticks_per_turn;
+        c_client :> hall_params.pole_pairs;
+        c_client :> hall_params.max_ticks;
+        c_client :> hall_params.max_ticks_per_turn;
         status = 1;
         break;
 
     case HALL_RESET_COUNT_REQ:
-        c_hall :> count;
+        c_client :> count;
         break;
 
     case HALL_FILTER_PARAM_REQ:
-        c_hall <: hall_params.max_ticks_per_turn;
+        c_client <: hall_params.max_ticks_per_turn;
         break;
 
     default:
         break;
     }
+    break;
 }
 
 //FIXME rename to check_hall_parameters();
@@ -78,7 +81,7 @@ void init_hall_param(hall_par &hall_params)
 }
 
 void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
-              chanend c_hall_p5, chanend c_hall_p6, port in p_hall, hall_par &hall_params)
+              chanend c_hall_p5, chanend c_hall_p6, in port p_hall, hall_par & hall_params)
 {
     init_hall_param(hall_params);
 
@@ -86,7 +89,6 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 
     timer tx;
     unsigned int ts;
-    unsigned int command;
 
     unsigned int angle1 = 0;            // newest angle (base angle on hall state transition)
     unsigned int delta_angle = 0;
@@ -321,39 +323,22 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
         xscope_probe_data(2, raw_velocity);
 #endif
 
-
-#pragma ordered
+/* FIXME: uncomment #pragma ordered once it is possible to use it in combination with
+   select-functions */
+//#pragma ordered
         select {
-        case c_hall_p1 :> command:
-            hall_client_handler(c_hall_p1, command, angle, raw_velocity, init_state, count,
-                                direction, hall_params, status);
-            break;
-
-        case c_hall_p2 :> command:
-            hall_client_handler(c_hall_p2, command, angle, raw_velocity, init_state, count,
-                                direction, hall_params, status);
-            break;
-
-        case c_hall_p3 :> command:
-            hall_client_handler(c_hall_p3, command, angle, raw_velocity, init_state, count,
-                                direction, hall_params, status);
-            break;
-
-        case c_hall_p4 :> command:
-            hall_client_handler(c_hall_p4, command, angle, raw_velocity, init_state, count,
-                                direction, hall_params, status);
-            break;
-
-        case c_hall_p5 :> command:
-            hall_client_handler(c_hall_p5, command, angle, raw_velocity, init_state, count,
-                                direction, hall_params, status);
-            break;
-
-        case c_hall_p6 :> command:
-            hall_client_handler(c_hall_p6, command, angle, raw_velocity, init_state, count,
-                                direction, hall_params, status);
-            break;
-
+        case on_client_request(c_hall_p1, angle, raw_velocity, init_state, count, direction,
+                               hall_params, status);
+        case on_client_request(c_hall_p2, angle, raw_velocity, init_state, count, direction,
+                               hall_params, status);
+        case on_client_request(c_hall_p3, angle, raw_velocity, init_state, count, direction,
+                               hall_params, status);
+        case on_client_request(c_hall_p4, angle, raw_velocity, init_state, count, direction,
+                               hall_params, status);
+        case on_client_request(c_hall_p5, angle, raw_velocity, init_state, count, direction,
+                               hall_params, status);
+        case on_client_request(c_hall_p6, angle, raw_velocity, init_state, count, direction,
+                               hall_params, status);
         case tx when timerafter(time1 + MSEC_FAST) :> time1:
             if(init_velocity == 0) {
                 if(count > 2049) {
