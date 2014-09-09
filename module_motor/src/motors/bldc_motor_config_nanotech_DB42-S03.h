@@ -13,7 +13,7 @@
  * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS                  8               // Number of pole pairs
+#define POLE_PAIRS                  4               // Number of pole pairs
 #define MAX_NOMINAL_SPEED           4000            // rpm
 #define MAX_NOMINAL_CURRENT         5               // A
 #define MOTOR_TORQUE_CONSTANT       35              // mNm/A
@@ -30,11 +30,11 @@
 #define SENSOR_USED                 QEI
 
 /* Define your Incremental Encoder type (QEI_WITH_INDEX/ QEI_WITH_NO_INDEX) */
-#define QEI_SENSOR_TYPE             QEI_WITH_NO_INDEX
+#define QEI_SENSOR_TYPE             QEI_WITH_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
  *  (QEI_POLARITY_NORMAL/QEI_POLARITY_INVERTED) */
-#define QEI_SENSOR_POLARITY         QEI_POLARITY_INVERTED
+#define QEI_SENSOR_POLARITY         QEI_POLARITY_NORMAL
 
 /* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
  *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
