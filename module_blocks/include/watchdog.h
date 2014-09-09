@@ -6,10 +6,7 @@
 
 #pragma once
 
-#define WD_CMD_EN_MOTOR  1
-#define WD_CMD_DIS_MOTOR 2
-#define WD_CMD_TICK      3
-#define WD_CMD_START     4
+void watchdog_start(chanend c_watchdog);
 
 /** @brief Run the watchdog timer server
  *

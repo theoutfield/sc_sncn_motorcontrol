@@ -124,7 +124,7 @@ void bdc_loop(chanend c_watchdog, chanend c_signal,
     // enable watchdog
     t :> ts;
     t when timerafter (ts + 250000*4):> ts;
-    c_watchdog <: WD_CMD_START;
+    watchdog_start(c_watchdog);
 
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;

@@ -222,7 +222,7 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
     // enable watchdog
     t :> ts;
     t when timerafter (ts + 250000*4):> ts; /* FIXME: replace with constant */
-    c_watchdog <: WD_CMD_START;
+    watchdog_start(c_watchdog);
 
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;
