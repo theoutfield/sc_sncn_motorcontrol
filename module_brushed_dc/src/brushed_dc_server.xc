@@ -26,9 +26,9 @@ static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-static select on_client_request(chanend c_client, int & voltage, int & shutdown)
+static select on_client_request(chanend ? c_client, int & voltage, int & shutdown)
 {
-case c_client :> int command:
+case !isnull(c_client) => c_client :> int command:
 
     switch (command) {
     case BDC_CMD_SET_VOLTAGE:
@@ -62,7 +62,7 @@ case c_client :> int command:
 static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl, chanend c_signal,
-                               chanend c_voltage_p1, chanend c_voltage_p2, chanend c_voltage_p3)
+                               chanend ? c_voltage_p1, chanend ? c_voltage_p2, chanend ? c_voltage_p3)
 {
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
@@ -108,7 +108,7 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
 
 
 void bdc_loop(chanend c_watchdog, chanend c_signal,
-              chanend c_voltage_p1, chanend c_voltage_p2, chanend c_voltage_p3,
+              chanend ? c_voltage_p1, chanend ? c_voltage_p2, chanend ? c_voltage_p3,
               chanend c_pwm_ctrl,
               out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2)
 {

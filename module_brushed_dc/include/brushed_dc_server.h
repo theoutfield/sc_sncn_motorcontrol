@@ -24,7 +24,7 @@
  * @param p_ifm_ff2 FET driver fault flag 2
  */
 void bdc_loop(chanend c_watchdog, chanend c_signal,
-              chanend c_voltage_p1, chanend  c_voltage_p2, chanend  c_voltage_p3,
+              chanend ? c_voltage_p1, chanend ? c_voltage_p2, chanend ? c_voltage_p3,
               chanend c_pwm_ctrl,
               out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn,
               port p_ifm_ff1, port p_ifm_ff2);

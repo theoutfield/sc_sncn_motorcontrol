@@ -19,12 +19,12 @@
 //#pragma xta command "set required - 10.0 us"
 //#define DEBUG
 
-static select on_client_request(chanend c_client, int angle, int raw_velocity,
+static select on_client_request(chanend ? c_client, int angle, int raw_velocity,
                                 int init_state, int & count, int direction,
                                 hall_par & hall_params, int & status)
 {
-case c_client :> int command:
-    switch(command) {
+case !isnull(c_client) => c_client :> int command:
+    switch (command) {
     case HALL_POS_REQ:
         c_client <: angle;
         break;
@@ -78,8 +78,8 @@ void init_hall_param(hall_par &hall_params)
     return;
 }
 
-void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
-              chanend c_hall_p5, chanend c_hall_p6, in port p_hall, hall_par & hall_params)
+void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, chanend ? c_hall_p4,
+              chanend ? c_hall_p5, chanend ? c_hall_p6, in port p_hall, hall_par & hall_params)
 {
     init_hall_param(hall_params);
 
@@ -267,7 +267,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
 
 
 #define defPeriodMax 1000000  //1000msec
-        if(iCountMicroSeconds > defPeriodMax) {
+        if (iCountMicroSeconds > defPeriodMax) {
             iCountMicroSeconds = defPeriodMax;
         }
 
@@ -288,13 +288,13 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
             angle += delta_angle;
         }
 
-        if(direction == -1) {
+        if (direction == -1) {
             angle -= delta_angle;
         }
 
         angle &= 0x0FFF; // 4095
 
-        if(first == 1) {
+        if (first == 1) {
             previous_position = angle;
             first = 0;
         }
@@ -338,20 +338,20 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
         case on_client_request(c_hall_p6, angle, raw_velocity, init_state, count, direction,
                                hall_params, status);
         case tx when timerafter(time1 + MSEC_FAST) :> time1:
-            if(init_velocity == 0) {
-                if(count > 2049) {
+            if (init_velocity == 0) {
+                if (count > 2049) {
                     init_velocity = 1;
                     previous_position1 = 2049;
-                } else if(count < -2049) {
+                } else if (count < -2049) {
                     init_velocity = 1;
                     previous_position1 = -2049;
                 }
                 velocity = 0;
             } else {
                 difference1 = count - previous_position1;
-                if(difference1 > hall_crossover) {
+                if (difference1 > hall_crossover) {
                     difference1 = old_difference;
-                } else if(difference1 < -hall_crossover) {
+                } else if (difference1 < -hall_crossover) {
                     difference1 = old_difference;
                 }
                 velocity = difference1;
@@ -368,7 +368,7 @@ void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c
             break;
         }
 
-        if(status == 1) {
+        if (status == 1) {
             hall_max_count = hall_params.max_ticks;
             status = 0;
         }

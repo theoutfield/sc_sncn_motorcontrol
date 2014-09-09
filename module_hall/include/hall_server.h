@@ -27,5 +27,5 @@ void init_hall_param(hall_par & hall_params);
  * @param[in] p_hall the port for reading the hall sensor data
  * @param hall_params struct defines the pole-pairs and gear ratio
  */
-void run_hall(chanend c_hall_p1, chanend c_hall_p2, chanend c_hall_p3, chanend c_hall_p4,
-              chanend c_hall_p5, chanend c_hall_p6, in port p_hall, hall_par & hall_params);
+void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, chanend ? c_hall_p4,
+              chanend ? c_hall_p5, chanend ? c_hall_p6, in port p_hall, hall_par & hall_params);
