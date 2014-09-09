@@ -26,15 +26,17 @@ static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-static void bdc_client_handler(chanend c_voltage, int command, int & voltage, int & shutdown)
+static select on_client_request(chanend c_client, int & voltage, int & shutdown)
 {
+case c_client :> int command:
+
     switch (command) {
     case BDC_CMD_SET_VOLTAGE:
-        c_voltage :> voltage;
+        c_client :> voltage;
         break;
 
     case BDC_CMD_CHECK_BUSY:    // init signal
-        c_voltage <: init_state;
+        c_client <: init_state;
         break;
 
     case BDC_CMD_DISABLE_FETS:
@@ -47,12 +49,14 @@ static void bdc_client_handler(chanend c_voltage, int command, int & voltage, in
         break;
 
     case BDC_CMD_FETS_STATE:
-        c_voltage <: shutdown;
+        c_client <: shutdown;
         break;
 
     default:
         break;
     }
+
+    break;
 }
 
 static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
@@ -78,7 +82,6 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
                 pwm[0] = 0;
                 pwm[1] = -voltage;
             }
-
             pwm[2] = 0;
         }
 
@@ -86,19 +89,13 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
          * update_pwm_inv() */
         update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
-#pragma ordered
+/* FIXME: uncomment #pragma ordered once it is possible to use it in combination with
+   select-functions */
+//#pragma ordered
         select {
-        case c_voltage_p1 :> command:
-            bdc_client_handler( c_voltage_p1, command, voltage, shutdown );
-            break;
-
-        case c_voltage_p2 :> command:
-            bdc_client_handler( c_voltage_p2, command, voltage, shutdown );
-            break;
-
-        case c_voltage_p3 :> command:
-            bdc_client_handler( c_voltage_p3, command, voltage, shutdown );
-            break;
+        case on_client_request(c_voltage_p1, voltage, shutdown);
+        case on_client_request(c_voltage_p2, voltage, shutdown);
+        case on_client_request(c_voltage_p3, voltage, shutdown);
 
         case c_signal :> command:
             if (command == CHECK_BUSY) { // init signal
