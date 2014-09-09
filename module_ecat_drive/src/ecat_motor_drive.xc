@@ -32,7 +32,7 @@
 
     if (sensor_select == HALL) {
         {actual_position, direction} = get_hall_position_absolute(c_hall);
-    } else { /* QEI || QEI_1 */
+    } else { /* QEI */
         {actual_position, direction} = get_qei_position_absolute(c_qei);
     }
 
@@ -254,7 +254,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                     int sensor_ticks;
                     if (sensor_select == HALL) {
                         sensor_ticks = hall_params.max_ticks_per_turn;
-                    } else {    /* QEI || QEI_1 */
+                    } else {    /* QEI */
                         sensor_ticks = qei_params.real_counts;
                     }
 
@@ -407,7 +407,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                         if (sensor_select == HALL) {
                             set_position_ctrl_hall_param(hall_params, c_position_ctrl);
-                        } else { /* QEI || QEI_1 */
+                        } else { /* QEI */
                             set_position_ctrl_qei_param(qei_params, c_position_ctrl);
                         }
                         set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
@@ -447,7 +447,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                         if (sensor_select == HALL) {
                             set_torque_ctrl_hall_param(hall_params, c_torque_ctrl);
-                        } else { /* QEI || QEI_1 */
+                        } else { /* QEI */
                             set_torque_ctrl_qei_param(qei_params, c_torque_ctrl);
                         }
 
@@ -486,7 +486,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                         if (sensor_select == HALL) {
                             set_velocity_ctrl_hall_param(hall_params, c_velocity_ctrl);
-                        } else { /* QEI || QEI_1 */
+                        } else { /* QEI */
                             set_velocity_ctrl_qei_param(qei_params, c_velocity_ctrl);
                         }
 
@@ -522,7 +522,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                         if (sensor_select == HALL) {
                             set_position_ctrl_hall_param(hall_params, c_position_ctrl);
-                        } else { /* QEI || QEI_1 */
+                        } else { /* QEI */
                             set_position_ctrl_qei_param(qei_params, c_position_ctrl);
                         }
                         set_position_ctrl_param(position_ctrl_params, c_position_ctrl);
@@ -556,7 +556,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                         if (sensor_select == HALL) {
                             set_velocity_ctrl_hall_param(hall_params, c_velocity_ctrl);
-                        } else { /* QEI || QEI_1 */
+                        } else { /* QEI */
                             set_velocity_ctrl_qei_param(qei_params, c_velocity_ctrl);
                         }
 
@@ -591,7 +591,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                         if (sensor_select == HALL) {
                             set_torque_ctrl_hall_param(hall_params, c_torque_ctrl);
-                        } else { /* QEI || QEI_1 */
+                        } else { /* QEI */
                             set_torque_ctrl_qei_param(qei_params, c_torque_ctrl);
                         }
 
@@ -671,7 +671,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                             int sensor_ticks;
                             if (sensor_select == HALL) {
                                 sensor_ticks = hall_params.max_ticks_per_turn;
-                            } else { /* QEI || QEI_1 */
+                            } else { /* QEI */
                                 sensor_ticks = qei_params.real_counts;
                             }
 
@@ -681,7 +681,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                                 (deceleration * sensor_ticks) / 60);
 
                             i = 0;
-                            mode_selected = 3;// non interruptible mode
+                            mode_selected = 3; // non interruptible mode
                             mode_quick_flag = 0;
                         } else {
                             mode_selected = 100;

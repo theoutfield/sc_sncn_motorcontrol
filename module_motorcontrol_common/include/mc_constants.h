@@ -3,7 +3,6 @@
 
 #define HALL  1
 #define QEI   2
-#define QEI_1 3
 
 /* FIXME: replace with enum once duplicate definitions are removed */
 #define QEI_WITH_NO_INDEX 0
