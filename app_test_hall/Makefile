@@ -6,11 +6,10 @@
 #TARGET = SOMANET-C21-DX
 #TARGET = SOMANET-C21-DX-Motor_control-XScope_v13
 
-
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = 
+APP_NAME = test_hall
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = module_blocks module_board-support module_hall module_motor module_motorcontrol_common module_xscope-wrapper
