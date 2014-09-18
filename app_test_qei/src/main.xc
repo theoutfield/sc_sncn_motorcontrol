@@ -1,3 +1,7 @@
+/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IMF_BOARD_REQUIRED" WIT A APPROPRIATE BOARD SUPPORT FILE */
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
+
 /**
  * @file test_qei.xc
  * @brief Test illustrates usage of qei sensor to get position and velocity information
@@ -5,16 +9,11 @@
  * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
-#include <xs1.h>
-#include <platform.h>
 #include <print.h>
-#include <ioports.h>
 #include <qei_client.h>
 #include <qei_server.h>
 #include <refclk.h>
 #include <xscope_wrapper.h>
-#include <bldc_motor_config.h>
-
 
 void xscope_initialise_1()
 {
@@ -69,16 +68,16 @@ int main(void)
 
 	par
 	{
-		on tile[0]:
+		on tile[COM_TILE]:
 		{
 			/* Test QEI Sensor Client */
 			qei_test(c_qei_p1);
 		}
 
 		/************************************************************
-		 * IFM_CORE
+		 * IFM_TILE
 		 ************************************************************/
-		on tile[3]:
+		on tile[IFM_TILE]:
 		{
 			/* QEI Server Loop */
 			{

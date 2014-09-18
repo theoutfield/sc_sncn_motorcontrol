@@ -118,7 +118,7 @@ documentation.
 Other dependencies:
 `module\_blocks <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_blocks>`_
 `module\_common <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_common>`_
-`module\_nodeconfig <https://github.com/synapticon/sc_somanet-base/tree/master/module_nodeconfig>`_@`sc\_somanet-base <https://github.com/synapticon/sc_somanet-base>`_
+`module\_nodeconfig <https://github.com/synapticon/sc_somanet-base/tree/master/module_board-support>`_@`sc\_somanet-base <https://github.com/synapticon/sc_somanet-base>`_
 
 **See also**:
 

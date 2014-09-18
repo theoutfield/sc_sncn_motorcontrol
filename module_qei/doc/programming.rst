@@ -12,7 +12,7 @@ Make sure you Makefile contains at least these module
 
 ::
 
-    USED_MODULES = module_blocks module_qei module_motor module_motorcontrol_common module_nodeconfig
+    USED_MODULES = module_blocks module_qei module_motor module_motorcontrol_common module_board-support
 
 Make sure you include these files in your main.xc file
 
