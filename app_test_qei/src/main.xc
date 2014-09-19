@@ -5,8 +5,7 @@
 /**
  * @file test_qei.xc
  * @brief Test illustrates usage of qei sensor to get position and velocity information
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <print.h>

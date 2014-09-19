@@ -1,7 +1,7 @@
 /**
  * @file sine_table_big.c
  * @brief Sine Lookup tables
- * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <stdint.h>

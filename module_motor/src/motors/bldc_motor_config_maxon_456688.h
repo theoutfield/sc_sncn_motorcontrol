@@ -1,7 +1,7 @@
 /**
  * @file bldc_motor_config.h
  * @brief Motor Control config file for maxon EC 60, 100 Watt with Hall, Encoder and gearbox (4,3)
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

@@ -1,7 +1,7 @@
 /**
  * @file gpio_server.h
  * @brief General Purpose IO Digital Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

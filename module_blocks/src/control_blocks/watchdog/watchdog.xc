@@ -1,7 +1,7 @@
 /**
  * @file watchdog.xc
  * @brief Watchdog Implementation
- * @author Victor de la Cruz <vdelacruz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <watchdog.h>

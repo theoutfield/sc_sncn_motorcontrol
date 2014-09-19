@@ -1,8 +1,7 @@
 /**
  * @file adc_client_ad7949.h
  * @brief ADC Client
- * @author Martin Schwarz <mschwarz@synapticon.com>
- * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

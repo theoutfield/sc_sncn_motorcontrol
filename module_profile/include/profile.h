@@ -1,11 +1,10 @@
-
 /**
  * @file profile.h
  * @brief Profile Generation for Position, Velocity and Torque
  *      Implements position profile based on Linear Function with
  *      Parabolic Blends, velocity profile and torque profiles are
  *      based on linear functions.
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

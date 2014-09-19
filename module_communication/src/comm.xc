@@ -1,7 +1,7 @@
 /**
  * @file comm.xc
  * @brief Ctrlproto data struct client
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <refclk.h>

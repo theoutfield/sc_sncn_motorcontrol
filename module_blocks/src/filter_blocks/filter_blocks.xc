@@ -1,7 +1,7 @@
 /**
  * @file filter_blocks.xc
  * @brief Moving Average Filter Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <filter_blocks.h>

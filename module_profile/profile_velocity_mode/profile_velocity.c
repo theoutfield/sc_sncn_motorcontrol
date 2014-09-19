@@ -3,7 +3,7 @@
  * @file profile_velocity.c
  * @brief Profile Generation for Velocity
  *      Implements velocity profile based on linear functions.
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 

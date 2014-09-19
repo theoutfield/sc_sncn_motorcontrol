@@ -1,7 +1,7 @@
 /**
  * @file  position_ctrl_client.xc
  * @brief Position control Loop Client functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <position_ctrl_client.h>

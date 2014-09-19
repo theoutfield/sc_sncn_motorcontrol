@@ -1,8 +1,7 @@
-
 /**
  * @file a4935.h
  * @brief Driver header file for motor
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

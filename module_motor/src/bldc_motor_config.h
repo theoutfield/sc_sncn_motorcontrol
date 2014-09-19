@@ -1,7 +1,7 @@
 /**
  * @file bldc_motor_config.h
  * @brief Motor Control config file (define your the motor specifications here)
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <internal_config.h>

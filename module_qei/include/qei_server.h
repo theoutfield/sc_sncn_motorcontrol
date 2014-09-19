@@ -1,8 +1,7 @@
 /**
  * @file qei_server.h
  * @brief QEI Sensor Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

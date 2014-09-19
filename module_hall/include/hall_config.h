@@ -1,8 +1,7 @@
 /**
  * @file hall_config.h
  * @brief Hall Sensor Config Definitions
- * @author Ludwig Orgler <lorgler@synapticon.com>
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

@@ -1,7 +1,7 @@
 /**
  * @file velocity_ctrl_client.h
  * @brief Velocity Control Loop Client functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

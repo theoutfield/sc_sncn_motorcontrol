@@ -1,9 +1,7 @@
 /**
  * @file commutation_server.h
  * @brief Commutation Loop based on sinusoidal commutation method
- * @author Ludwig Orgler <lorgler@synapticon.com>
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

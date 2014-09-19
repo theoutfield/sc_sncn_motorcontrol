@@ -1,7 +1,7 @@
 /**
  * @file comm.h
  * @brief Ctrlproto data struct client
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

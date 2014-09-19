@@ -1,8 +1,7 @@
-
 /**
  * @file a4935.xc
  * @brief Driver file for motor
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include "a4935.h"

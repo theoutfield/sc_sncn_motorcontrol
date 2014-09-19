@@ -1,7 +1,7 @@
 /**
  * @file velocity_ctrl_server.xc
  * @brief Velocity Control Loop Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <velocity_ctrl_server.h>

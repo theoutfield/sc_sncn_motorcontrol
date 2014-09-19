@@ -1,10 +1,9 @@
-
 /**
  * @file profile_control.h
  * @brief Profile Control functions
  *  Implements position profile control, velocity profile control
  *  and torque profile control functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

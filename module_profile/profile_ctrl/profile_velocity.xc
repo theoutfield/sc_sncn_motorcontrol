@@ -2,7 +2,7 @@
  * @file profile_velocity.xc
  * @brief Profile Velocity Control functions
  *      Implements velocity profile control function
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <velocity_ctrl_client.h>

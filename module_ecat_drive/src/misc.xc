@@ -1,6 +1,6 @@
 /**
  * @file misc.xc
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <refclk.h>

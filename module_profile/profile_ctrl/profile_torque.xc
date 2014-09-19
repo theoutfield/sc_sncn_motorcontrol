@@ -2,7 +2,7 @@
  * @file profile_torque.xc
  * @brief Profile Torque Control functions
  *      Implements torque profile control function
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <torque_ctrl_client.h>

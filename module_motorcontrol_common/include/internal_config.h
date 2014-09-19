@@ -1,7 +1,7 @@
 /**
  * @file internal_config.h
  * @brief Internal Definitions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

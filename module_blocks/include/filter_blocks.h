@@ -1,7 +1,7 @@
 /**
  * @file filter_blocks.h
  * @brief Moving Average Filter Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

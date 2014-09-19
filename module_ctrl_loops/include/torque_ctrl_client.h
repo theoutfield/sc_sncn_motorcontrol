@@ -1,7 +1,7 @@
 /**
  * @file  torque_ctrl_client.h
  * @brief Torque Control Loop Client functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

@@ -1,6 +1,6 @@
 /**
  * @file qei.c
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 

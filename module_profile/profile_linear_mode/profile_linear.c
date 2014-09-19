@@ -2,7 +2,7 @@
  * @file profile_linear.c
  * @brief Profile Generation
  *      Implements Torque profile based on linear functions.
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <profile.h>

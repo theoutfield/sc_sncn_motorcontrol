@@ -1,8 +1,7 @@
-
 /**
  * @file gpio_client.xc
  * @brief General Purpose IO Digital Client Functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <gpio_client.h>

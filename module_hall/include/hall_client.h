@@ -2,9 +2,7 @@
 /**
  * @file hall_client.h
  * @brief Hall Sensor Client Functions
- * @author Ludwig Orgler <lorgler@synapticon.com>
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

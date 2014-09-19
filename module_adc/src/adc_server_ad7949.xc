@@ -1,8 +1,7 @@
 /**
  * @file adc_server_ad7949.xc
  * @brief ADC Server
- * @author Martin Schwarz <mschwarz@synapticon.com>
- * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <xs1.h>
