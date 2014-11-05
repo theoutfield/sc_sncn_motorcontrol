@@ -24,6 +24,7 @@
 #define BLDC                                1
 #define BDC                                 2
 
+#define MOTOR_TYPE                          BLDC
 
 #define INIT_BUSY                           0
 #define INIT                                1

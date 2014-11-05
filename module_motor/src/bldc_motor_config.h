@@ -13,7 +13,6 @@
  * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define MOTOR_TYPE                  BLDC
 #define POLE_PAIRS                  3               // Number of pole pairs
 #define MAX_NOMINAL_SPEED           4000            // rpm
 #define MAX_NOMINAL_CURRENT         2               // A
@@ -74,12 +73,12 @@
 #define POSITION_Kd_DENOMINATOR     1000
 
 #if(SENSOR_USED == HALL)
-    #define MAX_POSITION_LIMIT      POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO       // ticks (max range: 2^30, limited for safe operation) qei/hall/any position sensor
-    #define MIN_POSITION_LIMIT      -POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO      // ticks (min range: -2^30, limited for safe operation) qei/hall/any position sensor
+    #define MAX_POSITION_LIMIT      POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO*10       // ticks (max range: 2^30, limited for safe operation) qei/hall/any position sensor
+    #define MIN_POSITION_LIMIT      -POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO*10      // ticks (min range: -2^30, limited for safe operation) qei/hall/any position sensor
 #endif
 #if(SENSOR_USED == QEI)
-    #define MAX_POSITION_LIMIT      GEAR_RATIO*ENCODER_RESOLUTION    // ticks (max range: 2^30, limited for safe operation)
-    #define MIN_POSITION_LIMIT      -GEAR_RATIO*ENCODER_RESOLUTION   // ticks (min range: -2^30, limited for safe operation)
+    #define MAX_POSITION_LIMIT      GEAR_RATIO*ENCODER_RESOLUTION*10    // ticks (max range: 2^30, limited for safe operation)
+    #define MIN_POSITION_LIMIT      -GEAR_RATIO*ENCODER_RESOLUTION*10   // ticks (min range: -2^30, limited for safe operation)
 #endif
 
 /* Torque Control (Mandatory if Torque control used)
