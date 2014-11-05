@@ -13,6 +13,7 @@
  * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
+#define MOTOR_TYPE                  BLDC
 #define POLE_PAIRS                  3               // Number of pole pairs
 #define MAX_NOMINAL_SPEED           4000            // rpm
 #define MAX_NOMINAL_CURRENT         2               // A
@@ -23,7 +24,7 @@
  * and any additional encoders attached specify encoder resolution here (Mandatory)
  */
 #define GEAR_RATIO                  1                    // if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION          16384               // 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
+#define ENCODER_RESOLUTION          4096               // 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
 
 /* Position Sensor Types (select your sensor type here)
  * (HALL/ QEI) */

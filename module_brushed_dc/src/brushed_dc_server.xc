@@ -52,6 +52,10 @@ case !isnull(c_client) => c_client :> int command:
         c_client <: shutdown;
         break;
 
+    case CHECK_BUSY:
+        c_client <: init_state;
+        break;
+
     default:
         break;
     }
@@ -61,13 +65,13 @@ case !isnull(c_client) => c_client :> int command:
 
 static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
                                t_pwm_control &pwm_ctrl,
-                               chanend c_pwm_ctrl, chanend c_signal,
-                               chanend ? c_voltage_p1, chanend ? c_voltage_p2, chanend ? c_voltage_p3)
+                               chanend c_pwm_ctrl, chanend c_commutation)
 {
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
     int voltage = 0;
     int shutdown = 0; // Disable FETS
+    int pwm_half = (PWM_MAX_VALUE - PWM_DEAD_TIME) >> 1;
 
     while (1) {
         if (shutdown == 1) {
@@ -76,13 +80,39 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
             pwm[2] = -1;
         } else {
             if (voltage >= 0) {
-                pwm[0] = voltage;
-                pwm[1] = 0;
+                if(voltage <= pwm_half)
+                {
+                    pwm[0] = pwm_half + voltage;
+                    pwm[1] = pwm_half;
+                }
+                else if(voltage > pwm_half && voltage < BDC_PWM_CONTROL_LIMIT)
+                {
+                    pwm[0] = pwm_half + pwm_half;
+                    pwm[1] = pwm_half - (voltage - pwm_half);
+                }
+                else if(voltage >= BDC_PWM_CONTROL_LIMIT)
+                {
+                    pwm[0] = pwm_half + pwm_half;
+                    pwm[1] = PWM_MIN_LIMIT;
+                }
             } else {
-                pwm[0] = 0;
-                pwm[1] = -voltage;
+                if(-voltage <= pwm_half)
+                {
+                    pwm[0] = pwm_half;
+                    pwm[1] = pwm_half - voltage;
+                }
+                else if(-voltage > pwm_half && -voltage < BDC_PWM_CONTROL_LIMIT)
+                {
+                    pwm[0] = pwm_half - (-voltage - pwm_half);
+                    pwm[1] = pwm_half + pwm_half;
+                }
+                else if(-voltage >= BDC_PWM_CONTROL_LIMIT)
+                {
+                    pwm[0] = PWM_MIN_LIMIT;
+                    pwm[1] = pwm_half + pwm_half;
+                }
             }
-            pwm[2] = 0;
+            pwm[2] = pwm_half;
         }
 
         /* Limiting PWM values (and suppression of short pulses) is done in
@@ -93,22 +123,13 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
    select-functions */
 //#pragma ordered
         select {
-        case on_client_request(c_voltage_p1, voltage, shutdown);
-        case on_client_request(c_voltage_p2, voltage, shutdown);
-        case on_client_request(c_voltage_p3, voltage, shutdown);
-
-        case c_signal :> command:
-            if (command == CHECK_BUSY) { // init signal
-                c_signal <: init_state;
-            }
-            break;
+            case on_client_request(c_commutation, voltage, shutdown);
         }
     }
 }
 
 
-void bdc_loop(chanend c_watchdog, chanend c_signal,
-              chanend ? c_voltage_p1, chanend ? c_voltage_p2, chanend ? c_voltage_p3,
+void bdc_loop(chanend c_watchdog, chanend c_commutation,
               chanend c_pwm_ctrl,
               out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2)
 {
@@ -135,6 +156,6 @@ void bdc_loop(chanend c_watchdog, chanend c_signal,
     p_ifm_coastn :> init_state;
 
     bdc_internal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, pwm_ctrl, c_pwm_ctrl,
-                      c_signal, c_voltage_p1, c_voltage_p2, c_voltage_p3);
+            c_commutation);
 }
 

@@ -21,7 +21,8 @@
 #define DC300_RESOLUTION                    400
 #define OLD_DC300_RESOLUTION                264
 
-
+#define BLDC                                1
+#define BDC                                 2
 
 
 #define INIT_BUSY                           0

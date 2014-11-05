@@ -11,6 +11,7 @@
 #include <refclk.h>
 #include <filter_blocks.h>
 #include <xscope_wrapper.h>
+#include "print.h"
 
 //TODO remove these dependencies
 #include <bldc_motor_config.h>
@@ -108,7 +109,6 @@ static void qei_client_handler(chanend c_qei, int command, int position, int ok,
 //FIXME rename to check_qei_parameters();
 void init_qei_param(qei_par &qei_params)
 {
-
     qei_params.real_counts = ENCODER_RESOLUTION;
 
     // Find absolute maximum position deviation from origin
@@ -128,6 +128,7 @@ void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3, chanend
              chanend ? c_qei_p5, chanend ? c_qei_p6, port in p_qei, qei_par & qei_params)
 {
     init_qei_param(qei_params);
+    printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
 
     int position = 0;
     unsigned int v;
