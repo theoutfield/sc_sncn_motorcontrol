@@ -1,0 +1,10 @@
+#pragma once
+
+enum { TCTRL_CMD_SET_HALL,
+       TCTRL_CMD_SET_QEI,
+       TCTRL_CMD_GET_TORQUE,
+       TCTRL_CMD_SET_TORQUE,
+       TCTRL_CMD_ENABLE,
+       TCTRL_CMD_SHUTDOWN,
+       TCTRL_CMD_GET_STATUS };
+

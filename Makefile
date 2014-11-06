@@ -5,7 +5,18 @@
 # If the variable is set to "all" then all directories that start with app_
 # are built.
 
-BUILD_SUBDIRS = test_adc_external_input test_ethercat-motorctrl-mode test_gpio_digital test_hall test_homing test_position-ctrl test_qei test_torque-ctrl test_velocity-ctrl
+BUILD_SUBDIRS = all
 
 XMOS_MAKE_PATH ?= ..
 include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.toplevel
+
+# Only for documentation generation
+SPHINX_PROJECT_NAME = SOMANET Motor Control Software
+REPO=./
+VERSION=2v0
+DOXYGEN_DIRS=$(REPO)/module_hall
+DOXYGEN_DIRS+=$(REPO)/module_qei
+DOXYGEN_DIRS+=$(REPO)/module_commutation
+SOURCE_INCLUDE_DIRS=$(REPO)
+XDOC_DIR ?= ../xdoc
+-include $(XDOC_DIR)/Makefile.inc

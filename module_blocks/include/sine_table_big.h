@@ -1,22 +1,13 @@
-
 /**
- * \file sine_table_big.h
- * \brief Sine Loopup table declarations
- * \author Ludwig Orgler <lorgler@synapticon.com>
- * \author Martin Schwarz <mschwarz@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
+ * @file sine_table_big.h
+ * @brief Sine Lookup table declarations
+ * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Martin Schwarz <mschwarz@synapticon.com>
  */
 
- 
+#pragma once
 
-int arctg1(int Real, int Imag);
-
-extern short arctg_table[];
-
-extern short sine_third[257];
-
-extern short sine_table[257];
+#include <stdint.h>
 
 int sine_third_expanded(int angle);
 

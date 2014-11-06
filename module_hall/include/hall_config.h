@@ -1,23 +1,32 @@
-
 /**
- * \file hall_config.h
- * \brief Hall Sensor Config Definitions
- * \author Ludwig Orgler <lorgler@synapticon.com>
- * \author Pavan Kanajar <pkanajar@synapticon.com>
- * \version 1.0
- * \date 10/04/2014
+ * @file hall_config.h
+ * @brief Hall Sensor Config Definitions
+ * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Pavan Kanajar <pkanajar@synapticon.com>
  */
 
- 
+#pragma once
 
-#ifndef __HALL_CONFIG_H__
-#define __HALL_CONFIG_H__
+#define RPM_CONST           60000000 // 60s / 1us
+#define FILTER_LENGTH_HALL  16
 
-#define RPM_CONST 						 60000000  		// 60 s/ 1us
-#define HALL_POS_REQ  							1
-#define HALL_VELOCITY_REQ 						2
-#define HALL_ABSOLUTE_POS_REQ 					3
-#define FILTER_LENGTH_HALL 						16
-#define RESET_HALL_COUNT						9
+/**
+ * Client/server interaction commands/tokens
+ */
+enum {
+    HALL_POS_REQ,         //!< Position request token
+    HALL_ABSOLUTE_POS_REQ,//!< Position request token
+    HALL_VELOCITY_REQ,    //!< Velocity request token
+    HALL_RESET_COUNT_REQ,     //!< Reset hall server ticks count
+    HALL_FILTER_PARAM_REQ,//!< Filter length request token
+};
 
-#endif /* __HALL_CONFIG_H__ */
+/**
+ * @brief Structure definition for hall sensor
+ */
+typedef struct {
+    int pole_pairs;
+    int max_ticks_per_turn;
+    int max_ticks;
+    int sensor_polarity;
+} hall_par;
