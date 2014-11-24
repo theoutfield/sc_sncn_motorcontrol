@@ -1,6 +1,6 @@
 #pragma once
 
-enum { PCTRL_CMD_SET_HALL, 
+enum { PCTRL_CMD_SET_HALL,
        PCTRL_CMD_SET_QEI,
        PCTRL_CMD_GET_POSITION,
        PCTRL_CMD_SET_POSITION,
@@ -8,4 +8,4 @@ enum { PCTRL_CMD_SET_HALL,
        PCTRL_CMD_ENABLE,
        PCTRL_CMD_SHUTDOWN,
        PCTRL_CMD_GET_STATUS };
-       
+
