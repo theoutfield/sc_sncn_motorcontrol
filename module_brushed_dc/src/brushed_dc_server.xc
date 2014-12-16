@@ -67,7 +67,7 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl, chanend c_commutation)
 {
-    unsigned int command;
+
     unsigned int pwm[3] = { 0, 0, 0 };
     int voltage = 0;
     int shutdown = 0; // Disable FETS
