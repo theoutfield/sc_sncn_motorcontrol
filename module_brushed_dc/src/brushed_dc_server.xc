@@ -26,43 +26,6 @@ static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-static select on_client_request(chanend ? c_client, int & voltage, int & shutdown)
-{
-case !isnull(c_client) => c_client :> int command:
-
-    switch (command) {
-    case BDC_CMD_SET_VOLTAGE:
-        c_client :> voltage;
-        break;
-
-    case BDC_CMD_CHECK_BUSY:    // init signal
-        c_client <: init_state;
-        break;
-
-    case BDC_CMD_DISABLE_FETS:
-        shutdown = 1;
-        break;
-
-    case BDC_CMD_ENABLE_FETS:
-        shutdown = 0;
-        voltage = 0;
-        break;
-
-    case BDC_CMD_FETS_STATE:
-        c_client <: shutdown;
-        break;
-
-    case CHECK_BUSY:
-        c_client <: init_state;
-        break;
-
-    default:
-        break;
-    }
-
-    break;
-}
-
 static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl, chanend c_commutation)
@@ -119,11 +82,41 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
          * update_pwm_inv() */
         update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
-/* FIXME: uncomment #pragma ordered once it is possible to use it in combination with
-   select-functions */
-//#pragma ordered
         select {
-            case on_client_request(c_commutation, voltage, shutdown);
+            case c_commutation :> int command:
+		    switch (command) {
+		    case BDC_CMD_SET_VOLTAGE:
+			c_commutation :> voltage;
+			break;
+
+		    case BDC_CMD_CHECK_BUSY:    // init signal
+			c_commutation <: init_state;
+			break;
+
+		    case BDC_CMD_DISABLE_FETS:
+			shutdown = 1;
+			break;
+
+		    case BDC_CMD_ENABLE_FETS:
+			shutdown = 0;
+			voltage = 0;
+			break;
+
+		    case BDC_CMD_FETS_STATE:
+			c_commutation <: shutdown;
+			break;
+
+		    case CHECK_BUSY:
+			c_commutation <: init_state;
+			break;
+
+		    default:
+			break;
+		    }
+		break;
+		 
+	    default:
+		break;
         }
     }
 }
