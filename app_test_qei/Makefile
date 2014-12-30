@@ -2,7 +2,7 @@
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
 #TARGET = SOMANET-C22
-#TARGET = SOMANET-C22_Motor-Control_xSCOPE_v13
+#TARGET = SOMANET-C22_Motor-Control_xSCOPE
 #TARGET = SOMANET-C21-DX
 #TARGET = SOMANET-C21-DX_Motor-Control_xSCOPE
 
