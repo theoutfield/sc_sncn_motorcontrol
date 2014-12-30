@@ -1,12 +1,12 @@
 /**
  * @file bldc_motor_config.h
- * @brief Motor Control config file (define your the motor specifications here)
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @brief Motor Control init  API
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <internal_config.h>
-
 #pragma once
+
+#include <internal_config.h>
 
 /**
  * @brief initialize Velocity sensor filter
@@ -56,24 +56,3 @@ void init_pv_params(pv_par &pv_params);
  * @param pt_params struct defines profile torque params
  */
 void init_pt_params(pt_par &pt_params);
-
-/**
- * @brief initialize torque control PID params
- *
- * @param torque_ctrl_params struct defines torque control PID params
- */
-void init_torque_control_param(ctrl_par &torque_ctrl_params);
-
-/**
- * @brief initialize velocity control PID params
- *
- * @param velocity_ctrl_params struct defines velocity control PID params
- */
-void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
-
-/**
- * @brief initialize position control PID params
- *
- * @param position_ctrl_params struct defines position control PID params
- */
-void init_position_control_param(ctrl_par &position_ctrl_params);

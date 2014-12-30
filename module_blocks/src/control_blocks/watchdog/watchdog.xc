@@ -1,11 +1,20 @@
 /**
  * @file watchdog.xc
  * @brief Watchdog Implementation
- * @author Victor de la Cruz <vdelacruz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <watchdog.h>
 #include <xs1.h>
+
+enum { WD_CMD_EN_MOTOR,
+       WD_CMD_DIS_MOTOR,
+       WD_CMD_TICK,
+       WD_CMD_START };
+
+void watchdog_start(chanend c_watchdog)
+{
+    c_watchdog <: WD_CMD_START;
+}
 
 void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds_wden)
 {

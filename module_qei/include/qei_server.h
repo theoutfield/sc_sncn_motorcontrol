@@ -1,8 +1,7 @@
 /**
  * @file qei_server.h
  * @brief QEI Sensor Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once
@@ -15,7 +14,7 @@
  * @param qei_params struct defines the resolution for quadrature encoder (QEI),
  *          gear-ratio, poles, encoder type
  */
-void init_qei_param(qei_par &qei_params);
+void init_qei_param(qei_par & qei_params);
 
 /**
  * @brief Implementation of the QEI server thread (for sensor with index/no index)
@@ -29,7 +28,7 @@ void init_qei_param(qei_par &qei_params);
  * @param p_qei the hardware port where the quadrature encoder is located
  * @param qei_params the struct defines sensor type and resolution parameters for qei
  */
-void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3,
-        chanend c_qei_p4, chanend c_qei_p5, chanend c_qei_p6, port in p_qei,
-        qei_par &qei_params);
+void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3,
+             chanend ? c_qei_p4, chanend ? c_qei_p5, chanend ? c_qei_p6,
+             port in p_qei, qei_par & qei_params);
 

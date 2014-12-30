@@ -1,8 +1,7 @@
 /**
  * @file
  * @brief Brushed Motor Drive Client function
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <xs1.h>

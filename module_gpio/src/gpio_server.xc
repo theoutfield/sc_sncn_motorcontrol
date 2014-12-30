@@ -1,7 +1,7 @@
 /**
  * @file gpio_server.xc
  * @brief General Purpose IO Digital Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <gpio_server.h>

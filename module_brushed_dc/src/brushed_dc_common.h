@@ -7,3 +7,4 @@ enum { BDC_CMD_SET_VOLTAGE,
        BDC_CMD_FETS_STATE,
        BDC_CMD_CHECK_BUSY };
 
+#define PWM_MIN_LIMIT 250 /* FIXME: remove it when proper PWM module is used */

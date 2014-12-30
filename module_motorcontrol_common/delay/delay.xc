@@ -1,8 +1,7 @@
 /**
  * @file delay.xc
  * @brief Implementation of delay functions
- * @author Martin Schwarz <mschwarz@synapticon.com>
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <refclk.h>

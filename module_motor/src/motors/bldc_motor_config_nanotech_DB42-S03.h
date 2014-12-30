@@ -1,6 +1,6 @@
 /**
  * @file bldc_motor_config.h
- * @brief Motor Control config file for maxon EC 60, 100 Watt with Hall, Encoder and gearbox (4,3)
+ * @brief Motor Control config file for Nanotech DB42-S03, 26 Watt with Hall sensors and Encoder (Nanotec WEDL5541-B14)
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
@@ -13,28 +13,28 @@
  * Define Motor Specific Constants (found in motor specification sheet)
  * Mandatory constants to be set
  */
-#define POLE_PAIRS                  7               // Number of pole pairs
-#define MAX_NOMINAL_SPEED           3740            // rpm
+#define POLE_PAIRS                  4               // Number of pole pairs
+#define MAX_NOMINAL_SPEED           4000            // rpm
 #define MAX_NOMINAL_CURRENT         5               // A
-#define MOTOR_TORQUE_CONSTANT       53              // mNm/A
+#define MOTOR_TORQUE_CONSTANT       35              // mNm/A
 
 /**
  * If you have any gears added, specify gear-ratio
  * and any additional encoders attached specify encoder resolution here (Mandatory)
  */
-#define GEAR_RATIO                  4                   // if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION          16384               // 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
+#define GEAR_RATIO                  1                   // if no gears are attached - set to gear ratio to 1
+#define ENCODER_RESOLUTION          1000               // 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
 
 /* Position Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
 #define SENSOR_USED                 QEI
 
 /* Define your Incremental Encoder type (QEI_WITH_INDEX/ QEI_WITH_NO_INDEX) */
-#define QEI_SENSOR_TYPE             QEI_WITH_NO_INDEX
+#define QEI_SENSOR_TYPE             QEI_WITH_INDEX
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
  *  (QEI_POLARITY_NORMAL/QEI_POLARITY_INVERTED) */
-#define QEI_SENSOR_POLARITY         QEI_POLARITY_INVERTED
+#define QEI_SENSOR_POLARITY         QEI_POLARITY_NORMAL
 
 /* Somanet IFM Internal Config:  Specifies the current sensor resolution per Ampere
  *  (DC300_RESOLUTION / DC100_RESOLUTION / OLD_DC300_RESOLUTION) */
@@ -45,7 +45,7 @@
 #define COMMUTATION_OFFSET_CCLK     2731
 
 /* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
-#define WINDING_TYPE                STAR_WINDING
+#define WINDING_TYPE                DELTA_WINDING
 
 /* Changes direction of the motor drive  (1 /-1) */
 #define POLARITY                    1

@@ -3,7 +3,7 @@
  * @brief Profile Generation for Position
  * Implements position profile based on Linear Function with
  * Parabolic Blends.
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <profile.h>

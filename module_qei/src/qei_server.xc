@@ -1,8 +1,7 @@
 /**
  * @file qei_server.xc
  * @brief QEI Sensor Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 
@@ -12,6 +11,7 @@
 #include <refclk.h>
 #include <filter_blocks.h>
 #include <xscope_wrapper.h>
+#include "print.h"
 
 //TODO remove these dependencies
 #include <bldc_motor_config.h>
@@ -91,10 +91,10 @@ static void qei_client_handler(chanend c_qei, int command, int position, int ok,
         c_qei :> qei_params.max_ticks;
         c_qei :> qei_params.sensor_polarity;
         status = 1;
-	//					printintln(qei_params.gear_ratio);
-	//					printintln(qei_params.index);
-	//					printintln(qei_params.max_ticks_per_turn);
-	//					printintln(qei_params.real_counts);
+	//printintln(qei_params.gear_ratio);
+	//printintln(qei_params.index);
+	//printintln(qei_params.max_ticks_per_turn);
+	//printintln(qei_params.real_counts);
         break;
 
     case QEI_RESET_COUNT:
@@ -109,7 +109,6 @@ static void qei_client_handler(chanend c_qei, int command, int position, int ok,
 //FIXME rename to check_qei_parameters();
 void init_qei_param(qei_par &qei_params)
 {
-
     qei_params.real_counts = ENCODER_RESOLUTION;
 
     // Find absolute maximum position deviation from origin
@@ -125,11 +124,11 @@ void init_qei_param(qei_par &qei_params)
 }
 
 #pragma unsafe arrays
-void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei_p4, chanend c_qei_p5, \
-             chanend c_qei_p6, port in p_qei, qei_par &qei_params)
+void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3, chanend ? c_qei_p4,
+             chanend ? c_qei_p5, chanend ? c_qei_p6, port in p_qei, qei_par & qei_params)
 {
-
     init_qei_param(qei_params);
+    printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
 
     int position = 0;
     unsigned int v;
@@ -209,7 +208,7 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
                         first = 0;
                     }
 
-                    if(previous_position != position ) {
+                    if (previous_position != position) {
                         difference = position - previous_position;
                         //xscope_probe_data(1, difference);
                         if (difference >= qei_crossover) {
@@ -273,37 +272,37 @@ void run_qei(chanend c_qei_p1, chanend c_qei_p2, chanend c_qei_p3, chanend c_qei
 
             break;
 
-        case c_qei_p1 :> command :
+        case !isnull(c_qei_p1) => c_qei_p1 :> command :
             qei_client_handler( c_qei_p1, command, position, ok, count, direction, init_state,
                                 sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,
                                 status);
             break;
 
-        case c_qei_p2 :> command :
+        case !isnull(c_qei_p2) => c_qei_p2 :> command :
             qei_client_handler( c_qei_p2, command, position, ok, count, direction, init_state,
                                 sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,
                                 status);
             break;
 
-        case c_qei_p3 :> command :
+        case !isnull(c_qei_p3) => c_qei_p3 :> command :
             qei_client_handler( c_qei_p3, command, position, ok, count, direction, init_state,
                                 sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,
                                 status);
             break;
 
-        case c_qei_p4 :> command :
+        case !isnull(c_qei_p4) => c_qei_p4 :> command :
             qei_client_handler( c_qei_p4, command, position, ok, count, direction, init_state,
                                 sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,
                                 status);
             break;
 
-        case c_qei_p5 :> command :
+        case !isnull(c_qei_p5) => c_qei_p5 :> command :
             qei_client_handler( c_qei_p5, command, position, ok, count, direction, init_state,
                                 sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,
                                 status);
             break;
 
-        case c_qei_p6 :> command :
+        case !isnull(c_qei_p6) => c_qei_p6 :> command :
             qei_client_handler( c_qei_p6, command, position, ok, count, direction, init_state,
                                 sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_params,
                                 status);

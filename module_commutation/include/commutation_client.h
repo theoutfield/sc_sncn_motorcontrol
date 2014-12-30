@@ -1,9 +1,7 @@
 /**
  * @file commutation_client.h
  * @brief Commutation Client functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Ludwig Orgler <lorgler@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

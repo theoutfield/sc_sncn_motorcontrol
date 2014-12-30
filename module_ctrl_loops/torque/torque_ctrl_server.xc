@@ -1,7 +1,7 @@
 /**
  * @file  torque_ctrl_server.xc
  * @brief Torque Control Loop Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <torque_ctrl_server.h>
@@ -23,7 +23,6 @@
 
 #define TORQUE_CTRL_WRITE(x)    c_torque_ctrl <: (x)
 #define TORQUE_CTRL_READ(x)     c_torque_ctrl :> (x)
-
 
 void init_buffer(int buffer[], int length)
 {

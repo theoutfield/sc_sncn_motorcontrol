@@ -1,7 +1,7 @@
 /**
  * @file velocity_ctrl_server.h
  * @brief Velocity Control Loop Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once
@@ -9,6 +9,8 @@
 #include <hall_client.h>
 #include <qei_client.h>
 #include <internal_config.h>
+#include "control_loops_common.h"
+#include "velocity_ctrl_client.h"
 
 /**
  * @brief Velocity Control Loop

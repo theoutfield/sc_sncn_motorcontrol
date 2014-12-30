@@ -1,9 +1,6 @@
 /**
  * @file hall_client.xc
- * @brief Hall Sensor Client Functions
- * @author Ludwig Orgler <lorgler@synapticon.com>
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <hall_config.h>

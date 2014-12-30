@@ -1,7 +1,7 @@
 /**
  * @file gpio_client.h
  * @brief General Purpose IO Digital Client Functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

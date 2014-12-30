@@ -1,7 +1,7 @@
 /**
  * @file velocity_ctrl_client.xc
  * @brief Velocity Control Loop Client functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <velocity_ctrl_client.h>
@@ -12,10 +12,40 @@
 #include <drive_modes.h>
 #include <print.h>
 
+/* TODO: remove dependency (at the moment required for PID params) */
+#include <bldc_motor_config.h>
+
 //#define debug_print
 
 #define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
 #define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> (x)
+
+void init_velocity_control_param(ctrl_par & velocity_ctrl_params)
+{
+    velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;
+    velocity_ctrl_params.Kp_d = VELOCITY_Kp_DENOMINATOR;
+    velocity_ctrl_params.Ki_n = VELOCITY_Ki_NUMERATOR;
+    velocity_ctrl_params.Ki_d = VELOCITY_Ki_DENOMINATOR;
+    velocity_ctrl_params.Kd_n = VELOCITY_Kd_NUMERATOR;
+    velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
+    velocity_ctrl_params.Loop_time = 1 * MSEC_STD; // units - core timer value //CORE 2/1/0 default
+
+    if (MOTOR_TYPE == BDC) {
+        velocity_ctrl_params.Control_limit = BDC_PWM_CONTROL_LIMIT; // PWM resolution
+    }
+    else {
+        velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
+    }
+
+    if(velocity_ctrl_params.Ki_n != 0) {
+        // auto calculated using control_limit
+        velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
+    } else {
+        velocity_ctrl_params.Integral_limit = 0;
+    }
+
+    return;
+}
 
 int init_velocity_control(chanend c_velocity_ctrl)
 {

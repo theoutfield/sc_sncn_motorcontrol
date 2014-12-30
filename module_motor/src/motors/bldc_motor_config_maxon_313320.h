@@ -1,7 +1,7 @@
 /**
  * @file motor_maxon_313320.h
  * @brief Motor parameters for the maxon EC-i 40, brushless, 50 Watt motor with Hall sensors (Part Number: 313320)
- * @author Andrija Feher <afeher@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

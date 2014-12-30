@@ -2,7 +2,7 @@
  * @file profile_position.xc
  * @brief Profile Position Control functions
  *      Implements position profile control function
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <position_ctrl_client.h>

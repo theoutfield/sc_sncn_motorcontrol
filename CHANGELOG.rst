@@ -1,6 +1,11 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+1.0.3
+-----
+
+  * Switch to sc_somanet-base 2.0.0
+
 1.0.2
 ------
 

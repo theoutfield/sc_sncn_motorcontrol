@@ -1,8 +1,7 @@
 /**
  * @file adc_server_ad7949.xc
  * @brief ADC Server
- * @author Martin Schwarz <mschwarz@synapticon.com>
- * @author Ludwig Orgler <lorgler@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <xs1.h>
@@ -308,8 +307,8 @@ void adc_ad7949_triggered( chanend c_adc,
                                               0b11111001001001,   // ADC Channel 4, unipolar, referenced to GND
                                               0b11111011001001 }; // ADC Channel 5, unipolar, referenced to GND
     const unsigned int delay = (11*USEC_FAST) / 3; // 3.7 us
-    static unsigned int adc_data_a[5];
-    static unsigned int adc_data_b[5];
+    unsigned int adc_data_a[5];
+    unsigned int adc_data_b[5];
     unsigned short adc_index = 0;
     configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
 

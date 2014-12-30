@@ -1,7 +1,7 @@
 /**
  * @file  position_ctrl_client.xc
  * @brief Position control Loop Client functions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <position_ctrl_client.h>
@@ -9,11 +9,38 @@
 #include <print.h>
 #include <statemachine.h>
 #include <drive_modes.h>
+#include <internal_config.h>
+#include <refclk.h>
+
+/* TODO: remove dependency (at the moment required for PID params) */
+#include <bldc_motor_config.h>
 
 //#define debug_print
 
 #define POSITION_CTRL_WRITE(x)  c_position_ctrl <: (x)
 #define POSITION_CTRL_READ(x)   c_position_ctrl :> (x)
+
+void init_position_control_param(ctrl_par &position_ctrl_params)
+{
+    position_ctrl_params.Kp_n = POSITION_Kp_NUMERATOR;
+    position_ctrl_params.Kp_d = POSITION_Kp_DENOMINATOR;
+    position_ctrl_params.Ki_n = POSITION_Ki_NUMERATOR;
+    position_ctrl_params.Ki_d = POSITION_Ki_DENOMINATOR;
+    position_ctrl_params.Kd_n = POSITION_Kd_NUMERATOR;
+    position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
+    position_ctrl_params.Loop_time = 1 * MSEC_STD; // units - for CORE 2/1/0 only default
+
+    position_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
+
+    if(position_ctrl_params.Ki_n != 0) // auto calculated using control_limit
+    {
+        position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n);
+    } else {
+        position_ctrl_params.Integral_limit = 0;
+    }
+
+    return;
+}
 
 int init_position_control(chanend c_position_ctrl)
 {

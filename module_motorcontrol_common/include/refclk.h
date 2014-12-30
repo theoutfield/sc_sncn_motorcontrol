@@ -1,7 +1,7 @@
 /**
  * @file refclk.h
  * @brief Reference Clock definitions
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 

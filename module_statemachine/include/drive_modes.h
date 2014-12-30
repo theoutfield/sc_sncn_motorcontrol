@@ -1,7 +1,7 @@
 /**
  * @file drive_config.h
  * @brief Drive mode definitions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once

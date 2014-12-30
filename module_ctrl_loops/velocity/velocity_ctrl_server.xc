@@ -1,7 +1,7 @@
 /**
  * @file velocity_ctrl_server.xc
  * @brief Velocity Control Loop Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <velocity_ctrl_server.h>
@@ -17,7 +17,7 @@
 #include <print.h>
 #include <a4935.h>
 
-#ifdef BDC
+#if(MOTOR_TYPE == BDC)
 #include <brushed_dc_client.h>
 #endif
 
@@ -26,7 +26,6 @@
 
 #define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
 #define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> (x)
-
 
 void velocity_control( ctrl_par & velocity_ctrl_params,
                        filter_par & sensor_filter_params,
@@ -171,7 +170,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                     velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
                 }
 
-#ifdef BDC
+#if(MOTOR_TYPE == BDC)
                 set_bdc_voltage(c_commutation, velocity_control_out);
 #else
                 set_commutation_sinusoidal(c_commutation, velocity_control_out);
@@ -251,11 +250,13 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
 #ifdef debug_print
                         printstrln("commutation intialized");
 #endif
+#if(MOTOR_TYPE == BLDC)
                         fet_state = check_fet_state(c_commutation);
                         if (fet_state == 1) {
                             enable_motor(c_commutation);
                             wait_ms(2, 1, ts);
                         }
+#endif
                         break;
                     }
                 }

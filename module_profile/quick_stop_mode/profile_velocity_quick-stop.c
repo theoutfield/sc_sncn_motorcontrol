@@ -1,7 +1,7 @@
 /**
  * @file profile_velocity_quick-stop.c
  * @brief Quick stop Profile Generation for Velocity
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <profile.h>

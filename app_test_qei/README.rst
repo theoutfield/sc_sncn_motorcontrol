@@ -112,7 +112,7 @@ More information about QEI Server/ Client can be found at
 `module\_qei <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_qei>`_.
 
 Other dependancies:
-`module\_nodeconfig <https://github.com/synapticon/sc_somanet-base/tree/master/module_nodeconfig>`_@`sc\_somanet-base <https://github.com/synapticon/sc_somanet-base>`_
+`module\_nodeconfig <https://github.com/synapticon/sc_somanet-base/tree/master/module_board-support>`_@`sc\_somanet-base <https://github.com/synapticon/sc_somanet-base>`_
 `module\_blocks <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_blocks>`_
 `module\_common <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_common>`_
 

@@ -1,8 +1,7 @@
 /**
  * @file qei_config.h
  * @brief QEI Sensor Config Definitions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
- * @author Martin Schwarz <mschwarz@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once

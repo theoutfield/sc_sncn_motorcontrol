@@ -1,15 +1,18 @@
 /**
  * @file internal_config.h
  * @brief Internal Definitions
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once
 
 #include <mc_constants.h>
+#include <pwm_config.h>
 
-#define BLDC_PWM_CONTROL_LIMIT              6794
-#define BDC_PWM_CONTROL_LIMIT               13589
+/* TODO: output of control loops shouldn't (directly) depend on
+ * PWM_MAX_VALUE, etc. */
+#define BLDC_PWM_CONTROL_LIMIT              (((PWM_MAX_VALUE) - (PWM_DEAD_TIME)) / 2)
+#define BDC_PWM_CONTROL_LIMIT               ((PWM_MAX_VALUE) - (PWM_DEAD_TIME))
 
 #define HALL_POSITION_INTERPOLATED_RANGE    4096
 
@@ -18,8 +21,10 @@
 #define DC300_RESOLUTION                    400
 #define OLD_DC300_RESOLUTION                264
 
+#define BLDC                                1
+#define BDC                                 2
 
-
+#define MOTOR_TYPE                          BLDC
 
 #define INIT_BUSY                           0
 #define INIT                                1
@@ -50,19 +55,6 @@
 /* Digital Input types */
 #define GP_INPUT_TYPE                       40
 #define SWITCH_INPUT_TYPE                   50
-
-/**
- * @brief struct definition for PID Controller
- */
-typedef struct S_Control
-{
-    int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
-    int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
-    int Kd_n, Kd_d; //Kd = Kd_n/Kd_d
-    int Integral_limit;
-    int Control_limit;
-    int Loop_time;
-} ctrl_par;
 
 /**
  * @brief struct definition for velocity filter

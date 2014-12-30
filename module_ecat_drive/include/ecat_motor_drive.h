@@ -1,13 +1,13 @@
 /**
  * @file ecat_motor_drive.h
  * @brief Ethercat Motor Drive Server
- * @author Pavan Kanajar <pkanajar@synapticon.com>
-*/
+ * @author Synapticon GmbH <support@synapticon.com>
+ */
 
 #pragma once
 
 /**
- * @brief This server implementation enables motor drive functions via Ethercat communication
+ * @brief This server implementation enables motor drive functions via EtherCAT communication
  *
  * @Input Channel
  * @param pdo_in channel to receive information from ethercat
@@ -24,7 +24,7 @@
  * @param c_gpio channel to config/read/drive GPIO digital ports
  *
  */
-void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,\
+void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,
         chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio);
 
 int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation);

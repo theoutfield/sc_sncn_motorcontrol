@@ -1,7 +1,7 @@
 /**
  * @file profile_position_quick-stop.c
  * @brief Quick stop Profile Generation for Position
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #include <profile.h>

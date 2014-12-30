@@ -1,7 +1,7 @@
 /**
  * @file bldc_motor_config.h
- * @brief Motor Control config file (define your the motor specifications here)
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @brief Motor Control config file (define your motor specifications here)
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <internal_config.h>
@@ -23,7 +23,7 @@
  * and any additional encoders attached specify encoder resolution here (Mandatory)
  */
 #define GEAR_RATIO                  1                    // if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION          16384               // 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
+#define ENCODER_RESOLUTION          4096               // 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
 
 /* Position Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
@@ -73,12 +73,12 @@
 #define POSITION_Kd_DENOMINATOR     1000
 
 #if(SENSOR_USED == HALL)
-    #define MAX_POSITION_LIMIT      POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO       // ticks (max range: 2^30, limited for safe operation) qei/hall/any position sensor
-    #define MIN_POSITION_LIMIT      -POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO      // ticks (min range: -2^30, limited for safe operation) qei/hall/any position sensor
+    #define MAX_POSITION_LIMIT      POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO*10       // ticks (max range: 2^30, limited for safe operation) qei/hall/any position sensor
+    #define MIN_POSITION_LIMIT      -POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO*10      // ticks (min range: -2^30, limited for safe operation) qei/hall/any position sensor
 #endif
 #if(SENSOR_USED == QEI)
-    #define MAX_POSITION_LIMIT      GEAR_RATIO*ENCODER_RESOLUTION    // ticks (max range: 2^30, limited for safe operation)
-    #define MIN_POSITION_LIMIT      -GEAR_RATIO*ENCODER_RESOLUTION   // ticks (min range: -2^30, limited for safe operation)
+    #define MAX_POSITION_LIMIT      GEAR_RATIO*ENCODER_RESOLUTION*10    // ticks (max range: 2^30, limited for safe operation)
+    #define MIN_POSITION_LIMIT      -GEAR_RATIO*ENCODER_RESOLUTION*10   // ticks (min range: -2^30, limited for safe operation)
 #endif
 
 /* Torque Control (Mandatory if Torque control used)

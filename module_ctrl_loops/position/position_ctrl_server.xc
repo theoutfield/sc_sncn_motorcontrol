@@ -1,18 +1,21 @@
 /**
  * @file  position_ctrl_server.xc
  * @brief Position Control Loop Server Implementation
- * @author Pavan Kanajar <pkanajar@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
 */
+
+#include <xscope_wrapper.h>
+#include <print.h>
 
 #include <position_ctrl_server.h>
 #include <position_ctrl_common.h>
-#include <xscope_wrapper.h>
-#include <print.h>
 #include <statemachine.h>
 #include <drive_modes.h>
 #include <a4935.h>
+#include <internal_config.h>
 
-#ifdef BDC
+
+#if(MOTOR_TYPE == BDC)
 #include <brushed_dc_client.h>
 #endif
 
@@ -22,8 +25,6 @@
 #define POSITION_CTRL_WRITE(x)  c_position_ctrl <: (x)
 #define POSITION_CTRL_READ(x)   c_position_ctrl :> (x)
 
-
-//extern int position_factor(int gear_ratio, int qei_max_real, int pole_pairs, int sensor_used);
 
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used,
                       chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation)
@@ -119,7 +120,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                     position_control_out = 0 - position_ctrl_params.Control_limit;
                 }
 
-#ifdef BDC
+#if(MOTOR_TYPE == BDC)
                 set_bdc_voltage(c_commutation, position_control_out);
 #else
                 set_commutation_sinusoidal(c_commutation, position_control_out);
@@ -192,11 +193,13 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 #ifdef debug_print
                         printstrln("commutation intialized");
 #endif
+#if(MOTOR_TYPE == BLDC)
                         fet_state = check_fet_state(c_commutation);
                         if (fet_state == 1) {
                             enable_motor(c_commutation);
                             wait_ms(2, 1, ts);
                         }
+#endif
                         break;
                     }
                 }
