@@ -92,12 +92,14 @@
     <release parenthash = "9de9b35b2cce5156658a993cbf31ff1540925362" version = "1.0.0rc0" githash = "0e2e6ba69942aa47483cae4514d93b5c0cd3076f"></release>
     <release parenthash = "82c26ceba659f5e52d6a58da75f470da5d2d5a18" version = "1.0.1rc0" githash = "f2f85b918399844af1f856507d0a921a24bd8540"></release>
     <release parenthash = "6fcfbcd382a321daed453c4e748ea85da91e3844" version = "1.0.1rc1" githash = "20f02ffe4a026217fe683b3c6c1d2a88c269c36b"></release>
-    <release parenthash = "d3d7455c1b26c5f3279a09fed59a4813ce7dd7f2" version = "1.0.1rc2" githash = "a6e52bf711aee5b1b20400dcd851028fae0b856d 4eb2983caebfc2074b3be61117bd7c319c2980b2"></release>
+    <release parenthash = "d3d7455c1b26c5f3279a09fed59a4813ce7dd7f2" version = "1.0.1rc2" githash = "a6e52bf711aee5b1b20400dcd851028fae0b856d"></release>
     <release parenthash = "7f113900ec3a02c7f17f4cf089ee705cb1659ead" version = "1.0.1rc3" githash = "88f41d1317ab6a16bdf5166f765d62c72ddc54c8"></release>
     <release parenthash = "c65f2d985346998b1fe3b48e82c79ea33ad9a1b7" version = "1.0.2beta0" githash = "9484aa4f3b5e3af4049ceea3fb4680a13993deea"></release>
     <release parenthash = "9484aa4f3b5e3af4049ceea3fb4680a13993deea" version = "1.0.2beta1" githash = "84f2e59edf4072bedeeb779acb5ccb4686992463"></release>
     <release parenthash = "d04a73b0e2ff0bf9d3b3eb697cd2538903ba4fe4" version = "1.0.2rc0" githash = "a785478bb69ca7fe2c6e00143d56fa9903a84859"></release>
-    <release parenthash = "ff4cba79677e2e6178dc2f0eb30c615e223e8926" version = "1.0.2rc1"></release>
+    <release parenthash = "ff4cba79677e2e6178dc2f0eb30c615e223e8926" version = "1.0.2rc1" githash = "e186cdc7aa42ae23206676eb9ce6da43ef338263"></release>
+    <release parenthash = "e186cdc7aa42ae23206676eb9ce6da43ef338263" version = "1.0.2" githash = "332f807f7650558f7568c9bb365ab30adb50be7f"></release>
+    <release parenthash = "332f807f7650558f7568c9bb365ab30adb50be7f" version = "1.0.3"></release>
     <subpartnumber>XM-005824-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <version_defines></version_defines>
