@@ -14,6 +14,7 @@
 #include <internal_config.h>
 #include <hall_config.h>
 #include <qei_config.h>
+#include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/
 
@@ -162,8 +163,6 @@ extern int init_linear_profile(int target_value, int actual_value, int accelerat
  */
 extern int linear_profile_generate(int step);
 
-#ifndef __XC__
-
 typedef struct
 {
     float max_acceleration;     // max acceleration
@@ -226,12 +225,12 @@ typedef struct
 
 void __initialize_position_profile_limits( int max_acceleration, int max_velocity,
                                            int sensor_select, int max_position, int min_position,
-                                           profile_position_param *profile_pos_params );
+                                           REFERENCE_PARAM(profile_position_param, profile_pos_params) );
 
 int __initialize_position_profile( int target_position, int actual_position, int velocity, int acceleration,
-                                   int deceleration, profile_position_param *profile_pos_params );
+                                   int deceleration, REFERENCE_PARAM(profile_position_param, profile_pos_params) );
 
-int __position_profile_generate_in_steps(int step, profile_position_param *profile_pos_params);
+int __position_profile_generate_in_steps(int step, REFERENCE_PARAM(profile_position_param, profile_pos_params) );
 
 typedef struct
 {
@@ -247,9 +246,9 @@ typedef struct
 } profile_linear_param;
 
 int __init_linear_profile_float( float target_value, float actual_value, float acceleration,
-                                 float deceleration, float max_value, profile_linear_param * profile_linear_params );
+                                 float deceleration, float max_value, REFERENCE_PARAM(profile_linear_param, profile_linear_params) );
 
-float __linear_profile_generate_float( int step, profile_linear_param *profile_linear_params );
+float __linear_profile_generate_float( int step, REFERENCE_PARAM(profile_linear_param, profile_linear_params) );
 
 typedef struct
 {
@@ -265,9 +264,8 @@ typedef struct
 } profile_velocity_param;
 
 int __initialize_velocity_profile( int target_velocity, int actual_velocity, int acceleration,
-                                   int deceleration, int max_velocity, profile_velocity_param *profile_velocity_params );
+                                   int deceleration, int max_velocity, REFERENCE_PARAM(profile_velocity_param, profile_velocity_params) );
 
-int __velocity_profile_generate_in_steps( int step, profile_velocity_param *profile_velocity_params );
+int __velocity_profile_generate_in_steps( int step, REFERENCE_PARAM(profile_velocity_param, profile_velocity_params) );
 
-#endif  /* ifndef __XC__ */
 
