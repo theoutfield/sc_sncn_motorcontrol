@@ -18,6 +18,7 @@ enum {
     HALL_VELOCITY_REQ,    //!< Velocity request token
     HALL_RESET_COUNT_REQ,     //!< Reset hall server ticks count
     HALL_FILTER_PARAM_REQ,//!< Filter length request token
+    HALL_REQUEST_PORT_STATES
 };
 
 /**

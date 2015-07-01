@@ -21,7 +21,7 @@
 
 static select on_client_request(chanend ? c_client, int angle, int raw_velocity,
                                 int init_state, int & count, int direction,
-                                hall_par & hall_params, int & status)
+                                hall_par & hall_params, int & status, unsigned int raw_pin_states)
 {
 case !isnull(c_client) => c_client :> int command:
     switch (command) {
@@ -55,6 +55,10 @@ case !isnull(c_client) => c_client :> int command:
 
     case HALL_FILTER_PARAM_REQ:
         c_client <: hall_params.max_ticks_per_turn;
+        break;
+
+    case HALL_REQUEST_PORT_STATES:
+        c_client <: raw_pin_states;
         break;
 
     default:
@@ -99,6 +103,7 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
 
     unsigned int pin_state = 0;         // newest hall state
     unsigned int pin_state_last = 0;
+    unsigned int pin_state_monitor = 0;
     unsigned int new1 = 0;
     unsigned int new2 = 0;
     unsigned int uHallNext = 0;
@@ -143,6 +148,7 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
 
     /* Init hall sensor */
     p_hall :> pin_state;
+    pin_state_monitor = pin_state;
     switch(pin_state) {
     case 3: angle = 0;
         break;
@@ -187,6 +193,8 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
             }
             break;
         }
+
+        p_hall :> pin_state_monitor;
 
         iCountMicroSeconds = iCountMicroSeconds + 10; // period in 10 usec
         iTimeCountOneTransition = iTimeCountOneTransition + 10 ;
@@ -326,17 +334,17 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
 //#pragma ordered
         select {
         case on_client_request(c_hall_p1, angle, raw_velocity, init_state, count, direction,
-                               hall_params, status);
+                               hall_params, status, pin_state_monitor);
         case on_client_request(c_hall_p2, angle, raw_velocity, init_state, count, direction,
-                               hall_params, status);
+                               hall_params, status, pin_state_monitor);
         case on_client_request(c_hall_p3, angle, raw_velocity, init_state, count, direction,
-                               hall_params, status);
+                               hall_params, status, pin_state_monitor);
         case on_client_request(c_hall_p4, angle, raw_velocity, init_state, count, direction,
-                               hall_params, status);
+                               hall_params, status, pin_state_monitor);
         case on_client_request(c_hall_p5, angle, raw_velocity, init_state, count, direction,
-                               hall_params, status);
+                               hall_params, status, pin_state_monitor);
         case on_client_request(c_hall_p6, angle, raw_velocity, init_state, count, direction,
-                               hall_params, status);
+                               hall_params, status, pin_state_monitor);
         case tx when timerafter(time1 + MSEC_FAST) :> time1:
             if (init_velocity == 0) {
                 if (count > 2049) {
