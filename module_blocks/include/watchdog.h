@@ -22,5 +22,5 @@ void watchdog_start(chanend c_watchdog);
  * @param p_wd_tick control for the tick of the watchdog
  * @param p_shared_leds_wden control port for the watchdog device
  */
-void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds_wden);
+void run_watchdog(chanend c_watchdog, out port ? p_wd_tick, out port p_shared_leds_wden);
 

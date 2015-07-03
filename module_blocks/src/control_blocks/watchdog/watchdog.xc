@@ -16,8 +16,9 @@ void watchdog_start(chanend c_watchdog)
     c_watchdog <: WD_CMD_START;
 }
 
-void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds_wden)
+void run_watchdog(chanend c_watchdog, out port ?p_wd_tick, out port p_shared_leds_wden)
 {
+
     unsigned int cmd, wd_enabled = 1, shared_out = 0xe, tick_out = 0;
     unsigned int ts, ts2;
     timer t;
@@ -31,11 +32,22 @@ void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds
         case c_watchdog :> cmd:
             switch (cmd) {
             case WD_CMD_START: // produce a rising edge on the WD_EN
-                shared_out &= ~0x1;
+                if (isnull(p_wd_tick)){
+                    shared_out &= ~0x5;
+                }
+                else {
+                    shared_out &= ~0x1;
+                }
                 p_shared_leds_wden <: shared_out; // go low
                 t :> ts2;
                 t when timerafter(ts2+25000) :> ts2;
-                shared_out |= 0x1;
+                if (isnull(p_wd_tick)){
+                    shared_out &= 0x7;
+                    shared_out |= 0x1;
+                }
+                else{
+                    shared_out |= 0x1;
+                }
                 p_shared_leds_wden <: shared_out; // go high
                 break;
 
@@ -58,7 +70,13 @@ void run_watchdog(chanend c_watchdog, out port p_wd_tick, out port p_shared_leds
         }
 
         // Send out the new value to the shared port
-        p_shared_leds_wden <: shared_out;
-        p_wd_tick <: tick_out;
+        if (isnull(p_wd_tick)){
+            p_shared_leds_wden <: shared_out | tick_out << 1;
+        }
+        // or to the WD tick port
+        else {
+            p_wd_tick <: tick_out;
+        }
+
     }
 }
