@@ -148,6 +148,7 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
 
     /* Init hall sensor */
     p_hall :> pin_state;
+    pin_state &= 0x07;
     pin_state_monitor = pin_state;
     switch(pin_state) {
     case 3: angle = 0;
@@ -195,6 +196,7 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
         }
 
         p_hall :> pin_state_monitor;
+        pin_state_monitor &= 0x07;
 
         iCountMicroSeconds = iCountMicroSeconds + 10; // period in 10 usec
         iTimeCountOneTransition = iTimeCountOneTransition + 10 ;
