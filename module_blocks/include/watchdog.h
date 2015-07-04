@@ -8,6 +8,10 @@
 
 void watchdog_start(chanend c_watchdog);
 
+void watchdog_enable_motors(chanend c_watchdog);
+
+void watchdog_disable_motors(chanend c_watchdog);
+
 /** @brief Run the watchdog timer server
  *
  * The watchdog timer needs a constant stream of pulses to prevent it
