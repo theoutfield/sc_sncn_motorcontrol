@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IMF_BOARD_REQUIRED" WIT A APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <IMF_BOARD_REQUIRED>
 
 /**
  * @file test_hall.xc
@@ -12,8 +12,6 @@
 #include <hall_client.h>
 #include <hall_server.h>
 #include <xscope_wrapper.h>
-
-//#define ENABLE_xscope
 
 /* Test Hall Sensor Client */
 void hall_test(chanend c_hall)
@@ -30,18 +28,17 @@ void hall_test(chanend c_hall)
         /* get velocity from Hall Sensor */
         velocity = get_hall_velocity(c_hall);
 
-#ifdef ENABLE_xscope
-        xscope_core_int(0, position);
-        xscope_core_int(1, velocity);
-#else
         printstr("Position: ");
         printint(position);
         printstr(" ");
         printstr("Velocity: ");
-        printintln(velocity);
-#endif
+        printint(velocity);
+        printstr(" ");
+        printintln(get_hall_pinstate(c_hall));
     }
 }
+
+
 
 int main(void)
 {
@@ -49,7 +46,7 @@ int main(void)
 
     par
     {
-        on tile[COM_TILE]:
+        on tile[APP_TILE]:
         {
             /* Test Hall Sensor Client */
             par
@@ -66,8 +63,16 @@ int main(void)
             /* Hall Server */
             {
                 hall_par hall_params;
+#ifdef DC1K
+                //connector 1
+                p_ifm_encoder_hall_select_ext_d4to5 <: SET_AS_HALL;
                 run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6,
-                         p_ifm_hall, hall_params); // channel priority 1,2..6
+                                        p_ifm_encoder_hall_1, hall_params); // channel priority 1,2..6
+
+#else
+                run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6,
+                        p_ifm_hall, hall_params); // channel priority 1,2..6
+#endif
             }
 
         }
