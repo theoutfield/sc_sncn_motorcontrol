@@ -78,7 +78,7 @@ case c_client :> int command:
     break;
 }
 
-static void commutation_sinusoidal_loop(port ? p_ifm_ff1, port ? p_ifm_ff2, port p_ifm_coastn,
+static void commutation_sinusoidal_loop(port ? p_ifm_ff1, port ? p_ifm_ff2, port ? p_ifm_coastn,
                                         int sensor_select, t_pwm_control & pwm_ctrl,
                                         hall_par & hall_params, qei_par & qei_params,
                                         commutation_par & commutation_params,
@@ -200,7 +200,7 @@ static void commutation_sinusoidal_loop(port ? p_ifm_ff1, port ? p_ifm_ff2, port
 void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, chanend c_watchdog,
                             chanend  c_commutation_p1, chanend  c_commutation_p2,
                             chanend  c_commutation_p3, chanend c_pwm_ctrl,
-                            out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn,
+                            out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn,
                             port ? p_ifm_ff1, port ? p_ifm_ff2,
                             hall_par & hall_params, qei_par & qei_params,
                             commutation_par &commutation_params)
@@ -226,11 +226,19 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;
 
-    a4935_initialize(p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, A4935_BIT_PWML | A4935_BIT_PWMH);
-    t when timerafter (ts + t_delay) :> ts;
+    if (!isnull(p_ifm_esf_rstn_pwml_pwmh) && !isnull(p_ifm_coastn)){
+        a4935_initialize(p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, A4935_BIT_PWML | A4935_BIT_PWMH);
+        t when timerafter (ts + t_delay) :> ts;
+    }
 
-    p_ifm_coastn :> check_fet;
-    init_state = check_fet;
+    if(!isnull(p_ifm_coastn)){
+        p_ifm_coastn :> check_fet;
+        init_state = check_fet;
+    }
+    else {
+        watchdog_enable_motors(c_watchdog);
+        init_state = 1;
+    }
 
     commutation_sinusoidal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, HALL, pwm_ctrl, hall_params,
                                 qei_params, commutation_params, init_state,
