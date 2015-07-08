@@ -5,7 +5,6 @@
  */
 
 #include <xs1.h>
-#include <stdio.h>
 
 enum { WD_CMD_EN_MOTOR,
        WD_CMD_DIS_MOTOR,
@@ -47,7 +46,6 @@ void run_watchdog(chanend c_watchdog, out port ?p_wd_tick, out port p_shared_led
                     else {
                         shared_out &= ~0x1;
                     }
-          //          printf("%x\n", shared_out);
                     p_shared_leds_wden <: shared_out; // go low
                     t :> ts2;
                     t when timerafter(ts2+25000) :> ts2;
