@@ -65,7 +65,7 @@ int main(void)
                 hall_par hall_params;
 #ifdef DC1K
                 //connector 1
-                p_ifm_encoder_hall_select_ext_d4to5 <: SET_AS_HALL;
+                p_ifm_encoder_hall_select_ext_d4to5 <: SET_ALL_AS_HALL;
                 run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6,
                                         p_ifm_encoder_hall_1, hall_params); // channel priority 1,2..6
 
