@@ -119,5 +119,5 @@ Other dependancies:
 **See also**:
 
 -  `Getting started with
-   SOMANET <http://doc.synapticon.com/wiki/index.php/Category:Getting_Started_with_SOMANET>`_
+   SOMANET <http://doc.synapticon.com/index.php/Category:Getting_Started_with_SOMANET>`_
 
