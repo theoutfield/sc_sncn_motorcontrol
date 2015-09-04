@@ -31,10 +31,10 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 /* Sinusoidal based commutation functions */
 
 
-static select on_client_request(chanend c_client, commutation_par & commutation_params, int & voltage,
+static select on_client_request(chanend ? c_client, commutation_par & commutation_params, int & voltage,
                                 int & sensor_select, int init_state, int & shutdown)
 {
-case c_client :> int command:
+case !isnull(c_client) => c_client :> int command:
     switch (command) {
     case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
         c_client :> voltage;    //STAR_WINDING
@@ -84,8 +84,8 @@ static void commutation_sinusoidal_loop(port ? p_ifm_ff1, port ? p_ifm_ff2, port
                                         commutation_par & commutation_params,
                                         int init_state, chanend c_hall, chanend c_qei,
                                         chanend c_pwm_ctrl, chanend c_signal,
-                                        chanend c_commutation_p1, chanend c_commutation_p2,
-                                        chanend c_commutation_p3)
+                                        chanend c_commutation_p1, chanend ? c_commutation_p2,
+                                        chanend ? c_commutation_p3)
 {
     unsigned int command;
     unsigned int pwm[3] = { 0, 0, 0 };
@@ -197,9 +197,9 @@ static void commutation_sinusoidal_loop(port ? p_ifm_ff1, port ? p_ifm_ff2, port
 
 }
 
-void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, chanend c_watchdog,
-                            chanend  c_commutation_p1, chanend  c_commutation_p2,
-                            chanend  c_commutation_p3, chanend c_pwm_ctrl,
+void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, chanend ? c_watchdog,
+                            chanend  c_commutation_p1, chanend ? c_commutation_p2,
+                            chanend ? c_commutation_p3, chanend c_pwm_ctrl,
                             out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn,
                             port ? p_ifm_ff1, port ? p_ifm_ff2,
                             hall_par & hall_params, qei_par & qei_params,
@@ -221,7 +221,8 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
     // enable watchdog
     t :> ts;
     t when timerafter (ts + 250000*4):> ts; /* FIXME: replace with constant */
-    watchdog_start(c_watchdog);
+    if(!isnull(c_watchdog))
+        watchdog_start(c_watchdog);
 
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;
@@ -236,7 +237,8 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
         init_state = check_fet;
     }
     else {
-        watchdog_enable_motors(c_watchdog);
+        if(!isnull(c_watchdog))
+            watchdog_enable_motors(c_watchdog);
         init_state = 1;
     }
 
