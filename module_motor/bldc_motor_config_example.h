@@ -50,6 +50,9 @@
 /* Changes direction of the motor drive  (1 /-1) */
 #define POLARITY                    1
 
+/* Reduce when sine commutation loops are combined. 250MHz reference clock is considered! */
+#define COMMUTATION_LOOP_FREQUENCY_KHZ  10
+
 /* Profile defines (Mandatory for profile modes) */
 #define MAX_PROFILE_VELOCITY        MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY            1000                // rpm
