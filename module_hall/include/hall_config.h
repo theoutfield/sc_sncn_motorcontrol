@@ -8,6 +8,7 @@
 
 #define RPM_CONST           60000000 // 60s / 1us
 #define FILTER_LENGTH_HALL  16
+#define PULL_PERIOD_USEC 12
 
 /**
  * Client/server interaction commands/tokens
