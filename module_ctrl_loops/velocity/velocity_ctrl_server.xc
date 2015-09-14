@@ -14,7 +14,7 @@
 #include <internal_config.h>
 #include <statemachine.h>
 #include <drive_modes.h>
-#include <print.h>
+#include <stdio.h>
 #include <a4935.h>
 
 #if(MOTOR_TYPE == BDC)
@@ -27,13 +27,14 @@
 #define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
 #define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> (x)
 
+[[combinable]]
 void velocity_control( ctrl_par & velocity_ctrl_params,
                        filter_par & sensor_filter_params,
-                       hall_par &hall_params,
-                       qei_par &qei_params,
+                       hall_par &?hall_params,
+                       qei_par &?qei_params,
                        int sensor_used,
                        chanend c_hall,
-                       chanend c_qei,
+                       chanend ?c_qei,
                        chanend c_velocity_ctrl,
                        chanend c_commutation )
 {
@@ -63,26 +64,45 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
     int direction = 0;
     int old_difference;
     int rpm_constant = 1000*60; // constant
-    int speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD);  // variable pole_pairs    core 2/1/0 only
-    int speed_factor_qei  = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);       // variable qei_real_max  core 2/1/0 only
-
+    int speed_factor_hall = 0;
+    int speed_factor_qei = 0;
     int command;
     int activate = 0;
     int init_state = INIT_BUSY;
-    int qei_crossover = qei_params.real_counts - qei_params.real_counts/10;
-    int hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
+    int qei_crossover = 0;
+    int hall_crossover = 0;
     int compute_flag = 0;
     int fet_state = 0;
-    init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 
-    printstr("*************************************\n    VELOCITY CONTROLLER STARTING\n*************************************\n");
+    init_filter(filter_buffer, index, FILTER_SIZE_MAX);
+    if (sensor_used == HALL){
+        if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
+            speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_FAST); // variable pole_pairs
+        }
+        else {
+            speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs
+        }
+        hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
+    }
+    else if (sensor_used == QEI){
+        if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
+            speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_FAST);       // variable qei_real_max
+        }
+        else {
+            speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);       // variable qei_real_max
+        }
+        qei_crossover = qei_params.real_counts - qei_params.real_counts/10;
+    }
+
+    printf("*************************************\n    VELOCITY CONTROLLER STARTING\n*************************************\n");
 
     ts :> time;
     time += velocity_ctrl_params.Loop_time;
 
     init_state = INIT;
+
     while (1) {
-#pragma ordered
+//#pragma ordered
         select {
         case ts when timerafter (time) :> void:
             time += velocity_ctrl_params.Loop_time;
@@ -115,7 +135,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                         previous_position = position;
                         old_difference = difference;
                     }
-                } else if (sensor_used == QEI) {
+                } else if (sensor_used == QEI && !isnull(c_qei)) {
                     { position, direction } = get_qei_position_absolute(c_qei);
                     difference = position - previous_position;
 
@@ -173,12 +193,12 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
 #if(MOTOR_TYPE == BDC)
                 set_bdc_voltage(c_commutation, velocity_control_out);
 #else
-                set_commutation_sinusoidal(c_commutation, velocity_control_out);
+                set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
 #endif
                 previous_error = error_velocity;
 
             }
-
+    //        printf("looping %d\n", velocity_ctrl_params.Loop_time);
             break;
 
             /* acq target velocity etherCAT */
@@ -186,6 +206,8 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
             switch (command) {
             case VCTRL_CMD_SET_VELOCITY:
                 VELOCITY_CTRL_READ(target_velocity);
+              //  target_velocity = 1000;
+              //  printf("%d %d\n", target_velocity, MOTOR_TYPE);
                 break;
 
             case VCTRL_CMD_GET_VELOCITY:
@@ -248,7 +270,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                     init_state = __check_commutation_init(c_commutation);
                     if (init_state == INIT) {
 #ifdef debug_print
-                        printstrln("commutation intialized");
+                        printf("commutation intialized\n");
 #endif
 #if(MOTOR_TYPE == BLDC)
                         fet_state = check_fet_state(c_commutation);
@@ -261,7 +283,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                     }
                 }
 #ifdef debug_print
-                printstrln("velocity control activated");
+                printf("velocity control activated\n");
 #endif
                 break;
 

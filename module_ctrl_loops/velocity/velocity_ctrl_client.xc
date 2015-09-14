@@ -28,7 +28,8 @@ void init_velocity_control_param(ctrl_par & velocity_ctrl_params)
     velocity_ctrl_params.Ki_d = VELOCITY_Ki_DENOMINATOR;
     velocity_ctrl_params.Kd_n = VELOCITY_Kd_NUMERATOR;
     velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
-    velocity_ctrl_params.Loop_time = 1 * MSEC_STD; // units - core timer value //CORE 2/1/0 default
+    if (velocity_ctrl_params.Loop_time != MSEC_FAST)////FixMe: implement reference clock check
+        velocity_ctrl_params.Loop_time = 1 * MSEC_STD; // units - core timer value //CORE 2/1/0 default
 
     if (MOTOR_TYPE == BDC) {
         velocity_ctrl_params.Control_limit = BDC_PWM_CONTROL_LIMIT; // PWM resolution
