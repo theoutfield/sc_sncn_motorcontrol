@@ -82,7 +82,7 @@ case !isnull(c_client) => c_client :> int command:
 */
 
 [[combinable]]
-void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, chanend ? c_watchdog,
+void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, chanend ? c_watchdog,
                             chanend  c_commutation_p1, chanend ? c_commutation_p2,
                             chanend ? c_commutation_p3, chanend c_pwm_ctrl,
                             out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn,
@@ -158,7 +158,7 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
                 if (sensor_select == HALL) {
                     //hall only
                     angle = get_hall_position(c_hall);
-                } else if (sensor_select == QEI) {
+                } else if (sensor_select == QEI && !isnull(c_qei)) {
                     { angle, fw_flag, bw_flag } = get_qei_sync_position(c_qei);
                     angle = (angle << 12) / max_count_per_hall;
                     if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0)) {
@@ -339,7 +339,7 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
             case on_client_request(c_commutation_p3, commutation_params, voltage, sensor_select,
                                    init_state, shutdown);
 */
-            case c_signal :> command:
+            case !isnull(c_signal) => c_signal :> command:
                 if (command == CHECK_BUSY) {      // init signal
                     c_signal <: init_state;
                 } else if (command == SET_COMM_PARAM_ECAT) {
