@@ -28,18 +28,21 @@ void test_biss(client interface i_biss i_biss) {
     }
 }
 
-
 int main() {
     interface i_biss i_biss[2];
+
     par {
         on tile[0]: test_biss(i_biss[0]);
 
-#if(P_BISS_DATA == ENC_CH1)
-        on tile[3]: run_biss(i_biss, qei_q_ch1, p_ifm_encoder_ch1, clk_biss, 1,1);
-#else
         on tile[3]: {
+            biss_par biss_params;
+            init_biss_param(biss_params, 28, 12, 13, 2, 0b110000);
+
+#if(P_BISS_DATA == ENC_CH1)
+            run_biss(i_biss, qei_q_ch1, p_ifm_encoder_ch1, clk_biss, 10, 1, biss_params, 2);
+#else
             p_ifm_encoder_ch1 <: 0b1000;
-            run_biss(i_biss, qei_q_ch1, p_ifm_encoder_ch2, clk_biss, 10,1);
+            run_biss(i_biss, qei_q_ch1, p_ifm_encoder_ch2, clk_biss, 10, 1, biss_params, 2);
         }
 #endif
     }

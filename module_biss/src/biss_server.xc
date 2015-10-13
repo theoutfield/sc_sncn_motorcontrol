@@ -9,10 +9,22 @@
 #include <timer.h>
 #include <xclib.h>
 #include <print.h>
+#include <xs1.h>
 
 
-void run_biss(server interface i_biss i_biss[2], port out p_biss_clk, port p_biss_data, clock clk, unsigned a, unsigned b) {
+void init_biss_param(biss_par &biss_params, int data_length, int multiturn_length, int singleturn_length, int status_length, unsigned int crc_poly) {
+    biss_params.data_length = data_length;
+    biss_params.multiturn_length = multiturn_length;
+    biss_params.singleturn_length = singleturn_length;
+    biss_params.status_length = status_length;
+    biss_params.crc_poly = crc_poly;
+}
+
+void run_biss(server interface i_biss i_biss[2], port out p_biss_clk, port p_biss_data, clock clk, unsigned a, unsigned b,
+              biss_par biss_params, static const int frame_bytes) {
     printstr("*************************************\n    BISS SERVER STARTING\n*************************************\n");
+    unsigned int data[frame_bytes];
+    //clock configuration
     configure_clock_rate(clk, a, b) ; // a/b MHz
     configure_port_clock_output(p_biss_clk, clk);
     set_port_inv(p_biss_clk);
@@ -21,20 +33,18 @@ void run_biss(server interface i_biss i_biss[2], port out p_biss_clk, port p_bis
 #else
     configure_in_port(p_biss_data, clk);
 #endif
+    //main loop
     while (1) {
-        unsigned int data;
         unsigned int biss_timeout = 0;
         select {
         case i_biss[0].position() -> { int count, int position, unsigned int status }:
-                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, a, b, &data, 28, 2, 0b110000);
-                { count, position, status } = biss_ac36(data);
-                count = 0x2000 * count + position;
+                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, a, b, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                { count, position, status } = biss_encoder(data[0], biss_params.multiturn_length, biss_params.singleturn_length, biss_params.status_length);
                 biss_timeout = 1;
                 break;
         case i_biss[1].position() -> { int count, int position, unsigned int status }:
-                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, a, b, &data, 28, 2, 0b110000);
-                { count, position, status } = biss_ac36(data);
-                count = 0x2000 * count + position;
+                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, a, b, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                { count, position, status } = biss_encoder(data[0], biss_params.multiturn_length, biss_params.singleturn_length, biss_params.status_length);
                 biss_timeout = 1;
                 break;
         }
@@ -142,7 +152,7 @@ unsigned int biss_crc(unsigned int *data, unsigned int data_length, unsigned int
 void biss_crc_correct(unsigned int *data, unsigned int data_length, static const unsigned int frame_bytes,
                       unsigned int crc_received, unsigned int poly) {
     unsigned int crc_expected = biss_crc(data, data_length, poly);
-    unsigned int crc_error = ~(crc_expected ^ crc_received) & (0xFFFFFFFF >> clz(poly));
+    unsigned int crc_error = ~(crc_expected ^ crc_received) & (~0U >> clz(poly));
     unsigned int mask[frame_bytes];
     unsigned int corrected = 0;
     int i=0;
@@ -160,11 +170,12 @@ void biss_crc_correct(unsigned int *data, unsigned int data_length, static const
 }
 
 
-{ int, int, unsigned int } biss_ac36(unsigned int data) {
-    int multiturn  = ((data >> 15) & 0x0FFF); // 12 bit multiturn
-    int singleturn = ((data >>  2) & 0x1FFF); // 13 bit singelturn
-    unsigned int status = (data & 0b11);      // error and warning bits
-    if (multiturn >= 0b100000000000) //convert multiturn to signed
-        multiturn = multiturn - 0x1000;
-    return { multiturn, singleturn, status };
+{ int, unsigned int, unsigned int } biss_encoder(unsigned int data, int multiturn_length, int singleturn_length, int status_length) {
+    int count  = data >> (singleturn_length + status_length);                               //multiturn bits
+    unsigned int position  = (data >> status_length) & (~0U >> (32-singleturn_length));     //singleturn bits
+    unsigned int status = data & (~0U >> (32 - status_length));                             //status bits
+    if (count >= (1 << (multiturn_length-1)))                                               //convert multiturn to signed
+        count = count - (1 << multiturn_length);
+    count = (1 << singleturn_length) * count + position;                                    //convert multiturn to absolute count
+    return { count, position, status };
 }
