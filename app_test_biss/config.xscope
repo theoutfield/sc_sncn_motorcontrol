@@ -18,8 +18,8 @@
     <!-- For example: -->
     <!-- <Probe name="Probe Name" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/> -->
 
-    <Probe name="MULTITURN" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="SINGLETURN" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="COUNT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="ERROR" type="DISCRETE" datatype="UINT" units="Value" enabled="true"/>
     <Probe name="WARNING" type="DISCRETE" datatype="UINT" units="Value" enabled="true"/>
     <Probe name="TIME" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
