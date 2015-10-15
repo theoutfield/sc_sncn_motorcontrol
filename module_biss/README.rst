@@ -9,4 +9,4 @@ SOMANET Motor Control BiSS Encoder Component
 Description
 -----------
 
-This component provides driver for a BiSS encoder connected to the SOMANET IFM_A1 hardware module. The component provides BiSS server thread which read BiSS sensor data from the encoder and extract position information when called by the client with interface; and provides an interface for the client to get position from the BiSS server.
+This component provides driver for a BiSS encoder connected to the SOMANET IFM_A1 hardware module. The component provides BiSS server thread which read BiSS sensor data from the encoder and extract position information when called by the client with an interface; and provides an interface for the client to get position from the BiSS server.
