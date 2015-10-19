@@ -14,7 +14,9 @@
 void init_biss_param(biss_par &biss_params) {
     biss_params.data_length = BISS_DATA_LENGTH;
     biss_params.multiturn_length = BISS_MULTITURN_LENGTH;
+    biss_params.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
     biss_params.singleturn_length = BISS_SINGLETURN_LENGTH;
+    biss_params.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
     biss_params.status_length = BISS_STATUS_LENGTH;
     biss_params.crc_poly = BISS_CRC_POLY;
 }
@@ -45,12 +47,12 @@ void run_biss(server interface i_biss i_biss[2], port out p_biss_clk, port p_bis
         select {
         case i_biss[0].get_position() -> { int count, int position, unsigned int status }:
                 read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
-                { count, position, status } = biss_encoder(data[0], biss_params.multiturn_length, biss_params.singleturn_length, biss_params.status_length);
+                { count, position, status } = biss_encoder(data, biss_params);
                 biss_timeout = 1;
                 break;
         case i_biss[1].get_position() -> { int count, int position, unsigned int status }:
                 read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
-                { count, position, status } = biss_encoder(data[0], biss_params.multiturn_length, biss_params.singleturn_length, biss_params.status_length);
+                { count, position, status } = biss_encoder(data, biss_params);
                 biss_timeout = 1;
                 break;
         }
@@ -65,7 +67,9 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port p_biss_data, clock 
     unsigned int frame[frame_bytes];
     unsigned int crc = 0;
     unsigned int status = 0;
-    unsigned int index = 0;
+    unsigned int bitindex = 0;
+    unsigned int byteindex = 0;
+    unsigned int readbuf;
     unsigned int timeout = 8; //max number of bits to read before the ack bit, at least 3
     unsigned int crc_length = 32 - clz(crc_poly); //clz: number of leading 0
     for (int i=0; i<(data_length-1)/32+1; i++) //init data with zeros
@@ -86,7 +90,7 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port p_biss_data, clock 
     //get the raw data
     start_clock(clk);
     for (int j=0; j<frame_bytes; j++) {
-        unsigned int readbuf = 0;
+        /*unsigned int*/ readbuf = 0;
         for (int i=0; i<32; i++) {
             unsigned int bit;
             p_biss_data :> bit;
@@ -103,10 +107,11 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port p_biss_data, clock 
 
     //process the raw data
     //search for ack and start bit
-    while (status < 2 && index <= timeout) {
-        unsigned int bit = (frame[index/32] & 0x80000000);
-        frame[index/32] = frame[index/32] << 1;
-        index++;
+    readbuf = frame[0];
+    while (status < 2 && bitindex <= timeout) {
+        unsigned int bit = (readbuf & 0x80000000);
+        readbuf = readbuf << 1;
+        bitindex++;
         if (status) {
             if (bit) //status = 2, ack and start bit found
                 status++;
@@ -116,16 +121,26 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port p_biss_data, clock 
     //extract the data and crc
     if (status == 2) {
         for (int i=0; i<data_length; i++) {
-            data[i/32] = (data[i/32] << 1);
-            data[i/32] |= ( (frame[index/32] & 0x80000000) >> 31 );
-            frame[index/32] = frame[index/32] << 1;
-            index++;
+            if (bitindex == 32) {
+                bitindex = 0;
+                byteindex++;
+                readbuf = frame[byteindex];
+            }
+            data[i/32] = data[i/32] << 1;
+            data[i/32] |= (readbuf & 0x80000000) >> 31;
+            readbuf = readbuf << 1;
+            bitindex++;
         }
         for (int i=0; i<crc_length; i++) {
-            crc = (crc << 1);
-            crc |= ( (frame[index/32] & 0x80000000) >> 31 );
-            frame[index/32] = frame[index/32] << 1;
-            index++;
+            if (bitindex == 32) {
+                bitindex = 0;
+                byteindex++;
+                readbuf = frame[byteindex];
+            }
+            crc = crc << 1;
+            crc |= (readbuf & 0x80000000) >> 31;
+            readbuf = readbuf << 1;
+            bitindex++;
         }
         status = NoError;
         //check crc
@@ -142,16 +157,36 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port p_biss_data, clock 
 }
 
 
-{ int, unsigned int, unsigned int } biss_encoder(unsigned int data, int multiturn_length, int singleturn_length, int status_length) {
-    int count  = data >> (singleturn_length + status_length);                               //multiturn bits
-    unsigned int position  = (data >> status_length) & (~0U >> (32-singleturn_length));     //singleturn bits
-    unsigned int status = data & (~0U >> (32 - status_length));                             //status bits
-    if (count >= (1 << (multiturn_length-1)))                                               //convert multiturn to signed
-        count = count - (1 << multiturn_length);
-    count = (1 << singleturn_length) * count + position;                                    //convert multiturn to absolute count
+{ int, unsigned int, unsigned int } biss_encoder(unsigned int *data, biss_par biss_params) {
+    unsigned int bytes = (biss_params.data_length-1)/32; //number of bytes used - 1
+    unsigned int rest = biss_params.data_length % 32; //rest of bits
+    int count = 0;
+    unsigned int position = 0;
+    unsigned int status = 0;
+    unsigned int readbuf;
+    int byteindex = -1;
+    data[bytes] = data[bytes] << (32-rest); //left align last data byte
+    for (int i=0; i<biss_params.data_length; i++) {
+        if ((i%32) == 0) {
+            byteindex++;
+            readbuf = data[byteindex];
+        }
+        if (i < biss_params.multiturn_length) {
+            count = count << 1;
+            count |= (readbuf & 0x80000000) >> 31;
+        } else if (i < biss_params.multiturn_length + biss_params.singleturn_length) {
+            position = position << 1;
+            position|= (readbuf & 0x80000000) >> 31;
+        } else {
+            status = status << 1;
+            status|= (readbuf & 0x80000000) >> 31;
+        }
+        readbuf = readbuf << 1;
+    }
+    count = sext(count, biss_params.multiturn_resolution);  //convert multiturn to signed
+    { byteindex, count } = macs(1 << biss_params.singleturn_resolution, count, 0, position); //convert multiturn to absolute count: ticks per turn * number of turns + position
     return { count, position, ~status };
 }
-
 
 unsigned int biss_crc(unsigned int *data, unsigned int data_length, unsigned int poly) {
     //poly in reverse representation:  x^0 + x^1 + x^4 is 0b1100

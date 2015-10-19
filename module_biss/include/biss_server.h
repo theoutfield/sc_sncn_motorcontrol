@@ -61,7 +61,7 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port p_biss_data, clock 
  *
  * @return absolute count, position, inverted status (error and warning bits)
  */
-{ int, unsigned int, unsigned int } biss_encoder(unsigned int data, int multiturn_length, int singleturn_length, int status_length);
+{ int, unsigned int, unsigned int } biss_encoder(unsigned int *data, biss_par biss_params);
 
 
 /**
