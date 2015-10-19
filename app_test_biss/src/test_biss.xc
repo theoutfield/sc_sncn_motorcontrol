@@ -1,5 +1,6 @@
-#include <CORE_C22-rev-a.inc>
-#include <IFM_A1-rev-a.inc>
+/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IMF_BOARD_REQUIRED" WIT A APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 /**
  * @file test_biss.xc
@@ -24,7 +25,7 @@ void biss_test(client interface i_biss i_biss) {
     while(1) {
         t :> start_time;
 
-        /* get position from BiSS Encoderr */
+        /* get position from BiSS Encoder */
         { count, position, status } = i_biss.get_position();
 
         t :> end_time;
