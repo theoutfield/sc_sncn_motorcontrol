@@ -1,4 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IMF_BOARD_REQUIRED" WIT A APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+//#include <CORE_BOARD_REQUIRED>
+//#include <IFM_BOARD_REQUIRED>
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
@@ -12,6 +14,7 @@
 #include <xscope.h>
 #include <timer.h>
 #include <biss_server.h>
+#include <biss_client.h>
 
 
 /* Test BiSS Encoder Client */
@@ -26,7 +29,7 @@ void biss_test(client interface i_biss i_biss) {
         t :> start_time;
 
         /* get position from BiSS Encoder */
-        { count, position, status } = i_biss.get_position();
+        { count, position, status } = get_biss_position(i_biss);
 
         t :> end_time;
         xscope_int(COUNT, count);

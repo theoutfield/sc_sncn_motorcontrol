@@ -45,12 +45,12 @@ void run_biss(server interface i_biss i_biss[2], port out p_biss_clk, port p_bis
     while (1) {
         unsigned int biss_timeout = 0;
         select {
-        case i_biss[0].get_position() -> { int count, int position, unsigned int status }:
+        case i_biss[0].get_position() -> { int count, unsigned int position, unsigned int status }:
                 read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
                 { count, position, status } = biss_encoder(data, biss_params);
                 biss_timeout = 1;
                 break;
-        case i_biss[1].get_position() -> { int count, int position, unsigned int status }:
+        case i_biss[1].get_position() -> { int count, unsigned int position, unsigned int status }:
                 read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
                 { count, position, status } = biss_encoder(data, biss_params);
                 biss_timeout = 1;
@@ -69,7 +69,7 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port p_biss_data, clock 
     unsigned int status = 0;
     unsigned int bitindex = 0;
     unsigned int byteindex = 0;
-    unsigned int readbuf;
+    unsigned int readbuf = 0;
     unsigned int timeout = 8; //max number of bits to read before the ack bit, at least 3
     unsigned int crc_length = 32 - clz(crc_poly); //clz: number of leading 0
     for (int i=0; i<(data_length-1)/32+1; i++) //init data with zeros
@@ -89,21 +89,28 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port p_biss_data, clock 
 
     //get the raw data
     start_clock(clk);
-    for (int j=0; j<frame_bytes; j++) {
-        /*unsigned int*/ readbuf = 0;
-        for (int i=0; i<32; i++) {
-            unsigned int bit;
-            p_biss_data :> bit;
-            bit = (bit & 1);
-#if(BISS_DATA_PORT == ENC_CH1)
-            configure_out_port(p_biss_data, clk, 0b1000); //to reconfigure p_biss_clk as output
-#endif
-            readbuf = readbuf << 1;
-            readbuf |= bit;
+    for (int i=0; i<timeout+data_length+crc_length; i++) {
+        if (bitindex == 32) {
+            frame[byteindex] = readbuf;
+            readbuf = 0;
+            bitindex = 0;
+            byteindex++;
         }
-        frame[j] = readbuf;
+        unsigned int bit;
+        p_biss_data :> bit;
+#if(BISS_DATA_PORT == ENC_CH1)
+        configure_out_port(p_biss_data, clk, 0b1000); //to reconfigure p_biss_clk as output
+#endif
+        readbuf = readbuf << 1;
+        readbuf |= (bit & 1);
+        bitindex++;
     }
     stop_clock(clk);
+    readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
+    frame[byteindex] = readbuf;
+    readbuf = 0;
+    byteindex = 0;
+    bitindex = 0;
 
     //process the raw data
     //search for ack and start bit

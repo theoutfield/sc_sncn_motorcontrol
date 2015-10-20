@@ -22,7 +22,7 @@
  * @brief Interface definition for biss server
  */
 interface i_biss {
-    { int, int, unsigned int } get_position();
+    { int, unsigned int, unsigned int } get_position();
 };
 
 /**
