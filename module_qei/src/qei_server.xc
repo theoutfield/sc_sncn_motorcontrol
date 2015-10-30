@@ -10,7 +10,7 @@
 #include <xs1.h>
 #include <refclk.h>
 #include <filter_blocks.h>
-#include <xscope_wrapper.h>
+#include <xscope.h>
 #include "print.h"
 
 //TODO remove these dependencies
@@ -160,13 +160,6 @@ void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3, chanend
     int flag_index = 0;
     unsigned int new_pins_1;
 
-    /*{
-      xscope_register(4, XSCOPE_CONTINUOUS, "0 qei_position", XSCOPE_INT,	"n",
-      XSCOPE_CONTINUOUS, "1 qei_velocity", XSCOPE_INT,	"n",
-      XSCOPE_CONTINUOUS, "2 qei_position1", XSCOPE_INT, "n",
-      XSCOPE_CONTINUOUS, "3 qei_velocity1", XSCOPE_INT, "n");
-      xscope_config_io(XSCOPE_IO_BASIC);
-      }*/
     p_qei :> new_pins;
 
     while (1) {
@@ -199,7 +192,7 @@ void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3, chanend
                     }
 
 
-                    //	xscope_probe_data(0, position);
+                    //	xscope_int(0, position);
 
                     old_pins = new_pins & 0x3;
 
@@ -210,7 +203,7 @@ void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3, chanend
 
                     if (previous_position != position) {
                         difference = position - previous_position;
-                        //xscope_probe_data(1, difference);
+                        //xscope_int(1, difference);
                         if (difference >= qei_crossover) {
                             if (qei_params.sensor_polarity == QEI_POLARITY_NORMAL) {
                                 count = count - 1;
@@ -267,8 +260,8 @@ void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3, chanend
                     }
                 }
             }
-            //xscope_probe_data(0, position);
-            //xscope_probe_data(1, count);
+            //xscope_int(0, position);
+            //xscope_int(1, count);
 
             break;
 

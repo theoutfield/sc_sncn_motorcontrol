@@ -10,7 +10,7 @@
 #include <qei_client.h>
 #include <commutation_client.h>
 #include <filter_blocks.h>
-#include <xscope_wrapper.h>
+#include <xscope.h>
 #include <internal_config.h>
 #include <statemachine.h>
 #include <drive_modes.h>
@@ -21,7 +21,7 @@
 #include <brushed_dc_client.h>
 #endif
 
-//#define Debug_velocity_ctrl
+//#define Debug_velocity_ctrl  //don't forget to set up the config.xscope file
 //#define debug_print
 
 #define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
@@ -130,7 +130,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                         }
                         raw_speed = (difference*rpm_constant)/speed_factor_hall;
 #ifdef Debug_velocity_ctrl
-                        //xscope_probe_data(0, raw_speed);
+                        //xscope_int(RAW_SPEED, raw_speed);
 #endif
                         previous_position = position;
                         old_difference = difference;
@@ -150,7 +150,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                     raw_speed = (difference*rpm_constant)/speed_factor_qei;
 
 #ifdef Debug_velocity_ctrl
-                    //xscope_probe_data(0, raw_speed);
+                    //xscope_int(RAW_SPEED, raw_speed);
 #endif
                     previous_position = position;
                     old_difference = difference;
@@ -165,8 +165,8 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
 
             if(activate == 1) {
 #ifdef Debug_velocity_ctrl
-                xscope_probe_data(0,actual_velocity );
-                xscope_probe_data(1, target_velocity);
+                xscope_int(ACTUAL_VELOCITY, actual_velocity);
+                xscope_int(TARGET_VELOCITY, target_velocity);
 #endif
                 compute_flag = 1;
                 /* Controller */
