@@ -2,6 +2,7 @@ SOMANET Motor Configuration and Tuning how-to Guide
 ===================================================
 
 .. toctree::
+	:maxdepth: 1
 
-	motor_configuration
-	motor_tuning
+	Drive Configuration <motor_configuration> 
+	Drive Tuning <motor_tuning>

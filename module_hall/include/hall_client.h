@@ -39,3 +39,5 @@ int get_hall_position(chanend c_hall);
 int get_hall_velocity(chanend c_hall);
 
 void reset_hall_count(chanend c_hall, int offset);
+
+unsigned get_hall_pinstate(chanend c_hall);

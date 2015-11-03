@@ -106,7 +106,7 @@ int linear_profile_generate(int step)
 }
 
 int __init_linear_profile_float(float target_value, float actual_value, float acceleration,
-                                float deceleration, float max_value, profile_linear_param *profile_linear_params)
+                                float deceleration, float max_value, REFERENCE_PARAM(profile_linear_param, profile_linear_params) )
 {
     profile_linear_params->u =  actual_value;
     // profile_linear_params->v_d = (float) target_value;
@@ -185,7 +185,7 @@ int __init_linear_profile_float(float target_value, float actual_value, float ac
     return (int) round (profile_linear_params->T);
 }
 
-float __linear_profile_generate_float(int step, profile_linear_param *profile_linear_params)
+float __linear_profile_generate_float(int step, REFERENCE_PARAM(profile_linear_param, profile_linear_params) )
 {
     return  profile_linear_params->u + profile_linear_params->a_d * profile_linear_params->s_time * (float)step;
 }

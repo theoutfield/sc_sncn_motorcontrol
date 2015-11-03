@@ -50,3 +50,10 @@ void reset_hall_count(chanend c_hall, int offset)
     c_hall <: HALL_RESET_COUNT_REQ;
     c_hall <: offset;
 }
+
+unsigned get_hall_pinstate(chanend c_hall){
+    c_hall <: HALL_REQUEST_PORT_STATES;
+    unsigned state;
+    c_hall :> state;
+    return state;
+}

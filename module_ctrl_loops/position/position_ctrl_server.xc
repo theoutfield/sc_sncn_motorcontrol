@@ -4,7 +4,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
-#include <xscope_wrapper.h>
+#include <xscope.h>
 #include <print.h>
 
 #include <position_ctrl_server.h>
@@ -50,14 +50,6 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
     printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
 
-#ifdef DEBUG
-    {
-        xscope_register(2, XSCOPE_CONTINUOUS, "0 actual_position", XSCOPE_INT,  "n",
-                        XSCOPE_CONTINUOUS, "1 target_position", XSCOPE_INT, "n");
-
-        xscope_config_io(XSCOPE_IO_BASIC);
-    }
-#endif
     //printstrln("start pos");
 
     if (sensor_used == HALL) {
@@ -127,10 +119,10 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 #endif
 
 #ifdef DEBUG
-                xscope_probe_data(0, actual_position);
-                xscope_probe_data(1, target_position);
+                xscope_int(ACTUAL_POSITION, actual_position);
+                xscope_int(TARGET_POSITION, target_position);
 #endif
-                //xscope_probe_data(2, target_position);
+                //xscope_int(TARGET_POSITION, target_position);
                 previous_error = error_position;
             }
 

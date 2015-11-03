@@ -8,20 +8,10 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <print.h>
 #include <qei_client.h>
 #include <qei_server.h>
 #include <refclk.h>
-#include <xscope_wrapper.h>
-
-void xscope_initialise_1()
-{
-	{
-		xscope_register(2, XSCOPE_CONTINUOUS, "0 qei_position", XSCOPE_INT,	"n",
-				           XSCOPE_CONTINUOUS, "1 qei_velocity", XSCOPE_INT,	"n");
-	}
-	return;
-}
+#include <xscope.h>
 
 /* Test QEI Sensor Client */
 void qei_test(chanend c_qei)
@@ -31,7 +21,6 @@ void qei_test(chanend c_qei)
 	int direction;
 	int core_id = 1;
 	timer t;
-	int index_count;
 	int count=0;
 	qei_par qei_params;
 	qei_velocity_par qei_velocity_params;  			// to compute velocity from qei
@@ -41,29 +30,23 @@ void qei_test(chanend c_qei)
 	while(1)
 	{
 		/* get position from QEI Sensor */
-		{position, direction} = get_qei_position_absolute(c_qei);
+		{count, direction} = get_qei_position_absolute(c_qei);
+		{position, direction} = get_qei_position(c_qei, qei_params);
 
 		/* calculate velocity from QEI Sensor position */
 		velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
 
-		wait_ms(1, core_id, t);
+		xscope_int(COUNT, count);
+		xscope_int(POSITION, position);
+		xscope_int(VELOCITY, velocity);
 
-	#ifdef ENABLE_xscope
-		xscope_core_int(0, position);
-		xscope_core_int(1, velocity);
-	#else
-		printstr("Position: ");
-		printintln(position);
-//		printstr(" ");
-//		printstr("Velocity: "); // with print velocity information will be corrupt (use xscope)
-//		printintln(velocity);
-    #endif
+		wait_ms(1, core_id, t);
 	}
 }
 
 int main(void)
 {
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6;				// qei channels
+	chan c_qei_p1;				// qei channel
 
 	par
 	{
@@ -81,7 +64,7 @@ int main(void)
 			/* QEI Server Loop */
 			{
 				qei_par qei_params;
-				run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  		// channel priority 1,2..6
+				run_qei(c_qei_p1, null, null, null, null, null, p_ifm_encoder, qei_params);  		// channel priority 1,2..6
 			}
 		}
 	}

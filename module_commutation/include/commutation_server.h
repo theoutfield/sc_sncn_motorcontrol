@@ -32,9 +32,10 @@
  * @param[in] commutation_params struct defines the commutation angle parameters
  *
  */
-void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, chanend c_watchdog,
-                            chanend c_commutation_p1, chanend c_commutation_p2, chanend c_commutation_p3, chanend c_pwm_ctrl,
-                            out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port ? p_ifm_ff1, port ? p_ifm_ff2,
+[[combinable]]
+void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, chanend ? c_watchdog,
+                            chanend ? c_commutation_p1, chanend ? c_commutation_p2, chanend ? c_commutation_p3, chanend c_pwm_ctrl,
+                            out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn, port ? p_ifm_ff1, port ? p_ifm_ff2,
                             hall_par &hall_params, qei_par & qei_params, commutation_par & commutation_params);
 
 /**
@@ -45,4 +46,5 @@ void commutation_sinusoidal(chanend c_hall, chanend c_qei, chanend c_signal, cha
  * @param nominal_speed is the rated speed for the motor given on specs sheet
  */
 void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
+
 

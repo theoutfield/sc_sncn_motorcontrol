@@ -4,6 +4,7 @@ SOMANET Motor Control Software
 .. toctree::
 	:maxdepth: 1
 
-	Commutation Component <module_commutation/doc/index>
-	Hall Interface Component<module_hall/doc/index>
-	QEI Interface Component<module_qei/doc/index>
+	Tutorial: Drive Tuning and Configuration <howto/index>
+	Module Commutation <module_commutation/doc/index>
+	Module Hall Sensor Interface <module_hall/doc/index>
+	Module Encoder Interface <module_qei/doc/index>

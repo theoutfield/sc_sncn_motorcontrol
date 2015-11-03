@@ -108,7 +108,7 @@ int velocity_profile_generate(int step)
 
 
 int __initialize_velocity_profile(int target_velocity, int actual_velocity, int acceleration, \
-                                  int deceleration, int max_velocity, profile_velocity_param *profile_velocity_params)
+                                  int deceleration, int max_velocity, REFERENCE_PARAM(profile_velocity_param, profile_velocity_params))
 {
     profile_velocity_params->u = (float) actual_velocity;
     //profile_velocity_params->v_d = (float) target_velocity;
@@ -187,7 +187,7 @@ int __initialize_velocity_profile(int target_velocity, int actual_velocity, int 
     return (int) round (profile_velocity_params->T);
 }
 
-int __velocity_profile_generate_in_steps(int step, profile_velocity_param *profile_velocity_params)
+int __velocity_profile_generate_in_steps(int step, REFERENCE_PARAM(profile_velocity_param, profile_velocity_params))
 {
     return (int) round( profile_velocity_params->u + profile_velocity_params->a_d * profile_velocity_params->s_time * step);
 }

@@ -336,7 +336,7 @@ int position_profile_generate(int step)
 
 void __initialize_position_profile_limits(int max_acceleration, int max_velocity,
                                           int sensor_select, int max_position, int min_position,
-                                          profile_position_param *profile_pos_params)
+                                          REFERENCE_PARAM(profile_position_param, profile_pos_params) )
 {
     //profile_pos_params.qei_params;compute
     //profile_pos_params.hall_params = hall_params;
@@ -364,7 +364,7 @@ void __initialize_position_profile_limits(int max_acceleration, int max_velocity
   }*/
 
 int __initialize_position_profile(int target_position, int actual_position, int velocity, int acceleration,
-                                  int deceleration, profile_position_param *profile_pos_params)
+                                  int deceleration, REFERENCE_PARAM(profile_position_param, profile_pos_params) )
 {
     profile_pos_params->qf = (float) target_position;
 
@@ -567,7 +567,7 @@ int __initialize_position_profile(int target_position, int actual_position, int 
 }
 
 //c only
-int __position_profile_generate_in_steps(int step, profile_position_param *profile_pos_params)
+int __position_profile_generate_in_steps(int step, REFERENCE_PARAM(profile_position_param, profile_pos_params) )
 {
     profile_pos_params->ts = profile_pos_params->s_time * step ;
 
