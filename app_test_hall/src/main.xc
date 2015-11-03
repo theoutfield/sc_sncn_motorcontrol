@@ -2,6 +2,7 @@
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
+
 /**
  * @file test_hall.xc
  * @brief Test illustrates usage of hall sensor to get position and velocity information
@@ -11,30 +12,57 @@
 #include <print.h>
 #include <hall_client.h>
 #include <hall_server.h>
-#include <xscope_wrapper.h>
+#include <xscope.h>
+
+//#define ENABLE_XSCOPE
 
 /* Test Hall Sensor Client */
 void hall_test(chanend c_hall)
 {
     int position = 0;
     int velocity = 0;
+    int count = 0;
     int direction;
+    int old_count = 0;
+    int pins = 0;
 
     while(1)
     {
         /* get position from Hall Sensor */
-        {position, direction} = get_hall_position_absolute(c_hall);
+        {count, direction} = get_hall_position_absolute(c_hall);
+        position = get_hall_position(c_hall);
 
         /* get velocity from Hall Sensor */
         velocity = get_hall_velocity(c_hall);
 
-        printstr("Position: ");
-        printint(position);
-        printstr(" ");
-        printstr("Velocity: ");
-        printint(velocity);
-        printstr(" ");
-        printintln(get_hall_pinstate(c_hall));
+        /* get pins state from Hall Sensor */
+        pins = get_hall_pinstate(c_hall);
+
+#ifndef ENABLE_XSCOPE
+        if (count != old_count) {
+            printstr("Count: ");
+            printint(count);
+            printstr(" ");
+            printstr("Position: ");
+            printint(position);
+            printstr(" ");
+            printstr("Velocity: ");
+            printint(velocity);
+            printstr(" ");
+            printstr("Pins: ");
+            printchar('0'+((pins&0b100)>>2));
+            printchar('0'+((pins&0b10)>>1));
+            printcharln('0'+(pins&1));
+        }
+        old_count = count;
+#else
+        xscope_int(COUNT, count);
+        xscope_int(POSITION, position);
+        xscope_int(VELOCITY, velocity);
+        xscope_int(A, (pins&1)*1000); // scale to 1000 for easier display in xscope
+        xscope_int(B, (pins&0b10)*500);
+        xscope_int(C, (pins&0b100)*250);
+#endif
     }
 }
 
