@@ -17,13 +17,20 @@
 #include <spi_master.h>
 #include <xclib.h>
 #include <stdint.h>
-#include <print.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 typedef struct sensor_spi_interface
 {
     spi_master_interface spi_interface;
     out port slave_select;
 } sensor_spi_interface;
+
+interface AMS{
+    int get_angle_electrical(void);
+    {int, int} get_absolute_position_multiturn(void);
+    int get_velocity(void);
+};
 
 #define ROTARY_SENSOR_MAX_ANGLE   16384
 
@@ -90,3 +97,5 @@ int writeSettings2(sensor_spi_interface &sensor_if, unsigned short data);
 int writeZeroPosition(sensor_spi_interface &sensor_if, unsigned short data);
 int writeNumberPolePairs(sensor_spi_interface &sensor_if, unsigned short data);
 
+//server for commutation and position control applications
+void run_ams_sensor(server interface AMS iAMS[n], unsigned n, int sensor_resolution, sensor_spi_interface &sensor_if, unsigned short settings1, unsigned short settings2, unsigned short offset);
