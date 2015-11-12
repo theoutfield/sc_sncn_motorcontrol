@@ -15,7 +15,6 @@
 #include <hall_config.h>
 #include <qei_config.h>
 #include <profile.h>
-#include <xscope_wrapper.h>
 #include <print.h>
 #include <gpio_client.h>
 #include <flash_somanet.h>
