@@ -7,7 +7,7 @@
 
 #include <torque_ctrl_client.h>
 #include <refclk.h>
-#include <xscope_wrapper.h>
+#include <xscope.h>
 #include <internal_config.h>
 #include <statemachine.h>
 #include <drive_modes.h>

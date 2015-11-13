@@ -16,7 +16,6 @@
 #include <adc_client_ad7949.h>
 #include <refclk.h>
 #include <qei_client.h>
-#include <xscope_wrapper.h>
 #include <stdio.h>
 #include <internal_config.h>
 

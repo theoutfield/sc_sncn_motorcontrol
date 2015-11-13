@@ -9,7 +9,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <refclk.h>
-#include <xscope_wrapper.h>
+#include <xscope.h>
 #include <print.h>
 #include <statemachine.h>
 #include <drive_modes.h>
@@ -18,7 +18,7 @@
 #include <sine_table_big.h>
 #include <a4935.h>
 
-//#define ENABLE_xscope_torq
+//#define ENABLE_xscope_torq //don't forget to set up the config.xscope file
 //#define debug_print
 
 #define TORQUE_CTRL_WRITE(x)    c_torque_ctrl <: (x)
@@ -246,7 +246,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 phase_b = 0 - phase_b_filtered;
 
 #ifdef ENABLE_xscope_torq
-                xscope_probe_data(0, phase_a_filtered);
+                xscope_int(PHASE_A_FILTERED, phase_a_filtered);
 #endif
                 //xscope_probe_data(1, phase_b_filtered);
                 alpha = phase_a;
@@ -286,7 +286,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 
             if (activate == 1) {
 #ifdef ENABLE_xscope_torq
-                xscope_probe_data(1, actual_torque);
+                xscope_int(ACTUAL_TORQUE, actual_torque);
 #endif
                 compute_flag = 1;
 
@@ -337,7 +337,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
             case TCTRL_CMD_SET_TORQUE:
                 TORQUE_CTRL_READ(target_torque);
 #ifdef ENABLE_xscope_torq
-                xscope_probe_data(2, target_torque);
+                xscope_int(TARGET_TORQUE, target_torque);
 #endif
                 break;
 
