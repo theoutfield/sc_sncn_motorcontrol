@@ -81,7 +81,7 @@ case !isnull(c_client) => c_client :> int command:
 */
 
 [[combinable]]
-void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, chanend ? c_watchdog,
+void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, interface WatchdogInterface client watchdog_interface,
                             chanend ? c_commutation_p1, chanend ? c_commutation_p2,
                             chanend ? c_commutation_p3, chanend c_pwm_ctrl,
                             out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn,
@@ -123,8 +123,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, c
     // enable watchdog
     t :> ts;
     t when timerafter (ts + 250000*4):> ts; /* FIXME: replace with constant */
-    if(!isnull(c_watchdog))
-        watchdog_start(c_watchdog);
+    watchdog_interface.start();
 
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;
@@ -139,8 +138,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, c
         init_state = check_fet;
     }
     else {
-        if(!isnull(c_watchdog))
-            watchdog_enable_motors(c_watchdog);
+        watchdog_interface.enable_motors();
         init_state = 1;
     }
 
