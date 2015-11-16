@@ -6,11 +6,16 @@
 
 #pragma once
 
-void watchdog_start(chanend c_watchdog);
+typedef struct {
+    out port p_enable;
+    out port ?p_tick;
+} WatchdogPorts;
 
-void watchdog_enable_motors(chanend c_watchdog);
-
-void watchdog_disable_motors(chanend c_watchdog);
+interface WatchdogInterface{
+    void start(void);
+    void enable_motors(void);
+    void disable_motors(void);
+};
 
 /** @brief Run the watchdog timer server
  *
@@ -26,5 +31,5 @@ void watchdog_disable_motors(chanend c_watchdog);
  * @param p_wd_tick control for the tick of the watchdog
  * @param p_shared_leds_wden control port for the watchdog device
  */
-void run_watchdog(chanend c_watchdog, out port ? p_wd_tick, out port p_shared_leds_wden);
+void run_watchdog(interface WatchdogInterface server watchdog_interface, WatchdogPorts &watchdog_ports);
 
