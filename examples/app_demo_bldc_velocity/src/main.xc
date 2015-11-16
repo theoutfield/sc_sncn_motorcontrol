@@ -31,6 +31,7 @@ on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
@@ -62,6 +63,7 @@ int main(void)
 	chan c_pwm_ctrl, c_adctrig;							// pwm channels
 	chan c_velocity_ctrl;								// velocity control channel
     interface WatchdogInterface wd_interface;
+    interface CommutationInterface commutation_interface[3];
 
 	par
 	{
@@ -95,7 +97,7 @@ int main(void)
 
 				/* Control Loop */
 				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, \
-					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, c_commutation_p2);
+					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, commutation_interface[0]);
 			}
 
 		}
@@ -121,12 +123,8 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					commutation_sinusoidal(c_hall_p1,  c_qei_p1, null, wd_interface,
-							null, c_commutation_p2, null, c_pwm_ctrl,
-#ifdef DC1K
-                            null, null, null, null,
-#else
-							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,
-#endif
+					        commutation_interface, c_pwm_ctrl,
+					        fet_driver_ports,
 							hall_params, qei_params, commutation_params);
 				}
 

@@ -12,7 +12,7 @@
 #include <commutation_client.h>
 #include "control_loops_common.h"
 #include "position_ctrl_client.h"
-
+#include <commutation_server.h>
 /**
  * @brief Position Control Loop
  *  Implements PID controller for position using Hall or QEI sensors.
@@ -34,5 +34,5 @@
  *
  */
 void position_control(ctrl_par & position_ctrl_params, hall_par & hall_params, qei_par & qei_params, int sensor_used,
-                      chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation);
+                      chanend c_hall, chanend c_qei, chanend c_position_ctrl, interface CommutationInterface client commutation_interface);
 

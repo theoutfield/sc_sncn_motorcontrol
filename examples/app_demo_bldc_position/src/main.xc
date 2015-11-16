@@ -31,6 +31,7 @@ on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 
 
 /* Test Profile Position function */
@@ -79,6 +80,7 @@ int main(void)
 	chan c_pwm_ctrl, c_adctrig;				// pwm channels
 	chan c_position_ctrl;					// position control channel
 	interface WatchdogInterface wd_interface;
+	interface CommutationInterface commutation_interface[3];
 
 	par
 	{
@@ -107,7 +109,7 @@ int main(void)
 
 				 /* Control Loop */
 				 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, c_hall_p2,\
-						 c_qei_p2, c_position_ctrl, c_commutation_p3);
+						 c_qei_p2, c_position_ctrl, commutation_interface[0]);
 			}
 
 		}
@@ -120,9 +122,7 @@ int main(void)
 			par
 			{
 				/* PWM Loop */
-                {
-                    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
-                }
+                do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
 
 				/* Motor Commutation loop */
 				{
@@ -132,21 +132,12 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					commutation_sinusoidal(c_hall_p1,  c_qei_p1, null, wd_interface,
-							null, null, c_commutation_p3, c_pwm_ctrl,
-#ifdef DC1K
-                            null, null, null, null,
-#else
-							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,
-#endif
+							commutation_interface, c_pwm_ctrl, fet_driver_ports,
 							hall_params, qei_params, commutation_params);
 				}
 
 				/* Watchdog Server */
-#ifdef DC1K
-                run_watchdog(c_watchdog, null, p_ifm_led_moton_wdtick_wden);
-#else
                 run_watchdog(wd_interface, wd_ports);
-#endif
 
 				/* Hall Server */
 				{

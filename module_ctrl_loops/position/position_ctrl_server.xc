@@ -27,7 +27,7 @@
 
 
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used,
-                      chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation)
+                      chanend c_hall, chanend c_qei, chanend c_position_ctrl, interface CommutationInterface client commutation_interface)
 {
     int actual_position = 0;
     int target_position = 0;
@@ -115,7 +115,8 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 #if(MOTOR_TYPE == BDC)
                 set_bdc_voltage(c_commutation, position_control_out);
 #else
-                set_commutation_sinusoidal(c_commutation, position_control_out);
+               // set_commutation_sinusoidal(c_commutation, position_control_out);
+                commutation_interface.setVoltage(position_control_out);
 #endif
 
 #ifdef DEBUG
@@ -180,15 +181,16 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 POSITION_CTRL_READ(activate);
                 activate = SET;
                 while (1) {
-                    init_state = __check_commutation_init(c_commutation);
+                    init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
                     if(init_state == INIT) {
 #ifdef debug_print
                         printstrln("commutation intialized");
 #endif
 #if(MOTOR_TYPE == BLDC)
-                        fet_state = check_fet_state(c_commutation);
+                        fet_state = commutation_interface.getFetsState(); // check_fet_state(c_commutation);
                         if (fet_state == 1) {
-                            enable_motor(c_commutation);
+                            commutation_interface.enableFets();
+                            //enable_motor(c_commutation);
                             wait_ms(2, 1, ts);
                         }
 #endif
@@ -202,13 +204,15 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
 
             case PCTRL_CMD_SHUTDOWN:
                 POSITION_CTRL_READ(activate);
-                set_commutation_sinusoidal(c_commutation, 0);
+                commutation_interface.setVoltage(0);
+                //set_commutation_sinusoidal(c_commutation, 0);
                 error_position = 0;
                 error_position_D = 0;
                 error_position_I = 0;
                 previous_error = 0;
                 position_control_out = 0;
-                disable_motor(c_commutation);
+                commutation_interface.disableFets();
+                // disable_motor(c_commutation);
                 wait_ms(30, 1, ts); //
 #ifdef debug_print
                 printstrln("position control disabled");
