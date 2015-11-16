@@ -28,8 +28,8 @@
 
 
 on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
-on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
+PwmPorts pwm_ports = PWM_PORTS;
 
 /* Test Profile Position function */
 void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
@@ -119,11 +119,7 @@ int main(void)
 			{
 				/* PWM Loop */
                 {
-#ifdef DC1K
-                    // Turning off all MOSFETs for for initialization
-                    disable_fets(p_ifm_motor_hi, p_ifm_motor_lo, 4);
-#endif
-                    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port, p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+                    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
                 }
 
 				/* Motor Commutation loop */

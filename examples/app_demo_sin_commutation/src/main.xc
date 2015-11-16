@@ -18,7 +18,10 @@
 #endif
 
 on tile[IFM_TILE]:clock clk_adc = XS1_CLKBLK_1;
-on tile[IFM_TILE]:clock clk_pwm = XS1_CLKBLK_REF;
+//on tile[IFM_TILE]:clock clk_pwm = XS1_CLKBLK_REF;
+
+
+PwmPorts pwm_ports = PWM_PORTS;
 
 #define VOLTAGE 2000 //+/- 4095
 
@@ -93,12 +96,7 @@ int main(void) {
 
                 /* PWM Loop */
                 {
-#ifdef DC1K
-                    // Turning off all MOSFETs for for initialization
-                    disable_fets(p_ifm_motor_hi, p_ifm_motor_lo, 4);
-#endif
-                    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
-                                        p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+                    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
                 }
                 /* Motor Commutation loop */
                 {

@@ -28,8 +28,9 @@
 
 
 on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
-on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
+//on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
+PwmPorts pwm_ports = PWM_PORTS;
 
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
@@ -120,8 +121,7 @@ int main(void)
 						p_ifm_adc_misob);
 
 				/* PWM Loop */
-				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,
-						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
 
 				/* Motor Commutation loop */
 				{
