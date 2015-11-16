@@ -6,12 +6,13 @@
 
 #pragma once
 
-#include <commutation_client.h>
+#include <commutation_server.h>
 #include <hall_client.h>
 #include <qei_client.h>
 #include <internal_config.h>
 #include "control_loops_common.h"
 #include "torque_ctrl_client.h"
+
 
 /**
  * @brief Torque Control Loop
@@ -33,7 +34,7 @@
  *
  */
 void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
-                    int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
+                    int sensor_used, chanend c_adc, interface CommutationInterface client commutation_interface, chanend c_hall, chanend c_qei, chanend c_torque_ctrl);
 
 
 /**

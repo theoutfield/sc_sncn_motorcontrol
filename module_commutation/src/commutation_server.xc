@@ -82,11 +82,8 @@ case !isnull(c_client) => c_client :> int command:
 
 [[combinable]]
 void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, interface WatchdogInterface client watchdog_interface,
-                            chanend ? c_commutation_p1, chanend ? c_commutation_p2,
-                            chanend ? c_commutation_p3, chanend c_pwm_ctrl,
-                            out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn,
-                            port ? p_ifm_ff1, port ? p_ifm_ff2,
-                            hall_par & hall_params, qei_par & qei_params,
+                            interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
+                            FetDriverPorts &fet_driver_ports, hall_par & hall_params, qei_par & qei_params,
                             commutation_par &commutation_params)
 {
     const unsigned t_delay = 300*USEC_FAST;
@@ -128,13 +125,13 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, i
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;
 
-    if (!isnull(p_ifm_esf_rstn_pwml_pwmh) && !isnull(p_ifm_coastn)){
-        a4935_initialize(p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, A4935_BIT_PWML | A4935_BIT_PWMH);
+    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast)){
+        a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
         t when timerafter (ts + t_delay) :> ts;
     }
 
-    if(!isnull(p_ifm_coastn)){
-        p_ifm_coastn :> check_fet;
+    if(!isnull(fet_driver_ports.p_coast)){
+        fet_driver_ports.p_coast :> check_fet;
         init_state = check_fet;
     }
     else {
@@ -199,6 +196,44 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, i
                 update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
                 break;
 
+
+            case commutation_interface[int i].setVoltage(int new_voltage):
+                    voltage = new_voltage;
+                    if (commutation_params.winding_type == DELTA_WINDING) {
+                        voltage = -voltage;
+                    }
+                    break;
+
+            case commutation_interface[int i].setParameters(commutation_par new_parameters):
+                    commutation_params.angle_variance = new_parameters.angle_variance;
+                    commutation_params.nominal_speed = new_parameters.nominal_speed;
+                    commutation_params.hall_offset_clk = new_parameters.hall_offset_clk;
+                    commutation_params.hall_offset_cclk = new_parameters.hall_offset_cclk;
+                    commutation_params.winding_type = new_parameters.winding_type;
+
+                    break;
+
+            case commutation_interface[int i].setSensor(int new_sensor):
+                    sensor_select = new_sensor;
+                    break;
+
+            case commutation_interface[int i].enableFets():
+                    shutdown = 0;
+                    voltage = 0;
+                    break;
+
+            case commutation_interface[int i].disableFets():
+                    shutdown = 1;
+                    break;
+
+            case commutation_interface[int i].getFetsState() -> int fets_state:
+                    fets_state = shutdown;
+                    break;
+
+            case commutation_interface[int i].checkBusy() -> int state_return:
+                    state_return = init_state;
+                    break;
+              /*
             case !isnull(c_commutation_p1) => c_commutation_p1 :> int command:
                 switch (command) {
                     case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
@@ -240,8 +275,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, i
                     default:
                         break;
                 }
-                break;
-
+                break; */
+/*
                 case !isnull(c_commutation_p2) => c_commutation_p2 :> int command:
                     switch (command) {
                         case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
@@ -327,6 +362,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, i
                                 break;
                         }
                         break;
+                        */
+
 /*FixMe: restore select functions when supported in combinable functions or replace by array of interfaces
  *
             case on_client_request(c_commutation_p1, commutation_params, voltage, sensor_select,

@@ -8,7 +8,7 @@
 #include <commutation_common.h>
 
 /* MAX Input value 13739 */
-void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
+/*void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
 {
     c_commutation <: COMMUTATION_CMD_SET_VOLTAGE;
     c_commutation <: input_voltage;
@@ -51,4 +51,5 @@ void enable_motor(chanend c_commutation)
     c_commutation <: COMMUTATION_CMD_ENABLE_FETS;
     return;
 }
+*/
 

@@ -11,6 +11,7 @@
 #include <internal_config.h>
 #include "control_loops_common.h"
 #include "velocity_ctrl_client.h"
+#include <commutation_server.h>
 
 /**
  * @brief Velocity Control Loop
@@ -33,5 +34,5 @@
  */
 [[combinable]]
 void velocity_control(ctrl_par & velocity_ctrl_params, filter_par & sensor_filter_params, hall_par &?hall_params, qei_par &?qei_params,
-                      int sensor_used, chanend c_hall, chanend ?c_qei, chanend c_velocity_ctrl, chanend c_commutation);
+                      int sensor_used, chanend c_hall, chanend ?c_qei, chanend c_velocity_ctrl, interface CommutationInterface client commutation_interface);
 

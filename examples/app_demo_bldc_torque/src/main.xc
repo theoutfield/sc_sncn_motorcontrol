@@ -32,6 +32,7 @@ on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
@@ -74,6 +75,7 @@ int main(void)
 	chan c_pwm_ctrl;														// pwm channel
 	chan c_torque_ctrl,c_velocity_ctrl, c_position_ctrl;					// torque control channel
     interface WatchdogInterface wd_interface;
+    interface CommutationInterface commutation_interface[3];
 
 	par
 	{
@@ -104,7 +106,7 @@ int main(void)
 
 					/* Control Loop */
 					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
-							c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+							c_adc, commutation_interface[0],  c_hall_p3,  c_qei_p3, c_torque_ctrl);
 				}
 			}
 		}
@@ -132,8 +134,7 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, wd_interface,
-							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,
-							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,
+					        commutation_interface, c_pwm_ctrl, fet_driver_ports,
 							hall_params, qei_params, commutation_params);
 				}
 
