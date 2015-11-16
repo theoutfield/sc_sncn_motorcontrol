@@ -31,12 +31,13 @@ on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 //on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
 
 PwmPorts pwm_ports = PWM_PORTS;
+WatchdogPorts wd_ports = WATCHDOG_PORTS;
 
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
 	int target_torque = 500; 	//(desired torque/torque_constant)  * IFM resolution
-	int torque_slope  = 30;  	//(desired torque_slope/torque_constant)  * IFM resolution
+	int torque_slope  = 500;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);
     xscope_int(TARGET_TORQUE, target_torque);
@@ -72,7 +73,7 @@ int main(void)
 	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
 	chan c_pwm_ctrl;														// pwm channel
 	chan c_torque_ctrl,c_velocity_ctrl, c_position_ctrl;					// torque control channel
-	chan c_watchdog; 														// watchdog channel
+    interface WatchdogInterface wd_interface;
 
 	par
 	{
@@ -130,14 +131,14 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, 	\
-							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
-							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, wd_interface,
+							c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,
+							p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,
 							hall_params, qei_params, commutation_params);
 				}
 
 				/* Watchdog Server */
-				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
+				run_watchdog(wd_interface, wd_ports);
 
 				/* Hall Server */
 				{

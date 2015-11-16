@@ -30,6 +30,8 @@
 on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 
 PwmPorts pwm_ports = PWM_PORTS;
+WatchdogPorts wd_ports = WATCHDOG_PORTS;
+
 
 /* Test Profile Position function */
 void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
@@ -76,7 +78,7 @@ int main(void)
 	chan c_commutation_p3;	                // commutation channels
 	chan c_pwm_ctrl, c_adctrig;				// pwm channels
 	chan c_position_ctrl;					// position control channel
-	chan c_watchdog; 						// watchdog channel
+	interface WatchdogInterface wd_interface;
 
 	par
 	{
@@ -129,7 +131,7 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1, null, c_watchdog,
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, null, wd_interface,
 							null, null, c_commutation_p3, c_pwm_ctrl,
 #ifdef DC1K
                             null, null, null, null,
@@ -143,7 +145,7 @@ int main(void)
 #ifdef DC1K
                 run_watchdog(c_watchdog, null, p_ifm_led_moton_wdtick_wden);
 #else
-                run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
+                run_watchdog(wd_interface, wd_ports);
 #endif
 
 				/* Hall Server */
