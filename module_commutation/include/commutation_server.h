@@ -12,6 +12,33 @@
 #include <qei_client.h>
 #include <bldc_motor_config.h>
 
+typedef struct {
+    port ?p_coast;
+    out port ?p_esf_rst_pwml_pwmh;
+    port ?p_ff1;
+    port ?p_ff2;
+} FetDriverPorts;
+
+typedef struct {
+    int angle_variance;         /* max allowed variance depending on speed */
+    int nominal_speed;
+    int qei_forward_offset;
+    int qei_backward_offset;
+    int hall_offset_clk;
+    int hall_offset_cclk;
+    int winding_type;
+} commutation_par;
+
+interface CommutationInterface{
+    int checkBusy();
+    void setVoltage(int voltage);
+    void setParameters(commutation_par parameters);
+    void setSensor(int sensor);
+    void disableFets();
+    void enableFets();
+    int getFetsState();
+};
+
 /**
  * @brief Sinusoidal based Commutation Loop
  *
@@ -34,8 +61,8 @@
  */
 [[combinable]]
 void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, interface WatchdogInterface client watchdog_interface,
-                            chanend ? c_commutation_p1, chanend ? c_commutation_p2, chanend ? c_commutation_p3, chanend c_pwm_ctrl,
-                            out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn, port ? p_ifm_ff1, port ? p_ifm_ff2,
+                            interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
+                            FetDriverPorts &fet_driver_ports,
                             hall_par &hall_params, qei_par & qei_params, commutation_par & commutation_params);
 
 /**

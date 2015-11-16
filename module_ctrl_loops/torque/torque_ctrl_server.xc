@@ -17,6 +17,7 @@
 #include <qei_client.h>
 #include <sine_table_big.h>
 #include <a4935.h>
+#include <commutation_server.h>
 
 //#define ENABLE_xscope_torq //don't forget to set up the config.xscope file
 //#define debug_print
@@ -147,7 +148,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 
 
 static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params,
-                        int sensor_used, chanend c_current, chanend c_speed, chanend c_commutation,
+                        int sensor_used, chanend c_current, chanend c_speed, interface CommutationInterface client commutation_interface,
                         chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
 #define FILTER_LENGTH_TORQUE 80
@@ -328,7 +329,8 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                         torque_control_output = 0 - torque_ctrl_params.Control_limit;
                     }
                 }
-                set_commutation_sinusoidal(c_commutation, torque_control_output);
+                commutation_interface.setVoltage(torque_control_output);
+                //set_commutation_sinusoidal(c_commutation, torque_control_output);
             }
             break;
 
@@ -412,14 +414,14 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 TORQUE_CTRL_READ(activate);
                 activate = SET;
                 while (1) {
-                    init_state = __check_commutation_init(c_commutation);
+                    init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
                     if (init_state == INIT) {
 #ifdef debug_print
                         printstrln("commutation intialized");
 #endif
-                        fet_state = check_fet_state(c_commutation);
+                        fet_state = commutation_interface.getFetsState(); //check_fet_state(c_commutation);
                         if (fet_state == 1) {
-                            enable_motor(c_commutation);
+                            commutation_interface.enableFets(); //enable_motor(c_commutation);
                             wait_ms(2, 1, tc);
                         }
 
@@ -463,8 +465,8 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 error_torque_derivative = 0;
                 error_torque_previous = 0;
                 torque_control_output = 0;
-                set_commutation_sinusoidal(c_commutation, 0);
-                disable_motor(c_commutation);
+                commutation_interface.setVoltage(0);//set_commutation_sinusoidal(c_commutation, 0);
+                commutation_interface.disableFets(); //disable_motor(c_commutation);
                 wait_ms(30, 1, tc);
                 break;
 
@@ -482,13 +484,13 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 
 /* TODO: do we really need 2 threads for this? */
 void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
-                    int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
+                    int sensor_used, chanend c_adc, interface CommutationInterface client commutation_interface, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
     chan c_current, c_speed;
     par {
         current_filter(c_adc, c_current, c_speed);
         torque_ctrl_loop(torque_ctrl_params, hall_params, qei_params, sensor_used,
-                         c_current, c_speed, c_commutation, c_hall, c_qei, c_torque_ctrl);
+                         c_current, c_speed, commutation_interface, c_hall, c_qei, c_torque_ctrl);
     }
 }
 

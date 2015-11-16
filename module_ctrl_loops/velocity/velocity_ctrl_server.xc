@@ -16,6 +16,7 @@
 #include <drive_modes.h>
 #include <stdio.h>
 #include <a4935.h>
+#include <commutation_server.h>
 
 #if(MOTOR_TYPE == BDC)
 #include <brushed_dc_client.h>
@@ -36,7 +37,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                        chanend c_hall,
                        chanend ?c_qei,
                        chanend c_velocity_ctrl,
-                       chanend c_commutation )
+                       interface CommutationInterface client commutation_interface )
 {
     /* Controller declarations */
     int actual_velocity = 0;
@@ -193,7 +194,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
 #if(MOTOR_TYPE == BDC)
                 set_bdc_voltage(c_commutation, velocity_control_out);
 #else
-                set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
+                commutation_interface.setVoltage(velocity_control_out);//set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
 #endif
                 previous_error = error_velocity;
 
@@ -267,15 +268,15 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                 VELOCITY_CTRL_READ(activate);
                 activate = SET;
                 while (1) {
-                    init_state = __check_commutation_init(c_commutation);
+                    init_state = commutation_interface.checkBusy();//__check_commutation_init(c_commutation);
                     if (init_state == INIT) {
 #ifdef debug_print
                         printf("commutation intialized\n");
 #endif
 #if(MOTOR_TYPE == BLDC)
-                        fet_state = check_fet_state(c_commutation);
+                        fet_state = commutation_interface.getFetsState();//check_fet_state(c_commutation);
                         if (fet_state == 1) {
-                            enable_motor(c_commutation);
+                            commutation_interface.enableFets();//enable_motor(c_commutation);
                             wait_ms(2, 1, ts);
                         }
 #endif
@@ -294,8 +295,8 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                 error_velocity_I = 0;
                 previous_error = 0;
                 velocity_control_out = 0;
-                set_commutation_sinusoidal(c_commutation, 0);
-                disable_motor(c_commutation);
+                commutation_interface.setVoltage(0); //set_commutation_sinusoidal(c_commutation, 0);
+                commutation_interface.disableFets();//disable_motor(c_commutation);
                 wait_ms(30, 1, ts);
                 break;
 
