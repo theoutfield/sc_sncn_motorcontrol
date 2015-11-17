@@ -72,7 +72,7 @@ void configure_adc_ports_7265( // Configure all ADC data ports
 /*****************************************************************************/
 void foc_adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to client
     server interface ADC iADC,
-    adc_ports_t &adc_ports
+    AD7265Ports &adc_ports
 )
 {
     // Mapping array from 'trigger channel' to 'analogue ADC mux input' See. AD7265 data-sheet
@@ -155,7 +155,7 @@ void foc_adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to 
     printstrln("\n                                             ADC Server Ends");
 } // foc_adc_7265_triggered
 
-void run_adc_AD7256(server interface ADC iADC, server interface ADC_trigger i_ADC_trigger, adc_ports_t &adc_ports)
+void run_adc_AD7256(server interface ADC iADC, server interface ADC_trigger i_ADC_trigger, AD7265Ports &adc_ports)
 {
     printstrln("                                           ADC Server Starts");
     unsigned time_stamp; // Time stamp
