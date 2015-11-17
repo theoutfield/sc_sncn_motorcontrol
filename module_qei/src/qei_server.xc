@@ -6,6 +6,7 @@
 
 
 #include <qei_config.h>
+#include <qei_server.h>
 #include <stdlib.h>
 #include <xs1.h>
 #include <refclk.h>
@@ -125,7 +126,7 @@ void init_qei_param(qei_par &qei_params)
 
 #pragma unsafe arrays
 void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3, chanend ? c_qei_p4,
-             chanend ? c_qei_p5, chanend ? c_qei_p6, port in p_qei, qei_par & qei_params)
+             chanend ? c_qei_p5, chanend ? c_qei_p6, EncoderPorts & encoder_ports, qei_par & qei_params)
 {
     init_qei_param(qei_params);
     printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
@@ -160,17 +161,17 @@ void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3, chanend
     int flag_index = 0;
     unsigned int new_pins_1;
 
-    p_qei :> new_pins;
+    encoder_ports.p_qei :> new_pins;
 
     while (1) {
 #pragma xta endpoint "qei_loop"
 #pragma ordered
         select {
-        case p_qei when pinsneq(new_pins) :> new_pins :
-            p_qei :> new_pins_1;
-            p_qei :> new_pins_1;
+        case encoder_ports.p_qei when pinsneq(new_pins) :> new_pins :
+            encoder_ports.p_qei :> new_pins_1;
+            encoder_ports.p_qei :> new_pins_1;
             if(new_pins_1 == new_pins) {
-                p_qei :> new_pins;
+                encoder_ports.p_qei :> new_pins;
                 if(new_pins_1 == new_pins) {
                     v = lookup[new_pins][old_pins];
 

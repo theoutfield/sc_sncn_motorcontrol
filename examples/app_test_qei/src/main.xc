@@ -13,6 +13,8 @@
 #include <refclk.h>
 #include <xscope.h>
 
+EncoderPorts encoder_ports = ENCODER_PORTS;
+
 /* Test QEI Sensor Client */
 void qei_test(chanend c_qei)
 {
@@ -64,7 +66,7 @@ int main(void)
 			/* QEI Server Loop */
 			{
 				qei_par qei_params;
-				run_qei(c_qei_p1, null, null, null, null, null, p_ifm_encoder, qei_params);  		// channel priority 1,2..6
+				run_qei(c_qei_p1, null, null, null, null, null, encoder_ports, qei_params);  		// channel priority 1,2..6
 			}
 		}
 	}
