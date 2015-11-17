@@ -8,6 +8,13 @@
 
 #include <qei_config.h>
 
+ /**
+* @brief Structure containing hall sensor port/s
+*/
+typedef struct {
+    port p_qei;
+} EncoderPorts;
+
 /**
  * @brief initialize QEI sensor
  *
@@ -25,10 +32,10 @@ void init_qei_param(qei_par & qei_params);
  * @param c_qei_p4 the control channel for reading qei position priority - 4
  * @param c_qei_p5 the control channel for reading qei position priority - 5
  * @param c_qei_p6 the control channel for reading qei position priority - 6
- * @param p_qei the hardware port where the quadrature encoder is located
- * @param qei_params the struct defines sensor type and resolution parameters for qei
+ * @param EncoderPorts structure containing the hardware port where the quadrature encoder is located
+ * @param qei_params the structure defines sensor type and resolution parameters for qei
  */
 void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3,
              chanend ? c_qei_p4, chanend ? c_qei_p5, chanend ? c_qei_p6,
-             port in p_qei, qei_par & qei_params);
+             EncoderPorts & encoder_ports, qei_par & qei_params);
 
