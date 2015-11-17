@@ -33,6 +33,13 @@ PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 
+port p_hall = HALL_PORT;
+#ifdef DC1K
+port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
+#endif
+
+port p_encoder = ENCODER_PORT;
+
 
 /* Test Profile Position function */
 void position_profile_test(chanend c_position_ctrl, chanend c_qei, chanend c_hall)
@@ -146,7 +153,7 @@ int main(void)
                     //connector 1 is configured as hall
                     p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
 #endif
-                    run_hall(c_hall_p1, c_hall_p2, null, null, c_hall_p5,null, p_ifm_hall, hall_params); // channel priority 1,2..6
+                    run_hall(c_hall_p1, c_hall_p2, null, null, c_hall_p5,null, p_hall, hall_params); // channel priority 1,2..6
 				}
 
 				/* QEI Server */
@@ -154,7 +161,7 @@ int main(void)
 					qei_par qei_params;
 
 					//connector 2 is configured as QEI
-                    run_qei(c_qei_p1, c_qei_p2, null, null, c_qei_p5, null, p_ifm_encoder, qei_params);          // channel priority 1,2..5
+                    run_qei(c_qei_p1, c_qei_p2, null, null, c_qei_p5, null, p_encoder, qei_params);          // channel priority 1,2..5
 				}
 			}
 		}
