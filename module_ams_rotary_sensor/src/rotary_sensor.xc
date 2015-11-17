@@ -476,7 +476,7 @@ void run_ams_sensor(server interface AMS iAMS[n], unsigned n, int sensor_resolut
     int angle_electrical_rotation = 0;
     int segm_num_ = 0;
     int abs_pos_ = 0, abs_pos_previos_ = 0;
-
+    int enable_aquisition_ = 0;
 
     int result = initRotarySensor(sensor_if,  settings1,  settings2, offset);
     abs_pos_previos_ = sensor_resolution - readRotarySensorAngleWithoutCompensation(sensor_if);
@@ -509,13 +509,14 @@ void run_ams_sensor(server interface AMS iAMS[n], unsigned n, int sensor_resolut
                     break;
             case iAMS[int i].get_absolute_position_multiturn(void)  -> {int position, int direction}:
 
-                    if(settings1 == 5){
-                        abs_pos_ = sensor_resolution - readRotarySensorAngleWithoutCompensation(sensor_if);
+                    if (enable_aquisition_ == 1){
+                        if(settings1 == 5){
+                            abs_pos_ = sensor_resolution - readRotarySensorAngleWithoutCompensation(sensor_if);
+                        }
+                        else {
+                            abs_pos_ = readRotarySensorAngleWithoutCompensation(sensor_if);
+                        }
                     }
-                    else {
-                        abs_pos_ = readRotarySensorAngleWithoutCompensation(sensor_if);
-                    }
-
 
                     if((abs_pos_ - abs_pos_previos_) < -sensor_resolution/2){
                         pos_multiturn += sensor_resolution - abs_pos_previos_ + abs_pos_;
@@ -538,6 +539,9 @@ void run_ams_sensor(server interface AMS iAMS[n], unsigned n, int sensor_resolut
                     break;
             case iAMS[int i].get_absolute_position_singleturn(void) -> int position:
                     position = readRotarySensorAngleWithoutCompensation(sensor_if);
+                    break;
+            case iAMS[int i].configure(int enable_aquisition):
+                    enable_aquisition_ = enable_aquisition;
                     break;
         }
     }

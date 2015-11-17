@@ -1,6 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C22-rev-a.inc>
-#include <IFM_DC1K-rev-c2.inc>
+//#include <CORE_C22-rev-a.inc>
+#include <CORE_C21-rev-a.inc>
+//#include <IFM_DC1K-rev-c2.inc>
+#include <IFM_DC100-rev-b.inc>
 
 /**
  * @file app_test_ams_rotary_sensor.xc
@@ -52,11 +54,12 @@ void ams_rotary_sensor_test(client interface AMS iAMS)
 
     while(1)
     {
+       // iAMS.configure(1);
    //     electrical_angle = iAMS.get_angle_electrical();
 
         /* get position from Hall Sensor */
-    //    {position, direction} = iAMS.get_absolute_position_multiturn();
-        position = iAMS.get_absolute_position_singleturn();
+        {position, direction} = iAMS.get_absolute_position_multiturn();
+    //    position = iAMS.get_absolute_position_singleturn();
 
         /* get velocity from Hall Sensor */
         velocity = iAMS.get_velocity();
@@ -96,7 +99,7 @@ int main(void)
             /* Test Hall Sensor Client */
             par
             {
-      //          ams_rotary_sensor_test(iAMS[0]);
+                ams_rotary_sensor_test(iAMS[0]);
             }
         }
 
@@ -105,21 +108,21 @@ int main(void)
          ************************************************************/
         on tile[IFM_TILE]:
         {
-            p_ifm_motor_hi[0] <: 0;
-            p_ifm_motor_hi[1] <: 0;
-            p_ifm_motor_hi[2] <: 0;
-
-            p_ifm_motor_lo[0] <: 0;
-            p_ifm_motor_lo[1] <: 0;
-            p_ifm_motor_lo[2] <: 0;
-
-            p_ifm_motor_hi[3] <: 0;
-            p_ifm_motor_lo[3] <: 0;
+//            p_ifm_motor_hi[0] <: 0;
+//            p_ifm_motor_hi[1] <: 0;
+//            p_ifm_motor_hi[2] <: 0;
+//
+//            p_ifm_motor_lo[0] <: 0;
+//            p_ifm_motor_lo[1] <: 0;
+//            p_ifm_motor_lo[2] <: 0;
+//
+//            p_ifm_motor_hi[3] <: 0;
+//            p_ifm_motor_lo[3] <: 0;
 
             /* AMS Rotary Sensor Server */
-  //          run_ams_sensor(iAMS, NUM_OF_AMS_INTERFACES, ROTARY_SENSOR_MAX_ANGLE, pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);//MOT 3 R3
+            run_ams_sensor(iAMS, NUM_OF_AMS_INTERFACES, ROTARY_SENSOR_MAX_ANGLE, pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);//MOT 3 R3
 
-            ams_rotary_sensor_direct_method(pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);
+  //          ams_rotary_sensor_direct_method(pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);
 
 
         }

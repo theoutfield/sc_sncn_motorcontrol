@@ -2,9 +2,9 @@
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
 #TARGET = SOMANET-C22
-TARGET = SOMANET-C22_Motor-Control_xSCOPE
+#TARGET = SOMANET-C22_Motor-Control_xSCOPE
 #TARGET = SOMANET-C21-DX
-#TARGET = SOMANET-C21_Motor-Control_xSCOPE
+TARGET = SOMANET-C21_Motor-Control_xSCOPE
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -20,7 +20,8 @@ USED_MODULES = module_ams_rotary_sensor module_blocks module_board-support modul
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 XCC_FLAGS_Debug = -g -O0
-XCC_FLAGS_Release = -g -O3
+#Warning: with optimization other than 0 the software is unstable
+XCC_FLAGS_Release = -g -O0
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
 VERBOSE = 0
