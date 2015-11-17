@@ -4,10 +4,10 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <commutation_server.h>
-#include <commutation_common.h>
-#include <watchdog.h>
 #include <xs1.h>
+#include <commutation_server.h>
+#include <watchdog.h>
+
 #include <stdlib.h>
 #include <pwm_config.h>
 #include <pwm_cli_inv.h>
@@ -27,58 +27,6 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-
-/* Sinusoidal based commutation functions */
-
-/*FixMe: restore select functions when sopported in combinable functions or replace by array of interfaces
- *
-static select on_client_request(chanend ? c_client, commutation_par & commutation_params, int & voltage,
-                                int & sensor_select, int init_state, int & shutdown)
-{
-case !isnull(c_client) => c_client :> int command:
-    switch (command) {
-    case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
-        c_client :> voltage;    //STAR_WINDING
-        if (commutation_params.winding_type == DELTA_WINDING) {
-            voltage = -voltage;
-        }
-        break;
-
-    case COMMUTATION_CMD_SET_PARAMS:
-        c_client :> commutation_params.angle_variance;
-        c_client :> commutation_params.nominal_speed;
-        c_client :> commutation_params.hall_offset_clk;
-        c_client :> commutation_params.hall_offset_cclk;
-        c_client :> commutation_params.winding_type;
-        break;
-
-    case COMMUTATION_CMD_SENSOR_SELECT:
-        c_client :> sensor_select;
-        break;
-
-    case CHECK_BUSY:            // init signal
-        c_client <: init_state;
-        break;
-
-    case COMMUTATION_CMD_DISABLE_FETS:
-        shutdown = 1;
-        break;
-
-    case COMMUTATION_CMD_ENABLE_FETS:
-        shutdown = 0;
-        voltage = 0;
-        break;
-
-    case COMMUTATION_CMD_FETS_STATE:
-        c_client <: shutdown;
-        break;
-
-    default:
-        break;
-    }
-    break;
-}
-*/
 
 [[combinable]]
 void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, interface WatchdogInterface client watchdog_interface,
@@ -188,7 +136,6 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, i
                         angle_pwm = (angle_pwm + 342) & 0x3ff;
                         pwm[2] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
                     }
-
                 }
 
                 /* Limiting PWM values (and suppression of short pulses) is done in
@@ -233,136 +180,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, i
             case commutation_interface[int i].checkBusy() -> int state_return:
                     state_return = init_state;
                     break;
-              /*
-            case !isnull(c_commutation_p1) => c_commutation_p1 :> int command:
-                switch (command) {
-                    case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
-                        c_commutation_p1 :> voltage;    //STAR_WINDING
-                        if (commutation_params.winding_type == DELTA_WINDING) {
-                            voltage = -voltage;
-                        }
-                        break;
 
-                    case COMMUTATION_CMD_SET_PARAMS:
-                        c_commutation_p1 :> commutation_params.angle_variance;
-                        c_commutation_p1 :> commutation_params.nominal_speed;
-                        c_commutation_p1 :> commutation_params.hall_offset_clk;
-                        c_commutation_p1 :> commutation_params.hall_offset_cclk;
-                        c_commutation_p1 :> commutation_params.winding_type;
-                        break;
-
-                    case COMMUTATION_CMD_SENSOR_SELECT:
-                        c_commutation_p1 :> sensor_select;
-                        break;
-
-                    case CHECK_BUSY:            // init signal
-                        c_commutation_p1 <: init_state;
-                        break;
-
-                    case COMMUTATION_CMD_DISABLE_FETS:
-                        shutdown = 1;
-                        break;
-
-                    case COMMUTATION_CMD_ENABLE_FETS:
-                        shutdown = 0;
-                        voltage = 0;
-                        break;
-
-                    case COMMUTATION_CMD_FETS_STATE:
-                        c_commutation_p1 <: shutdown;
-                        break;
-
-                    default:
-                        break;
-                }
-                break; */
-/*
-                case !isnull(c_commutation_p2) => c_commutation_p2 :> int command:
-                    switch (command) {
-                        case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
-                            c_commutation_p2 :> voltage;    //STAR_WINDING
-                            if (commutation_params.winding_type == DELTA_WINDING) {
-                                voltage = -voltage;
-                            }
-                            break;
-
-                        case COMMUTATION_CMD_SET_PARAMS:
-                            c_commutation_p2 :> commutation_params.angle_variance;
-                            c_commutation_p2 :> commutation_params.nominal_speed;
-                            c_commutation_p2 :> commutation_params.hall_offset_clk;
-                            c_commutation_p2 :> commutation_params.hall_offset_cclk;
-                            c_commutation_p2 :> commutation_params.winding_type;
-                            break;
-
-                        case COMMUTATION_CMD_SENSOR_SELECT:
-                            c_commutation_p2 :> sensor_select;
-                            break;
-
-                        case CHECK_BUSY:            // init signal
-                            c_commutation_p2 <: init_state;
-                            break;
-
-                        case COMMUTATION_CMD_DISABLE_FETS:
-                            shutdown = 1;
-                            break;
-
-                        case COMMUTATION_CMD_ENABLE_FETS:
-                            shutdown = 0;
-                            voltage = 0;
-                            break;
-
-                        case COMMUTATION_CMD_FETS_STATE:
-                            c_commutation_p2 <: shutdown;
-                            break;
-
-                        default:
-                            break;
-                    }
-                    break;
-
-                    case !isnull(c_commutation_p3) => c_commutation_p3 :> int command:
-                        switch (command) {
-                            case COMMUTATION_CMD_SET_VOLTAGE:                // set voltage
-                                c_commutation_p3 :> voltage;    //STAR_WINDING
-                                if (commutation_params.winding_type == DELTA_WINDING) {
-                                    voltage = -voltage;
-                                }
-                                break;
-
-                            case COMMUTATION_CMD_SET_PARAMS:
-                                c_commutation_p3 :> commutation_params.angle_variance;
-                                c_commutation_p3 :> commutation_params.nominal_speed;
-                                c_commutation_p3 :> commutation_params.hall_offset_clk;
-                                c_commutation_p3 :> commutation_params.hall_offset_cclk;
-                                c_commutation_p3 :> commutation_params.winding_type;
-                                break;
-
-                            case COMMUTATION_CMD_SENSOR_SELECT:
-                                c_commutation_p3 :> sensor_select;
-                                break;
-
-                            case CHECK_BUSY:            // init signal
-                                c_commutation_p3 <: init_state;
-                                break;
-
-                            case COMMUTATION_CMD_DISABLE_FETS:
-                                shutdown = 1;
-                                break;
-
-                            case COMMUTATION_CMD_ENABLE_FETS:
-                                shutdown = 0;
-                                voltage = 0;
-                                break;
-
-                            case COMMUTATION_CMD_FETS_STATE:
-                                c_commutation_p3 <: shutdown;
-                                break;
-
-                            default:
-                                break;
-                        }
-                        break;
-                        */
 
 /*FixMe: restore select functions when supported in combinable functions or replace by array of interfaces
  *
