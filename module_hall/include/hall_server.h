@@ -9,6 +9,13 @@
 #include <hall_config.h>
 
 /**
+* @brief Structure containing hall sensor port/s
+*/
+typedef struct {
+    port p_hall;
+} HallPorts;
+
+/**
  * @brief initialize hall sensor
  *
  * @param hall_params struct defines the pole-pairs and gear ratio
@@ -24,9 +31,9 @@ void init_hall_param(hall_par & hall_params);
  * @param[out] c_hall_p4 the control channel for reading hall position (priority 4)
  * @param[out] c_hall_p5 the control channel for reading hall position (priority 5)
  * @param[out] c_hall_p6 the control channel for reading hall position (priority 6)
- * @param[in] p_hall the port for reading the hall sensor data
- * @param hall_params struct defines the pole-pairs and gear ratio
+ * @param[in] hall_ports structure containing the ports for reading the hall sensor data
+ * @param hall_params structure defines the pole-pairs and gear ratio
  */
 [[combinable]]
 void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, chanend ? c_hall_p4,
-              chanend ? c_hall_p5, chanend ? c_hall_p6, in port p_hall, hall_par & hall_params);
+              chanend ? c_hall_p5, chanend ? c_hall_p6, HallPorts & hall_ports, hall_par & hall_params);
