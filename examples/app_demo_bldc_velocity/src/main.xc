@@ -32,13 +32,12 @@ on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
-HallPorts hall_ports= HALL_PORTS;
+HallPorts hall_ports = HALL_PORTS;
+EncoderPorts encoder_ports = ENCODER_PORTS;
 
 #ifdef DC1K
 port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
 #endif
-
-port p_encoder = ENCODER_PORT;
 
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
@@ -159,7 +158,7 @@ int main(void)
 					qei_par qei_params;
 					init_qei_param(qei_params);
 
-					run_qei(c_qei_p1, c_qei_p2, null, null, null, null, p_encoder, qei_params);  		 // channel priority 1,2..5
+					run_qei(c_qei_p1, c_qei_p2, null, null, null, null, encoder_ports, qei_params);  		 // channel priority 1,2..5
 
 				}
 
