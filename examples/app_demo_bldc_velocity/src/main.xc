@@ -27,8 +27,6 @@
 #include <bldc_motor_config.h>
 
 
-on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
-
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
@@ -62,7 +60,8 @@ int main(void)
 	chan c_commutation_p2;	                            // commutation channels
 	chan c_pwm_ctrl, c_adctrig;							// pwm channels
 	chan c_velocity_ctrl;								// velocity control channel
-    interface WatchdogInterface wd_interface;
+
+	interface WatchdogInterface wd_interface;
     interface CommutationInterface commutation_interface[3];
 
 	par
