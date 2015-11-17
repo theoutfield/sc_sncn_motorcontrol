@@ -13,7 +13,7 @@
 #include <pwm_cli_inv.h>
 #include <a4935.h>
 #include <sine_table_big.h>
-#include <adc_client_ad7949.h>
+//#include <adc_client_ad7949.h>
 #include <refclk.h>
 #include <qei_client.h>
 #include <stdio.h>

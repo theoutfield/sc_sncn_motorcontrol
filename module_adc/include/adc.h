@@ -15,9 +15,13 @@
 #pragma once
 
 #include <xs1.h>
-#include <xclib.h> // NB Contains bitrev()
-#include <assert.h>
-#include <print.h>
+#include <adc_7265.h>
+#include <adc_server_ad7949.h>
+/*
+typedef struct ADCPorts{
+    AD7949Ports ?ad7949_ports;
+    AD7265Ports ?ad7265_ports;
+};
 
                            // nDIFF|A2|A1|A0
 #define AD7265_MUX_DEFAULT_CONFIG 0b1000
@@ -30,13 +34,7 @@ interface ADC_trigger{
   void trigger_measurement(unsigned char port_id, unsigned char config);
 };
 
-typedef struct adc_ports {
-    in buffered port:32 p32_data[2]; // Array of 32-bit buffered ADC data ports
-    clock xclk; // Internal XMOS clock
-    out port p1_serial_clk; // 1-bit port connecting to external ADC serial clock
-    port p1_ready;   // 1-bit port used to as ready signal for p32_adc_data ports and ADC chip
-    out port p4_mux; // 4-bit port used to control multiplexor on ADC chip
-} adc_ports_t;
+*/
 
 
 
@@ -98,7 +96,7 @@ typedef struct adc_ports {
 
 /* ADC_TRIGGER_DELAY needs to be tuned to move the ADC trigger point into the centre of the PWM 'OFF' period.
  * This value is related to the PWM_MAX_VALUE (in module_pwm_foc) and is independent of the Reference Frequency
- */
+ *//*
 #define ADC_TRIGGER_CORR 128 // Timing correction
 #define ADC_TRIGGER_DELAY (QUART_PWM_MAX - ADC_TRIGGER_CORR) // MB~ Re-tune
 
@@ -110,5 +108,5 @@ void foc_adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to 
 
 
 void run_adc_AD7256(server interface ADC iADC, server interface ADC_trigger, adc_ports_t &adc_ports);
-
+*/
 /*****************************************************************************/

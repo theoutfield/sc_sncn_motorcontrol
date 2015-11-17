@@ -8,7 +8,27 @@
 
 #include <xs1.h>
 #include <xclib.h>
-#include <adc_common.h>
+//#include <adc_common.h>
+
+typedef struct {
+    int Ia_calib;
+    int Ib_calib;
+    int Ic_calib;
+} calib_data;
+
+typedef struct{
+     buffered out port:32 sclk_conv_mosib_mosia;
+     in buffered port:32 data_a;
+     in buffered port:32 data_b;
+     clock clk;
+}AD7949Ports;
+
+interface AD7949Interface{
+    void calibrate();
+    {int, int, int, int, int, int, int, int} get_all();
+    {int, int} get_currents();
+    {int, int} get_external_inputs();
+};
 
 /**
  * @brief Non triggered ADC server
@@ -26,11 +46,7 @@
  *
  */
 void adc_ad7949( chanend c_adc,
-                 clock clk,
-                 buffered out port:32 p_sclk_conv_mosib_mosia,
-                 in buffered port:32 p_data_a,
-                 in buffered port:32 p_data_b );
-
+                 AD7949Ports &adc_ports );
 
 /**
  * @brief Triggered ADC server
@@ -50,9 +66,6 @@ void adc_ad7949( chanend c_adc,
  * @param p_data_b 1-bit port for ADC data channel 1
  *
  */
-void adc_ad7949_triggered( chanend c_adc,
-                           chanend c_trig,
-                           clock clk,
-                           buffered out port:32 p_sclk_conv_mosib_mosia,
-                           in buffered port:32 p_data_a,
-                           in buffered port:32 p_data_b );
+void adc_ad7949_triggered( interface AD7949Interface server ad7949_interface,
+                            AD7949Ports &adc_ports,
+                           chanend c_trig);

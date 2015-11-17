@@ -13,7 +13,7 @@
 #include <print.h>
 #include <statemachine.h>
 #include <drive_modes.h>
-#include <adc_client_ad7949.h>
+//#include <adc_client_ad7949.h>
 #include <qei_client.h>
 #include <sine_table_big.h>
 #include <a4935.h>
@@ -34,7 +34,7 @@ void init_buffer(int buffer[], int length)
     return;
 }
 
-void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
+void current_filter(interface AD7949Interface client adc_if, chanend c_current, chanend c_speed)
 {
 #define FILTER_LENGTH_ADC 80
     int phase_a_raw = 0;
@@ -71,8 +71,8 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
         if (adc_calib_start == 1)
             break;
     }
-
-    do_adc_calibration_ad7949(c_adc, I_calib);
+    adc_if.calibrate();
+    //do_adc_calibration_ad7949(c_adc, I_calib);
 
     c_current <: 1; // adc calib done
     //init_buffer(buffer_phase_a, FILTER_LENGTH_ADC);
@@ -84,7 +84,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 #pragma ordered
         select {
         case ts when timerafter(time+5556) :> time: // .05 ms
-        { phase_a_raw, phase_b_raw } = get_adc_calibrated_current_ad7949(c_adc, I_calib);
+        { phase_a_raw, phase_b_raw } = adc_if.get_currents();//get_adc_calibrated_current_ad7949(c_adc, I_calib);
             //xscope_probe_data(0, phase_a_raw);
             buffer_phase_a[buffer_index] = phase_a_raw;
             buffer_phase_b[buffer_index] = phase_b_raw;
@@ -484,11 +484,11 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 
 /* TODO: do we really need 2 threads for this? */
 void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
-                    int sensor_used, chanend c_adc, interface CommutationInterface client commutation_interface, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
+                    int sensor_used, interface AD7949Interface client adc_if, interface CommutationInterface client commutation_interface, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
     chan c_current, c_speed;
     par {
-        current_filter(c_adc, c_current, c_speed);
+        current_filter(adc_if, c_current, c_speed);
         torque_ctrl_loop(torque_ctrl_params, hall_params, qei_params, sensor_used,
                          c_current, c_speed, commutation_interface, c_hall, c_qei, c_torque_ctrl);
     }
