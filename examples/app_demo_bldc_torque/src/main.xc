@@ -31,7 +31,7 @@ PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 ADCPorts adc_ports = ADC_PORTS;
-HallPorts hall_ports= HALL_PORTS;
+HallPorts hall_ports = HALL_PORTS;
 EncoderPorts encoder_ports = ENCODER_PORTS;
 
 #ifdef DC1K
@@ -43,7 +43,7 @@ void profile_torque_test(chanend c_torque_ctrl)
 {
     delay_seconds(1);
 
-	int target_torque = 1000; 	//(desired torque/torque_constant)  * IFM resolution
+	int target_torque = 500; 	//(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 500;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);

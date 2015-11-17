@@ -273,34 +273,6 @@ void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_
 #pragma ordered
         select
         {
-        case adc_interface.calibrate():
-
-                     int i = 0;
-                     i_calib_a = 0;
-                     i_calib_b = 0;
-
-                     while (i < ADC_CALIB_POINTS) {
-                         // get ADC reading
-
-                         adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
-                                                                adc_config_mot,  adc_config_other, delay, tx, adc_data_a, adc_data_b, adc_index);
-
-                         if (adc_data_a[4]>0 && adc_data_a[4]<16384  &&  adc_data_b[4]>0 && adc_data_b[4]<16384) {
-                             i_calib_a += adc_data_a[4];
-                             i_calib_b += adc_data_b[4];
-                             i++;
-                             if (i == ADC_CALIB_POINTS) {
-                                 break;
-                             }
-                         }
-                     }
-
-                    i_calib_a = (i_calib_a >> Factor);
-                    i_calib_b = (i_calib_b >> Factor);
-
-                  break;
-
-
               case adc_interface.get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
 
                       Ia = adc_data_a[4];         //  raw;
@@ -329,36 +301,6 @@ void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_
                       ext_b = adc_data_b[3];
 
                       break;
-
-
-       /* case c_adc :> command:
-            if(command == ADC_ALL_REQ)
-            {
-                master
-                {
-                    c_adc <: adc_data_a[4]; 		//  - ia_calibr;
-                    c_adc <: adc_data_b[4]; 		//  - ib_calibr;
-                    c_adc <: adc_data_a[0]; 		//
-                    c_adc <: adc_data_a[1]; 		//
-                    c_adc <: adc_data_a[2]; 		//
-                    c_adc <: adc_data_a[3]; 		//
-                    c_adc <: adc_data_b[0]; 		//
-                    c_adc <: adc_data_b[1]; 		//
-                    c_adc <: adc_data_b[2]; 		//
-                    c_adc <: adc_data_b[3];
-                    //	xCount = 58;               // ===>> tirgger for next adc conversion 54 * 0,5µsec = 27µsec
-                    //	tx :> ts;
-                }
-            }
-            else if(command == ADC_EXTERNAL_POT)
-            {
-                master
-                {
-                    c_adc <: adc_data_a[3];
-                    c_adc <: adc_data_b[3];
-                }
-            }
-            break;*/
         }
     }
 }
@@ -418,34 +360,6 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface, AD7949Po
             }
 
             break;
-
-        case adc_interface.calibrate():
-
-               int i = 0;
-               i_calib_a = 0;
-               i_calib_b = 0;
-
-               while (i < ADC_CALIB_POINTS) {
-                   // get ADC reading
-
-                   adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
-                                                          adc_config_mot,  adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
-
-                   if (adc_data_a[4]>0 && adc_data_a[4]<16384  &&  adc_data_b[4]>0 && adc_data_b[4]<16384) {
-                       i_calib_a += adc_data_a[4];
-                       i_calib_b += adc_data_b[4];
-                       i++;
-                       if (i == ADC_CALIB_POINTS) {
-                           break;
-                       }
-                   }
-               }
-
-              i_calib_a = (i_calib_a >> Factor);
-              i_calib_b = (i_calib_b >> Factor);
-
-            break;
-
 
         case adc_interface.get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
 
