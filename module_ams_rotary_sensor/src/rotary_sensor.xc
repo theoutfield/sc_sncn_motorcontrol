@@ -508,14 +508,14 @@ void run_ams_sensor(server interface AMS iAMS[n], unsigned n, int sensor_resolut
                     angle = angle_electrical_rotation;
                     break;
             case iAMS[int i].get_absolute_position_multiturn(void)  -> {int position, int direction}:
-//                    if (trigger) {
-//                        if(settings1 == 5){
-//                            abs_pos_ = sensor_resolution - readRotarySensorAngleWithoutCompensation(sensor_if);
-//                        }
-//                        else {
-//                            abs_pos_ = readRotarySensorAngleWithoutCompensation(sensor_if);
-//                        }
-//                    }
+
+                    if(settings1 == 5){
+                        abs_pos_ = sensor_resolution - readRotarySensorAngleWithoutCompensation(sensor_if);
+                    }
+                    else {
+                        abs_pos_ = readRotarySensorAngleWithoutCompensation(sensor_if);
+                    }
+
 
                     if((abs_pos_ - abs_pos_previos_) < -sensor_resolution/2){
                         pos_multiturn += sensor_resolution - abs_pos_previos_ + abs_pos_;
@@ -535,6 +535,9 @@ void run_ams_sensor(server interface AMS iAMS[n], unsigned n, int sensor_resolut
                     break;
             case iAMS[int i].get_velocity(void) -> int velocity:
                     velocity = 0;
+                    break;
+            case iAMS[int i].get_absolute_position_singleturn(void) -> int position:
+                    position = readRotarySensorAngleWithoutCompensation(sensor_if);
                     break;
         }
     }

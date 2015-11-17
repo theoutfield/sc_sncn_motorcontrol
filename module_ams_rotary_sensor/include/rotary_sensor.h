@@ -29,6 +29,7 @@ typedef struct sensor_spi_interface
 interface AMS{
     int get_angle_electrical(void);
     {int, int} get_absolute_position_multiturn(void);
+    int get_absolute_position_singleturn(void);
     int get_velocity(void);
 };
 
