@@ -18,13 +18,12 @@
 #include <statemachine.h>
 #include <xscope.h>
 #include <bldc_motor_config.h>
-#include <commutation_common.h>
 #include <internal_config.h>
 
 void set_commutation_offset_clk(chanend c_signal, unsigned offset);
 
 void set_commutation_offset_cclk(chanend c_signal, unsigned offset);
 
-void run_offset_tuning(int input_voltage, chanend c_commutation_p1, chanend c_commutation_p2);
+void run_offset_tuning(int input_voltage, interface CommutationInterface client commutation_interface);
 
 #endif /* TUNING_H_ */
