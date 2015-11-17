@@ -34,6 +34,13 @@ PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 
+port p_hall = HALL_PORT;
+#ifdef DC1K
+port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
+#endif
+
+port p_encoder = ENCODER_PORT;
+
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
@@ -144,14 +151,14 @@ int main(void)
 				/* Hall Server */
 				{
 					hall_par hall_params;
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_hall, hall_params); // channel priority 1,2..4
 				}
 
 				/* QEI Server */
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);  // channel priority 1,2..4
+					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_encoder, qei_params);  // channel priority 1,2..4
 				}
 			}
 		}
