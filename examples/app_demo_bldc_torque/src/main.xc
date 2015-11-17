@@ -33,11 +33,14 @@ on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
+AD7949Ports adc_ports = AD7949_PORTS;
 
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
 {
-	int target_torque = 500; 	//(desired torque/torque_constant)  * IFM resolution
+    delay_seconds(1);
+
+	int target_torque = 1000; 	//(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 500;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	cst_par cst_params; int actual_torque; timer t; unsigned int time;
 	init_cst_param(cst_params);
@@ -46,11 +49,13 @@ void profile_torque_test(chanend c_torque_ctrl)
 	/* Set new target torque for profile torque control */
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
+	delay_seconds(5);
+
 	target_torque = 0;
 	xscope_int(TARGET_TORQUE, target_torque);
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 
-	target_torque = -500;
+	target_torque = -1000;
 	xscope_int(TARGET_TORQUE, target_torque);
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 	t:>time;
@@ -76,6 +81,7 @@ int main(void)
 	chan c_torque_ctrl,c_velocity_ctrl, c_position_ctrl;					// torque control channel
     interface WatchdogInterface wd_interface;
     interface CommutationInterface commutation_interface[3];
+    interface AD7949Interface ad7949_if;
 
 	par
 	{
@@ -106,7 +112,7 @@ int main(void)
 
 					/* Control Loop */
 					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
-							c_adc, commutation_interface[0],  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+					        ad7949_if, commutation_interface[0],  c_hall_p3,  c_qei_p3, c_torque_ctrl);
 				}
 			}
 		}
@@ -119,9 +125,7 @@ int main(void)
 			par
 			{
 				/* ADC Loop */
-				adc_ad7949_triggered(c_adc, c_adctrig, clk_adc,\
-						p_ifm_adc_sclk_conv_mosib_mosia, p_ifm_adc_misoa,\
-						p_ifm_adc_misob);
+				adc_ad7949_triggered(ad7949_if, adc_ports,  c_adctrig);
 
 				/* PWM Loop */
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);

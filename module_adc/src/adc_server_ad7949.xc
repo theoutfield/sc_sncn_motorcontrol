@@ -8,11 +8,7 @@
 #include <stdint.h>
 #include <xclib.h>
 #include <refclk.h>
-
-#define ADC_CURRENT_REQ	1
-#define ADC_ALL_REQ	2
-#define ADC_CALIB_POINTS 64
-#define ADC_EXTERNAL_POT 3
+#include <adc_server_ad7949.h>
 
 #define BIT13 0x00002000
 #define BIT12 0x00001000
@@ -28,6 +24,9 @@
 #define BIT02 0x00000004
 #define BIT01 0x00000002
 #define BIT0  0x00000001
+
+#define ADC_CALIB_POINTS 64
+#define Factor 6
 
 void output_adc_config_data(clock clk, in buffered port:32 p_data_a, in buffered port:32 p_data_b,
                             buffered out port:32 p_adc, int adc_cfg_data)
@@ -215,11 +214,7 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
 
 
 
-void adc_ad7949( chanend c_adc,
-                 clock clk,
-                 buffered out port:32 p_sclk_conv_mosib_mosia,
-                 in buffered port:32 p_data_a,
-                 in buffered port:32 p_data_b )
+void adc_ad7949( chanend c_adc, AD7949Ports &adc_ports )
 {
     timer tx;
     unsigned ts;
@@ -235,24 +230,24 @@ void adc_ad7949( chanend c_adc,
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
     unsigned short adc_index = 0;
-    configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
+    configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
     tx :> ts;
 
 
     while (1)
     {
         tx when timerafter(ts + 13889) :> ts;   	// 250 => 1µsec 125= 0,5µsec
-        adc_ad7949_singleshot( p_sclk_conv_mosib_mosia,
-                               p_data_a,
-                               p_data_b,
-                               clk,
-                               adc_config_mot,
-                               adc_config_other,
-                               delay,
-                               tx,
-                               adc_data_a,
-                               adc_data_b,
-                               adc_index );
+        adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia,
+                                adc_ports.data_a,
+                                adc_ports.data_b,
+                                adc_ports.clk,
+                                adc_config_mot,
+                                adc_config_other,
+                                delay,
+                                tx,
+                                adc_data_a,
+                                adc_data_b,
+                                adc_index );
 
 #pragma ordered
         select
@@ -290,12 +285,7 @@ void adc_ad7949( chanend c_adc,
 }
 
 
-void adc_ad7949_triggered( chanend c_adc,
-                           chanend c_trig,
-                           clock clk,
-                           buffered out port:32 p_sclk_conv_mosib_mosia,
-                           in buffered port:32 p_data_a,
-                           in buffered port:32 p_data_b )
+void adc_ad7949_triggered( interface AD7949Interface server ad7949_interface, AD7949Ports &adc_ports, chanend c_trig)
 {
     timer t;
     unsigned int ts;
@@ -310,7 +300,9 @@ void adc_ad7949_triggered( chanend c_adc,
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
     unsigned short adc_index = 0;
-    configure_adc_ports(clk, p_sclk_conv_mosib_mosia, p_data_a, p_data_b);
+    calib_data I_calib;
+
+    configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
     while (1)
     {
@@ -322,50 +314,67 @@ void adc_ad7949_triggered( chanend c_adc,
             {
                 t :> ts;
                 t when timerafter(ts + 7080) :> ts; // 6200
-                adc_ad7949_singleshot( p_sclk_conv_mosib_mosia, p_data_a, p_data_b,	clk,
+                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,	adc_ports.clk,
                                        adc_config_mot,	adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
             }
             break;
 
-        case c_adc :> command:
-            switch(command)
-            {
-            case ADC_CURRENT_REQ:
-                master
-                {
-                    c_adc <: adc_data_a[4];
-                    c_adc <: adc_data_b[4];
-                }
-                break;
+        case ad7949_interface.calibrate():
 
-            case ADC_ALL_REQ:
-                master
-                {
-                    c_adc <: adc_data_a[4];         //  - ia_calibr;
-                    c_adc <: adc_data_b[4];         //  - ib_calibr;
-                    c_adc <: adc_data_a[0];         //
-                    c_adc <: adc_data_a[1];         //
-                    c_adc <: adc_data_a[2];         //
-                    c_adc <: adc_data_a[3];         //
-                    c_adc <: adc_data_b[0];         //
-                    c_adc <: adc_data_b[1];         //
-                    c_adc <: adc_data_b[2];         //
-                    c_adc <: adc_data_b[3];
-                }
-                break;
+               int i = 0;
+               I_calib.Ia_calib = 0;
+               I_calib.Ib_calib = 0;
 
-            case ADC_EXTERNAL_POT:
-                master
-                {
-                    c_adc <: adc_data_a[3];
-                    c_adc <: adc_data_b[3];
-                }
-                break;
+               while (i < ADC_CALIB_POINTS) {
+                   // get ADC reading
 
-            default:
-                break;
-            }
+                   adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
+                                                          adc_config_mot,  adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
+
+                   if (adc_data_a[4]>0 && adc_data_a[4]<16384  &&  adc_data_b[4]>0 && adc_data_b[4]<16384) {
+                       I_calib.Ia_calib += adc_data_a[4];
+                       I_calib.Ib_calib += adc_data_b[4];
+                       i++;
+                       if (i == ADC_CALIB_POINTS) {
+                           break;
+                       }
+                   }
+               }
+
+               I_calib.Ia_calib = (I_calib.Ia_calib >> Factor);
+               I_calib.Ib_calib = (I_calib.Ib_calib >> Factor);
+
             break;
+
+
+        case ad7949_interface.get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
+
+                Ia = adc_data_a[4];         //  raw;
+                Ib = adc_data_b[4];         //  raw;
+
+                tmp_1 = adc_data_a[1];
+                voltage = adc_data_a[2];
+                ext_1 = adc_data_a[3];
+
+                tmp_2 = adc_data_b[1];
+                dummy = adc_data_b[2];
+                ext_2 = adc_data_b[3];
+
+                break;
+
+        case ad7949_interface.get_currents() -> {int Ia, int Ib}:
+
+                Ia = ((int) adc_data_a[4]) - I_calib.Ia_calib;
+                Ib = ((int) adc_data_b[4]) - I_calib.Ib_calib;
+
+                break;
+
+        case ad7949_interface.get_external_inputs() -> {int ext_a, int ext_b}:
+
+                ext_a = adc_data_a[3];
+                ext_b = adc_data_b[3];
+
+                break;
         }
     }
 }
