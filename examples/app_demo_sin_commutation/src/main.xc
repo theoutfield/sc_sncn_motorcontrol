@@ -128,7 +128,6 @@ int main(void) {
                             commutation_params);
                 }
 
-
                 /* Hall Server */
                 {
                     hall_par hall_params;
