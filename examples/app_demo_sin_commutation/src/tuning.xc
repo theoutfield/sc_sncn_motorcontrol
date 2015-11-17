@@ -8,31 +8,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void set_commutation_offset_clk(chanend c_signal, unsigned offset){
-    c_signal <: COMMUTATION_CMD_SET_PARAMS;
-    c_signal <: (60 * 4096) / (POLE_PAIRS * 2 * 360);
-    c_signal <: MAX_NOMINAL_SPEED;
-    c_signal <: offset;
-    c_signal <: COMMUTATION_OFFSET_CCLK;
-    c_signal <: WINDING_TYPE;
-
-}
-
-void set_commutation_offset_cclk(chanend c_signal, unsigned offset){
-    c_signal <: COMMUTATION_CMD_SET_PARAMS;
-    c_signal <: (60 * 4096) / (POLE_PAIRS * 2 * 360);
-    c_signal <: MAX_NOMINAL_SPEED;
-    c_signal <: COMMUTATION_OFFSET_CLK;
-    c_signal <: offset;
-    c_signal <: WINDING_TYPE;
-
-}
-
-
-void run_offset_tuning(int input_voltage, chanend c_commutation_p1, chanend c_commutation_p2){
+void run_offset_tuning(int input_voltage, interface CommutationInterface client commutation_interface){
 
     delay_seconds(1);
-    set_commutation_sinusoidal(c_commutation_p1, input_voltage);
+    commutation_interface.setVoltage(input_voltage);
 
     printf (" Please enter an offset value different from %d, then press enter\n",
             (input_voltage > 0) ? ((WINDING_TYPE == 1) ? COMMUTATION_OFFSET_CLK : COMMUTATION_OFFSET_CCLK) : ((WINDING_TYPE == 1) ? COMMUTATION_OFFSET_CCLK : COMMUTATION_OFFSET_CLK)  );
@@ -51,13 +30,25 @@ void run_offset_tuning(int input_voltage, chanend c_commutation_p1, chanend c_co
         //please note for the delta winding type offset_clk and offset_cclk are flipped
         if (input_voltage > 0)
         {        //star winding
-            if (WINDING_TYPE == 1) set_commutation_offset_clk(c_commutation_p2, value);//910
-            else set_commutation_offset_cclk(c_commutation_p2, value);//2460
+            if (WINDING_TYPE == 1) {
+                commutation_par params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
+                commutation_interface.setParameters(params);
+            }
+            else {
+                commutation_par params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
+                commutation_interface.setParameters(params);
+            }
         }
         else
         {
-            if (WINDING_TYPE == 1) set_commutation_offset_cclk(c_commutation_p2, value);//2460
-            else set_commutation_offset_clk(c_commutation_p2, value);//910
+            if (WINDING_TYPE == 1){
+                commutation_par params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
+                commutation_interface.setParameters(params);
+            }
+            else{
+                commutation_par params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
+                commutation_interface.setParameters(params);
+            }
         }
 
         delay_milliseconds(10);

@@ -18,11 +18,10 @@
 #endif
 
 on tile[IFM_TILE]:clock clk_adc = XS1_CLKBLK_1;
-//on tile[IFM_TILE]:clock clk_pwm = XS1_CLKBLK_REF;
-
 
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 
 #define VOLTAGE 2000 //+/- 4095
 
@@ -59,6 +58,7 @@ int main(void) {
     chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal; // commutation channels
     chan c_pwm_ctrl, c_adctrig; // pwm channels
     interface WatchdogInterface watchdog_interface;
+    interface CommutationInterface commutation_interface[3];
 
     #ifdef AD7265
         interface ADC i_adc;
@@ -73,7 +73,7 @@ int main(void) {
         {
             /* WARNING: only one blocking task is possible per tile. */
             /* Waiting for a user input blocks other tasks on the same tile from execution. */
-            run_offset_tuning(VOLTAGE, c_commutation_p1, c_commutation_p2);
+            run_offset_tuning(VOLTAGE, commutation_interface[0]);
         }
 
         on tile[IFM_TILE]:
@@ -108,13 +108,8 @@ int main(void) {
                     init_hall_param(hall_params);
 
                     commutation_sinusoidal(c_hall_p1, c_qei_p1, c_signal,
-                            watchdog_interface, c_commutation_p1, c_commutation_p2,
-                            c_commutation_p3, c_pwm_ctrl,
-#ifdef DC1K
-                            null, null, null, null,
-#else
-                            p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,
-#endif
+                            watchdog_interface, commutation_interface, c_pwm_ctrl,
+                            fet_driver_ports,
                             hall_params, qei_params,
                             commutation_params);
                 }
