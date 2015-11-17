@@ -18,9 +18,10 @@
 
 /*****************************************************************************/
 void configure_adc_ports_7265( // Configure all ADC data ports
-    in buffered port:32 p32_data[2], // Array of 32-bit buffered ADC data ports
-    clock xclk, // XMOS internal clock
-    out port p1_serial_clk, // 1-bit Port connecting to external ADC serial clock
+    in buffered port:32 ?p32_data_a, // Array of 32-bit buffered ADC data ports
+    in buffered port:32 ?p32_data_b,
+    clock ?xclk, // XMOS internal clock
+    out port ?p1_serial_clk, // 1-bit Port connecting to external ADC serial clock
     port p1_ready,   // 1-bit port used to as ready signal for p32_adc_data ports and ADC chip
     out port p4_mux // 4-bit port used to control multiplexor on ADC chip
 )
@@ -61,8 +62,8 @@ void configure_adc_ports_7265( // Configure all ADC data ports
     set_port_inv( p1_ready ); // Invert p1_ready for connection to AD7265, which has active low
 
     // For this port, configure to read into buffer when using the serial clock
-    configure_in_port_strobed_slave( p32_data[0] ,p1_ready ,xclk ); // XS1 Library call
-    configure_in_port_strobed_slave( p32_data[1] ,p1_ready ,xclk ); // XS1 Library call
+    configure_in_port_strobed_slave( p32_data_a ,p1_ready ,xclk ); // XS1 Library call
+    configure_in_port_strobed_slave( p32_data_b ,p1_ready ,xclk ); // XS1 Library call
 
 
     start_clock( xclk );    // Start the ADC serial clock port
@@ -91,7 +92,7 @@ void foc_adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to 
     //MB~ However, removing it will alter timing, and a re-tuning exercise may be required!-(
     set_thread_fast_mode_on();
 
-    configure_adc_ports_7265( adc_ports.p32_data , adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready , adc_ports.p4_mux ); // Configure all ADC data ports
+    configure_adc_ports_7265( adc_ports.p32_data[0],  adc_ports.p32_data[1] , adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready , adc_ports.p4_mux ); // Configure all ADC data ports
     unsigned char mux_config = AD7265_MUX_DEFAULT_CONFIG;
 
     // Loop until termination condition detected
@@ -167,7 +168,7 @@ void run_adc_AD7256(server interface ADC iADC, server interface ADC_trigger i_AD
     unsigned tin = 0, tout = 0;
     int sampling_time_ = 0;
 
-    configure_adc_ports_7265( adc_ports.p32_data, adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
+    configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
     while(1){
 
