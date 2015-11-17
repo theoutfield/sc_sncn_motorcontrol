@@ -15,6 +15,12 @@
 
 #define ENABLE_XSCOPE
 
+HallPorts hall_ports = HALL_PORTS;
+
+#ifdef DC1K
+port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
+#endif
+
 /* Test Hall Sensor Client */
 void hall_test(chanend c_hall)
 {
@@ -94,11 +100,11 @@ int main(void)
                 //connector 1
                 p_ifm_encoder_hall_select_ext_d4to5 <: SET_ALL_AS_HALL;
                 run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6,
-                                        p_ifm_encoder_hall_1, hall_params); // channel priority 1,2..6
+                                        hall_ports, hall_params); // channel priority 1,2..6
 
 #else
                 run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6,
-                        p_ifm_hall, hall_params); // channel priority 1,2..6
+                        hall_ports, hall_params); // channel priority 1,2..6
 #endif
             }
 

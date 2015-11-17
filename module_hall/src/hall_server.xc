@@ -5,6 +5,7 @@
 */
 
 #include <hall_config.h>
+#include <hall_server.h>
 #include <filter_blocks.h>
 #include <refclk.h>
 #include <stdlib.h>
@@ -83,7 +84,7 @@ void init_hall_param(hall_par &hall_params)
 
 [[combinable]]
 void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, chanend ? c_hall_p4,
-              chanend ? c_hall_p5, chanend ? c_hall_p6, in port p_hall, hall_par & hall_params)
+              chanend ? c_hall_p5, chanend ? c_hall_p6, HallPorts & hall_ports, hall_par & hall_params)
 {
     init_hall_param(hall_params);
 
@@ -138,7 +139,7 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
     int status = 0; //1 changed
 
     /* Init hall sensor */
-    p_hall :> pin_state;
+    hall_ports.p_hall :> pin_state;
     pin_state &= 0x07;
     pin_state_monitor = pin_state;
     switch(pin_state) {
@@ -425,12 +426,12 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
             case tmr when timerafter(ts + PULL_PERIOD_USEC*250) :> ts: //12 usec 3000
                 switch(xreadings) {
                     case 0:
-                        p_hall :> new1;
+                        hall_ports.p_hall :> new1;
                         new1 &= 0x07;
                         xreadings++;
                         break;
                     case 1:
-                        p_hall :> new2;
+                        hall_ports.p_hall :> new2;
                         new2 &= 0x07;
                         if (new2 == new1) {
                             xreadings++;
@@ -439,7 +440,7 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
                         }
                         break;
                     case 2:
-                        p_hall :> new2;
+                        hall_ports.p_hall :> new2;
                         new2 &= 0x07;
                         if (new2 == new1) {
                             pin_state = new2;
@@ -449,7 +450,7 @@ void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, cha
                         break;
                 }//eof switch
 
-                p_hall :> pin_state_monitor;
+                hall_ports.p_hall :> pin_state_monitor;
                 pin_state_monitor &= 0x07;
 
                 iCountMicroSeconds = iCountMicroSeconds + PULL_PERIOD_USEC; // period in 12 usec

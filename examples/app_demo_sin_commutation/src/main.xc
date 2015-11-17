@@ -22,6 +22,8 @@ PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 ADCPorts adc_ports = ADC_PORTS;
+HallPorts hall_ports= HALL_PORTS;
+
 
 #define VOLTAGE 2000 //+/- 4095
 
