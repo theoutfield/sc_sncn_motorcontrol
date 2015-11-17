@@ -33,8 +33,8 @@ on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
+HallPorts hall_ports= HALL_PORTS;
 
-port p_hall = HALL_PORT;
 #ifdef DC1K
 port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
 #endif
@@ -151,7 +151,7 @@ int main(void)
 				/* Hall Server */
 				{
 					hall_par hall_params;
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_hall, hall_params); // channel priority 1,2..4
+					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, hall_ports, hall_params); // channel priority 1,2..4
 				}
 
 				/* QEI Server */

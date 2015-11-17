@@ -32,8 +32,8 @@ on stdcore[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
+HallPorts hall_ports= HALL_PORTS;
 
-port p_hall = HALL_PORT;
 #ifdef DC1K
 port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
 #endif
@@ -149,7 +149,7 @@ int main(void)
 					//connector 1 is configured as hall
 					p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
 #endif
-					run_hall(c_hall_p1, c_hall_p2, null, null, null, null, p_hall, hall_params); // channel priority 1,2..5
+					run_hall(c_hall_p1, c_hall_p2, null, null, null, null, hall_ports, hall_params); // channel priority 1,2..5
 
 				}
 

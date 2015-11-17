@@ -22,6 +22,7 @@ on tile[IFM_TILE]:clock clk_adc = XS1_CLKBLK_1;
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
+HallPorts hall_ports= HALL_PORTS;
 
 #define VOLTAGE 2000 //+/- 4095
 
