@@ -13,7 +13,7 @@
 #include <print.h>
 #include <statemachine.h>
 #include <drive_modes.h>
-//#include <adc_client_ad7949.h>
+
 #include <qei_client.h>
 #include <sine_table_big.h>
 #include <a4935.h>
@@ -34,7 +34,7 @@ void init_buffer(int buffer[], int length)
     return;
 }
 
-void current_filter(interface AD7949Interface client adc_if, chanend c_current, chanend c_speed)
+void current_filter(interface ADCInterface client adc_if, chanend c_current, chanend c_speed)
 {
 #define FILTER_LENGTH_ADC 80
     int phase_a_raw = 0;
@@ -58,7 +58,7 @@ void current_filter(interface AD7949Interface client adc_if, chanend c_current, 
     int abs_speed = 0;
     int filter_count = 0;
     int adc_calib_start = 0;
-    calib_data I_calib;
+   // calib_data I_calib;
 
     while (1) {
         select {
@@ -71,8 +71,6 @@ void current_filter(interface AD7949Interface client adc_if, chanend c_current, 
         if (adc_calib_start == 1)
             break;
     }
-    adc_if.calibrate();
-    //do_adc_calibration_ad7949(c_adc, I_calib);
 
     c_current <: 1; // adc calib done
     //init_buffer(buffer_phase_a, FILTER_LENGTH_ADC);
@@ -484,7 +482,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 
 /* TODO: do we really need 2 threads for this? */
 void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
-                    int sensor_used, interface AD7949Interface client adc_if, interface CommutationInterface client commutation_interface, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
+                    int sensor_used, interface ADCInterface client adc_if, interface CommutationInterface client commutation_interface, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
 {
     chan c_current, c_speed;
     par {

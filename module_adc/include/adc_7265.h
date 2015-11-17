@@ -18,7 +18,7 @@
 #include <xclib.h> // NB Contains bitrev()
 #include <assert.h>
 #include <print.h>
-
+#include <adc.h>
                            // nDIFF|A2|A1|A0
 #define AD7265_MUX_DEFAULT_CONFIG 0b1000
 
@@ -29,15 +29,6 @@ interface ADC{
 interface ADC_trigger{
   void trigger_measurement(unsigned char port_id, unsigned char config);
 };
-
-typedef struct{
-    in buffered port:32 p32_data[2]; // Array of 32-bit buffered ADC data ports
-    clock xclk; // Internal XMOS clock
-    out port p1_serial_clk; // 1-bit port connecting to external ADC serial clock
-    port p1_ready;   // 1-bit port used to as ready signal for p32_adc_data ports and ADC chip
-    out port p4_mux; // 4-bit port used to control multiplexor on ADC chip
-} AD7265Ports;
-
 
 
 /*	The AD7265 data-sheet refers to the following signals:-

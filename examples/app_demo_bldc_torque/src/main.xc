@@ -12,7 +12,8 @@
 #include <hall_server.h>
 #include <qei_server.h>
 #include <pwm_service_inv.h>
-#include <adc_server_ad7949.h>
+#include <adc.h>
+
 #include <commutation_server.h>
 #include <refclk.h>
 #include <xscope.h>
@@ -26,14 +27,10 @@
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
 
-
-on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
-//on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
-
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
-AD7949Ports adc_ports = AD7949_PORTS;
+ADCPorts adc_ports = ADC_PORTS;
 
 /* Test Profile Torque Function */
 void profile_torque_test(chanend c_torque_ctrl)
@@ -59,6 +56,7 @@ void profile_torque_test(chanend c_torque_ctrl)
 	xscope_int(TARGET_TORQUE, target_torque);
 	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
 	t:>time;
+
 	while(1)
 	{
 		actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
@@ -73,25 +71,22 @@ void profile_torque_test(chanend c_torque_ctrl)
 int main(void)
 {
 	// Motor control channels
-	chan c_adc, c_adctrig;													// adc channels
+	chan c_adctrig;													// adc channels
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6 ; 		// qei channels
 	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
-	chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;	// commutation channels
+	chan c_signal;	                                                        // commutation channels
 	chan c_pwm_ctrl;														// pwm channel
-	chan c_torque_ctrl,c_velocity_ctrl, c_position_ctrl;					// torque control channel
-    interface WatchdogInterface wd_interface;
+	chan c_torque_ctrl;                                 					// torque control channel
+
+	interface WatchdogInterface wd_interface;
     interface CommutationInterface commutation_interface[3];
-    interface AD7949Interface ad7949_if;
+    interface ADCInterface adc_interface;
 
 	par
 	{
 
 		/* Test Profile Torque Function */
-		on tile[0]:
-		{
-			profile_torque_test(c_torque_ctrl);
-			//torque_ctrl_unit_test(c_torque_ctrl, c_qei_p4, c_hall_p4);
-		}
+		on tile[0]: profile_torque_test(c_torque_ctrl);
 
 		on tile[2]:
 		{
@@ -112,7 +107,7 @@ int main(void)
 
 					/* Control Loop */
 					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
-					        ad7949_if, commutation_interface[0],  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+					        adc_interface, commutation_interface[0],  c_hall_p3,  c_qei_p3, c_torque_ctrl);
 				}
 			}
 		}
@@ -125,10 +120,13 @@ int main(void)
 			par
 			{
 				/* ADC Loop */
-				adc_ad7949_triggered(ad7949_if, adc_ports,  c_adctrig);
+			    run_adc_service(adc_interface, adc_ports, c_adctrig);
 
 				/* PWM Loop */
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
+
+                /* Watchdog Server */
+                run_watchdog(wd_interface, wd_ports);
 
 				/* Motor Commutation loop */
 				{
@@ -137,13 +135,9 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, wd_interface,
-					        commutation_interface, c_pwm_ctrl, fet_driver_ports,
-							hall_params, qei_params, commutation_params);
+					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, wd_interface, commutation_interface, c_pwm_ctrl,
+					        fet_driver_ports, hall_params, qei_params, commutation_params);
 				}
-
-				/* Watchdog Server */
-				run_watchdog(wd_interface, wd_ports);
 
 				/* Hall Server */
 				{
