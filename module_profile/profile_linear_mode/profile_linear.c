@@ -8,7 +8,6 @@
 #include <profile.h>
 #include <stdio.h>
 
-
 struct
 {
     float max_acceleration, max_deceleration;   // max allowed acceleration & deceleration

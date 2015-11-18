@@ -36,7 +36,7 @@
  */
 void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
                     int sensor_used, interface ADCInterface client adc_if, interface CommutationInterface client commutation_interface,
-                    interface HallInterface client i_hall, chanend c_qei, chanend c_torque_ctrl);
+                    interface HallInterface client i_hall, interface QEIInterface client i_qei, chanend c_torque_ctrl);
 
 
 /**

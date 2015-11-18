@@ -15,7 +15,7 @@
 #include <sine_table_big.h>
 //#include <adc_client_ad7949.h>
 #include <refclk.h>
-#include <qei_client.h>
+#include <qei_server.h>
 #include <stdio.h>
 #include <internal_config.h>
 
@@ -29,7 +29,8 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
 
 [[combinable]]
-void commutation_sinusoidal(interface HallInterface client i_hall, chanend ?c_qei, chanend ?c_signal, interface WatchdogInterface client watchdog_interface,
+void commutation_sinusoidal(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
+                            interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports, hall_par & hall_params, qei_par & qei_params,
                             commutation_par &commutation_params)
@@ -100,8 +101,8 @@ void commutation_sinusoidal(interface HallInterface client i_hall, chanend ?c_qe
                 if (sensor_select == HALL) {
                     //hall only
                     angle = i_hall.get_hall_position();//get_hall_position(c_hall);
-                } else if (sensor_select == QEI && !isnull(c_qei)) {
-                    { angle, fw_flag, bw_flag } = get_qei_sync_position(c_qei);
+                } else if (sensor_select == QEI && !isnull(i_qei)) {
+                    { angle, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
                     angle = (angle << 12) / max_count_per_hall;
                     if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0)) {
                         angle = i_hall.get_hall_position();//get_hall_position(c_hall);
@@ -116,7 +117,7 @@ void commutation_sinusoidal(interface HallInterface client i_hall, chanend ?c_qe
                     if (voltage >= 0) {
                         if (sensor_select == HALL) {
                             angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
-                        } else if (sensor_select == QEI) {
+                        } else if (sensor_select == QEI ) {
                             angle_pwm = ((angle + commutation_params.qei_forward_offset) >> 2) & 0x3ff; //512
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range

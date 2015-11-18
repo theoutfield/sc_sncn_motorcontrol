@@ -40,8 +40,8 @@
 
  * @return velocity from qei sensor in rpm
  */
-int get_qei_velocity(chanend c_qei, qei_par &qei_params,
-        qei_velocity_par &qei_velocity_params);
+//int get_qei_velocity(chanend c_qei, qei_par &qei_params,
+//        qei_velocity_par &qei_velocity_params);
 
 
 
@@ -59,12 +59,6 @@ extern int __qei_max_counts(int real_counts);
  */
 {int, int, int} get_qei_sync_position(chanend c_qei);
 
-/**
- * @brief Initialize struct for velocity calculation from QEI sensor
- *
- * @param qei_velocity_params  struct is initialised
- */
-void init_qei_velocity_params(qei_velocity_par &qei_velocity_params);
 
 /**
  * @brief Internal function

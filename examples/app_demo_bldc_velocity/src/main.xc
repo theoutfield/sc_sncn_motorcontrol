@@ -40,7 +40,7 @@ port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity = 1000;	 		// rpm
+	int target_velocity = 800;	 		// rpm
 	int acceleration 	= 1000;			// rpm/s
 	int deceleration 	= 1000;			// rpm/s
 	int actual_velocity;
@@ -61,14 +61,13 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 int main(void)
 {
 	// Motor control channels
-	chan c_qei_p1, c_qei_p2;		                    // qei channels
 	chan c_pwm_ctrl, c_adctrig;							// pwm channels
 	chan c_velocity_ctrl;								// velocity control channel
 
 	interface WatchdogInterface wd_interface;
     interface CommutationInterface commutation_interface[3];
     interface HallInterface i_hall[5];
-
+    interface QEIInterface i_qei[5];
 
 	par
 	{
@@ -98,7 +97,7 @@ int main(void)
 
 				/* Control Loop */
 				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,
-					 qei_params, SENSOR_USED, i_hall[1], c_qei_p2, c_velocity_ctrl, commutation_interface[0]);
+					 qei_params, SENSOR_USED, i_hall[1], i_qei[1], c_velocity_ctrl, commutation_interface[0]);
 			}
 
 		}
@@ -127,7 +126,7 @@ int main(void)
 					int init_state;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(i_hall[0],  c_qei_p1, null, wd_interface,
+					commutation_sinusoidal(i_hall[0], i_qei[0], null, wd_interface,
 					        commutation_interface, c_pwm_ctrl,
 					        fet_driver_ports,
 							hall_params, qei_params, commutation_params);
@@ -135,13 +134,15 @@ int main(void)
 
 				/* QEI Server */
 				{
-					qei_par qei_params;
-					init_qei_param(qei_params);
 #ifdef DC1K
                     //connector 1 is configured as hall
                     p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
 #endif
-					run_qei(c_qei_p1, c_qei_p2, null, null, null, null, encoder_ports, qei_params);  		 // channel priority 1,2..5
+                    qei_velocity_par qei_velocity_params;
+                    qei_par qei_config;
+                    init_qei_velocity_params(qei_velocity_params);
+
+                    run_qei(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
 
 				}
 
