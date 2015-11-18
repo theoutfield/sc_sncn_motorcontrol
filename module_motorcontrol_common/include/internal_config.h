@@ -36,7 +36,7 @@
 #define FILTER_SIZE_MAX                     128 // max size
 
 #define SET_COMM_PARAM_ECAT                 20
-#define SET_HALL_PARAM_ECAT                 21
+#define set_hall_conifg_ecat                 21
 #define SET_QEI_PARAM_ECAT                  22
 
 #define INIT_VELOCITY_CTRL                  29

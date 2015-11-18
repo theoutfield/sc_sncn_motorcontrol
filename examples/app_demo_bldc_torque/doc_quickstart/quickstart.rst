@@ -71,7 +71,7 @@ Examine the code
 
    #. Core 2: Torque Control Loop. This is the main torque control loop server for cyclic torque control mode. Some parameters have to be initialized prior starting the controller. ::
 
-       torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED, c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+       torque_control( torque_ctrl_params, hall_config, qei_params, SENSOR_USED, c_adc, c_commutation_p1,  c_hall_p3,  c_qei_p3, c_torque_ctrl);
    
    #. Core 3: ADC Loop. It implements the ADC server to measure current in motor phases. ::
 
@@ -83,7 +83,7 @@ Examine the code
 
    #. Core 5: Motor Commutation loop. The main commutation loop that implements sinusoidal commutation. Some parameters have to be initialized prior starting the loop. ::
 
-       commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl, p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2, hall_params, qei_params, commutation_params);
+       commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl, p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2, hall_config, qei_params, commutation_params);
 
    #. Core 6: Watchdog Server. In case of application crash to prevent the hardware damages this server is required to constantly run. If the server is not running, the motor phases are disabled and no motor commutation is possible. ::
 
@@ -91,7 +91,7 @@ Examine the code
 
    #. Core 7: Hall Server. Reads states of the motor Hall feedback sensor and calculates velocity and incremental position. Some parameters have to be initialized prior starting the server. ::
 
-       run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); 
+       run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_config); 
 
    #. Core 8: QEI Server. Reads states of an incremental encoder feedback sensor in a quadrature mode and calculates velocity and incremental position. Some parameters have to be initialized prior starting the server. ::
 

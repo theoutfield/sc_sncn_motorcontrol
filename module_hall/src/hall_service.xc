@@ -19,13 +19,13 @@
 //#define DEBUG
 
 //FIXME rename to check_hall_parameters();
-void init_hall_param(hall_par &hall_config)
+void init_hall_config(HallConfig &hall_config)
+
 {
     hall_config.pole_pairs = POLE_PAIRS;
 
     // Find absolute maximum position deviation from origin
     hall_config.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
-
     hall_config.max_ticks_per_turn = POLE_PAIRS * HALL_POSITION_INTERPOLATED_RANGE;
     hall_config.max_ticks += hall_config.max_ticks_per_turn ;  // tolerance
     hall_config.sensor_polarity = POLARITY;
@@ -34,11 +34,14 @@ void init_hall_param(hall_par &hall_config)
 }
 
 [[combinable]]
+<<<<<<< HEAD:module_hall/src/hall_service.xc
 void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports)
+=======
+void run_hall(interface HallInterface server i_hall[5], HallPorts & hall_ports, HallConfig & hall_config)
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions:module_hall/src/hall_server.xc
 {
-    hall_par hall_config;
 
-    init_hall_param(hall_config);
+    init_hall_config(hall_config);
 
     printf("*************************************\n    HALL SENSOR SERVER STARTING\n*************************************\n");
 
@@ -127,18 +130,15 @@ void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_por
                     break;
 
             case i_hall[int i].get_hall_position_absolute() -> {int out_position, int out_direction}:
-
                     out_position = count;
                     out_direction = direction;
                     break;
 
             case i_hall[int i].get_hall_velocity() -> int out_velocity:
-
                     out_velocity = raw_velocity;
                     break;
 
             case i_hall[int i].reset_hall_count(int offset):
-
                 count = offset;
                 break;
 
@@ -352,7 +352,6 @@ void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_por
                 break;
 
         }
-
 //#pragma xta endpoint "hall_loop_stop"
     }
 }

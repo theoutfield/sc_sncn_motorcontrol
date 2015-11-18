@@ -35,13 +35,13 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int deceleration 	= 500;     	// rpm/s
 	int follow_error;
 	timer t;
-	hall_par hall_params;
+	HallConfig hall_config;
 	qei_par qei_params;
 	init_qei_param(qei_params);
-	init_hall_param(hall_params);
+	init_hall_config(hall_config);
 
 	/* Initialise Profile Limits for position profile generator and select position sensor */
-	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_params, \
+	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_config, \
 			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
 
 
@@ -90,19 +90,24 @@ int main(void)
 			/* Position Control Loop */
 			{
 				 ctrl_par position_ctrl_params;
-				 hall_par hall_params;
+				 HallConfig hall_config;
 				 qei_par qei_params;
 
 				 /* Initialize PID parameters for Position Control (defined in config/motor/bldc_motor_config.h) */
 				 init_position_control_param(position_ctrl_params);
 
 				 /* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
-				 init_hall_param(hall_params);
+				 init_hall_config(hall_config);
 				 init_qei_param(qei_params);
 
 				 /* Control Loop */
+<<<<<<< HEAD
 				 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, i_hall[1],
 				         i_qei[1], i_position_control, commutation_interface[0]);
+=======
+				 position_control(position_ctrl_params, hall_config, qei_params, SENSOR_USED, i_hall[0],
+						 c_qei_p2, c_position_ctrl, commutation_interface[0]);
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions
 			}
 
 		}
@@ -121,6 +126,7 @@ int main(void)
                 watchdog_service(wd_interface, wd_ports);
 
                 /* Hall Server */
+<<<<<<< HEAD
                 hall_service(i_hall, hall_ports); // channel priority 1,2..6
 
                 /* QEI Server */
@@ -131,17 +137,40 @@ int main(void)
 
                     qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
                 }
+=======
+                {
+                	HallConfig hall_config;
+                	run_hall(i_hall, hall_ports, hall_config);
+            	}
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions
 
 				/* Motor Commutation loop */
 				{
-					hall_par hall_params;
+					HallConfig hall_config;
 					qei_par qei_params;
 					commutation_par commutation_params;
-					init_hall_param(hall_params);
+					init_hall_config(hall_config);
 					init_qei_param(qei_params);
+<<<<<<< HEAD
 
 					commutation_service(i_hall[0], i_qei[0], null, wd_interface, commutation_interface,
 					        c_pwm_ctrl, fet_driver_ports, hall_params, qei_params, commutation_params);
+=======
+					commutation_sinusoidal(i_hall[1],  c_qei_p1, null, wd_interface,
+							commutation_interface, c_pwm_ctrl, fet_driver_ports,
+							hall_config, qei_params, commutation_params);
+				}
+
+				/* QEI Server */
+				{
+					qei_par qei_params;
+#ifdef DC1K
+                    //connector 1 is configured as hall
+                    p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
+#endif
+					//connector 2 is configured as QEI
+                    run_qei(c_qei_p1, c_qei_p2, null, null, c_qei_p5, null, encoder_ports, qei_params);          // channel priority 1,2..5
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions
 				}
 			}
 		}

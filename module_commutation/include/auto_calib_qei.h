@@ -12,6 +12,6 @@
 #include <hall_qei.h>
 
 void qei_calibrate(chanend c_commutation, commutation_par & commutation_params,
-                   hall_par & hall_params, qei_par & qei_params,
+                   HallConfig & hall_config, qei_par & qei_params,
                    chanend c_hall, chanend c_qei, chanend c_calib); //commutation purpose
 
