@@ -27,13 +27,6 @@
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
 
-PwmPorts pwm_ports = PWM_PORTS;
-WatchdogPorts wd_ports = WATCHDOG_PORTS;
-FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
-ADCPorts adc_ports = ADC_PORTS;
-HallPorts hall_ports = HALL_PORTS;
-EncoderPorts encoder_ports = ENCODER_PORTS;
-
 #ifdef DC1K
 port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
 #endif
@@ -74,12 +67,18 @@ void profile_torque_test(chanend c_torque_ctrl)
 	}
 }
 
+PwmPorts pwm_ports = PWM_PORTS;
+WatchdogPorts wd_ports = WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
+ADCPorts adc_ports = ADC_PORTS;
+HallPorts hall_ports = HALL_PORTS;
+EncoderPorts encoder_ports = ENCODER_PORTS;
+
 int main(void)
 {
 	// Motor control channels
 	chan c_adctrig;													// adc channels
 	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6 ; 		// qei channels
-	chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;	// hall channels
 	chan c_signal;	                                                        // commutation channels
 	chan c_pwm_ctrl;														// pwm channel
 	chan c_torque_ctrl;                                 					// torque control channel
@@ -87,6 +86,7 @@ int main(void)
 	interface WatchdogInterface wd_interface;
     interface CommutationInterface commutation_interface[3];
     interface ADCInterface adc_interface;
+    interface HallInterface i_hall[5];
 
 	par
 	{
@@ -113,7 +113,7 @@ int main(void)
 
 					/* Control Loop */
 					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
-					        adc_interface, commutation_interface[0],  c_hall_p3,  c_qei_p3, c_torque_ctrl);
+					        adc_interface, commutation_interface[0],  i_hall[1],  c_qei_p3, c_torque_ctrl);
 				}
 			}
 		}
@@ -134,6 +134,9 @@ int main(void)
                 /* Watchdog Server */
                 run_watchdog(wd_interface, wd_ports);
 
+                /* Hall Server */
+                run_hall(i_hall, hall_ports); // channel priority 1,2..4
+
 				/* Motor Commutation loop */
 				{
 					hall_par hall_params;
@@ -141,14 +144,8 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, wd_interface, commutation_interface, c_pwm_ctrl,
+					commutation_sinusoidal(i_hall[0],  c_qei_p1, c_signal, wd_interface, commutation_interface, c_pwm_ctrl,
 					        fet_driver_ports, hall_params, qei_params, commutation_params);
-				}
-
-				/* Hall Server */
-				{
-					hall_par hall_params;
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, hall_ports, hall_params); // channel priority 1,2..4
 				}
 
 				/* QEI Server */

@@ -11,6 +11,7 @@
 #include <drive_modes.h>
 #include <internal_config.h>
 #include <refclk.h>
+#include <hall_server.h>
 
 /* TODO: remove dependency (at the moment required for PID params) */
 #include <bldc_motor_config.h>

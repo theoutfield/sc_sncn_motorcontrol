@@ -33,7 +33,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                        hall_par &?hall_params,
                        qei_par &?qei_params,
                        int sensor_used,
-                       chanend c_hall,
+                       interface HallInterface client i_hall,
                        chanend ?c_qei,
                        chanend c_velocity_ctrl,
                        interface CommutationInterface client commutation_interface )
@@ -110,7 +110,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                 /* calculate actual velocity from hall/qei with filter*/
                 if (sensor_used == HALL) {
                     if (init == 0) {
-                        { position, direction } = get_hall_position_absolute(c_hall);
+                        { position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                         if (position > 2049) {
                             init = 1;
                             previous_position = 2049;
@@ -121,7 +121,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                         raw_speed = 0;
                         //target_velocity = 0;
                     } else if (init == 1) {
-                        { position, direction } = get_hall_position_absolute(c_hall);
+                        { position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                         difference = position - previous_position;
                         if (difference > hall_crossover) {
                             difference = old_difference;

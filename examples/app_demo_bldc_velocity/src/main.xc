@@ -62,23 +62,19 @@ int main(void)
 {
 	// Motor control channels
 	chan c_qei_p1, c_qei_p2;		                    // qei channels
-	chan c_hall_p1, c_hall_p2;				            // hall channels
-	chan c_commutation_p2;	                            // commutation channels
 	chan c_pwm_ctrl, c_adctrig;							// pwm channels
 	chan c_velocity_ctrl;								// velocity control channel
 
 	interface WatchdogInterface wd_interface;
     interface CommutationInterface commutation_interface[3];
+    interface HallInterface i_hall[5];
+
 
 	par
 	{
 
 		/* Test Profile Velocity function */
-		on tile[APP_TILE_1]:
-		{
-			profile_velocity_test(c_velocity_ctrl);			// test PVM on node
-		//	velocity_ctrl_unit_test(c_velocity_ctrl, c_qei_p3, c_hall_p3);
-		}
+		on tile[APP_TILE_1]: profile_velocity_test(c_velocity_ctrl);            // test PVM on node
 
 		on tile[APP_TILE_1]:
 		{
@@ -101,8 +97,8 @@ int main(void)
 				init_sensor_filter_param(sensor_filter_params);
 
 				/* Control Loop */
-				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, \
-					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, commutation_interface[0]);
+				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,
+					 qei_params, SENSOR_USED, i_hall[1], c_qei_p2, c_velocity_ctrl, commutation_interface[0]);
 			}
 
 		}
@@ -115,9 +111,13 @@ int main(void)
 			par
 			{
 				/* PWM Loop */
-			    {
-				    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
-			    }
+			    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
+
+                /* Watchdog Server */
+                run_watchdog(wd_interface, wd_ports);
+
+                /* Hall Server */
+                run_hall(i_hall, hall_ports); // channel priority 1,2..5
 
 				/* Motor Commutation loop */
 				{
@@ -127,36 +127,20 @@ int main(void)
 					int init_state;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(c_hall_p1,  c_qei_p1, null, wd_interface,
+					commutation_sinusoidal(i_hall[0],  c_qei_p1, null, wd_interface,
 					        commutation_interface, c_pwm_ctrl,
 					        fet_driver_ports,
 							hall_params, qei_params, commutation_params);
 				}
 
-				/* Watchdog Server */
-#ifdef DC1K
-                run_watchdog(c_watchdog, null, p_ifm_led_moton_wdtick_wden);
-#else
-                run_watchdog(wd_interface, wd_ports);
-#endif
-
-				/* Hall Server */
-				{
-					hall_par hall_params;
-#ifdef DC1K
-					//connector 1 is configured as hall
-					p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
-#endif
-					run_hall(c_hall_p1, c_hall_p2, null, null, null, null, hall_ports, hall_params); // channel priority 1,2..5
-
-				}
-
 				/* QEI Server */
-
 				{
 					qei_par qei_params;
 					init_qei_param(qei_params);
-
+#ifdef DC1K
+                    //connector 1 is configured as hall
+                    p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
+#endif
 					run_qei(c_qei_p1, c_qei_p2, null, null, null, null, encoder_ports, qei_params);  		 // channel priority 1,2..5
 
 				}

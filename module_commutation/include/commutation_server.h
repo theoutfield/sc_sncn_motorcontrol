@@ -7,7 +7,7 @@
 #pragma once
 
 #include <watchdog.h>
-#include <hall_client.h>
+#include <hall_server.h>
 #include <qei_client.h>
 #include <bldc_motor_config.h>
 
@@ -59,7 +59,7 @@ interface CommutationInterface{
  *
  */
 [[combinable]]
-void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, interface WatchdogInterface client watchdog_interface,
+void commutation_sinusoidal(interface HallInterface client i_hall, chanend ?c_qei, chanend ?c_signal, interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
                             hall_par &hall_params, qei_par & qei_params, commutation_par & commutation_params);
