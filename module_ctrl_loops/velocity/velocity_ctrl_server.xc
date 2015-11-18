@@ -34,7 +34,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                        qei_par &?qei_params,
                        int sensor_used,
                        interface HallInterface client i_hall,
-                       chanend ?c_qei,
+                       interface QEIInterface client i_qei,
                        chanend c_velocity_ctrl,
                        interface CommutationInterface client commutation_interface )
 {
@@ -135,8 +135,8 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                         previous_position = position;
                         old_difference = difference;
                     }
-                } else if (sensor_used == QEI && !isnull(c_qei)) {
-                    { position, direction } = get_qei_position_absolute(c_qei);
+                } else if (sensor_used == QEI) {
+                    { position, direction } = i_qei.get_qei_position_absolute();
                     difference = position - previous_position;
 
                     if (difference > qei_crossover) {

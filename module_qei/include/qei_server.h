@@ -12,8 +12,22 @@
 * @brief Structure containing hall sensor port/s
 */
 typedef struct {
+    port ?p_qei_config;
     port p_qei;
 } EncoderPorts;
+
+interface QEIInterface{
+
+    {unsigned int, unsigned int} get_qei_position();
+    {int, int} get_qei_position_absolute();
+    {int, int, int} get_qei_sync_position();
+    int get_qei_velocity();
+    void set_qei_sync_offset(int, int);
+    void reset_qei_count(int offset);
+
+};
+
+//int calculate_qei_velocity(int qei_absolute_position, qei_par &qei_params, qei_velocity_par &qei_velocity_params);
 
 /**
  * @brief initialize QEI sensor
@@ -23,6 +37,14 @@ typedef struct {
  */
 void init_qei_param(qei_par & qei_params);
 
+/**
+ * @brief Initialize struct for velocity calculation from QEI sensor
+ *
+ * @param qei_velocity_params  struct is initialised
+ */
+void init_qei_velocity_params(qei_velocity_par &qei_velocity_params);
+
+int calculate_qei_velocity(int count, qei_par &qei_config, qei_velocity_par &qei_velocity_params);
 /**
  * @brief Implementation of the QEI server thread (for sensor with index/no index)
  *
@@ -35,7 +57,6 @@ void init_qei_param(qei_par & qei_params);
  * @param EncoderPorts structure containing the hardware port where the quadrature encoder is located
  * @param qei_params the structure defines sensor type and resolution parameters for qei
  */
-void run_qei(chanend ? c_qei_p1, chanend ? c_qei_p2, chanend ? c_qei_p3,
-             chanend ? c_qei_p4, chanend ? c_qei_p5, chanend ? c_qei_p6,
-             EncoderPorts & encoder_ports, qei_par & qei_params);
+void run_qei(interface QEIInterface server i_qei[5],
+             EncoderPorts & encoder_ports, qei_par qei_config, qei_velocity_par qei_velocity_params);
 

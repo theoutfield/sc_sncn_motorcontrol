@@ -13,17 +13,6 @@
 #include <bldc_motor_config.h>
 #include <internal_config.h>
 
-void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
-{
-    qei_velocity_params.previous_position = 0;
-    qei_velocity_params.old_difference = 0;
-    qei_velocity_params.filter_length = 8;
-    qei_velocity_params.index = 0;
-    init_filter(qei_velocity_params.filter_buffer,
-                qei_velocity_params.index,
-                qei_velocity_params.filter_length);
-    return;
-}
 
 //get position and valid from qei directly
 {unsigned int, unsigned int} get_qei_position(chanend c_qei, qei_par &qei_params)
@@ -55,7 +44,7 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
     }
     return {position, direction};
 }
-
+/*
 int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_velocity_params)
 {
     int difference;
@@ -63,16 +52,21 @@ int get_qei_velocity(chanend c_qei, qei_par &qei_params, qei_velocity_par &qei_v
     int direction;
     int qei_crossover = qei_params.real_counts - qei_params.real_counts/10;
     {count, direction} = get_qei_position_absolute(c_qei);
+
     difference = count - qei_velocity_params.previous_position;
     if(difference > qei_crossover)
         difference = qei_velocity_params.old_difference;
     else if(difference < -qei_crossover)
         difference = qei_velocity_params.old_difference;
+
     qei_velocity_params.previous_position = count;
     qei_velocity_params.old_difference = difference;
+
     return (filter(qei_velocity_params.filter_buffer, qei_velocity_params.index, \
                    qei_velocity_params.filter_length, difference)*1000*60) / (qei_params.real_counts);
+
 }
+*/
 
 {int, int, int} get_qei_sync_position(chanend c_qei)
 {
