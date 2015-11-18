@@ -78,7 +78,6 @@ int main(void)
 {
 	// Motor control channels
 	chan c_adctrig;													// adc channels
-	chan c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6 ; 		// qei channels
 	chan c_signal;	                                                        // commutation channels
 	chan c_pwm_ctrl;														// pwm channel
 	chan c_torque_ctrl;                                 					// torque control channel
@@ -87,10 +86,10 @@ int main(void)
     interface CommutationInterface commutation_interface[3];
     interface ADCInterface adc_interface;
     interface HallInterface i_hall[5];
+    interface QEIInterface i_qei[5];
 
 	par
 	{
-
 		/* Test Profile Torque Function */
 		on tile[0]: profile_torque_test(c_torque_ctrl);
 
@@ -113,7 +112,7 @@ int main(void)
 
 					/* Control Loop */
 					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
-					        adc_interface, commutation_interface[0],  i_hall[1],  c_qei_p3, c_torque_ctrl);
+					        adc_interface, commutation_interface[0],  i_hall[1], i_qei[1], c_torque_ctrl);
 				}
 			}
 		}
@@ -144,15 +143,17 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(i_hall[0],  c_qei_p1, c_signal, wd_interface, commutation_interface, c_pwm_ctrl,
+					commutation_sinusoidal(i_hall[0],  i_qei[0], c_signal, wd_interface, commutation_interface, c_pwm_ctrl,
 					        fet_driver_ports, hall_params, qei_params, commutation_params);
 				}
 
 				/* QEI Server */
 				{
-					qei_par qei_params;
-					init_qei_param(qei_params);
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, encoder_ports, qei_params);  // channel priority 1,2..4
+                    qei_velocity_par qei_velocity_params;
+                    qei_par qei_config;
+                    init_qei_velocity_params(qei_velocity_params);
+
+                    run_qei(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
 				}
 			}
 		}

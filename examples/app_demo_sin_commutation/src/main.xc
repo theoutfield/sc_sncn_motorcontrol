@@ -13,8 +13,6 @@
 #ifdef AD7265
 #include <adc_7265.h>
 #else
-//#include <adc_client_ad7949.h>
-//#include <adc_server_ad7949.h>
     #include <adc.h>
 #endif
 
@@ -77,6 +75,7 @@ int main(void) {
     interface ADCInterface adc_interface;
     interface HallInterface i_hall[5];
 
+
     #ifdef AD7265
         interface ADC i_adc;
     #endif
@@ -124,7 +123,7 @@ int main(void) {
                     commutation_par commutation_params;
                     init_hall_param(hall_params);
 
-                    commutation_sinusoidal(i_hall[0], c_qei_p1, c_signal,
+                    commutation_sinusoidal(i_hall[0], null, c_signal,
                             watchdog_interface, commutation_interface, c_pwm_ctrl,
                             fet_driver_ports,
                             hall_params, qei_params,

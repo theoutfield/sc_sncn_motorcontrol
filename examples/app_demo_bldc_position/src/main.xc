@@ -29,12 +29,8 @@
 
 on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 
-#ifdef DC1K
-port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
-#endif
-
 /* Test Profile Position function */
-void position_profile_test(chanend c_position_ctrl, chanend c_qei)
+void position_profile_test(chanend c_position_ctrl, interface QEIInterface client i_qei)
 {
 	int actual_position = 0;			// ticks
 	int target_position = 16000;		// HALL: 4096 extrapolated ticks x nr. pole pairs = one rotation; QEI: your encoder documented resolution x 4 = one rotation
@@ -79,7 +75,6 @@ EncoderPorts encoder_ports = ENCODER_PORTS;
 int main(void)
 {
 	// Motor control channels
-	chan c_qei_p1, c_qei_p2, c_qei_p5;		// qei channels
 	chan c_commutation_p3;	                // commutation channels
 	chan c_pwm_ctrl, c_adctrig;				// pwm channels
 	chan c_position_ctrl;					// position control channel
@@ -87,16 +82,12 @@ int main(void)
 	interface WatchdogInterface wd_interface;
 	interface CommutationInterface commutation_interface[3];
 	interface HallInterface i_hall[5];
+	interface QEIInterface i_qei[5];
 
 	par
 	{
 		/* Test Profile Position Client function*/
-		on tile[APP_TILE_1]:
-		{
-			position_profile_test(c_position_ctrl, c_qei_p5);		// test PPM on slave side
-			//position_ctrl_unit_test(c_position_ctrl, c_qei_p5, c_hall_p5); 	// Unit test controller
-		}
-
+		on tile[APP_TILE_1]: position_profile_test(c_position_ctrl, i_qei[2]);      // test PPM on slave side
 
 		on tile[APP_TILE_1]:
 		{
@@ -114,8 +105,8 @@ int main(void)
 				 init_qei_param(qei_params);
 
 				 /* Control Loop */
-				 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, i_hall[0],
-						 c_qei_p2, c_position_ctrl, commutation_interface[0]);
+				 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, i_hall[1],
+				         i_qei[1], c_position_ctrl, commutation_interface[0]);
 			}
 
 		}
@@ -125,7 +116,6 @@ int main(void)
 		 ************************************************************/
 		on tile[IFM_TILE]:
 		{
-
 			par
 			{
 				/* PWM Loop */
@@ -137,6 +127,15 @@ int main(void)
                 /* Hall Server */
                 run_hall(i_hall, hall_ports); // channel priority 1,2..6
 
+                /* QEI Server */
+                {
+                    qei_velocity_par qei_velocity_params;
+                    qei_par qei_config;
+                    init_qei_velocity_params(qei_velocity_params);
+
+                    run_qei(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
+                }
+
 				/* Motor Commutation loop */
 				{
 					hall_par hall_params;
@@ -144,21 +143,9 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(i_hall[1],  c_qei_p1, null, wd_interface,
-							commutation_interface, c_pwm_ctrl, fet_driver_ports,
-							hall_params, qei_params, commutation_params);
-				}
 
-				/* QEI Server */
-				{
-					qei_par qei_params;
-
-#ifdef DC1K
-                    //connector 1 is configured as hall
-                    p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
-#endif
-					//connector 2 is configured as QEI
-                    run_qei(c_qei_p1, c_qei_p2, null, null, c_qei_p5, null, encoder_ports, qei_params);          // channel priority 1,2..5
+					commutation_sinusoidal(i_hall[0], i_qei[0], null, wd_interface, commutation_interface,
+					        c_pwm_ctrl, fet_driver_ports, hall_params, qei_params, commutation_params);
 				}
 			}
 		}

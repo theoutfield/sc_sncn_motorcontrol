@@ -8,6 +8,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
+#include <print.h>
 #include <qei_client.h>
 #include <qei_server.h>
 #include <refclk.h>
@@ -16,27 +17,27 @@
 EncoderPorts encoder_ports = ENCODER_PORTS;
 
 /* Test QEI Sensor Client */
-void qei_test(chanend c_qei)
+void qei_test(interface QEIInterface client i_qei)
 {
 	int position;
 	int velocity;
 	int direction;
 	int core_id = 1;
-	timer t;
 	int count=0;
-	qei_par qei_params;
-	qei_velocity_par qei_velocity_params;  			// to compute velocity from qei
-	init_qei_param(qei_params);
-	init_qei_velocity_params(qei_velocity_params);
+	timer t;
+
+    qei_velocity_par qei_velocity_params;
+    qei_par qei_config;
+    init_qei_velocity_params(qei_velocity_params);
+    init_qei_param(qei_config);
 
 	while(1)
 	{
-		/* get position from QEI Sensor */
-		{count, direction} = get_qei_position_absolute(c_qei);
-		{position, direction} = get_qei_position(c_qei, qei_params);
+		/* get position and velocity from QEI Sensor */
+		{count, direction} = i_qei.get_qei_position_absolute();
+		{position, direction} = i_qei.get_qei_position();
 
-		/* calculate velocity from QEI Sensor position */
-		velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
+		velocity = calculate_qei_velocity(count,qei_config,qei_velocity_params);// i_qei.get_qei_velocity();
 
 		xscope_int(COUNT, count);
 		xscope_int(POSITION, position);
@@ -48,14 +49,14 @@ void qei_test(chanend c_qei)
 
 int main(void)
 {
-	chan c_qei_p1;				// qei channel
+    interface QEIInterface i_qei[5];
 
 	par
 	{
 		on tile[COM_TILE]:
 		{
 			/* Test QEI Sensor Client */
-			qei_test(c_qei_p1);
+			qei_test(i_qei[0]);
 		}
 
 		/************************************************************
@@ -63,10 +64,14 @@ int main(void)
 		 ************************************************************/
 		on tile[IFM_TILE]:
 		{
+
 			/* QEI Server Loop */
 			{
-				qei_par qei_params;
-				run_qei(c_qei_p1, null, null, null, null, null, encoder_ports, qei_params);  		// channel priority 1,2..6
+			    qei_velocity_par qei_velocity_params;
+			    qei_par qei_config;
+			    init_qei_velocity_params(qei_velocity_params);
+
+				run_qei(i_qei, encoder_ports, qei_config, qei_velocity_params);  		// channel priority 1,2..6
 			}
 		}
 	}
