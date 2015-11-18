@@ -112,19 +112,26 @@ int main(void) {
                 do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Hall Server */
+<<<<<<< HEAD
                 hall_service(i_hall, hall_ports); // channel priority 1,2..6
+=======
+                {
+                    HallConfig hall_config;
+                    run_hall(i_hall, hall_ports, hall_config);
+                }
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions
 
                 /* Motor Commutation loop */
                 {
-                    hall_par hall_params;
+                    HallConfig hall_config;
                     qei_par qei_params;
                     commutation_par commutation_params;
-                    init_hall_param(hall_params);
+                    init_hall_config(hall_config);
 
                     commutation_service(i_hall[0], null, c_signal,
                             watchdog_interface, commutation_interface, c_pwm_ctrl,
                             fet_driver_ports,
-                            hall_params, qei_params,
+                            hall_config, qei_params,
                             commutation_params);
                 }
 

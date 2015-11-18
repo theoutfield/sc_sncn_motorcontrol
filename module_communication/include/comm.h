@@ -60,10 +60,10 @@ void send_actual_position(int actual_position, ctrl_proto_values_t &InOut);
 /**
  * @brief Update Hall sensor parameters from Ethercat
  *
- * @param hall_params struct defines the pole-pairs and gear ratio
+ * @param hall_config struct defines the pole-pairs and gear ratio
  * @param coe_out
  */
-void update_hall_param_ecat(hall_par &hall_params, chanend coe_out);
+void update_hall_config_ecat(HallConfig &hall_config, chanend coe_out);
 
 /**
  * @brief Update QEI sensor parameters from Ethercat
@@ -149,12 +149,12 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
  * @brief Set commutation parameters from Ethercat communication loop
  *
  * @param[out] c_signal channel to signal Commutation loop
- * @param hall_params struct defines the pole-pairs and gear ratio
+ * @param hall_config struct defines the pole-pairs and gear ratio
  * @param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
  * @param nominal_speed defines nominal speed for the motor
  */
-void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params, \
+void set_commutation_param_ecat(chanend c_signal, HallConfig &hall_config, qei_par &qei_params, \
 		commutation_par &commutation_params, int nominal_speed);
 
 /**
@@ -162,9 +162,9 @@ void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par
  *
  * @param[out] c_hall channel to signal Hall acquisition loop
  *
- * @param hall_params struct defines the pole-pairs and gear ratio
+ * @param hall_config struct defines the pole-pairs and gear ratio
  */
-void set_hall_param_ecat(chanend c_hall, hall_par &hall_params);
+void set_hall_conifg_ecat(chanend c_hall, HallConfig &hall_config);
 
 /**
  * @brief Set QEI sensor parameters from Ethercat communication loop
@@ -182,9 +182,9 @@ void set_qei_param_ecat(chanend c_qei, qei_par &qei_params);
  *
  * @param[out] c_hall channel to signal Hall acquisition loop
  *
- * @param hall_params struct defines the pole-pairs and gear ratio
+ * @param hall_config struct defines the pole-pairs and gear ratio
  */
-void hall_init_ecat(chanend c_hall, hall_par &hall_params);
+void hall_init_ecat(chanend c_hall, HallConfig &hall_config);
 
 /**
  * @brief Initialize QEI sensor parameters from Ethercat communication loop

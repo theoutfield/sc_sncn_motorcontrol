@@ -76,7 +76,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
     csv_par csv_params;
     ctrl_par velocity_ctrl_params;
     qei_par qei_params;
-    hall_par hall_params;
+    HallConfig hall_config;
     ctrl_par position_ctrl_params;
     csp_par csp_params;
     pp_par pp_params;
@@ -138,7 +138,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
     init_cst_param(cst_params);
     init_csv_param(csv_params);
     init_csp_param(csp_params);
-    init_hall_param(hall_params);
+    init_hall_config(hall_config);
     init_pp_params(pp_params);
     init_pv_params(pv_params);
     init_pt_params(pt_params);
@@ -252,7 +252,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                     int sensor_ticks;
                     if (sensor_select == HALL) {
-                        sensor_ticks = hall_params.max_ticks_per_turn;
+                        sensor_ticks = hall_config.max_ticks_per_turn;
                     } else {    /* QEI */
                         sensor_ticks = qei_params.real_counts;
                     }
@@ -334,7 +334,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                     //if (sensor_select == HALL)  /* FIXME (?)
                     //{
-                    update_hall_param_ecat(hall_params, coe_out);
+                    update_hall_config_ecat(hall_config, coe_out);
                     //}
                     if (sensor_select >= QEI) { /* FIXME QEI with Index defined as 2 and without Index as 3  */
                         update_qei_param_ecat(qei_params, coe_out);
@@ -342,7 +342,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                     nominal_speed = speed_sdo_update(coe_out);
                     update_pp_param_ecat(pp_params, coe_out);
                     polarity = pp_params.base.polarity;
-                    qei_params.poles = hall_params.pole_pairs;
+                    qei_params.poles = hall_config.pole_pairs;
 
                     //config_sdo_handler(coe_out);
                     {homing_method, limit_switch_type} = homing_sdo_update(coe_out);
@@ -355,10 +355,10 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                     config_gpio_digital_input(c_gpio, 0, SWITCH_INPUT_TYPE, limit_switch_type);
                     config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, limit_switch_type);
                     end_config_gpio(c_gpio);
-                    set_hall_param_ecat(c_hall, hall_params);
+                    set_hall_conifg_ecat(c_hall, hall_config);
                     if (homing_done == 0)
                         set_qei_param_ecat(c_qei, qei_params);
-                    set_commutation_param_ecat(c_signal, hall_params, qei_params,
+                    set_commutation_param_ecat(c_signal, hall_config, qei_params,
                                                commutation_params, nominal_speed);
 
                     setup_loop_flag = 1;
@@ -405,7 +405,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         sensor_select = sensor_select_sdo(coe_out);
 
                         if (sensor_select == HALL) {
-                            set_position_ctrl_hall_param(hall_params, c_position_ctrl);
+                            set_position_ctrl_HallConfigam(hall_config, c_position_ctrl);
                         } else { /* QEI */
                             set_position_ctrl_qei_param(qei_params, c_position_ctrl);
                         }
@@ -431,7 +431,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         update_pp_param_ecat(pp_params, coe_out);
                         init_position_profile_limits(pp_params.max_acceleration,
                                                      pp_params.base.max_profile_velocity,
-                                                     qei_params, hall_params, sensor_select,
+                                                     qei_params, hall_config, sensor_select,
                                                      pp_params.software_position_limit_max,
                                                      pp_params.software_position_limit_min);
                         InOut.operation_mode_display = PP;
@@ -445,7 +445,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         sensor_select = sensor_select_sdo(coe_out);
 
                         if (sensor_select == HALL) {
-                            set_torque_ctrl_hall_param(hall_params, c_torque_ctrl);
+                            set_torque_ctrl_HallConfigam(hall_config, c_torque_ctrl);
                         } else { /* QEI */
                             set_torque_ctrl_qei_param(qei_params, c_torque_ctrl);
                         }
@@ -484,7 +484,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         sensor_select = sensor_select_sdo(coe_out);
 
                         if (sensor_select == HALL) {
-                            set_velocity_ctrl_hall_param(hall_params, c_velocity_ctrl);
+                            set_velocity_ctrl_HallConfigam(hall_config, c_velocity_ctrl);
                         } else { /* QEI */
                             set_velocity_ctrl_qei_param(qei_params, c_velocity_ctrl);
                         }
@@ -520,7 +520,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         sensor_select = sensor_select_sdo(coe_out);
 
                         if (sensor_select == HALL) {
-                            set_position_ctrl_hall_param(hall_params, c_position_ctrl);
+                            set_position_ctrl_HallConfigam(hall_config, c_position_ctrl);
                         } else { /* QEI */
                             set_position_ctrl_qei_param(qei_params, c_position_ctrl);
                         }
@@ -554,7 +554,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         sensor_select = sensor_select_sdo(coe_out);
 
                         if (sensor_select == HALL) {
-                            set_velocity_ctrl_hall_param(hall_params, c_velocity_ctrl);
+                            set_velocity_ctrl_HallConfigam(hall_config, c_velocity_ctrl);
                         } else { /* QEI */
                             set_velocity_ctrl_qei_param(qei_params, c_velocity_ctrl);
                         }
@@ -589,7 +589,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         sensor_select = sensor_select_sdo(coe_out);
 
                         if (sensor_select == HALL) {
-                            set_torque_ctrl_hall_param(hall_params, c_torque_ctrl);
+                            set_torque_ctrl_HallConfigam(hall_config, c_torque_ctrl);
                         } else { /* QEI */
                             set_torque_ctrl_qei_param(qei_params, c_torque_ctrl);
                         }
@@ -669,7 +669,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                             int sensor_ticks;
                             if (sensor_select == HALL) {
-                                sensor_ticks = hall_params.max_ticks_per_turn;
+                                sensor_ticks = hall_config.max_ticks_per_turn;
                             } else { /* QEI */
                                 sensor_ticks = qei_params.real_counts;
                             }

@@ -53,7 +53,7 @@ interface CommutationInterface{
  * @param[out] p_ifm_coastn port to enable motor FET driver
  * @param[out] p_ifm_ff1
  * @param[out] p_ifm_ff2
- * @param[in] hall_params struct defines the pole-pairs and gear ratio
+ * @param[in] hall_config struct defines the pole-pairs and gear ratio
  * @param[in] qei_params the struct defines sensor type and resolution parameters for QEI
  * @param[in] commutation_params struct defines the commutation angle parameters
  *
@@ -63,15 +63,15 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
                             interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
-                            hall_par &hall_params, qei_par & qei_params, commutation_par & commutation_params);
+                            HallConfig &hall_config, qei_par & qei_params, commutation_par & commutation_params);
 
 /**
  * @brief Initialize commutation parameters
  *
  * @param commutation_params struct defines the commutation angle parameters
- * @param hall_params struct defines the pole-pairs and gear ratio
+ * @param hall_config struct defines the pole-pairs and gear ratio
  * @param nominal_speed is the rated speed for the motor given on specs sheet
  */
-void init_commutation_param(commutation_par &commutation_params, hall_par &hall_params, int nominal_speed);
+void init_commutation_param(commutation_par &commutation_params, HallConfig &hall_config, int nominal_speed);
 
 

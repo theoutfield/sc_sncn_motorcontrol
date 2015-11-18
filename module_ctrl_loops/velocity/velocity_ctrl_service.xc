@@ -94,7 +94,7 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 [[combinable]]
 void velocity_control_service( ctrl_par & velocity_ctrl_params,
                        filter_par & sensor_filter_params,
-                       hall_par &?hall_params,
+                       HallConfig &?hall_config,
                        qei_par &?qei_params,
                        int sensor_used,
                        interface HallInterface client i_hall,
@@ -140,12 +140,12 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
     if (sensor_used == HALL){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
-            speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_FAST); // variable pole_pairs
+            speed_factor_hall = hall_config.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_FAST); // variable pole_pairs
         }
         else {
-            speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs
+            speed_factor_hall = hall_config.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs
         }
-        hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
+        hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
     }
     else if (sensor_used == QEI){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
@@ -269,7 +269,14 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
 
             break;
 
+<<<<<<< HEAD:module_ctrl_loops/velocity/velocity_ctrl_service.xc
         case i_velocity_control.get_velocity()-> int out_velocity:
+=======
+            case VCTRL_CMD_SET_HALL:
+                VELOCITY_CTRL_READ(hall_config.pole_pairs);
+                VELOCITY_CTRL_READ(hall_config.max_ticks);
+                VELOCITY_CTRL_READ(hall_config.max_ticks_per_turn);
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions:module_ctrl_loops/velocity/velocity_ctrl_server.xc
 
             out_velocity = actual_velocity;
 
@@ -287,6 +294,7 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
 
             break;
 
+<<<<<<< HEAD:module_ctrl_loops/velocity/velocity_ctrl_service.xc
         case i_velocity_control.set_velocity_filter(int in_length):
 
             filter_length = in_length;
@@ -349,6 +357,23 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
         case i_velocity_control.check_busy() -> int out_state:
 
                 out_state = activate;
+=======
+            case SENSOR_SELECT:
+                VELOCITY_CTRL_READ(sensor_used);
+                if(sensor_used == HALL) {
+                    speed_factor_hall = hall_config.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
+                    hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
+                    target_velocity =  actual_velocity;
+                } else if(sensor_used == QEI) {
+                    speed_factor_qei = qei_params.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
+                    qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
+                    target_velocity = actual_velocity;
+                }
+                /**
+                 * Or any other sensor interfaced to the IFM Module
+                 * place client functions here to acquire velocity/position
+                 */
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions:module_ctrl_loops/velocity/velocity_ctrl_server.xc
                 break;
 
         case i_velocity_control.enable_velocity_ctrl():

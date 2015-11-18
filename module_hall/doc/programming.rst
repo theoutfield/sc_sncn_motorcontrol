@@ -59,8 +59,8 @@ Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interfac
                 {
                     /* Hall Server */
                     {
-                        hall_par hall_params;
-                        run_hall(c_hall, NULL, NULL, NULL, NULL, NULL, p_ifm_hall, hall_params); // channel priority 1,2..6
+                        HallConfig hall_config;
+                        run_hall(c_hall, NULL, NULL, NULL, NULL, NULL, p_ifm_hall, hall_config); // channel priority 1,2..6
                     }
                 }
             }

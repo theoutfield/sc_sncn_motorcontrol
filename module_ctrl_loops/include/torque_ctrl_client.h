@@ -82,9 +82,9 @@ void set_torque_ctrl_param(ctrl_par & torque_ctrl_params, chanend c_torque_ctrl)
 /**
  * @brief Set hall sensor parameters for Torque Control
  *
- * @param hall_params struct defines the pole-pairs and gear ratio
+ * @param hall_config struct defines the pole-pairs and gear ratio
  */
-void set_torque_ctrl_hall_param(hall_par & hall_params, chanend c_torque_ctrl);
+void set_torque_ctrl_HallConfigam(HallConfig & hall_config, chanend c_torque_ctrl);
 
 /**
  * @brief Set QEI sensor parameters for Torque Control

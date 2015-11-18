@@ -99,7 +99,7 @@ int main(void)
 				/* Torque Control Loop */
 				{
 					ctrl_par torque_ctrl_params;
-					hall_par hall_params;
+					HallConfig hall_config;
 					qei_par qei_params;
 
 					/* Initialize PID parameters for Torque Control (defined in config/motor/bldc_motor_config.h) */
@@ -107,11 +107,16 @@ int main(void)
 
 					/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 					init_qei_param(qei_params);
-					init_hall_param(hall_params);
+					init_hall_config(hall_config);
 
 					/* Control Loop */
+<<<<<<< HEAD
 					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
 					        adc_interface, i_commutation[0],  i_hall[1], i_qei[1], c_torque_ctrl);
+=======
+					torque_control( torque_ctrl_params, hall_config, qei_params, SENSOR_USED,
+					        adc_interface, commutation_interface[0],  i_hall[1],  c_qei_p3, c_torque_ctrl);
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions
 				}
 			}
 		}
@@ -133,17 +138,29 @@ int main(void)
                 watchdog_service(i_watchdog, wd_ports);
 
                 /* Hall Server */
+<<<<<<< HEAD
                 hall_service(i_hall, hall_ports); // channel priority 1,2..4
+=======
+                {
+                	HallConfig hall_config;
+                	run_hall(i_hall, hall_ports, hall_config);
+            	}
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions
 
 				/* Motor Commutation loop */
 				{
-					hall_par hall_params;
+					HallConfig hall_config;
 					qei_par qei_params;
 					commutation_par commutation_params;
-					init_hall_param(hall_params);
+					init_hall_config(hall_config);
 					init_qei_param(qei_params);
+<<<<<<< HEAD
 					commutation_service(i_hall[0],  i_qei[0], c_signal, i_watchdog, i_commutation, c_pwm_ctrl,
 					        fet_driver_ports, hall_params, qei_params, commutation_params);
+=======
+					commutation_sinusoidal(i_hall[0],  c_qei_p1, c_signal, wd_interface, commutation_interface, c_pwm_ctrl,
+					        fet_driver_ports, hall_config, qei_params, commutation_params);
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions
 				}
 
 				/* QEI Server */

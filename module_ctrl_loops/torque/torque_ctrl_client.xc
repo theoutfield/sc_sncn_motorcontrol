@@ -118,12 +118,12 @@ void set_torque_ctrl_param(ctrl_par &torque_ctrl_params, chanend c_torque_ctrl)
     TORQUE_CTRL_WRITE(torque_ctrl_params.Integral_limit);
 }
 
-void set_torque_ctrl_hall_param(hall_par &hall_params, chanend c_torque_ctrl)
+void set_torque_ctrl_HallConfigam(HallConfig &hall_config, chanend c_torque_ctrl)
 {
     TORQUE_CTRL_WRITE(TCTRL_CMD_SET_HALL);
-    TORQUE_CTRL_WRITE(hall_params.pole_pairs);
-    TORQUE_CTRL_WRITE(hall_params.max_ticks);
-    TORQUE_CTRL_WRITE(hall_params.max_ticks_per_turn);
+    TORQUE_CTRL_WRITE(hall_config.pole_pairs);
+    TORQUE_CTRL_WRITE(hall_config.max_ticks);
+    TORQUE_CTRL_WRITE(hall_config.max_ticks_per_turn);
 }
 
 void set_torque_ctrl_qei_param(qei_par &qei_params, chanend c_torque_ctrl)
