@@ -6,14 +6,53 @@
 #pragma once
 
 #include <xs1.h>
-#include <hall_config.h>
+
+#define RPM_CONST           60000000 // 60s / 1us
+#define FILTER_LENGTH_HALL  16
+#define PULL_PERIOD_USEC 12
+
+/**
+ * Client/server interaction commands/tokens
+ */
+enum {
+    HALL_POS_REQ,         //!< Position request token
+    HALL_ABSOLUTE_POS_REQ,//!< Position request token
+    HALL_VELOCITY_REQ,    //!< Velocity request token
+    HALL_RESET_COUNT_REQ,     //!< Reset hall server ticks count
+    HALL_FILTER_PARAM_REQ,//!< Filter length request token
+    HALL_REQUEST_PORT_STATES
+};
+
+
+/**
+ * @brief Structure definition for hall sensor
+ */
+typedef struct {
+    int pole_pairs;
+    int max_ticks_per_turn;
+    int max_ticks;
+    int sensor_polarity;
+} hall_par;
+
 
 /**
 * @brief Structure containing hall sensor port/s
 */
+#ifdef __XC__
 typedef struct {
     port p_hall;
 } HallPorts;
+
+
+
+interface HallInterface {
+    unsigned get_hall_pinstate();
+    int get_hall_position();
+    {int, int} get_hall_position_absolute();
+    int get_hall_velocity();
+    void reset_hall_count(int offset);
+};
+
 
 /**
  * @brief initialize hall sensor
@@ -34,6 +73,7 @@ void init_hall_param(hall_par & hall_params);
  * @param[in] hall_ports structure containing the ports for reading the hall sensor data
  * @param hall_params structure defines the pole-pairs and gear ratio
  */
+
 [[combinable]]
-void run_hall(chanend ? c_hall_p1, chanend ? c_hall_p2, chanend ? c_hall_p3, chanend ? c_hall_p4,
-              chanend ? c_hall_p5, chanend ? c_hall_p6, HallPorts & hall_ports, hall_par & hall_params);
+void run_hall(interface HallInterface server i_hall[5], HallPorts & hall_ports);
+#endif

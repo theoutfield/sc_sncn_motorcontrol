@@ -13,6 +13,7 @@
 #include <drive_modes.h>
 #include <a4935.h>
 #include <internal_config.h>
+#include <hall_server.h>
 
 
 #if(MOTOR_TYPE == BDC)
@@ -27,7 +28,7 @@
 
 
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used,
-                      chanend c_hall, chanend c_qei, chanend c_position_ctrl, interface CommutationInterface client commutation_interface)
+                      interface HallInterface client i_hall, chanend c_qei, chanend c_position_ctrl, interface CommutationInterface client commutation_interface)
 {
     int actual_position = 0;
     int target_position = 0;
@@ -53,7 +54,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
     //printstrln("start pos");
 
     if (sensor_used == HALL) {
-        { actual_position, direction } = get_hall_position_absolute(c_hall);
+        { actual_position, direction } = i_hall.get_hall_position_absolute();// get_hall_position_absolute(c_hall);
         target_position = actual_position;
     } else if (sensor_used == QEI) {
         {actual_position, direction} = get_qei_position_absolute(c_qei);
@@ -77,7 +78,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 /* acquire actual position hall/qei/sensor */
                 switch (sensor_used) {
                 case HALL:
-                { actual_position, direction } = get_hall_position_absolute(c_hall);
+                { actual_position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                 break;
 
                 case QEI:
@@ -166,7 +167,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
             case SENSOR_SELECT:
                 POSITION_CTRL_READ(sensor_used);
                 if (sensor_used == HALL) {
-                    { actual_position, direction }= get_hall_position_absolute(c_hall);
+                    { actual_position, direction }= i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                 } else if (sensor_used == QEI) {
                     { actual_position, direction } = get_qei_position_absolute(c_qei);
                 }
