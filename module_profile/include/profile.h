@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <internal_config.h>
-#include <hall_config.h>
+#include <hall_server.h>
 #include <qei_config.h>
 #include <xccompat.h>
 
@@ -96,7 +96,7 @@ extern void init_position_profile_limits(int max_acceleration, int max_velocity,
  * @Output
  * @return no. of steps for position profile : range [1 - steps]
  */
-extern int init_position_profile(int target_position, int actual_position,      int velocity, int acceleration, \
+extern int init_position_profile(int target_position, int actual_position, int velocity, int acceleration, \
                                  int deceleration);
 
 /**

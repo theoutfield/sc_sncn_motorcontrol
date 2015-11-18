@@ -8,7 +8,6 @@
 
 #include <control_loops_common.h>
 #include <qei_client.h>
-#include <hall_client.h>
 #include "control_loops_common.h"
 #include "position_ctrl_client.h"
 #include <commutation_server.h>
@@ -33,5 +32,6 @@
  *
  */
 void position_control(ctrl_par & position_ctrl_params, hall_par & hall_params, qei_par & qei_params, int sensor_used,
-                      chanend c_hall, chanend c_qei, chanend c_position_ctrl, interface CommutationInterface client commutation_interface);
+                    interface HallInterface client i_hall, chanend c_qei, chanend c_position_ctrl,
+                    interface CommutationInterface client commutation_interface);
 

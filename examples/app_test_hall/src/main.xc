@@ -9,7 +9,7 @@
  */
 
 #include <print.h>
-#include <hall_client.h>
+#include <hall_server.h>
 #include <hall_server.h>
 #include <xscope.h>
 
@@ -17,12 +17,8 @@
 
 HallPorts hall_ports = HALL_PORTS;
 
-#ifdef DC1K
-port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
-#endif
-
 /* Test Hall Sensor Client */
-void hall_test(chanend c_hall)
+void hall_test(interface HallInterface client i_hall)
 {
     int position = 0;
     int velocity = 0;
@@ -34,14 +30,14 @@ void hall_test(chanend c_hall)
     while(1)
     {
         /* get position from Hall Sensor */
-        {count, direction} = get_hall_position_absolute(c_hall);
-        position = get_hall_position(c_hall);
+        {count, direction} = i_hall.get_hall_position_absolute();
+        position = i_hall.get_hall_position();
 
         /* get velocity from Hall Sensor */
-        velocity = get_hall_velocity(c_hall);
+        velocity = i_hall.get_hall_velocity();
 
         /* get pins state from Hall Sensor */
-        pins = get_hall_pinstate(c_hall);
+        pins = i_hall.get_hall_pinstate();
 
 #ifndef ENABLE_XSCOPE
         if (count != old_count) {
@@ -72,43 +68,14 @@ void hall_test(chanend c_hall)
 }
 
 
-
 int main(void)
 {
-    chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;  // hall channels
+    interface HallInterface i_hall[5];
 
     par
     {
-        on tile[APP_TILE]:
-        {
-            /* Test Hall Sensor Client */
-            par
-            {
-                hall_test(c_hall_p1);
-            }
-        }
-
-        /************************************************************
-         * IFM_TILE
-         ************************************************************/
-        on tile[IFM_TILE]:
-        {
-            /* Hall Server */
-            {
-                hall_par hall_params;
-#ifdef DC1K
-                //connector 1
-                p_ifm_encoder_hall_select_ext_d4to5 <: SET_ALL_AS_HALL;
-                run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6,
-                                        hall_ports, hall_params); // channel priority 1,2..6
-
-#else
-                run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6,
-                        hall_ports, hall_params); // channel priority 1,2..6
-#endif
-            }
-
-        }
+        on tile[APP_TILE]: hall_test(i_hall[0]);
+        on tile[IFM_TILE]: run_hall(i_hall, hall_ports); // channel priority 1,2..6
 
     }
 
