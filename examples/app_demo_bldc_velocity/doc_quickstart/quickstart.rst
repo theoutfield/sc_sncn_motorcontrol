@@ -73,7 +73,7 @@ Examine the code
 
    #. Core 2: Velocity Control Loop. This is the main velocity control loop server for cyclic velocity control mode. Some parameters have to be initialized prior starting the controller. ::
 
-       velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, c_commutation_p2);
+       velocity_control(velocity_ctrl_params, sensor_filter_params, hall_config, qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, c_velocity_ctrl, c_commutation_p2);
    
    #. Core 3: PWM Loop. It implements the PWM Server. ::
 
@@ -81,7 +81,7 @@ Examine the code
 
    #. Core 4: Motor Commutation loop. The main commutation loop that implements sinusoidal commutation. Some parameters have to be initialized prior starting the loop. ::
 
-       commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl, p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2, hall_params, qei_params, commutation_params);
+       commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog, c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl, p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2, hall_config, qei_params, commutation_params);
 
    #. Core 5: Watchdog Server. In case of application crash to prevent the hardware damages this server is required to constantly run. If the server is not running, the motor phases are disabled and no motor commutation is possible. ::
 
@@ -89,7 +89,7 @@ Examine the code
 
    #. Core 6: Hall Server. Reads states of the motor Hall feedback sensor and calculates velocity and incremental position. Some parameters have to be initialized prior starting the server. ::
 
-       run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); 
+       run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_config); 
 
    #. Core 7: QEI Server. Reads states of an incremental encoder feedback sensor in a quadrature mode and calculates velocity and incremental position. Some parameters have to be initialized prior starting the server. ::
 

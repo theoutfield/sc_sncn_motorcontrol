@@ -17,7 +17,7 @@
 #include <drive_modes.h>
 
 int get_average_velocity(int sensor_select, chanend c_hall,
-                         hall_par & hall_params,
+                         HallConfig & hall_config,
                          qei_velocity_par & qei_velocity_params,
                          int core_id, timer t, int & avg_times,
                          chanend c_qei,
@@ -28,11 +28,11 @@ void ramp_up(int & i, int comm_voltage, timer t, int core_id, chanend c_commutat
 void ramp_down(int & i, int comm_voltage, timer t, int core_id, chanend c_commutation);
 
 {int, int} update_comm_sine_max_state(int &sensor_select, timer t, int core_id,
-                                      hall_par & hall_params, qei_velocity_par & qei_velocity_params,
+                                      HallConfig & hall_config, qei_velocity_par & qei_velocity_params,
                                       int & avg_times, int max, chanend c_hall, chanend c_qei,
                                       qei_par &qei_params);
 
 void commutation_sine_automate(int & sensor_select, chanend c_signal, chanend c_commutation,
-                               commutation_par &commutation_params, hall_par &hall_params,
+                               commutation_par &commutation_params, HallConfig &hall_config,
                                qei_par &qei_params,
                                chanend c_hall, chanend c_qei);

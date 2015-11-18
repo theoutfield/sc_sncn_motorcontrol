@@ -146,7 +146,7 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
 
 
 
-static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params,
+static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, qei_par &qei_params,
                         int sensor_used, chanend c_current, chanend c_speed, interface CommutationInterface client commutation_interface,
                         interface HallInterface client i_hall, interface QEIInterface client i_qei, chanend c_torque_ctrl)
 {
@@ -180,7 +180,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
     int iq_filtered = 0;
     int id_filtered = 0;
     int buffer_index = 0;
-    int filter_length_variance = filter_length / hall_params.pole_pairs;
+    int filter_length_variance = filter_length / hall_config.pole_pairs;
 
 
     int actual_torque = 0;
@@ -208,11 +208,11 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 
     //init_qei_velocity_params(qei_velocity_params);
 
-    filter_length_variance = filter_length/hall_params.pole_pairs;
+    filter_length_variance = filter_length/hall_config.pole_pairs;
     if (filter_length_variance < 10) {
         filter_length_variance = 10;
     }
-    qei_counts_per_hall= qei_params.real_counts/ hall_params.pole_pairs;
+    qei_counts_per_hall= qei_params.real_counts/ hall_config.pole_pairs;
 
     //init_buffer(buffer_Id, filter_length);
     //init_buffer(buffer_Iq, filter_length);
@@ -367,11 +367,11 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                 break;
 
             case TCTRL_CMD_SET_HALL:
-                TORQUE_CTRL_READ(hall_params.pole_pairs);
-                TORQUE_CTRL_READ(hall_params.max_ticks);
-                TORQUE_CTRL_READ(hall_params.max_ticks_per_turn);
+                TORQUE_CTRL_READ(hall_config.pole_pairs);
+                TORQUE_CTRL_READ(hall_config.max_ticks);
+                TORQUE_CTRL_READ(hall_config.max_ticks_per_turn);
 
-                filter_length_variance =  filter_length/hall_params.pole_pairs;
+                filter_length_variance =  filter_length/hall_config.pole_pairs;
                 if (filter_length_variance < 10) {
                     filter_length_variance = 10;
                 }
@@ -393,7 +393,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
             case SENSOR_SELECT://sensor select from EtherCAT master
                 TORQUE_CTRL_READ(sensor_used);
                 if (sensor_used == HALL) {
-                    filter_length_variance =  filter_length/hall_params.pole_pairs;
+                    filter_length_variance =  filter_length/hall_config.pole_pairs;
                     if (filter_length_variance < 10)
                         filter_length_variance = 10;
                     target_torque = actual_torque;
@@ -484,15 +484,20 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 }
 
 /* TODO: do we really need 2 threads for this? */
-void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
+void torque_control(ctrl_par & torque_ctrl_params, HallConfig & hall_config, qei_par & qei_params,
                     int sensor_used, interface ADCInterface client adc_if, interface CommutationInterface client commutation_interface,
                     interface HallInterface client i_hall, interface QEIInterface client i_qei, chanend c_torque_ctrl)
 {
     chan c_current, c_speed;
     par {
         current_filter(adc_if, c_current, c_speed);
+<<<<<<< HEAD
         torque_ctrl_loop(torque_ctrl_params, hall_params, qei_params, sensor_used,
                          c_current, c_speed, commutation_interface, i_hall, i_qei, c_torque_ctrl);
+=======
+        torque_ctrl_loop(torque_ctrl_params, hall_config, qei_params, sensor_used,
+                         c_current, c_speed, commutation_interface, i_hall, c_qei, c_torque_ctrl);
+>>>>>>> Resolve conflicts ocured cause Agus removed the hall_par argument from run_hall and other functions
     }
 }
 

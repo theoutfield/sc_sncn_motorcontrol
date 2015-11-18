@@ -61,7 +61,7 @@ struct {
     float q;                  // position profile
 
     qei_par qei_params;
-    hall_par hall_params;
+    HallConfig hall_config;
     int sensor_used;
     float max_position;
     float min_position;
@@ -74,9 +74,9 @@ int rpm_to_ticks_qei(int rpm, qei_par qei_params)
     return ticks;
 }
 
-int rpm_to_ticks_hall(int rpm, hall_par hall_params)
+int rpm_to_ticks_hall(int rpm, HallConfig hall_config)
 {
-    int ticks = (rpm * hall_params.max_ticks_per_turn)/60;
+    int ticks = (rpm * hall_config.max_ticks_per_turn)/60;
     return ticks;
 }
 
@@ -87,16 +87,16 @@ int rpm_to_ticks_sensor(int rpm, int max_ticks_per_turn)
 }
 
 void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params,
-                                  hall_par hall_params, int sensor_select, int max_position, int min_position)
+                                  HallConfig hall_config, int sensor_select, int max_position, int min_position)
 {
     profile_pos_params.qei_params = qei_params;
-    profile_pos_params.hall_params = hall_params;
+    profile_pos_params.hall_config = hall_config;
     profile_pos_params.max_position =  max_position;
     profile_pos_params.min_position = min_position;
     profile_pos_params.sensor_used = sensor_select;
     if (profile_pos_params.sensor_used == HALL) {
-        profile_pos_params.max_acceleration =  rpm_to_ticks_hall(max_acceleration, hall_params);
-        profile_pos_params.max_velocity = rpm_to_ticks_hall(max_velocity, hall_params);
+        profile_pos_params.max_acceleration =  rpm_to_ticks_hall(max_acceleration, hall_config);
+        profile_pos_params.max_velocity = rpm_to_ticks_hall(max_velocity, hall_config);
     } else if (profile_pos_params.sensor_used >= QEI) {
         profile_pos_params.max_acceleration =  rpm_to_ticks_qei(max_acceleration, qei_params);
         profile_pos_params.max_velocity = rpm_to_ticks_qei(max_velocity, qei_params);
@@ -123,9 +123,9 @@ int init_position_profile(int target_position, int actual_position, int velocity
         profile_pos_params.acc =  rpm_to_ticks_qei(acceleration, profile_pos_params.qei_params);
         profile_pos_params.dec =  rpm_to_ticks_qei(deceleration, profile_pos_params.qei_params);
     } else if (profile_pos_params.sensor_used == HALL) {
-        profile_pos_params.vi = rpm_to_ticks_hall(velocity, profile_pos_params.hall_params);
-        profile_pos_params.acc =  rpm_to_ticks_hall(acceleration, profile_pos_params.hall_params);
-        profile_pos_params.dec =  rpm_to_ticks_hall(deceleration, profile_pos_params.hall_params);
+        profile_pos_params.vi = rpm_to_ticks_hall(velocity, profile_pos_params.hall_config);
+        profile_pos_params.acc =  rpm_to_ticks_hall(acceleration, profile_pos_params.hall_config);
+        profile_pos_params.dec =  rpm_to_ticks_hall(deceleration, profile_pos_params.hall_config);
     } else {
         //profile_pos_params.vi = rpm_to_ticks_sensor(velocity, max_ticks_per_turn);
         //profile_pos_params.acc =  rpm_to_ticks_sensor(acceleration, max_ticks_per_turn);
@@ -339,13 +339,13 @@ void __initialize_position_profile_limits(int max_acceleration, int max_velocity
                                           REFERENCE_PARAM(profile_position_param, profile_pos_params) )
 {
     //profile_pos_params.qei_params;compute
-    //profile_pos_params.hall_params = hall_params;
+    //profile_pos_params.hall_config = hall_config;
     profile_pos_params->max_position =  max_position;
     profile_pos_params->min_position = min_position;
     profile_pos_params->sensor_used = sensor_select;
     if (profile_pos_params->sensor_used == HALL) {
-        profile_pos_params->max_acceleration =  rpm_to_ticks_hall(max_acceleration , profile_pos_params->hall_params);
-        profile_pos_params->max_velocity = rpm_to_ticks_hall(max_velocity, profile_pos_params->hall_params);
+        profile_pos_params->max_acceleration =  rpm_to_ticks_hall(max_acceleration , profile_pos_params->hall_config);
+        profile_pos_params->max_velocity = rpm_to_ticks_hall(max_velocity, profile_pos_params->hall_config);
     } else if (profile_pos_params->sensor_used >= QEI) {
         profile_pos_params->max_acceleration =  rpm_to_ticks_qei(max_acceleration , profile_pos_params->qei_params);
         profile_pos_params->max_velocity = rpm_to_ticks_qei(max_velocity, profile_pos_params->qei_params);
@@ -381,9 +381,9 @@ int __initialize_position_profile(int target_position, int actual_position, int 
         profile_pos_params->acc =  rpm_to_ticks_qei(acceleration, profile_pos_params->qei_params);
         profile_pos_params->dec =  rpm_to_ticks_qei(deceleration, profile_pos_params->qei_params);
     } else if (profile_pos_params->sensor_used == HALL) {
-        profile_pos_params->vi = rpm_to_ticks_hall(velocity, profile_pos_params->hall_params);
-        profile_pos_params->acc =  rpm_to_ticks_hall(acceleration, profile_pos_params->hall_params);
-        profile_pos_params->dec =  rpm_to_ticks_hall(deceleration, profile_pos_params->hall_params);
+        profile_pos_params->vi = rpm_to_ticks_hall(velocity, profile_pos_params->hall_config);
+        profile_pos_params->acc =  rpm_to_ticks_hall(acceleration, profile_pos_params->hall_config);
+        profile_pos_params->dec =  rpm_to_ticks_hall(deceleration, profile_pos_params->hall_config);
     } else {
         //profile_pos_params->vi = rpm_to_ticks_sensor(velocity, max_ticks_per_turn);
         //profile_pos_params->acc =  rpm_to_ticks_sensor(acceleration, max_ticks_per_turn);
