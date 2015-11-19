@@ -13,7 +13,7 @@
 #include <math.h>
 #include <internal_config.h>
 #include <hall_server.h>
-#include <qei_config.h>
+#include <qei_server.h>
 #include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/

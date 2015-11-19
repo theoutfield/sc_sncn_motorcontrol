@@ -37,7 +37,7 @@ void qei_test(interface QEIInterface client i_qei)
 		{count, direction} = i_qei.get_qei_position_absolute();
 		{position, direction} = i_qei.get_qei_position();
 
-		velocity = calculate_qei_velocity(count,qei_config,qei_velocity_params);// i_qei.get_qei_velocity();
+		velocity = i_qei.get_qei_velocity();
 
 		xscope_int(COUNT, count);
 		xscope_int(POSITION, position);

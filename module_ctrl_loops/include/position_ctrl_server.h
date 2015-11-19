@@ -7,7 +7,7 @@
 #pragma once
 
 #include <control_loops_common.h>
-#include <qei_client.h>
+#include <qei_server.h>
 #include "control_loops_common.h"
 #include "position_ctrl_client.h"
 #include <commutation_server.h>
