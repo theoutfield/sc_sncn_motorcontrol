@@ -27,3 +27,14 @@ bin/
 ## ignore xdoc outputs
 _build/
 run_xdoc.log
+
+##.cproject .project
+**/.project
+**/.cproject
+
+
+app_test_biss/decompressor-*
+app_test_biss/decompressor-*
+app_test_biss/spanning-xn-v0-*
+app_test_biss/target-xn-v0-*
+

@@ -6,24 +6,24 @@
 
 #pragma once
 
+#include <refclk.h>
+
 #define ENC_CH1 1
 #define ENC_CH2 2
 
 #define BISS_DATA_PORT             ENC_CH2 //channel configuration, needed for the configuration of the clock output port
-#define BISS_DATA_LENGTH           28
-#define BISS_MULTITURN_LENGTH      13
-#define BISS_MULTITURN_RESOLUTION  BISS_MULTITURN_LENGTH-1 //length - filling bits
-#define BISS_SINGLETURN_LENGTH     13
-#define BISS_SINGLETURN_RESOLUTION BISS_SINGLETURN_LENGTH
+#define BISS_MULTITURN_RESOLUTION  12
+#define BISS_SINGLETURN_RESOLUTION 13
 #define BISS_STATUS_LENGTH         2
+#define BISS_MULTITURN_LENGTH      BISS_MULTITURN_RESOLUTION+1 //resolution + filling bits
+#define BISS_SINGLETURN_LENGTH     BISS_SINGLETURN_RESOLUTION
+#define BISS_DATA_LENGTH           BISS_MULTITURN_LENGTH + BISS_SINGLETURN_LENGTH + BISS_STATUS_LENGTH
 #define BISS_CRC_POLY              0b110000
+#define BISS_CLOCK_DIVIDEND        250
+#define BISS_CLOCK_DIVISOR         128
+#define BISS_TIMEOUT               12*USEC_FAST
+#define BISS_VELOCITY_LOOP         1000 //velocity loop time in microseconds
 
-/**
- * @brief Interface definition for biss server
- */
-interface i_biss {
-    { int, unsigned int, unsigned int } get_position();
-};
 
 /**
  * @brief Structure definition for biss encoder
@@ -36,7 +36,27 @@ typedef struct {
     int singleturn_resolution;
     int status_length;
     int crc_poly;
+    int poles;
+    int polarity;
+    int clock_dividend;
+    int clock_divisor;
+    int timeout;
+    int velocity_loop;
+    int max_ticks;
 } biss_par;
+
+
+/**
+ * @brief struct definition for velocity calculation from biss sensor
+ */
+typedef struct BISS_VELOCITY_PARAM
+{
+    int previous_position;
+    int old_difference;
+    int filter_buffer[8];
+    int index;
+    int filter_length;
+} biss_velocity_par;
 
 /**
  * enum for the several status informations
