@@ -59,7 +59,7 @@ interface CommutationInterface{
  *
  */
 [[combinable]]
-void commutation_sinusoidal(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
+void commutation_service(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
                             interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
