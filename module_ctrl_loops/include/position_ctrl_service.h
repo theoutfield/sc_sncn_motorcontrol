@@ -9,7 +9,7 @@
 #include <control_loops_common.h>
 #include <qei_service.h>
 #include "control_loops_common.h"
-#include <commutation_server.h>
+#include <commutation_service.h>
 
 #include <bldc_motor_config.h>
 

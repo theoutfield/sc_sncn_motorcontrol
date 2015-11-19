@@ -15,7 +15,7 @@
 #include <drive_modes.h>
 #include <stdio.h>
 #include <a4935.h>
-#include <commutation_server.h>
+#include <commutation_service.h>
 
 #if(MOTOR_TYPE == BDC)
 #include <brushed_dc_client.h>
