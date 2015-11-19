@@ -4,8 +4,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <velocity_ctrl_server.h>
-#include <velocity_ctrl_common.h>
+#include <velocity_ctrl_service.h>
 #include <refclk.h>
 //#include <qei_client.h>
 #include <filter_blocks.h>
@@ -24,18 +23,83 @@
 //#define Debug_velocity_ctrl  //don't forget to set up the config.xscope file
 //#define debug_print
 
-#define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
-#define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> (x)
+//#define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
+//#define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> (x)
+
+void init_velocity_control_param(ctrl_par & velocity_ctrl_params)
+{
+    velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;
+    velocity_ctrl_params.Kp_d = VELOCITY_Kp_DENOMINATOR;
+    velocity_ctrl_params.Ki_n = VELOCITY_Ki_NUMERATOR;
+    velocity_ctrl_params.Ki_d = VELOCITY_Ki_DENOMINATOR;
+    velocity_ctrl_params.Kd_n = VELOCITY_Kd_NUMERATOR;
+    velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
+    if (velocity_ctrl_params.Loop_time != MSEC_FAST)////FixMe: implement reference clock check
+        velocity_ctrl_params.Loop_time = 1 * MSEC_STD; // units - core timer value //CORE 2/1/0 default
+
+    if (MOTOR_TYPE == BDC) {
+        velocity_ctrl_params.Control_limit = BDC_PWM_CONTROL_LIMIT; // PWM resolution
+    }
+    else {
+        velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
+    }
+
+    if(velocity_ctrl_params.Ki_n != 0) {
+        // auto calculated using control_limit
+        velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
+    } else {
+        velocity_ctrl_params.Integral_limit = 0;
+    }
+
+    return;
+}
+
+int init_velocity_control(interface VelocityControlInterface client i_velocity_control)
+{
+    int ctrl_state = INIT_BUSY;
+
+    while (1) {
+        ctrl_state = i_velocity_control.check_velocity_ctrl_state(); //check_velocity_ctrl_state(c_velocity_ctrl);
+        if (ctrl_state == INIT_BUSY) {
+            i_velocity_control.enable_velocity_ctrl();
+        }
+
+        if(ctrl_state == INIT) {
+#ifdef debug_print
+            printstrln("velocity control intialized");
+#endif
+            break;
+        }
+    }
+    return ctrl_state;
+}
+
+int max_speed_limit(int velocity, int max_speed) {
+    if (velocity > max_speed) {
+        velocity = max_speed;
+    } else if (velocity < -max_speed) {
+        velocity = -max_speed;
+    }
+    return velocity;
+}
+
+//csv mode function
+void set_velocity_csv(csv_par &csv_params, int target_velocity,
+                      int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control)
+{
+    i_velocity_control.set_velocity( max_speed_limit( (target_velocity + velocity_offset) * csv_params.polarity,
+                                   csv_params.max_motor_speed ));
+}
 
 [[combinable]]
-void velocity_control( ctrl_par & velocity_ctrl_params,
+void velocity_control_service( ctrl_par & velocity_ctrl_params,
                        filter_par & sensor_filter_params,
                        hall_par &?hall_params,
                        qei_par &?qei_params,
                        int sensor_used,
                        interface HallInterface client i_hall,
                        interface QEIInterface client i_qei,
-                       chanend c_velocity_ctrl,
+                       interface VelocityControlInterface server i_velocity_control,
                        interface CommutationInterface client commutation_interface )
 {
     /* Controller declarations */
@@ -66,7 +130,6 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
     int rpm_constant = 1000*60; // constant
     int speed_factor_hall = 0;
     int speed_factor_qei = 0;
-    int command;
     int activate = 0;
     int init_state = INIT_BUSY;
     int qei_crossover = 0;
@@ -201,116 +264,121 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
     //        printf("looping %d\n", velocity_ctrl_params.Loop_time);
             break;
 
-            /* acq target velocity etherCAT */
-        case VELOCITY_CTRL_READ(command):
-            switch (command) {
-            case VCTRL_CMD_SET_VELOCITY:
-                VELOCITY_CTRL_READ(target_velocity);
-              //  target_velocity = 1000;
-              //  printf("%d %d\n", target_velocity, MOTOR_TYPE);
+        case i_velocity_control.set_velocity(int in_velocity):
+            target_velocity = in_velocity;
+
+            break;
+
+        case i_velocity_control.get_velocity()-> int out_velocity:
+
+            out_velocity = actual_velocity;
+
+            break;
+
+        case i_velocity_control.set_velocity_ctrl_param(ctrl_par in_params):
+
+            velocity_ctrl_params.Kp_n = in_params.Kp_n;
+            velocity_ctrl_params.Kp_d = in_params.Kp_d;
+            velocity_ctrl_params.Ki_n = in_params.Ki_n;
+            velocity_ctrl_params.Ki_d = in_params.Ki_d;
+            velocity_ctrl_params.Kd_n = in_params.Kd_n;
+            velocity_ctrl_params.Kd_d = in_params.Kd_d;
+            velocity_ctrl_params.Integral_limit = in_params.Integral_limit;
+
+            break;
+
+        case i_velocity_control.set_velocity_filter(int in_length):
+
+            filter_length = in_length;
+
+            if(filter_length > FILTER_SIZE_MAX)
+                filter_length = FILTER_SIZE_MAX;
+
+            break;
+
+        case i_velocity_control.set_velocity_ctrl_hall_param(hall_par in_params):
+
+            hall_params.pole_pairs = in_params.pole_pairs;
+            hall_params.max_ticks = in_params.max_ticks;
+            hall_params.max_ticks_per_turn = in_params.max_ticks_per_turn;
+            break;
+
+        case i_velocity_control.set_velocity_ctrl_qei_param(qei_par in_params):
+
+            qei_params.max_ticks = in_params.max_ticks;
+            qei_params.index = in_params.index;
+            qei_params.real_counts = in_params.real_counts;
+            qei_params.max_ticks_per_turn = in_params.max_ticks_per_turn;
+            qei_params.poles = in_params.poles;
+
+            break;
+
+        case i_velocity_control.set_velocity_sensor(int in_sensor_used):
+
+            if(in_sensor_used == HALL) {
+                speed_factor_hall = hall_params.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
+                hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
+
+            } else if(in_sensor_used == QEI) {
+                speed_factor_qei = qei_params.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
+                qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
+
+            }
+            target_velocity = actual_velocity;
+            break;
+
+
+        case i_velocity_control.shutdown_velocity_ctrl():
+
+            activate = 0;
+            error_velocity = 0;
+            error_velocity_D = 0;
+            error_velocity_I = 0;
+            previous_error = 0;
+            velocity_control_out = 0;
+            commutation_interface.setVoltage(0); //set_commutation_sinusoidal(c_commutation, 0);
+            commutation_interface.disableFets();//disable_motor(c_commutation);
+            wait_ms(30, 1, ts);
+            break;
+
+        case i_velocity_control.check_velocity_ctrl_state() -> int out_state:
+
+            out_state = activate;
+            break;
+
+        case i_velocity_control.check_busy() -> int out_state:
+
+                out_state = activate;
                 break;
 
-            case VCTRL_CMD_GET_VELOCITY:
-                VELOCITY_CTRL_WRITE(actual_velocity);
-                break;
+        case i_velocity_control.enable_velocity_ctrl():
 
-            case VCTRL_CMD_SET_HALL:
-                VELOCITY_CTRL_READ(hall_params.pole_pairs);
-                VELOCITY_CTRL_READ(hall_params.max_ticks);
-                VELOCITY_CTRL_READ(hall_params.max_ticks_per_turn);
-
-                break;
-
-            case VCTRL_CMD_SET_QEI:
-                VELOCITY_CTRL_READ(qei_params.max_ticks);
-                VELOCITY_CTRL_READ(qei_params.index);
-                VELOCITY_CTRL_READ(qei_params.real_counts);
-                VELOCITY_CTRL_READ(qei_params.max_ticks_per_turn);
-                VELOCITY_CTRL_READ(qei_params.poles);
-
-                break;
-
-            case SET_VELOCITY_FILTER:
-                VELOCITY_CTRL_READ(filter_length);
-                if(filter_length > FILTER_SIZE_MAX)
-                    filter_length = FILTER_SIZE_MAX;
-                break;
-
-            case SET_CTRL_PARAMETER:
-                VELOCITY_CTRL_READ(velocity_ctrl_params.Kp_n);
-                VELOCITY_CTRL_READ(velocity_ctrl_params.Kp_d);
-                VELOCITY_CTRL_READ(velocity_ctrl_params.Ki_n);
-                VELOCITY_CTRL_READ(velocity_ctrl_params.Ki_d);
-                VELOCITY_CTRL_READ(velocity_ctrl_params.Kd_n);
-                VELOCITY_CTRL_READ(velocity_ctrl_params.Kd_d);
-                VELOCITY_CTRL_READ(velocity_ctrl_params.Integral_limit);
-                break;
-
-            case SENSOR_SELECT:
-                VELOCITY_CTRL_READ(sensor_used);
-                if(sensor_used == HALL) {
-                    speed_factor_hall = hall_params.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
-                    hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
-                    target_velocity =  actual_velocity;
-                } else if(sensor_used == QEI) {
-                    speed_factor_qei = qei_params.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
-                    qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
-                    target_velocity = actual_velocity;
-                }
-                /**
-                 * Or any other sensor interfaced to the IFM Module
-                 * place client functions here to acquire velocity/position
-                 */
-                break;
-
-            case VCTRL_CMD_ENABLE:
-                VELOCITY_CTRL_READ(activate);
-                activate = SET;
-                while (1) {
-                    init_state = commutation_interface.checkBusy();//__check_commutation_init(c_commutation);
-                    if (init_state == INIT) {
+            activate = SET;
+            while (1) {
+                init_state = commutation_interface.checkBusy();//__check_commutation_init(c_commutation);
+                if (init_state == INIT) {
 #ifdef debug_print
-                        printf("commutation intialized\n");
+                    printf("commutation intialized\n");
 #endif
 #if(MOTOR_TYPE == BLDC)
-                        fet_state = commutation_interface.getFetsState();//check_fet_state(c_commutation);
-                        if (fet_state == 1) {
-                            commutation_interface.enableFets();//enable_motor(c_commutation);
-                            wait_ms(2, 1, ts);
-                        }
-#endif
-                        break;
+                    fet_state = commutation_interface.getFetsState();//check_fet_state(c_commutation);
+                    if (fet_state == 1) {
+                        commutation_interface.enableFets();//enable_motor(c_commutation);
+                        wait_ms(2, 1, ts);
                     }
+#endif
+                    break;
                 }
+            }
+
 #ifdef debug_print
                 printf("velocity control activated\n");
 #endif
-                break;
-
-            case VCTRL_CMD_SHUTDOWN:
-                VELOCITY_CTRL_READ(activate);
-                error_velocity = 0;
-                error_velocity_D = 0;
-                error_velocity_I = 0;
-                previous_error = 0;
-                velocity_control_out = 0;
-                commutation_interface.setVoltage(0); //set_commutation_sinusoidal(c_commutation, 0);
-                commutation_interface.disableFets();//disable_motor(c_commutation);
-                wait_ms(30, 1, ts);
-                break;
-
-            case CHECK_BUSY:
-                VELOCITY_CTRL_WRITE(activate);
-                break;
-
-            case VCTRL_CMD_GET_STATUS:
-                VELOCITY_CTRL_WRITE(activate);
-                break;
-
-            default:
-                break;
-            }
             break;
+
+
+            }
+           // break;
         }
-    }
+
 }

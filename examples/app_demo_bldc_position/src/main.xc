@@ -25,9 +25,6 @@
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
 
-
-on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
-
 /* Test Profile Position function */
 void position_profile_test(interface PositionControlInterface client i_position_control, interface QEIInterface client i_qei)
 {

@@ -127,7 +127,7 @@ void qei_service(interface QEIInterface server i_qei[5], EncoderPorts & encoder_
     int direction = 0;
     int qei_max = qei_config.max_ticks_per_turn;
     int qei_type = qei_config.index;            // TODO use to disable sync for no-index
-    int init_state = INIT;
+    //int init_state = INIT;
 
     int qei_crossover = (qei_max*19)/100;
     int qei_count_per_hall = qei_config.real_counts / qei_config.poles;

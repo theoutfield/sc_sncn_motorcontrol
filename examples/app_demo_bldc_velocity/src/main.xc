@@ -16,8 +16,7 @@
 #include <qei_service.h>
 #include <commutation_service.h>
 
-#include <velocity_ctrl_client.h>
-#include <velocity_ctrl_server.h>
+#include <velocity_ctrl_service.h>
 #include <profile.h>
 #include <profile_control.h>
 
@@ -37,7 +36,7 @@ port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
 #endif
 
 /* Test Profile Velocity function */
-void profile_velocity_test(chanend c_velocity_ctrl)
+void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
 	int target_velocity = 900;	 		// rpm
 	int acceleration 	= 1000;			// rpm/s
@@ -45,10 +44,10 @@ void profile_velocity_test(chanend c_velocity_ctrl)
 	int actual_velocity;
 	xscope_int(TARGET_VELOCITY, target_velocity);
 
-	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, c_velocity_ctrl);
+	set_profile_velocity( target_velocity, acceleration, deceleration, MAX_PROFILE_VELOCITY, i_velocity_control);
 
 	while(1) {
-	    actual_velocity = get_velocity(c_velocity_ctrl);
+	    actual_velocity = i_velocity_control.get_velocity();
 
 	    xscope_int(TARGET_VELOCITY, target_velocity);
 	    xscope_int(ACTUAL_VELOCITY, actual_velocity);
@@ -61,18 +60,19 @@ int main(void)
 {
 	// Motor control channels
 	chan c_pwm_ctrl, c_adctrig;							// pwm channels
-	chan c_velocity_ctrl;								// velocity control channel
 
 	interface WatchdogInterface wd_interface;
     interface CommutationInterface commutation_interface[3];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
+    interface VelocityControlInterface i_velocity_control;
+
 	par
 	{
 
 		/* Test Profile Velocity function */
-		on tile[APP_TILE_1]: profile_velocity_test(c_velocity_ctrl);            // test PVM on node
+		on tile[APP_TILE_1]: profile_velocity_test(i_velocity_control);            // test PVM on node
 
 		on tile[APP_TILE_1]:
 		{
@@ -95,8 +95,8 @@ int main(void)
 				init_sensor_filter_param(sensor_filter_params);
 
 				/* Control Loop */
-				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params,
-					 qei_params, SENSOR_USED, i_hall[1], i_qei[1], c_velocity_ctrl, commutation_interface[0]);
+				velocity_control_service(velocity_ctrl_params, sensor_filter_params, hall_params,
+					 qei_params, SENSOR_USED, i_hall[1], i_qei[1], i_velocity_control, commutation_interface[0]);
 			}
 
 		}
