@@ -9,10 +9,10 @@
  */
 
 #include <print.h>
-#include <hall_server.h>
-#include <qei_server.h>
+#include <hall_service.h>
+#include <qei_service.h>
 #include <pwm_service_inv.h>
-#include <adc.h>
+#include <adc_service.h>
 
 #include <commutation_server.h>
 #include <refclk.h>
@@ -82,8 +82,8 @@ int main(void)
 	chan c_pwm_ctrl;														// pwm channel
 	chan c_torque_ctrl;                                 					// torque control channel
 
-	interface WatchdogInterface wd_interface;
-    interface CommutationInterface commutation_interface[3];
+	interface WatchdogInterface i_watchdog;
+    interface CommutationInterface i_commutation[3];
     interface ADCInterface adc_interface;
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
@@ -112,7 +112,7 @@ int main(void)
 
 					/* Control Loop */
 					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
-					        adc_interface, commutation_interface[0],  i_hall[1], i_qei[1], c_torque_ctrl);
+					        adc_interface, i_commutation[0],  i_hall[1], i_qei[1], c_torque_ctrl);
 				}
 			}
 		}
@@ -125,16 +125,16 @@ int main(void)
 			par
 			{
 				/* ADC Loop */
-			    run_adc_service(adc_interface, adc_ports, c_adctrig);
+			    adc_service(adc_interface, adc_ports, c_adctrig);
 
 				/* PWM Loop */
 				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Watchdog Server */
-                run_watchdog(wd_interface, wd_ports);
+                watchdog_service(i_watchdog, wd_ports);
 
                 /* Hall Server */
-                run_hall(i_hall, hall_ports); // channel priority 1,2..4
+                hall_service(i_hall, hall_ports); // channel priority 1,2..4
 
 				/* Motor Commutation loop */
 				{
@@ -143,7 +143,7 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_sinusoidal(i_hall[0],  i_qei[0], c_signal, wd_interface, commutation_interface, c_pwm_ctrl,
+					commutation_sinusoidal(i_hall[0],  i_qei[0], c_signal, i_watchdog, i_commutation, c_pwm_ctrl,
 					        fet_driver_ports, hall_params, qei_params, commutation_params);
 				}
 
@@ -153,7 +153,7 @@ int main(void)
                     qei_par qei_config;
                     init_qei_velocity_params(qei_velocity_params);
 
-                    run_qei(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
+                    qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
 				}
 			}
 		}

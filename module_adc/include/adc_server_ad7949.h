@@ -8,7 +8,7 @@
 
 #include <xs1.h>
 #include <xclib.h>
-#include <adc.h>
+#include <adc_service.h>
 
 /*
 interface AD7949Interface{

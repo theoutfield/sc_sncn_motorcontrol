@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <watchdog.h>
-#include <hall_server.h>
-#include <qei_server.h>
+#include <watchdog_service.h>
+#include <hall_service.h>
+#include <qei_service.h>
 #include <bldc_motor_config.h>
 
 typedef struct {

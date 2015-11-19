@@ -11,11 +11,10 @@
 
 #include <platform.h>
 #include <commutation_server.h>
-#include <hall_server.h>
 #include <pwm_service_inv.h>
 #include <refclk.h>
-#include <drive_modes.h>
-#include <statemachine.h>
+//#include <drive_modes.h>
+//#include <statemachine.h>
 #include <xscope.h>
 #include <bldc_motor_config.h>
 #include <internal_config.h>

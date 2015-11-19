@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hall_server.h>
-#include <qei_server.h>
+#include <hall_service.h>
+#include <qei_service.h>
 #include <internal_config.h>
 #include "control_loops_common.h"
 

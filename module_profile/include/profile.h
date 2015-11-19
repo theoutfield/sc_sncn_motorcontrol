@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <internal_config.h>
-#include <hall_server.h>
-#include <qei_server.h>
+#include <hall_service.h>
+#include <qei_service.h>
 #include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/

@@ -9,6 +9,7 @@
 #include <internal_config.h>
 #include <stdbool_xc.h>
 #include <print.h>
+#include <position_ctrl_service.h>
 
 //#define print_slave
 
@@ -79,13 +80,6 @@ bool __check_velocity_init(chanend c_velocity_ctrl)
     c_velocity_ctrl :> init_state;
     return init_state;
 }
-bool __check_position_init(chanend c_position_ctrl)
-{
-    bool init_state;
-    c_position_ctrl <: CHECK_BUSY;
-    c_position_ctrl :> init_state;
-    return init_state;
-}
 
 check_list init_checklist(void)
 {
@@ -107,7 +101,7 @@ check_list init_checklist(void)
 }
 
 void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
-                      chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
+                      chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, interface PositionControlInterface client i_position_control)
 {
     bool check;
     bool skip = true;
@@ -143,7 +137,7 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
             check_list_param._velocity_init = __check_velocity_init(c_velocity_ctrl);
         }
         if (~check_list_param._position_init && mode == 3) {
-            check_list_param._position_init = __check_position_init(c_position_ctrl);
+            check_list_param._position_init = i_position_control.check_busy(); //__check_position_init(c_position_ctrl);
         }
         break;
     }
