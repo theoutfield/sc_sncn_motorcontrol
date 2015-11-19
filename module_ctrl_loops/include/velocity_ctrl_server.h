@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hall_server.h>
-#include <qei_client.h>
+#include <qei_server.h>
 #include <internal_config.h>
 #include "control_loops_common.h"
 #include "velocity_ctrl_client.h"

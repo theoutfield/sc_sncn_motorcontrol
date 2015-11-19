@@ -5,7 +5,6 @@
 */
 
 
-#include <qei_config.h>
 #include <qei_server.h>
 #include <stdlib.h>
 #include <xs1.h>
@@ -102,29 +101,6 @@ void init_qei_param(qei_par &qei_config)
     return;
 }
 
-int calculate_qei_velocity(int count, qei_par &qei_config, qei_velocity_par &qei_velocity_params){
-
-    int qei_crossover_velocity = qei_config.real_counts - qei_config.real_counts/10;
-    int difference_velocity;
-
-    difference_velocity = count - qei_velocity_params.previous_position;
-              if(difference_velocity > qei_crossover_velocity)
-                  difference_velocity = qei_velocity_params.old_difference;
-              else if(difference_velocity < -qei_crossover_velocity)
-                  difference_velocity = qei_velocity_params.old_difference;
-
-              qei_velocity_params.previous_position = count;
-              qei_velocity_params.old_difference = difference_velocity;
-
-              return (difference_velocity*60000)/(qei_config.real_counts); //<<12 multiplies by 4096
-                      //(filter(qei_velocity_params.filter_buffer, qei_velocity_params.index,
-                      //qei_velocity_params.filter_length, difference_velocity)*1000*60) / (qei_config.real_counts);
-
-    return ;
-}
-
-
-
 #pragma unsafe arrays
 void run_qei(interface QEIInterface server i_qei[5], EncoderPorts & encoder_ports, qei_par qei_config, qei_velocity_par qei_velocity_params)
 {
@@ -164,7 +140,7 @@ void run_qei(interface QEIInterface server i_qei[5], EncoderPorts & encoder_port
     int flag_index = 0;
     unsigned int new_pins_1;
 
-
+    int qei_crossover_velocity = qei_config.real_counts - qei_config.real_counts/10;
     int difference_velocity;
     int velocity = 0;
     timer t_velocity;
@@ -299,7 +275,7 @@ void run_qei(interface QEIInterface server i_qei[5], EncoderPorts & encoder_port
 
         case i_qei[int i].get_qei_velocity() -> int out_velocity:
 
-               // out_velocity = velocity;
+                out_velocity = velocity;
                  break;
 
         case i_qei[int i].set_qei_sync_offset(int in_fw, int in_bw):
@@ -315,47 +291,20 @@ void run_qei(interface QEIInterface server i_qei[5], EncoderPorts & encoder_port
                  count = in_offset;
                  break;
 
-                 /*
-        case !isnull(c_qei_p1) => c_qei_p1 :> command :
-            qei_client_handler( c_qei_p1, command, position, ok, count, direction, init_state,
-                                sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_config,
-                                status);
-            break;
+        case t_velocity when timerafter(ts_velocity + MILLISECOND) :> ts_velocity:
 
-        case !isnull(c_qei_p2) => c_qei_p2 :> command :
-            qei_client_handler( c_qei_p2, command, position, ok, count, direction, init_state,
-                                sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_config,
-                                status);
-            break;
+              difference_velocity = count - qei_velocity_params.previous_position;
+              if(difference_velocity > qei_crossover_velocity)
+                  difference_velocity = qei_velocity_params.old_difference;
+              else if(difference_velocity < -qei_crossover_velocity)
+                  difference_velocity = qei_velocity_params.old_difference;
 
-        case !isnull(c_qei_p3) => c_qei_p3 :> command :
-            qei_client_handler( c_qei_p3, command, position, ok, count, direction, init_state,
-                                sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_config,
-                                status);
-            break;
+              qei_velocity_params.previous_position = count;
+              qei_velocity_params.old_difference = difference_velocity;
 
-        case !isnull(c_qei_p4) => c_qei_p4 :> command :
-            qei_client_handler( c_qei_p4, command, position, ok, count, direction, init_state,
-                                sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_config,
-                                status);
-            break;
+              velocity = (difference_velocity*60000)/(qei_config.real_counts);
 
-        case !isnull(c_qei_p5) => c_qei_p5 :> command :
-                slave{
-                c_qei_p5 <: velocity; }
-                /*
-            qei_client_handler( c_qei_p5, command, position, ok, count, direction, init_state,
-                                sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_config,
-                                status);
-            break;
-
-        case !isnull(c_qei_p6) => c_qei_p6 :> command :
-
-            qei_client_handler( c_qei_p6, command, position, ok, count, direction, init_state,
-                                sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_config,
-                                status);
-            break;
-*/
+              break;
 
         }
 
@@ -370,4 +319,24 @@ void run_qei(interface QEIInterface server i_qei[5], EncoderPorts & encoder_port
 #pragma xta endpoint "qei_loop_end_point"
     }
 }
+/*
+ * int calculate_qei_velocity(int count, qei_par &qei_config, qei_velocity_par &qei_velocity_params){
 
+
+  //  int difference_velocity;
+
+ //<<12 multiplies by 4096
+                      //(filter(qei_velocity_params.filter_buffer, qei_velocity_params.index,
+                      //qei_velocity_params.filter_length, difference_velocity)*1000*60) / (qei_config.real_counts);
+
+    return ;
+}
+*/
+
+/*
+case !isnull(c_qei_p1) => c_qei_p1 :> command :
+qei_client_handler( c_qei_p1, command, position, ok, count, direction, init_state,
+               sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_config,
+               status);
+break;
+*/

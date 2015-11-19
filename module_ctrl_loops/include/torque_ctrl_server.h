@@ -8,7 +8,7 @@
 
 #include <commutation_server.h>
 #include <hall_server.h>
-#include <qei_client.h>
+#include <qei_server.h>
 #include <internal_config.h>
 #include "control_loops_common.h"
 #include "torque_ctrl_client.h"

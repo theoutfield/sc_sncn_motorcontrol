@@ -7,7 +7,7 @@
 #include <velocity_ctrl_server.h>
 #include <velocity_ctrl_common.h>
 #include <refclk.h>
-#include <qei_client.h>
+//#include <qei_client.h>
 #include <filter_blocks.h>
 #include <xscope.h>
 #include <internal_config.h>

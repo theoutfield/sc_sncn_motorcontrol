@@ -21,7 +21,6 @@
 #include <drive_modes.h>
 #include <statemachine.h>
 #include <profile_control.h>
-#include <qei_client.h>
 #include <internal_config.h>
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
@@ -40,7 +39,7 @@ port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
 /* Test Profile Velocity function */
 void profile_velocity_test(chanend c_velocity_ctrl)
 {
-	int target_velocity = 800;	 		// rpm
+	int target_velocity = 900;	 		// rpm
 	int acceleration 	= 1000;			// rpm/s
 	int deceleration 	= 1000;			// rpm/s
 	int actual_velocity;
