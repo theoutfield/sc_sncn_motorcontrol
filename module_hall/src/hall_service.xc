@@ -73,7 +73,7 @@ void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_por
     int first = 1;
     int hall_max_count = hall_config.max_ticks;
     int time_elapsed = 0;
-    int init_state = INIT;
+    //int init_state = INIT;
 
     timer t1;
     int time1;

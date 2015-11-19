@@ -11,6 +11,7 @@
 #include <xs1.h>
 #include <platform.h>
 #include <position_ctrl_service.h>
+#include <velocity_ctrl_service.h>
 
 /**
  * @brief Set profile position with Position Control loop
@@ -42,7 +43,7 @@ void set_profile_position( int target_position, int velocity, int acceleration, 
  *
  */
 void set_profile_velocity( int target_velocity, int acceleration, int deceleration,
-                           int max_profile_velocity, chanend c_velocity_ctrl );
+                           int max_profile_velocity, interface VelocityControlInterface client i_velocity_control );
 
 /**
  * @brief Set profile torque with Torque Control loop
