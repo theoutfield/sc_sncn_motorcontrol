@@ -55,18 +55,18 @@ void ams_rotary_sensor_test(client interface AMS iAMS)
     while(1)
     {
        // iAMS.configure(1);
-   //     electrical_angle = iAMS.get_angle_electrical();
+        electrical_angle = iAMS.get_angle_electrical();
 
         /* get position from Hall Sensor */
         {position, direction} = iAMS.get_absolute_position_multiturn();
     //    position = iAMS.get_absolute_position_singleturn();
 
         /* get velocity from Hall Sensor */
-        velocity = iAMS.get_velocity();
+   //     velocity = iAMS.get_velocity();
 
         xscope_int(POSITION, position);
         xscope_int(ANGLE, electrical_angle);
-        printf("%i\n", position);
+   //     printf("%i\n", position);
 
     }
 }

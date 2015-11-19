@@ -31,7 +31,7 @@ interface AMS{
     {int, int} get_absolute_position_multiturn(void);
     int get_absolute_position_singleturn(void);
     int get_velocity(void);
-    void configure(int);
+    void configure(int);//ToDo: extend this configuration. Now configures whether reading measuremnts on multiturn position request is required.
 };
 
 #define ROTARY_SENSOR_MAX_ANGLE   16384
