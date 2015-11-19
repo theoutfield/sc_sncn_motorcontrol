@@ -218,7 +218,6 @@ void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_
 {
     timer tx;
     unsigned ts;
-    int command;
 
     const unsigned int adc_config_mot     =   0b11110001001001;  	/* Motor current (ADC Channel 0), unipolar, referenced to GND */
     const unsigned int adc_config_other[] = { 0b10110001001001,  	// Temperature

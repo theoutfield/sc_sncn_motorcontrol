@@ -9,11 +9,12 @@
  */
 
 #include <tuning.h>
+#include <hall_service.h>
 
 #ifdef AD7265
 #include <adc_7265.h>
 #else
-    #include <adc.h>
+    #include <adc_service.h>
 #endif
 
 PwmPorts pwm_ports = PWM_PORTS;
@@ -21,7 +22,6 @@ WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 ADCPorts adc_ports = ADC_PORTS;
 HallPorts hall_ports= HALL_PORTS;
-
 
 #define VOLTAGE 2000 //+/- 4095
 
@@ -54,7 +54,7 @@ void adc_client(interface ADCInterface client adc_interface, interface HallInter
     while (1) {
         int b, c;
         unsigned state;
-        {b, c} = adc_interface.get_currents(); //get_adc_calibrated_current_ad7949(c_adc, I_calib);
+        {b, c} = adc_interface.get_currents();
         state = i_hall.get_hall_pinstate();
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
@@ -66,7 +66,6 @@ void adc_client(interface ADCInterface client adc_interface, interface HallInter
 int main(void) {
 
     // Motor control channels
-    chan c_qei_p1; // qei channels
     chan c_signal; // commutation channels
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
@@ -74,7 +73,6 @@ int main(void) {
     interface CommutationInterface commutation_interface[3];
     interface ADCInterface adc_interface;
     interface HallInterface i_hall[5];
-
 
     #ifdef AD7265
         interface ADC i_adc;
@@ -100,21 +98,21 @@ int main(void) {
 #ifdef AD7265
                 foc_adc_7265_continuous_loop(i_adc, adc_ports);
 #else
-                run_adc_service(adc_interface, adc_ports, c_adctrig);
+                adc_service(adc_interface, adc_ports, c_adctrig);
 #endif
 
                 /* Watchdog Server */
 #ifdef DC1K
                 run_watchdog(c_watchdog, null, p_ifm_led_moton_wdtick_wden);
 #else
-                run_watchdog(watchdog_interface, wd_ports);
+                watchdog_service(watchdog_interface, wd_ports);
 #endif
 
                 /* PWM Loop */
                 do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Hall Server */
-                run_hall(i_hall, hall_ports); // channel priority 1,2..6
+                hall_service(i_hall, hall_ports); // channel priority 1,2..6
 
                 /* Motor Commutation loop */
                 {

@@ -10,6 +10,7 @@
 
 #include <xs1.h>
 #include <platform.h>
+#include <position_ctrl_service.h>
 
 /**
  * @brief Set profile position with Position Control loop
@@ -25,7 +26,7 @@
  *
  */
 void set_profile_position( int target_position, int velocity, int acceleration, int deceleration,
-                           int sensor_select, chanend c_position_ctrl );
+                           int sensor_select, interface PositionControlInterface client i_position_control );
 
 /**
  * @brief Set profile velocity with Velocity Control loop

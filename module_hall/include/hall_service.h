@@ -75,5 +75,5 @@ void init_hall_param(hall_par & hall_params);
  */
 
 [[combinable]]
-void run_hall(interface HallInterface server i_hall[5], HallPorts & hall_ports);
+void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports);
 #endif

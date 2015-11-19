@@ -9,8 +9,8 @@
  */
 
 #include <print.h>
-#include <hall_server.h>
-#include <qei_server.h>
+#include <hall_service.h>
+#include <qei_service.h>
 #include <pwm_service_inv.h>
 #include <commutation_server.h>
 #include <refclk.h>
@@ -112,10 +112,10 @@ int main(void)
 			    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Watchdog Server */
-                run_watchdog(wd_interface, wd_ports);
+			    watchdog_service(wd_interface, wd_ports);
 
                 /* Hall Server */
-                run_hall(i_hall, hall_ports); // channel priority 1,2..5
+                hall_service(i_hall, hall_ports); // channel priority 1,2..5
 
 				/* Motor Commutation loop */
 				{
@@ -141,7 +141,7 @@ int main(void)
                     qei_par qei_config;
                     init_qei_velocity_params(qei_velocity_params);
 
-                    run_qei(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
+                    qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
 
 				}
 

@@ -31,5 +31,5 @@ interface WatchdogInterface{
  * @param p_wd_tick control for the tick of the watchdog
  * @param p_shared_leds_wden control port for the watchdog device
  */
-void run_watchdog(interface WatchdogInterface server watchdog_interface, WatchdogPorts &watchdog_ports);
+void watchdog_service(interface WatchdogInterface server watchdog_interface, WatchdogPorts &watchdog_ports);
 

@@ -9,19 +9,18 @@
  */
 
 #include <print.h>
-#include <hall_server.h>
+#include <hall_service.h>
 #include <pwm_service_inv.h>
 #include <commutation_server.h>
 #include <refclk.h>
 #include <xscope.h>
-#include <qei_server.h>
+#include <qei_service.h>
 #include <profile.h>
-#include <position_ctrl_server.h>
+#include <position_ctrl_service.h>
 #include <drive_modes.h>
 #include <statemachine.h>
 #include <profile_control.h>
 #include <drive_modes.h>
-#include <position_ctrl_client.h>
 #include <internal_config.h>
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
@@ -30,7 +29,7 @@
 on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
 
 /* Test Profile Position function */
-void position_profile_test(chanend c_position_ctrl, interface QEIInterface client i_qei)
+void position_profile_test(interface PositionControlInterface client i_position_control, interface QEIInterface client i_qei)
 {
 	int actual_position = 0;			// ticks
 	int target_position = 16000;		// HALL: 4096 extrapolated ticks x nr. pole pairs = one rotation; QEI: your encoder documented resolution x 4 = one rotation
@@ -50,12 +49,12 @@ void position_profile_test(chanend c_position_ctrl, interface QEIInterface clien
 
 
 	/* Set new target position for profile position control */
-	set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, c_position_ctrl);
+	set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, i_position_control);
 
 	while(1)
 	{
 	    /* Read actual position from the Position Control Server */
-		actual_position = get_position(c_position_ctrl);
+		actual_position = i_position_control.get_position();
 		follow_error = target_position - actual_position;
 
 		xscope_int(ACTUAL_POSITION, actual_position);
@@ -75,19 +74,19 @@ EncoderPorts encoder_ports = ENCODER_PORTS;
 int main(void)
 {
 	// Motor control channels
-	chan c_commutation_p3;	                // commutation channels
 	chan c_pwm_ctrl, c_adctrig;				// pwm channels
-	chan c_position_ctrl;					// position control channel
 
 	interface WatchdogInterface wd_interface;
 	interface CommutationInterface commutation_interface[3];
 	interface HallInterface i_hall[5];
 	interface QEIInterface i_qei[5];
 
+	interface PositionControlInterface i_position_control;
+
 	par
 	{
 		/* Test Profile Position Client function*/
-		on tile[APP_TILE_1]: position_profile_test(c_position_ctrl, i_qei[2]);      // test PPM on slave side
+		on tile[APP_TILE_1]: position_profile_test(i_position_control, i_qei[2]);      // test PPM on slave side
 
 		on tile[APP_TILE_1]:
 		{
@@ -106,7 +105,7 @@ int main(void)
 
 				 /* Control Loop */
 				 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, i_hall[1],
-				         i_qei[1], c_position_ctrl, commutation_interface[0]);
+				         i_qei[1], i_position_control, commutation_interface[0]);
 			}
 
 		}
@@ -122,10 +121,10 @@ int main(void)
                 do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Watchdog Server */
-                run_watchdog(wd_interface, wd_ports);
+                watchdog_service(wd_interface, wd_ports);
 
                 /* Hall Server */
-                run_hall(i_hall, hall_ports); // channel priority 1,2..6
+                hall_service(i_hall, hall_ports); // channel priority 1,2..6
 
                 /* QEI Server */
                 {
@@ -133,7 +132,7 @@ int main(void)
                     qei_par qei_config;
                     init_qei_velocity_params(qei_velocity_params);
 
-                    run_qei(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
+                    qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
                 }
 
 				/* Motor Commutation loop */

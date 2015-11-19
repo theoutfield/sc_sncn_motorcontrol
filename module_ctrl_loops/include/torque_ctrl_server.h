@@ -7,12 +7,12 @@
 #pragma once
 
 #include <commutation_server.h>
-#include <hall_server.h>
-#include <qei_server.h>
+#include <hall_service.h>
+#include <qei_service.h>
 #include <internal_config.h>
 #include "control_loops_common.h"
 #include "torque_ctrl_client.h"
-#include <adc.h>
+#include <adc_service.h>
 
 
 /**

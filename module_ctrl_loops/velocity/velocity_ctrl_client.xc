@@ -11,7 +11,7 @@
 #include <statemachine.h>
 #include <drive_modes.h>
 #include <print.h>
-#include <hall_server.h>
+#include <hall_service.h>
 
 /* TODO: remove dependency (at the moment required for PID params) */
 #include <bldc_motor_config.h>
