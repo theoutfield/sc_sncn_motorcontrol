@@ -105,7 +105,7 @@ int calculate_qei_velocity(int count, qei_par &qei_config, qei_velocity_par &qei
  * @param EncoderPorts structure containing the hardware port where the quadrature encoder is located
  * @param qei_params the structure defines sensor type and resolution parameters for qei
  */
-void run_qei(interface QEIInterface server i_qei[5],
+void qei_service(interface QEIInterface server i_qei[5],
              EncoderPorts & encoder_ports, qei_par qei_config, qei_velocity_par qei_velocity_params);
 
 #endif

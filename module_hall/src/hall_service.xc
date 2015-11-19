@@ -4,7 +4,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
-#include <hall_server.h>
+#include <hall_service.h>
 #include <filter_blocks.h>
 #include <refclk.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@ void init_hall_param(hall_par &hall_config)
 }
 
 [[combinable]]
-void run_hall(interface HallInterface server i_hall[5], HallPorts & hall_ports)
+void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports)
 {
     hall_par hall_config;
 

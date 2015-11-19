@@ -15,7 +15,7 @@
 #include <drive_modes.h>
 
 //#include <qei_client.h>
-#include <qei_server.h>
+#include <qei_service.h>
 #include <sine_table_big.h>
 #include <a4935.h>
 #include <commutation_server.h>

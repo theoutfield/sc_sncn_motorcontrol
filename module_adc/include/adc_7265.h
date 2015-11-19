@@ -18,7 +18,7 @@
 #include <xclib.h> // NB Contains bitrev()
 #include <assert.h>
 #include <print.h>
-#include <adc.h>
+#include <adc_service.h>
                            // nDIFF|A2|A1|A0
 #define AD7265_MUX_DEFAULT_CONFIG 0b1000
 

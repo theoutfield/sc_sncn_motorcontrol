@@ -5,7 +5,7 @@
 */
 
 
-#include <qei_server.h>
+#include <qei_service.h>
 #include <stdlib.h>
 #include <xs1.h>
 #include <refclk.h>
@@ -102,7 +102,7 @@ void init_qei_param(qei_par &qei_config)
 }
 
 #pragma unsafe arrays
-void run_qei(interface QEIInterface server i_qei[5], EncoderPorts & encoder_ports, qei_par qei_config, qei_velocity_par qei_velocity_params)
+void qei_service(interface QEIInterface server i_qei[5], EncoderPorts & encoder_ports, qei_par qei_config, qei_velocity_par qei_velocity_params)
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz

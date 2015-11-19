@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stdbool_xc.h>
+#include <position_ctrl_service.h>
 
 typedef struct S_Check_list {
     bool ready;
@@ -81,7 +82,7 @@ bool __check_velocity_init(chanend c_velocity_ctrl);
  * @Output
  * @return init state of the position control loop
  */
-bool __check_position_init(chanend c_position_ctrl);
+//bool __check_position_init(chanend c_position_ctrl);
 
 int init_state(void);
 
@@ -112,7 +113,7 @@ check_list init_checklist(void);
  * @return check_list_param updated checklist parameters
  */
 void update_checklist(check_list & check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
-                      chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
+                      chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, interface PositionControlInterface client i_position_control);
 
 int16_t update_statusword(int current_status, int state_reached, int ack, int q_active, int shutdown_ack);
 

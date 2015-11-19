@@ -6,7 +6,7 @@
 
 #include <xs1.h>
 #include <commutation_server.h>
-#include <watchdog.h>
+#include <watchdog_service.h>
 
 #include <stdlib.h>
 #include <pwm_config.h>
@@ -15,7 +15,7 @@
 #include <sine_table_big.h>
 //#include <adc_client_ad7949.h>
 #include <refclk.h>
-#include <qei_server.h>
+#include <qei_service.h>
 #include <stdio.h>
 #include <internal_config.h>
 
@@ -56,9 +56,6 @@ void commutation_sinusoidal(interface HallInterface client i_hall, interface QEI
     int shutdown = 0; //Disable FETS
     int sensor_select = HALL;
     qei_velocity_par qei_velocity_params;
-
-    timer t_loop;
-    unsigned int start_time, end_time;
 
     init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
 
