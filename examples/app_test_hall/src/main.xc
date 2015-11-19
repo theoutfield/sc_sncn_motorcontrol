@@ -9,8 +9,7 @@
  */
 
 #include <print.h>
-#include <hall_server.h>
-#include <hall_server.h>
+#include <hall_service.h>
 #include <xscope.h>
 
 #define ENABLE_XSCOPE
@@ -75,7 +74,7 @@ int main(void)
     par
     {
         on tile[APP_TILE]: hall_test(i_hall[0]);
-        on tile[IFM_TILE]: run_hall(i_hall, hall_ports); // channel priority 1,2..6
+        on tile[IFM_TILE]: hall_service(i_hall, hall_ports); // channel priority 1,2..6
 
     }
 
