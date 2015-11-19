@@ -9,8 +9,7 @@
  */
 
 #include <print.h>
-#include <qei_client.h>
-#include <qei_server.h>
+#include <qei_service.h>
 #include <refclk.h>
 #include <xscope.h>
 
@@ -71,7 +70,7 @@ int main(void)
 			    qei_par qei_config;
 			    init_qei_velocity_params(qei_velocity_params);
 
-				run_qei(i_qei, encoder_ports, qei_config, qei_velocity_params);  		// channel priority 1,2..6
+				qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);  		// channel priority 1,2..6
 			}
 		}
 	}
