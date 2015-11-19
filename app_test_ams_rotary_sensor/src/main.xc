@@ -120,7 +120,7 @@ int main(void)
 //            p_ifm_motor_lo[3] <: 0;
 
             /* AMS Rotary Sensor Server */
-            run_ams_sensor(iAMS, NUM_OF_AMS_INTERFACES, ROTARY_SENSOR_MAX_ANGLE, pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);//MOT 3 R3
+            run_ams_sensor(iAMS, NUM_OF_AMS_INTERFACES, ROTARY_SENSOR_RESOLUTION_BITS, pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);//MOT 3 R3
 
   //          ams_rotary_sensor_direct_method(pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);
 

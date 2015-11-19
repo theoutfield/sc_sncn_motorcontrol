@@ -35,6 +35,7 @@ interface AMS{
 };
 
 #define ROTARY_SENSOR_MAX_ANGLE   16384
+#define ROTARY_SENSOR_RESOLUTION_BITS 14
 
 //volatile registers
 #define ADDR_ERRFL      0x0001
