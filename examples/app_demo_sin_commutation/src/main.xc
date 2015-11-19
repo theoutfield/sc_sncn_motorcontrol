@@ -121,7 +121,7 @@ int main(void) {
                     commutation_par commutation_params;
                     init_hall_param(hall_params);
 
-                    commutation_sinusoidal(i_hall[0], null, c_signal,
+                    commutation_service(i_hall[0], null, c_signal,
                             watchdog_interface, commutation_interface, c_pwm_ctrl,
                             fet_driver_ports,
                             hall_params, qei_params,

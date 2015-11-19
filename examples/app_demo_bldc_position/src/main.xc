@@ -9,19 +9,19 @@
  */
 
 #include <print.h>
+#include <refclk.h>
+
+#include <qei_service.h>
 #include <hall_service.h>
 #include <pwm_service_inv.h>
-#include <commutation_server.h>
-#include <refclk.h>
-#include <xscope.h>
-#include <qei_service.h>
-#include <profile.h>
+#include <commutation_service.h>
+
 #include <position_ctrl_service.h>
-#include <drive_modes.h>
-#include <statemachine.h>
+#include <profile.h>
 #include <profile_control.h>
-#include <drive_modes.h>
-#include <internal_config.h>
+
+#include <xscope.h>
+
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
 
@@ -143,7 +143,7 @@ int main(void)
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
 
-					commutation_sinusoidal(i_hall[0], i_qei[0], null, wd_interface, commutation_interface,
+					commutation_service(i_hall[0], i_qei[0], null, wd_interface, commutation_interface,
 					        c_pwm_ctrl, fet_driver_ports, hall_params, qei_params, commutation_params);
 				}
 			}

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <commutation_server.h>
+#include <commutation_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 #include <internal_config.h>

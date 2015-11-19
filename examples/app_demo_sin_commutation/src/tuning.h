@@ -10,7 +10,7 @@
 #define TUNING_H_
 
 #include <platform.h>
-#include <commutation_server.h>
+#include <commutation_service.h>
 #include <pwm_service_inv.h>
 #include <refclk.h>
 //#include <drive_modes.h>

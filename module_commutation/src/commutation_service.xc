@@ -5,18 +5,20 @@
  */
 
 #include <xs1.h>
-#include <commutation_server.h>
-#include <watchdog_service.h>
-
 #include <stdlib.h>
+#include <refclk.h>
+#include <stdio.h>
+
+#include <commutation_service.h>
+#include <watchdog_service.h>
 #include <pwm_config.h>
 #include <pwm_cli_inv.h>
 #include <a4935.h>
 #include <sine_table_big.h>
 //#include <adc_client_ad7949.h>
-#include <refclk.h>
+
 #include <qei_service.h>
-#include <stdio.h>
+
 #include <internal_config.h>
 
 
@@ -29,7 +31,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
 
 [[combinable]]
-void commutation_sinusoidal(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
+void commutation_service(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
                             interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports, hall_par & hall_params, qei_par & qei_params,

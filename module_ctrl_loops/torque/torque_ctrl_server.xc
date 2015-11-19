@@ -18,7 +18,7 @@
 #include <qei_service.h>
 #include <sine_table_big.h>
 #include <a4935.h>
-#include <commutation_server.h>
+#include <commutation_service.h>
 
 //#define ENABLE_xscope_torq //don't forget to set up the config.xscope file
 //#define debug_print
