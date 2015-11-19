@@ -128,7 +128,7 @@ void set_position_ctrl_qei_param(qei_par & qei_params, chanend c_position_ctrl)
 
 void set_position_sensor(int sensor_used, chanend c_position_ctrl)
 {
-    POSITION_CTRL_WRITE(SENSOR_SELECT);
+    POSITION_CTRL_WRITE(PCTRL_CMD_SENSOR_SELECT);
     POSITION_CTRL_WRITE(sensor_used);
 }
 

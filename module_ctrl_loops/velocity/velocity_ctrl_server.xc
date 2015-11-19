@@ -35,6 +35,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                        int sensor_used,
                        chanend c_hall,
                        chanend ?c_qei,
+                       client interface i_biss ?i_biss,
                        chanend c_velocity_ctrl,
                        chanend c_commutation )
 {
@@ -62,7 +63,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
     int raw_speed = 0;                      // rpm
     int difference;
     int direction = 0;
-    int old_difference;
+    int old_difference= 0;
     int rpm_constant = 1000*60; // constant
     int speed_factor_hall = 0;
     int speed_factor_qei = 0;
@@ -107,61 +108,66 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
         case ts when timerafter (time) :> void:
             time += velocity_ctrl_params.Loop_time;
             if (compute_flag == 1) {
-                /* calculate actual velocity from hall/qei with filter*/
-                if (sensor_used == HALL) {
-                    if (init == 0) {
-                        { position, direction } = get_hall_position_absolute(c_hall);
-                        if (position > 2049) {
-                            init = 1;
-                            previous_position = 2049;
-                        } else if (position < -2049) {
-                            init = 1;
-                            previous_position = -2049;
+                if (sensor_used == BISS) {
+                    actual_velocity = i_biss.get_velocity();
+                } else {
+                    /* calculate actual velocity from hall/qei with filter*/
+                    if (sensor_used == HALL) {
+                        if (init == 0) {
+                            { position, direction } = get_hall_position_absolute(c_hall);
+                            if (position > 2049) {
+                                init = 1;
+                                previous_position = 2049;
+                            } else if (position < -2049) {
+                                init = 1;
+                                previous_position = -2049;
+                            }
+                            raw_speed = 0;
+                            //target_velocity = 0;
+                        } else if (init == 1) {
+                            { position, direction } = get_hall_position_absolute(c_hall);
+                            difference = position - previous_position;
+                            if (difference > hall_crossover) {
+                                difference = old_difference;
+                            } else if (difference < -hall_crossover) {
+                                difference = old_difference;
+                            }
+                            raw_speed = (difference*rpm_constant)/speed_factor_hall;
+#ifdef Debug_velocity_ctrl
+                            //xscope_int(RAW_SPEED, raw_speed);
+#endif
+                            previous_position = position;
+                            old_difference = difference;
                         }
-                        raw_speed = 0;
-                        //target_velocity = 0;
-                    } else if (init == 1) {
-                        { position, direction } = get_hall_position_absolute(c_hall);
+                    } else if (sensor_used == QEI && !isnull(c_qei)) {
+                        { position, direction } = get_qei_position_absolute(c_qei);
                         difference = position - previous_position;
-                        if (difference > hall_crossover) {
-                            difference = old_difference;
-                        } else if (difference < -hall_crossover) {
+
+                        if (difference > qei_crossover) {
                             difference = old_difference;
                         }
-                        raw_speed = (difference*rpm_constant)/speed_factor_hall;
+
+                        if (difference < -qei_crossover) {
+                            difference = old_difference;
+                        }
+
+                        raw_speed = (difference*rpm_constant)/speed_factor_qei;
+
 #ifdef Debug_velocity_ctrl
                         //xscope_int(RAW_SPEED, raw_speed);
 #endif
                         previous_position = position;
                         old_difference = difference;
                     }
-                } else if (sensor_used == QEI && !isnull(c_qei)) {
-                    { position, direction } = get_qei_position_absolute(c_qei);
-                    difference = position - previous_position;
+                    /**
+                     * Or any other sensor interfaced to the IFM Module
+                     * place client functions here to acquire velocity/position
+                     */
 
-                    if (difference > qei_crossover) {
-                        difference = old_difference;
-                    }
-
-                    if (difference < -qei_crossover) {
-                        difference = old_difference;
-                    }
-
-                    raw_speed = (difference*rpm_constant)/speed_factor_qei;
-
-#ifdef Debug_velocity_ctrl
-                    //xscope_int(RAW_SPEED, raw_speed);
-#endif
-                    previous_position = position;
-                    old_difference = difference;
+                    actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
                 }
-                /**
-                 * Or any other sensor interfaced to the IFM Module
-                 * place client functions here to acquire velocity/position
-                 */
-
-                actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
             }
+
 
             if(activate == 1) {
 #ifdef Debug_velocity_ctrl
@@ -189,6 +195,7 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                 } else if (velocity_control_out < -velocity_ctrl_params.Control_limit) {
                     velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
                 }
+
 
 #if(MOTOR_TYPE == BDC)
                 set_bdc_voltage(c_commutation, velocity_control_out);
@@ -256,7 +263,8 @@ void velocity_control( ctrl_par & velocity_ctrl_params,
                     speed_factor_qei = qei_params.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
                     qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
                     target_velocity = actual_velocity;
-                }
+                } else
+                    target_velocity = actual_velocity;
                 /**
                  * Or any other sensor interfaced to the IFM Module
                  * place client functions here to acquire velocity/position

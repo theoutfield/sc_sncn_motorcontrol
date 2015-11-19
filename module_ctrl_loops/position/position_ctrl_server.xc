@@ -27,7 +27,7 @@
 
 
 void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei_par &qei_params, int sensor_used,
-                      chanend c_hall, chanend c_qei, chanend c_position_ctrl, chanend c_commutation)
+                      chanend c_hall, chanend c_qei, client interface i_biss i_biss, chanend c_position_ctrl, chanend c_commutation)
 {
     int actual_position = 0;
     int target_position = 0;
@@ -55,6 +55,9 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
     if (sensor_used == HALL) {
         { actual_position, direction } = get_hall_position_absolute(c_hall);
         target_position = actual_position;
+    } else if (sensor_used == BISS) {
+        { actual_position, void, void } = i_biss.get_position();
+        target_position = actual_position;
     } else if (sensor_used == QEI) {
         {actual_position, direction} = get_qei_position_absolute(c_qei);
         target_position = actual_position;
@@ -78,6 +81,10 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 switch (sensor_used) {
                 case HALL:
                 { actual_position, direction } = get_hall_position_absolute(c_hall);
+                break;
+
+                case BISS:
+                { actual_position, void, void } = i_biss.get_position();
                 break;
 
                 case QEI:
@@ -122,7 +129,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 xscope_int(ACTUAL_POSITION, actual_position);
                 xscope_int(TARGET_POSITION, target_position);
 #endif
-                //xscope_int(TARGET_POSITION, target_position);
+
                 previous_error = error_position;
             }
 
@@ -162,10 +169,12 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 c_position_ctrl :> qei_params.max_ticks_per_turn;
                 break;
 
-            case SENSOR_SELECT:
+            case PCTRL_CMD_SENSOR_SELECT:
                 POSITION_CTRL_READ(sensor_used);
                 if (sensor_used == HALL) {
                     { actual_position, direction }= get_hall_position_absolute(c_hall);
+                } else if (sensor_used == BISS) {
+                    { actual_position, void, void } = i_biss.get_position();
                 } else if (sensor_used == QEI) {
                     { actual_position, direction } = get_qei_position_absolute(c_qei);
                 }
