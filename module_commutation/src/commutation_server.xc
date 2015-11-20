@@ -115,8 +115,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
     int sensor_select = HALL;
     qei_velocity_par qei_velocity_params;
 
-    //timer t_loop;
-    //unsigned int start_time, end_time;
+//    timer t_loop;
+//    unsigned int start_time, end_time;
 
     init_commutation_param(commutation_params, hall_params, MAX_NOMINAL_SPEED);
 
@@ -180,7 +180,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
                         if (sensor_select == HALL) {
                             angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
                         } else if (sensor_select == BISS) {
-                            angle_pwm = ((angle + commutation_params.biss_offset_clk) >> 2) & 0x3ff;
+                            angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_forward_offset) >> 2) & 0x3ff; //512
                         }
@@ -193,7 +193,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
                         if (sensor_select == HALL) {
                             angle_pwm = ((angle + commutation_params.hall_offset_cclk) >> 2) & 0x3ff;
                         } else if (sensor_select == BISS) {
-                            angle_pwm = ((angle + commutation_params.biss_offset_cclk) >> 2) & 0x3ff;
+                            angle_pwm = ((angle + commutation_params.hall_offset_clk + 2048) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_backward_offset) >> 2) & 0x3ff; //3100
                         }
@@ -224,13 +224,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
                     case COMMUTATION_CMD_SET_PARAMS:
                         c_commutation_p1 :> commutation_params.angle_variance;
                         c_commutation_p1 :> commutation_params.nominal_speed;
-                        if (sensor_select == HALL) {
-                            c_commutation_p2 :> commutation_params.hall_offset_clk;
-                            c_commutation_p2 :> commutation_params.hall_offset_cclk;
-                        } else if (sensor_select == BISS) {
-                            c_commutation_p2 :> commutation_params.biss_offset_clk;
-                            c_commutation_p2 :> commutation_params.biss_offset_cclk;
-                        }
+                        c_commutation_p1 :> commutation_params.hall_offset_clk;
+                        c_commutation_p1 :> commutation_params.hall_offset_cclk;
                         c_commutation_p1 :> commutation_params.winding_type;
                         break;
 
@@ -272,13 +267,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
                         case COMMUTATION_CMD_SET_PARAMS:
                             c_commutation_p2 :> commutation_params.angle_variance;
                             c_commutation_p2 :> commutation_params.nominal_speed;
-                            if (sensor_select == HALL) {
-                                c_commutation_p2 :> commutation_params.hall_offset_clk;
-                                c_commutation_p2 :> commutation_params.hall_offset_cclk;
-                            } else if (sensor_select == BISS) {
-                                c_commutation_p2 :> commutation_params.biss_offset_clk;
-                                c_commutation_p2 :> commutation_params.biss_offset_cclk;
-                            }
+                            c_commutation_p2 :> commutation_params.hall_offset_clk;
+                            c_commutation_p2 :> commutation_params.hall_offset_cclk;
                             c_commutation_p2 :> commutation_params.winding_type;
                             break;
 
@@ -320,13 +310,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
                             case COMMUTATION_CMD_SET_PARAMS:
                                 c_commutation_p3 :> commutation_params.angle_variance;
                                 c_commutation_p3 :> commutation_params.nominal_speed;
-                                if (sensor_select == HALL) {
-                                    c_commutation_p2 :> commutation_params.hall_offset_clk;
-                                    c_commutation_p2 :> commutation_params.hall_offset_cclk;
-                                } else if (sensor_select == BISS) {
-                                    c_commutation_p2 :> commutation_params.biss_offset_clk;
-                                    c_commutation_p2 :> commutation_params.biss_offset_cclk;
-                                }
+                                c_commutation_p3 :> commutation_params.hall_offset_clk;
+                                c_commutation_p3 :> commutation_params.hall_offset_cclk;
                                 c_commutation_p3 :> commutation_params.winding_type;
                                 break;
 
@@ -373,13 +358,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
                     c_signal :> qei_params.max_ticks_per_turn;
                     c_signal :> qei_params.real_counts;
                     c_signal :> nominal_speed;
-                    if (sensor_select == HALL) {
-                        c_signal :> commutation_params.hall_offset_clk;
-                        c_signal :> commutation_params.hall_offset_cclk;
-                    } else if (sensor_select == BISS) {
-                        c_signal :> commutation_params.biss_offset_clk;
-                        c_signal :> commutation_params.biss_offset_cclk;
-                    }
+                    c_signal :> commutation_params.hall_offset_clk;
+                    c_signal :> commutation_params.hall_offset_cclk;
                     c_signal :> commutation_params.winding_type;
                     commutation_params.angle_variance = (60 * 4096) / (hall_params.pole_pairs * 2 * 360);
                     if (hall_params.pole_pairs < 4) {
@@ -417,8 +397,6 @@ void init_commutation_param(commutation_par & commutation_params,
     }
     commutation_params.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
     commutation_params.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
-    commutation_params.biss_offset_clk =  COMMUTATION_OFFSET_BISS_CLK;
-    commutation_params.biss_offset_cclk = COMMUTATION_OFFSET_BISS_CCLK;
     commutation_params.winding_type = WINDING_TYPE;
     commutation_params.qei_forward_offset = 0;
     commutation_params.qei_backward_offset = 0;

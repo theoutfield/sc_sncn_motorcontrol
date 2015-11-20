@@ -32,6 +32,7 @@ void init_biss_param(biss_par &biss_params) {
     biss_params.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
     biss_params.max_ticks += (1 << biss_params.singleturn_resolution);  // tolerance
     biss_params.velocity_loop = BISS_VELOCITY_LOOP;
+    biss_params.offset_angle = BISS_OFFSET_ANGLE;
 }
 
 
@@ -56,12 +57,13 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
     int velocity_loop = (biss_params.velocity_loop * USEC_FAST); //velocity loop time in clock ticks
     int old_count = 0;
     int old_difference =0;
-    const int filter_length = 8;
-    int filter_buffer[8];
-    for (int i=0; i<filter_length; i++)
-        filter_buffer[i] = 0;
-    int filter_index = 0;
     int count_offset = 0;
+    //filter params
+//    const int filter_length = 8;
+//    int filter_buffer[8];
+//    for (int i=0; i<filter_length; i++)
+//        filter_buffer[i] = 0;
+//    int filter_index = 0;
 
     //clock and port configuration
     configure_clock_rate(clk, biss_params.clock_dividend, biss_params.clock_divisor) ; // a/b MHz
@@ -82,9 +84,9 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 angle = biss_position_fast(p_biss_clk, p_biss_data, clk, 0, 0, biss_params.multiturn_length, biss_params.singleturn_length);
                 t :> last_biss_read;
                 if (biss_params.singleturn_resolution > 12)
-                    angle = (biss_params.poles * (angle >> (biss_params.singleturn_resolution-12))) % 4096;
+                    angle = (biss_params.poles * ((angle >> (biss_params.singleturn_resolution-12)) + biss_params.offset_angle) ) & 4095;
                 else
-                    angle = (biss_params.poles * (angle << (12-biss_params.singleturn_resolution))) % 4096;
+                    angle = (biss_params.poles * ((angle << (12-biss_params.singleturn_resolution)) + biss_params.offset_angle) ) & 4095;
                 break;
         case i_biss[int i].get_position_fast() -> unsigned int position:
                 t when timerafter(last_biss_read + biss_params.timeout) :> void;
@@ -132,6 +134,9 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 velocity_ticks = (ticks_per_turn >> 8);
                 velocity_loop = (biss_params.velocity_loop * USEC_FAST);
                 break;
+        case i_biss[int i].get_params() -> biss_par biss_params_:
+                biss_params_ = biss_params;
+                break;
         case i_biss[int i].set_count(int new_count):
                 t when timerafter(last_biss_read + biss_params.timeout) :> void;
                 read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
@@ -156,8 +161,9 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
             old_count = count;
             old_difference = difference;
             // simplified version of: velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
-            // velocity = ( difference ticks * (60.000.000 us / 256) ) / ( (ticks per turn / 256) * velocity loop time in us)
-            velocity = (filter(filter_buffer, filter_index, filter_length, difference) * 234375) / (velocity_ticks * biss_params.velocity_loop);
+            //                                        = ( difference ticks * (60.000.000 us / 256) ) / ( (ticks per turn / 256) * velocity loop time in us)
+            //velocity = (filter(filter_buffer, filter_index, filter_length, difference) * 234375) / (velocity_ticks * biss_params.velocity_loop);
+            velocity = (difference * 234375) / (velocity_ticks * biss_params.velocity_loop);
             break;
         }
     }

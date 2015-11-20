@@ -16,8 +16,6 @@ typedef struct {
     int qei_backward_offset;
     int hall_offset_clk;
     int hall_offset_cclk;
-    int biss_offset_clk;
-    int biss_offset_cclk;
     int winding_type;
 } commutation_par;
 

@@ -19,10 +19,11 @@
 #define BISS_SINGLETURN_LENGTH     BISS_SINGLETURN_RESOLUTION
 #define BISS_DATA_LENGTH           BISS_MULTITURN_LENGTH + BISS_SINGLETURN_LENGTH + BISS_STATUS_LENGTH
 #define BISS_CRC_POLY              0b110000
-#define BISS_CLOCK_DIVIDEND        250
-#define BISS_CLOCK_DIVISOR         128
-#define BISS_TIMEOUT               12*USEC_FAST
-#define BISS_VELOCITY_LOOP         1000 //velocity loop time in microseconds
+#define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequercy: dividend/divisor in MHz
+#define BISS_CLOCK_DIVISOR         128          // supported frequencies are (tile frequency) / 2^n
+#define BISS_TIMEOUT               12*USEC_FAST // BiSS timeout in clock ticks
+#define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
+#define BISS_OFFSET_ANGLE          1150         // range [ 0 - 4095 ]
 
 
 /**
@@ -43,6 +44,7 @@ typedef struct {
     int timeout;
     int velocity_loop;
     int max_ticks;
+    int offset_angle;
 } biss_par;
 
 

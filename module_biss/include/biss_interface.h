@@ -18,5 +18,6 @@ interface i_biss {
     unsigned int get_angle_electrical();
     int get_velocity();
     void set_params(biss_par biss_params);
+    biss_par get_params();
     void set_count(int count);
 };
