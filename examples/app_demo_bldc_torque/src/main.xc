@@ -93,7 +93,7 @@ int main(void)
 				/* Torque Control Loop */
 				{
 					ctrl_par torque_ctrl_params;
-					hall_par hall_params;
+					HallConfig hall_config;
 					qei_par qei_params;
 
 					/* Initialize PID parameters for Torque Control (defined in config/motor/bldc_motor_config.h) */
@@ -101,12 +101,13 @@ int main(void)
 
 					/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 					init_qei_param(qei_params);
-					init_hall_param(hall_params);
+					init_hall_config(hall_config);
 
 					/* Control Loop */
-					torque_control_service( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
+					torque_control_service( torque_ctrl_params, hall_config, qei_params, SENSOR_USED,
 					        adc_interface, i_commutation[0],  i_hall[1], i_qei[1], i_torque_control);
 				}
+
 			}
 		}
 
@@ -127,17 +128,23 @@ int main(void)
                 watchdog_service(i_watchdog, wd_ports);
 
                 /* Hall Server */
-                hall_service(i_hall, hall_ports); // channel priority 1,2..4
+                {
+                	HallConfig hall_config;
+                	//NEEDS INITIALIZATION
+                	hall_service(i_hall, hall_ports, hall_config);
+            	}
+
 
 				/* Motor Commutation loop */
 				{
-					hall_par hall_params;
+					HallConfig hall_config;
 					qei_par qei_params;
 					commutation_par commutation_params;
-					init_hall_param(hall_params);
+					init_hall_config(hall_config);
 					init_qei_param(qei_params);
+
 					commutation_service(i_hall[0],  i_qei[0], null, i_watchdog, i_commutation, c_pwm_ctrl,
-					        fet_driver_ports, hall_params, qei_params, commutation_params);
+					        fet_driver_ports, hall_config, qei_params, commutation_params);
 				}
 
 				/* QEI Server */

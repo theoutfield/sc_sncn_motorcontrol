@@ -75,13 +75,13 @@ Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interfac
     
                     /* Motor Commutation loop */
                     {
-                        hall_par hall_params;
+                        HallConfig hall_config;
                         qei_par qei_params;
                         commutation_par commutation_params;
                         commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog,  \
                                 c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
                                 p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
-                                hall_params, qei_params, commutation_params);
+                                hall_config, qei_params, commutation_params);
                     }
     
                     /* Watchdog Server */
@@ -89,8 +89,8 @@ Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interfac
     
                     /* Hall Server */
                     {
-                        hall_par hall_params;
-                        run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
+                        HallConfig hall_config;
+                        run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_config); // channel priority 1,2..6
                     }
                 }
             }

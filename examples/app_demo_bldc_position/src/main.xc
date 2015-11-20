@@ -35,13 +35,13 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int deceleration 	= 500;     	// rpm/s
 	int follow_error;
 	timer t;
-	hall_par hall_params;
+	HallConfig hall_config;
 	qei_par qei_params;
 	init_qei_param(qei_params);
-	init_hall_param(hall_params);
+	init_hall_config(hall_config);
 
 	/* Initialise Profile Limits for position profile generator and select position sensor */
-	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_params, \
+	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_config, \
 			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
 
 
@@ -90,18 +90,18 @@ int main(void)
 			/* Position Control Loop */
 			{
 				 ctrl_par position_ctrl_params;
-				 hall_par hall_params;
+				 HallConfig hall_config;
 				 qei_par qei_params;
 
 				 /* Initialize PID parameters for Position Control (defined in config/motor/bldc_motor_config.h) */
 				 init_position_control_param(position_ctrl_params);
 
 				 /* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
-				 init_hall_param(hall_params);
+				 init_hall_config(hall_config);
 				 init_qei_param(qei_params);
 
 				 /* Control Loop */
-				 position_control_service(position_ctrl_params, hall_params, qei_params, SENSOR_USED, i_hall[1],
+				 position_control_service(position_ctrl_params, hall_config, qei_params, SENSOR_USED, i_hall[1],
 				         i_qei[1], i_position_control, commutation_interface[0]);
 			}
 
@@ -120,9 +120,6 @@ int main(void)
                 /* Watchdog Server */
                 watchdog_service(wd_interface, wd_ports);
 
-                /* Hall Server */
-                hall_service(i_hall, hall_ports); // channel priority 1,2..6
-
                 /* QEI Server */
                 {
                     qei_velocity_par qei_velocity_params;
@@ -132,21 +129,26 @@ int main(void)
                     qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
                 }
 
+                {
+                	HallConfig hall_config;
+                	 // NEEDS INITIALIZATION
+                	hall_service(i_hall, hall_ports, hall_config);
+            	}
+
 				/* Motor Commutation loop */
 				{
-					hall_par hall_params;
+					HallConfig hall_config;
 					qei_par qei_params;
 					commutation_par commutation_params;
-					init_hall_param(hall_params);
+					init_hall_config(hall_config);
 					init_qei_param(qei_params);
 
 					commutation_service(i_hall[0], i_qei[0], null, wd_interface, commutation_interface,
-					        c_pwm_ctrl, fet_driver_ports, hall_params, qei_params, commutation_params);
+					        c_pwm_ctrl, fet_driver_ports, hall_config, qei_params, commutation_params);
 				}
-			}
-		}
-
-	}
+            }
+        }
+    }
 
 	return 0;
 }

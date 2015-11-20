@@ -94,7 +94,7 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 [[combinable]]
 void velocity_control_service( ctrl_par & velocity_ctrl_params,
                        filter_par & sensor_filter_params,
-                       hall_par &?hall_params,
+                       HallConfig &?hall_config,
                        qei_par &?qei_params,
                        int sensor_used,
                        interface HallInterface client i_hall,
@@ -140,12 +140,12 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
     if (sensor_used == HALL){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
-            speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_FAST); // variable pole_pairs
+            speed_factor_hall = hall_config.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_FAST); // variable pole_pairs
         }
         else {
-            speed_factor_hall = hall_params.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs
+            speed_factor_hall = hall_config.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs
         }
-        hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
+        hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
     }
     else if (sensor_used == QEI){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
@@ -296,11 +296,11 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
 
             break;
 
-        case i_velocity_control.set_velocity_ctrl_hall_param(hall_par in_params):
+        case i_velocity_control.set_velocity_ctrl_hall_param(HallConfig in_config):
 
-            hall_params.pole_pairs = in_params.pole_pairs;
-            hall_params.max_ticks = in_params.max_ticks;
-            hall_params.max_ticks_per_turn = in_params.max_ticks_per_turn;
+            hall_config.pole_pairs = in_config.pole_pairs;
+            hall_config.max_ticks = in_config.max_ticks;
+            hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
             break;
 
         case i_velocity_control.set_velocity_ctrl_qei_param(qei_par in_params):
@@ -316,8 +316,8 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
         case i_velocity_control.set_velocity_sensor(int in_sensor_used):
 
             if(in_sensor_used == HALL) {
-                speed_factor_hall = hall_params.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
-                hall_crossover = hall_params.max_ticks - hall_params.max_ticks/10;
+                speed_factor_hall = hall_config.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
+                hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
 
             } else if(in_sensor_used == QEI) {
                 speed_factor_qei = qei_params.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);

@@ -11,7 +11,7 @@ TARGET = SOMANET-C22
 APP_NAME = test_hall
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config module_blocks module_board-support module_hall module_motor module_motorcontrol_common
+USED_MODULES = config_motor module_blocks module_board-support module_hall module_motor module_motorcontrol_common
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

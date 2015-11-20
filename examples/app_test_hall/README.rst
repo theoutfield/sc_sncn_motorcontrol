@@ -107,7 +107,7 @@ the Interface Module (IFM), just the tile that provides access to the
 IFM ports can run these functions.
 
 ``on stdcore[IFM_TILE]:`` - **Thread**: Hall Sensor Server
-``hall_par hall_params;     init_hall_param(hall_params);     run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,         c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6``
+``HallConfig hall_config;     init_hall_config(hall_config);     run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5,         c_hall_p6, p_ifm_hall, hall_config); // channel priority 1,2..6``
 The Hall Server captures signal values from the sensors. See more at
 `module\_hall <https://github.com/synapticon/sc_sncn_motorctrl_sin/tree/master/module_hall>`_.
 

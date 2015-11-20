@@ -32,7 +32,7 @@ typedef struct {
     int max_ticks_per_turn;
     int max_ticks;
     int sensor_polarity;
-} hall_par;
+} HallConfig;
 
 
 /**
@@ -57,9 +57,9 @@ interface HallInterface {
 /**
  * @brief initialize hall sensor
  *
- * @param hall_params struct defines the pole-pairs and gear ratio
+ * @param hall_config struct defines the pole-pairs and gear ratio
  */
-void init_hall_param(hall_par & hall_params);
+void init_hall_config(HallConfig & hall_config);
 
 /**
  * @brief A basic hall sensor server
@@ -71,9 +71,10 @@ void init_hall_param(hall_par & hall_params);
  * @param[out] c_hall_p5 the control channel for reading hall position (priority 5)
  * @param[out] c_hall_p6 the control channel for reading hall position (priority 6)
  * @param[in] hall_ports structure containing the ports for reading the hall sensor data
- * @param hall_params structure defines the pole-pairs and gear ratio
+ * @param hall_config structure defines the pole-pairs and gear ratio
  */
 
 [[combinable]]
-void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports);
+void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports, HallConfig & hall_config);
+
 #endif
