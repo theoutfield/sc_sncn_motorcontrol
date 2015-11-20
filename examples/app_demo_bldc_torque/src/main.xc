@@ -17,21 +17,16 @@
 #include <adc_service.h>
 #include <commutation_service.h>
 
-#include <torque_ctrl_server.h>
+#include <torque_ctrl_service.h>
 #include <profile_control.h>
-#include <torque_ctrl_client.h>
 #include <profile.h>
 
 #include <xscope.h>
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
 
-#ifdef DC1K
-port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
-#endif
-
 /* Test Profile Torque Function */
-void profile_torque_test(chanend c_torque_ctrl)
+void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
     delay_seconds(1);
 
@@ -42,22 +37,22 @@ void profile_torque_test(chanend c_torque_ctrl)
     xscope_int(TARGET_TORQUE, target_torque);
 
 	/* Set new target torque for profile torque control */
-	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+	set_profile_torque( target_torque, torque_slope, cst_params, i_torque_control);
 
 	delay_seconds(5);
 
 	target_torque = 0;
 	xscope_int(TARGET_TORQUE, target_torque);
-	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+	set_profile_torque( target_torque, torque_slope, cst_params, i_torque_control);
 
-	target_torque = -1000;
+	target_torque = -500;
 	xscope_int(TARGET_TORQUE, target_torque);
-	set_profile_torque( target_torque, torque_slope, cst_params, c_torque_ctrl);
+	set_profile_torque( target_torque, torque_slope, cst_params, i_torque_control);
 	t:>time;
 
 	while(1)
 	{
-		actual_torque = get_torque(c_torque_ctrl)*cst_params.polarity;
+		actual_torque = i_torque_control.get_torque()*cst_params.polarity;
 
         xscope_int(ACTUAL_TORQUE, actual_torque);
         xscope_int(TARGET_TORQUE, target_torque);
@@ -76,10 +71,7 @@ EncoderPorts encoder_ports = ENCODER_PORTS;
 int main(void)
 {
 	// Motor control channels
-	chan c_adctrig;													// adc channels
-	chan c_signal;	                                                        // commutation channels
-	chan c_pwm_ctrl;														// pwm channel
-	chan c_torque_ctrl;                                 					// torque control channel
+	chan c_adctrig, c_pwm_ctrl;
 
 	interface WatchdogInterface i_watchdog;
     interface CommutationInterface i_commutation[3];
@@ -87,10 +79,12 @@ int main(void)
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
+    interface TorqueControlInterface i_torque_control;
+
 	par
 	{
 		/* Test Profile Torque Function */
-		on tile[0]: profile_torque_test(c_torque_ctrl);
+		on tile[0]: profile_torque_test(i_torque_control);
 
 		on tile[2]:
 		{
@@ -110,8 +104,8 @@ int main(void)
 					init_hall_param(hall_params);
 
 					/* Control Loop */
-					torque_control( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
-					        adc_interface, i_commutation[0],  i_hall[1], i_qei[1], c_torque_ctrl);
+					torque_control_service( torque_ctrl_params, hall_params, qei_params, SENSOR_USED,
+					        adc_interface, i_commutation[0],  i_hall[1], i_qei[1], i_torque_control);
 				}
 			}
 		}
@@ -142,7 +136,7 @@ int main(void)
 					commutation_par commutation_params;
 					init_hall_param(hall_params);
 					init_qei_param(qei_params);
-					commutation_service(i_hall[0],  i_qei[0], c_signal, i_watchdog, i_commutation, c_pwm_ctrl,
+					commutation_service(i_hall[0],  i_qei[0], null, i_watchdog, i_commutation, c_pwm_ctrl,
 					        fet_driver_ports, hall_params, qei_params, commutation_params);
 				}
 

@@ -82,7 +82,7 @@ int main(void) {
     {
 
         on tile[APP_TILE_1]:
-        {   delay_seconds(1);
+        {  // delay_seconds(1);
             /* WARNING: only one blocking task is possible per tile. */
             /* Waiting for a user input blocks other tasks on the same tile from execution. */
             run_offset_tuning(VOLTAGE, commutation_interface[0]);

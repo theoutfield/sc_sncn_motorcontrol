@@ -4,14 +4,13 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <torque_ctrl_server.h>
-#include <torque_ctrl_common.h>
+#include <torque_ctrl_service.h>
 #include <math.h>
 #include <stdlib.h>
 #include <refclk.h>
 #include <xscope.h>
 #include <print.h>
-#include <statemachine.h>
+//#include <statemachine.h>
 #include <drive_modes.h>
 
 //#include <qei_client.h>
@@ -23,9 +22,6 @@
 //#define ENABLE_xscope_torq //don't forget to set up the config.xscope file
 //#define debug_print
 
-#define TORQUE_CTRL_WRITE(x)    c_torque_ctrl <: (x)
-#define TORQUE_CTRL_READ(x)     c_torque_ctrl :> (x)
-
 void init_buffer(int buffer[], int length)
 {
     int i;
@@ -33,6 +29,65 @@ void init_buffer(int buffer[], int length)
         buffer[i] = 0;
     }
     return;
+}
+
+
+void init_torque_control_param(ctrl_par &torque_ctrl_params)
+{
+    torque_ctrl_params.Kp_n = TORQUE_Kp_NUMERATOR;
+    torque_ctrl_params.Kp_d = TORQUE_Kp_DENOMINATOR;
+    torque_ctrl_params.Ki_n = TORQUE_Ki_NUMERATOR;
+    torque_ctrl_params.Ki_d = TORQUE_Ki_DENOMINATOR;
+    torque_ctrl_params.Kd_n = TORQUE_Kd_NUMERATOR;
+    torque_ctrl_params.Kd_d = TORQUE_Kd_DENOMINATOR;
+    torque_ctrl_params.Loop_time = 1 * MSEC_STD; // units - for CORE 2/1/0 only default
+
+    torque_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
+
+    if(torque_ctrl_params.Ki_n != 0) {
+        // auto calculated using control_limit
+        torque_ctrl_params.Integral_limit = (torque_ctrl_params.Control_limit * torque_ctrl_params.Ki_d) / torque_ctrl_params.Ki_n;
+    } else {
+        torque_ctrl_params.Integral_limit = 0;
+    }
+
+    return;
+}
+
+int init_torque_control(interface TorqueControlInterface client i_torque_control)
+{
+    int ctrl_state = INIT_BUSY;
+
+    while (1) {
+        ctrl_state = i_torque_control.check_torque_ctrl_state();
+        if (ctrl_state == INIT_BUSY) {
+            i_torque_control.enable_torque_ctrl();
+        }
+
+        if (ctrl_state == INIT) {
+#ifdef debug_print
+            printstrln("torque control intialized");
+#endif
+            break;
+        }
+    }
+    return ctrl_state;
+}
+
+int torque_limit(int torque, int max_torque_limit)
+{
+    if (torque > max_torque_limit) { //adc range // (5 * DC900_RESOLUTION)/2
+        torque = max_torque_limit;
+    } else if (torque < -max_torque_limit) {
+        torque = -max_torque_limit;
+    }
+    return torque;
+}
+
+void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control)
+{
+    i_torque_control.set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity,
+                              cst_params.max_torque));
 }
 
 void current_filter(interface ADCInterface client adc_if, chanend c_current, chanend c_speed)
@@ -146,9 +201,9 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
 
 
 
-static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params,
+void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params,
                         int sensor_used, chanend c_current, chanend c_speed, interface CommutationInterface client commutation_interface,
-                        interface HallInterface client i_hall, interface QEIInterface client i_qei, chanend c_torque_ctrl)
+                        interface HallInterface client i_hall, interface QEIInterface client i_qei, interface TorqueControlInterface server i_torque_control)
 {
 #define FILTER_LENGTH_TORQUE 80
     int actual_speed = 0;
@@ -224,6 +279,7 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
     while(1) {
 #pragma ordered
         select {
+
         case tc when timerafter(time1) :> void:
             time1 += MSEC_STD - 100;
             if (compute_flag == 1) {
@@ -335,164 +391,158 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
             }
             break;
 
-        case c_torque_ctrl:> command:
-            switch (command) {
-            case TCTRL_CMD_SET_TORQUE:
-                TORQUE_CTRL_READ(target_torque);
+        case i_torque_control.set_torque(int in_torque):
+
+            target_torque = in_torque;
 #ifdef ENABLE_xscope_torq
                 xscope_int(TARGET_TORQUE, target_torque);
 #endif
-                break;
+            break;
 
-            case TCTRL_CMD_GET_TORQUE:
+        case i_torque_control.get_torque() -> int out_torque:
+
                 if (torque_control_output >= 0) {
-                    TORQUE_CTRL_WRITE(actual_torque);
+                    out_torque = actual_torque;
                 } else {
-                    TORQUE_CTRL_WRITE(0-actual_torque);
+                    out_torque = 0-actual_torque;
                 }
+
                 break;
 
-            case CHECK_BUSY:
-                TORQUE_CTRL_WRITE(activate);
+        case i_torque_control.check_busy() -> int out_state:
+
+                out_state = activate;
                 break;
 
-            case SET_CTRL_PARAMETER:
-                TORQUE_CTRL_READ(torque_ctrl_params.Kp_n);
-                TORQUE_CTRL_READ(torque_ctrl_params.Kp_d);
-                TORQUE_CTRL_READ(torque_ctrl_params.Ki_n);
-                TORQUE_CTRL_READ(torque_ctrl_params.Ki_d);
-                TORQUE_CTRL_READ(torque_ctrl_params.Kd_n);
-                TORQUE_CTRL_READ(torque_ctrl_params.Kd_d);
-                TORQUE_CTRL_READ(torque_ctrl_params.Integral_limit);
+        case i_torque_control.set_torque_ctrl_param(ctrl_par in_params):
+
+            torque_ctrl_params.Kp_n = in_params.Kp_n;
+            torque_ctrl_params.Kp_d = in_params.Kp_d;
+            torque_ctrl_params.Ki_n = in_params.Ki_n;
+            torque_ctrl_params.Ki_d = in_params.Ki_d;
+            torque_ctrl_params.Kd_n = in_params.Kd_n;
+            torque_ctrl_params.Kd_d = in_params.Kd_d;
+            torque_ctrl_params.Integral_limit = in_params.Integral_limit;
+
                 break;
 
-            case TCTRL_CMD_SET_HALL:
-                TORQUE_CTRL_READ(hall_params.pole_pairs);
-                TORQUE_CTRL_READ(hall_params.max_ticks);
-                TORQUE_CTRL_READ(hall_params.max_ticks_per_turn);
+        case i_torque_control.set_torque_ctrl_hall_param(hall_par in_params):
 
+            hall_params.pole_pairs = in_params.pole_pairs;
+            hall_params.max_ticks = in_params.max_ticks;
+            hall_params.max_ticks_per_turn = in_params.max_ticks_per_turn;
+
+            filter_length_variance =  filter_length/hall_params.pole_pairs;
+            if (filter_length_variance < 10) {
+                filter_length_variance = 10;
+            }
+
+                break;
+
+        case i_torque_control.set_torque_ctrl_qei_param(qei_par in_params):
+
+           qei_params.index = in_params.index;
+           qei_params.real_counts = in_params.real_counts;
+           qei_params.max_ticks_per_turn = in_params.max_ticks_per_turn;
+           qei_params.poles = in_params.poles;
+           qei_params.max_ticks = in_params.max_ticks;
+
+           qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
+           filter_length_variance =  filter_length/qei_params.poles;
+           if (filter_length_variance < 10) {
+               filter_length_variance = 10;
+           }
+
+                break;
+
+        case i_torque_control.set_torque_sensor(int in_sensor):
+
+            sensor_used = in_sensor;
+
+            if (sensor_used == HALL) {
                 filter_length_variance =  filter_length/hall_params.pole_pairs;
-                if (filter_length_variance < 10) {
+                if (filter_length_variance < 10)
                     filter_length_variance = 10;
-                }
-                break;
-
-            case TCTRL_CMD_SET_QEI:
-                TORQUE_CTRL_READ(qei_params.index);
-                TORQUE_CTRL_READ(qei_params.real_counts);
-                TORQUE_CTRL_READ(qei_params.max_ticks_per_turn);
-                TORQUE_CTRL_READ(qei_params.poles);
-                TORQUE_CTRL_READ(qei_params.max_ticks);
+                target_torque = actual_torque;
+            } else if (sensor_used == QEI) {
                 qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
                 filter_length_variance =  filter_length/qei_params.poles;
-                if (filter_length_variance < 10) {
+                if (filter_length_variance < 10)
                     filter_length_variance = 10;
-                }
-                break;
-
-            case SENSOR_SELECT://sensor select from EtherCAT master
-                TORQUE_CTRL_READ(sensor_used);
-                if (sensor_used == HALL) {
-                    filter_length_variance =  filter_length/hall_params.pole_pairs;
-                    if (filter_length_variance < 10)
-                        filter_length_variance = 10;
-                    target_torque = actual_torque;
-                } else if (sensor_used == QEI) {
-                    qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
-                    filter_length_variance =  filter_length/qei_params.poles;
-                    if (filter_length_variance < 10)
-                        filter_length_variance = 10;
-                    target_torque = actual_torque;
-                }
-                if (!compute_flag)
-                {
-                    enable_adc(c_current);
-                    compute_flag = 1;
-                }
-                break;
-
-            case TCTRL_CMD_ENABLE:
-                TORQUE_CTRL_READ(activate);
-                activate = SET;
-                while (1) {
-                    init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
-                    if (init_state == INIT) {
-#ifdef debug_print
-                        printstrln("commutation intialized");
-#endif
-                        fet_state = commutation_interface.getFetsState(); //check_fet_state(c_commutation);
-                        if (fet_state == 1) {
-                            commutation_interface.enableFets(); //enable_motor(c_commutation);
-                            wait_ms(2, 1, tc);
-                        }
-
-                        if (compute_flag == 0) {
-                            c_current <: 1;
-                            init_state = INIT_BUSY;
-                            while (1) {
-#pragma ordered
-                                select {
-                                case c_current :> command:
-                                    //printstrln("adc calibrated");
-                                    start_flag = 1;
-                                    break;
-                                case c_torque_ctrl :> command:
-                                    if (command == CHECK_BUSY) {
-                                        c_torque_ctrl <: init_state;
-                                    } else if (command == TCTRL_CMD_GET_STATUS) {
-                                        TORQUE_CTRL_WRITE(init_state);
-                                    }
-                                    break;
-                                }
-                                if (start_flag == 1) {
-                                    break;
-                                }
-                            }
-                        }
-
-                        break;
-                    }
-                }
-#ifdef debug_print
-                printstrln("torque control activated");
-#endif
-                break;
-
-            case TCTRL_CMD_SHUTDOWN:
-                TORQUE_CTRL_READ(activate);
-                activate = UNSET;
-                error_torque = 0;
-                error_torque_integral = 0;
-                error_torque_derivative = 0;
-                error_torque_previous = 0;
-                torque_control_output = 0;
-                commutation_interface.setVoltage(0);//set_commutation_sinusoidal(c_commutation, 0);
-                commutation_interface.disableFets(); //disable_motor(c_commutation);
-                wait_ms(30, 1, tc);
-                break;
-
-            case TCTRL_CMD_GET_STATUS:
-                TORQUE_CTRL_WRITE(activate);
-                break;
-
-            default:
-                break;
+                target_torque = actual_torque;
+            }
+            if (!compute_flag)
+            {
+                enable_adc(c_current);
+                compute_flag = 1;
             }
             break;
+
+        case i_torque_control.enable_torque_ctrl():
+
+                activate = SET;
+                  init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
+                  if (init_state == INIT) {
+#ifdef debug_print
+                      printstrln("commutation intialized");
+#endif
+                      fet_state = commutation_interface.getFetsState(); //check_fet_state(c_commutation);
+                      if (fet_state == 1) {
+                          commutation_interface.enableFets(); //enable_motor(c_commutation);
+                          wait_ms(2, 1, tc);
+                      }
+
+                      if (compute_flag == 0) {
+                          init_state = INIT_BUSY;
+                          c_current <: 1;
+                      }
+                  }
+#ifdef debug_print
+              printstrln("torque control activated");
+#endif
+              break;
+
+        case c_current :> command:
+            //printstrln("adc calibrated");
+            start_flag = 1;
+            break;
+
+        case i_torque_control.shutdown_torque_ctrl():
+
+               activate = UNSET;
+               error_torque = 0;
+               error_torque_integral = 0;
+               error_torque_derivative = 0;
+               error_torque_previous = 0;
+               torque_control_output = 0;
+               commutation_interface.setVoltage(0);//set_commutation_sinusoidal(c_commutation, 0);
+               commutation_interface.disableFets(); //disable_motor(c_commutation);
+               wait_ms(30, 1, tc);
+               break;
+
+        case i_torque_control.check_torque_ctrl_state() -> int out_state:
+
+                out_state = activate;
+
+                 break;
         }
     }
 }
 
 /* TODO: do we really need 2 threads for this? */
-void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
-                    int sensor_used, interface ADCInterface client adc_if, interface CommutationInterface client commutation_interface,
-                    interface HallInterface client i_hall, interface QEIInterface client i_qei, chanend c_torque_ctrl)
+void torque_control_service(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
+                    int sensor_used,
+                    interface ADCInterface client adc_if,
+                    interface CommutationInterface client commutation_interface,
+                    interface HallInterface client i_hall,
+                    interface QEIInterface client i_qei,
+                    interface TorqueControlInterface server i_torque_control)
 {
     chan c_current, c_speed;
     par {
         current_filter(adc_if, c_current, c_speed);
         torque_ctrl_loop(torque_ctrl_params, hall_params, qei_params, sensor_used,
-                         c_current, c_speed, commutation_interface, i_hall, i_qei, c_torque_ctrl);
+                         c_current, c_speed, commutation_interface, i_hall, i_qei, i_torque_control);
     }
 }
 
