@@ -101,7 +101,7 @@ int main(void)
 				 init_qei_param(qei_params);
 
 				 /* Control Loop */
-				 position_control(position_ctrl_params, hall_params, qei_params, SENSOR_USED, i_hall[1],
+				 position_control_service(position_ctrl_params, hall_params, qei_params, SENSOR_USED, i_hall[1],
 				         i_qei[1], i_position_control, commutation_interface[0]);
 			}
 
