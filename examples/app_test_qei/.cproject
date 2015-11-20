@@ -88,6 +88,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<option id="com.xmos.xc.compiler.option.defined.symbols.1380515450" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SHRT_MAX__=32767"/>
@@ -624,6 +626,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.76121105" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -980,6 +984,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.28762221" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

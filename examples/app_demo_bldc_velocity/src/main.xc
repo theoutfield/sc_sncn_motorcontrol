@@ -81,21 +81,21 @@ int main(void)
 			{
 				ctrl_par velocity_ctrl_params;
 				filter_par sensor_filter_params;
-				hall_par hall_params;
+				HallConfig hall_config;
 				qei_par qei_params;
 
 				/* Initialize PID parameters for Velocity Control (defined in config/motor/bldc_motor_config.h) */
 				init_velocity_control_param(velocity_ctrl_params);
 
 				/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
-				init_hall_param(hall_params);
+				init_hall_config(hall_config);
 				init_qei_param(qei_params);
 
 				/* Initialize sensor filter length */
 				init_sensor_filter_param(sensor_filter_params);
 
 				/* Control Loop */
-				velocity_control_service(velocity_ctrl_params, sensor_filter_params, hall_params,
+				velocity_control_service(velocity_ctrl_params, sensor_filter_params, hall_config,
 					 qei_params, SENSOR_USED, i_hall[1], i_qei[1], i_velocity_control, commutation_interface[0]);
 			}
 
@@ -115,20 +115,25 @@ int main(void)
 			    watchdog_service(wd_interface, wd_ports);
 
                 /* Hall Server */
-                hall_service(i_hall, hall_ports); // channel priority 1,2..5
+                {
+                	HallConfig hall_config;
+                	 // NEEDS INITIALIZATION
+                	hall_service(i_hall, hall_ports, hall_config);
+            	}
+
 
 				/* Motor Commutation loop */
 				{
-					hall_par hall_params;
+					HallConfig hall_config;
 					qei_par qei_params;
 					commutation_par commutation_params;
 					int init_state;
-					init_hall_param(hall_params);
+					init_hall_config(hall_config);
 					init_qei_param(qei_params);
 					commutation_service(i_hall[0], i_qei[0], null, wd_interface,
 					        commutation_interface, c_pwm_ctrl,
 					        fet_driver_ports,
-							hall_params, qei_params, commutation_params);
+							hall_config, qei_params, commutation_params);
 				}
 
 				/* QEI Server */
