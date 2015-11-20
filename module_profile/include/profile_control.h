@@ -12,6 +12,7 @@
 #include <platform.h>
 #include <position_ctrl_service.h>
 #include <velocity_ctrl_service.h>
+#include <torque_ctrl_service.h>
 
 /**
  * @brief Set profile position with Position Control loop
@@ -58,5 +59,5 @@ void set_profile_velocity( int target_velocity, int acceleration, int decelerati
  *
  */
 void set_profile_torque( int target_torque, int torque_slope,
-                         cst_par & cst_params, chanend c_torque_ctrl );
+                         cst_par & cst_params, interface TorqueControlInterface client i_torque_control );
 
