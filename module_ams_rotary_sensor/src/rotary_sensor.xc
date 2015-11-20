@@ -6,7 +6,7 @@
  */
 
 #include <rotary_sensor.h>
-
+#include <ams_config.h>
 
 
 static char rotarySensorInitialized = 0;
@@ -468,6 +468,18 @@ int writeNumberPolePairs(sensor_spi_interface &sensorInterface, unsigned short d
     return data_in;
 }
 
+ams_config_params_t set_configuration(void){
+    ams_config_params_t config_params;
+    config_params.settings1 = AMS_INIT_SETTINGS1;
+    config_params.settings2 = AMS_INIT_SETTINGS2;
+    config_params.enable_aquisition = ENABLE_INDEPENDANT_AQUISITION;
+    config_params.sensor_placement_offset = SENSOR_PLACEMENT_OFFSET;
+    config_params.resolution_bits = ROTARY_SENSOR_RESOLUTION_BITS;
+    config_params.max_count_ticks_cw = MAX_COUNT_TICKS_CW;
+    config_params.max_count_ticks_ccw = MAX_COUNT_TICKS_CCW;
+    return config_params;
+}
+
 void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_interface &sensor_if){
 
     int n_pole_pairs_ = 0;
@@ -564,8 +576,8 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
                     settings1_ = config_params.settings1;
                     settings2_ = config_params.settings2;
                     offset_ = config_params.sensor_placement_offset;
-                    max_count_ticks_cw_ = 2 * config_params.max_count_ticks_cw;
-                    max_count_ticks_ccw_ = 2 * config_params.max_count_ticks_ccw;
+                    max_count_ticks_cw_ = config_params.max_count_ticks_cw;
+                    max_count_ticks_ccw_ = config_params.max_count_ticks_ccw;
 
                     int result = initRotarySensor(sensor_if,  settings1_,  settings2_, offset_);
 

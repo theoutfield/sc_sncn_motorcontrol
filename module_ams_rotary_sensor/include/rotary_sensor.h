@@ -2,7 +2,7 @@
  * rotary_sensor.h
  *
  *  Created on: Sep 5, 2014
- *      Author: atena
+ *      Author: support@synapticon.com
  */
 
 #pragma once
@@ -44,6 +44,8 @@ interface AMS{
     int get_velocity(void);
     void configure(ams_config_params_t config_params);//ToDo: extend this configuration. Now configures whether reading measuremnts on multiturn position request is required.
 };
+
+ams_config_params_t set_configuration(void);
 
 //#define ROTARY_SENSOR_MAX_ANGLE   16384
 //#define ROTARY_SENSOR_RESOLUTION_BITS 14
