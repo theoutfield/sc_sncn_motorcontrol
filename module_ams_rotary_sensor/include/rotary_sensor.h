@@ -26,16 +26,27 @@ typedef struct sensor_spi_interface
     out port slave_select;
 } sensor_spi_interface;
 
+typedef struct ams_config_params
+{
+    char settings1;
+    char settings2;
+    char enable_aquisition;
+    int sensor_placement_offset;
+    int resolution_bits;
+    int max_count_ticks_cw;
+    int max_count_ticks_ccw;
+} ams_config_params_t;
+
 interface AMS{
     int get_angle_electrical(void);
     {int, int} get_absolute_position_multiturn(void);
     int get_absolute_position_singleturn(void);
     int get_velocity(void);
-    void configure(int);//ToDo: extend this configuration. Now configures whether reading measuremnts on multiturn position request is required.
+    void configure(ams_config_params_t config_params);//ToDo: extend this configuration. Now configures whether reading measuremnts on multiturn position request is required.
 };
 
-#define ROTARY_SENSOR_MAX_ANGLE   16384
-#define ROTARY_SENSOR_RESOLUTION_BITS 14
+//#define ROTARY_SENSOR_MAX_ANGLE   16384
+//#define ROTARY_SENSOR_RESOLUTION_BITS 14
 
 //volatile registers
 #define ADDR_ERRFL      0x0001
@@ -101,4 +112,4 @@ int writeZeroPosition(sensor_spi_interface &sensor_if, unsigned short data);
 int writeNumberPolePairs(sensor_spi_interface &sensor_if, unsigned short data);
 
 //server for commutation and position control applications
-void run_ams_sensor(server interface AMS iAMS[n], unsigned n, int sensor_resolution, sensor_spi_interface &sensor_if, unsigned short settings1, unsigned short settings2, unsigned short offset);
+void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_interface &sensor_if);

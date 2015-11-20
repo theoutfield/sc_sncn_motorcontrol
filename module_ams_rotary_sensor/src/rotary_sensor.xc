@@ -468,82 +468,123 @@ int writeNumberPolePairs(sensor_spi_interface &sensorInterface, unsigned short d
     return data_in;
 }
 
-void run_ams_sensor(server interface AMS iAMS[n], unsigned n, int sensor_resolution_bits, sensor_spi_interface &sensor_if, unsigned short settings1, unsigned short settings2, unsigned short offset){
+void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_interface &sensor_if){
 
-    int n_pole_pairs_ = settings2 + 1;
-    int sensor_resolution_ticks = 1;
+    int n_pole_pairs_ = 0;
+    int sensor_resolution_ticks_ = 1;
+    int sensor_resolution_bits_ = 0;
     int abs_pos_ = 0, abs_pos_previos_ = 0;
+    int settings1_ = 0, settings2_ = 0;
+    int offset_ = 0;
     int enable_aquisition_ = 0;
-    int pos_multiturn = 0;
-
-    int result = initRotarySensor(sensor_if,  settings1,  settings2, offset);
-
-    if (result > 0){
-        printf("*************************************\n    AMS SENSOR SERVER STARTING\n*************************************\n");
-    } else{
-       printf("*************************************\n    AMS SENSOR ERROR!!!\n*************************************\n");
-       exit(-1);
-    }
-
-    sensor_resolution_ticks = sensor_resolution_ticks << sensor_resolution_bits;
-    abs_pos_previos_ = sensor_resolution_ticks - readRotarySensorAngleWithoutCompensation(sensor_if);
-
+    int pos_multiturn_ = 0;
+    int max_count_ticks_cw_ = 0, max_count_ticks_ccw_ = 0;
+    char sensor_initialized_ = 0;
+    char measurement_taken_ = 0;
 
     while(1)
     {
         select{
             case iAMS[int i].get_angle_electrical(void) -> int angle_electrical:
-                    if(settings1 == 5){
-                        abs_pos_ = sensor_resolution_ticks - readRotarySensorAngleWithCompensation(sensor_if);//readRotarySensorAngleWithoutCompensation(sensor_if);
+                    if (sensor_initialized_ == 1){
+                        if(settings1_ == 5){
+                            abs_pos_ = sensor_resolution_ticks_ - readRotarySensorAngleWithCompensation(sensor_if);//readRotarySensorAngleWithoutCompensation(sensor_if);
+                            measurement_taken_ = 1;
+                        }
 
+                        else {
+                            abs_pos_ = readRotarySensorAngleWithCompensation(sensor_if);//readRotarySensorAngleWithoutCompensation(sensor_if);
+                            measurement_taken_ = 1;
+                        }
+
+                        if(sensor_resolution_bits_ > 12){
+                            angle_electrical = (n_pole_pairs_ * abs_pos_ >> (sensor_resolution_bits_ - 12)) % 4096;
+                        }else{
+                            angle_electrical = (n_pole_pairs_ * abs_pos_ >> (12 - sensor_resolution_bits_)) % 4096;
+                        }
+                    } else {
+                        angle_electrical = -1;
                     }
-
-                    else {
-                        abs_pos_ = readRotarySensorAngleWithCompensation(sensor_if);//readRotarySensorAngleWithoutCompensation(sensor_if);
-                    }
-
-                    if(sensor_resolution_bits > 12){
-                        angle_electrical = (n_pole_pairs_ * abs_pos_ >> (sensor_resolution_bits - 12)) % 4096;
-                    }else{
-                        angle_electrical = (n_pole_pairs_ * abs_pos_ >> (12 - sensor_resolution_bits)) % 4096;
-                    }
-
                     break;
             case iAMS[int i].get_absolute_position_multiturn(void)  -> {int position, int direction}:
-
-                    if (enable_aquisition_ == 1){
-                        if(settings1 == 5){
-                            abs_pos_ = sensor_resolution_ticks - readRotarySensorAngleWithoutCompensation(sensor_if);
+                    if (sensor_initialized_ == 1){
+                        if (enable_aquisition_ == 1){
+                            if(settings1_ == 5){
+                                abs_pos_ = sensor_resolution_ticks_ - readRotarySensorAngleWithCompensation(sensor_if);
+                                measurement_taken_ = 1;
+                            }
+                            else {
+                                abs_pos_ = readRotarySensorAngleWithCompensation(sensor_if);
+                                measurement_taken_ = 1;
+                            }
                         }
-                        else {
-                            abs_pos_ = readRotarySensorAngleWithoutCompensation(sensor_if);
+
+                        if (measurement_taken_ == 1){
+                            measurement_taken_ = 0;
+                            if((abs_pos_ - abs_pos_previos_) < -sensor_resolution_ticks_/2){
+                                pos_multiturn_ += sensor_resolution_ticks_ - abs_pos_previos_ + abs_pos_;
+                                direction = 1;
+                            }
+                            else if ((abs_pos_ - abs_pos_previos_) > sensor_resolution_ticks_/2){
+                                pos_multiturn_ += sensor_resolution_ticks_ - abs_pos_ + abs_pos_previos_;
+                                direction = -1;
+                            }
+                            else {
+                                pos_multiturn_ += abs_pos_ - abs_pos_previos_;
+                            }
+
+                            if ((pos_multiturn_ > max_count_ticks_cw_) || (pos_multiturn_ < -max_count_ticks_ccw_)){
+                                pos_multiturn_ = 0;
+                            }
+
+                            position = pos_multiturn_;
+                            abs_pos_previos_ = abs_pos_;
+                        } else {
+                            position = 0x7FFFFFFF;
                         }
-                    }
 
-                    if((abs_pos_ - abs_pos_previos_) < -sensor_resolution_ticks/2){
-                        pos_multiturn += sensor_resolution_ticks - abs_pos_previos_ + abs_pos_;
-                        direction = 1;
+                    } else {
+                        position = 0x7FFFFFFF;
                     }
-                    else if ((abs_pos_ - abs_pos_previos_) > sensor_resolution_ticks/2){
-                        pos_multiturn += sensor_resolution_ticks - abs_pos_ + abs_pos_previos_;
-                        direction = -1;
-                    }
-                    else {
-                        pos_multiturn += abs_pos_ - abs_pos_previos_;
-                    }
-
-                    position = pos_multiturn;
-
-                    abs_pos_previos_ = abs_pos_;
                     break;
             case iAMS[int i].get_velocity(void) -> int velocity:
                     velocity = 0;
                     break;
             case iAMS[int i].get_absolute_position_singleturn(void) -> int position:
-                    position = readRotarySensorAngleWithoutCompensation(sensor_if);
+                    if (sensor_initialized_ == 1){
+                        position = readRotarySensorAngleWithoutCompensation(sensor_if);
+                    } else {
+                        position = 0x7FFFFFFF;
+                    }
                     break;
-            case iAMS[int i].configure(int enable_aquisition):
-                    enable_aquisition_ = enable_aquisition;
+            case iAMS[int i].configure(ams_config_params_t config_params):
+                    enable_aquisition_ = config_params.enable_aquisition;
+                    n_pole_pairs_ = config_params.settings2 + 1;
+                    sensor_resolution_bits_ = config_params.resolution_bits;
+                    settings1_ = config_params.settings1;
+                    settings2_ = config_params.settings2;
+                    offset_ = config_params.sensor_placement_offset;
+                    max_count_ticks_cw_ = 2 * config_params.max_count_ticks_cw;
+                    max_count_ticks_ccw_ = 2 * config_params.max_count_ticks_ccw;
+
+                    int result = initRotarySensor(sensor_if,  settings1_,  settings2_, offset_);
+
+                    if (result > 0){
+                        printf("*************************************\n    AMS SENSOR SERVER STARTED\n*************************************\n");
+                    } else{
+                       printf("*************************************\n    AMS SENSOR SPI ERROR!!!\n*************************************\n");
+                       exit(-1);
+                    }
+
+                    sensor_resolution_ticks_ = sensor_resolution_ticks_ << sensor_resolution_bits_;
+                    if(settings1_ == 5){
+                        abs_pos_previos_ = sensor_resolution_ticks_ - readRotarySensorAngleWithCompensation(sensor_if);
+                    }
+                    else{
+                        abs_pos_previos_ = readRotarySensorAngleWithCompensation(sensor_if);
+                    }
+                    sensor_initialized_ = 1;
+
                     break;
         }
     }

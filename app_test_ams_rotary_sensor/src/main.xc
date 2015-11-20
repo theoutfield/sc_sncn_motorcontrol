@@ -12,6 +12,7 @@
 
 #include <rotary_sensor.h>
 #include <xscope.h>
+#include <bldc_motor_config.h>
 
 #define NUM_OF_AMS_INTERFACES 1
 
@@ -31,30 +32,46 @@ on tile[IFM_TILE]: sensor_spi_interface pRotarySensor =
 
 
 
-#define AMS_INIT_SETTINGS1  1//5    // Factory Setting 1
-                                // NOISESET 0
-                                // DIR      0   (CW)
-                                // UVW_ABI  0
-                                // DAECDIS  0
-                                // ABIBIN   0
-                                // Dataselect 0
-                                // PWMon    0
 
-#define AMS_INIT_SETTINGS2  4    //UVWPP     001 (5)
-                                //HYS       0
-                                //ABIRES    0
 
 /* Test Hall Sensor Client */
 void ams_rotary_sensor_test(client interface AMS iAMS)
 {
+    #define AMS_INIT_SETTINGS1  1//5    // Factory Setting 1
+                                        // NOISESET 0
+                                        // DIR      0   (CW)
+                                        // UVW_ABI  0
+                                        // DAECDIS  0
+                                        // ABIBIN   0
+                                        // Dataselect 0
+                                        // PWMon    0
+
+    #define AMS_INIT_SETTINGS2  4    //UVWPP     001 (5)
+                                     //HYS       0
+                                     //ABIRES    0
+
+    #define ROTARY_SENSOR_RESOLUTION_BITS 14
+
+
     int position = 0;
     int velocity = 0;
     int direction = 0;
     int electrical_angle = 0;
+    ams_config_params_t config_params;
+
+    config_params.settings1 = AMS_INIT_SETTINGS1;
+    config_params.settings2 = AMS_INIT_SETTINGS2;
+    config_params.enable_aquisition = 0;
+    config_params.sensor_placement_offset = 2555;
+    config_params.resolution_bits = ROTARY_SENSOR_RESOLUTION_BITS;
+    config_params.max_count_ticks_cw = 16384*10;//MAX_POSITION_LIMIT;
+    config_params.max_count_ticks_ccw = 16384*10;//MIN_POSITION_LIMIT;
+
+    iAMS.configure(config_params);
 
     while(1)
     {
-       // iAMS.configure(1);
+
         electrical_angle = iAMS.get_angle_electrical();
 
         /* get position from Hall Sensor */
@@ -120,7 +137,7 @@ int main(void)
 //            p_ifm_motor_lo[3] <: 0;
 
             /* AMS Rotary Sensor Server */
-            run_ams_sensor(iAMS, NUM_OF_AMS_INTERFACES, ROTARY_SENSOR_RESOLUTION_BITS, pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);//MOT 3 R3
+            ams_sensor_server(iAMS, NUM_OF_AMS_INTERFACES, pRotarySensor);
 
   //          ams_rotary_sensor_direct_method(pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);
 
