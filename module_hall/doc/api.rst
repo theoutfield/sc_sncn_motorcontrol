@@ -17,4 +17,4 @@ Server API
 Types
 -----
 
-.. doxygenstruct:: hall_par
+.. doxygenstruct:: HallConfig

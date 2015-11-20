@@ -82,7 +82,7 @@ int main(void) {
     {
 
         on tile[APP_TILE_1]:
-        {  // delay_seconds(1);
+        {
             /* WARNING: only one blocking task is possible per tile. */
             /* Waiting for a user input blocks other tasks on the same tile from execution. */
             run_offset_tuning(VOLTAGE, commutation_interface[0]);
@@ -112,19 +112,23 @@ int main(void) {
                 do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Hall Server */
-                hall_service(i_hall, hall_ports); // channel priority 1,2..6
+                {
+                    HallConfig hall_config;
+                    // NEEDS INITIALIZATION
+                    hall_service(i_hall, hall_ports, hall_config);
+                }
 
                 /* Motor Commutation loop */
                 {
-                    hall_par hall_params;
+                    HallConfig hall_config;
                     qei_par qei_params;
                     commutation_par commutation_params;
-                    init_hall_param(hall_params);
+                    init_hall_config(hall_config);
 
                     commutation_service(i_hall[0], null, c_signal,
                             watchdog_interface, commutation_interface, c_pwm_ctrl,
                             fet_driver_ports,
-                            hall_params, qei_params,
+                            hall_config, qei_params,
                             commutation_params);
                 }
 

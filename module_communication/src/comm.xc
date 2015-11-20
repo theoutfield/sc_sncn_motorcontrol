@@ -43,20 +43,20 @@ void send_actual_position(int actual_position, ctrl_proto_values_t &InOut)
     InOut.position_actual = actual_position;
 }
 
-void update_hall_param_ecat(hall_par &hall_params, chanend coe_out)
+void update_hall_config_ecat(HallConfig &hall_config, chanend coe_out)
 {
     int min;
     int max;
 
-    {hall_params.pole_pairs, max, min} = hall_sdo_update(coe_out);
+    {hall_config.pole_pairs, max, min} = hall_sdo_update(coe_out);
 
     min = abs(min);
     max = abs(max);
 
-    hall_params.max_ticks = (max > min) ? max : min;
+    hall_config.max_ticks = (max > min) ? max : min;
 
-    hall_params.max_ticks_per_turn = hall_params.pole_pairs * HALL_POSITION_INTERPOLATED_RANGE;
-    hall_params.max_ticks += hall_params.max_ticks_per_turn;
+    hall_config.max_ticks_per_turn = hall_config.pole_pairs * HALL_POSITION_INTERPOLATED_RANGE;
+    hall_config.max_ticks += hall_config.max_ticks_per_turn;
 }
 
 void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
@@ -199,11 +199,11 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
 }
 
 
-void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par &qei_params,
+void set_commutation_param_ecat(chanend c_signal, HallConfig &hall_config, qei_par &qei_params,
                                 commutation_par &commutation_params, int nominal_speed)
 {
     c_signal <: SET_COMM_PARAM_ECAT;
-    c_signal <: hall_params.pole_pairs;
+    c_signal <: hall_config.pole_pairs;
     c_signal <: qei_params.index;
     c_signal <: qei_params.max_ticks_per_turn;
     c_signal <: qei_params.real_counts;
@@ -213,15 +213,15 @@ void set_commutation_param_ecat(chanend c_signal, hall_par &hall_params, qei_par
     c_signal <: commutation_params.winding_type;
 }
 
-void set_hall_param_ecat(chanend c_hall, hall_par & hall_params)
+void set_hall_conifg_ecat(chanend c_hall, HallConfig & hall_config)
 {
-    c_hall <: SET_HALL_PARAM_ECAT;
-    c_hall <: hall_params.pole_pairs;
-    c_hall <: hall_params.max_ticks;
-    c_hall <: hall_params.max_ticks_per_turn;
+    c_hall <: set_hall_conifg_ecat;
+    c_hall <: hall_config.pole_pairs;
+    c_hall <: hall_config.max_ticks;
+    c_hall <: hall_config.max_ticks_per_turn;
 }
 
-void hall_init_ecat(chanend c_hall, hall_par & hall_params)
+void hall_init_ecat(chanend c_hall, HallConfig & hall_config)
 {
     int command;
     int flag = 0;
@@ -231,10 +231,10 @@ void hall_init_ecat(chanend c_hall, hall_par & hall_params)
         case c_hall :> command:
             if (command == CHECK_BUSY) {
                 c_hall <: INIT_BUSY;
-            } else if (command == SET_HALL_PARAM_ECAT) {
-                c_hall :> hall_params.pole_pairs;
-                c_hall :> hall_params.max_ticks;
-                c_hall :> hall_params.max_ticks_per_turn;
+            } else if (command == set_hall_conifg_ecat) {
+                c_hall :> hall_config.pole_pairs;
+                c_hall :> hall_config.max_ticks;
+                c_hall :> hall_config.max_ticks_per_turn;
                 flag = 1;
             }
             break;

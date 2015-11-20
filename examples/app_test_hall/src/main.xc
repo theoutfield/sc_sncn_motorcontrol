@@ -73,9 +73,14 @@ int main(void)
 
     par
     {
-        on tile[APP_TILE]: hall_test(i_hall[0]);
-        on tile[IFM_TILE]: hall_service(i_hall, hall_ports); // channel priority 1,2..6
+        on tile[APP_TILE]: {
+            hall_test(i_hall[0]);
+        }
 
+        on tile[IFM_TILE]: {
+            HallConfig hall_config;
+            hall_service(i_hall, hall_ports, hall_config);
+        }
     }
 
     return 0;
