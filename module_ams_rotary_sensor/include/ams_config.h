@@ -22,7 +22,7 @@
 
 #define ROTARY_SENSOR_RESOLUTION_BITS 14
 
-#define ENABLE_INDEPENDANT_AQUISITION 0 //0 - disabled, 1 - enabled
+#define ENABLE_INDEPENDENT_AQUISITION 0 //0 - disabled, 1 - enabled
 
 #define SENSOR_PLACEMENT_OFFSET 2555
 

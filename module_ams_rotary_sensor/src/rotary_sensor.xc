@@ -472,7 +472,7 @@ ams_config_params_t set_configuration(void){
     ams_config_params_t config_params;
     config_params.settings1 = AMS_INIT_SETTINGS1;
     config_params.settings2 = AMS_INIT_SETTINGS2;
-    config_params.enable_aquisition = ENABLE_INDEPENDANT_AQUISITION;
+    config_params.enable_aquisition = ENABLE_INDEPENDENT_AQUISITION;
     config_params.sensor_placement_offset = SENSOR_PLACEMENT_OFFSET;
     config_params.resolution_bits = ROTARY_SENSOR_RESOLUTION_BITS;
     config_params.max_count_ticks_cw = MAX_COUNT_TICKS_CW;

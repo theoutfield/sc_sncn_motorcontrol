@@ -81,7 +81,7 @@ case !isnull(c_client) => c_client :> int command:
 */
 
 [[combinable]]
-void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, chanend ? c_watchdog,
+void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface AMS ?i_ams, chanend ?c_signal, chanend ? c_watchdog,
                             chanend ? c_commutation_p1, chanend ? c_commutation_p2,
                             chanend ? c_commutation_p3, chanend c_pwm_ctrl,
                             out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn,
@@ -163,6 +163,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, c
                     if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0)) {
                         angle = get_hall_position(c_hall);
                     }
+                } else if (sensor_select == ABS_AMS && !isnull(i_ams)){
+                    angle = i_ams.get_angle_electrical();
                 }
 
                 if (shutdown == 1) {    /* stop PWM */
@@ -175,6 +177,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, c
                             angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_forward_offset) >> 2) & 0x3ff; //512
+                        } else if (sensor_select == ABS_AMS && !isnull(i_ams)){
+                            angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
                         angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
@@ -186,6 +190,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, chanend ?c_signal, c
                             angle_pwm = ((angle + commutation_params.hall_offset_cclk) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_backward_offset) >> 2) & 0x3ff; //3100
+                        } else if (sensor_select == ABS_AMS && !isnull(i_ams)){
+                            angle_pwm = ((angle + commutation_params.hall_offset_cclk) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
                         angle_pwm = (angle_pwm + 341) & 0x3ff;
