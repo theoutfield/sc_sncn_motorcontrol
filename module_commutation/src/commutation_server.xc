@@ -84,14 +84,14 @@ case !isnull(c_client) => c_client :> int command:
 */
 
 [[combinable]]
-void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_biss ?i_biss,
+void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface i_biss ?i_biss,
                             chanend ?c_signal, chanend ? c_watchdog,
                             chanend ? c_commutation_p1, chanend ? c_commutation_p2,
                             chanend ? c_commutation_p3, chanend c_pwm_ctrl,
                             out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn,
                             port ? p_ifm_ff1, port ? p_ifm_ff2,
                             hall_par & hall_params, qei_par & qei_params,
-                            commutation_par &commutation_params)
+                            commutation_par &commutation_params, int sensor_select)
 {
     const unsigned t_delay = 300*USEC_FAST;
     timer t;
@@ -112,7 +112,6 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
     int bw_flag = 0;
     int nominal_speed;
     int shutdown = 0; //Disable FETS
-    int sensor_select = HALL;
     qei_velocity_par qei_velocity_params;
 
 //    timer t_loop;
@@ -148,6 +147,14 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
         init_state = 1;
     }
 
+    //fallback sensor_select on hall or biss
+    if (sensor_select == BISS && isnull(i_biss))
+        sensor_select = HALL;
+    if (sensor_select == QEI && isnull(c_qei))
+        sensor_select = HALL;
+    if (sensor_select == HALL && isnull(c_hall))
+        sensor_select = BISS;
+
 
     init_qei_velocity_params(qei_velocity_params);
 
@@ -180,7 +187,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
                         if (sensor_select == HALL) {
                             angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
                         } else if (sensor_select == BISS) {
-                            angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
+                            angle_pwm = angle >> 2;
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_forward_offset) >> 2) & 0x3ff; //512
                         }
@@ -193,7 +200,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_b
                         if (sensor_select == HALL) {
                             angle_pwm = ((angle + commutation_params.hall_offset_cclk) >> 2) & 0x3ff;
                         } else if (sensor_select == BISS) {
-                            angle_pwm = ((angle + commutation_params.hall_offset_clk + 2048) >> 2) & 0x3ff;
+                            angle_pwm = ((angle + 2048) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_backward_offset) >> 2) & 0x3ff; //3100
                         }

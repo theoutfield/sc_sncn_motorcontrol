@@ -34,11 +34,11 @@
  *
  */
 [[combinable]]
-void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface i_biss ?i_biss,
+void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface i_biss ?i_biss,
                             chanend ?c_signal, chanend ? c_watchdog,
                             chanend ? c_commutation_p1, chanend ? c_commutation_p2, chanend ? c_commutation_p3, chanend c_pwm_ctrl,
                             out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn, port ? p_ifm_ff1, port ? p_ifm_ff2,
-                            hall_par &hall_params, qei_par & qei_params, commutation_par & commutation_params);
+                            hall_par &hall_params, qei_par & qei_params, commutation_par & commutation_params, int sensor_select);
 
 /**
  * @brief Initialize commutation parameters
