@@ -15,6 +15,7 @@
 #include <drive_modes.h>
 #include <adc_client_ad7949.h>
 #include <qei_client.h>
+#include <biss_client.h>
 #include <sine_table_big.h>
 #include <a4935.h>
 
@@ -148,7 +149,7 @@ void current_filter(chanend c_adc, chanend c_current, chanend c_speed)
 
 static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params, qei_par &qei_params,
                         int sensor_used, chanend c_current, chanend c_speed, chanend c_commutation,
-                        chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
+                        chanend c_hall, chanend c_qei, client interface i_biss ?i_biss, chanend c_torque_ctrl)
 {
 #define FILTER_LENGTH_TORQUE 80
     int actual_speed = 0;
@@ -231,6 +232,9 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
                     angle = (get_hall_position(c_hall) >> 2) & 0x3ff; //  << 10 ) >> 12
                     //xscope_probe_data(0, angle);
                     actual_speed = get_hall_velocity(c_hall);
+                } else if (sensor_used == BISS) {
+                    angle = i_biss.get_angle_electrical() >> 2;
+                    actual_speed = i_biss.get_velocity();
                 } else if (sensor_used == QEI) {
                     { angle, offset_fw_flag, offset_bw_flag } = get_qei_sync_position(c_qei);
                     angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
@@ -482,13 +486,13 @@ static void torque_ctrl_loop(ctrl_par &torque_ctrl_params, hall_par &hall_params
 
 /* TODO: do we really need 2 threads for this? */
 void torque_control(ctrl_par & torque_ctrl_params, hall_par & hall_params, qei_par & qei_params,
-                    int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, chanend c_torque_ctrl)
+                    int sensor_used, chanend c_adc, chanend c_commutation, chanend c_hall, chanend c_qei, client interface i_biss ?i_biss, chanend c_torque_ctrl)
 {
     chan c_current, c_speed;
     par {
         current_filter(c_adc, c_current, c_speed);
         torque_ctrl_loop(torque_ctrl_params, hall_params, qei_params, sensor_used,
-                         c_current, c_speed, c_commutation, c_hall, c_qei, c_torque_ctrl);
+                         c_current, c_speed, c_commutation, c_hall, c_qei, i_biss, c_torque_ctrl);
     }
 }
 

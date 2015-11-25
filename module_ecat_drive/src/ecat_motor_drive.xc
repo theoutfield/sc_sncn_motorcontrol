@@ -12,10 +12,11 @@
 #include <torque_ctrl_client.h>
 #include <hall_server.h>
 #include <qei_server.h>
+#include <biss_client.h>
 #include <hall_config.h>
 #include <qei_config.h>
 #include <profile.h>
-#include <xscope_wrapper.h>
+#include <xscope.h>
 #include <print.h>
 #include <gpio_client.h>
 #include <flash_somanet.h>
@@ -25,15 +26,19 @@
 #include <bldc_motor_init.h>
 
 
-{int, int} static inline get_position_absolute(int sensor_select, chanend c_hall, chanend c_qei)
+{int, int} static inline get_position_absolute(int sensor_select, chanend c_hall, chanend ?c_qei, client interface i_biss ?i_biss)
 {
     int actual_position;
-    int direction;
+    int direction = 0;
 
     if (sensor_select == HALL) {
         {actual_position, direction} = get_hall_position_absolute(c_hall);
+    } else if (sensor_select == BISS) {
+        if (!isnull(i_biss))
+            { actual_position, void, void } = i_biss.get_position();
     } else { /* QEI */
-        {actual_position, direction} = get_qei_position_absolute(c_qei);
+        if (!isnull(c_qei))
+            {actual_position, direction} = get_qei_position_absolute(c_qei);
     }
 
     return {actual_position, direction};
@@ -43,7 +48,7 @@
 //#pragma xta command "set required - 1.0 ms"
 
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,
-                      chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio)
+                      chanend ?c_qei, client interface i_biss ?i_biss, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend ?c_gpio)
 {
     int i = 0;
     int mode = 40;
@@ -94,7 +99,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
     int quick_active = 0;
     int mode_quick_flag = 0;
     int shutdown_ack = 0;
-    int sensor_select = 4;
+    int sensor_select = -1;
 
     int direction;
 
@@ -267,7 +272,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                     mode_quick_flag = 0;
                 }
 
-                {actual_position, sense} = get_position_absolute(sensor_select, c_hall, c_qei);
+                {actual_position, sense} = get_position_absolute(sensor_select, c_hall, c_qei, i_biss);
 
                 t :> c_time;
                 for (int i=0; i<steps; i++) {
@@ -353,12 +358,16 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         limit_switch = 1;
 
                     /* Configuration of GPIO Digital ports follows here */
-                    config_gpio_digital_input(c_gpio, 0, SWITCH_INPUT_TYPE, limit_switch_type);
-                    config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, limit_switch_type);
-                    end_config_gpio(c_gpio);
+                    if (!isnull(c_gpio)) {
+                        config_gpio_digital_input(c_gpio, 0, SWITCH_INPUT_TYPE, limit_switch_type);
+                        config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, limit_switch_type);
+                        end_config_gpio(c_gpio);
+                    }
                     set_hall_param_ecat(c_hall, hall_params);
-                    if (homing_done == 0)
-                        set_qei_param_ecat(c_qei, qei_params);
+                    if (homing_done == 0) {
+                        if (!isnull(c_qei))
+                            set_qei_param_ecat(c_qei, qei_params);
+                    }
                     set_commutation_param_ecat(c_signal, hall_params, qei_params,
                                                commutation_params, nominal_speed);
 
@@ -370,7 +379,11 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
             if (sensor_select == HALL) {
                 actual_velocity = get_hall_velocity(c_hall);
             } else if (sensor_select == QEI) {
-                actual_velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
+                if (!isnull(c_qei))
+                    actual_velocity = get_qei_velocity(c_qei, qei_params, qei_velocity_params);
+            } else if (sensor_select == BISS) {
+                if (!isnull(i_biss))
+                    actual_velocity = i_biss.get_velocity();
             }
             send_actual_velocity(actual_velocity * polarity, InOut);
 
@@ -731,9 +744,17 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                                     set_velocity(velocity_ramp, c_velocity_ctrl);
                                     i++;
                                 }
-                                home_state = read_gpio_digital_input(c_gpio, 0);
-                                safety_state = read_gpio_digital_input(c_gpio, 1);
-                                {capture_position, direction} = get_qei_position_absolute(c_qei);
+                                if (!isnull(c_gpio)) {
+                                    home_state = read_gpio_digital_input(c_gpio, 0);
+                                    safety_state = read_gpio_digital_input(c_gpio, 1);
+                                }
+                                if (sensor_select == BISS) {
+                                    if (!isnull(i_biss))
+                                        { capture_position, void, void } = i_biss.get_position();
+                                } else {
+                                    if (!isnull(c_qei))
+                                        {capture_position, direction} = get_qei_position_absolute(c_qei);
+                                }
 
                                 if ((home_state == 1 || safety_state == 1) && end_state == 0) {
                                     actual_velocity = get_velocity(c_velocity_ctrl);
@@ -747,12 +768,22 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                                 if (end_state == 1 && i >= steps) {
                                     shutdown_velocity_ctrl(c_velocity_ctrl);
                                     if (home_state == 1) {
-                                        {current_position, direction} = get_qei_position_absolute(c_qei);
+                                        if (sensor_select == BISS) {
+                                            if (!isnull(i_biss)) {
+                                                {current_position , void, void } = i_biss.get_position();
+                                                home_offset = current_position - capture_position;
+                                                i_biss.set_count(home_offset);
+                                            }
+                                        } else {
+                                            if (!isnull(c_qei)) {
+                                                {current_position, direction} = get_qei_position_absolute(c_qei);
+                                                home_offset = current_position - capture_position;
+                                                reset_qei_count(c_qei, home_offset); //reset_hall_count(c_hall, home_offset);
+                                            }
+                                        }
                                         //{current_position, direction} = get_hall_position_absolute(c_hall);
                                         //printintln(current_position);
-                                        home_offset = current_position - capture_position;
                                         //printintln(home_offset);
-                                        reset_qei_count(c_qei, home_offset); //reset_hall_count(c_hall, home_offset);
                                         reset_counter = 1;
                                     }
                                 }
@@ -994,7 +1025,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
                     }
                 } else if (op_mode == CSP || op_mode == PP) {
-                    {actual_position, sense} = get_position_absolute(sensor_select, c_hall, c_qei);
+                    {actual_position, sense} = get_position_absolute(sensor_select, c_hall, c_qei, i_biss);
 
                     t :> c_time;
                     while (i < steps) {
@@ -1055,7 +1086,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
             }
 
             /* Read Torque and Position */
-            {actual_position, direction} = get_position_absolute(sensor_select, c_hall, c_qei);
+            {actual_position, direction} = get_position_absolute(sensor_select, c_hall, c_qei, i_biss);
             send_actual_torque( get_torque(c_torque_ctrl) * polarity, InOut );
             send_actual_position(actual_position * polarity, InOut);
             t when timerafter(time + MSEC_STD) :> time;

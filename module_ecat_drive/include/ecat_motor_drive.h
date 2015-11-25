@@ -25,7 +25,7 @@
  *
  */
 void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,
-        chanend c_qei, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend c_gpio);
+        chanend ?c_qei, client interface i_biss ?i_biss, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend ?c_gpio);
 
 int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation);
 

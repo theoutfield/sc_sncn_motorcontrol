@@ -111,7 +111,7 @@ check_list init_checklist(void);
  * @Output
  * @return check_list_param updated checklist parameters
  */
-void update_checklist(check_list & check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
+void update_checklist(check_list & check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend ?c_qei,
                       chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl);
 
 int16_t update_statusword(int current_status, int state_reached, int ack, int q_active, int shutdown_ack);
