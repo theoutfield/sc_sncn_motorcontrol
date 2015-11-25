@@ -11,9 +11,7 @@
 #include <xs1.h>
 #include <refclk.h>
 #include <stdlib.h>
-
 #include <print.h>
-#include <stdio.h>
 
 
 void init_biss_param(biss_par &biss_params) {
@@ -45,10 +43,13 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
 
     unsigned int data[frame_bytes];
     timer t;
-    unsigned int last_biss_read;
     unsigned int time;
+    unsigned int last_biss_read;
+    unsigned int last_count = 0;
+    unsigned int last_position = 0;
     t :> last_biss_read;
-    time = last_biss_read;
+    unsigned int next_velocity_read = last_biss_read;
+    unsigned int last_count_read = last_biss_read;
     int velocity = 0;
     int ticks_per_turn = (1 << biss_params.singleturn_resolution);
     int crossover = ticks_per_turn - ticks_per_turn/10;
@@ -58,7 +59,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
     int old_count = 0;
     int old_difference =0;
     int count_offset = 0;
-    //filter params
+    //filter params  //FIXME remove filter
 //    const int filter_length = 8;
 //    int filter_buffer[8];
 //    for (int i=0; i<filter_length; i++)
@@ -69,7 +70,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
     configure_clock_rate(clk, biss_params.clock_dividend, biss_params.clock_divisor) ; // a/b MHz
     configure_port_clock_output(p_biss_clk, clk);
     set_port_inv(p_biss_clk);
-#if(BISS_DATA_PORT == ENC_CH1)
+#if(BISS_DATA_PORT == ENC_CH1) //FIXME use a normal 1-bit output port
     configure_out_port(p_biss_data, clk, 0b1000); //to configure p_biss_clk as output
 #else
     configure_in_port(p_biss_data, clk);
@@ -80,25 +81,42 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
         [[ordered]]
         select {
         case i_biss[int i].get_angle_electrical() -> unsigned int angle:
-                t when timerafter(last_biss_read + biss_params.timeout) :> void;
-                angle = biss_position_fast(p_biss_clk, p_biss_data, clk, 0, 0, biss_params.multiturn_length, biss_params.singleturn_length);
-                t :> last_biss_read;
+                t :> time;
+                if (timeafter(time, last_biss_read + biss_params.timeout)) {
+                    angle = biss_position_fast(p_biss_clk, p_biss_data, clk, 0, 0, biss_params.multiturn_length, biss_params.singleturn_length);
+                    t :> last_biss_read;
+                    last_position = angle;
+                } else
+                    angle = last_position;
                 if (biss_params.singleturn_resolution > 12)
                     angle = (biss_params.poles * ((angle >> (biss_params.singleturn_resolution-12)) + biss_params.offset_angle) ) & 4095;
                 else
                     angle = (biss_params.poles * ((angle << (12-biss_params.singleturn_resolution)) + biss_params.offset_angle) ) & 4095;
                 break;
         case i_biss[int i].get_position_fast() -> unsigned int position:
-                t when timerafter(last_biss_read + biss_params.timeout) :> void;
-                position = biss_position_fast(p_biss_clk, p_biss_data, clk, 0, 0, biss_params.multiturn_length, biss_params.singleturn_length);
-                t :> last_biss_read;
+                t :> time;
+                if (timeafter(time, last_biss_read + biss_params.timeout)) {
+                    position = biss_position_fast(p_biss_clk, p_biss_data, clk, 0, 0, biss_params.multiturn_length, biss_params.singleturn_length);
+                    t :> last_biss_read;
+                    last_position = position;
+                } else
+                    position = last_position;
                 break;
         case i_biss[int i].get_position() -> { int count, unsigned int position, unsigned int status }:
-                t when timerafter(last_biss_read + biss_params.timeout) :> void;
-                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
-                t :> last_biss_read;
                 int count_internal;
-                { count_internal, position, status } = biss_encoder(data, biss_params);
+                t :> time;
+                if (timeafter(time, last_count_read + biss_params.timeout)) {
+                    t when timerafter(last_biss_read + biss_params.timeout) :> void;
+                    read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                    t :> last_biss_read;
+                    last_count_read = last_biss_read;
+                    { count_internal, position, status } = biss_encoder(data, biss_params);
+                    last_count = count_internal;
+                    last_position = position;
+                } else {
+                    count_internal = last_count;
+                    position = last_position;
+                }
                 count = count_internal + count_offset;
                 if (count < -max_ticks_internal)
                     count = max_ticks_internal + (count % max_ticks_internal);
@@ -114,10 +132,19 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 }
                 break;
         case i_biss[int i].get_real_position() -> { int count, unsigned int position, unsigned int status }:
-                t when timerafter(last_biss_read + biss_params.timeout) :> void;
-                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
-                t :> last_biss_read;
-                { count, position, status } = biss_encoder(data, biss_params);
+                t :> time;
+                if (timeafter(time, last_count_read + biss_params.timeout)) {
+                    t when timerafter(last_biss_read + biss_params.timeout) :> void;
+                    read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                    t :> last_biss_read;
+                    last_count_read = last_biss_read;
+                    { count, position, status } = biss_encoder(data, biss_params);
+                    last_count = count;
+                    last_position = position;
+                } else {
+                    count = last_count;
+                    position = last_position;
+                }
                 break;
         case i_biss[int i].get_velocity() -> int velocity_:
                 if (biss_params.polarity == BISS_POLARITY_NORMAL)
@@ -141,20 +168,30 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 t when timerafter(last_biss_read + biss_params.timeout) :> void;
                 read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
                 t :> last_biss_read;
-                int count;
-                { count, void, void } = biss_encoder(data, biss_params);
+                last_count_read = last_biss_read;
+                int count, position;
+                { count, position, void } = biss_encoder(data, biss_params);
+                last_count = count;
+                last_position = position;
                 if (biss_params.polarity == BISS_POLARITY_NORMAL)
                     count_offset = new_count - count;
                 else
                     count_offset = -new_count - count;
                 break;
-        case t when timerafter(time) :> void:
-            time += velocity_loop;
-            int count;
-            t when timerafter(last_biss_read + biss_params.timeout) :> void;
-            read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
-            t :> last_biss_read;
-            { count, void, void } = biss_encoder(data, biss_params);
+        case t when timerafter(next_velocity_read) :> void:
+            next_velocity_read += velocity_loop;
+            int count, position;
+            t :> time;
+            if (timeafter(time, last_count_read + biss_params.timeout)) {
+                t when timerafter(last_biss_read + biss_params.timeout) :> void;
+                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                t :> last_biss_read;
+                last_count_read = last_biss_read;
+                { count, position, void } = biss_encoder(data, biss_params);
+                last_count = count;
+                last_position = position;
+            } else
+                count = last_count;
             int difference = count - old_count;
             if(difference > crossover || difference < -crossover)
                 difference = old_difference;
@@ -163,7 +200,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
             // simplified version of: velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                                        = ( difference ticks * (60.000.000 us / 256) ) / ( (ticks per turn / 256) * velocity loop time in us)
             //velocity = (filter(filter_buffer, filter_index, filter_length, difference) * 234375) / (velocity_ticks * biss_params.velocity_loop);
-            velocity = (difference * 234375) / (velocity_ticks * biss_params.velocity_loop);
+            velocity = (difference * 234375) / (velocity_ticks * biss_params.velocity_loop); // USEC_FAST is harcoded in this
             break;
         }
     }
@@ -180,7 +217,7 @@ unsigned int biss_position_fast(port out p_biss_clk, port in p_biss_data, clock 
         configure_clock_rate(clk, a, b) ; // a/b MHz
         configure_port_clock_output(p_biss_clk, clk);
         set_port_inv(p_biss_clk);
-#if(BISS_DATA_PORT == ENC_CH1)
+#if(BISS_DATA_PORT == ENC_CH1)//FIXME use a normal 1-bit output port
         configure_out_port(p_biss_data, clk, 0b1000); //to configure p_biss_clk as output
 #else
         configure_in_port(p_biss_data, clk);
@@ -192,7 +229,7 @@ unsigned int biss_position_fast(port out p_biss_clk, port in p_biss_data, clock 
         timeout--;
         unsigned int bit;
         p_biss_data :> bit;
-        bit = (bit & 0b10);
+        bit = (bit & 0b10); //FIXME use a 1-bit input port
         if (status) {
             if (bit) //status = 2, ack and start bit found
                 status++;
@@ -233,7 +270,7 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
         configure_clock_rate(clk, a, b) ; // a/b MHz
         configure_port_clock_output(p_biss_clk, clk);
         set_port_inv(p_biss_clk);
-#if(BISS_DATA_PORT == ENC_CH1)
+#if(BISS_DATA_PORT == ENC_CH1)//FIXME use a normal 1-bit output port
         configure_out_port(p_biss_data, clk, 0b1000); //to configure p_biss_clk as output
 #else
         configure_in_port(p_biss_data, clk);
@@ -251,11 +288,11 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
         }
         unsigned int bit;
         p_biss_data :> bit;
-#if(BISS_DATA_PORT == ENC_CH1)
+#if(BISS_DATA_PORT == ENC_CH1)//FIXME use a normal 1-bit output port
         configure_out_port(p_biss_data, clk, 0b1000); //to reconfigure p_biss_clk as output
 #endif
         readbuf = readbuf << 1;
-        readbuf |= ((bit & 0b10) >> 1);
+        readbuf |= ((bit & 0b10) >> 1); //FIXME use a 1-bit input port
         bitindex++;
     }
     stop_clock(clk);
