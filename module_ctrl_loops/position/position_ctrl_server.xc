@@ -169,7 +169,7 @@ void position_control(ctrl_par &position_ctrl_params, hall_par &hall_params, qei
                 c_position_ctrl :> qei_params.max_ticks_per_turn;
                 break;
 
-            case PCTRL_CMD_SENSOR_SELECT:
+            case SENSOR_SELECT:
                 POSITION_CTRL_READ(sensor_used);
                 if (sensor_used == HALL) {
                     { actual_position, direction }= get_hall_position_absolute(c_hall);
