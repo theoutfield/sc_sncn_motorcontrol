@@ -23,7 +23,7 @@ void init_biss_param(biss_par &biss_params) {
     biss_params.status_length = BISS_STATUS_LENGTH;
     biss_params.crc_poly = BISS_CRC_POLY;
     biss_params.poles = POLE_PAIRS;
-    biss_params.polarity = BISS_SENSOR_POLARITY;
+    biss_params.polarity = QEI_SENSOR_POLARITY; //FIXME BiSS uses same polarity as QEI
     biss_params.clock_dividend = BISS_CLOCK_DIVIDEND;
     biss_params.clock_divisor = BISS_CLOCK_DIVISOR;
     biss_params.timeout = BISS_TIMEOUT;
@@ -122,13 +122,14 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                     count = max_ticks_internal + (count % max_ticks_internal);
                 else if (count >= max_ticks_internal)
                     count = (count % max_ticks_internal) - max_ticks_internal;
-                if (biss_params.polarity == BISS_POLARITY_INVERTED) {
+                if (biss_params.polarity == QEI_POLARITY_INVERTED) {
                     count = -count;
                     position -= ticks_per_turn;
                 }
                 if (count > biss_params.max_ticks || count < -biss_params.max_ticks) {
                     count_offset = -count_internal;
                     count = 0;
+                    status = 0;
                 }
                 break;
         case i_biss[int i].get_real_position() -> { int count, unsigned int position, unsigned int status }:
@@ -144,10 +145,11 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 } else {
                     count = last_count;
                     position = last_position;
+                    status = 0;
                 }
                 break;
         case i_biss[int i].get_velocity() -> int velocity_:
-                if (biss_params.polarity == BISS_POLARITY_NORMAL)
+                if (biss_params.polarity == QEI_POLARITY_NORMAL)
                     velocity_ = velocity;
                 else
                     velocity_ = -velocity;
@@ -173,7 +175,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 { count, position, void } = biss_encoder(data, biss_params);
                 last_count = count;
                 last_position = position;
-                if (biss_params.polarity == BISS_POLARITY_NORMAL)
+                if (biss_params.polarity == QEI_POLARITY_NORMAL)
                     count_offset = new_count - count;
                 else
                     count_offset = -new_count - count;

@@ -79,7 +79,7 @@
     #define MAX_POSITION_LIMIT      POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO*10       // ticks (max range: 2^30, limited for safe operation) qei/hall/any position sensor
     #define MIN_POSITION_LIMIT      -POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO*10      // ticks (min range: -2^30, limited for safe operation) qei/hall/any position sensor
 #endif
-#if(SENSOR_USED == QEI)
+#if(SENSOR_USED == QEI || SENSOR_USED == BISS)
     #define MAX_POSITION_LIMIT      GEAR_RATIO*ENCODER_RESOLUTION*10    // ticks (max range: 2^30, limited for safe operation)
     #define MIN_POSITION_LIMIT      -GEAR_RATIO*ENCODER_RESOLUTION*10   // ticks (min range: -2^30, limited for safe operation)
 #endif
