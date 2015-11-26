@@ -1,8 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 //#include <CORE_C22-rev-a.inc>
 #include <CORE_C21-rev-a.inc>
-//#include <IFM_DC1K-rev-c2.inc>
-#include <IFM_DC100-rev-b.inc>
+#include <IFM_DC1K-rev-c2.inc>
+//#include <IFM_DC100-rev-b.inc>
 
 /**
  * @file app_test_ams_rotary_sensor.xc
@@ -99,17 +99,18 @@ int main(void)
          ************************************************************/
         on tile[IFM_TILE]:
         {
-//            p_ifm_motor_hi[0] <: 0;
-//            p_ifm_motor_hi[1] <: 0;
-//            p_ifm_motor_hi[2] <: 0;
-//
-//            p_ifm_motor_lo[0] <: 0;
-//            p_ifm_motor_lo[1] <: 0;
-//            p_ifm_motor_lo[2] <: 0;
-//
-//            p_ifm_motor_hi[3] <: 0;
-//            p_ifm_motor_lo[3] <: 0;
+#ifdef DC1K
+            p_ifm_motor_hi[0] <: 0;
+            p_ifm_motor_hi[1] <: 0;
+            p_ifm_motor_hi[2] <: 0;
 
+            p_ifm_motor_lo[0] <: 0;
+            p_ifm_motor_lo[1] <: 0;
+            p_ifm_motor_lo[2] <: 0;
+
+            p_ifm_motor_hi[3] <: 0;
+            p_ifm_motor_lo[3] <: 0;
+#endif
             /* AMS Rotary Sensor Server */
 
             ams_sensor_server(iAMS, NUM_OF_AMS_INTERFACES, pRotarySensor);

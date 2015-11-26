@@ -81,7 +81,7 @@ case !isnull(c_client) => c_client :> int command:
 */
 
 [[combinable]]
-void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface AMS ?i_ams, chanend ?c_signal, chanend ? c_watchdog,
+void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AMS ?i_ams, chanend ?c_signal, chanend ? c_watchdog,
                             chanend ? c_commutation_p1, chanend ? c_commutation_p2,
                             chanend ? c_commutation_p3, chanend c_pwm_ctrl,
                             out port ? p_ifm_esf_rstn_pwml_pwmh, port ? p_ifm_coastn,
@@ -108,7 +108,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface AMS
     int bw_flag = 0;
     int nominal_speed;
     int shutdown = 0; //Disable FETS
-    int sensor_select = HALL;
+    int sensor_select = ABS_AMS;//HALL;
     qei_velocity_par qei_velocity_params;
 
     timer t_loop;
@@ -154,7 +154,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface AMS
         select {
 
             case t when timerafter(ts + USEC_FAST*40*COMMUTATION_LOOP_FREQUENCY_KHZ) :> ts: //XX kHz commutation loop
-                if (sensor_select == HALL) {
+                if (sensor_select == HALL && !isnull(c_hall)) {
                     //hall only
                     angle = get_hall_position(c_hall);
                 } else if (sensor_select == QEI && !isnull(c_qei)) {
@@ -165,6 +165,12 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface AMS
                     }
                 } else if (sensor_select == ABS_AMS && !isnull(i_ams)){
                     angle = i_ams.get_angle_electrical();
+                } else {
+                    /* stop PWM */
+                    pwm[0] = -1;
+                    pwm[1] = -1;
+                    pwm[2] = -1;
+                    break;
                 }
 
                 if (shutdown == 1) {    /* stop PWM */
@@ -177,8 +183,8 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface AMS
                             angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_forward_offset) >> 2) & 0x3ff; //512
-                        } else if (sensor_select == ABS_AMS && !isnull(i_ams)){
-                            angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
+                        } else if (sensor_select == ABS_AMS){
+                            angle_pwm = (angle >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
                         angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
@@ -191,7 +197,7 @@ void commutation_sinusoidal(chanend c_hall, chanend ?c_qei, client interface AMS
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_backward_offset) >> 2) & 0x3ff; //3100
                         } else if (sensor_select == ABS_AMS && !isnull(i_ams)){
-                            angle_pwm = ((angle + commutation_params.hall_offset_cclk) >> 2) & 0x3ff;
+                            angle_pwm = ((angle + 2048) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
                         angle_pwm = (angle_pwm + 341) & 0x3ff;
