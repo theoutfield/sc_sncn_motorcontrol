@@ -29,6 +29,15 @@ typedef struct {
 void set_commutation_sinusoidal(chanend c_commutation, int input_voltage);
 
 /**
+ * @brief Sets rotor angle to electrical zero position
+ *
+ * @param[out] c_commutation A chanend connected to commutation server
+ *
+ * @param[in] input_voltage Applied voltage (range: -13739 to 13739, please do not use higher than 500 without necessity)
+ */
+void set_to_zero_angle(chanend c_commutation, int input_voltage);
+
+/**
  * @brief Internal function used to set the commutation parameters
  *
  * @param[out] c_commutation A chanend connected to commutation server

@@ -15,6 +15,13 @@ void set_commutation_sinusoidal(chanend c_commutation, int input_voltage)
     return;
 }
 
+void set_to_zero_angle(chanend c_commutation, int input_voltage)
+{
+    c_commutation <: COMMUTATION_CMD_SET_TO_ZERO_ANGLE;
+    c_commutation <: input_voltage;
+    return;
+}
+
 void set_commutation_params(chanend c_commutation, commutation_par &commutation_params)
 {
     c_commutation <: COMMUTATION_CMD_SET_PARAMS;

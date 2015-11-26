@@ -106,6 +106,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
 
     int fw_flag = 0;
     int bw_flag = 0;
+    int zero_offset_tuning_flag = 0;
     int nominal_speed;
     int shutdown = 0; //Disable FETS
     int sensor_select = ABS_AMS;//HALL;
@@ -156,15 +157,27 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
             case t when timerafter(ts + USEC_FAST*40*COMMUTATION_LOOP_FREQUENCY_KHZ) :> ts: //XX kHz commutation loop
                 if (sensor_select == HALL && !isnull(c_hall)) {
                     //hall only
-                    angle = get_hall_position(c_hall);
-                } else if (sensor_select == QEI && !isnull(c_qei)) {
-                    { angle, fw_flag, bw_flag } = get_qei_sync_position(c_qei);
-                    angle = (angle << 12) / max_count_per_hall;
-                    if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0)) {
+                    if (zero_offset_tuning_flag == 1){
+                        angle = 0;
+                    }else{
                         angle = get_hall_position(c_hall);
                     }
+                } else if (sensor_select == QEI && !isnull(c_qei)) {
+                    if (zero_offset_tuning_flag == 1){
+                        angle = 0;
+                    }else{
+                        { angle, fw_flag, bw_flag } = get_qei_sync_position(c_qei);
+                        angle = (angle << 12) / max_count_per_hall;
+                        if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0)) {
+                            angle = get_hall_position(c_hall);
+                        }
+                    }
                 } else if (sensor_select == ABS_AMS && !isnull(i_ams)){
-                    angle = i_ams.get_angle_electrical();
+                    if (zero_offset_tuning_flag == 1){
+                        angle = 0;
+                    }else{
+                        angle = i_ams.get_angle_electrical();
+                    }
                 } else {
                     /* stop PWM */
                     pwm[0] = -1;
@@ -220,6 +233,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                         if (commutation_params.winding_type == DELTA_WINDING) {
                             voltage = -voltage;
                         }
+                        zero_offset_tuning_flag = 0;
                         break;
 
                     case COMMUTATION_CMD_SET_PARAMS:
@@ -251,6 +265,13 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                         c_commutation_p1 <: shutdown;
                         break;
 
+                    case COMMUTATION_CMD_SET_TO_ZERO_ANGLE:
+                        c_commutation_p1 :> voltage;    //STAR_WINDING
+                        if (commutation_params.winding_type == DELTA_WINDING) {
+                            voltage = -voltage;
+                        }
+                        break;
+
                     default:
                         break;
                 }
@@ -263,6 +284,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                             if (commutation_params.winding_type == DELTA_WINDING) {
                                 voltage = -voltage;
                             }
+                            zero_offset_tuning_flag = 0;
                             break;
 
                         case COMMUTATION_CMD_SET_PARAMS:
@@ -294,6 +316,13 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                             c_commutation_p2 <: shutdown;
                             break;
 
+                        case COMMUTATION_CMD_SET_TO_ZERO_ANGLE:
+                            c_commutation_p1 :> voltage;    //STAR_WINDING
+                            if (commutation_params.winding_type == DELTA_WINDING) {
+                                voltage = -voltage;
+                            }
+                            break;
+
                         default:
                             break;
                     }
@@ -306,6 +335,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                                 if (commutation_params.winding_type == DELTA_WINDING) {
                                     voltage = -voltage;
                                 }
+                                zero_offset_tuning_flag = 0;
                                 break;
 
                             case COMMUTATION_CMD_SET_PARAMS:
@@ -335,6 +365,13 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
 
                             case COMMUTATION_CMD_FETS_STATE:
                                 c_commutation_p3 <: shutdown;
+                                break;
+
+                            case COMMUTATION_CMD_SET_TO_ZERO_ANGLE:
+                                c_commutation_p1 :> voltage;    //STAR_WINDING
+                                if (commutation_params.winding_type == DELTA_WINDING) {
+                                    voltage = -voltage;
+                                }
                                 break;
 
                             default:
