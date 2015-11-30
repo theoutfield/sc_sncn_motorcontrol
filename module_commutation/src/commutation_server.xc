@@ -270,6 +270,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                         if (commutation_params.winding_type == DELTA_WINDING) {
                             voltage = -voltage;
                         }
+                        zero_offset_tuning_flag = 1;
                         break;
 
                     default:
@@ -321,6 +322,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                             if (commutation_params.winding_type == DELTA_WINDING) {
                                 voltage = -voltage;
                             }
+                            zero_offset_tuning_flag = 1;
                             break;
 
                         default:
@@ -372,6 +374,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                                 if (commutation_params.winding_type == DELTA_WINDING) {
                                     voltage = -voltage;
                                 }
+                                zero_offset_tuning_flag = 1;
                                 break;
 
                             default:
