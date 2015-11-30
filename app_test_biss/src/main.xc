@@ -17,7 +17,7 @@
 
 
 on tile[IFM_TILE]: clock clk_biss = XS1_CLKBLK_1 ;
-port p_ifm_ext_d[4] = { GPIO_D0, GPIO_D1, GPIO_D2, GPIO_D3 };
+port out p_ifm_biss_clk = GPIO_D0;
 
 /* Test BiSS Encoder Client */
 void biss_test(client interface i_biss i_biss) {
@@ -70,7 +70,7 @@ int main() {
             /* BiSS server */
             {
                 biss_par biss_params;
-                run_biss(i_biss, 1, p_ifm_ext_d[0], p_ifm_encoder, clk_biss, biss_params, 2);
+                run_biss(i_biss, 1, p_ifm_biss_clk, p_ifm_encoder, clk_biss, biss_params, 2);
             }
         }
     }
