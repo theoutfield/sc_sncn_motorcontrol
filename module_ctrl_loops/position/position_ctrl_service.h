@@ -18,7 +18,7 @@ interface PositionControlInterface{
     int check_busy();
     void set_position(int target_position);
     int get_position();
-    void set_position_ctrl_param(ctrl_par position_ctrl_params);
+    void set_position_ctrl_param(ControlConfig position_ctrl_params);
     void set_position_ctrl_hall_param(int pole_pairs);
     void set_position_ctrl_qei_param(QEIConfig qei_params);
     void set_position_sensor(int sensor_used);
@@ -27,13 +27,6 @@ interface PositionControlInterface{
     int check_position_ctrl_state();
 
 };
-
-/**
- * @brief initialize position control PID params
- *
- * @param position_ctrl_params struct defines position control PID params
- */
-void init_position_control_param(ctrl_par & position_ctrl_params);
 
 /**
  * @brief Initialise Position Control Loop
@@ -93,7 +86,7 @@ void set_position_csp(csp_par & csp_params, int target_position, int position_of
  * @param c_commutation channel to send motor voltage input value
  *
  */
-void position_control_service(ctrl_par & position_ctrl_params, int sensor_used,
+void position_control_service(ControlConfig & position_ctrl_params,
                     interface HallInterface client i_hall,
                     interface QEIInterface client i_qei,
                     interface PositionControlInterface server i_position_control,

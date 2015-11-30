@@ -7,7 +7,7 @@
 #pragma once
 
 #include <mc_constants.h>
-#include <pwm_config.h>
+#include <pwm_cli_common.h>
 
 /* TODO: output of control loops shouldn't (directly) depend on
  * PWM_MAX_VALUE, etc. */

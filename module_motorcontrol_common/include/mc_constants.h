@@ -10,7 +10,6 @@
 //enum { QEI_WITH_NO_INDEX, QEI_WITH_INDEX };
 
 enum { UNSET, SET };
-//enum { ERROR, SUCCESS };
 
 enum { ACTIVE_HIGH=1, ACTIVE_LOW };
 

@@ -11,6 +11,7 @@
 #include <tuning.h>
 #include <hall_service.h>
 #include <hall_config.h>
+#include <commutation_config.h>
 
 #ifdef AD7265
 #include <adc_7265.h>
@@ -50,12 +51,12 @@ void adc_client(client interface ADC i_adc, chanend c_hall_){
 }
 #endif
 
-void adc_client(interface ADCInterface client adc_interface, interface HallInterface client i_hall){
+void adc_client(interface ADCInterface client i_adc, interface HallInterface client i_hall){
 
     while (1) {
         int b, c;
         unsigned state;
-        {b, c} = adc_interface.get_currents();
+        {b, c} = i_adc.get_currents();
         state = i_hall.get_hall_pinstate();
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
@@ -70,9 +71,9 @@ int main(void) {
     chan c_signal; // commutation channels
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
-    interface WatchdogInterface watchdog_interface;
-    interface CommutationInterface commutation_interface[3];
-    interface ADCInterface adc_interface;
+    interface WatchdogInterface i_watchdog;
+    interface CommutationInterface i_commutation[3];
+    interface ADCInterface i_adc;
     interface HallInterface i_hall[5];
 
     #ifdef AD7265
@@ -86,10 +87,10 @@ int main(void) {
         {
             /* WARNING: only one blocking task is possible per tile. */
             /* Waiting for a user input blocks other tasks on the same tile from execution. */
-            run_offset_tuning(VOLTAGE, commutation_interface[0]);
+            run_offset_tuning(VOLTAGE, i_commutation[0]);
         }
 
-        on tile[IFM_TILE]: adc_client(adc_interface, i_hall[1]);
+        on tile[IFM_TILE]: adc_client(i_adc, i_hall[1]);
 
         on tile[IFM_TILE]:
         {
@@ -99,18 +100,18 @@ int main(void) {
 #ifdef AD7265
                 foc_adc_7265_continuous_loop(i_adc, adc_ports);
 #else
-                adc_service(adc_interface, adc_ports, c_adctrig);
+                adc_service(i_adc, adc_ports, c_adctrig);
 #endif
 
                 /* Watchdog Server */
 #ifdef DC1K
                 run_watchdog(c_watchdog, null, p_ifm_led_moton_wdtick_wden);
 #else
-                watchdog_service(watchdog_interface, wd_ports);
+                watchdog_service(i_watchdog, wd_ports);
 #endif
 
                 /* PWM Loop */
-                do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
+                pwm_triggered_service(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Hall Server */
                 {
@@ -122,12 +123,11 @@ int main(void) {
 
                 /* Motor Commutation loop */
                 {
-                    commutation_par commutation_params;
+                    CommutationConfig commutation_config;
+                    init_commutation_config(commutation_config);
 
-                    commutation_service(i_hall[0], null, c_signal,
-                            watchdog_interface, commutation_interface, c_pwm_ctrl,
-                            fet_driver_ports,
-                            commutation_params);
+                    commutation_service(i_hall[0], null, null, i_watchdog, i_commutation,
+                            c_pwm_ctrl, fet_driver_ports, commutation_config);
                 }
 
                 /*Current sampling*/

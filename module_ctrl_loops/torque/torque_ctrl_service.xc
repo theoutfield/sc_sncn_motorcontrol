@@ -18,6 +18,7 @@
 #include <sine_table_big.h>
 #include <a4935.h>
 #include <commutation_service.h>
+#include <bldc_motor_config.h>
 
 //#define ENABLE_xscope_torq //don't forget to set up the config.xscope file
 //#define debug_print
@@ -31,8 +32,8 @@ void init_buffer(int buffer[], int length)
     return;
 }
 
-
-void init_torque_control_param(ctrl_par &torque_ctrl_params)
+/*
+void init_torque_control_param(ControlConfig &torque_ctrl_params)
 {
     torque_ctrl_params.Kp_n = TORQUE_Kp_NUMERATOR;
     torque_ctrl_params.Kp_d = TORQUE_Kp_DENOMINATOR;
@@ -53,7 +54,7 @@ void init_torque_control_param(ctrl_par &torque_ctrl_params)
 
     return;
 }
-
+*/
 int init_torque_control(interface TorqueControlInterface client i_torque_control)
 {
     int ctrl_state = INIT_BUSY;
@@ -202,8 +203,8 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
 
 
 
-void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEIConfig &qei_params,
-                        int sensor_used, chanend c_current, chanend c_speed,
+void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config, QEIConfig &qei_params,
+                        chanend c_current, chanend c_speed,
                         interface CommutationInterface client commutation_interface,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
@@ -272,7 +273,7 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEI
         filter_length_variance = 10;
     }
 
-    if (sensor_used == QEI)
+    if (torque_ctrl_params.sensor_used == QEI)
         qei_counts_per_hall= qei_params.real_counts/ hall_config.pole_pairs;
 
     //init_buffer(buffer_Id, filter_length);
@@ -289,11 +290,11 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEI
         case tc when timerafter(time1) :> void:
             time1 += MSEC_STD - 100;
             if (compute_flag == 1) {
-                if (sensor_used == HALL) {
+                if (torque_ctrl_params.sensor_used == HALL) {
                     angle = (i_hall.get_hall_position() >> 2) & 0x3ff; //  << 10 ) >> 12 //get_hall_position(c_hall)
                     //xscope_probe_data(0, angle);
                     actual_speed = i_hall.get_hall_velocity();//get_hall_velocity(c_hall);
-                } else if (sensor_used == QEI) {
+                } else if (torque_ctrl_params.sensor_used == QEI) {
                     { angle, offset_fw_flag, offset_bw_flag } = i_qei.get_qei_sync_position();
                     angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
                     //{qei_count_velocity, qei_direction_velocity} = get_qei_position_absolute(c_qei);
@@ -420,7 +421,7 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEI
                 out_state = activate;
                 break;
 
-        case i_torque_control.set_torque_ctrl_param(ctrl_par in_params):
+        case i_torque_control.set_torque_ctrl_param(ControlConfig in_params):
 
             torque_ctrl_params.Kp_n = in_params.Kp_n;
             torque_ctrl_params.Kp_d = in_params.Kp_d;
@@ -463,14 +464,14 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEI
 
         case i_torque_control.set_torque_sensor(int in_sensor):
 
-            sensor_used = in_sensor;
+            torque_ctrl_params.sensor_used = in_sensor;
 
-            if (sensor_used == HALL) {
+            if (torque_ctrl_params.sensor_used == HALL) {
                 filter_length_variance =  filter_length/hall_config.pole_pairs;
                 if (filter_length_variance < 10)
                     filter_length_variance = 10;
                 target_torque = actual_torque;
-            } else if (sensor_used == QEI) {
+            } else if (torque_ctrl_params.sensor_used == QEI) {
                 qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
                 filter_length_variance =  filter_length/qei_params.poles;
                 if (filter_length_variance < 10)
@@ -535,7 +536,7 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEI
 }
 
 /* TODO: do we really need 2 threads for this? */
-void torque_control_service(ctrl_par &torque_ctrl_params, int sensor_used,
+void torque_control_service(ControlConfig &torque_ctrl_params,
                     interface ADCInterface client adc_if,
                     interface CommutationInterface client commutation_interface,
                     interface HallInterface client i_hall,
@@ -546,15 +547,15 @@ void torque_control_service(ctrl_par &torque_ctrl_params, int sensor_used,
     HallConfig hall_config = i_hall.getHallConfig();
 
     QEIConfig qei_config;
-    if(sensor_used == QEI && !isnull(i_qei)){
+    if(torque_ctrl_params.sensor_used == QEI && !isnull(i_qei)){
         qei_config = i_qei.getQEIConfig();
     }
 
 
     par {
         current_filter(adc_if, c_current, c_speed);
-        torque_ctrl_loop(torque_ctrl_params, hall_config, qei_config, sensor_used,
-                         c_current, c_speed, commutation_interface, i_hall, i_qei, i_torque_control);
+        torque_ctrl_loop(torque_ctrl_params, hall_config, qei_config, c_current,
+                c_speed, commutation_interface, i_hall, i_qei, i_torque_control);
 
     }
 }

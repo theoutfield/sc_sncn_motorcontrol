@@ -15,4 +15,5 @@ typedef struct {
     int Integral_limit;
     int Control_limit;
     int Loop_time;
-} ctrl_par;
+    int sensor_used;
+} ControlConfig;

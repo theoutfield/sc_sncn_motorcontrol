@@ -20,34 +20,6 @@
 #include <brushed_dc_client.h>
 #endif
 
-//#define DEBUG
-//#define debug_print
-
-//#define POSITION_CTRL_WRITE(x)  c_position_ctrl <: (x)
-//#define POSITION_CTRL_READ(x)   c_position_ctrl :> (x)
-
-void init_position_control_param(ctrl_par &position_ctrl_params)
-{
-    position_ctrl_params.Kp_n = POSITION_Kp_NUMERATOR;
-    position_ctrl_params.Kp_d = POSITION_Kp_DENOMINATOR;
-    position_ctrl_params.Ki_n = POSITION_Ki_NUMERATOR;
-    position_ctrl_params.Ki_d = POSITION_Ki_DENOMINATOR;
-    position_ctrl_params.Kd_n = POSITION_Kd_NUMERATOR;
-    position_ctrl_params.Kd_d = POSITION_Kd_DENOMINATOR;
-    position_ctrl_params.Loop_time = 1 * MSEC_STD; // units - for CORE 2/1/0 only default
-
-    position_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
-
-    if(position_ctrl_params.Ki_n != 0) // auto calculated using control_limit
-    {
-        position_ctrl_params.Integral_limit = position_ctrl_params.Control_limit * (position_ctrl_params.Ki_d/position_ctrl_params.Ki_n);
-    } else {
-        position_ctrl_params.Integral_limit = 0;
-    }
-
-    return;
-}
-
 int init_position_control(interface PositionControlInterface client i_position_control)
 {
     int ctrl_state = INIT_BUSY;
@@ -87,9 +59,11 @@ void set_position_csp( csp_par & csp_params, int target_position, int position_o
 }
 
 
-void position_control_service(ctrl_par &position_ctrl_params, int sensor_used,
-                      interface HallInterface client i_hall, interface QEIInterface client i_qei,
-                      interface PositionControlInterface server i_position_control, interface CommutationInterface client commutation_interface)
+void position_control_service(ControlConfig &position_ctrl_params,
+                                interface HallInterface client i_hall,
+                                interface QEIInterface client i_qei,
+                                interface PositionControlInterface server i_position_control,
+                                interface CommutationInterface client commutation_interface)
 {
     int actual_position = 0;
     int target_position = 0;
@@ -113,10 +87,10 @@ void position_control_service(ctrl_par &position_ctrl_params, int sensor_used,
 
     //printstrln("start pos");
 
-    if (sensor_used == HALL) {
+    if (position_ctrl_params.sensor_used == HALL) {
         { actual_position, direction } = i_hall.get_hall_position_absolute();// get_hall_position_absolute(c_hall);
         target_position = actual_position;
-    } else if (sensor_used == QEI) {
+    } else if (position_ctrl_params.sensor_used == QEI) {
         {actual_position, direction} = i_qei.get_qei_position_absolute();
         target_position = actual_position;
     }
@@ -136,7 +110,7 @@ void position_control_service(ctrl_par &position_ctrl_params, int sensor_used,
             time += position_ctrl_params.Loop_time;
             if (activate == 1) {
                 /* acquire actual position hall/qei/sensor */
-                switch (sensor_used) {
+                switch (position_ctrl_params.sensor_used) {
                 case HALL:
                 { actual_position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                 break;
@@ -206,7 +180,7 @@ void position_control_service(ctrl_par &position_ctrl_params, int sensor_used,
                 out_activate = activate;
                 break;
 
-        case i_position_control.set_position_ctrl_param(ctrl_par in_params):
+        case i_position_control.set_position_ctrl_param(ControlConfig in_params):
 
             position_ctrl_params.Kp_n = in_params.Kp_n;
             position_ctrl_params.Kp_d = in_params.Kp_d;
@@ -232,8 +206,10 @@ void position_control_service(ctrl_par &position_ctrl_params, int sensor_used,
 
         case i_position_control.set_position_sensor(int in_sensor_used):
 
+            position_ctrl_params.sensor_used = in_sensor_used;
+
             if (in_sensor_used == HALL) {
-                { actual_position, direction }= i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                { actual_position, direction }= i_hall.get_hall_position_absolute();
             } else if (in_sensor_used == QEI) {
                 { actual_position, direction } = i_qei.get_qei_position_absolute();
             }
