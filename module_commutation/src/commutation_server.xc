@@ -199,6 +199,8 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface i_
                     } else { /* voltage < 0 */
                         if (sensor_select == HALL) {
                             angle_pwm = ((angle + commutation_params.hall_offset_cclk) >> 2) & 0x3ff;
+                            //hall commutation with only one offset: we need to shift the angle by half a turn + 1 one step of hall sensor
+                            //angle_pwm = ((angle + commutation_params.hall_offset_clk + (2048 + HALL_POSITION_INTERPOLATED_RANGE/6)) >> 2) & 0x3ff; //HALL_POSITION_INTERPOLATED_RANGE/6 = 682 is one step of the hall sensor
                         } else if (sensor_select == BISS) {
                             angle_pwm = ((angle + 2048) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI) {
