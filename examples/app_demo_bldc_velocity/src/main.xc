@@ -63,7 +63,7 @@ void profile_velocity_test(interface VelocityControlInterface client i_velocity_
 int main(void)
 {
 	// Motor control channels
-	chan c_pwm_ctrl, c_adctrig;							// pwm channels
+	chan c_pwm_ctrl;     // pwm channel
 
 	interface WatchdogInterface i_watchdog;
     interface CommutationInterface i_commutation[3];
