@@ -13,7 +13,7 @@
 
 #include <hall_service.h>
 #include <qei_service.h>
-#include <pwm_service_inv.h>
+#include <pwm_service.h>
 #include <adc_service.h>
 #include <commutation_service.h>
 
@@ -26,6 +26,8 @@
 #include <bldc_motor_config.h>
 #include <qei_config.h>
 #include <hall_config.h>
+#include <commutation_config.h>
+#include <control_config.h>
 
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
@@ -90,19 +92,15 @@ int main(void)
 
 		on tile[APP_TILE]:
 		{
-			par
-			{
-                /* Torque Control Loop */
-                {
-                    ctrl_par torque_ctrl_params;
-                    init_torque_control_param(torque_ctrl_params);  /* Initialize PID parameters for Torque Control (defined in config/motor/bldc_motor_config.h) */
+        /* Torque Control Loop */
 
-                    /* Control Loop */
-                    torque_control_service( torque_ctrl_params, SENSOR_USED, adc_interface, i_commutation[0],  i_hall[1], i_qei[1], i_torque_control);
-                }
+            ControlConfig torque_ctrl_params;
+            init_torque_control_config(torque_ctrl_params);  /* Initialize PID parameters for Torque Control (defined in config/motor/bldc_motor_config.h) */
 
-			}
-		}
+            /* Control Loop */
+            torque_control_service( torque_ctrl_params, adc_interface, i_commutation[0],  i_hall[1], i_qei[1], i_torque_control);
+        }
+
 
 		/************************************************************
 		 * IFM_TILE
@@ -115,7 +113,7 @@ int main(void)
 			    adc_service(adc_interface, adc_ports, c_adctrig);
 
 				/* PWM Loop */
-				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, pwm_ports);
+				pwm_triggered_service(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Watchdog Server */
                 watchdog_service(i_watchdog, wd_ports);
@@ -127,23 +125,22 @@ int main(void)
                     hall_service(i_hall, hall_ports, hall_config);
                 }
 
-
-				/* Motor Commutation loop */
-				{
-					commutation_par commutation_params;
-
-					commutation_service(i_hall[0],  i_qei[0], null, i_watchdog, i_commutation, c_pwm_ctrl,
-					        fet_driver_ports, commutation_params);
-				}
-
-				/* QEI Server */
-				{
+                /* QEI Server */
+                {
                     QEIConfig qei_config;
                     init_qei_config(qei_config);
 
                     qei_service(i_qei, encoder_ports, qei_config);         // channel priority 1,2..6
-				}
+                }
 
+				/* Motor Commutation loop */
+                {
+                    CommutationConfig commutation_config;
+                    init_commutation_config(commutation_config);
+
+                    commutation_service(i_hall[0], i_qei[0], null, i_watchdog, i_commutation,
+                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                }
 			}
 		}
 

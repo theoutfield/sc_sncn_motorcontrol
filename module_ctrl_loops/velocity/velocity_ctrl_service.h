@@ -17,7 +17,7 @@ interface VelocityControlInterface{
     int check_velocity_ctrl_state();
     void set_velocity(int target_velocity);
     int get_velocity();
-    void set_velocity_ctrl_param(ctrl_par velocity_ctrl_params);
+    void set_velocity_ctrl_param(ControlConfig velocity_ctrl_params);
     void set_velocity_filter(int in_length);
     void set_velocity_ctrl_hall_param(HallConfig hall_config);
     void set_velocity_ctrl_qei_param(QEIConfig qei_params);
@@ -25,14 +25,6 @@ interface VelocityControlInterface{
     void enable_velocity_ctrl();
     void shutdown_velocity_ctrl();
 };
-
-
-/**
- * @brief Initialise velocity control PID params
- *
- * @param velocity_ctrl_params struct defines velocity control PID params
- */
-void init_velocity_control_param(ctrl_par &velocity_ctrl_params);
 
 /**
  * @brief Initialise Velocity Control Loop
@@ -89,9 +81,8 @@ void set_velocity_csv(csv_par & csv_params, int target_velocity,
  *
  */
 [[combinable]]
-void velocity_control_service(ctrl_par & velocity_ctrl_params,
+void velocity_control_service(ControlConfig & velocity_ctrl_params,
                         filter_par & sensor_filter_params,
-                        int sensor_used,
                         interface HallInterface client i_hall,
                         interface QEIInterface client ?i_qei,
                         interface VelocityControlInterface server i_velocity_control,

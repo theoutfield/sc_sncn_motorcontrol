@@ -9,7 +9,10 @@
 #include <watchdog_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
-#include <bldc_motor_config.h>
+
+
+#define ERROR 0
+#define SUCCESS 1
 
 typedef struct {
     port ?p_coast;
@@ -26,12 +29,13 @@ typedef struct {
     int hall_offset_clk;
     int hall_offset_cclk;
     int winding_type;
-} commutation_par;
+    int commutation_loop_freq;
+} CommutationConfig;
 
 interface CommutationInterface{
     int checkBusy();
     void setVoltage(int voltage);
-    void setParameters(commutation_par parameters);
+    void setParameters(CommutationConfig parameters);
     void setSensor(int sensor);
     void disableFets();
     void enableFets();
@@ -63,15 +67,4 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
                             interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
-                            commutation_par & commutation_params);
-
-/**
- * @brief Initialize commutation parameters
- *
- * @param commutation_params struct defines the commutation angle parameters
- * @param hall_config struct defines the pole-pairs and gear ratio
- * @param nominal_speed is the rated speed for the motor given on specs sheet
- */
-void init_commutation_param(commutation_par &commutation_params, HallConfig &hall_config, int nominal_speed);
-
-
+                            CommutationConfig &commutation_params);

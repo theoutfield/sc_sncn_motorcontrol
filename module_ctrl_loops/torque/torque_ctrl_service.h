@@ -20,7 +20,7 @@ interface TorqueControlInterface{
     int check_torque_ctrl_state();
     int get_torque();
     void set_torque(int in_torque);
-    void set_torque_ctrl_param(ctrl_par torque_ctrl_params);
+    void set_torque_ctrl_param(ControlConfig torque_ctrl_params);
     void set_torque_ctrl_hall_param(HallConfig hall_config);
     void set_torque_ctrl_qei_param(QEIConfig qei_params);
     void set_torque_sensor(int sensor_used);
@@ -34,7 +34,7 @@ interface TorqueControlInterface{
  *
  * @param torque_ctrl_params struct defines torque control PID params
  */
-void init_torque_control_param(ctrl_par &torque_ctrl_params);
+//void init_torque_control_param(ControlConfig &torque_ctrl_params);
 
 /**
  * @brief Initialise Torque Control Loop
@@ -88,12 +88,12 @@ void set_torque_cst(cst_par & cst_params, int target_torque, int torque_offset, 
  * @param c_commutation channel to send motor voltage input value
  *
  */
-void torque_control_service(ctrl_par &torque_ctrl_params, int sensor_used,
-        interface ADCInterface client adc_if,
-        interface CommutationInterface client commutation_interface,
-        interface HallInterface client i_hall,
-        interface QEIInterface client ?i_qei,
-        interface TorqueControlInterface server i_torque_control);
+void torque_control_service(ControlConfig &torque_ctrl_params,
+                            interface ADCInterface client adc_if,
+                            interface CommutationInterface client commutation_interface,
+                            interface HallInterface client i_hall,
+                            interface QEIInterface client ?i_qei,
+                            interface TorqueControlInterface server i_torque_control);
 
 
 /**

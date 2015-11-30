@@ -11,7 +11,7 @@
 
 #include <platform.h>
 #include <commutation_service.h>
-#include <pwm_service_inv.h>
+#include <pwm_service.h>
 #include <refclk.h>
 //#include <drive_modes.h>
 //#include <statemachine.h>
