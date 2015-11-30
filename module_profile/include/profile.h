@@ -80,7 +80,7 @@ extern int velocity_profile_generate(int step);
  * @param max_velocity for the position profile
  *
  */
-extern void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params, \
+extern void init_position_profile_limits(int max_acceleration, int max_velocity, QEIConfig qei_params, \
                                          HallConfig hall_config, int sensor_select, int max_position, int min_position);
 
 /**
@@ -215,7 +215,7 @@ typedef struct
 
     float q;                    // position profile
 
-    qei_par qei_params;
+    QEIConfig qei_params;
     HallConfig hall_config;
     int sensor_used;
     float max_position;

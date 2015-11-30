@@ -6,7 +6,9 @@
 
 #pragma once
 
-//#include <qei_config.h>
+#define ERROR                    0
+#define SUCCESS                  1
+
 #define FILTER_LENGTH_QEI        8
 #define FILTER_LENGTH_QEI_PWM    8
 
@@ -21,6 +23,9 @@
 #define SET_OFFSET               6
 #define QEI_RESET_COUNT          7
 
+enum QEI_Polarity{ QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1}; /* Encoder polarity */
+enum QEI_Type{ QEI_WITH_NO_INDEX = 0, QEI_WITH_INDEX = 1}; /* Encoder type */
+
 /**
  * @brief struct definition for quadrature sensor
  */
@@ -31,11 +36,12 @@ typedef struct {
     int index;          // no_index - 0 index - 1
     int poles;
     int sensor_polarity;
-} qei_par;
+} QEIConfig;
 
 /**
  * @brief struct definition for velocity calculation from qei sensor
  */
+/*
 typedef struct QEI_VELOCITY_PARAM
 {
     int previous_position;
@@ -44,7 +50,7 @@ typedef struct QEI_VELOCITY_PARAM
     int index;
     int filter_length;
 } qei_velocity_par;
-
+*/
 
 /**
  * @brief Internal function to calculate QEI position information
@@ -63,7 +69,7 @@ extern int __qei_max_counts(int real_counts);
 typedef struct {
     port ?p_qei_config;
     port p_qei;
-} EncoderPorts;
+} QEIPorts;
 
 interface QEIInterface{
 
@@ -83,16 +89,18 @@ interface QEIInterface{
  * @param qei_params struct defines the resolution for quadrature encoder (QEI),
  *          gear-ratio, poles, encoder type
  */
+/*
 void init_qei_param(qei_par & qei_params);
-
+*/
 /**
  * @brief Initialize struct for velocity calculation from QEI sensor
  *
  * @param qei_velocity_params  struct is initialised
  */
+/*
 void init_qei_velocity_params(qei_velocity_par &qei_velocity_params);
-
-int calculate_qei_velocity(int count, qei_par &qei_config, qei_velocity_par &qei_velocity_params);
+*/
+//int calculate_qei_velocity(int count, qei_config &qei_config, qei_velocity_par &qei_velocity_params);
 /**
  * @brief Implementation of the QEI server thread (for sensor with index/no index)
  *
@@ -106,6 +114,6 @@ int calculate_qei_velocity(int count, qei_par &qei_config, qei_velocity_par &qei
  * @param qei_params the structure defines sensor type and resolution parameters for qei
  */
 void qei_service(interface QEIInterface server i_qei[5],
-             EncoderPorts & encoder_ports, qei_par qei_config, qei_velocity_par qei_velocity_params);
+             QEIPorts & encoder_ports, QEIConfig qei_config);
 
 #endif

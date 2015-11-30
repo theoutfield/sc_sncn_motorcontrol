@@ -202,7 +202,7 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
 
 
 
-void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, qei_par &qei_params,
+void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEIConfig &qei_params,
                         int sensor_used, chanend c_current, chanend c_speed,
                         interface CommutationInterface client commutation_interface,
                         interface HallInterface client i_hall,
@@ -443,7 +443,7 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, qei
 
                 break;
 
-        case i_torque_control.set_torque_ctrl_qei_param(qei_par in_params):
+        case i_torque_control.set_torque_ctrl_qei_param(QEIConfig in_params):
 
            qei_params.index = in_params.index;
            qei_params.real_counts = in_params.real_counts;
@@ -533,7 +533,7 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, qei
 }
 
 /* TODO: do we really need 2 threads for this? */
-void torque_control_service(ctrl_par & torque_ctrl_params, HallConfig & hall_config, qei_par & qei_params,
+void torque_control_service(ctrl_par & torque_ctrl_params, HallConfig & hall_config, QEIConfig & qei_params,
                     int sensor_used,
                     interface ADCInterface client adc_if,
                     interface CommutationInterface client commutation_interface,

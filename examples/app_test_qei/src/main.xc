@@ -9,11 +9,13 @@
  */
 
 #include <print.h>
-#include <qei_service.h>
 #include <refclk.h>
 #include <xscope.h>
 
-EncoderPorts encoder_ports = ENCODER_PORTS;
+#include <qei_service.h>
+#include <qei_config.h>
+
+QEIPorts encoder_ports = ENCODER_PORTS;
 
 /* Test QEI Sensor Client */
 void qei_test(interface QEIInterface client i_qei)
@@ -24,11 +26,6 @@ void qei_test(interface QEIInterface client i_qei)
 	int core_id = 1;
 	int count=0;
 	timer t;
-
-    qei_velocity_par qei_velocity_params;
-    qei_par qei_config;
-    init_qei_velocity_params(qei_velocity_params);
-    init_qei_param(qei_config);
 
 	while(1)
 	{
@@ -66,11 +63,10 @@ int main(void)
 
 			/* QEI Server Loop */
 			{
-			    qei_velocity_par qei_velocity_params;
-			    qei_par qei_config;
-			    init_qei_velocity_params(qei_velocity_params);
+			    QEIConfig qei_config;
+			    init_qei_config(qei_config);
 
-				qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);  		// channel priority 1,2..6
+				qei_service(i_qei, encoder_ports, qei_config);  		// channel priority 1,2..6
 			}
 		}
 	}

@@ -95,7 +95,7 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 void velocity_control_service( ctrl_par & velocity_ctrl_params,
                        filter_par & sensor_filter_params,
                        HallConfig &?hall_config,
-                       qei_par &?qei_params,
+                       QEIConfig &?qei_params,
                        int sensor_used,
                        interface HallInterface client i_hall,
                        interface QEIInterface client i_qei,
@@ -303,7 +303,7 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
             hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
             break;
 
-        case i_velocity_control.set_velocity_ctrl_qei_param(qei_par in_params):
+        case i_velocity_control.set_velocity_ctrl_qei_param(QEIConfig in_params):
 
             qei_params.max_ticks = in_params.max_ticks;
             qei_params.index = in_params.index;

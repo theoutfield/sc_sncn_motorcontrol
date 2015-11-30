@@ -24,6 +24,7 @@
 
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
+#include <qei_config.h>
 
 /* Test Profile Position function */
 void position_profile_test(interface PositionControlInterface client i_position_control, interface QEIInterface client i_qei)
@@ -36,8 +37,8 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int follow_error;
 	timer t;
 	HallConfig hall_config;
-	qei_par qei_params;
-	init_qei_param(qei_params);
+	QEIConfig qei_params;
+	init_qei_config(qei_params);
 	init_hall_config(hall_config);
 
 	/* Initialise Profile Limits for position profile generator and select position sensor */
@@ -66,7 +67,7 @@ PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 HallPorts hall_ports = HALL_PORTS;
-EncoderPorts encoder_ports = ENCODER_PORTS;
+QEIPorts encoder_ports = ENCODER_PORTS;
 
 int main(void)
 {
@@ -91,17 +92,17 @@ int main(void)
 			{
 				 ctrl_par position_ctrl_params;
 				 HallConfig hall_config;
-				 qei_par qei_params;
+				 QEIConfig qei_config;
 
 				 /* Initialize PID parameters for Position Control (defined in config/motor/bldc_motor_config.h) */
 				 init_position_control_param(position_ctrl_params);
 
 				 /* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 				 init_hall_config(hall_config);
-				 init_qei_param(qei_params);
+				 init_qei_config(qei_config);
 
 				 /* Control Loop */
-				 position_control_service(position_ctrl_params, hall_config, qei_params, SENSOR_USED, i_hall[1],
+				 position_control_service(position_ctrl_params, hall_config, qei_config, SENSOR_USED, i_hall[1],
 				         i_qei[1], i_position_control, commutation_interface[0]);
 			}
 
@@ -120,13 +121,12 @@ int main(void)
                 /* Watchdog Server */
                 watchdog_service(wd_interface, wd_ports);
 
-                /* QEI Server */
+                /* QEI Service */
                 {
-                    qei_velocity_par qei_velocity_params;
-                    qei_par qei_config;
-                    init_qei_velocity_params(qei_velocity_params);
+                    QEIConfig qei_config;
+                    init_qei_config(qei_config);
 
-                    qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
+                    qei_service(i_qei, encoder_ports, qei_config);         // channel priority 1,2..6
                 }
 
                 {
@@ -138,10 +138,10 @@ int main(void)
 				/* Motor Commutation loop */
 				{
 					HallConfig hall_config;
-					qei_par qei_params;
+					QEIConfig qei_params;
 					commutation_par commutation_params;
 					init_hall_config(hall_config);
-					init_qei_param(qei_params);
+					init_qei_config(qei_params);
 
 					commutation_service(i_hall[0], i_qei[0], null, wd_interface, commutation_interface,
 					        c_pwm_ctrl, fet_driver_ports, hall_config, qei_params, commutation_params);
