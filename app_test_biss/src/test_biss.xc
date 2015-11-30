@@ -1,9 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IMF_BOARD_REQUIRED" WIT A APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-//#include <CORE_BOARD_REQUIRED>
-//#include <IFM_BOARD_REQUIRED>
-#include <CORE_C22-rev-a.inc>
-//#include <IFM_A1-rev-a.inc>
-#include <IFM_DC100-rev-b.inc>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 /**
  * @file test_biss.xc
@@ -20,6 +17,7 @@
 
 
 on tile[IFM_TILE]: clock clk_biss = XS1_CLKBLK_1 ;
+port p_ifm_ext_d[4] = { GPIO_D0, GPIO_D1, GPIO_D2, GPIO_D3 };
 
 /* Test BiSS Encoder Client */
 void biss_test(client interface i_biss i_biss) {
@@ -70,16 +68,11 @@ int main() {
          ************************************************************/
         on tile[IFM_TILE]: {
             /* BiSS server */
-            biss_par biss_params;
-
-#if(BISS_DATA_PORT == ENC_CH1)
-            run_biss(i_biss, qei_q_ch1, p_ifm_encoder_ch1, clk_biss, 10, 1, biss_params, 2);
-#else
-//            p_ifm_encoder_ch1 <: 0b1000;
-//            run_biss(i_biss, qei_q_ch1, p_ifm_encoder_ch2, clk_biss, 10, 1, biss_params, 2);
-            run_biss(i_biss, 1, p_ifm_ext_d[0], p_ifm_encoder, clk_biss, biss_params, 2);
+            {
+                biss_par biss_params;
+                run_biss(i_biss, 1, p_ifm_ext_d[0], p_ifm_encoder, clk_biss, biss_params, 2);
+            }
         }
-#endif
     }
     return 0;
 }
