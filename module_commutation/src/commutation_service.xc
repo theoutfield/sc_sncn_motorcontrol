@@ -34,7 +34,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 void commutation_service(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
                             interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
-                            FetDriverPorts &fet_driver_ports, HallConfig & hall_config,
+                            FetDriverPorts &fet_driver_ports,
                             commutation_par &commutation_params)
 {
     const unsigned t_delay = 300*USEC_FAST;
@@ -49,13 +49,15 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
     int angle = 0;
     int voltage = 0;
     int pwm_half = PWM_MAX_VALUE>>1;
-    QEIConfig qei_params;
+    QEIConfig qei_config;
+    HallConfig hall_config = i_hall.getHallConfig();
+
 
     if(!isnull(i_qei)){
-        qei_params = i_qei.getQEIConfig();
+        qei_config = i_qei.getQEIConfig();
     }
 
-    int max_count_per_hall = qei_params.real_counts/hall_config.pole_pairs;
+    int max_count_per_hall = qei_config.real_counts/hall_config.pole_pairs;
     int angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
 
     int fw_flag = 0;
@@ -205,9 +207,9 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
                     c_signal <: init_state;
                 } else if (command == SET_COMM_PARAM_ECAT) {
                     c_signal :> hall_config.pole_pairs;
-                    c_signal :> qei_params.index;
-                    c_signal :> qei_params.max_ticks_per_turn;
-                    c_signal :> qei_params.real_counts;
+                    c_signal :> qei_config.index;
+                    c_signal :> qei_config.max_ticks_per_turn;
+                    c_signal :> qei_config.real_counts;
                     c_signal :> nominal_speed;
                     c_signal :> commutation_params.hall_offset_clk;
                     c_signal :> commutation_params.hall_offset_cclk;
@@ -221,7 +223,7 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
                     commutation_params.qei_forward_offset = 0;
                     commutation_params.qei_backward_offset = 0;
                     voltage = 0;
-                    max_count_per_hall = qei_params.real_counts / hall_config.pole_pairs;
+                    max_count_per_hall = qei_config.real_counts / hall_config.pole_pairs;
                     angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
                     fw_flag = 0;
                     bw_flag = 0;

@@ -25,6 +25,7 @@
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
 #include <qei_config.h>
+#include <hall_config.h>
 
 /* Test Profile Position function */
 void position_profile_test(interface PositionControlInterface client i_position_control, interface QEIInterface client i_qei)
@@ -36,6 +37,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int deceleration 	= 500;     	// rpm/s
 	int follow_error;
 	timer t;
+
 	HallConfig hall_config;
 	QEIConfig qei_params;
 	init_qei_config(qei_params);
@@ -86,26 +88,6 @@ int main(void)
 		/* Test Profile Position Client function*/
 		on tile[APP_TILE_1]: position_profile_test(i_position_control, i_qei[2]);      // test PPM on slave side
 
-		on tile[APP_TILE_1]:
-		{
-			/* Position Control Loop */
-			{
-				 ctrl_par position_ctrl_params;
-				 HallConfig hall_config;
-
-				 /* Initialize PID parameters for Position Control (defined in config/motor/bldc_motor_config.h) */
-				 init_position_control_param(position_ctrl_params);
-
-				 /* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
-				 init_hall_config(hall_config);
-
-				 /* Control Loop */
-				 position_control_service(position_ctrl_params, hall_config, SENSOR_USED, i_hall[1],
-				         i_qei[1], i_position_control, commutation_interface[0]);
-			}
-
-		}
-
 		/************************************************************
 		 * IFM_TILE
 		 ************************************************************/
@@ -129,19 +111,29 @@ int main(void)
 
                 {
                 	HallConfig hall_config;
-                	 // NEEDS INITIALIZATION
+                	init_hall_config(hall_config);
+
                 	hall_service(i_hall, hall_ports, hall_config);
             	}
 
 				/* Motor Commutation loop */
 				{
-					HallConfig hall_config;
-					commutation_par commutation_params;
-					init_hall_config(hall_config);
+
+				    commutation_par commutation_params;
 
 					commutation_service(i_hall[0], i_qei[0], null, wd_interface, commutation_interface,
-					        c_pwm_ctrl, fet_driver_ports, hall_config, commutation_params);
+					        c_pwm_ctrl, fet_driver_ports, commutation_params);
 				}
+
+                /* Position Control Loop */
+                {
+                     ctrl_par position_ctrl_params;
+                     init_position_control_param(position_ctrl_params);  /* Initialize PID parameters for Position Control (defined in config/motor/bldc_motor_config.h) */
+
+                     /* Control Loop */
+                     position_control_service(position_ctrl_params, SENSOR_USED, i_hall[1],
+                                                 i_qei[1], i_position_control, commutation_interface[0]);
+                }
             }
         }
     }

@@ -94,11 +94,9 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 [[combinable]]
 void velocity_control_service( ctrl_par & velocity_ctrl_params,
                        filter_par & sensor_filter_params,
-                       HallConfig &?hall_config,
-                       QEIConfig &?qei_params,
                        int sensor_used,
                        interface HallInterface client i_hall,
-                       interface QEIInterface client i_qei,
+                       interface QEIInterface client ?i_qei,
                        interface VelocityControlInterface server i_velocity_control,
                        interface CommutationInterface client commutation_interface )
 {
@@ -137,6 +135,13 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
     int compute_flag = 0;
     int fet_state = 0;
 
+    HallConfig hall_config = i_hall.getHallConfig();
+    QEIConfig qei_config;
+
+    if(sensor_used == QEI && !isnull(i_qei)){
+        qei_config = i_qei.getQEIConfig();
+    }
+
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
     if (sensor_used == HALL){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
@@ -149,12 +154,12 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
     }
     else if (sensor_used == QEI){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
-            speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_FAST);       // variable qei_real_max
+            speed_factor_qei = qei_config.real_counts*(velocity_ctrl_params.Loop_time/MSEC_FAST);       // variable qei_real_max
         }
         else {
-            speed_factor_qei = qei_params.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);       // variable qei_real_max
+            speed_factor_qei = qei_config.real_counts*(velocity_ctrl_params.Loop_time/MSEC_STD);       // variable qei_real_max
         }
-        qei_crossover = qei_params.real_counts - qei_params.real_counts/10;
+        qei_crossover = qei_config.real_counts - qei_config.real_counts/10;
     }
 
     printf("*************************************\n    VELOCITY CONTROLLER STARTING\n*************************************\n");
@@ -305,11 +310,11 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
 
         case i_velocity_control.set_velocity_ctrl_qei_param(QEIConfig in_params):
 
-            qei_params.max_ticks = in_params.max_ticks;
-            qei_params.index = in_params.index;
-            qei_params.real_counts = in_params.real_counts;
-            qei_params.max_ticks_per_turn = in_params.max_ticks_per_turn;
-            qei_params.poles = in_params.poles;
+            qei_config.max_ticks = in_params.max_ticks;
+            qei_config.index = in_params.index;
+            qei_config.real_counts = in_params.real_counts;
+            qei_config.max_ticks_per_turn = in_params.max_ticks_per_turn;
+            qei_config.poles = in_params.poles;
 
             break;
 
@@ -320,8 +325,8 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
                 hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
 
             } else if(in_sensor_used == QEI) {
-                speed_factor_qei = qei_params.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
-                qei_crossover = qei_params.max_ticks - qei_params.max_ticks/10;
+                speed_factor_qei = qei_config.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
+                qei_crossover = qei_config.max_ticks - qei_config.max_ticks/10;
 
             }
             target_velocity = actual_velocity;

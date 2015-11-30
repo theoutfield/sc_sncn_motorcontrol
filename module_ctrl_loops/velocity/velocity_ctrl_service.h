@@ -91,11 +91,9 @@ void set_velocity_csv(csv_par & csv_params, int target_velocity,
 [[combinable]]
 void velocity_control_service(ctrl_par & velocity_ctrl_params,
                         filter_par & sensor_filter_params,
-                        HallConfig &?hall_config,
-                        QEIConfig &?qei_params,
                         int sensor_used,
                         interface HallInterface client i_hall,
-                        interface QEIInterface client i_qei,
+                        interface QEIInterface client ?i_qei,
                         interface VelocityControlInterface server i_velocity_control,
                         interface CommutationInterface client commutation_interface);
 
