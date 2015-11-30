@@ -128,16 +128,12 @@ int main(void)
 					HallConfig hall_config;
 					init_hall_config(hall_config);
 
-					QEIConfig qei_params;
-					init_qei_config(qei_params);
-
 					commutation_par commutation_params;
-					int init_state;
 
 					commutation_service(i_hall[0], i_qei[0], null, wd_interface,
 					        commutation_interface, c_pwm_ctrl,
 					        fet_driver_ports,
-							hall_config, qei_params, commutation_params);
+							hall_config, commutation_params);
 				}
 
 				/* QEI Server */

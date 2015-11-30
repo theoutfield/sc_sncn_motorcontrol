@@ -79,6 +79,7 @@ interface QEIInterface{
     int get_qei_velocity();
     void set_qei_sync_offset(int, int);
     void reset_qei_count(int offset);
+    QEIConfig getQEIConfig();
 
 };
 

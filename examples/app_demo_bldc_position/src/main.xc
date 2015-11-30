@@ -92,17 +92,15 @@ int main(void)
 			{
 				 ctrl_par position_ctrl_params;
 				 HallConfig hall_config;
-				 QEIConfig qei_config;
 
 				 /* Initialize PID parameters for Position Control (defined in config/motor/bldc_motor_config.h) */
 				 init_position_control_param(position_ctrl_params);
 
 				 /* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 				 init_hall_config(hall_config);
-				 init_qei_config(qei_config);
 
 				 /* Control Loop */
-				 position_control_service(position_ctrl_params, hall_config, qei_config, SENSOR_USED, i_hall[1],
+				 position_control_service(position_ctrl_params, hall_config, SENSOR_USED, i_hall[1],
 				         i_qei[1], i_position_control, commutation_interface[0]);
 			}
 
@@ -138,13 +136,11 @@ int main(void)
 				/* Motor Commutation loop */
 				{
 					HallConfig hall_config;
-					QEIConfig qei_params;
 					commutation_par commutation_params;
 					init_hall_config(hall_config);
-					init_qei_config(qei_params);
 
 					commutation_service(i_hall[0], i_qei[0], null, wd_interface, commutation_interface,
-					        c_pwm_ctrl, fet_driver_ports, hall_config, qei_params, commutation_params);
+					        c_pwm_ctrl, fet_driver_ports, hall_config, commutation_params);
 				}
             }
         }

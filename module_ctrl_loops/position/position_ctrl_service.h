@@ -93,7 +93,7 @@ void set_position_csp(csp_par & csp_params, int target_position, int position_of
  * @param c_commutation channel to send motor voltage input value
  *
  */
-void position_control_service(ctrl_par & position_ctrl_params, HallConfig & hall_config, QEIConfig & qei_params, int sensor_used,
+void position_control_service(ctrl_par & position_ctrl_params, HallConfig & hall_config, int sensor_used,
                     interface HallInterface client i_hall,
                     interface QEIInterface client i_qei,
                     interface PositionControlInterface server i_position_control,
