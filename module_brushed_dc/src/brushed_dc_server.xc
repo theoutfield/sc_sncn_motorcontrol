@@ -9,8 +9,8 @@
 #include <pwm_cli_inv.h>
 #include <a4935.h>
 #include <sine_table_big.h>
-#include <adc_client_ad7949.h>
-#include <hall_client.h>
+//#include <adc_client_ad7949.h>
+#include <hall_service.h>
 #include <refclk.h>
 #include <qei_client.h>
 #include <brushed_dc_common.h>
@@ -122,7 +122,7 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
 }
 
 
-void bdc_loop(chanend c_watchdog, chanend c_commutation,
+void bdc_loop(interface WatchdogInterface server i_watchdog, chanend c_commutation,
               chanend c_pwm_ctrl,
               out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2)
 {
@@ -138,7 +138,8 @@ void bdc_loop(chanend c_watchdog, chanend c_commutation,
     // enable watchdog
     t :> ts;
     t when timerafter (ts + 250000*4):> ts;
-    watchdog_start(c_watchdog);
+    i_watchdog.start();
+    //watchdog_start(c_watchdog);
 
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;

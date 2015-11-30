@@ -28,7 +28,7 @@
  *
  */
 void set_profile_position( int target_position, int velocity, int acceleration, int deceleration,
-                           int sensor_select, interface PositionControlInterface client i_position_control );
+                           interface PositionControlInterface client i_position_control );
 
 /**
  * @brief Set profile velocity with Velocity Control loop

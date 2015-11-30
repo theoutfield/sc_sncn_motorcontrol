@@ -83,9 +83,16 @@ void position_control_service(ControlConfig &position_ctrl_params,
     int fet_state = 0;
     int init_state = INIT_BUSY; /* check commutation init */
 
-    printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
+    HallConfig hall_config;
+    QEIConfig qei_config;
 
-    //printstrln("start pos");
+    if(position_ctrl_params.sensor_used == HALL){
+        hall_config = i_hall.getHallConfig();
+    } else if(position_ctrl_params.sensor_used >= QEI){
+        qei_config = i_qei.getQEIConfig();
+    }
+
+    printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
 
     if (position_ctrl_params.sensor_used == HALL) {
         { actual_position, direction } = i_hall.get_hall_position_absolute();// get_hall_position_absolute(c_hall);
@@ -267,8 +274,20 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
                 break;
 
-            }
+        case i_position_control.getControlConfig() ->  ControlConfig out_config:
 
+                out_config = position_ctrl_params;
+                break;
+        case i_position_control.getHallConfig() -> HallConfig out_config:
+
+                out_config = hall_config;
+                break;
+        case i_position_control.getQEIConfig() -> QEIConfig out_config:
+
+                out_config = qei_config;
+                break;
+
+        }
         }
 
     }
