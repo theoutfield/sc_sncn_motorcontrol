@@ -63,7 +63,7 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
                             interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
-                            HallConfig &hall_config, QEIConfig & qei_params, commutation_par & commutation_params);
+                            HallConfig &hall_config, commutation_par & commutation_params);
 
 /**
  * @brief Initialize commutation parameters

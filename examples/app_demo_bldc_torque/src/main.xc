@@ -137,13 +137,11 @@ int main(void)
 				/* Motor Commutation loop */
 				{
 					HallConfig hall_config;
-					QEIConfig qei_params;
 					commutation_par commutation_params;
 					init_hall_config(hall_config);
-					init_qei_config(qei_params);
 
 					commutation_service(i_hall[0],  i_qei[0], null, i_watchdog, i_commutation, c_pwm_ctrl,
-					        fet_driver_ports, hall_config, qei_params, commutation_params);
+					        fet_driver_ports, hall_config, commutation_params);
 				}
 
 				/* QEI Server */
