@@ -31,22 +31,22 @@ void run_offset_tuning(int input_voltage, interface CommutationInterface client 
         if (input_voltage > 0)
         {        //star winding
             if (WINDING_TYPE == 1) {
-                commutation_par params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
+                CommutationConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
                 commutation_interface.setParameters(params);
             }
             else {
-                commutation_par params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
+                CommutationConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
                 commutation_interface.setParameters(params);
             }
         }
         else
         {
             if (WINDING_TYPE == 1){
-                commutation_par params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
+                CommutationConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
                 commutation_interface.setParameters(params);
             }
             else{
-                commutation_par params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
+                CommutationConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
                 commutation_interface.setParameters(params);
             }
         }

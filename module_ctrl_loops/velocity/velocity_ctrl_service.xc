@@ -20,40 +20,6 @@
 #include <brushed_dc_client.h>
 #endif
 
-//#define Debug_velocity_ctrl  //don't forget to set up the config.xscope file
-//#define debug_print
-
-//#define VELOCITY_CTRL_WRITE(x)  c_velocity_ctrl <: (x)
-//#define VELOCITY_CTRL_READ(x)   c_velocity_ctrl :> (x)
-
-void init_velocity_control_param(ctrl_par & velocity_ctrl_params)
-{
-    velocity_ctrl_params.Kp_n = VELOCITY_Kp_NUMERATOR;
-    velocity_ctrl_params.Kp_d = VELOCITY_Kp_DENOMINATOR;
-    velocity_ctrl_params.Ki_n = VELOCITY_Ki_NUMERATOR;
-    velocity_ctrl_params.Ki_d = VELOCITY_Ki_DENOMINATOR;
-    velocity_ctrl_params.Kd_n = VELOCITY_Kd_NUMERATOR;
-    velocity_ctrl_params.Kd_d = VELOCITY_Kd_DENOMINATOR;
-    if (velocity_ctrl_params.Loop_time != MSEC_FAST)////FixMe: implement reference clock check
-        velocity_ctrl_params.Loop_time = 1 * MSEC_STD; // units - core timer value //CORE 2/1/0 default
-
-    if (MOTOR_TYPE == BDC) {
-        velocity_ctrl_params.Control_limit = BDC_PWM_CONTROL_LIMIT; // PWM resolution
-    }
-    else {
-        velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
-    }
-
-    if(velocity_ctrl_params.Ki_n != 0) {
-        // auto calculated using control_limit
-        velocity_ctrl_params.Integral_limit = velocity_ctrl_params.Control_limit * (velocity_ctrl_params.Ki_d/velocity_ctrl_params.Ki_n) ;
-    } else {
-        velocity_ctrl_params.Integral_limit = 0;
-    }
-
-    return;
-}
-
 int init_velocity_control(interface VelocityControlInterface client i_velocity_control)
 {
     int ctrl_state = INIT_BUSY;
@@ -92,9 +58,8 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 }
 
 [[combinable]]
-void velocity_control_service( ctrl_par & velocity_ctrl_params,
+void velocity_control_service(ControlConfig &velocity_ctrl_params,
                        filter_par & sensor_filter_params,
-                       int sensor_used,
                        interface HallInterface client i_hall,
                        interface QEIInterface client ?i_qei,
                        interface VelocityControlInterface server i_velocity_control,
@@ -138,12 +103,12 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
     HallConfig hall_config = i_hall.getHallConfig();
     QEIConfig qei_config;
 
-    if(sensor_used == QEI && !isnull(i_qei)){
+    if(velocity_ctrl_params.sensor_used == QEI && !isnull(i_qei)){
         qei_config = i_qei.getQEIConfig();
     }
 
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
-    if (sensor_used == HALL){
+    if (velocity_ctrl_params.sensor_used == HALL){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
             speed_factor_hall = hall_config.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_FAST); // variable pole_pairs
         }
@@ -152,7 +117,7 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
         }
         hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
     }
-    else if (sensor_used == QEI){
+    else if (velocity_ctrl_params.sensor_used == QEI){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
             speed_factor_qei = qei_config.real_counts*(velocity_ctrl_params.Loop_time/MSEC_FAST);       // variable qei_real_max
         }
@@ -176,7 +141,7 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
             time += velocity_ctrl_params.Loop_time;
             if (compute_flag == 1) {
                 /* calculate actual velocity from hall/qei with filter*/
-                if (sensor_used == HALL) {
+                if (velocity_ctrl_params.sensor_used == HALL) {
                     if (init == 0) {
                         { position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                         if (position > 2049) {
@@ -203,7 +168,7 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
                         previous_position = position;
                         old_difference = difference;
                     }
-                } else if (sensor_used == QEI) {
+                } else if (velocity_ctrl_params.sensor_used == QEI) {
                     { position, direction } = i_qei.get_qei_position_absolute();
                     difference = position - previous_position;
 
@@ -280,7 +245,7 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
 
             break;
 
-        case i_velocity_control.set_velocity_ctrl_param(ctrl_par in_params):
+        case i_velocity_control.set_velocity_ctrl_param(ControlConfig in_params):
 
             velocity_ctrl_params.Kp_n = in_params.Kp_n;
             velocity_ctrl_params.Kp_d = in_params.Kp_d;
@@ -320,6 +285,8 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
 
         case i_velocity_control.set_velocity_sensor(int in_sensor_used):
 
+            velocity_ctrl_params.sensor_used = in_sensor_used;
+
             if(in_sensor_used == HALL) {
                 speed_factor_hall = hall_config.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
                 hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
@@ -327,7 +294,6 @@ void velocity_control_service( ctrl_par & velocity_ctrl_params,
             } else if(in_sensor_used == QEI) {
                 speed_factor_qei = qei_config.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
                 qei_crossover = qei_config.max_ticks - qei_config.max_ticks/10;
-
             }
             target_velocity = actual_velocity;
             break;
