@@ -580,6 +580,7 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
                     max_count_ticks_ccw_ = config_params.max_count_ticks_ccw;
 
                     int result = initRotarySensor(sensor_if,  settings1_,  settings2_, offset_);
+          //          printf("offset_: %i", offset_);
 
                     if (result > 0){
                         printf("*************************************\n    AMS SENSOR SERVER STARTED\n*************************************\n");
@@ -598,6 +599,18 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
                     sensor_initialized_ = 1;
 
                     break;
+
+            case iAMS[int i].get_configuration(void) -> ams_config_params_t config_params:
+                    config_params.settings1 = settings1_;
+                    config_params.settings2 = settings2_;
+                    config_params.enable_aquisition = enable_aquisition_;
+                    config_params.sensor_placement_offset = offset_;
+                    config_params.resolution_bits = sensor_resolution_bits_;
+                    config_params.max_count_ticks_cw = max_count_ticks_cw_;
+                    config_params.max_count_ticks_ccw = max_count_ticks_ccw_;
+
+                    break;
+
         }
     }
 

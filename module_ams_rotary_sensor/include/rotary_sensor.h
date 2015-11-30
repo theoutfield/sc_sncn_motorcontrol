@@ -42,7 +42,8 @@ interface AMS{
     {int, int} get_absolute_position_multiturn(void);
     int get_absolute_position_singleturn(void);
     int get_velocity(void);
-    void configure(ams_config_params_t config_params);//ToDo: extend this configuration. Now configures whether reading measuremnts on multiturn position request is required.
+    void configure(ams_config_params_t config_params);
+    ams_config_params_t get_configuration(void);
 };
 
 ams_config_params_t set_configuration(void);
