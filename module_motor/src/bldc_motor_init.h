@@ -1,5 +1,5 @@
 /**
- * @file bldc_motor_config.h
+ * @file bldc_motor_init.h
  * @brief Motor Control init  API
  * @author Synapticon GmbH <support@synapticon.com>
  */

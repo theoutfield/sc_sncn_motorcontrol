@@ -11,7 +11,7 @@
 #include "control_loops_common.h"
 #include <commutation_service.h>
 
-#include <bldc_motor_config.h>
+#include <internal_config.h>
 
 interface PositionControlInterface{
 
@@ -25,7 +25,9 @@ interface PositionControlInterface{
     void enable_position_ctrl();
     void shutdown_position_ctrl();
     int check_position_ctrl_state();
-
+    ControlConfig getControlConfig();
+    HallConfig getHallConfig();
+    QEIConfig getQEIConfig();
 };
 
 /**
