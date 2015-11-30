@@ -10,4 +10,5 @@
 #include <bldc_motor_config.h>
 #include <commutation_service.h>
 
+
 void init_commutation_config(CommutationConfig & commutation_params);

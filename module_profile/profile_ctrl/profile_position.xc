@@ -15,7 +15,7 @@
 #include <profile_control.h>
 
 void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,
-                          int sensor_select,  interface PositionControlInterface client i_position_control )
+                          interface PositionControlInterface client i_position_control )
 {
     int i;
     timer t;
@@ -25,12 +25,12 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 
     int actual_position = 0;
 
-    int init_state = i_position_control.check_busy();//__check_position_init(c_position_ctrl);
+    int init_state = i_position_control.check_busy();
 
 
     if (init_state == INIT_BUSY)
     {
-        i_position_control.set_position_sensor(sensor_select);
+       // i_position_control.set_position_sensor(sensor_select);
         init_state = init_position_control(i_position_control);
     }
 

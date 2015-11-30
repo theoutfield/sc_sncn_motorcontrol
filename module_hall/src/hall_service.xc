@@ -14,7 +14,6 @@
 #include <print.h>
 
 //TODO remove these dependencies
-//#include <bldc_motor_config.h>
 //#pragma xta command "analyze loop hall_loop"
 //#pragma xta command "set required - 10.0 us"
 //#define DEBUG

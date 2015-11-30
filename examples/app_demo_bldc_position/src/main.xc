@@ -45,13 +45,12 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	init_qei_config(qei_params);
 	init_hall_config(hall_config);
 
-	/* Initialise Profile Limits for position profile generator and select position sensor */
+	/* Initialise Profile Limits for position profile generator and select position sensor */ //FIXME GET RID OF THIS
 	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_config, \
 			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
 
-
 	/* Set new target position for profile position control */
-	set_profile_position(target_position, velocity, acceleration, deceleration, SENSOR_USED, i_position_control);
+	set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
 
 	while(1)
 	{

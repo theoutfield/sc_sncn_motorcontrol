@@ -89,6 +89,7 @@ int rpm_to_ticks_sensor(int rpm, int max_ticks_per_turn)
 void init_position_profile_limits(int max_acceleration, int max_velocity, QEIConfig qei_params,
                                   HallConfig hall_config, int sensor_select, int max_position, int min_position)
 {
+
     profile_pos_params.qei_params = qei_params;
     profile_pos_params.hall_config = hall_config;
     profile_pos_params.max_position =  max_position;
