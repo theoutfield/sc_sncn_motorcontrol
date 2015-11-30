@@ -271,7 +271,9 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEI
     if (filter_length_variance < 10) {
         filter_length_variance = 10;
     }
-    qei_counts_per_hall= qei_params.real_counts/ hall_config.pole_pairs;
+
+    if (sensor_used == QEI)
+        qei_counts_per_hall= qei_params.real_counts/ hall_config.pole_pairs;
 
     //init_buffer(buffer_Id, filter_length);
     //init_buffer(buffer_Iq, filter_length);
@@ -533,18 +535,25 @@ void torque_ctrl_loop(ctrl_par &torque_ctrl_params, HallConfig &hall_config, QEI
 }
 
 /* TODO: do we really need 2 threads for this? */
-void torque_control_service(ctrl_par & torque_ctrl_params, HallConfig & hall_config, QEIConfig & qei_params,
-                    int sensor_used,
+void torque_control_service(ctrl_par &torque_ctrl_params, int sensor_used,
                     interface ADCInterface client adc_if,
                     interface CommutationInterface client commutation_interface,
                     interface HallInterface client i_hall,
-                    interface QEIInterface client i_qei,
+                    interface QEIInterface client ?i_qei,
                     interface TorqueControlInterface server i_torque_control)
 {
     chan c_current, c_speed;
+    HallConfig hall_config = i_hall.getHallConfig();
+
+    QEIConfig qei_config;
+    if(sensor_used == QEI && !isnull(i_qei)){
+        qei_config = i_qei.getQEIConfig();
+    }
+
+
     par {
         current_filter(adc_if, c_current, c_speed);
-        torque_ctrl_loop(torque_ctrl_params, hall_config, qei_params, sensor_used,
+        torque_ctrl_loop(torque_ctrl_params, hall_config, qei_config, sensor_used,
                          c_current, c_speed, commutation_interface, i_hall, i_qei, i_torque_control);
 
     }

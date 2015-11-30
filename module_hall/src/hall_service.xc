@@ -11,26 +11,32 @@
 #include <stdint.h>
 #include <refclk.h>
 #include <stdio.h>
+#include <print.h>
 
 //TODO remove these dependencies
-#include <bldc_motor_config.h>
+//#include <bldc_motor_config.h>
 //#pragma xta command "analyze loop hall_loop"
 //#pragma xta command "set required - 10.0 us"
 //#define DEBUG
 
-//FIXME rename to check_hall_parameters();
-void init_hall_config(HallConfig &hall_config)
+int check_hall_config(HallConfig &hall_config){
 
-{
-    hall_config.pole_pairs = POLE_PAIRS;
+    if(hall_config.pole_pairs < 0 || hall_config.pole_pairs > 10){
+        printstrln("Wrong Hall configuration: wrong pole-pairs");
+        return ERROR;
+    }
 
-    // Find absolute maximum position deviation from origin
-    hall_config.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
-    hall_config.max_ticks_per_turn = POLE_PAIRS * HALL_POSITION_INTERPOLATED_RANGE;
-    hall_config.max_ticks += hall_config.max_ticks_per_turn ;  // tolerance
-    hall_config.sensor_polarity = POLARITY;
+    if(hall_config.sensor_polarity < 0 || hall_config.sensor_polarity > 1){
+        printstrln("Wrong Hall configuration: wrong polarity");
+        return ERROR;
+    }
 
-    return;
+    if(hall_config.max_ticks < 0 || hall_config.max_ticks_per_turn < 0){
+        printstrln("Wrong Hall configuration: max ticks");
+        return ERROR;
+    }
+
+    return SUCCESS;
 }
 
 [[combinable]]
@@ -38,7 +44,10 @@ void init_hall_config(HallConfig &hall_config)
 void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports, HallConfig & hall_config)
 {
 
-    init_hall_config(hall_config);
+    if(check_hall_config(hall_config) == ERROR){
+        printstrln("Error while checking the Hall sensor configuration");
+        return;
+    }
 
     printf("*************************************\n    HALL SENSOR SERVER STARTING\n*************************************\n");
 
@@ -138,6 +147,11 @@ void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_por
             case i_hall[int i].reset_hall_count(int offset):
                 count = offset;
                 break;
+
+            case i_hall[int i].getHallConfig() -> HallConfig out_config:
+
+                    out_config = hall_config;
+                    break;
 
   /*          case !isnull(c_hall_p1) => c_hall_p1 :> int command:
                 switch (command) {

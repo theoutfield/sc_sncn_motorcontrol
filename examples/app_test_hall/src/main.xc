@@ -9,8 +9,10 @@
  */
 
 #include <print.h>
-#include <hall_service.h>
 #include <xscope.h>
+#include <hall_service.h>
+#include <hall_config.h>
+
 
 #define ENABLE_XSCOPE
 
@@ -73,12 +75,13 @@ int main(void)
 
     par
     {
-        on tile[APP_TILE]: {
-            hall_test(i_hall[0]);
-        }
+        on tile[APP_TILE]: hall_test(i_hall[0]);
 
-        on tile[IFM_TILE]: {
+        on tile[IFM_TILE]:
+        {
             HallConfig hall_config;
+            init_hall_config(hall_config);
+
             hall_service(i_hall, hall_ports, hall_config);
         }
     }
