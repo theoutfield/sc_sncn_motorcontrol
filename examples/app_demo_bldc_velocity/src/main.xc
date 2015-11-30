@@ -25,6 +25,7 @@
 
 #include <bldc_motor_config.h>
 #include <qei_config.h>
+#include <hall_config.h>
 
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
@@ -82,22 +83,15 @@ int main(void)
 			{
 				ctrl_par velocity_ctrl_params;
 				filter_par sensor_filter_params;
-				HallConfig hall_config;
-				QEIConfig qei_params;
 
 				/* Initialize PID parameters for Velocity Control (defined in config/motor/bldc_motor_config.h) */
 				init_velocity_control_param(velocity_ctrl_params);
-
-				/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
-				init_hall_config(hall_config);
-				init_qei_config(qei_params);
 
 				/* Initialize sensor filter length */
 				init_sensor_filter_param(sensor_filter_params);
 
 				/* Control Loop */
-				velocity_control_service(velocity_ctrl_params, sensor_filter_params, hall_config,
-					 qei_params, SENSOR_USED, i_hall[1], i_qei[1], i_velocity_control, commutation_interface[0]);
+				velocity_control_service(velocity_ctrl_params, sensor_filter_params,SENSOR_USED, i_hall[1], i_qei[1], i_velocity_control, commutation_interface[0]);
 			}
 
 		}
@@ -117,27 +111,14 @@ int main(void)
 
                 /* Hall Server */
                 {
-                	HallConfig hall_config;
-                	 // NEEDS INITIALIZATION
-                	hall_service(i_hall, hall_ports, hall_config);
-            	}
+                    HallConfig hall_config;
+                    init_hall_config(hall_config);
 
+                    hall_service(i_hall, hall_ports, hall_config);
+                }
 
-				/* Motor Commutation loop */
-				{
-					HallConfig hall_config;
-					init_hall_config(hall_config);
-
-					commutation_par commutation_params;
-
-					commutation_service(i_hall[0], i_qei[0], null, wd_interface,
-					        commutation_interface, c_pwm_ctrl,
-					        fet_driver_ports,
-							hall_config, commutation_params);
-				}
-
-				/* QEI Server */
-				{
+                /* QEI Server */
+                {
 #ifdef DC1K
                     //connector 1 is configured as hall
                     p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
@@ -148,6 +129,16 @@ int main(void)
 
                     qei_service(i_qei, encoder_ports, qei_config);         // channel priority 1,2..6
 
+                }
+
+				/* Motor Commutation loop */
+				{
+					commutation_par commutation_params;
+
+					commutation_service(i_hall[0], i_qei[0], null, wd_interface,
+					        commutation_interface, c_pwm_ctrl,
+					        fet_driver_ports,
+							commutation_params);
 				}
 
 			}

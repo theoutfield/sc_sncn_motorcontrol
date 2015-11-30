@@ -10,6 +10,7 @@
 
 #include <tuning.h>
 #include <hall_service.h>
+#include <hall_config.h>
 
 #ifdef AD7265
 #include <adc_7265.h>
@@ -23,7 +24,7 @@ FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 ADCPorts adc_ports = ADC_PORTS;
 HallPorts hall_ports= HALL_PORTS;
 
-#define VOLTAGE 2000 //+/- 4095
+#define VOLTAGE 200 //+/- 4095
 
 #ifdef AD7265
 on tile[IFM_TILE]: adc_ports_t adc_ports =
@@ -114,21 +115,18 @@ int main(void) {
                 /* Hall Server */
                 {
                     HallConfig hall_config;
-                    // NEEDS INITIALIZATION
+                    init_hall_config(hall_config);
+
                     hall_service(i_hall, hall_ports, hall_config);
                 }
 
                 /* Motor Commutation loop */
                 {
-                    HallConfig hall_config;
-
                     commutation_par commutation_params;
-                    init_hall_config(hall_config);
 
                     commutation_service(i_hall[0], null, c_signal,
                             watchdog_interface, commutation_interface, c_pwm_ctrl,
                             fet_driver_ports,
-                            hall_config,
                             commutation_params);
                 }
 

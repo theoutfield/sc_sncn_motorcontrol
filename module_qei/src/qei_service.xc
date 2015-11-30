@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <xs1.h>
 #include <refclk.h>
-#include <filter_blocks.h>
+//#include <filter_blocks.h>
 #include <xscope.h>
 #include "print.h"
 
@@ -117,7 +117,7 @@ void qei_service(interface QEIInterface server i_qei[5], QEIPorts &encoder_ports
 
                // to compute velocity from qei
     if(check_qei_config(qei_config) == ERROR){
-        printstrln("Error while checking the QEI configuration");
+        printstrln("Error while checking the QEI sensor configuration");
         return;
     }
 

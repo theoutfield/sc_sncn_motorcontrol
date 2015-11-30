@@ -5,24 +5,12 @@
 
 #pragma once
 
-#include <xs1.h>
+#define ERROR                    0
+#define SUCCESS                  1
 
 #define RPM_CONST           60000000 // 60s / 1us
 #define FILTER_LENGTH_HALL  16
 #define PULL_PERIOD_USEC 12
-
-/**
- * Client/server interaction commands/tokens
- */
-enum {
-    HALL_POS_REQ,         //!< Position request token
-    HALL_ABSOLUTE_POS_REQ,//!< Position request token
-    HALL_VELOCITY_REQ,    //!< Velocity request token
-    HALL_RESET_COUNT_REQ,     //!< Reset hall server ticks count
-    HALL_FILTER_PARAM_REQ,//!< Filter length request token
-    HALL_REQUEST_PORT_STATES
-};
-
 
 /**
  * @brief Structure definition for hall sensor
@@ -44,22 +32,14 @@ typedef struct {
 } HallPorts;
 
 
-
 interface HallInterface {
     unsigned get_hall_pinstate();
     int get_hall_position();
     {int, int} get_hall_position_absolute();
     int get_hall_velocity();
     void reset_hall_count(int offset);
+    HallConfig getHallConfig();
 };
-
-
-/**
- * @brief initialize hall sensor
- *
- * @param hall_config struct defines the pole-pairs and gear ratio
- */
-void init_hall_config(HallConfig & hall_config);
 
 /**
  * @brief A basic hall sensor server
