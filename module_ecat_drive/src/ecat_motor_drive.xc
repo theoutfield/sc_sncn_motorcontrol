@@ -12,6 +12,7 @@
 #include <torque_ctrl_client.h>
 #include <hall_server.h>
 #include <qei_server.h>
+#include <biss_server.h>
 #include <biss_client.h>
 #include <hall_config.h>
 #include <qei_config.h>
@@ -26,13 +27,14 @@
 #include <bldc_motor_init.h>
 
 
-{int, int} static inline get_position_absolute(int sensor_select, chanend c_hall, chanend ?c_qei, client interface i_biss ?i_biss)
+{int, int} static inline get_position_absolute(int sensor_select, chanend ?c_hall, chanend ?c_qei, client interface i_biss ?i_biss)
 {
     int actual_position;
     int direction = 0;
 
     if (sensor_select == HALL) {
-        {actual_position, direction} = get_hall_position_absolute(c_hall);
+        if (!isnull(c_hall))
+            {actual_position, direction} = get_hall_position_absolute(c_hall);
     } else if (sensor_select == BISS) {
         if (!isnull(i_biss))
             { actual_position, void, void } = i_biss.get_position();
@@ -47,7 +49,7 @@
 //#pragma xta command "analyze loop ecatloop"
 //#pragma xta command "set required - 1.0 ms"
 
-void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend c_hall,
+void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend c_signal, chanend ?c_hall,
                       chanend ?c_qei, client interface i_biss ?i_biss, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl, chanend ?c_gpio)
 {
     int i = 0;
@@ -82,6 +84,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
     csv_par csv_params;
     ctrl_par velocity_ctrl_params;
     qei_par qei_params;
+    biss_par biss_params;
     hall_par hall_params;
     ctrl_par position_ctrl_params;
     csp_par csp_params;
@@ -149,6 +152,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
     init_pv_params(pv_params);
     init_pt_params(pt_params);
     init_qei_param(qei_params);
+    init_biss_param(biss_params);
     init_velocity_control_param(velocity_ctrl_params);
     init_qei_velocity_params(qei_velocity_params);
 
@@ -232,7 +236,17 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
 
             /* quick stop for position mode */
             else if (op_mode == CSP || op_mode == PP) {
-                actual_velocity = get_hall_velocity(c_hall);
+                int sensor_ticks;
+                if (sensor_select == HALL) {
+                    actual_velocity = get_hall_velocity(c_hall);
+                    sensor_ticks = hall_params.max_ticks_per_turn;
+                } else if (sensor_select == BISS) {
+                    actual_velocity = i_biss.get_velocity();
+                    sensor_ticks = (1 << biss_params.singleturn_resolution);
+                } else {
+                    actual_velocity = get_hall_velocity(c_hall);
+                    sensor_ticks = qei_params.real_counts;
+                }
                 actual_position = get_position(c_position_ctrl);
 
                 int deceleration;
@@ -254,13 +268,6 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                 if (actual_velocity>=500 || actual_velocity<=-500) {
                     if (actual_velocity < 0) {
                         actual_velocity = -actual_velocity;
-                    }
-
-                    int sensor_ticks;
-                    if (sensor_select == HALL) {
-                        sensor_ticks = hall_params.max_ticks_per_turn;
-                    } else {    /* QEI */
-                        sensor_ticks = qei_params.real_counts;
                     }
 
                     steps = init_quick_stop_position_profile(
@@ -349,6 +356,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                     update_pp_param_ecat(pp_params, coe_out);
                     polarity = pp_params.base.polarity;
                     qei_params.poles = hall_params.pole_pairs;
+                    biss_params.poles = hall_params.pole_pairs;
 
                     //config_sdo_handler(coe_out);
                     {homing_method, limit_switch_type} = homing_sdo_update(coe_out);
@@ -363,10 +371,13 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, limit_switch_type);
                         end_config_gpio(c_gpio);
                     }
-                    set_hall_param_ecat(c_hall, hall_params);
+                    if (!isnull(c_hall))
+                        set_hall_param_ecat(c_hall, hall_params);
                     if (homing_done == 0) {
                         if (!isnull(c_qei))
                             set_qei_param_ecat(c_qei, qei_params);
+                        if (!isnull(i_biss))
+                            i_biss.set_params(biss_params);
                     }
                     set_commutation_param_ecat(c_signal, hall_params, qei_params,
                                                commutation_params, nominal_speed);
@@ -666,7 +677,17 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         mode_selected = 3; // non interruptible mode
                         mode_quick_flag = 0;
                     } else if (op_mode == CSP || op_mode == PP) {
-                        actual_velocity = get_hall_velocity(c_hall);
+                        int sensor_ticks;
+                        if (sensor_select == HALL) {
+                            actual_velocity = get_hall_velocity(c_hall);
+                            sensor_ticks = hall_params.max_ticks_per_turn;
+                        } else if (sensor_select == BISS) {
+                            actual_velocity = i_biss.get_velocity();
+                            sensor_ticks = (1 << biss_params.singleturn_resolution);
+                        } else {
+                            actual_velocity = get_hall_velocity(c_hall);
+                            sensor_ticks = qei_params.real_counts;
+                        }
                         actual_position = get_position(c_position_ctrl);
 
                         if (actual_velocity>=500 || actual_velocity<=-500) {
@@ -679,13 +700,6 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                                 deceleration = csp_params.base.max_acceleration;
                             } else { /* op_ode == PP */
                                 deceleration = pp_params.base.quick_stop_deceleration;
-                            }
-
-                            int sensor_ticks;
-                            if (sensor_select == HALL) {
-                                sensor_ticks = hall_params.max_ticks_per_turn;
-                            } else { /* QEI */
-                                sensor_ticks = qei_params.real_counts;
                             }
 
                             steps = init_quick_stop_position_profile(
@@ -1049,7 +1063,10 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out, chanend 
                         t when timerafter(c_time + 100*MSEC_STD) :> c_time;
                     }
                     if (i >= steps) {
-                        actual_velocity = get_hall_velocity(c_hall);
+                        if (sensor_select == BISS)
+                            actual_velocity = i_biss.get_velocity();
+                        else
+                            actual_velocity = get_hall_velocity(c_hall);
                         if (actual_velocity < 50 || actual_velocity > -50) {
                             mode_selected = 100;
                             op_set_flag = 0;

@@ -106,7 +106,7 @@ check_list init_checklist(void)
     return check_list_param;
 }
 
-void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend ?c_qei,
+void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend ?c_hall, chanend ?c_qei,
                       chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, chanend c_position_ctrl)
 {
     bool check;
@@ -128,7 +128,10 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
         }
 
         if (~skip && ~check_list_param._hall_init) {
-            check_list_param._hall_init = __check_hall_init(c_hall);
+            if (!isnull(c_hall))
+                check_list_param._hall_init = __check_hall_init(c_hall);
+            else
+                check_list_param._hall_init = INIT;
         }
 
         if (~skip &&  ~check_list_param._qei_init) {
