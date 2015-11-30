@@ -34,7 +34,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 void commutation_service(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
                             interface WatchdogInterface client watchdog_interface,
                             interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
-                            FetDriverPorts &fet_driver_ports, HallConfig & hall_config, QEIConfig & qei_params,
+                            FetDriverPorts &fet_driver_ports, HallConfig & hall_config,
                             commutation_par &commutation_params)
 {
     const unsigned t_delay = 300*USEC_FAST;
@@ -49,6 +49,12 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
     int angle = 0;
     int voltage = 0;
     int pwm_half = PWM_MAX_VALUE>>1;
+    QEIConfig qei_params;
+
+    if(!isnull(i_qei)){
+        qei_params = i_qei.getQEIConfig();
+    }
+
     int max_count_per_hall = qei_params.real_counts/hall_config.pole_pairs;
     int angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
 

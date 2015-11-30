@@ -121,14 +121,14 @@ int main(void) {
                 /* Motor Commutation loop */
                 {
                     HallConfig hall_config;
-                    qei_par qei_params;
+
                     commutation_par commutation_params;
                     init_hall_config(hall_config);
 
                     commutation_service(i_hall[0], null, c_signal,
                             watchdog_interface, commutation_interface, c_pwm_ctrl,
                             fet_driver_ports,
-                            hall_config, qei_params,
+                            hall_config,
                             commutation_params);
                 }
 

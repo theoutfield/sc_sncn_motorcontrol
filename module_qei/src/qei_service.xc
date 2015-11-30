@@ -303,6 +303,10 @@ void qei_service(interface QEIInterface server i_qei[5], QEIPorts &encoder_ports
 
                  count = in_offset;
                  break;
+        case i_qei[int i].getQEIConfig() -> QEIConfig out_config:
+
+                out_config = qei_config;
+                break;
 
         case t_velocity when timerafter(ts_velocity + MILLISECOND) :> ts_velocity:
 
