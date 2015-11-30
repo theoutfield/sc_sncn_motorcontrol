@@ -5,7 +5,6 @@
 */
 
 #include <biss_server.h>
-#include <filter_blocks.h>
 #include <timer.h>
 #include <xclib.h>
 #include <xs1.h>
@@ -15,7 +14,6 @@
 
 
 void init_biss_param(biss_par &biss_params) {
-    biss_params.data_length = BISS_DATA_LENGTH;
     biss_params.multiturn_length = BISS_MULTITURN_LENGTH;
     biss_params.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
     biss_params.singleturn_length = BISS_SINGLETURN_LENGTH;
@@ -23,14 +21,13 @@ void init_biss_param(biss_par &biss_params) {
     biss_params.status_length = BISS_STATUS_LENGTH;
     biss_params.crc_poly = BISS_CRC_POLY;
     biss_params.poles = POLE_PAIRS;
-    biss_params.polarity = QEI_SENSOR_POLARITY; //FIXME BiSS uses same polarity as QEI
+    biss_params.polarity = BISS_POLARITY;
     biss_params.clock_dividend = BISS_CLOCK_DIVIDEND;
     biss_params.clock_divisor = BISS_CLOCK_DIVISOR;
     biss_params.timeout = BISS_TIMEOUT;
-    biss_params.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
-    biss_params.max_ticks += (1 << biss_params.singleturn_resolution);  // tolerance
+    biss_params.max_ticks = BISS_MAX_TICKS;
     biss_params.velocity_loop = BISS_VELOCITY_LOOP;
-    biss_params.offset_angle = BISS_OFFSET_ANGLE;
+    biss_params.offset_electrical = BISS_OFFSET_ELECTRICAL;
 }
 
 
@@ -41,30 +38,29 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
 
     printstr("*************************************\n    BISS SERVER STARTING\n*************************************\n");
 
-    unsigned int data[frame_bytes];
-    timer t;
-    unsigned int time;
-    unsigned int last_biss_read;
-    unsigned int last_count = 0;
-    unsigned int last_position = 0;
-    t :> last_biss_read;
-    unsigned int next_velocity_read = last_biss_read;
-    unsigned int last_count_read = last_biss_read;
+    //init variables
+    //velocity
     int velocity = 0;
+    int old_count = 0;
+    int old_difference = 0;
     int ticks_per_turn = (1 << biss_params.singleturn_resolution);
     int crossover = ticks_per_turn - ticks_per_turn/10;
-    int max_ticks_internal = (1 << (biss_params.multiturn_resolution -1 + biss_params.singleturn_resolution));
     int velocity_ticks = (ticks_per_turn >> 8); //to simplify the velocity computation
     int velocity_loop = (biss_params.velocity_loop * USEC_FAST); //velocity loop time in clock ticks
-    int old_count = 0;
-    int old_difference =0;
+    //position
+    unsigned int data[frame_bytes];
+    unsigned int last_position = 0;
+    int last_count = 0;
     int count_offset = 0;
-    //filter params  //FIXME remove filter
-//    const int filter_length = 8;
-//    int filter_buffer[8];
-//    for (int i=0; i<filter_length; i++)
-//        filter_buffer[i] = 0;
-//    int filter_index = 0;
+    int biss_data_length = biss_params.multiturn_length +  biss_params.singleturn_length + biss_params.status_length;
+    int max_ticks_internal = (1 << (biss_params.multiturn_resolution -1 + biss_params.singleturn_resolution));
+    //timing
+    timer t;
+    unsigned int last_biss_read;
+    t :> last_biss_read;
+    unsigned int next_velocity_read = last_biss_read + velocity_loop;
+    unsigned int last_count_read = last_biss_read;
+    unsigned int time;
 
     //clock and port configuration
     configure_clock_rate(clk, biss_params.clock_dividend, biss_params.clock_divisor) ; // a/b MHz
@@ -89,9 +85,9 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 } else
                     angle = last_position;
                 if (biss_params.singleturn_resolution > 12)
-                    angle = (biss_params.poles * ((angle >> (biss_params.singleturn_resolution-12)) + biss_params.offset_angle) ) & 4095;
+                    angle = (biss_params.poles * (angle >> (biss_params.singleturn_resolution-12)) + biss_params.offset_electrical ) & 4095;
                 else
-                    angle = (biss_params.poles * ((angle << (12-biss_params.singleturn_resolution)) + biss_params.offset_angle) ) & 4095;
+                    angle = (biss_params.poles * (angle << (12-biss_params.singleturn_resolution)) + biss_params.offset_electrical ) & 4095;
                 break;
         case i_biss[int i].get_position_fast() -> unsigned int position:
                 t :> time;
@@ -107,7 +103,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 t :> time;
                 if (timeafter(time, last_count_read + biss_params.timeout)) {
                     t when timerafter(last_biss_read + biss_params.timeout) :> void;
-                    read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                    read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_data_length, frame_bytes, biss_params.crc_poly);
                     t :> last_biss_read;
                     last_count_read = last_biss_read;
                     { count_internal, position, status } = biss_encoder(data, biss_params);
@@ -122,7 +118,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                     count = max_ticks_internal + (count % max_ticks_internal);
                 else if (count >= max_ticks_internal)
                     count = (count % max_ticks_internal) - max_ticks_internal;
-                if (biss_params.polarity == QEI_POLARITY_INVERTED) {
+                if (biss_params.polarity == BISS_POLARITY_INVERTED) {
                     count = -count;
                     position -= ticks_per_turn;
                 }
@@ -136,7 +132,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 t :> time;
                 if (timeafter(time, last_count_read + biss_params.timeout)) {
                     t when timerafter(last_biss_read + biss_params.timeout) :> void;
-                    read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                    read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_data_length, frame_bytes, biss_params.crc_poly);
                     t :> last_biss_read;
                     last_count_read = last_biss_read;
                     { count, position, status } = biss_encoder(data, biss_params);
@@ -149,7 +145,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 }
                 break;
         case i_biss[int i].get_velocity() -> int velocity_:
-                if (biss_params.polarity == QEI_POLARITY_NORMAL)
+                if (biss_params.polarity == BISS_POLARITY_NORMAL)
                     velocity_ = velocity;
                 else
                     velocity_ = -velocity;
@@ -157,6 +153,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
         case i_biss[int i].set_params(biss_par biss_params_):
                 biss_params = biss_params_;
                 configure_clock_rate(clk, biss_params.clock_dividend, biss_params.clock_divisor) ; // a/b MHz
+                biss_data_length = biss_params.multiturn_length +  biss_params.singleturn_length + biss_params.status_length;
                 ticks_per_turn = (1 << biss_params.singleturn_resolution);
                 crossover = ticks_per_turn - ticks_per_turn/10;
                 max_ticks_internal = (1 << (biss_params.multiturn_resolution -1 + biss_params.singleturn_resolution));
@@ -168,17 +165,32 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 break;
         case i_biss[int i].set_count(int new_count):
                 t when timerafter(last_biss_read + biss_params.timeout) :> void;
-                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_data_length, frame_bytes, biss_params.crc_poly);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 int count, position;
                 { count, position, void } = biss_encoder(data, biss_params);
                 last_count = count;
                 last_position = position;
-                if (biss_params.polarity == QEI_POLARITY_NORMAL)
+                if (biss_params.polarity == BISS_POLARITY_NORMAL)
                     count_offset = new_count - count;
                 else
                     count_offset = -new_count - count;
+                break;
+        case i_biss[int i].set_angle_electrical(unsigned int new_angle) -> unsigned int offset:
+                t when timerafter(last_biss_read + biss_params.timeout) :> void;
+                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_data_length, frame_bytes, biss_params.crc_poly);
+                t :> last_biss_read;
+                last_count_read = last_biss_read;
+                int count, angle;
+                { count, angle, void } = biss_encoder(data, biss_params);
+                last_count = count;
+                last_position = angle;
+                if (biss_params.singleturn_resolution > 12)
+                    biss_params.offset_electrical = (new_angle - biss_params.poles * (angle >> (biss_params.singleturn_resolution-12)) ) & 4095;
+                else
+                    biss_params.offset_electrical = (new_angle - biss_params.poles * (angle >> (12-biss_params.singleturn_resolution)) ) & 4095;
+                offset = biss_params.offset_electrical;
                 break;
         case t when timerafter(next_velocity_read) :> void:
             next_velocity_read += velocity_loop;
@@ -186,7 +198,7 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
             t :> time;
             if (timeafter(time, last_count_read + biss_params.timeout)) {
                 t when timerafter(last_biss_read + biss_params.timeout) :> void;
-                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_params.data_length, frame_bytes, biss_params.crc_poly);
+                read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_data_length, frame_bytes, biss_params.crc_poly);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 { count, position, void } = biss_encoder(data, biss_params);
@@ -201,7 +213,6 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
             old_difference = difference;
             // simplified version of: velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                                        = ( difference ticks * (60.000.000 us / 256) ) / ( (ticks per turn / 256) * velocity loop time in us)
-            //velocity = (filter(filter_buffer, filter_index, filter_length, difference) * 234375) / (velocity_ticks * biss_params.velocity_loop);
             velocity = (difference * 234375) / (velocity_ticks * biss_params.velocity_loop); // USEC_FAST is harcoded in this
             break;
         }
@@ -357,15 +368,16 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
 
 
 { int, unsigned int, unsigned int } biss_encoder(unsigned int data[], biss_par biss_params) {
-    unsigned int bytes = (biss_params.data_length-1)/32; //number of bytes used - 1
-    unsigned int rest = biss_params.data_length % 32; //rest of bits
+    int biss_data_length = biss_params.multiturn_length +  biss_params.singleturn_length + biss_params.status_length;
+    unsigned int bytes = (biss_data_length-1)/32; //number of bytes used - 1
+    unsigned int rest = biss_data_length % 32; //rest of bits
     int count = 0;
     unsigned int position = 0;
     unsigned int status = 0;
     unsigned int readbuf;
     int byteindex = -1;
     data[bytes] = data[bytes] << (32-rest); //left align last data byte
-    for (int i=0; i<biss_params.data_length; i++) {
+    for (int i=0; i<biss_data_length; i++) {
         if ((i%32) == 0) {
             byteindex++;
             readbuf = data[byteindex];
