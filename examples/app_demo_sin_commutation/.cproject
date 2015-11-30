@@ -252,6 +252,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/position}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/torque}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1605921113" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -635,6 +637,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/position}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/torque}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.277344476" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1025,6 +1029,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/position}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/torque}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1122502185" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

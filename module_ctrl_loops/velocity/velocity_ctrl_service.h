@@ -20,7 +20,7 @@ interface VelocityControlInterface{
     void set_velocity_ctrl_param(ctrl_par velocity_ctrl_params);
     void set_velocity_filter(int in_length);
     void set_velocity_ctrl_hall_param(HallConfig hall_config);
-    void set_velocity_ctrl_qei_param(qei_par qei_params);
+    void set_velocity_ctrl_qei_param(QEIConfig qei_params);
     void set_velocity_sensor(int sensor_used);
     void enable_velocity_ctrl();
     void shutdown_velocity_ctrl();
@@ -92,7 +92,7 @@ void set_velocity_csv(csv_par & csv_params, int target_velocity,
 void velocity_control_service(ctrl_par & velocity_ctrl_params,
                         filter_par & sensor_filter_params,
                         HallConfig &?hall_config,
-                        qei_par &?qei_params,
+                        QEIConfig &?qei_params,
                         int sensor_used,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,

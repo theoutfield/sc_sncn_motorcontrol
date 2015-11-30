@@ -60,7 +60,7 @@ struct {
 
     float q;                  // position profile
 
-    qei_par qei_params;
+    QEIConfig qei_params;
     HallConfig hall_config;
     int sensor_used;
     float max_position;
@@ -68,7 +68,7 @@ struct {
 
 } profile_pos_params;
 
-int rpm_to_ticks_qei(int rpm, qei_par qei_params)
+int rpm_to_ticks_qei(int rpm, QEIConfig qei_params)
 {
     int ticks = (rpm * qei_params.real_counts)/60;
     return ticks;
@@ -86,7 +86,7 @@ int rpm_to_ticks_sensor(int rpm, int max_ticks_per_turn)
     return ticks;
 }
 
-void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params,
+void init_position_profile_limits(int max_acceleration, int max_velocity, QEIConfig qei_params,
                                   HallConfig hall_config, int sensor_select, int max_position, int min_position)
 {
     profile_pos_params.qei_params = qei_params;

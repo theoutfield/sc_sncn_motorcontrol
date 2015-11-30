@@ -22,7 +22,7 @@ interface TorqueControlInterface{
     void set_torque(int in_torque);
     void set_torque_ctrl_param(ctrl_par torque_ctrl_params);
     void set_torque_ctrl_hall_param(HallConfig hall_config);
-    void set_torque_ctrl_qei_param(qei_par qei_params);
+    void set_torque_ctrl_qei_param(QEIConfig qei_params);
     void set_torque_sensor(int sensor_used);
     void enable_torque_ctrl();
     void shutdown_torque_ctrl();
@@ -88,7 +88,7 @@ void set_torque_cst(cst_par & cst_params, int target_torque, int torque_offset, 
  * @param c_commutation channel to send motor voltage input value
  *
  */
-void torque_control_service(ctrl_par & torque_ctrl_params, HallConfig &hall_config, qei_par & qei_params,
+void torque_control_service(ctrl_par & torque_ctrl_params, HallConfig &hall_config, QEIConfig & qei_params,
                     int sensor_used, interface ADCInterface client adc_if, interface CommutationInterface client commutation_interface,
                     interface HallInterface client i_hall, interface QEIInterface client i_qei, interface TorqueControlInterface server i_torque_control);
 

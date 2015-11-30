@@ -24,6 +24,7 @@
 #include <xscope.h>
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
+#include <qei_config.h>
 
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
@@ -66,7 +67,7 @@ WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 ADCPorts adc_ports = ADC_PORTS;
 HallPorts hall_ports = HALL_PORTS;
-EncoderPorts encoder_ports = ENCODER_PORTS;
+QEIPorts encoder_ports = ENCODER_PORTS;
 
 int main(void)
 {
@@ -93,15 +94,13 @@ int main(void)
 				/* Torque Control Loop */
 				{
 					ctrl_par torque_ctrl_params;
+                    init_torque_control_param(torque_ctrl_params);  /* Initialize PID parameters for Torque Control (defined in config/motor/bldc_motor_config.h) */
+
 					HallConfig hall_config;
-					qei_par qei_params;
-
-					/* Initialize PID parameters for Torque Control (defined in config/motor/bldc_motor_config.h) */
-					init_torque_control_param(torque_ctrl_params);
-
-					/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
-					init_qei_param(qei_params);
 					init_hall_config(hall_config);
+
+					QEIConfig qei_params;
+		            init_qei_config(qei_params); /* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 
 					/* Control Loop */
 					torque_control_service( torque_ctrl_params, hall_config, qei_params, SENSOR_USED,
@@ -138,10 +137,10 @@ int main(void)
 				/* Motor Commutation loop */
 				{
 					HallConfig hall_config;
-					qei_par qei_params;
+					QEIConfig qei_params;
 					commutation_par commutation_params;
 					init_hall_config(hall_config);
-					init_qei_param(qei_params);
+					init_qei_config(qei_params);
 
 					commutation_service(i_hall[0],  i_qei[0], null, i_watchdog, i_commutation, c_pwm_ctrl,
 					        fet_driver_ports, hall_config, qei_params, commutation_params);
@@ -149,11 +148,10 @@ int main(void)
 
 				/* QEI Server */
 				{
-                    qei_velocity_par qei_velocity_params;
-                    qei_par qei_config;
-                    init_qei_velocity_params(qei_velocity_params);
+                    QEIConfig qei_config;
+                    init_qei_config(qei_config);
 
-                    qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
+                    qei_service(i_qei, encoder_ports, qei_config);         // channel priority 1,2..6
 				}
 			}
 		}
