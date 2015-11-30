@@ -13,9 +13,6 @@
 #include <xscope.h>
 #include "print.h"
 
-//TODO remove these dependencies
-#include <bldc_motor_config.h>
-
 #define MILLISECOND 250000 //ticks
 //#pragma xta command "analyze loop qei_loop"
 //#pragma xta command "set required - 1.0 us"
@@ -71,6 +68,7 @@ static void qei_client_handler(chanend c_qei, int command, int position, int ok,
     }
 }
 */
+/*
 void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
 {
     qei_velocity_params.previous_position = 0;
@@ -82,33 +80,47 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
                 qei_velocity_params.filter_length);
     return;
 }
+*/
 
-
-//FIXME rename to check_qei_parameters();
-void init_qei_param(qei_par &qei_config)
+int check_qei_config(QEIConfig &qei_config)
 {
-    qei_config.real_counts = ENCODER_RESOLUTION;
 
-    // Find absolute maximum position deviation from origin
-    qei_config.max_ticks = (abs(MAX_POSITION_LIMIT) > abs(MIN_POSITION_LIMIT)) ? abs(MAX_POSITION_LIMIT) : abs(MIN_POSITION_LIMIT);
+    if(qei_config.index < 0  || qei_config.index > 1){
+        printstrln("Wrong QEI configuration: wrong type");
+        return ERROR;
+    }
 
+    if(qei_config.sensor_polarity < 0  || qei_config.sensor_polarity > 1){
+        printstrln("Wrong QEI configuration: wrong polarity");
+        return ERROR;
+    }
 
-    qei_config.index = QEI_SENSOR_TYPE;
-    qei_config.max_ticks_per_turn = qei_config.real_counts;
-    qei_config.max_ticks += qei_config.max_ticks_per_turn;  // tolerance
-    qei_config.poles = POLE_PAIRS;
-    qei_config.sensor_polarity = QEI_SENSOR_POLARITY;
-    return;
+    if(qei_config.poles < 0  || qei_config.poles > 15){
+        printstrln("Wrong QEI configuration: wrong pole-pairs");
+        return ERROR;
+    }
+
+    if(qei_config.max_ticks_per_turn < 0 || qei_config.real_counts < 0){
+        printstrln("Wrong QEI configuration: wrong resolution");
+        return ERROR;
+    }
+
+    return SUCCESS;
 }
 
+
 #pragma unsafe arrays
-void qei_service(interface QEIInterface server i_qei[5], EncoderPorts & encoder_ports, qei_par qei_config, qei_velocity_par qei_velocity_params)
+void qei_service(interface QEIInterface server i_qei[5], QEIPorts &encoder_ports, QEIConfig qei_config)
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
                // to compute velocity from qei
-    init_qei_param(qei_config);
+    if(check_qei_config(qei_config) == ERROR){
+        printstrln("Error while checking the QEI configuration");
+        return;
+    }
+
     printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
 
     int position = 0;
@@ -141,6 +153,7 @@ void qei_service(interface QEIInterface server i_qei[5], EncoderPorts & encoder_
     unsigned int new_pins_1;
 
     int qei_crossover_velocity = qei_config.real_counts - qei_config.real_counts/10;
+    int vel_previous_position = 0, vel_old_difference = 0;
     int difference_velocity;
     int velocity = 0;
     timer t_velocity;
@@ -293,14 +306,14 @@ void qei_service(interface QEIInterface server i_qei[5], EncoderPorts & encoder_
 
         case t_velocity when timerafter(ts_velocity + MILLISECOND) :> ts_velocity:
 
-              difference_velocity = count - qei_velocity_params.previous_position;
+              difference_velocity = count - vel_previous_position;
               if(difference_velocity > qei_crossover_velocity)
-                  difference_velocity = qei_velocity_params.old_difference;
+                  difference_velocity = vel_old_difference;
               else if(difference_velocity < -qei_crossover_velocity)
-                  difference_velocity = qei_velocity_params.old_difference;
+                  difference_velocity = vel_old_difference;
 
-              qei_velocity_params.previous_position = count;
-              qei_velocity_params.old_difference = difference_velocity;
+              vel_previous_position = count;
+              vel_old_difference = difference_velocity;
 
               velocity = (difference_velocity*60000)/(qei_config.real_counts);
 

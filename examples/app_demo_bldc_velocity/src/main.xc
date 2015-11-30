@@ -22,14 +22,15 @@
 
 #include <xscope.h>
 //Configure your motor parameters in config/bldc_motor_config.h
-#include <bldc_motor_config.h>
 
+#include <bldc_motor_config.h>
+#include <qei_config.h>
 
 PwmPorts pwm_ports = PWM_PORTS;
 WatchdogPorts wd_ports = WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
 HallPorts hall_ports = HALL_PORTS;
-EncoderPorts encoder_ports = ENCODER_PORTS;
+QEIPorts encoder_ports = ENCODER_PORTS;
 
 #ifdef DC1K
 port p_ifm_encoder_hall_select_ext_d4to5 = SELECTION_HALL_ENCODER_PORT;
@@ -82,14 +83,14 @@ int main(void)
 				ctrl_par velocity_ctrl_params;
 				filter_par sensor_filter_params;
 				HallConfig hall_config;
-				qei_par qei_params;
+				QEIConfig qei_params;
 
 				/* Initialize PID parameters for Velocity Control (defined in config/motor/bldc_motor_config.h) */
 				init_velocity_control_param(velocity_ctrl_params);
 
 				/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
 				init_hall_config(hall_config);
-				init_qei_param(qei_params);
+				init_qei_config(qei_params);
 
 				/* Initialize sensor filter length */
 				init_sensor_filter_param(sensor_filter_params);
@@ -125,11 +126,14 @@ int main(void)
 				/* Motor Commutation loop */
 				{
 					HallConfig hall_config;
-					qei_par qei_params;
+					init_hall_config(hall_config);
+
+					QEIConfig qei_params;
+					init_qei_config(qei_params);
+
 					commutation_par commutation_params;
 					int init_state;
-					init_hall_config(hall_config);
-					init_qei_param(qei_params);
+
 					commutation_service(i_hall[0], i_qei[0], null, wd_interface,
 					        commutation_interface, c_pwm_ctrl,
 					        fet_driver_ports,
@@ -142,11 +146,11 @@ int main(void)
                     //connector 1 is configured as hall
                     p_ifm_encoder_hall_select_ext_d4to5 <: 0b0010;//last two bits define the interface [con2, con1], 0 - hall, 1 - QEI.
 #endif
-                    qei_velocity_par qei_velocity_params;
-                    qei_par qei_config;
-                    init_qei_velocity_params(qei_velocity_params);
 
-                    qei_service(i_qei, encoder_ports, qei_config, qei_velocity_params);         // channel priority 1,2..6
+                    QEIConfig qei_config;
+                    init_qei_config(qei_config);
+
+                    qei_service(i_qei, encoder_ports, qei_config);         // channel priority 1,2..6
 
 				}
 
