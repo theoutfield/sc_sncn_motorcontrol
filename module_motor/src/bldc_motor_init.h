@@ -13,7 +13,7 @@
  *
  * @param sensor_filter_par struct defines the velocity filter params
  */
-void init_sensor_filter_param(filter_par &sensor_filter_par) ;
+//void init_sensor_filter_param(filter_par &sensor_filter_par) ;
 
 /**
  * @brief initialize cyclic synchronous velocity params

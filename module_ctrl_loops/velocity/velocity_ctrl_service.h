@@ -26,6 +26,7 @@ interface VelocityControlInterface{
     void shutdown_velocity_ctrl();
 };
 
+#define DEFAULT_FILTER_LENGTH 8
 /**
  * @brief Initialise Velocity Control Loop
  *
@@ -82,7 +83,6 @@ void set_velocity_csv(csv_par & csv_params, int target_velocity,
  */
 [[combinable]]
 void velocity_control_service(ControlConfig & velocity_ctrl_params,
-                        filter_par & sensor_filter_params,
                         interface HallInterface client i_hall,
                         interface QEIInterface client ?i_qei,
                         interface VelocityControlInterface server i_velocity_control,

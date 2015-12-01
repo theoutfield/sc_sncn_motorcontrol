@@ -13,6 +13,7 @@
 struct
 {
     float max_acceleration, max_deceleration;  // max allowed acceleration & deceleration
+    float max_velocity;                        // max allowed velocity
     float acc, dec;                            // acceleration & deceleration input
     float u;                                   // initial velocity
     float v_d;                                 // desired velocity
@@ -23,18 +24,27 @@ struct
     int oldst;                                 // old state of acc/dec
 } profile_velocity_params;
 
+
+void init_velocity_profile_limits(int max_velocity, int max_acceleration, int max_deceleration){
+
+    profile_velocity_params.max_acceleration = (float) max_acceleration;
+    profile_velocity_params.max_deceleration = (float) max_deceleration;
+    profile_velocity_params.max_velocity = (float) max_velocity;
+
+}
+
 int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration,
-                          int deceleration, int max_velocity)
+                          int deceleration)
 {
     profile_velocity_params.u = (float) actual_velocity;
     //profile_velocity_params.v_d = (float) target_velocity;
     profile_velocity_params.acc = (float) acceleration;
     profile_velocity_params.dec = (float) deceleration;
 
-    if (target_velocity >= max_velocity) {
-        target_velocity = max_velocity;
-    } else if (target_velocity <= -max_velocity) {
-        target_velocity = 0-max_velocity;
+    if (target_velocity >= profile_velocity_params.max_velocity) {
+        target_velocity = profile_velocity_params.max_velocity;
+    } else if (target_velocity <= -profile_velocity_params.max_velocity) {
+        target_velocity = 0-profile_velocity_params.max_velocity;
     }
     profile_velocity_params.v_d = (float) target_velocity;
     //printf("srta");

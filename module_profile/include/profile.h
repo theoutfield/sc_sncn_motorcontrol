@@ -43,6 +43,8 @@ extern int quick_stop_velocity_profile_generate(int step);
 
 /*Profile Velocity Mode*/
 
+void init_velocity_profile_limits(int max_velocity, int max_acceleration, int max_deceleration);
+
 /**
  * @brief Initialise Velocity Profile
  *
@@ -56,7 +58,7 @@ extern int quick_stop_velocity_profile_generate(int step);
  * @Output
  * @return no. of steps for velocity profile : range [1 - steps]
  */
-extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration, int max_velocity);
+extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration);
 
 /**
  * @brief Generate Velocity Profile

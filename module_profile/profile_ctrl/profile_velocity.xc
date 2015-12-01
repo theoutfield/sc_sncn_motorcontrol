@@ -8,15 +8,18 @@
 #include <refclk.h>
 #include <xscope.h>
 #include <internal_config.h>
-#include <statemachine.h>
-#include <drive_modes.h>
-#include <print.h>
 #include <profile.h>
 #include <profile_control.h>
-//#define debug_print
 
+void init_velocity_profiler(int max_velocity, int max_acceleration, int max_deceleration,
+                                interface VelocityControlInterface client i_velocity_control){
 
-void set_profile_velocity(int target_velocity, int acceleration, int deceleration, int max_profile_velocity, interface VelocityControlInterface client i_velocity_control)
+    init_velocity_profile_limits(max_velocity,max_acceleration, max_deceleration);
+    //Interface not used for the moment, probably in the future.
+
+}
+
+void set_profile_velocity(int target_velocity, int acceleration, int deceleration, interface VelocityControlInterface client i_velocity_control)
 {
     int actual_velocity;
     timer t;
@@ -24,21 +27,17 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
     int steps = 0;
     int velocity_ramp;
     int i;
-    int init_state = i_velocity_control.check_busy(); //__check_velocity_init(c_velocity_ctrl);
+    int init_state = i_velocity_control.check_busy();
     while(init_state == INIT_BUSY)
     {
         init_state = init_velocity_control(i_velocity_control);
-        /*      if(init_state == INIT)
-                printstrln("velocity control intialized");
-                else
-                printstrln("intialize velocity control failed");*/
     }
 
 
     if(init_state == INIT)
     {
         actual_velocity = i_velocity_control.get_velocity();
-        steps = init_velocity_profile(target_velocity, actual_velocity, acceleration, deceleration, max_profile_velocity);
+        steps = init_velocity_profile(target_velocity, actual_velocity, acceleration, deceleration);
         t :> time;
         for(i = 1; i < steps; i++) {
             velocity_ramp = velocity_profile_generate(i);
