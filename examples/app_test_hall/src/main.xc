@@ -8,15 +8,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <print.h>
-#include <xscope.h>
 #include <hall_service.h>
-#include <hall_config.h>
-
-
-#define ENABLE_XSCOPE
-
-HallPorts hall_ports = HALL_PORTS;
 
 /* Test Hall Sensor Client */
 void hall_test(interface HallInterface client i_hall)
@@ -25,7 +17,6 @@ void hall_test(interface HallInterface client i_hall)
     int velocity = 0;
     int count = 0;
     int direction;
-    int old_count = 0;
     int pins = 0;
 
     while(1)
@@ -40,34 +31,17 @@ void hall_test(interface HallInterface client i_hall)
         /* get pins state from Hall Sensor */
         pins = i_hall.get_hall_pinstate();
 
-#ifndef ENABLE_XSCOPE
-        if (count != old_count) {
-            printstr("Count: ");
-            printint(count);
-            printstr(" ");
-            printstr("Position: ");
-            printint(position);
-            printstr(" ");
-            printstr("Velocity: ");
-            printint(velocity);
-            printstr(" ");
-            printstr("Pins: ");
-            printchar('0'+((pins&0b100)>>2));
-            printchar('0'+((pins&0b10)>>1));
-            printcharln('0'+(pins&1));
-        }
-        old_count = count;
-#else
         xscope_int(COUNT, count);
         xscope_int(POSITION, position);
         xscope_int(VELOCITY, velocity);
         xscope_int(A, (pins&1)*1000); // scale to 1000 for easier display in xscope
         xscope_int(B, (pins&0b10)*500);
         xscope_int(C, (pins&0b100)*250);
-#endif
+
     }
 }
 
+HallPorts hall_ports = HALL_PORTS;
 
 int main(void)
 {
@@ -80,7 +54,9 @@ int main(void)
         on tile[IFM_TILE]:
         {
             HallConfig hall_config;
-            init_hall_config(hall_config);
+                hall_config.pole_pairs = 4;                         // 4 Pole-pairs
+                hall_config.sensor_polarity = 1;                    // CW
+                hall_config.max_ticks = 10 * HALL_TICKS_PER_TURN;   // 10 turns
 
             hall_service(i_hall, hall_ports, hall_config);
         }

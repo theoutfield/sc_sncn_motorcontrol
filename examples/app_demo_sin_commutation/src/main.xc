@@ -9,6 +9,7 @@
  */
 
 #include <tuning.h>
+
 #include <hall_service.h>
 #include <hall_config.h>
 #include <commutation_config.h>

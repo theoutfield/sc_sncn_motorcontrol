@@ -100,7 +100,7 @@ int check_qei_config(QEIConfig &qei_config)
         return ERROR;
     }
 
-    if(qei_config.max_ticks_per_turn < 0 || qei_config.real_counts < 0){
+    if(qei_config.real_counts < 0){
         printstrln("Wrong QEI configuration: wrong resolution");
         return ERROR;
     }
@@ -123,6 +123,7 @@ void qei_service(interface QEIInterface server i_qei[5], QEIPorts &encoder_ports
 
     printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
 
+    qei_config.max_ticks_per_turn = qei_config.real_counts;
     int position = 0;
     unsigned int v;
 
