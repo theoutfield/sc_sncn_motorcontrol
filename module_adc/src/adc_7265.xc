@@ -144,11 +144,9 @@ void adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to clie
              break;
 
          }// end of select
-    } // while (do_loop)
+    } // while(1)
 
-    printstrln("Terminated loop");
-    printstrln("\n                                             ADC Server Ends");
-} // foc_adc_7265_triggered
+} // adc_7265_continuous_loop
 
 void run_adc_AD7256(server interface ADC iADC, server interface ADC_trigger i_ADC_trigger, adc_ports_t &adc_ports)
 {
