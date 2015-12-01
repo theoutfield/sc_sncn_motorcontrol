@@ -8,21 +8,21 @@
  * @author Synapticon GmbH (www.synapticon.com)
  */
 
-#include <print.h>
 #include <refclk.h>
+#include <print.h>
+#include <xscope.h>
 
+//BLDC Motor drive libs
 #include <qei_service.h>
 #include <hall_service.h>
 #include <pwm_service.h>
 #include <commutation_service.h>
 
+//Position control + profile libs
 #include <position_ctrl_service.h>
-#include <profile.h>
 #include <profile_control.h>
 
-#include <xscope.h>
-
-//Configure your motor parameters in config/bldc_motor_config.h
+//Configuration
 #include <bldc_motor_config.h>
 #include <qei_config.h>
 #include <hall_config.h>
@@ -30,7 +30,7 @@
 #include <control_config.h>
 
 /* Test Profile Position function */
-void position_profile_test(interface PositionControlInterface client i_position_control, interface QEIInterface client i_qei)
+void position_profile_test(interface PositionControlInterface client i_position_control)
 {
 	int actual_position = 0;			// ticks
 	int target_position = 16000;		// HALL: 4096 extrapolated ticks x nr. pole pairs = one rotation; QEI: your encoder documented resolution x 4 = one rotation
@@ -40,14 +40,8 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int follow_error;
 	timer t;
 
-	HallConfig hall_config;
-	QEIConfig qei_params;
-	init_qei_config(qei_params);
-	init_hall_config(hall_config);
-
-	/* Initialise Profile Limits for position profile generator and select position sensor */ //FIXME GET RID OF THIS
-	init_position_profile_limits(MAX_ACCELERATION, MAX_PROFILE_VELOCITY, qei_params, hall_config, \
-			SENSOR_USED, MAX_POSITION_LIMIT, MIN_POSITION_LIMIT);
+	/* Initialise the position profile generator */
+	init_position_profiler(MIN_POSITION_LIMIT, MAX_POSITION_LIMIT, MAX_PROFILE_VELOCITY, MAX_ACCELERATION, i_position_control);
 
 	/* Set new target position for profile position control */
 	set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
@@ -87,7 +81,7 @@ int main(void)
 	par
 	{
 		/* Test Profile Position Client function*/
-		on tile[APP_TILE_1]: position_profile_test(i_position_control, i_qei[2]);      // test PPM on slave side
+		on tile[APP_TILE_1]: position_profile_test(i_position_control);      // test PPM on slave side
 
 		/************************************************************
 		 * IFM_TILE
@@ -133,7 +127,7 @@ int main(void)
 
                      /* Control Loop */
                      position_control_service(position_ctrl_params, i_hall[1], i_qei[1],
-                                                     i_position_control, i_commutation[0]);
+                                               i_position_control, i_commutation[0]);
                 }
             }
         }

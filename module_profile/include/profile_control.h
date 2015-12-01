@@ -14,6 +14,11 @@
 #include <velocity_ctrl_service.h>
 #include <torque_ctrl_service.h>
 
+
+void init_position_profiler(int min_position, int max_position, int max_velocity, int max_acceleration,
+                                interface PositionControlInterface client i_position_control);
+
+
 /**
  * @brief Set profile position with Position Control loop
  *
