@@ -12,6 +12,7 @@
 #define FILTER_LENGTH_HALL  16
 #define PULL_PERIOD_USEC 12
 
+#define HALL_TICKS_PER_TURN 4096
 /**
  * @brief Structure definition for hall sensor
  */

@@ -30,7 +30,7 @@ int check_hall_config(HallConfig &hall_config){
         return ERROR;
     }
 
-    if(hall_config.max_ticks < 0 || hall_config.max_ticks_per_turn < 0){
+    if(hall_config.max_ticks < 0){
         printstrln("Wrong Hall configuration: max ticks");
         return ERROR;
     }
@@ -43,10 +43,14 @@ int check_hall_config(HallConfig &hall_config){
 void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports, HallConfig & hall_config)
 {
 
+
+
     if(check_hall_config(hall_config) == ERROR){
         printstrln("Error while checking the Hall sensor configuration");
         return;
     }
+
+    hall_config.max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_TURN;
 
     printf("*************************************\n    HALL SENSOR SERVER STARTING\n*************************************\n");
 
