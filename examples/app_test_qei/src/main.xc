@@ -8,14 +8,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <print.h>
-#include <refclk.h>
-#include <xscope.h>
-
 #include <qei_service.h>
-#include <qei_config.h>
-
-QEIPorts encoder_ports = ENCODER_PORTS;
 
 /* Test QEI Sensor Client */
 void qei_test(interface QEIInterface client i_qei)
@@ -39,9 +32,11 @@ void qei_test(interface QEIInterface client i_qei)
 		xscope_int(POSITION, position);
 		xscope_int(VELOCITY, velocity);
 
-		wait_ms(1, core_id, t);
+		delay_milliseconds(1);//, core_id, t);
 	}
 }
+
+QEIPorts encoder_ports = ENCODER_PORTS;
 
 int main(void)
 {
@@ -49,7 +44,7 @@ int main(void)
 
 	par
 	{
-		on tile[COM_TILE]:
+		on tile[APP_TILE]:
 		{
 			/* Test QEI Sensor Client */
 			qei_test(i_qei[0]);
@@ -64,9 +59,13 @@ int main(void)
 			/* QEI Server Loop */
 			{
 			    QEIConfig qei_config;
-			    init_qei_config(qei_config);
+                    qei_config.index = QEI_WITH_INDEX;                  // Indexed encoder
+                    qei_config.real_counts = 16000;                     // 4 x 4000 ticks (Cuadrature encoder)
+                    qei_config.sensor_polarity = QEI_POLARITY_NORMAL;   // CW
+                    qei_config.poles = 4;                               // 4 pole pairs on motor (for hall syncronization, not always used)
+                    qei_config.max_ticks = 10 * qei_config.real_counts; // 10 turns
 
-				qei_service(i_qei, encoder_ports, qei_config);  		// channel priority 1,2..6
+				qei_service(i_qei, encoder_ports, qei_config);
 			}
 		}
 	}

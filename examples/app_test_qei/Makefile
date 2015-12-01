@@ -12,7 +12,7 @@ TARGET = SOMANET-C22
 APP_NAME = test_qei
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_blocks module_board-support module_motor module_motorcontrol_common module_qei
+USED_MODULES = module_blocks module_board-support module_motorcontrol_common module_qei
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
