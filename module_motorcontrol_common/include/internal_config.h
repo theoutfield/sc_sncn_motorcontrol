@@ -59,11 +59,12 @@
 /**
  * @brief struct definition for velocity filter
  */
+/*
 typedef struct S_Filter_length
 {
     int filter_length;
 } filter_par;
-
+*/
 /**
  * @brief struct definition for Synchronous torque param
  */

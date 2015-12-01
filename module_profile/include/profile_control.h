@@ -18,6 +18,8 @@
 void init_position_profiler(int min_position, int max_position, int max_velocity, int max_acceleration,
                                 interface PositionControlInterface client i_position_control);
 
+void init_velocity_profiler(int max_velocity, int max_acceleration, int max_deceleration,
+                                interface VelocityControlInterface client i_velocity_control);
 
 /**
  * @brief Set profile position with Position Control loop
@@ -49,7 +51,7 @@ void set_profile_position( int target_position, int velocity, int acceleration, 
  *
  */
 void set_profile_velocity( int target_velocity, int acceleration, int deceleration,
-                           int max_profile_velocity, interface VelocityControlInterface client i_velocity_control );
+                           interface VelocityControlInterface client i_velocity_control );
 
 /**
  * @brief Set profile torque with Torque Control loop
