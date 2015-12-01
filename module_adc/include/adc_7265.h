@@ -103,7 +103,7 @@ typedef struct adc_ports {
 #define ADC_TRIGGER_DELAY (QUART_PWM_MAX - ADC_TRIGGER_CORR) // MB~ Re-tune
 
 
-void foc_adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to client
+void adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to client
     server interface ADC iADC,
     adc_ports_t &adc_ports
 );
