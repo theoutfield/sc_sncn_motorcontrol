@@ -56,7 +56,7 @@ int main(void)
 		on tile[IFM_TILE]:
 		{
 
-			/* QEI Server Loop */
+			/* QEI Service Loop */
 			{
 			    QEIConfig qei_config;
                     qei_config.index = QEI_WITH_INDEX;                  // Indexed encoder
