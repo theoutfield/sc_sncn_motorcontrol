@@ -8,20 +8,17 @@
  * @author Synapticon GmbH (www.synapticon.com)
  */
 
-#include <print.h>
-#include <refclk.h>
-
-#include <hall_service.h>
+//BLDC Motor drive libs
 #include <qei_service.h>
+#include <hall_service.h>
 #include <pwm_service.h>
 #include <adc_service.h>
 #include <commutation_service.h>
 
+//Torque control + profile libs
 #include <torque_ctrl_service.h>
 #include <profile_control.h>
-#include <profile.h>
 
-#include <xscope.h>
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <bldc_motor_config.h>
 #include <qei_config.h>
@@ -32,36 +29,34 @@
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-    delay_seconds(1);
-
 	int target_torque = 500; 	//(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 500;  	//(desired torque_slope/torque_constant)  * IFM resolution
-	cst_par cst_params; int actual_torque; timer t; unsigned int time;
-	init_cst_param(cst_params);
+	int actual_torque;
     xscope_int(TARGET_TORQUE, target_torque);
 
+
+	/* Initialise the torque profile generator */
+	init_torque_profiler(MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION, POLARITY, i_torque_control);
+
 	/* Set new target torque for profile torque control */
-	set_profile_torque( target_torque, torque_slope, cst_params, i_torque_control);
+	set_profile_torque( target_torque, torque_slope, i_torque_control);
 
-	delay_seconds(5);
-
-	target_torque = 0;
-	xscope_int(TARGET_TORQUE, target_torque);
-	set_profile_torque( target_torque, torque_slope, cst_params, i_torque_control);
+	delay_seconds(3);
 
 	target_torque = -500;
 	xscope_int(TARGET_TORQUE, target_torque);
-	set_profile_torque( target_torque, torque_slope, cst_params, i_torque_control);
-	t:>time;
+
+    /* Set new target torque for profile torque control */
+	set_profile_torque( target_torque, torque_slope, i_torque_control);
 
 	while(1)
 	{
-		actual_torque = i_torque_control.get_torque()*cst_params.polarity;
+		actual_torque = i_torque_control.get_torque();
 
         xscope_int(ACTUAL_TORQUE, actual_torque);
         xscope_int(TARGET_TORQUE, target_torque);
 
-		t when timerafter(time + MSEC_STD) :> time;
+		delay_milliseconds(1);
 	}
 }
 
@@ -79,7 +74,7 @@ int main(void)
 
 	interface WatchdogInterface i_watchdog;
     interface CommutationInterface i_commutation[3];
-    interface ADCInterface adc_interface;
+    interface ADCInterface i_adc;
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
@@ -92,13 +87,12 @@ int main(void)
 
 		on tile[APP_TILE]:
 		{
-        /* Torque Control Loop */
-
+		    /* Torque Control Loop */
             ControlConfig torque_ctrl_params;
-            init_torque_control_config(torque_ctrl_params);  /* Initialize PID parameters for Torque Control (defined in config/motor/bldc_motor_config.h) */
+            init_torque_control_config(torque_ctrl_params);  // Initialize PID parameters for Torque Control
 
             /* Control Loop */
-            torque_control_service( torque_ctrl_params, adc_interface, i_commutation[0],  i_hall[1], i_qei[1], i_torque_control);
+            torque_control_service( torque_ctrl_params, i_adc, i_commutation[0],  i_hall[1], i_qei[1], i_torque_control);
         }
 
 
@@ -109,14 +103,14 @@ int main(void)
 		{
 			par
 			{
-				/* ADC Loop */
-			    adc_service(adc_interface, adc_ports, c_adctrig);
-
 				/* PWM Loop */
 				pwm_triggered_service(c_pwm_ctrl, c_adctrig, pwm_ports);
 
                 /* Watchdog Server */
                 watchdog_service(i_watchdog, wd_ports);
+
+                /* ADC Loop */
+                adc_service(i_adc, adc_ports, c_adctrig);
 
                 {
                     HallConfig hall_config;
@@ -130,7 +124,7 @@ int main(void)
                     QEIConfig qei_config;
                     init_qei_config(qei_config);
 
-                    qei_service(i_qei, encoder_ports, qei_config);         // channel priority 1,2..6
+                    qei_service(i_qei, encoder_ports, qei_config);
                 }
 
 				/* Motor Commutation loop */

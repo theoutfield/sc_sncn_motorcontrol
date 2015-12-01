@@ -412,6 +412,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                 } else {
                     out_torque = 0-actual_torque;
                 }
+                out_torque *= hall_config.sensor_polarity; //it seems like the polarity is needed here.
 
                 break;
 
