@@ -20,6 +20,7 @@
 #include <brushed_dc_client.h>
 #endif
 
+
 int init_velocity_control(interface VelocityControlInterface client i_velocity_control)
 {
     int ctrl_state = INIT_BUSY;
@@ -59,7 +60,6 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 
 [[combinable]]
 void velocity_control_service(ControlConfig &velocity_ctrl_params,
-                       filter_par & sensor_filter_params,
                        interface HallInterface client i_hall,
                        interface QEIInterface client ?i_qei,
                        interface VelocityControlInterface server i_velocity_control,
@@ -78,7 +78,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
     unsigned int time;
 
     /* Sensor filter declarations */
-    int filter_length = sensor_filter_params.filter_length;
+    int filter_length = DEFAULT_FILTER_LENGTH; //sensor_filter_params.filter_length;
     int filter_buffer[FILTER_SIZE_MAX] = {0};   //default size used at compile time (cant be changed further)
     int index = 0;
 

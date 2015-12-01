@@ -71,9 +71,10 @@ void init_cst_param(cst_par &cst_params)
 	cst_params.max_torque = MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
         cst_params.motor_torque_constant = MOTOR_TORQUE_CONSTANT;
 }
-
+/*
 void init_sensor_filter_param(filter_par &sensor_filter_par) //optional for user to change
 {
 	sensor_filter_par.filter_length = VELOCITY_FILTER_SIZE;
 	return;
 }
+*/
