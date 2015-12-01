@@ -8,10 +8,6 @@
  * @author Synapticon GmbH (www.synapticon.com)
  */
 
-#include <refclk.h>
-#include <print.h>
-#include <xscope.h>
-
 //BLDC Motor drive libs
 #include <qei_service.h>
 #include <hall_service.h>
@@ -22,7 +18,7 @@
 #include <position_ctrl_service.h>
 #include <profile_control.h>
 
-//Configuration
+//Configuration headers
 #include <bldc_motor_config.h>
 #include <qei_config.h>
 #include <hall_config.h>
@@ -38,7 +34,6 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int acceleration 	= 500;			// rpm/s
 	int deceleration 	= 500;     	// rpm/s
 	int follow_error;
-	timer t;
 
 	/* Initialise the position profile generator */
 	init_position_profiler(MIN_POSITION_LIMIT, MAX_POSITION_LIMIT, MAX_PROFILE_VELOCITY, MAX_ACCELERATION, i_position_control);
@@ -56,7 +51,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
 		xscope_int(TARGET_POSITION, target_position);
 		xscope_int(FOLLOW_ERROR, follow_error);
 
-		wait_ms(1, 1, t);  /* 1 ms wait */
+		delay_milliseconds(1); /* 1 ms wait */
 	}
 }
 
@@ -101,7 +96,7 @@ int main(void)
                     QEIConfig qei_config;
                     init_qei_config(qei_config);
 
-                    qei_service(i_qei, encoder_ports, qei_config);         // channel priority 1,2..6
+                    qei_service(i_qei, encoder_ports, qei_config);
                 }
 
                 {
@@ -123,7 +118,7 @@ int main(void)
                 /* Position Control Loop */
                 {
                      ControlConfig position_ctrl_params;
-                     init_position_control_config(position_ctrl_params);  /* Initialize PID parameters for Position Control (defined in config/motor/bldc_motor_config.h) */
+                     init_position_control_config(position_ctrl_params); // Initialize PID parameters for Position Control
 
                      /* Control Loop */
                      position_control_service(position_ctrl_params, i_hall[1], i_qei[1],
