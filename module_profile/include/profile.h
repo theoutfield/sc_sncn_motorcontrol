@@ -43,7 +43,7 @@ extern int quick_stop_velocity_profile_generate(int step);
 
 /*Profile Velocity Mode*/
 
-void init_velocity_profile_limits(int max_velocity, int max_acceleration, int max_deceleration);
+extern void init_velocity_profile_limits(int max_velocity, int max_acceleration, int max_deceleration);
 
 /**
  * @brief Initialise Velocity Profile
@@ -139,6 +139,8 @@ extern int init_quick_stop_position_profile(int actual_velocity, int actual_posi
  */
 extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
 
+extern void init_linear_profile_limits(int max_value, int polarity);
+extern int get_linear_profile_polarity();
 /**
  * @brief Initialise Linear Profile
  *
@@ -152,7 +154,7 @@ extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
  * @Output
  * @return no. of steps for linear profile : range [1 - steps]
  */
-extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value);
+extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration);
 
 /**
  * @brief Generate Linear Profile
