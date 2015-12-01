@@ -11,6 +11,8 @@
 struct
 {
     float max_acceleration, max_deceleration;   // max allowed acceleration & deceleration
+    float max_value;                            // max allowed value
+    int polarity;
     float acc, dec;                             // acceleration & deceleration input
     float u;                                    // initial value
     float v_d;                                  // desired value
@@ -21,16 +23,28 @@ struct
     int oldst;                                  // old state of acc/dec
 } profile_linear_params;
 
-int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value)
+
+void init_linear_profile_limits(int max_value, int polarity){
+
+    profile_linear_params.polarity = polarity;
+    profile_linear_params.max_value = (float) max_value;
+}
+
+int get_linear_profile_polarity(){
+
+    return profile_linear_params.polarity;
+}
+
+int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration)
 {
     profile_linear_params.u = (float) actual_value;
     profile_linear_params.acc = (float) acceleration;
     profile_linear_params.dec = (float) deceleration;
 
-    if (target_value >= max_value) {
-        target_value = max_value;
-    } else if(target_value <= -max_value) {
-        target_value = 0-max_value;
+    if (target_value >=  profile_linear_params.max_value) {
+        target_value =  profile_linear_params.max_value;
+    } else if(target_value <= - profile_linear_params.max_value) {
+        target_value = 0- profile_linear_params.max_value;
     }
 
     profile_linear_params.v_d = (float) target_value;
