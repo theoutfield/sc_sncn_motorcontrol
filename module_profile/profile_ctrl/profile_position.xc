@@ -14,6 +14,23 @@
 #include <profile.h>
 #include <profile_control.h>
 
+
+
+void init_position_profiler(int min_position, int max_position, int max_velocity, int max_acceleration,
+                                interface PositionControlInterface client i_position_control){
+
+    ControlConfig control_config = i_position_control.getControlConfig();
+    QEIConfig qei_config = i_position_control.getQEIConfig();
+    HallConfig hall_config = i_position_control.getHallConfig();
+
+    init_position_profile_limits(max_acceleration, max_velocity, qei_config,
+                                      hall_config, control_config.sensor_used, max_position, min_position);
+
+    return;
+
+}
+
+
 void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,
                           interface PositionControlInterface client i_position_control )
 {
