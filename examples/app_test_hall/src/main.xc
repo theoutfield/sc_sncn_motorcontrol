@@ -41,7 +41,7 @@ void hall_test(interface HallInterface client i_hall)
     }
 }
 
-HallPorts hall_ports = HALL_PORTS;
+HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
 int main(void)
 {

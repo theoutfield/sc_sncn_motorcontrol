@@ -20,11 +20,11 @@
     #include <adc_service.h>
 #endif
 
-PwmPorts pwm_ports = PWM_PORTS;
-WatchdogPorts wd_ports = WATCHDOG_PORTS;
-FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
-ADCPorts adc_ports = ADC_PORTS;
-HallPorts hall_ports= HALL_PORTS;
+PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
+WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
+HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
 #define VOLTAGE 200 //+/- 4095
 
