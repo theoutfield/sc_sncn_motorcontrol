@@ -345,8 +345,8 @@ void __initialize_position_profile_limits(int max_acceleration, int max_velocity
     profile_pos_params->min_position = min_position;
     profile_pos_params->sensor_used = sensor_select;
     if (profile_pos_params->sensor_used == HALL) {
-        profile_pos_params->max_acceleration =  rpm_to_ticks_hall(max_acceleration , profile_pos_params->hall_config);
-        profile_pos_params->max_velocity = rpm_to_ticks_hall(max_velocity, profile_pos_params->hall_config);
+        profile_pos_params->max_acceleration =  rpm_to_ticks_hall(max_acceleration , profile_pos_params->hall_params);
+        profile_pos_params->max_velocity = rpm_to_ticks_hall(max_velocity, profile_pos_params->hall_params);
     } else if (profile_pos_params->sensor_used >= QEI) {
         profile_pos_params->max_acceleration =  rpm_to_ticks_qei(max_acceleration , profile_pos_params->qei_params);
         profile_pos_params->max_velocity = rpm_to_ticks_qei(max_velocity, profile_pos_params->qei_params);
@@ -382,9 +382,9 @@ int __initialize_position_profile(int target_position, int actual_position, int 
         profile_pos_params->acc =  rpm_to_ticks_qei(acceleration, profile_pos_params->qei_params);
         profile_pos_params->dec =  rpm_to_ticks_qei(deceleration, profile_pos_params->qei_params);
     } else if (profile_pos_params->sensor_used == HALL) {
-        profile_pos_params->vi = rpm_to_ticks_hall(velocity, profile_pos_params->hall_config);
-        profile_pos_params->acc =  rpm_to_ticks_hall(acceleration, profile_pos_params->hall_config);
-        profile_pos_params->dec =  rpm_to_ticks_hall(deceleration, profile_pos_params->hall_config);
+        profile_pos_params->vi = rpm_to_ticks_hall(velocity, profile_pos_params->hall_params);
+        profile_pos_params->acc =  rpm_to_ticks_hall(acceleration, profile_pos_params->hall_params);
+        profile_pos_params->dec =  rpm_to_ticks_hall(deceleration, profile_pos_params->hall_params);
     } else {
         //profile_pos_params->vi = rpm_to_ticks_sensor(velocity, max_ticks_per_turn);
         //profile_pos_params->acc =  rpm_to_ticks_sensor(acceleration, max_ticks_per_turn);
