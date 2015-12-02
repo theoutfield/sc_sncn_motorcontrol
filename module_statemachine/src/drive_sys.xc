@@ -100,8 +100,16 @@ check_list init_checklist(void)
     return check_list_param;
 }
 
-void update_checklist(check_list &check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
-                      chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, interface PositionControlInterface client i_position_control)
+void update_checklist(check_list &check_list_param, int mode,
+                        interface CommutationInterface client i_commutation,
+                        interface HallInterface client i_hall,
+                        interface QEIInterface client i_qei,
+                        interface ADCInterface client ?i_adc,
+                                interface TorqueControlInterface client i_torque_control,
+                                interface VelocityControlInterface client i_velocity_control,
+                                interface PositionControlInterface client i_position_control)
+
+
 {
     bool check;
     bool skip = true;
@@ -111,30 +119,30 @@ void update_checklist(check_list &check_list_param, int mode, chanend c_commutat
     switch(check) {
     case INIT_BUSY:
         if (~check_list_param._commutation_init) {
-            check_list_param._commutation_init = __check_commutation_init(c_commutation);
+            check_list_param._commutation_init = i_commutation.checkBusy();//__check_commutation_init(c_commutation);
             if(check_list_param._commutation_init) {
                 skip = false;
             }
         }
 
         if (~skip && ~check_list_param._adc_init) {
-            check_list_param._adc_init = __check_adc_init();
+            check_list_param._adc_init = 0; //__check_adc_init(); TODO NEED TO IMPLEMENT STATUS CHECKING HERE
         }
 
         if (~skip && ~check_list_param._hall_init) {
-            check_list_param._hall_init = __check_hall_init(c_hall);
+            check_list_param._hall_init = i_hall.checkBusy();//__check_hall_init(c_hall);
         }
 
         if (~skip &&  ~check_list_param._qei_init) {
-            check_list_param._qei_init = __check_qei_init(c_qei);
+            check_list_param._qei_init = i_qei.checkBusy();//__check_qei_init(c_qei);
         }
         break;
     case INIT:
         if (~check_list_param._torque_init && mode == 1) {
-            check_list_param._torque_init = __check_torque_init(c_torque_ctrl);
+            check_list_param._torque_init = i_torque_control.check_busy();//__check_torque_init(c_torque_ctrl);
         }
         if (~check_list_param._velocity_init && mode == 2) {
-            check_list_param._velocity_init = __check_velocity_init(c_velocity_ctrl);
+            check_list_param._velocity_init = i_velocity_control.check_busy();//__check_velocity_init(c_velocity_ctrl);
         }
         if (~check_list_param._position_init && mode == 3) {
             check_list_param._position_init = i_position_control.check_busy(); //__check_position_init(c_position_ctrl);

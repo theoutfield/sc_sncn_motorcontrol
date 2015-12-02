@@ -49,9 +49,11 @@ int check_commutation_config(CommutationConfig &commutation_params)
 }
 
 [[combinable]]
-void commutation_service(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
+void commutation_service(interface HallInterface client i_hall,
+                            interface QEIInterface client ?i_qei,
                             interface WatchdogInterface client watchdog_interface,
-                            interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
+                            interface CommutationInterface server commutation_interface[5],
+                            chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
                             CommutationConfig &commutation_params)
 {
@@ -61,7 +63,6 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
     t_pwm_control pwm_ctrl;
     int check_fet;
     int init_state = INIT_BUSY;
-    int command;
 
     unsigned int pwm[3] = { 0, 0, 0 };
     int angle_pwm = 0;
@@ -207,34 +208,35 @@ void commutation_service(interface HallInterface client i_hall, interface QEIInt
                     state_return = init_state;
                     break;
 
+            case commutation_interface[int i].setAllParameters(HallConfig in_hall_config,
+                                                                QEIConfig in_qei_config,
+                                                                CommutationConfig in_commutation_config, int in_nominal_speed):
 
-            case !isnull(c_signal) => c_signal :> command:
-                if (command == CHECK_BUSY) {      // init signal
-                    c_signal <: init_state;
-                } else if (command == SET_COMM_PARAM_ECAT) {
-                    c_signal :> hall_config.pole_pairs;
-                    c_signal :> qei_config.index;
-                    c_signal :> qei_config.max_ticks_per_turn;
-                    c_signal :> qei_config.real_counts;
-                    c_signal :> nominal_speed;
-                    c_signal :> commutation_params.hall_offset_clk;
-                    c_signal :> commutation_params.hall_offset_cclk;
-                    c_signal :> commutation_params.winding_type;
-                    commutation_params.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
-                    if (hall_config.pole_pairs < 4) {
-                        commutation_params.nominal_speed = nominal_speed * 4;
-                    } else if (hall_config.pole_pairs >= 4) {
-                        commutation_params.nominal_speed = nominal_speed;
-                    }
-                    commutation_params.qei_forward_offset = 0;
-                    commutation_params.qei_backward_offset = 0;
-                    voltage = 0;
-                    max_count_per_hall = qei_config.real_counts / hall_config.pole_pairs;
-                    angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
-                    fw_flag = 0;
-                    bw_flag = 0;
-                }
-                break;
+                 hall_config.pole_pairs = in_hall_config.pole_pairs;
+                 qei_config.index = in_qei_config.index;
+                 qei_config.max_ticks_per_turn = in_qei_config.max_ticks_per_turn;
+                 qei_config.real_counts = in_qei_config.real_counts;
+                 nominal_speed = in_nominal_speed;
+                 commutation_params.hall_offset_clk = in_commutation_config.hall_offset_clk;
+                 commutation_params.hall_offset_cclk = in_commutation_config.hall_offset_cclk;
+                 commutation_params.winding_type = in_commutation_config.winding_type;
+                 commutation_params.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
+
+                 if (hall_config.pole_pairs < 4) {
+                      commutation_params.nominal_speed = nominal_speed * 4;
+                  } else if (hall_config.pole_pairs >= 4) {
+                      commutation_params.nominal_speed = nominal_speed;
+                  }
+                  commutation_params.qei_forward_offset = 0;
+                  commutation_params.qei_backward_offset = 0;
+                  voltage = 0;
+                  max_count_per_hall = qei_config.real_counts / hall_config.pole_pairs;
+                  angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
+                  fw_flag = 0;
+                  bw_flag = 0;
+
+                    break;
+
             }
 
  //       t_loop :> end_time;

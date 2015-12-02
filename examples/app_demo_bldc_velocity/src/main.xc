@@ -58,11 +58,10 @@ void profile_velocity_test(interface VelocityControlInterface client i_velocity_
 
 int main(void)
 {
-	// Motor control channels
 	chan c_pwm_ctrl;     // pwm channel
 
 	interface WatchdogInterface i_watchdog;
-    interface CommutationInterface i_commutation[3];
+    interface CommutationInterface i_commutation[5];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
@@ -113,12 +112,10 @@ int main(void)
 
                 /* QEI Server */
                 {
-
                     QEIConfig qei_config;
                     init_qei_config(qei_config);
 
                     qei_service(i_qei, encoder_ports, qei_config);
-
                 }
 
 				/* Motor Commutation loop */
@@ -126,8 +123,8 @@ int main(void)
                     CommutationConfig commutation_config;
                     init_commutation_config(commutation_config);
 
-                    commutation_service(i_hall[0], i_qei[0], null, i_watchdog, i_commutation,
-                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                    commutation_service(i_hall[0], i_qei[0], i_watchdog, i_commutation,
+                                            c_pwm_ctrl, fet_driver_ports, commutation_config);
                 }
 			}
 		}

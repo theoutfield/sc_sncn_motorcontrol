@@ -7,12 +7,11 @@
 #pragma once
 
 #include <mc_constants.h>
-#include <pwm_common.h>
 
 /* TODO: output of control loops shouldn't (directly) depend on
  * PWM_MAX_VALUE, etc. */
-#define BLDC_PWM_CONTROL_LIMIT              (((PWM_MAX_VALUE) - (PWM_DEAD_TIME)) / 2)
-#define BDC_PWM_CONTROL_LIMIT               ((PWM_MAX_VALUE) - (PWM_DEAD_TIME))
+#define BLDC_PWM_CONTROL_LIMIT              (13889 - 700) / 2 //(((PWM_MAX_VALUE) - (PWM_DEAD_TIME)) / 2)
+#define BDC_PWM_CONTROL_LIMIT               (13889 - 700)     //((PWM_MAX_VALUE) - (PWM_DEAD_TIME))
 
 #define HALL_POSITION_INTERPOLATED_RANGE    4096
 
@@ -36,7 +35,7 @@
 #define FILTER_SIZE_MAX                     128 // max size
 
 #define SET_COMM_PARAM_ECAT                 20
-#define set_hall_conifg_ecat                 21
+#define SET_HALL_CONFIG_ECAT                21
 #define SET_QEI_PARAM_ECAT                  22
 
 #define INIT_VELOCITY_CTRL                  29

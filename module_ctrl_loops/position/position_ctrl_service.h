@@ -19,7 +19,7 @@ interface PositionControlInterface{
     void set_position(int target_position);
     int get_position();
     void set_position_ctrl_param(ControlConfig position_ctrl_params);
-    void set_position_ctrl_hall_param(int pole_pairs);
+    void set_position_ctrl_hall_param(HallConfig hall_config);
     void set_position_ctrl_qei_param(QEIConfig qei_params);
     void set_position_sensor(int sensor_used);
     void enable_position_ctrl();

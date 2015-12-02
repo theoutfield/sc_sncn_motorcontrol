@@ -40,6 +40,8 @@ interface HallInterface {
     int get_hall_velocity();
     void reset_hall_count(int offset);
     HallConfig getHallConfig();
+    void setHallConfig(HallConfig in_config);
+    int checkBusy();
 };
 
 /**

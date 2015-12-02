@@ -4,16 +4,15 @@
 */
 
 #include <refclk.h>
-#include <qei_client.h>
-#include <hall_client.h>
-#include <commutation_client.h>
+#include <qei_service.h>
+#include <hall_service.h>
+#include <commutation_service.h>
 #include <statemachine.h>
 #include <drive_modes.h>
-#include <qei_client.h>
 #include <internal_config.h>
 #include <print.h>
 
-int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation)
+int detect_sensor_placement(interface HallInterface client i_hall, interface QEIInterface client i_qei, interface CommutationInterface client i_commutation)
 {
     int times = 50;
     int valid;
@@ -33,7 +32,7 @@ int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation
     int init_state;
 
     while (1) {
-        init_state = __check_commutation_init(c_commutation);
+        init_state = i_commutation.checkBusy();//__check_commutation_init(c_commutation);
         if (init_state == INIT) {
             printstrln("commutation intialized");
             init_state = INIT_BUSY;
@@ -41,13 +40,13 @@ int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation
         }
     }
 
-    set_commutation_sinusoidal(c_commutation, 400);
+    i_commutation.setVoltage(400);//set_commutation_sinusoidal(c_commutation, 400);
     t :> time;
 
     while (sum_h == 0) {
         for (i=0; i<times ; i++) {
             t when timerafter(time+100000) :> time;
-            { current_pos_h, hall_di } = get_hall_position_absolute(c_hall);
+            { current_pos_h, hall_di } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
             difference_h = current_pos_h - previous_position_h;
             sum_h = sum_h + difference_h;
             previous_position_h = current_pos_h;
@@ -58,7 +57,7 @@ int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation
     while (avg_q == 0) {
         for (i = 0; i<times ; i++) {
             t when timerafter(time+3000) :> time;
-            { current_pos_q, valid } = get_qei_position_absolute(c_qei);
+            { current_pos_q, valid } = i_qei.get_qei_position_absolute();//get_qei_position_absolute(c_qei);
             difference_q = current_pos_q - previous_position_q;
             if (difference_h > 10) {
                 difference_h = 0;
@@ -92,7 +91,7 @@ int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation
         printstrln("normal case2");
     }
 
-    set_commutation_sinusoidal(c_commutation, 0);
+    i_commutation.setVoltage(0);//set_commutation_sinusoidal(c_commutation, 0);
     return sensor_placement_type;
 }
 

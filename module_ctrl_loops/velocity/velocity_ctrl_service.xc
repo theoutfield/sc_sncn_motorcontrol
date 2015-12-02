@@ -347,6 +347,10 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
 #endif
             break;
 
+        case i_velocity_control.get_velocity_control_config() -> ControlConfig out_config:
+
+                out_config = velocity_ctrl_params;
+                break;
 
             }
            // break;

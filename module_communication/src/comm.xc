@@ -4,11 +4,12 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
+#include <comm.h>
 #include <refclk.h>
+
 #include <ctrlproto.h>
-#include <commutation_client.h>
-#include <hall_config.h>
-#include <qei_config.h>
+#include <commutation_service.h>
+
 #include <control_loops_common.h>
 #include <internal_config.h>
 #include <stdlib.h>
@@ -59,7 +60,7 @@ void update_hall_config_ecat(HallConfig &hall_config, chanend coe_out)
     hall_config.max_ticks += hall_config.max_ticks_per_turn;
 }
 
-void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
+void update_qei_param_ecat(QEIConfig &qei_params, chanend coe_out)
 {
     int min;
     int max;
@@ -73,7 +74,7 @@ void update_qei_param_ecat(qei_par &qei_params, chanend coe_out)
     qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
 }
 
-void update_commutation_param_ecat(commutation_par &commutation_params, chanend coe_out)
+void update_commutation_param_ecat(CommutationConfig &commutation_params, chanend coe_out)
 {
     {commutation_params.hall_offset_clk, commutation_params.hall_offset_cclk,
             commutation_params.winding_type} = commutation_sdo_update(coe_out);
@@ -143,7 +144,7 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out)
             pp_params.max_acceleration} = pp_sdo_update(coe_out);
 }
 
-void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out)
+void update_torque_ctrl_param_ecat(ControlConfig &torque_ctrl_params, chanend coe_out)
 {
     {torque_ctrl_params.Kp_n, torque_ctrl_params.Ki_n, torque_ctrl_params.Kd_n} = torque_sdo_update(coe_out);
     torque_ctrl_params.Kp_d = 65536;                // 16 bit precision PID gains
@@ -162,7 +163,7 @@ void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out
 }
 
 
-void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out)
+void update_velocity_ctrl_param_ecat(ControlConfig &velocity_ctrl_params, chanend coe_out)
 {
     {velocity_ctrl_params.Kp_n, velocity_ctrl_params.Ki_n, velocity_ctrl_params.Kd_n} = velocity_sdo_update(coe_out);
     velocity_ctrl_params.Kp_d = 65536;              // 16 bit precision PID gains
@@ -180,7 +181,7 @@ void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe
     return;
 }
 
-void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out)
+void update_position_ctrl_param_ecat(ControlConfig &position_ctrl_params, chanend coe_out)
 {
     {position_ctrl_params.Kp_n, position_ctrl_params.Ki_n, position_ctrl_params.Kd_n} = position_sdo_update(coe_out);
     position_ctrl_params.Kp_d = 65536;              // 16 bit precision PID gains
@@ -199,8 +200,8 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
 }
 
 
-void set_commutation_param_ecat(chanend c_signal, HallConfig &hall_config, qei_par &qei_params,
-                                commutation_par &commutation_params, int nominal_speed)
+void set_commutation_param_ecat(chanend c_signal, HallConfig &hall_config, QEIConfig &qei_params,
+                                CommutationConfig &commutation_params, int nominal_speed)
 {
     c_signal <: SET_COMM_PARAM_ECAT;
     c_signal <: hall_config.pole_pairs;
@@ -212,16 +213,18 @@ void set_commutation_param_ecat(chanend c_signal, HallConfig &hall_config, qei_p
     c_signal <: commutation_params.hall_offset_cclk;
     c_signal <: commutation_params.winding_type;
 }
-
-void set_hall_conifg_ecat(chanend c_hall, HallConfig & hall_config)
+/*
+void set_hall_conifg_ecat(interface HallInterface client i_hall, HallConfig & hall_config)
 {
-    c_hall <: set_hall_conifg_ecat;
-    c_hall <: hall_config.pole_pairs;
-    c_hall <: hall_config.max_ticks;
-    c_hall <: hall_config.max_ticks_per_turn;
-}
 
-void hall_init_ecat(chanend c_hall, HallConfig & hall_config)
+    i_hall.setHallConfig(hall_config);
+    //c_hall <: set_hall_conifg_ecat;
+    //c_hall <: hall_config.pole_pairs;
+    //c_hall <: hall_config.max_ticks;
+    //c_hall <: hall_config.max_ticks_per_turn;
+}*/
+/*
+void hall_init_ecat(interface HallInterface client i_hall, HallConfig & hall_config)
 {
     int command;
     int flag = 0;
@@ -241,19 +244,13 @@ void hall_init_ecat(chanend c_hall, HallConfig & hall_config)
         }
     }
 }
-
-void set_qei_param_ecat(chanend c_qei, qei_par &qei_params)
+*//*
+void set_qei_param_ecat(interface QEIInterface client i_qei, QEIConfig &qei_params)
 {
-    c_qei <: SET_QEI_PARAM_ECAT;
-    c_qei <: qei_params.index;
-    c_qei <: qei_params.max_ticks_per_turn;
-    c_qei <: qei_params.real_counts;
-    c_qei <: qei_params.poles;
-    c_qei <: qei_params.max_ticks;
-    c_qei <: qei_params.sensor_polarity;
+    i_qei.setQEIConfig(qei_params);
 }
 
-void qei_init_ecat(chanend c_qei, qei_par &qei_params)
+void qei_init_ecat(interface QEIInterface client i_qei, QEIConfig &qei_params)
 {
     int command;
     int flag = 0;
@@ -276,4 +273,4 @@ void qei_init_ecat(chanend c_qei, qei_par &qei_params)
         }
     }
 }
-
+*/

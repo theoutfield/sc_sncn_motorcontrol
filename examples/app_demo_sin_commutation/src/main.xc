@@ -68,12 +68,11 @@ void adc_client(interface ADCInterface client i_adc, interface HallInterface cli
 
 int main(void) {
 
-    // Motor control channels
-    chan c_signal; // commutation channels
+    // Motor control interfaces
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
     interface WatchdogInterface i_watchdog;
-    interface CommutationInterface i_commutation[3];
+    interface CommutationInterface i_commutation[5];
     interface ADCInterface i_adc;
     interface HallInterface i_hall[5];
 
@@ -127,8 +126,8 @@ int main(void) {
                     CommutationConfig commutation_config;
                     init_commutation_config(commutation_config);
 
-                    commutation_service(i_hall[0], null, null, i_watchdog, i_commutation,
-                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                    commutation_service(i_hall[0], null, i_watchdog, i_commutation,
+                                            c_pwm_ctrl, fet_driver_ports, commutation_config);
                 }
 
                 /*Current sampling*/
