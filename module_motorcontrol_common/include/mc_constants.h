@@ -8,6 +8,8 @@
 //#define QEI_WITH_NO_INDEX 0
 //#define QEI_WITH_INDEX    1
 //enum { QEI_WITH_NO_INDEX, QEI_WITH_INDEX };
+#define QEI_WITH_NO_INDEX 0
+#define QEI_WITH_INDEX    1
 
 enum { UNSET, SET };
 
