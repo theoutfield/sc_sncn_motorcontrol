@@ -17,7 +17,7 @@ void init_torque_profiler(int max_torque, int polarity,
                                 interface TorqueControlInterface client i_torque_control){
 
     init_linear_profile_limits(max_torque,polarity);
-    delay_seconds(1);
+
     //Interface not used for the moment, likely in the future
 }
 

@@ -113,9 +113,9 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
     int mod = 0;
     int abs_speed = 0;
     int filter_count = 0;
-    int adc_calib_start = 0;
+   // int adc_calib_start = 0;
    // calib_data I_calib;
-
+/*
     while (1) {
         select {
         case c_current :> command:
@@ -128,7 +128,7 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
             break;
     }
 
-    c_current <: 1; // adc calib done
+    c_current <: 1; // adc calib done */
     //init_buffer(buffer_phase_a, FILTER_LENGTH_ADC);
     //init_buffer(buffer_phase_b, FILTER_LENGTH_ADC);
     ts :> time;
@@ -480,7 +480,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
             }
             if (!compute_flag)
             {
-                enable_adc(c_current);
+               // enable_adc(c_current);
                 compute_flag = 1;
             }
             break;
@@ -500,7 +500,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
                       if (compute_flag == 0) {
                           init_state = INIT_BUSY;
-                          c_current <: 1;
+                         // c_current <: 1;
                       }
                   }
 #ifdef debug_print
