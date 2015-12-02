@@ -220,7 +220,7 @@ typedef struct
     float q;                    // position profile
 
     QEIConfig qei_params;
-    HallConfig hall_config;
+    HallConfig hall_params;
     int sensor_used;
     float max_position;
     float min_position;
