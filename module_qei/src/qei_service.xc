@@ -9,9 +9,9 @@
 #include <stdlib.h>
 #include <xs1.h>
 #include <refclk.h>
-//#include <filter_blocks.h>
 #include <xscope.h>
 #include "print.h"
+#include <internal_config.h>
 
 #define MILLISECOND 250000 //ticks
 //#pragma xta command "analyze loop qei_loop"
@@ -45,10 +45,6 @@ static void qei_client_handler(chanend c_qei, int command, int position, int ok,
 {
     switch(command)
     {
-
-    case CHECK_BUSY:
-        c_qei <: init_state;
-        break;
 
     case SET_QEI_PARAM_ECAT:
         c_qei :> qei_config.index;
@@ -140,7 +136,7 @@ void qei_service(interface QEIInterface server i_qei[5], QEIPorts &encoder_ports
     int direction = 0;
     int qei_max = qei_config.max_ticks_per_turn;
     int qei_type = qei_config.index;            // TODO use to disable sync for no-index
-    //int init_state = INIT;
+    int init_state = INIT;
 
     int qei_crossover = (qei_max*19)/100;
     int qei_count_per_hall = qei_config.real_counts / qei_config.poles;
@@ -309,6 +305,16 @@ void qei_service(interface QEIInterface server i_qei[5], QEIPorts &encoder_ports
                 out_config = qei_config;
                 break;
 
+        case i_qei[int i].setQEIConfig(QEIConfig in_config):
+
+                qei_config = in_config;
+                break;
+
+        case i_qei[int i].checkBusy() -> int out_status:
+
+                out_status = init_state;
+                break;
+
         case t_velocity when timerafter(ts_velocity + MILLISECOND) :> ts_velocity:
 
               difference_velocity = count - vel_previous_position;
@@ -349,12 +355,4 @@ void qei_service(interface QEIInterface server i_qei[5], QEIPorts &encoder_ports
 
     return ;
 }
-*/
-
-/*
-case !isnull(c_qei_p1) => c_qei_p1 :> command :
-qei_client_handler( c_qei_p1, command, position, ok, count, direction, init_state,
-               sync_out, calib_bw_flag, calib_fw_flag, offset_fw, offset_bw, qei_config,
-               status);
-break;
 */

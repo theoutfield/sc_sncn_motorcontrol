@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <print.h>
 
+#include <internal_config.h>
 //TODO remove these dependencies
 //#pragma xta command "analyze loop hall_loop"
 //#pragma xta command "set required - 10.0 us"
@@ -42,8 +43,6 @@ int check_hall_config(HallConfig &hall_config){
 
 void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports, HallConfig & hall_config)
 {
-
-
 
     if(check_hall_config(hall_config) == ERROR){
         printstrln("Error while checking the Hall sensor configuration");
@@ -85,7 +84,7 @@ void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_por
     int first = 1;
     int hall_max_count = hall_config.max_ticks;
     int time_elapsed = 0;
-    //int init_state = INIT;
+    int init_state = INIT;
 
     timer t1;
     int time1;
@@ -156,6 +155,22 @@ void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_por
                     out_config = hall_config;
                     break;
 
+            case i_hall[int i].setHallConfig(HallConfig in_config):
+
+                    hall_config.max_ticks = in_config.max_ticks;
+                    hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
+                    hall_config.pole_pairs = in_config.pole_pairs;
+                    //FIXME Polarity, for some reason, was not updated. IT NEEDS TO.
+
+                    status = 1;
+
+                    break;
+
+            case i_hall[int i].checkBusy() -> int out_status:
+
+                    out_status = init_state;
+
+                    break;
   /*          case !isnull(c_hall_p1) => c_hall_p1 :> int command:
                 switch (command) {
 

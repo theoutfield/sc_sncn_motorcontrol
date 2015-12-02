@@ -38,19 +38,6 @@ typedef struct {
     int sensor_polarity;
 } QEIConfig;
 
-/**
- * @brief struct definition for velocity calculation from qei sensor
- */
-/*
-typedef struct QEI_VELOCITY_PARAM
-{
-    int previous_position;
-    int old_difference;
-    int filter_buffer[8];
-    int index;
-    int filter_length;
-} qei_velocity_par;
-*/
 
 /**
  * @brief Internal function to calculate QEI position information
@@ -72,7 +59,7 @@ typedef struct {
 } QEIPorts;
 
 interface QEIInterface{
-
+    int checkBusy();
     {unsigned int, unsigned int} get_qei_position();
     {int, int} get_qei_position_absolute();
     {int, int, int} get_qei_sync_position();
@@ -80,7 +67,7 @@ interface QEIInterface{
     void set_qei_sync_offset(int, int);
     void reset_qei_count(int offset);
     QEIConfig getQEIConfig();
-
+    void setQEIConfig(QEIConfig in_config);
 };
 
 

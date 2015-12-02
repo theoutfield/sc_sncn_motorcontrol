@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <hall_config.h>
-#include <qei_config.h>
+#include <hall_service.h>
+#include <qei_service.h>
 #include <internal_config.h>
 #include <ctrlproto.h>
-#include <commutation_client.h>
+#include <commutation_service.h>
 #include <control_loops_common.h>
 
 /**
@@ -71,9 +71,9 @@ void update_hall_config_ecat(HallConfig &hall_config, chanend coe_out);
  * @param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
 *    gear-ratio used for the motor
 */
-void update_qei_param_ecat(qei_par &qei_params, chanend coe_out);
+void update_qei_param_ecat(QEIConfig &qei_params, chanend coe_out);
 
-void update_commutation_param_ecat(commutation_par &commutation_params, chanend coe_out);
+void update_commutation_param_ecat(CommutationConfig &commutation_params, chanend coe_out);
 
 /**
  * @brief Update cyclic synchronous torque parameters from Ethercat
@@ -129,21 +129,21 @@ void update_pp_param_ecat(pp_par &pp_params, chanend coe_out);
  *
  * @param torque_ctrl_params struct defines torque control PID params
  */
-void update_torque_ctrl_param_ecat(ctrl_par &torque_ctrl_params, chanend coe_out);
+void update_torque_ctrl_param_ecat(ControlConfig &torque_ctrl_params, chanend coe_out);
 
 /**
  * @brief Update velocity control PID parameters from Ethercat
  *
  * @param velocity_ctrl_params struct defines velocity control PID params
  */
-void update_velocity_ctrl_param_ecat(ctrl_par &velocity_ctrl_params, chanend coe_out);
+void update_velocity_ctrl_param_ecat(ControlConfig &velocity_ctrl_params, chanend coe_out);
 
 /**
  * @brief Update position control PID params from Ethercat
  *
  * @param position_ctrl_params struct defines position control PID params
  */
-void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe_out);
+void update_position_ctrl_param_ecat(ControlConfig &position_ctrl_params, chanend coe_out);
 
 /**
  * @brief Set commutation parameters from Ethercat communication loop
@@ -154,8 +154,8 @@ void update_position_ctrl_param_ecat(ctrl_par &position_ctrl_params, chanend coe
  * 	 gear-ratio used for the motor
  * @param nominal_speed defines nominal speed for the motor
  */
-void set_commutation_param_ecat(chanend c_signal, HallConfig &hall_config, qei_par &qei_params, \
-		commutation_par &commutation_params, int nominal_speed);
+void set_commutation_param_ecat(chanend c_signal, HallConfig &hall_config, QEIConfig &qei_params,
+		CommutationConfig &commutation_params, int nominal_speed);
 
 /**
  * @brief Set hall sensor parameters from Ethercat communication loop
@@ -164,7 +164,7 @@ void set_commutation_param_ecat(chanend c_signal, HallConfig &hall_config, qei_p
  *
  * @param hall_config struct defines the pole-pairs and gear ratio
  */
-void set_hall_conifg_ecat(chanend c_hall, HallConfig &hall_config);
+void set_hall_conifg_ecat(interface HallInterface client i_hall, HallConfig & hall_config);
 
 /**
  * @brief Set QEI sensor parameters from Ethercat communication loop
@@ -174,7 +174,7 @@ void set_hall_conifg_ecat(chanend c_hall, HallConfig &hall_config);
  * @param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
  */
-void set_qei_param_ecat(chanend c_qei, qei_par &qei_params);
+void set_qei_param_ecat(interface QEIInterface client i_qei, QEIConfig &qei_params);
 
 /**
  * @brief Initialize hall sensor parameters from Ethercat communication loop
@@ -184,7 +184,7 @@ void set_qei_param_ecat(chanend c_qei, qei_par &qei_params);
  *
  * @param hall_config struct defines the pole-pairs and gear ratio
  */
-void hall_init_ecat(chanend c_hall, HallConfig &hall_config);
+void hall_init_ecat(interface HallInterface client i_hall, HallConfig & hall_config);
 
 /**
  * @brief Initialize QEI sensor parameters from Ethercat communication loop
@@ -196,5 +196,5 @@ void hall_init_ecat(chanend c_hall, HallConfig &hall_config);
  * @param qei_params struct defines the quadrature encoder (QEI) resolution, sensor type and
  * 	 gear-ratio used for the motor
  */
-void qei_init_ecat(chanend c_qei, qei_par &qei_params);
+void qei_init_ecat(interface QEIInterface client i_qei, QEIConfig &qei_params);
 

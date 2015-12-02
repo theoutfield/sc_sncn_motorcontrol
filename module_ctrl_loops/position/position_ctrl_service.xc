@@ -199,16 +199,16 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
             break;
 
-        case i_position_control.set_position_ctrl_hall_param(int in_pole_pairs):
+        case i_position_control.set_position_ctrl_hall_param(HallConfig in_config):
 
-            //hall_config.pole_pairs = in_pole_pairs;
+            hall_config.pole_pairs = in_config.pole_pairs;
             break;
 
         case i_position_control.set_position_ctrl_qei_param(QEIConfig in_qei_params):
 
-            //qei_params.index = in_qei_params.index;
-            //qei_params.real_counts = in_qei_params.real_counts;
-            //qei_params.max_ticks_per_turn = in_qei_params.max_ticks_per_turn;
+            qei_config.index = in_qei_params.index;
+            qei_config.real_counts = in_qei_params.real_counts;
+            qei_config.max_ticks_per_turn = in_qei_params.max_ticks_per_turn;
             break;
 
         case i_position_control.set_position_sensor(int in_sensor_used):
