@@ -36,7 +36,7 @@ void qei_test(interface QEIInterface client i_qei)
 	}
 }
 
-QEIPorts encoder_ports = ENCODER_PORTS;
+QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
 int main(void)
 {
@@ -65,7 +65,7 @@ int main(void)
                     qei_config.poles = 4;                               // 4 pole pairs on motor (for hall syncronization, not always used)
                     qei_config.max_ticks = 10 * qei_config.real_counts; // 10 turns
 
-				qei_service(i_qei, encoder_ports, qei_config);
+				qei_service(i_qei, qei_ports, qei_config);
 			}
 		}
 	}

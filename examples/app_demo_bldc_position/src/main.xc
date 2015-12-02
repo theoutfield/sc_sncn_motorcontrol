@@ -55,11 +55,11 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	}
 }
 
-PwmPorts pwm_ports = PWM_PORTS;
-WatchdogPorts wd_ports = WATCHDOG_PORTS;
-FetDriverPorts fet_driver_ports = FET_DRIVER_PORTS;
-HallPorts hall_ports = HALL_PORTS;
-QEIPorts encoder_ports = ENCODER_PORTS;
+PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
+WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
 int main(void)
 {
@@ -96,7 +96,7 @@ int main(void)
                     QEIConfig qei_config;
                     init_qei_config(qei_config);
 
-                    qei_service(i_qei, encoder_ports, qei_config);
+                    qei_service(i_qei, qei_ports, qei_config);
                 }
 
                 {
