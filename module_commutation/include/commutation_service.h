@@ -40,6 +40,7 @@ interface CommutationInterface{
     void disableFets();
     void enableFets();
     int getFetsState();
+    void setAllParameters(HallConfig hall_config, QEIConfig qei_config, CommutationConfig commutation_config, int in_nominal_speed);
 };
 
 /**
@@ -63,8 +64,9 @@ interface CommutationInterface{
  *
  */
 [[combinable]]
-void commutation_service(interface HallInterface client i_hall, interface QEIInterface client ?i_qei, chanend ?c_signal,
+void commutation_service(interface HallInterface client i_hall, interface QEIInterface client ?i_qei,
                             interface WatchdogInterface client watchdog_interface,
-                            interface CommutationInterface server commutation_interface[3], chanend c_pwm_ctrl,
+                            interface CommutationInterface server commutation_interface[5],
+                            chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
                             CommutationConfig &commutation_params);

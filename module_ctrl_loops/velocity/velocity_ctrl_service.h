@@ -24,6 +24,7 @@ interface VelocityControlInterface{
     void set_velocity_sensor(int sensor_used);
     void enable_velocity_ctrl();
     void shutdown_velocity_ctrl();
+    ControlConfig get_velocity_control_config();
 };
 
 #define DEFAULT_FILTER_LENGTH 8

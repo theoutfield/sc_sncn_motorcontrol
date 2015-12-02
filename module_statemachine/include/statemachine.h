@@ -8,7 +8,10 @@
 
 #include <stdint.h>
 #include <stdbool_xc.h>
+#include <adc_service.h>
 #include <position_ctrl_service.h>
+#include <velocity_ctrl_service.h>
+#include <torque_ctrl_service.h>
 
 typedef struct S_Check_list {
     bool ready;
@@ -112,8 +115,14 @@ check_list init_checklist(void);
  * @Output
  * @return check_list_param updated checklist parameters
  */
-void update_checklist(check_list & check_list_param, int mode, chanend c_commutation, chanend c_hall, chanend c_qei,
-                      chanend ? c_adc, chanend c_torque_ctrl, chanend c_velocity_ctrl, interface PositionControlInterface client i_position_control);
+void update_checklist(check_list &check_list_param, int mode,
+                        interface CommutationInterface client i_commutation,
+                        interface HallInterface client i_hall,
+                        interface QEIInterface client i_qei,
+                        interface ADCInterface client ?i_adc,
+                        interface TorqueControlInterface client i_torque_control,
+                        interface VelocityControlInterface client i_velocity_control,
+                        interface PositionControlInterface client i_position_control);
 
 int16_t update_statusword(int current_status, int state_reached, int ack, int q_active, int shutdown_ack);
 
