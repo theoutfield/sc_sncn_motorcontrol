@@ -16,9 +16,9 @@
 #include <qei_service.h>
 
 
-#if(MOTOR_TYPE == BDC)
-#include <brushed_dc_client.h>
-#endif
+
+
+
 
 int init_position_control(interface PositionControlInterface client i_position_control)
 {
@@ -60,8 +60,8 @@ void set_position_csp( csp_par & csp_params, int target_position, int position_o
 
 
 void position_control_service(ControlConfig &position_ctrl_params,
-                                interface HallInterface client i_hall,
-                                interface QEIInterface client i_qei,
+                                interface HallInterface client ?i_hall,
+                                interface QEIInterface client ?i_qei,
                                 interface PositionControlInterface server i_position_control,
                                 interface CommutationInterface client commutation_interface)
 {
@@ -80,24 +80,24 @@ void position_control_service(ControlConfig &position_ctrl_params,
     int activate = 0;
     int direction = 0;
 
-    int fet_state = 0;
+    int fet_state;
     int init_state = INIT_BUSY; /* check commutation init */
 
     HallConfig hall_config;
     QEIConfig qei_config;
 
-    if(position_ctrl_params.sensor_used == HALL){
+    if(position_ctrl_params.sensor_used == HALL && !isnull(i_hall)){
         hall_config = i_hall.getHallConfig();
-    } else if(position_ctrl_params.sensor_used >= QEI){
+    } else if(position_ctrl_params.sensor_used >= QEI && !isnull(i_qei)){
         qei_config = i_qei.getQEIConfig();
     }
 
     printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
 
-    if (position_ctrl_params.sensor_used == HALL) {
+    if (position_ctrl_params.sensor_used == HALL && !isnull(i_hall)) {
         { actual_position, direction } = i_hall.get_hall_position_absolute();// get_hall_position_absolute(c_hall);
         target_position = actual_position;
-    } else if (position_ctrl_params.sensor_used == QEI) {
+    } else if (position_ctrl_params.sensor_used == QEI && !isnull(i_qei)) {
         {actual_position, direction} = i_qei.get_qei_position_absolute();
         target_position = actual_position;
     }
@@ -118,13 +118,13 @@ void position_control_service(ControlConfig &position_ctrl_params,
             if (activate == 1) {
                 /* acquire actual position hall/qei/sensor */
                 switch (position_ctrl_params.sensor_used) {
-                case HALL:
-                { actual_position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
-                break;
+                    case HALL:
+                    { actual_position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                    break;
 
-                case QEI:
-                { actual_position, direction } =  i_qei.get_qei_position_absolute();
-                break;
+                    case QEI:
+                    { actual_position, direction } =  i_qei.get_qei_position_absolute();
+                    break;
 
                 /*
                  * Or any other sensor interfaced to the IFM Module
@@ -154,12 +154,9 @@ void position_control_service(ControlConfig &position_ctrl_params,
                     position_control_out = 0 - position_ctrl_params.Control_limit;
                 }
 
-#if(MOTOR_TYPE == BDC)
-                set_bdc_voltage(c_commutation, position_control_out);
-#else
+
                // set_commutation_sinusoidal(c_commutation, position_control_out);
                 commutation_interface.setVoltage(position_control_out);
-#endif
 
 #ifdef DEBUG
                 xscope_int(ACTUAL_POSITION, actual_position);
@@ -236,14 +233,12 @@ void position_control_service(ControlConfig &position_ctrl_params,
             #ifdef debug_print
                                     printstrln("commutation intialized");
             #endif
-            #if(MOTOR_TYPE == BLDC)
                                     fet_state = commutation_interface.getFetsState(); // check_fet_state(c_commutation);
                                     if (fet_state == 1) {
                                         commutation_interface.enableFets();
-                                        //enable_motor(c_commutation);
                                         wait_ms(2, 1, ts);
                                     }
-            #endif
+
                                     break;
                                 }
                             }

@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <watchdog_service.h>
+#include <commutation_service.h>
+
 /**
  * @brief Brushed DC Drive Loop
  *
@@ -23,7 +26,7 @@
  * @param p_ifm_ff1 FET driver fault flag 1
  * @param p_ifm_ff2 FET driver fault flag 2
  */
-void bdc_loop(chanend c_watchdog, chanend c_commutation,
-              chanend c_pwm_ctrl,
-              out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn,
-              port p_ifm_ff1, port p_ifm_ff2);
+void bdc_loop(chanend c_pwm_ctrl,
+               interface WatchdogInterface client watchdog_interface,
+               interface CommutationInterface server commutation_interface,
+               FetDriverPorts &fet_driver_ports);
