@@ -12,10 +12,10 @@
 //#include <adc_client_ad7949.h>
 #include <hall_service.h>
 #include <refclk.h>
-#include <qei_client.h>
+#include <qei_service.h>
 #include <brushed_dc_common.h>
 #include <internal_config.h>
-#include <watchdog.h>
+#include <watchdog_service.h>
 
 static int init_state;
 
@@ -26,9 +26,10 @@ static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
+static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                t_pwm_control &pwm_ctrl,
-                               chanend c_pwm_ctrl, chanend c_commutation)
+                               chanend c_pwm_ctrl,
+                               interface CommutationInterface server i_commutation)
 {
 
     unsigned int pwm[3] = { 0, 0, 0 };
@@ -83,48 +84,49 @@ static void bdc_internal_loop(port p_ifm_ff1, port p_ifm_ff2, port p_ifm_coastn,
         update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
         select {
-            case c_commutation :> int command:
-		    switch (command) {
-		    case BDC_CMD_SET_VOLTAGE:
-			c_commutation :> voltage;
-			break;
 
-		    case BDC_CMD_CHECK_BUSY:    // init signal
-			c_commutation <: init_state;
-			break;
+        case i_commutation.setVoltage(int new_voltage):
 
-		    case BDC_CMD_DISABLE_FETS:
-			shutdown = 1;
-			break;
+            voltage = new_voltage;
+            break;
 
-		    case BDC_CMD_ENABLE_FETS:
-			shutdown = 0;
-			voltage = 0;
-			break;
+        case i_commutation.checkBusy() -> int state_return:
 
-		    case BDC_CMD_FETS_STATE:
-			c_commutation <: shutdown;
-			break;
+                  state_return = init_state;
+                  break;
 
-		    case CHECK_BUSY:
-			c_commutation <: init_state;
-			break;
+        case i_commutation.disableFets():
 
-		    default:
-			break;
-		    }
-		break;
-		 
-	    default:
-		break;
+                shutdown = 1;
+                break;
+
+        case i_commutation.enableFets():
+
+                shutdown = 0;
+                voltage = 0;
+                break;
+
+        case i_commutation.getFetsState() -> int fets_state:
+                fets_state = shutdown;
+                break;
+        case i_commutation.setSensor(int new_sensor):
+                break;
+        case i_commutation.setParameters(CommutationConfig new_parameters):
+                break;
+        case i_commutation.setAllParameters(HallConfig in_hall_config,
+                                                            QEIConfig in_qei_config,
+                                                            CommutationConfig in_commutation_config, int in_nominal_speed):
+               break;
+
         }
     }
 }
 
 
-void bdc_loop(interface WatchdogInterface server i_watchdog, chanend c_commutation,
-              chanend c_pwm_ctrl,
-              out port p_ifm_esf_rstn_pwml_pwmh, port p_ifm_coastn, port p_ifm_ff1, port p_ifm_ff2)
+void bdc_loop(chanend c_pwm_ctrl,
+                interface WatchdogInterface client i_watchdog,
+                interface CommutationInterface server i_commutation,
+                FetDriverPorts &fet_driver_ports)
 {
     const unsigned t_delay = 300*USEC_FAST;
     timer t;
@@ -139,17 +141,15 @@ void bdc_loop(interface WatchdogInterface server i_watchdog, chanend c_commutati
     t :> ts;
     t when timerafter (ts + 250000*4):> ts;
     i_watchdog.start();
-    //watchdog_start(c_watchdog);
 
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;
 
-    a4935_initialize(p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, A4935_BIT_PWML | A4935_BIT_PWMH);
+    a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
     t when timerafter (ts + t_delay) :> ts;
 
-    p_ifm_coastn :> init_state;
+    fet_driver_ports.p_coast :> init_state;
 
-    bdc_internal_loop(p_ifm_ff1, p_ifm_ff2, p_ifm_coastn, pwm_ctrl, c_pwm_ctrl,
-            c_commutation);
+    bdc_internal_loop(fet_driver_ports, pwm_ctrl, c_pwm_ctrl, i_commutation);
 }
 

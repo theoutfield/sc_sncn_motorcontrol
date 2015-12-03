@@ -89,8 +89,8 @@ void set_position_csp(csp_par & csp_params, int target_position, int position_of
  *
  */
 void position_control_service(ControlConfig & position_ctrl_params,
-                    interface HallInterface client i_hall,
-                    interface QEIInterface client i_qei,
+                    interface HallInterface client ?i_hall,
+                    interface QEIInterface client ?i_qei,
                     interface PositionControlInterface server i_position_control,
                     interface CommutationInterface client commutation_interface);
 
