@@ -4,23 +4,22 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
+#include <refclk.h>
 #include <comm.h>
 #include <statemachine.h>
 #include <drive_modes.h>
-#include <velocity_ctrl_service.h>
-#include <position_ctrl_service.h>
-#include <torque_ctrl_service.h>
+
+#include <commutation_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 #include <gpio_service.h>
 
+#include <velocity_ctrl_service.h>
+#include <position_ctrl_service.h>
+#include <torque_ctrl_service.h>
+
 #include <profile.h>
-#include <print.h>
 
-#include <flash_somanet.h>
-#include <refclk.h>
-
-#include <commutation_service.h>
 #include <bldc_motor_init.h>
 
 
@@ -42,7 +41,7 @@
 //#pragma xta command "analyze loop ecatloop"
 //#pragma xta command "set required - 1.0 ms"
 
-void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out,
+void ethercat_drive_service(chanend pdo_out, chanend pdo_in, chanend coe_out,
                         interface CommutationInterface client i_commutation,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
