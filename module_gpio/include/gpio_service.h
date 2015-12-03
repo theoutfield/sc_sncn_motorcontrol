@@ -10,6 +10,12 @@
 #include <internal_config.h>
 #include <platform.h>
 
+interface GPIOInterface{
+    int config_dio_input(int gpio_port, int input_type, int switch_type);
+    void config_dio_done();
+    int read_gpio(int gpio_port);
+    void write_gpio(int gpio_port, int value);
+};
 /**
  * @fn gpio_digital_server(port p_ifm_ext_d0, port p_ifm_ext_d1, port p_ifm_ext_d2, port p_ifm_ext_d3,
  * chanend c_gpio_0, chanend c_gpio_1, chanend c_gpio_2, chanend c_gpio_3)
@@ -29,4 +35,4 @@
  *  	   to read/write to port EXT_D3
  *
  */
-void gpio_digital_server(port p_ifm_ext_d[], chanend c_gpio_0, chanend c_gpio_1);
+void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2]);

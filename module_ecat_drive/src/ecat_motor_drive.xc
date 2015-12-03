@@ -12,11 +12,11 @@
 #include <torque_ctrl_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
-//#include <hall_config.h>
-//#include <qei_config.h>
+#include <gpio_service.h>
+
 #include <profile.h>
 #include <print.h>
-#include <gpio_client.h>
+
 #include <flash_somanet.h>
 #include <refclk.h>
 
@@ -49,7 +49,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out,
                         interface TorqueControlInterface client i_torque_control,
                         interface VelocityControlInterface client i_velocity_control,
                         interface PositionControlInterface client i_position_control,
-                        chanend c_gpio)
+                        interface GPIOInterface client i_gpio)
 {
     int i = 0;
     int mode = 40;
@@ -359,9 +359,9 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out,
                         limit_switch = 1;
 
                     /* Configuration of GPIO Digital ports follows here */
-                    config_gpio_digital_input(c_gpio, 0, SWITCH_INPUT_TYPE, limit_switch_type);
-                    config_gpio_digital_input(c_gpio, 1, SWITCH_INPUT_TYPE, limit_switch_type);
-                    end_config_gpio(c_gpio);
+                    i_gpio.config_dio_input(0, SWITCH_INPUT_TYPE, limit_switch_type);
+                    i_gpio.config_dio_input(1, SWITCH_INPUT_TYPE, limit_switch_type);
+                    i_gpio.config_dio_done();//end_config_gpio(c_gpio);
                     i_hall.setHallConfig(hall_config); //set_hall_conifg_ecat(c_hall, hall_config);
                     if (homing_done == 0)
                         i_qei.setQEIConfig(qei_params);
@@ -742,8 +742,8 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out,
                                     i_velocity_control.set_velocity(velocity_ramp);
                                     i++;
                                 }
-                                home_state = read_gpio_digital_input(c_gpio, 0);
-                                safety_state = read_gpio_digital_input(c_gpio, 1);
+                                home_state = i_gpio.read_gpio(0);//read_gpio_digital_input(c_gpio, 0);
+                                safety_state = i_gpio.read_gpio(1);//read_gpio_digital_input(c_gpio, 1);
                                 {capture_position, direction} = i_qei.get_qei_position_absolute();
 
                                 if ((home_state == 1 || safety_state == 1) && end_state == 0) {
