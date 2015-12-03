@@ -31,7 +31,7 @@ void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out,
                         interface TorqueControlInterface client i_torque_control,
                         interface VelocityControlInterface client i_velocity_control,
                         interface PositionControlInterface client i_position_control,
-                        chanend c_gpio);
+                        interface GPIOInterface client i_gpio);
 
 int detect_sensor_placement(chanend c_hall, chanend c_qei, chanend c_commutation);
 
