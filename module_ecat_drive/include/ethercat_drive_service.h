@@ -24,7 +24,7 @@
  * @param c_gpio channel to config/read/drive GPIO digital ports
  *
  */
-void ecat_motor_drive(chanend pdo_out, chanend pdo_in, chanend coe_out,
+void ethercat_drive_service(chanend pdo_out, chanend pdo_in, chanend coe_out,
                         interface CommutationInterface client i_commutation,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,

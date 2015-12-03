@@ -118,11 +118,7 @@ void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2])
     int all_ports_input = 0;
     timer t;
     unsigned int time;
-    int command;
-    int type;
     int new_pin;
-    int input;
-    int output;
     int config_state = 0;
     int j;
 
