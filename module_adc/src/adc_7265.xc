@@ -201,14 +201,14 @@ void run_adc_AD7256(server interface ADC iADC, server interface ADC_trigger i_AD
                     t :> tout;
 
                     // Store data
-                    adc_data[0][port_id] = out_a;
-                    adc_data[1][port_id] = out_b;
+                    adc_data[0][port_id - 1] = out_a;
+                    adc_data[1][port_id - 1] = out_b;
                     sampling_time_ = (int)(tout-tin);
                 break;
 
             case iADC.get_adc_measurements(unsigned char port_id, unsigned char config) -> {int adc_A, int adc_B, int sampling_time}:
-                        adc_A = adc_data[0][port_id];
-                        adc_B = adc_data[1][port_id];
+                        adc_A = adc_data[0][port_id - 1];
+                        adc_B = adc_data[1][port_id - 1];
                         sampling_time = sampling_time_;
                  break;
 
