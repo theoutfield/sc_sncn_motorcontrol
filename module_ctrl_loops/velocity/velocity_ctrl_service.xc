@@ -16,10 +16,6 @@
 #include <a4935.h>
 #include <commutation_service.h>
 
-#if(MOTOR_TYPE == BDC)
-#include <brushed_dc_client.h>
-#endif
-
 
 int init_velocity_control(interface VelocityControlInterface client i_velocity_control)
 {
@@ -223,11 +219,8 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
                     velocity_control_out = 0 - velocity_ctrl_params.Control_limit;
                 }
 
-#if(MOTOR_TYPE == BDC)
-                set_bdc_voltage(c_commutation, velocity_control_out);
-#else
                 commutation_interface.setVoltage(velocity_control_out);//set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
-#endif
+
                 previous_error = error_velocity;
 
             }
@@ -331,13 +324,11 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
 #ifdef debug_print
                     printf("commutation intialized\n");
 #endif
-#if(MOTOR_TYPE == BLDC)
                     fet_state = commutation_interface.getFetsState();//check_fet_state(c_commutation);
                     if (fet_state == 1) {
                         commutation_interface.enableFets();//enable_motor(c_commutation);
                         wait_ms(2, 1, ts);
                     }
-#endif
                     break;
                 }
             }
