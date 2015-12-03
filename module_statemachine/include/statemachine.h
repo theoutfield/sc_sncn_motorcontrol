@@ -8,7 +8,9 @@
 
 #include <stdint.h>
 #include <stdbool_xc.h>
+
 #include <adc_service.h>
+
 #include <position_ctrl_service.h>
 #include <velocity_ctrl_service.h>
 #include <torque_ctrl_service.h>
@@ -31,61 +33,6 @@ typedef struct S_Check_list {
 
 
 bool __check_bdc_init(chanend c_signal);
-/**
- * @brief Check commutation initialization
- *
- * @Output
- * @return init state of the commutation loop
- */
-bool __check_commutation_init(chanend c_signal);
-
-/**
- * @brief Check hall initialization
- *
- * @Output
- * @return init state of the hall loop
- */
-bool __check_hall_init(chanend c_hall);
-
-/**
- * @brief Check qei initialization
- *
- * @Output
- * @return init state of the qei loop
- */
-bool __check_qei_init(chanend c_qei);
-
-/**
- * @brief Check adc initialization
- *
- * @Output
- * @return init state of the adc loop
- */
-bool __check_adc_init();
-
-/**
- * @brief Check torque control initialization
- *
- * @Output
- * @return init state of the torque control loop
- */
-bool __check_torque_init(chanend c_torque_ctrl);
-
-/**
- * @brief Check velocity control initialization
- *
- * @Output
- * @return init state of the velocity control loop
- */
-bool __check_velocity_init(chanend c_velocity_ctrl);
-
-/**
- * @brief Check position control initialization
- *
- * @Output
- * @return init state of the position control loop
- */
-//bool __check_position_init(chanend c_position_ctrl);
 
 int init_state(void);
 

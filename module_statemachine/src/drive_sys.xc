@@ -37,48 +37,9 @@ bool __check_bdc_init(chanend c_signal)
     return init_state;
 }
 
-bool __check_commutation_init(chanend c_signal)
-{
-    bool init_state;
-    c_signal <: CHECK_BUSY;
-    c_signal :> init_state;
-    return init_state;
-}
-
-bool __check_hall_init(chanend c_hall)
-{
-    bool init_state;
-    c_hall <: CHECK_BUSY;
-    c_hall :> init_state;
-    return init_state;
-}
-
-bool __check_qei_init(chanend c_qei)
-{
-    bool init_state;
-    c_qei <: CHECK_BUSY;
-    c_qei :> init_state;
-    return init_state;
-}
-
 bool __check_adc_init()
 {
     return 0;
-}
-
-bool __check_torque_init(chanend c_torque_ctrl)
-{
-    bool init_state;
-    c_torque_ctrl <: CHECK_BUSY;
-    c_torque_ctrl :> init_state;
-    return init_state;
-}
-bool __check_velocity_init(chanend c_velocity_ctrl)
-{
-    bool init_state;
-    c_velocity_ctrl <: CHECK_BUSY;
-    c_velocity_ctrl :> init_state;
-    return init_state;
 }
 
 check_list init_checklist(void)
