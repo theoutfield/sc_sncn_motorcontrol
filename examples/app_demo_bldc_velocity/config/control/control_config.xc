@@ -21,12 +21,8 @@ void init_velocity_control_config(ControlConfig &velocity_ctrl_params){
     if (velocity_ctrl_params.Loop_time != MSEC_FAST)////FixMe: implement reference clock check
         velocity_ctrl_params.Loop_time = 1 * MSEC_STD; // units - core timer value //CORE 2/1/0 default
 
-    if (MOTOR_TYPE == BDC) {
-        velocity_ctrl_params.Control_limit = BDC_PWM_CONTROL_LIMIT; // PWM resolution
-    }
-    else {
-        velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
-    }
+    velocity_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
+
 
     if(velocity_ctrl_params.Ki_n != 0) {
         // auto calculated using control_limit

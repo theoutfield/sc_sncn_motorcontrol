@@ -134,26 +134,16 @@ int main(void)
 
 		on tile[APP_TILE]:
 		{
-			/* Velocity Control Loop */
-			{
-				ctrl_par velocity_ctrl_params;
-				filter_par sensor_filter_params;
-				hall_par hall_params;
-				qei_par qei_params;
+            /* Velocity Control Loop */
+            {
+                ControlConfig velocity_ctrl_params;
+                /* Initialize PID parameters for Velocity Control (defined in config/motor/bldc_motor_config.h) */
+                init_velocity_control_config(velocity_ctrl_params);
 
-				/* Initialize PID parameters for Velocity Control (defined in config/motor/bldc_motor_config.h) */
-				init_velocity_control_param(velocity_ctrl_params);
-
-				/* Initialize Sensor configuration parameters (defined in config/motor/bldc_motor_config.h) */
-				init_qei_param(qei_params);
-
-				/* Initialize sensor filter length */
-				init_sensor_filter_param(sensor_filter_params);
-
-				/* Control Loop */
-				velocity_control(velocity_ctrl_params, sensor_filter_params, hall_params, \
-					 qei_params, SENSOR_USED, c_hall_p2, c_qei_p2, i_biss[0], c_velocity_ctrl, c_commutation);
-			}
+                /* Control Loop */
+                velocity_control_service(velocity_ctrl_params, i_hall[1], i_qei[1],
+                                            i_velocity_control, i_commutation[0]);
+            }
 		}
 
 		/************************************************************
@@ -161,42 +151,31 @@ int main(void)
 		 ************************************************************/
 		on tile[IFM_TILE]:
 		{
-			par
-			{
-				/* PWM Loop */
-				do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,\
-						p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
+            par
+            {
+                /* PWM Loop */
+                pwm_service(c_pwm_ctrl, pwm_ports);
 
-				/* Brushed Motor Drive loop */
+                /* Watchdog Server */
+                watchdog_service(i_watchdog, wd_ports);
 
-                bdc_loop(c_watchdog, c_commutation, c_pwm_ctrl,\
-                        p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2);
+                /* QEI Service */
+                {
+                    QEIConfig qei_config;
+                    init_qei_config(qei_config);
 
+                    qei_service(i_qei, qei_ports, qei_config);
+                }
 
-				/* Watchdog Server */
-				run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
+                {
+                    MotorcontrolConfig commutation_config;
+                    init_commutation_config(commutation_config);
 
-				/* Hall Server */
-				{
-					hall_par hall_params;
-					run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params);    // channel priority 1,2..5
-				}
+                    motorcontrol_service(null, i_qei[0], i_watchdog, i_motorcontrol,
+                                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                }
 
-#if (SENSOR_USED != BISS)
-				/* QEI Server */
-				{
-					qei_par qei_params;
-					run_qei(c_qei_p1, c_qei_p2, c_qei_p3, c_qei_p4, c_qei_p5, c_qei_p6, p_ifm_encoder, qei_params);         // channel priority 1,2..5
-				}
-#else
-				/* biss server */
-				{
-				    biss_par biss_params;
-				    run_biss(i_biss, 1, p_ifm_biss_clk, p_ifm_encoder, clk_biss, biss_params, 2);
-				}
-#endif
-
-			}
+            }
 		}
 
 	}

@@ -10,7 +10,7 @@
 #include <qei_service.h>
 #include <internal_config.h>
 #include <ctrlproto.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 #include <control_loops_common.h>
 
 /**
@@ -73,7 +73,7 @@ void update_hall_config_ecat(HallConfig &hall_config, chanend coe_out);
 */
 void update_qei_param_ecat(QEIConfig &qei_params, chanend coe_out);
 
-void update_commutation_param_ecat(CommutationConfig &commutation_params, chanend coe_out);
+void update_commutation_param_ecat(MotorcontrolConfig &commutation_params, chanend coe_out);
 
 /**
  * @brief Update cyclic synchronous torque parameters from Ethercat
