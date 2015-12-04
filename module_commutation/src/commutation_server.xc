@@ -154,7 +154,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
 
         select {
 
-            case t when timerafter(ts + USEC_FAST*40*COMMUTATION_LOOP_FREQUENCY_KHZ) :> ts: //XX kHz commutation loop
+            case t when timerafter(ts + USEC_FAST*(1000/COMMUTATION_LOOP_FREQUENCY_KHZ)) :> ts: //XX kHz commutation loop
                 if (sensor_select == HALL && !isnull(c_hall)) {
                     //hall only
                     if (zero_offset_tuning_flag == 1){

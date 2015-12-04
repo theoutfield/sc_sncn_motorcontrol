@@ -8,7 +8,6 @@
 #include <rotary_sensor.h>
 #include <ams_config.h>
 
-
 static char rotarySensorInitialized = 0;
 
 static inline void slave_select(out port spi_ss)
@@ -485,14 +484,21 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
     int n_pole_pairs_ = 0;
     int sensor_resolution_ticks_ = 1;
     int sensor_resolution_bits_ = 0;
-    int abs_pos_ = 0, abs_pos_previos_ = 0;
+    int abs_pos_ = 0, abs_pos_previos_ = 0, abs_pos_old_vel_est_ = 0;
     int settings1_ = 0, settings2_ = 0;
     int offset_ = 0;
+    int velocity_ = 0;
     int enable_aquisition_ = 0;
     int pos_multiturn_ = 0;
+    int difference_old_ = 0;
     int max_count_ticks_cw_ = 0, max_count_ticks_ccw_ = 0;
     char sensor_initialized_ = 0;
     char measurement_taken_ = 0;
+    int velocity_ticks_ = 0;
+    timer t;
+    unsigned int tmr;
+
+    t :> tmr;
 
     while(1)
     {
@@ -560,7 +566,7 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
                     }
                     break;
             case iAMS[int i].get_velocity(void) -> int velocity:
-                    velocity = 0;
+                    velocity = velocity_;
                     break;
             case iAMS[int i].get_absolute_position_singleturn(void) -> int position:
                     if (sensor_initialized_ == 1){
@@ -590,6 +596,8 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
                     }
 
                     sensor_resolution_ticks_ = sensor_resolution_ticks_ << sensor_resolution_bits_;
+                    velocity_ticks_ = (sensor_resolution_ticks_ >> 8);
+
                     if(settings1_ == 5){
                         abs_pos_previos_ = sensor_resolution_ticks_ - readRotarySensorAngleWithCompensation(sensor_if);
                     }
@@ -611,6 +619,20 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
 
                     break;
 
+            case t when timerafter (tmr) :> void:
+                    tmr += 250000;
+                    if (sensor_initialized_ == 1 && measurement_taken_ == 1){
+                        int difference = abs_pos_ - abs_pos_old_vel_est_;
+                        if(difference > sensor_resolution_ticks_/2 || difference < -sensor_resolution_ticks_/2){
+                            difference = difference_old_;
+                        }
+                        velocity_ = (difference * 234375) / (velocity_ticks_ * 1000);
+               //         velocity_ =  difference;
+                            abs_pos_old_vel_est_ = abs_pos_;
+                            difference_old_ = difference;
+
+                    }
+                    break;
         }
     }
 
