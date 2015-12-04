@@ -9,7 +9,7 @@
 #include <statemachine.h>
 #include <drive_modes.h>
 
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 #include <gpio_service.h>
@@ -42,7 +42,7 @@
 //#pragma xta command "set required - 1.0 ms"
 
 void ethercat_drive_service(chanend pdo_out, chanend pdo_in, chanend coe_out,
-                        interface CommutationInterface client i_commutation,
+                        interface MotorcontrolInterface client i_commutation,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
                         interface TorqueControlInterface client i_torque_control,
@@ -88,7 +88,7 @@ void ethercat_drive_service(chanend pdo_out, chanend pdo_in, chanend coe_out,
     pp_par pp_params;
     pv_par pv_params;
     pt_par pt_params;
-    CommutationConfig commutation_params;
+    MotorcontrolConfig commutation_params;
     ctrl_proto_values_t InOut;
     //qei_velocity_par qei_velocity_params;
 

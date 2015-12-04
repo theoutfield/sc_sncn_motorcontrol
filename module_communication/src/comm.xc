@@ -8,7 +8,7 @@
 #include <refclk.h>
 
 #include <ctrlproto.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
 #include <control_loops_common.h>
 #include <internal_config.h>
@@ -74,10 +74,10 @@ void update_qei_param_ecat(QEIConfig &qei_params, chanend coe_out)
     qei_params.max_ticks += qei_params.max_ticks_per_turn;  // tolerance
 }
 
-void update_commutation_param_ecat(CommutationConfig &commutation_params, chanend coe_out)
+void update_commutation_param_ecat(MotorcontrolConfig &commutation_params, chanend coe_out)
 {
     {commutation_params.hall_offset_clk, commutation_params.hall_offset_cclk,
-            commutation_params.winding_type} = commutation_sdo_update(coe_out);
+            commutation_params.bldc_winding_type} = commutation_sdo_update(coe_out);
 }
 
 void update_cst_param_ecat(cst_par &cst_params, chanend coe_out)

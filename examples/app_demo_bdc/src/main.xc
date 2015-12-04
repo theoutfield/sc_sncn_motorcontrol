@@ -7,14 +7,12 @@
  * @date 17/06/2014
  */
 #include <pwm_service.h>
-#include <commutation_service.h>
-#include <brushed_dc_server.h>
-#include <brushed_dc_client.h>
 #include <adc_service.h>
+#include <watchdog_service.h>
+#include <motorcontrol_service.h>
 
-#include <internal_config.h> //FIXME: to use BDC motor, please change the parameter #define MOTOR_TYPE BDC
-#include <brushed_dc_common.h>
 #include <bldc_motor_config.h>
+#include <motorcontrol_config.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -27,7 +25,7 @@ int main(void) {
     chan c_pwm_ctrl;
 
     interface WatchdogInterface i_watchdog;
-    interface CommutationInterface i_commutation;
+    interface MotorcontrolInterface i_motorcontrol[5];
     interface ADCInterface i_adc;
 
     par
@@ -39,18 +37,15 @@ int main(void) {
         on tile[APP_TILE_1]:
         {
             {
-                //calib_data I_calib;
-                //do_adc_calibration_ad7949(c_adc, I_calib);
                 while (1) {
                     int a, b, AI0, AI1;
-                   // {a, b} = i_adc.get_currents();//get_adc_calibrated_current_ad7949(c_adc, I_calib);
-         //         printf("phase currents: %i, %i\n", a, b);
+
                     {AI0 , AI1} =  i_adc.get_external_inputs();
                     int normalized_value = AI1*13589/16383;
                     printf("Voltage SP: %i\n", normalized_value);
-                    //int normalized_value = 1000;
-                    i_commutation.setVoltage(-1000);
-                   // set_BDC_motor_voltage(i_commutation, normalized_value);//maximum 13589
+
+                    i_motorcontrol[0].setVoltage(normalized_value);
+
               }
             }
         }
@@ -72,8 +67,13 @@ int main(void) {
                 watchdog_service(i_watchdog, wd_ports);
 
                 /* Brushed Motor Drive loop */
-                bdc_loop(c_pwm_ctrl, i_watchdog, i_commutation, fet_driver_ports);
+                {
+                    MotorcontrolConfig motorcontrol_config;
+                    init_motorcontrol_config(motorcontrol_config);
 
+                    motorcontrol_service(null, null, i_watchdog, i_motorcontrol,
+                                            c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
+                }
             }
         }
 

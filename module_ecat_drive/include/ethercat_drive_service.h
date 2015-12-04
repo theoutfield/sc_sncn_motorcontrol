@@ -25,7 +25,7 @@
  *
  */
 void ethercat_drive_service(chanend pdo_out, chanend pdo_in, chanend coe_out,
-                        interface CommutationInterface client i_commutation,
+                        interface MotorcontrolInterface client i_commutation,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
                         interface TorqueControlInterface client i_torque_control,

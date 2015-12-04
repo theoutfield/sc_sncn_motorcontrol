@@ -72,7 +72,7 @@ int main(void) {
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
     interface WatchdogInterface i_watchdog;
-    interface CommutationInterface i_commutation[5];
+    interface MotorcontrolInterface i_commutation[5];
     interface ADCInterface i_adc;
     interface HallInterface i_hall[5];
 
@@ -123,11 +123,11 @@ int main(void) {
 
                 /* Motor Commutation loop */
                 {
-                    CommutationConfig commutation_config;
+                    MotorcontrolConfig commutation_config;
                     init_commutation_config(commutation_config);
 
-                    commutation_service(i_hall[0], null, i_watchdog, i_commutation,
-                                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                    motorcontrol_service(i_hall[0], null, i_watchdog, i_commutation,
+                            c_pwm_ctrl, fet_driver_ports, commutation_config);
                 }
 
                 /*Current sampling*/

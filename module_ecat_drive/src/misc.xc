@@ -6,13 +6,13 @@
 #include <refclk.h>
 #include <qei_service.h>
 #include <hall_service.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 #include <statemachine.h>
 #include <drive_modes.h>
 #include <internal_config.h>
 #include <print.h>
 
-int detect_sensor_placement(interface HallInterface client i_hall, interface QEIInterface client i_qei, interface CommutationInterface client i_commutation)
+int detect_sensor_placement(interface HallInterface client i_hall, interface QEIInterface client i_qei, interface MotorcontrolInterface client i_commutation)
 {
     int times = 50;
     int valid;

@@ -7,14 +7,10 @@
  * @date 17/06/2014
  */
 #include <pwm_service.h>
-#include <commutation_service.h>
-#include <brushed_dc_server.h>
-#include <brushed_dc_client.h>
-#include <adc_service.h>
+#include <watchdog_service.h>
+#include <motorcontrol_service.h>
 
-#include <internal_config.h> //FIXME: to use BDC motor, please change the parameter #define MOTOR_TYPE BDC
-#include <brushed_dc_common.h>
-#include <bldc_motor_config.h>
+#include <motorcontrol_config.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -26,7 +22,7 @@ int main(void) {
     chan c_pwm_ctrl;
 
     interface WatchdogInterface i_watchdog;
-    interface CommutationInterface i_commutation;
+    interface MotorcontrolInterface i_motorcontrol[5];
 
     par
     {
@@ -37,7 +33,7 @@ int main(void) {
         on tile[APP_TILE_1]:
         {
               while (1) {
-                  i_commutation.setVoltage(1000);
+                  i_motorcontrol[0].setVoltage(1000);
               }
         }
 
@@ -55,7 +51,13 @@ int main(void) {
                 watchdog_service(i_watchdog, wd_ports);
 
                 /* Brushed Motor Drive loop */
-                bdc_loop(c_pwm_ctrl, i_watchdog, i_commutation, fet_driver_ports);
+                {
+                    MotorcontrolConfig motorcontrol_config;
+                    init_motorcontrol_config(motorcontrol_config);
+
+                    motorcontrol_service(null, null, i_watchdog, i_motorcontrol,
+                                            c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
+                }
 
             }
         }
