@@ -4,18 +4,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
-#include <brushed_dc_server.h>
-#include <xs1.h>
-#include <pwm_cli_inv.h>
-#include <a4935.h>
-#include <sine_table_big.h>
-//#include <adc_client_ad7949.h>
-#include <hall_service.h>
-#include <refclk.h>
-#include <qei_service.h>
-#include <brushed_dc_common.h>
-#include <internal_config.h>
-#include <watchdog_service.h>
+#include <bdc_motorcontrol.h>
 
 static int init_state;
 
@@ -29,7 +18,7 @@ static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl,
-                               interface CommutationInterface server i_commutation)
+                               interface MotorcontrolInterface server i_motorcontrol[5])
 {
 
     unsigned int pwm[3] = { 0, 0, 0 };
@@ -85,37 +74,37 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
         select {
 
-        case i_commutation.setVoltage(int new_voltage):
+        case i_motorcontrol[int i].setVoltage(int new_voltage):
 
             voltage = new_voltage;
             break;
 
-        case i_commutation.checkBusy() -> int state_return:
+        case i_motorcontrol[int i].checkBusy() -> int state_return:
 
                   state_return = init_state;
                   break;
 
-        case i_commutation.disableFets():
+        case i_motorcontrol[int i].disableFets():
 
                 shutdown = 1;
                 break;
 
-        case i_commutation.enableFets():
+        case i_motorcontrol[int i].enableFets():
 
                 shutdown = 0;
                 voltage = 0;
                 break;
 
-        case i_commutation.getFetsState() -> int fets_state:
+        case i_motorcontrol[int i].getFetsState() -> int fets_state:
                 fets_state = shutdown;
                 break;
-        case i_commutation.setSensor(int new_sensor):
+        case i_motorcontrol[int i].setSensor(int new_sensor):
                 break;
-        case i_commutation.setParameters(CommutationConfig new_parameters):
+        case i_motorcontrol[int i].setParameters(MotorcontrolConfig new_parameters):
                 break;
-        case i_commutation.setAllParameters(HallConfig in_hall_config,
+        case i_motorcontrol[int i].setAllParameters(HallConfig in_hall_config,
                                                             QEIConfig in_qei_config,
-                                                            CommutationConfig in_commutation_config, int in_nominal_speed):
+                                                            MotorcontrolConfig in_commutation_config, int in_nominal_speed):
                break;
 
         }
@@ -125,7 +114,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
 void bdc_loop(chanend c_pwm_ctrl,
                 interface WatchdogInterface client i_watchdog,
-                interface CommutationInterface server i_commutation,
+                interface MotorcontrolInterface server i_commutation[5],
                 FetDriverPorts &fet_driver_ports)
 {
     const unsigned t_delay = 300*USEC_FAST;

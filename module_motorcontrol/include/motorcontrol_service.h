@@ -6,13 +6,18 @@
 
 #pragma once
 
+#include <pwm_cli_inv.h>
 #include <watchdog_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 
+#include <a4935.h>
+#include <internal_config.h>
 
 #define ERROR 0
 #define SUCCESS 1
+
+typedef enum {BDC_MOTOR = 0, BLDC_MOTOR = 1} MotorType;
 
 typedef struct {
     port ?p_coast;
@@ -22,25 +27,26 @@ typedef struct {
 } FetDriverPorts;
 
 typedef struct {
+    MotorType motor_type;
     int angle_variance;         /* max allowed variance depending on speed */
     int nominal_speed;
     int qei_forward_offset;
     int qei_backward_offset;
     int hall_offset_clk;
     int hall_offset_cclk;
-    int winding_type;
+    int bldc_winding_type;
     int commutation_loop_freq;
-} CommutationConfig;
+} MotorcontrolConfig;
 
-interface CommutationInterface{
+interface MotorcontrolInterface{
     int checkBusy();
     void setVoltage(int voltage);
-    void setParameters(CommutationConfig parameters);
+    void setParameters(MotorcontrolConfig parameters);
     void setSensor(int sensor);
     void disableFets();
     void enableFets();
     int getFetsState();
-    void setAllParameters(HallConfig hall_config, QEIConfig qei_config, CommutationConfig commutation_config, int in_nominal_speed);
+    void setAllParameters(HallConfig hall_config, QEIConfig qei_config, MotorcontrolConfig commutation_config, int in_nominal_speed);
 };
 
 /**
@@ -64,9 +70,9 @@ interface CommutationInterface{
  *
  */
 [[combinable]]
-void commutation_service(interface HallInterface client i_hall, interface QEIInterface client ?i_qei,
+void motorcontrol_service(interface HallInterface client ?i_hall, interface QEIInterface client ?i_qei,
                             interface WatchdogInterface client watchdog_interface,
-                            interface CommutationInterface server commutation_interface[5],
+                            interface MotorcontrolInterface server motorcontrol_interface[5],
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
-                            CommutationConfig &commutation_params);
+                            MotorcontrolConfig &commutation_params);
