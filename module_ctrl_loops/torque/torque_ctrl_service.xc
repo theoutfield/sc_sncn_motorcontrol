@@ -17,7 +17,7 @@
 #include <qei_service.h>
 #include <sine_table_big.h>
 #include <a4935.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
 //#define ENABLE_xscope_torq //don't forget to set up the config.xscope file
 //#define debug_print
@@ -204,7 +204,7 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
 
 void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config, QEIConfig &qei_params,
                         chanend c_current, chanend c_speed,
-                        interface CommutationInterface client commutation_interface,
+                        interface MotorcontrolInterface client commutation_interface,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
                         interface TorqueControlInterface server i_torque_control)
@@ -538,7 +538,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 /* TODO: do we really need 2 threads for this? */
 void torque_control_service(ControlConfig &torque_ctrl_params,
                     interface ADCInterface client adc_if,
-                    interface CommutationInterface client commutation_interface,
+                    interface MotorcontrolInterface client commutation_interface,
                     interface HallInterface client i_hall,
                     interface QEIInterface client ?i_qei,
                     interface TorqueControlInterface server i_torque_control)

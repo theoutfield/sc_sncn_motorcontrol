@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 #include <internal_config.h>
@@ -83,7 +83,7 @@ void set_torque_cst(cst_par & cst_params, int target_torque, int torque_offset, 
  */
 void torque_control_service(ControlConfig &torque_ctrl_params,
                             interface ADCInterface client adc_if,
-                            interface CommutationInterface client commutation_interface,
+                            interface MotorcontrolInterface client commutation_interface,
                             interface HallInterface client i_hall,
                             interface QEIInterface client ?i_qei,
                             interface TorqueControlInterface server i_torque_control);

@@ -63,7 +63,7 @@ check_list init_checklist(void);
  * @return check_list_param updated checklist parameters
  */
 void update_checklist(check_list &check_list_param, int mode,
-                        interface CommutationInterface client i_commutation,
+                        interface MotorcontrolInterface client i_commutation,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
                         interface ADCInterface client ?i_adc,

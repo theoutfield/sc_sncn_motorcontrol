@@ -14,7 +14,7 @@
 #include <drive_modes.h>
 #include <stdio.h>
 #include <a4935.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
 
 int init_velocity_control(interface VelocityControlInterface client i_velocity_control)
@@ -59,7 +59,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
                        interface HallInterface client i_hall,
                        interface QEIInterface client ?i_qei,
                        interface VelocityControlInterface server i_velocity_control,
-                       interface CommutationInterface client commutation_interface )
+                       interface MotorcontrolInterface client commutation_interface )
 {
     /* Controller declarations */
     int actual_velocity = 0;

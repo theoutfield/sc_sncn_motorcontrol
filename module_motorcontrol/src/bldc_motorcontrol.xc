@@ -4,21 +4,8 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <xs1.h>
-#include <stdlib.h>
-#include <refclk.h>
-#include <stdio.h>
-#include <print.h>
-
-#include <commutation_service.h>
-#include <watchdog_service.h>
-#include <pwm_cli_inv.h>
-#include <a4935.h>
+#include <bldc_motorcontrol.h>
 #include <sine_table_big.h>
-#include <qei_service.h>
-
-#include <internal_config.h>
-
 
 static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
@@ -27,35 +14,15 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
-int check_commutation_config(CommutationConfig &commutation_params)
-{
-
-    if(commutation_params.nominal_speed <= 0){
-        printstrln("Wrong Commutation configuration: wrong nominal speed");
-        return ERROR;
-    }
-
-    if(commutation_params.winding_type < 0 || commutation_params.winding_type > 2){
-        printstrln("Wrong Commutation configuration: wrong winding");
-        return ERROR;
-    }
-
-    if(commutation_params.angle_variance <= 0){
-        printstrln("Wrong Commutation configuration: angle variance");
-        return ERROR;
-    }
-
-    return SUCCESS;
-}
-
 [[combinable]]
-void commutation_service(interface HallInterface client i_hall,
+void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
+                            interface HallInterface client i_hall,
                             interface QEIInterface client ?i_qei,
                             interface WatchdogInterface client watchdog_interface,
-                            interface CommutationInterface server commutation_interface[5],
+                            interface MotorcontrolInterface server commutation_interface[5],
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
-                            CommutationConfig &commutation_params)
+                            MotorcontrolConfig &commutation_params)
 {
     const unsigned t_delay = 300*USEC_FAST;
     timer t;
@@ -69,13 +36,6 @@ void commutation_service(interface HallInterface client i_hall,
     int angle = 0;
     int voltage = 0;
     int pwm_half = PWM_MAX_VALUE>>1;
-    QEIConfig qei_config;
-    HallConfig hall_config = i_hall.getHallConfig();
-
-
-    if(!isnull(i_qei)){
-        qei_config = i_qei.getQEIConfig();
-    }
 
     int max_count_per_hall = qei_config.real_counts/hall_config.pole_pairs;
     int angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
@@ -85,13 +45,6 @@ void commutation_service(interface HallInterface client i_hall,
     int nominal_speed;
     int shutdown = 0; //Disable FETS
     int sensor_select = HALL;
-
-    if (check_commutation_config(commutation_params) == ERROR){
-        printstrln("Error while checking the Commutation configuration");
-        return;
-    }
-
-    printf("*************************************\n    COMMUTATION SERVER STARTING\n*************************************\n");
 
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
@@ -126,12 +79,12 @@ void commutation_service(interface HallInterface client i_hall,
             case t when timerafter(ts + USEC_FAST*40*commutation_params.commutation_loop_freq) :> ts: //XX kHz commutation loop
                 if (sensor_select == HALL) {
                     //hall only
-                    angle = i_hall.get_hall_position();//get_hall_position(c_hall);
+                    angle = i_hall.get_hall_position();
                 } else if (sensor_select == QEI && !isnull(i_qei)) {
                     { angle, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
                     angle = (angle << 12) / max_count_per_hall;
                     if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0)) {
-                        angle = i_hall.get_hall_position();//get_hall_position(c_hall);
+                        angle = i_hall.get_hall_position();
                     }
                 }
 
@@ -173,17 +126,17 @@ void commutation_service(interface HallInterface client i_hall,
 
             case commutation_interface[int i].setVoltage(int new_voltage):
                     voltage = new_voltage;
-                    if (commutation_params.winding_type == DELTA_WINDING) {
+                    if (commutation_params.bldc_winding_type == DELTA_WINDING) {
                         voltage = -voltage;
                     }
                     break;
 
-            case commutation_interface[int i].setParameters(CommutationConfig new_parameters):
+            case commutation_interface[int i].setParameters(MotorcontrolConfig new_parameters):
                     commutation_params.angle_variance = new_parameters.angle_variance;
                     commutation_params.nominal_speed = new_parameters.nominal_speed;
                     commutation_params.hall_offset_clk = new_parameters.hall_offset_clk;
                     commutation_params.hall_offset_cclk = new_parameters.hall_offset_cclk;
-                    commutation_params.winding_type = new_parameters.winding_type;
+                    commutation_params.bldc_winding_type = new_parameters.bldc_winding_type;
 
                     break;
 
@@ -210,7 +163,7 @@ void commutation_service(interface HallInterface client i_hall,
 
             case commutation_interface[int i].setAllParameters(HallConfig in_hall_config,
                                                                 QEIConfig in_qei_config,
-                                                                CommutationConfig in_commutation_config, int in_nominal_speed):
+                                                                MotorcontrolConfig in_commutation_config, int in_nominal_speed):
 
                  hall_config.pole_pairs = in_hall_config.pole_pairs;
                  qei_config.index = in_qei_config.index;
@@ -219,7 +172,7 @@ void commutation_service(interface HallInterface client i_hall,
                  nominal_speed = in_nominal_speed;
                  commutation_params.hall_offset_clk = in_commutation_config.hall_offset_clk;
                  commutation_params.hall_offset_cclk = in_commutation_config.hall_offset_cclk;
-                 commutation_params.winding_type = in_commutation_config.winding_type;
+                 commutation_params.bldc_winding_type = in_commutation_config.bldc_winding_type;
                  commutation_params.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
 
                  if (hall_config.pole_pairs < 4) {
