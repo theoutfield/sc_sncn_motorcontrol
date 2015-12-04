@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include <watchdog_service.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
 /**
  * @brief Brushed DC Drive Loop
@@ -28,5 +27,5 @@
  */
 void bdc_loop(chanend c_pwm_ctrl,
                interface WatchdogInterface client watchdog_interface,
-               interface CommutationInterface server commutation_interface,
+               interface MotorcontrolInterface server commutation_interface[5],
                FetDriverPorts &fet_driver_ports);

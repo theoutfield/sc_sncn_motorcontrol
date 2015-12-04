@@ -12,7 +12,7 @@
 #include <qei_service.h>
 #include <hall_service.h>
 #include <pwm_service.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
 //Position control + profile libs
 #include <position_ctrl_service.h>
@@ -67,7 +67,7 @@ int main(void)
 	chan c_pwm_ctrl;			// pwm channel
 
 	interface WatchdogInterface i_watchdog;
-	interface CommutationInterface i_commutation[5];
+	interface MotorcontrolInterface i_motorcontrol[5];
 	interface HallInterface i_hall[5];
 	interface QEIInterface i_qei[5];
 
@@ -77,6 +77,17 @@ int main(void)
 	{
 		/* Test Profile Position Client function*/
 		on tile[APP_TILE_1]: position_profile_test(i_position_control);      // test PPM on slave side
+
+		on tile[IFM_TILE]:
+        /* Position Control Loop */
+        {
+             ControlConfig position_ctrl_params;
+             init_position_control_config(position_ctrl_params); // Initialize PID parameters for Position Control
+
+             /* Control Loop */
+             position_control_service(position_ctrl_params, i_hall[1], i_qei[1],
+                                       i_position_control, i_motorcontrol[0]);
+        }
 
 		/************************************************************
 		 * IFM_TILE
@@ -108,22 +119,13 @@ int main(void)
 
 				/* Motor Commutation loop */
 				{
-				    CommutationConfig commutation_config;
+				    MotorcontrolConfig commutation_config;
 				    init_commutation_config(commutation_config);
 
-					commutation_service(i_hall[0], i_qei[0], i_watchdog, i_commutation,
+					motorcontrol_service(i_hall[0], i_qei[0], i_watchdog, i_motorcontrol,
 					                        c_pwm_ctrl, fet_driver_ports, commutation_config);
 				}
 
-                /* Position Control Loop */
-                {
-                     ControlConfig position_ctrl_params;
-                     init_position_control_config(position_ctrl_params); // Initialize PID parameters for Position Control
-
-                     /* Control Loop */
-                     position_control_service(position_ctrl_params, i_hall[1], i_qei[1],
-                                               i_position_control, i_commutation[0]);
-                }
             }
         }
     }

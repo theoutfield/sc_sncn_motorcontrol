@@ -9,7 +9,7 @@
 #include <control_loops_common.h>
 #include <qei_service.h>
 #include "control_loops_common.h"
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
 #include <internal_config.h>
 
@@ -92,5 +92,5 @@ void position_control_service(ControlConfig & position_ctrl_params,
                     interface HallInterface client ?i_hall,
                     interface QEIInterface client ?i_qei,
                     interface PositionControlInterface server i_position_control,
-                    interface CommutationInterface client commutation_interface);
+                    interface MotorcontrolInterface client commutation_interface);
 

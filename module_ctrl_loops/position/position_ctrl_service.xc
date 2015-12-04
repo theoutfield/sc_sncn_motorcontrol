@@ -63,7 +63,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
                                 interface HallInterface client ?i_hall,
                                 interface QEIInterface client ?i_qei,
                                 interface PositionControlInterface server i_position_control,
-                                interface CommutationInterface client commutation_interface)
+                                interface MotorcontrolInterface client commutation_interface)
 {
     int actual_position = 0;
     int target_position = 0;

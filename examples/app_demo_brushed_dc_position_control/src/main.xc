@@ -5,8 +5,7 @@
 #include <pwm_service.h>
 #include <watchdog_service.h>
 #include <qei_service.h>
-
-#include <brushed_dc_server.h>
+#include <motorcontrol_service.h>
 
 #include <position_ctrl_service.h>
 #include <profile_control.h>
@@ -27,8 +26,6 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int deceleration 	= 100;     		// rpm/s
 	int follow_error;
 
-
-	/* Initialise Profile Limits for position profile generator and select position sensor */
     /* Initialise the position profile generator */
     init_position_profiler(MIN_POSITION_LIMIT, MAX_POSITION_LIMIT, MAX_PROFILE_VELOCITY, MAX_ACCELERATION, i_position_control);
 
@@ -61,7 +58,7 @@ int main(void)
     chan c_pwm_ctrl;            // pwm channel
 
     interface WatchdogInterface i_watchdog;
-    interface CommutationInterface i_commutation;
+    interface MotorcontrolInterface i_motorcontrol[5];
     interface QEIInterface i_qei[5];
 
     interface PositionControlInterface i_position_control;
@@ -85,7 +82,7 @@ int main(void)
 
                  /* Control Loop */
                  position_control_service(position_ctrl_params, null, i_qei[1],
-                                           i_position_control, i_commutation);
+                                           i_position_control, i_motorcontrol[0]);
             }
 		}
 
@@ -110,8 +107,13 @@ int main(void)
                     qei_service(i_qei, qei_ports, qei_config);
                 }
 
-                /* Brushed Motor Drive loop */
-                bdc_loop(c_pwm_ctrl, i_watchdog, i_commutation, fet_driver_ports);
+                {
+                    MotorcontrolConfig commutation_config;
+                    init_commutation_config(commutation_config);
+
+                    motorcontrol_service(null, i_qei[0], i_watchdog, i_motorcontrol,
+                                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                }
 			}
 		}
 
