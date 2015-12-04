@@ -19,7 +19,6 @@
 #include <profile_control.h>
 
 //Configuration headers
-#include <bldc_motor_config.h>
 #include <qei_config.h>
 #include <hall_config.h>
 #include <commutation_config.h>

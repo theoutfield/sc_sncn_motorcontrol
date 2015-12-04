@@ -8,6 +8,6 @@
 
 #pragma once
 #include <bldc_motor_config.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
-void init_commutation_config(CommutationConfig & commutation_params);
+void init_commutation_config(MotorcontrolConfig & commutation_params);

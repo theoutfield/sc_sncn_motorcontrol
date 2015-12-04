@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void run_offset_tuning(int input_voltage, interface CommutationInterface client commutation_interface){
+void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client commutation_interface){
 
     delay_seconds(1);
     commutation_interface.setVoltage(input_voltage);
@@ -31,22 +31,22 @@ void run_offset_tuning(int input_voltage, interface CommutationInterface client 
         if (input_voltage > 0)
         {        //star winding
             if (WINDING_TYPE == 1) {
-                CommutationConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
+                MotorcontrolConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
                 commutation_interface.setParameters(params);
             }
             else {
-                CommutationConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
+                MotorcontrolConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
                 commutation_interface.setParameters(params);
             }
         }
         else
         {
             if (WINDING_TYPE == 1){
-                CommutationConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
+                MotorcontrolConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
                 commutation_interface.setParameters(params);
             }
             else{
-                CommutationConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
+                MotorcontrolConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
                 commutation_interface.setParameters(params);
             }
         }

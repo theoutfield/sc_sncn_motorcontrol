@@ -12,17 +12,16 @@
 #include <qei_service.h>
 #include <hall_service.h>
 #include <pwm_service.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
 //Position control + profile libs
 #include <velocity_ctrl_service.h>
 #include <profile_control.h>
 
 //Configuration
-#include <bldc_motor_config.h>
 #include <qei_config.h>
 #include <hall_config.h>
-#include <commutation_config.h>
+#include <motorcontrol_config.h>
 #include <control_config.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -61,7 +60,7 @@ int main(void)
 	chan c_pwm_ctrl;     // pwm channel
 
 	interface WatchdogInterface i_watchdog;
-    interface CommutationInterface i_commutation[5];
+    interface MotorcontrolInterface i_commutation[5];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
@@ -120,10 +119,10 @@ int main(void)
 
 				/* Motor Commutation loop */
                 {
-                    CommutationConfig commutation_config;
+                    MotorcontrolConfig commutation_config;
                     init_commutation_config(commutation_config);
 
-                    commutation_service(i_hall[0], i_qei[0], i_watchdog, i_commutation,
+                    motorcontrol_service(i_hall[0], i_qei[0], i_watchdog, i_commutation,
                                             c_pwm_ctrl, fet_driver_ports, commutation_config);
                 }
 			}

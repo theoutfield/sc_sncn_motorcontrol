@@ -13,14 +13,13 @@
 #include <hall_service.h>
 #include <pwm_service.h>
 #include <adc_service.h>
-#include <commutation_service.h>
+#include <motorcontrol_service.h>
 
 //Torque control + profile libs
 #include <torque_ctrl_service.h>
 #include <profile_control.h>
 
 //Configure your motor parameters in config/bldc_motor_config.h
-#include <bldc_motor_config.h>
 #include <qei_config.h>
 #include <hall_config.h>
 #include <commutation_config.h>
@@ -73,7 +72,7 @@ int main(void)
 	chan c_adctrig, c_pwm_ctrl;
 
 	interface WatchdogInterface i_watchdog;
-    interface CommutationInterface i_commutation[5];
+    interface MotorcontrolInterface i_commutation[5];
     interface ADCInterface i_adc;
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
@@ -129,10 +128,10 @@ int main(void)
 
 				/* Motor Commutation loop */
                 {
-                    CommutationConfig commutation_config;
+                    MotorcontrolConfig commutation_config;
                     init_commutation_config(commutation_config);
 
-                    commutation_service(i_hall[0], i_qei[0], i_watchdog, i_commutation,
+                    motorcontrol_service(i_hall[0], i_qei[0], i_watchdog, i_commutation,
                             c_pwm_ctrl, fet_driver_ports, commutation_config);
                 }
 			}
