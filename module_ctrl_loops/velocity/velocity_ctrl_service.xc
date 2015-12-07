@@ -56,7 +56,7 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 
 [[combinable]]
 void velocity_control_service(ControlConfig &velocity_ctrl_params,
-                       interface HallInterface client i_hall,
+                       interface HallInterface client ?i_hall,
                        interface QEIInterface client ?i_qei,
                        interface VelocityControlInterface server i_velocity_control,
                        interface MotorcontrolInterface client commutation_interface )
@@ -96,10 +96,16 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
     int compute_flag = 0;
     int fet_state = 0;
 
-    HallConfig hall_config = i_hall.getHallConfig();
+    HallConfig hall_config;
     QEIConfig qei_config;
 
+    if(velocity_ctrl_params.sensor_used == HALL && !isnull(i_hall)){
+
+        hall_config = i_hall.getHallConfig();
+    }
+
     if(velocity_ctrl_params.sensor_used == QEI && !isnull(i_qei)){
+
         qei_config = i_qei.getQEIConfig();
     }
 

@@ -60,7 +60,7 @@ int main(void)
 	chan c_pwm_ctrl;     // pwm channel
 
 	interface WatchdogInterface i_watchdog;
-    interface MotorcontrolInterface i_commutation[5];
+    interface MotorcontrolInterface i_motorcontrol[5];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
@@ -83,7 +83,7 @@ int main(void)
 
                 /* Control Loop */
                 velocity_control_service(velocity_ctrl_params, i_hall[1], i_qei[1],
-                                            i_velocity_control, i_commutation[0]);
+                                            i_velocity_control, i_motorcontrol[0]);
             }
 
 		}
@@ -93,39 +93,39 @@ int main(void)
 		 ************************************************************/
 		on tile[IFM_TILE]:
 		{
-			par
-			{
-				/* PWM Loop */
-			    pwm_service(c_pwm_ctrl, pwm_ports);
+		    par
+            {
+                /* PWM Loop */
+                pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* Watchdog Server */
-			    watchdog_service(i_watchdog, wd_ports);
+                watchdog_service(wd_ports, i_watchdog);
 
-                /* Hall Server */
-                {
-                    HallConfig hall_config;
-                    init_hall_config(hall_config);
-
-                    hall_service(i_hall, hall_ports, hall_config);
-                }
-
-                /* QEI Server */
+                /* QEI Service */
                 {
                     QEIConfig qei_config;
                     init_qei_config(qei_config);
 
-                    qei_service(i_qei, qei_ports, qei_config);
+                    qei_service(qei_ports, qei_config, i_qei);
                 }
 
-				/* Motor Commutation loop */
                 {
-                    MotorcontrolConfig commutation_config;
-                    init_commutation_config(commutation_config);
+                    HallConfig hall_config;
+                    init_hall_config(hall_config);
 
-                    motorcontrol_service(i_hall[0], i_qei[0], i_watchdog, i_commutation,
-                                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                    hall_service(hall_ports, hall_config, i_hall);
                 }
-			}
+
+                /* Motor Commutation loop */
+                {
+                    MotorcontrolConfig motorcontrol_config;
+                    init_motorcontrol_config(motorcontrol_config);
+
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog, i_motorcontrol);
+                }
+
+            }
 		}
 
 	}

@@ -7,7 +7,7 @@
 #include <xs1.h>
 #include <watchdog_service.h>
 
-void watchdog_service(interface WatchdogInterface server watchdog_interface, WatchdogPorts &watchdog_ports)
+void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server watchdog_interface)
 {
 
     unsigned int wd_enabled = 1, shared_out = 0xe, tick_out = 0;

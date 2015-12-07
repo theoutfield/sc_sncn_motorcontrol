@@ -58,7 +58,7 @@ int main(void)
                 hall_config.sensor_polarity = 1;                    // CW
                 hall_config.max_ticks = 10 * HALL_TICKS_PER_TURN;   // 10 turns
 
-            hall_service(i_hall, hall_ports, hall_config);
+            hall_service(hall_ports, hall_config, i_hall);
         }
     }
 

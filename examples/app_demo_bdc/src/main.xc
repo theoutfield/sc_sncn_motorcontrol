@@ -61,18 +61,18 @@ int main(void) {
                 adc_service(i_adc, adc_ports, null);
 
                 /* PWM Loop */
-                pwm_service(c_pwm_ctrl, pwm_ports);
+                pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* Watchdog Server */
-                watchdog_service(i_watchdog, wd_ports);
+                watchdog_service(wd_ports, i_watchdog);
 
                 /* Brushed Motor Drive loop */
                 {
                     MotorcontrolConfig motorcontrol_config;
                     init_motorcontrol_config(motorcontrol_config);
 
-                    motorcontrol_service(null, null, i_watchdog, i_motorcontrol,
-                                            c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                            c_pwm_ctrl, null, null, i_watchdog, i_motorcontrol);
                 }
             }
         }

@@ -12,7 +12,7 @@
 
 #include <hall_service.h>
 #include <hall_config.h>
-#include <commutation_config.h>
+#include <motorcontrol_config.h>
 
 #ifdef AD7265
 #include <adc_7265.h>
@@ -26,7 +26,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
-#define VOLTAGE 200 //+/- 4095
+#define VOLTAGE 500 //+/- 4095
 
 #ifdef AD7265
 on tile[IFM_TILE]: adc_ports_t adc_ports =
@@ -72,7 +72,7 @@ int main(void) {
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
     interface WatchdogInterface i_watchdog;
-    interface MotorcontrolInterface i_commutation[5];
+    interface MotorcontrolInterface i_motorcontrol[5];
     interface ADCInterface i_adc;
     interface HallInterface i_hall[5];
 
@@ -87,7 +87,7 @@ int main(void) {
         {
             /* WARNING: only one blocking task is possible per tile. */
             /* Waiting for a user input blocks other tasks on the same tile from execution. */
-            run_offset_tuning(VOLTAGE, i_commutation[0]);
+            run_offset_tuning(VOLTAGE, i_motorcontrol[0]);
         }
 
         on tile[IFM_TILE]: adc_client(i_adc, i_hall[1]);
@@ -107,27 +107,27 @@ int main(void) {
 #ifdef DC1K
                 run_watchdog(c_watchdog, null, p_ifm_led_moton_wdtick_wden);
 #else
-                watchdog_service(i_watchdog, wd_ports);
+                watchdog_service(wd_ports, i_watchdog);
 #endif
 
                 /* PWM Loop */
-                pwm_triggered_service(c_pwm_ctrl, c_adctrig, pwm_ports);
+                pwm_triggered_service( pwm_ports, c_pwm_ctrl, c_adctrig);
 
                 /* Hall Server */
                 {
                     HallConfig hall_config;
                     init_hall_config(hall_config);
 
-                    hall_service(i_hall, hall_ports, hall_config);
+                    hall_service(hall_ports, hall_config, i_hall);
                 }
 
                 /* Motor Commutation loop */
                 {
-                    MotorcontrolConfig commutation_config;
-                    init_commutation_config(commutation_config);
+                    MotorcontrolConfig motorcontrol_config;
+                    init_motorcontrol_config(motorcontrol_config);
 
-                    motorcontrol_service(i_hall[0], null, i_watchdog, i_commutation,
-                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                            c_pwm_ctrl, i_hall[0], null, i_watchdog, i_motorcontrol);
                 }
 
                 /*Current sampling*/
