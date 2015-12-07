@@ -16,9 +16,7 @@ void qei_test(interface QEIInterface client i_qei)
 	int position;
 	int velocity;
 	int direction;
-	int core_id = 1;
 	int count=0;
-	timer t;
 
 	while(1)
 	{
