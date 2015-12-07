@@ -33,7 +33,7 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
 	int actual_torque;
     xscope_int(TARGET_TORQUE, target_torque);
 
-
+    delay_seconds(2);
 	/* Initialise the torque profile generator */
 	init_torque_profiler(MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION, POLARITY, i_torque_control);
 
