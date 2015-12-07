@@ -30,34 +30,3 @@
 #define SEC_FAST  250000000
 
 #endif
-
-/**
- * @brief Delay function in microseconds
- *
- * @Input
- * @param microseconds specify the delay in microseconds
- * @param core_id specify the core number in which the function is called
- * @param t timer used to calculate the microseconds elapsed
- */
-void wait_micro_s(unsigned microseconds, int core_id, timer t);
-
-/**
- * @brief Delay function in milliseconds
- *
- * @Input
- * @param milliseconds specify the delay in milliseconds
- * @param core_id specify the core number in which the function is called
- * @param t timer used to calculate the milliseconds elapsed
- */
-void wait_ms(unsigned milliseconds, int core_id, timer t);
-
-
-/**
- * @brief Delay function in seconds
- *
- * @Input
- * @param seconds specify the delay in seconds
- * @param core_id specify the core number in which the function is called
- * @param t timer used to calculate the seconds elapsed
- */
-void wait_s(unsigned seconds, int core_id, timer t);
