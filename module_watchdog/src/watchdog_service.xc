@@ -7,6 +7,7 @@
 #include <xs1.h>
 #include <watchdog_service.h>
 
+[[combinable]]
 void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server watchdog_interface)
 {
 
@@ -58,24 +59,16 @@ void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterfac
             if (wd_enabled == 1) {
                 if (isnull(watchdog_ports.p_tick)){
                     shared_out ^= (1 << 1) ; //toggle the second bit (DC1K)
+                    watchdog_ports.p_enable <: shared_out;
                 }
                 else{
                     tick_out ^= 0x1;
+                    watchdog_ports.p_tick <: tick_out;
                 }
             }
             break;
 
             // Do a case: Separate the LED bits from the port XS1_PORT_4B. LSB enable watchdog.
         }
-
-        // Send out the new value to the shared port
-        if (isnull(watchdog_ports.p_tick)){
-            watchdog_ports.p_enable <: shared_out;
-        }
-        // or to the WD tick port
-        else {
-            watchdog_ports.p_tick <: tick_out;
-        }
-
     }
 }
