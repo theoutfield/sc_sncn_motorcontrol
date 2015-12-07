@@ -6,26 +6,6 @@
 
 #pragma once
 
-/*
- * @brief Modes of Operation (CiA402 Standard)
- *
- *  [M] - Mandatory
- *  [C] - Conditional
- *  [R] - Recommended
- *  [O] - optional
- *  [FG] - Function Group
- */
-
-#define PP      1   /* [O] Profile Position mode */
-#define VL      2   /* [O] Velocity mode (frequency converter) */
-#define PV      3   /* [O] Profile velocity mode */
-#define TQ      4   /* [O] Torque profile mode */
-#define HM      6   /* [O] Homing mode */
-#define IP      7   /* [O] Interpolated position mode */
-#define CSP     8   /* [C] Cyclic synchronous position mode */
-#define CSV     9   /* [C] Cyclic synchronous velocity mode */
-#define CST     10  /* [C] Cyclic synchronous torque mode */
-#define CSTCA   11  /* [O] Cyclic synchronous torque mode with commutation angle */
 
 /* Manufacturer specific mode -128...-1 optional */
 

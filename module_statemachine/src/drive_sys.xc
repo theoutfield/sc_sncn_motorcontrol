@@ -5,13 +5,11 @@
  */
 
 #include <statemachine.h>
-#include <drive_modes.h>
-#include <internal_config.h>
+#include <drive_modes_config.h>
+#include <state_modes.h>
 #include <stdbool_xc.h>
-#include <print.h>
 #include <position_ctrl_service.h>
 
-//#define print_slave
 
 int read_controlword_switch_on(int control_word) {
     return (control_word & SWITCH_ON_CONTROL);

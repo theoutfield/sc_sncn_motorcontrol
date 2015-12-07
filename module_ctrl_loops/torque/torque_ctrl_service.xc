@@ -11,7 +11,7 @@
 #include <xscope.h>
 #include <print.h>
 //#include <statemachine.h>
-#include <drive_modes.h>
+#include <drive_modes_config.h>
 
 //#include <qei_client.h>
 #include <qei_service.h>
@@ -495,7 +495,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                       fet_state = commutation_interface.getFetsState(); //check_fet_state(c_commutation);
                       if (fet_state == 1) {
                           commutation_interface.enableFets(); //enable_motor(c_commutation);
-                          wait_ms(2, 1, tc);
+                          delay_milliseconds(2);//wait_ms(2, 1, tc);
                       }
 
                       if (compute_flag == 0) {
@@ -523,7 +523,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                torque_control_output = 0;
                commutation_interface.setVoltage(0);//set_commutation_sinusoidal(c_commutation, 0);
                commutation_interface.disableFets(); //disable_motor(c_commutation);
-               wait_ms(30, 1, tc);
+               delay_milliseconds(30);//wait_ms(30, 1, tc);
                break;
 
         case i_torque_control.check_torque_ctrl_state() -> int out_state:
