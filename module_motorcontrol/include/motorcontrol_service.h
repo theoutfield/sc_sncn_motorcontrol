@@ -17,7 +17,7 @@
 #define ERROR 0
 #define SUCCESS 1
 
-typedef enum {BDC_MOTOR = 0, BLDC_MOTOR = 1} MotorType;
+typedef enum {BDC_MOTOR = 10, BLDC_MOTOR = 11} MotorType;
 
 typedef struct {
     port ?p_coast;
@@ -70,9 +70,9 @@ interface MotorcontrolInterface{
  *
  */
 [[combinable]]
-void motorcontrol_service(interface HallInterface client ?i_hall, interface QEIInterface client ?i_qei,
-                            interface WatchdogInterface client watchdog_interface,
-                            interface MotorcontrolInterface server motorcontrol_interface[5],
+void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
                             chanend c_pwm_ctrl,
-                            FetDriverPorts &fet_driver_ports,
-                            MotorcontrolConfig &commutation_params);
+                            interface HallInterface client ?i_hall,
+                            interface QEIInterface client ?i_qei,
+                            interface WatchdogInterface client i_watchdog,
+                            interface MotorcontrolInterface server i_motorcontrol[5]);

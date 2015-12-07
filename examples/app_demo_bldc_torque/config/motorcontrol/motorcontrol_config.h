@@ -10,4 +10,4 @@
 #include <bldc_motor_config.h>
 #include <motorcontrol_service.h>
 
-void init_commutation_config(MotorcontrolConfig & commutation_params);
+void init_motorcontrol_config(MotorcontrolConfig &motorcontrol_config);

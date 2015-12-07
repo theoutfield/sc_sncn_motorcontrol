@@ -13,7 +13,7 @@
 #include <bldc_motor_config.h>
 #include <qei_config.h>
 #include <hall_config.h>
-#include <commutation_config.h>
+#include <motorcontrol_config.h>
 #include <control_config.h>
 
 /* Test Profile Position function */
@@ -77,11 +77,11 @@ int main(void)
 		{
 			/* Position Control Loop */
             {
-                 ControlConfig position_ctrl_params;
-                 init_position_control_config(position_ctrl_params); // Initialize PID parameters for Position Control
+                 ControlConfig position_ctrl_config;
+                 init_position_control_config(position_ctrl_config); // Initialize PID parameters for Position Control
 
                  /* Control Loop */
-                 position_control_service(position_ctrl_params, null, i_qei[1],
+                 position_control_service(position_ctrl_config, null, i_qei[1],
                                            i_position_control, i_motorcontrol[0]);
             }
 		}
@@ -91,30 +91,31 @@ int main(void)
 		 ************************************************************/
 		on tile[IFM_TILE]:
 		{
-			par
-			{
-				/* PWM Loop */
-                pwm_service(c_pwm_ctrl, pwm_ports);
+            par
+            {
+                /* PWM Loop */
+                pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* Watchdog Server */
-                watchdog_service(i_watchdog, wd_ports);
+                watchdog_service(wd_ports, i_watchdog);
 
                 /* QEI Service */
                 {
                     QEIConfig qei_config;
                     init_qei_config(qei_config);
 
-                    qei_service(i_qei, qei_ports, qei_config);
+                    qei_service(qei_ports, qei_config, i_qei);
                 }
 
                 {
-                    MotorcontrolConfig commutation_config;
-                    init_commutation_config(commutation_config);
+                    MotorcontrolConfig motorcontrol_config;
+                    init_motorcontrol_config(motorcontrol_config);
 
-                    motorcontrol_service(null, i_qei[0], i_watchdog, i_motorcontrol,
-                                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                            c_pwm_ctrl, null, i_qei[0], i_watchdog, i_motorcontrol);
                 }
-			}
+
+            }
 		}
 
 	}

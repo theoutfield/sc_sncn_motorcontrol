@@ -22,14 +22,14 @@
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <qei_config.h>
 #include <hall_config.h>
-#include <commutation_config.h>
+#include <motorcontrol_config.h>
 #include <control_config.h>
 
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-	int target_torque = 500; 	//(desired torque/torque_constant)  * IFM resolution
-	int torque_slope  = 500;  	//(desired torque_slope/torque_constant)  * IFM resolution
+	int target_torque = 200; 	//(desired torque/torque_constant)  * IFM resolution
+	int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	int actual_torque;
     xscope_int(TARGET_TORQUE, target_torque);
 
@@ -42,7 +42,7 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
 
 	delay_seconds(3);
 
-	target_torque = -500;
+	target_torque = -200;
 	xscope_int(TARGET_TORQUE, target_torque);
 
     /* Set new target torque for profile torque control */
@@ -72,7 +72,7 @@ int main(void)
 	chan c_adctrig, c_pwm_ctrl;
 
 	interface WatchdogInterface i_watchdog;
-    interface MotorcontrolInterface i_commutation[5];
+    interface MotorcontrolInterface i_motorcontrol[5];
     interface ADCInterface i_adc;
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
@@ -91,7 +91,7 @@ int main(void)
             init_torque_control_config(torque_ctrl_params);  // Initialize PID parameters for Torque Control
 
             /* Control Loop */
-            torque_control_service( torque_ctrl_params, i_adc, i_commutation[0],  i_hall[1], i_qei[1], i_torque_control);
+            torque_control_service( torque_ctrl_params, i_adc, i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
         }
 
 
@@ -102,37 +102,37 @@ int main(void)
 		{
 			par
 			{
-				/* PWM Loop */
-				pwm_triggered_service(c_pwm_ctrl, c_adctrig, pwm_ports);
+                /* PWM Loop */
+                pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* Watchdog Server */
-                watchdog_service(i_watchdog, wd_ports);
+                watchdog_service(wd_ports, i_watchdog);
 
                 /* ADC Loop */
                 adc_service(i_adc, adc_ports, c_adctrig);
+
+                /* QEI Service */
+                {
+                    QEIConfig qei_config;
+                    init_qei_config(qei_config);
+
+                    qei_service(qei_ports, qei_config, i_qei);
+                }
 
                 {
                     HallConfig hall_config;
                     init_hall_config(hall_config);
 
-                    hall_service(i_hall, hall_ports, hall_config);
+                    hall_service(hall_ports, hall_config, i_hall);
                 }
 
-                /* QEI Server */
+                /* Motor Commutation loop */
                 {
-                    QEIConfig qei_config;
-                    init_qei_config(qei_config);
+                    MotorcontrolConfig motorcontrol_config;
+                    init_motorcontrol_config(motorcontrol_config);
 
-                    qei_service(i_qei, qei_ports, qei_config);
-                }
-
-				/* Motor Commutation loop */
-                {
-                    MotorcontrolConfig commutation_config;
-                    init_commutation_config(commutation_config);
-
-                    motorcontrol_service(i_hall[0], i_qei[0], i_watchdog, i_commutation,
-                            c_pwm_ctrl, fet_driver_ports, commutation_config);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog, i_motorcontrol);
                 }
 			}
 		}

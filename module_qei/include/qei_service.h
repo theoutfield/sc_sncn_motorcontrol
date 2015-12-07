@@ -103,7 +103,7 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params);
  * @param EncoderPorts structure containing the hardware port where the quadrature encoder is located
  * @param qei_params the structure defines sensor type and resolution parameters for qei
  */
-void qei_service(interface QEIInterface server i_qei[5],
-             QEIPorts & encoder_ports, QEIConfig qei_config);
+void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
+                interface QEIInterface server i_qei[5]);
 
 #endif

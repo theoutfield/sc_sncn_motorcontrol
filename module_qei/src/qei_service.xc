@@ -106,7 +106,8 @@ int check_qei_config(QEIConfig &qei_config)
 
 
 #pragma unsafe arrays
-void qei_service(interface QEIInterface server i_qei[5], QEIPorts &encoder_ports, QEIConfig qei_config)
+void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
+                    interface QEIInterface server i_qei[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
