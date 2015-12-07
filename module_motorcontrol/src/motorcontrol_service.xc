@@ -38,13 +38,12 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
 }
 
 [[combinable]]
-void motorcontrol_service(interface HallInterface client ?i_hall,
+void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
+                            chanend c_pwm_ctrl,
+                            interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[5],
-                            chanend c_pwm_ctrl,
-                            FetDriverPorts &fet_driver_ports,
-                            MotorcontrolConfig &motorcontrol_config)
+                            interface MotorcontrolInterface server i_motorcontrol[5])
 {
     HallConfig hall_config;
     QEIConfig qei_config;

@@ -41,7 +41,8 @@ int check_hall_config(HallConfig &hall_config){
 
 [[combinable]]
 
-void hall_service(interface HallInterface server i_hall[5], HallPorts & hall_ports, HallConfig & hall_config)
+void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
+                    interface HallInterface server i_hall[5])
 {
 
     if(check_hall_config(hall_config) == ERROR){

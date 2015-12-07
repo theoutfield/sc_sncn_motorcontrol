@@ -289,6 +289,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC30}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1134324534" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -709,6 +719,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC30}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.678381819" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1136,6 +1156,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC30}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.711216607" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

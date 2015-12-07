@@ -5,10 +5,11 @@
  *      Author: atena
  */
 
-#include <commutation_config.h>
+#include <motorcontrol_config.h>
 
-void init_commutation_config(MotorcontrolConfig & commutation_params)
+void init_motorcontrol_config(MotorcontrolConfig & commutation_params)
 {
+    commutation_params.motor_type = BDC_MOTOR;
     commutation_params.angle_variance = (60 * 4096) / (POLE_PAIRS * 2 * 360);
 
     if (POLE_PAIRS < 4) {
