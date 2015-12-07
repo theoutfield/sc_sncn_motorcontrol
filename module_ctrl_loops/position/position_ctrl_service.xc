@@ -9,7 +9,6 @@
 
 #include <position_ctrl_service.h>
 #include <statemachine.h>
-#include <drive_modes.h>
 #include <a4935.h>
 #include <internal_config.h>
 #include <hall_service.h>
@@ -236,7 +235,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
                                     fet_state = commutation_interface.getFetsState(); // check_fet_state(c_commutation);
                                     if (fet_state == 1) {
                                         commutation_interface.enableFets();
-                                        wait_ms(2, 1, ts);
+                                        delay_milliseconds(2);
                                     }
 
                                     break;
@@ -258,7 +257,8 @@ void position_control_service(ControlConfig &position_ctrl_params,
             position_control_out = 0;
             commutation_interface.disableFets();
             // disable_motor(c_commutation);
-            wait_ms(30, 1, ts); //
+            delay_milliseconds(30);
+            //wait_ms(30, 1, ts); //
 #ifdef debug_print
             printstrln("position control disabled");
 #endif

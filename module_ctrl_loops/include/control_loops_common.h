@@ -17,3 +17,4 @@ typedef struct {
     int Loop_time;
     int sensor_used;
 } ControlConfig;
+

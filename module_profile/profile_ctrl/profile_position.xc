@@ -5,11 +5,12 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
-#include <refclk.h>
+//#include <refclk.h>
 #include <xscope.h>
-#include <internal_config.h>
-#include <statemachine.h>
-#include <drive_modes.h>
+//#include <internal_config.h>
+//#include <statemachine.h>
+#include <drive_modes_config.h>
+#include <state_modes.h>
 #include <print.h>
 #include <profile.h>
 #include <profile_control.h>

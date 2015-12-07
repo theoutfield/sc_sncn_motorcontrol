@@ -8,8 +8,8 @@
 
 #include <refclk.h>
 #include <xscope.h>
-#include <internal_config.h>
-#include <drive_modes.h>
+//#include <internal_config.h>
+#include <drive_modes_config.h>
 #include <profile.h>
 #include <profile_control.h>
 

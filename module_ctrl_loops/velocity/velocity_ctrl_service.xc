@@ -5,13 +5,13 @@
  */
 
 #include <velocity_ctrl_service.h>
-#include <refclk.h>
+//#include <refclk.h>
 //#include <qei_client.h>
 #include <filter_blocks.h>
 #include <xscope.h>
 #include <internal_config.h>
 #include <statemachine.h>
-#include <drive_modes.h>
+#include <drive_modes_config.h>
 #include <stdio.h>
 #include <a4935.h>
 #include <motorcontrol_service.h>
@@ -308,7 +308,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
             velocity_control_out = 0;
             commutation_interface.setVoltage(0); //set_commutation_sinusoidal(c_commutation, 0);
             commutation_interface.disableFets();//disable_motor(c_commutation);
-            wait_ms(30, 1, ts);
+            delay_milliseconds(30);//wait_ms(30, 1, ts);
             break;
 
         case i_velocity_control.check_velocity_ctrl_state() -> int out_state:
@@ -333,7 +333,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
                     fet_state = commutation_interface.getFetsState();//check_fet_state(c_commutation);
                     if (fet_state == 1) {
                         commutation_interface.enableFets();//enable_motor(c_commutation);
-                        wait_ms(2, 1, ts);
+                        delay_milliseconds(2);//wait_ms(2, 1, ts);
                     }
                     break;
                 }
