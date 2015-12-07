@@ -12,6 +12,7 @@
 #include <qei_service.h>
 #include <hall_service.h>
 #include <pwm_service.h>
+#include <watchdog_service.h>
 #include <motorcontrol_service.h>
 
 //Position control + profile libs
