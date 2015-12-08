@@ -28,12 +28,10 @@
 /* Test Profile Position function */
 void position_profile_test(interface PositionControlInterface client i_position_control)
 {
-	int actual_position = 0;			// ticks
 	int target_position = 16000;		// HALL: 4096 extrapolated ticks x nr. pole pairs = one rotation; QEI: your encoder documented resolution x 4 = one rotation
 	int velocity 		= 500;			// rpm
 	int acceleration 	= 500;			// rpm/s
 	int deceleration 	= 500;     	// rpm/s
-	int follow_error;
 
 	/* Initialise the position profile generator */
 	init_position_profiler(MIN_POSITION_LIMIT, MAX_POSITION_LIMIT, MAX_PROFILE_VELOCITY, MAX_ACCELERATION, i_position_control);
@@ -43,14 +41,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
 
 	while(1)
 	{
-	    /* Read actual position from the Position Control Server */
-		actual_position = i_position_control.get_position();
-		follow_error = target_position - actual_position;
-
-		xscope_int(ACTUAL_POSITION, actual_position);
 		xscope_int(TARGET_POSITION, target_position);
-		xscope_int(FOLLOW_ERROR, follow_error);
-
 		delay_milliseconds(1); /* 1 ms wait */
 	}
 }
@@ -71,12 +62,30 @@ int main(void)
 	interface HallInterface i_hall[5];
 	interface QEIInterface i_qei[5];
 
-	interface PositionControlInterface i_position_control;
+	interface PositionControlInterface i_position_control[3];
 
 	par
 	{
 		/* Test Profile Position Client function*/
-		on tile[APP_TILE_1]: position_profile_test(i_position_control);      // test PPM on slave side
+		on tile[APP_TILE_1]: position_profile_test(i_position_control[0]);      // test PPM on slave side
+
+		on tile[APP_TILE_1]: {
+		/* XScope monitoring */
+		    int actual_position, follow_error;
+
+		    while(1)
+		    {
+		        /* Read actual position from the Position Control Server */
+		        actual_position = i_position_control[1].get_position();
+		      // follow_error = target_position - actual_position;
+
+		        xscope_int(ACTUAL_POSITION, actual_position);
+		       // xscope_int(TARGET_POSITION, target_position);
+		       // xscope_int(FOLLOW_ERROR, follow_error);
+
+		        delay_milliseconds(1); /* 1 ms wait */
+		    }
+		}
 
 		on tile[IFM_TILE]:
         /* Position Control Loop */
@@ -85,8 +94,8 @@ int main(void)
              init_position_control_config(position_ctrl_params); // Initialize PID parameters for Position Control
 
              /* Control Loop */
-             position_control_service(position_ctrl_params, i_hall[1], i_qei[1],
-                                       i_position_control, i_motorcontrol[0]);
+             position_control_service(position_ctrl_params, i_hall[1], i_qei[1], i_motorcontrol[0],
+                                         i_position_control);
         }
 
 		/************************************************************

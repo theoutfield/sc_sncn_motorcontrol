@@ -20,10 +20,8 @@
     <!-- <Probe name="Probe Name" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/> -->
     <!-- From the target code, call: xscope_int(PROBE_NAME, value); -->
     <Probe name="actual torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="target torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Phase B" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Phase C" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PH IQ" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PH ID" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+
 
 </xSCOPEconfig>

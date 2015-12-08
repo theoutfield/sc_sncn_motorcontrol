@@ -52,12 +52,12 @@ int main(void)
     interface MotorcontrolInterface i_motorcontrol[5];
     interface QEIInterface i_qei[5];
 
-    interface VelocityControlInterface i_velocity_control;
+    interface VelocityControlInterface i_velocity_control[3];
 
 	par
 	{
 		/* Test Profile Velocity function */
-		on tile[APP_TILE]:  profile_velocity_test(i_velocity_control);
+		on tile[APP_TILE]:  profile_velocity_test(i_velocity_control[0]);
 
 
 		on tile[APP_TILE]:
@@ -68,8 +68,8 @@ int main(void)
                 init_velocity_control_config(velocity_ctrl_params);  /* Initialize PID parameters for Velocity Control */
 
                 /* Control Loop */
-                velocity_control_service(velocity_ctrl_params, null, i_qei[1],
-                                            i_velocity_control, i_motorcontrol[0]);
+                velocity_control_service(velocity_ctrl_params, null, i_qei[1], i_motorcontrol[0],
+                                            i_velocity_control);
             }
 		}
 

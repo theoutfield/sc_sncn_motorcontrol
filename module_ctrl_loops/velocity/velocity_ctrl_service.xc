@@ -58,8 +58,8 @@ void set_velocity_csv(csv_par &csv_params, int target_velocity,
 void velocity_control_service(ControlConfig &velocity_ctrl_params,
                        interface HallInterface client ?i_hall,
                        interface QEIInterface client ?i_qei,
-                       interface VelocityControlInterface server i_velocity_control,
-                       interface MotorcontrolInterface client commutation_interface )
+                       interface MotorcontrolInterface client commutation_interface,
+                       interface VelocityControlInterface server i_velocity_control[3])
 {
     /* Controller declarations */
     int actual_velocity = 0;
@@ -233,18 +233,18 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
     //        printf("looping %d\n", velocity_ctrl_params.Loop_time);
             break;
 
-        case i_velocity_control.set_velocity(int in_velocity):
+        case i_velocity_control[int i].set_velocity(int in_velocity):
             target_velocity = in_velocity;
 
             break;
 
-        case i_velocity_control.get_velocity()-> int out_velocity:
+        case i_velocity_control[int i].get_velocity()-> int out_velocity:
 
             out_velocity = actual_velocity;
 
             break;
 
-        case i_velocity_control.set_velocity_ctrl_param(ControlConfig in_params):
+        case i_velocity_control[int i].set_velocity_ctrl_param(ControlConfig in_params):
 
             velocity_ctrl_params.Kp_n = in_params.Kp_n;
             velocity_ctrl_params.Kp_d = in_params.Kp_d;
@@ -256,7 +256,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
 
             break;
 
-        case i_velocity_control.set_velocity_filter(int in_length):
+        case i_velocity_control[int i].set_velocity_filter(int in_length):
 
             filter_length = in_length;
 
@@ -265,14 +265,14 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
 
             break;
 
-        case i_velocity_control.set_velocity_ctrl_hall_param(HallConfig in_config):
+        case i_velocity_control[int i].set_velocity_ctrl_hall_param(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
             hall_config.max_ticks = in_config.max_ticks;
             hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
             break;
 
-        case i_velocity_control.set_velocity_ctrl_qei_param(QEIConfig in_params):
+        case i_velocity_control[int i].set_velocity_ctrl_qei_param(QEIConfig in_params):
 
             qei_config.max_ticks = in_params.max_ticks;
             qei_config.index = in_params.index;
@@ -282,7 +282,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
 
             break;
 
-        case i_velocity_control.set_velocity_sensor(int in_sensor_used):
+        case i_velocity_control[int i].set_velocity_sensor(int in_sensor_used):
 
             velocity_ctrl_params.sensor_used = in_sensor_used;
 
@@ -298,7 +298,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
             break;
 
 
-        case i_velocity_control.shutdown_velocity_ctrl():
+        case i_velocity_control[int i].shutdown_velocity_ctrl():
 
             activate = 0;
             error_velocity = 0;
@@ -311,17 +311,17 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
             delay_milliseconds(30);//wait_ms(30, 1, ts);
             break;
 
-        case i_velocity_control.check_velocity_ctrl_state() -> int out_state:
+        case i_velocity_control[int i].check_velocity_ctrl_state() -> int out_state:
 
             out_state = activate;
             break;
 
-        case i_velocity_control.check_busy() -> int out_state:
+        case i_velocity_control[int i].check_busy() -> int out_state:
 
                 out_state = activate;
                 break;
 
-        case i_velocity_control.enable_velocity_ctrl():
+        case i_velocity_control[int i].enable_velocity_ctrl():
 
             activate = SET;
             while (1) {
@@ -344,7 +344,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
 #endif
             break;
 
-        case i_velocity_control.get_velocity_control_config() -> ControlConfig out_config:
+        case i_velocity_control[int i].get_velocity_control_config() -> ControlConfig out_config:
 
                 out_config = velocity_ctrl_params;
                 break;

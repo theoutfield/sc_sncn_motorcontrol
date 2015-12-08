@@ -31,9 +31,7 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
 	int target_torque = 200; 	//(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
 	int actual_torque;
-    xscope_int(TARGET_TORQUE, target_torque);
 
-    delay_seconds(2);
 	/* Initialise the torque profile generator */
 	init_torque_profiler(MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION, POLARITY, i_torque_control);
 
@@ -41,22 +39,10 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
 	set_profile_torque( target_torque, torque_slope, i_torque_control);
 
 	delay_seconds(3);
-
 	target_torque = -200;
-	xscope_int(TARGET_TORQUE, target_torque);
 
     /* Set new target torque for profile torque control */
 	set_profile_torque( target_torque, torque_slope, i_torque_control);
-
-	while(1)
-	{
-		actual_torque = i_torque_control.get_torque();
-
-        xscope_int(ACTUAL_TORQUE, actual_torque);
-        xscope_int(TARGET_TORQUE, target_torque);
-
-		delay_milliseconds(1);
-	}
 }
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -77,12 +63,12 @@ int main(void)
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
-    interface TorqueControlInterface i_torque_control;
+    interface TorqueControlInterface i_torque_control[3];
 
 	par
 	{
 		/* Test Profile Torque Function */
-		on tile[APP_TILE]: profile_torque_test(i_torque_control);
+		on tile[APP_TILE]: profile_torque_test(i_torque_control[0]);
 
 		on tile[APP_TILE]:
 		{
@@ -91,16 +77,19 @@ int main(void)
             init_torque_control_config(torque_ctrl_params);  // Initialize PID parameters for Torque Control
 
             /* Control Loop */
-            torque_control_service( torque_ctrl_params, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
+            torque_control_service(torque_ctrl_params, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
         }
 
 		/* Currents monitoring in XScope */
 		on tile[APP_TILE]:
 		{
-		    int phaseB, phaseC;
+		    int phaseB, phaseC, actual_torque;
 		    unsigned hall_state = 0;
 		    while(1){
 		        {phaseB, phaseC} = i_adc[1].get_currents();
+		        actual_torque = i_torque_control[1].get_torque();
+
+		        xscope_int(ACTUAL_TORQUE, actual_torque);
 		        xscope_int(PHASE_B, phaseB);
 		        xscope_int(PHASE_C, phaseC);
 		        delay_microseconds(50);
