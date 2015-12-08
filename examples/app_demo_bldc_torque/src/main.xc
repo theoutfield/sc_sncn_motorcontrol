@@ -73,7 +73,7 @@ int main(void)
 
 	interface WatchdogInterface i_watchdog;
     interface MotorcontrolInterface i_motorcontrol[5];
-    interface ADCInterface i_adc;
+    interface ADCInterface i_adc[5];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
@@ -91,9 +91,21 @@ int main(void)
             init_torque_control_config(torque_ctrl_params);  // Initialize PID parameters for Torque Control
 
             /* Control Loop */
-            torque_control_service( torque_ctrl_params, i_adc, i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
+            torque_control_service( torque_ctrl_params, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
         }
 
+/*		on tile[APP_TILE]:
+		{
+		    int phaseB, phaseC;
+		    unsigned hall_state = 0;
+		    while(1){
+		        {phaseB, phaseC} = i_adc[1].get_currents();//port_id, config
+		        xscope_int(PHASE_B, phaseB);
+		        xscope_int(PHASE_C, phaseC);
+		        delay_microseconds(50);
+		    }
+		}
+*/
 
 		/************************************************************
 		 * IFM_TILE

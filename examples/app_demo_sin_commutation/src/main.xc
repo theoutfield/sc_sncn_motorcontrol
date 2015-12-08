@@ -26,7 +26,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
-#define VOLTAGE 500 //+/- 4095
+#define VOLTAGE 2000 //+/- 4095
 
 #ifdef AD7265
 on tile[IFM_TILE]: adc_ports_t adc_ports =
@@ -73,7 +73,7 @@ int main(void) {
 
     interface WatchdogInterface i_watchdog;
     interface MotorcontrolInterface i_motorcontrol[5];
-    interface ADCInterface i_adc;
+    interface ADCInterface i_adc[5];
     interface HallInterface i_hall[5];
 
     #ifdef AD7265
@@ -90,7 +90,7 @@ int main(void) {
             run_offset_tuning(VOLTAGE, i_motorcontrol[0]);
         }
 
-        on tile[IFM_TILE]: adc_client(i_adc, i_hall[1]);
+        on tile[IFM_TILE]: adc_client(i_adc[0], i_hall[1]);
 
         on tile[IFM_TILE]:
         {
