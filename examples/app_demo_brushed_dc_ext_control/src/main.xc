@@ -26,7 +26,7 @@ int main(void) {
 
     interface WatchdogInterface i_watchdog;
     interface MotorcontrolInterface i_motorcontrol[5];
-    interface ADCInterface i_adc;
+    interface ADCInterface i_adc[5];
 
     par
     {
@@ -40,7 +40,7 @@ int main(void) {
                 while (1) {
                     int a, b, AI0, AI1;
 
-                    {AI0 , AI1} =  i_adc.get_external_inputs();
+                    {AI0 , AI1} =  i_adc[0].get_external_inputs();
                     int normalized_value = AI1*13589/16383;
                     printf("Voltage SP: %i\n", normalized_value);
 

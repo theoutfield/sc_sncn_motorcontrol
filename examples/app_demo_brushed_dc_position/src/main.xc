@@ -61,7 +61,7 @@ int main(void)
     interface MotorcontrolInterface i_motorcontrol[5];
     interface QEIInterface i_qei[5];
 
-    interface PositionControlInterface i_position_control;
+    interface PositionControlInterface i_position_control[3];
 
 	par
 	{
@@ -69,7 +69,7 @@ int main(void)
 		/* Test Profile Position Client function*/
 		on tile[0]:
 		{
-			position_profile_test(i_position_control);		// test PPM on slave side
+			position_profile_test(i_position_control[0]);		// test PPM on slave side
 		}
 
 
@@ -81,8 +81,8 @@ int main(void)
                  init_position_control_config(position_ctrl_config); // Initialize PID parameters for Position Control
 
                  /* Control Loop */
-                 position_control_service(position_ctrl_config, null, i_qei[1],
-                                           i_position_control, i_motorcontrol[0]);
+                 position_control_service(position_ctrl_config, null, i_qei[1], i_motorcontrol[0],
+                                             i_position_control);
             }
 		}
 

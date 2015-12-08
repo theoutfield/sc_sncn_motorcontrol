@@ -61,8 +61,8 @@ void set_position_csp( csp_par & csp_params, int target_position, int position_o
 void position_control_service(ControlConfig &position_ctrl_params,
                                 interface HallInterface client ?i_hall,
                                 interface QEIInterface client ?i_qei,
-                                interface PositionControlInterface server i_position_control,
-                                interface MotorcontrolInterface client commutation_interface)
+                                interface MotorcontrolInterface client commutation_interface,
+                                interface PositionControlInterface server i_position_control[3])
 {
     int actual_position = 0;
     int target_position = 0;
@@ -167,23 +167,23 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
             break;
 
-        case i_position_control.set_position(int in_target_position):
+        case i_position_control[int i].set_position(int in_target_position):
 
             target_position = in_target_position;
 
             break;
 
-        case i_position_control.get_position() -> int out_position:
+        case i_position_control[int i].get_position() -> int out_position:
 
                 out_position = actual_position;
                 break;
 
-        case i_position_control.check_busy() -> int out_activate:
+        case i_position_control[int i].check_busy() -> int out_activate:
 
                 out_activate = activate;
                 break;
 
-        case i_position_control.set_position_ctrl_param(ControlConfig in_params):
+        case i_position_control[int i].set_position_ctrl_param(ControlConfig in_params):
 
             position_ctrl_params.Kp_n = in_params.Kp_n;
             position_ctrl_params.Kp_d = in_params.Kp_d;
@@ -195,19 +195,19 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
             break;
 
-        case i_position_control.set_position_ctrl_hall_param(HallConfig in_config):
+        case i_position_control[int i].set_position_ctrl_hall_param(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
             break;
 
-        case i_position_control.set_position_ctrl_qei_param(QEIConfig in_qei_params):
+        case i_position_control[int i].set_position_ctrl_qei_param(QEIConfig in_qei_params):
 
             qei_config.index = in_qei_params.index;
             qei_config.real_counts = in_qei_params.real_counts;
             qei_config.max_ticks_per_turn = in_qei_params.max_ticks_per_turn;
             break;
 
-        case i_position_control.set_position_sensor(int in_sensor_used):
+        case i_position_control[int i].set_position_sensor(int in_sensor_used):
 
             position_ctrl_params.sensor_used = in_sensor_used;
 
@@ -224,7 +224,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
             break;
 
-        case i_position_control.enable_position_ctrl():
+        case i_position_control[int i].enable_position_ctrl():
                         activate = SET;
                             while (1) {
                                 init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
@@ -246,7 +246,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
             #endif
                             break;
 
-        case i_position_control.shutdown_position_ctrl():
+        case i_position_control[int i].shutdown_position_ctrl():
             activate = 0;
             commutation_interface.setVoltage(0);
             //set_commutation_sinusoidal(c_commutation, 0);
@@ -264,20 +264,20 @@ void position_control_service(ControlConfig &position_ctrl_params,
 #endif
             break;
 
-        case i_position_control.check_position_ctrl_state() -> int out_state:
+        case i_position_control[int i].check_position_ctrl_state() -> int out_state:
                 out_state = activate;
 
                 break;
 
-        case i_position_control.getControlConfig() ->  ControlConfig out_config:
+        case i_position_control[int i].getControlConfig() ->  ControlConfig out_config:
 
                 out_config = position_ctrl_params;
                 break;
-        case i_position_control.getHallConfig() -> HallConfig out_config:
+        case i_position_control[int i].getHallConfig() -> HallConfig out_config:
 
                 out_config = hall_config;
                 break;
-        case i_position_control.getQEIConfig() -> QEIConfig out_config:
+        case i_position_control[int i].getQEIConfig() -> QEIConfig out_config:
 
                 out_config = qei_config;
                 break;
