@@ -9,6 +9,7 @@
 #include <xclib.h>
 #include <refclk.h>
 #include <adc_server_ad7949.h>
+#include <print.h>
 
 #define BIT13 0x00002000
 #define BIT12 0x00001000
@@ -92,7 +93,7 @@ static void configure_adc_ports(clock clk,
 {
     /* SCLK period >= 22ns (45.45 MHz)
        clk needs to be configured twice as fast as the required SCLK frequency */
-    configure_clock_rate_at_most(clk, 250, 5); // 83.3  --  < (2*45.45)
+    configure_clock_rate_at_most(clk, 250, 7);//5); // 83.3  --  < (2*45.45)
 
     /* when idle, keep clk and mosi low, conv high */
     configure_out_port(p_sclk_conv_mosib_mosia, clk, 0b0100);
@@ -249,8 +250,11 @@ void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_
             }
         }
 
-       i_calib_a = (i_calib_a >> Factor);
-       i_calib_b = (i_calib_b >> Factor);
+       i_calib_a = (i_calib_a / ADC_CALIB_POINTS);
+       i_calib_b = (i_calib_b / ADC_CALIB_POINTS);
+
+//       printintln(i_calib_a);
+//       printintln(i_calib_b);
 
     tx :> ts;
 
@@ -320,29 +324,33 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface, AD7949Po
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
     unsigned short adc_index = 0;
-    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+    int i_calib_a = 0, i_calib_b = 0, i = 0;
+
+    delay_milliseconds(5);
 
     configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
     //Calibration
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
-
+       // delay_microseconds(30);
         adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
                                                adc_config_mot,  adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
 
-        if (adc_data_a[4]>0 && adc_data_a[4]<16384  &&  adc_data_b[4]>0 && adc_data_b[4]<16384) {
+        if (adc_data_a[4]>0 && adc_data_a[4]<16384 && adc_data_b[4]>0 && adc_data_b[4]<16384) {
             i_calib_a += adc_data_a[4];
             i_calib_b += adc_data_b[4];
+           // printintln(adc_data_a[4]);
+           // printintln(adc_data_b[4]);
             i++;
-            if (i == ADC_CALIB_POINTS) {
+            if (i >= ADC_CALIB_POINTS) {
                 break;
             }
         }
     }
 
-   i_calib_a = (i_calib_a >> Factor);
-   i_calib_b = (i_calib_b >> Factor);
+   i_calib_a = (i_calib_a / ADC_CALIB_POINTS);
+   i_calib_b = (i_calib_b / ADC_CALIB_POINTS);
 
     while (1)
     {
@@ -377,8 +385,8 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface, AD7949Po
 
         case adc_interface.get_currents() -> {int Ia, int Ib}:
 
-                Ia = Icalibrated_a;
-                Ib = Icalibrated_b;
+                Ia = ((int) adc_data_a[4]) - i_calib_a;
+                Ib = ((int) adc_data_b[4]) - i_calib_b;
 
                 break;
 
@@ -390,8 +398,7 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface, AD7949Po
                 break;
         }
 
-        Icalibrated_a = ((int) adc_data_a[4]) - i_calib_a;
-        Icalibrated_b =((int) adc_data_b[4]) - i_calib_b;
+
     }
 
 
