@@ -86,7 +86,7 @@ void torque_control_service(ControlConfig &torque_ctrl_params,
                             interface MotorcontrolInterface client commutation_interface,
                             interface HallInterface client i_hall,
                             interface QEIInterface client ?i_qei,
-                            interface TorqueControlInterface server i_torque_control);
+                            interface TorqueControlInterface server i_torque_control[3]);
 
 
 /**

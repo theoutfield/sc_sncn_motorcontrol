@@ -64,13 +64,13 @@ int main(void)
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
 
-    interface VelocityControlInterface i_velocity_control;
+    interface VelocityControlInterface i_velocity_control[3];
 
 	par
 	{
 
 		/* Test Profile Velocity function */
-		on tile[APP_TILE]: profile_velocity_test(i_velocity_control);            // test PVM on node
+		on tile[APP_TILE]: profile_velocity_test(i_velocity_control[0]);            // test PVM on node
 
 		on tile[APP_TILE]:
 		{
@@ -82,8 +82,8 @@ int main(void)
                 init_velocity_control_config(velocity_ctrl_params);
 
                 /* Control Loop */
-                velocity_control_service(velocity_ctrl_params, i_hall[1], i_qei[1],
-                                            i_velocity_control, i_motorcontrol[0]);
+                velocity_control_service(velocity_ctrl_params, i_hall[1], i_qei[1], i_motorcontrol[0],
+                                            i_velocity_control);
             }
 
 		}

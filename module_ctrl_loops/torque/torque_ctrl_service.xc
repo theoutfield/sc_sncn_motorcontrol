@@ -207,7 +207,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                         interface MotorcontrolInterface client commutation_interface,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
-                        interface TorqueControlInterface server i_torque_control)
+                        interface TorqueControlInterface server i_torque_control[3])
 {
 #define FILTER_LENGTH_TORQUE 80
     int actual_speed = 0;
@@ -397,7 +397,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
             }
             break;
 
-        case i_torque_control.set_torque(int in_torque):
+        case i_torque_control[int i].set_torque(int in_torque):
 
             target_torque = in_torque;
 #ifdef ENABLE_xscope_torq
@@ -405,7 +405,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 #endif
             break;
 
-        case i_torque_control.get_torque() -> int out_torque:
+        case i_torque_control[int i].get_torque() -> int out_torque:
 
                 if (torque_control_output >= 0) {
                     out_torque = actual_torque;
@@ -416,12 +416,12 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
                 break;
 
-        case i_torque_control.check_busy() -> int out_state:
+        case i_torque_control[int i].check_busy() -> int out_state:
 
                 out_state = activate;
                 break;
 
-        case i_torque_control.set_torque_ctrl_param(ControlConfig in_params):
+        case i_torque_control[int i].set_torque_ctrl_param(ControlConfig in_params):
 
             torque_ctrl_params.Kp_n = in_params.Kp_n;
             torque_ctrl_params.Kp_d = in_params.Kp_d;
@@ -433,7 +433,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
                 break;
 
-        case i_torque_control.set_torque_ctrl_hall_param(HallConfig in_config):
+        case i_torque_control[int i].set_torque_ctrl_hall_param(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
             hall_config.max_ticks = in_config.max_ticks;
@@ -446,7 +446,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
                 break;
 
-        case i_torque_control.set_torque_ctrl_qei_param(QEIConfig in_params):
+        case i_torque_control[int i].set_torque_ctrl_qei_param(QEIConfig in_params):
 
            qei_params.index = in_params.index;
            qei_params.real_counts = in_params.real_counts;
@@ -462,7 +462,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
                 break;
 
-        case i_torque_control.set_torque_sensor(int in_sensor):
+        case i_torque_control[int i].set_torque_sensor(int in_sensor):
 
             torque_ctrl_params.sensor_used = in_sensor;
 
@@ -485,7 +485,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
             }
             break;
 
-        case i_torque_control.enable_torque_ctrl():
+        case i_torque_control[int i].enable_torque_ctrl():
                 activate = SET;
                   init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
                   if (init_state == INIT) {
@@ -514,7 +514,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
             start_flag = 1;
             break;
 
-        case i_torque_control.shutdown_torque_ctrl():
+        case i_torque_control[int i].shutdown_torque_ctrl():
 
                activate = UNSET;
                error_torque = 0;
@@ -528,7 +528,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                //wait_ms(30, 1, tc);
                break;
 
-        case i_torque_control.check_torque_ctrl_state() -> int out_state:
+        case i_torque_control[int i].check_torque_ctrl_state() -> int out_state:
 
                 out_state = activate;
 
@@ -543,7 +543,7 @@ void torque_control_service(ControlConfig &torque_ctrl_params,
                     interface MotorcontrolInterface client commutation_interface,
                     interface HallInterface client i_hall,
                     interface QEIInterface client ?i_qei,
-                    interface TorqueControlInterface server i_torque_control)
+                    interface TorqueControlInterface server i_torque_control[3])
 {
     chan c_current, c_speed;
     HallConfig hall_config = i_hall.getHallConfig();
