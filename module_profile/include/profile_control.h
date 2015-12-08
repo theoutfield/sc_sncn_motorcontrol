@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <xs1.h>
-#include <platform.h>
 #include <position_ctrl_service.h>
 #include <velocity_ctrl_service.h>
 #include <torque_ctrl_service.h>

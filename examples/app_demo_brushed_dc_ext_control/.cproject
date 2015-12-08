@@ -248,6 +248,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/predriver}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.451755224" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -627,6 +628,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/predriver}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1238246472" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1013,6 +1015,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/predriver}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.477397611" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
