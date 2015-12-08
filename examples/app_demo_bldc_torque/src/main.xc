@@ -94,18 +94,19 @@ int main(void)
             torque_control_service( torque_ctrl_params, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
         }
 
-/*		on tile[APP_TILE]:
+		/* Currents monitoring in XScope */
+		on tile[APP_TILE]:
 		{
 		    int phaseB, phaseC;
 		    unsigned hall_state = 0;
 		    while(1){
-		        {phaseB, phaseC} = i_adc[1].get_currents();//port_id, config
+		        {phaseB, phaseC} = i_adc[1].get_currents();
 		        xscope_int(PHASE_B, phaseB);
 		        xscope_int(PHASE_C, phaseC);
 		        delay_microseconds(50);
 		    }
 		}
-*/
+
 
 		/************************************************************
 		 * IFM_TILE
@@ -115,7 +116,7 @@ int main(void)
 			par
 			{
                 /* PWM Loop */
-                pwm_service(pwm_ports, c_pwm_ctrl);
+			    pwm_triggered_service(pwm_ports, c_pwm_ctrl, c_adctrig);
 
                 /* Watchdog Server */
                 watchdog_service(wd_ports, i_watchdog);
