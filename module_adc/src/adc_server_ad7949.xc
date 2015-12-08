@@ -9,6 +9,7 @@
 #include <xclib.h>
 #include <refclk.h>
 #include <adc_server_ad7949.h>
+#include <xscope.h>
 #include <print.h>
 
 #define BIT13 0x00002000
@@ -309,7 +310,7 @@ void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_
 }
 
 
-void adc_ad7949_triggered( interface ADCInterface server adc_interface, AD7949Ports &adc_ports, chanend c_trig)
+void adc_ad7949_triggered( interface ADCInterface server adc_interface[5], AD7949Ports &adc_ports, chanend c_trig)
 {
     timer t;
     unsigned int ts;
@@ -368,7 +369,7 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface, AD7949Po
 
             break;
 
-        case adc_interface.get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
+        case adc_interface[int i].get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
 
                 Ia = adc_data_a[4];         //  raw;
                 Ib = adc_data_b[4];         //  raw;
@@ -383,14 +384,14 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface, AD7949Po
 
                 break;
 
-        case adc_interface.get_currents() -> {int Ia, int Ib}:
+        case adc_interface[int i].get_currents() -> {int Ia, int Ib}:
 
                 Ia = ((int) adc_data_a[4]) - i_calib_a;
                 Ib = ((int) adc_data_b[4]) - i_calib_b;
 
                 break;
 
-        case adc_interface.get_external_inputs() -> {int ext_a, int ext_b}:
+        case adc_interface[int i].get_external_inputs() -> {int ext_a, int ext_b}:
 
                 ext_a = adc_data_a[3];
                 ext_b = adc_data_b[3];
