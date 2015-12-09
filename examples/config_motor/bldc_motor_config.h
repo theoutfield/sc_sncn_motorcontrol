@@ -6,6 +6,8 @@
 #pragma once
 
 #include <internal_config.h>
+#include <qei_service.h>
+#include <hall_service.h>
 
 /**
  * Define Motor Specific Constants (found in motor specification sheet)

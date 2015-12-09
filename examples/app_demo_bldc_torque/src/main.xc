@@ -42,7 +42,7 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
 	set_profile_torque( target_torque, torque_slope, i_torque_control);
 
 	delay_seconds(3);
-	target_torque = -500;
+	target_torque = -400;
 
     /* Set new target torque for profile torque control */
 	set_profile_torque( target_torque, torque_slope, i_torque_control);

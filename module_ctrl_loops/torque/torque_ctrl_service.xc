@@ -232,10 +232,6 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
     int buffer_Id[FILTER_LENGTH_TORQUE] = {0};
     int buffer_Iq[FILTER_LENGTH_TORQUE] = {0};
 
-  //  int i1 = 0;
-  //  int j1 = 0;
-  //  int mod1 = 0;
-
     int iq_filtered = 0;
     int id_filtered = 0;
     int buffer_index = 0;
@@ -265,19 +261,13 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
     printstr("*************************************\n    TORQUE CONTROLLER STARTING\n*************************************\n");
 
-    //init_qei_velocity_params(qei_velocity_params);
-
     filter_length_variance = filter_length/hall_config.pole_pairs;
     if (filter_length_variance < 10) {
         filter_length_variance = 10;
     }
 
-    if (torque_ctrl_params.sensor_used == QEI)
+    if (torque_ctrl_params.sensor_used >= QEI)
         qei_counts_per_hall= qei_params.real_counts/ hall_config.pole_pairs;
-
-    //init_buffer(buffer_Id, filter_length);
-    //init_buffer(buffer_Iq, filter_length);
-
 
     tc :> time1;
     time1 += MSEC_STD - 100;
@@ -293,7 +283,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                     angle = (i_hall.get_hall_position() >> 2) & 0x3ff; //  << 10 ) >> 12 //get_hall_position(c_hall)
                     //xscope_probe_data(0, angle);
                     actual_speed = i_hall.get_hall_velocity();//get_hall_velocity(c_hall);
-                } else if (torque_ctrl_params.sensor_used == QEI) {
+                } else if (torque_ctrl_params.sensor_used >= QEI) {
                     { angle, offset_fw_flag, offset_bw_flag } = i_qei.get_qei_sync_position();
                     angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
                     //{qei_count_velocity, qei_direction_velocity} = get_qei_position_absolute(c_qei);
@@ -476,7 +466,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                 if (filter_length_variance < 10)
                     filter_length_variance = 10;
                 target_torque = actual_torque;
-            } else if (torque_ctrl_params.sensor_used == QEI) {
+            } else if (torque_ctrl_params.sensor_used >= QEI) {
                 qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
                 filter_length_variance =  filter_length/qei_params.poles;
                 if (filter_length_variance < 10)
@@ -554,7 +544,7 @@ void torque_control_service(ControlConfig &torque_ctrl_params,
     HallConfig hall_config = i_hall.getHallConfig();
 
     QEIConfig qei_config;
-    if(torque_ctrl_params.sensor_used == QEI && !isnull(i_qei)){
+    if(torque_ctrl_params.sensor_used >= QEI && !isnull(i_qei)){
         qei_config = i_qei.getQEIConfig();
     }
 

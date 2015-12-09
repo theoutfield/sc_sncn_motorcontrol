@@ -23,8 +23,10 @@
 #define SET_OFFSET               6
 #define QEI_RESET_COUNT          7
 
-#define QEI_WITH_INDEX           1
-#define QEI_WITH_NO_INDEX        0
+#define QEI                      2
+#define QEI_WITH_NO_INDEX        3
+#define QEI_WITH_INDEX           4
+
 enum QEI_Polarity{ QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1}; /* Encoder polarity */
 //enum QEI_Type{ QEI_WITH_NO_INDEX = 0, QEI_WITH_INDEX = 1}; /* Encoder type */
 
