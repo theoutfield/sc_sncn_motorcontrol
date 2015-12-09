@@ -89,7 +89,7 @@ int main(void)
 		    }
 		}
 
-		on tile[IFM_TILE]:
+		on tile[APP_TILE]:
         /* Position Control Loop */
         {
              ControlConfig position_ctrl_params;

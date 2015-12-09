@@ -5,8 +5,10 @@
 
 #pragma once
 
-#define ERROR                    0
-#define SUCCESS                  1
+#define HALL                    1
+
+#define ERROR                   0
+#define SUCCESS                 1
 
 #define RPM_CONST           60000000 // 60s / 1us
 #define FILTER_LENGTH_HALL  16

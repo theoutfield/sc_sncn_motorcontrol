@@ -101,7 +101,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
         hall_config = i_hall.getHallConfig();
     }
 
-    if(velocity_ctrl_params.sensor_used == QEI && !isnull(i_qei)){
+    if(velocity_ctrl_params.sensor_used >= QEI && !isnull(i_qei)){
 
         qei_config = i_qei.getQEIConfig();
     }
@@ -116,7 +116,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
         }
         hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
     }
-    else if (velocity_ctrl_params.sensor_used == QEI){
+    else if (velocity_ctrl_params.sensor_used >= QEI){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
             speed_factor_qei = qei_config.real_counts*(velocity_ctrl_params.Loop_time/MSEC_FAST);       // variable qei_real_max
         }
@@ -167,7 +167,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
                         previous_position = position;
                         old_difference = difference;
                     }
-                } else if (velocity_ctrl_params.sensor_used == QEI) {
+                } else if (velocity_ctrl_params.sensor_used >= QEI) {
                     { position, direction } = i_qei.get_qei_position_absolute();
                     difference = position - previous_position;
 
@@ -291,7 +291,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
                 speed_factor_hall = hall_config.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
                 hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
 
-            } else if(in_sensor_used == QEI) {
+            } else if(in_sensor_used >= QEI) {
                 speed_factor_qei = qei_config.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
                 qei_crossover = qei_config.max_ticks - qei_config.max_ticks/10;
             }

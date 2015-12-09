@@ -81,7 +81,7 @@ void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
 int check_qei_config(QEIConfig &qei_config)
 {
 
-    if(qei_config.index < 0  || qei_config.index > 1){
+    if(qei_config.index < 3  || qei_config.index > 4){
         printstrln("Wrong QEI configuration: wrong type");
         return ERROR;
     }
