@@ -49,7 +49,7 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
     return position;
 }
 
-void set_position_csp( csp_par & csp_params, int target_position, int position_offset,
+void set_position_csp( CyclicSyncPositionConfig & csp_params, int target_position, int position_offset,
                        int velocity_offset, int torque_offset, interface PositionControlInterface client i_position_control )
 {
     i_position_control.set_position( position_limit( (target_position + position_offset) * csp_params.base.polarity,
@@ -176,6 +176,11 @@ void position_control_service(ControlConfig &position_ctrl_params,
         case i_position_control[int i].get_position() -> int out_position:
 
                 out_position = actual_position;
+                break;
+
+        case i_position_control[int i].get_set_position() -> int out_set_position:
+
+                out_set_position = target_position;
                 break;
 
         case i_position_control[int i].check_busy() -> int out_activate:

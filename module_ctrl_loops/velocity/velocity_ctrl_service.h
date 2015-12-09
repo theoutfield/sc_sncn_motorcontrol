@@ -8,15 +8,16 @@
 
 #include <hall_service.h>
 #include <qei_service.h>
-#include <drive_modes_config.h>
-#include "control_loops_common.h"
 #include <motorcontrol_service.h>
+#include <control_loops_common.h>
+
 
 interface VelocityControlInterface{
     int check_busy();
     int check_velocity_ctrl_state();
-    void set_velocity(int target_velocity);
     int get_velocity();
+    void set_velocity(int target_velocity);
+    int get_set_velocity();
     void set_velocity_ctrl_param(ControlConfig velocity_ctrl_params);
     void set_velocity_filter(int in_length);
     void set_velocity_ctrl_hall_param(HallConfig hall_config);
@@ -60,7 +61,7 @@ int max_speed_limit(int velocity, int max_speed);
  * @param velocity_offset defines offset in velocity
  * @param torque_offset defines offset in torque
  */
-void set_velocity_csv(csv_par & csv_params, int target_velocity,
+void set_velocity_csv(CyclicSyncVelocityConfig & csv_params, int target_velocity,
                       int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control);
 
 /**

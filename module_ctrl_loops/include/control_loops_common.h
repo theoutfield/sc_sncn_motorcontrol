@@ -18,3 +18,38 @@ typedef struct {
     int sensor_used;
 } ControlConfig;
 
+/**
+ * @brief struct definition for Synchronous torque param
+ */
+typedef struct
+{
+    int nominal_motor_speed;
+    int nominal_current;
+    int motor_torque_constant;
+    int max_torque;
+    int polarity;
+} CyclicSyncTorqueConfig;
+
+/**
+ * @brief struct definition for Synchronous velocity param
+ */
+typedef struct
+{
+    int max_motor_speed;
+    int nominal_current;
+    int motor_torque_constant;
+    int polarity;
+    int max_acceleration;
+} CyclicSyncVelocityConfig;
+
+/**
+ * @brief struct definition for Synchronous position param
+ */
+
+typedef struct
+{
+    CyclicSyncVelocityConfig base;
+    int max_following_error;
+    int max_position_limit;
+    int min_position_limit;
+} CyclicSyncPositionConfig;

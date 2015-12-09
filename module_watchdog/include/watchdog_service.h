@@ -32,5 +32,5 @@ interface WatchdogInterface{
  * @param p_shared_leds_wden control port for the watchdog device
  */
 [[combinable]]
-void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server watchdog_interface);
+void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server watchdog_interface[3]);
 

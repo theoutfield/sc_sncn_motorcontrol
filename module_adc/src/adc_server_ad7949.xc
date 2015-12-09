@@ -305,7 +305,7 @@ void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_
 }
 
 
-void adc_ad7949_triggered( interface ADCInterface server adc_interface[5], AD7949Ports &adc_ports, chanend c_trig)
+void adc_ad7949_triggered( interface ADCInterface server adc_interface[3], AD7949Ports &adc_ports, chanend c_trig)
 {
     timer t;
     unsigned int ts;
