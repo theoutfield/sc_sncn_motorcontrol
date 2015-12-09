@@ -5,13 +5,10 @@
  */
 
 #include <velocity_ctrl_service.h>
-//#include <refclk.h>
-//#include <qei_client.h>
 #include <filter_blocks.h>
 #include <xscope.h>
 #include <internal_config.h>
 #include <statemachine.h>
-#include <drive_modes_config.h>
 #include <stdio.h>
 #include <a4935.h>
 #include <motorcontrol_service.h>
@@ -47,7 +44,7 @@ int max_speed_limit(int velocity, int max_speed) {
 }
 
 //csv mode function
-void set_velocity_csv(csv_par &csv_params, int target_velocity,
+void set_velocity_csv(CyclicSyncVelocityConfig &csv_params, int target_velocity,
                       int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control)
 {
     i_velocity_control.set_velocity( max_speed_limit( (target_velocity + velocity_offset) * csv_params.polarity,
@@ -234,14 +231,18 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
             break;
 
         case i_velocity_control[int i].set_velocity(int in_velocity):
-            target_velocity = in_velocity;
 
+            target_velocity = in_velocity;
             break;
 
         case i_velocity_control[int i].get_velocity()-> int out_velocity:
 
             out_velocity = actual_velocity;
+            break;
 
+        case i_velocity_control[int i].get_set_velocity() -> int out_set_velocity:
+
+            out_set_velocity = target_velocity;
             break;
 
         case i_velocity_control[int i].set_velocity_ctrl_param(ControlConfig in_params):

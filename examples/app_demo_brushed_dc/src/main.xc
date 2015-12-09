@@ -21,7 +21,7 @@ int main(void) {
     // Motor control channels
     chan c_pwm_ctrl;
 
-    interface WatchdogInterface i_watchdog;
+    interface WatchdogInterface i_watchdog[3];
     interface MotorcontrolInterface i_motorcontrol[5];
 
     par
@@ -55,7 +55,8 @@ int main(void) {
                     MotorcontrolConfig motorcontrol_config;
                     init_motorcontrol_config(motorcontrol_config);
 
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_watchdog, i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_watchdog[0],
+                                                i_motorcontrol);
                 }
             }
         }

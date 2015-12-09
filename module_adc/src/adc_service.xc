@@ -3,7 +3,7 @@
 #include <adc_7265.h>
 #include <adc_server_ad7949.h>
 
-void adc_service(interface ADCInterface server adc_interface[5], ADCPorts &adc_ports, chanend ?c_trigger){
+void adc_service(interface ADCInterface server adc_interface[3], ADCPorts &adc_ports, chanend ?c_trigger){
 
     if(!isnull(adc_ports.ad7949_ports.clk)){
 

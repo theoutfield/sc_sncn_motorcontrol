@@ -71,10 +71,10 @@ int main(void) {
     // Motor control interfaces
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
-    interface WatchdogInterface i_watchdog;
-    interface MotorcontrolInterface i_motorcontrol[5];
+    interface WatchdogInterface i_watchdog[3];
     interface ADCInterface i_adc[5];
     interface HallInterface i_hall[5];
+    interface MotorcontrolInterface i_motorcontrol[5];
 
     #ifdef AD7265
         interface ADC i_adc;
@@ -127,7 +127,7 @@ int main(void) {
                     init_motorcontrol_config(motorcontrol_config);
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], null, i_watchdog, i_motorcontrol);
+                                            c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);
                 }
 
                 /*Current sampling*/

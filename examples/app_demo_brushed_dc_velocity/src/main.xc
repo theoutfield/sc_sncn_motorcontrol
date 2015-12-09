@@ -27,15 +27,6 @@ void profile_velocity_test(interface VelocityControlInterface client i_velocity_
 
     /* Set new target velocity for profile velocity control */
     set_profile_velocity( target_velocity, acceleration, deceleration, i_velocity_control);
-
-    while(1) {
-        actual_velocity = i_velocity_control.get_velocity();
-
-        xscope_int(TARGET_VELOCITY, target_velocity);
-        xscope_int(ACTUAL_VELOCITY, actual_velocity);
-
-        delay_microseconds(1);
-    }
 }
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -48,7 +39,7 @@ int main(void)
     // Motor control channels
     chan c_pwm_ctrl;            // pwm channel
 
-    interface WatchdogInterface i_watchdog;
+    interface WatchdogInterface i_watchdog[3];
     interface MotorcontrolInterface i_motorcontrol[5];
     interface QEIInterface i_qei[5];
 
@@ -58,6 +49,23 @@ int main(void)
 	{
 		/* Test Profile Velocity function */
 		on tile[APP_TILE]:  profile_velocity_test(i_velocity_control[0]);
+
+        /* XScope monitoring */
+        on tile[APP_TILE]:
+        {
+            int target_velocity, actual_velocity;
+
+            while(1) {
+
+                actual_velocity = i_velocity_control[1].get_velocity();
+                target_velocity = i_velocity_control[1].get_set_velocity();
+
+                xscope_int(TARGET_VELOCITY, target_velocity);
+                xscope_int(ACTUAL_VELOCITY, actual_velocity);
+
+                delay_microseconds(1);
+            }
+        }
 
 
 		on tile[APP_TILE]:
@@ -99,7 +107,7 @@ int main(void)
                     init_motorcontrol_config(motorcontrol_config);
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, null, i_qei[0], i_watchdog, i_motorcontrol);
+                                            c_pwm_ctrl, null, i_qei[0], i_watchdog[0], i_motorcontrol);
                 }
 
             }

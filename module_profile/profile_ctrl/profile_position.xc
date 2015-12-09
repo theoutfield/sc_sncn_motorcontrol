@@ -5,11 +5,6 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
-//#include <refclk.h>
-#include <xscope.h>
-//#include <internal_config.h>
-//#include <statemachine.h>
-#include <drive_modes_config.h>
 #include <state_modes.h>
 #include <print.h>
 #include <profile.h>
@@ -17,15 +12,18 @@
 
 
 
-void init_position_profiler(int min_position, int max_position, int max_velocity, int max_acceleration,
+void init_position_profiler(ProfilePositionConfig profile_position_config,
                                 interface PositionControlInterface client i_position_control){
 
     ControlConfig control_config = i_position_control.getControlConfig();
     QEIConfig qei_config = i_position_control.getQEIConfig();
     HallConfig hall_config = i_position_control.getHallConfig();
 
-    init_position_profile_limits(max_acceleration, max_velocity, qei_config,
-                                      hall_config, control_config.sensor_used, max_position, min_position);
+    init_position_profile_limits(profile_position_config.max_acceleration,
+                                    profile_position_config.velocity_config.max_profile_velocity,
+                                    qei_config, hall_config, control_config.sensor_used,
+                                    profile_position_config.software_position_limit_max,
+                                    profile_position_config.software_position_limit_min);
 
     return;
 

@@ -31,20 +31,6 @@ void position_profile_test(interface PositionControlInterface client i_position_
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
-
-    while(1)
-    {
-        /* Read actual position from the Position Control Server */
-        actual_position = i_position_control.get_position();
-        follow_error = target_position - actual_position;
-
-        xscope_int(ACTUAL_POSITION, actual_position);
-        xscope_int(TARGET_POSITION, target_position);
-        xscope_int(FOLLOW_ERROR, follow_error);
-
-        delay_milliseconds(1); /* 1 ms wait */
-    }
-
 }
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -57,9 +43,9 @@ int main(void)
     // Motor control channels
     chan c_pwm_ctrl;            // pwm channel
 
-    interface WatchdogInterface i_watchdog;
-    interface MotorcontrolInterface i_motorcontrol[5];
+    interface WatchdogInterface i_watchdog[3];
     interface QEIInterface i_qei[5];
+    interface MotorcontrolInterface i_motorcontrol[5];
 
     interface PositionControlInterface i_position_control[3];
 
@@ -67,13 +53,33 @@ int main(void)
 	{
 
 		/* Test Profile Position Client function*/
-		on tile[0]:
+		on tile[APP_TILE]:
 		{
 			position_profile_test(i_position_control[0]);		// test PPM on slave side
 		}
 
+        /* XScope monitoring */
+        on tile[APP_TILE]: {
 
-		on tile[0]:
+            int actual_position, target_position, follow_error;
+
+            while(1)
+            {
+                /* Read actual position from the Position Control Server */
+                actual_position = i_position_control[1].get_position();
+                target_position = i_position_control[1].get_set_position();
+                follow_error = target_position - actual_position;
+
+                xscope_int(ACTUAL_POSITION, actual_position);
+                xscope_int(TARGET_POSITION, target_position);
+                xscope_int(FOLLOW_ERROR, follow_error);
+
+                delay_milliseconds(1); /* 1 ms wait */
+            }
+        }
+
+
+		on tile[APP_TILE]:
 		{
 			/* Position Control Loop */
             {
@@ -112,7 +118,7 @@ int main(void)
                     init_motorcontrol_config(motorcontrol_config);
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, null, i_qei[0], i_watchdog, i_motorcontrol);
+                                            c_pwm_ctrl, null, i_qei[0], i_watchdog[0], i_motorcontrol);
                 }
 
             }
