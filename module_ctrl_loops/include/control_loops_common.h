@@ -48,7 +48,7 @@ typedef struct
 
 typedef struct
 {
-    CyclicSyncVelocityConfig base;
+    CyclicSyncVelocityConfig velocity_config;
     int max_following_error;
     int max_position_limit;
     int min_position_limit;

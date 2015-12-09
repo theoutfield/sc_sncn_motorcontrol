@@ -52,7 +52,7 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 void set_position_csp( CyclicSyncPositionConfig & csp_params, int target_position, int position_offset,
                        int velocity_offset, int torque_offset, interface PositionControlInterface client i_position_control )
 {
-    i_position_control.set_position( position_limit( (target_position + position_offset) * csp_params.base.polarity,
+    i_position_control.set_position( position_limit( (target_position + position_offset) * csp_params.velocity_config.polarity,
                                   csp_params.max_position_limit,
                                   csp_params.min_position_limit));
 }
@@ -96,7 +96,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
     if (position_ctrl_params.sensor_used == HALL && !isnull(i_hall)) {
         { actual_position, direction } = i_hall.get_hall_position_absolute();// get_hall_position_absolute(c_hall);
         target_position = actual_position;
-    } else if (position_ctrl_params.sensor_used == QEI && !isnull(i_qei)) {
+    } else if (position_ctrl_params.sensor_used >= QEI && !isnull(i_qei)) {
         {actual_position, direction} = i_qei.get_qei_position_absolute();
         target_position = actual_position;
     }
@@ -122,6 +122,14 @@ void position_control_service(ControlConfig &position_ctrl_params,
                     break;
 
                     case QEI:
+                    { actual_position, direction } =  i_qei.get_qei_position_absolute();
+                    break;
+
+                    case QEI_WITH_INDEX:
+                    { actual_position, direction } =  i_qei.get_qei_position_absolute();
+                    break;
+
+                    case QEI_WITH_NO_INDEX:
                     { actual_position, direction } =  i_qei.get_qei_position_absolute();
                     break;
 
@@ -218,7 +226,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
             if (in_sensor_used == HALL) {
                 { actual_position, direction }= i_hall.get_hall_position_absolute();
-            } else if (in_sensor_used == QEI) {
+            } else if (in_sensor_used >= QEI) {
                 { actual_position, direction } = i_qei.get_qei_position_absolute();
             }
             /*
