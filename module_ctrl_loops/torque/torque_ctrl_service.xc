@@ -232,9 +232,9 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
     int buffer_Id[FILTER_LENGTH_TORQUE] = {0};
     int buffer_Iq[FILTER_LENGTH_TORQUE] = {0};
 
-    int i1 = 0;
-    int j1 = 0;
-    int mod1 = 0;
+  //  int i1 = 0;
+  //  int j1 = 0;
+  //  int mod1 = 0;
 
     int iq_filtered = 0;
     int id_filtered = 0;
