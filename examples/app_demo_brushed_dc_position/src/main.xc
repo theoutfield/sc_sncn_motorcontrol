@@ -19,15 +19,19 @@
 /* Test Profile Position function */
 void position_profile_test(interface PositionControlInterface client i_position_control)
 {
-	int actual_position = 0;			// ticks
 	int target_position = 2000;			// ticks
 	int velocity 		= 100;			// rpm
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;     		// rpm/s
-	int follow_error;
+    ProfilePositionConfig profile_position_config;
+
+    profile_position_config.max_acceleration = MAX_ACCELERATION;
+    profile_position_config.software_position_limit_max = MAX_POSITION_LIMIT;
+    profile_position_config.software_position_limit_min = MIN_POSITION_LIMIT;
+    profile_position_config.velocity_config.max_profile_velocity = MAX_PROFILE_VELOCITY;
 
     /* Initialise the position profile generator */
-    init_position_profiler(MIN_POSITION_LIMIT, MAX_POSITION_LIMIT, MAX_PROFILE_VELOCITY, MAX_ACCELERATION, i_position_control);
+    init_position_profiler(profile_position_config, i_position_control);
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);

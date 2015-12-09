@@ -19,11 +19,14 @@ void profile_velocity_test(interface VelocityControlInterface client i_velocity_
     int target_velocity = 500;          // rpm
     int acceleration    = 1000;         // rpm/s
     int deceleration    = 1000;         // rpm/s
-    int actual_velocity;
+    ProfileVelocityConfig profile_velocity_config;
 
+    profile_velocity_config.max_profile_velocity = MAX_PROFILE_VELOCITY;
+    profile_velocity_config.max_acceleration = MAX_ACCELERATION;
+    profile_velocity_config.quick_stop_deceleration = MAX_ACCELERATION;
 
     /* Initialise the velocity profile generator */
-    init_velocity_profiler(MAX_PROFILE_VELOCITY, MAX_ACCELERATION, MAX_ACCELERATION, i_velocity_control);
+    init_velocity_profiler(profile_velocity_config, i_velocity_control);
 
     /* Set new target velocity for profile velocity control */
     set_profile_velocity( target_velocity, acceleration, deceleration, i_velocity_control);
