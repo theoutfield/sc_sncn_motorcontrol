@@ -8,8 +8,7 @@
 
 #include <control_loops_common.h>
 #include <qei_service.h>
-#include <drive_modes_config.h>
-#include "control_loops_common.h"
+#include <control_loops_common.h>
 #include <motorcontrol_service.h>
 
 
@@ -19,6 +18,7 @@ interface PositionControlInterface{
     int check_busy();
     void set_position(int target_position);
     int get_position();
+    int get_set_position();
     void set_position_ctrl_param(ControlConfig position_ctrl_params);
     void set_position_ctrl_hall_param(HallConfig hall_config);
     void set_position_ctrl_qei_param(QEIConfig qei_params);
@@ -65,7 +65,7 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
  * @param velocity_offset defines offset in velocity
  * @param torque_offset defines offset in torque
  */
-void set_position_csp(csp_par & csp_params, int target_position, int position_offset, int velocity_offset,
+void set_position_csp(CyclicSyncPositionConfig & csp_params, int target_position, int position_offset, int velocity_offset,
                       int torque_offset, interface PositionControlInterface client i_position_control);
 
 

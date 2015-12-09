@@ -12,14 +12,48 @@
 #include <velocity_ctrl_service.h>
 #include <torque_ctrl_service.h>
 
+/**
+ * @brief struct definition for profile velocity param
+ */
+typedef struct
+{
+    int max_profile_velocity;
+    int max_acceleration;
+    int profile_acceleration;
+    int profile_deceleration;
+    int quick_stop_deceleration;
+    int polarity;
+} ProfileVelocityConfig;
 
-void init_position_profiler(int min_position, int max_position, int max_velocity, int max_acceleration,
+/**
+ * @brief struct definition for profile position param
+ */
+typedef struct
+{
+    ProfileVelocityConfig velocity_config;
+    int profile_velocity;
+    int software_position_limit_min;
+    int software_position_limit_max;
+    int max_acceleration;
+} ProfilePositionConfig;
+
+/**
+ * @brief struct definition for profile torque param
+ */
+typedef struct
+{
+    int profile_slope;
+    int max_torque;
+    int polarity;
+} ProfileTorqueConfig;
+
+void init_position_profiler(ProfilePositionConfig profile_position_config,
                                 interface PositionControlInterface client i_position_control);
 
-void init_velocity_profiler(int max_velocity, int max_acceleration, int max_deceleration,
+void init_velocity_profiler(ProfileVelocityConfig profile_velocity_config,
                                 interface VelocityControlInterface client i_velocity_control);
 
-void init_torque_profiler(int max_torque, int polarity,
+void init_torque_profiler(ProfileTorqueConfig profile_torque_config,
                                 interface TorqueControlInterface client i_torque_control);
 
 /**

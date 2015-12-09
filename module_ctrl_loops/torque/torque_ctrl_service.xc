@@ -84,7 +84,7 @@ int torque_limit(int torque, int max_torque_limit)
     return torque;
 }
 
-void set_torque_cst(cst_par &cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control)
+void set_torque_cst(CyclicSyncTorqueConfig &cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control)
 {
     i_torque_control.set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity,
                               cst_params.max_torque));
@@ -404,6 +404,11 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                 xscope_int(TARGET_TORQUE, target_torque);
 #endif
             break;
+
+        case i_torque_control[int i].get_set_torque() -> int out_set_torque:
+
+                out_set_torque = target_torque;
+                break;
 
         case i_torque_control[int i].get_torque() -> int out_torque:
 

@@ -9,14 +9,14 @@
 #include <refclk.h>
 #include <xscope.h>
 //#include <internal_config.h>
-#include <drive_modes_config.h>
+//#include <drive_modes_config.h>
 #include <profile.h>
 #include <profile_control.h>
 
-void init_torque_profiler(int max_torque, int polarity,
+void init_torque_profiler(ProfileTorqueConfig profile_torque_config,
                                 interface TorqueControlInterface client i_torque_control){
 
-    init_linear_profile_limits(max_torque,polarity);
+    init_linear_profile_limits(profile_torque_config.max_torque,profile_torque_config.polarity);
 
     //Interface not used for the moment, likely in the future
 }

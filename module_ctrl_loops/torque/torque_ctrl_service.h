@@ -9,8 +9,7 @@
 #include <motorcontrol_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
-#include <drive_modes_config.h>
-#include "control_loops_common.h"
+#include <control_loops_common.h>
 #include <adc_service.h>
 
 
@@ -20,6 +19,7 @@ interface TorqueControlInterface{
     int check_torque_ctrl_state();
     int get_torque();
     void set_torque(int in_torque);
+    int get_set_torque();
     void set_torque_ctrl_param(ControlConfig torque_ctrl_params);
     void set_torque_ctrl_hall_param(HallConfig hall_config);
     void set_torque_ctrl_qei_param(QEIConfig qei_params);
@@ -60,7 +60,7 @@ int torque_limit(int torque, int max_torque_limit);
  * @param target_torque is the new target torque
  * @param torque_offset defines offset in torque
  */
-void set_torque_cst(cst_par & cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control);
+void set_torque_cst(CyclicSyncTorqueConfig & cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control);
 
 /**
  * @brief Torque Control Loop

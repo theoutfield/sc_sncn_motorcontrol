@@ -5,7 +5,7 @@
  */
 
 #include <statemachine.h>
-#include <drive_modes_config.h>
+//#include <drive_modes_config.h>
 #include <state_modes.h>
 #include <stdbool_xc.h>
 #include <position_ctrl_service.h>

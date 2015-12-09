@@ -28,18 +28,21 @@
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-	int target_torque = 200; 	//(desired torque/torque_constant)  * IFM resolution
-	int torque_slope  = 100;  	//(desired torque_slope/torque_constant)  * IFM resolution
-	int actual_torque;
+	int target_torque = 400; 	//(desired torque/torque_constant)  * IFM resolution
+	int torque_slope  = 1000;  	//(desired torque_slope/torque_constant)  * IFM resolution
+
+	ProfileTorqueConfig profile_torque_config;
+	profile_torque_config.max_torque = MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
+	profile_torque_config.polarity = POLARITY;
 
 	/* Initialise the torque profile generator */
-	init_torque_profiler(MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION, POLARITY, i_torque_control);
+	init_torque_profiler(profile_torque_config, i_torque_control);
 
 	/* Set new target torque for profile torque control */
 	set_profile_torque( target_torque, torque_slope, i_torque_control);
 
 	delay_seconds(3);
-	target_torque = -200;
+	target_torque = -500;
 
     /* Set new target torque for profile torque control */
 	set_profile_torque( target_torque, torque_slope, i_torque_control);
@@ -57,11 +60,11 @@ int main(void)
 	// Motor control channels
 	chan c_adctrig, c_pwm_ctrl;
 
-	interface WatchdogInterface i_watchdog;
-    interface MotorcontrolInterface i_motorcontrol[5];
-    interface ADCInterface i_adc[5];
+	interface WatchdogInterface i_watchdog[3];
+    interface ADCInterface i_adc[3];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
+    interface MotorcontrolInterface i_motorcontrol[5];
 
     interface TorqueControlInterface i_torque_control[3];
 
@@ -83,12 +86,14 @@ int main(void)
 		/* Currents monitoring in XScope */
 		on tile[APP_TILE]:
 		{
-		    int phaseB, phaseC, actual_torque;
+		    int phaseB, phaseC, actual_torque, target_torque;
 		    unsigned hall_state = 0;
 		    while(1){
 		        {phaseB, phaseC} = i_adc[1].get_currents();
 		        actual_torque = i_torque_control[1].get_torque();
+		        target_torque = i_torque_control[1].get_set_torque();
 
+		        xscope_int(TARGET_TORQUE, target_torque);
 		        xscope_int(ACTUAL_TORQUE, actual_torque);
 		        xscope_int(PHASE_B, phaseB);
 		        xscope_int(PHASE_C, phaseC);
@@ -134,7 +139,7 @@ int main(void)
                     init_motorcontrol_config(motorcontrol_config);
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog, i_motorcontrol);
+                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
                 }
 			}
 		}
