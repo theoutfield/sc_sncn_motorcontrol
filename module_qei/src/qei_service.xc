@@ -37,6 +37,46 @@ static const unsigned char lookup[16][4] = {
     { 0, 0, 0, 0 }, // 11 xx
     { 0, 0, 0, 0 }  // 11 xx
 };
+/*
+static void qei_client_handler(chanend c_qei, int command, int position, int ok, int &count,
+                               int direction, int init_state, int sync_out, int &calib_bw_flag,
+                               int &calib_fw_flag, int &offset_fw, int &offset_bw,
+                               qei_par &qei_config, int &status)
+{
+    switch(command)
+    {
+
+    case SET_QEI_PARAM_ECAT:
+        c_qei :> qei_config.index;
+        c_qei :> qei_config.max_ticks_per_turn;
+        c_qei :> qei_config.real_counts;
+        c_qei :> qei_config.poles;
+        c_qei :> qei_config.max_ticks;
+        c_qei :> qei_config.sensor_polarity;
+        status = 1;
+	//printintln(qei_config.gear_ratio);
+	//printintln(qei_config.index);
+	//printintln(qei_config.max_ticks_per_turn);
+	//printintln(qei_config.real_counts);
+        break;
+    default:
+        break;
+    }
+}
+*/
+/*
+void init_qei_velocity_params(qei_velocity_par &qei_velocity_params)
+{
+    qei_velocity_params.previous_position = 0;
+    qei_velocity_params.old_difference = 0;
+    qei_velocity_params.filter_length = 8;
+    qei_velocity_params.index = 0;
+    init_filter(qei_velocity_params.filter_buffer,
+                qei_velocity_params.index,
+                qei_velocity_params.filter_length);
+    return;
+}
+*/
 
 int check_qei_config(QEIConfig &qei_config)
 {
@@ -80,7 +120,7 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
 
     printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
 
-    int max_ticks_per_turn = qei_config.real_counts;
+    qei_config.max_ticks_per_turn = qei_config.real_counts;
     int position = 0;
     unsigned int v;
 
@@ -92,10 +132,10 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
     int previous_position = 0;
     int count = 0;
     int first = 1;
-    int max_count_actual = 2147483648; //TODO remove variable and make a define
+    int max_count_actual = qei_config.max_ticks;
     int difference = 0;
     int direction = 0;
-    int qei_max = max_ticks_per_turn;
+    int qei_max = qei_config.max_ticks_per_turn;
     int qei_type = qei_config.index;            // TODO use to disable sync for no-index
     int init_state = INIT;
 
@@ -227,7 +267,7 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
         case i_qei[int i].get_qei_position() -> {unsigned int out_count, unsigned int out_valid}:
 
                 out_count = count;
-                out_count &= (max_ticks_per_turn - 1);
+                out_count &= (qei_config.max_ticks_per_turn - 1);
                 out_valid = ok;
                 break;
 
@@ -295,7 +335,8 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
 
         if (status == 1) {
             status = 0;
-            qei_max = max_ticks_per_turn;
+            max_count_actual = qei_config.max_ticks;
+            qei_max = qei_config.max_ticks_per_turn;
             qei_type = qei_config.index;
             qei_crossover = (qei_max*19)/100;
             qei_count_per_hall = qei_config.real_counts / qei_config.poles;
@@ -303,3 +344,16 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
 #pragma xta endpoint "qei_loop_end_point"
     }
 }
+/*
+ * int calculate_qei_velocity(int count, qei_par &qei_config, qei_velocity_par &qei_velocity_params){
+
+
+  //  int difference_velocity;
+
+ //<<12 multiplies by 4096
+                      //(filter(qei_velocity_params.filter_buffer, qei_velocity_params.index,
+                      //qei_velocity_params.filter_length, difference_velocity)*1000*60) / (qei_config.real_counts);
+
+    return ;
+}
+*/

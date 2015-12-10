@@ -13,6 +13,7 @@
 #include <a4935.h>
 #include <motorcontrol_service.h>
 
+
 int init_velocity_control(interface VelocityControlInterface client i_velocity_control)
 {
     int ctrl_state = INIT_BUSY;
@@ -35,21 +36,19 @@ int init_velocity_control(interface VelocityControlInterface client i_velocity_c
 
 int max_speed_limit(int velocity, int max_speed) {
     if (velocity > max_speed) {
-        velocity = max_speed
-    ;
-} else if (velocity < -max_speed) {
-    velocity = -max_speed
-;
-}
-return velocity;
+        velocity = max_speed;
+    } else if (velocity < -max_speed) {
+        velocity = -max_speed;
+    }
+    return velocity;
 }
 
 //csv mode function
 void set_velocity_csv(CyclicSyncVelocityConfig &csv_params, int target_velocity,
                       int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control)
 {
-i_velocity_control.set_velocity( max_speed_limit( (target_velocity + velocity_offset) * csv_params.polarity,
-    csv_params.max_motor_speed ));
+    i_velocity_control.set_velocity( max_speed_limit( (target_velocity + velocity_offset) * csv_params.polarity,
+                                   csv_params.max_motor_speed ));
 }
 
 [[combinable]]
@@ -110,12 +109,12 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
     if (velocity_ctrl_params.sensor_used == HALL){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
-            speed_factor_hall = hall_config.pole_pairs*HALL_TICKS_PER_TURN*(velocity_ctrl_params.Loop_time/MSEC_FAST); // variable pole_pairs
+            speed_factor_hall = hall_config.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_FAST); // variable pole_pairs
         }
         else {
-            speed_factor_hall = hall_config.pole_pairs*HALL_TICKS_PER_TURN*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs
+            speed_factor_hall = hall_config.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs
         }
-        hall_crossover = hall_config.pole_pairs*HALL_TICKS_PER_TURN - ((hall_config.pole_pairs*HALL_TICKS_PER_TURN)/10);
+        hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
     }
     else if (velocity_ctrl_params.sensor_used >= QEI){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
@@ -270,12 +269,16 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
         case i_velocity_control[int i].set_velocity_ctrl_hall_param(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
+            hall_config.max_ticks = in_config.max_ticks;
+            hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
             break;
 
         case i_velocity_control[int i].set_velocity_ctrl_qei_param(QEIConfig in_params):
 
+            qei_config.max_ticks = in_params.max_ticks;
             qei_config.index = in_params.index;
             qei_config.real_counts = in_params.real_counts;
+            qei_config.max_ticks_per_turn = in_params.max_ticks_per_turn;
             qei_config.poles = in_params.poles;
 
             break;
@@ -285,12 +288,12 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
             velocity_ctrl_params.sensor_used = in_sensor_used;
 
             if(in_sensor_used == HALL) {
-                speed_factor_hall = hall_config.pole_pairs * HALL_TICKS_PER_TURN * (velocity_ctrl_params.Loop_time/MSEC_STD);
-                hall_config.pole_pairs * HALL_TICKS_PER_TURN - ((hall_config.pole_pairs * HALL_TICKS_PER_TURN)/10);
+                speed_factor_hall = hall_config.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
+                hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
 
             } else if(in_sensor_used >= QEI) {
                 speed_factor_qei = qei_config.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
-                qei_crossover = qei_config.real_counts - qei_config.real_counts/10;
+                qei_crossover = qei_config.max_ticks - qei_config.max_ticks/10;
             }
             target_velocity = actual_velocity;
             break;
