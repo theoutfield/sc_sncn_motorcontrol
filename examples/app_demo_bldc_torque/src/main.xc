@@ -110,13 +110,13 @@ int main(void)
 			par
 			{
                 /* PWM Loop */
-			    pwm_triggered_service(pwm_ports, c_pwm_ctrl, c_adctrig);
+			    pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl);
 
                 /* Watchdog Server */
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* ADC Loop */
-                adc_service(i_adc, adc_ports, c_adctrig);
+                adc_service(adc_ports, c_adctrig, i_adc);
 
                 /* QEI Service */
                 {
