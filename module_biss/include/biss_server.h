@@ -9,7 +9,7 @@
 
 
 /**
- * @brief Initialize BuSS encoder parameters
+ * @brief Initialize BiSS encoder parameters
  *
  * @param[out] biss_params struct defines the data lengths and the crc polynom of the encoder
  */
@@ -24,7 +24,7 @@ void init_biss_param(biss_par &biss_params);
  * @param p_biss_clk 1-bit out port to output the biss clock
  * @param p_biss_data in port for reading the biss encoder data
  * @param clk clock to generate the biss clock
- * @param biss_params structure definition for the biss encoder data lengths and crc polynom
+ * @param biss_params structure definition for the biss encoder data lengths, crc polynom, clock frequency, etc
  * @param frame_bytes number of 32 bit bytes to read from the encoder, should be able to contain at least 2 bits + ack and start bits + data + crc
  */
 void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss_clk, port in p_biss_data, clock clk,
@@ -48,6 +48,22 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
  */
 unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clock clk, unsigned int a, unsigned int b,
                                    unsigned int data[], unsigned int data_length, static const unsigned int frame_bytes, unsigned int crc_poly);
+
+
+/**
+ * @brief Read up to 32 bit of BiSS sensor data without CRC checking
+ *
+ * @param p_biss_clk 1-bit out port to output the biss clock
+ * @param p_biss_data in port for reading the biss encoder data
+ * @param clk clock to generate the biss clock
+ * @param a the dividend of the desired clock rate
+ * @param b the divisor of the desired clock rates
+ * @param before_length length of data to dismiss
+ * @param data_length length of desired data
+ *
+ * @return data
+ */
+unsigned int read_biss_sensor_data_fast(port out p_biss_clk, port in p_biss_data, clock clk, unsigned a, unsigned b, int before_length, int data_length);
 
 
 /**
@@ -86,5 +102,3 @@ unsigned int biss_crc(unsigned int data[], unsigned int data_length, unsigned in
  */
 void biss_crc_correct(unsigned int data[], unsigned int data_length, static const unsigned int frame_bytes,
                       unsigned int crc_received, unsigned int poly);
-
-unsigned int biss_position_fast(port out p_biss_clk, port in p_biss_data, clock clk, unsigned a, unsigned b, int multiturn_length, int singleturn_length);
