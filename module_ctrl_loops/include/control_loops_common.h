@@ -16,6 +16,7 @@ typedef struct {
     int Control_limit;
     int Loop_time;
     int sensor_used;
+    int polarity;
 } ControlConfig;
 
 /**

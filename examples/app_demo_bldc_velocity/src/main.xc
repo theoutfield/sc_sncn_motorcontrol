@@ -20,10 +20,10 @@
 #include <profile_control.h>
 
 //Configuration
-#include <qei_config.h>
-#include <hall_config.h>
+#include <bldc_motor_config.h>
 #include <motorcontrol_config.h>
 #include <control_config.h>
+#include <stdlib.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -34,6 +34,7 @@ QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 /* Test Profile Velocity function */
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
+
 	int target_velocity = 300;	 		// rpm
 	int acceleration 	= 1000;			// rpm/s
 	int deceleration 	= 1000;			// rpm/s
@@ -89,12 +90,12 @@ int main(void)
 
             /* Velocity Control Loop */
             {
-                ControlConfig velocity_ctrl_params;
+                ControlConfig velocity_ctrl_config;
                 /* Initialize PID parameters for Velocity Control (defined in config/motor/bldc_motor_config.h) */
-                init_velocity_control_config(velocity_ctrl_params);
+                init_velocity_control_config(velocity_ctrl_config);
 
                 /* Control Loop */
-                velocity_control_service(velocity_ctrl_params, i_hall[1], i_qei[1], i_motorcontrol[0],
+                velocity_control_service(velocity_ctrl_config, i_hall[1], i_qei[1], i_motorcontrol[0],
                                             i_velocity_control);
             }
 		}
@@ -115,22 +116,38 @@ int main(void)
                 /* QEI Service */
                 {
                     QEIConfig qei_config;
-                    init_qei_config(qei_config);
-
+                    qei_config.index = QEI_SENSOR_TYPE;
+                    qei_config.real_counts = ENCODER_RESOLUTION;
+                    qei_config.sensor_polarity = QEI_SENSOR_POLARITY;
+                    qei_config.poles = POLE_PAIRS;
                     qei_service(qei_ports, qei_config, i_qei);
                 }
 
+                /* Hall Service*/
                 {
                     HallConfig hall_config;
-                    init_hall_config(hall_config);
-
+                    hall_config.pole_pairs = POLE_PAIRS;
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
                 /* Motor Commutation loop */
                 {
                     MotorcontrolConfig motorcontrol_config;
-                    init_motorcontrol_config(motorcontrol_config);
+                    motorcontrol_config.motor_type = BLDC_MOTOR;
+                    motorcontrol_config.angle_variance = (60 * 4096) / (POLE_PAIRS * 2 * 360);
+
+                    if (POLE_PAIRS < 4) {
+                        motorcontrol_config.nominal_speed =  MAX_NOMINAL_SPEED * 4;
+                    } else if (POLE_PAIRS >= 4) {
+                        motorcontrol_config.nominal_speed =  MAX_NOMINAL_SPEED;
+                    }
+
+                    motorcontrol_config.commutation_loop_freq =  COMMUTATION_LOOP_FREQUENCY_KHZ;
+                    motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.bldc_winding_type = WINDING_TYPE;
+                    motorcontrol_config.qei_forward_offset = 0;
+                    motorcontrol_config.qei_backward_offset = 0;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                             c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
