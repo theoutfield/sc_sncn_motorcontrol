@@ -5,11 +5,12 @@
 */
 
 #include <biss_server.h>
-#include <timer.h>
+#include <bldc_motor_config.h>
 #include <xclib.h>
 #include <xs1.h>
 #include <refclk.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <print.h>
 
 
@@ -43,10 +44,10 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
     int velocity = 0;
     int old_count = 0;
     int old_difference = 0;
-    int ticks_per_turn = (1 << biss_params.singleturn_resolution);
+    unsigned int ticks_per_turn = (1 << biss_params.singleturn_resolution);
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_ticks = (ticks_per_turn >> 8); //to simplify the velocity computation
-    int velocity_loop = (biss_params.velocity_loop * USEC_FAST); //velocity loop time in clock ticks
+    int velocity_loop = (biss_params.velocity_loop * BISS_USEC); //velocity loop time in clock ticks
     //position
     unsigned int data[frame_bytes];
     unsigned int last_position = 0;
@@ -56,11 +57,11 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
     int max_ticks_internal = (1 << (biss_params.multiturn_resolution -1 + biss_params.singleturn_resolution));
     //timing
     timer t;
-    unsigned int last_biss_read;
-    t :> last_biss_read;
-    unsigned int next_velocity_read = last_biss_read + velocity_loop;
-    unsigned int last_count_read = last_biss_read;
     unsigned int time;
+    t :> time;
+    unsigned int next_velocity_read = time;
+    unsigned int last_count_read = 0;
+    unsigned int last_biss_read = 0;
 
     //clock and port configuration
     configure_clock_rate(clk, biss_params.clock_dividend, biss_params.clock_divisor) ; // a/b MHz
@@ -76,10 +77,12 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
     while (1) {
         [[ordered]]
         select {
+        //send electrical angle for commutation, ajusted with electrical offset
         case i_biss[int i].get_angle_electrical() -> unsigned int angle:
                 t :> time;
                 if (timeafter(time, last_biss_read + biss_params.timeout)) {
-                    angle = biss_position_fast(p_biss_clk, p_biss_data, clk, 0, 0, biss_params.multiturn_length, biss_params.singleturn_length);
+                    angle = read_biss_sensor_data_fast(p_biss_clk, p_biss_data, clk, 0, 0,
+                            biss_params.multiturn_length + biss_params.singleturn_length - biss_params.singleturn_resolution, biss_params.singleturn_resolution);
                     t :> last_biss_read;
                     last_position = angle;
                 } else
@@ -89,15 +92,22 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 else
                     angle = (biss_params.poles * (angle << (12-biss_params.singleturn_resolution)) + biss_params.offset_electrical ) & 4095;
                 break;
+
+        //send singleturn position fast
         case i_biss[int i].get_position_fast() -> unsigned int position:
                 t :> time;
                 if (timeafter(time, last_biss_read + biss_params.timeout)) {
-                    position = biss_position_fast(p_biss_clk, p_biss_data, clk, 0, 0, biss_params.multiturn_length, biss_params.singleturn_length);
+                    position = read_biss_sensor_data_fast(p_biss_clk, p_biss_data, clk, 0, 0,
+                               biss_params.multiturn_length + biss_params.singleturn_length - biss_params.singleturn_resolution, biss_params.singleturn_resolution);
                     t :> last_biss_read;
                     last_position = position;
                 } else
                     position = last_position;
+                if (biss_params.polarity == BISS_POLARITY_INVERTED)
+                    position -= ticks_per_turn;
                 break;
+
+        //send count, position and status (error and warning bits), ajusted with count offset and polarity
         case i_biss[int i].get_position() -> { int count, unsigned int position, unsigned int status }:
                 int count_internal;
                 t :> time;
@@ -122,12 +132,14 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                     count = -count;
                     position -= ticks_per_turn;
                 }
-                if (count > biss_params.max_ticks || count < -biss_params.max_ticks) {
+                if (count >= biss_params.max_ticks || count < -biss_params.max_ticks) {
                     count_offset = -count_internal;
                     count = 0;
                     status = 0;
                 }
                 break;
+
+        //send count, position and status (error and warning bits) as returned by the encoder (not ajusted)
         case i_biss[int i].get_real_position() -> { int count, unsigned int position, unsigned int status }:
                 t :> time;
                 if (timeafter(time, last_count_read + biss_params.timeout)) {
@@ -144,25 +156,34 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                     status = 0;
                 }
                 break;
+
+        //send velocity
         case i_biss[int i].get_velocity() -> int velocity_:
                 if (biss_params.polarity == BISS_POLARITY_NORMAL)
                     velocity_ = velocity;
                 else
                     velocity_ = -velocity;
                 break;
+
+        //receive new biss_params
         case i_biss[int i].set_params(biss_par biss_params_):
                 biss_params = biss_params_;
+                //update variables which depend on biss_params
                 configure_clock_rate(clk, biss_params.clock_dividend, biss_params.clock_divisor) ; // a/b MHz
                 biss_data_length = biss_params.multiturn_length +  biss_params.singleturn_length + biss_params.status_length;
                 ticks_per_turn = (1 << biss_params.singleturn_resolution);
                 crossover = ticks_per_turn - ticks_per_turn/10;
                 max_ticks_internal = (1 << (biss_params.multiturn_resolution -1 + biss_params.singleturn_resolution));
                 velocity_ticks = (ticks_per_turn >> 8);
-                velocity_loop = (biss_params.velocity_loop * USEC_FAST);
+                velocity_loop = (biss_params.velocity_loop * BISS_USEC);
                 break;
+
+        //send biss_params
         case i_biss[int i].get_params() -> biss_par biss_params_:
                 biss_params_ = biss_params;
                 break;
+
+        //receive the new count to set and set the offset accordingly
         case i_biss[int i].set_count(int new_count):
                 t when timerafter(last_biss_read + biss_params.timeout) :> void;
                 read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_data_length, frame_bytes, biss_params.crc_poly);
@@ -177,6 +198,8 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                 else
                     count_offset = -new_count - count;
                 break;
+
+        //receive the new elecrical angle to set and set the offset accordingly
         case i_biss[int i].set_angle_electrical(unsigned int new_angle) -> unsigned int offset:
                 t when timerafter(last_biss_read + biss_params.timeout) :> void;
                 read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_data_length, frame_bytes, biss_params.crc_poly);
@@ -192,6 +215,8 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
                     biss_params.offset_electrical = (new_angle - biss_params.poles * (angle >> (12-biss_params.singleturn_resolution)) ) & 4095;
                 offset = biss_params.offset_electrical;
                 break;
+
+        //compute velocity
         case t when timerafter(next_velocity_read) :> void:
             next_velocity_read += velocity_loop;
             int count, position;
@@ -213,55 +238,11 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
             old_difference = difference;
             // simplified version of: velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                                        = ( difference ticks * (60.000.000 us / 256) ) / ( (ticks per turn / 256) * velocity loop time in us)
-            velocity = (difference * 234375) / (velocity_ticks * biss_params.velocity_loop); // USEC_FAST is harcoded in this
+            //velocity = (difference * 60000000) / (ticks_per_turn * biss_params.velocity_loop);
+            velocity = (difference * 234375) / (velocity_ticks * biss_params.velocity_loop);
             break;
         }
     }
-}
-
-
-unsigned int biss_position_fast(port out p_biss_clk, port in p_biss_data, clock clk, unsigned a, unsigned b, int multiturn_length, int singleturn_length) {
-    unsigned int position = 0;
-    int status = 0;
-    int timeout = 8;
-
-    //clock and data port config
-    if (a) { // set a to 0 to not reconfig each time
-        configure_clock_rate(clk, a, b) ; // a/b MHz
-        configure_port_clock_output(p_biss_clk, clk);
-        set_port_inv(p_biss_clk);
-#if(BISS_DATA_PORT == ENC_CH1)//FIXME use a normal 1-bit output port
-        configure_out_port(p_biss_data, clk, 0b1000); //to configure p_biss_clk as output
-#else
-        configure_in_port(p_biss_data, clk);
-#endif
-    }
-
-    start_clock(clk);
-    while(status < 2 && timeout > 0) {
-        timeout--;
-        unsigned int bit;
-        p_biss_data :> bit;
-        bit = (bit & 0b10); //FIXME use a 1-bit input port
-        if (status) {
-            if (bit) //status = 2, ack and start bit found
-                status++;
-        } else if (bit == 0) //status = 1, ack bit found
-            status++;
-    }
-    if (timeout >= 0) {
-        for (int i=0; i<multiturn_length; i++)
-            p_biss_data :> void;
-        for (int i=0; i<singleturn_length; i++) {
-            unsigned int bit;
-            p_biss_data :> bit;
-            position = position << 1;
-            position |= ((bit & 0b10) >> 1);
-        }
-    }
-    stop_clock(clk);
-
-    return position;
 }
 
 
@@ -305,7 +286,7 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
         configure_out_port(p_biss_data, clk, 0b1000); //to reconfigure p_biss_clk as output
 #endif
         readbuf = readbuf << 1;
-        readbuf |= ((bit & 0b10) >> 1); //FIXME use a 1-bit input port
+        readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         bitindex++;
     }
     stop_clock(clk);
@@ -367,6 +348,51 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
 }
 
 
+unsigned int read_biss_sensor_data_fast(port out p_biss_clk, port in p_biss_data, clock clk, unsigned a, unsigned b, int before_length, int data_length) {
+    unsigned int data = 0;
+    int status = 0;
+    int timeout = 8;
+
+    //clock and data port config
+    if (a) { // set a to 0 to not reconfig each time
+        configure_clock_rate(clk, a, b) ; // a/b MHz
+        configure_port_clock_output(p_biss_clk, clk);
+        set_port_inv(p_biss_clk);
+#if(BISS_DATA_PORT == ENC_CH1)//FIXME use a normal 1-bit output port
+        configure_out_port(p_biss_data, clk, 0b1000); //to configure p_biss_clk as output
+#else
+        configure_in_port(p_biss_data, clk);
+#endif
+    }
+
+    start_clock(clk);
+    while(status < 2 && timeout > 0) {
+        timeout--;
+        unsigned int bit;
+        p_biss_data :> bit;
+        bit = (bit & (1 << BISS_DATA_PORT_BIT));
+        if (status) {
+            if (bit) //status = 2, ack and start bit found
+                status++;
+        } else if (bit == 0) //status = 1, ack bit found
+            status++;
+    }
+    if (timeout >= 0) {
+        for (int i=0; i<before_length; i++)
+            p_biss_data :> void;
+        for (int i=0; i<data_length; i++) {
+            unsigned int bit;
+            p_biss_data :> bit;
+            data = data << 1;
+            data |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
+        }
+    }
+    stop_clock(clk);
+
+    return data;
+}
+
+
 { int, unsigned int, unsigned int } biss_encoder(unsigned int data[], biss_par biss_params) {
     int biss_data_length = biss_params.multiturn_length +  biss_params.singleturn_length + biss_params.status_length;
     unsigned int bytes = (biss_data_length-1)/32; //number of bytes used - 1
@@ -394,6 +420,8 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
         }
         readbuf = readbuf << 1;
     }
+    count &= ~(~0U <<  biss_params.multiturn_resolution);
+    position &= ~(~0U <<  biss_params.singleturn_resolution);
     count = sext(count, biss_params.multiturn_resolution);  //convert multiturn to signed
     { void, count } = macs(1 << biss_params.singleturn_resolution, count, 0, position); //convert multiturn to absolute count: ticks per turn * number of turns + position
     return { count, position, ~status };

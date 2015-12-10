@@ -13,18 +13,20 @@
 #define BISS_DATA_PORT             ENC_CH2 //channel configuration, needed for the configuration of the clock output port
 
 
-#define BISS_MULTITURN_RESOLUTION  12
-#define BISS_SINGLETURN_RESOLUTION 13
+#define BISS_MULTITURN_RESOLUTION  0
+#define BISS_SINGLETURN_RESOLUTION 18
 #define BISS_STATUS_LENGTH         2
-#define BISS_MULTITURN_LENGTH      BISS_MULTITURN_RESOLUTION+1 //resolution + filling bits
-#define BISS_SINGLETURN_LENGTH     BISS_SINGLETURN_RESOLUTION
-#define BISS_CRC_POLY              0b110000
+#define BISS_MULTITURN_LENGTH      BISS_MULTITURN_RESOLUTION //resolution + filling bits
+#define BISS_SINGLETURN_LENGTH     BISS_SINGLETURN_RESOLUTION + 1
+#define BISS_MAX_TICKS             (1 << (BISS_MULTITURN_RESOLUTION -1 + BISS_SINGLETURN_RESOLUTION))
 #define BISS_POLARITY              BISS_POLARITY_NORMAL
-#define BISS_MAX_TICKS             (1 << (BISS_MULTITURN_LENGTH -1 + BISS_SINGLETURN_LENGTH))
+#define BISS_CRC_POLY              0b0          // poly in reverse representation:  x^0 + x^1 + x^4 is 0b1100
+#define BISS_DATA_PORT_BIT         1            // bit number (0 = rightmost bit) when inputing from a multibit port
 #define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequercy: dividend/divisor in MHz
 #define BISS_CLOCK_DIVISOR         128          // supported frequencies are (tile frequency) / 2^n
-#define BISS_TIMEOUT               12*USEC_FAST // BiSS timeout in clock ticks
+#define BISS_USEC                  USEC_FAST    // number of ticks in a microseconds
 #define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
+#define BISS_TIMEOUT               15*BISS_USEC // BiSS timeout in clock ticks
 #define BISS_OFFSET_ELECTRICAL     2670         // offset to align with the electrical 0 of the motor, range [ 0 - 4095 ]
 
 
@@ -48,18 +50,6 @@ typedef struct {
     int offset_electrical;
 } biss_par;
 
-
-/**
- * @brief struct definition for velocity calculation from biss sensor
- */
-typedef struct BISS_VELOCITY_PARAM
-{
-    int previous_position;
-    int old_difference;
-    int filter_buffer[8];
-    int index;
-    int filter_length;
-} biss_velocity_par;
 
 /**
  * enum for the several status informations
