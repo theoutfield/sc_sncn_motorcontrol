@@ -5,7 +5,6 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
-#include <state_modes.h>
 #include <print.h>
 #include <profile.h>
 #include <profile_control.h>

@@ -10,10 +10,7 @@
 #include <refclk.h>
 #include <xscope.h>
 #include <print.h>
-//#include <statemachine.h>
-//#include <drive_modes.h>
 
-//#include <qei_client.h>
 #include <qei_service.h>
 #include <sine_table_big.h>
 #include <a4935.h>

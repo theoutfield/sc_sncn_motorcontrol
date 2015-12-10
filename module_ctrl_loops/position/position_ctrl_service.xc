@@ -8,7 +8,6 @@
 #include <print.h>
 
 #include <position_ctrl_service.h>
-#include <statemachine.h>
 #include <a4935.h>
 #include <internal_config.h>
 #include <hall_service.h>

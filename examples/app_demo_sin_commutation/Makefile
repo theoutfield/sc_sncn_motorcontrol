@@ -10,7 +10,7 @@ TARGET = SOMANET-C22
 APP_NAME = app_demo_sin_commutation
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_blocks module_board-support module_ctrl_loops module_hall module_motorcontrol module_motorcontrol_common module_pwm_symmetrical module_qei module_statemachine module_watchdog
+USED_MODULES = config_motor module_adc module_blocks module_board-support module_ctrl_loops module_hall module_motorcontrol module_motorcontrol_common module_pwm_symmetrical module_qei module_watchdog
 
 
 # The flags passed to xcc when building the application
