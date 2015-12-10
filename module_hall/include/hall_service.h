@@ -20,6 +20,9 @@
  */
 typedef struct {
     int pole_pairs;
+    int max_ticks_per_turn;
+    int max_ticks;
+    int sensor_polarity;
 } HallConfig;
 
 

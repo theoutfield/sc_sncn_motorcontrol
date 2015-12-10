@@ -18,54 +18,55 @@ void qei_test(interface QEIInterface client i_qei)
 	int direction;
 	int count=0;
 
-    while(1)
-    {
-        /* get position and velocity from QEI Sensor */
-        {   count, direction}= i_qei.get_qei_position_absolute();
-        {   position, direction}= i_qei.get_qei_position();
+	while(1)
+	{
+		/* get position and velocity from QEI Sensor */
+		{count, direction} = i_qei.get_qei_position_absolute();
+		{position, direction} = i_qei.get_qei_position();
 
-        velocity = i_qei.get_qei_velocity();
+		velocity = i_qei.get_qei_velocity();
 
-        xscope_int(COUNT, count);
-        xscope_int(POSITION, position);
-        xscope_int(VELOCITY, velocity);
+		xscope_int(COUNT, count);
+		xscope_int(POSITION, position);
+		xscope_int(VELOCITY, velocity);
 
-        delay_milliseconds(1); //, core_id, t);
-    }
+		delay_milliseconds(1);//, core_id, t);
+	}
 }
 
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
-int main(void) {
+int main(void)
+{
+    interface QEIInterface i_qei[5];
 
-interface    QEIInterface i_qei[5];
+	par
+	{
+		on tile[APP_TILE]:
+		{
+			/* Test QEI Sensor Client */
+			qei_test(i_qei[0]);
+		}
 
-    par
-    {
-        on tile[APP_TILE]:
-        {
-            /* Test QEI Sensor Client */
-            qei_test(i_qei[0]);
-        }
+		/************************************************************
+		 * IFM_TILE
+		 ************************************************************/
+		on tile[IFM_TILE]:
+		{
 
-        /************************************************************
-         * IFM_TILE
-         ************************************************************/
-        on tile[IFM_TILE]:
-        {
-
-            /* QEI Service Loop */
-            {
-                QEIConfig qei_config;
-                qei_config.index = QEI_WITH_INDEX;            // Indexed encoder
-                qei_config.real_counts = 16000;// 4 x 4000 ticks (Cuadrature encoder)
-                qei_config.sensor_polarity = QEI_POLARITY_NORMAL;// CW
-                qei_config.poles = 4;// 4 pole pairs on motor (for hall syncronization, not always used)
+			/* QEI Service Loop */
+			{
+			    QEIConfig qei_config;
+                    qei_config.index = QEI_WITH_INDEX;                  // Indexed encoder
+                    qei_config.real_counts = 16000;                     // 4 x 4000 ticks (Cuadrature encoder)
+                    qei_config.sensor_polarity = QEI_POLARITY_NORMAL;   // CW
+                    qei_config.poles = 4;                               // 4 pole pairs on motor (for hall syncronization, not always used)
+                    qei_config.max_ticks = 10 * qei_config.real_counts; // 10 turns
 
 				qei_service(qei_ports, qei_config, i_qei);
 			}
 		}
 	}
 
-    return 0;
+	return 0;
 }

@@ -167,6 +167,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
                  hall_config.pole_pairs = in_hall_config.pole_pairs;
                  qei_config.index = in_qei_config.index;
+                 qei_config.max_ticks_per_turn = in_qei_config.max_ticks_per_turn;
                  qei_config.real_counts = in_qei_config.real_counts;
                  nominal_speed = in_nominal_speed;
                  commutation_params.hall_offset_clk = in_commutation_config.hall_offset_clk;
