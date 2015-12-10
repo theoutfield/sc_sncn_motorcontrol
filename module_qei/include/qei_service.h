@@ -34,10 +34,8 @@ enum QEI_Polarity{ QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1}; /* Encod
  * @brief struct definition for quadrature sensor
  */
 typedef struct {
-    int max_ticks_per_turn;
     int real_counts;
-    int max_ticks;      // paramater allows for more turns
-    int index;          // no_index - 0 index - 1
+    int index;          // no_index - 0 index - 1 TODO rename to has_index
     int poles;
     int sensor_polarity;
 } QEIConfig;

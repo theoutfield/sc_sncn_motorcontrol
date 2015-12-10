@@ -26,16 +26,6 @@ int check_hall_config(HallConfig &hall_config){
         return ERROR;
     }
 
-    if(hall_config.sensor_polarity < 0 || hall_config.sensor_polarity > 1){
-        printstrln("Wrong Hall configuration: wrong polarity");
-        return ERROR;
-    }
-
-    if(hall_config.max_ticks < 0){
-        printstrln("Wrong Hall configuration: max ticks");
-        return ERROR;
-    }
-
     return SUCCESS;
 }
 
@@ -49,8 +39,6 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
         printstrln("Error while checking the Hall sensor configuration");
         return;
     }
-
-    hall_config.max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_TURN;
 
     printf("*************************************\n    HALL SENSOR SERVER STARTING\n*************************************\n");
 
@@ -83,7 +71,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
     int previous_position = 0;
     int count = 0;
     int first = 1;
-    int hall_max_count = hall_config.max_ticks;
+    int hall_max_count = 2147483648; //TODO remove variable and make a define
     int time_elapsed = 0;
     int init_state = INIT;
 
@@ -100,7 +88,6 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
     int index = 0;
     int raw_velocity = 0;
     int hall_crossover = (4096 * 9 )/10;
-    int status = 0; //1 changed
 
     /* Init hall sensor */
     hall_ports.p_hall :> pin_state;
@@ -158,40 +145,14 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
 
             case i_hall[int i].setHallConfig(HallConfig in_config):
 
-                    hall_config.max_ticks = in_config.max_ticks;
-                    hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
                     hall_config.pole_pairs = in_config.pole_pairs;
                     //FIXME Polarity, for some reason, was not updated. IT NEEDS TO.
-
-                    status = 1;
 
                     break;
 
             case i_hall[int i].checkBusy() -> int out_status:
-
                     out_status = init_state;
-
                     break;
-  /*          case !isnull(c_hall_p1) => c_hall_p1 :> int command:
-                switch (command) {
-
-                 case CHECK_BUSY:
-                    c_hall_p1 <: init_state;
-                    break;
-
-                case SET_HALL_PARAM_ECAT:
-                    c_hall_p1 :> hall_config.pole_pairs;
-                    c_hall_p1 :> hall_config.max_ticks;
-                    c_hall_p1 :> hall_config.max_ticks_per_turn;
-                    status = 1;
-                    break;
-
-                case HALL_FILTER_PARAM_REQ:
-                    c_hall_p1 <: hall_config.max_ticks_per_turn;
-                    break;
-                }
-                break;
-*/
 
             case tmr when timerafter(ts + PULL_PERIOD_USEC*250) :> ts: //12 usec 3000
                 switch(xreadings) {
@@ -346,13 +307,8 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                     previous_position = angle;
                 }
 
-                if (count > hall_max_count || count < -hall_max_count) {
+                if (count > hall_max_count - 1 || count < -hall_max_count) {
                     count = 0;
-                }
-
-                if (status == 1) {
-                     hall_max_count = hall_config.max_ticks;
-                     status = 0;
                 }
 
                 break;

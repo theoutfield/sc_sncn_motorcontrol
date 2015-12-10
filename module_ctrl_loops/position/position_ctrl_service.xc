@@ -217,7 +217,6 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
             qei_config.index = in_qei_params.index;
             qei_config.real_counts = in_qei_params.real_counts;
-            qei_config.max_ticks_per_turn = in_qei_params.max_ticks_per_turn;
             break;
 
         case i_position_control[int i].set_position_sensor(int in_sensor_used):
