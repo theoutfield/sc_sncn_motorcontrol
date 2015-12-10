@@ -100,7 +100,7 @@ int main(void) {
 #ifdef AD7265
                 foc_adc_7265_continuous_loop(i_adc, adc_ports);
 #else
-                adc_service(i_adc, adc_ports, c_adctrig);
+                adc_service(adc_ports, c_adctrig, i_adc);
 #endif
 
                 /* Watchdog Server */
@@ -111,7 +111,7 @@ int main(void) {
 #endif
 
                 /* PWM Loop */
-                pwm_triggered_service( pwm_ports, c_pwm_ctrl, c_adctrig);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
 
                 /* Hall Server */
                 {
