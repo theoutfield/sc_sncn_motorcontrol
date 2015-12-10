@@ -8,7 +8,6 @@
 #include <filter_blocks.h>
 #include <xscope.h>
 #include <internal_config.h>
-#include <statemachine.h>
 #include <stdio.h>
 #include <a4935.h>
 #include <motorcontrol_service.h>
