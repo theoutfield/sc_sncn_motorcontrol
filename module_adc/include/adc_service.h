@@ -43,4 +43,4 @@ typedef struct {
     AD7265Ports ad7265_ports;
 } ADCPorts;
 
-void adc_service(interface ADCInterface server adc_interface[3], ADCPorts &adc_ports, chanend ?c_trigger);
+void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server adc_interface[3]);
