@@ -21,7 +21,6 @@
 
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <qei_config.h>
-#include <hall_config.h>
 #include <motorcontrol_config.h>
 #include <control_config.h>
 
@@ -60,7 +59,7 @@ int main(void)
 	// Motor control channels
 	chan c_adctrig, c_pwm_ctrl;
 
-	interface WatchdogInterface i_watchdog[3];
+	interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[3];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
@@ -118,6 +117,14 @@ int main(void)
                 /* ADC Loop */
                 adc_service(adc_ports, c_adctrig, i_adc);
 
+                /* Hall sensor Service */
+                {
+                    HallConfig hall_config;
+                        hall_config.pole_pairs = POLE_PAIRS;
+
+                    hall_service(hall_ports, hall_config, i_hall);
+                }
+
                 /* QEI Service */
                 {
                     QEIConfig qei_config;
@@ -126,12 +133,7 @@ int main(void)
                     qei_service(qei_ports, qei_config, i_qei);
                 }
 
-                {
-                    HallConfig hall_config;
-                    init_hall_config(hall_config);
 
-                    hall_service(hall_ports, hall_config, i_hall);
-                }
 
                 /* Motor Commutation loop */
                 {

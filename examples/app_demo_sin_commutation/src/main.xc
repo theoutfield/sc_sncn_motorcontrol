@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.inc>
-#include <IFM_DC1K-rev-c.inc>
+#include <IFM_DC100-rev-b.inc>
 
 
 /**
@@ -11,7 +11,6 @@
 #include <tuning.h>
 
 #include <hall_service.h>
-#include <hall_config.h>
 #include <motorcontrol_config.h>
 
 #ifdef AD7265
@@ -26,7 +25,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
-#define VOLTAGE 200 //+/- 4095
+#define VOLTAGE 1000 //+/- 4095
 
 #ifdef AD7265
 on tile[IFM_TILE]: adc_ports_t adc_ports =
@@ -54,9 +53,10 @@ void adc_client(client interface ADC i_adc, chanend c_hall_){
 
 void adc_client(interface ADCInterface client i_adc, interface HallInterface client i_hall){
 
+    int b, c;
+    unsigned state;
+
     while (1) {
-        int b, c;
-        unsigned state;
         {b, c} = i_adc.get_currents();
         state = i_hall.get_hall_pinstate();
         xscope_int(PHASE_B, b);
@@ -71,7 +71,7 @@ int main(void) {
     // Motor control interfaces
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
-    interface WatchdogInterface i_watchdog[3];
+    interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[5];
     interface HallInterface i_hall[5];
     interface MotorcontrolInterface i_motorcontrol[5];
@@ -79,21 +79,21 @@ int main(void) {
     par
     {
 
-        on tile[APP_TILE]:
+        on tile[APP_TILE_1]:
         {
             /* WARNING: only one blocking task is possible per tile. */
             /* Waiting for a user input blocks other tasks on the same tile from execution. */
-           // run_offset_tuning(VOLTAGE, i_motorcontrol[0]);
+            run_offset_tuning(VOLTAGE, i_motorcontrol[0]);
         }
 
-        on tile[APP_TILE]: //adc_client(i_adc[0], i_hall[1]);
-        { int a,b;
+        on tile[APP_TILE_2]: adc_client(i_adc[0], i_hall[1]);
+     /*   { int a,b;
             while(1){
                 a = i_adc[0].get_temperature();
                 printf("%d %d\n",a,b);
             }
         }
-
+*/
         on tile[IFM_TILE]:
         {
             par
@@ -112,10 +112,10 @@ int main(void) {
                 /* PWM Loop */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
 
-                /* Hall Server */
+                /* Hall sensor Service */
                 {
                     HallConfig hall_config;
-                    init_hall_config(hall_config);
+                        hall_config.pole_pairs = POLE_PAIRS;
 
                     hall_service(hall_ports, hall_config, i_hall);
                 }

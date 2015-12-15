@@ -14,15 +14,14 @@
 #define FILTER_LENGTH_HALL  16
 #define PULL_PERIOD_USEC 12
 
-#define HALL_TICKS_PER_TURN 4096
+#define HALL_TICKS_PER_ELECTRICAL_ROTATION 4096
 /**
  * @brief Structure definition for hall sensor
  */
 typedef struct {
     int pole_pairs;
-    int max_ticks_per_turn;
-    int max_ticks;
-    int sensor_polarity;
+    //int max_ticks_per_turn;
+    //int sensor_polarity;
 } HallConfig;
 
 

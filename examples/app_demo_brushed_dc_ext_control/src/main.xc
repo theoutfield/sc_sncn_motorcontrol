@@ -24,7 +24,7 @@ int main(void) {
     // Motor control channels
     chan c_pwm_ctrl;
 
-    interface WatchdogInterface i_watchdog[3];
+    interface WatchdogInterface i_watchdog[2];
     interface MotorcontrolInterface i_motorcontrol[5];
     interface ADCInterface i_adc[5];
 
