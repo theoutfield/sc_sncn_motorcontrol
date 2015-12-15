@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.inc>
-#include <IFM_DC100-rev-b.inc>
+#include <IFM_DC1K-rev-c.inc>
 
 #include <pwm_service.h>
 #include <qei_service.h>
@@ -42,7 +42,7 @@ int main(void)
     // Motor control channels
     chan c_pwm_ctrl;            // pwm channel
 
-    interface WatchdogInterface i_watchdog[3];
+    interface WatchdogInterface i_watchdog[2];
     interface MotorcontrolInterface i_motorcontrol[5];
     interface QEIInterface i_qei[5];
 

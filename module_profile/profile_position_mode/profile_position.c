@@ -76,7 +76,7 @@ int rpm_to_ticks_qei(int rpm, QEIConfig qei_params)
 
 int rpm_to_ticks_hall(int rpm, HallConfig hall_config)
 {
-    int ticks = (rpm * hall_config.max_ticks_per_turn)/60;
+    int ticks = (rpm * hall_config.pole_pairs*HALL_TICKS_PER_ELECTRICAL_ROTATION)/60;
     return ticks;
 }
 

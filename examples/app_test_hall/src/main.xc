@@ -55,8 +55,6 @@ int main(void)
         {
             HallConfig hall_config;
                 hall_config.pole_pairs = 4;                         // 4 Pole-pairs
-                hall_config.sensor_polarity = 1;                    // CW
-                hall_config.max_ticks = 10 * HALL_TICKS_PER_TURN;   // 10 turns
 
             hall_service(hall_ports, hall_config, i_hall);
         }

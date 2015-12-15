@@ -185,7 +185,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
                 out_position = actual_position;
                 break;
 
-        case i_position_control[int i].get_set_position() -> int out_set_position:
+        case i_position_control[int i].get_target_position() -> int out_set_position:
 
                 out_set_position = target_position;
                 break;

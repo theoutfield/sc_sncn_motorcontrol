@@ -21,7 +21,6 @@
 
 //Configuration headers
 #include <qei_config.h>
-#include <hall_config.h>
 #include <motorcontrol_config.h>
 #include <control_config.h>
 
@@ -57,7 +56,7 @@ int main(void)
 	// Motor control channels
 	chan c_pwm_ctrl;			// pwm channel
 
-	interface WatchdogInterface i_watchdog[3];
+	interface WatchdogInterface i_watchdog[2];
 	interface MotorcontrolInterface i_motorcontrol[5];
 	interface HallInterface i_hall[5];
 	interface QEIInterface i_qei[5];
@@ -78,12 +77,10 @@ int main(void)
 		    {
 		        /* Read actual position from the Position Control Server */
 		        actual_position = i_position_control[1].get_position();
-		        target_position = i_position_control[1].get_set_position();
-		        follow_error = target_position - actual_position;
+		        target_position = i_position_control[1].get_target_position();
 
-		        xscope_int(ACTUAL_POSITION, actual_position);
-		        xscope_int(TARGET_POSITION, target_position);
-		        xscope_int(FOLLOW_ERROR, follow_error);
+		        xscope_int(TARGET_POSITION, target_position/10); //Divided by 10 for better displaying
+		        xscope_int(ACTUAL_POSITION, actual_position/10); //Divided by 10 for better displaying
 
 		        delay_milliseconds(1); /* 1 ms wait */
 		    }
@@ -113,6 +110,14 @@ int main(void)
                 /* Watchdog Server */
                 watchdog_service(wd_ports, i_watchdog);
 
+                /* Hall sensor Service */
+                {
+                    HallConfig hall_config;
+                        hall_config.pole_pairs = POLE_PAIRS;
+
+                    hall_service(hall_ports, hall_config, i_hall);
+                }
+
                 /* QEI Service */
                 {
                     QEIConfig qei_config;
@@ -120,13 +125,6 @@ int main(void)
 
                     qei_service(qei_ports, qei_config, i_qei);
                 }
-
-                {
-                	HallConfig hall_config;
-                	init_hall_config(hall_config);
-
-                	hall_service(hall_ports, hall_config, i_hall);
-            	}
 
 				/* Motor Commutation loop */
 				{

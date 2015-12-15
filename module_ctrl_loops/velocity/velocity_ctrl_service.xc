@@ -6,6 +6,7 @@
 
 #include <velocity_ctrl_service.h>
 #include <filter_blocks.h>
+#include <limits.h>
 #include <xscope.h>
 #include <internal_config.h>
 #include <stdio.h>
@@ -88,7 +89,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
     int activate = 0;
     int init_state = INIT_BUSY;
     int qei_crossover = 0;
-    int hall_crossover = 0;
+    int const hall_crossover = INT_MAX - INT_MAX/10;
     int compute_flag = 0;
     int fet_state = 0;
 
@@ -113,7 +114,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
         else {
             speed_factor_hall = hall_config.pole_pairs*4096*(velocity_ctrl_params.Loop_time/MSEC_STD); // variable pole_pairs
         }
-        hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
+//        hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
     }
     else if (velocity_ctrl_params.sensor_used >= QEI){
         if(velocity_ctrl_params.Loop_time == MSEC_FAST){//FixMe: implement reference clock check
@@ -268,8 +269,8 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
         case i_velocity_control[int i].set_velocity_ctrl_hall_param(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
-            hall_config.max_ticks = in_config.max_ticks;
-            hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
+            //hall_config.max_ticks = in_config.max_ticks;
+            //hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
             break;
 
         case i_velocity_control[int i].set_velocity_ctrl_qei_param(QEIConfig in_params):
@@ -288,7 +289,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
 
             if(in_sensor_used == HALL) {
                 speed_factor_hall = hall_config.pole_pairs * 4096 * (velocity_ctrl_params.Loop_time/MSEC_STD);
-                hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
+                //hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
 
             } else if(in_sensor_used >= QEI) {
                 speed_factor_qei = qei_config.real_counts * (velocity_ctrl_params.Loop_time/MSEC_STD);
