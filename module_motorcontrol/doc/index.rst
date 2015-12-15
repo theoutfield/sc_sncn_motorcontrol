@@ -1,9 +1,10 @@
 ==================================
-SOMANET BLDC Commutation Component
+SOMANET BLDC Motorcontrol Module
 ==================================
 
-Component Overview
-==================
+.. contents:: In this document
+    :backlinks: none
+    :depth: 3
 
 Like shown in the core diagram below, 4 timing critical task are executed on the SOMANET IFM Tile:
 
@@ -22,8 +23,8 @@ As shown, custom controllers should run in a different tile to avoid influencing
 
 .. _commutation_programming_label:
 
-Programming Guide
-=================
+How to use
+===========
 
 Running the commutation server
 ------------------------------
@@ -156,21 +157,23 @@ A motor voltage can be applied by a simple function call:
 .. note:: The commutation value's range is -13739 to 13739
 
 
-Commutation API
-===============
-
-Client API
-----------
-
-.. doxygenfunction:: set_commutation_sinusoidal
-
-Server API
-----------------
-
-.. doxygenfunction:: init_commutation_param
-.. doxygenfunction:: commutation_sinusoidal
+API
+====
 
 Types
 -----
 
-.. doxygenstruct:: commutation_par
+.. doxygenenum:: MotorType
+.. doxygenstruct:: FetDriverPorts
+.. doxygenstruct:: MotorcontrolConfig
+
+Service
+--------
+
+.. doxygenfunction:: motorcontrol_service
+
+Interface
+---------
+
+.. doxygeninterface:: MotorcontrolInterface
+
