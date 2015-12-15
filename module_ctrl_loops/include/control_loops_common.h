@@ -12,10 +12,10 @@ typedef struct {
     int Kp_n, Kp_d; /**< Kp = Kp_n/Kp_d */
     int Ki_n, Ki_d; /**< Ki = Ki_n/Ki_d */
     int Kd_n, Kd_d; /**< Kd = Kd_n/Kd_d */
-    int Integral_limit; /**< Lorem ipsum... */
-    int Control_limit; /**< Lorem ipsum... */
-    int Loop_time; /**< Lorem ipsum... */
-    int sensor_used; /**< Lorem ipsum... */
+    int Integral_limit;
+    int Control_limit;
+    int Loop_time;
+    int sensor_used;
 } ControlConfig;
 
 /**
@@ -23,11 +23,11 @@ typedef struct {
  */
 typedef struct
 {
-    int nominal_motor_speed; /**< Lorem ipsum... */
-    int nominal_current; /**< Lorem ipsum... */
-    int motor_torque_constant; /**< Lorem ipsum... */
-    int max_torque; /**< Lorem ipsum... */
-    int polarity; /**< Lorem ipsum... */
+    int nominal_motor_speed;
+    int nominal_current;
+    int motor_torque_constant;
+    int max_torque;
+    int polarity;
 } CyclicSyncTorqueConfig;
 
 /**
@@ -35,11 +35,11 @@ typedef struct
  */
 typedef struct
 {
-    int max_motor_speed; /**< Lorem ipsum... */
-    int nominal_current; /**< Lorem ipsum... */
-    int motor_torque_constant; /**< Lorem ipsum... */
-    int polarity; /**< Lorem ipsum... */
-    int max_acceleration; /**< Lorem ipsum... */
+    int max_motor_speed;
+    int nominal_current;
+    int motor_torque_constant;
+    int polarity;
+    int max_acceleration;
 } CyclicSyncVelocityConfig;
 
 /**
@@ -47,8 +47,8 @@ typedef struct
  */
 typedef struct
 {
-    CyclicSyncVelocityConfig velocity_config; /**< Lorem ipsum... */
-    int max_following_error; /**< Lorem ipsum... */
-    int max_position_limit; /**< Lorem ipsum... */
-    int min_position_limit; /**< Lorem ipsum... */
+    CyclicSyncVelocityConfig velocity_config;
+    int max_following_error;
+    int max_position_limit;
+    int min_position_limit;
 } CyclicSyncPositionConfig;
