@@ -10,8 +10,6 @@
 #include <position_ctrl_service.h>
 #include <profile_control.h>
 
-#include <qei_config.h>
-#include <hall_config.h>
 #include <motorcontrol_config.h>
 #include <control_config.h>
 
@@ -67,7 +65,7 @@ int main(void)
             {
                 /* Read actual position from the Position Control Server */
                 actual_position = i_position_control[1].get_position();
-                target_position = i_position_control[1].get_set_position();
+                target_position = i_position_control[1].get_target_position();
                 follow_error = target_position - actual_position;
 
                 xscope_int(ACTUAL_POSITION, actual_position);
@@ -105,13 +103,16 @@ int main(void)
                 /* Watchdog Server */
                 watchdog_service(wd_ports, i_watchdog);
 
-                /* QEI Service */
-                {
-                    QEIConfig qei_config;
-                    init_qei_config(qei_config);
+                /* Quadrature encoder sensor Service */
+                 {
+                     QEIConfig qei_config;
+                         qei_config.signal_type = QEI_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
+                         qei_config.index_type = QEI_INDEX_TYPE;                 // Indexed encoder?
+                         qei_config.ticks_resolution = ENCODER_RESOLUTION;       // Encoder resolution
+                         qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
-                    qei_service(qei_ports, qei_config, i_qei);
-                }
+                     qei_service(qei_ports, qei_config, i_qei);
+                 }
 
                 {
                     MotorcontrolConfig motorcontrol_config;
