@@ -17,8 +17,14 @@
 #define ERROR 0
 #define SUCCESS 1
 
+/**
+ * Lorem ipsum...
+ */
 typedef enum {BDC_MOTOR = 10, BLDC_MOTOR = 11} MotorType;
 
+/**
+ * Lorem ipsum...
+ */
 typedef struct {
     port ?p_coast;
     out port ?p_esf_rst_pwml_pwmh;
@@ -26,9 +32,12 @@ typedef struct {
     port ?p_ff2;
 } FetDriverPorts;
 
+/**
+ * Lorem ipsum...
+ */
 typedef struct {
     MotorType motor_type;
-    int angle_variance;         /* max allowed variance depending on speed */
+    int angle_variance; /**< max allowed variance depending on speed */
     int nominal_speed;
     int qei_forward_offset;
     int qei_backward_offset;
@@ -38,36 +47,75 @@ typedef struct {
     int commutation_loop_freq;
 } MotorcontrolConfig;
 
+/**
+ * Lorem ipsum...
+ */
 interface MotorcontrolInterface{
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int checkBusy();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param voltage Lorem ipsum...
+     */
     void setVoltage(int voltage);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param parameters Lorem ipsum...
+     */
     void setParameters(MotorcontrolConfig parameters);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     MotorcontrolConfig getConfig();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param sensor Lorem ipsum...
+     */
     void setSensor(int sensor);
+     /**
+     * @brief Lorem ipsum...
+     */
     void disableFets();
+    /**
+     * @brief Lorem ipsum...
+     */
     void enableFets();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int getFetsState();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param hall_config Lorem ipsum...
+     * @param qei_config Lorem ipsum...
+     * @param commutation_config Lorem ipsum...
+     * @param in_nominal_speed Lorem ipsum...
+     */
     void setAllParameters(HallConfig hall_config, QEIConfig qei_config, MotorcontrolConfig commutation_config, int in_nominal_speed);
 };
 
 /**
  * @brief Sinusoidal based Commutation Loop
  *
- * @param[in] c_hall A chanend connected to the hall server
- * @param[in] c_qei A chanend connected to the qei server (QEI)
- * @param[in] c_signal A chanend for signaling after initialization of commutation loop
- * @param[in] c_watchdog A chanend connected to the watchdog
- * @param[in] c_commutation_p1 channel for receiving motor voltage input value - priority 1 (highest) 1 ... (lowest) 3
- * @param[in] c_commutation_p2 channel for receiving motor voltage input value - priority 2
- * @param[in] c_commutation_p3 channel for receiving motor voltage input value - priority 3
- * @param[out] c_pwm_ctrl channel to set PWM level output to motor phases
- * @param[out] p_ifm_esf_rstn_pwml_pwmh port to configure motor FET driver
- * @param[out] p_ifm_coastn port to enable motor FET driver
- * @param[out] p_ifm_ff1
- * @param[out] p_ifm_ff2
- * @param[in] hall_config struct defines the pole-pairs and gear ratio
- * @param[in] qei_params the struct defines sensor type and resolution parameters for QEI
- * @param[in] commutation_params struct defines the commutation angle parameters
+ * @param fet_driver_ports Lorem ipsum...
+ * @param motorcontrol_config Lorem ipsum...
+ * @param c_pwm_ctrl channel to set PWM level output to motor phases
+ * @param i_hall Lorem ipsum...
+ * @param i_qei Lorem ipsum...
+ * @param i_watchdog Lorem ipsum...
+ * @param i_motorcontrol[5] Lorem ipsum...
  *
  */
 [[combinable]]
