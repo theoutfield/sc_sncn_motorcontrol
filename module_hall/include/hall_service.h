@@ -14,50 +14,88 @@
 #define FILTER_LENGTH_HALL  16
 #define PULL_PERIOD_USEC 12
 
+
 #define HALL_TICKS_PER_ELECTRICAL_ROTATION 4096
+
 /**
- * @brief Structure definition for hall sensor
+ * Structure definition for hall sensor
  */
 typedef struct {
     int pole_pairs;
-    //int max_ticks_per_turn;
-    //int sensor_polarity;
 } HallConfig;
 
 
-/**
-* @brief Structure containing hall sensor port/s
-*/
 #ifdef __XC__
+/**
+* Structure containing hall sensor port/s
+*/
 typedef struct {
-    port p_hall;
+    port p_hall; /**< Lorem ipsum... */
 } HallPorts;
 
-
+/**
+ * @brief Lorem ipsum...
+ */
 interface HallInterface {
+    /**
+     * @brief Gets hall pinstate
+     *
+     * @return Lorem ipsum...
+     */
     unsigned get_hall_pinstate();
+    /**
+     * @brief Gets position from Hall Server
+     *
+     * @return the position in the range [0 - 4095] which maps to [0 - 359]/pole-pairs
+     */
     int get_hall_position();
+
+    /**
+     * @brief Gets absolute position from Hall Server
+     *
+     * @return the counted up position (compensates for pole-pairs) in the range [0 - 4095] * pole-pairs
+     * @return the counted up position (compensates for pole-pairs) in the range [0 - 4095] * pole-pairs
+     */
     {int, int} get_hall_position_absolute();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int get_hall_velocity();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param offset Lorem ipsum...
+     */
     void reset_hall_count(int offset);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     HallConfig getHallConfig();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param in_config Lorem ipsum...
+     */
     void setHallConfig(HallConfig in_config);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int checkBusy();
 };
 
 /**
- * @brief A basic hall sensor server
+ * @brief Lorem ipsum...
  *
- * @param[out] c_hall_p1 the control channel for reading hall position in order of priority (highest) 1 ... (lowest) 6
- * @param[out] c_hall_p2 the control channel for reading hall position (priority 2)
- * @param[out] c_hall_p3 the control channel for reading hall position (priority 3)
- * @param[out] c_hall_p4 the control channel for reading hall position (priority 4)
- * @param[out] c_hall_p5 the control channel for reading hall position (priority 5)
- * @param[out] c_hall_p6 the control channel for reading hall position (priority 6)
- * @param[in] hall_ports structure containing the ports for reading the hall sensor data
- * @param hall_config structure defines the pole-pairs and gear ratio
+ * @param hall_ports Lorem ipsum...
+ * @param hall_config Lorem ipsum...
+ * @param i_hall[5] Lorem ipsum...
  */
-
 [[combinable]]
 void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                     interface HallInterface server i_hall[5]);
