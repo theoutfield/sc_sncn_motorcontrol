@@ -1,19 +1,18 @@
-=======================================
-SOMANET Hall Sensor Interface Component
-=======================================
+===========================
+SOMANET Hall Sensor Module
+===========================
 
-Component Overview
-==================
+.. contents:: In this document
+    :backlinks: none
+    :depth: 3
 
-.. figure:: images/core-diagram-hall-interface.png
-   :width: 60%
+Lorem ipsum...
 
-   Core diagram
+.. image:: images/core-diagram-hall-interface.png
+   :width: 50%
 
-.. _hall_programming_label:
-
-Programming Guide
-=================
+How to use
+==========
 
 Getting position and velocity information from your Hall sensor
 ---------------------------------------------------------------
@@ -111,23 +110,25 @@ Getting velocity and position information from the hall server is easy:
     }
 
 
-Hall Interface API
-==================
-
-Client API
-----------
-
-.. doxygenfunction:: get_hall_position
-.. doxygenfunction:: get_hall_position_absolute
-.. doxygenfunction:: get_hall_velocity
-.. doxygenfunction:: reset_hall_count
-
-Server API
-----------
-
-.. doxygenfunction:: run_hall
+API
+===
 
 Types
 -----
 
-.. doxygenstruct:: hall_par
+.. doxygenstruct:: HallConfig
+.. doxygenstruct:: HallPorts
+
+Service
+-------
+
+Lorem ipsum...
+
+.. doxygenfunction:: hall_service
+
+Interface
+---------
+
+Lorem ipsum...
+
+.. doxygeninterface:: HallInterface
