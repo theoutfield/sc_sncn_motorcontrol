@@ -14,18 +14,71 @@
 
 #define FILTER_LENGTH_TORQUE 80
 
+/**
+ * @brief Lorem ipsum...
+ */
 interface TorqueControlInterface{
-
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int check_busy();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int check_torque_ctrl_state();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int get_torque();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param in_torque Lorem ipsum...
+     */
     void set_torque(int in_torque);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int get_set_torque();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param torque_ctrl_params Lorem ipsum...
+     */
     void set_torque_ctrl_param(ControlConfig torque_ctrl_params);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param hall_config Lorem ipsum...
+     */
     void set_torque_ctrl_hall_param(HallConfig hall_config);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param qei_params Lorem ipsum...
+     */
     void set_torque_ctrl_qei_param(QEIConfig qei_params);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param sensor_used Lorem ipsum...
+     */
     void set_torque_sensor(int sensor_used);
+    /**
+     * @brief Lorem ipsum...
+     */
     void enable_torque_ctrl();
+    /**
+     * @brief Lorem ipsum...
+     */
     void shutdown_torque_ctrl();
 
 };
@@ -34,7 +87,7 @@ interface TorqueControlInterface{
  * @brief Initialise Torque Control Loop
  *
  * @Input Channel
- * @param c_torque_ctrl channel to signal initialisation
+ * @param i_torque_control Lorem ipsum...
  */
 int init_torque_control(interface TorqueControlInterface client i_torque_control);
 
@@ -57,7 +110,7 @@ int torque_limit(int torque, int max_torque_limit);
  * @param c_torque_ctrl channel to signal new target torque
  *
  * @Input
- * @param cst_param struct defines the motor parameters and torque limits
+ * @param cst_params struct defines the motor parameters and torque limits
  * @param target_torque is the new target torque
  * @param torque_offset defines offset in torque
  */
@@ -66,20 +119,12 @@ void set_torque_cst(CyclicSyncTorqueConfig & cst_params, int target_torque, int 
 /**
  * @brief Torque Control Loop
  *
- * @Input
  * @param torque_ctrl_params struct defines the torque control parameters
- * @param hall_params struct defines the poles for hall sensor and gear-ratio
- * @param qei_params struct defines the resolution for qei sensor and gear-ratio
- * @param sensor_select specify the sensor to use via HALL/QEI defines
- *
- * @Input Channel
- * @param c_adc channel to receive torque information from current sensor
- * @param c_hall channel to receive position information from hall
- * @param c_qei channel to receive position information from qei
- * @param c_torque channel to receive/send torque control information
- *
- * @Output Channel
- * @param c_commutation channel to send motor voltage input value
+ * @param adc_if Lorem ipsum...
+ * @param commutation_interface Lorem ipsum...
+ * @param i_hall Lorem ipsum...
+ * @param i_qei Lorem ipsum...
+ * @param i_torque_control[3] Lorem ipsum...
  *
  */
 void torque_control_service(ControlConfig &torque_ctrl_params,
