@@ -6,7 +6,7 @@
  */
 #include <refclk.h>
 #include <control_config.h>
-#include <bldc_motor_config.h>
+#include <user_config.h>
 
 
 void init_velocity_control_config(ControlConfig &velocity_ctrl_params){

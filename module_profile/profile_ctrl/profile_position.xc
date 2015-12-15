@@ -4,12 +4,10 @@
  *      Implements position profile control function
  * @author Synapticon GmbH <support@synapticon.com>
 */
-
+#include <refclk.h>
 #include <print.h>
 #include <profile.h>
 #include <profile_control.h>
-
-
 
 void init_position_profiler(ProfilePositionConfig profile_position_config,
                                 interface PositionControlInterface client i_position_control){

@@ -4,6 +4,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
+#include <xs1.h>
 #include <print.h>
 
 #include <motorcontrol_service.h>
@@ -17,21 +18,11 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
         return ERROR;
     }
 
-    if(commutation_params.nominal_speed <= 0){
-        printstrln("Wrong Motorcontrol configuration: wrong nominal speed");
-        return ERROR;
-    }
-
     if(commutation_params.motor_type == BLDC_MOTOR){
         if(commutation_params.bldc_winding_type < 0 || commutation_params.bldc_winding_type > 2){
             printstrln("Wrong Motorcontrol configuration: wrong winding");
             return ERROR;
         }
-    }
-
-    if(commutation_params.angle_variance <= 0){
-        printstrln("Wrong Motorcontrol configuration: angle variance");
-        return ERROR;
     }
 
     return SUCCESS;

@@ -10,7 +10,7 @@
 #include <hall_service.h>
 #include <motorcontrol_service.h>
 
-#include <motorcontrol_config.h>
+#include <user_config.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -67,10 +67,14 @@ int main(void) {
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
-                /* Motor Commutation loop */
+                /* Motor Commutation Service */
                 {
                     MotorcontrolConfig motorcontrol_config;
-                    init_motorcontrol_config(motorcontrol_config);
+                        motorcontrol_config.motor_type = BLDC_MOTOR;
+                        motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                        motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+                        motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+                        motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                             c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);

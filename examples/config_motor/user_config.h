@@ -8,6 +8,11 @@
 #include <internal_config.h>
 #include <qei_service.h>
 #include <hall_service.h>
+#include <motorcontrol_service.h>
+
+
+
+#define MOTOR_TYPE  BLDC_MOTOR
 
 /**
  * Define Motor Specific Constants (found in motor specification sheet)
@@ -38,7 +43,6 @@
  */
 #define QEI_SIGNAL_TYPE            QEI_RS422_SIGNAL
 
-
 /* Polarity is used to keep all position sensors to count ticks in the same direction
  *  (QEI_POLARITY_NORMAL/QEI_POLARITY_INVERTED) */
 #define QEI_SENSOR_POLARITY         QEI_POLARITY_NORMAL
@@ -52,13 +56,15 @@
 #define COMMUTATION_OFFSET_CCLK     2460//2731
 
 /* Motor Winding type (STAR_WINDING/DELTA_WINDING) */
-#define WINDING_TYPE                DELTA_WINDING
+#define BLDC_WINDING_TYPE          DELTA_WINDING
 
 /* Changes direction of the motor drive  (1 /-1) */
 #define POLARITY                    1
 
-/* Reduce when sine commutation loops are combined. 250MHz reference clock is considered! */
-#define COMMUTATION_LOOP_FREQUENCY_KHZ  10
+/* Commutation loop period in us.
+ * Reduce when sine commutation loops are combined. 250MHz reference clock is considered!
+ */
+#define COMMUTATION_LOOP_PERIOD     60    //us
 
 /* Profile defines (Mandatory for profile modes) */
 #define MAX_PROFILE_VELOCITY        MAX_NOMINAL_SPEED

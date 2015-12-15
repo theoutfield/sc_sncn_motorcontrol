@@ -20,7 +20,7 @@
 #include <profile_control.h>
 
 //Configuration
-#include <motorcontrol_config.h>
+#include <user_config.h>
 #include <control_config.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -32,7 +32,7 @@ QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 /* Test Profile Velocity function */
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
-	int target_velocity = 300;	 		// rpm
+	int target_velocity = 30;	 		// rpm
 	int acceleration 	= 1000;			// rpm/s
 	int deceleration 	= 1000;			// rpm/s
 
@@ -129,14 +129,18 @@ int main(void)
                      qei_service(qei_ports, qei_config, i_qei);
                  }
 
-                /* Motor Commutation loop */
-                {
-                    MotorcontrolConfig motorcontrol_config;
-                    init_motorcontrol_config(motorcontrol_config);
+                 /* Motor Commutation Service */
+                 {
+                     MotorcontrolConfig motorcontrol_config;
+                         motorcontrol_config.motor_type = BLDC_MOTOR;
+                         motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                         motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+                         motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+                         motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
-                }
+                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                             c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
+                 }
             }
 		}
 	}
