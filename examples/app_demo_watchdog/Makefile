@@ -1,8 +1,8 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-#TARGET = SOMANET-C22
-TARGET = SOMANET-C21
+TARGET = SOMANET-C22
+#TARGET = SOMANET-C21
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -10,8 +10,7 @@ TARGET = SOMANET-C21
 APP_NAME = app_demo_watchdog
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_blocks module_board-support module_ctrl_loops module_hall module_motorcontrol module_motorcontrol_common module_pwm_symmetrical module_qei module_watchdog
-
+USED_MODULES = config_motor module_adc module_blocks module_board-support module_ctrl_loops module_hall module_motorcontrol module_motorcontrol_common module_profile module_pwm_symmetrical module_qei module_watchdog
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
@@ -20,10 +19,6 @@ USED_MODULES = config_motor module_adc module_blocks module_board-support module
 # xcc for the final link (mapping) stage.
 XCC_FLAGS_Debug = -g -O0 -report
 XCC_FLAGS_Release = -g -O3
-
-# The XCORE_ARM_PROJECT variable, if set to 1, configures this
-# project to create both xCORE and ARM binaries.
-XCORE_ARM_PROJECT = 0
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
 VERBOSE = 0

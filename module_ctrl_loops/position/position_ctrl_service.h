@@ -18,7 +18,7 @@ interface PositionControlInterface{
     int check_busy();
     void set_position(int target_position);
     int get_position();
-    int get_set_position();
+    int get_target_position();
     void set_position_ctrl_param(ControlConfig position_ctrl_params);
     void set_position_ctrl_hall_param(HallConfig hall_config);
     void set_position_ctrl_qei_param(QEIConfig qei_params);

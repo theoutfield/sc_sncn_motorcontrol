@@ -21,7 +21,6 @@
 
 //Configuration
 #include <qei_config.h>
-#include <hall_config.h>
 #include <motorcontrol_config.h>
 #include <control_config.h>
 
@@ -54,7 +53,7 @@ int main(void)
 {
 	chan c_pwm_ctrl;     // pwm channel
 
-	interface WatchdogInterface i_watchdog[3];
+	interface WatchdogInterface i_watchdog[2];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
     interface MotorcontrolInterface i_motorcontrol[5];
@@ -112,19 +111,20 @@ int main(void)
                 /* Watchdog Server */
                 watchdog_service(wd_ports, i_watchdog);
 
+                /* Hall sensor Service */
+                {
+                    HallConfig hall_config;
+                        hall_config.pole_pairs = POLE_PAIRS;
+
+                    hall_service(hall_ports, hall_config, i_hall);
+                }
+
                 /* QEI Service */
                 {
                     QEIConfig qei_config;
                     init_qei_config(qei_config);
 
                     qei_service(qei_ports, qei_config, i_qei);
-                }
-
-                {
-                    HallConfig hall_config;
-                    init_hall_config(hall_config);
-
-                    hall_service(hall_ports, hall_config, i_hall);
                 }
 
                 /* Motor Commutation loop */

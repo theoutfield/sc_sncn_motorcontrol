@@ -8,7 +8,8 @@
  */
 #include <pwm_service.h>
 #include <hall_service.h>
-#include <hall_config.h>
+#include <motorcontrol_service.h>
+
 #include <motorcontrol_config.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -21,7 +22,7 @@ int main(void) {
     // Motor control interfaces
     chan c_pwm_ctrl; // pwm channels
 
-    interface WatchdogInterface i_watchdog[3];
+    interface WatchdogInterface i_watchdog[2];
     interface HallInterface i_hall[5];
     interface MotorcontrolInterface i_motorcontrol[5];
 
@@ -58,10 +59,10 @@ int main(void) {
                 /* PWM Loop */
                 pwm_service(pwm_ports, c_pwm_ctrl);
 
-                /* Hall Server */
+                /* Hall sensor Service */
                 {
                     HallConfig hall_config;
-                    init_hall_config(hall_config);
+                        hall_config.pole_pairs = POLE_PAIRS;
 
                     hall_service(hall_ports, hall_config, i_hall);
                 }

@@ -387,7 +387,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                 } else {
                     out_torque = 0-actual_torque;
                 }
-                out_torque *= hall_config.sensor_polarity; //it seems like the polarity is needed here.
+                //out_torque *= hall_config.sensor_polarity; //it seems like the polarity is needed here.
 
                 break;
 
@@ -411,8 +411,6 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
         case i_torque_control[int i].set_torque_ctrl_hall_param(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
-            hall_config.max_ticks = in_config.max_ticks;
-            hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
 
             filter_length_variance =  filter_length/hall_config.pole_pairs;
             if (filter_length_variance < 10) {
