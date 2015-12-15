@@ -6,14 +6,29 @@
 
 #pragma once
 
+/**
+* @brief Lorem ipsum...
+*/
 typedef struct {
     out port p_enable;
     out port ?p_tick;
 } WatchdogPorts;
 
+/**
+* @brief Lorem ipsum...
+*/
 interface WatchdogInterface{
+	/**
+     * @brief Lorem ipsum...
+     */
     void start(void);
+    /**
+     * @brief Lorem ipsum...
+     */
     void enable_motors(void);
+    /**
+     * @brief Lorem ipsum...
+     */
     void disable_motors(void);
 };
 
@@ -27,9 +42,8 @@ interface WatchdogInterface{
  * the watchdog circuitry. The enable signal must be the LSB
  * bit in a 4-bit port. The tick control must be a 1-bit port.
  *
- * @param c_watchdog the control channel for controlling the watchdog
- * @param p_wd_tick control for the tick of the watchdog
- * @param p_shared_leds_wden control port for the watchdog device
+ * @param watchdog_ports Lorem ipsum...
+ * @param watchdog_interface[2] Lorem ipsum...
  */
 [[combinable]]
 void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server watchdog_interface[2]);
