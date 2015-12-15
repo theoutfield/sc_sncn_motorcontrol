@@ -37,7 +37,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
     int voltage = 0;
     int pwm_half = PWM_MAX_VALUE>>1;
 
-    int max_count_per_hall = qei_config.real_counts/hall_config.pole_pairs;
+    int max_count_per_hall = qei_config.ticks_resolution * QEI_CHANGES_PER_TICK /hall_config.pole_pairs;
     int angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
 
     int fw_flag = 0;
@@ -170,10 +170,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                                                                 QEIConfig in_qei_config,
                                                                 MotorcontrolConfig in_commutation_config, int in_nominal_speed):
 
-                 hall_config.pole_pairs = in_hall_config.pole_pairs;
-                 qei_config.index = in_qei_config.index;
-                 qei_config.max_ticks_per_turn = in_qei_config.max_ticks_per_turn;
-                 qei_config.real_counts = in_qei_config.real_counts;
+                 //hall_config.pole_pairs = in_hall_config.pole_pairs;
+                 qei_config.index_type = in_qei_config.index_type;
+                 //qei_config.max_ticks_per_turn = in_qei_config.max_ticks_per_turn;
+                 qei_config.ticks_resolution = in_qei_config.ticks_resolution;
                  nominal_speed = in_nominal_speed;
                  commutation_params.hall_offset_clk = in_commutation_config.hall_offset_clk;
                  commutation_params.hall_offset_cclk = in_commutation_config.hall_offset_cclk;
@@ -188,7 +188,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                   commutation_params.qei_forward_offset = 0;
                   commutation_params.qei_backward_offset = 0;
                   voltage = 0;
-                  max_count_per_hall = qei_config.real_counts / hall_config.pole_pairs;
+                  max_count_per_hall = qei_config.ticks_resolution  * QEI_CHANGES_PER_TICK / hall_config.pole_pairs;
                   angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
                   fw_flag = 0;
                   bw_flag = 0;

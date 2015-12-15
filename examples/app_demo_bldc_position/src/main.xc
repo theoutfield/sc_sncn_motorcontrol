@@ -20,7 +20,6 @@
 #include <profile_control.h>
 
 //Configuration headers
-#include <qei_config.h>
 #include <motorcontrol_config.h>
 #include <control_config.h>
 
@@ -118,10 +117,13 @@ int main(void)
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
-                /* QEI Service */
+                /* Quadrature encoder sensor Service */
                 {
                     QEIConfig qei_config;
-                    init_qei_config(qei_config);
+                        qei_config.signal_type = QEI_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
+                        qei_config.index_type = QEI_INDEX_TYPE;                 // Indexed encoder?
+                        qei_config.ticks_resolution = ENCODER_RESOLUTION;       // Encoder resolution
+                        qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
                     qei_service(qei_ports, qei_config, i_qei);
                 }
