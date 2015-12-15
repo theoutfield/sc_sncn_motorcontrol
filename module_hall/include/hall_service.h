@@ -30,7 +30,7 @@ typedef struct {
 * Structure containing hall sensor port/s
 */
 typedef struct {
-    port p_hall; /**< Lorem ipsum... */
+    port p_hall;
 } HallPorts;
 
 /**
