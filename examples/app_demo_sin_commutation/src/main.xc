@@ -11,7 +11,7 @@
 #include <tuning.h>
 
 #include <hall_service.h>
-#include <motorcontrol_config.h>
+#include <user_config.h>
 
 #ifdef AD7265
 #include <adc_7265.h>
@@ -25,7 +25,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
-#define VOLTAGE 1000 //+/- 4095
+#define VOLTAGE -1000 //+/- 4095
 
 #ifdef AD7265
 on tile[IFM_TILE]: adc_ports_t adc_ports =
@@ -120,10 +120,14 @@ int main(void) {
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
-                /* Motor Commutation loop */
+                /* Motor Commutation Service */
                 {
                     MotorcontrolConfig motorcontrol_config;
-                    init_motorcontrol_config(motorcontrol_config);
+                        motorcontrol_config.motor_type = BLDC_MOTOR;
+                        motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                        motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+                        motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+                        motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                             c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);

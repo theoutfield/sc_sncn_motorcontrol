@@ -12,9 +12,10 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
 
     delay_seconds(1);
     commutation_interface.setVoltage(input_voltage);
+    MotorcontrolConfig motorcontrol_config = commutation_interface.getConfig();
 
     printf (" Please enter an offset value different from %d, then press enter\n",
-            (input_voltage > 0) ? ((WINDING_TYPE == 1) ? COMMUTATION_OFFSET_CLK : COMMUTATION_OFFSET_CCLK) : ((WINDING_TYPE == 1) ? COMMUTATION_OFFSET_CCLK : COMMUTATION_OFFSET_CLK)  );
+            (input_voltage > 0) ? ((motorcontrol_config.bldc_winding_type == 1) ? motorcontrol_config.hall_offset_clk : motorcontrol_config.hall_offset_cclk) : ((motorcontrol_config.bldc_winding_type == 1) ? motorcontrol_config.hall_offset_cclk : motorcontrol_config.hall_offset_clk)  );
     fflush(stdout);
     while (1) {
         char c;
@@ -30,23 +31,23 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
         //please note for the delta winding type offset_clk and offset_cclk are flipped
         if (input_voltage > 0)
         {        //star winding
-            if (WINDING_TYPE == 1) {
-                MotorcontrolConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
+            if (motorcontrol_config.bldc_winding_type == 1) {
+                MotorcontrolConfig params = {BLDC_MOTOR, motorcontrol_config.bldc_winding_type, value, motorcontrol_config.hall_offset_cclk, motorcontrol_config.commutation_loop_period};
                 commutation_interface.setParameters(params);
             }
             else {
-                MotorcontrolConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
+                MotorcontrolConfig params = {BLDC_MOTOR, motorcontrol_config.bldc_winding_type, motorcontrol_config.hall_offset_clk, value, motorcontrol_config.commutation_loop_period};
                 commutation_interface.setParameters(params);
             }
         }
         else
         {
-            if (WINDING_TYPE == 1){
-                MotorcontrolConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, COMMUTATION_OFFSET_CLK, value, WINDING_TYPE};
+            if (motorcontrol_config.bldc_winding_type == 1){
+                MotorcontrolConfig params = {BLDC_MOTOR, motorcontrol_config.bldc_winding_type, motorcontrol_config.hall_offset_clk, value, motorcontrol_config.commutation_loop_period};
                 commutation_interface.setParameters(params);
             }
             else{
-                MotorcontrolConfig params = {(60 * 4096) / (POLE_PAIRS * 2 * 360), MAX_NOMINAL_SPEED, 0, 0, value, COMMUTATION_OFFSET_CCLK, WINDING_TYPE};
+                MotorcontrolConfig params = {BLDC_MOTOR, motorcontrol_config.bldc_winding_type, value, motorcontrol_config.hall_offset_cclk, motorcontrol_config.commutation_loop_period};
                 commutation_interface.setParameters(params);
             }
         }

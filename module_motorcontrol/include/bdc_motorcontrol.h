@@ -25,6 +25,7 @@
  * @param p_ifm_ff1 FET driver fault flag 1
  * @param p_ifm_ff2 FET driver fault flag 2
  */
+[[combinable]]
 void bdc_loop(chanend c_pwm_ctrl,
                interface WatchdogInterface client watchdog_interface,
                interface MotorcontrolInterface server commutation_interface[5],
