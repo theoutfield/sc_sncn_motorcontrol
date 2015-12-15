@@ -26,7 +26,7 @@ int check_hall_config(HallConfig &hall_config){
         return ERROR;
     }
 
-    if(hall_config.sensor_polarity < 0 || hall_config.sensor_polarity > 1){
+    if(hall_config.sensor_polarity < -1 || hall_config.sensor_polarity > 1){
         printstrln("Wrong Hall configuration: wrong polarity");
         return ERROR;
     }
@@ -44,6 +44,8 @@ int check_hall_config(HallConfig &hall_config){
 void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                     interface HallInterface server i_hall[5])
 {
+    //Set freq to 250MHz (always needed for velocity calculation)
+    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     if(check_hall_config(hall_config) == ERROR){
         printstrln("Error while checking the Hall sensor configuration");

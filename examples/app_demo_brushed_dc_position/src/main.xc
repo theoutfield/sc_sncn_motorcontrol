@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.inc>
-#include <IFM_DC100-rev-b.inc>
+#include <IFM_DC1K-rev-c.inc>
 
 #include <pwm_service.h>
 #include <watchdog_service.h>
@@ -10,7 +10,6 @@
 #include <position_ctrl_service.h>
 #include <profile_control.h>
 
-#include <bldc_motor_config.h>
 #include <qei_config.h>
 #include <hall_config.h>
 #include <motorcontrol_config.h>
@@ -57,10 +56,7 @@ int main(void)
 	{
 
 		/* Test Profile Position Client function*/
-		on tile[APP_TILE]:
-		{
-			position_profile_test(i_position_control[0]);		// test PPM on slave side
-		}
+		on tile[APP_TILE]: position_profile_test(i_position_control[0]);        // test PPM on slave side
 
         /* XScope monitoring */
         on tile[APP_TILE]: {

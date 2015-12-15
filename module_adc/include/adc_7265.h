@@ -23,12 +23,12 @@
 #define AD7265_MUX_DEFAULT_CONFIG 0b1000
 
 interface ADC{
-    {int, int, int} get_adc_measurements(unsigned char port_id, unsigned char config);
+    {int, int} get_adc_measurements(unsigned char port_id, unsigned char config);
 };
 
-interface ADC_trigger{
-  void trigger_measurement(unsigned char port_id, unsigned char config);
-};
+//interface ADC_trigger{
+//  void trigger_measurement(unsigned char port_id, unsigned char config);
+//};
 
 
 /*	The AD7265 data-sheet refers to the following signals:-
@@ -100,6 +100,6 @@ void foc_adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to 
 );
 
 
-void run_adc_AD7256(server interface ADC iADC, server interface ADC_trigger, AD7265Ports &adc_ports);
+void run_adc_AD7256(interface ADCInterface server iADC[3], AD7265Ports &adc_ports, chanend c_trig);
 
 /*****************************************************************************/
