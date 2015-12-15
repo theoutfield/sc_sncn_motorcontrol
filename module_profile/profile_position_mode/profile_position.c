@@ -70,7 +70,7 @@ struct {
 
 int rpm_to_ticks_qei(int rpm, QEIConfig qei_params)
 {
-    int ticks = (rpm * qei_params.real_counts)/60;
+    int ticks = (rpm * qei_params.ticks_resolution*QEI_CHANGES_PER_TICK)/60;
     return ticks;
 }
 

@@ -240,7 +240,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
     }
 
     if (torque_ctrl_params.sensor_used >= QEI)
-        qei_counts_per_hall= qei_params.real_counts/ hall_config.pole_pairs;
+        qei_counts_per_hall= (qei_params.ticks_resolution*4)/ hall_config.pole_pairs;
 
     tc :> time1;
     time1 += MSEC_STD - 100;
@@ -421,14 +421,11 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
         case i_torque_control[int i].set_torque_ctrl_qei_param(QEIConfig in_params):
 
-           qei_params.index = in_params.index;
-           qei_params.real_counts = in_params.real_counts;
-           qei_params.max_ticks_per_turn = in_params.max_ticks_per_turn;
-           qei_params.poles = in_params.poles;
-           qei_params.max_ticks = in_params.max_ticks;
+           qei_params.index_type = in_params.index_type;
+           qei_params.ticks_resolution = in_params.ticks_resolution;
 
-           qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
-           filter_length_variance =  filter_length/qei_params.poles;
+           qei_counts_per_hall = qei_params.ticks_resolution * 4 / hall_config.pole_pairs;
+           filter_length_variance =  filter_length/hall_config.pole_pairs;
            if (filter_length_variance < 10) {
                filter_length_variance = 10;
            }
@@ -445,8 +442,8 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                     filter_length_variance = 10;
                 target_torque = actual_torque;
             } else if (torque_ctrl_params.sensor_used >= QEI) {
-                qei_counts_per_hall = qei_params.real_counts/ qei_params.poles;
-                filter_length_variance =  filter_length/qei_params.poles;
+                qei_counts_per_hall = qei_params.ticks_resolution * 4 / hall_config.pole_pairs;
+                filter_length_variance =  filter_length/hall_config.pole_pairs;
                 if (filter_length_variance < 10)
                     filter_length_variance = 10;
                 target_torque = actual_torque;

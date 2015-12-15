@@ -6,6 +6,8 @@
 
 #pragma once
 
+#define QEI_CHANGES_PER_TICK     4 //Quadrature encoder
+
 #define ERROR                    0
 #define SUCCESS                  1
 
@@ -24,39 +26,27 @@
 #define QEI_RESET_COUNT          7
 
 #define QEI                      2
-#define QEI_WITH_NO_INDEX        3
-#define QEI_WITH_INDEX           4
+//#define QEI_WITH_NO_INDEX        3
+//#define QEI_WITH_INDEX           4
 
 #define QEI_PORT_AS_TTL           0b0000
 #define QEI_PORT_AS_RS422         0b0010
 
 typedef enum { QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1 } QEI_Polarity; /* Encoder polarity */
 typedef enum { QEI_RS422_SIGNAL = 11, QEI_TTL_SIGNAL = 22 } QEI_SignalType;
-
+typedef enum { QEI_WITH_NO_INDEX = 3, QEI_WITH_INDEX  = 4 } QEI_IndexType;
 //enum QEI_Type{ QEI_WITH_NO_INDEX = 0, QEI_WITH_INDEX = 1}; /* Encoder type */
 
 /**
  * @brief struct definition for quadrature sensor
  */
 typedef struct {
-    int max_ticks_per_turn;
-    int real_counts;
-    int max_ticks;      // paramater allows for more turns
-    int index;          // no_index - 0 index - 1
-    int poles;
-    int sensor_polarity;
+    int ticks_resolution; //real_counts;
+    QEI_IndexType index_type;          // no_index - 0 index - 1
+    QEI_Polarity sensor_polarity;
     QEI_SignalType signal_type;
 } QEIConfig;
 
-
-/**
- * @brief Internal function to calculate QEI position information
- *
- * @param real_counts qei counts per rotation
-
- * @return  max position from qei sensor
- */
-extern int __qei_max_counts(int real_counts);
 
 #ifdef __XC__
 

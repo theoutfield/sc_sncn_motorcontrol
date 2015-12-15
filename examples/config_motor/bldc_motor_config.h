@@ -23,14 +23,21 @@
  * and any additional encoders attached specify encoder resolution here (Mandatory)
  */
 #define GEAR_RATIO                  1                    // if no gears are attached - set to gear ratio to 1
-#define ENCODER_RESOLUTION          16000               // 4 x Max count of Incremental Encoder (4X decoding - quadrature mode)
+#define ENCODER_RESOLUTION          4000               //  Resolution of Incremental Encoder (4X decoding - quadrature mode)
 
 /* Position Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
 #define SENSOR_USED                 QEI
 
 /* Define your Incremental Encoder type (QEI_INDEX/ QEI_WITH_NO_INDEX) */
-#define QEI_SENSOR_TYPE             QEI_WITH_INDEX
+#define QEI_INDEX_TYPE             QEI_WITH_INDEX
+
+/* QEI signal type. This parameter takes effect just in case
+ * your dc board has a configurable qei port. Otherwise, the
+ * only signal type accepted is RS422
+ */
+#define QEI_SIGNAL_TYPE            QEI_RS422_SIGNAL
+
 
 /* Polarity is used to keep all position sensors to count ticks in the same direction
  *  (QEI_POLARITY_NORMAL/QEI_POLARITY_INVERTED) */
