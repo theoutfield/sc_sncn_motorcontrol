@@ -13,7 +13,7 @@
 #include <torque_ctrl_service.h>
 
 /**
- * @brief struct definition for profile velocity param
+ * @brief Struct definition for profile velocity param
  */
 typedef struct
 {
@@ -26,7 +26,7 @@ typedef struct
 } ProfileVelocityConfig;
 
 /**
- * @brief struct definition for profile position param
+ * @brief Struct definition for profile position param
  */
 typedef struct
 {
@@ -38,7 +38,7 @@ typedef struct
 } ProfilePositionConfig;
 
 /**
- * @brief struct definition for profile torque param
+ * @brief Struct definition for profile torque param
  */
 typedef struct
 {
@@ -47,26 +47,41 @@ typedef struct
     int polarity;
 } ProfileTorqueConfig;
 
+/**
+ * @brief Lorem ipsum...
+ *
+ * @param profile_position_config Lorem ipsum...
+ * @param i_position_control Lorem ipsum...
+ */
 void init_position_profiler(ProfilePositionConfig profile_position_config,
                                 interface PositionControlInterface client i_position_control);
 
+/**
+ * @brief Lorem ipsum...
+ *
+ * @param profile_velocity_config Lorem ipsum...
+ * @param i_velocity_control Lorem ipsum...
+ */
 void init_velocity_profiler(ProfileVelocityConfig profile_velocity_config,
                                 interface VelocityControlInterface client i_velocity_control);
 
+/**
+ * @brief Lorem ipsum...
+ *
+ * @param profile_torque_config Lorem ipsum...
+ * @param i_torque_control Lorem ipsum...
+ */
 void init_torque_profiler(ProfileTorqueConfig profile_torque_config,
                                 interface TorqueControlInterface client i_torque_control);
 
 /**
  * @brief Set profile position with Position Control loop
  *
- * @Output
- * @param c_position_ctrl for communicating with the Position Control Server
- *
- * @Input
  * @param target_position is the new target position in (ticks)
  * @param velocity in (rpm)
  * @param acceleration in (rpm/s)
  * @param deceleration in (rpm/s)
+ * @param i_position_control for communicating with the Position Control Server
  *
  */
 void set_profile_position( int target_position, int velocity, int acceleration, int deceleration,
@@ -75,14 +90,10 @@ void set_profile_position( int target_position, int velocity, int acceleration, 
 /**
  * @brief Set profile velocity with Velocity Control loop
  *
- * @Output
- * @param c_velocity_ctrl for communicating with the Velocity Control Server
- *
- * @Input
  * @param target_velocity is the new target velocity in (rpm)
  * @param acceleration in (rpm/s)
  * @param deceleration in (rpm/s)
- * @param max_profile_velocity is max velocity for the profile in (rpm)
+ * @param i_velocity_control for communicating with the Velocity Control Server
  *
  */
 void set_profile_velocity( int target_velocity, int acceleration, int deceleration,
@@ -91,13 +102,9 @@ void set_profile_velocity( int target_velocity, int acceleration, int decelerati
 /**
  * @brief Set profile torque with Torque Control loop
  *
- * @Output
- * @param c_torque_ctrl for communicating with the Torque Control Server
- *
- * @Input
  * @param target_torque is the new target torque in (mNm * current resolution)
  * @param torque_slope in (mNm/s * current resolution)
- * @param cst_params struct defines cyclic synchronous torque params
+ * @param i_torque_control for communicating with the Torque Control Server
  *
  */
 void set_profile_torque( int target_torque, int torque_slope,
