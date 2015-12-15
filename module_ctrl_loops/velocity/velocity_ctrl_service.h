@@ -11,20 +11,83 @@
 #include <motorcontrol_service.h>
 #include <control_loops_common.h>
 
-
+/**
+ * @brief Lorem ipsum...
+ */
 interface VelocityControlInterface{
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int check_busy();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int check_velocity_ctrl_state();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int get_velocity();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param target_velocity Lorem ipsum...
+     */
     void set_velocity(int target_velocity);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int get_set_velocity();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param velocity_ctrl_params Lorem ipsum...
+     */
     void set_velocity_ctrl_param(ControlConfig velocity_ctrl_params);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param in_length Lorem ipsum...
+     */
     void set_velocity_filter(int in_length);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param hall_config Lorem ipsum...
+     */
     void set_velocity_ctrl_hall_param(HallConfig hall_config);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param qei_params Lorem ipsum...
+     */
     void set_velocity_ctrl_qei_param(QEIConfig qei_params);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param sensor_used Lorem ipsum...
+     */
     void set_velocity_sensor(int sensor_used);
+    /**
+     * @brief Lorem ipsum...
+     */
     void enable_velocity_ctrl();
+    /**
+     * @brief Lorem ipsum...
+     */
     void shutdown_velocity_ctrl();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     ControlConfig get_velocity_control_config();
 };
 
@@ -33,7 +96,7 @@ interface VelocityControlInterface{
  * @brief Initialise Velocity Control Loop
  *
  * @Input Channel
- * @param c_velocity_ctrl channel to signal initialisation
+ * @param i_velocity_control channel to signal initialisation
  */
 int init_velocity_control(interface VelocityControlInterface client i_velocity_control);
 
@@ -52,14 +115,12 @@ int max_speed_limit(int velocity, int max_speed);
 /**
  * @brief Set new target velocity for velocity control (advanced function)
  *
- * @Input Channel
- * @param c_velocity_ctrl channel to signal new target velocity input
- *
  * @Input
- * @param csv_param struct defines the motor parameters and velocity limits
+ * @param csv_params struct defines the motor parameters and velocity limits
  * @param target_velocity is the new target velocity
  * @param velocity_offset defines offset in velocity
  * @param torque_offset defines offset in torque
+ * @param i_velocity_control Lorem ipsum...
  */
 void set_velocity_csv(CyclicSyncVelocityConfig & csv_params, int target_velocity,
                       int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control);
@@ -67,20 +128,11 @@ void set_velocity_csv(CyclicSyncVelocityConfig & csv_params, int target_velocity
 /**
  * @brief Velocity Control Loop
  *
- * @Input
  * @param velocity_ctrl_params struct defines the velocity control parameters
- * @param sensor_filter_par struct defines the filter parameters
- * @param hall_params struct defines the poles for hall sensor and gear-ratio
- * @param qei_params struct defines the resolution for qei sensor and gear-ratio
- * @param sensor_used specify the sensors to used via HALL/QEI defines
- *
- * @Input Channel
- * @param c_hall channel to receive position information from hall
- * @param c_qei channel to receive position information from qei
- * @param c_velocity_ctrl channel to receive/send velocity control information
- *
- * @Output Channel
- * @param c_commutation channel to send motor voltage input value
+ * @param i_hall Lorem ipsum...
+ * @param i_qei Lorem ipsum...
+ * @param commutation_interface Lorem ipsum...
+ * @param i_velocity_control[3] Lorem ipsum...
  *
  */
 [[combinable]]
