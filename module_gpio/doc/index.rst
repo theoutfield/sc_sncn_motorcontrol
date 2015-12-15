@@ -19,13 +19,9 @@ API
 Service
 -------
 
-Lorem ipsum...
-
 .. doxygenfunction:: gpio_service
 
 Interface
 ---------
-
-Lorem ipsum...
 
 .. doxygeninterface:: gpio_service
