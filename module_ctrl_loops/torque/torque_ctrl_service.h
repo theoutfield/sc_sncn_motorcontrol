@@ -12,6 +12,7 @@
 #include <control_loops_common.h>
 #include <adc_service.h>
 
+#define FILTER_LENGTH_TORQUE 80
 
 interface TorqueControlInterface{
 
