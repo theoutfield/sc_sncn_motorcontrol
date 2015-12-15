@@ -6,12 +6,12 @@
 #pragma once
 
 /**
- * @brief struct definition for PID Controller
+ * @brief Struct definition for PID Controller
  */
 typedef struct {
-    int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
-    int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
-    int Kd_n, Kd_d; //Kd = Kd_n/Kd_d
+    int Kp_n, Kp_d; /**< Kp = Kp_n/Kp_d */
+    int Ki_n, Ki_d; /**< Ki = Ki_n/Ki_d */
+    int Kd_n, Kd_d; /**< Kd = Kd_n/Kd_d */
     int Integral_limit;
     int Control_limit;
     int Loop_time;
@@ -19,7 +19,7 @@ typedef struct {
 } ControlConfig;
 
 /**
- * @brief struct definition for Synchronous torque param
+ * @brief Struct definition for Synchronous torque param
  */
 typedef struct
 {
@@ -31,7 +31,7 @@ typedef struct
 } CyclicSyncTorqueConfig;
 
 /**
- * @brief struct definition for Synchronous velocity param
+ * @brief Struct definition for Synchronous velocity param
  */
 typedef struct
 {
@@ -43,9 +43,8 @@ typedef struct
 } CyclicSyncVelocityConfig;
 
 /**
- * @brief struct definition for Synchronous position param
+ * @brief Struct definition for Synchronous position param
  */
-
 typedef struct
 {
     CyclicSyncVelocityConfig velocity_config;

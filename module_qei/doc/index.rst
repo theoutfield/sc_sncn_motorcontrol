@@ -2,18 +2,17 @@
 SOMANET Quadrature Encoder Interface Component
 ===============================================
 
-Component Overview
-==================
+.. contents:: In this document
+    :backlinks: none
+    :depth: 3
 
-.. figure:: images/core-diagram-qe-interface.png
-   :width: 60%
+Lorem ipsum...
 
-   Core diagram
+.. image:: images/core-diagram-qe-interface.png
+   :width: 50%
 
-.. _qei_programming_label:
-
-Programming Guide
-=================
+How to use
+==========
 
 Getting position and velocity information from your Quadrature Encoder
 ----------------------------------------------------------------------
@@ -110,22 +109,23 @@ While the QEI server is running and constantly monitoring, the velocity and posi
     }
     
 
-Quadrature Encoder Interface API
-================================
-
-Client API
-----------
-
-.. doxygenfunction:: get_qei_position
-.. doxygenfunction:: get_qei_position_absolute
-.. doxygenfunction:: get_qei_velocity
-
-Server API
-----------------
-
-.. doxygenfunction:: run_qei
+API
+===
 
 Types
 -----
 
-.. doxygenstruct:: qei_par
+.. doxygenenum:: QEI_Polarity
+.. doxygenenum:: QEI_SignalType
+.. doxygenstruct:: QEIConfig
+.. doxygenstruct:: QEIPorts
+
+Service
+--------
+
+.. doxygenfunction:: qei_service
+
+Interface
+---------
+
+.. doxygeninterface:: QEIInterface

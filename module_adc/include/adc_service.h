@@ -52,10 +52,10 @@ interface ADCInterface{
  * Lorem ipsum...
  */
 typedef struct {
-     buffered out port:32 ?sclk_conv_mosib_mosia; /**< Lorem ipsum... */
-     in buffered port:32 ?data_a; /**< Lorem ipsum... */
-     in buffered port:32 ?data_b; /**< Lorem ipsum... */
-     clock ?clk; /**< Lorem ipsum... */
+     buffered out port:32 ?sclk_conv_mosib_mosia;
+     in buffered port:32 ?data_a;
+     in buffered port:32 ?data_b;
+     clock ?clk;
 }AD7949Ports;
 
 /**
@@ -73,8 +73,8 @@ typedef struct {
  * Lorem ipsum...
  */
 typedef struct {
-    AD7949Ports ad7949_ports; /**< Lorem ipsum... */
-    AD7265Ports ad7265_ports; /**< Lorem ipsum... */
+    AD7949Ports ad7949_ports;
+    AD7265Ports ad7265_ports;
 } ADCPorts;
 
 /**
