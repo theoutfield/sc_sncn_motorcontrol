@@ -26,13 +26,9 @@ Types
 Service
 -------
 
-Lorem ipsum...
-
 .. doxygenfunction:: adc_service
 
 Interface
 ---------
-
-Lorem ipsum...
 
 .. doxygeninterface:: ADCInterface
