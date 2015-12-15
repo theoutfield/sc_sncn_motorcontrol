@@ -24,4 +24,4 @@ Service
 Interface
 ---------
 
-.. doxygeninterface:: gpio_service
+.. doxygeninterface:: GPIOInterface
