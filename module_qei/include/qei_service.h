@@ -30,19 +30,27 @@
 #define QEI_PORT_AS_TTL           0b0000
 #define QEI_PORT_AS_RS422         0b0010
 
-typedef enum { QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1 } QEI_Polarity; /* Encoder polarity */
+
+/**
+ * @brief Encoder polarity 
+ */
+typedef enum { QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1 } QEI_Polarity; 
+
+/**
+ * @brief Lorem ipsum...
+ */
 typedef enum { QEI_RS422_SIGNAL = 11, QEI_TTL_SIGNAL = 22 } QEI_SignalType;
 
 //enum QEI_Type{ QEI_WITH_NO_INDEX = 0, QEI_WITH_INDEX = 1}; /* Encoder type */
 
 /**
- * @brief struct definition for quadrature sensor
+ * @brief Struct definition for quadrature sensor
  */
 typedef struct {
     int max_ticks_per_turn;
     int real_counts;
-    int max_ticks;      // paramater allows for more turns
-    int index;          // no_index - 0 index - 1
+    int max_ticks;     /**< paramater allows for more turns */ 
+    int index;         /**< no_index - 0 index - 1 */ 
     int poles;
     int sensor_polarity;
     QEI_SignalType signal_type;
@@ -60,37 +68,85 @@ extern int __qei_max_counts(int real_counts);
 
 #ifdef __XC__
 
- /**
-* @brief Structure containing hall sensor port/s
+/**
+* @brief Struct containing hall sensor port/s
 */
 typedef struct {
     port ?p_qei_config;
     port p_qei;
 } QEIPorts;
 
+/**
+* @brief Lorem ipsum...
+*/
 interface QEIInterface{
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int checkBusy();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     * @return Lorem ipsum...
+     */
     {unsigned int, unsigned int} get_qei_position();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     * @return Lorem ipsum...
+     */
     {int, int} get_qei_position_absolute();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     * @return Lorem ipsum...
+     * @return Lorem ipsum...
+     */
     {int, int, int} get_qei_sync_position();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     int get_qei_velocity();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param int Lorem ipsum...
+     * @param int Lorem ipsum...
+     */
     void set_qei_sync_offset(int, int);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param offset Lorem ipsum...
+     */
     void reset_qei_count(int offset);
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
     QEIConfig getQEIConfig();
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @param in_config Lorem ipsum...
+     */
     void setQEIConfig(QEIConfig in_config);
 };
 
 /**
  * @brief Implementation of the QEI server thread (for sensor with index/no index)
  *
- * @param c_qei_p1 the control channel for reading qei position in order of priority (highest) 1 ... (lowest) 5
- * @param c_qei_p2 the control channel for reading qei position priority - 2
- * @param c_qei_p3 the control channel for reading qei position priority - 3
- * @param c_qei_p4 the control channel for reading qei position priority - 4
- * @param c_qei_p5 the control channel for reading qei position priority - 5
- * @param c_qei_p6 the control channel for reading qei position priority - 6
- * @param EncoderPorts structure containing the hardware port where the quadrature encoder is located
- * @param qei_params the structure defines sensor type and resolution parameters for qei
+ * @param encoder_ports structure containing the hardware port where the quadrature encoder is located
+ * @param qei_config the structure defines sensor type and resolution parameters for qei
+ * @param i_qei[5] Lorem ipsum
  */
 void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
                 interface QEIInterface server i_qei[5]);
