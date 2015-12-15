@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.inc>
-#include <IFM_DC100-rev-b.inc>
+#include <IFM_DC1K-rev-c.inc>
 
 
 /**
@@ -26,7 +26,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
-#define VOLTAGE 2000 //+/- 4095
+#define VOLTAGE 200 //+/- 4095
 
 #ifdef AD7265
 on tile[IFM_TILE]: adc_ports_t adc_ports =
@@ -76,21 +76,23 @@ int main(void) {
     interface HallInterface i_hall[5];
     interface MotorcontrolInterface i_motorcontrol[5];
 
-    #ifdef AD7265
-        interface ADC i_adc;
-    #endif
-
     par
     {
 
-        on tile[APP_TILE_1]:
+        on tile[APP_TILE]:
         {
             /* WARNING: only one blocking task is possible per tile. */
             /* Waiting for a user input blocks other tasks on the same tile from execution. */
-            run_offset_tuning(VOLTAGE, i_motorcontrol[0]);
+           // run_offset_tuning(VOLTAGE, i_motorcontrol[0]);
         }
 
-        on tile[IFM_TILE]: adc_client(i_adc[0], i_hall[1]);
+        on tile[APP_TILE]: //adc_client(i_adc[0], i_hall[1]);
+        { int a,b;
+            while(1){
+                a = i_adc[0].get_temperature();
+                printf("%d %d\n",a,b);
+            }
+        }
 
         on tile[IFM_TILE]:
         {
@@ -104,11 +106,8 @@ int main(void) {
 #endif
 
                 /* Watchdog Server */
-#ifdef DC1K
-                run_watchdog(c_watchdog, null, p_ifm_led_moton_wdtick_wden);
-#else
                 watchdog_service(wd_ports, i_watchdog);
-#endif
+
 
                 /* PWM Loop */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);

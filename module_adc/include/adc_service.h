@@ -20,6 +20,7 @@ interface ADCInterface{
    // void calibrate();
     {int, int, int, int, int, int, int, int} get_all();
     {int, int} get_currents();
+    int get_temperature();
     {int, int} get_external_inputs();
 };
 

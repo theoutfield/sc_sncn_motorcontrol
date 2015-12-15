@@ -27,7 +27,12 @@
 #define QEI_WITH_NO_INDEX        3
 #define QEI_WITH_INDEX           4
 
-enum QEI_Polarity{ QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1}; /* Encoder polarity */
+#define QEI_PORT_AS_TTL           0b0000
+#define QEI_PORT_AS_RS422         0b0010
+
+typedef enum { QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1 } QEI_Polarity; /* Encoder polarity */
+typedef enum { QEI_RS422_SIGNAL = 11, QEI_TTL_SIGNAL = 22 } QEI_SignalType;
+
 //enum QEI_Type{ QEI_WITH_NO_INDEX = 0, QEI_WITH_INDEX = 1}; /* Encoder type */
 
 /**
@@ -40,6 +45,7 @@ typedef struct {
     int index;          // no_index - 0 index - 1
     int poles;
     int sensor_polarity;
+    QEI_SignalType signal_type;
 } QEIConfig;
 
 
@@ -74,25 +80,6 @@ interface QEIInterface{
     void setQEIConfig(QEIConfig in_config);
 };
 
-
-/**
- * @brief initialize QEI sensor
- *
- * @param qei_params struct defines the resolution for quadrature encoder (QEI),
- *          gear-ratio, poles, encoder type
- */
-/*
-void init_qei_param(qei_par & qei_params);
-*/
-/**
- * @brief Initialize struct for velocity calculation from QEI sensor
- *
- * @param qei_velocity_params  struct is initialised
- */
-/*
-void init_qei_velocity_params(qei_velocity_par &qei_velocity_params);
-*/
-//int calculate_qei_velocity(int count, qei_config &qei_config, qei_velocity_par &qei_velocity_params);
 /**
  * @brief Implementation of the QEI server thread (for sensor with index/no index)
  *
