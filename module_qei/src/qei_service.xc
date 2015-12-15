@@ -120,6 +120,19 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
 
     printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
 
+    //Check if we are using a dc board with configurable qei port
+    if(!isnull(encoder_ports.p_qei_config)){
+
+        //Our board has a configurable qei port, lets check now the configuration provided by the user
+        if(qei_config.signal_type == QEI_TTL_SIGNAL){
+            encoder_ports.p_qei_config <: QEI_PORT_AS_TTL;
+        }else{
+
+            //By default the qei signals are defined as rs422, so no action is required.
+        }
+
+    }
+
     qei_config.max_ticks_per_turn = qei_config.real_counts;
     int position = 0;
     unsigned int v;

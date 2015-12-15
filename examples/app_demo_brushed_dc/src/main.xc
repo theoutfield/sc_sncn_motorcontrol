@@ -30,12 +30,7 @@ int main(void) {
          * USER_TILE
          ************************************************************/
 
-        on tile[APP_TILE_1]:
-        {
-              while (1) {
-                  i_motorcontrol[0].setVoltage(1000);
-              }
-        }
+        on tile[APP_TILE]:  i_motorcontrol[0].setVoltage(1000);
 
         /************************************************************
          * IFM_TILE

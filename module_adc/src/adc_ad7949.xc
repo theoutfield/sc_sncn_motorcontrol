@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <xclib.h>
 #include <refclk.h>
-#include <adc_server_ad7949.h>
+#include <adc_ad7949.h>
 
 #define BIT13 0x00002000
 #define BIT12 0x00001000
@@ -184,7 +184,6 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
     // iIndexADC        0  			1			       2			      3
     // readout       extern   	temperature		current-voltage			extern
 
-
     SPI_IDLE;
 
     output_adc_config_data(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_other[adc_index]);
@@ -211,7 +210,6 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
     SPI_IDLE;
     t :> ts;
 }
-
 
 
 void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_ports )
@@ -300,6 +298,11 @@ void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_
                       ext_b = adc_data_b[3];
 
                       break;
+
+              case adc_interface.get_temperature() -> {int out_temp}:
+
+                      out_temp = adc_data_a[1];
+                      break;
         }
     }
 }
@@ -380,6 +383,11 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface[3], AD794
                 Ia = Icalibrated_a;
                 Ib = Icalibrated_b;
 
+                break;
+
+        case adc_interface[int i].get_temperature() -> {int out_temp}:
+
+                out_temp = adc_data_a[1];
                 break;
 
         case adc_interface[int i].get_external_inputs() -> {int ext_a, int ext_b}:

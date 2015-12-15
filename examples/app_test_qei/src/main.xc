@@ -30,7 +30,9 @@ void qei_test(interface QEIInterface client i_qei)
 		xscope_int(POSITION, position);
 		xscope_int(VELOCITY, velocity);
 
-		delay_milliseconds(1);//, core_id, t);
+		printf("Position: %d Velocity: %d\n", position, velocity);
+
+		delay_milliseconds(1);
 	}
 }
 
@@ -57,6 +59,7 @@ int main(void)
 			/* QEI Service Loop */
 			{
 			    QEIConfig qei_config;
+			        qei_config.signal_type = QEI_RS422_SIGNAL;
                     qei_config.index = QEI_WITH_INDEX;                  // Indexed encoder
                     qei_config.real_counts = 16000;                     // 4 x 4000 ticks (Cuadrature encoder)
                     qei_config.sensor_polarity = QEI_POLARITY_NORMAL;   // CW

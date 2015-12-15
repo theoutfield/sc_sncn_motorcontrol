@@ -107,6 +107,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                                             MotorcontrolConfig in_commutation_config, int in_nominal_speed):
                break;
 
+        default: break;
         }
     }
 }
@@ -119,7 +120,7 @@ void bdc_loop(chanend c_pwm_ctrl,
 {
     const unsigned t_delay = 300*USEC_FAST;
     timer t;
-    unsigned int ts;
+    unsigned int ts, check_fet;
     t_pwm_control pwm_ctrl;
     
     init_state = INIT_BUSY;
@@ -134,10 +135,20 @@ void bdc_loop(chanend c_pwm_ctrl,
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;
 
-    a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
-    t when timerafter (ts + t_delay) :> ts;
+    if(!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast)){
+        a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
+        t when timerafter (ts + t_delay) :> ts;
+        fet_driver_ports.p_coast :> init_state;
+    }
 
-    fet_driver_ports.p_coast :> init_state;
+    if(!isnull(fet_driver_ports.p_coast)){
+        fet_driver_ports.p_coast :> check_fet;
+        init_state = check_fet;
+    }
+    else {
+        i_watchdog.enable_motors();
+        init_state = 1;
+    }
 
     bdc_internal_loop(fet_driver_ports, pwm_ctrl, c_pwm_ctrl, i_commutation);
 }
