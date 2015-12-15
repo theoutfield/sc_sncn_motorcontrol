@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.inc>
-#include <IFM_DC1K-rev-c.inc>
+#include <IFM_DC100-rev-b.inc>
 
 #include <pwm_service.h>
 #include <watchdog_service.h>
@@ -10,7 +10,7 @@
 #include <position_ctrl_service.h>
 #include <profile_control.h>
 
-#include <motorcontrol_config.h>
+#include <user_config.h>
 #include <control_config.h>
 
 /* Test Profile Position function */
@@ -44,7 +44,7 @@ int main(void)
     // Motor control channels
     chan c_pwm_ctrl;            // pwm channel
 
-    interface WatchdogInterface i_watchdog[3];
+    interface WatchdogInterface i_watchdog[2];
     interface QEIInterface i_qei[5];
     interface MotorcontrolInterface i_motorcontrol[5];
 
@@ -114,13 +114,15 @@ int main(void)
                      qei_service(qei_ports, qei_config, i_qei);
                  }
 
-                {
-                    MotorcontrolConfig motorcontrol_config;
-                    init_motorcontrol_config(motorcontrol_config);
+                 /* Motor Drive Service */
+                 {
+                     MotorcontrolConfig motorcontrol_config;
+                         motorcontrol_config.motor_type = BDC_MOTOR;
+                         motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, null, i_qei[0], i_watchdog[0], i_motorcontrol);
-                }
+                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_watchdog[0],
+                                                 i_motorcontrol);
+                 }
 
             }
 		}

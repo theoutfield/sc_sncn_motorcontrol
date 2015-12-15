@@ -10,7 +10,7 @@
 #include <watchdog_service.h>
 #include <motorcontrol_service.h>
 
-#include <motorcontrol_config.h>
+#include <user_config.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -45,10 +45,11 @@ int main(void) {
                 /* Watchdog Server */
                 watchdog_service(wd_ports, i_watchdog);
 
-                /* Brushed Motor Drive loop */
+                /* Motor drive service */
                 {
                     MotorcontrolConfig motorcontrol_config;
-                    init_motorcontrol_config(motorcontrol_config);
+                        motorcontrol_config.motor_type = BDC_MOTOR;
+                        motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_watchdog[0],
                                                 i_motorcontrol);

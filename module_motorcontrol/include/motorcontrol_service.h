@@ -6,18 +6,27 @@
 
 #pragma once
 
-#include <pwm_cli_inv.h>
+#define ERROR 0
+#define SUCCESS 1
+
+typedef enum { STAR_WINDING=1, DELTA_WINDING } BLDCWindingType;
+typedef enum { BDC_MOTOR = 10, BLDC_MOTOR = 11 } MotorType;
+
+typedef struct {
+    MotorType motor_type;
+    BLDCWindingType bldc_winding_type;
+    int hall_offset_clk;
+    int hall_offset_cclk;
+    int commutation_loop_period;
+} MotorcontrolConfig;
+
+#ifdef __XC__
+
 #include <watchdog_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 
-#include <a4935.h>
 #include <internal_config.h>
-
-#define ERROR 0
-#define SUCCESS 1
-
-typedef enum {BDC_MOTOR = 10, BLDC_MOTOR = 11} MotorType;
 
 typedef struct {
     port ?p_coast;
@@ -25,18 +34,6 @@ typedef struct {
     port ?p_ff1;
     port ?p_ff2;
 } FetDriverPorts;
-
-typedef struct {
-    MotorType motor_type;
-    int angle_variance;         /* max allowed variance depending on speed */
-    int nominal_speed;
-    int qei_forward_offset;
-    int qei_backward_offset;
-    int hall_offset_clk;
-    int hall_offset_cclk;
-    int bldc_winding_type;
-    int commutation_loop_freq;
-} MotorcontrolConfig;
 
 interface MotorcontrolInterface{
     int checkBusy();
@@ -77,3 +74,5 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface QEIInterface client ?i_qei,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[5]);
+
+#endif
