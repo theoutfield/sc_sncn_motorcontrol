@@ -24,8 +24,6 @@ Global Types
 Position
 --------
 
-Lorem ipsum...
-
 Position Types
 ````````````````
 
@@ -48,8 +46,6 @@ Position Interface
 Velocity
 --------
 
-Lorem ipsum...
-
 Velocity Types
 ``````````````
 
@@ -69,8 +65,6 @@ Velocity Interface
 
 Torque
 ------
-
-Lorem ipsum...
 
 Torque Types
 ``````````````
