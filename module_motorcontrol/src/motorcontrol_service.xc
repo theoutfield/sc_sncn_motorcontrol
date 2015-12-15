@@ -79,7 +79,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                     }else if(motorcontrol_config.motor_type == BDC_MOTOR){
 
-                        bdc_loop(c_pwm_ctrl, i_watchdog, i_motorcontrol, fet_driver_ports);
+                        bdc_loop(c_pwm_ctrl, i_watchdog, i_motorcontrol, fet_driver_ports, motorcontrol_config);
                     }
 
                     break;

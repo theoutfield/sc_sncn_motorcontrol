@@ -42,6 +42,7 @@ interface MotorcontrolInterface{
     int checkBusy();
     void setVoltage(int voltage);
     void setParameters(MotorcontrolConfig parameters);
+    MotorcontrolConfig getConfig();
     void setSensor(int sensor);
     void disableFets();
     void enableFets();

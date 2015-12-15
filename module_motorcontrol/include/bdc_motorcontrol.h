@@ -28,4 +28,5 @@
 void bdc_loop(chanend c_pwm_ctrl,
                interface WatchdogInterface client watchdog_interface,
                interface MotorcontrolInterface server commutation_interface[5],
-               FetDriverPorts &fet_driver_ports);
+               FetDriverPorts &fet_driver_ports,
+               MotorcontrolConfig &commutation_params);

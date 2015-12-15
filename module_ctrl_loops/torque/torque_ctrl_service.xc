@@ -16,9 +16,6 @@
 #include <a4935.h>
 #include <motorcontrol_service.h>
 
-//#define ENABLE_xscope_torq //don't forget to set up the config.xscope file
-//#define debug_print
-
 void init_buffer(int buffer[], int length)
 {
     int i;
@@ -28,29 +25,6 @@ void init_buffer(int buffer[], int length)
     return;
 }
 
-/*
-void init_torque_control_param(ControlConfig &torque_ctrl_params)
-{
-    torque_ctrl_params.Kp_n = TORQUE_Kp_NUMERATOR;
-    torque_ctrl_params.Kp_d = TORQUE_Kp_DENOMINATOR;
-    torque_ctrl_params.Ki_n = TORQUE_Ki_NUMERATOR;
-    torque_ctrl_params.Ki_d = TORQUE_Ki_DENOMINATOR;
-    torque_ctrl_params.Kd_n = TORQUE_Kd_NUMERATOR;
-    torque_ctrl_params.Kd_d = TORQUE_Kd_DENOMINATOR;
-    torque_ctrl_params.Loop_time = 1 * MSEC_STD; // units - for CORE 2/1/0 only default
-
-    torque_ctrl_params.Control_limit = BLDC_PWM_CONTROL_LIMIT; // PWM resolution
-
-    if(torque_ctrl_params.Ki_n != 0) {
-        // auto calculated using control_limit
-        torque_ctrl_params.Integral_limit = (torque_ctrl_params.Control_limit * torque_ctrl_params.Ki_d) / torque_ctrl_params.Ki_n;
-    } else {
-        torque_ctrl_params.Integral_limit = 0;
-    }
-
-    return;
-}
-*/
 int init_torque_control(interface TorqueControlInterface client i_torque_control)
 {
     int ctrl_state = INIT_BUSY;
@@ -201,12 +175,14 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
 
 void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config, QEIConfig &qei_params,
                         chanend c_current, chanend c_speed,
-                        interface MotorcontrolInterface client commutation_interface,
+                        interface MotorcontrolInterface client i_motorcontrol,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
                         interface TorqueControlInterface server i_torque_control[3])
 {
-#define FILTER_LENGTH_TORQUE 80
+
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.getConfig();
+
     int actual_speed = 0;
     int command;
 
@@ -299,40 +275,47 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 #ifdef ENABLE_xscope_torq
                 xscope_int(PHASE_A_FILTERED, phase_a_filtered);
 #endif
-                //xscope_probe_data(1, phase_b_filtered);
-                alpha = phase_a;
-                beta = (phase_a + 2*phase_b);  // beta = (a1 + 2*a2)/1.732 0.57736 --> invers from 1.732
-                beta *= 37838;
-                beta /= 65536;
-                beta = -beta;
+                if(motorcontrol_config.motor_type == BDC_MOTOR){
 
-                /* Park transform */
-                sin = sine_table_expanded(angle);
-                cos = sine_table_expanded((256 - angle) & 0x3ff);
+                    actual_torque = phase_a;
 
-                Id = ( alpha * cos + beta * sin ) / 16384;
-                Iq = ( beta * cos  - alpha * sin ) / 16384;
+                }else if(motorcontrol_config.motor_type == BLDC_MOTOR)
+                {
+                    //xscope_probe_data(1, phase_b_filtered);
+                    alpha = phase_a;
+                    beta = (phase_a + 2*phase_b);  // beta = (a1 + 2*a2)/1.732 0.57736 --> invers from 1.732
+                    beta *= 37838;
+                    beta /= 65536;
+                    beta = -beta;
 
-                buffer_Id[buffer_index] = Id;
-                buffer_Iq[buffer_index] = Iq;
-                buffer_index = (buffer_index + 1) % filter_length;
+                    /* Park transform */
+                    sin = sine_table_expanded(angle);
+                    cos = sine_table_expanded((256 - angle) & 0x3ff);
 
-                id_filtered = Id;
-                iq_filtered = Iq;
-/*
-                j1 = 0;
-                for (i1 = 0; i1 < filter_length_variance; i1++) {
-                    mod1 = (buffer_index - 1 - j1) % filter_length;
-                    if (mod1 < 0)
-                        mod1 = filter_length + mod1;
-                    id_filtered += buffer_Id[mod1];
-                    iq_filtered += buffer_Iq[mod1];
-                    j1++;
+                    Id = ( alpha * cos + beta * sin ) / 16384;
+                    Iq = ( beta * cos  - alpha * sin ) / 16384;
+
+                    buffer_Id[buffer_index] = Id;
+                    buffer_Iq[buffer_index] = Iq;
+                    buffer_index = (buffer_index + 1) % filter_length;
+
+                    id_filtered = Id;
+                    iq_filtered = Iq;
+    /*
+                    j1 = 0;
+                    for (i1 = 0; i1 < filter_length_variance; i1++) {
+                        mod1 = (buffer_index - 1 - j1) % filter_length;
+                        if (mod1 < 0)
+                            mod1 = filter_length + mod1;
+                        id_filtered += buffer_Id[mod1];
+                        iq_filtered += buffer_Iq[mod1];
+                        j1++;
+                    }
+                    id_filtered /= filter_length_variance;
+                    iq_filtered /= filter_length_variance;
+    */
+                    actual_torque = abs(Iq);//round( sqrt( iq_filtered * iq_filtered + id_filtered * id_filtered ) );//
                 }
-                id_filtered /= filter_length_variance;
-                iq_filtered /= filter_length_variance;
-*/
-                actual_torque = abs(Iq);//round( sqrt( iq_filtered * iq_filtered + id_filtered * id_filtered ) );//
             }
 
             if (activate == 1) {
@@ -379,7 +362,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                         torque_control_output = 0 - torque_ctrl_params.Control_limit;
                     }
                 }
-                commutation_interface.setVoltage(torque_control_output);
+                i_motorcontrol.setVoltage(torque_control_output);
                 //set_commutation_sinusoidal(c_commutation, torque_control_output);
             }
             break;
@@ -479,14 +462,14 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
         case i_torque_control[int i].enable_torque_ctrl():
                 activate = SET;
-                  init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
+                  init_state = i_motorcontrol.checkBusy(); //__check_commutation_init(c_commutation);
                   if (init_state == INIT) {
 #ifdef debug_print
                       printstrln("commutation intialized");
 #endif
-                      fet_state = commutation_interface.getFetsState(); //check_fet_state(c_commutation);
+                      fet_state = i_motorcontrol.getFetsState(); //check_fet_state(c_commutation);
                       if (fet_state == 1) {
-                          commutation_interface.enableFets(); //enable_motor(c_commutation);
+                          i_motorcontrol.enableFets(); //enable_motor(c_commutation);
                           delay_milliseconds(2);
                          // wait_ms(2, 1, tc);
                       }
@@ -514,8 +497,8 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                error_torque_derivative = 0;
                error_torque_previous = 0;
                torque_control_output = 0;
-               commutation_interface.setVoltage(0);//set_commutation_sinusoidal(c_commutation, 0);
-               commutation_interface.disableFets(); //disable_motor(c_commutation);
+               i_motorcontrol.setVoltage(0);//set_commutation_sinusoidal(c_commutation, 0);
+               i_motorcontrol.disableFets(); //disable_motor(c_commutation);
                delay_milliseconds(30);
                //wait_ms(30, 1, tc);
                break;
@@ -532,7 +515,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 /* TODO: do we really need 2 threads for this? */
 void torque_control_service(ControlConfig &torque_ctrl_params,
                     interface ADCInterface client adc_if,
-                    interface MotorcontrolInterface client commutation_interface,
+                    interface MotorcontrolInterface client i_motorcontrol,
                     interface HallInterface client i_hall,
                     interface QEIInterface client ?i_qei,
                     interface TorqueControlInterface server i_torque_control[3])
@@ -549,7 +532,7 @@ void torque_control_service(ControlConfig &torque_ctrl_params,
     par {
         current_filter(adc_if, c_current, c_speed);
         torque_ctrl_loop(torque_ctrl_params, hall_config, qei_config, c_current,
-                c_speed, commutation_interface, i_hall, i_qei, i_torque_control);
+                c_speed, i_motorcontrol, i_hall, i_qei, i_torque_control);
 
     }
 }
