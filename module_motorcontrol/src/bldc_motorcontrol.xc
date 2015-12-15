@@ -19,7 +19,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface HallInterface client i_hall,
                             interface QEIInterface client ?i_qei,
                             interface WatchdogInterface client watchdog_interface,
-                            interface MotorcontrolInterface server commutation_interface[5],
+                            interface MotorcontrolInterface server i_motorcontrol[5],
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
                             MotorcontrolConfig &commutation_params)
@@ -124,14 +124,14 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 break;
 
 
-            case commutation_interface[int i].setVoltage(int new_voltage):
+            case i_motorcontrol[int i].setVoltage(int new_voltage):
                     voltage = new_voltage;
                     if (commutation_params.bldc_winding_type == DELTA_WINDING) {
                         voltage = -voltage;
                     }
                     break;
 
-            case commutation_interface[int i].setParameters(MotorcontrolConfig new_parameters):
+            case i_motorcontrol[int i].setParameters(MotorcontrolConfig new_parameters):
                     commutation_params.angle_variance = new_parameters.angle_variance;
                     commutation_params.nominal_speed = new_parameters.nominal_speed;
                     commutation_params.hall_offset_clk = new_parameters.hall_offset_clk;
@@ -140,28 +140,33 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
                     break;
 
-            case commutation_interface[int i].setSensor(int new_sensor):
+            case i_motorcontrol[int i].getConfig() -> MotorcontrolConfig out_config:
+
+                    out_config = commutation_params;
+                    break;
+
+            case i_motorcontrol[int i].setSensor(int new_sensor):
                     sensor_select = new_sensor;
                     break;
 
-            case commutation_interface[int i].enableFets():
+            case i_motorcontrol[int i].enableFets():
                     shutdown = 0;
                     voltage = 0;
                     break;
 
-            case commutation_interface[int i].disableFets():
+            case i_motorcontrol[int i].disableFets():
                     shutdown = 1;
                     break;
 
-            case commutation_interface[int i].getFetsState() -> int fets_state:
+            case i_motorcontrol[int i].getFetsState() -> int fets_state:
                     fets_state = shutdown;
                     break;
 
-            case commutation_interface[int i].checkBusy() -> int state_return:
+            case i_motorcontrol[int i].checkBusy() -> int state_return:
                     state_return = init_state;
                     break;
 
-            case commutation_interface[int i].setAllParameters(HallConfig in_hall_config,
+            case i_motorcontrol[int i].setAllParameters(HallConfig in_hall_config,
                                                                 QEIConfig in_qei_config,
                                                                 MotorcontrolConfig in_commutation_config, int in_nominal_speed):
 

@@ -18,6 +18,7 @@ static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl,
+                               MotorcontrolConfig &commutation_params,
                                interface MotorcontrolInterface server i_motorcontrol[5])
 {
 
@@ -102,6 +103,10 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                 break;
         case i_motorcontrol[int i].setParameters(MotorcontrolConfig new_parameters):
                 break;
+        case i_motorcontrol[int i].getConfig() -> MotorcontrolConfig out_config:
+
+                  out_config = commutation_params;
+                  break;
         case i_motorcontrol[int i].setAllParameters(HallConfig in_hall_config,
                                                             QEIConfig in_qei_config,
                                                             MotorcontrolConfig in_commutation_config, int in_nominal_speed):
@@ -116,7 +121,8 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 void bdc_loop(chanend c_pwm_ctrl,
                 interface WatchdogInterface client i_watchdog,
                 interface MotorcontrolInterface server i_commutation[5],
-                FetDriverPorts &fet_driver_ports)
+                FetDriverPorts &fet_driver_ports,
+                MotorcontrolConfig &commutation_params)
 {
     const unsigned t_delay = 300*USEC_FAST;
     timer t;
@@ -150,6 +156,6 @@ void bdc_loop(chanend c_pwm_ctrl,
         init_state = 1;
     }
 
-    bdc_internal_loop(fet_driver_ports, pwm_ctrl, c_pwm_ctrl, i_commutation);
+    bdc_internal_loop(fet_driver_ports, pwm_ctrl, c_pwm_ctrl, commutation_params, i_commutation);
 }
 
