@@ -31,5 +31,4 @@ void init_position_control_config(ControlConfig &position_ctrl_params){
     position_ctrl_params.sensor_used = SENSOR_USED; // units - for CORE 2/1/0 only default
 
     return;
-
 }

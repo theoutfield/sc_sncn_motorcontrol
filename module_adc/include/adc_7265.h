@@ -19,17 +19,15 @@
 #include <assert.h>
 #include <print.h>
 #include <adc_service.h>
-                           // nDIFF|A2|A1|A0
-#define AD7265_MUX_DEFAULT_CONFIG 0b1000
+
+#define ADC_CALIB_POINTS 64
+#define Factor 6
+
+#define AD7265_MUX_DEFAULT_CONFIG 0b1000 // nDIFF|A2|A1|A0
 
 interface ADC{
     {int, int} get_adc_measurements(unsigned char port_id, unsigned char config);
 };
-
-//interface ADC_trigger{
-//  void trigger_measurement(unsigned char port_id, unsigned char config);
-//};
-
 
 /*	The AD7265 data-sheet refers to the following signals:-
  *		SCLK:				Serial Clock frequency (can be configured to between  4..16 MHz.)

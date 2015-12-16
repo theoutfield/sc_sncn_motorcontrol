@@ -135,6 +135,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_blocks/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
 								</option>
 								<option id="com.xmos.xc.compiler.option.defined.symbols.40325899" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SHRT_MAX__=32767"/>
@@ -718,6 +723,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_blocks/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.76138049" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1121,6 +1131,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_blocks/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.36413796" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

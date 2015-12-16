@@ -45,7 +45,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
         hall_config = i_hall.getHallConfig();
 
     if(!isnull(i_qei)){
-
         qei_config = i_qei.getQEIConfig();
     }
 
