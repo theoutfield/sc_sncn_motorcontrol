@@ -626,7 +626,9 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
                         if(difference > sensor_resolution_ticks_/2 || difference < -sensor_resolution_ticks_/2){
                             difference = difference_old_;
                         }
-                        velocity_ = (difference * 234375) / (velocity_ticks_ * 1000);
+                        //ToDo: check the velocity estimate relative to the sensor placement. -1 is temporal there!!!
+
+                        velocity_ = -1 * (difference * 234375) / (velocity_ticks_ * 1000);
                //         velocity_ =  difference;
                             abs_pos_old_vel_est_ = abs_pos_;
                             difference_old_ = difference;
