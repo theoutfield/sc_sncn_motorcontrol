@@ -32,7 +32,7 @@
 
 /* Position Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
-#define SENSOR_USED                 QEI
+#define SENSOR_USED                QEI
 
 /* Define your Incremental Encoder type (QEI_INDEX/ QEI_WITH_NO_INDEX) */
 #define QEI_INDEX_TYPE             QEI_WITH_INDEX
@@ -81,7 +81,7 @@
 /* Position Control (Mandatory if Position control used)
  * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
  * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define POSITION_Kp_NUMERATOR       100
+#define POSITION_Kp_NUMERATOR       10
 #define POSITION_Kp_DENOMINATOR     1000
 #define POSITION_Ki_NUMERATOR       1
 #define POSITION_Ki_DENOMINATOR     5000

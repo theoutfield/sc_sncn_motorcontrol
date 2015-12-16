@@ -44,7 +44,6 @@ int main(void) {
                     printf("Voltage SP: %i\n", normalized_value);
 
                     i_motorcontrol[0].setVoltage(normalized_value);
-
               }
             }
         }
@@ -76,7 +75,6 @@ int main(void) {
                 }
             }
         }
-
     }
 
     return 0;

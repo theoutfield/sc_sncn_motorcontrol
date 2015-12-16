@@ -191,7 +191,7 @@ void foc_adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to 
 
 void run_adc_AD7256(interface ADCInterface server iADC[3], AD7265Ports &adc_ports, chanend c_trig)
 {
-    printstrln("                                           ADC Server Starts");
+    printstrln("     ADC Server Starts");
     unsigned time_stamp; // Time stamp
     timer t;
     unsigned int ts;
@@ -200,10 +200,33 @@ void run_adc_AD7256(interface ADCInterface server iADC[3], AD7265Ports &adc_port
     unsigned inp_val = 0, tmp_val = 0;
     int out_a = 0, out_b= 0;
 
+    //Calibration variables
+    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+
     unsigned char mux_config, config, port_id;
     unsigned char ct;
 
     configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
+
+    //Calibration
+    while (i < ADC_CALIB_POINTS) {
+        // get ADC reading
+
+        adc_ad7265_singleshot(adc_ports, adc_data, 1, 1);
+
+        if (adc_data[0][0]>0 && adc_data[0][0]<4096  &&  adc_data[1][0]>0 && adc_data[1][0]<4096) {
+            i_calib_a += adc_data[0][0];
+            i_calib_b += adc_data[1][0];
+            i++;
+            if (i == ADC_CALIB_POINTS) {
+                break;
+            }
+        }
+    }
+
+   i_calib_a = (i_calib_a >> Factor);
+   i_calib_b = (i_calib_b >> Factor);
+
 
     while(1){
 
@@ -224,8 +247,8 @@ void run_adc_AD7256(interface ADCInterface server iADC[3], AD7265Ports &adc_port
 
         case iADC[int i].get_currents() -> {int adc_A, int adc_B}:
 
-                adc_A = adc_data[0][0];
-                adc_B = adc_data[1][0];
+                adc_A = Icalibrated_a;
+                adc_B = Icalibrated_b;
 
                 break;
 
@@ -254,10 +277,11 @@ void run_adc_AD7256(interface ADCInterface server iADC[3], AD7265Ports &adc_port
                 ext_a = 0;
                 ext_b = 0;
                 break;
-
-            default:
-                break;
         }//eof select
+
+        Icalibrated_a = ((int) adc_data[0][0]) - i_calib_a;
+        Icalibrated_b =((int) adc_data[1][0]) - i_calib_b;
+
     }//eof while
 }
 /*****************************************************************************/
