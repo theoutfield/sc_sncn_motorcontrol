@@ -1,7 +1,0 @@
-
-#pragma once
-
-enum { UNSET, SET };
-enum { ACTIVE_HIGH=1, ACTIVE_LOW };
-enum { HOMING_NEGATIVE_SWITCH=1, HOMING_POSITIVE_SWITCH };
-

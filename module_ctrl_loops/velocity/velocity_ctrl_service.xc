@@ -327,7 +327,7 @@ void velocity_control_service(ControlConfig &velocity_ctrl_params,
 
         case i_velocity_control[int i].enable_velocity_ctrl():
 
-            activate = SET;
+            activate = 1;
             while (1) {
                 init_state = commutation_interface.checkBusy();//__check_commutation_init(c_commutation);
                 if (init_state == INIT) {

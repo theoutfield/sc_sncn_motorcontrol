@@ -456,7 +456,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
             break;
 
         case i_torque_control[int i].enable_torque_ctrl():
-                activate = SET;
+                activate = 1;
                   init_state = i_motorcontrol.checkBusy(); //__check_commutation_init(c_commutation);
                   if (init_state == INIT) {
 #ifdef debug_print
@@ -486,7 +486,7 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
         case i_torque_control[int i].shutdown_torque_ctrl():
 
-               activate = UNSET;
+               activate = 0;
                error_torque = 0;
                error_torque_integral = 0;
                error_torque_derivative = 0;
