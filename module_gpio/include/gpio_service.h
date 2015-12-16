@@ -6,6 +6,12 @@
 
 #pragma once
 
+
+enum { ACTIVE_HIGH=1, ACTIVE_LOW };
+enum { HOMING_NEGATIVE_SWITCH=1, HOMING_POSITIVE_SWITCH };
+
+#ifdef __XC__
+
 #include <xs1.h>
 #include <internal_config.h>
 #include <platform.h>
@@ -55,3 +61,5 @@ interface GPIOInterface{
  *
  */
 void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2]);
+
+#endif

@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <mc_constants.h>
-
 /* TODO: output of control loops shouldn't (directly) depend on
  * PWM_MAX_VALUE, etc. */
 #define BLDC_PWM_CONTROL_LIMIT              (13889 - 700) / 2 //(((PWM_MAX_VALUE) - (PWM_DEAD_TIME)) / 2)
