@@ -237,7 +237,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
             break;
 
         case i_position_control[int i].enable_position_ctrl():
-                        activate = SET;
+                        activate = 1;
                             while (1) {
                                 init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
                                 if(init_state == INIT) {
