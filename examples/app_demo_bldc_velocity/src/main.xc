@@ -32,7 +32,7 @@ QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 /* Test Profile Velocity function */
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
-	int target_velocity = 30;	 		// rpm
+	int target_velocity = 300;	 		// rpm
 	int acceleration 	= 1000;			// rpm/s
 	int deceleration 	= 1000;			// rpm/s
 

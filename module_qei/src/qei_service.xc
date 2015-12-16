@@ -8,9 +8,7 @@
 #include <qei_service.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <xs1.h>
 #include <refclk.h>
-#include <xscope.h>
 #include "print.h"
 #include <internal_config.h>
 
@@ -82,12 +80,12 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
 
         //Our board has a configurable qei port, lets check now the configuration provided by the user
         if(qei_config.signal_type == QEI_TTL_SIGNAL){
+
             encoder_ports.p_qei_config <: QEI_PORT_AS_TTL;
         }else{
 
-            //By default the qei signals are defined as rs422, so no action is required.
+            encoder_ports.p_qei_config <: QEI_PORT_AS_RS422;
         }
-
     }
 
     //qei_config.max_ticks_per_turn = qei_config.real_counts;

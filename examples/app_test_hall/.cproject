@@ -90,6 +90,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_blocks/doc}&quot;"/>
 								</option>
 								<option id="com.xmos.xc.compiler.option.defined.symbols.730870327" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SHRT_MAX__=32767"/>
@@ -628,6 +629,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_blocks/doc}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.83104709" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -986,6 +988,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_blocks/doc}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.12001339" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

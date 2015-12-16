@@ -76,7 +76,6 @@ int main(void)
             }
         }
 
-
 		on tile[APP_TILE]:
 		{
 			/* Position Control Loop */
