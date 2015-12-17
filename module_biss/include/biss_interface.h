@@ -83,4 +83,10 @@ interface i_biss {
      *
      */
     void set_params(biss_par biss_params);
+
+    /**
+     * @brief Set calib flag in the BiSS Server which will alway return 0 as electrical angle
+     *
+     */
+    void set_calib(int flag);
 };
