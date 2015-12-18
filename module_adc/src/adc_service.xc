@@ -11,20 +11,20 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
         if(!isnull(adc_ports.ad7949_ports.clk)){
 
-            adc_ad7949_triggered(adc_interface, adc_ports.ad7949_ports, c_dummy);
+            adc_ad7949(adc_interface, adc_ports.ad7949_ports, adc_ports.current_sensor_config, c_dummy);
         }else{
 
-            run_adc_AD7256(adc_interface, adc_ports.ad7265_ports, c_dummy);
+            adc_ad7256(adc_interface, adc_ports.ad7265_ports, adc_ports.current_sensor_config, c_dummy);
         }
     }else{
 
         // There is triggering
         if(!isnull(adc_ports.ad7949_ports.clk)){
 
-            adc_ad7949_triggered(adc_interface, adc_ports.ad7949_ports, c_trigger);
+            adc_ad7949(adc_interface, adc_ports.ad7949_ports, adc_ports.current_sensor_config, c_trigger);
         }else{
 
-            run_adc_AD7256(adc_interface, adc_ports.ad7265_ports, c_trigger);
+            adc_ad7256(adc_interface, adc_ports.ad7265_ports, adc_ports.current_sensor_config, c_trigger);
         }
     }
 }

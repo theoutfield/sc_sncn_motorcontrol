@@ -108,9 +108,6 @@ static void configure_adc_ports(clock clk,
     start_clock(clk);
 }
 
-
-
-
 static inline unsigned convert(unsigned raw)
 {
     unsigned int data;
@@ -211,104 +208,8 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
     t :> ts;
 }
 
-
-void adc_ad7949(  interface ADCInterface server adc_interface, AD7949Ports &adc_ports )
-{
-    timer tx;
-    unsigned ts;
-
-    const unsigned int adc_config_mot     =   0b11110001001001;  	/* Motor current (ADC Channel 0), unipolar, referenced to GND */
-    const unsigned int adc_config_other[] = { 0b10110001001001,  	// Temperature
-                                              0b11110101001001,		// ADC Channel 2, unipolar, referenced to GND  voltage and current
-                                              0b11111001001001,  	// ADC Channel 4, unipolar, referenced to GND
-                                              0b11111011001001};   	// ADC Channel 5, unipolar, referenced to GND
-
-    const unsigned int delay = (11*USEC_FAST) / 3; 			// 3.7 us
-    unsigned int adc_data_a[5];
-    unsigned int adc_data_b[5];
-    unsigned short adc_index = 0;
-    int i_calib_a = 0, i_calib_b = 0, i = 0;
-    configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
-
-    //Calibration
-    while (i < ADC_CALIB_POINTS) {
-            // get ADC reading
-
-            adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
-                                                   adc_config_mot,  adc_config_other, delay, tx, adc_data_a, adc_data_b, adc_index);
-
-            if (adc_data_a[4]>0 && adc_data_a[4]<16384  &&  adc_data_b[4]>0 && adc_data_b[4]<16384) {
-                i_calib_a += adc_data_a[4];
-                i_calib_b += adc_data_b[4];
-                i++;
-                if (i == ADC_CALIB_POINTS) {
-                    break;
-                }
-            }
-        }
-
-       i_calib_a = (i_calib_a >> Factor);
-       i_calib_b = (i_calib_b >> Factor);
-
-    tx :> ts;
-
-    while (1)
-    {
-        tx when timerafter(ts + 13889) :> ts;   	// 250 => 1µsec 125= 0,5µsec
-        adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia,
-                                adc_ports.data_a,
-                                adc_ports.data_b,
-                                adc_ports.clk,
-                                adc_config_mot,
-                                adc_config_other,
-                                delay,
-                                tx,
-                                adc_data_a,
-                                adc_data_b,
-                                adc_index );
-
-#pragma ordered
-        select
-        {
-              case adc_interface.get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
-
-                      Ia = adc_data_a[4];         //  raw;
-                      Ib = adc_data_b[4];         //  raw;
-
-                      tmp_1 = adc_data_a[1];
-                      voltage = adc_data_a[2];
-                      ext_1 = adc_data_a[3];
-
-                      tmp_2 = adc_data_b[1];
-                      dummy = adc_data_b[2];
-                      ext_2 = adc_data_b[3];
-
-                      break;
-
-              case adc_interface.get_currents() -> {int Ia, int Ib}:
-
-                      Ia = ((int) adc_data_a[4]) - i_calib_a;
-                      Ib = ((int) adc_data_b[4]) - i_calib_b;
-
-                      break;
-
-              case adc_interface.get_external_inputs() -> {int ext_a, int ext_b}:
-
-                      ext_a = adc_data_a[3];
-                      ext_b = adc_data_b[3];
-
-                      break;
-
-              case adc_interface.get_temperature() -> {int out_temp}:
-
-                      out_temp = adc_data_a[1];
-                      break;
-        }
-    }
-}
-
-
-void adc_ad7949_triggered( interface ADCInterface server adc_interface[3], AD7949Ports &adc_ports, chanend c_trig)
+void adc_ad7949(interface ADCInterface server adc_interface[3], AD7949Ports &adc_ports,
+                                CurrentSensorsConfig &current_sensor_config, chanend c_trig)
 {
     timer t;
     unsigned int ts;
@@ -319,6 +220,8 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface[3], AD794
                                               0b11110101001001,   // ADC Channel 2, unipolar, referenced to GND  voltage and current
                                               0b11111001001001,   // ADC Channel 4, unipolar, referenced to GND
                                               0b11111011001001 }; // ADC Channel 5, unipolar, referenced to GND
+
+    unsigned char trigger_exists = 0;
     const unsigned int delay = (11*USEC_FAST) / 3; // 3.7 us
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
@@ -356,17 +259,31 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface[3], AD794
             if (ct == XS1_CT_END)
             {
                 t :> ts;
+                trigger_exists = 1;
                 t when timerafter(ts + 7080) :> ts; // 6200
-                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,	adc_ports.clk,
-                                       adc_config_mot,	adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
+
+                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+                                        adc_ports.clk, adc_config_mot,	adc_config_other, delay, t, adc_data_a,
+                                        adc_data_b, adc_index);
             }
 
             break;
 
         case adc_interface[int i].get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
 
-                Ia = adc_data_a[4];         //  raw;
-                Ib = adc_data_b[4];         //  raw;
+                if(trigger_exists == 0){
+
+                    //If no trigger exists on the system, we sample on request
+                    adc_index = 1;
+                    while(adc_index < 4){
+                        adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+                                                adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
+                                                adc_data_b, adc_index);
+                    }
+                }
+
+                Ia = adc_data_a[4];         // raw;
+                Ib = adc_data_b[4];         // raw;
 
                 tmp_1 = adc_data_a[1];
                 voltage = adc_data_a[2];
@@ -380,6 +297,18 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface[3], AD794
 
         case adc_interface[int i].get_currents() -> {int Ia, int Ib}:
 
+                if(trigger_exists == 0){
+
+                    //If no trigger exists on the system, we sample on request
+                    adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+                                            adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
+                                            adc_data_b, adc_index);
+
+                    Icalibrated_a = ((int) adc_data_a[4]) - i_calib_a;
+                    Icalibrated_b = ((int) adc_data_b[4]) - i_calib_b;
+
+                }
+
                 Ia = Icalibrated_a;
                 Ib = Icalibrated_b;
 
@@ -387,10 +316,31 @@ void adc_ad7949_triggered( interface ADCInterface server adc_interface[3], AD794
 
         case adc_interface[int i].get_temperature() -> {int out_temp}:
 
+                if(trigger_exists == 0){
+
+                    //If no trigger exists on the system, we sample on request
+                    adc_index = 1;
+                    adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+                                            adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
+                                            adc_data_b, adc_index);
+
+                }
+
                 out_temp = adc_data_a[1];
+
                 break;
 
         case adc_interface[int i].get_external_inputs() -> {int ext_a, int ext_b}:
+
+                if(trigger_exists == 0){
+
+                    //If no trigger exists on the system, we sample on request
+                    adc_index = 3;
+                    adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+                                            adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
+                                            adc_data_b, adc_index);
+
+                }
 
                 ext_a = adc_data_a[3];
                 ext_b = adc_data_b[3];

@@ -161,7 +161,6 @@ void bdc_loop(chanend c_pwm_ctrl,
         init_state = check_fet;
     }
     else {
-        i_watchdog.enable_motors();
         init_state = 1;
     }
 

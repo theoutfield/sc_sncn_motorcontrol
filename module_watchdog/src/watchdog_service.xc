@@ -11,7 +11,7 @@
 void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server watchdog_interface[2])
 {
 
-    unsigned int wd_enabled = 1, shared_out = 0xe, tick_out = 0;
+    unsigned int wd_enabled = 1, shared_out, tick_out = 0;
     unsigned int ts, ts2;
     timer t;
 
@@ -22,15 +22,19 @@ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface
         select {
             // Get a command from the out loop
                 case watchdog_interface[int i].start(): // produce a rising edge on the WD_EN
+
                     if (isnull(watchdog_ports.p_tick)){
+                        shared_out = 0xe;
                         shared_out &= ~0x5;//and shortly switch the LED to red (DC1K)
                     }
                     else {
                         shared_out &= ~0x1;
                     }
                     watchdog_ports.p_enable <: shared_out; // go low
+
                     t :> ts2;
                     t when timerafter(ts2+25000) :> ts2;
+
                     if (isnull(watchdog_ports.p_tick)){
                         shared_out &= 0x7;
                         shared_out |= 0x1;
@@ -39,21 +43,22 @@ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface
                         shared_out |= 0x1;
                     }
                     watchdog_ports.p_enable <: shared_out; // go high
-                    break;
 
-                    // if the watchdog is enabled, kick it
-                case watchdog_interface[int i].disable_motors():
-                    // mark that the watchdog should now not run
-                    wd_enabled = 0;
-                    break;
+                    t :> ts2;
+                    t when timerafter (ts2 + 25000) :> ts2;
 
-                case watchdog_interface[int i].enable_motors():
-                    //only for DC1K
                     if (isnull(watchdog_ports.p_tick)){
-                        shared_out |= (1 << 2);
+                        shared_out |= (1 << 2);             // prepare the kicking
+                        watchdog_ports.p_enable <: shared_out;
                     }
+
                     wd_enabled = 1;
 
+                    break;
+
+                case watchdog_interface[int i].stop():
+                    // Disable the kicking
+                    wd_enabled = 0;
                     break;
 
                 case t when timerafter(ts + 250000) :> ts:
