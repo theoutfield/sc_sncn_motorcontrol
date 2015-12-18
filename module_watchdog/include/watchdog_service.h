@@ -25,11 +25,7 @@ interface WatchdogInterface{
     /**
      * @brief Lorem ipsum...
      */
-    void enable_motors(void);
-    /**
-     * @brief Lorem ipsum...
-     */
-    void disable_motors(void);
+    void stop(void);
 };
 
 /** @brief Run the watchdog timer server

@@ -26,7 +26,7 @@
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-	int target_torque = 400; 	//(desired torque/torque_constant)  * IFM resolution
+	int target_torque = 100; 	//(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 1000;  	//(desired torque_slope/torque_constant)  * IFM resolution
 
 	ProfileTorqueConfig profile_torque_config;
@@ -37,10 +37,10 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
 	init_torque_profiler(profile_torque_config, i_torque_control);
 
 	/* Set new target torque for profile torque control */
-	set_profile_torque( target_torque, torque_slope, i_torque_control);
+	set_profile_torque(target_torque, torque_slope, i_torque_control);
 
 	delay_seconds(3);
-	target_torque = -400;
+	target_torque = -100;
 
     /* Set new target torque for profile torque control */
 	set_profile_torque( target_torque, torque_slope, i_torque_control);
@@ -107,13 +107,13 @@ int main(void)
 		{
 			par
 			{
-                /* PWM Loop */
+                /* Triggered PWM Service */
 			    pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl);
 
-                /* Watchdog Server */
+                /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
 
-                /* ADC Loop */
+                /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc);
 
                 /* Hall sensor Service */

@@ -68,7 +68,6 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
         init_state = check_fet;
     }
     else {
-        watchdog_interface.enable_motors();
         init_state = 1;
     }
 
