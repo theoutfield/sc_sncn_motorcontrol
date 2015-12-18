@@ -85,7 +85,7 @@ int main(void)
 		on tile[APP_TILE]:
 		{
 
-            /* Velocity Control Loop */
+            /* Velocity Control Service */
             {
                 ControlConfig velocity_ctrl_params;
                 /* Initialize PID parameters for Velocity Control (defined in config/motor/bldc_motor_config.h) */
@@ -104,10 +104,10 @@ int main(void)
 		{
 		    par
             {
-                /* PWM Loop */
+                /* PWM Service */
                 pwm_service(pwm_ports, c_pwm_ctrl);
 
-                /* Watchdog Server */
+                /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* Hall sensor Service */

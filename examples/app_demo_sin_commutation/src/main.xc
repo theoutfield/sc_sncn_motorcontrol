@@ -2,7 +2,6 @@
 #include <CORE_C22-rev-a.inc>
 #include <IFM_DC100-rev-b.inc>
 
-
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
@@ -19,7 +18,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
-#define VOLTAGE -1000 //+/- 4095
+#define VOLTAGE 2000 //+/- 4095
 
 void adc_client(interface ADCInterface client i_adc, interface HallInterface client i_hall){
 
@@ -27,12 +26,13 @@ void adc_client(interface ADCInterface client i_adc, interface HallInterface cli
     unsigned state;
 
     while (1) {
+
         {b, c} = i_adc.get_currents();
         state = i_hall.get_hall_pinstate();
+
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
         xscope_int(HALL_PINS, state);
-        delay_microseconds(10);
     }
 }
 
@@ -56,26 +56,20 @@ int main(void) {
             run_offset_tuning(VOLTAGE, i_motorcontrol[0]);
         }
 
-            on tile[APP_TILE_2]: adc_client(i_adc[0], i_hall[1]);
-   /*    { int a,b;
-            while(1){
-                a = i_adc[0].get_temperature();
-                printf("%d %d\n",a,b);
-            }
-        }
-*/
+        on tile[APP_TILE_2]: adc_client(i_adc[0], i_hall[1]);
+
         on tile[IFM_TILE]:
         {
             par
             {
-                /* ADC Loop */
+                /* Triggered PWM Service */
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
+
+                /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc);
 
-                /* Watchdog Server */
+                /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
-
-                /* PWM Loop */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
 
                 /* Hall sensor Service */
                 {

@@ -73,8 +73,18 @@ typedef struct {
  * Lorem ipsum...
  */
 typedef struct {
+    int sign_phase_b;
+    int sign_phase_c;
+    unsigned current_sensor_amplitude;
+}CurrentSensorsConfig;
+
+/**
+ * Lorem ipsum...
+ */
+typedef struct {
     AD7949Ports ad7949_ports;
     AD7265Ports ad7265_ports;
+    CurrentSensorsConfig current_sensor_config;
 } ADCPorts;
 
 /**

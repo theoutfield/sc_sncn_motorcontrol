@@ -31,22 +31,21 @@ int main(void) {
 
         on tile[APP_TILE]:
         {
-
-            i_motorcontrol[0].setVoltage(500);  // Motor start spinning
+            delay_seconds(1);
+            printstrln("Motor start spinning");
+            i_motorcontrol[0].setVoltage(500);
 
             delay_seconds(3);                   // Motor spins for 3 secs
 
-            i_watchdog[1].disable_motors();     // Stop pinging Watchdog, motor stops
+            printstrln("Watchdog is disabled, motor stops");
+            i_watchdog[1].stop();
 
             delay_seconds(2);                   // Motor still for 2 secs
+            i_motorcontrol[0].setVoltage(0);    // We set a 0 voltage before starting operation
 
-            i_motorcontrol[0].setVoltage(0);    // We deactivate spin before restarting
-
-            i_watchdog[1].enable_motors();      // Reenable watchdog operation
-            delay_milliseconds(1);
+            printstrln("Watchdog starts again, motor spins");
             i_watchdog[1].start();
-
-            i_motorcontrol[0].setVoltage(500);  // Motor spins again
+            i_motorcontrol[0].setVoltage(500);
         }
 
         on tile[IFM_TILE]:

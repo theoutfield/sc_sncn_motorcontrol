@@ -91,13 +91,7 @@ interface ADC{
 #define ADC_TRIGGER_CORR 128 // Timing correction
 #define ADC_TRIGGER_DELAY (QUART_PWM_MAX - ADC_TRIGGER_CORR) // MB~ Re-tune
 
-
-void foc_adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to client
-    server interface ADC iADC,
-    AD7265Ports &adc_ports
-);
-
-
-void run_adc_AD7256(interface ADCInterface server iADC[3], AD7265Ports &adc_ports, chanend c_trig);
+void adc_ad7256(interface ADCInterface server iADC[3], AD7265Ports &adc_ports,
+                    CurrentSensorsConfig &current_sensor_config, chanend c_trig);
 
 /*****************************************************************************/
