@@ -75,14 +75,9 @@ void run_biss(server interface i_biss i_biss[n], unsigned int n, port out p_biss
     unsigned int last_biss_read = 0;
 
     //clock and port configuration
-    configure_clock_rate(clk, biss_params.clock_dividend, biss_params.clock_divisor) ; // a/b MHz
-    configure_port_clock_output(p_biss_clk, clk);
-    set_port_inv(p_biss_clk);
-#if(BISS_DATA_PORT == ENC_CH1) //FIXME use a normal 1-bit output port
-    configure_out_port(p_biss_data, clk, 0b1000); //to configure p_biss_clk as output
-#else
+    configure_clock_rate(clk, biss_params.clock_dividend, biss_params.clock_divisor); // a/b MHz
+    configure_out_port(p_biss_clk, clk, BISS_CLK_PORT_MASK);
     configure_in_port(p_biss_data, clk);
-#endif
 
     //first read
     read_biss_sensor_data(p_biss_clk, p_biss_data, clk, 0, 0, data, biss_data_length, frame_bytes, biss_params.crc_poly);
@@ -297,21 +292,16 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
     unsigned int bitindex = 0;
     unsigned int byteindex = 0;
     unsigned int readbuf = 0;
-    unsigned int timeout = 8; //max number of bits to read before the ack bit, at least 3
+    const unsigned int timeout = 3+2; //3 bits to read before then the ack and start bits
     unsigned int crc_length = 32 - clz(crc_poly); //clz: number of leading 0
     for (int i=0; i<(data_length-1)/32+1; i++) //init data with zeros
         data[i] = 0;
 
     //clock and data port config
     if (a) { // set a to 0 to not reconfig each time
-        configure_clock_rate(clk, a, b) ; // a/b MHz
-        configure_port_clock_output(p_biss_clk, clk);
-        set_port_inv(p_biss_clk);
-#if(BISS_DATA_PORT == ENC_CH1)//FIXME use a normal 1-bit output port
-        configure_out_port(p_biss_data, clk, 0b1000); //to configure p_biss_clk as output
-#else
+        configure_clock_rate(clk, a, b); // a/b MHz
+        configure_out_port(p_biss_clk, clk, BISS_CLK_PORT_MASK);
         configure_in_port(p_biss_data, clk);
-#endif
     }
 
     //get the raw data
@@ -324,15 +314,15 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
             byteindex++;
         }
         unsigned int bit;
+        p_biss_clk <: 0b0011 & BISS_CLK_PORT_MASK;
+        p_biss_clk <: BISS_CLK_PORT_MASK;
         p_biss_data :> bit;
-#if(BISS_DATA_PORT == ENC_CH1)//FIXME use a normal 1-bit output port
-        configure_out_port(p_biss_data, clk, 0b1000); //to reconfigure p_biss_clk as output
-#endif
         readbuf = readbuf << 1;
         readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         bitindex++;
     }
     stop_clock(clk);
+    configure_out_port(p_biss_clk, clk, BISS_CLK_PORT_MASK);
     readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
     frame[byteindex] = readbuf;
     readbuf = 0;
@@ -394,24 +384,21 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
 unsigned int read_biss_sensor_data_fast(port out p_biss_clk, port in p_biss_data, clock clk, unsigned a, unsigned b, int before_length, int data_length) {
     unsigned int data = 0;
     int status = 0;
-    int timeout = 8;
+    int timeout = 3+2; //3 bits to read before then the ack and start bits
 
     //clock and data port config
     if (a) { // set a to 0 to not reconfig each time
-        configure_clock_rate(clk, a, b) ; // a/b MHz
-        configure_port_clock_output(p_biss_clk, clk);
-        set_port_inv(p_biss_clk);
-#if(BISS_DATA_PORT == ENC_CH1)//FIXME use a normal 1-bit output port
-        configure_out_port(p_biss_data, clk, 0b1000); //to configure p_biss_clk as output
-#else
+        configure_clock_rate(clk, a, b); // a/b MHz
+        configure_out_port(p_biss_clk, clk, BISS_CLK_PORT_MASK);
         configure_in_port(p_biss_data, clk);
-#endif
     }
 
     start_clock(clk);
     while(status < 2 && timeout > 0) {
         timeout--;
         unsigned int bit;
+        p_biss_clk <: 0b0011 & BISS_CLK_PORT_MASK;
+        p_biss_clk <: BISS_CLK_PORT_MASK;
         p_biss_data :> bit;
         bit = (bit & (1 << BISS_DATA_PORT_BIT));
         if (status) {
@@ -422,15 +409,20 @@ unsigned int read_biss_sensor_data_fast(port out p_biss_clk, port in p_biss_data
     }
     if (timeout >= 0) {
         for (int i=0; i<before_length; i++)
+            p_biss_clk <: 0b0011 & BISS_CLK_PORT_MASK;
+            p_biss_clk <: BISS_CLK_PORT_MASK;
             p_biss_data :> void;
         for (int i=0; i<data_length; i++) {
             unsigned int bit;
+            p_biss_clk <: 0b0011 & BISS_CLK_PORT_MASK;
+            p_biss_clk <: BISS_CLK_PORT_MASK;
             p_biss_data :> bit;
             data = data << 1;
             data |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         }
     }
     stop_clock(clk);
+    configure_out_port(p_biss_clk, clk, BISS_CLK_PORT_MASK);
 
     return data;
 }
