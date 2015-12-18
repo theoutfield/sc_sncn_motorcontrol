@@ -103,10 +103,10 @@ int main(void)
 		{
 			par
 			{
-				/* PWM Loop */
+				/* PWM Service */
                 pwm_service(pwm_ports, c_pwm_ctrl);
 
-                /* Watchdog Server */
+                /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* Hall sensor Service */
@@ -128,7 +128,7 @@ int main(void)
                     qei_service(qei_ports, qei_config, i_qei);
                 }
 
-				/* Motor Commutation loop */
+				/* Motor Control Service */
 				{
 				    MotorcontrolConfig motorcontrol_config;
 				        motorcontrol_config.motor_type = BLDC_MOTOR;
