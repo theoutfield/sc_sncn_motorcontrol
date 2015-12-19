@@ -61,7 +61,7 @@ void set_torque_cst(CyclicSyncTorqueConfig &cst_params, int target_torque, int t
                               cst_params.max_torque));
 }
 
-void current_filter(interface ADCInterface client adc_if, chanend c_current, chanend c_speed)
+void current_filter(interface ADCInterface client adc_if, chanend c_current)
 {
 #define FILTER_LENGTH_ADC 80
     int phase_a_raw = 0;
@@ -84,24 +84,7 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
     int mod = 0;
     int abs_speed = 0;
     int filter_count = 0;
-   // int adc_calib_start = 0;
-   // calib_data I_calib;
-/*
-    while (1) {
-        select {
-        case c_current :> command:
-            //printstrln("start adc calibration");
-            adc_calib_start = 1;
-            break;
-        }
 
-        if (adc_calib_start == 1)
-            break;
-    }
-
-    c_current <: 1; // adc calib done */
-    //init_buffer(buffer_phase_a, FILTER_LENGTH_ADC);
-    //init_buffer(buffer_phase_b, FILTER_LENGTH_ADC);
     ts :> time;
     tc :> time1;
 
@@ -109,7 +92,7 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
 #pragma ordered
         select {
         case ts when timerafter(time+5556) :> time: // .05 ms
-        { phase_a_raw, phase_b_raw } = adc_if.get_currents();//get_adc_calibrated_current_ad7949(c_adc, I_calib);
+        { phase_a_raw, phase_b_raw } = adc_if.get_currents();
             //xscope_probe_data(0, phase_a_raw);
             buffer_phase_a[buffer_index] = phase_a_raw;
             buffer_phase_b[buffer_index] = phase_b_raw;
@@ -174,7 +157,7 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current, cha
 
 
 void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config, QEIConfig &qei_params,
-                        chanend c_current, chanend c_speed,
+                        chanend c_current,
                         interface MotorcontrolInterface client i_motorcontrol,
                         interface HallInterface client i_hall,
                         interface QEIInterface client i_qei,
@@ -221,6 +204,24 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
     int error_torque_previous = 0;
     int torque_control_output = 0;
 
+    int torque_control_output_limit = 0;
+    int error_torque_integral_limit = 0;
+
+
+    if(motorcontrol_config.motor_type == BLDC_MOTOR){
+        torque_control_output_limit = BLDC_PWM_CONTROL_LIMIT;
+    }else if (motorcontrol_config.motor_type == BDC_MOTOR){
+        torque_control_output_limit = BDC_PWM_CONTROL_LIMIT;
+    }
+
+    if(torque_ctrl_params.Ki != 0)
+        error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_ctrl_params.Ki;
+
+    if(torque_ctrl_params.control_loop_period < MIN_TORQUE_CONTROL_LOOP_PERIOD){
+        torque_ctrl_params.control_loop_period = MIN_TORQUE_CONTROL_LOOP_PERIOD;
+        printstrln("Torque Control Loop ERROR: Loop period to small, set to 100 us");
+    }
+
     int init_state = INIT_BUSY;
 
     int compute_flag = 0;
@@ -239,24 +240,22 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
         filter_length_variance = 10;
     }
 
-    if (torque_ctrl_params.sensor_used >= QEI)
+    if (torque_ctrl_params.position_sensor_type >= QEI_SENSOR)
         qei_counts_per_hall= (qei_params.ticks_resolution*4)/ hall_config.pole_pairs;
 
     tc :> time1;
-    time1 += MSEC_STD - 100;
 
     while(1) {
 #pragma ordered
         select {
 
-        case tc when timerafter(time1) :> void:
-            time1 += MSEC_STD - 100;
+        case tc when timerafter(time1 + USEC_STD*torque_ctrl_params.control_loop_period) :> time1:
             if (compute_flag == 1) {
-                if (torque_ctrl_params.sensor_used == HALL) {
+                if (torque_ctrl_params.position_sensor_type == HALL_SENSOR) {
                     angle = (i_hall.get_hall_position() >> 2) & 0x3ff; //  << 10 ) >> 12 //get_hall_position(c_hall)
                     //xscope_probe_data(0, angle);
                     actual_speed = i_hall.get_hall_velocity();//get_hall_velocity(c_hall);
-                } else if (torque_ctrl_params.sensor_used >= QEI) {
+                } else if (torque_ctrl_params.position_sensor_type >= QEI_SENSOR) {
                     { angle, offset_fw_flag, offset_bw_flag } = i_qei.get_qei_sync_position();
                     angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
                     //{qei_count_velocity, qei_direction_velocity} = get_qei_position_absolute(c_qei);
@@ -269,8 +268,8 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                 c_current :> phase_a_filtered;
                 c_current :> phase_b_filtered;
 
-                phase_a = 0 - phase_a_filtered;
-                phase_b = 0 - phase_b_filtered;
+                phase_a = - phase_a_filtered;
+                phase_b = - phase_b_filtered;
 
 #ifdef ENABLE_xscope_torq
                 xscope_int(PHASE_A_FILTERED, phase_a_filtered);
@@ -333,22 +332,24 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                 error_torque_integral = error_torque_integral + error_torque;
                 error_torque_derivative = error_torque - error_torque_previous;
 
-                if (error_torque_integral > torque_ctrl_params.Integral_limit) {
-                    error_torque_integral = torque_ctrl_params.Integral_limit;
-                } else if (error_torque_integral < 0-torque_ctrl_params.Integral_limit) {
-                    error_torque_integral = 0 - torque_ctrl_params.Integral_limit;
+                if (error_torque_integral > error_torque_integral_limit) {
+                    error_torque_integral = error_torque_integral_limit;
+                } else if (error_torque_integral < -error_torque_integral_limit) {
+                    error_torque_integral = -error_torque_integral_limit;
                 }
 
 
-                torque_control_output = ( (torque_ctrl_params.Kp_n * error_torque)/torque_ctrl_params.Kp_d +
-                                          (torque_ctrl_params.Ki_n * error_torque_integral)/torque_ctrl_params.Ki_d +
-                                          (torque_ctrl_params.Kd_n  * error_torque_derivative)/torque_ctrl_params.Kd_d );
+                torque_control_output = (torque_ctrl_params.Kp * error_torque) +
+                                        (torque_ctrl_params.Ki * error_torque_integral) +
+                                        (torque_ctrl_params.Kd  * error_torque_derivative);
+
+                torque_control_output /= PID_DENOMINATOR;
 
                 error_torque_previous = error_torque;
 
                 if (target_torque >= 0) {
-                    if (torque_control_output >= torque_ctrl_params.Control_limit) {
-                        torque_control_output = torque_ctrl_params.Control_limit;
+                    if (torque_control_output >= torque_control_output_limit) {
+                        torque_control_output = torque_control_output_limit;
                     } else if (torque_control_output < 0) {
                         torque_control_output = 0;
                     }
@@ -358,12 +359,12 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
                         torque_control_output = 0;
                     }
 
-                    if (torque_control_output <= -torque_ctrl_params.Control_limit) {
-                        torque_control_output = 0 - torque_ctrl_params.Control_limit;
+                    if (torque_control_output < -torque_control_output_limit) {
+                        torque_control_output = -torque_control_output_limit;
                     }
                 }
+
                 i_motorcontrol.setVoltage(torque_control_output);
-                //set_commutation_sinusoidal(c_commutation, torque_control_output);
             }
             break;
 
@@ -398,13 +399,13 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
         case i_torque_control[int i].set_torque_ctrl_param(ControlConfig in_params):
 
-            torque_ctrl_params.Kp_n = in_params.Kp_n;
-            torque_ctrl_params.Kp_d = in_params.Kp_d;
-            torque_ctrl_params.Ki_n = in_params.Ki_n;
-            torque_ctrl_params.Ki_d = in_params.Ki_d;
-            torque_ctrl_params.Kd_n = in_params.Kd_n;
-            torque_ctrl_params.Kd_d = in_params.Kd_d;
-            torque_ctrl_params.Integral_limit = in_params.Integral_limit;
+            torque_ctrl_params.Kp = in_params.Kp;
+            torque_ctrl_params.Ki = in_params.Ki;
+            torque_ctrl_params.Kd = in_params.Kd;
+
+            error_torque_integral_limit = 0;
+            if(torque_ctrl_params.Ki != 0)
+                error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_ctrl_params.Ki;
 
                 break;
 
@@ -434,14 +435,14 @@ void torque_ctrl_loop(ControlConfig &torque_ctrl_params, HallConfig &hall_config
 
         case i_torque_control[int i].set_torque_sensor(int in_sensor):
 
-            torque_ctrl_params.sensor_used = in_sensor;
+            torque_ctrl_params.position_sensor_type = in_sensor;
 
-            if (torque_ctrl_params.sensor_used == HALL) {
+            if (torque_ctrl_params.position_sensor_type == HALL_SENSOR) {
                 filter_length_variance =  filter_length/hall_config.pole_pairs;
                 if (filter_length_variance < 10)
                     filter_length_variance = 10;
                 target_torque = actual_torque;
-            } else if (torque_ctrl_params.sensor_used >= QEI) {
+            } else if (torque_ctrl_params.position_sensor_type >= QEI_SENSOR) {
                 qei_counts_per_hall = qei_params.ticks_resolution * 4 / hall_config.pole_pairs;
                 filter_length_variance =  filter_length/hall_config.pole_pairs;
                 if (filter_length_variance < 10)
@@ -515,19 +516,19 @@ void torque_control_service(ControlConfig &torque_ctrl_params,
                     interface QEIInterface client ?i_qei,
                     interface TorqueControlInterface server i_torque_control[3])
 {
-    chan c_current, c_speed;
+    chan c_current;
     HallConfig hall_config = i_hall.getHallConfig();
 
     QEIConfig qei_config;
-    if(torque_ctrl_params.sensor_used >= QEI && !isnull(i_qei)){
+    if(torque_ctrl_params.position_sensor_type >= QEI_SENSOR && !isnull(i_qei)){
         qei_config = i_qei.getQEIConfig();
     }
 
 
     par {
-        current_filter(adc_if, c_current, c_speed);
-        torque_ctrl_loop(torque_ctrl_params, hall_config, qei_config, c_current,
-                c_speed, i_motorcontrol, i_hall, i_qei, i_torque_control);
+        current_filter(adc_if, c_current);
+        torque_ctrl_loop(torque_ctrl_params, hall_config, qei_config,
+                c_current, i_motorcontrol, i_hall, i_qei, i_torque_control);
 
     }
 }

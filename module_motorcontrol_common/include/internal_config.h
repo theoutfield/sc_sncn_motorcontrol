@@ -5,11 +5,12 @@
 */
 
 #pragma once
+#include <pwm_common.h>
 
 /* TODO: output of control loops shouldn't (directly) depend on
  * PWM_MAX_VALUE, etc. */
-#define BLDC_PWM_CONTROL_LIMIT              (13889 - 700) / 2 //(((PWM_MAX_VALUE) - (PWM_DEAD_TIME)) / 2)
-#define BDC_PWM_CONTROL_LIMIT               (13889 - 700)     //((PWM_MAX_VALUE) - (PWM_DEAD_TIME))
+#define BLDC_PWM_CONTROL_LIMIT              (PWM_MAX_VALUE - PWM_DEAD_TIME) / 2 //(((PWM_MAX_VALUE) - (PWM_DEAD_TIME)) / 2)
+#define BDC_PWM_CONTROL_LIMIT               (PWM_MAX_VALUE - PWM_DEAD_TIME)     //((PWM_MAX_VALUE) - (PWM_DEAD_TIME))
 
 #define PWM_MIN_LIMIT 250 /* FIXME: remove it when proper PWM module is used */
 

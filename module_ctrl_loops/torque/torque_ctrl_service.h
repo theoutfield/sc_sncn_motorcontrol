@@ -6,14 +6,14 @@
 
 #pragma once
 
+#include <control_loops_common.h>
 #include <motorcontrol_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
-#include <control_loops_common.h>
 #include <adc_service.h>
 
 #define FILTER_LENGTH_TORQUE 80
-
+#define MIN_TORQUE_CONTROL_LOOP_PERIOD 100 //us
 /**
  * @brief Lorem ipsum...
  */
