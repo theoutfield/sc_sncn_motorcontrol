@@ -5,17 +5,17 @@
 
 #pragma once
 
+#define PID_DENOMINATOR 10000.0
+
 /**
  * @brief Struct definition for PID Controller
  */
 typedef struct {
-    int Kp_n, Kp_d; /**< Kp = Kp_n/Kp_d */
-    int Ki_n, Ki_d; /**< Ki = Ki_n/Ki_d */
-    int Kd_n, Kd_d; /**< Kd = Kd_n/Kd_d */
-    int Integral_limit;
-    int Control_limit;
-    int Loop_time;
-    int sensor_used;
+    int Kp; /**< Kp = Kp_n/Kp_d */
+    int Ki; /**< Ki = Ki_n/Ki_d */
+    int Kd; /**< Kd = Kd_n/Kd_d */
+    int control_loop_period;
+    int position_sensor_type;
 } ControlConfig;
 
 /**

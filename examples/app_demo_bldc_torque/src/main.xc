@@ -21,7 +21,6 @@
 
 //Configure your motor parameters in config/bldc_motor_config.h
 #include <user_config.h>
-#include <control_config.h>
 
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
@@ -74,11 +73,18 @@ int main(void)
 		on tile[APP_TILE]:
 		{
 		    /* Torque Control Loop */
-            ControlConfig torque_ctrl_params;
-            init_torque_control_config(torque_ctrl_params);  // Initialize PID parameters for Torque Control
+            ControlConfig torque_control_config;
+
+            torque_control_config.position_sensor_type = SENSOR_USED;
+
+            torque_control_config.Kp = TORQUE_Kp_NUMERATOR;
+            torque_control_config.Ki = TORQUE_Ki_NUMERATOR;
+            torque_control_config.Kd = TORQUE_Kd_NUMERATOR;
+
+            torque_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; // us
 
             /* Control Loop */
-            torque_control_service(torque_ctrl_params, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
+            torque_control_service(torque_control_config, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
         }
 
 		/* Currents monitoring in XScope */
