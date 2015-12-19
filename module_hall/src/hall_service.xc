@@ -15,10 +15,6 @@
 #include <print.h>
 
 #include <internal_config.h>
-//TODO remove these dependencies
-//#pragma xta command "analyze loop hall_loop"
-//#pragma xta command "set required - 10.0 us"
-//#define DEBUG
 
 int check_hall_config(HallConfig &hall_config){
 
@@ -26,17 +22,7 @@ int check_hall_config(HallConfig &hall_config){
         printstrln("Wrong Hall configuration: wrong pole-pairs");
         return ERROR;
     }
-/*
-    if(hall_config.sensor_polarity < -1 || hall_config.sensor_polarity > 1){
-        printstrln("Wrong Hall configuration: wrong polarity");
-        return ERROR;
-    }*/
-/*
-    if(hall_config.max_ticks < 0){
-        printstrln("Wrong Hall configuration: max ticks");
-        return ERROR;
-    }
-*/
+
     return SUCCESS;
 }
 

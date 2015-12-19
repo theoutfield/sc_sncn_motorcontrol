@@ -57,10 +57,10 @@ void set_position_csp( CyclicSyncPositionConfig & csp_params, int target_positio
 }
 
 
-void position_control_service(ControlConfig &position_ctrl_params,
+void position_control_service(ControlConfig &position_control_config,
                                 interface HallInterface client ?i_hall,
                                 interface QEIInterface client ?i_qei,
-                                interface MotorcontrolInterface client commutation_interface,
+                                interface MotorcontrolInterface client i_motorcontrol,
                                 interface PositionControlInterface server i_position_control[3])
 {
     int actual_position = 0;
@@ -72,8 +72,11 @@ void position_control_service(ControlConfig &position_ctrl_params,
     int previous_error = 0;
     int position_control_out = 0;
 
-    timer ts;
-    unsigned int time;
+    int position_control_out_limit = 0;
+    int error_position_I_limit = 0;
+
+    timer t;
+    unsigned int ts;
 
     int activate = 0;
     int direction = 0;
@@ -83,19 +86,41 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
     HallConfig hall_config;
     QEIConfig qei_config;
+    MotorcontrolConfig motorcontrol_config;
 
-    if(position_ctrl_params.sensor_used == HALL && !isnull(i_hall)){
-        hall_config = i_hall.getHallConfig();
-    } else if(position_ctrl_params.sensor_used >= QEI && !isnull(i_qei)){
-        qei_config = i_qei.getQEIConfig();
+    if(position_control_config.position_sensor_type == HALL_SENSOR){
+        if(isnull(i_hall)){
+            printstrln("Position Control Loop ERROR: Interface for Hall Service not provided");
+        }else{
+            hall_config = i_hall.getHallConfig();
+        }
+    } else if(position_control_config.position_sensor_type >= QEI_SENSOR && !isnull(i_qei)){
+        if(isnull(i_qei)){
+            printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
+        }else{
+            qei_config = i_qei.getQEIConfig();
+        }
     }
+
+    motorcontrol_config = i_motorcontrol.getConfig();
+
+    //Limits
+    if(motorcontrol_config.motor_type == BLDC_MOTOR){
+        position_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
+    }else if(motorcontrol_config.motor_type == BDC_MOTOR){
+        position_control_out_limit = BDC_PWM_CONTROL_LIMIT;
+    }
+
+    if(position_control_config.Ki != 0)
+        error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki;
+
 
     printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
 
-    if (position_ctrl_params.sensor_used == HALL && !isnull(i_hall)) {
-        { actual_position, direction } = i_hall.get_hall_position_absolute();// get_hall_position_absolute(c_hall);
+    if (position_control_config.position_sensor_type == HALL_SENSOR && !isnull(i_hall)) {
+        { actual_position, direction } = i_hall.get_hall_position_absolute();
         target_position = actual_position;
-    } else if (position_ctrl_params.sensor_used >= QEI && !isnull(i_qei)) {
+    } else if (position_control_config.position_sensor_type >= QEI_SENSOR && !isnull(i_qei)) {
         {actual_position, direction} = i_qei.get_qei_position_absolute();
         target_position = actual_position;
     }
@@ -105,22 +130,20 @@ void position_control_service(ControlConfig &position_ctrl_params,
      * place client functions here to acquire position
      */
 
-    ts :> time;
-    time += position_ctrl_params.Loop_time;
+    t :> ts;
 
     while(1) {
 #pragma ordered
         select {
-        case ts when timerafter(time) :> void:
-            time += position_ctrl_params.Loop_time;
+        case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
             if (activate == 1) {
                 /* acquire actual position hall/qei/sensor */
-                switch (position_ctrl_params.sensor_used) {
-                    case HALL:
+                switch (position_control_config.position_sensor_type) {
+                    case HALL_SENSOR:
                     { actual_position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                     break;
 
-                    case QEI:
+                    case QEI_SENSOR:
                     { actual_position, direction } =  i_qei.get_qei_position_absolute();
                     break;
 
@@ -144,25 +167,27 @@ void position_control_service(ControlConfig &position_ctrl_params,
                 error_position_I = error_position_I + error_position;
                 error_position_D = error_position - previous_error;
 
-                if (error_position_I > position_ctrl_params.Integral_limit) {
-                    error_position_I = position_ctrl_params.Integral_limit;
-                } else if (error_position_I < -position_ctrl_params.Integral_limit) {
-                    error_position_I = 0 - position_ctrl_params.Integral_limit;
+                if (error_position_I > error_position_I_limit) {
+                    error_position_I = error_position_I_limit;
+                } else if (error_position_I < -error_position_I_limit) {
+                    error_position_I = - error_position_I_limit;
                 }
 
-                position_control_out = ( (position_ctrl_params.Kp_n * error_position)/position_ctrl_params.Kp_d +
-                                         (position_ctrl_params.Ki_n * error_position_I)/position_ctrl_params.Ki_d +
-                                         (position_ctrl_params.Kd_n * error_position_D)/position_ctrl_params.Kd_d );
+                position_control_out = (position_control_config.Kp * error_position) +
+                                       (position_control_config.Ki * error_position_I) +
+                                       (position_control_config.Kd * error_position_D);
 
-                if (position_control_out > position_ctrl_params.Control_limit) {
-                    position_control_out = position_ctrl_params.Control_limit;
-                } else if (position_control_out < -position_ctrl_params.Control_limit) {
-                    position_control_out = 0 - position_ctrl_params.Control_limit;
+                position_control_out /= PID_DENOMINATOR;
+
+                if (position_control_out > position_control_out_limit) {
+                    position_control_out = position_control_out_limit;
+                } else if (position_control_out < -position_control_out_limit) {
+                    position_control_out =  -position_control_out_limit;
                 }
 
 
                // set_commutation_sinusoidal(c_commutation, position_control_out);
-                commutation_interface.setVoltage(position_control_out);
+                i_motorcontrol.setVoltage(position_control_out);
 
 #ifdef DEBUG
                 xscope_int(ACTUAL_POSITION, actual_position);
@@ -197,13 +222,13 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
         case i_position_control[int i].set_position_ctrl_param(ControlConfig in_params):
 
-            position_ctrl_params.Kp_n = in_params.Kp_n;
-            position_ctrl_params.Kp_d = in_params.Kp_d;
-            position_ctrl_params.Ki_n = in_params.Ki_n;
-            position_ctrl_params.Ki_d = in_params.Ki_d;
-            position_ctrl_params.Kd_n = in_params.Kd_n;
-            position_ctrl_params.Kd_d = in_params.Kd_d;
-            position_ctrl_params.Integral_limit = in_params.Integral_limit;
+            position_control_config.Kp = in_params.Kp;
+            position_control_config.Ki = in_params.Ki;
+            position_control_config.Kd = in_params.Kd;
+
+            error_position_I_limit = 0;
+            if(position_control_config.Ki != 0)
+                error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki;;
 
             break;
 
@@ -221,11 +246,11 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
         case i_position_control[int i].set_position_sensor(int in_sensor_used):
 
-            position_ctrl_params.sensor_used = in_sensor_used;
+            position_control_config.position_sensor_type = in_sensor_used;
 
-            if (in_sensor_used == HALL) {
+            if (in_sensor_used == HALL_SENSOR) {
                 { actual_position, direction }= i_hall.get_hall_position_absolute();
-            } else if (in_sensor_used >= QEI) {
+            } else if (in_sensor_used >= QEI_SENSOR) {
                 { actual_position, direction } = i_qei.get_qei_position_absolute();
             }
             /*
@@ -239,14 +264,14 @@ void position_control_service(ControlConfig &position_ctrl_params,
         case i_position_control[int i].enable_position_ctrl():
                         activate = 1;
                             while (1) {
-                                init_state = commutation_interface.checkBusy(); //__check_commutation_init(c_commutation);
+                                init_state = i_motorcontrol.checkBusy(); //__check_commutation_init(c_commutation);
                                 if(init_state == INIT) {
             #ifdef debug_print
                                     printstrln("commutation intialized");
             #endif
-                                    fet_state = commutation_interface.getFetsState(); // check_fet_state(c_commutation);
+                                    fet_state = i_motorcontrol.getFetsState(); // check_fet_state(c_commutation);
                                     if (fet_state == 1) {
-                                        commutation_interface.enableFets();
+                                        i_motorcontrol.enableFets();
                                         delay_milliseconds(2);
                                     }
 
@@ -260,14 +285,14 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
         case i_position_control[int i].shutdown_position_ctrl():
             activate = 0;
-            commutation_interface.setVoltage(0);
+            i_motorcontrol.setVoltage(0);
             //set_commutation_sinusoidal(c_commutation, 0);
             error_position = 0;
             error_position_D = 0;
             error_position_I = 0;
             previous_error = 0;
             position_control_out = 0;
-            commutation_interface.disableFets();
+            i_motorcontrol.disableFets();
             // disable_motor(c_commutation);
             delay_milliseconds(30);
             //wait_ms(30, 1, ts); //
@@ -283,7 +308,7 @@ void position_control_service(ControlConfig &position_ctrl_params,
 
         case i_position_control[int i].getControlConfig() ->  ControlConfig out_config:
 
-                out_config = position_ctrl_params;
+                out_config = position_control_config;
                 break;
         case i_position_control[int i].getHallConfig() -> HallConfig out_config:
 

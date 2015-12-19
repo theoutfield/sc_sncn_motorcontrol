@@ -5,7 +5,7 @@
 
 #pragma once
 
-#define HALL                    1
+#define HALL_SENSOR             1
 
 #define ERROR                   0
 #define SUCCESS                 1

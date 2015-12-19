@@ -18,7 +18,7 @@ void init_position_profiler(ProfilePositionConfig profile_position_config,
 
     init_position_profile_limits(profile_position_config.max_acceleration,
                                     profile_position_config.velocity_config.max_profile_velocity,
-                                    qei_config, hall_config, control_config.sensor_used,
+                                    qei_config, hall_config, control_config.position_sensor_type,
                                     profile_position_config.software_position_limit_max,
                                     profile_position_config.software_position_limit_min);
 

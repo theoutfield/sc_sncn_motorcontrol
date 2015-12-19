@@ -32,7 +32,7 @@
 
 /* Position Sensor Types (select your sensor type here)
  * (HALL/ QEI) */
-#define SENSOR_USED                QEI
+#define SENSOR_USED                QEI_SENSOR
 
 /* Define your Incremental Encoder type (QEI_INDEX/ QEI_WITH_NO_INDEX) */
 #define QEI_INDEX_TYPE             QEI_WITH_INDEX
@@ -81,18 +81,15 @@
 /* Position Control (Mandatory if Position control used)
  * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
  * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define POSITION_Kp_NUMERATOR       10
-#define POSITION_Kp_DENOMINATOR     1000
+#define POSITION_Kp_NUMERATOR       1000
 #define POSITION_Ki_NUMERATOR       1
-#define POSITION_Ki_DENOMINATOR     5000
 #define POSITION_Kd_NUMERATOR       0
-#define POSITION_Kd_DENOMINATOR     1000
 
-#if(SENSOR_USED == HALL)
+#if(SENSOR_USED == HALL_SENSOR)
     #define MAX_POSITION_LIMIT      POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO*10       // ticks (max range: 2^30, limited for safe operation) qei/hall/any position sensor
     #define MIN_POSITION_LIMIT      -POLE_PAIRS*HALL_POSITION_INTERPOLATED_RANGE*GEAR_RATIO*10      // ticks (min range: -2^30, limited for safe operation) qei/hall/any position sensor
 #endif
-#if(SENSOR_USED == QEI)
+#if(SENSOR_USED == QEI_SENSOR)
     #define MAX_POSITION_LIMIT      GEAR_RATIO*ENCODER_RESOLUTION*10    // ticks (max range: 2^30, limited for safe operation)
     #define MIN_POSITION_LIMIT      -GEAR_RATIO*ENCODER_RESOLUTION*10   // ticks (min range: -2^30, limited for safe operation)
 #endif
@@ -100,22 +97,17 @@
 /* Torque Control (Mandatory if Torque control used)
  * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
  * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define TORQUE_Kp_NUMERATOR         2
-#define TORQUE_Kp_DENOMINATOR       20
-#define TORQUE_Ki_NUMERATOR         1
-#define TORQUE_Ki_DENOMINATOR       110
+#define TORQUE_Kp_NUMERATOR         1000
+#define TORQUE_Ki_NUMERATOR         91
 #define TORQUE_Kd_NUMERATOR         0
-#define TORQUE_Kd_DENOMINATOR       10
 
 /* Velocity Control (Mandatory if Velocity control used)
  * possible range of gains Kp/Ki/Kd: 1/2^30 to 2^30
  * Note: gains are calculated as NUMERATOR/DENOMINATOR to give ranges */
-#define VELOCITY_Kp_NUMERATOR       1
-#define VELOCITY_Kp_DENOMINATOR     15
-#define VELOCITY_Ki_NUMERATOR       2
-#define VELOCITY_Ki_DENOMINATOR     100
+#define VELOCITY_Kp_NUMERATOR       667
+#define VELOCITY_Ki_NUMERATOR       200
 #define VELOCITY_Kd_NUMERATOR       0
-#define VELOCITY_Kd_DENOMINATOR     1
+
 
 #define VELOCITY_FILTER_SIZE        8   //default (could be changed upto 16)
 

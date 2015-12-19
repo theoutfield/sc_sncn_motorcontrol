@@ -10,8 +10,7 @@
 #include <velocity_ctrl_service.h>
 #include <profile_control.h>
 
-#include <motorcontrol_config.h>
-#include <control_config.h>
+#include <user_config.h>
 
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
@@ -52,8 +51,8 @@ int main(void)
 		/* Test Profile Velocity function */
 		on tile[APP_TILE]:  profile_velocity_test(i_velocity_control[0]);
 
-        /* XScope monitoring */
         on tile[APP_TILE]:
+        /* XScope monitoring */
         {
             int target_velocity, actual_velocity;
 
@@ -71,17 +70,23 @@ int main(void)
 
 
 		on tile[APP_TILE]:
-		{
-            /* Velocity Control Loop */
-            {
-                ControlConfig velocity_ctrl_params;
-                init_velocity_control_config(velocity_ctrl_params);  /* Initialize PID parameters for Velocity Control */
+        /* Velocity Control Loop */
+        {
+            ControlConfig velocity_control_config;
 
-                /* Control Loop */
-                velocity_control_service(velocity_ctrl_params, null, i_qei[1], i_motorcontrol[0],
-                                            i_velocity_control);
-            }
-		}
+            velocity_control_config.position_sensor_type = SENSOR_USED;
+
+            velocity_control_config.Kp = VELOCITY_Kp_NUMERATOR;     // Divided by 10000
+            velocity_control_config.Ki = VELOCITY_Ki_NUMERATOR;     // Divided by 10000
+            velocity_control_config.Kd = VELOCITY_Kd_NUMERATOR;     // Divided by 10000
+
+            velocity_control_config.control_loop_period =  COMMUTATION_LOOP_PERIOD; //us
+
+            /* Control Loop */
+            velocity_control_service(velocity_control_config, null, i_qei[1], i_motorcontrol[0],
+                                        i_velocity_control);
+        }
+
 
 		/************************************************************
 		 * IFM_TILE
@@ -90,10 +95,10 @@ int main(void)
 		{
             par
             {
-                /* PWM Loop */
+                /* PWM Service */
                 pwm_service(pwm_ports, c_pwm_ctrl);
 
-                /* Watchdog Server */
+                /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* Quadrature encoder sensor Service */

@@ -11,7 +11,6 @@
 #include <profile_control.h>
 
 #include <user_config.h>
-#include <control_config.h>
 
 /* Test Profile Position function */
 void position_profile_test(interface PositionControlInterface client i_position_control)
@@ -80,11 +79,17 @@ int main(void)
 		{
 			/* Position Control Loop */
             {
-                 ControlConfig position_ctrl_config;
-                 init_position_control_config(position_ctrl_config); // Initialize PID parameters for Position Control
+                 ControlConfig position_control_config;
+                 position_control_config.position_sensor_type = SENSOR_USED;
+
+                 position_control_config.Kp = POSITION_Kp_NUMERATOR;    // Divided by 10000
+                 position_control_config.Ki = POSITION_Ki_NUMERATOR;    // Divided by 10000
+                 position_control_config.Kd = POSITION_Kd_NUMERATOR;    // Divided by 10000
+
+                 position_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; //us
 
                  /* Control Loop */
-                 position_control_service(position_ctrl_config, null, i_qei[1], i_motorcontrol[0],
+                 position_control_service(position_control_config, null, i_qei[1], i_motorcontrol[0],
                                              i_position_control);
             }
 		}

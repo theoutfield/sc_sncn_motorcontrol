@@ -46,7 +46,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
     int bw_flag = 0;
     int nominal_speed;
     int shutdown = 0; //Disable FETS
-    int sensor_select = HALL;
+    int sensor_select = HALL_SENSOR;
 
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
@@ -78,10 +78,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
         select {
 
             case t when timerafter(ts + USEC_FAST * commutation_params.commutation_loop_period) :> ts: //XX kHz commutation loop
-                if (sensor_select == HALL) {
+                if (sensor_select == HALL_SENSOR) {
                     //hall only
                     angle = i_hall.get_hall_position();
-                } else if (sensor_select == QEI && !isnull(i_qei)) {
+                } else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
                     { angle, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
                     angle = (angle << 12) / max_count_per_hall;
                     if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0)) {
@@ -95,9 +95,9 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     pwm[2] = -1;
                 } else {
                     if (voltage >= 0) {
-                        if (sensor_select == HALL) {
+                        if (sensor_select == HALL_SENSOR) {
                             angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
-                        } else if (sensor_select == QEI ) {
+                        } else if (sensor_select == QEI_SENSOR ) {
                             angle_pwm = (angle >> 2) & 0x3ff; //512
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
@@ -106,9 +106,9 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                         angle_pwm = (angle_pwm + 342) & 0x3ff;
                         pwm[2] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half;
                     } else { /* voltage < 0 */
-                        if (sensor_select == HALL) {
+                        if (sensor_select == HALL_SENSOR) {
                             angle_pwm = ((angle + commutation_params.hall_offset_cclk) >> 2) & 0x3ff;
-                        } else if (sensor_select == QEI) {
+                        } else if (sensor_select == QEI_SENSOR) {
                             angle_pwm = (angle >> 2) & 0x3ff; //3100
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
