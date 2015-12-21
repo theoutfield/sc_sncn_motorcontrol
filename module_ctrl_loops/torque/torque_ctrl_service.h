@@ -114,7 +114,7 @@ int torque_limit(int torque, int max_torque_limit);
  * @param target_torque is the new target torque
  * @param torque_offset defines offset in torque
  */
-void set_torque_cst(CyclicSyncTorqueConfig & cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control);
+void set_torque_cst(ProfilerConfig & cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control);
 
 /**
  * @brief Torque Control Loop

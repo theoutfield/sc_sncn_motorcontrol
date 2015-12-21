@@ -28,12 +28,12 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
 	int target_torque = 100; 	//(desired torque/torque_constant)  * IFM resolution
 	int torque_slope  = 1000;  	//(desired torque_slope/torque_constant)  * IFM resolution
 
-	ProfileTorqueConfig profile_torque_config;
-	profile_torque_config.max_torque = MOTOR_TORQUE_CONSTANT * MAX_NOMINAL_CURRENT * IFM_RESOLUTION;
-	profile_torque_config.polarity = POLARITY;
+    ProfilerConfig profiler_config;
+    profiler_config.polarity = POLARITY;
+    profiler_config.max_current = MAX_CURRENT;
 
 	/* Initialise the torque profile generator */
-	init_torque_profiler(profile_torque_config, i_torque_control);
+	init_torque_profiler(profiler_config, i_torque_control);
 
 	/* Set new target torque for profile torque control */
 	set_profile_torque(target_torque, torque_slope, i_torque_control);
@@ -91,7 +91,7 @@ int main(void)
 		on tile[APP_TILE]:
 		{
 		    int phaseB, phaseC, actual_torque, target_torque;
-		    unsigned hall_state = 0;
+
 		    while(1){
 		        {phaseB, phaseC} = i_adc[1].get_currents();
 		        actual_torque = i_torque_control[1].get_torque();

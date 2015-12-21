@@ -9,18 +9,24 @@
 #include <profile.h>
 #include <profile_control.h>
 
-void init_position_profiler(ProfilePositionConfig profile_position_config,
+void init_position_profiler(ProfilerConfig profile_position_config,
                                 interface PositionControlInterface client i_position_control){
 
     ControlConfig control_config = i_position_control.getControlConfig();
     QEIConfig qei_config = i_position_control.getQEIConfig();
     HallConfig hall_config = i_position_control.getHallConfig();
 
+    if(profile_position_config.max_acceleration <= 0 ||
+            profile_position_config.max_velocity <= 0){
+        printstrln("Wrong configuration provided to profiler");
+        return;
+    }
+
     init_position_profile_limits(profile_position_config.max_acceleration,
-                                    profile_position_config.velocity_config.max_profile_velocity,
+                                    profile_position_config.max_velocity,
                                     qei_config, hall_config, control_config.position_sensor_type,
-                                    profile_position_config.software_position_limit_max,
-                                    profile_position_config.software_position_limit_min);
+                                    profile_position_config.max_position,
+                                    profile_position_config.min_position);
 
     return;
 

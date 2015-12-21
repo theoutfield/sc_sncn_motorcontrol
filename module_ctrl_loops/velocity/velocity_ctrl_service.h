@@ -122,7 +122,7 @@ int max_speed_limit(int velocity, int max_speed);
  * @param torque_offset defines offset in torque
  * @param i_velocity_control Lorem ipsum...
  */
-void set_velocity_csv(CyclicSyncVelocityConfig & csv_params, int target_velocity,
+void set_velocity_csv(ProfilerConfig & csv_params, int target_velocity,
                       int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control);
 
 /**

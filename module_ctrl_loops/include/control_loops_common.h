@@ -18,6 +18,31 @@ typedef struct {
     int position_sensor_type;
 } ControlConfig;
 
+
+/**
+ * @brief Struct definition for profile velocity param
+ */
+typedef struct{
+    int polarity;
+
+    //Position
+    int velocity;
+    int max_position;
+    int min_position;
+
+    //Velocity
+    int acceleration;
+    int deceleration;
+    int max_acceleration;
+    int max_deceleration;
+    int max_velocity;
+
+    //Torque
+    int current_slope;   //not used for now
+    int max_current_slope;
+    int max_current;
+}ProfilerConfig;
+
 /**
  * @brief Struct definition for Synchronous torque param
  */

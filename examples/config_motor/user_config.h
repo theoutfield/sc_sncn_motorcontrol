@@ -20,7 +20,14 @@
  */
 #define POLE_PAIRS                  4               // Number of pole pairs
 #define MAX_NOMINAL_SPEED           4000            // rpm
-#define MAX_NOMINAL_CURRENT         2               // A
+#define MAX_CURRENT                 800             // adc_ticks
+                                                    // Max adc ticks are 8192 and
+                                                    // corresponds with the max
+                                                    // current your DC can handle:
+                                                    // DC100 5A
+                                                    // DC300 20A
+                                                    // DC1K 50A
+#define MAX_CURRENT_VARIATION       100
 #define MOTOR_TORQUE_CONSTANT       72              // mNm/A
 
 /**
@@ -67,7 +74,7 @@
 #define COMMUTATION_LOOP_PERIOD     60    //us
 
 /* Profile defines (Mandatory for profile modes) */
-#define MAX_PROFILE_VELOCITY        MAX_NOMINAL_SPEED
+#define MAX_VELOCITY        MAX_NOMINAL_SPEED
 #define PROFILE_VELOCITY            1000                // rpm
 #define MAX_ACCELERATION            4000                // rpm/s
 #define PROFILE_ACCELERATION        2000                // rpm/s

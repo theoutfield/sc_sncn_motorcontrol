@@ -48,12 +48,12 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
     return position;
 }
 
-void set_position_csp( CyclicSyncPositionConfig & csp_params, int target_position, int position_offset,
+void set_position_csp( ProfilerConfig & csp_params, int target_position, int position_offset,
                        int velocity_offset, int torque_offset, interface PositionControlInterface client i_position_control )
 {
-    i_position_control.set_position( position_limit( (target_position + position_offset) * csp_params.velocity_config.polarity,
-                                  csp_params.max_position_limit,
-                                  csp_params.min_position_limit));
+    i_position_control.set_position( position_limit( (target_position + position_offset) * csp_params.polarity,
+                                  csp_params.max_position,
+                                  csp_params.min_position));
 }
 
 
