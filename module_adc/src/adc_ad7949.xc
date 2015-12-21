@@ -208,7 +208,7 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
     t :> ts;
 }
 
-void adc_ad7949(interface ADCInterface server adc_interface[3], AD7949Ports &adc_ports,
+void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc_ports,
                                 CurrentSensorsConfig &current_sensor_config, chanend c_trig)
 {
     timer t;
@@ -344,6 +344,29 @@ void adc_ad7949(interface ADCInterface server adc_interface[3], AD7949Ports &adc
 
                 ext_a = adc_data_a[3];
                 ext_b = adc_data_b[3];
+
+                break;
+
+        case adc_interface[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+
+
+                if(amps >= current_sensor_config.current_sensor_amplitude)
+                     out_ticks = MAX_ADC_VALUE/2; break;
+                if(amps <= -current_sensor_config.current_sensor_amplitude)
+                    out_ticks = -MAX_ADC_VALUE/2; break;
+
+                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
+
+                break;
+
+        case adc_interface[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+
+                if(ticks >= MAX_ADC_VALUE/2)
+                    out_amps = current_sensor_config.current_sensor_amplitude; break;
+                if(ticks <= -MAX_ADC_VALUE/2)
+                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
+
+                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
 
                 break;
         }

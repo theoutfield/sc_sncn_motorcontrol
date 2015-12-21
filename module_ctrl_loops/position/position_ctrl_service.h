@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include <control_loops_common.h>
+//#include <profile_control.h>
 #include <qei_service.h>
-#include <control_loops_common.h>
 #include <motorcontrol_service.h>
-
+#include <control_loops_common.h>
 
 /**
  * @brief Lorem ipsum...
@@ -131,7 +130,7 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
  * @param torque_offset defines offset in torque
  * @param i_position_control Lorem ipsum...
  */
-void set_position_csp(CyclicSyncPositionConfig & csp_params, int target_position, int position_offset, int velocity_offset,
+void set_position_csp(ProfilerConfig &csp_params, int target_position, int position_offset, int velocity_offset,
                       int torque_offset, interface PositionControlInterface client i_position_control);
 
 

@@ -11,12 +11,12 @@
 #include <profile.h>
 #include <profile_control.h>
 
-void init_velocity_profiler(ProfileVelocityConfig profile_velocity_config,
+void init_velocity_profiler(ProfilerConfig profile_velocity_config,
                                 interface VelocityControlInterface client i_velocity_control){
 
-    init_velocity_profile_limits(profile_velocity_config.max_profile_velocity,
+    init_velocity_profile_limits(profile_velocity_config.max_velocity,
                                     profile_velocity_config.max_acceleration,
-                                    profile_velocity_config.quick_stop_deceleration);
+                                    profile_velocity_config.max_deceleration);
     //Interface not used for the moment, probably in the future.
 
 }

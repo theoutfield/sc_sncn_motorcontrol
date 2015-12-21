@@ -10,10 +10,10 @@
 #include <profile.h>
 #include <profile_control.h>
 
-void init_torque_profiler(ProfileTorqueConfig profile_torque_config,
+void init_torque_profiler(ProfilerConfig profile_torque_config,
                                 interface TorqueControlInterface client i_torque_control){
 
-    init_linear_profile_limits(profile_torque_config.max_torque,profile_torque_config.polarity);
+    init_linear_profile_limits(profile_torque_config.max_current, profile_torque_config.polarity);
 
     //Interface not used for the moment, likely in the future
 }

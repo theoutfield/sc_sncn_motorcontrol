@@ -30,14 +30,17 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int acceleration 	= 500;			// rpm/s
 	int deceleration 	= 500;     	    // rpm/s
 
-	ProfilePositionConfig profile_position_config;
-	profile_position_config.max_acceleration = MAX_ACCELERATION;
-	profile_position_config.software_position_limit_max = MAX_POSITION_LIMIT;
-	profile_position_config.software_position_limit_min = MIN_POSITION_LIMIT;
-	profile_position_config.velocity_config.max_profile_velocity = MAX_PROFILE_VELOCITY;
+	ProfilerConfig profiler_config;
+	profiler_config.polarity = POLARITY;
+	profiler_config.max_position = MAX_POSITION_LIMIT;
+	profiler_config.min_position = MIN_POSITION_LIMIT;
+
+	profiler_config.max_velocity = MAX_VELOCITY;
+	profiler_config.max_acceleration = MAX_ACCELERATION;
+	profiler_config.max_deceleration = MAX_ACCELERATION;
 
 	/* Initialise the position profile generator */
-	init_position_profiler(profile_position_config, i_position_control);
+	init_position_profiler(profiler_config, i_position_control);
 
 	/* Set new target position for profile position control */
 	set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);

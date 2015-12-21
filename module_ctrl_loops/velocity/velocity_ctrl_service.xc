@@ -46,11 +46,11 @@ int max_speed_limit(int velocity, int max_speed) {
 }
 
 //csv mode function
-void set_velocity_csv(CyclicSyncVelocityConfig &csv_params, int target_velocity,
+void set_velocity_csv(ProfilerConfig &csv_params, int target_velocity,
                       int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control)
 {
     i_velocity_control.set_velocity( max_speed_limit( (target_velocity + velocity_offset) * csv_params.polarity,
-                                   csv_params.max_motor_speed ));
+                                   csv_params.max_velocity ));
 }
 
 [[combinable]]

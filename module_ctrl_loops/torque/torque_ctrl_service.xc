@@ -55,10 +55,10 @@ int torque_limit(int torque, int max_torque_limit)
     return torque;
 }
 
-void set_torque_cst(CyclicSyncTorqueConfig &cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control)
+void set_torque_cst(ProfilerConfig &cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control)
 {
     i_torque_control.set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity,
-                              cst_params.max_torque));
+                              cst_params.max_current));
 }
 
 void current_filter(interface ADCInterface client adc_if, chanend c_current)
