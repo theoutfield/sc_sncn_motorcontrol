@@ -155,7 +155,7 @@ void configure_adc_ports_7265( // Configure all ADC data ports
 
 } // configure_adc_ports_7265
 
-void adc_ad7256(interface ADCInterface server iADC[3], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, chanend c_trig)
+void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, chanend c_trig)
 {
     printstrln("     ADC Server Starts");
 
@@ -266,6 +266,30 @@ void adc_ad7256(interface ADCInterface server iADC[3], AD7265Ports &adc_ports, C
                 ext_b = adc_data[1][2];
 
                 break;
+
+        case iADC[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+
+
+                if(amps >= current_sensor_config.current_sensor_amplitude)
+                     out_ticks = MAX_ADC_VALUE/2; break;
+                if(amps <= -current_sensor_config.current_sensor_amplitude)
+                    out_ticks = -MAX_ADC_VALUE/2; break;
+
+                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
+
+                break;
+
+        case iADC[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+
+                if(ticks >= MAX_ADC_VALUE/2)
+                    out_amps = current_sensor_config.current_sensor_amplitude; break;
+                if(ticks <= -MAX_ADC_VALUE/2)
+                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
+
+                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
+
+                break;
+
         }//eof select
 
         Icalibrated_a = (((int) adc_data[0][0]) - i_calib_a);

@@ -7,6 +7,7 @@
 
 #include <xs1.h>
 
+#define MAX_ADC_VALUE 16383
 /**
  * @brief Lorem ipsum...
  */
@@ -46,6 +47,22 @@ interface ADCInterface{
      * @return Lorem ipsum...
      */
     {int, int} get_external_inputs();
+
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     * @return Lorem ipsum...
+     */
+    int helper_amps_to_ticks(float amps);
+
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     * @return Lorem ipsum...
+     */
+    float helper_ticks_to_amps(int ticks);
 };
 
 /**
@@ -94,4 +111,4 @@ typedef struct {
  * @param c_trigger Lorem ipsum...
  * @param adc_interface[3] Lorem ipsum...
  */
-void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server adc_interface[3]);
+void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server adc_interface[2]);

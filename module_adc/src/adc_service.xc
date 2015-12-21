@@ -3,7 +3,7 @@
 #include <adc_7265.h>
 #include <adc_ad7949.h>
 
-void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server adc_interface[3]){
+void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server adc_interface[2]){
 
     if(isnull(c_trigger)){
         // There is not triggering by PWM

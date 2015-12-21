@@ -34,6 +34,6 @@ interface AD7949Interface{
  * @param    c_trig channel to trigger adc from the PWM modules
  *
  */
-void adc_ad7949(  interface ADCInterface server adc_interface[3],
+void adc_ad7949(  interface ADCInterface server adc_interface[2],
                  AD7949Ports &adc_ports, CurrentSensorsConfig &current_sensor_config,
                  chanend c_trig );
