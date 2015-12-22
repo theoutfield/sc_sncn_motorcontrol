@@ -75,13 +75,13 @@ int main(void)
 		    /* Torque Control Loop */
             ControlConfig torque_control_config;
 
-            torque_control_config.position_sensor_type = SENSOR_USED;
+            torque_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
 
-            torque_control_config.Kp = TORQUE_Kp_NUMERATOR;
-            torque_control_config.Ki = TORQUE_Ki_NUMERATOR;
-            torque_control_config.Kd = TORQUE_Kd_NUMERATOR;
+            torque_control_config.Kp = TORQUE_Kp;
+            torque_control_config.Ki = TORQUE_Ki;
+            torque_control_config.Kd = TORQUE_Kd;
 
-            torque_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; // us
+            torque_control_config.control_loop_period = CONTROL_LOOP_PERIOD; // us
 
             /* Control Loop */
             torque_control_service(torque_control_config, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
@@ -133,9 +133,9 @@ int main(void)
                 /* Quadrature encoder sensor Service */
                 {
                     QEIConfig qei_config;
-                        qei_config.signal_type = QEI_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
-                        qei_config.index_type = QEI_INDEX_TYPE;                 // Indexed encoder?
-                        qei_config.ticks_resolution = ENCODER_RESOLUTION;       // Encoder resolution
+                        qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
+                        qei_config.index_type = QEI_SENSOR_INDEX_TYPE;                 // Indexed encoder?
+                        qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;       // Encoder resolution
                         qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
                     qei_service(qei_ports, qei_config, i_qei);
@@ -145,6 +145,7 @@ int main(void)
                 {
                     MotorcontrolConfig motorcontrol_config;
                         motorcontrol_config.motor_type = BLDC_MOTOR;
+                        motorcontrol_config.commutation_sensor = HALL_SENSOR;
                         motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                         motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
                         motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;

@@ -86,15 +86,21 @@ void position_control_service(ControlConfig &position_control_config,
 
     HallConfig hall_config;
     QEIConfig qei_config;
-    MotorcontrolConfig motorcontrol_config;
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.getConfig();
 
-    if(position_control_config.position_sensor_type == HALL_SENSOR){
+   if(position_control_config.feedback_sensor != HALL_SENSOR
+           && position_control_config.feedback_sensor < QEI_SENSOR){
+       position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
+   }
+
+
+    if(position_control_config.feedback_sensor == HALL_SENSOR){
         if(isnull(i_hall)){
             printstrln("Position Control Loop ERROR: Interface for Hall Service not provided");
         }else{
             hall_config = i_hall.getHallConfig();
         }
-    } else if(position_control_config.position_sensor_type >= QEI_SENSOR && !isnull(i_qei)){
+    } else if(position_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
         if(isnull(i_qei)){
             printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
         }else{
@@ -102,7 +108,7 @@ void position_control_service(ControlConfig &position_control_config,
         }
     }
 
-    motorcontrol_config = i_motorcontrol.getConfig();
+
 
     //Limits
     if(motorcontrol_config.motor_type == BLDC_MOTOR){
@@ -117,10 +123,10 @@ void position_control_service(ControlConfig &position_control_config,
 
     printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
 
-    if (position_control_config.position_sensor_type == HALL_SENSOR && !isnull(i_hall)) {
+    if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
         { actual_position, direction } = i_hall.get_hall_position_absolute();
         target_position = actual_position;
-    } else if (position_control_config.position_sensor_type >= QEI_SENSOR && !isnull(i_qei)) {
+    } else if (position_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)) {
         {actual_position, direction} = i_qei.get_qei_position_absolute();
         target_position = actual_position;
     }
@@ -138,7 +144,7 @@ void position_control_service(ControlConfig &position_control_config,
         case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
             if (activate == 1) {
                 /* acquire actual position hall/qei/sensor */
-                switch (position_control_config.position_sensor_type) {
+                switch (position_control_config.feedback_sensor) {
                     case HALL_SENSOR:
                     { actual_position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                     break;
@@ -246,7 +252,7 @@ void position_control_service(ControlConfig &position_control_config,
 
         case i_position_control[int i].set_position_sensor(int in_sensor_used):
 
-            position_control_config.position_sensor_type = in_sensor_used;
+            position_control_config.feedback_sensor = in_sensor_used;
 
             if (in_sensor_used == HALL_SENSOR) {
                 { actual_position, direction }= i_hall.get_hall_position_absolute();

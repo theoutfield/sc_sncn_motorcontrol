@@ -23,6 +23,11 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
             printstrln("Wrong Motorcontrol configuration: wrong winding");
             return ERROR;
         }
+
+        if(commutation_params.commutation_sensor != HALL_SENSOR){
+            printstrln("Wrong Motorcontrol configuration: just HALL sensor is supported as commutation sensor");
+            return ERROR;
+        }
     }
 
     return SUCCESS;

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#define QEI_SENSOR               2
+
 #define QEI_CHANGES_PER_TICK     4 //Quadrature encoder
 
 #define ERROR                    0
@@ -25,16 +27,12 @@
 #define SET_OFFSET               6
 #define QEI_RESET_COUNT          7
 
-#define QEI_SENSOR               2
+#define QEI_POLARITY_NORMAL      1
+#define QEI_POLARITY_INVERTED   -1
 
 #define QEI_PORT_AS_TTL           0b0000
 #define QEI_PORT_AS_RS422         0b0010
 
-
-/**
- * @brief Encoder polarity 
- */
-typedef enum { QEI_POLARITY_NORMAL = 0, QEI_POLARITY_INVERTED = 1 } QEI_Polarity; 
 
 /**
  * @brief Lorem ipsum...
@@ -48,7 +46,7 @@ typedef enum { QEI_WITH_NO_INDEX = 3, QEI_WITH_INDEX  = 4 } QEI_IndexType;
 typedef struct {
     int ticks_resolution; //real_counts;
     QEI_IndexType index_type;          // no_index - 0 index - 1
-    QEI_Polarity sensor_polarity;
+    int sensor_polarity;
     QEI_SignalType signal_type;
 } QEIConfig;
 

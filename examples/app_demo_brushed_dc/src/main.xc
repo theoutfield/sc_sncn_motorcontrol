@@ -18,7 +18,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 int main(void) {
 
-    // Motor control channels
+    // Motor control interfaces
     chan c_pwm_ctrl;
 
     interface WatchdogInterface i_watchdog[2];

@@ -41,9 +41,9 @@ int main(void) {
             i_watchdog[1].stop();
 
             delay_seconds(2);                   // Motor still for 2 secs
-            i_motorcontrol[0].setVoltage(0);    // We set a 0 voltage before starting operation
 
             printstrln("Watchdog starts again, motor spins");
+            i_motorcontrol[0].setVoltage(0);    // We set a 0 voltage before starting operation
             i_watchdog[1].start();
             i_motorcontrol[0].setVoltage(500);
         }
@@ -70,6 +70,7 @@ int main(void) {
                 {
                     MotorcontrolConfig motorcontrol_config;
                         motorcontrol_config.motor_type = BLDC_MOTOR;
+                        motorcontrol_config.commutation_sensor = HALL_SENSOR;
                         motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                         motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
                         motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
