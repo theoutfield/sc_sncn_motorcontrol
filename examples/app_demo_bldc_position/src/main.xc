@@ -26,9 +26,9 @@
 void position_profile_test(interface PositionControlInterface client i_position_control)
 {
 	int target_position = 16000;		// HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
-	int velocity 		= 500;			// rpm
-	int acceleration 	= 500;			// rpm/s
-	int deceleration 	= 500;     	    // rpm/s
+	int velocity 		= 2000;			// rpm
+	int acceleration 	= 4000;			// rpm/s
+	int deceleration 	= 4000;     	    // rpm/s
 
 	ProfilerConfig profiler_config;
 	profiler_config.polarity = POLARITY;
@@ -37,7 +37,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
 
 	profiler_config.max_velocity = MAX_VELOCITY;
 	profiler_config.max_acceleration = MAX_ACCELERATION;
-	profiler_config.max_deceleration = MAX_ACCELERATION;
+	profiler_config.max_deceleration = MAX_DECELERATION;
 
 	/* Initialise the position profile generator */
 	init_position_profiler(profiler_config, i_position_control);
@@ -93,13 +93,13 @@ int main(void)
         {
              ControlConfig position_control_config;
 
-             position_control_config.position_sensor_type = SENSOR_USED;
+             position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
 
-             position_control_config.Kp = POSITION_Kp_NUMERATOR;    // Divided by 10000
-             position_control_config.Ki = POSITION_Ki_NUMERATOR;    // Divided by 10000
-             position_control_config.Kd = POSITION_Kd_NUMERATOR;    // Divided by 10000
+             position_control_config.Kp = POSITION_Kp;    // Divided by 10000
+             position_control_config.Ki = POSITION_Ki;    // Divided by 10000
+             position_control_config.Kd = POSITION_Kd;    // Divided by 10000
 
-             position_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; //us
+             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
 
              /* Control Loop */
              position_control_service(position_control_config, i_hall[1], i_qei[1], i_motorcontrol[0],
@@ -130,9 +130,9 @@ int main(void)
                 /* Quadrature encoder sensor Service */
                 {
                     QEIConfig qei_config;
-                        qei_config.signal_type = QEI_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
-                        qei_config.index_type = QEI_INDEX_TYPE;                 // Indexed encoder?
-                        qei_config.ticks_resolution = ENCODER_RESOLUTION;       // Encoder resolution
+                        qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
+                        qei_config.index_type = QEI_SENSOR_INDEX_TYPE;                 // Indexed encoder?
+                        qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;       // Encoder resolution
                         qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
                     qei_service(qei_ports, qei_config, i_qei);
@@ -142,6 +142,7 @@ int main(void)
 				{
 				    MotorcontrolConfig motorcontrol_config;
 				        motorcontrol_config.motor_type = BLDC_MOTOR;
+				        motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
 				        motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
 				        motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
 				        motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;

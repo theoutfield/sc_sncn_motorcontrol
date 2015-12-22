@@ -15,7 +15,7 @@ typedef struct {
     int Ki; /**< Ki = Ki_n/Ki_d */
     int Kd; /**< Kd = Kd_n/Kd_d */
     int control_loop_period;
-    int position_sensor_type;
+    int feedback_sensor;
 } ControlConfig;
 
 

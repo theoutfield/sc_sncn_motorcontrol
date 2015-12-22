@@ -100,15 +100,20 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
     HallConfig hall_config;
     QEIConfig qei_config;
-    MotorcontrolConfig motorcontrol_config;
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.getConfig();
 
-    if(velocity_control_config.position_sensor_type == HALL_SENSOR){
+   if(velocity_control_config.feedback_sensor != HALL_SENSOR
+           && velocity_control_config.feedback_sensor < QEI_SENSOR){
+       velocity_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
+   }
+
+    if(velocity_control_config.feedback_sensor == HALL_SENSOR){
         if(isnull(i_hall)){
             printstrln("Velocity Control Loop ERROR: Interface for Hall Service not provided");
         }else{
             hall_config = i_hall.getHallConfig();
         }
-    } else if(velocity_control_config.position_sensor_type >= QEI_SENSOR && !isnull(i_qei)){
+    } else if(velocity_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
         if(isnull(i_qei)){
             printstrln("Velocity Control Loop ERROR: Interface for QEI Service not provided");
         }else{
@@ -130,11 +135,11 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 
-    if (velocity_control_config.position_sensor_type == HALL_SENSOR){
+    if (velocity_control_config.feedback_sensor == HALL_SENSOR){
          speed_factor_hall = hall_config.pole_pairs*4096*(velocity_control_config.control_loop_period)/1000; // variable pole_pairs
 //       hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
     }
-    else if (velocity_control_config.position_sensor_type >= QEI_SENSOR){
+    else if (velocity_control_config.feedback_sensor >= QEI_SENSOR){
          speed_factor_qei = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * (velocity_control_config.control_loop_period)/1000;       // variable qei_real_max
          qei_crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK )/10;
     }
@@ -151,7 +156,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             if (compute_flag == 1) {
                 /* calculate actual velocity from hall/qei with filter*/
-                if (velocity_control_config.position_sensor_type == HALL_SENSOR) {
+                if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
                     if (init == 0) {
                         { position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                         if (position > 2049) {
@@ -178,7 +183,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         previous_position = position;
                         old_difference = difference;
                     }
-                } else if (velocity_control_config.position_sensor_type >= QEI_SENSOR) {
+                } else if (velocity_control_config.feedback_sensor >= QEI_SENSOR) {
                     { position, direction } = i_qei.get_qei_position_absolute();
                     difference = position - previous_position;
 
@@ -298,7 +303,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
         case i_velocity_control[int i].set_velocity_sensor(int in_sensor_used):
 
-            velocity_control_config.position_sensor_type = in_sensor_used;
+            velocity_control_config.feedback_sensor = in_sensor_used;
 
             if(in_sensor_used == HALL_SENSOR) {
                 speed_factor_hall = hall_config.pole_pairs * 4096 * (velocity_control_config.control_loop_period)/1000;

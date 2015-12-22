@@ -24,7 +24,7 @@ void init_position_profiler(ProfilerConfig profile_position_config,
 
     init_position_profile_limits(profile_position_config.max_acceleration,
                                     profile_position_config.max_velocity,
-                                    qei_config, hall_config, control_config.position_sensor_type,
+                                    qei_config, hall_config, control_config.feedback_sensor,
                                     profile_position_config.max_position,
                                     profile_position_config.min_position);
 
@@ -64,8 +64,6 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
             i_position_control.set_position(position_ramp);
             actual_position = i_position_control.get_position();
             t when timerafter(time + MSEC_STD) :> time;
-            /*xscope_int(0, actual_position);
-              xscope_int(1, position_ramp);*/
         }
         t when timerafter(time + 30 * MSEC_STD) :> time;
     }

@@ -19,15 +19,18 @@ void position_profile_test(interface PositionControlInterface client i_position_
 	int velocity 		= 100;			// rpm
 	int acceleration 	= 100;			// rpm/s
 	int deceleration 	= 100;     		// rpm/s
-    ProfilePositionConfig profile_position_config;
 
-    profile_position_config.max_acceleration = MAX_ACCELERATION;
-    profile_position_config.software_position_limit_max = MAX_POSITION_LIMIT;
-    profile_position_config.software_position_limit_min = MIN_POSITION_LIMIT;
-    profile_position_config.velocity_config.max_profile_velocity = MAX_PROFILE_VELOCITY;
+    ProfilerConfig profiler_config;
+    profiler_config.polarity = POLARITY;
+    profiler_config.max_position = MAX_POSITION_LIMIT;
+    profiler_config.min_position = MIN_POSITION_LIMIT;
+
+    profiler_config.max_velocity = MAX_VELOCITY;
+    profiler_config.max_acceleration = MAX_ACCELERATION;
+    profiler_config.max_deceleration = MAX_DECELERATION;
 
     /* Initialise the position profile generator */
-    init_position_profiler(profile_position_config, i_position_control);
+    init_position_profiler(profiler_config, i_position_control);
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
@@ -58,18 +61,16 @@ int main(void)
         /* XScope monitoring */
         on tile[APP_TILE]: {
 
-            int actual_position, target_position, follow_error;
+            int actual_position, target_position;
 
             while(1)
             {
                 /* Read actual position from the Position Control Server */
                 actual_position = i_position_control[1].get_position();
                 target_position = i_position_control[1].get_target_position();
-                follow_error = target_position - actual_position;
 
-                xscope_int(ACTUAL_POSITION, actual_position);
-                xscope_int(TARGET_POSITION, target_position);
-                xscope_int(FOLLOW_ERROR, follow_error);
+                xscope_int(ACTUAL_POSITION, actual_position/10); //Scaled for better plotting
+                xscope_int(TARGET_POSITION, target_position/10); //Scaled for better plotting
 
                 delay_milliseconds(1); /* 1 ms wait */
             }
@@ -80,11 +81,11 @@ int main(void)
 			/* Position Control Loop */
             {
                  ControlConfig position_control_config;
-                 position_control_config.position_sensor_type = SENSOR_USED;
+                 position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
 
-                 position_control_config.Kp = POSITION_Kp_NUMERATOR;    // Divided by 10000
-                 position_control_config.Ki = POSITION_Ki_NUMERATOR;    // Divided by 10000
-                 position_control_config.Kd = POSITION_Kd_NUMERATOR;    // Divided by 10000
+                 position_control_config.Kp = POSITION_Kp;    // Divided by 10000
+                 position_control_config.Ki = POSITION_Ki;    // Divided by 10000
+                 position_control_config.Kd = POSITION_Kd;    // Divided by 10000
 
                  position_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; //us
 
@@ -110,9 +111,9 @@ int main(void)
                 /* Quadrature encoder sensor Service */
                  {
                      QEIConfig qei_config;
-                         qei_config.signal_type = QEI_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
-                         qei_config.index_type = QEI_INDEX_TYPE;                 // Indexed encoder?
-                         qei_config.ticks_resolution = ENCODER_RESOLUTION;       // Encoder resolution
+                         qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
+                         qei_config.index_type = QEI_SENSOR_INDEX_TYPE;                 // Indexed encoder?
+                         qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;       // Encoder resolution
                          qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
                      qei_service(qei_ports, qei_config, i_qei);
