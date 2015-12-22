@@ -69,7 +69,6 @@ int main(void)
 		/* Test Profile Position Client function*/
 		on tile[APP_TILE]: position_profile_test(i_position_control[0]);      // test PPM on slave side
 
-
 		on tile[APP_TILE]:
         /* XScope monitoring */
 		{
