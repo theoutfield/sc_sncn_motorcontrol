@@ -15,6 +15,7 @@ typedef enum { BDC_MOTOR = 10, BLDC_MOTOR = 11 } MotorType;
 typedef struct {
     MotorType motor_type;
     BLDCWindingType bldc_winding_type;
+    int commutation_sensor;
     int hall_offset_clk;
     int hall_offset_cclk;
     int commutation_loop_period;

@@ -3,9 +3,10 @@
 #include <IFM_DC100-rev-b.inc>
 
 /**
- * @brief Test illustrates usage of module_commutation
+ * @brief Test illustrates usage of
  * @date 17/06/2014
  */
+
 #include <pwm_service.h>
 #include <adc_service.h>
 #include <watchdog_service.h>

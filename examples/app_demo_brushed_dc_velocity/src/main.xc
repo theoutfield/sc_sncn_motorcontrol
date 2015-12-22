@@ -14,17 +14,17 @@
 
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
-    int target_velocity = 30;          // rpm
+    int target_velocity = 300;          // rpm
     int acceleration    = 1000;         // rpm/s
     int deceleration    = 1000;         // rpm/s
-    ProfileVelocityConfig profile_velocity_config;
 
-    profile_velocity_config.max_profile_velocity = MAX_PROFILE_VELOCITY;
-    profile_velocity_config.max_acceleration = MAX_ACCELERATION;
-    profile_velocity_config.quick_stop_deceleration = MAX_ACCELERATION;
+    ProfilerConfig profiler_config;
+    profiler_config.max_velocity = MAX_VELOCITY;
+    profiler_config.max_acceleration = MAX_ACCELERATION;
+    profiler_config.max_deceleration = MAX_DECELERATION;
 
     /* Initialise the velocity profile generator */
-    init_velocity_profiler(profile_velocity_config, i_velocity_control);
+    init_velocity_profiler(profiler_config, i_velocity_control);
 
     /* Set new target velocity for profile velocity control */
     set_profile_velocity( target_velocity, acceleration, deceleration, i_velocity_control);
@@ -74,13 +74,13 @@ int main(void)
         {
             ControlConfig velocity_control_config;
 
-            velocity_control_config.position_sensor_type = SENSOR_USED;
+            velocity_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR ;
 
-            velocity_control_config.Kp = VELOCITY_Kp_NUMERATOR;     // Divided by 10000
-            velocity_control_config.Ki = VELOCITY_Ki_NUMERATOR;     // Divided by 10000
-            velocity_control_config.Kd = VELOCITY_Kd_NUMERATOR;     // Divided by 10000
+            velocity_control_config.Kp = VELOCITY_Kp;     // Divided by 10000
+            velocity_control_config.Ki = VELOCITY_Ki;     // Divided by 10000
+            velocity_control_config.Kd = VELOCITY_Kd;     // Divided by 10000
 
-            velocity_control_config.control_loop_period =  COMMUTATION_LOOP_PERIOD; //us
+            velocity_control_config.control_loop_period =  CONTROL_LOOP_PERIOD; //us
 
             /* Control Loop */
             velocity_control_service(velocity_control_config, null, i_qei[1], i_motorcontrol[0],
@@ -104,9 +104,9 @@ int main(void)
                 /* Quadrature encoder sensor Service */
                  {
                      QEIConfig qei_config;
-                         qei_config.signal_type = QEI_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
-                         qei_config.index_type = QEI_INDEX_TYPE;                 // Indexed encoder?
-                         qei_config.ticks_resolution = ENCODER_RESOLUTION;       // Encoder resolution
+                         qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
+                         qei_config.index_type = QEI_SENSOR_INDEX_TYPE;                 // Indexed encoder?
+                         qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;       // Encoder resolution
                          qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
                      qei_service(qei_ports, qei_config, i_qei);
