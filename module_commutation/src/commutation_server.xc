@@ -197,7 +197,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                         } else if (sensor_select == QEI) {
                             angle_pwm = ((angle + commutation_params.qei_forward_offset) >> 2) & 0x3ff; //512
                         } else if (sensor_select == ABS_AMS){
-                            angle_pwm = (angle >> 2) & 0x3ff;
+                            angle_pwm = ((angle + commutation_params.hall_offset_clk) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
                         angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
@@ -318,7 +318,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                             break;
 
                         case COMMUTATION_CMD_SET_TO_ZERO_ANGLE:
-                            c_commutation_p1 :> voltage;    //STAR_WINDING
+                            c_commutation_p2 :> voltage;    //STAR_WINDING
                             if (commutation_params.winding_type == DELTA_WINDING) {
                                 voltage = -voltage;
                             }
@@ -370,7 +370,7 @@ void commutation_sinusoidal(chanend ?c_hall, chanend ?c_qei, client interface AM
                                 break;
 
                             case COMMUTATION_CMD_SET_TO_ZERO_ANGLE:
-                                c_commutation_p1 :> voltage;    //STAR_WINDING
+                                c_commutation_p3 :> voltage;    //STAR_WINDING
                                 if (commutation_params.winding_type == DELTA_WINDING) {
                                     voltage = -voltage;
                                 }
