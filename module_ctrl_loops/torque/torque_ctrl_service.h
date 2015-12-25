@@ -47,7 +47,7 @@ interface TorqueControlInterface{
      *
      * @return Lorem ipsum...
      */
-    int get_set_torque();
+    int get_target_torque();
     /**
      * @brief Lorem ipsum...
      *

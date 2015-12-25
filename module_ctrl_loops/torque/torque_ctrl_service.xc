@@ -381,9 +381,9 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 #endif
             break;
 
-        case i_torque_control[int i].get_set_torque() -> int out_set_torque:
+        case i_torque_control[int i].get_target_torque() -> int out_target_torque:
 
-                out_set_torque = target_torque;
+                out_target_torque = target_torque;
                 break;
 
         case i_torque_control[int i].get_torque() -> int out_torque:
