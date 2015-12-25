@@ -72,7 +72,7 @@ int main(void)
 		    while(1) {
 
 		        actual_velocity = i_velocity_control[1].get_velocity();
-		        target_velocity = i_velocity_control[1].get_set_velocity();
+		        target_velocity = i_velocity_control[1].get_target_velocity();
 
 		        xscope_int(TARGET_VELOCITY, target_velocity);
 		        xscope_int(ACTUAL_VELOCITY, actual_velocity);

@@ -44,7 +44,7 @@ interface VelocityControlInterface{
      *
      * @return Lorem ipsum...
      */
-    int get_set_velocity();
+    int get_target_velocity();
     /**
      * @brief Lorem ipsum...
      *

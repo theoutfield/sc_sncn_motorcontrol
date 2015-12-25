@@ -95,7 +95,7 @@ int main(void)
 		    while(1){
 		        {phaseB, phaseC} = i_adc[1].get_currents();
 		        actual_torque = i_torque_control[1].get_torque();
-		        target_torque = i_torque_control[1].get_set_torque();
+		        target_torque = i_torque_control[1].get_target_torque();
 
 		        xscope_int(TARGET_TORQUE, target_torque);
 		        xscope_int(ACTUAL_TORQUE, actual_torque);
