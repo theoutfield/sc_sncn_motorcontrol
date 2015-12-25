@@ -80,7 +80,12 @@ interface TorqueControlInterface{
      * @brief Lorem ipsum...
      */
     void shutdown_torque_ctrl();
-
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
+    ControlConfig get_torque_control_config();
 };
 
 /**
