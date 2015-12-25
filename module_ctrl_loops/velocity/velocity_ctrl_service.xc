@@ -100,7 +100,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
     HallConfig hall_config;
     QEIConfig qei_config;
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.getConfig();
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
 
    if(velocity_control_config.feedback_sensor != HALL_SENSOR
            && velocity_control_config.feedback_sensor < QEI_SENSOR){
@@ -111,17 +111,17 @@ void velocity_control_service(ControlConfig &velocity_control_config,
         if(isnull(i_hall)){
             printstrln("Velocity Control Loop ERROR: Interface for Hall Service not provided");
         }else{
-            hall_config = i_hall.getHallConfig();
+            hall_config = i_hall.get_hall_config();
         }
     } else if(velocity_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
         if(isnull(i_qei)){
             printstrln("Velocity Control Loop ERROR: Interface for QEI Service not provided");
         }else{
-            qei_config = i_qei.getQEIConfig();
+            qei_config = i_qei.get_qei_config();
         }
     }
 
-    motorcontrol_config = i_motorcontrol.getConfig();
+    motorcontrol_config = i_motorcontrol.get_config();
 
     //Limits
     if(motorcontrol_config.motor_type == BLDC_MOTOR){
@@ -240,7 +240,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                     velocity_control_out = -velocity_control_out_limit;
                 }
 
-                i_motorcontrol.setVoltage(velocity_control_out);//set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
+                i_motorcontrol.set_voltage(velocity_control_out);//set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
 
                 previous_error = error_velocity;
 
@@ -325,8 +325,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             error_velocity_I = 0;
             previous_error = 0;
             velocity_control_out = 0;
-            i_motorcontrol.setVoltage(0); //set_commutation_sinusoidal(c_commutation, 0);
-            i_motorcontrol.disableFets();//disable_motor(c_commutation);
+            i_motorcontrol.set_voltage(0); //set_commutation_sinusoidal(c_commutation, 0);
+            i_motorcontrol.disable_fets();//disable_motor(c_commutation);
             delay_milliseconds(30);//wait_ms(30, 1, t);
             break;
 
@@ -344,14 +344,14 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             activate = 1;
             while (1) {
-                init_state = i_motorcontrol.checkBusy();//__check_commutation_init(c_commutation);
+                init_state = i_motorcontrol.check_busy();//__check_commutation_init(c_commutation);
                 if (init_state == INIT) {
 #ifdef debug_print
                     printf("commutation intialized\n");
 #endif
-                    fet_state = i_motorcontrol.getFetsState();//check_fet_state(c_commutation);
+                    fet_state = i_motorcontrol.get_fets_state();//check_fet_state(c_commutation);
                     if (fet_state == 1) {
-                        i_motorcontrol.enableFets();//enable_motor(c_commutation);
+                        i_motorcontrol.enable_fets();//enable_motor(c_commutation);
                         delay_milliseconds(2);//wait_ms(2, 1, t);
                     }
                     break;

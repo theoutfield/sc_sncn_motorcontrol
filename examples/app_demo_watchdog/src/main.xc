@@ -33,7 +33,7 @@ int main(void) {
         {
             delay_seconds(1);
             printstrln("Motor start spinning");
-            i_motorcontrol[0].setVoltage(500);
+            i_motorcontrol[0].set_voltage(500);
 
             delay_seconds(3);                   // Motor spins for 3 secs
 
@@ -43,9 +43,9 @@ int main(void) {
             delay_seconds(2);                   // Motor still for 2 secs
 
             printstrln("Watchdog starts again, motor spins");
-            i_motorcontrol[0].setVoltage(0);    // We set a 0 voltage before starting operation
+            i_motorcontrol[0].set_voltage(0);    // We set a 0 voltage before starting operation
             i_watchdog[1].start();
-            i_motorcontrol[0].setVoltage(500);
+            i_motorcontrol[0].set_voltage(500);
         }
 
         on tile[IFM_TILE]:

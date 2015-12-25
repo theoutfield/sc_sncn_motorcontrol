@@ -265,18 +265,18 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
 
                  count = in_offset;
                  break;
-        case i_qei[int i].getQEIConfig() -> QEIConfig out_config:
+        case i_qei[int i].get_qei_config() -> QEIConfig out_config:
 
                 out_config = qei_config;
                 break;
 
-        case i_qei[int i].setQEIConfig(QEIConfig in_config):
+        case i_qei[int i].set_qei_config(QEIConfig in_config):
 
                 qei_config = in_config;
                 status = 1;
                 break;
 
-        case i_qei[int i].checkBusy() -> int out_status:
+        case i_qei[int i].check_busy() -> int out_status:
 
                 out_status = init_state;
                 break;
