@@ -164,7 +164,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                         interface TorqueControlInterface server i_torque_control[3])
 {
 
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.getConfig();
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
 
    if(torque_control_config.feedback_sensor != HALL_SENSOR
            && torque_control_config.feedback_sensor < QEI_SENSOR){
@@ -369,7 +369,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                     }
                 }
 
-                i_motorcontrol.setVoltage(torque_control_output);
+                i_motorcontrol.set_voltage(torque_control_output);
             }
             break;
 
@@ -463,14 +463,14 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
         case i_torque_control[int i].enable_torque_ctrl():
                 activate = 1;
-                  init_state = i_motorcontrol.checkBusy(); //__check_commutation_init(c_commutation);
+                  init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
                   if (init_state == INIT) {
 #ifdef debug_print
                       printstrln("commutation intialized");
 #endif
-                      fet_state = i_motorcontrol.getFetsState(); //check_fet_state(c_commutation);
+                      fet_state = i_motorcontrol.get_fets_state(); //check_fet_state(c_commutation);
                       if (fet_state == 1) {
-                          i_motorcontrol.enableFets(); //enable_motor(c_commutation);
+                          i_motorcontrol.enable_fets(); //enable_motor(c_commutation);
                           delay_milliseconds(2);
                          // wait_ms(2, 1, tc);
                       }
@@ -498,8 +498,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                error_torque_derivative = 0;
                error_torque_previous = 0;
                torque_control_output = 0;
-               i_motorcontrol.setVoltage(0);//set_commutation_sinusoidal(c_commutation, 0);
-               i_motorcontrol.disableFets(); //disable_motor(c_commutation);
+               i_motorcontrol.set_voltage(0);//set_commutation_sinusoidal(c_commutation, 0);
+               i_motorcontrol.disable_fets(); //disable_motor(c_commutation);
                delay_milliseconds(30);
                //wait_ms(30, 1, tc);
                break;
@@ -522,11 +522,11 @@ void torque_control_service(ControlConfig &torque_control_config,
                     interface TorqueControlInterface server i_torque_control[3])
 {
     chan c_current;
-    HallConfig hall_config = i_hall.getHallConfig();
+    HallConfig hall_config = i_hall.get_hall_config();
 
     QEIConfig qei_config;
     if(torque_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
-        qei_config = i_qei.getQEIConfig();
+        qei_config = i_qei.get_qei_config();
     }
 
 

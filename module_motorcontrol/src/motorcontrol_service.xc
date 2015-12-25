@@ -47,10 +47,10 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
     unsigned ts = 0;
 
     if(!isnull(i_hall))
-        hall_config = i_hall.getHallConfig();
+        hall_config = i_hall.get_hall_config();
 
     if(!isnull(i_qei)){
-        qei_config = i_qei.getQEIConfig();
+        qei_config = i_qei.get_qei_config();
     }
 
     if (check_motorcontrol_config(motorcontrol_config) == ERROR){

@@ -143,12 +143,12 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                 count = offset;
                 break;
 
-            case i_hall[int i].getHallConfig() -> HallConfig out_config:
+            case i_hall[int i].get_hall_config() -> HallConfig out_config:
 
                     out_config = hall_config;
                     break;
 
-            case i_hall[int i].setHallConfig(HallConfig in_config):
+            case i_hall[int i].set_hall_config(HallConfig in_config):
 
                     //hall_config.max_ticks = in_config.max_ticks;
                     hall_config.pole_pairs = in_config.pole_pairs;
@@ -160,7 +160,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
 
                     break;
 
-            case i_hall[int i].checkBusy() -> int out_status:
+            case i_hall[int i].check_busy() -> int out_status:
 
                     out_status = init_state;
 

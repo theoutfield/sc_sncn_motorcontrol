@@ -44,7 +44,7 @@ int main(void) {
                     int normalized_value = AI1*13589/16383;
                     printf("Voltage SP: %i\n", normalized_value);
 
-                    i_motorcontrol[0].setVoltage(normalized_value);
+                    i_motorcontrol[0].set_voltage(normalized_value);
               }
             }
         }

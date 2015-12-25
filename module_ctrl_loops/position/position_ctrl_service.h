@@ -82,19 +82,19 @@ interface PositionControlInterface{
      *
      * @return Lorem ipsum...
      */
-    ControlConfig getControlConfig();
+    ControlConfig get_control_config();
     /**
      * @brief Lorem ipsum...
      *
      * @return Lorem ipsum...
      */
-    HallConfig getHallConfig();
+    HallConfig get_hall_config();
     /**
      * @brief Lorem ipsum...
      *
      * @return Lorem ipsum...
      */
-    QEIConfig getQEIConfig();
+    QEIConfig get_qei_config();
 };
 
 /**
