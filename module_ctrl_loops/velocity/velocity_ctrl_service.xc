@@ -258,9 +258,9 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             out_velocity = actual_velocity;
             break;
 
-        case i_velocity_control[int i].get_set_velocity() -> int out_set_velocity:
+        case i_velocity_control[int i].get_target_velocity() -> int out_target_velocity:
 
-            out_set_velocity = target_velocity;
+            out_target_velocity = target_velocity;
             break;
 
         case i_velocity_control[int i].set_velocity_ctrl_param(ControlConfig in_params):

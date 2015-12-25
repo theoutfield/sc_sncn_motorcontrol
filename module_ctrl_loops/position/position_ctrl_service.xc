@@ -216,9 +216,9 @@ void position_control_service(ControlConfig &position_control_config,
                 out_position = actual_position;
                 break;
 
-        case i_position_control[int i].get_target_position() -> int out_set_position:
+        case i_position_control[int i].get_target_position() -> int out_target_position:
 
-                out_set_position = target_position;
+                out_target_position = target_position;
                 break;
 
         case i_position_control[int i].check_busy() -> int out_activate:
