@@ -509,6 +509,11 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                 out_state = activate;
 
                  break;
+
+        case i_torque_control[int i].get_torque_control_config() -> ControlConfig out_config:
+
+            out_config = torque_control_config;
+            break;
         }
     }
 }
