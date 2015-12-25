@@ -125,14 +125,14 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 break;
 
 
-            case i_motorcontrol[int i].setVoltage(int new_voltage):
+            case i_motorcontrol[int i].set_voltage(int new_voltage):
                     voltage = new_voltage;
                     if (commutation_params.bldc_winding_type == DELTA_WINDING) {
                         voltage = -voltage;
                     }
                     break;
 
-            case i_motorcontrol[int i].setParameters(MotorcontrolConfig new_parameters):
+            case i_motorcontrol[int i].set_parameters(MotorcontrolConfig new_parameters):
                     //commutation_params.angle_variance = new_parameters.angle_variance;
                     //commutation_params.nominal_speed = new_parameters.nominal_speed;
                     commutation_params.hall_offset_clk = new_parameters.hall_offset_clk;
@@ -141,33 +141,33 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
                     break;
 
-            case i_motorcontrol[int i].getConfig() -> MotorcontrolConfig out_config:
+            case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
 
                     out_config = commutation_params;
                     break;
 
-            case i_motorcontrol[int i].setSensor(int new_sensor):
+            case i_motorcontrol[int i].set_sensor(int new_sensor):
                     sensor_select = new_sensor;
                     break;
 
-            case i_motorcontrol[int i].enableFets():
+            case i_motorcontrol[int i].enable_fets():
                     shutdown = 0;
                     voltage = 0;
                     break;
 
-            case i_motorcontrol[int i].disableFets():
+            case i_motorcontrol[int i].disable_fets():
                     shutdown = 1;
                     break;
 
-            case i_motorcontrol[int i].getFetsState() -> int fets_state:
+            case i_motorcontrol[int i].get_fets_state() -> int fets_state:
                     fets_state = shutdown;
                     break;
 
-            case i_motorcontrol[int i].checkBusy() -> int state_return:
+            case i_motorcontrol[int i].check_busy() -> int state_return:
                     state_return = init_state;
                     break;
 
-            case i_motorcontrol[int i].setAllParameters(HallConfig in_hall_config,
+            case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,
                                                                 QEIConfig in_qei_config,
                                                                 MotorcontrolConfig in_commutation_config, int in_nominal_speed):
 

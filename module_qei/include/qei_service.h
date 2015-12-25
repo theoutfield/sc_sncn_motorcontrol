@@ -70,7 +70,7 @@ interface QEIInterface{
      *
      * @return Lorem ipsum...
      */
-    int checkBusy();
+    int check_busy();
     /**
      * @brief Lorem ipsum...
      *
@@ -117,13 +117,13 @@ interface QEIInterface{
      *
      * @return Lorem ipsum...
      */
-    QEIConfig getQEIConfig();
+    QEIConfig get_qei_config();
     /**
      * @brief Lorem ipsum...
      *
      * @param in_config Lorem ipsum...
      */
-    void setQEIConfig(QEIConfig in_config);
+    void set_qei_config(QEIConfig in_config);
 };
 
 /**

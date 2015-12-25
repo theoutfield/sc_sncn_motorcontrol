@@ -86,7 +86,7 @@ void position_control_service(ControlConfig &position_control_config,
 
     HallConfig hall_config;
     QEIConfig qei_config;
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.getConfig();
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
 
    if(position_control_config.feedback_sensor != HALL_SENSOR
            && position_control_config.feedback_sensor < QEI_SENSOR){
@@ -98,13 +98,13 @@ void position_control_service(ControlConfig &position_control_config,
         if(isnull(i_hall)){
             printstrln("Position Control Loop ERROR: Interface for Hall Service not provided");
         }else{
-            hall_config = i_hall.getHallConfig();
+            hall_config = i_hall.get_hall_config();
         }
     } else if(position_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
         if(isnull(i_qei)){
             printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
         }else{
-            qei_config = i_qei.getQEIConfig();
+            qei_config = i_qei.get_qei_config();
         }
     }
 
@@ -193,7 +193,7 @@ void position_control_service(ControlConfig &position_control_config,
 
 
                // set_commutation_sinusoidal(c_commutation, position_control_out);
-                i_motorcontrol.setVoltage(position_control_out);
+                i_motorcontrol.set_voltage(position_control_out);
 
 #ifdef DEBUG
                 xscope_int(ACTUAL_POSITION, actual_position);
@@ -270,14 +270,14 @@ void position_control_service(ControlConfig &position_control_config,
         case i_position_control[int i].enable_position_ctrl():
                         activate = 1;
                             while (1) {
-                                init_state = i_motorcontrol.checkBusy(); //__check_commutation_init(c_commutation);
+                                init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
                                 if(init_state == INIT) {
             #ifdef debug_print
                                     printstrln("commutation intialized");
             #endif
-                                    fet_state = i_motorcontrol.getFetsState(); // check_fet_state(c_commutation);
+                                    fet_state = i_motorcontrol.get_fets_state(); // check_fet_state(c_commutation);
                                     if (fet_state == 1) {
-                                        i_motorcontrol.enableFets();
+                                        i_motorcontrol.enable_fets();
                                         delay_milliseconds(2);
                                     }
 
@@ -291,14 +291,14 @@ void position_control_service(ControlConfig &position_control_config,
 
         case i_position_control[int i].shutdown_position_ctrl():
             activate = 0;
-            i_motorcontrol.setVoltage(0);
+            i_motorcontrol.set_voltage(0);
             //set_commutation_sinusoidal(c_commutation, 0);
             error_position = 0;
             error_position_D = 0;
             error_position_I = 0;
             previous_error = 0;
             position_control_out = 0;
-            i_motorcontrol.disableFets();
+            i_motorcontrol.disable_fets();
             // disable_motor(c_commutation);
             delay_milliseconds(30);
             //wait_ms(30, 1, ts); //
@@ -312,15 +312,15 @@ void position_control_service(ControlConfig &position_control_config,
 
                 break;
 
-        case i_position_control[int i].getControlConfig() ->  ControlConfig out_config:
+        case i_position_control[int i].get_control_config() ->  ControlConfig out_config:
 
                 out_config = position_control_config;
                 break;
-        case i_position_control[int i].getHallConfig() -> HallConfig out_config:
+        case i_position_control[int i].get_hall_config() -> HallConfig out_config:
 
                 out_config = hall_config;
                 break;
-        case i_position_control[int i].getQEIConfig() -> QEIConfig out_config:
+        case i_position_control[int i].get_qei_config() -> QEIConfig out_config:
 
                 out_config = qei_config;
                 break;

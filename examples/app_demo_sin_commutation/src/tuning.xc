@@ -11,8 +11,8 @@
 void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client commutation_interface){
 
     delay_seconds(1);
-    commutation_interface.setVoltage(input_voltage);
-    MotorcontrolConfig motorcontrol_config = commutation_interface.getConfig();
+    commutation_interface.set_voltage(input_voltage);
+    MotorcontrolConfig motorcontrol_config = commutation_interface.get_config();
 
     printf (" Please enter an offset value different from %d, then press enter\n",
             (input_voltage > 0) ? ((motorcontrol_config.bldc_winding_type == 1) ? motorcontrol_config.hall_offset_clk : motorcontrol_config.hall_offset_cclk) : ((motorcontrol_config.bldc_winding_type == 1) ? motorcontrol_config.hall_offset_cclk : motorcontrol_config.hall_offset_clk)  );
@@ -33,22 +33,22 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
         {        //star winding
             if (motorcontrol_config.bldc_winding_type == 1) {
                 MotorcontrolConfig params = {BLDC_MOTOR, motorcontrol_config.bldc_winding_type, value, motorcontrol_config.hall_offset_cclk, motorcontrol_config.commutation_loop_period};
-                commutation_interface.setParameters(params);
+                commutation_interface.set_parameters(params);
             }
             else {
                 MotorcontrolConfig params = {BLDC_MOTOR, motorcontrol_config.bldc_winding_type, motorcontrol_config.hall_offset_clk, value, motorcontrol_config.commutation_loop_period};
-                commutation_interface.setParameters(params);
+                commutation_interface.set_parameters(params);
             }
         }
         else
         {
             if (motorcontrol_config.bldc_winding_type == 1){
                 MotorcontrolConfig params = {BLDC_MOTOR, motorcontrol_config.bldc_winding_type, motorcontrol_config.hall_offset_clk, value, motorcontrol_config.commutation_loop_period};
-                commutation_interface.setParameters(params);
+                commutation_interface.set_parameters(params);
             }
             else{
                 MotorcontrolConfig params = {BLDC_MOTOR, motorcontrol_config.bldc_winding_type, value, motorcontrol_config.hall_offset_cclk, motorcontrol_config.commutation_loop_period};
-                commutation_interface.setParameters(params);
+                commutation_interface.set_parameters(params);
             }
         }
 

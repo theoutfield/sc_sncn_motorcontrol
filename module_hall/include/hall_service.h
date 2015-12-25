@@ -74,19 +74,19 @@ interface HallInterface {
      *
      * @return Lorem ipsum...
      */
-    HallConfig getHallConfig();
+    HallConfig get_hall_config();
     /**
      * @brief Lorem ipsum...
      *
      * @param in_config Lorem ipsum...
      */
-    void setHallConfig(HallConfig in_config);
+    void set_hall_config(HallConfig in_config);
     /**
      * @brief Lorem ipsum...
      *
      * @return Lorem ipsum...
      */
-    int checkBusy();
+    int check_busy();
 };
 
 /**

@@ -42,45 +42,45 @@ interface MotorcontrolInterface{
      *
      * @return Lorem ipsum...
      */
-    int checkBusy();
+    int check_busy();
     /**
      * @brief Lorem ipsum...
      *
      * @param voltage Lorem ipsum...
      */
-    void setVoltage(int voltage);
+    void set_voltage(int voltage);
     /**
      * @brief Lorem ipsum...
      *
      * @param parameters Lorem ipsum...
      */
-    void setParameters(MotorcontrolConfig parameters);
+    void set_parameters(MotorcontrolConfig parameters);
     /**
      * @brief Lorem ipsum...
      *
      * @return Lorem ipsum...
      */
-    MotorcontrolConfig getConfig();
+    MotorcontrolConfig get_config();
     /**
      * @brief Lorem ipsum...
      *
      * @param sensor Lorem ipsum...
      */
-    void setSensor(int sensor);
+    void set_sensor(int sensor);
      /**
      * @brief Lorem ipsum...
      */
-    void disableFets();
+    void disable_fets();
     /**
      * @brief Lorem ipsum...
      */
-    void enableFets();
+    void enable_fets();
     /**
      * @brief Lorem ipsum...
      *
      * @return Lorem ipsum...
      */
-    int getFetsState();
+    int get_fets_state();
     /**
      * @brief Lorem ipsum...
      *
@@ -89,7 +89,7 @@ interface MotorcontrolInterface{
      * @param commutation_config Lorem ipsum...
      * @param in_nominal_speed Lorem ipsum...
      */
-    void setAllParameters(HallConfig hall_config, QEIConfig qei_config, MotorcontrolConfig commutation_config, int in_nominal_speed);
+    void set_all_parameters(HallConfig hall_config, QEIConfig qei_config, MotorcontrolConfig commutation_config, int in_nominal_speed);
 };
 
 /**
