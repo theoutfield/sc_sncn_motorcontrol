@@ -6,10 +6,10 @@
 #include <pwm_service.h>
 #include <pwm_test.h>
 
-on tile[3]: PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
+on tile[IFM_TILE]: PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 
 /* ADC */
-on tile[3]: out port p_adc_conv = XS1_PORT_1A;
+on tile[IFM_TILE]: out port p_adc_conv = XS1_PORT_1A;
 
 int main (void)
 {
@@ -19,7 +19,7 @@ int main (void)
 
     par {
         /* PWM service */
-        on tile[3]: {
+        on tile[IFM_TILE]: {
             timer t;
             unsigned ts;
 
@@ -30,14 +30,14 @@ int main (void)
 
 
         /* PWM client */
-        on tile[3]: {
+        on tile[IFM_TILE]: {
             do_pwm_test(c_pwm_ctrl);
             exit (0);
         }
 
 
         /* Using the ADC trigger */
-        on tile[3]: {
+        on tile[IFM_TILE]: {
             unsigned char ct;   /* control token received from channel */
 
             p_adc_conv <: 0;
