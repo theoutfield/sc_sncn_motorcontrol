@@ -7,10 +7,10 @@
  * @date 17/06/2014
  */
 
+#include <pwm_service.h>
 #include <hall_service.h>
 #include <adc_service.h>
 #include <user_config.h>
-#include <tuning.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -49,14 +49,13 @@ int main(void) {
     par
     {
 
-        on tile[APP_TILE_1]:
+        on tile[APP_TILE]:
         {
-            /* WARNING: only one blocking task is possible per tile. */
-            /* Waiting for a user input blocks other tasks on the same tile from execution. */
-            run_offset_tuning(VOLTAGE, i_motorcontrol[0]);
+            delay_seconds(1);
+            i_motorcontrol[0].set_voltage(VOLTAGE);
         }
 
-        on tile[APP_TILE_2]: adc_client(i_adc[0], i_hall[1]);
+        on tile[APP_TILE]: adc_client(i_adc[0], i_hall[1]);
 
         on tile[IFM_TILE]:
         {
