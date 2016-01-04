@@ -17,5 +17,5 @@ Hardware setup
 ===
 
 Quick how-to
-------------
+============
 

@@ -28,7 +28,7 @@ Our SOMANET Motor Control Library is composed of the following modules:
 * `Motorcontrol Common Module <module_motorcontrol_common/doc/index>`_ : Main definitions and constants for the software. 
 * `Blocks Module <module_blocks/doc/index>`_ : Contains software useful for signal filtering.
 * `ADC Module <module_adc/doc/index>`_ : Driver for the ADC on your IFM DC board.
-* `GPIO Module <module_gpio/doc/index>`_ : Contains a service to handle the GPIO, specially useful on Ethercat Drive Applications.
+* `GPIO Module <module_gpio/doc/index>`_ : Contains a service to handle the external digital input/outputs of your board.
 * `Watchdog Module <module_watchdog/doc/index>`_ : Driver for the Watchdog on your IFM DC board.
 * `Hall Sensor Module <module_hall/doc/index>`_ : Driver to read the signals from your feedback Hall sensor.
 * `Encoder Interface Module <module_qei/doc/index>`_ : Driver to read the signals from your feedback Encoder Interface.
