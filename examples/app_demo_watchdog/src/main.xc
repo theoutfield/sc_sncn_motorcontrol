@@ -32,7 +32,7 @@ int main(void) {
         on tile[APP_TILE]:
         {
             delay_seconds(1);
-            printstrln("Motor start spinning");
+            printstrln("Motor starts spinning");
             i_motorcontrol[0].set_voltage(500);
 
             delay_seconds(3);                   // Motor spins for 3 secs
@@ -61,7 +61,7 @@ int main(void) {
                 /* Hall sensor Service */
                 {
                     HallConfig hall_config;
-                        hall_config.pole_pairs = POLE_PAIRS;
+                    hall_config.pole_pairs = POLE_PAIRS;
 
                     hall_service(hall_ports, hall_config, i_hall);
                 }
@@ -69,12 +69,12 @@ int main(void) {
                 /* Motor Commutation Service */
                 {
                     MotorcontrolConfig motorcontrol_config;
-                        motorcontrol_config.motor_type = BLDC_MOTOR;
-                        motorcontrol_config.commutation_sensor = HALL_SENSOR;
-                        motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                        motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
-                        motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
-                        motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                    motorcontrol_config.motor_type = BLDC_MOTOR;
+                    motorcontrol_config.commutation_sensor = HALL_SENSOR;
+                    motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                    motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                             c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);

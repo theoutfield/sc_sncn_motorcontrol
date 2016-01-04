@@ -25,24 +25,24 @@
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-	int target_torque = 100; 	//(desired torque/torque_constant)  * IFM resolution
-	int torque_slope  = 1000;  	//(desired torque_slope/torque_constant)  * IFM resolution
+    int target_torque = 100;    //(desired torque/torque_constant)  * IFM resolution
+    int torque_slope  = 1000;   //(desired torque_slope/torque_constant)  * IFM resolution
 
     ProfilerConfig profiler_config;
     profiler_config.polarity = POLARITY;
     profiler_config.max_current = MAX_CURRENT;
 
-	/* Initialise the torque profile generator */
-	init_torque_profiler(profiler_config, i_torque_control);
-
-	/* Set new target torque for profile torque control */
-	set_profile_torque(target_torque, torque_slope, i_torque_control);
-
-	delay_seconds(3);
-	target_torque = -100;
+    /* Initialise the torque profile generator */
+    init_torque_profiler(profiler_config, i_torque_control);
 
     /* Set new target torque for profile torque control */
-	set_profile_torque( target_torque, torque_slope, i_torque_control);
+    set_profile_torque(target_torque, torque_slope, i_torque_control);
+
+    delay_seconds(3);
+    target_torque = -100;
+
+    /* Set new target torque for profile torque control */
+    set_profile_torque( target_torque, torque_slope, i_torque_control);
 }
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -54,10 +54,10 @@ QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
 int main(void)
 {
-	// Motor control channels
-	chan c_adctrig, c_pwm_ctrl;
+    // Motor control channels
+    chan c_adctrig, c_pwm_ctrl;
 
-	interface WatchdogInterface i_watchdog[2];
+    interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[3];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
@@ -65,14 +65,14 @@ int main(void)
 
     interface TorqueControlInterface i_torque_control[3];
 
-	par
-	{
-		/* Test Profile Torque Function */
-		on tile[APP_TILE]: profile_torque_test(i_torque_control[0]);
+    par
+    {
+        /* Test Profile Torque Function */
+        on tile[APP_TILE]: profile_torque_test(i_torque_control[0]);
 
-		on tile[APP_TILE]:
-		{
-		    /* Torque Control Loop */
+        on tile[APP_TILE]:
+        {
+            /* Torque Control Loop */
             ControlConfig torque_control_config;
 
             torque_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
@@ -87,34 +87,34 @@ int main(void)
             torque_control_service(torque_control_config, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
         }
 
-		/* Currents monitoring in XScope */
-		on tile[APP_TILE]:
-		{
-		    int phaseB, phaseC, actual_torque, target_torque;
+        /* Currents monitoring in XScope */
+        on tile[APP_TILE]:
+        {
+            int phaseB, phaseC, actual_torque, target_torque;
 
-		    while(1){
-		        {phaseB, phaseC} = i_adc[1].get_currents();
-		        actual_torque = i_torque_control[1].get_torque();
-		        target_torque = i_torque_control[1].get_target_torque();
+            while(1){
+                {phaseB, phaseC} = i_adc[1].get_currents();
+                actual_torque = i_torque_control[1].get_torque();
+                target_torque = i_torque_control[1].get_target_torque();
 
-		        xscope_int(TARGET_TORQUE, target_torque);
-		        xscope_int(ACTUAL_TORQUE, actual_torque);
-		        xscope_int(PHASE_B, phaseB);
-		        xscope_int(PHASE_C, phaseC);
-		        delay_microseconds(50);
-		    }
-		}
+                xscope_int(TARGET_TORQUE, target_torque);
+                xscope_int(ACTUAL_TORQUE, actual_torque);
+                xscope_int(PHASE_B, phaseB);
+                xscope_int(PHASE_C, phaseC);
+                delay_microseconds(50);
+            }
+        }
 
 
-		/************************************************************
-		 * IFM_TILE
-		 ************************************************************/
-		on tile[IFM_TILE]:
-		{
-			par
-			{
+        /************************************************************
+         * IFM_TILE
+         ************************************************************/
+        on tile[IFM_TILE]:
+        {
+            par
+            {
                 /* Triggered PWM Service */
-			    pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl);
+                pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
@@ -125,7 +125,7 @@ int main(void)
                 /* Hall sensor Service */
                 {
                     HallConfig hall_config;
-                        hall_config.pole_pairs = POLE_PAIRS;
+                    hall_config.pole_pairs = POLE_PAIRS;
 
                     hall_service(hall_ports, hall_config, i_hall);
                 }
@@ -133,10 +133,10 @@ int main(void)
                 /* Quadrature encoder sensor Service */
                 {
                     QEIConfig qei_config;
-                        qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
-                        qei_config.index_type = QEI_SENSOR_INDEX_TYPE;                 // Indexed encoder?
-                        qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;       // Encoder resolution
-                        qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
+                    qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;        // Encoder signal type (just if applicable)
+                    qei_config.index_type = QEI_SENSOR_INDEX_TYPE;          // Indexed encoder?
+                    qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;    // Encoder resolution
+                    qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
                     qei_service(qei_ports, qei_config, i_qei);
                 }
@@ -144,20 +144,20 @@ int main(void)
                 /* Motor Commutation loop */
                 {
                     MotorcontrolConfig motorcontrol_config;
-                        motorcontrol_config.motor_type = BLDC_MOTOR;
-                        motorcontrol_config.commutation_sensor = HALL_SENSOR;
-                        motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                        motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
-                        motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
-                        motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                    motorcontrol_config.motor_type = BLDC_MOTOR;
+                    motorcontrol_config.commutation_sensor = HALL_SENSOR;
+                    motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                    motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                             c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
                 }
-			}
-		}
+            }
+        }
 
-	}
+    }
 
-	return 0;
+    return 0;
 }

@@ -46,10 +46,10 @@ int main(void)
 
     interface VelocityControlInterface i_velocity_control[3];
 
-	par
-	{
-		/* Test Profile Velocity function */
-		on tile[APP_TILE]:  profile_velocity_test(i_velocity_control[0]);
+    par
+    {
+        /* Test Profile Velocity function */
+        on tile[APP_TILE]:  profile_velocity_test(i_velocity_control[0]);
 
         on tile[APP_TILE]:
         /* XScope monitoring */
@@ -69,7 +69,7 @@ int main(void)
         }
 
 
-		on tile[APP_TILE]:
+        on tile[APP_TILE]:
         /* Velocity Control Loop */
         {
             ControlConfig velocity_control_config;
@@ -88,11 +88,11 @@ int main(void)
         }
 
 
-		/************************************************************
-		 * IFM_TILE
-		 ************************************************************/
-		on tile[IFM_TILE]:
-		{
+        /************************************************************
+         * IFM_TILE
+         ************************************************************/
+        on tile[IFM_TILE]:
+        {
             par
             {
                 /* PWM Service */
@@ -102,30 +102,30 @@ int main(void)
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* Quadrature encoder sensor Service */
-                 {
-                     QEIConfig qei_config;
-                         qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
-                         qei_config.index_type = QEI_SENSOR_INDEX_TYPE;                 // Indexed encoder?
-                         qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;       // Encoder resolution
-                         qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
+                {
+                    QEIConfig qei_config;
+                    qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;        // Encoder signal type (just if applicable)
+                    qei_config.index_type = QEI_SENSOR_INDEX_TYPE;          // Indexed encoder?
+                    qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;    // Encoder resolution
+                    qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
-                     qei_service(qei_ports, qei_config, i_qei);
-                 }
+                    qei_service(qei_ports, qei_config, i_qei);
+                }
 
-                 /* Motor Drive Service */
-                 {
-                     MotorcontrolConfig motorcontrol_config;
-                         motorcontrol_config.motor_type = BDC_MOTOR;
-                         motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                /* Motor Drive Service */
+                {
+                    MotorcontrolConfig motorcontrol_config;
+                    motorcontrol_config.motor_type = BDC_MOTOR;
+                    motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_watchdog[0],
-                                                 i_motorcontrol);
-                 }
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_watchdog[0],
+                                             i_motorcontrol);
+                }
 
             }
-		}
+        }
 
-	}
+    }
 
-	return 0;
+    return 0;
 }
