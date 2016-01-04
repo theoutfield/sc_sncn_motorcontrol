@@ -14,7 +14,7 @@ Overview
 Lorem ipsum...
 
 Hardware setup
-===
+==============
 
 Quick how-to
 ============
