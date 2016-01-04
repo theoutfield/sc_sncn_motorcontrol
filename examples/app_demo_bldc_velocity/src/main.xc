@@ -31,57 +31,57 @@ QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 /* Test Profile Velocity function */
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
-	int target_velocity = 900;	 		// rpm
-	int acceleration 	= 100;			// rpm/s
-	int deceleration 	= 100;			// rpm/s
+    int target_velocity = 900;          // rpm
+    int acceleration    = 100;          // rpm/s
+    int deceleration    = 100;          // rpm/s
 
     ProfilerConfig profiler_config;
     profiler_config.max_velocity = MAX_VELOCITY;
     profiler_config.max_acceleration = MAX_ACCELERATION;
     profiler_config.max_deceleration = MAX_DECELERATION;
 
-	/* Initialise the velocity profile generator */
-	init_velocity_profiler(profiler_config, i_velocity_control);
+    /* Initialise the velocity profile generator */
+    init_velocity_profiler(profiler_config, i_velocity_control);
 
-	/* Set new target velocity for profile velocity control */
-	set_profile_velocity(target_velocity, acceleration, deceleration, i_velocity_control);
+    /* Set new target velocity for profile velocity control */
+    set_profile_velocity(target_velocity, acceleration, deceleration, i_velocity_control);
 }
 
 int main(void)
 {
-	chan c_pwm_ctrl;     // pwm channel
+    chan c_pwm_ctrl;     // pwm channel
 
-	interface WatchdogInterface i_watchdog[2];
+    interface WatchdogInterface i_watchdog[2];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
     interface MotorcontrolInterface i_motorcontrol[5];
 
     interface VelocityControlInterface i_velocity_control[3];
 
-	par
-	{
+    par
+    {
 
-		/* Test Profile Velocity function */
-		on tile[APP_TILE]: profile_velocity_test(i_velocity_control[0]);
+        /* Test Profile Velocity function */
+        on tile[APP_TILE]: profile_velocity_test(i_velocity_control[0]);
 
-		on tile[APP_TILE]:
+        on tile[APP_TILE]:
         /* XScope monitoring */
-		{
-		    int target_velocity, actual_velocity;
+        {
+            int target_velocity, actual_velocity;
 
-		    while(1) {
+            while(1) {
 
-		        actual_velocity = i_velocity_control[1].get_velocity();
-		        target_velocity = i_velocity_control[1].get_target_velocity();
+                actual_velocity = i_velocity_control[1].get_velocity();
+                target_velocity = i_velocity_control[1].get_target_velocity();
 
-		        xscope_int(TARGET_VELOCITY, target_velocity);
-		        xscope_int(ACTUAL_VELOCITY, actual_velocity);
+                xscope_int(TARGET_VELOCITY, target_velocity);
+                xscope_int(ACTUAL_VELOCITY, actual_velocity);
 
-		        delay_microseconds(1);
-		    }
-		}
+                delay_microseconds(1);
+            }
+        }
 
-		on tile[APP_TILE]:
+        on tile[APP_TILE]:
         /* Velocity Control Service */
         {
             ControlConfig velocity_control_config;
@@ -99,12 +99,12 @@ int main(void)
                                         i_velocity_control);
         }
 
-		/************************************************************
-		 * IFM_CORE
-		 ************************************************************/
-		on tile[IFM_TILE]:
-		{
-		    par
+        /************************************************************
+         * IFM_CORE
+         ************************************************************/
+        on tile[IFM_TILE]:
+        {
+            par
             {
                 /* PWM Service */
                 pwm_service(pwm_ports, c_pwm_ctrl);
@@ -115,37 +115,37 @@ int main(void)
                 /* Hall sensor Service */
                 {
                     HallConfig hall_config;
-                        hall_config.pole_pairs = POLE_PAIRS;
+                    hall_config.pole_pairs = POLE_PAIRS;
 
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
                 /* Quadrature encoder sensor Service */
-                 {
-                     QEIConfig qei_config;
-                         qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;               // Encoder signal type (just if applicable)
-                         qei_config.index_type = QEI_SENSOR_INDEX_TYPE;                 // Indexed encoder?
-                         qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;       // Encoder resolution
-                         qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
+                {
+                    QEIConfig qei_config;
+                    qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;       // Encoder signal type (just if applicable)
+                    qei_config.index_type = QEI_SENSOR_INDEX_TYPE;         // Indexed encoder?
+                    qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;   // Encoder resolution
+                    qei_config.sensor_polarity = QEI_SENSOR_POLARITY;      // CW
 
-                     qei_service(qei_ports, qei_config, i_qei);
-                 }
+                    qei_service(qei_ports, qei_config, i_qei);
+                }
 
                  /* Motor Commutation Service */
-                 {
-                     MotorcontrolConfig motorcontrol_config;
-                         motorcontrol_config.motor_type = BLDC_MOTOR;
-                         motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                         motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
-                         motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
-                         motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                {
+                    MotorcontrolConfig motorcontrol_config;
+                    motorcontrol_config.motor_type = BLDC_MOTOR;
+                    motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                    motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                             c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
-                 }
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
+                }
             }
-		}
-	}
+        }
+    }
 
-	return 0;
+    return 0;
 }

@@ -54,7 +54,7 @@ int main(void)
         on tile[IFM_TILE]:
         {
             HallConfig hall_config;
-                hall_config.pole_pairs = 4;                         // 4 Pole-pairs
+            hall_config.pole_pairs = 4;     // 4 Pole-pairs
 
             hall_service(hall_ports, hall_config, i_hall);
         }
