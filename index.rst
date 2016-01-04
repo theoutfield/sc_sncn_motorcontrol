@@ -88,7 +88,7 @@ Examples
 * `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>`_: Simple example to make Torque Control of your Brushed DC motor.
 
 * `Brushed DC Velocity Control over analog Input <examples/app_demo_brushed_dc_ext_regulated/doc/index>`_: Example to control the speed of your Brushed DC motor over an analog input.
-* `Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index> _: Example to help you calibrating the commutation offsets of your Hall sensor.
+* `Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index>`_: Example to help you calibrating the commutation offsets of your Hall sensor.
 
 Drive Configuration
 --------------------
