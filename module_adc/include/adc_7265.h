@@ -29,37 +29,37 @@ interface ADC{
     {int, int} get_adc_measurements(unsigned char port_id, unsigned char config);
 };
 
-/*	The AD7265 data-sheet refers to the following signals:-
- *		SCLK:				Serial Clock frequency (can be configured to between  4..16 MHz.)
- *		CS#:				Chip Select. Ready signal (Falling edge starts sample conversion)
- *		A[0..2]:		Multiplexer Select. Selects inputs to be sampled.
- *		SGL/DIFF:		Selects between Single-ended/Differential mode.
- *		RANGE:			Selects between 0..Vref and 0..2xVref.
- *		Vdrive:			Max. analogue voltage corresponding to Max. 12-bit sample (Hardwired to 3.3V)
- *		REF_SELECT:	Selects internal/external ref. (Hardwired to 2.5V internal)
+/*  The AD7265 data-sheet refers to the following signals:-
+ *      SCLK:               Serial Clock frequency (can be configured to between  4..16 MHz.)
+ *      CS#:                Chip Select. Ready signal (Falling edge starts sample conversion)
+ *      A[0..2]:        Multiplexer Select. Selects inputs to be sampled.
+ *      SGL/DIFF:       Selects between Single-ended/Differential mode.
+ *      RANGE:          Selects between 0..Vref and 0..2xVref.
+ *      Vdrive:         Max. analogue voltage corresponding to Max. 12-bit sample (Hardwired to 3.3V)
+ *      REF_SELECT: Selects internal/external ref. (Hardwired to 2.5V internal)
  *
- *	The Motor-Control Board has been hardwired for differential mode.
- *	There are 2 jumper settings for controlling the following signals:-
- *		SGL/DIFF:		Should be set to 0 for Differential mode.
- *		RANGE:			Should be set to 0 for 0..Vref range.
+ *  The Motor-Control Board has been hardwired for differential mode.
+ *  There are 2 jumper settings for controlling the following signals:-
+ *      SGL/DIFF:       Should be set to 0 for Differential mode.
+ *      RANGE:          Should be set to 0 for 0..Vref range.
  *
- *	The S/W application needs to set A[0..2].
- *	In differential mode (SGl/DIFF = 0):
- *		A[0] selects between Fully/Pseudo Differential. We choose A[0] = 0 for Fully Differential.
- *		A[1,2] is dependant on the motor identifier, and selects between Motor ports V1/V3/V5
+ *  The S/W application needs to set A[0..2].
+ *  In differential mode (SGl/DIFF = 0):
+ *      A[0] selects between Fully/Pseudo Differential. We choose A[0] = 0 for Fully Differential.
+ *      A[1,2] is dependant on the motor identifier, and selects between Motor ports V1/V3/V5
  *
- *	The AD7265 returns a sample with 12 active bits of data.
- *	For our configuration (SGL/DIFF=0, A[0]=0, RANGE=0), these bit are in 2's compliment format.
+ *  The AD7265 returns a sample with 12 active bits of data.
+ *  For our configuration (SGL/DIFF=0, A[0]=0, RANGE=0), these bit are in 2's compliment format.
  *
- *	There can also be padding bits (of value zero) both before and after the active bits.
- *	For this application 14, 15, or 16-bit samples can be used.
- *	If timings are set up correctly, the padding bits are expected to be as follows:-
+ *  There can also be padding bits (of value zero) both before and after the active bits.
+ *  For this application 14, 15, or 16-bit samples can be used.
+ *  If timings are set up correctly, the padding bits are expected to be as follows:-
  *
- *	Total-Sample-Size   Pre-Pad(MSB)   Post-Pad(LSB)
- *	-----------------  --------------  -------------
- *	    14                 2               0
- *	    15                 2               1
- *	    16                 2               2
+ *  Total-Sample-Size   Pre-Pad(MSB)   Post-Pad(LSB)
+ *  -----------------  --------------  -------------
+ *      14                 2               0
+ *      15                 2               1
+ *      16                 2               2
  */
 
 #define ADC_PRE_PAD_BITS 2 // 0..2 No. of pre-padding bits before Most-Significant active bit of sample
@@ -77,11 +77,11 @@ interface ADC{
 #define ADC_SHIFT_BITS (ADC_DIFF_BITS - ADC_POST_PAD_BITS) //4..2 No. of bits to shift to get 16-bit word alignment
 #define ADC_MASK 0x0FFF // Mask for 12 active bits in MS bits of 16-bit word
 
-/*	The AD7265 clock frequency (SCLK) can be configured to between  4..16 MHz.
- *	The PWM requires a 16-bit sample every 61 KHz, this translates to a minimum ADC frequency of 977 KHz.
+/*  The AD7265 clock frequency (SCLK) can be configured to between  4..16 MHz.
+ *  The PWM requires a 16-bit sample every 61 KHz, this translates to a minimum ADC frequency of 977 KHz.
  *  In order to trigger capture from the ADC digital ouput on a rising edge,
- *	the SCLK frequency must be less than 13.7 MHz.
- *	Considering all above constraints. We set the ADC frequency to 8 MHz
+ *  the SCLK frequency must be less than 13.7 MHz.
+ *  Considering all above constraints. We set the ADC frequency to 8 MHz
  */
 #define ADC_SCLK_MHZ 8 // ADC Serial Clock frequency (in MHz)
 
