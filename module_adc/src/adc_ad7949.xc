@@ -208,7 +208,7 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
     t :> ts;
 }
 
-void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc_ports,
+void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                                 CurrentSensorsConfig &current_sensor_config, chanend c_trig)
 {
     timer t;
@@ -234,7 +234,7 @@ void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
 
-        adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
+        adc_ad7949_singleshot(adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
                                                adc_config_mot,  adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
 
         if (adc_data_a[4]>0 && adc_data_a[4]<16384  &&  adc_data_b[4]>0 && adc_data_b[4]<16384) {
@@ -269,7 +269,7 @@ void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc
 
             break;
 
-        case adc_interface[int i].get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
+        case i_adc[int i].get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
 
                 if(trigger_exists == 0){
 
@@ -295,7 +295,7 @@ void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc
 
                 break;
 
-        case adc_interface[int i].get_currents() -> {int Ia, int Ib}:
+        case i_adc[int i].get_currents() -> {int Ia, int Ib}:
 
                 if(trigger_exists == 0){
 
@@ -314,7 +314,7 @@ void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc
 
                 break;
 
-        case adc_interface[int i].get_temperature() -> {int out_temp}:
+        case i_adc[int i].get_temperature() -> {int out_temp}:
 
                 if(trigger_exists == 0){
 
@@ -330,7 +330,7 @@ void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc
 
                 break;
 
-        case adc_interface[int i].get_external_inputs() -> {int ext_a, int ext_b}:
+        case i_adc[int i].get_external_inputs() -> {int ext_a, int ext_b}:
 
                 if(trigger_exists == 0){
 
@@ -347,7 +347,7 @@ void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc
 
                 break;
 
-        case adc_interface[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+        case i_adc[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
 
 
                 if(amps >= current_sensor_config.current_sensor_amplitude)
@@ -359,7 +359,7 @@ void adc_ad7949(interface ADCInterface server adc_interface[2], AD7949Ports &adc
 
                 break;
 
-        case adc_interface[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+        case i_adc[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
 
                 if(ticks >= MAX_ADC_VALUE/2)
                     out_amps = current_sensor_config.current_sensor_amplitude; break;
