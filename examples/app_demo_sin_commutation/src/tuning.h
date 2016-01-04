@@ -22,6 +22,6 @@ void set_commutation_offset_clk(chanend c_signal, unsigned offset);
 
 void set_commutation_offset_cclk(chanend c_signal, unsigned offset);
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client commutation_interface);
+void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation);
 
 #endif /* TUNING_H_ */

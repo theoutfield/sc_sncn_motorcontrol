@@ -131,7 +131,7 @@ void set_velocity_csv(ProfilerConfig & csv_params, int target_velocity,
  * @param velocity_ctrl_params struct defines the velocity control parameters
  * @param i_hall Lorem ipsum...
  * @param i_qei Lorem ipsum...
- * @param commutation_interface Lorem ipsum...
+ * @param i_commutation Lorem ipsum...
  * @param i_velocity_control[3] Lorem ipsum...
  *
  */
@@ -139,6 +139,6 @@ void set_velocity_csv(ProfilerConfig & csv_params, int target_velocity,
 void velocity_control_service(ControlConfig & velocity_ctrl_params,
                         interface HallInterface client ?i_hall,
                         interface QEIInterface client ?i_qei,
-                        interface MotorcontrolInterface client commutation_interface,
+                        interface MotorcontrolInterface client i_commutation,
                         interface VelocityControlInterface server i_velocity_control[3]);
 

@@ -20,7 +20,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface HallInterface client i_hall,
                             interface QEIInterface client ?i_qei,
-                            interface WatchdogInterface client watchdog_interface,
+                            interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[5],
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
@@ -53,7 +53,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
     // enable watchdog
     t :> ts;
     t when timerafter (ts + 250000*4):> ts; /* FIXME: replace with constant */
-    watchdog_interface.start();
+    i_watchdog.start();
 
     t :> ts;
     t when timerafter (ts + t_delay) :> ts;

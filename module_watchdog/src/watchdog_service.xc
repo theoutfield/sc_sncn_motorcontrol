@@ -8,7 +8,7 @@
 #include <watchdog_service.h>
 
 [[combinable]]
-void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server watchdog_interface[2])
+void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2])
 {
 
     unsigned int wd_enabled = 1, shared_out, tick_out = 0;
@@ -21,7 +21,7 @@ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface
     while (1) {
         select {
             // Get a command from the out loop
-                case watchdog_interface[int i].start(): // produce a rising edge on the WD_EN
+                case i_watchdog[int i].start(): // produce a rising edge on the WD_EN
 
                     if (isnull(watchdog_ports.p_tick)){
                         shared_out = 0xe;
@@ -56,7 +56,7 @@ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface
 
                     break;
 
-                case watchdog_interface[int i].stop():
+                case i_watchdog[int i].stop():
                     // Disable the kicking
                     wd_enabled = 0;
                     break;
