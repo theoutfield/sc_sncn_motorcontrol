@@ -7,7 +7,7 @@
  * @brief Test illustrates usage of hall sensor to get position and velocity information
  * @author Synapticon GmbH <support@synapticon.com>
  */
-
+//Hall libs
 #include <hall_service.h>
 
 /* Test Hall Sensor Client */
@@ -54,7 +54,7 @@ int main(void)
         on tile[IFM_TILE]:
         {
             HallConfig hall_config;
-            hall_config.pole_pairs = POLE_PAIRS;
+            hall_config.pole_pairs = 1;
 
             hall_service(hall_ports, hall_config, i_hall);
         }
