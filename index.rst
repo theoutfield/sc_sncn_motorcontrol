@@ -75,7 +75,7 @@ Examples
 * `Encoder Interface Test <examples/app_test_qei/doc/index>`_: Show the data read from your feedback Encoder Interface.
 * `Hall Sensor Test <examples/app_test_hall/doc/index>`_: Show the data read from your feedback Hall sensor.
 * `Watchdog Demo <examples/app_watchdog_demo/doc/index>`_: Simple example on how to use the Watchdog.
-* `PWM Symmetrical Demo <examples/app_watchdog_demo/doc/index>`_: Simple example on PWM signal output.
+* `PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index>`_: Simple example on PWM signal output.
 
 * `Motorcontrol Demo <examples/app_demo_motorcontrol/doc/index>`_: Plain Sinusoidal commutation of your BLDC motor.
 * `BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index>`_: Simple example to make Position Control of your BLDC motor.
