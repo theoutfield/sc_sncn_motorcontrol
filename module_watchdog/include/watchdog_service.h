@@ -39,8 +39,8 @@ interface WatchdogInterface{
  * bit in a 4-bit port. The tick control must be a 1-bit port.
  *
  * @param watchdog_ports Lorem ipsum...
- * @param watchdog_interface[2] Lorem ipsum...
+ * @param i_watchdog[2] Lorem ipsum...
  */
 [[combinable]]
-void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server watchdog_interface[2]);
+void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2]);
 
