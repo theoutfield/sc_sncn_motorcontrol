@@ -51,8 +51,8 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
             /*xscope_int(0, actual_velocity);
               xscope_int(1, velocity_ramp);*/
         }
-	if (target_velocity == 0) {
-	    i_velocity_control.set_velocity(target_velocity);
+    if (target_velocity == 0) {
+        i_velocity_control.set_velocity(target_velocity);
         }
         t when timerafter(time + 30 * MSEC_STD) :> time;
     }
