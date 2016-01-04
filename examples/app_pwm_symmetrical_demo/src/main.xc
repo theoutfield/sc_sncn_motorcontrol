@@ -9,7 +9,7 @@
 on tile[3]: PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 
 /* ADC */
-on stdcore[3]: out port p_adc_conv = XS1_PORT_1A;
+on tile[3]: out port p_adc_conv = XS1_PORT_1A;
 
 int main (void)
 {
@@ -19,7 +19,7 @@ int main (void)
 
     par {
         /* PWM service */
-        on stdcore[3]: {
+        on tile[3]: {
             timer t;
             unsigned ts;
 
@@ -30,14 +30,14 @@ int main (void)
 
 
         /* PWM client */
-        on stdcore[3]: {
+        on tile[3]: {
             do_pwm_test(c_pwm_ctrl);
             exit (0);
         }
 
 
         /* Using the ADC trigger */
-        on stdcore[3]: {
+        on tile[3]: {
             unsigned char ct;   /* control token received from channel */
 
             p_adc_conv <: 0;
