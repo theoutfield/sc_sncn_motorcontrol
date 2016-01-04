@@ -33,7 +33,8 @@ int main(void) {
         {
             delay_seconds(1);
             printstrln("Motor starts spinning");
-            i_motorcontrol[0].set_voltage(500);
+            i_motorcontrol[0].set_voltage(500); // Watchdog is first started by the
+                                                // Motorcontrol Service
 
             delay_seconds(3);                   // Motor spins for 3 secs
 
