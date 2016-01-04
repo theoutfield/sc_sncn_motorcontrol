@@ -13,26 +13,26 @@
 /* Test QEI Sensor Client */
 void qei_test(interface QEIInterface client i_qei)
 {
-	int position;
-	int velocity;
-	int direction;
-	int count;
+    int position;
+    int velocity;
+    int direction;
+    int count;
 
-	while(1)
-	{
-		/* get position and velocity from QEI Sensor */
-		{count, direction} = i_qei.get_qei_position_absolute();
-		{position, direction} = i_qei.get_qei_position();
+    while(1)
+    {
+        /* get position and velocity from QEI Sensor */
+        {count, direction} = i_qei.get_qei_position_absolute();
+        {position, direction} = i_qei.get_qei_position();
 
-		velocity = i_qei.get_qei_velocity();
+        velocity = i_qei.get_qei_velocity();
 
-		xscope_int(POSITION, position);
-		xscope_int(VELOCITY, velocity);
+        xscope_int(POSITION, position);
+        xscope_int(VELOCITY, velocity);
 
-		//printf("Position: %d Velocity: %d\n", position, velocity);
+        //printf("Position: %d Velocity: %d\n", position, velocity);
 
-		delay_milliseconds(1);
-	}
+        delay_milliseconds(1);
+    }
 }
 
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
@@ -41,32 +41,32 @@ int main(void)
 {
     interface QEIInterface i_qei[5];
 
-	par
-	{
-		on tile[APP_TILE]:
-		{
-			/* Test QEI Sensor Client */
-			qei_test(i_qei[0]);
-		}
+    par
+    {
+        on tile[APP_TILE]:
+        {
+            /* Test QEI Sensor Client */
+            qei_test(i_qei[0]);
+        }
 
-		/************************************************************
-		 * IFM_TILE
-		 ************************************************************/
-		on tile[IFM_TILE]:
-		{
+        /************************************************************
+         * IFM_TILE
+         ************************************************************/
+        on tile[IFM_TILE]:
+        {
 
-			/* Quadrature encoder sensor Service */
-			{
-			    QEIConfig qei_config;
-			        qei_config.signal_type = QEI_RS422_SIGNAL;              // Encoder signal type
-                    qei_config.index_type = QEI_WITH_INDEX;                 // Indexed encoder?
-                    qei_config.ticks_resolution = 4000;                     // Encoder resolution
-                    qei_config.sensor_polarity = QEI_POLARITY_NORMAL;       // CW
+            /* Quadrature encoder sensor Service */
+            {
+                QEIConfig qei_config;
+                qei_config.signal_type = QEI_RS422_SIGNAL;              // Encoder signal type
+                qei_config.index_type = QEI_WITH_INDEX;                 // Indexed encoder?
+                qei_config.ticks_resolution = 4000;                     // Encoder resolution
+                qei_config.sensor_polarity = QEI_POLARITY_NORMAL;       // CW
 
-				qei_service(qei_ports, qei_config, i_qei);
-			}
-		}
-	}
+                qei_service(qei_ports, qei_config, i_qei);
+            }
+        }
+    }
 
-	return 0;
+    return 0;
 }

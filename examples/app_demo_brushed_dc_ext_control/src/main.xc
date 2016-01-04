@@ -68,8 +68,8 @@ int main(void) {
                 /* Brushed Motor Drive loop */
                 {
                     MotorcontrolConfig motorcontrol_config;
-                        motorcontrol_config.motor_type = BDC_MOTOR;
-                        motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                    motorcontrol_config.motor_type = BDC_MOTOR;
+                    motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_watchdog[0],
                                                 i_motorcontrol);
