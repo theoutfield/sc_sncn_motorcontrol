@@ -71,24 +71,28 @@ Examples
 	Slave Standalone Velocity Control Demo <examples/app_demo_bldc_velocity/doc_quickstart/quickstart>
 	Slave Standalone Torque Control Demo <examples/app_demo_bldc_torque/doc_quickstart/quickstart>
 
+* **Low level functionality tests:**
 
-* `Encoder Interface Test <examples/app_test_qei/doc/index>`_: Show the data read from your feedback Encoder Interface.
-* `Hall Sensor Test <examples/app_test_hall/doc/index>`_: Show the data read from your feedback Hall sensor.
-* `Watchdog Demo <examples/app_demo_watchdog/doc/index>`_: Simple example on how to use the Watchdog.
-* `PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index>`_: Simple example on PWM signal output.
+	* `Encoder Interface Test <examples/app_test_qei/doc/index>`_: Show the data read from your feedback Encoder Interface.
+	* `Hall Sensor Test <examples/app_test_hall/doc/index>`_: Show the data read from your feedback Hall sensor.
+	* `Watchdog Demo <examples/app_demo_watchdog/doc/index>`_: Simple example on how to use the Watchdog.
+	* `PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index>`_: Simple example on PWM signal output.
 
-* `Motorcontrol Demo <examples/app_demo_motorcontrol/doc/index>`_: Plain Sinusoidal commutation of your BLDC motor.
-* `BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index>`_: Simple example to make Position Control of your BLDC motor.
-* `BLDC Velocity Control Demo <examples/app_demo_bldc_velocity/doc/index>`_: Simple example to make Velocity Control of your BLDC motor.
-* `BLDC Torque Control Demo <examples/app_demo_bldc_torque/doc/index>`_: Simple example to make Torque Control of your BLDC motor.
+* **BLDC Motorcontrol demos:**
 
-* `Brushed DC Motorcontrol Demo <examples/app_demo_brushed_dc/doc/index>`_: Plain commutation of your BLDC motor.
-* `Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index>`_: Simple example to make Position Control of your Brushed DC motor.
-* `Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>`_: Simple example to make Velocity Control of your Brushed DC motor.
-* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>`_: Simple example to make Torque Control of your Brushed DC motor.
+	* `Motorcontrol Demo <examples/app_demo_motorcontrol/doc/index>`_: Plain Sinusoidal commutation of your BLDC motor.
+	* `BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index>`_: Simple example to make Position Control of your BLDC motor.
+	* `BLDC Velocity Control Demo <examples/app_demo_bldc_velocity/doc/index>`_: Simple example to make Velocity Control of your BLDC motor.
+	* `BLDC Torque Control Demo <examples/app_demo_bldc_torque/doc/index>`_: Simple example to make Torque Control of your BLDC motor.
+	* `Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index>`_: Example to help you calibrating the commutation offsets of your Hall sensor.
 
-* `Brushed DC Velocity Control over analog Input <examples/app_demo_brushed_dc_ext_regulated/doc/index>`_: Example to control the speed of your Brushed DC motor over an analog input.
-* `Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index>`_: Example to help you calibrating the commutation offsets of your Hall sensor.
+* **Brushed DC Motorcontrol demos:**
+
+	* `Brushed DC Motorcontrol Demo <examples/app_demo_brushed_dc/doc/index>`_: Plain commutation of your BLDC motor.
+	* `Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index>`_: Simple example to make Position Control of your Brushed DC motor.
+	* `Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>`_: Simple example to make Velocity Control of your Brushed DC motor.
+	* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>`_: Simple example to make Torque Control of your Brushed DC motor.
+	* `Brushed DC Velocity Control over analog Input <examples/app_demo_brushed_dc_ext_regulated/doc/index>`_: Example to control the speed of your Brushed DC motor over an analog input.
 
 Drive Configuration
 --------------------
