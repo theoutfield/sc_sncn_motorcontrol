@@ -12,13 +12,13 @@ API
 ---
 
 Client
-------
+``````
 
 .. doxygenfunction:: update_pwm_inv
 .. doxygenfunction:: pwm_share_control_buffer_address_with_server
 
 Server
-------
+``````
 
 .. doxygenfunction:: pwm_triggered_service
 .. doxygenfunction:: pwm_service
