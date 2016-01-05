@@ -26,6 +26,7 @@
  * @param[in] hall_config struct defines the pole-pairs and gear ratio
  * @param[in] qei_params the struct defines sensor type and resolution parameters for QEI
  * @param[in] commutation_params struct defines the commutation angle parameters
+ * @param[in] sensor_select used for commutation
  *
  */
 [[combinable]]
