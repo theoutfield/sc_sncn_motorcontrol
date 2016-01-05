@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C22-rev-a.inc>
-#include <IFM_DC100-rev-b.inc>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC100-rev-b.bsp>
 
 #include <pwm_service.h>
 #include <qei_service.h>
