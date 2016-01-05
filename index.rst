@@ -14,6 +14,14 @@ The library is spread over different modules which offer different functionaliti
 * Position, velocity, and torque control loops.
 * Profiles ramp generation support.
 
+.. cssclass:: downloadable-button 
+
+  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/new_board_support_system.zip>`_
+
+.. cssclass:: github
+
+  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/new_board_support_system>`_
+
 Modules
 --------
 .. toctree::
@@ -46,14 +54,6 @@ This is the complete list of modules currently included in the **SOMANET Motor C
 * `Blocks Module <module_blocks/doc/index>`_ : Contains software useful for signal filtering.
 * `Control Loops Module <module_ctrl_loops/doc/index>`_ : Provide services for position, velocity and control loops. 
 * `Profile Module <module_profile/doc/index>`_ : Contains software for profile ramps generation.
-
-.. cssclass:: downloadable-button 
-
-  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/new_board_support_system.zip>`_
-
-.. cssclass:: github
-
-  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/new_board_support_system>`_
 
 Examples
 --------
