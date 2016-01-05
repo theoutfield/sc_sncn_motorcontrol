@@ -1,6 +1,21 @@
 SOMANET Motor Control Library
 ==============================
 
+The **SOMANET Motor Control Library** gathers services and utilities to perform BLDC/BDC Motor Control using SOMANET devices.
+The library is spread over different modules which offer different functionalities:
+
+* Feedback Hall sensor support.
+* Feedback Encoder Interface support.  
+* Fully functional ADC driver.
+* Fully functional Watchdog driver.      
+* GPIO management support (for homing-related functions).
+* BLDC and Brushed DC motors support.
+* Sinusoidal commutation.      
+* Position, velocity, and torque control loops.
+* Profiles ramp generation support.
+
+Modules
+--------
 .. toctree::
 	:maxdepth: 1
 	:hidden:
@@ -18,32 +33,19 @@ SOMANET Motor Control Library
 	Watchdog Module <module_watchdog/doc/index>
 	Symmetrical PWM Module <module_pwm_symmetrical/doc/index>
 
-The **SOMANET Motor Control Library** gathers services and utilities to perform BLDC/BDC Motor Control using SOMANET devices.
-The library is spread over different modules which offer different functionalities:
-
-* Feedback Hall sensor support.
-* Feedback Encoder Interface support.  
-* Fully functional ADC driver.
-* Fully functional Watchdog driver.      
-* GPIO management support (for homing-related functions).
-* BLDC and Brushed DC motors support.
-* Sinusoidal commutation.      
-* Position, velocity, and torque control loops.
-* Profiles ramp generation support.
-
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
 
-* `Profile Module <module_profile/doc/index>`_ : Contains software for profile ramps generation.
-* `Control Loops Module <module_ctrl_loops/doc/index>`_ : Provide services for position, velocity and control loops. 
+* `Symmetrical PWM Module <module_pwm_symmetrical/doc/index>`_ : Service for PWM generation. 
+* `Hall Sensor Module <module_hall/doc/index>`_ : Driver to read the signals from your feedback Hall sensor.
+* `Encoder Interface Module <module_qei/doc/index>`_ : Driver to read the signals from your feedback Encoder Interface.
+* `ADC Module <module_adc/doc/index>`_ : Driver for the ADC on your IFM DC board.
+* `Watchdog Module <module_watchdog/doc/index>`_ : Driver for the Watchdog on your IFM DC board.
+* `GPIO Module <module_gpio/doc/index>`_ : Contains a service to handle the external digital input/outputs of your board.
 * `Motorcontrol Module <module_motorcontrol/doc/index>`_ : Provide a service to commutate BLDC motors and drive Brushed DC motors.
 * `Motorcontrol Common Module <module_motorcontrol_common/doc/index>`_ : Main definitions and constants for the software. 
 * `Blocks Module <module_blocks/doc/index>`_ : Contains software useful for signal filtering.
-* `ADC Module <module_adc/doc/index>`_ : Driver for the ADC on your IFM DC board.
-* `GPIO Module <module_gpio/doc/index>`_ : Contains a service to handle the external digital input/outputs of your board.
-* `Watchdog Module <module_watchdog/doc/index>`_ : Driver for the Watchdog on your IFM DC board.
-* `Hall Sensor Module <module_hall/doc/index>`_ : Driver to read the signals from your feedback Hall sensor.
-* `Encoder Interface Module <module_qei/doc/index>`_ : Driver to read the signals from your feedback Encoder Interface.
-* `Symmetrical PWM Module <module_pwm_symmetrical/doc/index>`_ : Service for PWM generation. 
+* `Control Loops Module <module_ctrl_loops/doc/index>`_ : Provide services for position, velocity and control loops. 
+* `Profile Module <module_profile/doc/index>`_ : Contains software for profile ramps generation.
 
 .. cssclass:: downloadable-button 
 

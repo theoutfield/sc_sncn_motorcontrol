@@ -1,7 +1,7 @@
 .. _motor_configuration_label:
 
-How to configure your motors
-============================
+How to configure your SOMANET Motor Control Libray
+==================================================
 
 Any application that uses this software component must contain a motor
 configuration file. This file, called **bldc\_motor\_config.h**, must be
