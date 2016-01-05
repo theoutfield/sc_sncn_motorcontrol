@@ -1,5 +1,5 @@
-#include <CORE_C22-rev-a.inc>
-#include <IFM_DC100-rev-b.inc>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC100-rev-b.bsp>
 
 #include <stdlib.h>
 
@@ -7,9 +7,6 @@
 #include <pwm_test.h>
 
 on tile[IFM_TILE]: PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
-
-/* ADC */
-on tile[IFM_TILE]: out port p_adc_conv = XS1_PORT_1A;
 
 int main (void)
 {
@@ -33,27 +30,6 @@ int main (void)
         on tile[IFM_TILE]: {
             do_pwm_test(c_pwm_ctrl);
             exit (0);
-        }
-
-
-        /* Using the ADC trigger */
-        on tile[IFM_TILE]: {
-            unsigned char ct;   /* control token received from channel */
-
-            p_adc_conv <: 0;
-
-            while(1) {
-                select {
-                case inct_byref(c_adc_trigger, ct):
-                    if (ct == XS1_CT_END) {
-                        /* only output a short pulse for testing purposes;
-                           the adc sampling/conversion function would be called here otherwise */
-                        p_adc_conv <: 1;
-                        p_adc_conv <: 0;
-                    }
-                    break;
-                }
-            }
         }
     }
 
