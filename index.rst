@@ -97,13 +97,13 @@ Drive Configuration
 	:hidden:
 	:maxdepth: 1
 
-	Drive Configuration <howto/motor_configuration> 
-	Drive Tuning <howto/motor_tuning>
+	Drive Configuration <doc/motor_configuration> 
+	Drive Tuning <doc/motor_tuning>
 
 In order to learn how to proceed with the configuration of the motors we highly recommend to read the following tutorials:
 
-* `Drive Configuration <howto/motor_configuration>`_ : Lorem ipsum... 
-* `Drive Tuning <howto/motor_tuning>`_ : Lorem ipsum... 
+* `Drive Configuration <doc/motor_configuration>`_ : Lorem ipsum... 
+* `Drive Tuning <doc/motor_tuning>`_ : Lorem ipsum... 
 
 Dependencies
 ------------
