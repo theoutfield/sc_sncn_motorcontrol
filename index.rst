@@ -18,9 +18,20 @@ SOMANET Motor Control Library
 	Watchdog Module <module_watchdog/doc/index>
 	Symmetrical PWM Module <module_pwm_symmetrical/doc/index>
 
-The **SOMANET Motor Control Library** provides Motor Control support for SOMANET devices. 
+The **SOMANET Motor Control Library** gathers services and utilities to perform BLDC/BDC Motor Control using SOMANET devices.
+The library is spread over different modules which offer different functionalities:
 
-Our SOMANET Motor Control Library is composed of the following modules:
+* Feedback Hall sensor support.
+* Feedback Encoder Interface support.  
+* Fully functional ADC driver.
+* Fully functional Watchdog driver.      
+* GPIO management support (for homing-related functions).
+* BLDC and Brushed DC motors support.
+* Sinusoidal commutation.      
+* Position, velocity, and torque control loops.
+* Profiles ramp generation support.
+
+This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
 
 * `Profile Module <module_profile/doc/index>`_ : Contains software for profile ramps generation.
 * `Control Loops Module <module_ctrl_loops/doc/index>`_ : Provide services for position, velocity and control loops. 
@@ -94,20 +105,20 @@ Examples
 	* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>`_: Simple example to make Torque Control of your Brushed DC motor.
 	* `Brushed DC Velocity Control over analog Input <examples/app_demo_brushed_dc_ext_regulated/doc/index>`_: Example to control the speed of your Brushed DC motor over an analog input.
 
-Drive Configuration
+Motor Control Quick Guides
 --------------------
 
 .. toctree::
 	:hidden:
 	:maxdepth: 1
 
-	Drive Configuration <doc/motor_configuration> 
-	Drive Tuning <doc/motor_tuning>
+	Motor Control Library configuration <doc/motor_configuration> 
+	Commutation offsets adjustment <doc/motor_tuning>
 
 In order to learn how to proceed with the configuration of the motors we highly recommend to read the following tutorials:
 
-* `Drive Configuration <doc/motor_configuration>`_ : Lorem ipsum... 
-* `Drive Tuning <doc/motor_tuning>`_ : Lorem ipsum... 
+* `Motor Control Library configuration <doc/motor_configuration>`_ : Learn how to configure your Motor Control Library. 
+* `Commutation offsets adjustment <doc/motor_tuning>`_ : Learn how to adjust your feedback Hall sensor offsets for an optimal commutation.
 
 Dependencies
 ------------
