@@ -5,7 +5,7 @@
  */
 
 #include <bldc_motorcontrol.h>
-#include <pwm_cli_inv.h>
+#include <pwm_service_client.h>
 #include <a4935.h>
 #include <sine_table_big.h>
 

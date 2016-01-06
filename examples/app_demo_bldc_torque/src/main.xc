@@ -55,7 +55,7 @@ QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 int main(void)
 {
     // Motor control channels
-    chan c_adctrig, c_pwm_ctrl;
+    chan c_pwm_ctrl, c_adctrig;
 
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[3];

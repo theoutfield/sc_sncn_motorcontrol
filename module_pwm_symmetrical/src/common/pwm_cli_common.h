@@ -50,13 +50,11 @@ void order_pwm( REFERENCE_PARAM(unsigned,mode), unsigned chan_id[], t_out_data p
 
 
 /**
- * @brief Share the control buffer address with the server
+ * @brief Share the control buffer address with the service. It is required to call this
+ *        function before start calling the PWM Service client.
  *
- * The PWM client and server share a common block of memory.  The client passes a reference
- * to this block through to the server at initalization time.
- *
- * @param c The PWM control channel
+ * @param c_pwm The PWM control channel
  * @param ctrl The shared PWM control data structure reference
  */
-void pwm_share_control_buffer_address_with_server(chanend c, REFERENCE_PARAM(t_pwm_control, ctrl));
+void pwm_share_control_buffer_address_with_server(chanend c_pwm, REFERENCE_PARAM(t_pwm_control, ctrl));
 
