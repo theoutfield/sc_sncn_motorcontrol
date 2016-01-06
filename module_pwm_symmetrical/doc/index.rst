@@ -33,21 +33,25 @@ First add the module to your app Makefile
 Include the Service header in your app
 
 ::
+
  #include <pwm_service.h>
 
 Declare the channels for Service-Client communication.
 
 ::
+
  chan c_pwm_ctrl;
 
 Configure the ports and clocks for your service. This configuration is defined within the **board support** files.
 
 ::
+
  PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 
 Add a new parallel core in your main app where the PWM Service will run.
 
 ::
+
  on tile[IFM_TILE]: pwm_service(pwm_ports, c_pwm_ctrl);
 
 Using the Service
@@ -56,6 +60,7 @@ Using the Service
 Include the Service Client header in your app
 
 ::
+
  #include <pwm_service_client.h>
 
 Instanciate the shared control structure, array for the PWM target values. 
