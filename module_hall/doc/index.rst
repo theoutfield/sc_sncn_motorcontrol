@@ -6,7 +6,9 @@ SOMANET Hall Sensor Module
     :backlinks: none
     :depth: 3
 
-Lorem ipsum...
+This module provides a Service that will read the data coming from your 
+Feedback Hall Sensor. All the read data and related calculations can be accessed
+by a client through an interface.
 
 .. image:: images/core-diagram-hall-interface.png
    :width: 50%
@@ -33,7 +35,7 @@ Make sure you include these files in your main.xc file
     #include <platform.h>
     #include <ioports.h>
     #include <hall_client.h>
-    #include <hall_server.h>
+    #include <hall_service.h>
 
 
 Step 2: Define required channel

@@ -19,7 +19,7 @@ Later on, it was moved into this Motor Control Library.
 How to use
 ==========
 
-.. important:: We assume that you are using SOMANET Base and your app includes the required board support for your hardware.
+.. important:: We assume that you are using SOMANET Base and your app includes the required board support files for your hardware.
           You might find useful the **PWM Symmetrical Demo** example app, which illustrates the use of this module. 
 
 Service Initialization
@@ -28,11 +28,11 @@ First add the module to your app Makefile
 
 ::
 
- USED_MODULES = module_pwm_symmetrical etc etc
+ USED_MODULES = module_pwm_symmetrical module_board-support etc
 
 Include the Service header in your app
 
-::
+.. code-block:: C
 
  #include <pwm_service.h>
 
@@ -59,7 +59,7 @@ Using the Service
 
 Include the Service Client header in your app
 
-::
+.. code-block:: C
 
  #include <pwm_service_client.h>
 
@@ -67,7 +67,7 @@ Instanciate the shared control structure, array for the PWM target values.
 Initialize the communication calling **pwm_share_control_buffer_address_with_server**.
 Then you can start updating your PWM outputs through client calls. 
 
-::
+.. code-block:: C
 
   on tile[IFM_TILE]: 
   {
