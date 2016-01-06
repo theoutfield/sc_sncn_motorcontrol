@@ -40,13 +40,17 @@ Service Initialization
 Using the Service
 ---------------------
 
+Configuring the Service
+---------------------
+.. important:: Changing the default configuration might be dangerous for your hardware and we do not recommend to do it unless you know what you are doing.
+
 API
 ===
 
 Types
 -----
 
-.. doxygenenum:: PwmPorts
+.. doxygenstruct:: PwmPorts
 
 Server
 -----
