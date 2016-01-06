@@ -28,18 +28,18 @@ Modules
 	:maxdepth: 1
 	:hidden:
 
-	Symmetrical PWM Module <module_pwm_symmetrical/doc/index>	
-	Motorcontrol Module <module_motorcontrol/doc/index>
-	Hall Sensor Module <module_hall/doc/index>
+	Symmetrical PWM Module <module_pwm_symmetrical/doc/index>
+	Hall Sensor Module <module_hall/doc/index>	
 	Encoder Interface Module <module_qei/doc/index>
 	ADC Module <module_adc/doc/index>
+	Watchdog Module <module_watchdog/doc/index>
+	GPIO Module <module_gpio/doc/index>
+	Motorcontrol Module <module_motorcontrol/doc/index>
+	Motorcontrol Common Module <module_motorcontrol_common/doc/index>
 	Blocks Module <module_blocks/doc/index>
 	Control Loops Module <module_ctrl_loops/doc/index>
-	GPIO Module <module_gpio/doc/index>
-	Motorcontrol Common Module <module_motorcontrol_common/doc/index>
 	Profile Module <module_profile/doc/index>
-	Watchdog Module <module_watchdog/doc/index>
-	Symmetrical PWM Module <module_pwm_symmetrical/doc/index>
+	
 
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
 
