@@ -26,13 +26,13 @@ First add the module to your app Makefile
 
 ::
 
-USED_MODULES = module_pwm_symmetrical etc etc
+ USED_MODULES = module_pwm_symmetrical etc etc
 
 Include the header in your app
 
 ::
 
-#include <pwm_service.h>
+ #include <pwm_service.h>
 
 Service Initialization
 ---------------------
@@ -51,8 +51,9 @@ Types
 Server
 -----
 
-.. doxygenfunction:: pwm_triggered_service
 .. doxygenfunction:: pwm_service
+.. doxygenfunction:: pwm_triggered_service
+
 
 Client
 ------
