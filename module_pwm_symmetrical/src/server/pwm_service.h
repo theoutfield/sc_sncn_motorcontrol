@@ -18,7 +18,7 @@
 #include <xs1.h>
 
 /**
- * Structure type for PWM output ports.
+ * @brief Structure type for PWM output ports.
  */
 typedef struct{
     buffered out port:32 p_pwm[3]; /**< Array of 3 ports for the high-side PWM signals output */
