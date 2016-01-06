@@ -17,6 +17,11 @@
 #include <pwm_common.h>
 #include <xs1.h>
 
+/**
+* Structure type for PWM ports
+*
+*
+*/
 typedef struct{
     buffered out port:32 p_pwm[3];
     buffered out port:32 p_pwm_inv[3];
@@ -30,25 +35,22 @@ typedef struct{
 void disable_fets(PwmPorts &ports);
 
 /**
- * @brief Implementation of the centre aligned inverted pair PWM server, with ADC synchronization
+ * @brief Service to generate center-aligned inverted pair PWM signals,
+ *                  it provides additional ADC synchronization
  *
- * This server includes a port which triggers the ADC measurement
+ * This service includes a port which triggers the ADC measurement
  *
- * @param c_pwm the control channel for setting PWM values
- * @param c_adc_trig the control channel for triggering the ADC
- * @param dummy_port a dummy port used for precise timing of the ADC trigger
- * @param p_pwm the array of PWM ports
- * @param p_pwm_inv the array of inverted PWM ports
- * @param clk a clock for generating accurate PWM timing
+ * @param ports Structure containing ports and other hardware information.
+ * @param c_adc_trig Channel for communication with the ADC service.
+ * @param c_pwm Channel for communication with the service client.
+ *
  */
 void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm);
 
 /**
- * @brief Implementation of the centre aligned inverted pair PWM server
+ * @brief Service to generate center-aligned inverted pair PWM signals
  *
- * @param c_pwm the control channel for setting PWM values
- * @param p_pwm the array of PWM ports
- * @param p_pwm_inv the array of inverted PWM ports
- * @param clk a clock for generating accurate PWM timing
+ * @param ports Structure containing ports and other hardware information.
+ * @param c_pwm Channel for communication with the service client.
  */
-void pwm_service( PwmPorts &ports, chanend c_pwm);
+void pwm_service(PwmPorts &ports, chanend c_pwm);
