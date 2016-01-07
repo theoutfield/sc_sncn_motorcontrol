@@ -162,9 +162,9 @@ API
 
 Types
 -----
-
-.. doxygenenum:: MotorType
 .. doxygenstruct:: FetDriverPorts
+.. doxygenenum:: MotorType
+.. doxygenenum:: BLDCWindingType
 .. doxygenstruct:: MotorcontrolConfig
 
 Service
