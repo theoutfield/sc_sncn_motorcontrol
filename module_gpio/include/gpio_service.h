@@ -6,7 +6,6 @@
 
 #pragma once
 
-
 enum { ACTIVE_HIGH=1, ACTIVE_LOW };
 enum { HOMING_NEGATIVE_SWITCH=1, HOMING_POSITIVE_SWITCH };
 
@@ -17,47 +16,50 @@ enum { HOMING_NEGATIVE_SWITCH=1, HOMING_POSITIVE_SWITCH };
 #include <platform.h>
 
 /**
- * @brief Lorem ipsum...
+ * @brief Interface type to communicate with the GPIO Service.
  */
 interface GPIOInterface{
+
 	/**
-     * @brief Lorem ipsum...
+     * @brief   Set the configuration of the GPIOs.
+     *          By default all GPIOs are configured as outputs.
      *
-     * @param gpio_port Lorem ipsum...
-     * @param input_type Lorem ipsum...
-     * @param switch_type Lorem ipsum...
+     * @param gpio_port Number of the pin to be configured [0:3].
+     * @param input_type Type of input [GP_INPUT_TYPE, SWITCH_INPUT_TYPE].
+     * @param switch_type [ACTIVE_HIGH, ACTIVE_LOW].
      *
-     * @return Lorem ipsum...
+     * @return 0 - Error
+     *         1 - Success
      */
     int config_dio_input(int gpio_port, int input_type, int switch_type);
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Disables further configuration of any GPIO.
+     *        Required before starting reading or writing values.
      */
     void config_dio_done();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Read the current value in a GPIO pin.
      *
-     * @param gpio_port Lorem ipsum...
-     *
-     * @return Lorem ipsum...
+     * @param gpio_port Number of the pin to read [0:3].
+     * @return Read value in the port [0,1].
      */
     int read_gpio(int gpio_port);
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Set a value in certain GPIO.
      *
-     * @param gpio_port Lorem ipsum...
-     * @param value Lorem ipsum...
+     * @param gpio_port Number of the pin to write to [0:3].
+     * @param value Output value for the pin [0,1].
      */
     void write_gpio(int gpio_port, int value);
 };
 /**
- * @fn gpio_digital_server(port p_ifm_ext_d0, port p_ifm_ext_d1, port p_ifm_ext_d2, port p_ifm_ext_d3,
- * chanend c_gpio_0, chanend c_gpio_1, chanend c_gpio_2, chanend c_gpio_3)
- * @brief Server enables configuration of digital I/Os as inputs or outputs,
- *  	   to read input ports and write to output ports
+ * @brief Service to manage the digital I/Os in your SOMANET device.
  *
- * @param gpio_ports[4] Lorem ipsum...
- * @param i_gpio[2] Lorem ipsum...
+ * @param gpio_ports[4] Array of ports to be managed.
+ * @param i_gpio[2] Array of communication interfaces to handle up to 2 different clients.
  *
  */
 void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2]);
