@@ -7,7 +7,7 @@
 #pragma once
 
 /**
-* @brief Definition for referring to the Encoder Interface sensor.
+* @brief Definition for referring to the Encoder sensor.
 */
 #define QEI_SENSOR               2
 
@@ -54,7 +54,7 @@ typedef enum {
 } QEI_IndexType;
 
 /**
- * @brief Structure type for the Encoder Interface configuration.
+ * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
     int ticks_resolution;       /**< Encoder resolution [pulses/revolution]. */
@@ -67,7 +67,7 @@ typedef struct {
 #ifdef __XC__
 
 /**
- * @brief Interface type to communicate with the Encoder Interface Service.
+ * @brief Structure type to define the Encoder Service ports.
  */
 typedef struct {
     port ?p_qei_config; /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). */
@@ -75,7 +75,7 @@ typedef struct {
 } QEIPorts;
 
 /**
- * @brief Interface type to communicate with the Encoder Interface Service.
+ * @brief Interface type to communicate with the Encoder Service.
  */
 interface QEIInterface{
 
@@ -152,14 +152,24 @@ interface QEIInterface{
     void set_qei_sync_offset(int, int);
 };
 
+
 /**
- * @brief Implementation of the QEI server thread (for sensor with index/no index)
  *
- * @param encoder_ports structure containing the hardware port where the quadrature encoder is located
- * @param qei_config the structure defines sensor type and resolution parameters for qei
- * @param i_qei[5] Lorem ipsum
+ * @brief Service to read and process data from a Feedback Hall Sensor.
+ *
+ * @param hall_ports Port to get the Hall signals from.
+ * @param hall_config Configuration for the service.
+ * @param i_hall[5] Array of communication interfaces to handle up to 5 different clients.
  */
-void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
+
+/**
+ * @brief Service to read and process data from an Feedback Incremental Encoder Sensor.
+ *
+ * @param qei_ports Ports where accessings the Encoder signals.
+ * @param qei_config Configuration for the service.
+ * @param i_qei[5] Array of communication interfaces to handle up to 5 different clients.
+ */
+void qei_service(QEIPorts & qei_ports, QEIConfig qei_config,
                 interface QEIInterface server i_qei[5]);
 
 #endif
