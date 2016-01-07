@@ -26,11 +26,14 @@ How to use
 
 Service Initialization
 ----------------------
-First add the module to your app Makefile
+First add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
 ::
 
- USED_MODULES = module_pwm_symmetrical module_board-support etc
+ USED_MODULES = module_pwm_symmetrical etc etc
+
+.. note:: Not all modules will be required, but it is recommended to include in your Makefile all the modules in a library.
+
 
 Include the Service header in your app
 
