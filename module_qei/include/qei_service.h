@@ -71,7 +71,7 @@ typedef struct {
  */
 typedef struct {
     port ?p_qei_config; /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). */
-    port p_qei; /**< 4-bit port for Encoder Interface signals input. */
+    port p_qei; /**< 4-bit Port for Encoder Interface signals input. */
 } QEIPorts;
 
 /**
@@ -141,31 +141,18 @@ interface QEIInterface{
      */
     int check_busy();
 
-    /**
-     * @brief For internal use
-     */
+     // For internal use
     {int, int, int} get_qei_sync_position();
 
-    /**
-     * @brief For internal use
-     */
+    // For internal use
     void set_qei_sync_offset(int, int);
 };
 
 
 /**
- *
- * @brief Service to read and process data from a Feedback Hall Sensor.
- *
- * @param hall_ports Port to get the Hall signals from.
- * @param hall_config Configuration for the service.
- * @param i_hall[5] Array of communication interfaces to handle up to 5 different clients.
- */
-
-/**
  * @brief Service to read and process data from an Feedback Incremental Encoder Sensor.
  *
- * @param qei_ports Ports where accessings the Encoder signals.
+ * @param qei_ports Ports structure defining where to access the Encoder signals.
  * @param qei_config Configuration for the service.
  * @param i_qei[5] Array of communication interfaces to handle up to 5 different clients.
  */

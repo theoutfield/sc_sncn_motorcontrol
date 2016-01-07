@@ -7,39 +7,34 @@
 #pragma once
 
 /**
-* @brief Lorem ipsum...
-*/
+ * Structure type for Watchdog Service ports
+ */
 typedef struct {
-    out port p_enable;
-    out port ?p_tick;
+    out port p_enable; /**< 4-bit Port for Watchdog basic management. */
+    out port ?p_tick; /**< [Nullable] Port for the periodic tick signal (if applicable in your SOMANET device). */
 } WatchdogPorts;
 
 /**
-* @brief Lorem ipsum...
-*/
+ * @brief Interface type to communicate with the Watchdog Service.
+ */
 interface WatchdogInterface{
+
 	/**
-     * @brief Lorem ipsum...
+     * @brief Initialize and starts ticking the watchdog.
      */
     void start(void);
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Stops ticking the watchdog. Therefore, any output through phases is disabled.
      */
     void stop(void);
 };
 
-/** @brief Run the watchdog timer server
+/**
+ * @brief Service to manage the watchdog chip within your SOMANET device.
  *
- * The watchdog timer needs a constant stream of pulses to prevent it
- * from shutting down the motor.  This is a thread server which implements
- * the watchdog timer output.
- *
- * The watchdog control has two differents ports attached to
- * the watchdog circuitry. The enable signal must be the LSB
- * bit in a 4-bit port. The tick control must be a 1-bit port.
- *
- * @param watchdog_ports Lorem ipsum...
- * @param i_watchdog[2] Lorem ipsum...
+ * @param watchdog_ports Ports structure defining where to access the watchdog chip.
+ * @param i_watchdog[2] Array of communication interfaces to handle up to 2 different clients.
  */
 [[combinable]]
 void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2]);
