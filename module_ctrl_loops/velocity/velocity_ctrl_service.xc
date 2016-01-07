@@ -158,7 +158,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 /* calculate actual velocity from hall/qei with filter*/
                 if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
                     if (init == 0) {
-                        { position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                        position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                         if (position > 2049) {
                             init = 1;
                             previous_position = 2049;
@@ -169,7 +169,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         raw_speed = 0;
                         //target_velocity = 0;
                     } else if (init == 1) {
-                        { position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                        position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                         difference = position - previous_position;
                         if (difference > hall_crossover) {
                             difference = old_difference;

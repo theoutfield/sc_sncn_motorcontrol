@@ -13,8 +13,10 @@ every generated pulse (required sometimes for proper ADC sampling) and the other
 These PWM signals are intended to control both high- and low-side switches of three H-brigdes. 
 The three channels are center aligned which means that the outputs are symmetrical to the center of the pulses.
 
-This module was originally `created by XMOS and then forked`_ and maintained in a dedicated `repo by Synapticon`_.
-Later on, it was moved into this Motor Control Library.
+This module was originally created by XMOS and then reworked by Synapticon before being include into the SOMANET Motor Control Library.
+
+* `Original forked XMOS repository`_
+* `Forked repository by Synapticon`_
 
 How to use
 ==========
@@ -104,5 +106,5 @@ Client
 .. doxygenfunction:: update_pwm_inv
 
 
-.. _`created by XMOS and then forked`: https://github.com/xcore/sc_pwm/tree/53f275204764669c9d8ae10378453aa279a5bc47
-.. _`repo by Synapticon`: https://github.com/synapticon/sc_pwm/tree/30623702ab9b535e34113f41abb429d55edd26ec
+.. _`Original forked XMOS repository`: https://github.com/xcore/sc_pwm/tree/53f275204764669c9d8ae10378453aa279a5bc47
+.. _`Forked repository by Synapticon`: https://github.com/synapticon/sc_pwm/tree/30623702ab9b535e34113f41abb429d55edd26ec
