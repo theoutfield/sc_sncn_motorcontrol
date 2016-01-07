@@ -16,11 +16,11 @@ The library is spread over different modules which offer different functionaliti
 
 .. cssclass:: downloadable-button 
 
-  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/new_board_support_system.zip>`_
+  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/master.zip>`_
 
 .. cssclass:: github
 
-  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/new_board_support_system>`_
+  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/>`_
 
 Modules
 --------
