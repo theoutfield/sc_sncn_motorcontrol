@@ -21,7 +21,7 @@ This module was originally created by XMOS and then reworked by Synapticon befor
 How to use
 ==========
 
-.. important:: We assume that you are using SOMANET Base and your app includes the required board support files for your hardware.
+.. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
           You might find useful the **PWM Symmetrical Demo** example app, which illustrates the use of this module. 
 
 Service Initialization
@@ -32,8 +32,8 @@ First add all the **SOMANET Motor Control Library** modules to your app Makefile
 
  USED_MODULES = module_pwm_symmetrical etc etc
 
-.. note:: Not all modules will be required, but it is recommended to include in your Makefile all the modules in a library.
-
+.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+          This will help solving internal dependancy issues.
 
 Include the Service header in your app
 
