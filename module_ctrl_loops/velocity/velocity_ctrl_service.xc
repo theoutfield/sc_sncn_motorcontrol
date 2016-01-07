@@ -86,7 +86,6 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     int previous_position = 0;
     int raw_speed = 0;                      // rpm
     int difference;
-    int direction = 0;
     int old_difference;
     int rpm_constant = 1000*60; // constant
     int speed_factor_hall = 0;
@@ -184,7 +183,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         old_difference = difference;
                     }
                 } else if (velocity_control_config.feedback_sensor >= QEI_SENSOR) {
-                    { position, direction } = i_qei.get_qei_position_absolute();
+                    position = i_qei.get_qei_position_absolute();
                     difference = position - previous_position;
 
                     if (difference > qei_crossover) {

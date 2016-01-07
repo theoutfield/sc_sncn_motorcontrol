@@ -6,6 +6,9 @@
 
 #pragma once
 
+/**
+* @brief Definition for referring to the Encoder Interface sensor.
+*/
 #define QEI_SENSOR               2
 
 #define QEI_CHANGES_PER_TICK     4 //Quadrature encoder
@@ -35,95 +38,118 @@
 
 
 /**
- * @brief Lorem ipsum...
+ * @brief Type for the Encoder output signals.
  */
-typedef enum { QEI_RS422_SIGNAL = 11, QEI_TTL_SIGNAL = 22 } QEI_SignalType;
-typedef enum { QEI_WITH_NO_INDEX = 3, QEI_WITH_INDEX  = 4 } QEI_IndexType;
+typedef enum {
+    QEI_RS422_SIGNAL = 11,  /**< Encoder signal output over RS422 (differential). */
+    QEI_TTL_SIGNAL = 22     /**< Encoder signal output over standard TTL signal.  */
+} QEI_SignalType;
 
 /**
- * @brief Struct definition for quadrature sensor
+ * @brief Type for the sort of Encoder index.
+ */
+typedef enum {
+    QEI_WITH_NO_INDEX = 3,  /**< Encoder with no index signal. */
+    QEI_WITH_INDEX  = 4     /**< Encoder with index signal.  */
+} QEI_IndexType;
+
+/**
+ * @brief Structure type for the Encoder Interface configuration.
  */
 typedef struct {
-    int ticks_resolution; //real_counts;
-    QEI_IndexType index_type;          // no_index - 0 index - 1
-    int sensor_polarity;
-    QEI_SignalType signal_type;
+    int ticks_resolution;       /**< Encoder resolution [pulses/revolution]. */
+    QEI_IndexType index_type;   /**< Encoder index type. */
+    int sensor_polarity;        /**< Encoder direction. */
+    QEI_SignalType signal_type; /**< Encoder output signal type (if applicable in your SOMANET device). */
 } QEIConfig;
 
 
 #ifdef __XC__
 
 /**
-* @brief Struct containing hall sensor port/s
-*/
+ * @brief Interface type to communicate with the Encoder Interface Service.
+ */
 typedef struct {
-    port ?p_qei_config;
-    port p_qei;
+    port ?p_qei_config; /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). */
+    port p_qei; /**< 4-bit port for Encoder Interface signals input. */
 } QEIPorts;
 
 /**
-* @brief Lorem ipsum...
-*/
+ * @brief Interface type to communicate with the Encoder Interface Service.
+ */
 interface QEIInterface{
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Getter for current position.
      *
-     * @return Lorem ipsum...
-     */
-    int check_busy();
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     * @return Lorem ipsum...
+     * @return  Position within one mechanical rotation [0: 4 x Encoder resolution].
+     * @return  Validity of the returned position (for indexed Encoders).
+     *          0 - not valid.
+     *          1 - valid.
      */
     {unsigned int, unsigned int} get_qei_position();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Getter for calculated velocity of the motor.
      *
-     * @return Lorem ipsum...
-     * @return Lorem ipsum...
-     */
-    {int, int} get_qei_position_absolute();
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     * @return Lorem ipsum...
-     * @return Lorem ipsum...
-     */
-    {int, int, int} get_qei_sync_position();
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
+     * @return Mechanical RPMs.
      */
     int get_qei_velocity();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Getter for direction of last change in the Encoder signals.
      *
-     * @param int Lorem ipsum...
-     * @param int Lorem ipsum...
+     * @return 1 for CW or positive rotation.
+     *        -1 for CCW or negative rotation.
      */
-    void set_qei_sync_offset(int, int);
+    int get_qei_direction();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Getter for current absolute position.
      *
-     * @param offset Lorem ipsum...
+     * @return Absolute counted up position [INT_MIN:INT_MAX].
+     *         One mechanical rotation = 4 x Encoder resolution.
      */
-    void reset_qei_count(int offset);
+    int get_qei_position_absolute();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Setter for the absolute position.
      *
-     * @return Lorem ipsum...
+     * @param offset New value for absolute position.
+     */
+    void reset_qei_absolute_position(int offset);
+
+    /**
+     * @brief Getter for current configuration used by the Service.
+     *
+     * @return Current configuration.
      */
     QEIConfig get_qei_config();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Setter for the configuration used by the Service.
      *
-     * @param in_config Lorem ipsum...
+     * @param in_config New Service configuration.
      */
     void set_qei_config(QEIConfig in_config);
+
+    /**
+     * @brief Getter for the current state of the Service.
+     *
+     * @return 0 if not initialized.
+     *         1 if initialized.
+     */
+    int check_busy();
+
+    /**
+     * @brief For internal use
+     */
+    {int, int, int} get_qei_sync_position();
+
+    /**
+     * @brief For internal use
+     */
+    void set_qei_sync_offset(int, int);
 };
 
 /**

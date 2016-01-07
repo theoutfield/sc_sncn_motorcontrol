@@ -5,7 +5,9 @@
 
 #pragma once
 
-/**< Definition for referring to the Hall sensor */
+/**
+* @brief Definition for referring to the Hall sensor.
+*/
 #define HALL_SENSOR             1
 
 #define ERROR                   0
@@ -22,7 +24,7 @@
  * Structure type for Hall Service configuration
  */
 typedef struct {
-    int pole_pairs; /**< Number of pole pairs in your motor */
+    int pole_pairs; /**< Number of pole pairs in your motor. */
 } HallConfig;
 
 
@@ -32,7 +34,7 @@ typedef struct {
 * Structure type for Hall Service ports
 */
 typedef struct {
-    port p_hall; /**< 4-bit port for Hall Sensor signals input */
+    port p_hall; /**< 4-bit port for Hall Sensor signals input. */
 } HallPorts;
 
 /**
@@ -101,8 +103,8 @@ interface HallInterface {
     /**
      * @brief Getter for the current state of the Service.
      *
-     * @return 0 if not initialized.
-     *         1 if initialized.
+     * @return 0 - not initialized.
+     *         1 - initialized.
      */
     int check_busy();
 };
