@@ -79,7 +79,6 @@ void position_control_service(ControlConfig &position_control_config,
     unsigned int ts;
 
     int activate = 0;
-    int direction = 0;
 
     int fet_state;
     int init_state = INIT_BUSY; /* check commutation init */
@@ -127,7 +126,7 @@ void position_control_service(ControlConfig &position_control_config,
         actual_position = i_hall.get_hall_position_absolute();
         target_position = actual_position;
     } else if (position_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)) {
-        {actual_position, direction} = i_qei.get_qei_position_absolute();
+        actual_position = i_qei.get_qei_position_absolute();
         target_position = actual_position;
     }
 
@@ -150,15 +149,15 @@ void position_control_service(ControlConfig &position_control_config,
                     break;
 
                     case QEI_SENSOR:
-                    { actual_position, direction } =  i_qei.get_qei_position_absolute();
+                        actual_position =  i_qei.get_qei_position_absolute();
                     break;
 
                     case QEI_WITH_INDEX:
-                    { actual_position, direction } =  i_qei.get_qei_position_absolute();
+                        actual_position =  i_qei.get_qei_position_absolute();
                     break;
 
                     case QEI_WITH_NO_INDEX:
-                    { actual_position, direction } =  i_qei.get_qei_position_absolute();
+                        actual_position =  i_qei.get_qei_position_absolute();
                     break;
 
                 /*
@@ -257,7 +256,7 @@ void position_control_service(ControlConfig &position_control_config,
             if (in_sensor_used == HALL_SENSOR) {
                 actual_position = i_hall.get_hall_position_absolute();
             } else if (in_sensor_used >= QEI_SENSOR) {
-                { actual_position, direction } = i_qei.get_qei_position_absolute();
+                actual_position = i_qei.get_qei_position_absolute();
             }
             /*
              * Or any other sensor interfaced to the IFM Module

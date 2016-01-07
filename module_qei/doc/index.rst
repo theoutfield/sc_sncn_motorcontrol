@@ -114,9 +114,8 @@ API
 
 Types
 -----
-
-.. doxygenenum:: QEI_Polarity
 .. doxygenenum:: QEI_SignalType
+.. doxygenenum:: QEI_IndexType
 .. doxygenstruct:: QEIConfig
 .. doxygenstruct:: QEIPorts
 

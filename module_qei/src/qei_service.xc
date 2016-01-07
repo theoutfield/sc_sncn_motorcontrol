@@ -235,9 +235,13 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
                 out_valid = ok;
                 break;
 
-        case i_qei[int i].get_qei_position_absolute() -> {int out_count, int out_direction}:
+        case i_qei[int i].get_qei_position_absolute() -> int out_count:
 
                 out_count = count;
+                break;
+
+        case i_qei[int i].get_qei_direction() -> int out_direction:
+
                 out_direction = direction;
                 break;
 
@@ -251,7 +255,7 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
         case i_qei[int i].get_qei_velocity() -> int out_velocity:
 
                 out_velocity = velocity;
-                 break;
+                break;
 
         case i_qei[int i].set_qei_sync_offset(int in_fw, int in_bw):
 
@@ -261,7 +265,7 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
                 calib_fw_flag = 0;
                  break;
 
-        case i_qei[int i].reset_qei_count(int in_offset):
+        case i_qei[int i].reset_qei_absolute_position(int in_offset):
 
                  count = in_offset;
                  break;

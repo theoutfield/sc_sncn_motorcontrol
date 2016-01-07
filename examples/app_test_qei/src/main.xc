@@ -13,16 +13,13 @@
 /* Test QEI Sensor Client */
 void qei_test(interface QEIInterface client i_qei)
 {
-    int position;
-    int velocity;
-    int direction;
-    int count;
+    int position, velocity, count, valid;
 
     while(1)
     {
         /* get position and velocity from QEI Sensor */
-        {count, direction} = i_qei.get_qei_position_absolute();
-        {position, direction} = i_qei.get_qei_position();
+        count = i_qei.get_qei_position_absolute();
+        {position, valid} = i_qei.get_qei_position();
 
         velocity = i_qei.get_qei_velocity();
 
