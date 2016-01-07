@@ -39,8 +39,6 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
         return;
     }
 
-   // hall_config.max_ticks_per_turn =
-
     printf("*************************************\n    HALL SENSOR SERVER STARTING\n*************************************\n");
 
     #define defPeriodMax 1000000  //1000msec
@@ -142,7 +140,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                     out_direction = direction;
                     break;
 
-            case i_hall[int i].reset_hall_count(int offset):
+            case i_hall[int i].reset_hall_absolute_position(int offset):
                 count = offset;
                 break;
 
