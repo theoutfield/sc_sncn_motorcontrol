@@ -6,7 +6,7 @@ SOMANET Hall Sensor Module
     :backlinks: none
     :depth: 3
 
-This module provides a Service that will read the data coming from your 
+This module provides a Service that will read and process the data coming from your 
 Feedback Hall Sensor. All the read data and related calculations can be accessed
 by a client through an interface.
 
