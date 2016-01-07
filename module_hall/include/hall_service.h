@@ -34,7 +34,7 @@ typedef struct {
 * Structure type for Hall Service ports
 */
 typedef struct {
-    port p_hall; /**< 4-bit port for Hall Sensor signals input. */
+    port p_hall; /**< 4-bit Port for Hall Sensor signals input. */
 } HallPorts;
 
 /**
@@ -113,7 +113,7 @@ interface HallInterface {
  *
  * @brief Service to read and process data from a Feedback Hall Sensor.
  *
- * @param hall_ports Port to get the Hall signals from.
+ * @param hall_ports Ports structure defining where to read the Hall signals.
  * @param hall_config Configuration for the service.
  * @param i_hall[5] Array of communication interfaces to handle up to 5 different clients.
  */
