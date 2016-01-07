@@ -25,13 +25,13 @@ interface WatchdogInterface{
     void start(void);
 
     /**
-     * @brief Stops ticking the watchdog. Therefore, any output through phases is disabled.
+     * @brief Stops ticking the watchdog. Therefore, any output through the phases is disabled.
      */
     void stop(void);
 };
 
 /**
- * @brief Service to manage the watchdog chip within your SOMANET device.
+ * @brief Service to manage the watchdog chip within your IFM SOMANET device.
  *
  * @param watchdog_ports Ports structure defining where to access the watchdog chip.
  * @param i_watchdog[2] Array of communication interfaces to handle up to 2 different clients.
