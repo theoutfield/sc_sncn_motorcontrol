@@ -124,7 +124,7 @@ void position_control_service(ControlConfig &position_control_config,
     printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
 
     if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
-        { actual_position, direction } = i_hall.get_hall_position_absolute();
+        actual_position = i_hall.get_hall_position_absolute();
         target_position = actual_position;
     } else if (position_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)) {
         {actual_position, direction} = i_qei.get_qei_position_absolute();
@@ -146,7 +146,7 @@ void position_control_service(ControlConfig &position_control_config,
                 /* acquire actual position hall/qei/sensor */
                 switch (position_control_config.feedback_sensor) {
                     case HALL_SENSOR:
-                    { actual_position, direction } = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                        actual_position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                     break;
 
                     case QEI_SENSOR:
@@ -255,7 +255,7 @@ void position_control_service(ControlConfig &position_control_config,
             position_control_config.feedback_sensor = in_sensor_used;
 
             if (in_sensor_used == HALL_SENSOR) {
-                { actual_position, direction }= i_hall.get_hall_position_absolute();
+                actual_position = i_hall.get_hall_position_absolute();
             } else if (in_sensor_used >= QEI_SENSOR) {
                 { actual_position, direction } = i_qei.get_qei_position_absolute();
             }

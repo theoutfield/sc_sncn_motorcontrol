@@ -130,13 +130,16 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                     out_position = angle;
                     break;
 
-            case i_hall[int i].get_hall_position_absolute() -> {int out_position, int out_direction}:
+            case i_hall[int i].get_hall_position_absolute() -> int out_position:
                     out_position = count;
-                    out_direction = direction;
                     break;
 
             case i_hall[int i].get_hall_velocity() -> int out_velocity:
                     out_velocity = raw_velocity;
+                    break;
+
+            case i_hall[int i].get_hall_direction() -> int out_direction:
+                    out_direction = direction;
                     break;
 
             case i_hall[int i].reset_hall_count(int offset):
