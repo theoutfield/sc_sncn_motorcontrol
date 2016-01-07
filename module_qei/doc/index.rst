@@ -112,6 +112,11 @@ While the QEI server is running and constantly monitoring, the velocity and posi
 API
 ===
 
+Definitions
+-----
+
+.. doxygendefine:: QEI_SENSOR
+
 Types
 -----
 .. doxygenenum:: QEI_SignalType
