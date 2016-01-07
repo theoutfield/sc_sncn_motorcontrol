@@ -113,7 +113,7 @@ interface HallInterface {
  *
  * @param hall_ports Port to get the Hall signals from.
  * @param hall_config Configuration for the service.
- * @param i_hall[5] \verbatim Array of communication interfaces to handle up to 5 different clients. \endverbatim
+ * @param i_hall[5] Array of communication interfaces to handle up to 5 different clients.
  */
 [[combinable]]
 void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
