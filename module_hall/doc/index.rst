@@ -124,13 +124,9 @@ Types
 Service
 -------
 
-Lorem ipsum...
-
 .. doxygenfunction:: hall_service
 
 Interface
 ---------
-
-Lorem ipsum...
 
 .. doxygeninterface:: HallInterface
