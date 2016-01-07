@@ -39,6 +39,11 @@ Include the Service header in your app
 API
 ===
 
+Definitions
+-----
+
+.. doxygendefine:: HALL_SENSOR
+
 Types
 -----
 
