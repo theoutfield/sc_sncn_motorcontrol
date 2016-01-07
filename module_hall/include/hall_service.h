@@ -55,6 +55,13 @@ interface HallInterface {
     int get_hall_position();
 
     /**
+     * @brief Getter for calculated velocity of the motor.
+     *
+     * @return Mechanical RPMs.
+     */
+    int get_hall_velocity();
+
+    /**
      * @brief Getter for absolute position.
      *
      * @return Absolute position [INT_MIN:INT_MAX].
@@ -63,25 +70,19 @@ interface HallInterface {
     int get_hall_position_absolute();
 
     /**
-     * @brief Getter for calculated velocity of the motor.
-     *
-     * @return Lorem ipsum...
-     */
-    int get_hall_velocity();
-
-    /**
      * @brief Getter for direction of last change in the Hall Sensor signals.
      *
-     * @return
+     * @return 1 for CW or positive rotation.
+     *        -1 for CCW or negative rotation.
      */
     int get_hall_direction();
 
     /**
-     * @brief Lorem ipsum...
+     * @brief Setter for the absolute position.
      *
-     * @param offset Lorem ipsum...
+     * @param offset New value for absolute position.
      */
-    void reset_hall_count(int offset);
+    void reset_hall_absolute_position(int offset);
 
     /**
      * @brief Getter for current configuration used by the Service.
@@ -91,16 +92,17 @@ interface HallInterface {
     HallConfig get_hall_config();
 
     /**
-     * @brief Lorem ipsum...
+     * @brief Setter for the configuration used by the Service.
      *
-     * @param in_config Lorem ipsum...
+     * @param in_config New Service configuration.
      */
     void set_hall_config(HallConfig in_config);
 
     /**
-     * @brief Lorem ipsum...
+     * @brief Getter for the current state of the Service.
      *
-     * @return Lorem ipsum...
+     * @return 0 if not initialized.
+     *         1 if initialized.
      */
     int check_busy();
 };
