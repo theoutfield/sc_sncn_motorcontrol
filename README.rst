@@ -10,16 +10,15 @@ Key Features
 ============
 
   * Commutation (sinusoidal)
+  * PID control fo position, velocity and torque
   * Profile Position Control
   * Profile Velocity Control
   * Profile Torque Control
+  * Incremental encoder feedback (Index/ no Index) support
+  * Hall effect sensor feedback support
   * Homing feature
-  * EtherCAT Operating Modes
-  * QEI sensor (Index/ no Index) support
-  * Hall sensor sensor
-  * Analog sensor sensor
-  * GPIO Digital sensor
-  * Precise position control based on position sensor ticks
+  * Compatible with EtherCAT
+ 
 
 Firmware overview
 =================
