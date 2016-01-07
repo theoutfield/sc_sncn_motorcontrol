@@ -38,7 +38,7 @@
 
 
 /**
- * @brief Type for the Encoder output signals.
+ * @brief Type for the kind of Encoder output signals.
  */
 typedef enum {
     QEI_RS422_SIGNAL = 11,  /**< Encoder signal output over RS422 (differential). */
