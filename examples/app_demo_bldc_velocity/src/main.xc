@@ -131,13 +131,13 @@ int main(void)
                     qei_service(qei_ports, qei_config, i_qei);
                 }
 
-                 /* Motor Commutation Service */
+                /* Motor Commutation Service */
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset_clk =  COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset_cclk = COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.hall_offset[0] =  COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
