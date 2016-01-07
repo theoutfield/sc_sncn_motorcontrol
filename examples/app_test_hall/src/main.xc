@@ -16,13 +16,12 @@ void hall_test(interface HallInterface client i_hall)
     int position = 0;
     int velocity = 0;
     int count = 0;
-    int direction;
     int pins = 0;
 
     while(1)
     {
         /* get position from Hall Sensor */
-        {count, direction} = i_hall.get_hall_position_absolute();
+        count = i_hall.get_hall_position_absolute();
         position = i_hall.get_hall_position();
 
         /* get velocity from Hall Sensor */
