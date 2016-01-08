@@ -32,7 +32,7 @@ interface PositionControlInterface{
     void set_position(int target_position);
 
     /**
-     * @brief Setter the current position of your shaft.
+     * @brief Getter for the current position of your motor.
      *
      * @return Current position [INT_MIN:INT_MAX].
      */
@@ -50,14 +50,14 @@ interface PositionControlInterface{
      *
      * @return Current Service configuration.
      */
-    ControlConfig get_control_config();
+    ControlConfig get_position_control_config();
 
     /**
-     * @brief Setter for the configuration used by the Service.
+     * @brief Setter for new configuration in the Service.
      *
      * @param in_config New Service configuration.
      */
-    void set_control_config(ControlConfig in_config);
+    void set_position_control_config(ControlConfig in_config);
 
     /**
      * @brief Allows you to change the position control sensor on runtime.
@@ -74,7 +74,7 @@ interface PositionControlInterface{
     HallConfig get_hall_config();
 
     /**
-     * @brief Setter for the configuration used by the Hall Sensor Service.
+     * @brief Setter for new configuration in the Hall Sensor Service.
      *
      * @param in_config New Hall Sensor Service configuration.
      */
@@ -88,11 +88,11 @@ interface PositionControlInterface{
     QEIConfig get_qei_config();
 
     /**
-     * @brief Setter for the configuration used by the Encoder Service.
+     * @brief Setter for new configuration in the Encoder Service.
      *
      * @param in_config New Encoder Service configuration.
      */
-    void set_qei_config(QEIConfig qei_params);
+    void set_qei_config(QEIConfig in_config);
 
     /**
      * @brief Getter for the current state of the Service.

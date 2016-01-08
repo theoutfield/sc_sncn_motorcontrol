@@ -12,7 +12,7 @@
 void init_position_profiler(ProfilerConfig profile_position_config,
                                 interface PositionControlInterface client i_position_control){
 
-    ControlConfig control_config = i_position_control.get_control_config();
+    ControlConfig control_config = i_position_control.get_position_control_config();
     QEIConfig qei_config = i_position_control.get_qei_config();
     HallConfig hall_config = i_position_control.get_hall_config();
 
