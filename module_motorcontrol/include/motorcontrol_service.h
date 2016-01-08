@@ -32,7 +32,7 @@ typedef struct {
     MotorType motor_type;               /**< Type of motor to drive. */
     BLDCWindingType bldc_winding_type;  /**< Type of winding of your motor (if using a BLDC motor). */
     int commutation_sensor;             /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
-    int hall_offset[2];                 /**< Feedback Hall sensor offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
+    int hall_offset[2];                 /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
     int commutation_loop_period;        /**< Period for the commutation loop [microseconds]. */
 } MotorcontrolConfig;
 
@@ -84,16 +84,16 @@ interface MotorcontrolInterface{
     /**
      * @brief Setter for the status of the fets
      *
-     * @return 0 - Fets disabled
-     *         1 - Fets enabled
+     * @return 0 - Fets disabled.
+     *         1 - Fets enabled.
      */
     void set_fets_state(int state);
 
     /**
      * @brief Getter for the status of the fets
      *
-     * @return 0 - Fets disabled
-     *         1 - Fets enabled
+     * @return 0 - Fets disabled.
+     *         1 - Fets enabled.
      */
     int get_fets_state();
 

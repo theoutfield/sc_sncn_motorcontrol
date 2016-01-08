@@ -16,6 +16,11 @@ Lorem ipsum...
 API
 ===
 
+Definitions
+-------------
+
+.. doxygendefine:: PID_DENOMINATOR
+
 Global Types
 -------------
 

@@ -11,22 +11,13 @@
 #include <motorcontrol_service.h>
 #include <control_loops_common.h>
 
+#define DEFAULT_FILTER_LENGTH 8
+
 /**
- * @brief Lorem ipsum...
+ * @brief Interface type to communicate with the Velocity Control Service.
  */
 interface VelocityControlInterface{
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     */
-    int check_busy();
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     */
-    int check_velocity_ctrl_state();
+
     /**
      * @brief Lorem ipsum...
      *
@@ -89,9 +80,15 @@ interface VelocityControlInterface{
      * @return Lorem ipsum...
      */
     ControlConfig get_velocity_control_config();
+
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
+    int check_busy();
 };
 
-#define DEFAULT_FILTER_LENGTH 8
 /**
  * @brief Initialise Velocity Control Loop
  *
@@ -113,19 +110,6 @@ int init_velocity_control(interface VelocityControlInterface client i_velocity_c
 int max_speed_limit(int velocity, int max_speed);
 
 /**
- * @brief Set new target velocity for velocity control (advanced function)
- *
- * @Input
- * @param csv_params struct defines the motor parameters and velocity limits
- * @param target_velocity is the new target velocity
- * @param velocity_offset defines offset in velocity
- * @param torque_offset defines offset in torque
- * @param i_velocity_control Lorem ipsum...
- */
-void set_velocity_csv(ProfilerConfig & csv_params, int target_velocity,
-                      int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control);
-
-/**
  * @brief Velocity Control Loop
  *
  * @param velocity_ctrl_params struct defines the velocity control parameters
@@ -133,7 +117,6 @@ void set_velocity_csv(ProfilerConfig & csv_params, int target_velocity,
  * @param i_qei Lorem ipsum...
  * @param i_commutation Lorem ipsum...
  * @param i_velocity_control[3] Lorem ipsum...
- *
  */
 [[combinable]]
 void velocity_control_service(ControlConfig & velocity_ctrl_params,

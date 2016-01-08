@@ -13,79 +13,89 @@
 #include <adc_service.h>
 
 #define FILTER_LENGTH_TORQUE 80
-#define MIN_TORQUE_CONTROL_LOOP_PERIOD 100 //us
+
 /**
- * @brief Lorem ipsum...
+ * @brief Minimum period for the Torque Control Loop is 100 us.
+ */
+#define MIN_TORQUE_CONTROL_LOOP_PERIOD 100 //us
+
+/**
+ * @brief Interface type to communicate with the Torque Control Service.
  */
 interface TorqueControlInterface{
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     */
-    int check_busy();
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     */
-    int check_torque_ctrl_state();
+
     /**
      * @brief Lorem ipsum...
      *
      * @return Lorem ipsum...
      */
     int get_torque();
+
     /**
      * @brief Lorem ipsum...
      *
      * @param in_torque Lorem ipsum...
      */
     void set_torque(int in_torque);
+
     /**
      * @brief Lorem ipsum...
      *
      * @return Lorem ipsum...
      */
     int get_target_torque();
+
     /**
      * @brief Lorem ipsum...
      *
      * @param torque_ctrl_params Lorem ipsum...
      */
     void set_torque_ctrl_param(ControlConfig torque_ctrl_params);
+
     /**
      * @brief Lorem ipsum...
      *
      * @param hall_config Lorem ipsum...
      */
     void set_torque_ctrl_hall_param(HallConfig hall_config);
+
     /**
      * @brief Lorem ipsum...
      *
      * @param qei_params Lorem ipsum...
      */
     void set_torque_ctrl_qei_param(QEIConfig qei_params);
+
     /**
      * @brief Lorem ipsum...
      *
      * @param sensor_used Lorem ipsum...
      */
     void set_torque_sensor(int sensor_used);
+
     /**
      * @brief Lorem ipsum...
      */
     void enable_torque_ctrl();
+
     /**
      * @brief Lorem ipsum...
      */
     void shutdown_torque_ctrl();
+
     /**
      * @brief Lorem ipsum...
      *
      * @return Lorem ipsum...
      */
     ControlConfig get_torque_control_config();
+
+    /**
+     * @brief Lorem ipsum...
+     *
+     * @return Lorem ipsum...
+     */
+    int check_busy();
 };
 
 /**
@@ -107,19 +117,6 @@ int init_torque_control(interface TorqueControlInterface client i_torque_control
  * @return torque in the range [-max_torque_limit to max_torque_limit] (mNm * Current resolution)
  */
 int torque_limit(int torque, int max_torque_limit);
-
-/**
- * @brief Set new target torque for torque control (advanced function)
- *
- * @Input Channel
- * @param c_torque_ctrl channel to signal new target torque
- *
- * @Input
- * @param cst_params struct defines the motor parameters and torque limits
- * @param target_torque is the new target torque
- * @param torque_offset defines offset in torque
- */
-void set_torque_cst(ProfilerConfig & cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control);
 
 /**
  * @brief Torque Control Loop
