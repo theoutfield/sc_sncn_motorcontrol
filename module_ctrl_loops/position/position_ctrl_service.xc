@@ -275,8 +275,8 @@ void position_control_service(ControlConfig &position_control_config,
                                     printstrln("commutation intialized");
             #endif
                                     fet_state = i_motorcontrol.get_fets_state(); // check_fet_state(c_commutation);
-                                    if (fet_state == 1) {
-                                        i_motorcontrol.enable_fets();
+                                    if (fet_state == 0) {
+                                        i_motorcontrol.set_fets_state(1);
                                         delay_milliseconds(2);
                                     }
 
@@ -297,7 +297,7 @@ void position_control_service(ControlConfig &position_control_config,
             error_position_I = 0;
             previous_error = 0;
             position_control_out = 0;
-            i_motorcontrol.disable_fets();
+            i_motorcontrol.set_fets_state(0);
             // disable_motor(c_commutation);
             delay_milliseconds(30);
             //wait_ms(30, 1, ts); //
