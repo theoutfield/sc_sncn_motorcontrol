@@ -13,17 +13,12 @@
 #include <hall_service.h>
 #include <qei_service.h>
 
-
-
-
-
-
-int init_position_control(interface PositionControlInterface client i_position_control)
+void init_position_control(interface PositionControlInterface client i_position_control)
 {
     int ctrl_state = INIT_BUSY;
 
     while (1) {
-        ctrl_state = i_position_control.check_position_ctrl_state();
+        ctrl_state = i_position_control.check_busy();
         if (ctrl_state == INIT_BUSY) {
             i_position_control.enable_position_ctrl();
         }
@@ -35,7 +30,6 @@ int init_position_control(interface PositionControlInterface client i_position_c
             break;
         }
     }
-    return ctrl_state;
 }
 
 int position_limit(int position, int max_position_limit, int min_position_limit)
@@ -47,15 +41,6 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
     }
     return position;
 }
-
-void set_position_csp( ProfilerConfig & csp_params, int target_position, int position_offset,
-                       int velocity_offset, int torque_offset, interface PositionControlInterface client i_position_control )
-{
-    i_position_control.set_position( position_limit( (target_position + position_offset) * csp_params.polarity,
-                                  csp_params.max_position,
-                                  csp_params.min_position));
-}
-
 
 void position_control_service(ControlConfig &position_control_config,
                                 interface HallInterface client ?i_hall,
@@ -116,8 +101,8 @@ void position_control_service(ControlConfig &position_control_config,
         position_control_out_limit = BDC_PWM_CONTROL_LIMIT;
     }
 
-    if(position_control_config.Ki != 0)
-        error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki;
+    if(position_control_config.Ki_n != 0)
+        error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
 
 
     printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
@@ -178,9 +163,9 @@ void position_control_service(ControlConfig &position_control_config,
                     error_position_I = - error_position_I_limit;
                 }
 
-                position_control_out = (position_control_config.Kp * error_position) +
-                                       (position_control_config.Ki * error_position_I) +
-                                       (position_control_config.Kd * error_position_D);
+                position_control_out = (position_control_config.Kp_n * error_position) +
+                                       (position_control_config.Ki_n * error_position_I) +
+                                       (position_control_config.Kd_n * error_position_D);
 
                 position_control_out /= PID_DENOMINATOR;
 
@@ -225,24 +210,24 @@ void position_control_service(ControlConfig &position_control_config,
                 out_activate = activate;
                 break;
 
-        case i_position_control[int i].set_position_ctrl_param(ControlConfig in_params):
+        case i_position_control[int i].set_control_config(ControlConfig in_params):
 
-            position_control_config.Kp = in_params.Kp;
-            position_control_config.Ki = in_params.Ki;
-            position_control_config.Kd = in_params.Kd;
+            position_control_config.Kp_n = in_params.Kp_n;
+            position_control_config.Ki_n = in_params.Ki_n;
+            position_control_config.Kd_n = in_params.Kd_n;
 
             error_position_I_limit = 0;
-            if(position_control_config.Ki != 0)
-                error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki;;
+            if(position_control_config.Ki_n != 0)
+                error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
 
             break;
 
-        case i_position_control[int i].set_position_ctrl_hall_param(HallConfig in_config):
+        case i_position_control[int i].set_hall_config(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
             break;
 
-        case i_position_control[int i].set_position_ctrl_qei_param(QEIConfig in_qei_params):
+        case i_position_control[int i].set_qei_config(QEIConfig in_qei_params):
 
             qei_config.index_type = in_qei_params.index_type;
             qei_config.ticks_resolution = in_qei_params.ticks_resolution;
@@ -288,7 +273,7 @@ void position_control_service(ControlConfig &position_control_config,
             #endif
                             break;
 
-        case i_position_control[int i].shutdown_position_ctrl():
+        case i_position_control[int i].disable_position_ctrl():
             activate = 0;
             i_motorcontrol.set_voltage(0);
             //set_commutation_sinusoidal(c_commutation, 0);
@@ -305,11 +290,6 @@ void position_control_service(ControlConfig &position_control_config,
             printstrln("position control disabled");
 #endif
             break;
-
-        case i_position_control[int i].check_position_ctrl_state() -> int out_state:
-                out_state = activate;
-
-                break;
 
         case i_position_control[int i].get_control_config() ->  ControlConfig out_config:
 

@@ -76,9 +76,9 @@ int main(void)
 
             velocity_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR ;
 
-            velocity_control_config.Kp = VELOCITY_Kp;     // Divided by 10000
-            velocity_control_config.Ki = VELOCITY_Ki;     // Divided by 10000
-            velocity_control_config.Kd = VELOCITY_Kd;     // Divided by 10000
+            velocity_control_config.Kp_n = VELOCITY_Kp;     // Divided by 10000
+            velocity_control_config.Ki_n = VELOCITY_Ki;     // Divided by 10000
+            velocity_control_config.Kd_n = VELOCITY_Kd;     // Divided by 10000
 
             velocity_control_config.control_loop_period =  CONTROL_LOOP_PERIOD; //us
 

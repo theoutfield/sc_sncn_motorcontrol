@@ -94,9 +94,9 @@ int main(void)
 
             position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
 
-            position_control_config.Kp = POSITION_Kp;    // Divided by 10000
-            position_control_config.Ki = POSITION_Ki;    // Divided by 10000
-            position_control_config.Kd = POSITION_Kd;    // Divided by 10000
+            position_control_config.Kp_n = POSITION_Kp;    // Divided by 10000
+            position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
+            position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
 
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
 

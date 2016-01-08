@@ -88,9 +88,9 @@ int main(void)
 
             velocity_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
 
-            velocity_control_config.Kp = VELOCITY_Kp;
-            velocity_control_config.Ki = VELOCITY_Ki;
-            velocity_control_config.Kd = VELOCITY_Kd;
+            velocity_control_config.Kp_n = VELOCITY_Kp;
+            velocity_control_config.Ki_n = VELOCITY_Ki;
+            velocity_control_config.Kd_n = VELOCITY_Kd;
 
             velocity_control_config.control_loop_period =  CONTROL_LOOP_PERIOD;
 

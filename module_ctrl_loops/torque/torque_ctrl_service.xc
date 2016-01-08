@@ -30,7 +30,7 @@ int init_torque_control(interface TorqueControlInterface client i_torque_control
     int ctrl_state = INIT_BUSY;
 
     while (1) {
-        ctrl_state = i_torque_control.check_torque_ctrl_state();
+        ctrl_state = i_torque_control.check_busy();
         if (ctrl_state == INIT_BUSY) {
             i_torque_control.enable_torque_ctrl();
         }
@@ -53,12 +53,6 @@ int torque_limit(int torque, int max_torque_limit)
         torque = -max_torque_limit;
     }
     return torque;
-}
-
-void set_torque_cst(ProfilerConfig &cst_params, int target_torque, int torque_offset, interface TorqueControlInterface client i_torque_control)
-{
-    i_torque_control.set_torque( torque_limit( (target_torque + torque_offset) * cst_params.polarity,
-                              cst_params.max_current));
 }
 
 void current_filter(interface ADCInterface client adc_if, chanend c_current)
@@ -219,8 +213,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
         torque_control_output_limit = BDC_PWM_CONTROL_LIMIT;
     }
 
-    if(torque_control_config.Ki != 0)
-        error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_control_config.Ki;
+    if(torque_control_config.Ki_n != 0)
+        error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_control_config.Ki_n;
 
     if(torque_control_config.control_loop_period < MIN_TORQUE_CONTROL_LOOP_PERIOD){
         torque_control_config.control_loop_period = MIN_TORQUE_CONTROL_LOOP_PERIOD;
@@ -344,9 +338,9 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                 }
 
 
-                torque_control_output = (torque_control_config.Kp * error_torque) +
-                                        (torque_control_config.Ki * error_torque_integral) +
-                                        (torque_control_config.Kd  * error_torque_derivative);
+                torque_control_output = (torque_control_config.Kp_n * error_torque) +
+                                        (torque_control_config.Ki_n * error_torque_integral) +
+                                        (torque_control_config.Kd_n  * error_torque_derivative);
 
                 torque_control_output /= PID_DENOMINATOR;
 
@@ -404,13 +398,13 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
         case i_torque_control[int i].set_torque_ctrl_param(ControlConfig in_params):
 
-            torque_control_config.Kp = in_params.Kp;
-            torque_control_config.Ki = in_params.Ki;
-            torque_control_config.Kd = in_params.Kd;
+            torque_control_config.Kp_n = in_params.Kp_n;
+            torque_control_config.Ki_n = in_params.Ki_n;
+            torque_control_config.Kd_n = in_params.Kd_n;
 
             error_torque_integral_limit = 0;
-            if(torque_control_config.Ki != 0)
-                error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_control_config.Ki;
+            if(torque_control_config.Ki_n != 0)
+                error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_control_config.Ki_n;
 
                 break;
 
@@ -503,12 +497,6 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                delay_milliseconds(30);
                //wait_ms(30, 1, tc);
                break;
-
-        case i_torque_control[int i].check_torque_ctrl_state() -> int out_state:
-
-                out_state = activate;
-
-                 break;
 
         case i_torque_control[int i].get_torque_control_config() -> ControlConfig out_config:
 

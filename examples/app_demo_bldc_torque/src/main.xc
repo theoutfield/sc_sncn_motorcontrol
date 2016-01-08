@@ -77,9 +77,9 @@ int main(void)
 
             torque_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
 
-            torque_control_config.Kp = TORQUE_Kp;
-            torque_control_config.Ki = TORQUE_Ki;
-            torque_control_config.Kd = TORQUE_Kd;
+            torque_control_config.Kp_n = TORQUE_Kp;
+            torque_control_config.Ki_n = TORQUE_Ki;
+            torque_control_config.Kd_n = TORQUE_Kd;
 
             torque_control_config.control_loop_period = CONTROL_LOOP_PERIOD; // us
 

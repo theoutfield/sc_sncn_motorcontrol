@@ -13,6 +13,30 @@
 #include <torque_ctrl_service.h>
 
 /**
+ * @brief Structure definition for Profiler configuration.
+ */
+typedef struct{
+    int polarity;
+
+    //Position
+    int velocity;
+    int max_position;
+    int min_position;
+
+    //Velocity
+    int acceleration;
+    int deceleration;
+    int max_acceleration;
+    int max_deceleration;
+    int max_velocity;
+
+    //Torque
+    int current_slope;   //not used for now
+    int max_current_slope;
+    int max_current;
+}ProfilerConfig;
+
+/**
  * @brief Lorem ipsum...
  *
  * @param profile_position_config Lorem ipsum...
@@ -47,7 +71,6 @@ void init_torque_profiler(ProfilerConfig profile_torque_config,
  * @param acceleration in (rpm/s)
  * @param deceleration in (rpm/s)
  * @param i_position_control for communicating with the Position Control Server
- *
  */
 void set_profile_position( int target_position, int velocity, int acceleration, int deceleration,
                            interface PositionControlInterface client i_position_control );
@@ -59,7 +82,6 @@ void set_profile_position( int target_position, int velocity, int acceleration, 
  * @param acceleration in (rpm/s)
  * @param deceleration in (rpm/s)
  * @param i_velocity_control for communicating with the Velocity Control Server
- *
  */
 void set_profile_velocity( int target_velocity, int acceleration, int deceleration,
                            interface VelocityControlInterface client i_velocity_control );
@@ -70,7 +92,6 @@ void set_profile_velocity( int target_velocity, int acceleration, int decelerati
  * @param target_torque is the new target torque in (mNm * current resolution)
  * @param torque_slope in (mNm/s * current resolution)
  * @param i_torque_control for communicating with the Torque Control Server
- *
  */
 void set_profile_torque( int target_torque, int torque_slope,
                          interface TorqueControlInterface client i_torque_control );
