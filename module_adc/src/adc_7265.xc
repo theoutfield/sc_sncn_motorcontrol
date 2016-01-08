@@ -241,7 +241,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
                 out_temp = adc_data[0][4];
 
              break;
-
+/*
         case iADC[int i].get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
 
                 Ia = 0;
@@ -254,7 +254,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
                 dummy = 0;
 
                 break;
-
+*/
         case iADC[int i].get_external_inputs() -> {int ext_a, int ext_b}:
 
                 //We sample the external inputs as differential inputs: ch3 - ch4
