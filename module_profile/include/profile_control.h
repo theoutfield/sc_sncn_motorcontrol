@@ -19,58 +19,63 @@ typedef struct{
     int polarity;
 
     //Position
-    int velocity;
-    int max_position;
-    int min_position;
+    int velocity;   /**< Lorem ipsum */
+    int max_position;    /**< Lorem ipsum */
+    int min_position;    /**< Lorem ipsum */
 
     //Velocity
-    int acceleration;
-    int deceleration;
-    int max_acceleration;
-    int max_deceleration;
-    int max_velocity;
+    int acceleration;    /**< Lorem ipsum */
+    int deceleration;    /**< Lorem ipsum */
+    int max_acceleration;    /**< Lorem ipsum */
+    int max_deceleration;    /**< Lorem ipsum */
+    int max_velocity;    /**< Lorem ipsum */
 
     //Torque
     int current_slope;   //not used for now
-    int max_current_slope;
-    int max_current;
+    int max_current_slope;   /**< Lorem ipsum */
+    int max_current;     /**< Lorem ipsum */
 }ProfilerConfig;
 
 /**
- * @brief Lorem ipsum...
+ * @brief Position Profiler Initializer.
+ *        It is required running this function once before start using the Profiler.
  *
- * @param profile_position_config Lorem ipsum...
- * @param i_position_control Lorem ipsum...
+ * @param profile_position_config Configuration for the Position Profiler.
+ * @param i_position_control Communication interface to the Position Control Service.
  */
 void init_position_profiler(ProfilerConfig profile_position_config,
                                 interface PositionControlInterface client i_position_control);
 
 /**
- * @brief Lorem ipsum...
+ * @brief Velocity Profiler Initializer.
+ *        It is required running this function once before start using the Profiler.
  *
- * @param profile_velocity_config Lorem ipsum...
- * @param i_velocity_control Lorem ipsum...
+ * @param profile_velocity_config Configuration for the Velocity Profiler.
+ * @param i_velocity_control Communication interface to the Velocity Control Service.
  */
 void init_velocity_profiler(ProfilerConfig profile_velocity_config,
                                 interface VelocityControlInterface client i_velocity_control);
 
 /**
- * @brief Lorem ipsum...
+ * @brief Torque Profiler Initializer.
+ *        It is required running this function once before start using the Profiler.
  *
- * @param profile_torque_config Lorem ipsum...
- * @param i_torque_control Lorem ipsum...
+ * @param profile_torque_config Configuration for the Torque Profiler.
+ * @param i_torque_control Communication interface to the Torque Control Service.
  */
 void init_torque_profiler(ProfilerConfig profile_torque_config,
                                 interface TorqueControlInterface client i_torque_control);
 
 /**
- * @brief Set profile position with Position Control loop
+ * @brief Generates a profile ramp from the current position to the defined target position
+ *        according to the provided parameters. Then sequentially sends each point of the profile
+ *        as target to the Position Control Service.
  *
- * @param target_position is the new target position in (ticks)
- * @param velocity in (rpm)
- * @param acceleration in (rpm/s)
- * @param deceleration in (rpm/s)
- * @param i_position_control for communicating with the Position Control Server
+ * @param target_position New target position in [INT_MIN:INT_MAX].
+ * @param velocity in [RPM].
+ * @param acceleration in [RPM/s].
+ * @param deceleration [RPM/s].
+ * @param i_position_control Communication interface to the Position Control Service.
  */
 void set_profile_position( int target_position, int velocity, int acceleration, int deceleration,
                            interface PositionControlInterface client i_position_control );
