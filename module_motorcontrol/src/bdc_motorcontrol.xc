@@ -21,7 +21,7 @@ static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl,
-                               MotorcontrolConfig &commutation_params,
+                               MotorcontrolConfig &motorcontrol_config,
                                interface MotorcontrolInterface server i_motorcontrol[5])
 {
     timer t;
@@ -37,7 +37,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
     while (1) {
         select {
 
-        case t when timerafter(ts + USEC_FAST * commutation_params.commutation_loop_period) :> ts:
+        case t when timerafter(ts + USEC_FAST * motorcontrol_config.commutation_loop_period) :> ts:
 
                 if (shutdown == 1) {
                     pwm[0] = -1;
@@ -95,28 +95,33 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                   state_return = init_state;
                   break;
-
+/*
         case i_motorcontrol[int i].disable_fets():
 
                 shutdown = 1;
                 break;
+*/
+        case i_motorcontrol[int i].set_fets_state(int new_state):
 
-        case i_motorcontrol[int i].enable_fets():
+                if(new_state == 0){
+                    shutdown = 1;
+                }else{
+                    shutdown = 0;
+                    voltage = 0;
+                }
 
-                shutdown = 0;
-                voltage = 0;
                 break;
 
         case i_motorcontrol[int i].get_fets_state() -> int fets_state:
-                fets_state = shutdown;
+                fets_state = !shutdown;
                 break;
         case i_motorcontrol[int i].set_sensor(int new_sensor):
                 break;
-        case i_motorcontrol[int i].set_parameters(MotorcontrolConfig new_parameters):
+        case i_motorcontrol[int i].set_config(MotorcontrolConfig new_config):
                 break;
         case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
 
-                  out_config = commutation_params;
+                  out_config = motorcontrol_config;
                   break;
         case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,
                                                             QEIConfig in_qei_config,
@@ -131,7 +136,7 @@ void bdc_loop(chanend c_pwm_ctrl,
                 interface WatchdogInterface client i_watchdog,
                 interface MotorcontrolInterface server i_commutation[5],
                 FetDriverPorts &fet_driver_ports,
-                MotorcontrolConfig &commutation_params)
+                MotorcontrolConfig &motorcontrol_config)
 {
     const unsigned t_delay = 300*USEC_FAST;
     timer t;
@@ -171,7 +176,7 @@ void bdc_loop(chanend c_pwm_ctrl,
         select{
 
             case t when timerafter(ts+0) :> void:
-                    bdc_internal_loop(fet_driver_ports, pwm_ctrl, c_pwm_ctrl, commutation_params, i_commutation);
+                    bdc_internal_loop(fet_driver_ports, pwm_ctrl, c_pwm_ctrl, motorcontrol_config, i_commutation);
                     break;
         }
     }

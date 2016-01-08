@@ -24,7 +24,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface MotorcontrolInterface server i_motorcontrol[5],
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
-                            MotorcontrolConfig &commutation_params)
+                            MotorcontrolConfig &motorcontrol_config)
 {
     const unsigned t_delay = 300*USEC_FAST;
     timer t;
@@ -77,7 +77,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
         select {
 
-            case t when timerafter(ts + USEC_FAST * commutation_params.commutation_loop_period) :> ts: //XX kHz commutation loop
+            case t when timerafter(ts + USEC_FAST * motorcontrol_config.commutation_loop_period) :> ts: //XX kHz commutation loop
                 if (sensor_select == HALL_SENSOR) {
                     //hall only
                     angle = i_hall.get_hall_position();
@@ -96,7 +96,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 } else {
                     if (voltage >= 0) {
                         if (sensor_select == HALL_SENSOR) {
-                            angle_pwm = ((angle + commutation_params.hall_offset[0]) >> 2) & 0x3ff;
+                            angle_pwm = ((angle + motorcontrol_config.hall_offset[0]) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI_SENSOR ) {
                             angle_pwm = (angle >> 2) & 0x3ff; //512
                         }
@@ -107,7 +107,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                         pwm[2] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half;
                     } else { /* voltage < 0 */
                         if (sensor_select == HALL_SENSOR) {
-                            angle_pwm = ((angle + commutation_params.hall_offset[1]) >> 2) & 0x3ff;
+                            angle_pwm = ((angle + motorcontrol_config.hall_offset[1]) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI_SENSOR) {
                             angle_pwm = (angle >> 2) & 0x3ff; //3100
                         }
@@ -127,29 +127,28 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
             case i_motorcontrol[int i].set_voltage(int new_voltage):
                     voltage = new_voltage;
-                    if (commutation_params.bldc_winding_type == DELTA_WINDING) {
+                    if (motorcontrol_config.bldc_winding_type == DELTA_WINDING) {
                         voltage = -voltage;
                     }
                     break;
 
-            case i_motorcontrol[int i].set_parameters(MotorcontrolConfig new_parameters):
-                    //commutation_params.angle_variance = new_parameters.angle_variance;
-                    //commutation_params.nominal_speed = new_parameters.nominal_speed;
-                    commutation_params.hall_offset[0] = new_parameters.hall_offset[0];
-                    commutation_params.hall_offset[1] = new_parameters.hall_offset[1];
-                    commutation_params.bldc_winding_type = new_parameters.bldc_winding_type;
+            case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
+
+                    motorcontrol_config.hall_offset[0] = new_parameters.hall_offset[0];
+                    motorcontrol_config.hall_offset[1] = new_parameters.hall_offset[1];
+                    motorcontrol_config.bldc_winding_type = new_parameters.bldc_winding_type;
 
                     break;
 
             case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
 
-                    out_config = commutation_params;
+                    out_config = motorcontrol_config;
                     break;
 
             case i_motorcontrol[int i].set_sensor(int new_sensor):
                     sensor_select = new_sensor;
                     break;
-
+/*
             case i_motorcontrol[int i].enable_fets():
                     shutdown = 0;
                     voltage = 0;
@@ -158,9 +157,20 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
             case i_motorcontrol[int i].disable_fets():
                     shutdown = 1;
                     break;
+                    */
+            case i_motorcontrol[int i].set_fets_state(int new_state):
+
+                    if(new_state == 0){
+                        shutdown = 1;
+                    }else{
+                        shutdown = 0;
+                        voltage = 0;
+                    }
+
+                    break;
 
             case i_motorcontrol[int i].get_fets_state() -> int fets_state:
-                    fets_state = shutdown;
+                    fets_state = !shutdown;
                     break;
 
             case i_motorcontrol[int i].check_busy() -> int state_return:
@@ -176,18 +186,17 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                  //qei_config.max_ticks_per_turn = in_qei_config.max_ticks_per_turn;
                  qei_config.ticks_resolution = in_qei_config.ticks_resolution;
 
-                 commutation_params.hall_offset[0] = in_commutation_config.hall_offset[0];
-                 commutation_params.hall_offset[1] = in_commutation_config.hall_offset[1];
-                 commutation_params.bldc_winding_type = in_commutation_config.bldc_winding_type;
-                 //commutation_params.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
+                 motorcontrol_config.hall_offset[0] = in_commutation_config.hall_offset[0];
+                 motorcontrol_config.hall_offset[1] = in_commutation_config.hall_offset[1];
+                 motorcontrol_config.bldc_winding_type = in_commutation_config.bldc_winding_type;
+                 //motorcontrol_config.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
 
                 // if (hall_config.pole_pairs < 4) {
-                //      commutation_params.nominal_speed = nominal_speed * 4;
+                //      motorcontrol_config.nominal_speed = nominal_speed * 4;
                 //  } else if (hall_config.pole_pairs >= 4) {
-                //      commutation_params.nominal_speed = nominal_speed;
+                //      motorcontrol_config.nominal_speed = nominal_speed;
                 //  }
-                  //commutation_params.qei_forward_offset = 0;
-                  //commutation_params.qei_backward_offset = 0;
+
                   voltage = 0;
                   max_count_per_hall = qei_config.ticks_resolution  * QEI_CHANGES_PER_TICK / hall_config.pole_pairs;
                   angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
