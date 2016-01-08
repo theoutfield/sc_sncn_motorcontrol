@@ -268,7 +268,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
             }
 
             break;
-
+/*
         case i_adc[int i].get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
 
                 if(trigger_exists == 0){
@@ -294,7 +294,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                 ext_2 = adc_data_b[3];
 
                 break;
-
+*/
         case i_adc[int i].get_currents() -> {int Ia, int Ib}:
 
                 if(trigger_exists == 0){
