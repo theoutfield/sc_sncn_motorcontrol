@@ -21,7 +21,7 @@ int init_velocity_control(interface VelocityControlInterface client i_velocity_c
     int ctrl_state = INIT_BUSY;
 
     while (1) {
-        ctrl_state = i_velocity_control.check_velocity_ctrl_state(); //check_velocity_ctrl_state(c_velocity_ctrl);
+        ctrl_state = i_velocity_control.check_busy();
         if (ctrl_state == INIT_BUSY) {
             i_velocity_control.enable_velocity_ctrl();
         }
@@ -43,14 +43,6 @@ int max_speed_limit(int velocity, int max_speed) {
         velocity = -max_speed;
     }
     return velocity;
-}
-
-//csv mode function
-void set_velocity_csv(ProfilerConfig &csv_params, int target_velocity,
-                      int velocity_offset, int torque_offset, interface VelocityControlInterface client i_velocity_control)
-{
-    i_velocity_control.set_velocity( max_speed_limit( (target_velocity + velocity_offset) * csv_params.polarity,
-                                   csv_params.max_velocity ));
 }
 
 [[combinable]]
@@ -129,8 +121,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
         velocity_control_out_limit = BDC_PWM_CONTROL_LIMIT;
     }
 
-    if(velocity_control_config.Ki != 0)
-        error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki;
+    if(velocity_control_config.Ki_n != 0)
+        error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
 
     init_filter(filter_buffer, index, FILTER_SIZE_MAX);
 
@@ -227,9 +219,9 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                     error_velocity_I = 0 -(error_velocity_I_limit);
                 }
 
-                velocity_control_out = (velocity_control_config.Kp*error_velocity)  +
-                                       (velocity_control_config.Ki*error_velocity_I) +
-                                       (velocity_control_config.Kd*error_velocity_D);
+                velocity_control_out = (velocity_control_config.Kp_n*error_velocity)  +
+                                       (velocity_control_config.Ki_n*error_velocity_I) +
+                                       (velocity_control_config.Kd_n*error_velocity_D);
 
                 velocity_control_out /= PID_DENOMINATOR;
 
@@ -264,13 +256,13 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
         case i_velocity_control[int i].set_velocity_ctrl_param(ControlConfig in_params):
 
-            velocity_control_config.Kp = in_params.Kp;
-            velocity_control_config.Ki = in_params.Ki;
-            velocity_control_config.Kd = in_params.Kd;
+            velocity_control_config.Kp_n = in_params.Kp_n;
+            velocity_control_config.Ki_n = in_params.Ki_n;
+            velocity_control_config.Kd_n = in_params.Kd_n;
 
             error_velocity_I_limit = 0;
-            if(velocity_control_config.Ki != 0)
-                error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki;
+            if(velocity_control_config.Ki_n != 0)
+                error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
 
             break;
 
@@ -327,11 +319,6 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             i_motorcontrol.set_voltage(0); //set_commutation_sinusoidal(c_commutation, 0);
             i_motorcontrol.set_fets_state(0);//disable_motor(c_commutation);
             delay_milliseconds(30);//wait_ms(30, 1, t);
-            break;
-
-        case i_velocity_control[int i].check_velocity_ctrl_state() -> int out_state:
-
-            out_state = activate;
             break;
 
         case i_velocity_control[int i].check_busy() -> int out_state:

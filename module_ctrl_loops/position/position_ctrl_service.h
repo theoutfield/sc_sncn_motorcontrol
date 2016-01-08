@@ -6,149 +6,138 @@
 
 #pragma once
 
-//#include <profile_control.h>
-#include <qei_service.h>
 #include <motorcontrol_service.h>
 #include <control_loops_common.h>
 
 /**
- * @brief Lorem ipsum...
+ * @brief Interface type to communicate with the Position Control Service.
  */
 interface PositionControlInterface{
+
     /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     */
-    int check_busy();
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @param target_position Lorem ipsum...
-     */
-    void set_position(int target_position);
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     */
-    int get_position();
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @return Lorem ipsum...
-     */
-    int get_target_position();
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @param position_ctrl_params Lorem ipsum...
-     */
-    void set_position_ctrl_param(ControlConfig position_ctrl_params);
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @param hall_config Lorem ipsum...
-     */
-    void set_position_ctrl_hall_param(HallConfig hall_config);
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @param qei_params Lorem ipsum...
-     */
-    void set_position_ctrl_qei_param(QEIConfig qei_params);
-    /**
-     * @brief Lorem ipsum...
-     *
-     * @param sensor_used Lorem ipsum...
-     */
-    void set_position_sensor(int sensor_used);
-    /**
-     * @brief Lorem ipsum...
+     * @brief Enables the Service operation.
      */
     void enable_position_ctrl();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Disables the Service operation.
      */
-    void shutdown_position_ctrl();
+    void disable_position_ctrl();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Setter for new target position in the controller.
      *
-     * @return Lorem ipsum...
+     * @param target_position New target position [INT_MIN:INT_MAX].
      */
-    int check_position_ctrl_state();
+    void set_position(int target_position);
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Setter the current position of your shaft.
      *
-     * @return Lorem ipsum...
+     * @return Current position [INT_MIN:INT_MAX].
+     */
+    int get_position();
+
+    /**
+     * @brief Getter for the current target position in the controller.
+     *
+     * @param Current target position [INT_MIN:INT_MAX].
+     */
+    int get_target_position();
+
+    /**
+     * @brief Getter for current configuration used by the Service.
+     *
+     * @return Current Service configuration.
      */
     ControlConfig get_control_config();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Setter for the configuration used by the Service.
      *
-     * @return Lorem ipsum...
+     * @param in_config New Service configuration.
+     */
+    void set_control_config(ControlConfig in_config);
+
+    /**
+     * @brief Allows you to change the position control sensor on runtime.
+     *
+     * @param sensor New sensor [HALL_SENSOR, QEI_SENSOR].
+     */
+    void set_position_sensor(int sensor_used);
+
+    /**
+     * @brief Getter for current configuration used by the Hall Sensor Service.
+     *
+     * @return Current Hall Sensor Service configuration.
      */
     HallConfig get_hall_config();
+
     /**
-     * @brief Lorem ipsum...
+     * @brief Setter for the configuration used by the Hall Sensor Service.
      *
-     * @return Lorem ipsum...
+     * @param in_config New Hall Sensor Service configuration.
+     */
+    void set_hall_config(HallConfig hall_config);
+
+    /**
+     * @brief Getter for current configuration used by the Encoder Service.
+     *
+     * @return Current Encoder Service configuration.
      */
     QEIConfig get_qei_config();
+
+    /**
+     * @brief Setter for the configuration used by the Encoder Service.
+     *
+     * @param in_config New Encoder Service configuration.
+     */
+    void set_qei_config(QEIConfig qei_params);
+
+    /**
+     * @brief Getter for the current state of the Service.
+     *
+     * @return 0 - not initialized.
+     *         1 - initialized.
+     */
+    int check_busy();
 };
 
 /**
- * @brief Initialise Position Control Loop
+ * @brief Initializer helper for the Position Control Service.
+ *        It is required the client to call this function before
+ *        starting to perform position control.
  *
- * @param i_position_control channel to signal initialisation
- *
- * @return Lorem ipsum...
+ * @param i_position_control Communication interface to the Position Control Service.
  */
-int init_position_control(interface PositionControlInterface client i_position_control);
+void init_position_control(interface PositionControlInterface client i_position_control);
 
 /**
- * @brief Position Limiter
+ * @brief Position limiter helper.
  *
- * @Input
- * @param position is the input position to be limited in range
- * @param max_position_limit is the max position that can be reached
- * @param min_position_limit is the min position that can be reached
+ * @param position The input position to be limited in range.
+ * @param max_position_limit Upper limit that can be reached.
+ * @param min_position_limit Lower limit that can be reached.
  *
- * @Output
- * @return position in the range [min_position_limit - max_position_limit]
+ * @return position in the range [min_position_limit:max_position_limit].
  */
 int position_limit(int position, int max_position_limit, int min_position_limit);
 
 /**
- * @brief Set new target position for position control (advanced function)
+ * @brief Service to perform a Position PID Control Loop on top of a Motor Control Service.
+ *        You will need a Motor Control Stack running parallely to this Service,
+ *        have a look at Motor Control Service for more information.
  *
- * @Input
- * @param csp_params struct defines the motor parameters and position limits
- * @param target_position is the new target position
- * @param position_offset defines offset in position
- * @param velocity_offset defines offset in velocity
- * @param torque_offset defines offset in torque
- * @param i_position_control Lorem ipsum...
+ *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
+ *
+ * @param position_ctrl_config Configuration for the Position Control Service.
+ * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
+ * @param i_qei [[Nullable]] Communication interface to the Encoder Service (if applicable).
+ * @param i_motorcontrol Communication interface to the Motor Control Service.
+ * @param i_position_control[3] Array of communication interfaces to handle up to 3 different clients.
  */
-void set_position_csp(ProfilerConfig &csp_params, int target_position, int position_offset, int velocity_offset,
-                      int torque_offset, interface PositionControlInterface client i_position_control);
-
-
-/**
- * @brief Position Control Loop
- *  Implements PID controller for position using Hall or QEI sensors.
- *  Note: The Server must be placed on CORES 0/1/2 only.
- *
- * @param position_ctrl_params struct defines the position control parameters
- * @param i_hall Lorem ipsum...
- * @param i_qei Lorem ipsum...
- * @param i_commutation Lorem ipsum...
- * @param i_position_control[3] Lorem ipsum...
- *
- */
-void position_control_service(ControlConfig & position_ctrl_params,
+void position_control_service(ControlConfig & position_ctrl_config,
                     interface HallInterface client ?i_hall,
                     interface QEIInterface client ?i_qei,
-                    interface MotorcontrolInterface client i_commutation,
+                    interface MotorcontrolInterface client i_motorcontrol,
                     interface PositionControlInterface server i_position_control[3]);
-

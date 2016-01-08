@@ -5,75 +5,19 @@
 
 #pragma once
 
+/**
+ * @brief Denominator for PID contants. The values set by the user for such constants will be divided by this value.
+ */
 #define PID_DENOMINATOR 10000.0
 
 /**
- * @brief Struct definition for PID Controller
+ * @brief Structure definition for a Control Loop Service configuration.
  */
 typedef struct {
-    int Kp; /**< Kp = Kp_n/Kp_d */
-    int Ki; /**< Ki = Ki_n/Ki_d */
-    int Kd; /**< Kd = Kd_n/Kd_d */
-    int control_loop_period;
-    int feedback_sensor;
+    int Kp_n; /**< Value for proportional coefficient (Kp) in PID controller. Kp = Kp_n/PID_DENOMINATOR (by default PID_DENOMINATOR = 10000) */
+    int Ki_n; /**< Value for integral coefficient (Ki) in PID controller. Ki = Ki_n/PID_DENOMINATOR (by default PID_DENOMINATOR = 10000) */
+    int Kd_n; /**< Value for differential coefficient (Kd) in PID controller. Kd = Kd_n/PID_DENOMINATOR (by default PID_DENOMINATOR = 10000) */
+    int control_loop_period; /**< Period for the control loop [microseconds]. */
+    int feedback_sensor; /**< Sensor used for position control feedback [HALL_SENSOR, QEI_SENSOR]*/
 } ControlConfig;
 
-
-/**
- * @brief Struct definition for profile velocity param
- */
-typedef struct{
-    int polarity;
-
-    //Position
-    int velocity;
-    int max_position;
-    int min_position;
-
-    //Velocity
-    int acceleration;
-    int deceleration;
-    int max_acceleration;
-    int max_deceleration;
-    int max_velocity;
-
-    //Torque
-    int current_slope;   //not used for now
-    int max_current_slope;
-    int max_current;
-}ProfilerConfig;
-
-/**
- * @brief Struct definition for Synchronous torque param
- */
-typedef struct
-{
-    int nominal_motor_speed;
-    int nominal_current;
-    int motor_torque_constant;
-    int max_torque;
-    int polarity;
-} CyclicSyncTorqueConfig;
-
-/**
- * @brief Struct definition for Synchronous velocity param
- */
-typedef struct
-{
-    int max_motor_speed;
-    int nominal_current;
-    int motor_torque_constant;
-    int polarity;
-    int max_acceleration;
-} CyclicSyncVelocityConfig;
-
-/**
- * @brief Struct definition for Synchronous position param
- */
-typedef struct
-{
-    CyclicSyncVelocityConfig velocity_config;
-    int max_following_error;
-    int max_position_limit;
-    int min_position_limit;
-} CyclicSyncPositionConfig;
