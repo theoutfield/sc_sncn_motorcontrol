@@ -16,7 +16,7 @@
 
 
 
-int init_velocity_control(interface VelocityControlInterface client i_velocity_control)
+void init_velocity_control(interface VelocityControlInterface client i_velocity_control)
 {
     int ctrl_state = INIT_BUSY;
 
@@ -33,7 +33,6 @@ int init_velocity_control(interface VelocityControlInterface client i_velocity_c
             break;
         }
     }
-    return ctrl_state;
 }
 
 int max_speed_limit(int velocity, int max_speed) {
@@ -254,7 +253,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             out_target_velocity = target_velocity;
             break;
 
-        case i_velocity_control[int i].set_velocity_ctrl_param(ControlConfig in_params):
+        case i_velocity_control[int i].set_velocity_control_config(ControlConfig in_params):
 
             velocity_control_config.Kp_n = in_params.Kp_n;
             velocity_control_config.Ki_n = in_params.Ki_n;
@@ -275,14 +274,14 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             break;
 
-        case i_velocity_control[int i].set_velocity_ctrl_hall_param(HallConfig in_config):
+        case i_velocity_control[int i].set_hall_config(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
             //hall_config.max_ticks = in_config.max_ticks;
             //hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
             break;
 
-        case i_velocity_control[int i].set_velocity_ctrl_qei_param(QEIConfig in_params):
+        case i_velocity_control[int i].set_qei_config(QEIConfig in_params):
 
             //qei_config.max_ticks = in_params.max_ticks;
             qei_config.index_type = in_params.index_type;
@@ -308,7 +307,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             break;
 
 
-        case i_velocity_control[int i].shutdown_velocity_ctrl():
+        case i_velocity_control[int i].disable_velocity_ctrl():
 
             activate = 0;
             error_velocity = 0;
