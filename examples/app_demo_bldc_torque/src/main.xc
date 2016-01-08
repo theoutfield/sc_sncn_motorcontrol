@@ -84,7 +84,7 @@ int main(void)
             torque_control_config.control_loop_period = CONTROL_LOOP_PERIOD; // us
 
             /* Control Loop */
-            torque_control_service(torque_control_config, i_adc[0], i_motorcontrol[0],  i_hall[1], i_qei[1], i_torque_control);
+            torque_control_service(torque_control_config, i_adc[0], i_hall[1], i_qei[1], i_motorcontrol[0], i_torque_control);
         }
 
         /* Currents monitoring in XScope */
