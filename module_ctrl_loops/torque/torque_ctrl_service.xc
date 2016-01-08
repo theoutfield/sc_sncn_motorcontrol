@@ -469,8 +469,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                       printstrln("commutation intialized");
 #endif
                       fet_state = i_motorcontrol.get_fets_state(); //check_fet_state(c_commutation);
-                      if (fet_state == 1) {
-                          i_motorcontrol.enable_fets(); //enable_motor(c_commutation);
+                      if (fet_state == 0) {
+                          i_motorcontrol.set_fets_state(1); //enable_motor(c_commutation);
                           delay_milliseconds(2);
                          // wait_ms(2, 1, tc);
                       }
@@ -499,7 +499,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                error_torque_previous = 0;
                torque_control_output = 0;
                i_motorcontrol.set_voltage(0);//set_commutation_sinusoidal(c_commutation, 0);
-               i_motorcontrol.disable_fets(); //disable_motor(c_commutation);
+               i_motorcontrol.set_fets_state(0); //disable_motor(c_commutation);
                delay_milliseconds(30);
                //wait_ms(30, 1, tc);
                break;
