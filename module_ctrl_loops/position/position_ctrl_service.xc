@@ -210,7 +210,7 @@ void position_control_service(ControlConfig &position_control_config,
                 out_activate = activate;
                 break;
 
-        case i_position_control[int i].set_control_config(ControlConfig in_params):
+        case i_position_control[int i].set_position_control_config(ControlConfig in_params):
 
             position_control_config.Kp_n = in_params.Kp_n;
             position_control_config.Ki_n = in_params.Ki_n;
@@ -291,7 +291,7 @@ void position_control_service(ControlConfig &position_control_config,
 #endif
             break;
 
-        case i_position_control[int i].get_control_config() ->  ControlConfig out_config:
+        case i_position_control[int i].get_position_control_config() ->  ControlConfig out_config:
 
                 out_config = position_control_config;
                 break;

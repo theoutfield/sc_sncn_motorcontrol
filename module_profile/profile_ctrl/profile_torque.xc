@@ -29,10 +29,7 @@ void set_profile_torque(int target_torque, int torque_slope, interface TorqueCon
 
     int init_state = i_torque_control.check_busy();
     if (init_state == INIT_BUSY) {
-        init_state = init_torque_control(i_torque_control);
-        if (init_state == INIT) {
-            //printstrln("torque control intialized");
-        }
+        init_torque_control(i_torque_control);
     }
 
     actual_torque = i_torque_control.get_torque() * get_linear_profile_polarity();

@@ -25,7 +25,7 @@ void init_buffer(int buffer[], int length)
     return;
 }
 
-int init_torque_control(interface TorqueControlInterface client i_torque_control)
+void init_torque_control(interface TorqueControlInterface client i_torque_control)
 {
     int ctrl_state = INIT_BUSY;
 
@@ -42,7 +42,6 @@ int init_torque_control(interface TorqueControlInterface client i_torque_control
             break;
         }
     }
-    return ctrl_state;
 }
 
 int torque_limit(int torque, int max_torque_limit)
@@ -225,7 +224,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
     int compute_flag = 0;
     int qei_counts_per_hall;
-   // qei_velocity_par qei_velocity_params;
+
     int start_flag = 0;
     int offset_fw_flag = 0;
     int offset_bw_flag = 0;
@@ -396,7 +395,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                 out_state = activate;
                 break;
 
-        case i_torque_control[int i].set_torque_ctrl_param(ControlConfig in_params):
+        case i_torque_control[int i].set_torque_control_config(ControlConfig in_params):
 
             torque_control_config.Kp_n = in_params.Kp_n;
             torque_control_config.Ki_n = in_params.Ki_n;
@@ -408,7 +407,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
                 break;
 
-        case i_torque_control[int i].set_torque_ctrl_hall_param(HallConfig in_config):
+        case i_torque_control[int i].set_hall_config(HallConfig in_config):
 
             hall_config.pole_pairs = in_config.pole_pairs;
 
@@ -419,7 +418,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
                 break;
 
-        case i_torque_control[int i].set_torque_ctrl_qei_param(QEIConfig in_params):
+        case i_torque_control[int i].set_qei_config(QEIConfig in_params):
 
            qei_params.index_type = in_params.index_type;
            qei_params.ticks_resolution = in_params.ticks_resolution;
@@ -450,7 +449,6 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
             }
             if (!compute_flag)
             {
-               // enable_adc(c_current);
                 compute_flag = 1;
             }
             break;
@@ -484,7 +482,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
             start_flag = 1;
             break;
 
-        case i_torque_control[int i].shutdown_torque_ctrl():
+        case i_torque_control[int i].disable_torque_ctrl():
 
                activate = 0;
                error_torque = 0;
@@ -506,12 +504,11 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
     }
 }
 
-/* TODO: do we really need 2 threads for this? */
 void torque_control_service(ControlConfig &torque_control_config,
                     interface ADCInterface client adc_if,
-                    interface MotorcontrolInterface client i_motorcontrol,
                     interface HallInterface client i_hall,
                     interface QEIInterface client ?i_qei,
+                    interface MotorcontrolInterface client i_motorcontrol,
                     interface TorqueControlInterface server i_torque_control[3])
 {
     chan c_current;
@@ -527,20 +524,5 @@ void torque_control_service(ControlConfig &torque_control_config,
         current_filter(adc_if, c_current);
         torque_ctrl_loop(torque_control_config, hall_config, qei_config,
                 c_current, i_motorcontrol, i_hall, i_qei, i_torque_control);
-
-    }
-}
-
-void enable_adc(chanend c_current)
-{
-    int command, enabled = 0;
-    c_current <: 1;
-    while (!enabled)
-    {
-        select {
-           case c_current :> command: //enable adc
-                enabled = 1;
-                break;
-          }
     }
 }
