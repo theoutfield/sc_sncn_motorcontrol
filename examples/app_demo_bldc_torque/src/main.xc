@@ -12,6 +12,7 @@
 #include <qei_service.h>
 #include <hall_service.h>
 #include <pwm_service.h>
+#include <watchdog_service.h>
 #include <adc_service.h>
 #include <motorcontrol_service.h>
 
@@ -58,7 +59,7 @@ int main(void)
     chan c_pwm_ctrl, c_adctrig;
 
     interface WatchdogInterface i_watchdog[2];
-    interface ADCInterface i_adc[3];
+    interface ADCInterface i_adc[2];
     interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
     interface MotorcontrolInterface i_motorcontrol[5];

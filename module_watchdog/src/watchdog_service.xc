@@ -11,6 +11,9 @@
 void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2])
 {
 
+    //Set freq to 250MHz (always needed for proper time calculation)
+    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+
     unsigned int wd_enabled = 1, shared_out, tick_out = 0;
     unsigned int ts, ts2;
     timer t;
