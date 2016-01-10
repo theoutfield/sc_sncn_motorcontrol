@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <print.h>
 
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 
 int check_hall_config(HallConfig &hall_config){
 

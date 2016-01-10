@@ -16,7 +16,7 @@
 
 #include <xscope.h>
 //#include <bldc_motor_config.h>
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 
 void set_commutation_offset_clk(chanend c_signal, unsigned offset);
 

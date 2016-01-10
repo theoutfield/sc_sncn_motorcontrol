@@ -12,7 +12,7 @@ enum { HOMING_NEGATIVE_SWITCH=1, HOMING_POSITIVE_SWITCH };
 #ifdef __XC__
 
 #include <xs1.h>
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 #include <platform.h>
 
 /**

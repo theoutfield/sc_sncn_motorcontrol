@@ -9,7 +9,7 @@
 
 #include <position_ctrl_service.h>
 #include <a4935.h>
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 #include <hall_service.h>
 #include <qei_service.h>
 

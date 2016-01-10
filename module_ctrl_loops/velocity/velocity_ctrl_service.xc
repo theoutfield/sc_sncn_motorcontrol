@@ -6,7 +6,7 @@
 
 #include <velocity_ctrl_service.h>
 #include <motorcontrol_service.h>
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 
 #include <filter_blocks.h>
 #include <limits.h>

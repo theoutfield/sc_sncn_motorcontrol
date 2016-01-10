@@ -1,5 +1,5 @@
 /**
- * @file internal_config.h
+ * @file mc_internal_constants.h
  * @brief Internal Definitions
  * @author Synapticon GmbH <support@synapticon.com>
 */

@@ -19,25 +19,25 @@ typedef struct{
     int polarity;
 
     //Position
-    int velocity;   /**< Lorem ipsum */
-    int max_position;    /**< Lorem ipsum */
-    int min_position;    /**< Lorem ipsum */
+    int velocity;   /**< Default velocity for Position Profile ramps generation [RPM]. */
+    int max_position;    /**< Max. reachable position. */
+    int min_position;    /**< Min. reachable position. */
 
     //Velocity
-    int acceleration;    /**< Lorem ipsum */
-    int deceleration;    /**< Lorem ipsum */
-    int max_acceleration;    /**< Lorem ipsum */
-    int max_deceleration;    /**< Lorem ipsum */
-    int max_velocity;    /**< Lorem ipsum */
+    int acceleration;    /**< Default acceleration for Velocity Profile ramps generation [RPM/s].  */
+    int deceleration;    /**< Default deceleration for Velocity Profile ramps generation [RPM/s].  */
+    int max_acceleration;    /**< Max. reachable acceleration [RPM/s].  */
+    int max_deceleration;    /**< Max. reachable deceleration [RPM/s].  */
+    int max_velocity;    /**< Max. reachable velocity [RPM].  */
 
     //Torque
-    int current_slope;   //not used for now
-    int max_current_slope;   /**< Lorem ipsum */
-    int max_current;     /**< Lorem ipsum */
+    int current_slope;   /**< Default current variation for torque ramps [ADC Current ticks/s]. Check ADC Module to know more about ADC Current ticks. */
+    int max_current_slope;  /**< Max. reachable current variation [ADC Current ticks/s]. Check ADC Module to know more about ADC Current ticks. */
+    int max_current;     /**< Max reachable current [ADC ticks]. Check ADC Module to know more about ADC Current ticks. */
 }ProfilerConfig;
 
 /**
- * @brief Position Profiler Initializer.
+ * @brief Position Profiler Initializer. It sets the profiler configuration.
  *        It is required running this function once before start using the Profiler.
  *
  * @param profile_position_config Configuration for the Position Profiler.
@@ -47,7 +47,7 @@ void init_position_profiler(ProfilerConfig profile_position_config,
                                 interface PositionControlInterface client i_position_control);
 
 /**
- * @brief Velocity Profiler Initializer.
+ * @brief Velocity Profiler Initializer. It sets the profiler configuration.
  *        It is required running this function once before start using the Profiler.
  *
  * @param profile_velocity_config Configuration for the Velocity Profiler.
@@ -57,7 +57,7 @@ void init_velocity_profiler(ProfilerConfig profile_velocity_config,
                                 interface VelocityControlInterface client i_velocity_control);
 
 /**
- * @brief Torque Profiler Initializer.
+ * @brief Torque Profiler Initializer. It sets the profiler configuration.
  *        It is required running this function once before start using the Profiler.
  *
  * @param profile_torque_config Configuration for the Torque Profiler.

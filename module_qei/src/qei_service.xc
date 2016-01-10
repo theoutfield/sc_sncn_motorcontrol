@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <refclk.h>
 #include "print.h"
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 
 #define MILLISECOND 250000 //ticks
 //#pragma xta command "analyze loop qei_loop"
