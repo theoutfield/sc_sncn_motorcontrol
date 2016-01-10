@@ -7,26 +7,35 @@
 
 #pragma once
 
-#include <xs1.h>
-
-/* 10NSEC_STD --> 1 */
+/**
+ * Defines the amount of ticks of a 100MHz timer (standard system reference frequency) for 1 us.
+ */
 #define USEC_STD       100
+
+/**
+ * Defines the amount of ticks of a 100MHz timer (standard system reference frequency) for 1 ms.
+ */
 #define MSEC_STD    100000
+
+/**
+ * Defines the amount of ticks of a 100MHz timer (standard system reference frequency) for 1 s.
+ */
 #define SEC_STD  100000000
 
 
-#if PLATFORM_REFERENCE_MHZ == 100
 
-#define USEC_FAST USEC_STD
-#define MSEC_FAST MSEC_STD
-#define SEC_FAST  SEC_STD
-
-#else /* REFCLK_STD == 100 MHZ , REFCLK_FAST == 250 MHZ */
-
-
-/* 4NSEC_FAST --> 1 */
+/**
+ * Defines the amount of ticks of a 250MHz timer (Motorcontrol TILE reference frequency) for 1 us.
+ */
 #define USEC_FAST       250
-#define MSEC_FAST    250000
-#define SEC_FAST  250000000
 
-#endif
+/**
+ * Defines the amount of ticks of a 250MHz timer (Motorcontrol TILE reference frequency) for 1 ms.
+ */
+
+#define MSEC_FAST    250000
+
+/**
+ * Defines the amount of ticks of a 250MHz timer (Motorcontrol TILE reference frequency) for 1 s.
+ */
+#define SEC_FAST  250000000
