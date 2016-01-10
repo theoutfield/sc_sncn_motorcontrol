@@ -16,12 +16,13 @@
  * @brief Interface type to communicate with the ADC Service.
  */
 interface ADCInterface{
-
+    // *Max adc ticks are 8192 and corresponds with the max current your DC can handle:
+    // DC100: 5A, DC300: 20A, DC1K 50A
     /**
      * @brief Get the ongoing current at B and C Phases.
      *
-     * @return Current on B Phase [-8191:8192].
-     * @return Current on C Phase [-8191:8192].
+     * @return Current on B Phase [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
+     * @return Current on C Phase [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
      */
     {int, int} get_currents();
 

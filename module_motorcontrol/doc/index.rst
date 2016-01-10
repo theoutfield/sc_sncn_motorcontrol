@@ -43,7 +43,7 @@ Step 1: Include the required headers
     #include <refclk.h>
     #include <drive_modes.h>
     #include <statemachine.h>
-    #include <internal_config.h>
+    #include <mc_internal_constants.h>
     #include <bldc_motor_config.h>
 
 Step 2: Define the clocks

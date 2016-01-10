@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 #include <hall_service.h>
 #include <qei_service.h>
 #include <xccompat.h>
