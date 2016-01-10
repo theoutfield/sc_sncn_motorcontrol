@@ -3,7 +3,7 @@
  * @brief Hall Sensor Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
 */
-
+#include <xs1.h>
 #include <hall_service.h>
 #include <limits.h>
 #include <filter_blocks.h>

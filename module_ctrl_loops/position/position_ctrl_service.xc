@@ -3,7 +3,7 @@
  * @brief Position Control Loop Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
 */
-
+#include <xs1.h>
 #include <xscope.h>
 #include <print.h>
 
