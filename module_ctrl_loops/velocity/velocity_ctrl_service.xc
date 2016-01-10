@@ -3,7 +3,7 @@
  * @brief Velocity Control Loop Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
  */
-
+#include <xs1.h>
 #include <velocity_ctrl_service.h>
 #include <motorcontrol_service.h>
 #include <mc_internal_constants.h>

@@ -4,7 +4,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
-
+#include <xs1.h>
 #include <qei_service.h>
 #include <limits.h>
 #include <stdlib.h>
