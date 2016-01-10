@@ -10,6 +10,9 @@
 #include <pwm_service.h>
 #include <hall_service.h>
 #include <adc_service.h>
+#include <watchdog_service.h>
+#include <motorcontrol_service.h>
+
 #include <user_config.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;

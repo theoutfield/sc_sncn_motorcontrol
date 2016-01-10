@@ -6,12 +6,65 @@ SOMANET ADC Module
     :backlinks: none
     :depth: 3
 
-Lorem ipsum...
+This module provides a Service that will read and process the data coming from the ADC 
+on your SOMANET device. Up to 2 clients could retrieve data from the Service
+through interfaces.
+
+When running the ADC Service, the **Reference Frequency** of the tile where the Service is
+allocated will be automatically changed to **250MHz**.
+
+The Hall Service should always run over an **IFM tile** so it can access the ports to
+your SOMANET IFM device.
+
 
 How to use
 ==========
 
-Lorem ipsum...
+.. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
+          
+1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
+
+::
+
+ USED_MODULES = module_adc etc etc
+
+.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+          This will help solving internal dependancy issues.
+
+2. Include the Service header in your app. 
+
+3. Instanciate the ports where the Service will be accessing the ADC chip signals. 
+
+4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+
+5. At your IFM tile, instanciate the Service. 
+
+6. At whichever other core, now you can perform calls to the ADC Service through the interfaces connected to it.
+
+.. code-block:: C
+
+        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
+        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
+                                        //(select your board support files according to your device)
+
+        #include <adc_service.h> // 2
+
+        ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS; // 3
+
+        int main(void)
+        {
+            interface ADCInterface i_adc[2] // 4
+
+            par
+            {
+                on tile[APP_TILE]: i_adc[0].get_currents(); // 6
+
+                on tile[IFM_TILE]: adc_service(adc_ports, null, i_adc) // 5
+
+            }
+
+            return 0;
+        }
 
 API
 ===

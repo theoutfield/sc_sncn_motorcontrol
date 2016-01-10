@@ -1,113 +1,87 @@
 ===============================================
-SOMANET Quadrature Encoder Interface Component
+SOMANET Quadrature Encoder Interface Module
 ===============================================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-Lorem ipsum...
+This module provides a Service that will read and process the data coming from your 
+Incremental Quadrature Encoder Feedback Sensor. Up to 5 clients could retrieve data from the Service
+through an interface.
+
+When running the QEI Service, the **Reference Frequency** of the tile where the Service is
+allocated will be automatically changed to **250MHz**.
+
+The Hall Service should always run over an **IFM tile** so it can access the ports to
+your SOMANET IFM device.
 
 .. image:: images/core-diagram-qe-interface.png
    :width: 50%
 
+
 How to use
 ==========
 
-Getting position and velocity information from your Quadrature Encoder
-----------------------------------------------------------------------
+.. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
+          
+.. note:: You might find useful the **Encoder Interface Test** example app, which illustrates the use of this module. 
 
-Step 1: Include the required modules & headers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Make sure you Makefile contains at least these module
+1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
-.. code-block:: C
+::
 
-    USED_MODULES = module_blocks module_qei module_motor module_motorcontrol_common module_board-support
+ USED_MODULES = module_qei etc etc
 
-Make sure you include these files in your main.xc file
+.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+          This will help solving internal dependancy issues.
 
-.. code-block:: C
+2. Include the Service header in your app. 
 
-    #include <xs1.h>
-    #include <platform.h>
-    #include <ioports.h>
-    #include <qei_client.h>
-    #include <qei_server.h>
+3. Instanciate the ports where the Service will be reading the Encoder Sensor feedback signals. 
 
+4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
 
-Step 2: Define required channels
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-A channel is required to transport data from the qei_server task to your custom client's task
+5. At your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration.
+
+6. At whichever other core, now you can perform calls to the Encoder Service through the interfaces connected to it.
 
 .. code-block:: C
 
-	int main(void)
-	{
-		chan c_qei
-		...
-	}
+        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
+        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
+                                        //(select your board support files according to your device)
 
+        #include <qei_service.h> // 2
 
-Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Quadrature Encoder Interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS; // 3
 
-.. important:: Please note that all these tasks must be executed on a tile with access to I/O of a Synapticon SOMANET IFM Drive DC board. 
-
-.. code-block:: C
-
-    int main(void)
-    {
-    ...
-
-        par
+        int main(void)
         {
-        ...
+            interface QEIInterface i_qei[5]; // 4
 
-            on tile[IFM_TILE]:
+            par
             {
-                par
+                on tile[APP_TILE]: i_qei[0].get_qei_position(); // 6
+  
+                on tile[IFM_TILE]:
                 {
-                    /* QEI Server */
+
+                    /* Quadrature encoder sensor Service */
                     {
-                        qei_par qei_params;
-                        run_qei(c_qei, NULL, NULL, NULL, NULL, NULL, p_ifm_encoder, qei_params);
+                        QEIConfig qei_config; // 5
+                        qei_config.signal_type = QEI_RS422_SIGNAL;              
+                        qei_config.index_type = QEI_WITH_INDEX;                 
+                        qei_config.ticks_resolution = 4000;                     
+                        qei_config.sensor_polarity = QEI_POLARITY_NORMAL;       
+
+                        qei_service(qei_ports, qei_config, i_qei);
                     }
                 }
             }
-            ...
 
+            return 0;
         }
-
-        return 0;
-    }
-
-
-Getting velocity/position information from sensor server
---------------------------------------------------------
-While the QEI server is running and constantly monitoring, the velocity and position can be aquired by a simple API call:
-
-.. code-block:: C
-
-    int main(void)
-    {
-    ...
-
-        par
-        {
-            on tile[0]: // Can be any tile
-            {
-                /* Get encoder absolute position */
-                {position, direction} = get_qei_position_absolute(c_qei);
-
-                /* Get current velocity */
-                velocity = get_qei_velocity(c_qei,);
-            }
-        }
-    ...
-
-    }
-    
 
 API
 ===
