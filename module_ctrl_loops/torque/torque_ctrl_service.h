@@ -40,7 +40,7 @@ interface TorqueControlInterface{
      *        on the SOMANET IFM DC device that you use and
      *        the torque constant of your motor.
      *
-     * @param in_torque New target torque [-8191:8192].
+     * @param in_torque New target torque [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
      */
     void set_torque(int in_torque);
 
@@ -50,14 +50,14 @@ interface TorqueControlInterface{
      *        on the SOMANET IFM DC device that you use and
      *        the torque constant of your motor.
      *
-     * @return Current torque [-8191:8192].
+     * @return Current torque [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
      */
     int get_torque();
 
     /**
      * @brief Getter for the current target torque in the controller.
      *
-     * @param Current target torque [-8191:8192].
+     * @param Current target torque [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
      */
     int get_target_torque();
 

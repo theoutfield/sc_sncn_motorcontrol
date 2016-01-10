@@ -42,7 +42,7 @@ typedef struct {
 #include <hall_service.h>
 #include <qei_service.h>
 
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 
 /**
  * @brief Structure type to define the ports to manage the fet-driver in your IFM SOMANET device (if applicable).

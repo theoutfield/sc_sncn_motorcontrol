@@ -7,7 +7,7 @@
 
 #include <refclk.h>
 #include <xscope.h>
-#include <internal_config.h>
+#include <mc_internal_constants.h>
 #include <profile.h>
 #include <profile_control.h>
 

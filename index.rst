@@ -50,8 +50,7 @@ This is the complete list of modules currently included in the **SOMANET Motor C
 * `Watchdog Module <module_watchdog/doc/index>`_ : Driver for the Watchdog on your IFM DC board.
 * `GPIO Module <module_gpio/doc/index>`_ : Contains a service to handle the external digital input/outputs of your board.
 * `Motorcontrol Module <module_motorcontrol/doc/index>`_ : Provide a service to commutate BLDC motors and drive Brushed DC motors.
-* `Motorcontrol Common Module <module_motorcontrol_common/doc/index>`_ : Main definitions and constants for the software. 
-* `Blocks Module <module_blocks/doc/index>`_ : Contains software useful for signal filtering.
+* `Miscellaneous Module <module_misc/doc/index>`_ : Contains constants and utilities used by the library.
 * `Control Loops Module <module_ctrl_loops/doc/index>`_ : Provide services for position, velocity and control loops. 
 * `Profile Module <module_profile/doc/index>`_ : Contains software for profile ramps generation.
 
