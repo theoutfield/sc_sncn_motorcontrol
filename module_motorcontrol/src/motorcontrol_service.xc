@@ -41,6 +41,9 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[5])
 {
+    //Set freq to 250MHz (always needed for proper timing)
+    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+
     HallConfig hall_config;
     QEIConfig qei_config;
     timer t;

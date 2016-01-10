@@ -7,8 +7,14 @@ SOMANET Hall Sensor Module
     :depth: 3
 
 This module provides a Service that will read and process the data coming from your 
-Feedback Hall Sensor. A client that needs this data could retrieve it from the service
-through a common interface.
+Feedback Hall Sensor. Up to 5 clients could retrieve data from the Service
+through interfaces.
+
+When running the Hall Service, the **Reference Frequency** of the tile where the Service is
+allocated will be automatically changed to **250MHz**.
+
+The Hall Service should always run over an **IFM tile** so it can access the ports to
+your SOMANET IFM device.
 
 .. image:: images/core-diagram-hall-interface.png
    :width: 50%
@@ -17,11 +23,10 @@ How to use
 ==========
 
 .. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
-          You might find useful the **Hall Sensor Test** example app, which illustrates the use of this module. 
+          
+.. note:: You might find useful the **Hall Sensor Test** example app, which illustrates the use of this module. 
 
-Service Initialization
-----------------------
-First add all the **SOMANET Motor Control Library** modules to your app Makefile.
+1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
 ::
 
@@ -30,11 +35,45 @@ First add all the **SOMANET Motor Control Library** modules to your app Makefile
 .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
 
-Include the Service header in your app
+2. Include the Service header in your app. 
+
+3. Instanciate the ports where the Service will be reading the Hall Sensor feedback signals. 
+
+4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+
+5. At your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration.
+
+6. At whichever other core, now you can perform calls to the Hall Service through the interfaces connected to it.
 
 .. code-block:: C
 
- #include <hall_service.h>
+        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
+        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
+                                        //(select your board support files according to your device)
+
+        #include <hall_service.h> // 2
+
+        HallPorts hall_ports = SOMANET_IFM_HALL_PORTS; // 3
+
+        int main(void)
+        {
+            interface HallInterface i_hall[5]; // 4
+
+            par
+            {
+                on tile[APP_TILE]: i_hall[0].get_hall_position(); // 6
+
+                on tile[IFM_TILE]:
+                {
+                    HallConfig hall_config; // 5
+                    hall_config.pole_pairs = 1;
+
+                    hall_service(hall_ports, hall_config, i_hall);
+                }
+            }
+
+            return 0;
+        }
 
 API
 ===

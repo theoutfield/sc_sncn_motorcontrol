@@ -1,20 +1,21 @@
 ==================================
-SOMANET BLDC Motorcontrol Module
+SOMANET BLDC Motor Control Module
 ==================================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-Like shown in the core diagram below, 4 timing critical task are executed on the SOMANET IFM Tile:
+This module provides a Service that will let you spin at a desired voltage Brushed DC and BLDC motors
+by applying sinusodial commutation. Up to 5 clients can control and communicate with the Service over interfaces.
 
-* **Commutation Server** - Executes sinusoidal commutation software
-* **PWM Server** - Generates PWM signals
-* **Hall Server** - Delivers rotor angle information required for sinusoidal commutation
-* **Watchdog Server** - Provides WDT (Watchdog timer) functionality
+The Service will require of other modules running parallely, such as PWM, Hall and Watchdog Services.
 
-As shown, custom controllers should run in a different tile to avoid influencing the performance of motor control. Please refer to the :ref:`commutation_programming_label`
+When running the Motorcontrol Service, the **Reference Frequency** of the tile where the Service is
+allocated will be automatically changed to **250MHz**.
 
+The Motorcontrol Service should always run over an **IFM tile** so it can access the ports to
+your SOMANET IFM device.
 
 .. figure:: images/core-diagram-commutation.png
    :width: 60%
@@ -26,136 +27,94 @@ As shown, custom controllers should run in a different tile to avoid influencing
 How to use
 ===========
 
-Running the commutation server
-------------------------------
+.. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
+          
+.. note:: You might find useful the **BLDC/Brushed DC Motor Control Demo** example apps, which illustrate the use of this module. 
 
-Step 1: Include the required headers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
-.. code-block:: C
+::
 
-    #include <xs1.h>
-    #include <platform.h>
-    #include <ioports.h>
-    #include <hall_server.h>
-    #include <pwm_service_inv.h>
-    #include <commutation_server.h>
-    #include <refclk.h>
-    #include <drive_modes.h>
-    #include <statemachine.h>
-    #include <mc_internal_constants.h>
-    #include <bldc_motor_config.h>
+ USED_MODULES = module_motorcontrol etc etc
 
-Step 2: Define the clocks
-^^^^^^^^^^^^^^^^^^^^^^^^^
+.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+          This will help solving internal dependancy issues.
 
-.. code-block:: C
+2. Properly instanciate **PWM**, **Hall** and **Watchdog** Services.
 
-    on tile[IFM_TILE]: clock clk_adc = XS1_CLKBLK_1;
-    on tile[IFM_TILE]: clock clk_pwm = XS1_CLKBLK_REF;
+3. Include the Service header in your app. 
 
-Step 3: Define motor control channels
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4. Instanciate the ports where the Service will be accessing the Fet Driver signals. 
+
+5. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+
+6. At your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration and provide the PWM, Hall and Watchdog interfaces or channels.
+
+7. At whichever other core, now you can perform calls to the Motorcontrol Service through the interfaces connected to it.
 
 .. code-block:: C
 
-	int main(void)
-	{
-		chan c_qei_p1;                                                          // qei channel
-		chan c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6;  // hall channels
-		chan c_commutation_p1, c_commutation_p2, c_commutation_p3, c_signal;    // commutation channels
-		chan c_pwm_ctrl, c_adctrig;                                             // pwm channels
-		chan c_watchdog;
+        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
+        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
+                                        //(select your board support files according to your device)
 
-		...
-	}
+        #include <pwm_service.h>
+        #include <hall_service.h>
+        #include <watchdog_service.h>
+        #include <motorcontrol_service.h> // 3
 
+        PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
+        WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
+        HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+        FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS; // 4
 
-Step 4: Run required tasks/servers: PWM, Commutation, Watchdog and Hall interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        int main(void) {
 
-.. important:: Please note that all these tasks must be executed on a tile with access to I/O of a Synapticon SOMANET IFM Drive DC board. 
+            chan c_pwm_ctrl; 
 
-.. code-block:: C
+            interface WatchdogInterface i_watchdog[2];
+            interface HallInterface i_hall[5];
+            interface MotorcontrolInterface i_motorcontrol[5]; // 5
 
-    int main(void)
-    {
-
-    ...
-
-        par
-        {
-
-        	...
-
-            on tile[IFM_TILE]:
+            par
             {
-                par
+
+                on tile[APP_TILE]: i_motorcontrol[0].set_voltage(100); // 7
+
+
+                on tile[IFM_TILE]:
                 {
-                    /* PWM Loop */
-                    do_pwm_inv_triggered(c_pwm_ctrl, c_adctrig, p_ifm_dummy_port,\
-                            p_ifm_motor_hi, p_ifm_motor_lo, clk_pwm);
-    
-                    /* Motor Commutation loop */
+                    par
                     {
-                        hall_par hall_params;
-                        qei_par qei_params;
-                        commutation_par commutation_params;
-                        commutation_sinusoidal(c_hall_p1,  c_qei_p1, c_signal, c_watchdog,  \
-                                c_commutation_p1, c_commutation_p2, c_commutation_p3, c_pwm_ctrl,\
-                                p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, p_ifm_ff1, p_ifm_ff2,\
-                                hall_params, qei_params, commutation_params);
-                    }
-    
-                    /* Watchdog Server */
-                    run_watchdog(c_watchdog, p_ifm_wd_tick, p_ifm_shared_leds_wden);
-    
-                    /* Hall Server */
-                    {
-                        hall_par hall_params;
-                        run_hall(c_hall_p1, c_hall_p2, c_hall_p3, c_hall_p4, c_hall_p5, c_hall_p6, p_ifm_hall, hall_params); // channel priority 1,2..6
+                        pwm_service( pwm_ports, c_pwm_ctrl);
+
+                        watchdog_service(wd_ports, i_watchdog);
+
+                        {
+                            HallConfig hall_config;
+                            hall_config.pole_pairs = 1;
+
+                            hall_service(hall_ports, hall_config, i_hall);
+                        }
+
+                        {
+                            MotorcontrolConfig motorcontrol_config; // 6
+                            motorcontrol_config.motor_type = BLDC_MOTOR;
+                            motorcontrol_config.commutation_sensor = HALL_SENSOR;
+                            motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                            motorcontrol_config.hall_offset[0] =  0;
+                            motorcontrol_config.hall_offset[1] = 0;
+                            motorcontrol_config.commutation_loop_period =  40;
+
+                            motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                                    c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);
+                        }
                     }
                 }
             }
-    
+
+            return 0;
         }
-
-
-        ...
-    
-
-        return 0;
-    }
-
-
-Applying output voltage to the motor
--------------------------------------
-A motor voltage can be applied by a simple function call:
-
-.. code-block:: C
-
-    int main(void)
-    {
-
-    ...
-
-        par
-        {
-            on tile[0]: // Can be any tile
-            {
-                //Set commutation value to 100
-                set_commutation_sinusoidal(c_commutation_p1, 100);
-            }
-        }
-
-    ...
-
-    }
-
-.. tip:: Start by applying lower values like e.g. 20 before causing any demage to your motor or driver.
-
-.. note:: The commutation value's range is -13739 to 13739
-
 
 API
 ====

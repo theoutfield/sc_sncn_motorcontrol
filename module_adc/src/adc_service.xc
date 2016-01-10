@@ -5,8 +5,11 @@
 
 void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2]){
 
+    //Set freq to 250MHz (always needed for proper timing)
+    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+
     if(isnull(c_trigger)){
-        // There is not triggering by PWM
+        // There is not triggered sampling
         chan c_dummy;
 
         if(!isnull(adc_ports.ad7949_ports.clk)){
