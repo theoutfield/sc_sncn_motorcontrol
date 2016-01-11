@@ -12,7 +12,7 @@
 #define OUTPUT_PORT          2
 #define NUMBER_OF_IO_PORTS   4    /**< Defines number of Digital IOs available. */
 
-void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2])
+void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[1])
 {
     //Set freq to 250MHz (always needed for proper timing)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
