@@ -16,7 +16,6 @@ therefore they must be instanciated in a different tile from the remaining Motor
 How to use
 ==========
 
-
 .. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
           
 .. seealso:: You might find useful the **BLDC/Brushed DC Position, Velocity and Torque Control Demo** example apps, which illustrate the use of this module. 
@@ -119,6 +118,8 @@ How to use
 
             return 0;
         }
+
+.. note:: Similary to this example, you can repeat the same steps for Velocity and Torque Control Loops. 
 
 API
 ===
