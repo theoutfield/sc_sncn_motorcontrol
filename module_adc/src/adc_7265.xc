@@ -157,8 +157,6 @@ void configure_adc_ports_7265( // Configure all ADC data ports
 
 void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config)
 {
-    printstrln("     ADC Server Starts");
-
     int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
     unsigned char sampling_port = 0;
 
@@ -254,8 +252,6 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
 void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, chanend c_trig)
 {
-    printstrln("     ADC Server Starts");
-
     timer t;
     unsigned int ts;
     unsigned char ct;

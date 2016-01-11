@@ -148,16 +148,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
             case i_motorcontrol[int i].set_sensor(int new_sensor):
                     sensor_select = new_sensor;
                     break;
-/*
-            case i_motorcontrol[int i].enable_fets():
-                    shutdown = 0;
-                    voltage = 0;
-                    break;
 
-            case i_motorcontrol[int i].disable_fets():
-                    shutdown = 1;
-                    break;
-                    */
             case i_motorcontrol[int i].set_fets_state(int new_state):
 
                     if(new_state == 0){

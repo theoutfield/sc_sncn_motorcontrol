@@ -134,7 +134,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
          qei_crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK )/10;
     }
 
-    printstrln("*************************************\n    VELOCITY CONTROLLER STARTING\n*************************************");
+    printstr(">>   SOMANET VELOCITY CONTROL SERVICE STARTING...\n");
 
     t :> ts;
     init_state = INIT;

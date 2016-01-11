@@ -98,7 +98,7 @@ How to use
                             MotorcontrolConfig motorcontrol_config; // 6
                             motorcontrol_config.motor_type = BLDC_MOTOR;
                             motorcontrol_config.commutation_sensor = HALL_SENSOR;
-                            motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                            motorcontrol_config.bldc_winding_type = STAR_WINDING;
                             motorcontrol_config.hall_offset[0] =  0;
                             motorcontrol_config.hall_offset[1] = 0;
                             motorcontrol_config.commutation_loop_period = 40;
