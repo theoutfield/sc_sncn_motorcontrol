@@ -16,8 +16,8 @@ Lorem ipsum...
 API
 ===
 
-Types
------
+Global Types
+------------
 
 .. doxygenstruct:: ProfilerConfig
 
