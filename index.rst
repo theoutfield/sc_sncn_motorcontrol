@@ -35,8 +35,7 @@ Modules
 	Watchdog Module <module_watchdog/doc/index>
 	GPIO Module <module_gpio/doc/index>
 	Motorcontrol Module <module_motorcontrol/doc/index>
-	Motorcontrol Common Module <module_motorcontrol_common/doc/index>
-	Blocks Module <module_blocks/doc/index>
+	Miscellaneous Module <module_misc/doc/index>
 	Control Loops Module <module_ctrl_loops/doc/index>
 	Profile Module <module_profile/doc/index>
 	
