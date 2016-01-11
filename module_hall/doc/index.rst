@@ -13,7 +13,7 @@ through interfaces.
 When running the Hall Service, the **Reference Frequency** of the tile where the Service is
 allocated will be automatically changed to **250MHz**.
 
-The Hall Service should always run over an **IFM tile** so it can access the ports to
+The Hall Service should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
 
 .. image:: images/core-diagram-hall-interface.png

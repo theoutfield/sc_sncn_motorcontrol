@@ -39,7 +39,7 @@ void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2])
 
         select
         {
-        case i_gpio[int i].config_dio_input(int port_number, int input_type, int switch_type) -> int out_config_state:
+        case i_gpio[int i].config_dio_input(int port_number, int input_type, SwitchType switch_type) -> int out_config_state:
 
                 if (input_type != SWITCH_INPUT_TYPE && input_type != GP_INPUT_TYPE) {
                     out_config_state = 0;

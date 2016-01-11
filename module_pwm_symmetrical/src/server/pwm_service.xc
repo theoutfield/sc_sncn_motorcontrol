@@ -102,7 +102,7 @@ void pwm_service( PwmPorts &ports, chanend c_pwm)
 
 extern unsigned pwm_op_inv_trig( unsigned buf, buffered out port:32 p_pwm[], buffered out port:32 (&?p_pwm_inv)[], chanend c, unsigned control, chanend c_trig, in port dummy_port );
 
-void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig,chanend c_pwm)
+void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm)
 {
 
     //Set Tile Ref Freq to 250MHz
