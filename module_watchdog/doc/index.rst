@@ -20,7 +20,7 @@ How to use
 
 .. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
           
-.. note:: You might find useful the **Watchdog Demo** example app, which illustrates the use of this module. 
+.. seealso:: You might find useful the **Watchdog Demo** example app, which illustrates the use of this module. 
 
 1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
