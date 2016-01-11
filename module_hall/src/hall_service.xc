@@ -10,8 +10,6 @@
 #include <refclk.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <refclk.h>
-#include <stdio.h>
 #include <print.h>
 
 #include <mc_internal_constants.h>
@@ -39,7 +37,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
         return;
     }
 
-    printf("*************************************\n    HALL SENSOR SERVER STARTING\n*************************************\n");
+    printstr(">>   SOMANET HALL SENSOR SERVICE STARTING...\n");
 
     #define defPeriodMax 1000000  //1000msec
     timer tx, tmr;

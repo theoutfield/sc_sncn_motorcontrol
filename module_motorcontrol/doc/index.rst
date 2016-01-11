@@ -78,7 +78,6 @@ How to use
 
                 on tile[APP_TILE]: i_motorcontrol[0].set_voltage(100); // 7
 
-
                 on tile[IFM_TILE]:
                 {
                     par
@@ -95,16 +94,16 @@ How to use
                         }
 
                         {
-                            MotorcontrolConfig motorcontrol_config; // 6
+                            MotorcontrolConfig motorcontrol_config; 
                             motorcontrol_config.motor_type = BLDC_MOTOR;
                             motorcontrol_config.commutation_sensor = HALL_SENSOR;
-                            motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
+                            motorcontrol_config.bldc_winding_type = STAR_WINDING;
                             motorcontrol_config.hall_offset[0] =  0;
                             motorcontrol_config.hall_offset[1] = 0;
-                            motorcontrol_config.commutation_loop_period = 40;
+                            motorcontrol_config.commutation_loop_period = 60;
 
                             motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                                    c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);
+                                                    c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol); // 6
                         }
                     }
                 }

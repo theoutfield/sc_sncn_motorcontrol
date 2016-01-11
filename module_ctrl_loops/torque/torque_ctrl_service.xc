@@ -231,7 +231,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
     int fet_state = 0;
     int activate = 0;
 
-    printstr("*************************************\n    TORQUE CONTROLLER STARTING\n*************************************\n");
+    printstr(">>   SOMANET TORQUE CONTROL SERVICE STARTING...\n");
 
     filter_length_variance = filter_length/hall_config.pole_pairs;
     if (filter_length_variance < 10) {
