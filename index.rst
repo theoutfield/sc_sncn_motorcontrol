@@ -1,3 +1,5 @@
+.. _somanet_motor_control:
+
 SOMANET Motor Control Library
 ==============================
 
@@ -123,7 +125,7 @@ In order to learn how to proceed with the configuration of the motors we highly 
 Dependencies
 ------------
 
-To run your **Motorcontrol library** it is neccesary to include **SOMANET Base Library**.
+To run your **Motorcontrol library** it is neccesary to include :ref:`SOMANET Base <somanet_base>`.
 
 .. cssclass:: downloadable-button 
 
