@@ -58,7 +58,11 @@ How to use
 
             par
             {
-                on tile[APP_TILE]: i_adc[0].get_currents(); // 6
+                on tile[APP_TILE]: 
+                {
+                        int foo, bar;       
+                        {foo, bar} = i_adc[0].get_currents(); // 6
+                }
 
                 on tile[IFM_TILE]: adc_service(adc_ports, null, i_adc) // 5
 
