@@ -6,7 +6,11 @@
 
 #pragma once
 
-enum { ACTIVE_HIGH=1, ACTIVE_LOW };
+/**
+ * @brief .
+ */
+typedef enum { ACTIVE_HIGH=1, ACTIVE_LOW }SwitchType;
+
 enum { HOMING_NEGATIVE_SWITCH=1, HOMING_POSITIVE_SWITCH };
 
 #ifdef __XC__
@@ -31,7 +35,7 @@ interface GPIOInterface{
      * @return 0 - Error
      *         1 - Success
      */
-    int config_dio_input(int gpio_port, int input_type, int switch_type);
+    int config_dio_input(int gpio_port, int input_type, SwitchType switch_type);
 
     /**
      * @brief Disables further configuration of any GPIO.

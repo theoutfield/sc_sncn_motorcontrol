@@ -16,23 +16,25 @@ Lorem ipsum...
 API
 ===
 
-Position Profile
+Types
+-----
+
+.. doxygenstruct:: ProfilerConfig
+
+Position Profiler
 -----------------
 
-.. doxygenstruct:: ProfilePositionConfig
 .. doxygenfunction:: init_position_profiler
 .. doxygenfunction:: set_profile_position
 
-Velocity Profile
-----------------
+Velocity Profiler
+-----------------
 
-.. doxygenstruct:: ProfileVelocityConfig
 .. doxygenfunction:: init_velocity_profiler
 .. doxygenfunction:: set_profile_velocity
 
-Torque Profile
---------------
+Torque Profiler
+---------------
 
-.. doxygenstruct:: ProfileTorqueConfig
 .. doxygenfunction:: init_torque_profiler
 .. doxygenfunction:: set_profile_torque

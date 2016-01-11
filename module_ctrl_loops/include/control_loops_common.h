@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @brief Denominator for PID contants. The values set by the user for such constants will be divided by this value.
+ * @brief Denominator for PID contants. The values set by the user for such constants will be divided by this value (10000 by default).
  */
 #define PID_DENOMINATOR 10000.0
 
