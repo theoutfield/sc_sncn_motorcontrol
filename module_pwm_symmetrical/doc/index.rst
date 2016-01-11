@@ -90,7 +90,7 @@ Types
 .. doxygenstruct:: PwmPorts
 
 Server
------
+------
 
 .. doxygenfunction:: pwm_service
 .. doxygenfunction:: pwm_triggered_service
