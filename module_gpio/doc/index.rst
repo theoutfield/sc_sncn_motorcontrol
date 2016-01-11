@@ -7,7 +7,7 @@ SOMANET GPIO Module
     :depth: 3
 
 This module provides a Service that will configure, read and write
-the general purpose IO pins on your SOMANET device. Up to 2 clients
+the general purpose IO pins on your SOMANET device. A client
 could retrieve data from the Service through interfaces. This Service
 is very useful for certain applications, such as Motor Control over
 a communication protocol (e.g. EtherCAT).
@@ -57,7 +57,7 @@ USED_MODULES = module_gpio module_hall module_pwm_symmetrical module_adc module_
         int main(void)
         {
 
-            interface GPIOInterface i_gpio[2]; // 4
+            interface GPIOInterface i_gpio[1]; // 4
         
             par
             {
