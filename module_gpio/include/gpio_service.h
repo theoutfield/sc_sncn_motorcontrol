@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @brief .
+ * @brief Type definition for port configuration.
  */
 typedef enum { ACTIVE_HIGH=1, ACTIVE_LOW }SwitchType;
 

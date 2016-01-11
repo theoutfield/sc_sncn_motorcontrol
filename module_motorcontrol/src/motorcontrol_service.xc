@@ -61,7 +61,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
         return;
     }
 
-    printstr("*************************************\n    MOTORCONTROL SERVICE STARTING\n*************************************\n");
+    printstr(">>   SOMANET MOTORCONTROL SERVICE STARTING...\n");
 
     //This while + select is just to make it combinable
     while(1){
