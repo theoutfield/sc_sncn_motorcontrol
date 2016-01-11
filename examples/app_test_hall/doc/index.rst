@@ -1,6 +1,6 @@
-==================
+=========================
 Feedback Hall Sensor Demo
-==================
+=========================
 
 .. contents:: In this document
     :backlinks: none

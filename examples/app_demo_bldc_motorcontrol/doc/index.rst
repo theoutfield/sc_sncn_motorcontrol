@@ -1,6 +1,6 @@
-==================
+=======================
 BLDC Motor Drive Demo
-==================
+=======================
 
 .. contents:: In this document
     :backlinks: none

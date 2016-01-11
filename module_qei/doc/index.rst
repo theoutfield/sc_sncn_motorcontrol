@@ -87,7 +87,7 @@ API
 ===
 
 Definitions
------
+-----------
 
 .. doxygendefine:: QEI_SENSOR
 
