@@ -34,14 +34,44 @@ USED_MODULES = module_gpio module_hall module_pwm_symmetrical module_adc module_
 
 2. Include the Service header in your app. 
 
-3. Instanciate the ports where the Service will be reading the Hall Sensor feedback signals. 
+3. Instanciate the ports where the Service will be accessing the GPIO pins. 
 
 4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration.
+5. At your IFM tile, instanciate the Service. 
 
-6. At whichever other core, now you can perform calls to the Hall Service through the interfaces connected to it.
+6. At whichever other core, now you can perform calls to the GPIO Service through the interfaces connected to it.
 
+.. code-block:: C
+
+        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
+        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
+                                        //(select your board support files according to your device)
+
+        #include <gpio_service.h> // 2
+
+        port gpio_ports[4] = {  SOMANET_IFM_GPIO_D0,
+                                SOMANET_IFM_GPIO_D1,
+                                SOMANET_IFM_GPIO_D2,
+                                SOMANET_IFM_GPIO_D3 }; // 3
+        int main(void)
+        {
+
+            interface GPIOInterface i_gpio[2]; // 4
+        
+            par
+            {
+                on tile[APP_TILE]:
+                {
+                        i_gpio[0].config_dio_done(); // 6
+                        int foo = i_gpio[0].read_gpio(0);                        
+                }
+
+                on tile[IFM_TILE]: gpio_service(gpio_ports, i_gpio); // 5
+            }
+
+            return 0;
+        }    
 API
 ===
 
