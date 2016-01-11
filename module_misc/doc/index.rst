@@ -1,6 +1,6 @@
-======================
+============================
 SOMANET Miscellaneous Module 
-======================
+============================
 
 .. contents:: In this document
     :backlinks: none

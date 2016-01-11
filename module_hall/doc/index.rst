@@ -61,7 +61,7 @@ USED_MODULES = module_hall module_pwm_symmetrical module_adc module_ctrl_loops m
 
             par
             {
-                on tile[APP_TILE]: i_hall[0].get_hall_position(); // 6
+                on tile[APP_TILE]: int foo = i_hall[0].get_hall_position(); // 6
 
                 on tile[IFM_TILE]:
                 {
