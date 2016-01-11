@@ -308,6 +308,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol_common/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1245571842" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -747,6 +751,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol_common/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.700762534" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1193,6 +1201,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_motorcontrol_common/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1372212315" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
