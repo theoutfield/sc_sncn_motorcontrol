@@ -73,7 +73,7 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
         return;
     }
 
-    printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
+    printstr(">>   SOMANET ENCODER SENSOR SERVICE STARTING...\n");
 
     //Check if we are using a dc board with configurable qei port
     if(!isnull(encoder_ports.p_qei_config)){

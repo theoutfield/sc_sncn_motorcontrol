@@ -62,7 +62,7 @@ How to use
 
             par
             {
-                on tile[APP_TILE]: i_qei[0].get_qei_position(); // 6
+                on tile[APP_TILE]: int foo = i_qei[0].get_qei_position(); // 6
   
                 on tile[IFM_TILE]:
                 {
