@@ -105,7 +105,7 @@ void position_control_service(ControlConfig &position_control_config,
         error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
 
 
-    printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
+    printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
         actual_position = i_hall.get_hall_position_absolute();

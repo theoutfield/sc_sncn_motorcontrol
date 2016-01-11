@@ -28,7 +28,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
     int target_position = 16000;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
     int velocity        = 2000;         // rpm
     int acceleration    = 4000;         // rpm/s
-    int deceleration    = 4000;             // rpm/s
+    int deceleration    = 4000;         // rpm/s
 
     ProfilerConfig profiler_config;
     profiler_config.polarity = POLARITY;
@@ -141,7 +141,7 @@ int main(void)
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
-                    motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
+                    motorcontrol_config.commutation_sensor = HALL_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;

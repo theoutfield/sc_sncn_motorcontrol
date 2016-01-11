@@ -57,7 +57,7 @@ How to use
 
             par
             {
-                on tile[APP_TILE]: i_watchdog[1].start(); // 6
+                on tile[APP_TILE]: i_watchdog[0].start(); // 6
 
                 on tile[IFM_TILE]: watchdog_service(wd_ports, i_watchdog); // 5
             }

@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @brief .
+ * @brief Type definition for port configuration.
  */
 typedef enum { ACTIVE_HIGH=1, ACTIVE_LOW }SwitchType;
 
@@ -63,9 +63,9 @@ interface GPIOInterface{
  * @brief Service to manage the digital I/Os in your SOMANET device.
  *
  * @param gpio_ports[4] Array of ports to be managed.
- * @param i_gpio[2] Array of communication interfaces to handle up to 2 different clients.
+ * @param i_gpio[2] Array of communication interfaces to handle one client.
  *
  */
-void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2]);
+void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[1]);
 
 #endif

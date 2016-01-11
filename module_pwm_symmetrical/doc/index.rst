@@ -30,8 +30,6 @@ How to use
 
 .. seealso:: You might find useful the **PWM Symmetrical Demo** example app, which illustrates the use of this module. 
 
-Service Initialization
-----------------------
 1. First, add all the :ref:`**SOMANET Motor Control** <somanet_motor_control>` modules to your app Makefile.
 
 ::
