@@ -243,8 +243,6 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
 
-   printstrln("     ADC Server Starts");
-
     while (1)
     {
 #pragma ordered
@@ -351,8 +349,6 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
-
-   printstrln("     ADC Server Starts");
 
     while (1)
     {
