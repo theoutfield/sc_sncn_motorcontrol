@@ -35,5 +35,9 @@ interface AD7949Interface{
  *
  */
 void adc_ad7949(  interface ADCInterface server i_adc[2],
+                 AD7949Ports &adc_ports, CurrentSensorsConfig &current_sensor_config);
+
+
+void adc_ad7949_triggered(  interface ADCInterface server i_adc[2],
                  AD7949Ports &adc_ports, CurrentSensorsConfig &current_sensor_config,
                  chanend c_trig );

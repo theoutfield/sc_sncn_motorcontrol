@@ -20,8 +20,6 @@ your SOMANET IFM device.
 .. figure:: images/core-diagram-commutation.png
    :width: 60%
 
-   Custom control application core diagram
-
 .. _commutation_programming_label:
 
 How to use
@@ -29,13 +27,13 @@ How to use
 
 .. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
           
-.. note:: You might find useful the **BLDC/Brushed DC Motor Control Demo** example apps, which illustrate the use of this module. 
+.. seealso:: You might find useful the **BLDC/Brushed DC Motor Control Demo** example apps, which illustrate the use of this module. 
 
 1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
 ::
 
- USED_MODULES = module_motorcontrol etc etc
+ USED_MODULES = module_motorcontrol module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_profile module_qei module_watchdog module_board-support
 
 .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
@@ -71,7 +69,6 @@ How to use
         int main(void) {
 
             chan c_pwm_ctrl; 
-
             interface WatchdogInterface i_watchdog[2];
             interface HallInterface i_hall[5];
             interface MotorcontrolInterface i_motorcontrol[5]; // 5

@@ -26,63 +26,45 @@ Global Types
 
 .. doxygenstruct:: ControlConfig
 
-Position
---------
+Position Control Loop
+---------------------
 
-Position Types
-````````````````
-
-.. doxygenstruct:: CyclicSyncPositionConfig
-
-Position Service
-``````````````````
+Position Control Service
+````````````````````````
 
 .. doxygenfunction:: init_position_control
-.. doxygenfunction:: position_limit
-.. doxygenfunction:: set_position_csp
 .. doxygenfunction:: position_control_service
+.. doxygenfunction:: position_limit
 
-Position Interface
-```````````````````
+Position Control Interface
+``````````````````````````
 
 .. doxygeninterface:: PositionControlInterface
 
 
-Velocity
---------
-
-Velocity Types
-``````````````
-
-.. doxygenstruct:: CyclicSyncVelocityConfig
+Velocity Control Loop
+---------------------
 
 Velocity Service
-``````````````````
+````````````````
+
 .. doxygenfunction:: init_velocity_control
-.. doxygenfunction:: max_speed_limit
-.. doxygenfunction:: set_velocity_csv
 .. doxygenfunction:: velocity_control_service
+.. doxygenfunction:: max_speed_limit
 
 Velocity Interface
-````````````````````
+``````````````````
 
 .. doxygeninterface:: VelocityControlInterface
 
-Torque
-------
-
-Torque Types
-``````````````
-
-.. doxygenstruct:: CyclicSyncTorqueConfig
+Torque Control Loop
+-------------------
 
 Torque Service
 ````````````````
 .. doxygenfunction:: init_torque_control
-.. doxygenfunction:: torque_limit
-.. doxygenfunction:: set_torque_cst
 .. doxygenfunction:: torque_control_service
-.. doxygenfunction:: enable_adc
+.. doxygenfunction:: torque_limit
 
 Torque Interface
 ````````````````

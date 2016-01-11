@@ -92,6 +92,8 @@ interface ADC{
 #define ADC_TRIGGER_DELAY (QUART_PWM_MAX - ADC_TRIGGER_CORR) // MB~ Re-tune
 
 void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
+                    CurrentSensorsConfig &current_sensor_config);
+void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
                     CurrentSensorsConfig &current_sensor_config, chanend c_trig);
 
 /*****************************************************************************/
