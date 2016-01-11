@@ -1,6 +1,6 @@
-==================
+=======================
 Brushed DC Drive Demo
-==================
+=======================
 
 .. contents:: In this document
     :backlinks: none

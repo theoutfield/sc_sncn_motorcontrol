@@ -26,6 +26,7 @@ The library is spread over different modules which offer different functionaliti
 
 Modules
 --------
+
 .. toctree::
 	:maxdepth: 1
 	:hidden:
@@ -108,7 +109,7 @@ Examples
 	* `Brushed DC Velocity Control over analog Input <examples/app_demo_brushed_dc_ext_regulated/doc/index>`_: Example to control the speed of your Brushed DC motor over an analog input.
 
 Motor Control Quick Guides
---------------------
+---------------------------
 
 .. toctree::
 	:hidden:

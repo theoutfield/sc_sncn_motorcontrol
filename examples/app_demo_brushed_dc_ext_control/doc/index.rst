@@ -1,6 +1,6 @@
-==================
+================================================
 Brushed DC Velocity Control with a potentiometer
-==================
+================================================
 
 .. contents:: In this document
     :backlinks: none
