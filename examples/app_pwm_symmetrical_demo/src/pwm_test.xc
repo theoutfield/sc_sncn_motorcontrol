@@ -1,4 +1,4 @@
-#include <pwm_cli_inv.h>
+#include <pwm_service_client.h>
 
 #include <stdlib.h>
 
@@ -8,7 +8,6 @@
 
 /* Shared buffer for communication between PWM client and service */
 static t_pwm_control pwm_ctrl;
-
 
 /* Use PWM client API to send new values to the PWM service */
 void do_pwm_test(chanend c_pwm_ctrl)
@@ -27,21 +26,24 @@ void do_pwm_test(chanend c_pwm_ctrl)
     timer t;
     unsigned ts;
 
-    /* share buffer address with pwm service and send initial pwm values */
-    pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
-    update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm_values);
+    while(1){
 
-    t :> ts;
-    t when timerafter (ts + PWM_CLIENT_UPDATE_DELAY) :> void;
-
-    for (int i = 0; i < (3*num_data); ) {
-        pwm_values[0] = testdata[i++];
-        pwm_values[1] = testdata[i++];
-        pwm_values[2] = testdata[i++];
+        /* share buffer address with pwm service and send initial pwm values */
+        pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
         update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm_values);
 
-        ts += PWM_CLIENT_UPDATE_DELAY;
-        t when timerafter (ts) :> void;
+        t :> ts;
+        t when timerafter (ts + PWM_CLIENT_UPDATE_DELAY) :> void;
+
+        for (int i = 0; i < (3*num_data); ) {
+            pwm_values[0] = testdata[i++];
+            pwm_values[1] = testdata[i++];
+            pwm_values[2] = testdata[i++];
+            update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm_values);
+
+            ts += PWM_CLIENT_UPDATE_DELAY;
+            t when timerafter (ts) :> void;
+        }
     }
 
 }

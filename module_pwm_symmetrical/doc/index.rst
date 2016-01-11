@@ -13,6 +13,11 @@ every generated pulse (required sometimes for proper ADC sampling) and the other
 These PWM signals are intended to control both high- and low-side switches of three H-brigdes. 
 The three channels are center aligned which means that the outputs are symmetrical to the center of the pulses.
 
+When running the PWM Service, the **Reference Frequency** of the tile where the Service is allocated will be
+automatically changed to **250MHz**.
+
+The PWM Service should always run over an **IFM tile** so it can access the ports to your SOMANET IFM device.
+
 This module was originally created by XMOS and then reworked by Synapticon before being include into the SOMANET Motor Control Library.
 
 * `Original forked XMOS repository`_
@@ -22,70 +27,61 @@ How to use
 ==========
 
 .. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
-          You might find useful the **PWM Symmetrical Demo** example app, which illustrates the use of this module. 
+
+.. seealso:: You might find useful the **PWM Symmetrical Demo** example app, which illustrates the use of this module. 
 
 Service Initialization
 ----------------------
-First add all the **SOMANET Motor Control Library** modules to your app Makefile.
+1. First add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
 ::
 
- USED_MODULES = module_pwm_symmetrical etc etc
+ USED_MODULES = module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
+
 
 .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
 
-Include the Service header in your app
+2. Include the Service headers in your app, for Service and Client.
+3. Instanciate the ports where the Service will be outputting the PWM signals. 
+4. Inside your main function, declare the channels for Service-Client communication.
+5. At your IFM tile, instanciate the Service.
+6. At whichever other core, you can update your PWM outputs through a client call. 
+        But first you will need to initialize the communication by calling **pwm_share_control_buffer_address_with_server**.
 
 .. code-block:: C
 
- #include <pwm_service.h>
+        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
+        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
+                                        //(select your board support files according to your device)
 
-Declare the channels for Service-Client communication.
+        #include <pwm_service.h> // 2
+        #include <pwm_service_client.h>
 
-::
+        PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS; // 3
+       
+        int main (void)
+        {
+            chan c_pwm_ctrl; // 4         
+      
+            par {
 
- chan c_pwm_ctrl;
+                on tile[IFM_TILE]:
+                {
+                    static t_pwm_control pwm_ctrl; // 6 
+                    unsigned int pwm_values[3] = { 1000, 2000, 4000 };
 
-Configure the ports and clocks for your service. This configuration is defined within the **board support** files.
+                    pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
+                    update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm_values);
+                }
 
-::
+                on tile[IFM_TILE]: pwm_service(pwm_ports, c_pwm_ctrl); // 5
+            }
 
- PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
+            return 0;
+        }
 
-Add a new parallel core in your main app where the PWM Service will run.
-
-::
-
- on tile[IFM_TILE]: pwm_service(pwm_ports, c_pwm_ctrl);
-
-Using the Service
------------------
-
-Include the Service Client header in your app
-
-.. code-block:: C
-
- #include <pwm_service_client.h>
-
-Instanciate the shared control structure, array for the PWM target values. 
-Initialize the communication calling **pwm_share_control_buffer_address_with_server**.
-Then you can start updating your PWM outputs through client calls. 
-
-.. code-block:: C
-
-  on tile[IFM_TILE]: 
-  {
-        t_pwm_control pwm_ctrl;
-        unsigned int pwm[3] = {0, 0, 0};  
-
-        pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
-        update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
-  }
-
-
-
-.. note:: If you are interested in the use of the Triggered PWM Service, have a look at the **Torque Control Demo App**.
+.. seealso:: If you are interested in the use of the **Triggered PWM Service**, have a look at the **Torque Control Demo App**.
 
 API
 ===
