@@ -39,6 +39,8 @@ Quick How-to
 
     .. note:: Do not worry if you don't know how many pole pairs your motor has. You can always run the application and see on the **console outputs** how many **electrical revolutions** are contained in a mechanical motor revolution. **This number is the number of pole pairs in your motor**.
 
+    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the *hardware compatibility* at the library overview.
+
 6. Run the application enabling XScope (LINK TO TUTORIAL HOW TO RUN SOMANET APPLICATIONS)
 
 HERE WE SHOULD PROVIDE MAYBE LINKS TO THE FORUM OR SOME SUPPORT... IF SOMETHING GOES WRONG WHILE RUNNING THE APP
