@@ -1,6 +1,6 @@
-==================
+=====================
 Watchdog driver Demo
-==================
+=====================
 
 .. contents:: In this document
     :backlinks: none

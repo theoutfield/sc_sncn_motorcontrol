@@ -1,6 +1,6 @@
-==================
+====================
 PWM generation Demo
-==================
+====================
 
 .. contents:: In this document
     :backlinks: none
