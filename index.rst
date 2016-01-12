@@ -4,15 +4,23 @@ SOMANET Motor Control Library
 The **SOMANET Motor Control Library** gathers services and utilities to perform BLDC/BDC Motor Control using SOMANET devices.
 The library is spread over different modules which offer different functionalities:
 
-* Feedback Hall sensor support.
-* Feedback Encoder Interface support.  
+* BLDC and Brushed DC motors support.
+* Sinusoidal commutation.
+* PWM Switching frequency up to 18KHz.  
+* Hall Effect Feedback sensor support.
+* Incremental Encoder Interface support.  
 * Fully functional ADC driver.
 * Fully functional Watchdog driver.      
-* GPIO management support (for homing-related functions).
-* BLDC and Brushed DC motors support.
-* Sinusoidal commutation.      
-* Position, velocity, and torque control loops.
+* GPIO management support (for homing-related functions).    
+* Position, velocity, and torque control loops (up to 18KHz).
 * Profiles ramp generation support.
+
+Minimum Hardware requirements: 
+- 1x SOMANET **Core**.
+- 1x SOMANET **IFM**.
+Hardware Compatibility:
+- SOMANET Core: **C22**, **C21**.
+- SOMANET IFM: **DC 100**, **DC 300**, **DC 1000**, **DC 5000**.
 
 .. cssclass:: downloadable-button 
 
