@@ -8,7 +8,7 @@ SOMANET BLDC Torque Control Demo
     :backlinks: none
     :depth: 3
 
-The purpose of this app (app_demo_bldc_torque) is showing the use of the :ref:`Control Loops Module <module_ctrl_loops>` and :ref:`Profile Module <module_profile>` for Torque control of a BLDC motor. For that, it implements a simple app that will make your motor reach a desired target torque. A Hall Effect Feedback sensor will be used for commutation and, additionally, an Encoder Interface can be used for accurate position feedback. The app also will display over **XScope** the currents on phases B and C together with the target torque.
+The purpose of this app (app_demo_bldc_torque) is showing the use of the :ref:`Control Loops Module <module_ctrl_loops>` and :ref:`Profile Module <module_profile>` for Torque control of a BLDC motor. For that, it implements a simple app that will make your motor reach a desired target torque, first on one direction and then on the opposite one. A Hall Effect Feedback sensor will be used for commutation and, additionally, an Encoder Interface can be used for accurate position feedback. The app also will display over **XScope** the currents on phases B and C together with the target torque.
 
 * **Minimum Number of Cores**: 9
 * **Minimum Number of Tiles**: 2

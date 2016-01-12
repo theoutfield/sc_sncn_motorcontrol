@@ -102,12 +102,7 @@ Examples
 	Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>
 	Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>
 
-	Brushed DC Velocity Control over analog Input <examples/app_demo_brushed_dc_ext_regulated/doc/index>
 	Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index> 
-	
-	Slave Standalone Position Control Demo <examples/app_demo_bldc_position/doc_quickstart/quickstart>
-	Slave Standalone Velocity Control Demo <examples/app_demo_bldc_velocity/doc_quickstart/quickstart>
-	Slave Standalone Torque Control Demo <examples/app_demo_bldc_torque/doc_quickstart/quickstart>
 
 * **Low level functionality tests:**
 
@@ -130,7 +125,7 @@ Examples
 	* `Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index>`_: Simple example to make Position Control of your Brushed DC motor.
 	* `Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>`_: Simple example to make Velocity Control of your Brushed DC motor.
 	* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>`_: Simple example to make Torque Control of your Brushed DC motor.
-	* `Brushed DC Velocity Control over analog Input <examples/app_demo_brushed_dc_ext_regulated/doc/index>`_: Example to control the speed of your Brushed DC motor over an analog input.
+	
 
 Motor Control Quick Guides
 ---------------------------
