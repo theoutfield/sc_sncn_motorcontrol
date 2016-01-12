@@ -126,7 +126,7 @@ int main(void)
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
-                /* Quadrature encoder sensor Service */
+                /* Quadrature Encoder sensor Service */
                 {
                     QEIConfig qei_config;
                     qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;        // Encoder signal type (just if applicable)
