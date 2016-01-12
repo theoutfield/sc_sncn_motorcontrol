@@ -1,3 +1,5 @@
+.. _offset_commutation_tuning_demo:
+
 ============================================
 Helper for finding your Hall sensor offsets
 ============================================

@@ -1,3 +1,5 @@
+.. _brushed_dc_velocity_control_demo:
+
 =================================
 Brushed DC Velocity Control Demo
 =================================

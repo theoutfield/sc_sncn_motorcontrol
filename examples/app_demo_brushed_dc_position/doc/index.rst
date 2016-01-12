@@ -1,3 +1,5 @@
+.. _brushed_dc_position_control_demo:
+
 =================================
 Brushed DC Position Control Demo
 =================================
