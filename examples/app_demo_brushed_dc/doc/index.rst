@@ -1,3 +1,5 @@
+.. _brushed_dc_drive_demo:
+
 =======================
 Brushed DC Drive Demo
 =======================

@@ -1,3 +1,5 @@
+.. _watchdog_driver_demo:
+
 =====================
 Watchdog driver Demo
 =====================

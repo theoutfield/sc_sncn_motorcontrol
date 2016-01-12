@@ -1,6 +1,8 @@
-=========================
+.. _hall_demo:
+
+==========================================
 SOMANET Hall Effect Feecback Sensor Demo
-=========================
+==========================================
 
 .. contents:: In this document
     :backlinks: none
