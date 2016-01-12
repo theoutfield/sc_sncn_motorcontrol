@@ -10,7 +10,7 @@ SOMANET Watchdog Driver Demo
 
 The purpose of this app (app_demo_watchdog) is showing the use of the :ref:`Watchdog Module <module_watchdog>`. For that, it implements a simple app that disables the Watchdog ticking while spinning the motor. After that it renables the Watchdog chip operation again.
 
-* **Min. Nr. of cores**: 2
+* **Min. Nr. of cores**: 5
 * **Min. Nr. of tiles**: 2
 
 .. cssclass:: github
@@ -25,7 +25,7 @@ Quick How-to
 4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
 5. Open the **main.xc** within  the **app_demo_watchdog**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
 
-        .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the *hardware compatibility* at the library overview.
+           .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the **Hardware compatibility** section of the library. (LINK TO IT).
 
 6. Set the configuration for Motor Control and Hall Service.   (LINK TO HOW TO CONFIGURE) 
 
