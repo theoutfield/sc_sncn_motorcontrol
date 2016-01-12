@@ -1,3 +1,5 @@
+.. _bldc_motor_drive_demo:
+
 =======================
 BLDC Motor Drive Demo
 =======================

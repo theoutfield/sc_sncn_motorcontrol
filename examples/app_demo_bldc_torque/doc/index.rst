@@ -1,3 +1,5 @@
+.. _bldc_torque_control_demo:
+
 ============================
 BLDC Torque Control Demo
 ============================

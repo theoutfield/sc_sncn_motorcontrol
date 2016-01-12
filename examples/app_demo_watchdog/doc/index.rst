@@ -1,7 +1,8 @@
-.. _watchdog_demo:
-============================
+.. _watchdog_driver_demo:
+
+=====================
 SOMANET Watchdog Driver Demo
-============================
+=====================
 
 .. contents:: In this document
     :backlinks: none

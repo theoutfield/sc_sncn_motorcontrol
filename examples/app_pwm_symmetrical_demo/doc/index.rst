@@ -1,3 +1,5 @@
+.. _pwm_symmetrical_demo:
+
 ====================
 PWM generation Demo
 ====================
