@@ -1,6 +1,6 @@
-==================
+============================
 BLDC Position Control Demo
-==================
+============================
 
 .. contents:: In this document
     :backlinks: none

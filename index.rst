@@ -1,3 +1,5 @@
+.. _somanet_motor_control:
+
 SOMANET Motor Control Library
 ==============================
 
@@ -32,6 +34,7 @@ Hardware Compatibility:
 
 Modules
 --------
+
 .. toctree::
 	:maxdepth: 1
 	:hidden:
@@ -114,7 +117,7 @@ Examples
 	* `Brushed DC Velocity Control over analog Input <examples/app_demo_brushed_dc_ext_regulated/doc/index>`_: Example to control the speed of your Brushed DC motor over an analog input.
 
 Motor Control Quick Guides
---------------------
+---------------------------
 
 .. toctree::
 	:hidden:
@@ -131,7 +134,7 @@ In order to learn how to proceed with the configuration of the motors we highly 
 Dependencies
 ------------
 
-To run your **Motorcontrol library** it is neccesary to include **SOMANET Base Library**.
+To run your **Motorcontrol library** it is neccesary to include :ref:`SOMANET Base <somanet_base>`.
 
 .. cssclass:: downloadable-button 
 
