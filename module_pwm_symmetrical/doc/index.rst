@@ -79,7 +79,7 @@ How to use
             return 0;
         }
 
-.. seealso:: If you are interested in the use of the **Triggered PWM Service**, have a look at the :ref: BLDC Torque Control Demo App`<bldc_torque_control_demo>`.
+.. seealso:: If you are interested in the use of the **Triggered PWM Service**, have a look at the :ref:`BLDC Torque Control Demo App<bldc_torque_control_demo>`.
 
 API
 ===

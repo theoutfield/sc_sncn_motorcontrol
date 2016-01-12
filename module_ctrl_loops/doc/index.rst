@@ -16,17 +16,18 @@ therefore they must be instanciated in a different tile from the remaining Motor
 How to use
 ==========
 
-.. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
+.. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
 .. seealso:: 
     You might find useful the **BLDC/Brushed DC Position, Velocity and Torque Control Demo** example apps, which illustrate the use of this module: 
+    
     * :ref:`BLDC Position Control Demo <bldc_position_control_demo>`
     * :ref:`BLDC Position Control Demo <bldc_velocity_control_demo>`
     * :ref:`BLDC Torque Control Demo <bldc_torque_control_demo>`
     * :ref:`Brushed DC Position Control Demo <brushed_dc_position_control_demo>`
     * :ref:`Brushed DC Velocity Control Demo <brushed_dc_velocity_control_demo>`
 
-1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
     ::
 
