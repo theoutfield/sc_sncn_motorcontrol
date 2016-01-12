@@ -39,7 +39,7 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
     /* Set new target torque for profile torque control */
     set_profile_torque(target_torque, torque_slope, i_torque_control);
 
-    delay_seconds(5);
+    delay_seconds(3);
     target_torque = -100;
 
     /* Set new target torque for profile torque control */
@@ -50,7 +50,6 @@ PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
 int main(void)
@@ -60,7 +59,6 @@ int main(void)
 
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
-    interface HallInterface i_hall[5];
     interface QEIInterface i_qei[5];
     interface MotorcontrolInterface i_motorcontrol[5];
 
@@ -85,7 +83,7 @@ int main(void)
             torque_control_config.control_loop_period = CONTROL_LOOP_PERIOD; // us
 
             /* Control Loop */
-            torque_control_service(torque_control_config, i_adc[0], i_hall[1], i_qei[1], i_motorcontrol[0], i_torque_control);
+            torque_control_service(torque_control_config, i_adc[0], null, i_qei[1], i_motorcontrol[0], i_torque_control);
         }
 
         /* Currents monitoring in XScope */
@@ -101,7 +99,6 @@ int main(void)
                 xscope_int(TARGET_TORQUE, target_torque);
                 xscope_int(ACTUAL_TORQUE, actual_torque);
                 xscope_int(PHASE_B, phaseB);
-                xscope_int(PHASE_C, phaseC);
                 delay_microseconds(50);
             }
         }
@@ -123,14 +120,6 @@ int main(void)
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc);
 
-                /* Hall sensor Service */
-                {
-                    HallConfig hall_config;
-                    hall_config.pole_pairs = POLE_PAIRS;
-
-                    hall_service(hall_ports, hall_config, i_hall);
-                }
-
                 /* Quadrature encoder sensor Service */
                 {
                     QEIConfig qei_config;
@@ -145,15 +134,11 @@ int main(void)
                 /* Motor Commutation loop */
                 {
                     MotorcontrolConfig motorcontrol_config;
-                    motorcontrol_config.motor_type = BLDC_MOTOR;
-                    motorcontrol_config.commutation_sensor = HALL_SENSOR;
-                    motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] =  COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.motor_type = BDC_MOTOR;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
+                                            c_pwm_ctrl, null, i_qei[0], i_watchdog[0], i_motorcontrol);
                 }
             }
         }
