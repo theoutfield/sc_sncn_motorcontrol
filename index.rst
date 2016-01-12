@@ -18,11 +18,12 @@ The library is spread over different modules which offer different functionaliti
 * Profiles ramp generation support.
 
 Minimum Hardware requirements: 
-- 1x SOMANET **Core**.
-- 1x SOMANET **IFM**.
+* 1x SOMANET **Core**.
+* 1x SOMANET **IFM**.
+
 Hardware Compatibility:
-- SOMANET Core: **C22**, **C21**.
-- SOMANET IFM: **DC 100**, **DC 300**, **DC 1000**, **DC 5000**.
+* SOMANET Core: :ref:`C22 <core_c22>`, :ref:`C21 DX <core_c21_dx>`.
+* SOMANET IFM: :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 1000**, **DC 5000**.
 
 .. cssclass:: downloadable-button 
 
@@ -59,10 +60,10 @@ This is the complete list of modules currently included in the **SOMANET Motor C
 * `ADC Module <module_adc/doc/index>`_ : Driver for the ADC on your IFM DC board.
 * `Watchdog Module <module_watchdog/doc/index>`_ : Driver for the Watchdog on your IFM DC board.
 * `GPIO Module <module_gpio/doc/index>`_ : Contains a service to handle the external digital input/outputs of your board.
-* `Motorcontrol Module <module_motorcontrol/doc/index>`_ : Provide a service to commutate BLDC motors and drive Brushed DC motors.
-* `Miscellaneous Module <module_misc/doc/index>`_ : Contains constants and utilities used by the library.
+* `Motor Control Module <module_motorcontrol/doc/index>`_ : Provide a service to commutate BLDC motors and drive Brushed DC motors.
 * `Control Loops Module <module_ctrl_loops/doc/index>`_ : Provide services for position, velocity and control loops. 
 * `Profile Module <module_profile/doc/index>`_ : Contains software for profile ramps generation.
+* `Miscellaneous Module <module_misc/doc/index>`_ : Contains constants and utilities used by the library.
 
 Examples
 --------

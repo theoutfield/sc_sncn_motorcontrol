@@ -21,6 +21,5 @@
     <!-- From the target code, call: xscope_int(PROBE_NAME, value); -->
     <Probe name="Phase B" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Phase C" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="HALL pins" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 
 </xSCOPEconfig>
