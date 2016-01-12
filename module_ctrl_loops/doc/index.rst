@@ -18,16 +18,22 @@ How to use
 
 .. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
           
-.. seealso:: You might find useful the **BLDC/Brushed DC Position, Velocity and Torque Control Demo** example apps, which illustrate the use of this module. 
+.. seealso:: 
+    You might find useful the **BLDC/Brushed DC Position, Velocity and Torque Control Demo** example apps, which illustrate the use of this module: 
+    * :ref:`BLDC Position Control Demo <bldc_position_control_demo>`
+    * :ref:`BLDC Position Control Demo <bldc_velocity_control_demo>`
+    * :ref:`BLDC Torque Control Demo <bldc_torque_control_demo>`
+    * :ref:`Brushed DC Position Control Demo <brushed_dc_position_control_demo>`
+    * :ref:`Brushed DC Velocity Control Demo <brushed_dc_velocity_control_demo>`
 
 1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
-::
+    ::
 
- USED_MODULES = module_ctrl_loops module_motorcontrol module_pwm_symmetrical module_adc module_hall module_misc module_profile module_qei module_gpio module_watchdog module_board-support
+        USED_MODULES = module_ctrl_loops module_motorcontrol module_pwm_symmetrical module_adc module_hall module_misc module_profile module_qei module_gpio module_watchdog module_board-support
 
-.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+    .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+              This will help solving internal dependancy issues.
 
 2. Properly instanciate a **Motor Control Service**.
 
@@ -39,7 +45,7 @@ How to use
 
 6. At whichever other core, now you can perform calls to the Control Service through the interfaces connected to it. Do not forget to initialize it first.
 
-.. code-block:: C
+    .. code-block:: C
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
@@ -119,7 +125,7 @@ How to use
             return 0;
         }
 
-.. note:: Similary to this example, you can repeat the same steps for Velocity and Torque Control Loops. 
+    .. note:: Similary to this example, you can repeat the same steps for Velocity and Torque Control Loops. 
 
 API
 ===
