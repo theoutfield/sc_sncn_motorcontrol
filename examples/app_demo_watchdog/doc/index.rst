@@ -24,6 +24,9 @@ Quick How-to
 3. Set up your development environment by installing xTIMEcomposer. (LINK TO TUTORIAL OR TO XMOS TUTORIAL)
 4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
 5. Open the **main.xc** within  the **app_demo_watchdog**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?).
+
+        .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the *hardware compatibility* at the library overview.
+
 6. Set the configuration for Motor Control and Hall Service.    (LINK TO HOW TO CONFIGURE) 
 7. Run the application (LINK TO TUTORIAL HOW TO RUN SOMANET APPLICATIONS)
 
