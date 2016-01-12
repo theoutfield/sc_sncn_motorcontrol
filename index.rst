@@ -17,16 +17,6 @@ The library is spread over different modules which offer different functionaliti
 * Position, velocity, and torque control loops (up to 18KHz).
 * Profiles ramp generation support.
 
-Minimum Hardware requirements:
- 
-* 1x SOMANET **Core**.
-* 1x SOMANET **IFM**.
-
-Hardware Compatibility:
-
-* SOMANET Core: :ref:`C22 <core_c22>`, :ref:`C21 DX <core_c21_dx>`.
-* SOMANET IFM: :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 1000**, **DC 5000**.
-
 .. cssclass:: downloadable-button 
 
   `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/master.zip>`_
@@ -34,6 +24,29 @@ Hardware Compatibility:
 .. cssclass:: github
 
   `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/>`_
+
+Hardware Compatibility
+----------------------
+
+.. class:: float-left 
+
++---------------------------+
+| Required SOMANET Hardware |
++===========================+
+| 1x SOMANET **Core**       |
++---------------------------+
+| 1x SOMANET **IFM**        |
++---------------------------+
+
+.. class:: float-left
+
++------------------------------------------------------------------------------------------------+
+| Supported SOMANET Devices                                                                      |
++================================================================================================+
+| SOMANET Core: :ref:`C22 <core_c22>`, :ref:`C21 DX <core_c21_dx>`                               |
++------------------------------------------------------------------------------------------------+
+| SOMANET IFM: :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 1000**, **DC 5000**    |
++------------------------------------------------------------------------------------------------+
 
 Modules
 --------
