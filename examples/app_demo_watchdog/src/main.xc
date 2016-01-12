@@ -31,6 +31,7 @@ int main(void) {
     {
 
         on tile[APP_TILE]:
+        /* Client Side */
         {
             delay_seconds(1);
             printstrln("Motor starts spinning");
@@ -50,6 +51,9 @@ int main(void) {
             i_motorcontrol[0].set_voltage(500);
         }
 
+        /***************************************************
+         * IFM TILE
+         ***************************************************/
         on tile[IFM_TILE]:
         {
             par

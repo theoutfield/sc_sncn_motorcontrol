@@ -7,16 +7,16 @@ SOMANET Encoder Interface Demo
     :backlinks: none
     :depth: 3
 
-The purpose of this app is showing the use of the :ref:`Encoder Interface Module <module_qei>`. For that, it implements a simple app that reads the output of an Encoder sensor and shows over **XScope** the read velocity and position.
+The purpose of this app (app_test_qei) is showing the use of the :ref:`Encoder Interface Module <module_qei>`. For that, it implements a simple app that reads the output of an Encoder sensor and shows over **XScope** the read velocity and position.
 
-Min. Nr. of cores: **2**.
-Min. Nr. of tiles: **2**.
+* **Min. Nr. of cores**: 2
+* **Min. Nr. of tiles**: 2
 
 .. cssclass:: github
 
   `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_test_qei/>`_
 
-Quick how-to
+Quick How-to
 ============
 1. **Assemble your SOMANET device** (LINK TO TUTORIAL PAGE).
 2. **Wire up your device** (LINK TO INTERFACING YOUR SOMANET). Connect your Encoder sensor, power supply cable, and XTAG. Power up!

@@ -1,3 +1,4 @@
+.. _hall_demo:
 =========================
 SOMANET Hall Effect Feecback Sensor Demo
 =========================
@@ -6,16 +7,16 @@ SOMANET Hall Effect Feecback Sensor Demo
     :backlinks: none
     :depth: 3
 
-The purpose of this app is showing the use of the :ref:`Hall Sensor Module <module_hall>`. For that, it implements a simple app that reads the output of a Hall Effect sensor and shows over **XScope** the velocity and absolute position. Over console, it will output the electrical position of your shaft.
+The purpose of this app (app_test_hall) is showing the use of the :ref:`Hall Sensor Module <module_hall>`. For that, it implements a simple app that reads the output of a Hall Effect sensor and shows over **XScope** the velocity and absolute position. Over console, it will output the electrical position of your shaft.
 
-Min. Nr. of cores: **2**.
-Min. Nr. of tiles: **2**.
+* **Min. Nr. of cores**: 2
+* **Min. Nr. of tiles**: 2
 
 .. cssclass:: github
 
   `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_test_hall/>`_
 
-Quick how-to
+Quick How-to
 ============
 1. **Assemble your SOMANET device** (LINK TO TUTORIAL PAGE).
 2. **Wire up your device** (LINK TO INTERFACING YOUR SOMANET). Connect your Hall sensor, power supply cable, and XTAG. Power up!

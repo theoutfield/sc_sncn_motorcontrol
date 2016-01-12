@@ -47,6 +47,9 @@ int main(void)
         /* Client side */
         on tile[APP_TILE]: hall_test(i_hall[0]);
 
+        /***************************************************
+         * IFM TILE
+         ***************************************************/
         on tile[IFM_TILE]:
         /* Hall Service */
         {
