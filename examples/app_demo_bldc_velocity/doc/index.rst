@@ -1,3 +1,5 @@
+.. _bldc_velocity_control_demo:
+
 ============================
 BLDC Position Control Demo
 ============================
