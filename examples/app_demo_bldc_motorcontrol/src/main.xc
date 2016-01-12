@@ -35,7 +35,6 @@ void adc_client(interface ADCInterface client i_adc, interface HallInterface cli
 
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
-        xscope_int(HALL_PINS, state);
     }
 }
 
@@ -43,7 +42,6 @@ int main(void) {
 
     // Motor control interfaces
     chan c_pwm_ctrl, c_adctrig; // pwm channels
-
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[5];
     interface HallInterface i_hall[5];
@@ -51,13 +49,7 @@ int main(void) {
 
     par
     {
-
-        on tile[APP_TILE]:
-        {
-            delay_seconds(1);
-            i_motorcontrol[0].set_voltage(VOLTAGE);
-        }
-
+        on tile[APP_TILE]: i_motorcontrol[0].set_voltage(VOLTAGE);
         on tile[APP_TILE]: adc_client(i_adc[0], i_hall[1]);
 
         on tile[IFM_TILE]:
