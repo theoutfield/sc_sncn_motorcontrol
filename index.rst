@@ -106,7 +106,7 @@ Examples
 
 * **Low level functionality tests:**
 
-        * `PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index>`_: Simple example on PWM signal output.
+	* `PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index>`_: Simple example on PWM signal output.
 	* `Encoder Interface Test <examples/app_test_qei/doc/index>`_: Show the data read from your feedback Encoder Interface.
 	* `Hall Sensor Test <examples/app_test_hall/doc/index>`_: Show the data read from your feedback Hall sensor.
 	* `Watchdog Demo <examples/app_demo_watchdog/doc/index>`_: Simple example on how to use the Watchdog.
