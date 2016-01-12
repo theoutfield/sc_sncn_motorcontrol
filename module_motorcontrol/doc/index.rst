@@ -29,7 +29,7 @@ How to use
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
-.. seealso:: You might find useful the :ref:` BLDC DC Motor Control Demo <bldc_motor_drive_demo>` and :ref:`Brushed DC Motor Control Demo <brushed_dc_drive_demo>` example apps, which illustrate the use of this module. 
+.. seealso:: You might find useful the :ref:`BLDC DC Motor Control Demo <bldc_motor_drive_demo>` and :ref:`Brushed DC Motor Control Demo <brushed_dc_drive_demo>` example apps, which illustrate the use of this module. 
 
 1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
