@@ -24,12 +24,12 @@ How to use
           
 1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
-::
+    ::
 
- USED_MODULES = module_adc module_pwm_symmetrical module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
+        USED_MODULES = module_adc module_pwm_symmetrical module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
 
 
-.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+    .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
 
 2. Include the Service header in your app. 

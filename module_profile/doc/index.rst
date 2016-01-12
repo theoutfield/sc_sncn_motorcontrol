@@ -18,15 +18,21 @@ How to use
 
 .. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
           
-.. seealso:: You might find useful the **BLDC/Brushed DC Position, Velocity and Torque Control Demo** example apps, which illustrate the use of this module. 
+.. seealso:: 
+    You might find useful the **BLDC/Brushed DC Position, Velocity and Torque Control Demo** example apps, which illustrate the use of this module: 
+    * :ref:`BLDC Position Control Demo <bldc_position_control_demo>`
+    * :ref:`BLDC Position Control Demo <bldc_velocity_control_demo>`
+    * :ref:`BLDC Torque Control Demo <bldc_torque_control_demo>`
+    * :ref:`Brushed DC Position Control Demo <brushed_dc_position_control_demo>`
+    * :ref:`Brushed DC Velocity Control Demo <brushed_dc_velocity_control_demo>`
 
 1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
-::
+    ::
 
-USED_MODULES = module_profile module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_gpio module_qei module_watchdog module_board-support
+        USED_MODULES = module_profile module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_gpio module_qei module_watchdog module_board-support
 
-.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+    .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
 
 2. Properly instanciate a **Position Control Loop Service**.
