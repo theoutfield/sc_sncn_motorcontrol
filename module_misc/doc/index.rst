@@ -29,13 +29,13 @@ How to use
 Moving Average Filter
 `````````````````````
 
-Include the filter header in your app. 
+2. Include the filter header in your app. 
 
 .. code-block:: C
         
   #include <filter_blocks.h>
 
-Now you can just use filter API.
+3. Now you can just use filter API.
 
 .. code-block:: C
 
@@ -48,13 +48,13 @@ Now you can just use filter API.
 Time Definitions
 ````````````````
 
-Include the header in your app.
+2. Include the header in your app.
 
 .. code-block:: C
         
   #include <refclk.h>
 
-If you need to set 1 ms time in your code, and your code is running on tile with a **100MHz Reference Freq.**:
+3. If you need to set 1 ms time in your code, and your code is running on tile with a **100MHz Reference Freq.**:
 
 .. code-block:: C
         
@@ -64,7 +64,7 @@ If you need to set 1 ms time in your code, and your code is running on tile with
   t :> ts; 
   t when timerafter(ts + MSEC_STD) :> ts;
 
-However, if you need to set 1 ms time in your code, but your code is running on tile with a **250MHz Reference Freq.** (e.g. IFM tile):
+4. However, if you need to set 1 ms time in your code, but your code is running on tile with a **250MHz Reference Freq.** (e.g. IFM tile):
 
 .. code-block:: C
         
