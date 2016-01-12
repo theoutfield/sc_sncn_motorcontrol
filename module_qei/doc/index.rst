@@ -1,5 +1,6 @@
+.. _module_qei:
 ===============================================
-SOMANET Quadrature Encoder Interface Module
+SOMANET Encoder Interface Module
 ===============================================
 
 .. contents:: In this document
@@ -65,10 +66,8 @@ How to use
                 on tile[APP_TILE]: int foo = i_qei[0].get_qei_position(); // 6
   
                 on tile[IFM_TILE]:
+                /* Quadrature Encoder sensor Service */
                 {
-
-                    /* Quadrature encoder sensor Service */
-                    {
                         QEIConfig qei_config; // 5
                         qei_config.signal_type = QEI_RS422_SIGNAL;              
                         qei_config.index_type = QEI_WITH_INDEX;                 
@@ -76,7 +75,6 @@ How to use
                         qei_config.sensor_polarity = QEI_POLARITY_NORMAL;       
 
                         qei_service(qei_ports, qei_config, i_qei);
-                    }
                 }
             }
 

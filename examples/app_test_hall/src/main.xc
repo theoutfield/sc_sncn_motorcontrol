@@ -51,7 +51,7 @@ int main(void)
         /* Hall Service */
         {
             HallConfig hall_config;
-            hall_config.pole_pairs = 3;
+            hall_config.pole_pairs = 1;
 
             hall_service(hall_ports, hall_config, i_hall);
         }
