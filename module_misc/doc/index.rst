@@ -17,7 +17,7 @@ From all its functionality, the user might find useful the following resources:
 How to use
 ==========
 
-1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
   ::
 
