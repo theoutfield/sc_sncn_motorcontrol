@@ -28,16 +28,16 @@ How to use
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
 
-.. seealso:: You might find useful the **PWM Symmetrical Demo** example app, which illustrates the use of this module. 
+.. seealso:: You might find useful the :ref:`PWM Symmetrical Demo <pwm_symmetrical_demo>` example app, which illustrates the use of this module. 
 
-1. First, add all the :ref:`**SOMANET Motor Control** <somanet_motor_control>` modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
-::
+    ::
 
- USED_MODULES = module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
+        USED_MODULES = module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
 
 
-.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+    .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
 
 2. Include the Service headers in your app, for Service and Client.
@@ -45,9 +45,9 @@ How to use
 4. Inside your main function, declare the channels for Service-Client communication.
 5. At your IFM tile, instanciate the Service.
 6. At whichever other core, you can update your PWM outputs through a client call. 
-        But first you will need to initialize the communication by calling **pwm_share_control_buffer_address_with_server**.
+    But first you will need to initialize the communication by calling ``pwm_share_control_buffer_address_with_server``.
 
-.. code-block:: C
+    .. code-block:: C
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
@@ -79,7 +79,7 @@ How to use
             return 0;
         }
 
-.. seealso:: If you are interested in the use of the **Triggered PWM Service**, have a look at the **Torque Control Demo App**.
+.. seealso:: If you are interested in the use of the **Triggered PWM Service**, have a look at the :ref: BLDC Torque Control Demo App`<bldc_torque_control_demo>`.
 
 API
 ===
