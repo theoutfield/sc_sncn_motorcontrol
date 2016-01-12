@@ -1,4 +1,3 @@
-
 .. _module_hall:
 ===========================
 SOMANET Hall Sensor Module
