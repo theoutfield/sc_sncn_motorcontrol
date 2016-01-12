@@ -1,6 +1,6 @@
-==================
+=================================
 Feedback Encoder Interface Demo
-==================
+=================================
 
 .. contents:: In this document
     :backlinks: none
