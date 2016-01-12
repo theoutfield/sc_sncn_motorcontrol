@@ -10,7 +10,7 @@ SOMANET BLDC Motor Control Demo
 
 The purpose of this app (app_demo_bldc_motorcontrol) is showing the use of the :ref:`Motor Control Module <module_motorcontrol>` over a BLDC motor. For that, it implements a simple app that commutate your BLDC motor using a Hall Effect feedback sensor. The app also will display over **XScope** the present currents on phases B and C.
 
-* **Minimum Number of Cores**: 3
+* **Minimum Number of Cores**: 7
 * **Minimum Number of Tiles**: 2
 
 .. cssclass:: github
@@ -25,7 +25,7 @@ Quick How-to
 4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
 5. Open the **main.xc** within  the **app_demo_bldc_motorcontrol**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
 
-    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the *hardware compatibility* at the library overview.
+      .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the **Hardware compatibility** section of the library. (LINK TO IT).
 
 6. Set the configuration for Motor Control and Hall Service.    (LINK TO HOW TO CONFIGURE) 
 7. Run the application (LINK TO TUTORIAL HOW TO RUN SOMANET APPLICATIONS)
