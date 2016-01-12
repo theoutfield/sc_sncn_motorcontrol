@@ -38,8 +38,9 @@ Quick How-to
                 qei_service(qei_ports, qei_config, i_qei);
         }
 
+        .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the *hardware compatibility* at the library overview.
 
-.. important:: Not all the SOMANET IFM DC boards support TTL Encoder output signals. Make sure your DC device support such configuration.
+        .. important:: Not all the SOMANET IFM DC boards support TTL Encoder output signals. Make sure your DC device support such configuration.
 
 6. Run the application enabling XScope (LINK TO TUTORIAL HOW TO RUN SOMANET APPLICATIONS)
 

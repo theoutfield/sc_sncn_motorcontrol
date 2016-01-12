@@ -1,5 +1,7 @@
+.. _module_motorcontrol:
+
 ==================================
-SOMANET BLDC Motor Control Module
+SOMANET Motor Control Module
 ==================================
 
 .. contents:: In this document
