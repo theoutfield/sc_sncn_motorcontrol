@@ -26,7 +26,7 @@ Quick How-to
 4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
 5. Open the **main.xc** within  the **app_test_hall**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
 
-    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the *hardware compatibility* at the library overview.
+   .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the **Hardware compatibility** section of the library. (LINK TO IT).
 
 6. Again in your **main.xc**, set the configuration for your Hall Service. 
 
