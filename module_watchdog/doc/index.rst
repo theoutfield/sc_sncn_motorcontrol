@@ -1,3 +1,4 @@
+.. _module_watchdog:
 =======================
 SOMANET Watchdog Module 
 =======================
