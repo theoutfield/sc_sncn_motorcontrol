@@ -25,11 +25,11 @@ How to use
           
 1. First, add all the **SOMANET Motor Control Library** modules to your app Makefile.
 
-::
+    ::
 
-USED_MODULES = module_gpio module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
+        USED_MODULES = module_gpio module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
 
-.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+    .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
 
 2. Include the Service header in your app. 
@@ -42,7 +42,7 @@ USED_MODULES = module_gpio module_hall module_pwm_symmetrical module_adc module_
 
 6. At whichever other core, now you can perform calls to the GPIO Service through the interfaces connected to it.
 
-.. code-block:: C
+    .. code-block:: C
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
