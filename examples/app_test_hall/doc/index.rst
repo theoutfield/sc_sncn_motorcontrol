@@ -1,5 +1,5 @@
 =========================
-Feedback Hall Sensor Demo
+SOMANET Hall Effect Feecback Sensor Demo
 =========================
 
 .. contents:: In this document
@@ -19,8 +19,8 @@ Quick how-to
 ============
 1. **Assemble your SOMANET device** (LINK TO TUTORIAL PAGE).
 2. **Wire up your device** (LINK TO INTERFACING YOUR SOMANET). Connect your Hall sensor, power supply cable, and XTAG. Power up!
-3. Install xTIMEcomposer to set your development environment. (LINK TO TUTORIAL OR TO XMOS TUTORIAL)
-4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Contrl Library and its dependancies.
+3. Set up your development environment by installing xTIMEcomposer. (LINK TO TUTORIAL OR TO XMOS TUTORIAL)
+4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
 5. Open the **main.xc** within  the **app_test_hall**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?) and set the configuration for your Hall Service. 
 
 .. code-block:: C
