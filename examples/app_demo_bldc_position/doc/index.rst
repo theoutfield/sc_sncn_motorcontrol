@@ -8,7 +8,7 @@ SOMANET BLDC Position Control Demo
     :backlinks: none
     :depth: 3
 
-The purpose of this app (app_demo_bldc_position) is showing the use of the :ref:`Motor Control Module <module_motorcontrol>` over a BLDC motor. For that, it implements a simple app that commutate your BLDC motor using a Hall Effect feedback sensor. The app also will display over **XScope** the present currents on phases B and C.
+The purpose of this app (app_demo_bldc_position) is showing the use of the :ref:`Control Loops Module <module_ctrl_loops>` and :ref:`Profile Module <module_profile>` for Position control of a BLDC motor. For that, it implements a simple app that will make your motor reach a desired target position. A Hall Effect Feedback sensor will be used for commutation and, additionally, an Encoder Interface can be used for accurate position feedback and control. The app also will display over **XScope** the current position of the motor respect to the target position.
 
 * **Minimum Number of Cores**: 8
 * **Minimum Number of Tiles**: 2
@@ -20,15 +20,15 @@ The purpose of this app (app_demo_bldc_position) is showing the use of the :ref:
 Quick How-to
 ============
 1. **Assemble your SOMANET device** (LINK TO TUTORIAL PAGE).
-2. **Wire up your device** (LINK TO INTERFACING YOUR SOMANET). Connect your Hall sensor, motor phases, power supply cable, and XTAG. Power up!
+2. **Wire up your device** (LINK TO INTERFACING YOUR SOMANET). Connect your Hall sensor, Encoder Interface (if used), motor phases, power supply cable, and XTAG. Power up!
 3. Set up your development environment by installing xTIMEcomposer. (LINK TO TUTORIAL OR TO XMOS TUTORIAL)
 4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
-5. Open the **main.xc** within  the **app_demo_bldc_motorcontrol**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
+5. Open the **main.xc** within  the **app_demo_bldc_position**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
 
-    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the *hardware compatibility* at the library overview.
+    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the **Hardware compatibility** section of the library. (LINK TO IT).
 
-6. Set the configuration for Motor Control and Hall Service.    (LINK TO HOW TO CONFIGURE) 
-7. Run the application (LINK TO TUTORIAL HOW TO RUN SOMANET APPLICATIONS)
+6. Set the configuration for Motor Control, Hall, Encoder (if used), and Position Control Services. Also for your Position Profiler.  (LINK TO HOW TO CONFIGURE) 
+7. Run the application (LINK TO TUTORIAL HOW TO RUN SOMANET APPLICATIONS).
 
 HERE WE SHOULD PROVIDE MAYBE LINKS TO THE FORUM OR SOME SUPPORT... IF SOMETHING GOES WRONG WHILE RUNNING THE APP
 
