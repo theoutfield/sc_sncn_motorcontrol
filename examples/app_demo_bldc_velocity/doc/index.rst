@@ -8,7 +8,7 @@ BLDC Velocity Control Demo
     :backlinks: none
     :depth: 3
 
-The purpose of this app (app_demo_bldc_velocity) is showing the use of the :ref:`Control Loops Module <module_ctrl_loops>` and :ref:`Profile Module <module_profile>` for Velocity control of a BLDC motor. For that, it implements a simple app that will make your motor reach a desired target velocity. A Hall Effect Feedback sensor will be used for commutation and, additionally, an Encoder Interface can be used for accurate velocity feedback on low RPMs. The app also will display over **XScope** the current position of the motor respect to the target position.
+The purpose of this app (app_demo_bldc_velocity) is showing the use of the :ref:`Control Loops Module <module_ctrl_loops>` and :ref:`Profile Module <module_profile>` for Velocity control of a BLDC motor. For that, it implements a simple app that will make your motor reach a desired target velocity. A Hall Effect Feedback sensor will be used for commutation and, additionally, an Encoder Interface can be used for accurate velocity feedback on low RPMs. The app also will display over **XScope** the current velocity of the motor respect to the target velocity.
 
 * **Minimum Number of Cores**: 8
 * **Minimum Number of Tiles**: 2
