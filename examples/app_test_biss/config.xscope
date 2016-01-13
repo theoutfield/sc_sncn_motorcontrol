@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ======================================================= -->
+<!-- The 'ioMode' attribute on the xSCOPEconfig              -->
+<!-- element can take the following values:                  -->
+<!--   "none", "basic", "timed"                              -->
+<!--                                                         -->
+<!-- The 'type' attribute on Probe                           -->
+<!-- elements can take the following values:                 -->
+<!--   "STARTSTOP", "CONTINUOUS", "DISCRETE", "STATEMACHINE" -->
+<!--                                                         -->
+<!-- The 'datatype' attribute on Probe                       -->
+<!-- elements can take the following values:                 -->
+<!--   "NONE", "UINT", "INT", "FLOAT"                        -->
+<!-- ======================================================= -->
+
+<xSCOPEconfig ioMode="none" enabled="true">
+    <!-- For example: -->
+    <!-- <Probe name="Probe Name" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/> -->
+
+    <Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Count" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Real Count" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Error bit" type="DISCRETE" datatype="UINT" units="Value" enabled="true"/>
+    <Probe name="Warning bit" type="DISCRETE" datatype="UINT" units="Value" enabled="true"/>
+    <Probe name="Time" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
+
+</xSCOPEconfig>
