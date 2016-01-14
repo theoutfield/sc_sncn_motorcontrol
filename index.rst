@@ -25,6 +25,8 @@ The library is spread over different modules which offer different functionaliti
 
   `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/>`_
 
+.. _motor_control_hw_compatibility:
+
 Hardware Compatibility
 ----------------------
 

@@ -22,7 +22,7 @@ Quick How-to
 1. `Assemble your SOMANET device <assembling_somanet_node>`.
 2. Wire up your device. Check how at your specific hardware documentation. Connect your Hall sensor, motor phases, power supply cable, and XTAG. Power up!
 3. `Set up your XMOS development tools <getting_started_xmos_dev_tools>`_. 
-4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
+4. Download and `import in your workspace <getting_started_importing_library>`_ the SOMANET Motor Control Library and its dependancies.
 5. Open the **main.xc** within  the **app_demo_bldc_motorcontrol**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
 
       .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the **Hardware compatibility** section of the library. (LINK TO IT).

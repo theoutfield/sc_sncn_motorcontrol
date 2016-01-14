@@ -20,13 +20,13 @@ The purpose of this app (app_test_hall) is showing the use of the :ref:`Hall Sen
 Quick How-to
 ============
 
-1. `Assemble your SOMANET device <assembling_somanet_node>`.
+1. :ref: `Assemble your SOMANET device <assembling_somanet_node>`.
 2. Wire up your device. Check how at your specific hardware documentation. Connect your Hall sensor, power supply cable, and XTAG. Power up!
-3. `Set up your XMOS development tools <getting_started_xmos_dev_tools>`_. 
-4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
-5. Open the **main.xc** within  the **app_test_hall**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
+3. :ref: `Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
+4. Download and :ref: `import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependancies.
+5. Open the **main.xc** within  the **app_test_hall**. Include the :ref: `board-support file according to your device <board_support>`. Also set the `appropiate target in your Makefile <board_support>`.
 
-   .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the **Hardware compatibility** section of the library. (LINK TO IT).
+   .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the `Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
 6. Again in your **main.xc**, set the configuration for your Hall Service. 
 
@@ -43,7 +43,8 @@ Quick How-to
 
     .. note:: Do not worry if you don't know how many pole pairs your motor has. You can always run the application and see on the **console outputs** how many **electrical revolutions** are contained in a mechanical motor revolution. **This number is the number of pole pairs in your motor**.
 
-7. Run the application enabling XScope (LINK TO TUTORIAL HOW TO RUN SOMANET APPLICATIONS)
+7. :ref: `Run the application enabling XScope <running_an_application>`.
 
-HERE WE SHOULD PROVIDE MAYBE LINKS TO THE FORUM OR SOME SUPPORT... IF SOMETHING GOES WRONG WHILE RUNNING THE APP
+    .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
+        
 
