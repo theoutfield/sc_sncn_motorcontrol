@@ -1,7 +1,11 @@
 .. _motor_tuning_label:
 
-BLDC Motor Tuning Guide 
-=======================
+BLDC Hall Effect Feedback sensor offset adjustment 
+==================================================
+
+It is common that Hall Effect sensors used for position feedback are not perfectly placed mechanically along the windings. This strongly affects the commutation efficiency of your motor.
+
+In order  
 
 After you have set up most of your motor parameters according to :ref:`motor_configuration_label` you can further fine tune your motors efficiency and performance. Inside the bldc_motor_config file you will find following lines::
 
