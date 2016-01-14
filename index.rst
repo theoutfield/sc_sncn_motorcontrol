@@ -94,7 +94,7 @@ Examples
 	Watchdog Demo <examples/app_demo_watchdog/doc/index>
 	PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index>
 	
-	BLDC Motor Control Demo <examples/app_demo_motorcontrol/doc/index>	
+	BLDC Motor Control Demo <examples/app_demo_bldc_motorcontrol/doc/index>	
 	BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index>	
 	BLDC Velocity Control Demo <examples/app_demo_bldc_velocity/doc/index>
 	BLDC Torque Control Demo <examples/app_demo_bldc_torque/doc/index>
@@ -115,7 +115,7 @@ Examples
 
 * **BLDC Motorcontrol demos:**
 
-	* `BLDC Motor Control Demo <examples/app_demo_motorcontrol/doc/index>`_: Plain Sinusoidal commutation of your BLDC motor.
+	* `BLDC Motor Control Demo <examples/app_demo_bldc_motorcontrol/doc/index>`_: Plain Sinusoidal commutation of your BLDC motor.
 	* `BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index>`_: Simple example to make Position Control of your BLDC motor.
 	* `BLDC Velocity Control Demo <examples/app_demo_bldc_velocity/doc/index>`_: Simple example to make Velocity Control of your BLDC motor.
 	* `BLDC Torque Control Demo <examples/app_demo_bldc_torque/doc/index>`_: Simple example to make Torque Control of your BLDC motor.
@@ -123,7 +123,7 @@ Examples
 
 * **Brushed DC Motorcontrol demos:**
 
-	* `Brushed DC Motor Control Demo <examples/app_demo_brushed_dc/doc/index>`_: Plain commutation of your BLDC motor.
+	* `Brushed DC Motor Control Demo <examples/app_demo_brushed_dc/doc/index>`_: Simple example to drive your Brushed DC motor.
 	* `Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index>`_: Simple example to make Position Control of your Brushed DC motor.
 	* `Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>`_: Simple example to make Velocity Control of your Brushed DC motor.
 	* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>`_: Simple example to make Torque Control of your Brushed DC motor.
