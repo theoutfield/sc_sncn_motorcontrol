@@ -23,7 +23,7 @@
 // NUMBER OF POLE PAIRS (if applicable)
 #define POLE_PAIRS  4
 
-// WINDING TYPE (if applicable) [DELTA_WINDING, DELTA_WINDING]
+// WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
 #define BLDC_WINDING_TYPE   DELTA_WINDING
 
 /////////////////////////////////////////////
@@ -94,7 +94,7 @@
 #define PROFILE_VELOCITY        1000        // rpm
 #define PROFILE_ACCELERATION    2000        // rpm/s
 #define PROFILE_DECELERATION    2000        // rpm/s
-#define PROFILE_TORQUE_SLOPE    400         // adc_ticks*
+#define PROFILE_TORQUE_SLOPE    400         // adc_ticks
 
 // PROFILER LIMITIS
 #define MAX_POSITION_LIMIT      20000000        // ticks (max range: 2^30, limited for safe operation)
@@ -102,8 +102,5 @@
 #define MAX_VELOCITY            4000            // rpm
 #define MAX_ACCELERATION        4000            // rpm/s
 #define MAX_DECELERATION        4000            // rpm/s
-#define MAX_CURRENT_VARIATION   800             // adc_ticks/s*
-#define MAX_CURRENT             800             // adc_ticks*
-
-// *Max adc ticks are 8192 and corresponds with the max current your DC can handle:
-// DC100: 5A, DC300: 20A, DC1K 50A
+#define MAX_CURRENT_VARIATION   800             // adc_ticks/s
+#define MAX_CURRENT             800             // adc_ticks

@@ -15,15 +15,15 @@ The purpose of this app (app_test_hall) is showing the use of the :ref:`Hall Sen
 
 .. cssclass:: github
 
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_test_hall/>`_
+  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_hall/>`_
 
 Quick How-to
 ============
 
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
-2. Wire up your device. Check how at your specific hardware documentation. Connect your Hall sensor, power supply cable, and XTAG. Power up!
+2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your Hall sensor, power supply cable, and XTAG. Power up!
 3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
-4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependancies.
+4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
 5. Open the **main.xc** within  the **app_test_hall**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropiate target in your Makefile <somanet_board_support_module>`.
 
 .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.

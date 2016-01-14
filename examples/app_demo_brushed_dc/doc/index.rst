@@ -1,8 +1,8 @@
 .. _brushed_dc_drive_demo:
 
-=======================
+=====================================
 SOMANET Brushed DC Motor Control Demo
-=======================
+=====================================
 
 .. contents:: In this document
     :backlinks: none
@@ -15,19 +15,19 @@ The purpose of this app (app_demo_brushed_dc) is showing the use of the :ref:`Mo
 
 .. cssclass:: github
 
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_demo_brushed_dc/>`_
+  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_brushed_dc/>`_
 
 Quick How-to
 ============
-1. **Assemble your SOMANET device** (LINK TO TUTORIAL PAGE).
-2. **Wire up your device** (LINK TO INTERFACING YOUR SOMANET). Connect your motor phases, power supply cable, and XTAG. Power up!
-3. Set up your development environment by installing xTIMEcomposer. (LINK TO TUTORIAL OR TO XMOS TUTORIAL)
-4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
-5. Open the **main.xc** within  the **app_demo_brushed_dc**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
+1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
+2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your motor phases (A and B), power supply cable, and XTAG. Power up!
+3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
+4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
+5. Open the **main.xc** within  the **app_demo_brushed_dc**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropiate target in your Makefile <somanet_board_support_module>`.
 
-    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the **Hardware compatibility** section of the library. (LINK TO IT).
+.. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
-6. Set the configuration for Motor Control.
+6. :ref:`Set the configuration <motor_configuration_label>` for Motor Control.
 
 .. code-block:: C
 
@@ -41,7 +41,7 @@ Quick How-to
                                                 i_motorcontrol);
                 }
 
-7. Run the application (LINK TO TUTORIAL HOW TO RUN SOMANET APPLICATIONS).
+7. :ref:`Run the application enabling XScope <running_an_application>`.
 
-HERE WE SHOULD PROVIDE MAYBE LINKS TO THE FORUM OR SOME SUPPORT... IF SOMETHING GOES WRONG WHILE RUNNING THE APP
+.. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
 
