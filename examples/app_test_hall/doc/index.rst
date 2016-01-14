@@ -24,7 +24,7 @@ Quick How-to
 2. Wire up your device. Check how at your specific hardware documentation. Connect your Hall sensor, power supply cable, and XTAG. Power up!
 3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
 4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependancies.
-5. Open the **main.xc** within  the **app_test_hall**. Include the :ref:`board-support file according to your device <board_support>`. Also set the :ref:`appropiate target in your Makefile <board_support>`.
+5. Open the **main.xc** within  the **app_test_hall**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropiate target in your Makefile <somanet_board_support_module>`.
 
 .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
