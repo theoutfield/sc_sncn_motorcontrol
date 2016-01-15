@@ -80,7 +80,7 @@ int main(void) {
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
-                /* Motor Commutation Service */
+                /* Motor Control Service */
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
