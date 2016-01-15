@@ -28,7 +28,7 @@ Quick how-to
 2. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
 3. Run the application over the `simulator generating an output to a VCD trace file <https://www.xmos.com/published/xsimtut>`_. You will have to configure the simulator to trace the **ports** of **tile[3]**.
 4. The app will run in an endless loop, terminate the **Run** after 2 minutes.
-5. Display the generated **VCD file** and check the following ports:
+5. `Display the generated VCD file <https://www.xmos.com/published/xsimtut>`_ and check the following ports:
         * **XS1_PORT_1K** and **XS1_PORT_1L**: These are the high and low side respectively for phase A (coordinate 0 at PWM output vector). 
         * **XS1_PORT_1O** and **XS1_PORT_1P**: These are the high and low side respectively for phase B (coordinate 1 at PWM output vector). 
         * **XS1_PORT_1M** and **XS1_PORT_1N**: These are the high and low side respectively for phase C (coordinate 2 at PWM output vector). 
