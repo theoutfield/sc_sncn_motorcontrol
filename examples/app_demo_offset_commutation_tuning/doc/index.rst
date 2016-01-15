@@ -8,7 +8,7 @@ Helper for finding your Hall sensor offsets
     :backlinks: none
     :depth: 3
 
-It is common that Hall Effect sensors used for position feedback are not perfectly placed physically along the windings. This strongly affects the commutation efficiency of your motor. In order to avoid such loss of efficiency we can configure at the :ref:`Motor Control Service <module_motorcontrol>` the offsets to compensate the Hall sensors error on clock-wise and counter-clock-wise spin. This app will help you finding such offsets.
+It is common that Hall Effect sensors used for position feedback are not perfectly placed physically along the windings. This strongly affects the commutation efficiency of your motor. In order to avoid such loss of efficiency we can configure at the :ref:`Motor Control Service <module_motorcontrol>` the offsets to compensate the Hall sensors error on clock-wise and counter-clock-wise spin. The purpose of this app (app_demo_offset_commutation_tuning) is helping you to find such offsets.
 
 The motor will commutate at a certain voltage (either positive, clockwise spin, or negative, counter-clockwise spin) and the current at the phases will be displayed over XScope. At the same time, the user could set different offsets over the console and see the effect of it on the amplitude of the phase currents. 
 
