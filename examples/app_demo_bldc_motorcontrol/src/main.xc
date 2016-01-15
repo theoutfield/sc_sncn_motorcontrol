@@ -50,6 +50,7 @@ int main(void) {
     par
     {
         on tile[APP_TILE]: i_motorcontrol[0].set_voltage(VOLTAGE);
+
         on tile[APP_TILE]: adc_client(i_adc[0], i_hall[1]);
 
         on tile[IFM_TILE]:

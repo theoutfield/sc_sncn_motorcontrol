@@ -34,7 +34,7 @@ How to use
         USED_MODULES = module_ctrl_loops module_motorcontrol module_pwm_symmetrical module_adc module_hall module_misc module_profile module_qei module_gpio module_watchdog module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-              This will help solving internal dependancy issues.
+              This will help solving internal dependency issues.
 
 2. Properly instanciate a **Motor Control Service**.
 
