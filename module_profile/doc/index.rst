@@ -1,3 +1,5 @@
+.. _module_profile:
+
 =======================
 SOMANET Profile Module
 =======================
@@ -38,7 +40,7 @@ How to use
 
 2. Properly instanciate a **Position Control Loop Service**.
 
-3. Include the header in your app. 
+3. Include the Profiler header **profile_control.h** in your app. 
 
 4. Over whichever other core you can perform calls to the profiler. Do not forget to first fill up the configuration and initialize your profiler.
 

@@ -1,8 +1,8 @@
 .. _bldc_velocity_control_demo:
 
-============================
-BLDC Velocity Control Demo
-============================
+==================================
+SOMANET BLDC Velocity Control Demo
+==================================
 
 .. contents:: In this document
     :backlinks: none

@@ -42,7 +42,7 @@ How to use
 
 2. Properly instanciate **PWM**, **Hall** and **Watchdog** Services.
 
-3. Include the Service header in your app. 
+3. Include the Motor Control Service header **motorcontrol_service.h** in your app. 
 
 4. Instanciate the ports where the Service will be accessing the Fet Driver signals. 
 

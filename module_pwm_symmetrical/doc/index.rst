@@ -41,7 +41,7 @@ How to use
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
 
-2. Include the Service headers in your app, for Service and Client.
+2. Include the PWM Service headers in your app, for Service **pwm_service.h** and Client **pwm_service_client.h**.
 3. Instanciate the ports where the Service will be outputting the PWM signals. 
 4. Inside your main function, declare the channels for Service-Client communication.
 5. At your IFM tile, instanciate the Service.

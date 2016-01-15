@@ -1,8 +1,8 @@
 .. _bldc_torque_control_demo:
 
-============================
+================================
 SOMANET BLDC Torque Control Demo
-============================
+================================
 
 .. contents:: In this document
     :backlinks: none

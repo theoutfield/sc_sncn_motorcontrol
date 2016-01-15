@@ -1,3 +1,5 @@
+.. _module_ctrl_loops:
+
 =============================
 SOMANET Control Loops Module 
 =============================
@@ -13,8 +15,8 @@ through interfaces.
 The Position, Velocity and Torque Control Services are intended to run at a **100MHz Reference Frequency**,
 therefore they must be instanciated in a different tile from the remaining Motor Control Services.
 
-How to use
-==========
+How to use (eg. Position Control Service)
+=========================================
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
@@ -38,7 +40,7 @@ How to use
 
 2. Properly instanciate a :ref:`Motor Control Service <module_motorcontrol>`.
 
-3. Include the Service header in your app. 
+3. Include the Position Control Service header **position_ctrl_service.h** in your app. 
 
 4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
 

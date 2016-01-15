@@ -32,7 +32,7 @@ How to use
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependancy issues.
 
-2. Include the Service header in your app. 
+2. Include the Watchdog Service header **watchdog_service.h** in your app. 
 
 3. Instanciate the ports where the Service will be accessing the ports of the watchdog chip. 
 
