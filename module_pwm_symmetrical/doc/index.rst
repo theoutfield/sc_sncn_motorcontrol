@@ -1,3 +1,4 @@
+.. _pwm_symmetrical_module:
 ==============================
 SOMANET Symmetrical PWM module
 ==============================
