@@ -40,7 +40,7 @@ BiSS Server that reads the data from the encoder. Read more at
 More information about BiSS Server/ Client can be found at
 `module\_biss <https://github.com/synapticon/sc_sncn_motorctrl/tree/feature_biss/module_biss>`_.
 
-Other dependancies:
+Other dependencies:
 `module\_nodeconfig <https://github.com/synapticon/sc_somanet-base/tree/master/module_board-support>`_@`sc\_somanet-base <https://github.com/synapticon/sc_somanet-base>`_
 `module\_blocks <https://github.com/synapticon/sc_sncn_motorctrl/tree/master/module_blocks>`_
 `module\_common <https://github.com/synapticon/sc_sncn_motorctrl/tree/master/module_common>`_
