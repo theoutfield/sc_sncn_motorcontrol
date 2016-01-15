@@ -36,7 +36,7 @@ How to use
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
               This will help solving internal dependency issues.
 
-2. Properly instanciate a **Motor Control Service**.
+2. Properly instanciate a :ref:`Motor Control Service <module_motorcontrol>`.
 
 3. Include the Service header in your app. 
 
