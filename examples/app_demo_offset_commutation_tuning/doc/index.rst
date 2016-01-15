@@ -18,6 +18,7 @@ Helper for finding your Hall sensor offsets
 
 Quick How-to
 ============
+
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
 2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your Hall sensor, motor phases, power supply cable, and XTAG. Power up!
 3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
@@ -29,6 +30,7 @@ Quick How-to
 6. :ref:`Set the configuration <motor_configuration_label>` for Motor Control and Hall Services.
 
 .. code-block:: C
+
                 /* Hall sensor Service */
                 {
                     HallConfig hall_config;

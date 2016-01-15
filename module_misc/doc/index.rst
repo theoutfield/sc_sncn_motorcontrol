@@ -14,6 +14,10 @@ From all its functionality, the user might find useful the following resources:
 - Implementation of a Moving Average Filter.
 - Time definitions for proper time management.
 
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_misc>`_
+
 How to use
 ==========
 

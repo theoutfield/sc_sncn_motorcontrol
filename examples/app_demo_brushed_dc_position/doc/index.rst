@@ -1,8 +1,8 @@
 .. _brushed_dc_position_control_demo:
 
-=================================
+===========================================
 SOMANET Brushed DC Position Control Demo
-=================================
+===========================================
 
 .. contents:: In this document
     :backlinks: none
