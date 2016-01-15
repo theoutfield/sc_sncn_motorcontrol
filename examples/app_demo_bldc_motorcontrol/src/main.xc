@@ -85,7 +85,7 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);
+                                            c_pwm_ctrl, i_hall[0], null, null, i_watchdog[0], i_motorcontrol);
                 }
             }
         }

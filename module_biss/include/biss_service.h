@@ -39,7 +39,7 @@
 #define BISS_USEC                  USEC_FAST    // number of ticks in a microsecond
 #define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
 #define BISS_TIMEOUT               14*BISS_USEC // BiSS timeout in clock ticks
-#define BISS_OFFSET_ELECTRICAL     1800
+#define BISS_OFFSET_ELECTRICAL     600
 
 /**
  * @brief Structure type to define the BiSS Service configuration.
@@ -51,7 +51,7 @@ typedef struct {
     int singleturn_resolution;
     int status_length;
     int crc_poly;
-    int poles;
+    int pole_pairs;
     int polarity;
     int clock_dividend;
     int clock_divisor;
@@ -81,10 +81,9 @@ enum {
  * @brief Structure type to define the BiSS Service ports.
  */
 typedef struct {
-    port ?p_biss_config; /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). */
     port p_biss_data;   /**< Port for BiSS Interface signal input. */
     port p_biss_clk;    /**< Port for BiSS Interface clock output. */
-    clock clk;          /**< Clock for BiSS Interface. */
+    clock clk; /**< Hardware clock used as time reference */
 } BISSPorts;
 
 /**
@@ -122,7 +121,7 @@ interface BISSInterface {
      *
      * @return electrical angle
      */
-    unsigned int get_biss_angle_electrical();
+    unsigned int get_biss_angle();
 
     /**
      * @brief Get velocity from BiSS Server

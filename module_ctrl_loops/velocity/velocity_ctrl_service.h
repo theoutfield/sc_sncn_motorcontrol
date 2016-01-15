@@ -8,6 +8,7 @@
 
 #include <hall_service.h>
 #include <qei_service.h>
+#include <biss_service.h>
 #include <motorcontrol_service.h>
 #include <control_loops_common.h>
 
@@ -136,5 +137,6 @@ int max_speed_limit(int velocity, int max_speed);
 void velocity_control_service(ControlConfig & velocity_ctrl_config,
                         interface HallInterface client ?i_hall,
                         interface QEIInterface client ?i_qei,
+                        interface BISSInterface client ?i_biss,
                         interface MotorcontrolInterface client i_motorcontrol,
                         interface VelocityControlInterface server i_velocity_control[3]);

@@ -18,8 +18,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
 [[combinable]]
 void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
-                            interface HallInterface client i_hall,
+                            interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[5],
                             chanend c_pwm_ctrl,
@@ -46,7 +47,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
     int bw_flag = 0;
 
     int shutdown = 0; //Disable FETS
-    int sensor_select = HALL_SENSOR;
+    int sensor_select = motorcontrol_config.commutation_sensor;
 
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
@@ -87,6 +88,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     if ((voltage >= 0 && fw_flag == 0) || (voltage < 0 && bw_flag == 0)) {
                         angle = i_hall.get_hall_position();
                     }
+                } else if (sensor_select == BISS_SENSOR) {
+                    angle = i_biss.get_biss_angle();
                 }
 
                 if (shutdown == 1) {    /* stop PWM */
@@ -99,6 +102,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             angle_pwm = ((angle + motorcontrol_config.hall_offset[0]) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI_SENSOR ) {
                             angle_pwm = (angle >> 2) & 0x3ff; //512
+                        } else if (sensor_select == BISS_SENSOR) {
+                            angle_pwm = angle >> 2;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
                         angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
@@ -110,6 +115,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             angle_pwm = ((angle + motorcontrol_config.hall_offset[1]) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI_SENSOR) {
                             angle_pwm = (angle >> 2) & 0x3ff; //3100
+                        } else if (sensor_select == BISS_SENSOR) {
+                            angle_pwm = ((angle + 2048) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
                         angle_pwm = (angle_pwm + 341) & 0x3ff;
@@ -137,6 +144,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     motorcontrol_config.hall_offset[0] = new_parameters.hall_offset[0];
                     motorcontrol_config.hall_offset[1] = new_parameters.hall_offset[1];
                     motorcontrol_config.bldc_winding_type = new_parameters.bldc_winding_type;
+                    motorcontrol_config.commutation_sensor = new_parameters.commutation_sensor;
+                    sensor_select = motorcontrol_config.commutation_sensor;
 
                     break;
 
@@ -147,6 +156,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
             case i_motorcontrol[int i].set_sensor(int new_sensor):
                     sensor_select = new_sensor;
+                    motorcontrol_config.commutation_sensor = sensor_select;
                     break;
 
             case i_motorcontrol[int i].set_fets_state(int new_state):

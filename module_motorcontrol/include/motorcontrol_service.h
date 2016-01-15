@@ -41,6 +41,7 @@ typedef struct {
 #include <watchdog_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
+#include <biss_service.h>
 
 #include <mc_internal_constants.h>
 
@@ -143,6 +144,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             chanend c_pwm_ctrl,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[5]);
 

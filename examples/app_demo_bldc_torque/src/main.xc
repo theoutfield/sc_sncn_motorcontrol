@@ -85,7 +85,7 @@ int main(void)
             torque_control_config.control_loop_period = CONTROL_LOOP_PERIOD; // us
 
             /* Control Loop */
-            torque_control_service(torque_control_config, i_adc[0], i_hall[1], i_qei[1], i_motorcontrol[0], i_torque_control);
+            torque_control_service(torque_control_config, i_adc[0], i_hall[1], i_qei[1], null, i_motorcontrol[0], i_torque_control);
         }
 
         /* Currents monitoring in XScope */
@@ -153,7 +153,7 @@ int main(void)
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
+                                            c_pwm_ctrl, i_hall[0], i_qei[0], null, i_watchdog[0], i_motorcontrol);
                 }
             }
         }

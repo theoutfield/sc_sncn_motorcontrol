@@ -29,7 +29,9 @@ void biss_test(client interface BISSInterface i_biss) {
         /* get position from BiSS Encoder */
         { count, position, status } = i_biss.get_biss_position();
         t :> end_time;
-        { real_count, void, void } = i_biss.get_biss_real_position();
+//        { real_count, void, void } = i_biss.get_biss_real_position();
+        real_count = i_biss.get_biss_angle();
+//        real_count = i_biss.get_biss_position_fast();
 
         /* get velocity from BiSS Encoder */
         velocity = i_biss.get_biss_velocity();
@@ -46,7 +48,7 @@ void biss_test(client interface BISSInterface i_biss) {
     }
 }
 
-BISSPorts biss_ports = { null, QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_1};
+BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
 
 int main() {
     interface BISSInterface i_biss[5]; //array of interfaces for biss server
@@ -69,7 +71,7 @@ int main() {
                 biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
                 biss_config.status_length = BISS_STATUS_LENGTH;
                 biss_config.crc_poly = BISS_CRC_POLY;
-                biss_config.poles = 3;
+                biss_config.pole_pairs = 2;
                 biss_config.polarity = BISS_POLARITY;
                 biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
                 biss_config.clock_divisor = BISS_CLOCK_DIVISOR;

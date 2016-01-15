@@ -48,6 +48,7 @@ int max_speed_limit(int velocity, int max_speed) {
 void velocity_control_service(ControlConfig &velocity_control_config,
                        interface HallInterface client ?i_hall,
                        interface QEIInterface client ?i_qei,
+                       interface BISSInterface client ?i_biss,
                        interface MotorcontrolInterface client i_motorcontrol,
                        interface VelocityControlInterface server i_velocity_control[3])
 {
@@ -103,11 +104,15 @@ void velocity_control_service(ControlConfig &velocity_control_config,
         }else{
             hall_config = i_hall.get_hall_config();
         }
-    } else if(velocity_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
+    } else if (velocity_control_config.feedback_sensor == QEI_SENSOR){
         if(isnull(i_qei)){
             printstrln("Velocity Control Loop ERROR: Interface for QEI Service not provided");
         }else{
             qei_config = i_qei.get_qei_config();
+        }
+    } else if (velocity_control_config.feedback_sensor == BISS_SENSOR){
+        if(isnull(i_biss)){
+            printstrln("Velocity Control Loop ERROR: Interface for BiSS Service not provided");
         }
     }
 
@@ -129,7 +134,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
          speed_factor_hall = hall_config.pole_pairs*4096*(velocity_control_config.control_loop_period)/1000; // variable pole_pairs
 //       hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
     }
-    else if (velocity_control_config.feedback_sensor >= QEI_SENSOR){
+    else if (velocity_control_config.feedback_sensor == QEI_SENSOR){
          speed_factor_qei = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * (velocity_control_config.control_loop_period)/1000;       // variable qei_real_max
          qei_crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK )/10;
     }
@@ -146,59 +151,63 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             if (compute_flag == 1) {
                 /* calculate actual velocity from hall/qei with filter*/
-                if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
-                    if (init == 0) {
-                        position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
-                        if (position > 2049) {
-                            init = 1;
-                            previous_position = 2049;
-                        } else if (position < -2049) {
-                            init = 1;
-                            previous_position = -2049;
+                if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
+                    actual_velocity = i_biss.get_biss_velocity();
+                } else {
+                    if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
+                        if (init == 0) {
+                            position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                            if (position > 2049) {
+                                init = 1;
+                                previous_position = 2049;
+                            } else if (position < -2049) {
+                                init = 1;
+                                previous_position = -2049;
+                            }
+                            raw_speed = 0;
+                            //target_velocity = 0;
+                        } else if (init == 1) {
+                            position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                            difference = position - previous_position;
+                            if (difference > hall_crossover) {
+                                difference = old_difference;
+                            } else if (difference < -hall_crossover) {
+                                difference = old_difference;
+                            }
+                            raw_speed = (difference*rpm_constant)/speed_factor_hall;
+#ifdef Debug_velocity_ctrl
+                            //xscope_int(RAW_SPEED, raw_speed);
+#endif
+                            previous_position = position;
+                            old_difference = difference;
                         }
-                        raw_speed = 0;
-                        //target_velocity = 0;
-                    } else if (init == 1) {
-                        position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                    } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
+                        position = i_qei.get_qei_position_absolute();
                         difference = position - previous_position;
-                        if (difference > hall_crossover) {
-                            difference = old_difference;
-                        } else if (difference < -hall_crossover) {
+
+                        if (difference > qei_crossover) {
                             difference = old_difference;
                         }
-                        raw_speed = (difference*rpm_constant)/speed_factor_hall;
+
+                        if (difference < -qei_crossover) {
+                            difference = old_difference;
+                        }
+
+                        raw_speed = (difference*rpm_constant)/speed_factor_qei;
+
 #ifdef Debug_velocity_ctrl
                         //xscope_int(RAW_SPEED, raw_speed);
 #endif
                         previous_position = position;
                         old_difference = difference;
                     }
-                } else if (velocity_control_config.feedback_sensor >= QEI_SENSOR) {
-                    position = i_qei.get_qei_position_absolute();
-                    difference = position - previous_position;
+                    /**
+                     * Or any other sensor interfaced to the IFM Module
+                     * place client functions here to acquire velocity/position
+                     */
 
-                    if (difference > qei_crossover) {
-                        difference = old_difference;
-                    }
-
-                    if (difference < -qei_crossover) {
-                        difference = old_difference;
-                    }
-
-                    raw_speed = (difference*rpm_constant)/speed_factor_qei;
-
-#ifdef Debug_velocity_ctrl
-                    //xscope_int(RAW_SPEED, raw_speed);
-#endif
-                    previous_position = position;
-                    old_difference = difference;
+                    actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
                 }
-                /**
-                 * Or any other sensor interfaced to the IFM Module
-                 * place client functions here to acquire velocity/position
-                 */
-
-                actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
             }
 
             if(activate == 1) {

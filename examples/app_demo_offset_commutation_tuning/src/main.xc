@@ -19,7 +19,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
-#define VOLTAGE 2000 //+/- 4095
+#define VOLTAGE -2000 //+/- 4095
 
 void adc_client(interface ADCInterface client i_adc, interface HallInterface client i_hall){
 
@@ -91,7 +91,7 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);
+                                            c_pwm_ctrl, i_hall[0], null, null, i_watchdog[0], i_motorcontrol);
                 }
             }
         }

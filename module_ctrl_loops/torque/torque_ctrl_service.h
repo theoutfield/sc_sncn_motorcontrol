@@ -143,5 +143,6 @@ void torque_control_service(ControlConfig &torque_ctrl_config,
                             interface ADCInterface client i_adc,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss,
                             interface MotorcontrolInterface client i_motorcontrol,
                             interface TorqueControlInterface server i_torque_control[3]);

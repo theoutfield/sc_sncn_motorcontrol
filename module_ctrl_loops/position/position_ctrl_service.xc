@@ -45,6 +45,7 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 void position_control_service(ControlConfig &position_control_config,
                                 interface HallInterface client ?i_hall,
                                 interface QEIInterface client ?i_qei,
+                                interface BISSInterface client ?i_biss,
                                 interface MotorcontrolInterface client i_motorcontrol,
                                 interface PositionControlInterface server i_position_control[3])
 {
@@ -84,12 +85,17 @@ void position_control_service(ControlConfig &position_control_config,
         }else{
             hall_config = i_hall.get_hall_config();
         }
-    } else if(position_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
+    } else if(position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)){
         if(isnull(i_qei)){
             printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
         }else{
             qei_config = i_qei.get_qei_config();
         }
+    } else if(position_control_config.feedback_sensor == BISS_SENSOR){
+        if(isnull(i_biss)){
+            printstrln("Position Control Loop ERROR: Interface for BiSS Service not provided");
+        }
+        printstrln("BiSS sensor");
     }
 
 
@@ -110,8 +116,11 @@ void position_control_service(ControlConfig &position_control_config,
     if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
         actual_position = i_hall.get_hall_position_absolute();
         target_position = actual_position;
-    } else if (position_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)) {
+    } else if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
         actual_position = i_qei.get_qei_position_absolute();
+        target_position = actual_position;
+    } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
+        { actual_position, void, void } = i_biss.get_biss_position();
         target_position = actual_position;
     }
 
@@ -129,20 +138,16 @@ void position_control_service(ControlConfig &position_control_config,
             if (activate == 1) {
                 /* acquire actual position hall/qei/sensor */
                 switch (position_control_config.feedback_sensor) {
-                    case HALL_SENSOR:
-                        actual_position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                case HALL_SENSOR:
+                    actual_position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
                     break;
 
-                    case QEI_SENSOR:
-                        actual_position =  i_qei.get_qei_position_absolute();
+                case QEI_SENSOR:
+                    actual_position =  i_qei.get_qei_position_absolute();
                     break;
 
-                    case QEI_WITH_INDEX:
-                        actual_position =  i_qei.get_qei_position_absolute();
-                    break;
-
-                    case QEI_WITH_NO_INDEX:
-                        actual_position =  i_qei.get_qei_position_absolute();
+                case BISS_SENSOR:
+                    { actual_position, void, void } = i_biss.get_biss_position();
                     break;
 
                 /*
@@ -240,8 +245,10 @@ void position_control_service(ControlConfig &position_control_config,
 
             if (in_sensor_used == HALL_SENSOR) {
                 actual_position = i_hall.get_hall_position_absolute();
-            } else if (in_sensor_used >= QEI_SENSOR) {
+            } else if (in_sensor_used == QEI_SENSOR) {
                 actual_position = i_qei.get_qei_position_absolute();
+            } else if (in_sensor_used == BISS_SENSOR) {
+                { actual_position, void, void } = i_biss.get_biss_position();
             }
             /*
              * Or any other sensor interfaced to the IFM Module

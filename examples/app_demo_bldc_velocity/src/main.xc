@@ -95,7 +95,7 @@ int main(void)
             velocity_control_config.control_loop_period =  CONTROL_LOOP_PERIOD;
 
             /* Control Loop */
-            velocity_control_service(velocity_control_config, i_hall[1], i_qei[1], i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, i_hall[1], i_qei[1], null, i_motorcontrol[0],
                                         i_velocity_control);
         }
 
@@ -142,7 +142,7 @@ int main(void)
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], i_qei[0], i_watchdog[0], i_motorcontrol);
+                                            c_pwm_ctrl, i_hall[0], i_qei[0], null, i_watchdog[0], i_motorcontrol);
                 }
             }
         }

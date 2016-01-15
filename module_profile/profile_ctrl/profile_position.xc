@@ -43,7 +43,6 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     int position_ramp;
 
     int actual_position = 0;
-
     int init_state = i_position_control.check_busy();
 
 
@@ -59,7 +58,6 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     {
         position_ramp = position_profile_generate(i);
         i_position_control.set_position(position_ramp);
-        actual_position = i_position_control.get_position();
         t when timerafter(time + MSEC_STD) :> time;
     }
     t when timerafter(time + 30 * MSEC_STD) :> time;
