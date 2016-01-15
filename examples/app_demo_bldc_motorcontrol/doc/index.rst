@@ -1,8 +1,8 @@
 .. _bldc_motor_drive_demo:
 
-=======================
+================================
 SOMANET BLDC Motor Control Demo
-=======================
+================================
 
 .. contents:: In this document
     :backlinks: none
@@ -30,6 +30,7 @@ Quick How-to
 6. :ref:`Set the configuration <motor_configuration_label>` for Motor Control and Hall Services.
 
 .. code-block:: C
+
                 /* Hall sensor Service */
                 {
                     HallConfig hall_config;

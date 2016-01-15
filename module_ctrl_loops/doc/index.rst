@@ -15,8 +15,13 @@ through interfaces.
 The Position, Velocity and Torque Control Services are intended to run at a **100MHz Reference Frequency**,
 therefore they must be instanciated in a different tile from the remaining Motor Control Services.
 
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_ctrl_loops>`_
+
 How to use (eg. Position Control Service)
 =========================================
+
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
@@ -119,7 +124,7 @@ How to use (eg. Position Control Service)
                             motorcontrol_config.commutation_loop_period = 60;
 
                             motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                                    c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);
+                                                c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol);
                         }
                     }
                 }

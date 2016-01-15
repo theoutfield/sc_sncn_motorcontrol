@@ -17,6 +17,10 @@ allocated will be automatically changed to **250MHz**.
 The Hall Service should always run over an **IFM tile** so it can access the ports to
 your SOMANET IFM device.
 
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_qei>`_
+
 .. image:: images/core-diagram-qe-interface.png
    :width: 50%
 

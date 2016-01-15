@@ -17,6 +17,7 @@ for all your apps. We do exactly this for most of our example apps, in a way tha
 .. note:: In order to include such configuration header in your app, you must tell the Makefile to use the module where the header is contained. e.g.
 
        .. code-block:: C
+       
                 USED_MODULES = config_motor etc etc
 
 For most apps, it is not strictly necessary to fill up all the configuration parameters. Normally they just need a few, but the header is thought to be used generally for any app. You can easily check in your app **main.xc** which parameters are used for the configuration of your services. 

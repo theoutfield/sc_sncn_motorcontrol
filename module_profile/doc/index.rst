@@ -15,6 +15,10 @@ Profile ramps ensure a smooth transition between set points on a control loop. I
 where 2 set points are not close enough, it is mandatory the use of profiles for apropiate motion of
 the motor.
 
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_profile>`_
+
 How to use
 ==========
 
