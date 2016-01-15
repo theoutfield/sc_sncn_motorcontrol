@@ -109,7 +109,7 @@ How to use
                             motorcontrol_config.commutation_loop_period = 60;
 
                             motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                                    c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol); // 6
+                                            c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol); // 6
                         }
                     }
                 }
