@@ -1,3 +1,5 @@
+.. _module_profile:
+
 =======================
 SOMANET Profile Module
 =======================
@@ -12,6 +14,10 @@ a Motor Control PID Controller.
 Profile ramps ensure a smooth transition between set points on a control loop. In some cases,
 where 2 set points are not close enough, it is mandatory the use of profiles for apropiate motion of
 the motor.
+
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_profile>`_
 
 How to use
 ==========
@@ -38,7 +44,7 @@ How to use
 
 2. Properly instanciate a **Position Control Loop Service**.
 
-3. Include the header in your app. 
+3. Include the Profiler header **profile_control.h** in your app. 
 
 4. Over whichever other core you can perform calls to the profiler. Do not forget to first fill up the configuration and initialize your profiler.
 

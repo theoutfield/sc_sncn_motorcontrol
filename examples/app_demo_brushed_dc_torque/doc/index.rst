@@ -1,8 +1,8 @@
 .. _brushed_dc_torque_control_demo:
 
-============================
+======================================
 SOMANET Brushed DC Torque Control Demo
-============================
+======================================
 
 .. contents:: In this document
     :backlinks: none

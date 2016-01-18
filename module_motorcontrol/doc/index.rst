@@ -19,6 +19,10 @@ allocated will be automatically changed to **250MHz**.
 The Motorcontrol Service should always run over an **IFM tile** so it can access the ports to
 your SOMANET IFM device.
 
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_motorcontrol>`_
+
 .. figure:: images/core-diagram-commutation.png
    :width: 60%
 
@@ -42,7 +46,7 @@ How to use
 
 2. Properly instanciate **PWM**, **Hall** and **Watchdog** Services.
 
-3. Include the Service header in your app. 
+3. Include the Motor Control Service header **motorcontrol_service.h** in your app. 
 
 4. Instanciate the ports where the Service will be accessing the Fet Driver signals. 
 
@@ -105,7 +109,7 @@ How to use
                             motorcontrol_config.commutation_loop_period = 60;
 
                             motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                                    c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol); // 6
+                                            c_pwm_ctrl, i_hall[0], null, i_watchdog[0], i_motorcontrol); // 6
                         }
                     }
                 }

@@ -80,13 +80,13 @@ int main(void) {
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
-                /* Motor Commutation Service */
+                /* Motor Control Service */
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.commutation_sensor = HALL_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] =  COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 

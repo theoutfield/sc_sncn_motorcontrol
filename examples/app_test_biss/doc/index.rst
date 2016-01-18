@@ -21,7 +21,7 @@ Quick How-to
 1. **Assemble your SOMANET device** (LINK TO TUTORIAL PAGE).
 2. **Wire up your device** (LINK TO INTERFACING YOUR SOMANET). Connect your Encoder sensor, power supply cable, and XTAG. Power up!
 3. Set up your development environment by installing xTIMEcomposer. (LINK TO TUTORIAL OR TO XMOS TUTORIAL)
-4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependancies.
+4. Download and **import** (LINK TO TUTORIAL: IMPORTING SOMANET LIBRARIES) in your workspace the SOMANET Motor Control Library and its dependencies.
 5. Open the **main.xc** within  the **app_test_biss**. Include the **board-support file according to your device** (LINK TO BOARD SUPPORT MODULE?). Also set the appropiate target in your Makefile. (LINK HOW TO SET YOUR RIGHT TARGET IN YOUR MAKEFILE)
 
    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the **Hardware compatibility** section of the library. (LINK TO IT).
