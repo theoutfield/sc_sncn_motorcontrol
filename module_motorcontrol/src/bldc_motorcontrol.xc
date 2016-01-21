@@ -39,9 +39,13 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
     int angle = 0;
     int voltage = 0;
     int pwm_half = PWM_MAX_VALUE>>1;
+    int max_count_per_hall, angle_offset;
 
-    int max_count_per_hall = qei_config.ticks_resolution * QEI_CHANGES_PER_TICK /hall_config.pole_pairs;
-    int angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
+    if (!isnull(i_hall)) {
+        if(!isnull(i_qei))
+            max_count_per_hall = qei_config.ticks_resolution * QEI_CHANGES_PER_TICK /hall_config.pole_pairs;
+        angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
+    }
 
     int fw_flag = 0;
     int bw_flag = 0;
@@ -133,10 +137,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
 
             case i_motorcontrol[int i].set_voltage(int new_voltage):
-                    voltage = new_voltage;
-                    if (motorcontrol_config.bldc_winding_type == DELTA_WINDING) {
-                        voltage = -voltage;
-                    }
+                    if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
+                        voltage = -new_voltage;
+                    else
+                        voltage = new_voltage;
                     break;
 
             case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
@@ -199,8 +203,11 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 //  }
 
                   voltage = 0;
-                  max_count_per_hall = qei_config.ticks_resolution  * QEI_CHANGES_PER_TICK / hall_config.pole_pairs;
-                  angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
+                  if (!isnull(i_hall)) {
+                      if(!isnull(i_qei))
+                          max_count_per_hall = qei_config.ticks_resolution  * QEI_CHANGES_PER_TICK / hall_config.pole_pairs;
+                      angle_offset = (4096 / 6) / (2 * hall_config.pole_pairs);
+                  }
                   fw_flag = 0;
                   bw_flag = 0;
 

@@ -518,17 +518,17 @@ void torque_control_service(ControlConfig &torque_control_config,
     chan c_current;
 
     HallConfig hall_config;
-    if(torque_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)){
+    if(!isnull(i_hall)){
         hall_config = i_hall.get_hall_config();
     }
 
     QEIConfig qei_config;
-    if(torque_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)){
+    if(!isnull(i_qei)){
         qei_config = i_qei.get_qei_config();
     }
 
     BISSConfig biss_config;
-    if(torque_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)){
+    if(!isnull(i_biss)){
         biss_config = i_biss.get_biss_config();
     }
 

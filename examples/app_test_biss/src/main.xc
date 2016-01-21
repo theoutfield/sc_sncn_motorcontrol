@@ -21,17 +21,13 @@ void biss_test(client interface BISSInterface i_biss) {
     unsigned int position = 0;
     unsigned int status = 0;
 
-    i_biss.reset_biss_position(0);
-
     while(1) {
         t :> start_time;
 
         /* get position from BiSS Encoder */
         { count, position, status } = i_biss.get_biss_position();
         t :> end_time;
-//        { real_count, void, void } = i_biss.get_biss_real_position();
-        real_count = i_biss.get_biss_angle();
-//        real_count = i_biss.get_biss_position_fast();
+        { real_count, void, void } = i_biss.get_biss_real_position();
 
         /* get velocity from BiSS Encoder */
         velocity = i_biss.get_biss_velocity();

@@ -100,6 +100,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     last_count_read = last_biss_read;
     next_velocity_read = last_biss_read;
     { last_count , last_position, void } = biss_encoder(data, biss_config);
+    count_offset = -last_count;
 
     //main loop
     while (1) {

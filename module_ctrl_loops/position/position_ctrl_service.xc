@@ -95,7 +95,6 @@ void position_control_service(ControlConfig &position_control_config,
         if(isnull(i_biss)){
             printstrln("Position Control Loop ERROR: Interface for BiSS Service not provided");
         }
-        printstrln("BiSS sensor");
     }
 
 
@@ -259,26 +258,26 @@ void position_control_service(ControlConfig &position_control_config,
             break;
 
         case i_position_control[int i].enable_position_ctrl():
-                        activate = 1;
-                            while (1) {
-                                init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
-                                if(init_state == INIT) {
-            #ifdef debug_print
-                                    printstrln("commutation intialized");
-            #endif
-                                    fet_state = i_motorcontrol.get_fets_state(); // check_fet_state(c_commutation);
-                                    if (fet_state == 0) {
-                                        i_motorcontrol.set_fets_state(1);
-                                        delay_milliseconds(2);
-                                    }
+            activate = 1;
+            while (1) {
+                init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
+                if(init_state == INIT) {
+#ifdef debug_print
+                    printstrln("commutation intialized");
+#endif
+                    fet_state = i_motorcontrol.get_fets_state(); // check_fet_state(c_commutation);
+                    if (fet_state == 0) {
+                        i_motorcontrol.set_fets_state(1);
+                        delay_milliseconds(2);
+                    }
 
-                                    break;
-                                }
-                            }
-            #ifdef debug_print
-                            printstrln("position control activated");
-            #endif
-                            break;
+                    break;
+                }
+            }
+#ifdef debug_print
+            printstrln("position control activated");
+#endif
+            break;
 
         case i_position_control[int i].disable_position_ctrl():
             activate = 0;

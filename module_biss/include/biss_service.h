@@ -10,7 +10,7 @@
 /**
  * @brief Definition for referring to the BiSS sensor.
  */
-#define BISS_SENSOR                3
+#define BISS_SENSOR                4
 
 #define ERROR                      0
 #define SUCCESS                    1
