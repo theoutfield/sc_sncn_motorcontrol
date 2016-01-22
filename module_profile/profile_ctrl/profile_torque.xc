@@ -38,10 +38,10 @@ void set_profile_torque(int target_torque, int torque_slope, interface TorqueCon
     for(i = 1; i<steps; i++) {
         torque_ramp =  linear_profile_generate(i);
         i_torque_control.set_torque(torque_ramp);
-        actual_torque = i_torque_control.get_torque() * get_linear_profile_polarity();
-        t when timerafter(time + MSEC_STD) :> time;
-        /*xscope_int(0, actual_torque);
+        /*actual_torque = i_torque_control.get_torque() * get_linear_profile_polarity();
+          xscope_int(0, actual_torque);
           xscope_int(1, torque_ramp);*/
+        t when timerafter(time + MSEC_STD) :> time;
     }
     t when timerafter(time + 30 * MSEC_STD) :> time;
 }

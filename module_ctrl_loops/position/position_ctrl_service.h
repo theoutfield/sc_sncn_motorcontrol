@@ -95,6 +95,13 @@ interface PositionControlInterface{
     void set_qei_config(QEIConfig in_config);
 
     /**
+     * @brief Getter for current configuration used by the BiSS Service.
+     *
+     * @return Current BiSS Service configuration.
+     */
+    BISSConfig get_biss_config();
+
+    /**
      * @brief Getter for the current state of the Service.
      *
      * @return 0 - not initialized.

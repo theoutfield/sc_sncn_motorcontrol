@@ -41,15 +41,15 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
     for(i = 1; i < steps; i++) {
         velocity_ramp = velocity_profile_generate(i);
         i_velocity_control.set_velocity(velocity_ramp);
-        actual_velocity = i_velocity_control.get_velocity();
 
         t when timerafter(time + MSEC_STD) :> time;
 
         /*xscope_int(0, actual_velocity);
+          actual_velocity = i_velocity_control.get_velocity();
           xscope_int(1, velocity_ramp);*/
     }
-if (target_velocity == 0) {
-    i_velocity_control.set_velocity(target_velocity);
+    if (target_velocity == 0) {
+        i_velocity_control.set_velocity(target_velocity);
     }
     t when timerafter(time + 30 * MSEC_STD) :> time;
 

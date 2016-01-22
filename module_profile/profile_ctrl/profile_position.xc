@@ -15,6 +15,7 @@ void init_position_profiler(ProfilerConfig profile_position_config,
     ControlConfig control_config = i_position_control.get_position_control_config();
     QEIConfig qei_config = i_position_control.get_qei_config();
     HallConfig hall_config = i_position_control.get_hall_config();
+    BISSConfig biss_config = i_position_control.get_biss_config();
 
     if(profile_position_config.max_acceleration <= 0 ||
             profile_position_config.max_velocity <= 0){
@@ -24,7 +25,7 @@ void init_position_profiler(ProfilerConfig profile_position_config,
 
     init_position_profile_limits(profile_position_config.max_acceleration,
                                     profile_position_config.max_velocity,
-                                    qei_config, hall_config, control_config.feedback_sensor,
+                                    qei_config, hall_config, biss_config, control_config.feedback_sensor,
                                     profile_position_config.max_position,
                                     profile_position_config.min_position);
 
