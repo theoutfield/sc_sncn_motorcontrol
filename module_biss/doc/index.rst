@@ -24,38 +24,22 @@ All communication is done by interface communication and client interface calls 
 BiSS Encoder Interface API
 ================================
 
-Server API
+Service
 ----------------
 
-.. doxygenfunction:: run_biss
+.. doxygenfunction:: biss_service
 
 
-Client API
-----------
+Interface
+---------
 
-.. doxygenfunction:: get_position
-
-.. doxygenfunction:: get_real_position
-
-.. doxygenfunction:: get_position_fast
-
-.. doxygenfunction:: get_angle_electrical
-
-.. doxygenfunction:: get_velocity
-
-.. doxygenfunction:: get_params
-
-.. doxygenfunction:: set_count
-
-.. doxygenfunction:: set_angle_electrical
-
-.. doxygenfunction:: set_params
+.. doxygeninterface:: BISSInterface
 
 
 Types
 -----
 
-.. doxygenstruct:: biss_par
+.. doxygenstruct:: BISSConfig
 
 
 .. _biss_programming_label:
