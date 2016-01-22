@@ -50,6 +50,7 @@ int main(void) {
             printstrln("Watchdog starts again, motor spins");
             i_motorcontrol[0].set_voltage(0);    // We set a 0 voltage before starting operation
             i_watchdog[1].start();
+            delay_milliseconds(200);
             i_motorcontrol[0].set_voltage(500);
         }
 
