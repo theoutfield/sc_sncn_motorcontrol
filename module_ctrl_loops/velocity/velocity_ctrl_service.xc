@@ -90,47 +90,9 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
     HallConfig hall_config;
     QEIConfig qei_config;
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+    MotorcontrolConfig motorcontrol_config;
 
-   if(velocity_control_config.feedback_sensor != HALL_SENSOR
-           && velocity_control_config.feedback_sensor < QEI_SENSOR){
-       velocity_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
-   }
-
-    if(velocity_control_config.feedback_sensor == HALL_SENSOR){
-        if(isnull(i_hall)){
-            printstrln("Velocity Control Loop ERROR: Interface for Hall Service not provided");
-        }else{
-            hall_config = i_hall.get_hall_config();
-        }
-    } else if(velocity_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
-        if(isnull(i_qei)){
-            printstrln("Velocity Control Loop ERROR: Interface for QEI Service not provided");
-        }else{
-            qei_config = i_qei.get_qei_config();
-        }
-    }
-
-    //Limits
-    if(motorcontrol_config.motor_type == BLDC_MOTOR){
-        velocity_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
-    }else if(motorcontrol_config.motor_type == BDC_MOTOR){
-        velocity_control_out_limit = BDC_PWM_CONTROL_LIMIT;
-    }
-
-    if(velocity_control_config.Ki_n != 0)
-        error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
-
-    init_filter(filter_buffer, index, FILTER_SIZE_MAX);
-
-    if (velocity_control_config.feedback_sensor == HALL_SENSOR){
-         speed_factor_hall = hall_config.pole_pairs*4096*(velocity_control_config.control_loop_period)/1000; // variable pole_pairs
-//       hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
-    }
-    else if (velocity_control_config.feedback_sensor >= QEI_SENSOR){
-         speed_factor_qei = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * (velocity_control_config.control_loop_period)/1000;       // variable qei_real_max
-         qei_crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK )/10;
-    }
+    int config_update_flag = 1;
 
     printstrln("*************************************\n    VELOCITY CONTROLLER STARTING\n*************************************");
 
@@ -140,6 +102,52 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 //#pragma ordered
         select {
         case t when timerafter (ts +  USEC_STD * velocity_control_config.control_loop_period) :> ts:
+
+            if (config_update_flag) {
+                motorcontrol_config = i_motorcontrol.get_config();
+
+                   if(velocity_control_config.feedback_sensor != HALL_SENSOR
+                           && velocity_control_config.feedback_sensor < QEI_SENSOR){
+                       velocity_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
+                   }
+
+                    if(velocity_control_config.feedback_sensor == HALL_SENSOR){
+                        if(isnull(i_hall)){
+                            printstrln("Velocity Control Loop ERROR: Interface for Hall Service not provided");
+                        }else{
+                            hall_config = i_hall.get_hall_config();
+                        }
+                    } else if(velocity_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)){
+                        if(isnull(i_qei)){
+                            printstrln("Velocity Control Loop ERROR: Interface for QEI Service not provided");
+                        }else{
+                            qei_config = i_qei.get_qei_config();
+                        }
+                    }
+
+                    //Limits
+                    if(motorcontrol_config.motor_type == BLDC_MOTOR){
+                        velocity_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
+                    }else if(motorcontrol_config.motor_type == BDC_MOTOR){
+                        velocity_control_out_limit = BDC_PWM_CONTROL_LIMIT;
+                    }
+
+                    if(velocity_control_config.Ki_n != 0)
+                        error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
+
+                    if (velocity_control_config.feedback_sensor == HALL_SENSOR){
+                         speed_factor_hall = hall_config.pole_pairs*4096*(velocity_control_config.control_loop_period)/1000; // variable pole_pairs
+                //       hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
+                    }
+                    else if (velocity_control_config.feedback_sensor >= QEI_SENSOR){
+                         speed_factor_qei = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * (velocity_control_config.control_loop_period)/1000;       // variable qei_real_max
+                         qei_crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK )/10;
+                    }
+
+                    init_filter(filter_buffer, index, FILTER_SIZE_MAX);
+
+                    config_update_flag = 0;
+            }
 
             if (compute_flag == 1) {
                 /* calculate actual velocity from hall/qei with filter*/
@@ -258,6 +266,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             if(velocity_control_config.Ki_n != 0)
                 error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
 
+            config_update_flag = 1;
+
             break;
 
         case i_velocity_control[int i].set_velocity_filter(int in_length):
@@ -267,6 +277,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             if(filter_length > FILTER_SIZE_MAX)
                 filter_length = FILTER_SIZE_MAX;
 
+            config_update_flag = 1;
+
             break;
 
         case i_velocity_control[int i].set_hall_config(HallConfig in_config):
@@ -274,6 +286,9 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             hall_config.pole_pairs = in_config.pole_pairs;
             //hall_config.max_ticks = in_config.max_ticks;
             //hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
+
+            config_update_flag = 1;
+
             break;
 
         case i_velocity_control[int i].set_qei_config(QEIConfig in_params):
@@ -283,6 +298,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             qei_config.ticks_resolution = in_params.ticks_resolution;
             //qei_config.max_ticks_per_turn = in_params.max_ticks_per_turn;
             //qei_config.poles = in_params.poles;
+
+            config_update_flag = 1;
 
             break;
 
@@ -299,6 +316,9 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 qei_crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK )/10;
             }
             target_velocity = actual_velocity;
+
+            config_update_flag = 1;
+
             break;
 
 
