@@ -255,9 +255,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
         case i_velocity_control[int i].set_velocity_control_config(ControlConfig in_params):
 
-            velocity_control_config.Kp_n = in_params.Kp_n;
-            velocity_control_config.Ki_n = in_params.Ki_n;
-            velocity_control_config.Kd_n = in_params.Kd_n;
+            velocity_control_config = in_params;
 
             error_velocity_I_limit = 0;
             if(velocity_control_config.Ki_n != 0)

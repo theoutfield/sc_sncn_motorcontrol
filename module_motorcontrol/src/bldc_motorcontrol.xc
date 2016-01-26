@@ -133,11 +133,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     break;
 
             case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
-
-                    motorcontrol_config.hall_offset[0] = new_parameters.hall_offset[0];
-                    motorcontrol_config.hall_offset[1] = new_parameters.hall_offset[1];
-                    motorcontrol_config.bldc_winding_type = new_parameters.bldc_winding_type;
-
+                    motorcontrol_config = new_parameters;
                     break;
 
             case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:

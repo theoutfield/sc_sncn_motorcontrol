@@ -212,9 +212,7 @@ void position_control_service(ControlConfig &position_control_config,
 
         case i_position_control[int i].set_position_control_config(ControlConfig in_params):
 
-            position_control_config.Kp_n = in_params.Kp_n;
-            position_control_config.Ki_n = in_params.Ki_n;
-            position_control_config.Kd_n = in_params.Kd_n;
+            position_control_config = in_params;
 
             error_position_I_limit = 0;
             if(position_control_config.Ki_n != 0)

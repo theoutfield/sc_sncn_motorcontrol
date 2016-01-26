@@ -397,9 +397,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
         case i_torque_control[int i].set_torque_control_config(ControlConfig in_params):
 
-            torque_control_config.Kp_n = in_params.Kp_n;
-            torque_control_config.Ki_n = in_params.Ki_n;
-            torque_control_config.Kd_n = in_params.Kd_n;
+            torque_control_config = in_params;
 
             error_torque_integral_limit = 0;
             if(torque_control_config.Ki_n != 0)
