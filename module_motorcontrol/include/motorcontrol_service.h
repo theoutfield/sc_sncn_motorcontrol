@@ -140,12 +140,13 @@ interface MotorcontrolInterface{
  * @param i_motorcontrol[5] Array of communication interfaces to handle up to 5 different clients.
  */
 [[combinable]]
-void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
-                            chanend c_pwm_ctrl,
-                            interface HallInterface client ?i_hall,
-                            interface QEIInterface client ?i_qei,
-                            interface BISSInterface client ?i_biss,
-                            interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[5]);
+ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
+                             chanend c_pwm_ctrl,
+                             interface HallInterface client ?i_hall,
+                             interface QEIInterface client ?i_qei,
+                             interface BISSInterface client ?i_biss,
+                             interface AMSInterface client ?i_ams,
+                             interface WatchdogInterface client i_watchdog,
+                             interface MotorcontrolInterface server i_motorcontrol[5])
 
 #endif

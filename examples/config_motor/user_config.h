@@ -7,6 +7,7 @@
 
 #include <qei_service.h>
 #include <hall_service.h>
+#include <rotary_sensor.h>
 #include <motorcontrol_service.h>
 
 /**************************************************
@@ -21,7 +22,7 @@
 #define MOTOR_TYPE  BLDC_MOTOR
 
 // NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  4
+#define POLE_PAIRS  3
 
 // WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
 #define BLDC_WINDING_TYPE   DELTA_WINDING
@@ -34,7 +35,7 @@
 #define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR]
-#define MOTOR_FEEDBACK_SENSOR      QEI_SENSOR
+#define MOTOR_FEEDBACK_SENSOR      AMS_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
 #define QEI_SENSOR_INDEX_TYPE      QEI_WITH_INDEX
@@ -44,6 +45,7 @@
 
 // RESOLUTION OF YOUR INCREMENTAL ENCODER (if applicable)
 #define QEI_SENSOR_RESOLUTION      4000
+#define SENSOR_RESOLUTION          ROTARY_SENSOR_MAX_ANGLE
 
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1

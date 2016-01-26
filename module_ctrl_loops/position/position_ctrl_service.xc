@@ -46,6 +46,7 @@ void position_control_service(ControlConfig &position_control_config,
                                 interface HallInterface client ?i_hall,
                                 interface QEIInterface client ?i_qei,
                                 interface BISSInterface client ?i_biss,
+                                interface AMSInterface client ?i_ams,
                                 interface MotorcontrolInterface client i_motorcontrol,
                                 interface PositionControlInterface server i_position_control[3])
 {
@@ -71,12 +72,13 @@ void position_control_service(ControlConfig &position_control_config,
 
     HallConfig hall_config;
     QEIConfig qei_config;
+    AMSConfig ams_config;
     MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
 
-   if(position_control_config.feedback_sensor != HALL_SENSOR
+    if(position_control_config.feedback_sensor != HALL_SENSOR
            && position_control_config.feedback_sensor < QEI_SENSOR){
        position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
-   }
+    }
 
 
     if(position_control_config.feedback_sensor == HALL_SENSOR){
@@ -95,9 +97,15 @@ void position_control_service(ControlConfig &position_control_config,
         if(isnull(i_biss)){
             printstrln("Position Control Loop ERROR: Interface for BiSS Service not provided");
         }
+    } else if(position_control_config.feedback_sensor == AMS_SENSOR){
+        if(isnull(i_ams)){
+            printstrln("Position Control Loop ERROR: Interface for AMS Service not provided");
+        }
+        else
+        {
+            ams_config = i_ams.get_ams_config();
+        }
     }
-
-
 
     //Limits
     if(motorcontrol_config.motor_type == BLDC_MOTOR){
@@ -120,6 +128,9 @@ void position_control_service(ControlConfig &position_control_config,
         target_position = actual_position;
     } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
         { actual_position, void, void } = i_biss.get_biss_position();
+        target_position = actual_position;
+    } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
+        actual_position = i_ams.get_ams_position();
         target_position = actual_position;
     }
 
@@ -147,6 +158,10 @@ void position_control_service(ControlConfig &position_control_config,
 
                 case BISS_SENSOR:
                     { actual_position, void, void } = i_biss.get_biss_position();
+                    break;
+
+                case AMS_SENSOR:
+                    actual_position = i_ams.get_ams_position();
                     break;
 
                 /*
@@ -248,6 +263,8 @@ void position_control_service(ControlConfig &position_control_config,
                 actual_position = i_qei.get_qei_position_absolute();
             } else if (in_sensor_used == BISS_SENSOR) {
                 { actual_position, void, void } = i_biss.get_biss_position();
+            } else if (in_sensor_used == AMS_SENSOR) {
+                actual_position = i_ams.get_ams_position_absolute();
             }
             /*
              * Or any other sensor interfaced to the IFM Module
@@ -314,8 +331,12 @@ void position_control_service(ControlConfig &position_control_config,
                 out_config = i_biss.get_biss_config();
                 break;
 
-        }
-        }
+        case i_position_control[int i].get_ams_config() -> AMSConfig out_config:
 
+                out_config = i_ams.get_ams_config();
+                break;
+
+        }
     }
+}
 

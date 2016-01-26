@@ -39,6 +39,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[5])
 {
@@ -47,6 +48,8 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
     HallConfig hall_config;
     QEIConfig qei_config;
+    AMSConfig ams_config;
+
     timer t;
     unsigned ts = 0;
 
@@ -55,6 +58,11 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
     if(!isnull(i_qei)){
         qei_config = i_qei.get_qei_config();
+    }
+
+    if (!isnull(i_ams))
+    {
+        ams_config = i_ams.get_ams_config();
     }
 
     if (check_motorcontrol_config(motorcontrol_config) == ERROR){
