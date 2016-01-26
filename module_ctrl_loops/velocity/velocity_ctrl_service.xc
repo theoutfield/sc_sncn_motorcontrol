@@ -82,7 +82,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     int speed_factor_hall = 0;
     int speed_factor_qei = 0;
     int activate = 0;
-    int init_state = INIT_BUSY;
+    int init_state;
     int qei_crossover = 0;
     int const hall_crossover = INT_MAX - INT_MAX/10;
     int compute_flag = 0;
@@ -111,8 +111,6 @@ void velocity_control_service(ControlConfig &velocity_control_config,
         }
     }
 
-    motorcontrol_config = i_motorcontrol.get_config();
-
     //Limits
     if(motorcontrol_config.motor_type == BLDC_MOTOR){
         velocity_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
@@ -137,7 +135,6 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     printstrln("*************************************\n    VELOCITY CONTROLLER STARTING\n*************************************");
 
     t :> ts;
-    init_state = INIT;
 
     while (1) {
 //#pragma ordered
