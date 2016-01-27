@@ -15,7 +15,7 @@
 
 void init_position_control(interface PositionControlInterface client i_position_control)
 {
-    int ctrl_state = INIT_BUSY;
+    int ctrl_state;
 
     while (1) {
         ctrl_state = i_position_control.check_busy();
@@ -50,7 +50,6 @@ void position_control_service(ControlConfig &position_control_config,
 {
     int actual_position = 0;
     int target_position = 0;
-
     int error_position = 0;
     int error_position_D = 0;
     int error_position_I = 0;
@@ -64,9 +63,6 @@ void position_control_service(ControlConfig &position_control_config,
     unsigned int ts;
 
     int activate = 0;
-
-    int fet_state;
-    int init_state = INIT_BUSY; /* check commutation init */
 
     HallConfig hall_config;
     QEIConfig qei_config;
@@ -266,13 +262,11 @@ void position_control_service(ControlConfig &position_control_config,
 
                 activate = 1;
                 while (1) {
-                    init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
-                    if (init_state == INIT) {
+                    if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
 #ifdef debug_print
                         printstrln("commutation intialized");
 #endif
-                        fet_state = i_motorcontrol.get_fets_state(); // check_fet_state(c_commutation);
-                        if (fet_state == 0) {
+                        if (i_motorcontrol.get_fets_state() == 0) { // check_fet_state(c_commutation);
                             i_motorcontrol.set_fets_state(1);
                             delay_milliseconds(2);
                         }
