@@ -79,9 +79,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     int speed_factor;
     int crossover;
     int activate = 0;
-    int init_state;
     int compute_flag = 0;
-    int fet_state = 0;
 
     HallConfig hall_config;
     QEIConfig qei_config;
@@ -308,13 +306,11 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
                 activate = 1;
                 while (1) {
-                    init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
-                    if (init_state == INIT) {
+                    if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
 #ifdef debug_print
                         printstrln("commutation intialized");
 #endif
-                        fet_state = i_motorcontrol.get_fets_state(); //check_fet_state(c_commutation);
-                        if (fet_state == 0) {
+                        if (i_motorcontrol.get_fets_state() == 0) { //check_fet_state(c_commutation);
                             i_motorcontrol.set_fets_state(1); //enable_motor(c_commutation);
                             delay_milliseconds(2); //wait_ms(2, 1, t);
                         }
