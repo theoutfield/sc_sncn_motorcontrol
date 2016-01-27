@@ -1,7 +1,7 @@
 .. _brushed_dc_velocity_control_demo:
 
 ========================================
-SOMANET Brushed DC Velocity Control Demo
+Brushed DC Velocity Control Demo
 ========================================
 
 .. contents:: In this document

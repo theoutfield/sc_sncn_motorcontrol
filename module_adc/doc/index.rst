@@ -1,5 +1,5 @@
 ==================
-SOMANET ADC Module 
+ADC Module 
 ==================
 
 .. contents:: In this document

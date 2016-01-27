@@ -1,7 +1,7 @@
 .. _bldc_motor_drive_demo:
 
 ================================
-SOMANET BLDC Motor Control Demo
+BLDC Motor Control Demo
 ================================
 
 .. contents:: In this document

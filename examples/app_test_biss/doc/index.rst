@@ -1,6 +1,6 @@
 .. _biss_demo:
 =================================
-SOMANET BiSS Interface Demo
+BiSS Interface Demo
 =================================
 
 .. contents:: In this document

@@ -1,7 +1,7 @@
 .. _module_qei:
-===============================================
-SOMANET Encoder Interface Module
-===============================================
+===========================
+Incremental Encoder Module
+===========================
 
 .. contents:: In this document
     :backlinks: none

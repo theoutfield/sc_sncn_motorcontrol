@@ -1,7 +1,7 @@
 .. _module_ctrl_loops:
 
 =============================
-SOMANET Control Loops Module 
+Control Loops Module 
 =============================
 
 .. contents:: In this document

@@ -1,7 +1,7 @@
 .. _bldc_position_control_demo:
 
 ==================================
-SOMANET BLDC Position Control Demo
+BLDC Position Control Demo
 ==================================
 
 .. contents:: In this document

@@ -1,6 +1,6 @@
 .. _qei_demo:
 =================================
-SOMANET Encoder Interface Demo
+Encoder Interface Demo
 =================================
 
 .. contents:: In this document

@@ -1,7 +1,7 @@
 .. _module_watchdog:
-=======================
-SOMANET Watchdog Module 
-=======================
+=================
+Watchdog Module 
+=================
 
 .. contents:: In this document
     :backlinks: none

@@ -1,7 +1,7 @@
 .. _brushed_dc_drive_demo:
 
 =====================================
-SOMANET Brushed DC Motor Control Demo
+Brushed DC Motor Control Demo
 =====================================
 
 .. contents:: In this document

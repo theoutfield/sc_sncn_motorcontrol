@@ -1,7 +1,7 @@
 .. _module_profile:
 
 =======================
-SOMANET Profile Module
+Profile Module
 =======================
 
 .. contents:: In this document

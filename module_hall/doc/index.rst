@@ -1,6 +1,6 @@
 .. _module_hall:
 ===========================
-SOMANET Hall Sensor Module
+Hall Sensor Module
 ===========================
 
 .. contents:: In this document

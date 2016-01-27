@@ -1,5 +1,5 @@
 ============================
-SOMANET Miscellaneous Module 
+Miscellaneous Module 
 ============================
 
 .. contents:: In this document

@@ -1,7 +1,7 @@
 .. _module_motorcontrol:
 
 ==================================
-SOMANET Motor Control Module
+Motor Control Module
 ==================================
 
 .. contents:: In this document

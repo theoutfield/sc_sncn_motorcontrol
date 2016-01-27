@@ -1,5 +1,5 @@
 ====================
-SOMANET GPIO Module 
+GPIO Service Module 
 ====================
 
 .. contents:: In this document

@@ -1,7 +1,7 @@
 .. _watchdog_driver_demo:
 
 ============================
-SOMANET Watchdog Driver Demo
+Watchdog Driver Demo
 ============================
 
 .. contents:: In this document
