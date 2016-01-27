@@ -66,37 +66,9 @@ void position_control_service(ControlConfig &position_control_config,
 
     HallConfig hall_config;
     QEIConfig qei_config;
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+    MotorcontrolConfig motorcontrol_config;
 
-    if (position_control_config.feedback_sensor != HALL_SENSOR
-           && position_control_config.feedback_sensor < QEI_SENSOR) {
-        position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
-    }
-
-    if (position_control_config.feedback_sensor == HALL_SENSOR) {
-        if (isnull(i_hall)) {
-            printstrln("Position Control Loop ERROR: Interface for Hall Service not provided");
-        } else {
-            hall_config = i_hall.get_hall_config();
-        }
-    } else if (position_control_config.feedback_sensor >= QEI_SENSOR) {
-        if (isnull(i_qei)) {
-            printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
-        } else {
-            qei_config = i_qei.get_qei_config();
-        }
-    }
-
-    //Limits
-    if (motorcontrol_config.motor_type == BLDC_MOTOR) {
-        position_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
-    } else if(motorcontrol_config.motor_type == BDC_MOTOR) {
-        position_control_out_limit = BDC_PWM_CONTROL_LIMIT;
-    }
-
-    if (position_control_config.Ki_n != 0) {
-        error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
-    }
+    int config_update_flag = 1;
 
     printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
 
@@ -119,6 +91,43 @@ void position_control_service(ControlConfig &position_control_config,
 #pragma ordered
         select {
             case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
+
+                if (config_update_flag) {
+                    motorcontrol_config = i_motorcontrol.get_config();
+
+                    //Limits
+                    if (motorcontrol_config.motor_type == BLDC_MOTOR) {
+                        position_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
+                    } else if(motorcontrol_config.motor_type == BDC_MOTOR) {
+                        position_control_out_limit = BDC_PWM_CONTROL_LIMIT;
+                    }
+
+                    if (position_control_config.feedback_sensor != HALL_SENSOR
+                           && position_control_config.feedback_sensor < QEI_SENSOR) {
+                        position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
+                    }
+
+                    if (position_control_config.feedback_sensor == HALL_SENSOR) {
+                        if (isnull(i_hall)) {
+                            printstrln("Position Control Loop ERROR: Interface for Hall Service not provided");
+                        } else {
+                            hall_config = i_hall.get_hall_config();
+                        }
+                    } else if (position_control_config.feedback_sensor >= QEI_SENSOR) {
+                        if (isnull(i_qei)) {
+                            printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
+                        } else {
+                            qei_config = i_qei.get_qei_config();
+                        }
+                    }
+
+                    if (position_control_config.Ki_n != 0) {
+                        error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
+                    }
+
+                    config_update_flag = 0;
+                }
+
                 if (activate == 1) {
                     /* acquire actual position hall/qei/sensor */
                     switch (position_control_config.feedback_sensor) {
@@ -201,12 +210,7 @@ void position_control_service(ControlConfig &position_control_config,
             case i_position_control[int i].set_position_control_config(ControlConfig in_params):
 
                 position_control_config = in_params;
-
-                error_position_I_limit = 0;
-                if (position_control_config.Ki_n != 0) {
-                    error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
-                }
-
+                config_update_flag = 1;
                 break;
 
             case i_position_control[int i].get_position_control_config() ->  ControlConfig out_config:
@@ -217,6 +221,7 @@ void position_control_service(ControlConfig &position_control_config,
             case i_position_control[int i].set_hall_config(HallConfig in_config):
 
                 hall_config.pole_pairs = in_config.pole_pairs;
+                config_update_flag = 1;
                 break;
 
             case i_position_control[int i].get_hall_config() -> HallConfig out_config:
@@ -229,6 +234,7 @@ void position_control_service(ControlConfig &position_control_config,
                 qei_config.index_type = in_qei_params.index_type;
                 qei_config.ticks_resolution = in_qei_params.ticks_resolution;
                 //qei_config.max_ticks_per_turn = in_qei_params.max_ticks_per_turn;
+                config_update_flag = 1;
                 break;
 
             case i_position_control[int i].get_qei_config() -> QEIConfig out_config:
@@ -250,6 +256,7 @@ void position_control_service(ControlConfig &position_control_config,
                  * place client functions here to acquire position
                  */
                 target_position = actual_position;
+                config_update_flag = 1;
 
                 break;
 
