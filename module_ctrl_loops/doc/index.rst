@@ -13,13 +13,13 @@ PID control over a Motor Control Service. Up to 3 clients could control the Serv
 through interfaces.
 
 The Position, Velocity and Torque Control Services are intended to run at a **100MHz Reference Frequency**,
-therefore they must be instanciated in a different tile from the remaining Motor Control Services.
+therefore they must be instantiated in a different tile from the remaining Motor Control Services.
 
 .. cssclass:: github
 
   `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_ctrl_loops>`_
 
-How to use (eg. Position Control Service)
+How to use (e.g. Position Control Service)
 =========================================
 
 
@@ -43,13 +43,13 @@ How to use (eg. Position Control Service)
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
               This will help solving internal dependency issues.
 
-2. Properly instanciate a :ref:`Motor Control Service <module_motorcontrol>`.
+2. Properly instantiate a :ref:`Motor Control Service <module_motorcontrol>`.
 
 3. Include the Position Control Service header **position_ctrl_service.h** in your app. 
 
-4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. Outside your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your control feedback sensor Service and Motor Control Service.
+5. Outside your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your control feedback sensor Service and Motor Control Service.
 
 6. At whichever other core, now you can perform calls to the Control Service through the interfaces connected to it. Do not forget to initialize it first.
 
@@ -133,7 +133,7 @@ How to use (eg. Position Control Service)
             return 0;
         }
 
-    .. note:: Similary to this example, you can repeat the same steps for Velocity and Torque Control Loops. 
+    .. note:: Similarly to this example, you can repeat the same steps for Velocity and Torque Control Loops. 
 
 API
 ===

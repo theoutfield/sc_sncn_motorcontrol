@@ -34,15 +34,15 @@ How to use
         USED_MODULES = module_gpio module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
 2. Include the GPIO Service header **gpio_service.h** in your app. 
 
-3. Instanciate the ports where the Service will be accessing the GPIO pins. 
+3. Instantiate the ports where the Service will be accessing the GPIO pins. 
 
-4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instanciate the Service. 
+5. At your IFM tile, instantiate the Service. 
 
 6. At whichever other core, now you can perform calls to the GPIO Service through the interfaces connected to it.
 

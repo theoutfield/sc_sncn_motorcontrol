@@ -115,9 +115,9 @@ Step 4: Run BiSS Encoder Interface Server
     }
 
 
-Getting position information from biss server
+Getting position information from BiSS server
 ---------------------------------------------
-While the BiSS server is running, the position can be aquired by a simple API call:
+While the BiSS server is running, the position can be acquired by a simple API call:
 
 ::
 

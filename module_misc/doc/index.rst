@@ -28,7 +28,7 @@ How to use
     USED_MODULES = module_misc module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_motorcontrol module_profile module_gpio module_qei module_watchdog module_board-support
 
   .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
 Moving Average Filter
 `````````````````````
