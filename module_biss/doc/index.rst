@@ -1,138 +1,121 @@
-========================================
-SOMANET BiSS Encoder Interface Component
-========================================
+.. _module_biss:
 
-Overview
-========
+===========================
+SOMANET BiSS Encoder Module
+===========================
+
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-**BiSS** BiSS is an open source digital interface for sensors and actuators. BiSS is hardware compatible to the industrial standard SSI (Serial Synchronous Interface). The standardization process is coordinated on biss-interface.com_.
- 
-This module (**module_biss**) provides a BiSS server thread which read BiSS sensor data from the encoder and extract position information when called by the client with an interface; and provides an interface for the client to get position from the BiSS server.
+This module provides a Service which will read and process the data coming from your BiSS Encoder Feedback Sensor. Up to 5 clients could retrieve data from the Servicethrough an interface.
 
-All communication is done by interface communication and client interface calls following a Server-Client scheme.
+BiSS is an open source digital interface for sensors and actuators. BiSS is hardware compatible to the industrial standard SSI (Serial Synchronous Interface). The standardization process is coordinated on biss-interface.com_.
+
+When running the BiSS Service, the **Reference Frequency** of the tile where the Service is
+allocated will be automatically changed to **250MHz**.
+
+The BiSS Service should always run over an **IFM Tile** so it can access the ports to
+your SOMANET IFM device.
+
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_biss>`_
+
+.. image:: images/core-diagram-biss-interface.png
+   :width: 50%
 
 .. _biss-interface.com: http://www.biss-interface.com/
 
-.. figure:: images/core-diagram-biss-interface.png
-   :width: 100%
 
-   Core diagram
-   
-BiSS Encoder Interface API
-================================
+How to use
+==========
+
+.. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
+
+.. seealso:: You might find useful the :ref:`BiSS Sensor Demo <biss_demo>`, which illustrates the use of this module.
+
+1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
+
+    ::
+
+        USED_MODULES = module_biss module_board-support module_misc
+
+    .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules.
+          This will help solving internal dependancy issues.
+
+2. Include the BiSS Service header **biss_service.h** in your app.
+
+3. Instanciate the ports where the Service will be sendind the BiSS clock, reading the BiSS Sensor feedback signals and the clock block to use.
+
+4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+
+5. At your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration.
+
+6. At whichever other core, now you can perform calls to the BiSS Service through the interfaces connected to it.
+
+    .. code-block:: C
+
+        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
+        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
+                                        //(select your board support files according to your device)
+
+        #include <biss_service.h> // 2
+
+        BiSSPorts biss_ports = SOMANET_IFM_BISS_PORTS; // 3
+
+        int main(void)
+        {
+            interface BiSSInterface i_biss[5]; // 4
+
+            par
+            {
+                on tile[APP_TILE]: int foo = i_biss[0].get_biss_position(); // 6
+
+                on tile[IFM_TILE]:
+                {
+                    BiSSConfig biss_config; // 5
+                    biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
+                    biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                    biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
+                    biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
+                    biss_config.status_length = BISS_STATUS_LENGTH;
+                    biss_config.crc_poly = BISS_CRC_POLY;
+                    biss_config.pole_pairs = 2;
+                    biss_config.polarity = BISS_POLARITY;
+                    biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
+                    biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+                    biss_config.timeout = BISS_TIMEOUT;
+                    biss_config.max_ticks = BISS_MAX_TICKS;
+                    biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                    biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+
+                    biss_service(biss_ports, biss_config, i_biss);
+                }
+            }
+
+            return 0;
+        }
+
+API
+===
+
+Definitions
+-----------
+
+.. doxygendefine:: BISS_SENSOR
+
+Types
+-----
+.. doxygenstruct:: BISSConfig
+.. doxygenstruct:: BISSPorts
 
 Service
-----------------
+--------
 
 .. doxygenfunction:: biss_service
-
 
 Interface
 ---------
 
 .. doxygeninterface:: BISSInterface
-
-
-Types
------
-
-.. doxygenstruct:: BISSConfig
-
-
-.. _biss_programming_label:
-
-How to Use
-==========
-
-Getting position information from your BiSS Encoder
----------------------------------------------------
-
-Step 1: Include the required modules & headers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Make sure you Makefile contains at least these modules
-
-::
-
-    USED_MODULES = module_biss module_board-support
-
-Make sure you include these files in your main.xc file
-
-::
-
-    #include <xscope.h>
-    #include <timer.h>
-    #include <biss_server.h>
-    #include <biss_client.h>
-
-
-Step 2: Define required interfaces
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-An interface is required to transport data from the biss_server task to your custom client's task
-
-::
-
-	int main(void)
-	{
-		interface i_biss i_biss[2];
-		...
-	}
-
-
-Step 4: Run BiSS Encoder Interface Server
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. important:: Please note that all the server must be executed on a tile with access to I/O of a Synapticon SOMANET IFM Drive DC board. 
-
-::
-
-    int main(void)
-    {
-    ...
-
-        par
-        {
-        ...
-
-            on tile[IFM_TILE]:
-            {
-                par
-                {
-                    /* BiSS Server */
-                    {
-                        biss_par biss_params;
-			run_biss(i_biss, qei_q_ch1, p_ifm_encoder_ch2, clk_biss, 10, 1, biss_params, 2);
-                    }
-                }
-            }
-            ...
-
-        }
-
-        return 0;
-    }
-
-
-Getting position information from biss server
----------------------------------------------
-While the BiSS server is running, the position can be aquired by a simple API call:
-
-::
-
-    int main(void)
-    {
-    ...
-
-        par
-        {
-            on tile[0]: // Can be any tile
-            {
-                /* get position from BiSS Encoder */
-        	{ count, position, status } = i_biss[0].get_position();
-            }
-        }
-    ...
-
-    }

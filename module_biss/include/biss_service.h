@@ -63,15 +63,14 @@ typedef struct {
 
 
 /**
- * enum for the several status informations
- * of the read_biss_sensor_data() function
+ * @brief Type for the return status when reading BiSS data
  */
-enum {
-  NoError,
-  CRCError,
-  NoAck,
-  NoStartBit,
-};
+typedef enum {
+    NoError,    /**< no error */
+    CRCError,   /**< CRC mismatch  */
+    NoAck,      /**< Ack bit not found. */
+    NoStartBit  /**< Start bit not found */
+} BISS_ErrorType;
 
 #ifdef __XC__
 
@@ -83,7 +82,7 @@ enum {
 typedef struct {
     port p_biss_data;   /**< Port for BiSS Interface signal input. */
     port p_biss_clk;    /**< Port for BiSS Interface clock output. */
-    clock clk; /**< Hardware clock used as time reference */
+    clock clk;          /**< Hardware clock used as time reference */
 } BISSPorts;
 
 /**
@@ -92,7 +91,7 @@ typedef struct {
 interface BISSInterface {
 
     /**
-     * @brief Get position from BiSS Server
+     * @brief Getter for absolute and singleturn position.
      *
      * @return absolute position
      * @return singleturn position
@@ -101,7 +100,7 @@ interface BISSInterface {
     { int, unsigned int, unsigned int } get_biss_position();
 
     /**
-     * @brief Get real internal encoder position from BiSS Server
+     * @brief Getter for real internal encoder position, not ajusted for polarity or offset.
      *
      * @return absolute position
      * @return singleturn position
@@ -110,72 +109,71 @@ interface BISSInterface {
     { int, unsigned int, unsigned int } get_biss_real_position();
 
     /**
-     * @brief Get only singleturn position without CRC checking from BiSS Server
+     * @brief Getter for only singleturn position without CRC checking.
      *
      * @return singleturn position
      */
     unsigned int get_biss_position_fast();
 
     /**
-     * @brief Get electrical angle from BiSS Server
+     * @brief Getter for electrical angle which is singleturn position * pole pairs.
      *
      * @return electrical angle
      */
     unsigned int get_biss_angle();
 
     /**
-     * @brief Get velocity from BiSS Server
+     * @brief Getter for calculated velocity.
      *
-     * @return velocity
+     * @return Mechanical RPMs.
      */
     int get_biss_velocity();
 
     /**
-     * @brief Get biss parameters from BiSS Server
+     * @brief Setter for the absolute position.
      *
-     * @return biss parameters
+     * @param new_count New value for absolute position.
      */
-    BISSConfig get_biss_config();
+    void reset_biss_position(int new_count);
 
     /**
-     * @brief Set count of the BiSS Server
+     * @brief Setter for electrical angle
      *
-     * @param count to set
+     * @param angle electrical angle to set
      *
-     */
-    void reset_biss_position(int count);
-
-    /**
-     * @brief Set electrical angle of the BiSS Server
-     *
-     * @param electrical angle to set
-     *
-     * @return electrical angle offset
+     * @return new electrical angle offset
      */
     unsigned int reset_biss_angle_electrical(unsigned int angle);
 
     /**
-     * @brief Set biss parameters of the BiSS Server
+     * @brief Set calib flag in the BiSS Server so it will alway return 0 as electrical angle
      *
-     * @param biss parameters to set
-     *
-     */
-    void set_biss_config(BISSConfig in_config);
-
-    /**
-     * @brief Set calib flag in the BiSS Server which will alway return 0 as electrical angle
-     *
+     * @param flag 1 to activate, 0 to deactivate calibration
      */
     void set_biss_calib(int flag);
+
+    /**
+     * @brief Getter for current configuration used by the Service.
+     *
+     * @return Current configuration.
+     */
+    BISSConfig get_biss_config();
+
+    /**
+     * @brief Setter for the configuration used by the Service.
+     *
+     * @param in_config New Service configuration.
+     */
+    void set_biss_config(BISSConfig in_config);
 };
 
 
 /**
  * @brief Service to read and process data from an Feedback BiSS Encoder Sensor.
  *
- * @param biss_ports Ports structure defining where to read the BiSS signal, outputing the clock.
- * @param biss_config structure definition for the biss encoder data lengths, crc polynom, clock frequency, etc
- * @param[out] i_biss array of interfaces to send the data to the client
+ * @param biss_ports Ports structure defining where to read the BiSS signal, outputing the clock and which clock bloc to use.
+ * @param biss_config Configuration for the service.
+ * @param i_biss Array of communication interfaces to handle up to 5 different clients.
  */
 void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BISSInterface server i_biss[5]);
 
