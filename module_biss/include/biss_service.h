@@ -35,7 +35,7 @@
 #define BISS_CLK_PORT_HIGH         1            // high clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
 #define BISS_CLK_PORT_LOW          0            // low  clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
 #define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequercy: dividend/divisor in MHz
-#define BISS_CLOCK_DIVISOR         128          // supported frequencies are (tile frequency) / 2^n
+#define BISS_CLOCK_DIVISOR         8          // supported frequencies are (tile frequency) / 2^n
 #define BISS_USEC                  USEC_FAST    // number of ticks in a microsecond
 #define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
 #define BISS_TIMEOUT               14*BISS_USEC // BiSS timeout in clock ticks
@@ -171,7 +171,7 @@ interface BISSInterface {
 /**
  * @brief Service to read and process data from an Feedback BiSS Encoder Sensor.
  *
- * @param biss_ports Ports structure defining where to read the BiSS signal, outputing the clock and which clock bloc to use.
+ * @param biss_ports Ports structure defining where to read the BiSS signal, outputing the clock and which clock block to use.
  * @param biss_config Configuration for the service.
  * @param i_biss Array of communication interfaces to handle up to 5 different clients.
  */
@@ -181,36 +181,26 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
 /**
  * @brief Read generic BiSS sensor data
  *
- * @param p_biss_clk 1-bit out port to output the biss clock
- * @param p_biss_data in port for reading the biss encoder data
- * @param clk clock to generate the biss clock
- * @param a the dividend of the desired clock rate
- * @param b the divisor of the desired clock rates
+ * @param biss_ports Ports structure defining where to read the BiSS signal, outputing the clock and which clock block to use.
+ * @param biss_config data lengths and crc polynom.
  * @param[out] data array to store the received bits
- * @param data_length length of sensor data in bits (without crc)
- * @param frame_bytes number of 32 bit bytes to read from the encoder, should be able to contain 2 bits + ack and start bits + data + crc
- * @param crc_poly crc polynom in reverse representation:  x^0 + x^1 + x^4 is 0b1100
+ * @param frame_bytes number of 32 bit bytes to read from the encoder, should be able to contain 3 bits + ack and start bits + data + crc
  *
  * @return error status (NoError, CRCError, NoAck, NoStartBit)
  */
-unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clock clk, unsigned int a, unsigned int b,
-                                   unsigned int data[], unsigned int data_length, static const unsigned int frame_bytes, unsigned int crc_poly);
+unsigned int read_biss_sensor_data(BISSPorts & biss_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes);
 
 
 /**
  * @brief Read up to 32 bit of BiSS sensor data without CRC checking
  *
- * @param p_biss_clk 1-bit out port to output the biss clock
- * @param p_biss_data in port for reading the biss encoder data
- * @param clk clock to generate the biss clock
- * @param a the dividend of the desired clock rate
- * @param b the divisor of the desired clock rates
+ * @param biss_ports Ports structure defining where to read the BiSS signal, outputing the clock and which clock block to use.
  * @param before_length length of data to dismiss
  * @param data_length length of desired data
  *
  * @return data
  */
-unsigned int read_biss_sensor_data_fast(port out p_biss_clk, port in p_biss_data, clock clk, unsigned a, unsigned b, int before_length, int data_length);
+unsigned int read_biss_sensor_data_fast(BISSPorts & biss_ports, int before_length, int data_length);
 
 
 /**
