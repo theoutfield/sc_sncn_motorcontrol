@@ -13,6 +13,7 @@
 #include <adc_service.h>
 
 #define FILTER_LENGTH_TORQUE 80
+#define FILTER_LENGTH_ADC 80
 
 /**
  * @brief Minimum period for the Torque Control Loop is 100 us.

@@ -16,18 +16,16 @@
 #include <a4935.h>
 #include <motorcontrol_service.h>
 
+#include <string.h>
+
 void init_buffer(int buffer[], int length)
 {
-    int i;
-    for (i = 0; i < length; i++) {
-        buffer[i] = 0;
-    }
-    return;
+    memset(buffer, 0, length);
 }
 
 void init_torque_control(interface TorqueControlInterface client i_torque_control)
 {
-    int ctrl_state = INIT_BUSY;
+    int ctrl_state;
 
     while (1) {
         ctrl_state = i_torque_control.check_busy();
@@ -56,17 +54,16 @@ int torque_limit(int torque, int max_torque_limit)
 
 void current_filter(interface ADCInterface client adc_if, chanend c_current)
 {
-#define FILTER_LENGTH_ADC 80
-    int phase_a_raw = 0;
-    int phase_b_raw = 0;
+    int phase_a_raw;
+    int phase_b_raw;
     int actual_speed = 0;
     int command;
     int buffer_phase_a[FILTER_LENGTH_ADC] = {0};
     int buffer_phase_b[FILTER_LENGTH_ADC] = {0};
-    timer ts;
-    timer tc;
+
+    timer t;
     unsigned int time;
-    unsigned int time1;
+
     int buffer_index = 0;
     int phase_a_filtered = 0;
     int phase_b_filtered = 0;
@@ -78,13 +75,12 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current)
     int abs_speed = 0;
     int filter_count = 0;
 
-    ts :> time;
-    tc :> time1;
+    t :> time;
 
     while (1) {
 #pragma ordered
         select {
-            case ts when timerafter(time + 5556) :> time: // .05 ms
+            case t when timerafter(time + 5556) :> time: // .05 ms
                 { phase_a_raw, phase_b_raw } = adc_if.get_currents();
                 //xscope_probe_data(0, phase_a_raw);
                 buffer_phase_a[buffer_index] = phase_a_raw;
@@ -147,25 +143,18 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current)
     }
 }
 
-void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_config, QEIConfig &qei_params,
+void torque_ctrl_loop(ControlConfig &torque_control_config,
                       chanend c_current,
-                      interface MotorcontrolInterface client i_motorcontrol,
                       interface HallInterface client i_hall,
                       interface QEIInterface client i_qei,
+                      interface MotorcontrolInterface client i_motorcontrol,
                       interface TorqueControlInterface server i_torque_control[3])
 {
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
-
-    if (torque_control_config.feedback_sensor != HALL_SENSOR
-           && torque_control_config.feedback_sensor < QEI_SENSOR) {
-        torque_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
-    }
-
     int actual_speed = 0;
     int command;
 
-    timer tc;
-    unsigned int time1;
+    timer t;
+    unsigned int time;
     int phase_a_filtered = 0;
     int phase_b_filtered = 0;
 
@@ -183,11 +172,10 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
     int buffer_Id[FILTER_LENGTH_TORQUE] = {0};
     int buffer_Iq[FILTER_LENGTH_TORQUE] = {0};
 
-    int iq_filtered = 0;
     int id_filtered = 0;
+    int iq_filtered = 0;
     int buffer_index = 0;
-    int filter_length_variance = filter_length / hall_config.pole_pairs;
-
+    int filter_length_variance;
 
     int actual_torque = 0;
     int target_torque = 0;
@@ -202,50 +190,78 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
     int torque_control_output_limit = 0;
     int error_torque_integral_limit = 0;
 
-
-    if (motorcontrol_config.motor_type == BLDC_MOTOR) {
-        torque_control_output_limit = BLDC_PWM_CONTROL_LIMIT;
-    } else if (motorcontrol_config.motor_type == BDC_MOTOR) {
-        torque_control_output_limit = BDC_PWM_CONTROL_LIMIT;
-    }
-
-    if(torque_control_config.Ki_n != 0) {
-        error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_control_config.Ki_n;
-    }
-
-    if (torque_control_config.control_loop_period < MIN_TORQUE_CONTROL_LOOP_PERIOD) {
-        torque_control_config.control_loop_period = MIN_TORQUE_CONTROL_LOOP_PERIOD;
-        printstrln("Torque Control Loop ERROR: Loop period to small, set to 100 us");
-    }
-
-    int init_state = INIT_BUSY;
-
     int compute_flag = 0;
     int qei_counts_per_hall;
 
     int start_flag = 0;
     int offset_fw_flag = 0;
     int offset_bw_flag = 0;
-    int fet_state = 0;
     int activate = 0;
+
+    HallConfig hall_config;
+    QEIConfig qei_config;
+    MotorcontrolConfig motorcontrol_config;
+
+    int config_update_flag = 1;
 
     printstr("*************************************\n    TORQUE CONTROLLER STARTING\n*************************************\n");
 
-    filter_length_variance = filter_length/hall_config.pole_pairs;
-    if (filter_length_variance < 10) {
-        filter_length_variance = 10;
-    }
-
-    if (torque_control_config.feedback_sensor >= QEI_SENSOR) {
-        qei_counts_per_hall= (qei_params.ticks_resolution*4)/ hall_config.pole_pairs;
-    }
-
-    tc :> time1;
+    t :> time;
 
     while(1) {
 #pragma ordered
         select {
-            case tc when timerafter(time1 + USEC_STD * torque_control_config.control_loop_period) :> time1:
+            case t when timerafter(time + USEC_STD * torque_control_config.control_loop_period) :> time:
+
+                if (config_update_flag) {
+                    motorcontrol_config = i_motorcontrol.get_config();
+
+                    //Limits
+                    if (motorcontrol_config.motor_type == BLDC_MOTOR) {
+                        torque_control_output_limit = BLDC_PWM_CONTROL_LIMIT;
+                    } else if (motorcontrol_config.motor_type == BDC_MOTOR) {
+                        torque_control_output_limit = BDC_PWM_CONTROL_LIMIT;
+                    }
+
+                    // The Hall configuration must always be loaded because of qei_counts_per_hall computation
+                    if (isnull(i_hall)) {
+                        printstrln("Position Control Loop ERROR: Interface for Hall Service not provided");
+                    } else {
+                        hall_config = i_hall.get_hall_config();
+                    }
+
+                    if (torque_control_config.feedback_sensor >= QEI_SENSOR) {
+                        if (isnull(i_qei)) {
+                            printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
+                        } else {
+                            qei_config = i_qei.get_qei_config();
+                        }
+                    }
+
+                    if (torque_control_config.feedback_sensor != HALL_SENSOR
+                           && torque_control_config.feedback_sensor < QEI_SENSOR) {
+                        torque_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
+                    } else {
+                        qei_counts_per_hall = (qei_config.ticks_resolution * 4) / hall_config.pole_pairs;
+                    }
+
+                    if(torque_control_config.Ki_n != 0) {
+                        error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_control_config.Ki_n;
+                    }
+
+                    if (torque_control_config.control_loop_period < MIN_TORQUE_CONTROL_LOOP_PERIOD) {
+                        torque_control_config.control_loop_period = MIN_TORQUE_CONTROL_LOOP_PERIOD;
+                        printstrln("Torque Control Loop ERROR: Loop period to small, set to 100 us");
+                    }
+
+                    filter_length_variance = filter_length / hall_config.pole_pairs;
+                    if (filter_length_variance < 10) {
+                        filter_length_variance = 10;
+                    }
+
+                    config_update_flag = 0;
+                }
+
                 if (compute_flag == 1) {
                     if (torque_control_config.feedback_sensor == HALL_SENSOR) {
                         angle = (i_hall.get_hall_position() >> 2) & 0x3ff; //  << 10 ) >> 12 //get_hall_position(c_hall)
@@ -253,10 +269,10 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                         actual_speed = i_hall.get_hall_velocity();// get_hall_velocity(c_hall);
                     } else if (torque_control_config.feedback_sensor >= QEI_SENSOR) {
                         { angle, offset_fw_flag, offset_bw_flag } = i_qei.get_qei_sync_position();
-                        angle = ((angle <<10)/qei_counts_per_hall ) & 0x3ff;
+                        angle = ((angle << 10) / qei_counts_per_hall ) & 0x3ff;
                         //{qei_count_velocity, qei_direction_velocity} = get_qei_position_absolute(c_qei);
-                        actual_speed = i_qei.get_qei_velocity(); // calculate_qei_velocity(qei_count_velocity,qei_params, qei_velocity_params);
-                        //get_qei_velocity(c_qei, qei_params, qei_velocity_params);
+                        actual_speed = i_qei.get_qei_velocity(); // calculate_qei_velocity(qei_count_velocity,qei_config, qei_velocity_params);
+                        //get_qei_velocity(c_qei, qei_config, qei_velocity_params);
                     }
 
                     c_current <: 2;
@@ -333,7 +349,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
                     torque_control_output = (torque_control_config.Kp_n * error_torque) +
                                             (torque_control_config.Ki_n * error_torque_integral) +
-                                            (torque_control_config.Kd_n  * error_torque_derivative);
+                                            (torque_control_config.Kd_n * error_torque_derivative);
 
                     torque_control_output /= PID_DENOMINATOR;
 
@@ -364,13 +380,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
                 target_torque = in_torque;
 #ifdef ENABLE_xscope_torq
-                    xscope_int(TARGET_TORQUE, target_torque);
+                xscope_int(TARGET_TORQUE, target_torque);
 #endif
-                break;
-
-            case i_torque_control[int i].get_target_torque() -> int out_target_torque:
-
-                out_target_torque = target_torque;
                 break;
 
             case i_torque_control[int i].get_torque() -> int out_torque:
@@ -384,78 +395,59 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
 
                 break;
 
-            case i_torque_control[int i].check_busy() -> int out_state:
+            case i_torque_control[int i].get_target_torque() -> int out_target_torque:
 
-                out_state = activate;
+                out_target_torque = target_torque;
                 break;
 
             case i_torque_control[int i].set_torque_control_config(ControlConfig in_params):
 
                 torque_control_config = in_params;
+                config_update_flag = 1;
+                break;
 
-                error_torque_integral_limit = 0;
-                if(torque_control_config.Ki_n != 0) {
-                    error_torque_integral_limit = (torque_control_output_limit * PID_DENOMINATOR) / torque_control_config.Ki_n;
-                }
+            case i_torque_control[int i].get_torque_control_config() -> ControlConfig out_config:
 
+                out_config = torque_control_config;
                 break;
 
             case i_torque_control[int i].set_hall_config(HallConfig in_config):
 
                 hall_config.pole_pairs = in_config.pole_pairs;
-
-                filter_length_variance =  filter_length / hall_config.pole_pairs;
-                if (filter_length_variance < 10) {
-                    filter_length_variance = 10;
-                }
-
+                config_update_flag = 1;
                 break;
 
             case i_torque_control[int i].set_qei_config(QEIConfig in_params):
 
-               qei_params.index_type = in_params.index_type;
-               qei_params.ticks_resolution = in_params.ticks_resolution;
-
-               qei_counts_per_hall = qei_params.ticks_resolution * 4 / hall_config.pole_pairs;
-               filter_length_variance =  filter_length / hall_config.pole_pairs;
-               if (filter_length_variance < 10) {
-                   filter_length_variance = 10;
-               }
-
+               qei_config.index_type = in_params.index_type;
+               qei_config.ticks_resolution = in_params.ticks_resolution;
+               config_update_flag = 1;
                break;
 
             case i_torque_control[int i].set_torque_sensor(int in_sensor):
 
                 torque_control_config.feedback_sensor = in_sensor;
-
-                if (torque_control_config.feedback_sensor == HALL_SENSOR) {
-                    filter_length_variance =  filter_length / hall_config.pole_pairs;
-                    if (filter_length_variance < 10)
-                        filter_length_variance = 10;
-                    target_torque = actual_torque;
-                } else if (torque_control_config.feedback_sensor >= QEI_SENSOR) {
-                    qei_counts_per_hall = qei_params.ticks_resolution * 4 / hall_config.pole_pairs;
-                    filter_length_variance =  filter_length / hall_config.pole_pairs;
-                    if (filter_length_variance < 10)
-                        filter_length_variance = 10;
-                    target_torque = actual_torque;
-                }
+                target_torque = actual_torque;
                 if (!compute_flag) {
                     compute_flag = 1;
                 }
+                config_update_flag = 1;
+                break;
 
+            case i_torque_control[int i].check_busy() -> int out_state:
+
+                out_state = activate;
                 break;
 
             case i_torque_control[int i].enable_torque_ctrl():
 
                 activate = 1;
-                init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
+                int init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
                 if (init_state == INIT) {
 #ifdef debug_print
                     printstrln("commutation intialized");
 #endif
-                    fet_state = i_motorcontrol.get_fets_state(); //check_fet_state(c_commutation);
-                    if (fet_state == 0) {
+                    if (i_motorcontrol.get_fets_state() == 0) { //check_fet_state(c_commutation);
                         i_motorcontrol.set_fets_state(1); //enable_motor(c_commutation);
                         delay_milliseconds(2);
                         // wait_ms(2, 1, tc);
@@ -490,10 +482,6 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
                 //wait_ms(30, 1, tc);
                 break;
 
-            case i_torque_control[int i].get_torque_control_config() -> ControlConfig out_config:
-
-                out_config = torque_control_config;
-                break;
         }
     }
 }
@@ -506,16 +494,9 @@ void torque_control_service(ControlConfig &torque_control_config,
                             interface TorqueControlInterface server i_torque_control[3])
 {
     chan c_current;
-    HallConfig hall_config = i_hall.get_hall_config();
-
-    QEIConfig qei_config;
-    if (torque_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)) {
-        qei_config = i_qei.get_qei_config();
-    }
 
     par {
         current_filter(adc_if, c_current);
-        torque_ctrl_loop(torque_control_config, hall_config, qei_config,
-                c_current, i_motorcontrol, i_hall, i_qei, i_torque_control);
+        torque_ctrl_loop(torque_control_config, c_current, i_hall, i_qei, i_motorcontrol, i_torque_control);
     }
 }
