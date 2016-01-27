@@ -30,7 +30,7 @@
  *
  */
 [[combinable]]
- void bldc_loop(HallConfig hall_config, QEIConfig qei_config,AMSConfig ams_config,
+ void bldc_loop(HallConfig hall_config, QEIConfig qei_config, AMSConfig ams_config,
                              interface HallInterface client ?i_hall,
                              interface QEIInterface client ?i_qei,
                              interface BISSInterface client ?i_biss,

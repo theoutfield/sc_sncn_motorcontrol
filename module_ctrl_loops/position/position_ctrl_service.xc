@@ -80,14 +80,13 @@ void position_control_service(ControlConfig &position_control_config,
        position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
     }
 
-
     if(position_control_config.feedback_sensor == HALL_SENSOR){
         if(isnull(i_hall)){
             printstrln("Position Control Loop ERROR: Interface for Hall Service not provided");
         }else{
             hall_config = i_hall.get_hall_config();
         }
-    } else if(position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)){
+    } else if(position_control_config.feedback_sensor == QEI_SENSOR) {
         if(isnull(i_qei)){
             printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
         }else{
@@ -100,9 +99,7 @@ void position_control_service(ControlConfig &position_control_config,
     } else if(position_control_config.feedback_sensor == AMS_SENSOR){
         if(isnull(i_ams)){
             printstrln("Position Control Loop ERROR: Interface for AMS Service not provided");
-        }
-        else
-        {
+        } else {
             ams_config = i_ams.get_ams_config();
         }
     }
@@ -130,7 +127,7 @@ void position_control_service(ControlConfig &position_control_config,
         { actual_position, void, void } = i_biss.get_biss_position();
         target_position = actual_position;
     } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
-        actual_position = i_ams.get_ams_position();
+        actual_position = i_ams.get_ams_position_absolute();
         target_position = actual_position;
     }
 
@@ -148,21 +145,21 @@ void position_control_service(ControlConfig &position_control_config,
             if (activate == 1) {
                 /* acquire actual position hall/qei/sensor */
                 switch (position_control_config.feedback_sensor) {
-                case HALL_SENSOR:
-                    actual_position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
-                    break;
+                    case HALL_SENSOR:
+                        actual_position = i_hall.get_hall_position_absolute();
+                        break;
 
-                case QEI_SENSOR:
-                    actual_position =  i_qei.get_qei_position_absolute();
-                    break;
+                    case QEI_SENSOR:
+                        actual_position =  i_qei.get_qei_position_absolute();
+                        break;
 
-                case BISS_SENSOR:
-                    { actual_position, void, void } = i_biss.get_biss_position();
-                    break;
+                    case BISS_SENSOR:
+                        { actual_position, void, void } = i_biss.get_biss_position();
+                        break;
 
-                case AMS_SENSOR:
-                    actual_position = i_ams.get_ams_position();
-                    break;
+                    case AMS_SENSOR:
+                        actual_position = i_ams.get_ams_position_absolute();
+                        break;
 
                 /*
                  * Or any other sensor interfaced to the IFM Module

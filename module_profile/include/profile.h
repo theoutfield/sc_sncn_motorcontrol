@@ -15,6 +15,7 @@
 #include <hall_service.h>
 #include <qei_service.h>
 #include <biss_service.h>
+#include <ams_service.h>
 #include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/
@@ -223,6 +224,7 @@ typedef struct
     QEIConfig qei_params;
     HallConfig hall_params;
     BISSConfig biss_params;
+    AMSConfig ams_params;
     int sensor_used;
     float max_position;
     float min_position;

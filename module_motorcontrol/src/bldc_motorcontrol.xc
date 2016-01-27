@@ -9,6 +9,8 @@
 #include <a4935.h>
 #include <sine_table_big.h>
 
+#define MILLISECOND 250000
+
 static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
     unsigned int pwm[3] = {0, 0, 0};  // PWM OFF (break mode; short all phases)
@@ -17,7 +19,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 }
 
 [[combinable]]
-void bldc_loop(HallConfig hall_config, QEIConfig qei_config,AMSConfig ams_config,
+void bldc_loop(HallConfig hall_config, QEIConfig qei_config, AMSConfig ams_config,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
@@ -58,7 +60,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,AMSConfig ams_config
 
     // enable watchdog
     t :> ts;
-    t when timerafter (ts + 250000*4):> ts; /* FIXME: replace with constant */
+    t when timerafter (ts + MILLISECOND*4):> ts;
     i_watchdog.start();
 
     t :> ts;
@@ -95,6 +97,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,AMSConfig ams_config
                     }
                 } else if (sensor_select == BISS_SENSOR) {
                     angle = i_biss.get_biss_angle();
+                } else if (sensor_select == AMS_SENSOR) {
+                    angle = i_ams.get_ams_angle();
                 }
 
                 if (shutdown == 1) {    /* stop PWM */
@@ -109,6 +113,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,AMSConfig ams_config
                             angle_pwm = (angle >> 2) & 0x3ff; //512
                         } else if (sensor_select == BISS_SENSOR) {
                             angle_pwm = angle >> 2;
+                        } else if (sensor_select == AMS_SENSOR) {
+                            angle_pwm = ((angle + motorcontrol_config.hall_offset[0]) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
                         angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
@@ -122,6 +128,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,AMSConfig ams_config
                             angle_pwm = (angle >> 2) & 0x3ff; //3100
                         } else if (sensor_select == BISS_SENSOR) {
                             angle_pwm = ((angle + 2048) >> 2) & 0x3ff;
+                        } else if (sensor_select == AMS_SENSOR) {
+                            angle_pwm = ((angle + motorcontrol_config.hall_offset[1]) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
                         angle_pwm = (angle_pwm + 341) & 0x3ff;

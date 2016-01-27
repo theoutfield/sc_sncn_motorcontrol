@@ -296,7 +296,7 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config,
               vel_previous_position = count;
               vel_old_difference = difference_velocity;
 
-              velocity = (difference_velocity*60000)/(config_qei_changes_per_turn);
+              velocity = (difference_velocity*60000)/(config_qei_changes_per_turn); // FIXME Magic numbers. Magic numbers everywhere...
 
               break;
 

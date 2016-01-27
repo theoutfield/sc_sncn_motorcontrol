@@ -102,6 +102,20 @@ interface PositionControlInterface{
     BISSConfig get_biss_config();
 
     /**
+     * @brief Getter for current configuration used by the AMS Absolute Sensor Service.
+     *
+     * @return Current AMS Service configuration.
+     */
+    AMSConfig get_ams_config();
+
+    /**
+     * @brief Setter for new configuration in the Encoder Service.
+     *
+     * @param in_config New Encoder Service configuration.
+     */
+    //void set_ams_config(AMSConfig in_config);
+
+    /**
      * @brief Getter for the current state of the Service.
      *
      * @return 0 - not initialized.
@@ -147,5 +161,6 @@ void position_control_service(ControlConfig & position_ctrl_config,
                     interface HallInterface client ?i_hall,
                     interface QEIInterface client ?i_qei,
                     interface BISSInterface client ?i_biss,
+                    interface AMSInterface client ?i_ams,
                     interface MotorcontrolInterface client i_motorcontrol,
                     interface PositionControlInterface server i_position_control[3]);

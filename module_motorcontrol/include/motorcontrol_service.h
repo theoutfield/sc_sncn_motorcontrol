@@ -42,6 +42,7 @@ typedef struct {
 #include <hall_service.h>
 #include <qei_service.h>
 #include <biss_service.h>
+#include <ams_service.h>
 
 #include <mc_internal_constants.h>
 
@@ -147,6 +148,6 @@ interface MotorcontrolInterface{
                              interface BISSInterface client ?i_biss,
                              interface AMSInterface client ?i_ams,
                              interface WatchdogInterface client i_watchdog,
-                             interface MotorcontrolInterface server i_motorcontrol[5])
+                             interface MotorcontrolInterface server i_motorcontrol[5]);
 
 #endif

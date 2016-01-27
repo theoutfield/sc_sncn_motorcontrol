@@ -7,7 +7,15 @@
 
 #pragma once
 
+#include <xclib.h>
+#include <stdint.h>
+#include <print.h>
+#include <spi_master.h>
+
 #define AMS_SENSOR  3
+
+#define ERROR                   0
+#define SUCCESS                 1
 
 #define AS5147      0
 #define AS5047      1
@@ -24,32 +32,62 @@
 #define AMS_DIR_CW      0
 #define AMS_DIR_CCW     1
 
-#include <spi_master.h>
-#include <xclib.h>
-#include <stdint.h>
-#include <print.h>
+#define AMS_PWM_OFF     0
+#define AMS_PWM_ON      1
+
+#define AMS_ABI_RES_11BIT   0
+#define AMS_ABI_RES_10BIT   1
+
+#define AMS_ABI_ON_PWM_W    0
+#define AMS_UVW_ON_PWM_I    1
+
+#define AMS_DAE_ON          0
+#define AMS_DAE_OFF         1
+
+#define AMS_DAECANG         0
+#define AMS_CORDICANG       1
+
+#define AMS_NOISE_NORMAL    0
+#define AMS_NOISE_REDUCED   1
+
+typedef enum {
+    AMS_HYS_11BIT_3LSB = 0,
+    AMS_HYS_11BIT_2LSB = 1,
+    AMS_HYS_11BIT_1LSB = 2,
+    AMS_HYS_11BIT_OFF = 3,
+
+    AMS_HYS_10BIT_3LSB = 3,
+    AMS_HYS_10BIT_2LSB = 0,
+    AMS_HYS_10BIT_1LSB = 1,
+    AMS_HYS_10BIT_OFF = 2
+} AMS_Hysteresis;
+
 
 /**
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    int ticks_resolution;       /**< Encoder resolution [pulses/revolution]. */
+    int sensor_resolution;       /**< Encoder resolution [pulses/revolution]. */
 #if AMS_SENSOR_TYPE == AS5147
     int width_index_pulse;      /**< Width of the index pulse I (0 = 3LSB, 1 = 1LSB). */
 #else
     int factory_settings;       /**< Factory Settings, just reading, no  writing. */
 #endif
-    int noise_setting;          /**< Noise setting */
-    int direction;              /**< Encoder direction. */
-    int uvw_abi;                /**< Defines the PWM Output (0 = ABI is operating, W is used as PWM;
+    int noise_setting;    /**< Noise setting. In 3.3V operation, VDD and VREG must be tied together. In this
+                                     configuration, normal noise performance (ONL) is available at
+                                     reduced maximum temperature (125°C) by clearing NOISESET
+                                     to 0. When NOISESET is set to 1, the full temperature range is
+                                     available with reduced noise performance (ONH). */
+    int direction;    /**< Encoder direction. */
+    int uvw_abi;        /**< Defines the PWM Output (0 = ABI is operating, W is used as PWM;
                                      1 = UVW is operating, I is used as PWM) */
-    int disable_angle_comp;     /**< Disable Dynamic Angle Error Compensation
+    int dyn_angle_comp;     /**< Disable Dynamic Angle Error Compensation
                                      (0 = DAE compensation ON, 1 = DAE compensation OFF) */
-    int data_select;            /**< This bit defines which data can be read form address
+    int data_select;       /**< This bit defines which data can be read form address
                                      16383dec (3FFFhex). 0->DAECANG 1->CORDICANG */
-    int pwm_on;                 /**< Enables PWM (setting of UVW_ABI Bit necessary) */
+    int pwm_on;             /**< Enables PWM (setting of UVW_ABI Bit necessary) */
     int pole_pairs;             /**< Number of pole pairs (1-7) */
-    int hysteresis;             /**< Hysteresis for 11 Bit ABI Resolution:
+    AMS_Hysteresis hysteresis;  /**< Hysteresis for 11 Bit ABI Resolution:
                                      0 = 3 LSB
                                      1 = 2 LSB
                                      2 = 1 LSB
@@ -65,30 +103,6 @@ typedef struct {
     int offset;                 /**< Rotary sensor offset (Zero) */
 } AMSConfig;
 
-typedef struct
-{
-    spi_master_interface spi_interface;
-    out port slave_select;
-} AMSPorts;
-
-interface AMSInterface
-{
-    int get_angle_electrical(void);
-
-    int get_ams_position(void);
-
-    int get_ams_velocity(void);
-
-    int get_ams_direction(void);
-
-    int get_ams_position_absolute(void);
-
-    void reset_ams_absolute_position(int offset);
-
-    AMSConfig get_ams_config(void);
-
-    void set_ams_config(AMSConfig in_config);
-};
 
 #define ROTARY_SENSOR_MAX_ANGLE   16384
 
@@ -130,6 +144,33 @@ interface AMSInterface
 #define PARITY_ERROR    -1
 #define ERROR_WRITING   -2
 
+#ifdef __XC__
+
+typedef struct
+{
+    spi_master_interface spi_interface;
+    out port slave_select;
+} AMSPorts;
+
+interface AMSInterface
+{
+    int get_ams_angle(void);
+
+    int get_ams_position(void);
+
+    int get_ams_velocity(void);
+
+    int get_ams_direction(void);
+
+    int get_ams_position_absolute(void);
+
+    void reset_ams_absolute_position(int offset);
+
+    AMSConfig get_ams_config(void);
+
+    void set_ams_config(AMSConfig in_config);
+};
+
 void initRotarySensorInterface(AMSPorts &ams_ports);
 int initRotarySensor(AMSPorts &ams_ports, AMSConfig config);
 
@@ -155,4 +196,7 @@ int writeSettings2(AMSPorts &ams_ports, unsigned short data);
 int writeZeroPosition(AMSPorts &ams_ports, unsigned short data);
 int writeNumberPolePairs(AMSPorts &ams_ports, unsigned short data);
 
-void run_ams_sensor(server interface AMSInterface i_AMS, unsigned n, AMSPorts &ams_ports, AMSConfig config);
+//[[combinable]]
+void ams_service(AMSPorts &ams_ports, AMSConfig config, server interface AMSInterface i_AMS[n], unsigned n);
+
+#endif

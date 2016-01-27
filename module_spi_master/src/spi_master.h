@@ -21,6 +21,9 @@
 #define _spi_master_h_
 #include <xs1.h>
 
+#ifdef __XC__
+
+
 /** Structure containing the resources required for the SPI master interface.
  *
  * It consists of two clock blocks, two 8bit buffered output ports for MOSI and SCLK,
@@ -190,4 +193,5 @@ void spi_master_out_word(spi_master_interface &spi_if, unsigned int data);
  */
 void spi_master_out_buffer(spi_master_interface &spi_if, const unsigned char buffer[], int num_bytes);
 
+#endif
 #endif

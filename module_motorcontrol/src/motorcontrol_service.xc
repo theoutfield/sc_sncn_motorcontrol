@@ -81,7 +81,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                     if(motorcontrol_config.motor_type == BLDC_MOTOR){
 
-                        bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_watchdog, i_motorcontrol,
+                        bldc_loop(hall_config, qei_config, ams_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
                                 c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
 
                     }else if(motorcontrol_config.motor_type == BDC_MOTOR){

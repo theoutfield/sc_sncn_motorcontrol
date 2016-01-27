@@ -7,7 +7,7 @@
 
 #include <qei_service.h>
 #include <hall_service.h>
-#include <rotary_sensor.h>
+#include <ams_service.h>
 #include <motorcontrol_service.h>
 
 /**************************************************
