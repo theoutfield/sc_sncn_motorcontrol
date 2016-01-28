@@ -198,8 +198,6 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
     int offset_bw_flag = 0;
     int activate = 0;
 
-    HallConfig hall_config;
-    QEIConfig qei_config;
     MotorcontrolConfig motorcontrol_config;
 
     int config_update_flag = 1;
@@ -214,6 +212,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
             case t when timerafter(time + USEC_STD * torque_control_config.control_loop_period) :> time:
 
                 if (config_update_flag) {
+                    HallConfig hall_config;
+                    QEIConfig qei_config;
                     motorcontrol_config = i_motorcontrol.get_config();
 
                     //Limits
@@ -443,19 +443,6 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
 
                 out_config = torque_control_config;
                 break;
-
-            case i_torque_control[int i].set_hall_config(HallConfig in_config):
-
-                hall_config.pole_pairs = in_config.pole_pairs;
-                config_update_flag = 1;
-                break;
-
-            case i_torque_control[int i].set_qei_config(QEIConfig in_params):
-
-               qei_config.index_type = in_params.index_type;
-               qei_config.ticks_resolution = in_params.ticks_resolution;
-               config_update_flag = 1;
-               break;
 
             case i_torque_control[int i].set_torque_sensor(int in_sensor):
 

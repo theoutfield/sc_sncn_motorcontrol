@@ -78,20 +78,6 @@ interface VelocityControlInterface{
     void set_velocity_filter(int in_length);
 
     /**
-     * @brief Setter for new configuration in the Hall Sensor Service.
-     *
-     * @param in_config New Hall Sensor Service configuration.
-     */
-    void set_hall_config(HallConfig hall_config);
-
-    /**
-     * @brief Setter for new configuration in the Encoder Service.
-     *
-     * @param in_config New Encoder Service configuration.
-     */
-    void set_qei_config(QEIConfig qei_params);
-
-    /**
      * @brief Getter for the current state of the Service.
      *
      * @return 0 - not initialized.

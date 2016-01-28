@@ -10,11 +10,13 @@
 #include <profile_control.h>
 
 void init_position_profiler(ProfilerConfig profile_position_config,
-                                interface PositionControlInterface client i_position_control){
+                            interface PositionControlInterface client i_position_control,
+                            interface HallInterface client i_hall,
+                            interface QEIInterface client i_qei) {
 
     ControlConfig control_config = i_position_control.get_position_control_config();
-    QEIConfig qei_config = i_position_control.get_qei_config();
-    HallConfig hall_config = i_position_control.get_hall_config();
+    HallConfig hall_config = i_hall.get_hall_config();
+    QEIConfig qei_config = i_qei.get_qei_config();
 
     if(profile_position_config.max_acceleration <= 0 ||
             profile_position_config.max_velocity <= 0){

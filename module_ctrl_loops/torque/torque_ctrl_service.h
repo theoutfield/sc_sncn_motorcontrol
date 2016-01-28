@@ -84,20 +84,6 @@ interface TorqueControlInterface{
     void set_torque_sensor(int sensor_used);
 
     /**
-     * @brief Setter for new configuration in the Hall Sensor Service.
-     *
-     * @param in_config New Hall Sensor Service configuration.
-     */
-    void set_hall_config(HallConfig in_config);
-
-    /**
-     * @brief Setter for new configuration in the Encoder Service.
-     *
-     * @param in_config New Encoder Service configuration.
-     */
-    void set_qei_config(QEIConfig in_config);
-
-    /**
      * @brief Getter for the current state of the Service.
      *
      * @return 0 - not initialized.
