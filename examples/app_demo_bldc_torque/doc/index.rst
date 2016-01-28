@@ -1,7 +1,7 @@
 .. _bldc_torque_control_demo:
 
 ================================
-SOMANET BLDC Torque Control Demo
+BLDC Torque Control Demo
 ================================
 
 
@@ -24,7 +24,7 @@ Quick How-to
 2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your Hall sensor, Encoder Interface (if used), motor phases, power supply cable, and XTAG. Power up!
 3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
 4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
-5. Open the **main.xc** within  the **app_demo_bldc_torque**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropiate target in your Makefile <somanet_board_support_module>`.
+5. Open the **main.xc** within  the **app_demo_bldc_torque**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropriate target in your Makefile <somanet_board_support_module>`.
 
 .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 

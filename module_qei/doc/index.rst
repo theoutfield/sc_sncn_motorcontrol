@@ -1,20 +1,20 @@
 .. _module_qei:
-===============================================
-SOMANET Encoder Interface Module
-===============================================
+===========================
+Incremental Encoder Module
+===========================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
 This module provides a Service that will read and process the data coming from your 
-Incremental Quadrature Encoder Feedback Sensor. Up to 5 clients could retrieve data from the Service
+Incremental Encoder Feedback Sensor. Up to 5 clients could retrieve data from the Service
 through an interface.
 
 When running the QEI Service, the **Reference Frequency** of the tile where the Service is
 allocated will be automatically changed to **250MHz**.
 
-The Hall Service should always run over an **IFM tile** so it can access the ports to
+The Service should always run over an **IFM tile** so it can access the ports to
 your SOMANET IFM device.
 
 .. cssclass:: github
@@ -39,15 +39,15 @@ How to use
         USED_MODULES = module_qei module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_watchdog module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
 2. Include the Encoder Service header **qei_service.h** in your app. 
 
-3. Instanciate the ports where the Service will be reading the Encoder Sensor feedback signals. 
+3. Instantiate the ports where the Service will be reading the Encoder Sensor feedback signals. 
 
-4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration.
+5. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
 6. At whichever other core, now you can perform calls to the Encoder Service through the interfaces connected to it.
 

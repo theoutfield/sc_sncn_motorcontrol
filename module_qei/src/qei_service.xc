@@ -1,6 +1,6 @@
 /**
  * @file qei_server.xc
- * @brief QEI Sensor Server Implementation
+ * @brief Incremental Encoder Service Implementation
  * @author Synapticon GmbH <support@synapticon.com>
 */
 

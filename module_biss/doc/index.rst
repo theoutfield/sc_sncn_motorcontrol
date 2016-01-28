@@ -1,14 +1,14 @@
 .. _module_biss:
 
-===========================
-SOMANET BiSS Encoder Module
-===========================
+=====================
+BiSS Encoder Module
+=====================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-This module provides a Service which will read and process the data coming from your BiSS Encoder Feedback Sensor. Up to 5 clients could retrieve data from the Servicethrough an interface.
+This module provides a Service which will read and process the data coming from your BiSS Encoder Feedback Sensor. Up to 5 clients could retrieve data from the Service through an interface.
 
 BiSS is an open source digital interface for sensors and actuators. BiSS is hardware compatible to the industrial standard SSI (Serial Synchronous Interface). The standardization process is coordinated on biss-interface.com_.
 
@@ -42,15 +42,15 @@ How to use
         USED_MODULES = module_biss module_board-support module_misc
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules.
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
 2. Include the BiSS Service header **biss_service.h** in your app.
 
-3. Instanciate the ports where the Service will be sendind the BiSS clock, reading the BiSS Sensor feedback signals and the clock block to use.
+3. Instantiate the ports where the Service will be sending the BiSS clock, reading the BiSS Sensor feedback signals and the clock block to use.
 
-4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration.
+5. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
 6. At whichever other core, now you can perform calls to the BiSS Service through the interfaces connected to it.
 
