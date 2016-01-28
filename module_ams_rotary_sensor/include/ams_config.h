@@ -16,7 +16,7 @@
                                     // Dataselect 0
                                     // PWMon    0
 
-#define AMS_INIT_SETTINGS2  4    //UVWPP     001 (5)
+#define AMS_INIT_SETTINGS2  10//4    //UVWPP     001 (5)
                                  //HYS       0
                                  //ABIRES    0
 
@@ -24,7 +24,7 @@
 
 #define ENABLE_INDEPENDENT_AQUISITION 0 //0 - disabled, 1 - enabled
 
-#define SENSOR_PLACEMENT_OFFSET 15175//15486-Axis_1, 15175-AMK_motor, 5545-ModBot_motor
+#define SENSOR_PLACEMENT_OFFSET 15485//15486-Axis_1, 15175-AMK_motor, 5545-ModBot_motor
 
 #define MAX_COUNT_TICKS_CW (1<<ROTARY_SENSOR_RESOLUTION_BITS) * 1000
 #define MAX_COUNT_TICKS_CCW (1<<ROTARY_SENSOR_RESOLUTION_BITS) * 1000

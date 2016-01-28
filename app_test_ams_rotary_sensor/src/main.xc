@@ -1,8 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-//#include <CORE_C22-rev-a.inc>
-#include <CORE_C21-rev-a.inc>
-#include <IFM_DC1K-rev-c2.inc>
-//#include <IFM_DC100-rev-b.inc>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC300-rev-a.bsp>
 
 /**
  * @file app_test_ams_rotary_sensor.xc
@@ -12,7 +10,7 @@
 
 #include <rotary_sensor.h>
 #include <xscope.h>
-#include <bldc_motor_config.h>
+#include <user_config.h>
 
 #define NUM_OF_AMS_INTERFACES 1
 
@@ -22,12 +20,12 @@ on tile[IFM_TILE]: sensor_spi_interface pRotarySensor =
         {
             XS1_CLKBLK_2,
             XS1_CLKBLK_4,
-            GPIO_D3, //D3,    //mosi
-            GPIO_D1, //D1,    //sclk
-            GPIO_D2  //D2     //miso
+            SOMANET_IFM_GPIO_D3, //D3,    //mosi
+            SOMANET_IFM_GPIO_D1, //D1,    //sclk
+            SOMANET_IFM_GPIO_D2  //D2     //miso
         },
 
-        GPIO_D0 //D0         //slave select
+        SOMANET_IFM_GPIO_D0 //D0         //slave select
 };
 
 
@@ -57,6 +55,8 @@ void ams_rotary_sensor_test(client interface AMS iAMS)
 
         xscope_int(POSITION, position);
         xscope_int(ANGLE, electrical_angle);
+
+        delay_milliseconds(1);
    //     printf("%i\n", position);
 
     }
@@ -99,18 +99,6 @@ int main(void)
          ************************************************************/
         on tile[IFM_TILE]:
         {
-#ifdef DC1K
-            p_ifm_motor_hi[0] <: 0;
-            p_ifm_motor_hi[1] <: 0;
-            p_ifm_motor_hi[2] <: 0;
-
-            p_ifm_motor_lo[0] <: 0;
-            p_ifm_motor_lo[1] <: 0;
-            p_ifm_motor_lo[2] <: 0;
-
-            p_ifm_motor_hi[3] <: 0;
-            p_ifm_motor_lo[3] <: 0;
-#endif
             /* AMS Rotary Sensor Server */
 
             ams_sensor_server(iAMS, NUM_OF_AMS_INTERFACES, pRotarySensor);

@@ -508,9 +508,7 @@ void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_inte
                         if(settings1_ == 5){
                             abs_pos_ = sensor_resolution_ticks_ - readRotarySensorAngleWithCompensation(sensor_if);//readRotarySensorAngleWithoutCompensation(sensor_if);
                             measurement_taken_ = 1;
-                        }
-
-                        else {
+                        } else {
                             abs_pos_ = readRotarySensorAngleWithCompensation(sensor_if);//readRotarySensorAngleWithoutCompensation(sensor_if);
                             measurement_taken_ = 1;
                         }
