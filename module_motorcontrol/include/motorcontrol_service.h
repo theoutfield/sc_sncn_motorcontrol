@@ -144,6 +144,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[5]);
+                            interface MotorcontrolInterface server i_motorcontrol[4]);
 
 #endif

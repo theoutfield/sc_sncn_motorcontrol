@@ -22,7 +22,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl,
                                MotorcontrolConfig &motorcontrol_config,
-                               interface MotorcontrolInterface server i_motorcontrol[5])
+                               interface MotorcontrolInterface server i_motorcontrol[4])
 {
     timer t;
     unsigned int ts;
@@ -134,7 +134,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 [[combinable]]
 void bdc_loop(chanend c_pwm_ctrl,
                 interface WatchdogInterface client i_watchdog,
-                interface MotorcontrolInterface server i_commutation[5],
+                interface MotorcontrolInterface server i_commutation[4],
                 FetDriverPorts &fet_driver_ports,
                 MotorcontrolConfig &motorcontrol_config)
 {
