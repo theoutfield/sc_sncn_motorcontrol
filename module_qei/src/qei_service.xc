@@ -115,6 +115,9 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
     int vel_previous_position = 0, vel_old_difference = 0;
     int difference_velocity;
     int velocity = 0;
+
+    int notification = MOTCTRL_NTF_EMPTY;
+
     timer t_velocity;
     unsigned int ts_velocity;
 
@@ -218,6 +221,11 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
 
                 break;
 
+            case i_qei[int i].get_notification() -> int out_notification:
+
+                out_notification = notification;
+                break;
+
             case i_qei[int i].get_qei_position() -> {unsigned int out_count, unsigned int out_valid}:
 
                 out_count = count;
@@ -269,6 +277,12 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
 
                 qei_config = in_config;
                 status = 1;
+
+                notification = MOTCTRL_NTF_CONFIG_CHANGED;
+                // TODO: Use a constant for the number of interfaces
+                for (int i = 0; i < 5; i++) {
+                    i_qei[i].notification();
+                }
                 break;
 
             case i_qei[int i].check_busy() -> int out_status:

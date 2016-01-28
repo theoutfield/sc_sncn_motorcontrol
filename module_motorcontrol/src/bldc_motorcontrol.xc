@@ -48,6 +48,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
     int shutdown = 0; //Disable FETS
     int sensor_select = HALL_SENSOR;
 
+    int notification = MOTCTRL_NTF_EMPTY;
+
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
     // enable watchdog
@@ -124,6 +126,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
                 break;
 
+            case i_motorcontrol[int i].get_notification() -> int out_notification:
+
+                out_notification = notification;
+                break;
 
             case i_motorcontrol[int i].set_voltage(int new_voltage):
                     voltage = new_voltage;
@@ -134,6 +140,12 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
             case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
                     motorcontrol_config = new_parameters;
+
+                    notification = MOTCTRL_NTF_CONFIG_CHANGED;
+                    // TODO: Use a constant for the number of interfaces
+                    for (int i = 0; i < 4; i++) {
+                        i_motorcontrol[i].notification();
+                    }
                     break;
 
             case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
