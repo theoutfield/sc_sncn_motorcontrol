@@ -11,6 +11,7 @@
 #include <hall_service.h>
 #include <qei_service.h>
 #include <adc_service.h>
+#include <ams_service.h>
 
 #define FILTER_LENGTH_TORQUE 80
 
@@ -96,6 +97,8 @@ interface TorqueControlInterface{
      */
     void set_qei_config(QEIConfig in_config);
 
+    void set_ams_config(AMSConfig in_config);
+
     /**
      * @brief Getter for the current state of the Service.
      *
@@ -136,6 +139,7 @@ int torque_limit(int torque, int max_torque_limit);
  * @param adc_if Communication interface to the ADC Service.
  * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
  * @param i_qei [[Nullable]] Communication interface to the Encoder Service (if applicable).
+ * @param i_ams [[Nullable]] Communication interface to the AMS Service (if applicable).
  * @param i_motorcontrol Communication interface to the Motor Control Service.
  * @param Array of communication interfaces to handle up to 3 different clients.
  */
@@ -144,5 +148,6 @@ void torque_control_service(ControlConfig &torque_ctrl_config,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
                             interface MotorcontrolInterface client i_motorcontrol,
                             interface TorqueControlInterface server i_torque_control[3]);

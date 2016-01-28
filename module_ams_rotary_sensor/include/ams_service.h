@@ -26,6 +26,8 @@
 //#define DEFAULT_SPI_CLOCK_DIV 10        // (100MHz / (10) = 10 MHz [100MHz ref clock]
 #define DEFAULT_SPI_CLOCK_DIV 200        // (250MHz / (50) = 5 MHz [250MHz ref clock]
 
+#define PULL_PERIOD_USEC        120
+
 #define AMS_SENSOR_EXECUTING_TIME 125       //50us at 250MHz
 #define AMS_SENSOR_SAVING_TIME 50           //20us at 250 MHz
 
@@ -44,8 +46,8 @@
 #define AMS_DAE_ON          0
 #define AMS_DAE_OFF         1
 
-#define AMS_DAECANG         0
-#define AMS_CORDICANG       1
+#define AMS_DATA_DAECANG    0
+#define AMS_DATA_CORDICANG  1
 
 #define AMS_NOISE_NORMAL    0
 #define AMS_NOISE_REDUCED   1
@@ -196,7 +198,7 @@ int writeSettings2(AMSPorts &ams_ports, unsigned short data);
 int writeZeroPosition(AMSPorts &ams_ports, unsigned short data);
 int writeNumberPolePairs(AMSPorts &ams_ports, unsigned short data);
 
-//[[combinable]]
+[[combinable]]
 void ams_service(AMSPorts &ams_ports, AMSConfig config, server interface AMSInterface i_AMS[n], unsigned n);
 
 #endif

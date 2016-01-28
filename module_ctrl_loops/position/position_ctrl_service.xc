@@ -73,6 +73,7 @@ void position_control_service(ControlConfig &position_control_config,
     HallConfig hall_config;
     QEIConfig qei_config;
     AMSConfig ams_config;
+    BISSConfig biss_config;
     MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
 
     if(position_control_config.feedback_sensor != HALL_SENSOR
@@ -325,14 +326,12 @@ void position_control_service(ControlConfig &position_control_config,
                 break;
         case i_position_control[int i].get_biss_config() -> BISSConfig out_config:
 
-                out_config = i_biss.get_biss_config();
+                out_config = biss_config;
                 break;
-
         case i_position_control[int i].get_ams_config() -> AMSConfig out_config:
 
-                out_config = i_ams.get_ams_config();
+                out_config = ams_config;
                 break;
-
         }
     }
 }

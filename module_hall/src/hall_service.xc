@@ -165,7 +165,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
 
                     break;
 
-            case tmr when timerafter(ts + PULL_PERIOD_USEC*250) :> ts: //12 usec 3000
+            case tmr when timerafter(ts + PULL_PERIOD_USEC * USEC_FAST) :> ts: //12 usec 3000
                 switch(xreadings) {
                     case 0:
                         hall_ports.p_hall :> new1;

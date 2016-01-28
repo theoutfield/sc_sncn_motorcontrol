@@ -154,6 +154,7 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
  * @param position_ctrl_config Configuration for the Position Control Service.
  * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
  * @param i_qei [[Nullable]] Communication interface to the Encoder Service (if applicable).
+ * @param i_ams [[Nullable]] Communication interface to the AMS Service (if applicable).
  * @param i_motorcontrol Communication interface to the Motor Control Service.
  * @param i_position_control[3] Array of communication interfaces to handle up to 3 different clients.
  */

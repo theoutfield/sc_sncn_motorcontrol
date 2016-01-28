@@ -20,7 +20,7 @@
 /**
  * Defines the amount of ticks of a 100MHz timer (standard system reference frequency) for 1 s.
  */
-#define SEC_STD  100000000
+#define SEC_STD   100000000
 
 
 

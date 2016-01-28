@@ -44,7 +44,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
-}
+}1
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;

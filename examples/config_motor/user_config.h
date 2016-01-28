@@ -71,9 +71,9 @@
 #define CONTROL_LOOP_PERIOD     60
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
-#define POSITION_Kp       1000
-#define POSITION_Ki       1
-#define POSITION_Kd       0
+#define POSITION_Kp       10000
+#define POSITION_Ki       40
+#define POSITION_Kd       10
 
 // PID FOR VELOCITY CONTROL (if applicable) [will be divided by 10000]
 #define VELOCITY_Kp       667

@@ -6,9 +6,8 @@
  */
 
 #include <xs1.h>
+#include <refclk.h>
 #include <ams_service.h>
-
-#define MILLISECOND 250000 //ticks
 
 static char rotarySensorInitialized = 0;
 
@@ -22,9 +21,9 @@ static inline void slave_deselect(out port spi_ss)
     spi_ss <: 1;
 }
 
-void initams_ports(AMSPorts &ams_ports){
-
-    if(rotarySensorInitialized != 1){
+void initams_ports(AMSPorts &ams_ports)
+{
+    if (rotarySensorInitialized != 1){
 
         spi_master_init(ams_ports.spi_interface, DEFAULT_SPI_CLOCK_DIV);
         slave_deselect(ams_ports.slave_select); // Ensure slave select is in correct start state
@@ -49,14 +48,14 @@ void initams_ports(AMSPorts &ams_ports){
     settings1 |= (config.pwm_on << 7);
 
     settings2 = (config.pole_pairs-1) << 0;
-    settings2 |= (config.hysteresis) << 3;
-    settings2 |= (config.abi_resolution) << 5;
+    settings2 |= (config.hysteresis << 3);
+    settings2 |= (config.abi_resolution << 5);
 
     return {settings1, settings2};
 }
 
-int initRotarySensor(AMSPorts &ams_ports, AMSConfig config){
-
+int initRotarySensor(AMSPorts &ams_ports, AMSConfig config)
+{
     int data_in;
 
     unsigned short settings1, settings2;
@@ -91,7 +90,6 @@ int initRotarySensor(AMSPorts &ams_ports, AMSConfig config){
     }
 
     return SUCCESS_WRITING;
-
 }
 
 /**
@@ -204,8 +202,6 @@ int readRedundancyReg(AMSPorts &ams_ports){
         return PARITY_ERROR;
     }
 }
-
-
 
 int readProgrammingReg(AMSPorts &ams_ports){
 
@@ -498,7 +494,7 @@ int check_ams_config(AMSConfig &ams_config){
 }
 
 
-//[[combinable]]
+[[combinable]]
 void ams_service(AMSPorts &ams_ports, AMSConfig config, server interface AMSInterface i_AMS[n], unsigned n)
 {
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -538,29 +534,8 @@ void ams_service(AMSPorts &ams_ports, AMSConfig config, server interface AMSInte
 
     while(1)
     {
-#pragma ordered
+//#pragma ordered
         select {
-            case t_read_sensor when timerafter(ts_read_sensor + 12*2500) :> ts_read_sensor:
-                    if(config.direction == AMS_DIR_CCW){
-                        _abs_pos = config.sensor_resolution - readRotarySensorAngleWithCompensation(ams_ports);//readRotarySensorAngleWithoutCompensation(ams_ports);
-                    }
-                    else {
-                        _abs_pos = readRotarySensorAngleWithCompensation(ams_ports);//readRotarySensorAngleWithoutCompensation(ams_ports);
-                    }
-
-                    if((_abs_pos - _abs_pos_previos) < -config.sensor_resolution/2) {
-                        pos_multiturn += config.sensor_resolution - _abs_pos_previos + _abs_pos;
-                        direction = 1;
-                    }
-                    else if ((_abs_pos - _abs_pos_previos) > config.sensor_resolution/2) {
-                        pos_multiturn += config.sensor_resolution - _abs_pos + _abs_pos_previos;
-                        direction = -1;
-                    }
-                    else {
-                        pos_multiturn += _abs_pos - _abs_pos_previos;
-                    }
-                    _abs_pos_previos = _abs_pos;
-                    break;
 
             case i_AMS[int i].get_ams_angle(void) -> int angle:
                     segm_num = (int)_abs_pos/segm_resolution;
@@ -569,8 +544,8 @@ void ams_service(AMSPorts &ams_ports, AMSConfig config, server interface AMSInte
                     break;
 
             case i_AMS[int i].get_ams_position(void) -> int out_position:
-                   out_position = _abs_pos;
-                   break;
+                    out_position = _abs_pos;
+                    break;
 
             case i_AMS[int i].get_ams_velocity(void) -> int out_velocity:
                     out_velocity = velocity;
@@ -596,7 +571,35 @@ void ams_service(AMSPorts &ams_ports, AMSConfig config, server interface AMSInte
                     config = in_config;
                     break;
 
-            case t_velocity when timerafter(ts_velocity + MILLISECOND) :> ts_velocity:
+            case t_read_sensor when timerafter(ts_read_sensor + PULL_PERIOD_USEC * USEC_FAST) :> ts_read_sensor:
+
+                    if(config.direction == AMS_DIR_CCW)
+                    {
+                        _abs_pos = config.sensor_resolution - readRotarySensorAngleWithCompensation(ams_ports);//readRotarySensorAngleWithoutCompensation(ams_ports);
+                    }
+                    else
+                    {
+                        _abs_pos = readRotarySensorAngleWithCompensation(ams_ports);//readRotarySensorAngleWithoutCompensation(ams_ports);
+                    }
+
+                    if ((_abs_pos - _abs_pos_previos) < -config.sensor_resolution/2)
+                    {
+                        pos_multiturn += config.sensor_resolution - _abs_pos_previos + _abs_pos;
+                        direction = 1;
+                    }
+                    else if ((_abs_pos - _abs_pos_previos) > config.sensor_resolution/2)
+                    {
+                        pos_multiturn += config.sensor_resolution - _abs_pos + _abs_pos_previos;
+                        direction = -1;
+                    }
+                    else
+                    {
+                        pos_multiturn += _abs_pos - _abs_pos_previos;
+                    }
+                    _abs_pos_previos = _abs_pos;
+                    break;
+
+            case t_velocity when timerafter(ts_velocity + MSEC_FAST) :> ts_velocity:
 
                   difference_velocity = pos_multiturn - vel_previous_position;
                   //if ( (difference_velocity > qei_crossover_velocity) || (difference_velocity < -qei_crossover_velocity) )
