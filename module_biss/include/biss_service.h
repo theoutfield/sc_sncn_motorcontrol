@@ -32,9 +32,9 @@
 #define BISS_MAX_TICKS             0x7fffffff   // the count is reset to 0 if greater than this
 #define BISS_CRC_POLY              0b110000     // poly in reverse representation:  x^0 + x^1 + x^4 is 0b1100
 #define BISS_DATA_PORT_BIT         1            // bit number (0 = rightmost bit) when inputing from a multibit port
-#define BISS_CLK_PORT_HIGH         1            // high clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
-#define BISS_CLK_PORT_LOW          0            // low  clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
-#define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequercy: dividend/divisor in MHz
+#define BISS_CLK_PORT_HIGH         1            // high clock value when outputting the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
+#define BISS_CLK_PORT_LOW          0            // low  clock value when outputting the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
+#define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequency: dividend/divisor in MHz
 #define BISS_CLOCK_DIVISOR         128          // supported frequencies are (tile frequency) / 2^n
 #define BISS_USEC                  USEC_FAST    // number of ticks in a microsecond
 #define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
@@ -148,7 +148,7 @@ interface BISSInterface {
     /**
      * @brief Set electrical angle of the BiSS Server
      *
-     * @param electrical angle to set
+     * @param angle electrical angle to set
      *
      * @return electrical angle offset
      */
@@ -157,7 +157,7 @@ interface BISSInterface {
     /**
      * @brief Set biss parameters of the BiSS Server
      *
-     * @param biss parameters to set
+     * @param in_config biss parameters to set
      *
      */
     void set_biss_config(BISSConfig in_config);
@@ -173,8 +173,8 @@ interface BISSInterface {
 /**
  * @brief Service to read and process data from an Feedback BiSS Encoder Sensor.
  *
- * @param biss_ports Ports structure defining where to read the BiSS signal, outputing the clock.
- * @param biss_config structure definition for the biss encoder data lengths, crc polynom, clock frequency, etc
+ * @param biss_ports Ports structure defining where to read the BiSS signal, outputting the clock.
+ * @param biss_config structure definition for the BiSS encoder data lengths, crc polynomial, clock frequency, etc
  * @param[out] i_biss array of interfaces to send the data to the client
  */
 void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BISSInterface server i_biss[5]);
@@ -183,15 +183,15 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
 /**
  * @brief Read generic BiSS sensor data
  *
- * @param p_biss_clk 1-bit out port to output the biss clock
- * @param p_biss_data in port for reading the biss encoder data
- * @param clk clock to generate the biss clock
+ * @param p_biss_clk 1-bit out port to output the BiSS clock
+ * @param p_biss_data in port for reading the BiSS encoder data
+ * @param clk clock to generate the BiSS clock
  * @param a the dividend of the desired clock rate
  * @param b the divisor of the desired clock rates
  * @param[out] data array to store the received bits
  * @param data_length length of sensor data in bits (without crc)
  * @param frame_bytes number of 32 bit bytes to read from the encoder, should be able to contain 2 bits + ack and start bits + data + crc
- * @param crc_poly crc polynom in reverse representation:  x^0 + x^1 + x^4 is 0b1100
+ * @param crc_poly crc polynomial in reverse representation:  x^0 + x^1 + x^4 is 0b1100
  *
  * @return error status (NoError, CRCError, NoAck, NoStartBit)
  */
@@ -202,9 +202,9 @@ unsigned int read_biss_sensor_data(port out p_biss_clk, port in p_biss_data, clo
 /**
  * @brief Read up to 32 bit of BiSS sensor data without CRC checking
  *
- * @param p_biss_clk 1-bit out port to output the biss clock
- * @param p_biss_data in port for reading the biss encoder data
- * @param clk clock to generate the biss clock
+ * @param p_biss_clk 1-bit out port to output the BiSS clock
+ * @param p_biss_data in port for reading the BiSS encoder data
+ * @param clk clock to generate the BiSS clock
  * @param a the dividend of the desired clock rate
  * @param b the divisor of the desired clock rates
  * @param before_length length of data to dismiss
@@ -216,10 +216,10 @@ unsigned int read_biss_sensor_data_fast(port out p_biss_clk, port in p_biss_data
 
 
 /**
- * @brief Extract turn data from a biss encoder sensor data
+ * @brief Extract turn data from a BiSS encoder sensor data
  *
- * @param data biss sensor data
- * @param biss_config structure definition for the biss encoder data lengths
+ * @param data BiSS sensor data
+ * @param biss_config structure definition for the BiSS encoder data lengths
  *
  * @return absolute count
  * @return position in the range [0 - (2^singleturn_resolution - 1)]
@@ -229,27 +229,27 @@ unsigned int read_biss_sensor_data_fast(port out p_biss_clk, port in p_biss_data
 
 
 /**
- * @brief Compute a crc for biss data
+ * @brief Compute a crc for BiSS data
  *
- * @param data biss data
+ * @param data BiSS data
  * @param data_length length of data in bits
- * @param crc_poly crc polynom in reverse representation:  x^0 + x^1 + x^4 is 0b1100
+ * @param crc_poly crc polynomial in reverse representation:  x^0 + x^1 + x^4 is 0b1100
  *
- * @return inverted crc for biss
+ * @return inverted crc for BiSS
  */
-unsigned int biss_crc(unsigned int data[], unsigned int data_length, unsigned int poly);
+unsigned int biss_crc(unsigned int data[], unsigned int data_length, unsigned int crc_poly);
 
 
 /**
- * @brief Try 1-bit error correction for biss data
+ * @brief Try 1-bit error correction for BiSS data
  *
- * @param[out] data biss data
+ * @param[out] data BiSS data
  * @param data_length length of data in bits
  * @param frame_bytes number of 32 bit bytes of data
  * @param crc_received crc received with the data
- * @param crc_poly crc polynom in reverse representation:  x^0 + x^1 + x^4 is 0b1100
+ * @param crc_poly crc polynomial in reverse representation:  x^0 + x^1 + x^4 is 0b1100
  */
 void biss_crc_correct(unsigned int data[], unsigned int data_length, static const unsigned int frame_bytes,
-                      unsigned int crc_received, unsigned int poly);
+                      unsigned int crc_received, unsigned int crc_poly);
 
 #endif

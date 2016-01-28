@@ -1,5 +1,5 @@
 /**
- * @file hall_server.h
+ * @file adc_service.h
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
@@ -106,6 +106,6 @@ typedef struct {
  *
  * @param adc_ports Ports structure defining where to access the ADC chip signals.
  * @param c_trigger [[Nullable]] Channel communication to trigger sampling. If not provided, sampling takes place on request.
- * @param i_adc[3] Array of communication interfaces to handle up to 5 different clients.
+ * @param i_adc Array of communication interfaces to handle up to 5 different clients.
  */
 void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2]);

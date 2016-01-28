@@ -1,5 +1,5 @@
 /**
- * @file qei_server.h
+ * @file qei_service.h
  * @brief Incremental Encoder Service Implementation
  * @author Synapticon GmbH <support@synapticon.com>
  */
@@ -154,7 +154,7 @@ interface QEIInterface{
  *
  * @param qei_ports Ports structure defining where to access the Encoder signals.
  * @param qei_config Configuration for the service.
- * @param i_qei[5] Array of communication interfaces to handle up to 5 different clients.
+ * @param i_qei Array of communication interfaces to handle up to 5 different clients.
  */
 void qei_service(QEIPorts & qei_ports, QEIConfig qei_config,
                 interface QEIInterface server i_qei[5]);

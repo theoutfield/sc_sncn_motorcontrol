@@ -1,5 +1,5 @@
 /**
- * @file gpio_server.h
+ * @file gpio_service.h
  * @brief General Purpose IO Digital Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
 */
@@ -62,8 +62,8 @@ interface GPIOInterface{
 /**
  * @brief Service to manage the digital I/Os in your SOMANET device.
  *
- * @param gpio_ports[4] Array of ports to be managed.
- * @param i_gpio[2] Array of communication interfaces to handle one client.
+ * @param gpio_ports Array of ports to be managed.
+ * @param i_gpio Array of communication interfaces to handle one client.
  *
  */
 void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[1]);

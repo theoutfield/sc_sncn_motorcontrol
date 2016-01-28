@@ -10,7 +10,7 @@ Overview
 
 **BiSS** BiSS is an open source digital interface for sensors and actuators. BiSS is hardware compatible to the industrial standard SSI (Serial Synchronous Interface). The standardization process is coordinated on biss-interface.com_.
  
-This module (**module_biss**) provides a BiSS server thread which read BiSS sensor data from the encoder and extract position information when called by the client with an interface; and provides an interface for the client to get position from the BiSS server.
+This module (**module_biss**) provides a BiSS service thread which read BiSS sensor data from the encoder and extract position information when called by the client with an interface; and provides an interface for the client to get position from the BiSS service.
 
 All communication is done by interface communication and client interface calls following a Server-Client scheme.
 
@@ -64,13 +64,13 @@ Make sure you include these files in your main.xc file
 
     #include <xscope.h>
     #include <timer.h>
-    #include <biss_server.h>
+    #include <biss_service.h>
     #include <biss_client.h>
 
 
 Step 2: Define required interfaces
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-An interface is required to transport data from the biss_server task to your custom client's task
+An interface is required to transport data from the biss_service task to your custom client's task
 
 ::
 
@@ -84,7 +84,7 @@ An interface is required to transport data from the biss_server task to your cus
 Step 4: Run BiSS Encoder Interface Server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. important:: Please note that all the server must be executed on a tile with access to I/O of a Synapticon SOMANET IFM Drive DC board. 
+.. important:: Please note that all the services must be executed on a tile with access to I/O of a Synapticon SOMANET IFM Drive DC board. 
 
 ::
 
@@ -100,7 +100,7 @@ Step 4: Run BiSS Encoder Interface Server
             {
                 par
                 {
-                    /* BiSS Server */
+                    /* BiSS Service */
                     {
                         biss_par biss_params;
 			run_biss(i_biss, qei_q_ch1, p_ifm_encoder_ch2, clk_biss, 10, 1, biss_params, 2);
@@ -115,9 +115,9 @@ Step 4: Run BiSS Encoder Interface Server
     }
 
 
-Getting position information from BiSS server
----------------------------------------------
-While the BiSS server is running, the position can be acquired by a simple API call:
+Getting position information from BiSS service
+----------------------------------------------
+While the BiSS service is running, the position can be acquired by a simple API call:
 
 ::
 
