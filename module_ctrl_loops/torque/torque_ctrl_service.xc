@@ -243,6 +243,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
         filter_length_variance = filter_length/ams_config.pole_pairs;
     else
         filter_length_variance = filter_length/hall_config.pole_pairs;
+
     if (filter_length_variance < 10)
         filter_length_variance = 10;
 
@@ -269,7 +270,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     angle = i_biss.get_biss_angle() >> 2; //  << 10 ) >> 12 /
                     actual_speed = i_biss.get_biss_velocity();
                 } else if (torque_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
-                    angle = i_ams.get_ams_angle() >> 2; //  << 10 ) >> 12 /     // TODO I have also to shift here?
+                    angle = i_ams.get_ams_angle() >> 2; //  << 10 ) >> 12 /     // TODO I have also to divide through 4?
                     actual_speed = i_ams.get_ams_velocity();
                 }
 

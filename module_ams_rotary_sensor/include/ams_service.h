@@ -47,7 +47,7 @@
 #define AMS_DAE_OFF         1
 
 #define AMS_DATA_DAECANG    0
-#define AMS_DATA_CORDICANG  1
+#define AMS_DATA_CORDICANG       1
 
 #define AMS_NOISE_NORMAL    0
 #define AMS_NOISE_REDUCED   1
@@ -106,7 +106,7 @@ typedef struct {
 } AMSConfig;
 
 
-#define ROTARY_SENSOR_MAX_ANGLE   16384
+#define AMS_MAX_RESOLUTION   16384
 
 //volatile registers
 #define ADDR_ERRFL      0x0001
