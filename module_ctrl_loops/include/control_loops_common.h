@@ -6,13 +6,18 @@
 #pragma once
 
 /**
- * @brief struct definition for PID Controller
+ * @brief Denominator for PID contants. The values set by the user for such constants will be divided by this value (10000 by default).
+ */
+#define PID_DENOMINATOR 10000.0
+
+/**
+ * @brief Structure definition for a Control Loop Service configuration.
  */
 typedef struct {
-    int Kp_n, Kp_d; //Kp = Kp_n/Kp_d
-    int Ki_n, Ki_d; //Ki = Ki_n/Ki_d
-    int Kd_n, Kd_d; //Kd = Kd_n/Kd_d
-    int Integral_limit;
-    int Control_limit;
-    int Loop_time;
-} ctrl_par;
+    int Kp_n; /**< Value for proportional coefficient (Kp) in PID controller. Kp = Kp_n/PID_DENOMINATOR (by default PID_DENOMINATOR = 10000) */
+    int Ki_n; /**< Value for integral coefficient (Ki) in PID controller. Ki = Ki_n/PID_DENOMINATOR (by default PID_DENOMINATOR = 10000) */
+    int Kd_n; /**< Value for differential coefficient (Kd) in PID controller. Kd = Kd_n/PID_DENOMINATOR (by default PID_DENOMINATOR = 10000) */
+    int control_loop_period; /**< Period for the control loop [microseconds]. */
+    int feedback_sensor; /**< Sensor used for position control feedback [HALL_SENSOR, QEI_SENSOR]*/
+} ControlConfig;
+

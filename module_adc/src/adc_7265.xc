@@ -16,11 +16,97 @@
 
 #define SHIFTING_BITS   1
 
+void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
+                            unsigned char config,
+                            unsigned char &port_id,
+                            unsigned int stabilizing_ticks){
+
+    unsigned inp_val = 0, tmp_val = 0;
+    unsigned time_stamp; // Time stamp
+    unsigned char mux_config;
+    timer t;
+    unsigned int ts;
+
+///////////////First we sample currents///////////////////
+    mux_config = (1 << 3); //Channel 0 - Config 1 : Currents
+    adc_ports.p4_mux <: mux_config;
+    clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
+    clearbuf( adc_ports.p32_data[1] );
+
+    t :> ts;
+    t when timerafter(ts + stabilizing_ticks) :> ts;
+
+    adc_ports.p1_ready <: 1 @ time_stamp; // Switch ON input reads (and ADC conversion)
+    time_stamp += (ADC_TOTAL_BITS+2); // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
+    adc_ports.p1_ready @ time_stamp <: 0; // Switch OFF input reads, (and ADC conversion)
+
+    sync( adc_ports.p1_ready ); // Wait until port has completed any pending outputs
+
+    // Get data from port a
+    endin( adc_ports.p32_data[0] ); // End the previous input on this buffered port
+    adc_ports.p32_data[0] :> inp_val; // Get new input
+    tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
+    tmp_val = tmp_val >> (SHIFTING_BITS+1);
+    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+    adc_data[0][0] = (int)tmp_val;
+    adc_data[0][0] = adc_data[0][0] << 2;  // So we extend to 14Bit: 0 - 16384
+
+    // Get data from port b
+    endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
+    adc_ports.p32_data[1] :> inp_val; // Get new input
+    tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
+    tmp_val = tmp_val >> (SHIFTING_BITS+1);
+    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+    adc_data[1][0] = (int)tmp_val;
+    adc_data[1][0] = adc_data[1][0] << 2;  // So we extend to 14Bit: 0 - 16384
+
+
+    if(port_id == 0)
+        return;
+
+/////////////Then we sample the requested index///////////////////////
+    mux_config = (config << 3) | (port_id - 1);
+    adc_ports.p4_mux <: mux_config;
+    clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
+    clearbuf( adc_ports.p32_data[1] );
+
+    t :> ts;
+    t when timerafter(ts + stabilizing_ticks) :> ts;
+
+    adc_ports.p1_ready <: 1 @ time_stamp; // Switch ON input reads (and ADC conversion)
+    time_stamp += (ADC_TOTAL_BITS+2); // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
+    adc_ports.p1_ready @ time_stamp <: 0; // Switch OFF input reads, (and ADC conversion)
+
+    sync( adc_ports.p1_ready ); // Wait until port has completed any pending outputs
+
+    // Get data from port a
+    endin( adc_ports.p32_data[0] ); // End the previous input on this buffered port
+    adc_ports.p32_data[0] :> inp_val; // Get new input
+    tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
+    if(config == 0) tmp_val = tmp_val >> SHIFTING_BITS;
+    else tmp_val = tmp_val >> (SHIFTING_BITS+1);
+    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+    adc_data[0][port_id - 1] = (int)tmp_val;
+    adc_data[0][port_id - 1] = adc_data[0][port_id - 1] << 2; // So we extend to 14Bit: 0 - 16384
+
+    // Get data from port b
+    endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
+    adc_ports.p32_data[1] :> inp_val; // Get new input
+    tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
+    if(config == 0) tmp_val = tmp_val >> SHIFTING_BITS;
+    else tmp_val = tmp_val >> (SHIFTING_BITS+1);
+    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+    adc_data[1][port_id - 1] = (int)tmp_val;
+    adc_data[1][port_id - 1] = adc_data[1][port_id - 1] << 2; // So we extend to 14Bit: 0 - 16384
+
+}
+
 /*****************************************************************************/
 void configure_adc_ports_7265( // Configure all ADC data ports
-    in buffered port:32 p32_data[2], // Array of 32-bit buffered ADC data ports
-    clock xclk, // XMOS internal clock
-    out port p1_serial_clk, // 1-bit Port connecting to external ADC serial clock
+    in buffered port:32 ?p32_data_a, // Array of 32-bit buffered ADC data ports
+    in buffered port:32 ?p32_data_b,
+    clock ?xclk, // XMOS internal clock
+    out port ?p1_serial_clk, // 1-bit Port connecting to external ADC serial clock
     port p1_ready,   // 1-bit port used to as ready signal for p32_adc_data ports and ADC chip
     out port p4_mux // 4-bit port used to control multiplexor on ADC chip
 )
@@ -61,160 +147,215 @@ void configure_adc_ports_7265( // Configure all ADC data ports
     set_port_inv( p1_ready ); // Invert p1_ready for connection to AD7265, which has active low
 
     // For this port, configure to read into buffer when using the serial clock
-    configure_in_port_strobed_slave( p32_data[0] ,p1_ready ,xclk ); // XS1 Library call
-    configure_in_port_strobed_slave( p32_data[1] ,p1_ready ,xclk ); // XS1 Library call
+    configure_in_port_strobed_slave( p32_data_a ,p1_ready ,xclk ); // XS1 Library call
+    configure_in_port_strobed_slave( p32_data_b ,p1_ready ,xclk ); // XS1 Library call
 
 
     start_clock( xclk );    // Start the ADC serial clock port
 
 } // configure_adc_ports_7265
 
-/*****************************************************************************/
-void adc_7265_continuous_loop( // Get ADC data from AD7265 chip and send to client
-    server interface ADC iADC,
-    adc_ports_t &adc_ports
-)
+void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config)
 {
-    // Mapping array from 'trigger channel' to 'analogue ADC mux input' See. AD7265 data-sheet
-
-    unsigned time_stamp; // Time stamp
-    unsigned inp_val = 0, tmp_val = 0;
-    int out_a = 0, out_b= 0;
-    timer t;
-    unsigned tin,tout;
-    char config_ = 0;
-
-
-    printstrln("                                           ADC Server Starts");
-
-    //MB~ The next line gives priority to this thread, this is historical, and probably not required any more
-    //MB~ However, removing it will alter timing, and a re-tuning exercise may be required!-(
-    set_thread_fast_mode_on();
-
-    configure_adc_ports_7265( adc_ports.p32_data , adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready , adc_ports.p4_mux ); // Configure all ADC data ports
-    unsigned char mux_config = AD7265_MUX_DEFAULT_CONFIG;
-
-    // Loop until termination condition detected
-    while (1) //
-    {
-#pragma ordered
-         select {
-             case iADC.get_adc_measurements(unsigned char port_id, unsigned char config) -> {int VA, int VB, int sampling_time}:
-                 t :> tin;
-                 config_ = config;
-                 if (port_id > 6 || port_id < 1) port_id = 1;
-                 mux_config = (config << 3) | (port_id - 1);
-
-                 //Sampling time < 3us
-                 adc_ports.p4_mux <: mux_config; // Signal to Multiplexor which input to use for this trigger
-
-                 clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
-                 clearbuf( adc_ports.p32_data[1] );
-
-                 adc_ports.p1_ready <: 1 @ time_stamp; // Switch ON input reads (and ADC conversion)
-                 time_stamp += (ADC_TOTAL_BITS+2); // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
-                 adc_ports.p1_ready @ time_stamp <: 0; // Switch OFF input reads, (and ADC conversion)
-
-                 sync( adc_ports.p1_ready ); // Wait until port has completed any pending outputs
-
-                 // Get data from port a
-                 endin( adc_ports.p32_data[0] ); // End the previous input on this buffered port
-                 adc_ports.p32_data[0] :> inp_val; // Get new input
-                 tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
-               //  printhexln(tmp_val);
-                 if(config_ == 0) tmp_val = tmp_val >> SHIFTING_BITS;
-                 else tmp_val = tmp_val >> (SHIFTING_BITS+1);
-                 tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-                 out_a = (int)tmp_val;
-
-                 // Get data from port b
-                 endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
-                 adc_ports.p32_data[1] :> inp_val; // Get new input
-                 tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
-               // printhexln(tmp_val);
-                 if(config_ == 0) tmp_val = tmp_val >> SHIFTING_BITS;
-                 else tmp_val = tmp_val >> (SHIFTING_BITS+1);
-                 tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-                 out_b = (int)tmp_val;
-
-                 t :> tout;
-                 VA = out_a;
-                 VB = out_b;
-                 sampling_time = tout-tin;
-             break;
-
-         }// end of select
-    } // while(1)
-
-} // adc_7265_continuous_loop
-
-void run_adc_AD7256(server interface ADC iADC, server interface ADC_trigger i_ADC_trigger, adc_ports_t &adc_ports)
-{
-    printstrln("                                           ADC Server Starts");
-    unsigned time_stamp; // Time stamp
-    //        A/B | AI
     int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
-    unsigned inp_val = 0, tmp_val = 0;
-    int out_a = 0, out_b= 0;
-    timer t;
-    unsigned tin = 0, tout = 0;
-    int sampling_time_ = 0;
+    unsigned char sampling_port = 0;
 
-    configure_adc_ports_7265( adc_ports.p32_data, adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
+    //Calibration variables
+    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+
+    configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
+
+    //Calibration
+    while (i < ADC_CALIB_POINTS) {
+        // get ADC reading
+
+        adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 0);
+
+        if (adc_data[0][0]>0 && adc_data[0][0]<16382  &&  adc_data[1][0]>0 && adc_data[1][0]<16382) {
+            i_calib_a += adc_data[0][0];
+            i_calib_b += adc_data[1][0];
+            i++;
+            if (i == ADC_CALIB_POINTS) {
+                break;
+            }
+        }
+    }
+
+   i_calib_a = (i_calib_a >> Factor);
+   i_calib_b = (i_calib_b >> Factor);
 
     while(1){
 
     #pragma ordered
         select {
-            case i_ADC_trigger.trigger_measurement(unsigned char port_id, unsigned char config):
-                    t :> tin;
-                    if (port_id > 6 || port_id < 1) port_id = 1;
-                    unsigned char mux_config = (config << 3) | (port_id - 1);
-                    adc_ports.p4_mux <: mux_config;
-                    clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
-                    clearbuf( adc_ports.p32_data[1] );
+        case iADC[int i].get_currents() -> {int adc_A, int adc_B}:
 
-                    adc_ports.p1_ready <: 1 @ time_stamp; // Switch ON input reads (and ADC conversion)
-                    time_stamp += (ADC_TOTAL_BITS+2); // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
-                    adc_ports.p1_ready @ time_stamp <: 0; // Switch OFF input reads, (and ADC conversion)
+                // Config: 1 Port: 1
+                sampling_port = 0;  // If provided port is 0, just once sampling takes place: current,
+                                    // and no additional sampling is done
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
+                Icalibrated_a = ((int) adc_data[0][0]) - i_calib_a;
+                Icalibrated_b =((int) adc_data[1][0]) - i_calib_b;
 
-                    sync( adc_ports.p1_ready ); // Wait until port has completed any pending outputs
+                adc_A = current_sensor_config.sign_phase_b * Icalibrated_a;
+                adc_B = current_sensor_config.sign_phase_c * Icalibrated_b;
 
-                    // Get data from port a
-                    endin( adc_ports.p32_data[0] ); // End the previous input on this buffered port
-                    adc_ports.p32_data[0] :> inp_val; // Get new input
-                    tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
-                    if(config == 0) tmp_val = tmp_val >> SHIFTING_BITS;
-                    else tmp_val = tmp_val >> (SHIFTING_BITS+1);
-                    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-                    out_a = (int)tmp_val;
-
-                    // Get data from port b
-                    endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
-                    adc_ports.p32_data[1] :> inp_val; // Get new input
-                    tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
-                    if(config == 0) tmp_val = tmp_val >> SHIFTING_BITS;
-                    else tmp_val = tmp_val >> (SHIFTING_BITS+1);
-                    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-                    out_b = (int)tmp_val;
-
-                    t :> tout;
-
-                    // Store data
-                    adc_data[0][port_id - 1] = out_a;
-                    adc_data[1][port_id - 1] = out_b;
-                    sampling_time_ = (int)(tout-tin);
                 break;
 
-            case iADC.get_adc_measurements(unsigned char port_id, unsigned char config) -> {int adc_A, int adc_B, int sampling_time}:
-                        adc_A = adc_data[0][port_id - 1];
-                        adc_B = adc_data[1][port_id - 1];
-                        sampling_time = sampling_time_;
-                 break;
+        case iADC[int i].get_temperature() -> {int out_temp}:
 
-            default:
+                sampling_port = 5;
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
+
+                out_temp = adc_data[0][4];
+
+             break;
+
+        case iADC[int i].get_external_inputs() -> {int ext_a, int ext_b}:
+
+                //We sample the external inputs as differential inputs: ch3 - ch4
+                // Config: 0 Port: 3
+                sampling_port = 3;
+                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200);
+
+                ext_a = adc_data[0][2];
+                ext_b = adc_data[1][2];
+
                 break;
+
+        case iADC[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+
+
+                if(amps >= current_sensor_config.current_sensor_amplitude)
+                     out_ticks = MAX_ADC_VALUE/2; break;
+                if(amps <= -current_sensor_config.current_sensor_amplitude)
+                    out_ticks = -MAX_ADC_VALUE/2; break;
+
+                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
+
+                break;
+
+        case iADC[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+
+                if(ticks >= MAX_ADC_VALUE/2)
+                    out_amps = current_sensor_config.current_sensor_amplitude; break;
+                if(ticks <= -MAX_ADC_VALUE/2)
+                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
+
+                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
+
+                break;
+
         }//eof select
+    }//eof while
+}
+
+void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, chanend c_trig)
+{
+    timer t;
+    unsigned int ts;
+    unsigned char ct;
+    int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
+    unsigned char sampling_port = 0;
+
+    //Calibration variables
+    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+
+    configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
+
+    //Calibration
+    while (i < ADC_CALIB_POINTS) {
+        // get ADC reading
+
+        adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 0);
+
+        if (adc_data[0][0]>0 && adc_data[0][0]<16382  &&  adc_data[1][0]>0 && adc_data[1][0]<16382) {
+            i_calib_a += adc_data[0][0];
+            i_calib_b += adc_data[1][0];
+            i++;
+            if (i == ADC_CALIB_POINTS) {
+                break;
+            }
+        }
+    }
+
+   i_calib_a = (i_calib_a >> Factor);
+   i_calib_b = (i_calib_b >> Factor);
+
+    while(1){
+
+    #pragma ordered
+        select {
+        case inct_byref(c_trig, ct):
+                if (ct == XS1_CT_END)
+                {
+                    t :> ts;
+
+                    sampling_port++;
+                    if(sampling_port > 6){
+                        sampling_port = 2;
+                    }
+
+                    t when timerafter(ts + 7080) :> ts; // 6200
+                    //Sampling
+                    adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
+                }
+
+                break;
+
+        case iADC[int i].get_currents() -> {int adc_A, int adc_B}:
+
+                adc_A = current_sensor_config.sign_phase_b * Icalibrated_a;
+                adc_B = current_sensor_config.sign_phase_c * Icalibrated_b;
+
+                break;
+
+        case iADC[int i].get_temperature() -> {int out_temp}:
+
+                out_temp = adc_data[0][4];
+
+             break;
+
+        case iADC[int i].get_external_inputs() -> {int ext_a, int ext_b}:
+
+                //We sample the external inputs as differential inputs: ch3 - ch4
+                // Config: 0 Port: 3
+                sampling_port = 3;
+                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200);
+
+                ext_a = adc_data[0][2];
+                ext_b = adc_data[1][2];
+
+                break;
+
+        case iADC[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+
+
+                if(amps >= current_sensor_config.current_sensor_amplitude)
+                     out_ticks = MAX_ADC_VALUE/2; break;
+                if(amps <= -current_sensor_config.current_sensor_amplitude)
+                    out_ticks = -MAX_ADC_VALUE/2; break;
+
+                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
+
+                break;
+
+        case iADC[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+
+                if(ticks >= MAX_ADC_VALUE/2)
+                    out_amps = current_sensor_config.current_sensor_amplitude; break;
+                if(ticks <= -MAX_ADC_VALUE/2)
+                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
+
+                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
+
+                break;
+
+        }//eof select
+
+        Icalibrated_a = (((int) adc_data[0][0]) - i_calib_a);
+        Icalibrated_b = (((int) adc_data[1][0]) - i_calib_b);  // So we extend to 14Bit: 0 - 16384
+
     }//eof while
 }
 /*****************************************************************************/

@@ -11,9 +11,10 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <internal_config.h>
-#include <hall_config.h>
-#include <qei_config.h>
+#include <mc_internal_constants.h>
+#include <hall_service.h>
+#include <qei_service.h>
+#include <biss_service.h>
 #include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/
@@ -43,6 +44,8 @@ extern int quick_stop_velocity_profile_generate(int step);
 
 /*Profile Velocity Mode*/
 
+extern void init_velocity_profile_limits(int max_velocity, int max_acceleration, int max_deceleration);
+
 /**
  * @brief Initialise Velocity Profile
  *
@@ -56,7 +59,7 @@ extern int quick_stop_velocity_profile_generate(int step);
  * @Output
  * @return no. of steps for velocity profile : range [1 - steps]
  */
-extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration, int max_velocity);
+extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration);
 
 /**
  * @brief Generate Velocity Profile
@@ -80,8 +83,8 @@ extern int velocity_profile_generate(int step);
  * @param max_velocity for the position profile
  *
  */
-extern void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params, \
-                                         hall_par hall_params, int sensor_select, int max_position, int min_position);
+extern void init_position_profile_limits(int max_acceleration, int max_velocity, QEIConfig qei_params, \
+                                         HallConfig hall_config, BISSConfig biss_config, int sensor_select, int max_position, int min_position);
 
 /**
  * @brief Initialise Position Profile
@@ -96,7 +99,7 @@ extern void init_position_profile_limits(int max_acceleration, int max_velocity,
  * @Output
  * @return no. of steps for position profile : range [1 - steps]
  */
-extern int init_position_profile(int target_position, int actual_position,      int velocity, int acceleration, \
+extern int init_position_profile(int target_position, int actual_position, int velocity, int acceleration, \
                                  int deceleration);
 
 /**
@@ -137,6 +140,8 @@ extern int init_quick_stop_position_profile(int actual_velocity, int actual_posi
  */
 extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
 
+extern void init_linear_profile_limits(int max_value, int polarity);
+extern int get_linear_profile_polarity();
 /**
  * @brief Initialise Linear Profile
  *
@@ -150,7 +155,7 @@ extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
  * @Output
  * @return no. of steps for linear profile : range [1 - steps]
  */
-extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value);
+extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration);
 
 /**
  * @brief Generate Linear Profile
@@ -215,8 +220,9 @@ typedef struct
 
     float q;                    // position profile
 
-    qei_par qei_params;
-    hall_par hall_params;
+    QEIConfig qei_params;
+    HallConfig hall_params;
+    BISSConfig biss_params;
     int sensor_used;
     float max_position;
     float min_position;
