@@ -217,6 +217,39 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 //printf("looping %d\n", velocity_control_config.Loop_time);
                 break;
 
+            case i_hall.notification():
+
+                switch (i_hall.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case i_qei.notification():
+
+                switch (i_qei.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case i_motorcontrol.notification():
+
+                switch (i_motorcontrol.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
             case i_velocity_control[int i].set_velocity(int in_velocity):
 
                 target_velocity = in_velocity;

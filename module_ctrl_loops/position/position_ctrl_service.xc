@@ -191,6 +191,39 @@ void position_control_service(ControlConfig &position_control_config,
 
                 break;
 
+            case i_hall.notification():
+
+                switch (i_hall.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case i_qei.notification():
+
+                switch (i_qei.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case i_motorcontrol.notification():
+
+                switch (i_motorcontrol.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
             case i_position_control[int i].set_position(int in_target_position):
 
                 target_position = in_target_position;
