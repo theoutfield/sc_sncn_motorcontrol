@@ -159,14 +159,9 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
 
             case i_hall[int i].set_hall_config(HallConfig in_config):
 
-                //hall_config.max_ticks = in_config.max_ticks;
-                hall_config.pole_pairs = in_config.pole_pairs;
+                hall_config = in_config;
                 config_max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
-
-                //FIXME Polarity, for some reason, was not updated. IT NEEDS TO.
-
                 status = 1;
-
                 break;
 
             case i_hall[int i].check_busy() -> int out_status:
