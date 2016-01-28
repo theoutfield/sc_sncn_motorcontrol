@@ -17,8 +17,17 @@
 #pragma once
 
 /****** CONFIGURATION. DO NOT TOUCH!! ******/
-#define PWM_DEAD_TIME 700
-#define PWM_MAX_VALUE 13889
+
+/* All timing values depend on reference clock setting. For 100 MHz reference clock each tick
+ * is equivalent to 10ns (for 250 MHz clock it's 4ns)
+ */
+#define PWM_DEAD_TIME 700 //DC100/300 - 300, DC1K/5K - 700
+
+/* This defines the PWM resolution. Because the PWM is driven by a fixed clock,
+ * this also configures the PWM frequency at the same time. The relation is as follows:
+ * PWM_MAX_VALUE = PWM_CLOCK / PWM_FREQUENCY (e.g. 250 MHz / 18 kHz = 13889)
+ */
+#define PWM_MAX_VALUE 13889 //DC100/300 - 13889, DC1K/5K - 12500
 /*******************************************/
 
 #ifndef __ASSEMBLER__
