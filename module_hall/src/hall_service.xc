@@ -18,7 +18,7 @@
 
 int check_hall_config(HallConfig &hall_config){
 
-    if(hall_config.pole_pairs < 1 || hall_config.pole_pairs > 10){
+    if (hall_config.pole_pairs < 1 || hall_config.pole_pairs > 10) {
         printstrln("Wrong Hall configuration: wrong pole-pairs");
         return ERROR;
     }
@@ -27,14 +27,12 @@ int check_hall_config(HallConfig &hall_config){
 }
 
 [[combinable]]
-
-void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
-                    interface HallInterface server i_hall[5])
+void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface HallInterface server i_hall[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    if(check_hall_config(hall_config) == ERROR){
+    if (check_hall_config(hall_config) == ERROR) {
         printstrln("Error while checking the Hall sensor configuration");
         return;
     }
@@ -96,79 +94,88 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
     hall_ports.p_hall :> pin_state;
     pin_state &= 0x07;
     pin_state_monitor = pin_state;
-    switch(pin_state) {
-    case 3: angle = 0;
-        break;
-    case 2: angle = 682;
-        break; //  60
-    case 6: angle = 1365;
-        break;
-    case 4: angle = 2048;
-        break; // 180
-    case 5: angle = 2730;
-        break;
-    case 1: angle = 3413;
-        break; // 300 degree
+    switch (pin_state) {
+        case 3:
+            angle = 0;
+            break;
+        case 2:
+            angle = 682;
+            break; //  60
+        case 6:
+            angle = 1365;
+            break;
+        case 4:
+            angle = 2048;
+            break; // 180
+        case 5:
+            angle = 2730;
+            break;
+        case 1:
+            angle = 3413;
+            break; // 300 degree
     }
 
     t1 :> time1;
     tmr :> ts;
 
-    while(1) {
+    while (1) {
 //#pragma xta endpoint "hall_loop"
       //[[ordered]] //FixMe ordered is not supported for combinable functions
         select {
             case i_hall[int i].get_hall_pinstate() -> unsigned out_pinstate:
 
-                    out_pinstate = pin_state_monitor;
-                    break;
+                out_pinstate = pin_state_monitor;
+                break;
 
             case i_hall[int i].get_hall_position() -> int out_position:
 
-                    out_position = angle;
-                    break;
+                out_position = angle;
+                break;
 
             case i_hall[int i].get_hall_position_absolute() -> int out_position:
-                    out_position = count;
-                    break;
+
+                out_position = count;
+                break;
 
             case i_hall[int i].get_hall_velocity() -> int out_velocity:
-                    out_velocity = raw_velocity;
-                    break;
+
+                out_velocity = raw_velocity;
+                break;
 
             case i_hall[int i].get_hall_direction() -> int out_direction:
-                    out_direction = direction;
-                    break;
+
+                out_direction = direction;
+                break;
 
             case i_hall[int i].reset_hall_absolute_position(int offset):
+
                 count = offset;
                 break;
 
             case i_hall[int i].get_hall_config() -> HallConfig out_config:
 
-                    out_config = hall_config;
-                    break;
+                out_config = hall_config;
+                break;
 
             case i_hall[int i].set_hall_config(HallConfig in_config):
 
-                    //hall_config.max_ticks = in_config.max_ticks;
-                    hall_config.pole_pairs = in_config.pole_pairs;
-                    config_max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
+                //hall_config.max_ticks = in_config.max_ticks;
+                hall_config.pole_pairs = in_config.pole_pairs;
+                config_max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
 
-                    //FIXME Polarity, for some reason, was not updated. IT NEEDS TO.
+                //FIXME Polarity, for some reason, was not updated. IT NEEDS TO.
 
-                    status = 1;
+                status = 1;
 
-                    break;
+                break;
 
             case i_hall[int i].check_busy() -> int out_status:
 
-                    out_status = init_state;
+                out_status = init_state;
+                break;
 
-                    break;
-
-            case tmr when timerafter(ts + PULL_PERIOD_USEC*250) :> ts: //12 usec 3000
-                switch(xreadings) {
+            case tmr when timerafter(ts + PULL_PERIOD_USEC * 250) :> ts: //12 usec 3000
+                switch (xreadings) {
                     case 0:
                         hall_ports.p_hall :> new1;
                         new1 &= 0x07;
@@ -212,43 +219,43 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                     //if(direction >= 0) // CW  3 2 6 4 5 1
 
                     switch(pin_state) {
-                    case 3:
-                        angle1 = 0;
-                        uHallNext=2;
-                        uHallPrevious=1;
-                        break;
-                    case 2:
-                        angle1 = 682;
-                        uHallNext=6;
-                        uHallPrevious=3;
-                        break; //  60
-                    case 6:
-                        angle1 = 1365;
-                        uHallNext=4;
-                        uHallPrevious=2;
-                        break;
-                    case 4:
-                        angle1 = 2048;
-                        uHallNext=5;
-                        uHallPrevious=6;
-                        break; // 180
-                    case 5:
-                        angle1 = 2730;
-                        uHallNext=1;
-                        uHallPrevious=4;
-                        break;
-                    case 1:
-                        angle1 = 3413;
-                        uHallNext=3;
-                        uHallPrevious=5;
-                        break; // 300 degree
-                    default:
-                        iHallError++;
-                        break;
+                        case 3:
+                            angle1 = 0;
+                            uHallNext = 2;
+                            uHallPrevious = 1;
+                            break;
+                        case 2:
+                            angle1 = 682;
+                            uHallNext = 6;
+                            uHallPrevious = 3;
+                            break; //  60
+                        case 6:
+                            angle1 = 1365;
+                            uHallNext = 4;
+                            uHallPrevious = 2;
+                            break;
+                        case 4:
+                            angle1 = 2048;
+                            uHallNext = 5;
+                            uHallPrevious = 6;
+                            break; // 180
+                        case 5:
+                            angle1 = 2730;
+                            uHallNext = 1;
+                            uHallPrevious = 4;
+                            break;
+                        case 1:
+                            angle1 = 3413;
+                            uHallNext = 3;
+                            uHallPrevious = 5;
+                            break; // 300 degree
+                        default:
+                            iHallError++;
+                            break;
                     }
 
                     if (direction == 1)
-                        if (pin_state_last==1 && pin_state==3) {
+                        if (pin_state_last == 1 && pin_state == 3) {
                             // transition to NULL
                             iPeriodMicroSeconds = iCountMicroSeconds;
                             iCountMicroSeconds = 0;
@@ -258,7 +265,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                         }
 
                     if (direction == -1) {
-                        if (pin_state_last==3 && pin_state==1) {
+                        if (pin_state_last == 3 && pin_state == 1) {
                             iPeriodMicroSeconds = iCountMicroSeconds;
                             iCountMicroSeconds = 0;
                             if (iPeriodMicroSeconds) {
@@ -280,7 +287,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
                 }
 
                 if (iTimeSaveOneTransition) {
-                    delta_angle = (682 *iTimeCountOneTransition)/iTimeSaveOneTransition;
+                    delta_angle = (682 * iTimeCountOneTransition) / iTimeSaveOneTransition;
                 }
 
                 if (delta_angle >= 680) {
