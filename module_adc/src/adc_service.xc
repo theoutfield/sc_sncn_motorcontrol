@@ -12,7 +12,7 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
     if(isnull(c_trigger)){
 
-        // There is not triggered sampling
+        // There is no triggered sampling
         if(!isnull(adc_ports.ad7949_ports.clk)){
 
             adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config);
@@ -22,7 +22,7 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
         }
     }else{
 
-        // There is triggering
+        // There is a triggering
         if(!isnull(adc_ports.ad7949_ports.clk)){
 
             adc_ad7949_triggered(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, c_trigger);

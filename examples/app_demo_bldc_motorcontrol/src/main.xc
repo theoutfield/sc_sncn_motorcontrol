@@ -22,7 +22,7 @@ ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
 
-#define VOLTAGE 2000 //+/- 4095
+#define VOLTAGE 2000 //+/- 13889
 
 void adc_client(interface ADCInterface client i_adc){
 

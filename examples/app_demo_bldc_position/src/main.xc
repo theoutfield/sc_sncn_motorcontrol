@@ -11,6 +11,7 @@
 //BLDC Motor drive libs
 #include <qei_service.h>
 #include <hall_service.h>
+#include <biss_service.h>
 #include <pwm_service.h>
 #include <watchdog_service.h>
 #include <motorcontrol_service.h>

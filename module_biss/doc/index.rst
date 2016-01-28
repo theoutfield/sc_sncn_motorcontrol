@@ -107,6 +107,7 @@ Definitions
 
 Types
 -----
+
 .. doxygenstruct:: BISSConfig
 .. doxygenstruct:: BISSPorts
 

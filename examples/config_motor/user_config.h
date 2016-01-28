@@ -7,6 +7,7 @@
 
 #include <qei_service.h>
 #include <hall_service.h>
+#include <biss_service.h>
 #include <motorcontrol_service.h>
 
 /**************************************************
@@ -33,8 +34,8 @@
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
 #define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
 
-// SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR]
-#define MOTOR_FEEDBACK_SENSOR      QEI_SENSOR
+// SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
+#define MOTOR_FEEDBACK_SENSOR      HALL_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
 #define QEI_SENSOR_INDEX_TYPE      QEI_WITH_INDEX

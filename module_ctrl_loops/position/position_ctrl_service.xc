@@ -311,7 +311,8 @@ void position_control_service(ControlConfig &position_control_config,
                 break;
         case i_position_control[int i].get_biss_config() -> BISSConfig out_config:
 
-                out_config = i_biss.get_biss_config();
+                if(!isnull(i_biss))
+                    out_config = i_biss.get_biss_config();
                 break;
 
         }
