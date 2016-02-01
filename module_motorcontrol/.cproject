@@ -540,6 +540,27 @@
 									<listOptionValue builtIn="false" value="__STDC_UTF_16__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_32__=1"/>
 									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccZ1mIgG.h&quot;"/>
+									<listOptionValue builtIn="false" value="__DEC_EVAL_METHOD__=2"/>
+									<listOptionValue builtIn="false" value="__DEC32_MANT_DIG__=7"/>
+									<listOptionValue builtIn="false" value="__DEC32_MIN_EXP__=(-95)"/>
+									<listOptionValue builtIn="false" value="__DEC32_MAX_EXP__=96"/>
+									<listOptionValue builtIn="false" value="__DEC32_MIN__=1E-95DF"/>
+									<listOptionValue builtIn="false" value="__DEC32_MAX__=9.999999E96DF"/>
+									<listOptionValue builtIn="false" value="__DEC32_EPSILON__=1E-6DF"/>
+									<listOptionValue builtIn="false" value="__DEC64_MANT_DIG__=16"/>
+									<listOptionValue builtIn="false" value="__DEC64_MIN_EXP__=(-383)"/>
+									<listOptionValue builtIn="false" value="__DEC64_MAX_EXP__=384"/>
+									<listOptionValue builtIn="false" value="__DEC64_MIN__=1E-383DD"/>
+									<listOptionValue builtIn="false" value="__DEC64_MAX__=9.999999999999999E384DD"/>
+									<listOptionValue builtIn="false" value="__DEC64_EPSILON__=1E-15DD"/>
+									<listOptionValue builtIn="false" value="__DEC128_MANT_DIG__=34"/>
+									<listOptionValue builtIn="false" value="__DEC128_MIN_EXP__=(-6143)"/>
+									<listOptionValue builtIn="false" value="__DEC128_MAX_EXP__=6144"/>
+									<listOptionValue builtIn="false" value="__DEC128_MIN__=1E-6143DL"/>
+									<listOptionValue builtIn="false" value="__DEC128_MAX__=9.999999999999999999999999999999999E6144DL"/>
+									<listOptionValue builtIn="false" value="__DEC128_EPSILON__=1E-33DL"/>
+									<listOptionValue builtIn="false" value="__REGISTER_PREFIX__"/>
+									<listOptionValue builtIn="false" value="__ELF__=1"/>
 								</option>
 								<option id="com.xmos.c.compiler.option.include.paths.3354698" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
@@ -855,6 +876,27 @@
 									<listOptionValue builtIn="false" value="__STDC_UTF_16__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_32__=1"/>
 									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccrg3a7K.h&quot;"/>
+									<listOptionValue builtIn="false" value="__DEC_EVAL_METHOD__=2"/>
+									<listOptionValue builtIn="false" value="__DEC32_MANT_DIG__=7"/>
+									<listOptionValue builtIn="false" value="__DEC32_MIN_EXP__=(-95)"/>
+									<listOptionValue builtIn="false" value="__DEC32_MAX_EXP__=96"/>
+									<listOptionValue builtIn="false" value="__DEC32_MIN__=1E-95DF"/>
+									<listOptionValue builtIn="false" value="__DEC32_MAX__=9.999999E96DF"/>
+									<listOptionValue builtIn="false" value="__DEC32_EPSILON__=1E-6DF"/>
+									<listOptionValue builtIn="false" value="__DEC64_MANT_DIG__=16"/>
+									<listOptionValue builtIn="false" value="__DEC64_MIN_EXP__=(-383)"/>
+									<listOptionValue builtIn="false" value="__DEC64_MAX_EXP__=384"/>
+									<listOptionValue builtIn="false" value="__DEC64_MIN__=1E-383DD"/>
+									<listOptionValue builtIn="false" value="__DEC64_MAX__=9.999999999999999E384DD"/>
+									<listOptionValue builtIn="false" value="__DEC64_EPSILON__=1E-15DD"/>
+									<listOptionValue builtIn="false" value="__DEC128_MANT_DIG__=34"/>
+									<listOptionValue builtIn="false" value="__DEC128_MIN_EXP__=(-6143)"/>
+									<listOptionValue builtIn="false" value="__DEC128_MAX_EXP__=6144"/>
+									<listOptionValue builtIn="false" value="__DEC128_MIN__=1E-6143DL"/>
+									<listOptionValue builtIn="false" value="__DEC128_MAX__=9.999999999999999999999999999999999E6144DL"/>
+									<listOptionValue builtIn="false" value="__DEC128_EPSILON__=1E-33DL"/>
+									<listOptionValue builtIn="false" value="__REGISTER_PREFIX__"/>
+									<listOptionValue builtIn="false" value="__ELF__=1"/>
 								</option>
 								<option id="com.xmos.cxx.compiler.option.include.paths.24942362" name="com.xmos.cxx.compiler.option.include.paths" superClass="com.xmos.cxx.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>

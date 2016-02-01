@@ -7,6 +7,7 @@
 
 #include <qei_service.h>
 #include <hall_service.h>
+#include <ams_service.h>
 #include <motorcontrol_service.h>
 
 /**************************************************
@@ -21,7 +22,7 @@
 #define MOTOR_TYPE  BLDC_MOTOR
 
 // NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  4
+#define POLE_PAIRS  3
 
 // WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
 #define BLDC_WINDING_TYPE   DELTA_WINDING
@@ -44,6 +45,7 @@
 
 // RESOLUTION OF YOUR INCREMENTAL ENCODER (if applicable)
 #define QEI_SENSOR_RESOLUTION      4000
+#define SENSOR_RESOLUTION          ROTARY_SENSOR_MAX_ANGLE
 
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1
@@ -69,9 +71,9 @@
 #define CONTROL_LOOP_PERIOD     60
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
-#define POSITION_Kp       1000
-#define POSITION_Ki       1
-#define POSITION_Kd       0
+#define POSITION_Kp       10000
+#define POSITION_Ki       40
+#define POSITION_Kd       10
 
 // PID FOR VELOCITY CONTROL (if applicable) [will be divided by 10000]
 #define VELOCITY_Kp       667

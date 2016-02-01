@@ -49,6 +49,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                        interface HallInterface client ?i_hall,
                        interface QEIInterface client ?i_qei,
                        interface BISSInterface client ?i_biss,
+                       interface AMSInterface client ?i_ams,
                        interface MotorcontrolInterface client i_motorcontrol,
                        interface VelocityControlInterface server i_velocity_control[3])
 {
@@ -91,6 +92,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
     HallConfig hall_config;
     QEIConfig qei_config;
+    AMSConfig ams_config;
     MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
 
    if(velocity_control_config.feedback_sensor != HALL_SENSOR
@@ -113,6 +115,10 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     } else if (velocity_control_config.feedback_sensor == BISS_SENSOR){
         if(isnull(i_biss)){
             printstrln("Velocity Control Loop ERROR: Interface for BiSS Service not provided");
+        }
+    } else if (velocity_control_config.feedback_sensor == AMS_SENSOR){
+        if(isnull(i_ams)){
+            printstrln("Velocity Control Loop ERROR: Interface for AMS Service not provided");
         }
     }
 
@@ -153,6 +159,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 /* calculate actual velocity from hall/qei with filter*/
                 if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
                     actual_velocity = i_biss.get_biss_velocity();
+                } else if (velocity_control_config.feedback_sensor == AMS_SENSOR) {
+                    actual_velocity = i_ams.get_ams_velocity();
                 } else {
                     if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
                         if (init == 0) {

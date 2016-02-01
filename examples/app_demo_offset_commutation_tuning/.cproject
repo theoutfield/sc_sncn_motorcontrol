@@ -270,6 +270,53 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/examples/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc/images}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1605921113" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -573,6 +620,27 @@
 									<listOptionValue builtIn="false" value="__xcore__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_16__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_32__=1"/>
+									<listOptionValue builtIn="false" value="__DEC_EVAL_METHOD__=2"/>
+									<listOptionValue builtIn="false" value="__DEC32_MANT_DIG__=7"/>
+									<listOptionValue builtIn="false" value="__DEC32_MIN_EXP__=(-95)"/>
+									<listOptionValue builtIn="false" value="__DEC32_MAX_EXP__=96"/>
+									<listOptionValue builtIn="false" value="__DEC32_MIN__=1E-95DF"/>
+									<listOptionValue builtIn="false" value="__DEC32_MAX__=9.999999E96DF"/>
+									<listOptionValue builtIn="false" value="__DEC32_EPSILON__=1E-6DF"/>
+									<listOptionValue builtIn="false" value="__DEC64_MANT_DIG__=16"/>
+									<listOptionValue builtIn="false" value="__DEC64_MIN_EXP__=(-383)"/>
+									<listOptionValue builtIn="false" value="__DEC64_MAX_EXP__=384"/>
+									<listOptionValue builtIn="false" value="__DEC64_MIN__=1E-383DD"/>
+									<listOptionValue builtIn="false" value="__DEC64_MAX__=9.999999999999999E384DD"/>
+									<listOptionValue builtIn="false" value="__DEC64_EPSILON__=1E-15DD"/>
+									<listOptionValue builtIn="false" value="__DEC128_MANT_DIG__=34"/>
+									<listOptionValue builtIn="false" value="__DEC128_MIN_EXP__=(-6143)"/>
+									<listOptionValue builtIn="false" value="__DEC128_MAX_EXP__=6144"/>
+									<listOptionValue builtIn="false" value="__DEC128_MIN__=1E-6143DL"/>
+									<listOptionValue builtIn="false" value="__DEC128_MAX__=9.999999999999999999999999999999999E6144DL"/>
+									<listOptionValue builtIn="false" value="__DEC128_EPSILON__=1E-33DL"/>
+									<listOptionValue builtIn="false" value="__REGISTER_PREFIX__"/>
+									<listOptionValue builtIn="false" value="__ELF__=1"/>
 								</option>
 								<option id="com.xmos.c.compiler.option.include.paths.386587629" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
@@ -671,6 +739,53 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/examples/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc/images}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.277344476" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -978,6 +1093,27 @@
 									<listOptionValue builtIn="false" value="__xcore__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_16__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_32__=1"/>
+									<listOptionValue builtIn="false" value="__DEC_EVAL_METHOD__=2"/>
+									<listOptionValue builtIn="false" value="__DEC32_MANT_DIG__=7"/>
+									<listOptionValue builtIn="false" value="__DEC32_MIN_EXP__=(-95)"/>
+									<listOptionValue builtIn="false" value="__DEC32_MAX_EXP__=96"/>
+									<listOptionValue builtIn="false" value="__DEC32_MIN__=1E-95DF"/>
+									<listOptionValue builtIn="false" value="__DEC32_MAX__=9.999999E96DF"/>
+									<listOptionValue builtIn="false" value="__DEC32_EPSILON__=1E-6DF"/>
+									<listOptionValue builtIn="false" value="__DEC64_MANT_DIG__=16"/>
+									<listOptionValue builtIn="false" value="__DEC64_MIN_EXP__=(-383)"/>
+									<listOptionValue builtIn="false" value="__DEC64_MAX_EXP__=384"/>
+									<listOptionValue builtIn="false" value="__DEC64_MIN__=1E-383DD"/>
+									<listOptionValue builtIn="false" value="__DEC64_MAX__=9.999999999999999E384DD"/>
+									<listOptionValue builtIn="false" value="__DEC64_EPSILON__=1E-15DD"/>
+									<listOptionValue builtIn="false" value="__DEC128_MANT_DIG__=34"/>
+									<listOptionValue builtIn="false" value="__DEC128_MIN_EXP__=(-6143)"/>
+									<listOptionValue builtIn="false" value="__DEC128_MAX_EXP__=6144"/>
+									<listOptionValue builtIn="false" value="__DEC128_MIN__=1E-6143DL"/>
+									<listOptionValue builtIn="false" value="__DEC128_MAX__=9.999999999999999999999999999999999E6144DL"/>
+									<listOptionValue builtIn="false" value="__DEC128_EPSILON__=1E-33DL"/>
+									<listOptionValue builtIn="false" value="__REGISTER_PREFIX__"/>
+									<listOptionValue builtIn="false" value="__ELF__=1"/>
 								</option>
 								<option id="com.xmos.cxx.compiler.option.include.paths.148542306" name="com.xmos.cxx.compiler.option.include.paths" superClass="com.xmos.cxx.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
@@ -1079,6 +1215,53 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_watchdog/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_motorcontrol/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_adc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_pwm_symmetrical/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_hall/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/examples/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc/images}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1122502185" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
