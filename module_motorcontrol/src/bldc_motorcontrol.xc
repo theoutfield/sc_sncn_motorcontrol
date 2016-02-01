@@ -21,6 +21,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[5],
                             chanend c_pwm_ctrl,
@@ -94,6 +95,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     }
                 } else if (sensor_select == BISS_SENSOR) {
                     angle = i_biss.get_biss_angle();
+                } else if (sensor_select == AMS_SENSOR) {
+                    angle = i_ams.get_ams_angle_electrical();
                 }
 
                 if (shutdown == 1) {    /* stop PWM */
@@ -106,7 +109,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             angle_pwm = ((angle + motorcontrol_config.hall_offset[0]) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI_SENSOR ) {
                             angle_pwm = (angle >> 2) & 0x3ff; //512
-                        } else if (sensor_select == BISS_SENSOR) {
+                        } else if (sensor_select == BISS_SENSOR || sensor_select == AMS_SENSOR) {
                             angle_pwm = angle >> 2;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
@@ -119,7 +122,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             angle_pwm = ((angle + motorcontrol_config.hall_offset[1]) >> 2) & 0x3ff;
                         } else if (sensor_select == QEI_SENSOR) {
                             angle_pwm = (angle >> 2) & 0x3ff; //3100
-                        } else if (sensor_select == BISS_SENSOR) {
+                        } else if (sensor_select == BISS_SENSOR || sensor_select == AMS_SENSOR) {
                             angle_pwm = ((angle + 2048) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;

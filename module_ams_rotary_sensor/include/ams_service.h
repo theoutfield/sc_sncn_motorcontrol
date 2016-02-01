@@ -7,6 +7,8 @@
 
 #pragma once
 
+#define AMS_SENSOR                5
+
 #define SPI_MASTER_MODE 1
 //#define DEFAULT_SPI_CLOCK_DIV 10        // (100MHz / (10) = 10 MHz [100MHz ref clock]
 #define DEFAULT_SPI_CLOCK_DIV 200        // (250MHz / (50) = 5 MHz [250MHz ref clock]
@@ -19,6 +21,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ams_config.h>
 
 typedef struct sensor_spi_interface
 {
@@ -26,7 +29,8 @@ typedef struct sensor_spi_interface
     out port slave_select;
 } sensor_spi_interface;
 
-typedef struct ams_config_params
+
+typedef struct
 {
     char settings1;
     char settings2;
@@ -35,18 +39,22 @@ typedef struct ams_config_params
     int resolution_bits;
     int max_count_ticks_cw;
     int max_count_ticks_ccw;
-} ams_config_params_t;
+    int offset_electrical;
+    int pole_pairs;
+} AMSConfig;
 
-interface AMS{
-    int get_angle_electrical(void);
-    {int, int} get_absolute_position_multiturn(void);
-    int get_absolute_position_singleturn(void);
-    int get_velocity(void);
-    void configure(ams_config_params_t config_params);
-    ams_config_params_t get_configuration(void);
+interface AMSInterface {
+    unsigned int get_ams_angle_electrical(void);
+    {int, int} get_ams_position(void);
+    unsigned int get_ams_real_position(void);
+    int get_ams_velocity(void);
+    void set_ams_config(AMSConfig in_config);
+    AMSConfig get_ams_config(void);
+    unsigned int reset_ams_angle_electrical(unsigned int angle);
+    void set_ams_calib(int flag);
 };
 
-ams_config_params_t set_configuration(void);
+AMSConfig set_configuration(void);
 
 //#define ROTARY_SENSOR_MAX_ANGLE   16384
 //#define ROTARY_SENSOR_RESOLUTION_BITS 14
@@ -115,4 +123,6 @@ int writeZeroPosition(sensor_spi_interface &sensor_if, unsigned short data);
 int writeNumberPolePairs(sensor_spi_interface &sensor_if, unsigned short data);
 
 //server for commutation and position control applications
-void ams_sensor_server(server interface AMS iAMS[n], unsigned n, sensor_spi_interface &sensor_if);
+void ams_sensor_server(server interface AMSInterface i_ams[n], unsigned n, sensor_spi_interface &sensor_if);
+
+void ams_service(sensor_spi_interface &sensor_if, AMSConfig & ams_config, interface AMSInterface server i_ams[5]);

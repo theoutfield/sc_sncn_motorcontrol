@@ -8,12 +8,13 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface BISSInterface client ?i_biss){
+void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams){
 
     delay_seconds(1);
     i_commutation.set_voltage(input_voltage);
     MotorcontrolConfig motorcontrol_config = i_commutation.get_config();
     BISSConfig biss_config;
+    AMSConfig ams_config;
 
     if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
         printf ("Hall tuning. Voltage %d\nPlease enter an offset value different from %d, then press enter\n", input_voltage,
@@ -21,6 +22,9 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
     else if (motorcontrol_config.commutation_sensor == BISS_SENSOR){
         biss_config = i_biss.get_biss_config();
         printf ("BiSS tuning. Voltage %d\nPlease enter an offset value different from %d, then press enter\n", input_voltage, biss_config.offset_electrical);
+    } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR){
+        ams_config = i_ams.get_ams_config();
+        printf ("AMS tuning. Voltage %d\nPlease enter an offset value different from %d, then press enter\n", input_voltage, ams_config.offset_electrical);
     }
     fflush(stdout);
     //read and adjust the offset
@@ -39,16 +43,25 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             } else
                 mode = c;
         }
-        if (motorcontrol_config.commutation_sensor == BISS_SENSOR){
+        if (motorcontrol_config.commutation_sensor == BISS_SENSOR || motorcontrol_config.commutation_sensor == AMS_SENSOR){
             switch(mode) {
             case 'a': //auto
                 i_commutation.set_voltage(0);
                 delay_milliseconds(500);
-                i_biss.set_biss_calib(1);
-                i_commutation.set_voltage(1000);
-                delay_milliseconds(200);
-                unsigned int offset = i_biss.reset_biss_angle_electrical(0);
-                i_biss.set_biss_calib(0);
+                unsigned int offset;
+                if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+                    i_biss.set_biss_calib(1);
+                    i_commutation.set_voltage(1000);
+                    delay_milliseconds(200);
+                    offset = i_biss.reset_biss_angle_electrical(0);
+                    i_biss.set_biss_calib(0);
+                } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
+                    i_ams.set_ams_calib(1);
+                    i_commutation.set_voltage(1000);
+                    delay_milliseconds(200);
+                    offset = i_ams.reset_ams_angle_electrical(0);
+                    i_ams.set_ams_calib(0);
+                }
                 i_commutation.set_voltage(input_voltage);
                 mode = 0;
                 printf("auto offset: %d\n", offset);
@@ -67,8 +80,13 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
                 break;
             default: //set offset
                 printf("offset: %i\n", value);
-                biss_config.offset_electrical = value;
-                i_biss.set_biss_config(biss_config);
+                if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+                    biss_config.offset_electrical = value;
+                    i_biss.set_biss_config(biss_config);
+                } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
+                    ams_config.offset_electrical = value;
+                    i_ams.set_ams_config(ams_config);
+                }
                 break;
             }
         } else { //please note for the delta winding type offset_clk and offset_cclk are flipped

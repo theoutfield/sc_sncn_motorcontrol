@@ -39,6 +39,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[5])
 {
@@ -73,7 +74,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                     if(motorcontrol_config.motor_type == BLDC_MOTOR){
 
-                        bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_watchdog, i_motorcontrol,
+                        bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
                                 c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
 
                     }else if(motorcontrol_config.motor_type == BDC_MOTOR){

@@ -8,11 +8,11 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <rotary_sensor.h>
-#include <xscope.h>
+#include <ams_service.h>
 #include <user_config.h>
+#include <ctype.h>
 
-#define NUM_OF_AMS_INTERFACES 1
+#define NUM_OF_AMS_INTERFACES 2
 
 //DC1K
 on tile[IFM_TILE]: sensor_spi_interface pRotarySensor =
@@ -33,25 +33,25 @@ on tile[IFM_TILE]: sensor_spi_interface pRotarySensor =
 
 
 /* Test Hall Sensor Client */
-void ams_rotary_sensor_test(client interface AMS iAMS)
+void ams_rotary_sensor_test(client interface AMSInterface i_ams)
 {
 
     int position = 0;
-    int velocity = 0;
+//    int velocity = 0;
     int direction = 0;
     int electrical_angle = 0;
 
     while(1)
     {
 
-        electrical_angle = iAMS.get_angle_electrical();
+        electrical_angle = i_ams.get_ams_angle_electrical();
 
         /* get position from Hall Sensor */
-        {position, direction} = iAMS.get_absolute_position_multiturn();
-    //    position = iAMS.get_absolute_position_singleturn();
+        {position, direction} = i_ams.get_ams_position();
+//        position = i_ams.get_ams_real_position();
 
         /* get velocity from Hall Sensor */
-   //     velocity = iAMS.get_velocity();
+   //     velocity = i_ams.get_ams_velocity();
 
         xscope_int(POSITION, position);
         xscope_int(ANGLE, electrical_angle);
@@ -78,19 +78,38 @@ void ams_rotary_sensor_direct_method(sensor_spi_interface &sensor_if, unsigned s
 
 }
 
+void test(client interface AMSInterface i_ams) {
+    delay_seconds(2);
+    printf("test\n");
+    fflush(stdout);
+    while (1) {
+        char c;
+        int value = 0;
+        while((c = getchar ()) != '\n'){
+            if(isdigit(c)>0){
+                value *= 10;
+                value += c - '0';
+            }
+        }
+        int offset = i_ams.reset_ams_angle_electrical(value);
+        printf("offset %d\n", offset);
+    }
+}
 
 
 
 int main(void)
 {
-    interface AMS iAMS[NUM_OF_AMS_INTERFACES];
+    interface AMSInterface i_ams[5];
 
     par
     {
-        on tile[APP_TILE]:
+        on tile[APP_TILE]: test(i_ams[1]);
+
+        on tile[COM_TILE]:
         {
-            iAMS[0].configure(set_configuration());
-            ams_rotary_sensor_test(iAMS[0]);
+//            i_ams[0].configure(set_configuration());
+            ams_rotary_sensor_test(i_ams[0]);
 
         }
 
@@ -100,8 +119,17 @@ int main(void)
         on tile[IFM_TILE]:
         {
             /* AMS Rotary Sensor Server */
+            AMSConfig ams_config;
 
-            ams_sensor_server(iAMS, NUM_OF_AMS_INTERFACES, pRotarySensor);
+            ams_config.settings1 = AMS_INIT_SETTINGS1;
+            ams_config.settings2 = AMS_INIT_SETTINGS2;
+            ams_config.resolution_bits = ROTARY_SENSOR_RESOLUTION_BITS;
+            ams_config.offset_electrical = SENSOR_PLACEMENT_OFFSET;
+            ams_config.pole_pairs = 2;
+
+            ams_service(pRotarySensor, ams_config, i_ams);
+
+//            ams_sensor_server(i_ams, NUM_OF_AMS_INTERFACES, pRotarySensor);
 
   //          ams_rotary_sensor_direct_method(pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);
 

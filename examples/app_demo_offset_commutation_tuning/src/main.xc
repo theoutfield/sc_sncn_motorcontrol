@@ -18,7 +18,19 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+//BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+on tile[IFM_TILE]: sensor_spi_interface pRotarySensor =
+{
+        {
+            XS1_CLKBLK_2,
+            XS1_CLKBLK_4,
+            SOMANET_IFM_GPIO_D3, //D3,    //mosi
+            SOMANET_IFM_GPIO_D1, //D1,    //sclk
+            SOMANET_IFM_GPIO_D2  //D2     //miso
+        },
+
+        SOMANET_IFM_GPIO_D0 //D0         //slave select
+};
 
 #define VOLTAGE 1000 //+/- 4095
 
@@ -52,6 +64,8 @@ int main(void) {
     interface MotorcontrolInterface i_motorcontrol[5];
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+    interface AMSInterface i_ams[5];
 #else
     interface HallInterface i_hall[5];
 #endif
@@ -63,6 +77,9 @@ int main(void) {
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
         on tile[APP_TILE_2]: adc_client(i_adc[0], null);
         on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_biss[1]);
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+        on tile[APP_TILE_2]: adc_client(i_adc[0], null);
+        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], null, i_ams[1]);
 #else
         on tile[APP_TILE_2]: adc_client(i_adc[0], i_hall[1]);
         on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], null);
@@ -102,6 +119,18 @@ int main(void) {
 
                     biss_service(biss_ports, biss_config, i_biss);
                 }
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+                /* AMS Rotary Sensor Server */
+                {
+                    AMSConfig ams_config;
+                    ams_config.settings1 = AMS_INIT_SETTINGS1;
+                    ams_config.settings2 = AMS_INIT_SETTINGS2;
+                    ams_config.resolution_bits = ROTARY_SENSOR_RESOLUTION_BITS;
+                    ams_config.offset_electrical = SENSOR_PLACEMENT_OFFSET;
+                    ams_config.pole_pairs = 2;
+
+                    ams_service(pRotarySensor, ams_config, i_ams);
+                }
 #else
                 /* Hall sensor Service */
                 {
@@ -124,6 +153,9 @@ int main(void) {
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, null, null, i_biss[0], i_watchdog[0], i_motorcontrol);
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                         c_pwm_ctrl, null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, i_hall[0], null, null, i_watchdog[0], i_motorcontrol);
