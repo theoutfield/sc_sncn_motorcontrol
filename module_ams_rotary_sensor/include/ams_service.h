@@ -12,7 +12,14 @@
 #include <print.h>
 #include <spi_master.h>
 
-#define AMS_SENSOR  3
+#define AMS_SENSOR  5
+
+
+#define AMS_OFFSET      0
+#define AMS_RESOLUTION  14
+
+#define AMS_POLARITY_NORMAL
+#define AMS_POLARITY_INVERTED
 
 #define ERROR                   0
 #define SUCCESS                 1
@@ -24,7 +31,7 @@
 
 #define SPI_MASTER_MODE 1
 //#define DEFAULT_SPI_CLOCK_DIV 10        // (100MHz / (10) = 10 MHz [100MHz ref clock]
-#define DEFAULT_SPI_CLOCK_DIV 200        // (250MHz / (50) = 5 MHz [250MHz ref clock]
+#define DEFAULT_SPI_CLOCK_DIV 250        // (250MHz / (50) = 5 MHz [250MHz ref clock]
 
 #define PULL_PERIOD_USEC        120
 
@@ -69,7 +76,7 @@ typedef enum {
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    int sensor_resolution;       /**< Encoder resolution [pulses/revolution]. */
+    int resolution_bits;       /**< Encoder resolution in bits. */
 #if AMS_SENSOR_TYPE == AS5147
     int width_index_pulse;      /**< Width of the index pulse I (0 = 3LSB, 1 = 1LSB). */
 #else
@@ -103,6 +110,10 @@ typedef struct {
     int abi_resolution;         /**< Resolution of ABI (0 = 11 bits, 1 = 10 bits) */
 
     int offset;                 /**< Rotary sensor offset (Zero) */
+
+    int cache_time;
+
+    int velocity_loop;
 } AMSConfig;
 
 
@@ -156,21 +167,23 @@ typedef struct
 
 interface AMSInterface
 {
-    int get_ams_angle(void);
+    unsigned int get_ams_angle(void);
 
-    int get_ams_position(void);
+    { int, unsigned int } get_ams_position(void);
+
+    unsigned int get_ams_real_position(void);
 
     int get_ams_velocity(void);
-
-    int get_ams_direction(void);
-
-    int get_ams_position_absolute(void);
-
-    void reset_ams_absolute_position(int offset);
 
     AMSConfig get_ams_config(void);
 
     void set_ams_config(AMSConfig in_config);
+
+    void reset_ams_position(int in_count);
+
+    unsigned int reset_ams_angle(unsigned int in_angle);
+
+    unsigned int set_ams_calib(int flag);
 };
 
 void initRotarySensorInterface(AMSPorts &ams_ports);
@@ -199,6 +212,6 @@ int writeZeroPosition(AMSPorts &ams_ports, unsigned short data);
 int writeNumberPolePairs(AMSPorts &ams_ports, unsigned short data);
 
 [[combinable]]
-void ams_service(AMSPorts &ams_ports, AMSConfig config, server interface AMSInterface i_AMS[n], unsigned n);
+void ams_service(AMSPorts &ams_ports, AMSConfig &config, interface AMSInterface server i_ams[5]);
 
 #endif

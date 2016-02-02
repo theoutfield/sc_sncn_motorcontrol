@@ -1,6 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
+//#include <IFM_DC100-rev-b.bsp>
+#include <IFM_DC300-rev-a.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -19,11 +20,11 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 //BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
-on tile[IFM_TILE]: sensor_spi_interface pRotarySensor =
+on tile[IFM_TILE]: AMSPorts ams_ports =
 {
         {
-            XS1_CLKBLK_2,
-            XS1_CLKBLK_4,
+            IFM_TILE_CLOCK_2,
+            IFM_TILE_CLOCK_3,
             SOMANET_IFM_GPIO_D3, //D3,    //mosi
             SOMANET_IFM_GPIO_D1, //D1,    //sclk
             SOMANET_IFM_GPIO_D2  //D2     //miso
@@ -32,7 +33,7 @@ on tile[IFM_TILE]: sensor_spi_interface pRotarySensor =
         SOMANET_IFM_GPIO_D0 //D0         //slave select
 };
 
-#define VOLTAGE 1000 //+/- 4095
+#define VOLTAGE 700 //+/- 4095
 
 void adc_client(interface ADCInterface client i_adc, interface HallInterface client ?i_hall){
 
@@ -123,13 +124,21 @@ int main(void) {
                 /* AMS Rotary Sensor Server */
                 {
                     AMSConfig ams_config;
-                    ams_config.settings1 = AMS_INIT_SETTINGS1;
-                    ams_config.settings2 = AMS_INIT_SETTINGS2;
-                    ams_config.resolution_bits = ROTARY_SENSOR_RESOLUTION_BITS;
-                    ams_config.offset_electrical = SENSOR_PLACEMENT_OFFSET;
-                    ams_config.pole_pairs = 2;
-
-                    ams_service(pRotarySensor, ams_config, i_ams);
+                    ams_config.factory_settings = 1;
+                    ams_config.direction = AMS_DIR_CW;
+                    ams_config.hysteresis = 1;
+                    ams_config.noise_setting = AMS_NOISE_NORMAL;
+                    ams_config.uvw_abi = 0;
+                    ams_config.dyn_angle_comp = 0;;
+                    ams_config.data_select = 0;
+                    ams_config.pwm_on = AMS_PWM_OFF;
+                    ams_config.abi_resolution = 0;
+                    ams_config.resolution_bits = AMS_RESOLUTION;
+                    ams_config.offset = AMS_OFFSET;
+                    ams_config.pole_pairs = POLE_PAIRS;
+                    ams_config.cache_time = 600;
+                    ams_config.velocity_loop = 1000;
+                    ams_service(ams_ports, ams_config, i_ams);
                 }
 #else
                 /* Hall sensor Service */

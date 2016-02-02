@@ -24,7 +24,9 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
         printf ("BiSS tuning. Voltage %d\nPlease enter an offset value different from %d, then press enter\n", input_voltage, biss_config.offset_electrical);
     } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR){
         ams_config = i_ams.get_ams_config();
-        printf ("AMS tuning. Voltage %d\nPlease enter an offset value different from %d, then press enter\n", input_voltage, ams_config.offset_electrical);
+        printf ("AMS tuning. Voltage %d\nPlease enter an offset value different from %d, then press enter\n", input_voltage,
+                (input_voltage > 0) ? ((motorcontrol_config.bldc_winding_type == 1) ? motorcontrol_config.hall_offset[0] : motorcontrol_config.hall_offset[1]) : ((motorcontrol_config.bldc_winding_type == 1) ? motorcontrol_config.hall_offset[1] : motorcontrol_config.hall_offset[0])  );
+
     }
     fflush(stdout);
     //read and adjust the offset
@@ -46,25 +48,32 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
         if (motorcontrol_config.commutation_sensor == BISS_SENSOR || motorcontrol_config.commutation_sensor == AMS_SENSOR){
             switch(mode) {
             case 'a': //auto
+                unsigned int offset;
                 i_commutation.set_voltage(0);
                 delay_milliseconds(500);
-                unsigned int offset;
+                if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
+                    i_commutation.set_voltage(1000);
+                else
+                    i_commutation.set_voltage(-1000);
                 if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
                     i_biss.set_biss_calib(1);
                     i_commutation.set_voltage(1000);
                     delay_milliseconds(200);
-                    offset = i_biss.reset_biss_angle_electrical(0);
+                    offset = i_biss.reset_biss_angle_electrical(2731);
                     i_biss.set_biss_calib(0);
+                    printf("auto offset: %d\n", offset);
                 } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
+                    motorcontrol_config.hall_offset[0] = 0;
+                    i_commutation.set_config(motorcontrol_config);
                     i_ams.set_ams_calib(1);
-                    i_commutation.set_voltage(1000);
                     delay_milliseconds(200);
-                    offset = i_ams.reset_ams_angle_electrical(0);
-                    i_ams.set_ams_calib(0);
+                    motorcontrol_config.hall_offset[0] = (2731 - i_ams.set_ams_calib(0)) & 4095;
+                    motorcontrol_config.hall_offset[1] = (2731 + motorcontrol_config.hall_offset[0]) & 4095;
+                    i_commutation.set_config(motorcontrol_config);
+                    printf("offset clk: %d, offset cclk: %d\n", motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
                 }
                 i_commutation.set_voltage(input_voltage);
                 mode = 0;
-                printf("auto offset: %d\n", offset);
                 break;
             case 'v': //set voltage
                 input_voltage = value * sign;
@@ -72,20 +81,26 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
                 i_commutation.set_voltage(input_voltage);
                 mode = 0;
                 break;
-            case 'r': //reverse volatage
+            case 'r': //reverse voltage
                 input_voltage = -input_voltage;
                 printf("voltage: %i\n", input_voltage);
                 i_commutation.set_voltage(input_voltage);
                 mode = 0;
                 break;
             default: //set offset
-                printf("offset: %i\n", value);
                 if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+                    printf("offset: %d\n", value);
                     biss_config.offset_electrical = value;
                     i_biss.set_biss_config(biss_config);
-                } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
-                    ams_config.offset_electrical = value;
-                    i_ams.set_ams_config(ams_config);
+                } else {
+                    if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING)) {
+                        motorcontrol_config.hall_offset[0] = value;
+                        printf("offset clk: %d\n", value);
+                    } else {
+                        motorcontrol_config.hall_offset[1] = value;
+                        printf("offset cclk: %d\n", value);
+                    }
+                    i_commutation.set_config(motorcontrol_config);
                 }
                 break;
             }
