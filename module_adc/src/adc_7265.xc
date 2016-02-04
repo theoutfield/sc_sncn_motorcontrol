@@ -155,14 +155,8 @@ void configure_adc_ports_7265( // Configure all ADC data ports
 
 } // configure_adc_ports_7265
 
-void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, chanend c_trig)
+void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config)
 {
-    printstrln("     ADC Server Starts");
-
-    timer t;
-    unsigned int ts;
-    unsigned char ct;
-    unsigned char trigger_exists = 0;
     int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
     unsigned char sampling_port = 0;
 
@@ -194,13 +188,109 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
     #pragma ordered
         select {
+        case iADC[int i].get_currents() -> {int adc_A, int adc_B}:
 
+                // Config: 1 Port: 1
+                sampling_port = 0;  // If provided port is 0, just once sampling takes place: current,
+                                    // and no additional sampling is done
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
+                Icalibrated_a = ((int) adc_data[0][0]) - i_calib_a;
+                Icalibrated_b =((int) adc_data[1][0]) - i_calib_b;
+
+                adc_A = current_sensor_config.sign_phase_b * Icalibrated_a;
+                adc_B = current_sensor_config.sign_phase_c * Icalibrated_b;
+
+                break;
+
+        case iADC[int i].get_temperature() -> {int out_temp}:
+
+                sampling_port = 5;
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
+
+                out_temp = adc_data[0][4];
+
+             break;
+
+        case iADC[int i].get_external_inputs() -> {int ext_a, int ext_b}:
+
+                //We sample the external inputs as differential inputs: ch3 - ch4
+                // Config: 0 Port: 3
+                sampling_port = 3;
+                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200);
+
+                ext_a = adc_data[0][2];
+                ext_b = adc_data[1][2];
+
+                break;
+
+        case iADC[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+
+
+                if(amps >= current_sensor_config.current_sensor_amplitude)
+                     out_ticks = MAX_ADC_VALUE/2; break;
+                if(amps <= -current_sensor_config.current_sensor_amplitude)
+                    out_ticks = -MAX_ADC_VALUE/2; break;
+
+                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
+
+                break;
+
+        case iADC[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+
+                if(ticks >= MAX_ADC_VALUE/2)
+                    out_amps = current_sensor_config.current_sensor_amplitude; break;
+                if(ticks <= -MAX_ADC_VALUE/2)
+                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
+
+                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
+
+                break;
+
+        }//eof select
+    }//eof while
+}
+
+void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, chanend c_trig)
+{
+    timer t;
+    unsigned int ts;
+    unsigned char ct;
+    int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
+    unsigned char sampling_port = 0;
+
+    //Calibration variables
+    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+
+    configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
+
+    //Calibration
+    while (i < ADC_CALIB_POINTS) {
+        // get ADC reading
+
+        adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 0);
+
+        if (adc_data[0][0]>0 && adc_data[0][0]<16382  &&  adc_data[1][0]>0 && adc_data[1][0]<16382) {
+            i_calib_a += adc_data[0][0];
+            i_calib_b += adc_data[1][0];
+            i++;
+            if (i == ADC_CALIB_POINTS) {
+                break;
+            }
+        }
+    }
+
+   i_calib_a = (i_calib_a >> Factor);
+   i_calib_b = (i_calib_b >> Factor);
+
+    while(1){
+
+    #pragma ordered
+        select {
         case inct_byref(c_trig, ct):
                 if (ct == XS1_CT_END)
                 {
                     t :> ts;
 
-                    trigger_exists = 1;
                     sampling_port++;
                     if(sampling_port > 6){
                         sampling_port = 2;
@@ -215,16 +305,6 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
         case iADC[int i].get_currents() -> {int adc_A, int adc_B}:
 
-                if(trigger_exists == 0){
-
-                    // Config: 1 Port: 1
-                    sampling_port = 0;  // If provided port is 0, just once sampling takes place: current,
-                                        // and no additional sampling is done
-                    adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
-                    Icalibrated_a = ((int) adc_data[0][0]) - i_calib_a;
-                    Icalibrated_b =((int) adc_data[1][0]) - i_calib_b;
-                }
-
                 adc_A = current_sensor_config.sign_phase_b * Icalibrated_a;
                 adc_B = current_sensor_config.sign_phase_c * Icalibrated_b;
 
@@ -232,29 +312,10 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
         case iADC[int i].get_temperature() -> {int out_temp}:
 
-                if(trigger_exists == 0){
-
-                    sampling_port = 5;
-                    adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
-                }
-
                 out_temp = adc_data[0][4];
 
              break;
-/*
-        case iADC[int i].get_all() -> {int Ia, int Ib, int tmp_1, int tmp_2, int ext_1, int ext_2, int voltage, int dummy}:
 
-                Ia = 0;
-                Ib = 0;
-                tmp_1 = 0;
-                tmp_2 = 0;
-                ext_1 = 0;
-                ext_2 = 0;
-                voltage = 0;
-                dummy = 0;
-
-                break;
-*/
         case iADC[int i].get_external_inputs() -> {int ext_a, int ext_b}:
 
                 //We sample the external inputs as differential inputs: ch3 - ch4

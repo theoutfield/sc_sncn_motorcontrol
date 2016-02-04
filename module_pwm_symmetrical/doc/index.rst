@@ -1,5 +1,6 @@
+.. _pwm_symmetrical_module:
 ==============================
-SOMANET Symmetrical PWM module
+Symmetrical PWM Module
 ==============================
 
 .. contents:: In this document
@@ -10,7 +11,7 @@ This module offers a service that generates PWM signals over the provided ports.
 controlled by a client function. Two different versions of the service are available, one triggers a signal with
 every generated pulse (required sometimes for proper ADC sampling) and the other one does not. 
 
-These PWM signals are intended to control both high- and low-side switches of three H-brigdes. 
+These PWM signals are intended to control both high- and low-side switches of three H-bridges. 
 The three channels are center aligned which means that the outputs are symmetrical to the center of the pulses.
 
 When running the PWM Service, the **Reference Frequency** of the tile where the Service is allocated will be
@@ -23,33 +24,35 @@ This module was originally created by XMOS and then reworked by Synapticon befor
 * `Original forked XMOS repository`_
 * `Forked repository by Synapticon`_
 
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_pwm_symmetrical>`_
+
 How to use
 ==========
 
-.. important:: We assume that you are using **SOMANET Base** and your app includes the required **board support** files for your SOMANET device.
+.. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
 
-.. seealso:: You might find useful the **PWM Symmetrical Demo** example app, which illustrates the use of this module. 
+.. seealso:: You might find useful the :ref:`PWM Symmetrical Demo <pwm_symmetrical_demo>` example app, which illustrates the use of this module. 
 
-Service Initialization
-----------------------
-1. First add all the **SOMANET Motor Control Library** modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
-::
+    ::
 
- USED_MODULES = module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
+        USED_MODULES = module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
 
 
-.. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+    .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
+          This will help solving internal dependency issues.
 
-2. Include the Service headers in your app, for Service and Client.
-3. Instanciate the ports where the Service will be outputting the PWM signals. 
+2. Include the PWM Service headers in your app, for Service **pwm_service.h** and Client **pwm_service_client.h**.
+3. Instantiate the ports where the Service will be outputting the PWM signals. 
 4. Inside your main function, declare the channels for Service-Client communication.
-5. At your IFM tile, instanciate the Service.
+5. At your IFM tile, instantiate the Service.
 6. At whichever other core, you can update your PWM outputs through a client call. 
-        But first you will need to initialize the communication by calling **pwm_share_control_buffer_address_with_server**.
+    But first you will need to initialize the communication by calling ``pwm_share_control_buffer_address_with_server``.
 
-.. code-block:: C
+    .. code-block:: C
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
@@ -81,7 +84,7 @@ Service Initialization
             return 0;
         }
 
-.. seealso:: If you are interested in the use of the **Triggered PWM Service**, have a look at the **Torque Control Demo App**.
+.. seealso:: If you are interested in the use of the **Triggered PWM Service**, have a look at the :ref:`BLDC Torque Control Demo App<bldc_torque_control_demo>`.
 
 API
 ===
@@ -92,7 +95,7 @@ Types
 .. doxygenstruct:: PwmPorts
 
 Server
------
+------
 
 .. doxygenfunction:: pwm_service
 .. doxygenfunction:: pwm_triggered_service

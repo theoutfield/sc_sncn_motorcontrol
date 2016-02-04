@@ -71,7 +71,7 @@ int main(void) {
                     motorcontrol_config.motor_type = BDC_MOTOR;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_watchdog[0],
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, null, i_watchdog[0],
                                                 i_motorcontrol);
                 }
             }

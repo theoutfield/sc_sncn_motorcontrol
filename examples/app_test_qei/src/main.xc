@@ -46,22 +46,19 @@ int main(void)
             qei_test(i_qei[0]);
         }
 
-        /************************************************************
-         * IFM_TILE
-         ************************************************************/
+        /***************************************************
+         * IFM TILE
+         ***************************************************/
         on tile[IFM_TILE]:
+        /* Quadrature Encoder sensor Service */
         {
+            QEIConfig qei_config;
+            qei_config.signal_type = QEI_RS422_SIGNAL;              // Encoder signal type
+            qei_config.index_type = QEI_WITH_INDEX;                 // Indexed encoder?
+            qei_config.ticks_resolution = 4000;                     // Encoder resolution
+            qei_config.sensor_polarity = QEI_POLARITY_NORMAL;       // CW
 
-            /* Quadrature encoder sensor Service */
-            {
-                QEIConfig qei_config;
-                qei_config.signal_type = QEI_RS422_SIGNAL;              // Encoder signal type
-                qei_config.index_type = QEI_WITH_INDEX;                 // Indexed encoder?
-                qei_config.ticks_resolution = 4000;                     // Encoder resolution
-                qei_config.sensor_polarity = QEI_POLARITY_NORMAL;       // CW
-
-                qei_service(qei_ports, qei_config, i_qei);
-            }
+            qei_service(qei_ports, qei_config, i_qei);
         }
     }
 

@@ -45,8 +45,9 @@ typedef struct{
  */
 void init_position_profiler(ProfilerConfig profile_position_config,
                             interface PositionControlInterface client i_position_control,
-                            interface HallInterface client i_hall,
-                            interface QEIInterface client i_qei);
+                            interface HallInterface client ?i_hall,
+                            interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss);
 
 /**
  * @brief Velocity Profiler Initializer. It sets the profiler configuration.

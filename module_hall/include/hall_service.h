@@ -1,5 +1,5 @@
 /**
- * @file hall_server.h
+ * @file hall_service.h
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
@@ -58,7 +58,7 @@ interface HallInterface {
     int get_notification();
 
     /**
-     * @brief Getter for the current pinstate at the Hall port.
+     * @brief Getter for the current pin state at the Hall port.
      *
      * @return UVW signals state.
      */
@@ -131,7 +131,7 @@ interface HallInterface {
  *
  * @param hall_ports Ports structure defining where to read the Hall signals.
  * @param hall_config Configuration for the service.
- * @param i_hall[5] Array of communication interfaces to handle up to 5 different clients.
+ * @param i_hall Array of communication interfaces to handle up to 5 different clients.
  */
 [[combinable]]
 void hall_service(HallPorts & hall_ports, HallConfig & hall_config,

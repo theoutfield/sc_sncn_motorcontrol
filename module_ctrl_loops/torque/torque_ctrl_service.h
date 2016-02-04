@@ -1,5 +1,5 @@
 /**
- * @file  torque_ctrl_server.h
+ * @file  torque_ctrl_service.h
  * @brief Torque Control Loop Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
  */
@@ -58,7 +58,7 @@ interface TorqueControlInterface{
     /**
      * @brief Getter for the current target torque in the controller.
      *
-     * @param Current target torque [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
+     * @return Current target torque [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
      */
     int get_target_torque();
 
@@ -74,12 +74,12 @@ interface TorqueControlInterface{
      *
      * @param in_config New Service configuration.
      */
-    void set_torque_control_config(ControlConfig torque_ctrl_config);
+    void set_torque_control_config(ControlConfig in_config);
 
     /**
      * @brief Allows you to change the position sensor on runtime.
      *
-     * @param sensor New sensor [HALL_SENSOR, QEI_SENSOR].
+     * @param sensor_used New sensor [HALL_SENSOR, QEI_SENSOR].
      */
     void set_torque_sensor(int sensor_used);
 
@@ -113,22 +113,24 @@ int torque_limit(int torque, int max_torque_limit);
 
 /**
  * @brief Service to perform a Torque PID Control Loop on top of a Motor Control Service.
- *        You will need a motor control stack running parallely to this Service,
+ *        You will need a motor control stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
  *        The motor control stack must contain an ADC Service triggered by the PWM Service.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
  * @param torque_ctrl_config Configuration for the Torque Control Service.
- * @param adc_if Communication interface to the ADC Service.
+ * @param i_adc Communication interface to the ADC Service.
  * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
  * @param i_qei [[Nullable]] Communication interface to the Encoder Service (if applicable).
+ * @param i_biss [[Nullable]] Communication interface to the BiSSEncoder Service (if applicable).
  * @param i_motorcontrol Communication interface to the Motor Control Service.
- * @param Array of communication interfaces to handle up to 3 different clients.
+ * @param i_torque_control Array of communication interfaces to handle up to 3 different clients.
  */
 void torque_control_service(ControlConfig &torque_ctrl_config,
                             interface ADCInterface client i_adc,
-                            interface HallInterface client i_hall,
+                            interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss,
                             interface MotorcontrolInterface client i_motorcontrol,
                             interface TorqueControlInterface server i_torque_control[3]);

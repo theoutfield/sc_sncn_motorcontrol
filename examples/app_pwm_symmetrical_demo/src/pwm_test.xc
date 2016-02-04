@@ -26,8 +26,6 @@ void do_pwm_test(chanend c_pwm_ctrl)
     timer t;
     unsigned ts;
 
-    while(1){
-
         /* share buffer address with pwm service and send initial pwm values */
         pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
         update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm_values);
@@ -35,15 +33,17 @@ void do_pwm_test(chanend c_pwm_ctrl)
         t :> ts;
         t when timerafter (ts + PWM_CLIENT_UPDATE_DELAY) :> void;
 
-        for (int i = 0; i < (3*num_data); ) {
-            pwm_values[0] = testdata[i++];
-            pwm_values[1] = testdata[i++];
-            pwm_values[2] = testdata[i++];
-            update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm_values);
+        while(1){
 
-            ts += PWM_CLIENT_UPDATE_DELAY;
-            t when timerafter (ts) :> void;
+            for (int i = 0; i < (3*num_data); ) {
+                pwm_values[0] = testdata[i++];
+                pwm_values[1] = testdata[i++];
+                pwm_values[2] = testdata[i++];
+                update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm_values);
+
+                ts += PWM_CLIENT_UPDATE_DELAY;
+                t when timerafter (ts) :> void;
+            }
         }
-    }
 
 }

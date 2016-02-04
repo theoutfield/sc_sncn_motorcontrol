@@ -1,12 +1,16 @@
 /**
- * @file gpio_server.h
+ * @file gpio_service.h
  * @brief General Purpose IO Digital Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
 #pragma once
 
-enum { ACTIVE_HIGH=1, ACTIVE_LOW };
+/**
+ * @brief Type definition for port configuration.
+ */
+typedef enum { ACTIVE_HIGH=1, ACTIVE_LOW }SwitchType;
+
 enum { HOMING_NEGATIVE_SWITCH=1, HOMING_POSITIVE_SWITCH };
 
 #ifdef __XC__
@@ -31,7 +35,7 @@ interface GPIOInterface{
      * @return 0 - Error
      *         1 - Success
      */
-    int config_dio_input(int gpio_port, int input_type, int switch_type);
+    int config_dio_input(int gpio_port, int input_type, SwitchType switch_type);
 
     /**
      * @brief Disables further configuration of any GPIO.
@@ -58,10 +62,10 @@ interface GPIOInterface{
 /**
  * @brief Service to manage the digital I/Os in your SOMANET device.
  *
- * @param gpio_ports[4] Array of ports to be managed.
- * @param i_gpio[2] Array of communication interfaces to handle up to 2 different clients.
+ * @param gpio_ports Array of ports to be managed.
+ * @param i_gpio Array of communication interfaces to handle one client.
  *
  */
-void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2]);
+void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[1]);
 
 #endif

@@ -16,7 +16,9 @@ void hall_test(interface HallInterface client i_hall)
     int position = 0;
     int velocity = 0;
     int count = 0;
-    int pins = 0;
+
+    xscope_int(COUNT, count);
+    xscope_int(VELOCITY, velocity);
 
     while(1)
     {
@@ -27,16 +29,10 @@ void hall_test(interface HallInterface client i_hall)
         /* get velocity from Hall Sensor */
         velocity = i_hall.get_hall_velocity();
 
-        /* get pins state from Hall Sensor */
-        pins = i_hall.get_hall_pinstate();
+        printintln(position);
 
         xscope_int(COUNT, count);
-        xscope_int(POSITION, position);
         xscope_int(VELOCITY, velocity);
-        xscope_int(A, (pins&1)*1000); // scale to 1000 for easier display in xscope
-        xscope_int(B, (pins&0b10)*500);
-        xscope_int(C, (pins&0b100)*250);
-
     }
 }
 
@@ -48,9 +44,14 @@ int main(void)
 
     par
     {
+        /* Client side */
         on tile[APP_TILE]: hall_test(i_hall[0]);
 
+        /***************************************************
+         * IFM TILE
+         ***************************************************/
         on tile[IFM_TILE]:
+        /* Hall Service */
         {
             HallConfig hall_config;
             hall_config.pole_pairs = 1;

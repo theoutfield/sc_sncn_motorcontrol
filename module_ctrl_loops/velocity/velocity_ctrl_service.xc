@@ -45,6 +45,7 @@ int max_speed_limit(int velocity, int max_speed) {
 void velocity_control_service(ControlConfig &velocity_control_config,
                        interface HallInterface client ?i_hall,
                        interface QEIInterface client ?i_qei,
+                       interface BISSInterface client ?i_biss,
                        interface MotorcontrolInterface client i_motorcontrol,
                        interface VelocityControlInterface server i_velocity_control[3])
 {
@@ -83,7 +84,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
     int config_update_flag = 1;
 
-    printstrln("*************************************\n    VELOCITY CONTROLLER STARTING\n*************************************");
+    printstr(">>   SOMANET VELOCITY CONTROL SERVICE STARTING...\n");
 
     t :> ts;
 
@@ -115,13 +116,17 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                             crossover = INT_MAX - INT_MAX/10;
                             //hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
                         }
-                    } else if (velocity_control_config.feedback_sensor >= QEI_SENSOR) {
+                    } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
                         if (isnull(i_qei)) {
                             printstrln("Velocity Control Loop ERROR: Interface for QEI Service not provided");
                         } else {
                             QEIConfig qei_config = i_qei.get_qei_config();
                             speed_factor = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * velocity_control_config.control_loop_period / 1000;       // variable qei_real_max
                             crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) / 10;
+                        }
+                    } else if (velocity_control_config.feedback_sensor == BISS_SENSOR){
+                        if(isnull(i_biss)){
+                            printstrln("Velocity Control Loop ERROR: Interface for BiSS Service not provided");
                         }
                     }
 
@@ -136,7 +141,9 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
                 if (compute_flag == 1) {
                     /* calculate actual velocity from hall/qei with filter*/
-                    if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
+                    if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
+                        actual_velocity = i_biss.get_biss_velocity();
+                    } else if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
                         position = i_hall.get_hall_position_absolute(); //get_hall_position_absolute(c_hall);
                         if (position > 2049) {
                             init = 1;
@@ -212,7 +219,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 //printf("looping %d\n", velocity_control_config.Loop_time);
                 break;
 
-            case i_hall.notification():
+            case !isnull(i_hall) => i_hall.notification():
 
                 switch (i_hall.get_notification()) {
                     case MOTCTRL_NTF_CONFIG_CHANGED:
@@ -223,7 +230,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 }
                 break;
 
-            case i_qei.notification():
+            case !isnull(i_qei) => i_qei.notification():
 
                 switch (i_qei.get_notification()) {
                     case MOTCTRL_NTF_CONFIG_CHANGED:

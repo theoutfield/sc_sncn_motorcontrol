@@ -3,76 +3,23 @@
 How to configure your SOMANET Motor Control Libray
 ==================================================
 
-Any application that uses this software component must contain a motor
-configuration file. This file, called **bldc\_motor\_config.h**, must be
-located at the folder **config/motor/** on your application. Since It
-defines the features of your BLDC motor, it is important to set it
-properly before running any motor control application.
+.. important:: It is very important to set your Services configuration according to your motor specifications, otherwise you might experience 
+misbehavior when driving your motors.
 
-You can find many examples of this file at the different application
-examples provided.
+All services that compose the SOMANET Control Library receive their very own and independent configuration. These configurations are provided as
+arguments of the Services and therefore they must be set before the Service instatiation. 
 
-The main parameters to define in our configuration file will be:
+.. note:: Check the API of each Service you use for further information of its specific configuration.
 
--  Number of pole pairs:
+However, for simplicity and in order to use a common configuration for all your apps. We encourage you to gather your configuration in a common header
+for all your apps. We do exactly this for most of our example apps, in a way that each app fethes its configuration from `config_motor/user_config.h <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/config_motor>`. 
 
-   ::
+.. note:: In order to include such configuration header in your app, you must tell the Makefile to use the module where the header is contained. e.g.
 
-       #define POLE_PAIRS n // e.g. 8
+       .. code-block:: C
+       
+                USED_MODULES = config_motor etc etc
 
--  Maximum nominal speed (in rpms):
+For most apps, it is not strictly necessary to fill up all the configuration parameters. Normally they just need a few, but the header is thought to be used generally for any app. You can easily check in your app **main.xc** which parameters are used for the configuration of your services. 
 
-   ::
-
-       #define MAX_NOMINAL_SPEED n // e.g. 4000
-
--  Maximum nominal current (A):
-
-   ::
-
-       #define MAX_NOMINAL_CURRENT n // e.g. 2
-
--  Motor torque constant (required for torque control):
-
-   ::
-
-       #define MOTOR_TORQUE_CONSTANT 34 // mNm/A
-
--  Your motor winding type (star or delta):
-
-   ::
-
-       #define WINDING_TYPE DELTA_WINDING // or STAR_WINDING
-
--  Your DC board (DC100 or DC300):
-
-   ::
-
-       #define IFM_RESOLUTION DC100_RESOLUTION // or DC300_RESOLUTION
-
--  Sensor used for control (Hall or Quadrature Encoder):
-
-   ::
-
-       #define SENSOR_USED HALL // or QEI
-
--  If QEI sensor is used then set the type (w/ or w/o index),
-   resolution, or polarity (to match the hall sensor polarity):
-
-::
-
-    #define QEI_SENSOR_POLARITY QEI_POLARITY_NORMAL // or QEI_POLARITY_NORMAL
-    #define ENCODER_RESOLUTION 4000 // 4 x Max count of Quadrature Encoder
-    #define QEI_SENSOR_POLARITY QEI_POLARITY_NORMAL // QEI_POLARITY_NORMAL
-
--  If you are using a gear, specify the ratio, otherwise set to 1:
-
-   ::
-
-       #define GEAR_RATIO n // e.g. 26, or 1 if no gear is attached
-
-
-Tuning the commutation offset angles
-+++++++++++++++++++++++++++++++++++++
-
-Please refer to the :ref:`motor_tuning_label`
+.. note:: Of course, you could avoid using any configuration header and simply hardcode your configuration within your **main.xc**. But it is not the a recommendable practice for managing several apps in a workspace.

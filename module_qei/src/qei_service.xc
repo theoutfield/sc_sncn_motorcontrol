@@ -1,6 +1,6 @@
 /**
  * @file qei_server.xc
- * @brief QEI Sensor Server Implementation
+ * @brief Incremental Encoder Service Implementation
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
@@ -69,7 +69,7 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
         return;
     }
 
-    printstr("*************************************\n    QEI SENSOR SERVER STARTING\n*************************************\n");
+    printstr(">>   SOMANET ENCODER SENSOR SERVICE STARTING...\n");
 
     //Check if we are using a dc board with configurable qei port
     if (!isnull(encoder_ports.p_qei_config)) {

@@ -10,7 +10,7 @@ TARGET = SOMANET-C22
 APP_NAME = app_demo_brushed_dc
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_misc module_board-support module_hall module_motorcontrol  module_pwm_symmetrical module_qei module_watchdog
+USED_MODULES = config_motor module_adc module_biss module_board-support module_hall module_misc module_motorcontrol module_pwm_symmetrical module_qei module_watchdog
 
 
 # The flags passed to xcc when building the application

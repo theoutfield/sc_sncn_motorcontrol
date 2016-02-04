@@ -1,5 +1,5 @@
 /**
- * @file adc_server_ad7949.h
+ * @file adc_ad7949.h
  * @brief ADC Server
  * @author Synapticon GmbH <support@synapticon.com>
  */
@@ -22,18 +22,19 @@ interface AD7949Interface{
  * @brief Non triggered ADC server
  *
  *
- * This server should be used if the somanet node is not used for motor
+ * This server should be used if the SOMANET node is not used for motor
  * drive/control. This is the interface to AD7949 ADC devices. It controls
  * two devices so that two channels can be sampled simultaneously.
  *
- * @param c_adc channel to receive ADC output
- * @param clk clock for the ADC device serial port
- * @param p_sclk_conv_mosib_mosia 4-bit port for ADC control interface
- * @param p_data_a 1-bit port for ADC data channel 0
- * @param p_data_b 1-bit port for ADC data channel 1
- * @param    c_trig channel to trigger adc from the PWM modules
+ * @param i_adc Interface to receive ADC output
+ * @param adc_ports Structure containing hardware ports (e.g. SPI) to the ADC
+ * @param current_sensor_config Structure containing configurations for this service
  *
  */
 void adc_ad7949(  interface ADCInterface server i_adc[2],
+                 AD7949Ports &adc_ports, CurrentSensorsConfig &current_sensor_config);
+
+
+void adc_ad7949_triggered(  interface ADCInterface server i_adc[2],
                  AD7949Ports &adc_ports, CurrentSensorsConfig &current_sensor_config,
                  chanend c_trig );

@@ -26,8 +26,7 @@
  *
  * @param ctrl Client control structure for this PWM server
  * @param c_pwm Channel for communication with the PWM service
- * @param value[] Array of 24 bit values for the PWM server.
- *        These values must be in the range of 0-13889 (max PWM value by default).
+ * @param value[] Array of values for the outputs of the PWM Service [0-13889 (max PWM value by default)]. (PWM period = 13889/250MHz = 55.55 us).
  */
 void update_pwm_inv( t_pwm_control& ctrl, chanend c_pwm, unsigned value[]);
 

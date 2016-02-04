@@ -12,8 +12,11 @@
 #define OUTPUT_PORT          2
 #define NUMBER_OF_IO_PORTS   4    /**< Defines number of Digital IOs available. */
 
-void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2])
+void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[1])
 {
+    //Set freq to 250MHz (always needed for proper timing)
+    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+
     int port_state[NUMBER_OF_IO_PORTS];
     int port_function[NUMBER_OF_IO_PORTS];
     int port_switch_states[NUMBER_OF_IO_PORTS];
@@ -39,7 +42,7 @@ void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[2])
 
         select
         {
-        case i_gpio[int i].config_dio_input(int port_number, int input_type, int switch_type) -> int out_config_state:
+        case i_gpio[int i].config_dio_input(int port_number, int input_type, SwitchType switch_type) -> int out_config_state:
 
                 if (input_type != SWITCH_INPUT_TYPE && input_type != GP_INPUT_TYPE) {
                     out_config_state = 0;

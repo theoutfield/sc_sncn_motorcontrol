@@ -45,6 +45,7 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 void position_control_service(ControlConfig &position_control_config,
                               interface HallInterface client ?i_hall,
                               interface QEIInterface client ?i_qei,
+                              interface BISSInterface client ?i_biss,
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionControlInterface server i_position_control[3])
 {
@@ -66,20 +67,7 @@ void position_control_service(ControlConfig &position_control_config,
 
     int config_update_flag = 1;
 
-    printstr("*************************************\n    POSITION CONTROLLER STARTING\n*************************************\n");
-
-    if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
-        actual_position = i_hall.get_hall_position_absolute();
-        target_position = actual_position;
-    } else if (position_control_config.feedback_sensor >= QEI_SENSOR && !isnull(i_qei)) {
-        actual_position = i_qei.get_qei_position_absolute();
-        target_position = actual_position;
-    }
-
-    /*
-     * Or any other sensor interfaced to the IFM Module
-     * place client functions here to acquire position
-     */
+    printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     t :> ts;
 
@@ -87,7 +75,6 @@ void position_control_service(ControlConfig &position_control_config,
 #pragma ordered
         select {
             case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
-
                 if (config_update_flag) {
                     MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
 
@@ -99,12 +86,21 @@ void position_control_service(ControlConfig &position_control_config,
                     }
 
                     if (position_control_config.feedback_sensor != HALL_SENSOR
-                           && position_control_config.feedback_sensor < QEI_SENSOR) {
+                           && position_control_config.feedback_sensor != QEI_SENSOR
+                           && position_control_config.feedback_sensor != BISS_SENSOR) {
                         position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
                     if (position_control_config.Ki_n != 0) {
                         error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
+                    }
+
+                    if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
+                        actual_position = i_hall.get_hall_position_absolute();
+                    } else if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
+                        actual_position = i_qei.get_qei_position_absolute();
+                    } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
+                        { actual_position, void, void } = i_biss.get_biss_position();
                     }
 
                     config_update_flag = 0;
@@ -121,12 +117,8 @@ void position_control_service(ControlConfig &position_control_config,
                             actual_position =  i_qei.get_qei_position_absolute();
                             break;
 
-                        case QEI_WITH_INDEX:
-                            actual_position =  i_qei.get_qei_position_absolute();
-                            break;
-
-                        case QEI_WITH_NO_INDEX:
-                            actual_position =  i_qei.get_qei_position_absolute();
+                        case BISS_SENSOR:
+                            { actual_position, void, void } = i_biss.get_biss_position();
                             break;
 
                     }
@@ -173,7 +165,7 @@ void position_control_service(ControlConfig &position_control_config,
 
                 break;
 
-            case i_hall.notification():
+            case !isnull(i_hall) => i_hall.notification():
 
                 switch (i_hall.get_notification()) {
                     case MOTCTRL_NTF_CONFIG_CHANGED:
@@ -184,7 +176,7 @@ void position_control_service(ControlConfig &position_control_config,
                 }
                 break;
 
-            case i_qei.notification():
+            case !isnull(i_qei) => i_qei.notification():
 
                 switch (i_qei.get_notification()) {
                     case MOTCTRL_NTF_CONFIG_CHANGED:
@@ -236,16 +228,6 @@ void position_control_service(ControlConfig &position_control_config,
             case i_position_control[int i].set_position_sensor(int in_sensor_used):
 
                 position_control_config.feedback_sensor = in_sensor_used;
-
-                if (in_sensor_used == HALL_SENSOR) {
-                    actual_position = i_hall.get_hall_position_absolute();
-                } else if (in_sensor_used >= QEI_SENSOR) {
-                    actual_position = i_qei.get_qei_position_absolute();
-                }
-                /*
-                 * Or any other sensor interfaced to the IFM Module
-                 * place client functions here to acquire position
-                 */
                 target_position = actual_position;
                 config_update_flag = 1;
 
@@ -292,9 +274,7 @@ void position_control_service(ControlConfig &position_control_config,
                 printstrln("position control disabled");
 #endif
                 break;
-
         }
     }
-
 }
 

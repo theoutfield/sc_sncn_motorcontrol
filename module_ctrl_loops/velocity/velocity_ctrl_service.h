@@ -1,5 +1,5 @@
 /**
- * @file velocity_ctrl_server.h
+ * @file velocity_ctrl_service.h
  * @brief Velocity Control Loop Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
  */
@@ -8,6 +8,7 @@
 
 #include <hall_service.h>
 #include <qei_service.h>
+#include <biss_service.h>
 #include <motorcontrol_service.h>
 #include <control_loops_common.h>
 
@@ -45,7 +46,7 @@ interface VelocityControlInterface{
     /**
      * @brief Getter for the current target velocity in the controller.
      *
-     * @param Current target velocity [RPMs].
+     * @return Current target velocity [RPMs].
      */
     int get_target_velocity();
 
@@ -61,12 +62,12 @@ interface VelocityControlInterface{
      *
      * @param in_config New Service configuration.
      */
-    void set_velocity_control_config(ControlConfig velocity_ctrl_params);
+    void set_velocity_control_config(ControlConfig in_config);
 
     /**
      * @brief Allows you to change the sensor for velocity control on runtime.
      *
-     * @param sensor New sensor [HALL_SENSOR, QEI_SENSOR].
+     * @param sensor_used New sensor [HALL_SENSOR, QEI_SENSOR].
      */
     void set_velocity_sensor(int sensor_used);
 
@@ -107,7 +108,7 @@ int max_speed_limit(int velocity, int max_speed);
 
 /**
  * @brief Service to perform a Velocity PID Control Loop on top of a Motor Control Service.
- *        You will need a Motor Control Stack running parallely to this Service,
+ *        You will need a Motor Control Stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
@@ -115,12 +116,14 @@ int max_speed_limit(int velocity, int max_speed);
  * @param velocity_ctrl_config Configuration for the Velocity Control Service.
  * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
  * @param i_qei [[Nullable]] Communication interface to the Encoder Service (if applicable).
+ * @param i_biss [[Nullable]] Communication interface to the BiSSEncoder Service (if applicable).
  * @param i_motorcontrol Communication interface to the Motor Control Service.
- * @param i_velocity_control[3] Array of communication interfaces to handle up to 3 different clients.
+ * @param i_velocity_control Array of communication interfaces to handle up to 3 different clients.
  */
 [[combinable]]
 void velocity_control_service(ControlConfig & velocity_ctrl_config,
                         interface HallInterface client ?i_hall,
                         interface QEIInterface client ?i_qei,
+                        interface BISSInterface client ?i_biss,
                         interface MotorcontrolInterface client i_motorcontrol,
                         interface VelocityControlInterface server i_velocity_control[3]);
