@@ -22,7 +22,7 @@
 #define MOTOR_TYPE  BLDC_MOTOR
 
 // NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  4
+#define POLE_PAIRS  3
 
 // WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
 #define BLDC_WINDING_TYPE   DELTA_WINDING
@@ -67,7 +67,7 @@
 /////////////////////////////////////////////
 
 // CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     60
+#define CONTROL_LOOP_PERIOD     100
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
 #define POSITION_Kp       1000

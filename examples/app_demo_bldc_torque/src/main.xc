@@ -26,8 +26,8 @@
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-    int target_torque = 100;    //(desired torque/torque_constant)  * IFM resolution
-    int torque_slope  = 1000;   //(desired torque_slope/torque_constant)  * IFM resolution
+    int target_torque = 150;    //(desired torque/torque_constant)  * IFM resolution
+    int torque_slope  = 100;   //(desired torque_slope/torque_constant)  * IFM resolution
 
     ProfilerConfig profiler_config;
     profiler_config.polarity = POLARITY;
@@ -40,7 +40,7 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
     set_profile_torque(target_torque, torque_slope, i_torque_control);
 
     delay_seconds(5);
-    target_torque = -100;
+    target_torque = -150;
 
     /* Set new target torque for profile torque control */
     set_profile_torque( target_torque, torque_slope, i_torque_control);

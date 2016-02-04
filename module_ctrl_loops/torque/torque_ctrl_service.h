@@ -12,7 +12,7 @@
 #include <qei_service.h>
 #include <adc_service.h>
 
-#define FILTER_LENGTH_TORQUE 80
+#define FILTER_LENGTH_TORQUE 20
 #define FILTER_LENGTH_ADC 80
 
 /**

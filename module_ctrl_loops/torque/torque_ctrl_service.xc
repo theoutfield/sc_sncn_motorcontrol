@@ -15,6 +15,9 @@
 #include <sine_table_big.h>
 #include <a4935.h>
 #include <motorcontrol_service.h>
+#include <filter_blocks.h>
+
+#define CURRENT_CONTROL
 
 #include <string.h>
 
@@ -112,6 +115,8 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current)
                     //xscope_probe_data(0, actual_speed);
                     abs_speed = abs(actual_speed);
 
+                    //ToDo: this needs to be adapted depending on the IFM device type, use fixed length in meanwhile
+/*
                     if (abs_speed <= 100) {
                         filter_length_variance = 50;
                     } else if (abs_speed > 100 && abs_speed <= 800) {
@@ -119,6 +124,8 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current)
                     } else if (abs_speed >= 800) {
                         filter_length_variance = 3;
                     }
+*/
+                    filter_length_variance = 50;
                 }
                 break;
 
@@ -154,8 +161,13 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
     int actual_speed = 0;
     int command;
 
-    timer t;
+    timer tc;
     unsigned int time;
+
+    timer tc2;
+    unsigned int start_time1, end_time1, start_time2, end_time2;
+    int elapsed_time1, elapsed_time2;
+
     int phase_a_filtered = 0;
     int phase_b_filtered = 0;
 
@@ -172,6 +184,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
     int filter_length = FILTER_LENGTH_TORQUE;
     int buffer_Id[FILTER_LENGTH_TORQUE] = {0};
     int buffer_Iq[FILTER_LENGTH_TORQUE] = {0};
+    int current_control_buffer[FILTER_LENGTH_TORQUE];
+    int index = 0;
 
     int id_filtered = 0;
     int iq_filtered = 0;
@@ -179,6 +193,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
     int filter_length_variance;
 
     int actual_torque = 0;
+    int actual_torque_filtered = 0;
     int target_torque = 0;
     int absolute_torque = 0;
 
@@ -199,18 +214,26 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
     int offset_bw_flag = 0;
     int activate = 0;
 
+    int max_ph_a = 0, max_ph_a_actual = 0;
+    int max_ph_b = 0, max_ph_b_actual = 0;
+    int min_ph_a = 0, min_ph_a_actual = 0;
+    int min_ph_b = 0, min_ph_b_actual = 0;
+    int phase_a_prev = 0;
+    int phase_b_prev = 0;
+    int reset1 = 0, reset2 = 0, reset3 = 0, reset4 = 0;
+
     MotorcontrolConfig motorcontrol_config;
 
     int config_update_flag = 1;
 
     printstr(">>   SOMANET TORQUE CONTROL SERVICE STARTING...\n");
 
-    t :> time;
+    tc :> time;
 
     while(1) {
 #pragma ordered
         select {
-            case t when timerafter(time + USEC_STD * torque_control_config.control_loop_period) :> time:
+            case tc when timerafter(time + USEC_STD * torque_control_config.control_loop_period) :> time:
 
                 if (config_update_flag) {
                     HallConfig hall_config;
@@ -306,6 +329,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     if (motorcontrol_config.motor_type == BDC_MOTOR) {
                         actual_torque = abs(phase_a);
                     } else if (motorcontrol_config.motor_type == BLDC_MOTOR) {
+#ifndef CURRENT_CONTROL
                         //xscope_probe_data(1, phase_b_filtered);
                         alpha = phase_a;
                         beta = (phase_a + 2*phase_b);  // beta = (a1 + 2*a2)/1.732 0.57736 --> invers from 1.732
@@ -340,6 +364,94 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                         iq_filtered /= filter_length_variance;
         */
                         actual_torque = abs(Iq); // round( sqrt( iq_filtered * iq_filtered + id_filtered * id_filtered ) );//
+#else
+                        //Find current magnitudes
+                        if (phase_a > max_ph_a) {
+                            max_ph_a = phase_a;
+                        }
+                        if (phase_b > max_ph_b) {
+                            max_ph_b = phase_b;
+                        }
+                        if (phase_a < min_ph_a) {
+                            min_ph_a = phase_a;
+                        }
+                        if (phase_b < min_ph_b) {
+                            min_ph_b = phase_b;
+                        }
+
+                        //detect zero crossings for phase_a and phase_b
+                        if ((phase_a < 0) && (phase_a_prev > 0)) {
+                            tc2 :> start_time1;
+                            if (!reset1) {
+                                //xscope_int(PERIOD, 1000);
+                                max_ph_a_actual = max_ph_a;
+                                max_ph_a = 0;
+                                reset1 = 1;
+                            }
+                        } else if ((phase_a > 0) && (phase_a_prev < 0)) {
+                            tc2 :> end_time1;
+                            if (!reset2) {
+                                //xscope_int(PERIOD, 2000);
+                                min_ph_a_actual = min_ph_a;
+                                min_ph_a = 0;
+                                reset2 = 1;
+                            }
+                        } else {
+                            //xscope_int(PERIOD, 0);
+                        }
+
+                        if ((phase_b < 0) && (phase_b_prev > 0)) {
+                            tc2 :> start_time2;
+                            if (!reset3) {
+                                max_ph_b_actual = max_ph_b;
+                                max_ph_b = 0;
+                                reset3 = 1;
+                            }
+                        }
+                        else if ((phase_b > 0) && (phase_b_prev < 0)) {
+                            tc2 :> end_time2;
+                            if (!reset4) {
+                                min_ph_b_actual = min_ph_b;
+                                min_ph_b = 0;
+                                reset4 = 1;
+                            }
+                        }
+
+                        //calculate time between zero crosings of phase_a and phase_b to reject false positives
+                        elapsed_time1 = end_time1 - start_time1;
+                        elapsed_time2 = end_time2 - start_time2;
+
+                        //for low velocities phase currents are becoming linear if there is a load
+                        if (abs(actual_speed) < 100) {
+                            max_ph_a_actual = max_ph_a;
+                            min_ph_a_actual = min_ph_a;
+                            max_ph_b_actual = max_ph_b;
+                            min_ph_b_actual = min_ph_b;
+                            reset1 = 0;
+                            reset2 = 0;
+                            reset3 = 0;
+                            reset4 = 0;
+                            max_ph_a = 0;
+                            min_ph_a = 0;
+                            max_ph_b = 0;
+                            min_ph_b = 0;
+                        } else if (elapsed_time1 > 10 * MSEC_STD*torque_control_config.control_loop_period / (abs(actual_speed) + 1)) {
+                            reset1 = 0;
+                            reset2 = 0;
+                            elapsed_time1 = 0;
+                        } else if(elapsed_time2 > 10 * MSEC_STD*torque_control_config.control_loop_period / (abs(actual_speed) + 1)) {
+                            reset3 = 0;
+                            reset4 = 0;
+                            elapsed_time2 = 0;
+                        }
+
+                        phase_a_prev = phase_a;
+                        phase_b_prev = phase_b;
+
+                        int temp = ((max_ph_a_actual - min_ph_a_actual) / 2 + (max_ph_b_actual - min_ph_b_actual) / 2) / 2;//calculate mean of two phase currents amplitudes
+                        actual_torque_filtered = filter(current_control_buffer, index, FILTER_LENGTH_TORQUE, temp);
+                        actual_torque = actual_torque_filtered;
+#endif
                     }
                 }
 
