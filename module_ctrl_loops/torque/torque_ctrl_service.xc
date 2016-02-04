@@ -117,6 +117,8 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current)
 
                 //xscope_probe_data(0, actual_speed);
                 abs_speed = abs(actual_speed);
+
+                //ToDo: this needs to be adapted depending on the IFM device type, use fixed length in meanwhile
 /*
                 if (abs_speed <= 100) {
                     filter_length_variance = 50;
@@ -253,7 +255,6 @@ void torque_ctrl_loop(ControlConfig &torque_control_config, HallConfig &hall_con
     int min_ph_b = 0, min_ph_b_actual = 0;
     int phase_a_prev = 0;
     int phase_b_prev = 0;
-    int counter = 0;
     int reset1 = 0, reset2 = 0, reset3 = 0, reset4 = 0;
 
     printstr(">>   SOMANET TORQUE CONTROL SERVICE STARTING...\n");
