@@ -1,7 +1,7 @@
 .. _module_motorcontrol:
 
 ==================================
-SOMANET Motor Control Module
+Motor Control Module
 ==================================
 
 .. contents:: In this document
@@ -11,7 +11,7 @@ SOMANET Motor Control Module
 This module provides a Service that will let you spin at a desired voltage Brushed DC and BLDC motors
 by applying sinusodial commutation. Up to 5 clients can control and communicate with the Service over interfaces.
 
-The Service will require of other modules running parallely, such as PWM, Hall and Watchdog Services.
+The Service will require other services to run in parallel, such as PWM, Hall Feedback and Watchdog Service.
 
 When running the Motorcontrol Service, the **Reference Frequency** of the tile where the Service is
 allocated will be automatically changed to **250MHz**.
@@ -42,19 +42,19 @@ How to use
         USED_MODULES = module_motorcontrol module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_profile module_qei module_watchdog module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
-2. Properly instanciate **PWM**, **Hall** and **Watchdog** Services.
+2. Properly instantiate **PWM**, **Hall** and **Watchdog** Services.
 
 3. Include the Motor Control Service header **motorcontrol_service.h** in your app. 
 
-4. Instanciate the ports where the Service will be accessing the Fet Driver signals. 
+4. Instantiate the ports where the Service will be accessing the FET Driver signals. 
 
-5. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+5. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-6. At your IFM tile, instanciate the Service. For that, first you will have to fill up your Service configuration and provide the PWM, Hall and Watchdog interfaces or channels.
+6. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide the PWM, Hall and Watchdog interfaces or channels.
 
-7. At whichever other core, now you can perform calls to the Motorcontrol Service through the interfaces connected to it.
+7. At whichever other core, now you can perform calls to the Motor-control Service through the interfaces connected to it.
 
     .. code-block:: C
 

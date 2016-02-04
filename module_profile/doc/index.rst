@@ -1,7 +1,7 @@
 .. _module_profile:
 
 =======================
-SOMANET Profile Module
+Profile Module
 =======================
 
 .. contents:: In this document
@@ -12,7 +12,7 @@ This module contains utilities to generate Position, Velocity and Torque Profile
 a Motor Control PID Controller.
 
 Profile ramps ensure a smooth transition between set points on a control loop. In some cases,
-where 2 set points are not close enough, it is mandatory the use of profiles for apropiate motion of
+where 2 set points are not close enough, it is mandatory the use of profiles for appropriate motion of
 the motor.
 
 .. cssclass:: github
@@ -40,9 +40,9 @@ How to use
         USED_MODULES = module_profile module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_gpio module_qei module_watchdog module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
-2. Properly instanciate a **Position Control Loop Service**.
+2. Properly instantiate a **Position Control Loop Service**.
 
 3. Include the Profiler header **profile_control.h** in your app. 
 
@@ -138,7 +138,7 @@ How to use
             return 0;
         }
 
-.. note:: Similary to this example, you can repeat the same steps for Velocity and Torque Profilers. Each Profiler would require different parameters of the **ProfilerConfig**.
+.. note:: Similarly to this example, you can repeat the same steps for Velocity and Torque Profilers. Each Profiler would require different parameters of the **ProfilerConfig**.
 
 API
 ===

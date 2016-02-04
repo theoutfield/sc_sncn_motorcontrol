@@ -1,5 +1,5 @@
 ==================
-SOMANET ADC Module 
+ADC Module 
 ==================
 
 .. contents:: In this document
@@ -33,15 +33,15 @@ How to use
 
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
 2. Include the ADC Service header **adc_service.h** in your app. 
 
-3. Instanciate the ports where the Service will be accessing the ADC chip signals. 
+3. Instantiate the ports where the Service will be accessing the ADC chip signals. 
 
-4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instanciate the Service. 
+5. At your IFM tile, instantiate the Service. 
 
 6. At whichever other core, now you can perform calls to the ADC Service through the interfaces connected to it.
 

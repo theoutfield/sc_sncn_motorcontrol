@@ -1,5 +1,5 @@
 /**
- * @file  position_ctrl_server.h
+ * @file  position_ctrl_service.h
  * @brief Position Control Loop Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
 */
@@ -41,7 +41,7 @@ interface PositionControlInterface{
     /**
      * @brief Getter for the current target position in the controller.
      *
-     * @param Current target position [INT_MIN:INT_MAX].
+     * @return Current target position [INT_MIN:INT_MAX].
      */
     int get_target_position();
 
@@ -62,7 +62,7 @@ interface PositionControlInterface{
     /**
      * @brief Allows you to change the position control sensor on runtime.
      *
-     * @param sensor New sensor [HALL_SENSOR, QEI_SENSOR].
+     * @param sensor_used New sensor [HALL_SENSOR, QEI_SENSOR].
      */
     void set_position_sensor(int sensor_used);
 
@@ -76,9 +76,9 @@ interface PositionControlInterface{
     /**
      * @brief Setter for new configuration in the Hall Sensor Service.
      *
-     * @param in_config New Hall Sensor Service configuration.
+     * @param in_hall_config New Hall Sensor Service configuration.
      */
-    void set_hall_config(HallConfig hall_config);
+    void set_hall_config(HallConfig in_hall_config);
 
     /**
      * @brief Getter for current configuration used by the Encoder Service.
@@ -90,9 +90,9 @@ interface PositionControlInterface{
     /**
      * @brief Setter for new configuration in the Encoder Service.
      *
-     * @param in_config New Encoder Service configuration.
+     * @param in_qei_config New Encoder Service configuration.
      */
-    void set_qei_config(QEIConfig in_config);
+    void set_qei_config(QEIConfig in_qei_config);
 
     /**
      * @brief Getter for current configuration used by the BiSS Service.
@@ -132,16 +132,17 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 
 /**
  * @brief Service to perform a Position PID Control Loop on top of a Motor Control Service.
- *        You will need a Motor Control Stack running parallely to this Service,
+ *        You will need a Motor Control Stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
  * @param position_ctrl_config Configuration for the Position Control Service.
  * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
- * @param i_qei [[Nullable]] Communication interface to the Encoder Service (if applicable).
+ * @param i_qei [[Nullable]] Communication interface to the Incremental Encoder Service (if applicable).
+ * @param i_biss [[Nullable]] Communication interface to the BiSSEncoder Service (if applicable).
  * @param i_motorcontrol Communication interface to the Motor Control Service.
- * @param i_position_control[3] Array of communication interfaces to handle up to 3 different clients.
+ * @param i_position_control Array of communication interfaces to handle up to 3 different clients.
  */
 void position_control_service(ControlConfig & position_ctrl_config,
                     interface HallInterface client ?i_hall,
