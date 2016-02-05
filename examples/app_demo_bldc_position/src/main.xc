@@ -24,7 +24,10 @@
 #include <user_config.h>
 
 /* Test Profile Position function */
-void position_profile_test(interface PositionControlInterface client i_position_control)
+void position_profile_test(interface PositionControlInterface client i_position_control,
+                           interface HallInterface client ?i_hall,
+                           interface QEIInterface client ?i_qei,
+                           interface BISSInterface client ?i_biss)
 {
     int target_position = 16000;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
     int velocity        = 2000;         // rpm
@@ -41,7 +44,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
     profiler_config.max_deceleration = MAX_DECELERATION;
 
     /* Initialise the position profile generator */
-    init_position_profiler(profiler_config, i_position_control);
+    init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss);
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
@@ -76,7 +79,14 @@ int main(void)
     par
     {
         /* Test Profile Position Client function*/
-        on tile[APP_TILE]: position_profile_test(i_position_control[0]);      // test PPM on slave side
+        on tile[APP_TILE]:
+        {
+#if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
+            position_profile_test(i_position_control[0], i_hall[2], i_qei[2], null);      // test PPM on slave side
+#else
+            position_profile_test(i_position_control[0], i_hall[2], null, i_biss[2]);      // test PPM on slave side
+#endif
+        }
 
         on tile[APP_TILE]:
         /* XScope monitoring */
