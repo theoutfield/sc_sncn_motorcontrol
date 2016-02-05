@@ -13,6 +13,7 @@
 #include <adc_service.h>
 
 #define FILTER_LENGTH_TORQUE 20
+#define FILTER_LENGTH_ADC 80
 
 /**
  * @brief Minimum period for the Torque Control Loop is 100 us.
@@ -81,20 +82,6 @@ interface TorqueControlInterface{
      * @param sensor_used New sensor [HALL_SENSOR, QEI_SENSOR].
      */
     void set_torque_sensor(int sensor_used);
-
-    /**
-     * @brief Setter for new configuration in the Hall Sensor Service.
-     *
-     * @param in_config New Hall Sensor Service configuration.
-     */
-    void set_hall_config(HallConfig in_config);
-
-    /**
-     * @brief Setter for new configuration in the Encoder Service.
-     *
-     * @param in_qei_config New Encoder Service configuration.
-     */
-    void set_qei_config(QEIConfig in_qei_config);
 
     /**
      * @brief Getter for the current state of the Service.

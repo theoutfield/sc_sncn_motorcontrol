@@ -22,7 +22,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl,
                                MotorcontrolConfig &motorcontrol_config,
-                               interface MotorcontrolInterface server i_motorcontrol[5])
+                               interface MotorcontrolInterface server i_motorcontrol[4])
 {
     timer t;
     unsigned int ts;
@@ -32,6 +32,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
     int shutdown = 0; // Disable FETS
     int pwm_half = (PWM_MAX_VALUE - PWM_DEAD_TIME) >> 1;
 
+    int notification = MOTCTRL_NTF_EMPTY;
 
     t :> ts;
     while (1) {
@@ -86,6 +87,11 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                 break;
 
+        case i_motorcontrol[int i].get_notification() -> int out_notification:
+
+            out_notification = notification;
+            break;
+
         case i_motorcontrol[int i].set_voltage(int new_voltage):
 
             voltage = new_voltage;
@@ -134,7 +140,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 [[combinable]]
 void bdc_loop(chanend c_pwm_ctrl,
                 interface WatchdogInterface client i_watchdog,
-                interface MotorcontrolInterface server i_commutation[5],
+                interface MotorcontrolInterface server i_commutation[4],
                 FetDriverPorts &fet_driver_ports,
                 MotorcontrolConfig &motorcontrol_config)
 {

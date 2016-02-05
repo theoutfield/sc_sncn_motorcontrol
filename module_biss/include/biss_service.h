@@ -91,6 +91,21 @@ typedef struct {
 interface BISSInterface {
 
     /**
+     * @brief Notifies the interested parties that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
+
+    /**
      * @brief Getter for absolute and singleturn position.
      *
      * @return absolute position

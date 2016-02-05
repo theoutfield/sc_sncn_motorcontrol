@@ -67,41 +67,6 @@ interface PositionControlInterface{
     void set_position_sensor(int sensor_used);
 
     /**
-     * @brief Getter for current configuration used by the Hall Sensor Service.
-     *
-     * @return Current Hall Sensor Service configuration.
-     */
-    HallConfig get_hall_config();
-
-    /**
-     * @brief Setter for new configuration in the Hall Sensor Service.
-     *
-     * @param in_hall_config New Hall Sensor Service configuration.
-     */
-    void set_hall_config(HallConfig in_hall_config);
-
-    /**
-     * @brief Getter for current configuration used by the Encoder Service.
-     *
-     * @return Current Encoder Service configuration.
-     */
-    QEIConfig get_qei_config();
-
-    /**
-     * @brief Setter for new configuration in the Encoder Service.
-     *
-     * @param in_qei_config New Encoder Service configuration.
-     */
-    void set_qei_config(QEIConfig in_qei_config);
-
-    /**
-     * @brief Getter for current configuration used by the BiSS Service.
-     *
-     * @return Current BiSS Service configuration.
-     */
-    BISSConfig get_biss_config();
-
-    /**
      * @brief Getter for the current state of the Service.
      *
      * @return 0 - not initialized.

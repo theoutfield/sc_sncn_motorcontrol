@@ -44,7 +44,10 @@ typedef struct{
  * @param i_position_control Communication interface to the Position Control Service.
  */
 void init_position_profiler(ProfilerConfig profile_position_config,
-                                interface PositionControlInterface client i_position_control);
+                            interface PositionControlInterface client i_position_control,
+                            interface HallInterface client ?i_hall,
+                            interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss);
 
 /**
  * @brief Velocity Profiler Initializer. It sets the profiler configuration.

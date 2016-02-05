@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <print.h>
 
+#include <mc_internal_constants.h>
+
 static inline void update_turns(int &turns, int last_position, int position, int multiturn_resolution, int ticks_per_turn) {
     if (multiturn_resolution == 0) {
         int difference = position - last_position;
@@ -89,6 +91,8 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     unsigned int last_count_read = 0;
     unsigned int last_biss_read = 0;
 
+    int notification = MOTCTRL_NTF_EMPTY;
+
     //clock and port configuration
     configure_clock_rate(biss_ports.clk, biss_config.clock_dividend, biss_config.clock_divisor); // a/b MHz
     configure_out_port(biss_ports.p_biss_clk, biss_ports.clk, BISS_CLK_PORT_HIGH);
@@ -107,6 +111,11 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
         [[ordered]]
         select {
         //send electrical angle for commutation, ajusted with electrical offset
+            case i_biss[int i].get_notification() -> int out_notification:
+
+                out_notification = notification;
+                break;
+
         case i_biss[int i].get_biss_angle() -> unsigned int angle:
                 if (calib_flag == 0) {
                     t :> time;
@@ -219,6 +228,13 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 max_ticks_internal = (1 << (biss_config.multiturn_resolution -1 + biss_config.singleturn_resolution));
                 velocity_loop = (biss_config.velocity_loop * BISS_USEC);
                 velocity_factor = 60000000/biss_config.velocity_loop;
+
+                notification = MOTCTRL_NTF_CONFIG_CHANGED;
+                // TODO: Use a constant for the number of interfaces
+                for (int i = 0; i < 5; i++) {
+                    i_biss[i].notification();
+                }
+
                 break;
 
         //send biss_config

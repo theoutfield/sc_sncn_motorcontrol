@@ -41,6 +41,22 @@ typedef struct {
  * @brief Interface type to communicate with the Hall Service.
  */
 interface HallInterface {
+
+    /**
+     * @brief Notifies the interested parties that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
+
     /**
      * @brief Getter for the current pin state at the Hall port.
      *
