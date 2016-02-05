@@ -91,7 +91,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     while (1) {
 //#pragma ordered
         select {
-            case t when timerafter (ts +  USEC_STD * velocity_control_config.control_loop_period) :> ts:
+            case t when timerafter (ts + USEC_STD * velocity_control_config.control_loop_period) :> ts:
 
                 if (config_update_flag) {
                     MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
@@ -104,7 +104,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                     }
 
                     if (velocity_control_config.feedback_sensor != HALL_SENSOR
-                           && velocity_control_config.feedback_sensor < QEI_SENSOR) {
+                           && velocity_control_config.feedback_sensor != QEI_SENSOR
+                           && velocity_control_config.feedback_sensor != BISS_SENSOR) {
                         velocity_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
