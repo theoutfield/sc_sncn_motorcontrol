@@ -20,16 +20,12 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 //BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
-on tile[IFM_TILE]: AMSPorts ams_ports =
-{
-        {
-            IFM_TILE_CLOCK_2,
-            IFM_TILE_CLOCK_3,
-            SOMANET_IFM_GPIO_D3, //D3,    //mosi
-            SOMANET_IFM_GPIO_D1, //D1,    //sclk
-            SOMANET_IFM_GPIO_D2  //D2     //miso
-        },
-
+AMSPorts ams_ports = { {
+        IFM_TILE_CLOCK_2,
+        IFM_TILE_CLOCK_3,
+        SOMANET_IFM_GPIO_D3, //D3,    //mosi
+        SOMANET_IFM_GPIO_D1, //D1,    //sclk
+        SOMANET_IFM_GPIO_D2  },//D2     //miso
         SOMANET_IFM_GPIO_D0 //D0         //slave select
 };
 
@@ -121,7 +117,7 @@ int main(void) {
                     biss_service(biss_ports, biss_config, i_biss);
                 }
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-                /* AMS Rotary Sensor Server */
+                /* AMS Rotary Sensor Service */
                 {
                     AMSConfig ams_config;
                     ams_config.factory_settings = 1;
@@ -129,15 +125,17 @@ int main(void) {
                     ams_config.hysteresis = 1;
                     ams_config.noise_setting = AMS_NOISE_NORMAL;
                     ams_config.uvw_abi = 0;
-                    ams_config.dyn_angle_comp = 0;;
+                    ams_config.dyn_angle_comp = 0;
                     ams_config.data_select = 0;
                     ams_config.pwm_on = AMS_PWM_OFF;
                     ams_config.abi_resolution = 0;
                     ams_config.resolution_bits = AMS_RESOLUTION;
                     ams_config.offset = AMS_OFFSET;
                     ams_config.pole_pairs = POLE_PAIRS;
-                    ams_config.cache_time = 600;
-                    ams_config.velocity_loop = 1000;
+                    ams_config.max_ticks = 0x7fffffff;
+                    ams_config.cache_time = AMS_CACHE_TIME;
+                    ams_config.velocity_loop = AMS_VELOCITY_LOOP;
+
                     ams_service(ams_ports, ams_config, i_ams);
                 }
 #else

@@ -128,7 +128,7 @@ void position_control_service(ControlConfig &position_control_config,
         { actual_position, void, void } = i_biss.get_biss_position();
         target_position = actual_position;
     } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
-        actual_position = i_ams.get_ams_position_absolute();
+        { actual_position, void } = i_ams.get_ams_position();
         target_position = actual_position;
     }
 
@@ -159,7 +159,7 @@ void position_control_service(ControlConfig &position_control_config,
                         break;
 
                     case AMS_SENSOR:
-                        actual_position = i_ams.get_ams_position_absolute();
+                        { actual_position, void } = i_ams.get_ams_position();
                         break;
 
                 /*
@@ -262,7 +262,7 @@ void position_control_service(ControlConfig &position_control_config,
             } else if (in_sensor_used == BISS_SENSOR) {
                 { actual_position, void, void } = i_biss.get_biss_position();
             } else if (in_sensor_used == AMS_SENSOR) {
-                actual_position = i_ams.get_ams_position_absolute();
+                { actual_position, void } = i_ams.get_ams_position();
             }
             /*
              * Or any other sensor interfaced to the IFM Module

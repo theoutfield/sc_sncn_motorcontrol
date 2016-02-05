@@ -81,9 +81,10 @@ void ams_rotary_sensor_test(client interface AMSInterface i_ams)
 //}
 
 void test(client interface AMSInterface i_ams) {
-    delay_seconds(2);
+    delay_seconds(1);
     printf("test\n");
     fflush(stdout);
+    int offset;
     while (1) {
         char c;
         int value = 0;
@@ -93,8 +94,23 @@ void test(client interface AMSInterface i_ams) {
                 value += c - '0';
             }
         }
-        int offset = i_ams.reset_ams_angle(value);
-        printf("offset %d\n", offset);
+//        int offset = i_ams.reset_ams_angle(value);
+        offset = i_ams.get_ams_real_position();
+        printf("position %d\n", offset);
+    }
+}
+
+void freq(int set) {
+    if(set) {
+        int value = write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        printf("freq 250Mhz %d\n", value);
+    } else
+        printf("freq 100Mhz\n");
+}
+
+void test_out_port(out buffered port:8 pout) {
+    while(1) {
+        pout <: 0xAA;
     }
 }
 
@@ -108,42 +124,39 @@ int main(void)
     {
         on tile[APP_TILE]: test(i_ams[1]);
 
-        on tile[COM_TILE]:
-        {
-//            i_ams[0].configure(set_configuration());
-            ams_rotary_sensor_test(i_ams[0]);
-
-        }
+        on tile[COM_TILE]: ams_rotary_sensor_test(i_ams[0]);
 
         /************************************************************
          * IFM_TILE
          ************************************************************/
-        on tile[IFM_TILE]:
-        {
-            /* AMS Rotary Sensor Server */
-            AMSConfig ams_config;
-            ams_config.factory_settings = 1;
-            ams_config.direction = AMS_DIR_CW;
-            ams_config.hysteresis = 1;
-            ams_config.noise_setting = AMS_NOISE_NORMAL;
-            ams_config.uvw_abi = 0;
-            ams_config.dyn_angle_comp = 0;;
-            ams_config.data_select = 0;
-            ams_config.pwm_on = AMS_PWM_OFF;
-            ams_config.abi_resolution = 0;
-            ams_config.resolution_bits = AMS_RESOLUTION;
-            ams_config.offset = AMS_OFFSET;
-            ams_config.pole_pairs = 3;
-            ams_config.cache_time = 0;
-            ams_config.velocity_loop = 1000;
+        on tile[IFM_TILE]: par {
+            {
+                /* AMS Rotary Sensor Server */
+                AMSConfig ams_config;
+                ams_config.factory_settings = 1;
+                ams_config.direction = AMS_DIR_CW;
+                ams_config.hysteresis = 1;
+                ams_config.noise_setting = AMS_NOISE_NORMAL;
+                ams_config.uvw_abi = 0;
+                ams_config.dyn_angle_comp = 0;
+                ams_config.data_select = 0;
+                ams_config.pwm_on = AMS_PWM_OFF;
+                ams_config.abi_resolution = 0;
+                ams_config.resolution_bits = AMS_RESOLUTION;
+                ams_config.offset = AMS_OFFSET;
+                ams_config.max_ticks = 0x7fffffff;
+                ams_config.pole_pairs = 3;
+                ams_config.cache_time = AMS_CACHE_TIME;
+                ams_config.velocity_loop = AMS_VELOCITY_LOOP;
 
-            ams_service(ams_ports, ams_config, i_ams);
+                ams_service(ams_ports, ams_config, i_ams);
+                //            ams_sensor_server(i_ams, NUM_OF_AMS_INTERFACES, pRotarySensor);
+                //          ams_rotary_sensor_direct_method(pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);
+            }
 
-//            ams_sensor_server(i_ams, NUM_OF_AMS_INTERFACES, pRotarySensor);
+//            test_out_port(ams_ports.spi_interface.mosi);
 
-  //          ams_rotary_sensor_direct_method(pRotarySensor, AMS_INIT_SETTINGS1, AMS_INIT_SETTINGS2, 2555);
-
-
+//            freq(1);
         }
 
     }

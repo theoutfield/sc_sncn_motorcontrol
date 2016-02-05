@@ -16,7 +16,7 @@
 
 int check_hall_config(HallConfig &hall_config){
 
-    if(hall_config.pole_pairs < 1 || hall_config.pole_pairs > 10){
+    if(hall_config.pole_pairs < 1){
         printstrln("Wrong Hall configuration: wrong pole-pairs");
         return ERROR;
     }

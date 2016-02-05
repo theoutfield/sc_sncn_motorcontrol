@@ -24,9 +24,10 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
         printf ("BiSS tuning. Voltage %d\nPlease enter an offset value different from %d, then press enter\n", input_voltage, biss_config.offset_electrical);
     } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR){
         ams_config = i_ams.get_ams_config();
-        printf ("AMS tuning. Voltage %d\nPlease enter an offset value different from %d, then press enter\n", input_voltage,
-                (input_voltage > 0) ? ((motorcontrol_config.bldc_winding_type == 1) ? motorcontrol_config.hall_offset[0] : motorcontrol_config.hall_offset[1]) : ((motorcontrol_config.bldc_winding_type == 1) ? motorcontrol_config.hall_offset[1] : motorcontrol_config.hall_offset[0])  );
-
+        if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
+            printf ("AMS tuning, Star winding, Voltage %d, offset clk %d (positive voltage), offset cclk %d (negative voltage)\n", input_voltage, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
+        else
+            printf ("AMS tuning, Delta winding, Voltage %d, offset cclk %d (positive voltage), offset clk %d (negative voltage)\n", input_voltage, motorcontrol_config.hall_offset[1], motorcontrol_config.hall_offset[0]);
     }
     fflush(stdout);
     //read and adjust the offset
@@ -77,14 +78,14 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
                 break;
             case 'v': //set voltage
                 input_voltage = value * sign;
-                printf("voltage: %i\n", input_voltage);
                 i_commutation.set_voltage(input_voltage);
+                printf("voltage: %i\n", input_voltage);
                 mode = 0;
                 break;
             case 'r': //reverse voltage
                 input_voltage = -input_voltage;
-                printf("voltage: %i\n", input_voltage);
                 i_commutation.set_voltage(input_voltage);
+                printf("voltage: %i\n", input_voltage);
                 mode = 0;
                 break;
             default: //set offset

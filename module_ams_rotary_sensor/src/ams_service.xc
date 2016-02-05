@@ -10,6 +10,8 @@
 #include <ams_service.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <timer.h>
+#include <spi_master.h>
 
 static char rotarySensorInitialized = 0;
 
@@ -63,10 +65,6 @@ int initRotarySensor(AMSPorts &ams_ports, AMSConfig config)
     unsigned short settings1, settings2;
 
     {settings1, settings2} = transform_settings(config);
-//    settings1 = 1;
-//    settings2 = 10;
-
-    printf("settings1 %d, settings2 %d\n", settings1, settings2);
 
     initams_ports(ams_ports);
 
@@ -129,36 +127,29 @@ unsigned char checkEvenParity(unsigned short bitStream){
      return (calc_parity(bitStream) == ((bitStream >> 15) & 1));    //comparison the parity bit the the real one
 }
 
-short SPIReadTransaction(AMSPorts &ams_ports, unsigned short reg){
-
-    timer t;
-    unsigned ts;
+short SPIReadTransaction(AMSPorts &ams_ports, unsigned short reg) {
     unsigned short data_in = 0;
 
     reg |= READ_MASK;                           //read command
     reg = addEvenParity(reg);                   //parity
 
-    slave_select(ams_ports.slave_select);                       //start transaction
+    slave_select(ams_ports.slave_select);                   //start transaction
 
-    spi_master_out_short(ams_ports.spi_interface, reg);          //send command
+    spi_master_out_short(ams_ports.spi_interface, reg);     //send command
     ams_ports.spi_interface.mosi <: 0;
 
-    slave_deselect(ams_ports.slave_select);                     //pause
-    t:>ts;                                      //for executing
-    t when timerafter(ts+50):>void;            //the command
-    slave_select(ams_ports.slave_select);                       //on the sensor
+    slave_deselect(ams_ports.slave_select);                 //pause for
+    delay_ticks(AMS_SENSOR_EXECUTING_TIME);                 //executing the command
+    slave_select(ams_ports.slave_select);                   //on the sensor
 
-    data_in = spi_master_in_short(ams_ports.spi_interface);      //handle response
+    data_in = spi_master_in_short(ams_ports.spi_interface); //handle response
 
-    slave_deselect(ams_ports.slave_select);                     //end transaction
+    slave_deselect(ams_ports.slave_select);                 //end transaction
 
     return data_in;
 }
 
-short SPIWriteTransaction(AMSPorts &ams_ports, unsigned short reg, unsigned short data){
-
-    timer t;
-    unsigned ts;
+short SPIWriteTransaction(AMSPorts &ams_ports, unsigned short reg, unsigned short data) {
     unsigned short data_in = 0;
 
     reg &= WRITE_MASK;                          //action
@@ -167,28 +158,26 @@ short SPIWriteTransaction(AMSPorts &ams_ports, unsigned short reg, unsigned shor
     data &= WRITE_MASK;                         //action
     data = addEvenParity(data);                 //parity
 
-    slave_select(ams_ports.slave_select);                       //start transaction
+    slave_select(ams_ports.slave_select);                   //start transaction
 
-    spi_master_out_short(ams_ports.spi_interface, reg);          //send command
+    spi_master_out_short(ams_ports.spi_interface, reg);     //send command
 
-    slave_deselect(ams_ports.slave_select);                       //pause
-    t:>ts;                                                              //for executing
-    t when timerafter(ts+AMS_SENSOR_EXECUTING_TIME):>void;             //the command
-    slave_select(ams_ports.slave_select);                         //on the sensor
+    slave_deselect(ams_ports.slave_select);                 //pause for
+    delay_ticks(AMS_SENSOR_EXECUTING_TIME);                 //executing the command
+    slave_select(ams_ports.slave_select);                   //on the sensor
 
     spi_master_out_short(ams_ports.spi_interface, data);
     ams_ports.spi_interface.mosi <: 0;
 
-    slave_deselect(ams_ports.slave_select);                       //pause
-    t:>ts;                                                              //for saving
-    t when timerafter(ts+AMS_SENSOR_SAVING_TIME):>void;                //the data
-    slave_select(ams_ports.slave_select);                         //on the reg
+    slave_deselect(ams_ports.slave_select);                 //pause for
+    delay_ticks(AMS_SENSOR_SAVING_TIME);                    //saving the data
+    slave_select(ams_ports.slave_select);                   //on the reg
 
-    data_in = spi_master_in_short(ams_ports.spi_interface);       //handle response
+    data_in = spi_master_in_short(ams_ports.spi_interface); //handle response
    // printhex(data_in);
    // printstrln("");
 
-    slave_deselect(ams_ports.slave_select);                       //end transaction
+    slave_deselect(ams_ports.slave_select);                 //end transaction
 
     return data_in;
 }
@@ -499,27 +488,41 @@ static inline void multiturn(int &count, int last_position, int position, int ti
             count += difference;
 }
 
-int check_ams_config(AMSConfig &ams_config){
-
-    if(ams_config.pole_pairs < 1 || ams_config.pole_pairs > 7){
-        printstrln("Wrong Hall configuration: wrong pole-pairs");
+int check_ams_config(AMSConfig &ams_config) {
+    if(ams_config.direction < 0  || ams_config.direction > 1){
+        printstrln("Wrong AMS configuration: wrong direction");
         return ERROR;
     }
-
+    if( AMS_USEC <= 0 ){
+        printstrln("Wrong AMS configuration: wrong AMS_USEC value");
+        return ERROR;
+    }
+    if(ams_config.cache_time < 0){
+        printstrln("Wrong AMS configuration: wrong timeout");
+        return ERROR;
+    }
+    if(ams_config.pole_pairs < 1){
+        printstrln("Wrong AMS configuration: wrong pole-pairs");
+        return ERROR;
+    }
     return SUCCESS;
 }
 
-//fixme ,iu
 [[combinable]]
  void ams_service(AMSPorts &ams_ports, AMSConfig & ams_config, interface AMSInterface server i_ams[5])
 {
+    //FIXME 250MHz frequency breakes SPI
     //Set freq to 250MHz (always needed for velocity calculation)
-//    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    //    if(check_ams_config(ams_config) == ERROR){
-    //        printstrln("Error while checking the BiSS sensor configuration");
-    //        return;
-    //    }
+    if(check_ams_config(ams_config) == ERROR){
+        printstrln("Error while checking the AMS sensor configuration");
+        return;
+    }
+    if (initRotarySensor(ams_ports,  ams_config) != SUCCESS_WRITING) {
+        printstrln("Error with SPI AMS sensor");
+        return;
+    }
 
     printstr(">>   SOMANET AMS SENSOR SERVICE STARTING...\n");
 
@@ -530,40 +533,23 @@ int check_ams_config(AMSConfig &ams_config){
     int old_difference = 0;
     int ticks_per_turn = (1 << ams_config.resolution_bits);
     int crossover = ticks_per_turn - ticks_per_turn/10;
-    //    int velocity_loop = (ams_config.velocity_loop * AMS_USEC); //velocity loop time in clock ticks
-    int velocity_loop = ams_config.velocity_loop*100;
-    //    int velocity_factor = 60000000/ams_config.velocity_loop;
+    int velocity_loop = ams_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
     int velocity_factor = 60000000/ams_config.velocity_loop;
     //position
     unsigned int last_position = 0;
-    int count_offset = 0;
-    int turns = 0;
     int count = 0;
     int calib_flag = 0;
     //timing
     timer t;
     unsigned int time;
     unsigned int next_velocity_read = 0;
-    unsigned int last_count_read = 0;
     unsigned int last_ams_read = 0;
-
-
-    int result = initRotarySensor(ams_ports,  ams_config);
-
-    //          printf("offset_: %i", offset_);
-
-    if (result == SUCCESS_WRITING){
-        printf("*************************************\n    AMS SENSOR SERVER STARTED\n*************************************\n");
-    } else{
-        printf("*************************************\n    AMS SENSOR SPI ERROR!!!\n*************************************\n");
-        exit(-1);
-    }
 
 
     //main loop
     while (1) {
         select {
-        //send electrical angle for commutation, ajusted with electrical offset
+        //send electrical angle for commutation
         case i_ams[int i].get_ams_angle() -> unsigned int angle:
                 if (calib_flag == 0) {
                     t :> time;
@@ -582,9 +568,7 @@ int check_ams_config(AMSConfig &ams_config){
                     angle = 0;
                 break;
 
-
-
-        //send count, position and status (error and warning bits), ajusted with count offset and polarity
+        //send multiturn count and position
         case i_ams[int i].get_ams_position() -> { int out_count, unsigned int position }:
                 t :> time;
                 if (timeafter(time, last_ams_read + ams_config.cache_time)) {
@@ -594,32 +578,13 @@ int check_ams_config(AMSConfig &ams_config){
                     last_position = position;
                 } else
                     position = last_position;
+                //count reset
+                if (count >= ams_config.max_ticks || count < -ams_config.max_ticks)
+                    count = 0;
                 out_count = count;
-
-                //                //add offset
-                //                if (ams_config.multiturn_resolution) { //multiturn encoder
-                //                    count = count_internal + count_offset;
-                //                    if (count < -max_ticks_internal)
-                //                        count = max_ticks_internal + (count % max_ticks_internal);
-                //                    else if (count >= max_ticks_internal)
-                //                        count = (count % max_ticks_internal) - max_ticks_internal;
-                //                } else //singleturn encoder
-                //                    count = turns*ticks_per_turn + count_internal  + count_offset;
-                //                //polarity
-                //                if (ams_config.polarity == AMS_POLARITY_INVERTED) {
-                //                    count = -count;
-                //                    position = ticks_per_turn - position;
-                //                }
-                //                //count reset
-                //                if (count >= ams_config.max_ticks || count < -ams_config.max_ticks) {
-                //                    count_offset = -count_internal;
-                //                    count = 0;
-                //                    status = 0;
-                //                    turns = 0;
-                //                }
                 break;
 
-        //send count, position and status (error and warning bits) as returned by the encoder (not ajusted)
+        //send position
         case i_ams[int i].get_ams_real_position() -> unsigned int position:
                 position = readRotarySensorAngleWithoutCompensation(ams_ports);
                 break;
@@ -632,17 +597,12 @@ int check_ams_config(AMSConfig &ams_config){
         //receive new ams_config
         case i_ams[int i].set_ams_config(AMSConfig in_config):
                 //update variables which depend on ams_config
-                //                if (ams_config.clock_dividend != in_config.clock_dividend || ams_config.clock_divisor != in_config.clock_divisor)
-                //                    configure_clock_rate(ams_ports.clk, in_config.clock_dividend, in_config.clock_divisor) ; // a/b MHz
                 if (ams_config.offset != in_config.offset)
                     writeZeroPosition(ams_ports, in_config.offset);
                 ams_config = in_config;
-                //                ams_data_length = ams_config.multiturn_length +  ams_config.singleturn_length + ams_config.status_length;
-                //                ams_before_singleturn_length = ams_config.multiturn_length + ams_config.singleturn_length - ams_config.singleturn_resolution;
                 ticks_per_turn = (1 << ams_config.resolution_bits);
                 crossover = ticks_per_turn - ticks_per_turn/10;
-                //                max_ticks_internal = (1 << (ams_config.multiturn_resolution -1 + ams_config.singleturn_resolution));
-                velocity_loop = (ams_config.velocity_loop * 100);
+                velocity_loop = ams_config.velocity_loop * AMS_USEC;
                 velocity_factor = 60000000/ams_config.velocity_loop;
 
                 break;

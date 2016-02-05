@@ -1,6 +1,7 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
+//#include <IFM_DC100-rev-b.bsp>
+#include <IFM_DC300-rev-a.bsp>
 
 /**
  * @file test_torque-ctrl.xc
@@ -27,7 +28,7 @@
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-    int target_torque = 100;    //(desired torque/torque_constant)  * IFM resolution
+    int target_torque = 400;    //(desired torque/torque_constant)  * IFM resolution
     int torque_slope  = 1000;   //(desired torque_slope/torque_constant)  * IFM resolution
 
     ProfilerConfig profiler_config;
@@ -41,7 +42,7 @@ void profile_torque_test(interface TorqueControlInterface client i_torque_contro
     set_profile_torque(target_torque, torque_slope, i_torque_control);
 
     delay_seconds(5);
-    target_torque = -100;
+    target_torque = -target_torque;
 
     /* Set new target torque for profile torque control */
     set_profile_torque( target_torque, torque_slope, i_torque_control);
@@ -55,7 +56,14 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
+AMSPorts ams_ports = { {
+        IFM_TILE_CLOCK_2,
+        IFM_TILE_CLOCK_3,
+        SOMANET_IFM_GPIO_D3, //D3,    //mosi
+        SOMANET_IFM_GPIO_D1, //D1,    //sclk
+        SOMANET_IFM_GPIO_D2  },//D2     //miso
+        SOMANET_IFM_GPIO_D0 //D0         //slave select
+};
 #else
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
@@ -121,7 +129,8 @@ int main(void)
                 xscope_int(ACTUAL_TORQUE, actual_torque);
                 xscope_int(PHASE_B, phaseB);
                 xscope_int(PHASE_C, phaseC);
-                delay_microseconds(50);
+//                delay_microseconds(50);
+                delay_milliseconds(10);
             }
         }
 
@@ -162,22 +171,26 @@ int main(void)
                     qei_service(qei_ports, qei_config, i_qei);
                 }
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
+                /* AMS Rotary Sensor Service */
                 {
                     AMSConfig ams_config;
-                    ams_config.sensor_resolution = AMS_MAX_RESOLUTION;
-                    ams_config.factory_settings = 0;
+                    ams_config.factory_settings = 1;
+                    ams_config.direction = AMS_DIR_CW;
+                    ams_config.hysteresis = 1;
                     ams_config.noise_setting = AMS_NOISE_NORMAL;
-                    ams_config.direction = AMS_DIR_CCW;
-                    ams_config.pole_pairs = POLE_PAIRS;
+                    ams_config.uvw_abi = 0;
+                    ams_config.dyn_angle_comp = 0;
+                    ams_config.data_select = 0;
                     ams_config.pwm_on = AMS_PWM_OFF;
-                    ams_config.hysteresis = AMS_HYS_11BIT_3LSB;
-                    ams_config.abi_resolution = AMS_ABI_RES_11BIT;
-                    ams_config.offset = 0;
-                    ams_config.data_select = AMS_DATA_DAECANG;
-                    ams_config.uvw_abi = AMS_ABI_ON_PWM_W;
-                    ams_config.dyn_angle_comp = AMS_DAE_ON;
+                    ams_config.abi_resolution = 0;
+                    ams_config.resolution_bits = AMS_RESOLUTION;
+                    ams_config.offset = AMS_OFFSET;
+                    ams_config.pole_pairs = POLE_PAIRS;
+                    ams_config.max_ticks = 0x7fffffff;
+                    ams_config.cache_time = AMS_CACHE_TIME;
+                    ams_config.velocity_loop = AMS_VELOCITY_LOOP;
 
-                    ams_service(ams_ports, ams_config, i_ams, 5);
+                    ams_service(ams_ports, ams_config, i_ams);
                 }
 #else
                 /* BiSS service */
