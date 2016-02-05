@@ -11,7 +11,7 @@ TARGET = SOMANET-C22
 APP_NAME = test_biss
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_biss module_board-support module_misc
+USED_MODULES = module_biss module_board-support module_misc module_pwm_symmetrical
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
