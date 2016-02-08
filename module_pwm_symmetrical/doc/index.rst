@@ -52,7 +52,7 @@ How to use
 6. At whichever other core, you can update your PWM outputs through a client call. 
     But first you will need to initialize the communication by calling ``pwm_share_control_buffer_address_with_server``.
 
-    .. code-block:: C
+    .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 

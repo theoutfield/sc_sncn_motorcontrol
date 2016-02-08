@@ -28,7 +28,7 @@ Quick How-to
 
 6. Again in your **main.xc**, set the configuration for your Encoder Service. 
 
-.. code-block:: C
+.. code-block:: c
 
         on tile[IFM_TILE]:
         /* Quadrature Encoder sensor Service */

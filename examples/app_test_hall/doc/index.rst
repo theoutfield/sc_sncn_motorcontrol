@@ -30,7 +30,7 @@ Quick How-to
 
 6. Again in your **main.xc**, set the configuration for your Hall Service. 
 
-    .. code-block:: C
+    .. code-block:: c
 
             on tile[IFM_TILE]:
             /* Hall Service */

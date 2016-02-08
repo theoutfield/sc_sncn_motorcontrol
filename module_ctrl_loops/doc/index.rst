@@ -53,7 +53,7 @@ How to use (e.g. Position Control Service)
 
 6. At whichever other core, now you can perform calls to the Control Service through the interfaces connected to it. Do not forget to initialize it first.
 
-    .. code-block:: C
+    .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 

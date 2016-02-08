@@ -32,7 +32,7 @@ Quick How-to
 
 6. Set parameters for your :ref:`Motor Control Service <module_motorcontrol>`. Just the **bldc_winding_type**, hall_offset[0] (CW)  and hall_offset[1] (CCW) are relevant for this app. Remaining parameters could stay like this:
 
-.. code-block:: C
+.. code-block:: c
 
                 /* Motor Control Service */
                 {
@@ -50,7 +50,8 @@ Quick How-to
 
 7.  Define a low voltage value to start with, 1000 should be fine. Since it is a positive value, it will help you finding the clockwise offset.
 
-.. code-block:: C
+.. code-block:: c
+
         #define VOLTAGE 1000
 
 8. :ref:`Run the application enabling XScope <running_an_application>`.

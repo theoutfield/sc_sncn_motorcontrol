@@ -29,7 +29,7 @@ Quick How-to
 
 6. :ref:`Set the configuration <motor_configuration_label>` for Motor Control.
 
-.. code-block:: C
+.. code-block:: c
 
                 /* Motor drive service */
                 {
