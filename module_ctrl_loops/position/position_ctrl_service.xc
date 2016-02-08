@@ -6,6 +6,7 @@
 #include <xs1.h>
 #include <xscope.h>
 #include <print.h>
+#include <stdlib.h>
 
 #include <position_ctrl_service.h>
 #include <a4935.h>
@@ -110,15 +111,34 @@ void position_control_service(ControlConfig &position_control_config,
                     /* acquire actual position hall/qei/sensor */
                     switch (position_control_config.feedback_sensor) {
                         case HALL_SENSOR:
-                            actual_position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                            if(!isnull(i_hall)){
+                                actual_position = i_hall.get_hall_position_absolute();
+                            }
+                            else{
+                                printstrln("ERROR: Hall interface is not provided but requested");
+                                exit(-1);
+                            }
                             break;
 
                         case QEI_SENSOR:
-                            actual_position =  i_qei.get_qei_position_absolute();
+                            if(!isnull(i_qei)){
+                                actual_position =  i_qei.get_qei_position_absolute();
+                            }
+                            else{
+                                printstrln("ERROR: Encoder interface is not provided but requested");
+                                exit(-1);
+                            }
                             break;
 
                         case BISS_SENSOR:
-                            { actual_position, void, void } = i_biss.get_biss_position();
+                            if(!isnull(i_biss)){
+                            {
+                                actual_position, void, void } = i_biss.get_biss_position();
+                            }
+                            else{
+                                printstrln("ERROR: BiSS interface is not provided but requested");
+                                exit(-1);
+                            }
                             break;
 
                     }
