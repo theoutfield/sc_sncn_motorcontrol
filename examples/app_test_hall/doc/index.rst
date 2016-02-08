@@ -1,7 +1,7 @@
 .. _hall_demo:
 
 ==========================================
-Hall Effect Feecback Sensor Demo
+Hall Effect Feedback Sensor Demo
 ==========================================
 
 .. contents:: In this document
