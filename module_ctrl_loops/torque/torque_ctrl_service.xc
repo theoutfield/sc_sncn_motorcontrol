@@ -248,16 +248,18 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                         torque_control_output_limit = BDC_PWM_CONTROL_LIMIT;
                     }
 
-                    // The Hall configuration must always be loaded because of qei_counts_per_hall computation
+                    // The Hall configuration for BLDC motor must always be loaded because of qei_counts_per_hall computation
                     if (isnull(i_hall)) {
-                        printstrln("Position Control Loop ERROR: Interface for Hall Service not provided");
+                        if(motorcontrol_config.motor_type == BLDC_MOTOR){
+                            printstrln("Torque Control Loop ERROR: Interface for Hall Service not provided");
+                        }
                     } else {
                         hall_config = i_hall.get_hall_config();
                     }
 
                     if (torque_control_config.feedback_sensor == QEI_SENSOR) {
                         if (isnull(i_qei)) {
-                            printstrln("Position Control Loop ERROR: Interface for QEI Service not provided");
+                            printstrln("Torque Control Loop ERROR: Interface for QEI Service not provided");
                         } else {
                             qei_config = i_qei.get_qei_config();
                         }
@@ -265,7 +267,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
 
                     if (torque_control_config.feedback_sensor == BISS_SENSOR) {
                         if (isnull(i_qei)) {
-                            printstrln("Position Control Loop ERROR: Interface for BISS Service not provided");
+                            printstrln("Torque Control Loop ERROR: Interface for BISS Service not provided");
                         } else {
                             biss_config = i_biss.get_biss_config();
                         }
@@ -276,7 +278,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                         torque_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
-                    if (torque_control_config.feedback_sensor == QEI_SENSOR) {
+                    if (torque_control_config.feedback_sensor == QEI_SENSOR && motorcontrol_config.motor_type == BLDC_MOTOR) {
                         qei_counts_per_hall = (qei_config.ticks_resolution * 4) / hall_config.pole_pairs;
                     }
 
@@ -308,10 +310,14 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                         actual_speed = i_hall.get_hall_velocity();
                     } else if (torque_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
                         { angle, offset_fw_flag, offset_bw_flag } = i_qei.get_qei_sync_position();
-                        angle = ((angle << 10) / qei_counts_per_hall ) & 0x3ff;
+                        if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
+                            angle = ((angle << 10) / qei_counts_per_hall ) & 0x3ff;
+                        }
                         actual_speed = i_qei.get_qei_velocity();
                     } else if (torque_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
-                        angle = i_biss.get_biss_angle() >> 2; //  << 10 ) >> 12 /
+                        if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
+                            angle = i_biss.get_biss_angle() >> 2; //  << 10 ) >> 12 /
+                        }
                         actual_speed = i_biss.get_biss_velocity();
                     }
 
