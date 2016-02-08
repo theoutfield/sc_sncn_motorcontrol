@@ -42,6 +42,9 @@ typedef struct{
  *
  * @param profile_position_config Configuration for the Position Profiler.
  * @param i_position_control Communication interface to the Position Control Service.
+ * @param i_hall Interface to hall Service
+ * @param i_qei Interface to Incremental Encoder Service (QEI)
+ * @param i_biss Interface to BiSS Encoder Service (QEI)
  */
 void init_position_profiler(ProfilerConfig profile_position_config,
                             interface PositionControlInterface client i_position_control,
