@@ -26,6 +26,8 @@ your SOMANET IFM device.
 .. figure:: images/core-diagram-commutation.png
    :width: 60%
 
+   Diagrams shows core/task diagram of a client app using motorcontrol_service
+
 .. _commutation_programming_label:
 
 How to use
