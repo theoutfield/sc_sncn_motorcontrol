@@ -18,7 +18,7 @@ USED_MODULES = config_motor module_adc module_biss module_board-support module_c
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 XCC_FLAGS_Debug = -g -O0
-XCC_FLAGS_Release = -g -O3
+XCC_FLAGS_Release = -g -O1 # Reduce optimization to bypass the XMOS tools error - "Error: Meta information..."
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
 VERBOSE = 0

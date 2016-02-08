@@ -88,8 +88,7 @@ int main(void)
             }
         }
 
-		// TODO: The application cannot be built (as Release) if the velocity_control_service is on a tile with other tasks
-        on tile[APP_TILE_2]:
+        on tile[APP_TILE]:
         /* Velocity Control Service */
         {
             ControlConfig velocity_control_config;
