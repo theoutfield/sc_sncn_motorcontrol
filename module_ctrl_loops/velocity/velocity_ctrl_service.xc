@@ -12,6 +12,7 @@
 #include <limits.h>
 #include <refclk.h>
 #include <print.h>
+#include <stdlib.h>
 
 void init_velocity_control(interface VelocityControlInterface client i_velocity_control)
 {
@@ -111,7 +112,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
                     if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
                         if (isnull(i_hall)) {
-                            printstrln("Velocity Control Loop ERROR: Interface for Hall Service not provided");
+                            printstrln("Velocity Control Loop ERROR: Interface for Hall Service is not provided, but configured to be used");
+                            exit(-1);
                         } else {
                             speed_factor = i_hall.get_hall_config().pole_pairs * 4096 * velocity_control_config.control_loop_period / 1000; // variable pole_pairs
                             crossover = INT_MAX - INT_MAX/10;
@@ -119,7 +121,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         }
                     } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
                         if (isnull(i_qei)) {
-                            printstrln("Velocity Control Loop ERROR: Interface for QEI Service not provided");
+                            printstrln("Velocity Control Loop ERROR: Interface for QEI Service is not provided, but configured to be used");
+                            exit(-1);
                         } else {
                             QEIConfig qei_config = i_qei.get_qei_config();
                             speed_factor = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * velocity_control_config.control_loop_period / 1000;       // variable qei_real_max
@@ -127,7 +130,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         }
                     } else if (velocity_control_config.feedback_sensor == BISS_SENSOR){
                         if(isnull(i_biss)){
-                            printstrln("Velocity Control Loop ERROR: Interface for BiSS Service not provided");
+                            printstrln("Velocity Control Loop ERROR: Interface for BiSS Service is not provided, but configured to be used");
+                            exit(-1);
                         }
                     }
 
@@ -146,7 +150,10 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         actual_velocity = i_biss.get_biss_velocity();
                     } else {
                         if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
-                            position = i_hall.get_hall_position_absolute(); //get_hall_position_absolute(c_hall);
+                            if(!isnull(i_hall)){
+                                position = i_hall.get_hall_position_absolute();
+                            }
+
                             if (position > 2049) {
                                 init = 1;
                                 previous_position = 2049;
