@@ -51,7 +51,7 @@ int main() {
 
     par {
         /* Test BiSS Encoder Client */
-        on tile[COM_TILE]: biss_test(i_biss[0]);
+        on tile[APP_TILE]: biss_test(i_biss[0]);
 
 
         /************************************************************
