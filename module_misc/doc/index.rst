@@ -35,13 +35,13 @@ Moving Average Filter
 
 2. Include the filter header in your app. 
 
-.. code-block:: C
+.. code-block:: c
         
   #include <filter_blocks.h>
 
 3. Now you can just use filter API.
 
-.. code-block:: C
+.. code-block:: c
 
   int filter_buffer[8] = {0};   
   int index = 0;
@@ -54,13 +54,13 @@ Time Definitions
 
 2. Include the header in your app.
 
-.. code-block:: C
+.. code-block:: c
         
   #include <refclk.h>
 
 3. If you need to set 1 ms time in your code, and your code is running on tile with a **100MHz Reference Freq.**:
 
-.. code-block:: C
+.. code-block:: c
         
   timer t;
   unsigned ts;
@@ -70,7 +70,7 @@ Time Definitions
 
 4. However, if you need to set 1 ms time in your code, but your code is running on tile with a **250MHz Reference Freq.** (e.g. IFM tile):
 
-.. code-block:: C
+.. code-block:: c
         
   timer t;
   unsigned ts;

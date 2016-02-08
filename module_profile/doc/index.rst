@@ -49,7 +49,7 @@ How to use
 4. Over whichever other core you can perform calls to the profiler. Do not forget to first fill up the configuration and initialize your profiler.
 
 
-.. code-block:: C
+.. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 

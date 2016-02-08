@@ -1,5 +1,5 @@
-#include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 #include <pwm_service.h>
 #include <pwm_test.h>
