@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 #include <pwm_service.h>
 #include <qei_service.h>
@@ -68,8 +68,7 @@ int main(void)
             }
         }
 
-		// TODO: The application cannot be built (as Release) if the velocity_control_service is on a tile with other tasks
-        on tile[APP_TILE_2]:
+        on tile[APP_TILE]:
         /* Velocity Control Loop */
         {
             ControlConfig velocity_control_config;

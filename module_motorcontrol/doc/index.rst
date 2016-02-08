@@ -26,6 +26,8 @@ your SOMANET IFM device.
 .. figure:: images/core-diagram-commutation.png
    :width: 60%
 
+   Diagrams shows core/task diagram of a client app using motorcontrol_service
+
 .. _commutation_programming_label:
 
 How to use
@@ -56,7 +58,7 @@ How to use
 
 7. At whichever other core, now you can perform calls to the Motor-control Service through the interfaces connected to it.
 
-    .. code-block:: C
+    .. code-block:: XC
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 

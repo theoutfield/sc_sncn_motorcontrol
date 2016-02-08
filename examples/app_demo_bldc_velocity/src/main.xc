@@ -1,6 +1,6 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
-#include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 /**
  * @file test_velocity-ctrl.xc
@@ -88,8 +88,7 @@ int main(void)
             }
         }
 
-		// TODO: The application cannot be built (as Release) if the velocity_control_service is on a tile with other tasks
-        on tile[APP_TILE_2]:
+        on tile[APP_TILE]:
         /* Velocity Control Service */
         {
             ControlConfig velocity_control_config;

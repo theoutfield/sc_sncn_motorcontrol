@@ -1,8 +1,11 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = SOMANET-C22
-#TARGET = SOMANET-C21
+
+# Possible SOMANET targets:
+# SOMANET-C22
+# SOMANET-C21-DX
+TARGET =
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -18,7 +21,7 @@ USED_MODULES = config_motor module_adc module_biss module_board-support module_c
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 XCC_FLAGS_Debug = -g -O0 -report
-XCC_FLAGS_Release = -g -O3
+XCC_FLAGS_Release = -g -O1 # Reduce optimization to bypass the XMOS tools error - "Error: Meta information..."
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
 VERBOSE = 0

@@ -1,4 +1,5 @@
 .. _qei_demo:
+
 =================================
 Encoder Interface Demo
 =================================
@@ -18,6 +19,7 @@ The purpose of this app (app_test_qei) is showing the use of the :ref:`Encoder I
 
 Quick How-to
 ============
+
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
 2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your Encoder sensor, power supply cable, and XTAG. Power up!
 3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
@@ -28,7 +30,7 @@ Quick How-to
 
 6. Again in your **main.xc**, set the configuration for your Encoder Service. 
 
-.. code-block:: C
+.. code-block:: c
 
         on tile[IFM_TILE]:
         /* Quadrature Encoder sensor Service */

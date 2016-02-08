@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 /**
  * @file test_biss.xc
@@ -51,7 +51,7 @@ int main() {
 
     par {
         /* Test BiSS Encoder Client */
-        on tile[COM_TILE]: biss_test(i_biss[0]);
+        on tile[APP_TILE]: biss_test(i_biss[0]);
 
 
         /************************************************************
