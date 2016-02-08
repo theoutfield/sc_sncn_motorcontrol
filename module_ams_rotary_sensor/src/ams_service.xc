@@ -6,12 +6,11 @@
  */
 
 #include <xs1.h>
-#include <refclk.h>
 #include <ams_service.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <timer.h>
-#include <spi_master.h>
+#include <print.h>
 
 static char rotarySensorInitialized = 0;
 

@@ -9,7 +9,7 @@
 
 //#include <xclib.h>
 #include <stdint.h>
-//#include <print.h>
+#include <refclk.h>
 
 #define AMS_SENSOR      5
 
@@ -158,6 +158,8 @@ typedef struct {
 #define ERROR_WRITING   -2
 
 #ifdef __XC__
+
+#include <spi_master.h>
 
 typedef struct
 {
