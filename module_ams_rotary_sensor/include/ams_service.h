@@ -7,20 +7,23 @@
 
 #pragma once
 
-//#include <xclib.h>
 #include <stdint.h>
 #include <refclk.h>
 
+
+#define AMS_USEC            USEC_FAST
+#define AMS_CACHE_TIME      (60*AMS_USEC)
+#define AMS_OFFSET          0
+#define AMS_RESOLUTION      14
+#define AMS_VELOCITY_LOOP   1000
+#define DEFAULT_SPI_CLOCK_DIV 32        // 250/DIV MHz
+#define AMS_SENSOR_EXECUTING_TIME (AMS_USEC/2)       //0.5 us
+#define AMS_SENSOR_SAVING_TIME    (AMS_USEC/5)       //0.2 us
+
 #define AMS_SENSOR      5
 
-#define AMS_USEC        250
-#define AMS_CACHE_TIME  (60*AMS_USEC)
-#define AMS_OFFSET      0
-#define AMS_RESOLUTION  14
-#define AMS_VELOCITY_LOOP         1000
-
-#define ERROR                   0
-#define SUCCESS                 1
+#define ERROR       0
+#define SUCCESS     1
 
 #define AS5147      0
 #define AS5047      1
@@ -28,13 +31,6 @@
 #define AMS_SENSOR_TYPE AS5047
 
 #define SPI_MASTER_MODE 1
-//#define DEFAULT_SPI_CLOCK_DIV 10        // (100MHz / (10) = 10 MHz [100MHz ref clock]
-#define DEFAULT_SPI_CLOCK_DIV 32        // (250MHz / (50) = 5 MHz [250MHz ref clock]
-
-#define PULL_PERIOD_USEC        120
-
-#define AMS_SENSOR_EXECUTING_TIME (AMS_USEC/2)       //0.5 us
-#define AMS_SENSOR_SAVING_TIME    (AMS_USEC/5)       //0.2 us
 
 #define AMS_DIR_CW      0
 #define AMS_DIR_CCW     1

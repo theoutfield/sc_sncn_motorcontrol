@@ -22,7 +22,7 @@
 #define MOTOR_TYPE  BLDC_MOTOR
 
 // NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  3
+#define POLE_PAIRS  11
 
 // WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
 #define BLDC_WINDING_TYPE   DELTA_WINDING
@@ -58,17 +58,17 @@
 #define COMMUTATION_LOOP_PERIOD     60
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      910
+#define COMMUTATION_OFFSET_CLK      1350
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     2460
+#define COMMUTATION_OFFSET_CCLK     3600
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION
 /////////////////////////////////////////////
 
 // CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     60
+#define CONTROL_LOOP_PERIOD     1000
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
 #define POSITION_Kp       10000

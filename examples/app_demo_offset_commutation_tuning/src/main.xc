@@ -19,7 +19,9 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-//BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
+BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = { {
         IFM_TILE_CLOCK_2,
         IFM_TILE_CLOCK_3,
@@ -28,6 +30,7 @@ AMSPorts ams_ports = { {
         SOMANET_IFM_GPIO_D2  },//D2     //miso
         SOMANET_IFM_GPIO_D0 //D0         //slave select
 };
+#endif
 
 #define VOLTAGE 700 //+/- 4095
 

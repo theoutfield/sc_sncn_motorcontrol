@@ -510,7 +510,6 @@ int check_ams_config(AMSConfig &ams_config) {
 [[combinable]]
  void ams_service(AMSPorts &ams_ports, AMSConfig & ams_config, interface AMSInterface server i_ams[5])
 {
-    //FIXME 250MHz frequency breakes SPI
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 

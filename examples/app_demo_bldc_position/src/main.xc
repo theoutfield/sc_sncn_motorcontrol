@@ -61,7 +61,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
         xscope_core_int(2, follow_error);
         */
         // Keep motor turning when reaching target position
-        if ((target_position == target) && (follow_error < 10)){
+        if ((target_position == target) && (follow_error < 100)){
 
             target_position = 0;
             set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
