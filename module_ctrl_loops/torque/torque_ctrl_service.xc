@@ -274,7 +274,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     }
 
                     if (torque_control_config.feedback_sensor != HALL_SENSOR
-                           && torque_control_config.feedback_sensor < QEI_SENSOR) {
+                           && torque_control_config.feedback_sensor != QEI_SENSOR
+                           && torque_control_config.feedback_sensor != BISS_SENSOR) {
                         torque_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
