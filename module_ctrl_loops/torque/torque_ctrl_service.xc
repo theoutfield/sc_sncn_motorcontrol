@@ -266,7 +266,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     }
 
                     if (torque_control_config.feedback_sensor == BISS_SENSOR) {
-                        if (isnull(i_qei)) {
+                        if (isnull(i_biss)) {
                             printstrln("Torque Control Loop ERROR: Interface for BISS Service not provided");
                         } else {
                             biss_config = i_biss.get_biss_config();
