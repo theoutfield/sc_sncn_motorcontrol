@@ -64,14 +64,15 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
                     i_biss.set_biss_calib(0);
                     printf("auto offset: %d\n", offset);
                 } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
-                    motorcontrol_config.hall_offset[0] = 0;
-                    i_commutation.set_config(motorcontrol_config);
                     i_ams.set_ams_calib(1);
                     delay_milliseconds(200);
-                    motorcontrol_config.hall_offset[0] = (2731 - i_ams.set_ams_calib(0)) & 4095;
-                    motorcontrol_config.hall_offset[1] = (2731 + motorcontrol_config.hall_offset[0]) & 4095;
-                    i_commutation.set_config(motorcontrol_config);
-                    printf("offset clk: %d, offset cclk: %d\n", motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
+//                    offset = i_ams.reset_ams_angle((2731 - motorcontrol_config.hall_offset[0]) & 4095);
+//                    offset = i_ams.reset_ams_angle(4096 - motorcontrol_config.hall_offset[0]);
+                    offset = i_ams.reset_ams_angle(0);
+//                    offset = i_ams.reset_ams_angle(2731);
+                    i_commutation.set_voltage(0);
+                    i_ams.set_ams_calib(0);
+                    printf("offset mechanical: %d, offset clk: %d, offset cclk: %d\n", offset, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
                 }
                 i_commutation.set_voltage(input_voltage);
                 mode = 0;

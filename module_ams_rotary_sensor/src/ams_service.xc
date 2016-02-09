@@ -631,7 +631,7 @@ int check_ams_config(AMSConfig &ams_config) {
         //set the calib flag, the server will alway return 0 as electrical angle
         case i_ams[int i].set_ams_calib(int flag) -> unsigned int angle:
                 if (flag == 0) {
-                    angle = readRotarySensorAngleWithCompensation(ams_ports);
+                    angle = readRotarySensorAngleWithoutCompensation(ams_ports);
                     if (ams_config.resolution_bits > 12)
                         angle = (ams_config.pole_pairs * (angle >> (ams_config.resolution_bits-12)) ) & 4095;
                     else

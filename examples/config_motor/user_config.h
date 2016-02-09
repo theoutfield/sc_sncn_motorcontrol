@@ -58,10 +58,10 @@
 #define COMMUTATION_LOOP_PERIOD     60
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1350
+#define COMMUTATION_OFFSET_CLK      910
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     3600
+#define COMMUTATION_OFFSET_CCLK     2460
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION
