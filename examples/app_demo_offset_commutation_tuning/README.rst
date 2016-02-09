@@ -1,6 +1,5 @@
-SOMANET Commutation offset tunning Demo
-=============================
+SOMANET Commutation offset tunning demo
+=======================================
 
-
-`SOMANET Documentation <http://doc.synapticon.com/software/sc_sncn_motorcontrol/examples/app_demo_offset_commutation_tuning/doc/index>`_
+`Please visit SOMANET Documentation for further information <https://doc.synapticon.com/software/sc_sncn_motorcontrol/examples/app_demo_offset_commutation_tuning/doc/index.html>`_
 
