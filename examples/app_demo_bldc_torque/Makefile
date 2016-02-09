@@ -10,7 +10,7 @@ TARGET =
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = demo-bldc-torque
+APP_NAME = app_demo_bldc_torque
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = config_motor module_adc module_biss module_board-support module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_pwm_symmetrical module_qei module_watchdog
