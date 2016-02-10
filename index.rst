@@ -4,17 +4,17 @@ SOMANET Motor Control Library
 ==============================
 
 The **SOMANET Motor Control Library** provides services and utilities to perform BLDC/BDC Motor Control using SOMANET devices.
-The library is consisting of different modules which offer different functionalities:
+The library offer following functionalities:
 
-* BLDC and Brushed DC motors support
+* BLDC and Brushed DC motors control
+* Sinusoidal BLDC commutation
 * Position, Velocity and torque control loops (up to 18KHz)
-* Sinusoidal commutation
 * Feedback sensor support (Hall Sensor, Incremental Encoder, BiSS, AMS Magnetic Rotary sensor via SPI)
 * Basic Motion Profile Generation
 * Fully featured ADC driver
 * Configurable software defined PWM module 
-* Watchdog driver
-* GPIO server (eg for homing-related functions)
+* Watchdog
+* GPIO server (e.g. for homing-related functions)
 
 .. cssclass:: downloadable-button 
 
