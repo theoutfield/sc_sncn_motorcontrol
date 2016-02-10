@@ -61,7 +61,7 @@
 #define COMMUTATION_OFFSET_CLK      0
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     2000
+#define COMMUTATION_OFFSET_CCLK     2048
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION

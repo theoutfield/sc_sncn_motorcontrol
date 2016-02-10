@@ -11,9 +11,10 @@
 #include <refclk.h>
 
 
+#define AMS_OFFSET          5167
+#define AMS_DIR             AMS_DIR_CW
 #define AMS_USEC            USEC_FAST
 #define AMS_CACHE_TIME      (60*AMS_USEC)
-#define AMS_OFFSET          7666
 #define AMS_RESOLUTION      14
 #define AMS_VELOCITY_LOOP   1000
 #define DEFAULT_SPI_CLOCK_DIV 32        // 250/DIV MHz

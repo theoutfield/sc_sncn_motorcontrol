@@ -595,7 +595,9 @@ int check_ams_config(AMSConfig &ams_config) {
         //receive new ams_config
         case i_ams[int i].set_ams_config(AMSConfig in_config):
                 //update variables which depend on ams_config
-                if (ams_config.offset != in_config.offset)
+                if (ams_config.direction != in_config.direction)
+                    initRotarySensor(ams_ports,  in_config);
+                else if (ams_config.offset != in_config.offset)
                     writeZeroPosition(ams_ports, in_config.offset);
                 ams_config = in_config;
                 ticks_per_turn = (1 << ams_config.resolution_bits);
@@ -626,6 +628,7 @@ int check_ams_config(AMSConfig &ams_config) {
                 else
                     out_offset = (ticks_per_turn - ((new_angle >> (12-ams_config.resolution_bits)) / ams_config.pole_pairs) + position) & (ticks_per_turn-1);
                 writeZeroPosition(ams_ports, out_offset);
+                ams_config.offset = out_offset;
                 break;
 
         //set the calib flag, the server will alway return 0 as electrical angle

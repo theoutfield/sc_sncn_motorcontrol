@@ -47,7 +47,7 @@ BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 /* Test Profile Velocity function */
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
-    int target_velocity = -1000;          // rpm
+    int target_velocity = 1000;          // rpm
     int acceleration    = 100;          // rpm/s
     int deceleration    = 100;          // rpm/s
 
@@ -165,7 +165,7 @@ int main(void)
                 {
                     AMSConfig ams_config;
                     ams_config.factory_settings = 1;
-                    ams_config.direction = AMS_DIR_CW;
+                    ams_config.direction = AMS_DIR;
                     ams_config.hysteresis = 1;
                     ams_config.noise_setting = AMS_NOISE_NORMAL;
                     ams_config.uvw_abi = 0;
