@@ -44,7 +44,7 @@ void initams_ports(AMSPorts &ams_ports)
     settings1 = (config.factory_settings << 0);
     #endif
     settings1 |= (config.noise_setting << 1);
-    settings1 |= (config.direction << 2);
+    settings1 |= (config.polarity << 2);
     settings1 |= (config.uvw_abi << 3);
     settings1 |= (config.dyn_angle_comp << 4);
     settings1 |= (config.data_select << 6);
@@ -488,7 +488,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
 }
 
 int check_ams_config(AMSConfig &ams_config) {
-    if(ams_config.direction < 0  || ams_config.direction > 1){
+    if(ams_config.polarity < 0  || ams_config.polarity > 1){
         printstrln("Wrong AMS configuration: wrong direction");
         return ERROR;
     }
@@ -595,7 +595,7 @@ int check_ams_config(AMSConfig &ams_config) {
         //receive new ams_config
         case i_ams[int i].set_ams_config(AMSConfig in_config):
                 //update variables which depend on ams_config
-                if (ams_config.direction != in_config.direction)
+                if (ams_config.polarity != in_config.polarity)
                     initRotarySensor(ams_ports,  in_config);
                 else if (ams_config.offset != in_config.offset)
                     writeZeroPosition(ams_ports, in_config.offset);

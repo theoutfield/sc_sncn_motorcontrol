@@ -12,7 +12,7 @@
 
 
 #define AMS_OFFSET          5167
-#define AMS_DIR             AMS_DIR_CW
+#define AMS_POLARITY        AMS_POLARITY_NORMAL
 #define AMS_USEC            USEC_FAST
 #define AMS_CACHE_TIME      (60*AMS_USEC)
 #define AMS_RESOLUTION      14
@@ -33,8 +33,8 @@
 
 #define SPI_MASTER_MODE 1
 
-#define AMS_DIR_CW      0
-#define AMS_DIR_CCW     1
+#define AMS_POLARITY_NORMAL      0
+#define AMS_POLARITY_INVERTED    1
 
 #define AMS_PWM_OFF     0
 #define AMS_PWM_ON      1
@@ -71,25 +71,25 @@ typedef enum {
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    int resolution_bits;       /**< Encoder resolution in bits. */
+    int resolution_bits;        /**< Encoder resolution in bits. */
 #if AMS_SENSOR_TYPE == AS5147
     int width_index_pulse;      /**< Width of the index pulse I (0 = 3LSB, 1 = 1LSB). */
 #else
     int factory_settings;       /**< Factory Settings, just reading, no  writing. */
 #endif
-    int noise_setting;    /**< Noise setting. In 3.3V operation, VDD and VREG must be tied together. In this
+    int noise_setting;          /**< Noise setting. In 3.3V operation, VDD and VREG must be tied together. In this
                                      configuration, normal noise performance (ONL) is available at
                                      reduced maximum temperature (125°C) by clearing NOISESET
                                      to 0. When NOISESET is set to 1, the full temperature range is
                                      available with reduced noise performance (ONH). */
-    int direction;    /**< Encoder direction. */
-    int uvw_abi;        /**< Defines the PWM Output (0 = ABI is operating, W is used as PWM;
+    int polarity;               /**< Encoder polarity. */
+    int uvw_abi;                /**< Defines the PWM Output (0 = ABI is operating, W is used as PWM;
                                      1 = UVW is operating, I is used as PWM) */
-    int dyn_angle_comp;     /**< Disable Dynamic Angle Error Compensation
+    int dyn_angle_comp;         /**< Disable Dynamic Angle Error Compensation
                                      (0 = DAE compensation ON, 1 = DAE compensation OFF) */
-    int data_select;       /**< This bit defines which data can be read form address
+    int data_select;            /**< This bit defines which data can be read form address
                                      16383dec (3FFFhex). 0->DAECANG 1->CORDICANG */
-    int pwm_on;             /**< Enables PWM (setting of UVW_ABI Bit necessary) */
+    int pwm_on;                 /**< Enables PWM (setting of UVW_ABI Bit necessary) */
     int pole_pairs;             /**< Number of pole pairs (1-7) */
     AMS_Hysteresis hysteresis;  /**< Hysteresis for 11 Bit ABI Resolution:
                                      0 = 3 LSB
@@ -106,11 +106,11 @@ typedef struct {
 
     int offset;                 /**< Rotary sensor offset (Zero) */
 
-    int cache_time;
+    int cache_time;             /**< How long to cache the position (in clock ticks) */
 
-    int velocity_loop;
+    int velocity_loop;          /**< Velcity loop time in microseconds */
 
-    int max_ticks;
+    int max_ticks;              /**< The count is reset to 0 if greater than this */
 } AMSConfig;
 
 

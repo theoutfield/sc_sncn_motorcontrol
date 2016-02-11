@@ -50,7 +50,7 @@ void adc_client(interface ADCInterface client i_adc, interface HallInterface cli
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
 
-        delay_milliseconds(1000);
+        delay_milliseconds(1);
     }
 }
 
@@ -124,7 +124,7 @@ int main(void) {
                 {
                     AMSConfig ams_config;
                     ams_config.factory_settings = 1;
-                    ams_config.direction = AMS_DIR;
+                    ams_config.polarity = AMS_POLARITY;
                     ams_config.hysteresis = 1;
                     ams_config.noise_setting = AMS_NOISE_NORMAL;
                     ams_config.uvw_abi = 0;
