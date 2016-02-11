@@ -17,9 +17,9 @@ The app uses commands to set the offsets and voltage over the console:
 - a
     Automatically find the sensor offset, the clockwise or counterclockwise offsets are set to 0 and 2048 (half a turn)
 - s VALUE
-    Set the Sensor offset
+    Set the sensor offset to VALUE
 - VALUE
-    Set the clockwise or counterclockwise offset (depending on the voltage sign and winding type)
+    Set the clockwise or counterclockwise (depending on the voltage sign and winding type) offset to VALUE
 - d
     Reverse sensor direction, use this when the phases are wired incorrectly and the motor is not moving
 - v VALUE
