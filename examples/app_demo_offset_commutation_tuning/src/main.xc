@@ -32,7 +32,7 @@ AMSPorts ams_ports = { {
 };
 #endif
 
-#define VOLTAGE 700 //+/- 4095
+#define VOLTAGE 1000 //+/- 4095
 
 void adc_client(interface ADCInterface client i_adc, interface HallInterface client ?i_hall){
 
