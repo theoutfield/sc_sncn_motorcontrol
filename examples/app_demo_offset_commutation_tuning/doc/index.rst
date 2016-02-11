@@ -1,25 +1,25 @@
 .. _offset_commutation_tuning_demo:
 
-============================================
-Helper for finding your sensor offsets
-============================================
+======================================================
+Helper for finding your sensor and commutation offsets
+======================================================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-It is common that sensors used for position feedback are not perfectly placed physically along the windings. This strongly affects the commutation efficiency of your motor. In order to avoid such loss of efficiency we can configure at the :ref:`Motor Control Service <module_motorcontrol>` the sensor offset and the offsets to compensate the error on clock-wise and counter-clock-wise spin. The purpose of this app (app_demo_offset_commutation_tuning) is helping you to find such offsets.
+It is common that sensors used for position feedback are not perfectly placed physically along the windings. This strongly affects the commutation efficiency of your motor. In order to avoid such loss of efficiency we can configure at the :ref:`Motor Control Service <module_motorcontrol>` the sensor offset and the commutation offsets to compensate the error on clock-wise and counter-clock-wise spin. The purpose of this app (app_demo_offset_commutation_tuning) is helping you to find such offsets.
 
 The motor will commute at a certain voltage and the current at the phases will be displayed over XScope. At the same time, the user could set different offsets over the console and see the effect of it on the amplitude of the phase currents.
 
 The app uses commands to set the offsets and voltage over the console:
 
 - a
-    Automatically find the sensor offset, the clockwise or counterclockwise offsets are set to 0 and 2048 (half a turn)
+    Automatically find the sensor offset, the clockwise or counterclockwise commutation offsets are set to 0 and 2048 (half a turn)
 - s VALUE
     Set the sensor offset to VALUE
 - VALUE
-    Set the clockwise or counterclockwise (depending on the voltage sign and winding type) offset to VALUE
+    Set the commutation offset to VALUE (clockwise or counterclockwise offset depending on the voltage sign and winding type)
 - d
     Reverse sensor direction, use this when the phases are wired incorrectly and the motor is not moving
 - v VALUE
@@ -81,14 +81,14 @@ Quick How-to
 
 9. :ref:`Run the application enabling XScope <running_an_application>`.
 
-10. First try to set the offset automatically with the ``a`` command. If the motor is not turning try to change the sensor polarity with the ``d`` command and repeat the ``a`` command. This will find the sensor offset and set the clockwise or counterclockwise offsets to 0 and 2048 (half a turn). The motor should start turning.
+10. First try to set the offset automatically with the ``a`` command. If the motor is not turning try to change the sensor polarity with the ``d`` command and repeat the ``a`` command. This will find the sensor offset and set the clockwise or counterclockwise commutation offsets to 0 and 2048 (half a turn). The motor should start turning.
 
-    Adjust the sensor offset with the ``s VALUE`` command to minimise the current consumption for the current direction.
+    Adjust the sensor offset with the ``s VALUE`` command to minimize the current consumption for the current direction.
 
-    Reverse the voltage with the ``r`` command, the motor should turn is the other direction. Adjust the offset for this direction with the ``VALUE`` command (clockwise or counterclockwise offset depending on the voltage sign and winding type).
+    Reverse the voltage with the ``r`` command, the motor should turn is the other direction. Adjust the commutation offset for this direction with the ``VALUE`` command (clockwise or counterclockwise offset depending on the voltage sign and winding type).
 
     You can change the voltage with the ``v VALUE`` command (up to 4000) to test the offsets at different velocity and obtain finer results.
 
-    Finally you can print the offsets with the ``p`` command and edit your config files accordingly.
+    Finally you can print the offsets with the ``p`` command and edit your configuration files accordingly.
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
