@@ -83,12 +83,12 @@ Quick How-to
 
 10. First try to set the offset automatically with the ``a`` command. If the motor is not turning try to change the sensor polarity with the ``d`` command and repeat the ``a`` command. This will find the sensor offset and set the clockwise or counterclockwise offsets to 0 and 2048 (half a turn). The motor should start turning.
 
-   Adjust the sensor offset with the ``s VALUE`` command to minimise the current consumption for the current direction.
+    Adjust the sensor offset with the ``s VALUE`` command to minimise the current consumption for the current direction.
 
-   Reverse the voltage with the ``r`` command, the motor should turn is the other direction. Adjust the offset for this direction with the ``VALUE`` command (clockwise or counterclockwise offset depending on the voltage sign and winding type).
+    Reverse the voltage with the ``r`` command, the motor should turn is the other direction. Adjust the offset for this direction with the ``VALUE`` command (clockwise or counterclockwise offset depending on the voltage sign and winding type).
 
-   You can change the voltage with the ``v VALUE`` command (up to 4000) to test the offsets at different velocity and obtain finer results.
+    You can change the voltage with the ``v VALUE`` command (up to 4000) to test the offsets at different velocity and obtain finer results.
 
-   Finally you can print the offsets with the ``p`` command and edit your config files accordingly.
+    Finally you can print the offsets with the ``p`` command and edit your config files accordingly.
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
