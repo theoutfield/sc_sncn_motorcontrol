@@ -11,7 +11,7 @@ TARGET = SOMANET-C22
 APP_NAME = app_test_ams_rotary_sensor
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_ams_rotary_sensor module_biss module_board-support module_hall module_misc module_motorcontrol module_pwm_symmetrical module_qei module_spi_master module_watchdog
+USED_MODULES = module_ams_rotary_sensor module_board-support module_misc module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

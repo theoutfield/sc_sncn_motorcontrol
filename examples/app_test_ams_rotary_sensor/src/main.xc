@@ -1,6 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC300-rev-a.bsp>
+//#include <IFM_DC300-rev-a.bsp>
+#include <IFM_DC1K-rev-c1.bsp>
 
 /**
  * @file app_test_ams_rotary_sensor.xc
@@ -9,7 +10,6 @@
  */
 
 #include <ams_service.h>
-#include <user_config.h>
 #include <ctype.h>
 
 AMSPorts ams_ports = { {
