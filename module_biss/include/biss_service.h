@@ -178,8 +178,10 @@ interface BISSInterface {
      * @brief Setter for the configuration used by the Service.
      *
      * @param in_config New Service configuration.
+     * @return 0 New Service configuration is not valid.
+     *         1 New Service configuration is valid.
      */
-    void set_biss_config(BISSConfig in_config);
+    int set_biss_config(BISSConfig in_config);
 };
 
 

@@ -113,8 +113,10 @@ interface HallInterface {
      * @brief Setter for the configuration used by the Service.
      *
      * @param in_config New Service configuration.
+     * @return 0 New Service configuration is not valid.
+     *         1 New Service configuration is valid.
      */
-    void set_hall_config(HallConfig in_config);
+    int set_hall_config(HallConfig in_config);
 
     /**
      * @brief Getter for the current state of the Service.

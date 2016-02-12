@@ -49,7 +49,7 @@ int check_qei_config(QEIConfig &qei_config)
         return ERROR;
     }
 
-    if (qei_config.ticks_resolution < 0) {
+    if (qei_config.ticks_resolution <= 0) {
         printstrln("Wrong QEI configuration: wrong resolution");
         return ERROR;
     }
@@ -273,7 +273,12 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
                 out_config = qei_config;
                 break;
 
-            case i_qei[int i].set_qei_config(QEIConfig in_config):
+            case i_qei[int i].set_qei_config(QEIConfig in_config) -> int result:
+
+                result = check_qei_config(in_config);
+                if (result == ERROR) {
+                    break;
+                }
 
                 qei_config = in_config;
                 status = 1;

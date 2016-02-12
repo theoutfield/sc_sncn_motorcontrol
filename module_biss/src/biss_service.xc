@@ -216,7 +216,13 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 break;
 
         //receive new biss_config
-        case i_biss[int i].set_biss_config(BISSConfig in_config):
+        case i_biss[int i].set_biss_config(BISSConfig in_config) -> int result:
+
+                result = check_biss_config(in_config);
+                if (result == ERROR) {
+                    break;
+                }
+
                 //update variables which depend on biss_config
                 if (biss_config.clock_dividend != in_config.clock_dividend || biss_config.clock_divisor != in_config.clock_divisor)
                     configure_clock_rate(biss_ports.clk, in_config.clock_dividend, in_config.clock_divisor) ; // a/b MHz
