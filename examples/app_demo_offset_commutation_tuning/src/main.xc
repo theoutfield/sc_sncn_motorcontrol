@@ -76,14 +76,14 @@ int main(void) {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-        on tile[APP_TILE_2]: adc_client(i_adc[0], null);
-        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_biss[1], null);
+        on tile[APP_TILE_2]: adc_client(i_adc[1], null);
+        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[0], i_biss[1], null);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-        on tile[APP_TILE_2]: adc_client(i_adc[0], null);
-        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], null, i_ams[1]);
+        on tile[APP_TILE_2]: adc_client(i_adc[1], null);
+        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[0], null, i_ams[1]);
 #else
-        on tile[APP_TILE_2]: adc_client(i_adc[0], i_hall[1]);
-        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], null, null);
+        on tile[APP_TILE_2]: adc_client(i_adc[1], i_hall[1]);
+        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[0], null, null);
 #endif
 
         on tile[IFM_TILE]:

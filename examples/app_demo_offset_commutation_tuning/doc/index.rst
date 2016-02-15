@@ -27,7 +27,9 @@ Console commands
 The app uses commands to set the offsets and voltage over the console:
 
 - a
-    Automatically find the sensor offset, the clockwise or counterclockwise commutation offsets are set to 0 and 2048 (half a turn)
+    Automatically find the sensor offset, the clockwise or counterclockwise commutation offsets are set to 0 and 2048 (half a turn). This is not very precise but should suffice to turn the motor.
+- c
+    Automatically tune the commutation offset, this works by searching the offset with minimum peak current consumption.
 - s VALUE
     Set the sensor offset to VALUE
 - VALUE
@@ -114,11 +116,11 @@ Quick How-to
 
    First try to set the offset automatically with the ``a`` command. If the motor is not turning and the current consumption is high try to change the sensor polarity with the ``d`` command and repeat the ``a`` command. This will find the sensor offset and set the clockwise or counterclockwise commutation offsets to 0 and 2048 (half a turn) and the motor should start turning.
 
-   Fine tune the sensor commutation offset for the current direction with the ``VALUE`` command to minimize the phases current. The offset is a 12 bit positive value so it wraps around at 4096. It means that if you want an offset of ``-100`` you enter ``3996``.
+   Fine tune the sensor commutation offset for the current direction. You could use the ``c`` command for auto tuning or the ``VALUE`` command to manually minimize the phases current. The offset is a 12 bit positive value so it wraps around at 4096. It means that if you want an offset of ``-100`` you enter ``3996``.
 
-   Reverse the voltage with the ``r`` command, the motor should turn in the other direction. Fine tune the commutation offset for this direction with the ``VALUE`` command.
+   Reverse the voltage with the ``r`` command, the motor should turn in the other direction. Fine tune the commutation offset for this direction with the ``c`` (auto tuning) or ``VALUE`` (manual tuning) command.
 
-   You can change the voltage with the ``v VALUE`` command (up to 4000) to test the offsets at a different velocity and obtain finer results.
+   You can change the voltage with the ``v VALUE`` command (up to 4000) to test and tune the offsets at a different velocity and obtain finer results.
 
    You can print all the current offsets with the ``p`` command.
 
