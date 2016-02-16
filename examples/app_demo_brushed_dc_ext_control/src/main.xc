@@ -1,6 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+//#include <CORE_BOARD_REQUIRED>
+//#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC100-rev-b.bsp>
 
 /**
  * @brief Test illustrates usage of
@@ -11,6 +13,7 @@
 #include <adc_service.h>
 #include <watchdog_service.h>
 #include <motorcontrol_service.h>
+#include <print.h>
 
 #include <user_config.h>
 
@@ -43,9 +46,10 @@ int main(void) {
                     {AI0 , AI1} =  i_adc[0].get_external_inputs();
                     int normalized_value = AI1*PWM_MAX_VALUE/MAX_ADC_VALUE;
                     printf("Voltage SP: %i\n", normalized_value);
+                    xscope_int(ANALOG_INPUT, normalized_value);
 
                     i_motorcontrol[0].set_voltage(normalized_value);
-              }
+                }
             }
         }
 
