@@ -8,12 +8,33 @@
 #include <pwm_service_client.h>
 #include <a4935.h>
 #include <sine_table_big.h>
+#include <print.h>
 
 static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
     unsigned int pwm[3] = {0, 0, 0};  // PWM OFF (break mode; short all phases)
     pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
+}
+
+int check_bldc_motorcontrol_config(MotorcontrolConfig &commutation_params)
+{
+    if (commutation_params.motor_type != BLDC_MOTOR) {
+        printstrln("Wrong Motorcontrol configuration: motor type");
+        return ERROR;
+    } else {
+        if (commutation_params.bldc_winding_type < 0 || commutation_params.bldc_winding_type > 2) {
+            printstrln("Wrong Motorcontrol configuration: wrong winding");
+            return ERROR;
+        }
+
+        if (commutation_params.commutation_sensor != HALL_SENSOR && commutation_params.commutation_sensor != BISS_SENSOR) {
+            printstrln("Wrong Motorcontrol configuration: just HALL and BiSS sensors are supported as commutation sensor");
+            return ERROR;
+        }
+    }
+
+    return SUCCESS;
 }
 
 [[combinable]]
@@ -149,7 +170,12 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                         voltage = new_voltage;
                     break;
 
-            case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
+            case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters) -> int result:
+                    result = check_bldc_motorcontrol_config(new_parameters);
+                    if (result == ERROR) {
+                        break;
+                    }
+
                     motorcontrol_config = new_parameters;
 
                     notification = MOTCTRL_NTF_CONFIG_CHANGED;

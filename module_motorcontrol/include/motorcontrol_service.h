@@ -88,7 +88,7 @@ interface MotorcontrolInterface{
      *
      * @param in_config New Service configuration.
      */
-    void set_config(MotorcontrolConfig in_config);
+    int set_config(MotorcontrolConfig in_config);
 
     /**
      * @brief Getter for current configuration used by the Service.
