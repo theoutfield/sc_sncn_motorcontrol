@@ -1,7 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
-//#include <IFM_DC300-rev-a.bsp>
-#include <IFM_DC1K-rev-c1.bsp>
+#include <IFM_DC300-rev-a.bsp>
+//#include <IFM_DC1K-rev-c1.bsp>
 
 /**
  * @file app_test_ams_rotary_sensor.xc
@@ -25,7 +25,6 @@ AMSPorts ams_ports = { {
 /* Test AMS Sensor Client */
 void ams_rotary_sensor_test(client interface AMSInterface i_ams)
 {
-
     int count = 0;
     int velocity = 0;
     int position = 0;

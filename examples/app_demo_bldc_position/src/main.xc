@@ -1,8 +1,8 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
 //#include <IFM_DC100-rev-b.bsp>
-//#include <IFM_DC300-rev-a.bsp>
-#include <IFM_DC1K-rev-c1.bsp>
+#include <IFM_DC300-rev-a.bsp>
+//#include <IFM_DC1K-rev-c1.bsp>
 
 /**
  * @file test_position-ctrl.xc
@@ -131,7 +131,7 @@ int main(void)
                 xscope_int(TARGET_POSITION, target_position/10); //Divided by 10 for better displaying
                 xscope_int(ACTUAL_POSITION, actual_position/10); //Divided by 10 for better displaying
 
-                delay_milliseconds(10); /* 1 ms wait */
+                delay_milliseconds(1); /* 1 ms wait */
             }
         }
 

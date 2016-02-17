@@ -22,7 +22,7 @@
 #define MOTOR_TYPE  BLDC_MOTOR
 
 // NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  5
+#define POLE_PAIRS  11
 
 // WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
 #define BLDC_WINDING_TYPE   STAR_WINDING
@@ -61,7 +61,7 @@
 #define COMMUTATION_OFFSET_CLK      0
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     2000
+#define COMMUTATION_OFFSET_CCLK     2048
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION

@@ -11,13 +11,13 @@
 #include <refclk.h>
 
 
-#define AMS_OFFSET          11570
+#define AMS_OFFSET          3696
 #define AMS_POLARITY        AMS_POLARITY_NORMAL
 #define AMS_USEC            USEC_FAST
 #define AMS_CACHE_TIME      (60*AMS_USEC)
 #define AMS_RESOLUTION      14
 #define AMS_VELOCITY_LOOP   1000
-#define DEFAULT_SPI_CLOCK_DIV 6        // 250/DIV MHz
+#define DEFAULT_SPI_CLOCK_DIV 32        // 250/DIV MHz
 #define AMS_SENSOR_EXECUTING_TIME (AMS_USEC/2)       //0.5 us
 #define AMS_SENSOR_SAVING_TIME    (AMS_USEC/5)       //0.2 us
 
@@ -181,8 +181,6 @@ interface AMSInterface
     void reset_ams_position(int in_count);
 
     unsigned int reset_ams_angle(unsigned int in_angle);
-
-    unsigned int set_ams_calib(int flag);
 };
 
 void initRotarySensorInterface(AMSPorts &ams_ports);

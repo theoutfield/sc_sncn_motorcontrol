@@ -42,11 +42,12 @@ void adc_client(interface ADCInterface client i_adc){
     int b, c;
 
     while (1) {
-
         {b, c} = i_adc.get_currents();
 
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
+
+        delay_milliseconds(1);
     }
 }
 

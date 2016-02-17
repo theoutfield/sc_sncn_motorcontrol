@@ -536,7 +536,6 @@ int check_ams_config(AMSConfig &ams_config) {
     //position
     unsigned int last_position = 0;
     int count = 0;
-    int calib_flag = 0;
     //timing
     timer t;
     unsigned int time;
@@ -549,21 +548,18 @@ int check_ams_config(AMSConfig &ams_config) {
         select {
         //send electrical angle for commutation
         case i_ams[int i].get_ams_angle() -> unsigned int angle:
-                if (calib_flag == 0) {
-                    t :> time;
-                    if (timeafter(time, last_ams_read + ams_config.cache_time)) {
-                        angle = readRotarySensorAngleWithCompensation(ams_ports);
-                        t :> last_ams_read;
-                        multiturn(count, last_position, angle, ticks_per_turn);
-                        last_position = angle;
-                    } else
-                        angle = last_position;
-                    if (ams_config.resolution_bits > 12)
-                        angle = (ams_config.pole_pairs * (angle >> (ams_config.resolution_bits-12)) ) & 4095;
-                    else
-                        angle = (ams_config.pole_pairs * (angle << (12-ams_config.resolution_bits)) ) & 4095;
+                t :> time;
+                if (timeafter(time, last_ams_read + ams_config.cache_time)) {
+                    angle = readRotarySensorAngleWithCompensation(ams_ports);
+                    t :> last_ams_read;
+                    multiturn(count, last_position, angle, ticks_per_turn);
+                    last_position = angle;
                 } else
-                    angle = 0;
+                    angle = last_position;
+                if (ams_config.resolution_bits > 12)
+                    angle = (ams_config.pole_pairs * (angle >> (ams_config.resolution_bits-12)) ) & 4095;
+                else
+                    angle = (ams_config.pole_pairs * (angle << (12-ams_config.resolution_bits)) ) & 4095;
                 break;
 
         //send multiturn count and position
@@ -629,18 +625,6 @@ int check_ams_config(AMSConfig &ams_config) {
                     out_offset = (ticks_per_turn - ((new_angle >> (12-ams_config.resolution_bits)) / ams_config.pole_pairs) + position) & (ticks_per_turn-1);
                 writeZeroPosition(ams_ports, out_offset);
                 ams_config.offset = out_offset;
-                break;
-
-        //set the calib flag, the server will alway return 0 as electrical angle
-        case i_ams[int i].set_ams_calib(int flag) -> unsigned int angle:
-                if (flag == 0) {
-                    angle = readRotarySensorAngleWithoutCompensation(ams_ports);
-                    if (ams_config.resolution_bits > 12)
-                        angle = (ams_config.pole_pairs * (angle >> (ams_config.resolution_bits-12)) ) & 4095;
-                    else
-                        angle = (ams_config.pole_pairs * (angle << (12-ams_config.resolution_bits)) ) & 4095;
-                }
-                calib_flag = flag;
                 break;
 
         //compute velocity

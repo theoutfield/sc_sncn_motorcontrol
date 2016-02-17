@@ -1,8 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
 //#include <IFM_DC100-rev-b.bsp>
-//#include <IFM_DC300-rev-a.bsp>
-#include <IFM_DC1K-rev-c1.bsp>
+#include <IFM_DC300-rev-a.bsp>
+//#include <IFM_DC1K-rev-c1.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -33,7 +33,7 @@ AMSPorts ams_ports = { {
 };
 #endif
 
-#define VOLTAGE 1000 //+/- 4095
+#define VOLTAGE 700 //+/- 4095
 
 void adc_client(interface ADCInterface client i_adc, interface HallInterface client ?i_hall){
 
@@ -51,7 +51,7 @@ void adc_client(interface ADCInterface client i_adc, interface HallInterface cli
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
 
-        delay_milliseconds(1);
+        delay_milliseconds(2);
     }
 }
 

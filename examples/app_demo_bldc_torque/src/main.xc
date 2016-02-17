@@ -1,8 +1,8 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
 //#include <IFM_DC100-rev-b.bsp>
-//#include <IFM_DC300-rev-a.bsp>
-#include <IFM_DC1K-rev-c1.bsp>
+#include <IFM_DC300-rev-a.bsp>
+//#include <IFM_DC1K-rev-c1.bsp>
 
 /**
  * @file test_torque-ctrl.xc
@@ -29,7 +29,7 @@
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-    int target_torque = 400;    //(desired torque/torque_constant)  * IFM resolution
+    int target_torque = 800;    //(desired torque/torque_constant)  * IFM resolution
     int torque_slope  = 1000;   //(desired torque_slope/torque_constant)  * IFM resolution
 
     ProfilerConfig profiler_config;
@@ -130,8 +130,7 @@ int main(void)
                 xscope_int(ACTUAL_TORQUE, actual_torque);
                 xscope_int(PHASE_B, phaseB);
                 xscope_int(PHASE_C, phaseC);
-//                delay_microseconds(50);
-                delay_milliseconds(10);
+                delay_milliseconds(1);
             }
         }
 
