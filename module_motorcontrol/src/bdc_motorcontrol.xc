@@ -95,6 +95,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                   state_return = init_state;
                   break;
+
+        case i_motorcontrol[int i].set_calib(int flag) -> int out_offset:
+                break;
 /*
         case i_motorcontrol[int i].disable_fets():
 

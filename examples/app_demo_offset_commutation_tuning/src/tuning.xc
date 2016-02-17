@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams)
+void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc,
+                       interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams)
 {
     delay_seconds(1);
     MotorcontrolConfig motorcontrol_config = i_commutation.get_config();
@@ -53,49 +54,51 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
                 mode = c;
         }
         switch(mode) {
-        case 'a': //auto find offset
+        //auto find offset
+        case 'a':
+            //stop the motor
             i_commutation.set_voltage(0);
             delay_milliseconds(500);
-            //reset offsets: 0 and half a turn
-            motorcontrol_config.hall_offset[0] = 0;
-            motorcontrol_config.hall_offset[1] = 2048; // + half a turn
-            i_commutation.set_config(motorcontrol_config);
-            //set internal commutation voltage to 1000 for Start Winding or -1000 for Delta Winding
-            i_commutation.set_voltage(1000);
+            i_commutation.set_calib(1);
+            //set internal commutation voltage to 1000
+            if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
+                i_commutation.set_voltage(1000);
+            else
+                i_commutation.set_voltage(-1000);
             //go to 1024 position (quarter turn)
-            if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
-                i_biss.set_biss_calib(1);
-                delay_milliseconds(500);
-                offset = i_biss.reset_biss_angle_electrical(1024);// quarter turn
-                biss_config.offset_electrical = offset;
-                i_biss.set_biss_calib(0);
-            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
-                i_ams.set_ams_calib(1);
-                delay_milliseconds(500);
-                offset = i_ams.reset_ams_angle(1024);// quarter turn
-                ams_config.offset = offset;
-                i_ams.set_ams_calib(0);
-            }
+            delay_milliseconds(500);
+            offset = i_commutation.set_calib(0);
+            //start turning the motor and print the offsets found
             i_commutation.set_voltage(input_voltage);
-            printf("Sensor offset: %d, Polarity: %d, Voltage %d\n", offset, polarity, input_voltage);
+            motorcontrol_config = i_commutation.get_config();
+            if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+                biss_config.offset_electrical = offset;
+                printf("Sensor offset: %d, Polarity: %d, ", offset, polarity);
+            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
+                ams_config.offset = offset;
+                printf("Sensor offset: %d, Polarity: %d, ", offset, polarity);
+            }
+            printf("Voltage %d\n", input_voltage);
             if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
                 printf("Now you can tune the offset clk: %d\n", motorcontrol_config.hall_offset[0]);
             else
                 printf("Now you can tune the offset cclk: %d\n", motorcontrol_config.hall_offset[1]);
             printf("Enter c to start the auto tuning\nor enter a value to set the offset manually\n");
             break;
+        //auto tune the offset by mesuring the current consumption
         case 'c':
             printf("Starting auto tuning...\n(This could take around 30 seconds)\n");
             if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING)) {
-                motorcontrol_config.hall_offset[0] = auto_tuning_current(i_commutation, i_adc, input_voltage, value);
+                motorcontrol_config.hall_offset[0] = auto_tuning_current(i_commutation, i_adc, input_voltage);
                 printf("auto tuned offset clk: %d\n", motorcontrol_config.hall_offset[0]);
             } else {
-                motorcontrol_config.hall_offset[1] = auto_tuning_current(i_commutation, i_adc, input_voltage, value);
+                motorcontrol_config.hall_offset[1] = auto_tuning_current(i_commutation, i_adc, input_voltage);
                 printf("auto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[1]);
             }
             i_commutation.set_config(motorcontrol_config);
             break;
-        case 'v': //set voltage
+        //set voltage
+        case 'v':
             input_voltage = value * sign;
             i_commutation.set_voltage(input_voltage);
             if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
@@ -103,7 +106,8 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             else
                 printf("voltage: %i, offset cclk: %d\n", input_voltage, motorcontrol_config.hall_offset[1]);
             break;
-        case 'r': //reverse voltage
+        //reverse voltage
+        case 'r':
             input_voltage = -input_voltage;
             i_commutation.set_voltage(input_voltage);
             if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
@@ -111,7 +115,8 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             else
                 printf("voltage: %i, offset cclk: %d\n", input_voltage, motorcontrol_config.hall_offset[1]);
             break;
-        case 's': //set sensor offset
+        //set sensor offset
+        case 's':
             offset = value;
             if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
                 biss_config.offset_electrical = offset;
@@ -122,7 +127,8 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             }
             printf("Sensor offset: %d\n", offset);
             break;
-        case 'p': //print
+        //print offsets, voltage and polarity
+        case 'p':
             if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR)
                 printf("Polarity %d, Sensor offset %d, ", polarity, offset);
             if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
@@ -130,7 +136,8 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             else
                 printf("Voltage %d\noffset clk %d (for negative voltage)\noffset cclk %d (for positive voltage)\n", input_voltage, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
             break;
-        case 'd': //reverse sensor direction
+        //reverse sensor direction
+        case 'd':
             if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
                 if (biss_config.polarity == BISS_POLARITY_NORMAL)
                     biss_config.polarity = BISS_POLARITY_INVERTED;
@@ -148,7 +155,8 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             }
             printf("Polarity %d\n", polarity);
             break;
-        default: //set offset
+        //set offset
+        default:
             if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING)) {
                 motorcontrol_config.hall_offset[0] = value;
                 printf("offset clk: %d\n", value);
@@ -164,8 +172,7 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
 }
 
 int find_peak_current(interface ADCInterface client i_adc, int period, int times)
-{
-    //find the peak current by sampling
+{   //find the peak current by sampling every [period] microseconds [times] times
     int peak_current = 0;
     for (int i=0; i<times; i++) {
         int current;
@@ -180,7 +187,7 @@ int find_peak_current(interface ADCInterface client i_adc, int period, int times
 }
 
 
-int auto_tuning_current(interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc, int input_voltage, int range)
+int auto_tuning_current(interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc, int input_voltage)
 {
     int step = 2;
     int start_offset = 0;

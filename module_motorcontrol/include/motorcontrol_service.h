@@ -122,6 +122,13 @@ interface MotorcontrolInterface{
      *         1 - initialized.
      */
     int check_busy();
+
+    /**
+     * @brief Set calib flag in the Motorcontrol service so it will alway set 0 as electrical angle
+     *
+     * @param flag 1 to activate, 0 to deactivate calibration
+     */
+    int set_calib(int flag);
 };
 
 /**
