@@ -35,7 +35,9 @@ The app uses commands to set the offsets and voltage over the console:
 - VALUE
     Set the commutation offset to VALUE (clockwise or counterclockwise offset depending on the voltage sign and winding type)
 - d
-    Reverse sensor direction, use this when the phases are wired incorrectly and the motor is not moving
+    Reverse motor polarity, use this when the the motor is not moving. It happens when the phases wiring or the position sensor polarity is changed.
+- f
+    Flip the clockwise and counterclockwise commutation offsets, this will change the direction of the motor.
 - v VALUE
     Set the voltage to VALUE, accept negative values
 - r
@@ -54,17 +56,18 @@ Quick How-to
 
 #. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`.
 #. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
-#. Edit **user_config.h** in **config_motor** to set the motor parameters. The importants parameters are the number of poles pairs, the winding type, the commutation sensor and the commutation offsets. For the first start leave the offsets to their default values.
+#. Edit **user_config.h** in **config_motor** to set the motor parameters. The importants parameters are the number of poles pairs, the winding type, the motor polarity, the commutation sensor and the commutation offsets. For the first start leave the offsets to their default values. The motor polarity depends on the wiring of the phases and the position sensor polarity.
 
    .. code-block:: C
 
                 #define POLE_PAIRS                11
                 #define BLDC_WINDING_TYPE         STAR_WINDING
+                #define POLARITY                  NORMAL_POLARITY
                 #define MOTOR_COMMUTATION_SENSOR  AMS_SENSOR
                 #define COMMUTATION_OFFSET_CLK    0
                 #define COMMUTATION_OFFSET_CCLK   2048
 
-#. Set parameters for your position sensor. The most important parameters are the sensor offset and polarity. For the first start leave the default values:
+#. Set parameters for your position sensor. The most important parameters are the sensor offset and polarity. For the first start leave the default offset value. The sensor polarity will define the physical direction of your motor. You can use the test app of the position sensor to test which physical direction corresponds to a positive velocity.
 
    - For AMS sensor edit **ams_service.h** in **module_ams_rotary_sensor**:
 
@@ -94,6 +97,7 @@ Quick How-to
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
+                    motorcontrol_config.polarity_type = POLARITY;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
@@ -114,7 +118,9 @@ Quick How-to
 
 #. The app start with ``0`` commutation voltage so the motor will not move and the current consumption should be low. Remember to use a current limited power supply and always monitor the current consumption.
 
-   First try to set the offset automatically with the ``a`` command. If the motor is not turning and the current consumption is high try to change the sensor polarity with the ``d`` command and repeat the ``a`` command. This will find the sensor offset and set the clockwise or counterclockwise commutation offsets to 0 and 2048 (half a turn) and the motor should start turning.
+   First try to set the offset automatically with the ``a`` command. If the motor is not turning and the current consumption is high try to change the motor polarity with the ``d`` command and repeat the ``a`` command. This will find the sensor offset and set the clockwise or counterclockwise commutation offsets to 0 and 2048 (half a turn) and the motor should start turning.
+
+   With a positive voltage the motor should turn in the direction of positive velocity. If it is not the case you can change the direction by flipping the clockwise and counterclockwise commutation offsets with the ``f`` command.
 
    Fine tune the sensor commutation offset for the current direction. You could use the ``c`` command for auto tuning or the ``VALUE`` command to manually minimize the phases current. The offset is a 12 bit positive value so it wraps around at 4096. It means that if you want an offset of ``-100`` you enter ``3996``.
 

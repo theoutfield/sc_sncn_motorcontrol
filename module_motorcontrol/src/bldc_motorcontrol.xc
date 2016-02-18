@@ -170,6 +170,18 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     motorcontrol_config.commutation_sensor = sensor_select;
                     break;
 
+            case i_motorcontrol[int i].set_sensor_offset(int in_offset):
+                    if (sensor_select == BISS_SENSOR ) {
+                        BISSConfig out_biss_config = i_biss.get_biss_config();
+                        out_biss_config.offset_electrical = in_offset;
+                        i_biss.set_biss_config(out_biss_config);
+                    } else if (sensor_select == AMS_SENSOR ) {
+                        AMSConfig out_ams_config = i_ams.get_ams_config();
+                        out_ams_config.offset = in_offset;
+                        i_ams.set_ams_config(out_ams_config);
+                    }
+                    break;
+
             case i_motorcontrol[int i].set_fets_state(int new_state):
 
                     if(new_state == 0){

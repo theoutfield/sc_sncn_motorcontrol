@@ -138,6 +138,8 @@ interface MotorcontrolInterface{
      * @param flag 1 to activate, 0 to deactivate calibration
      */
     int set_calib(int flag);
+
+    void set_sensor_offset(int in_offset);
 };
 
 /**
