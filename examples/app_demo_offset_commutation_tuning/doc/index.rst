@@ -56,13 +56,12 @@ Quick How-to
 
 #. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`.
 #. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
-#. Edit **user_config.h** in **config_motor** to set the motor parameters. The importants parameters are the number of poles pairs, the winding type, the motor polarity, the commutation sensor and the commutation offsets. For the first start leave the offsets to their default values. The motor polarity depends on the wiring of the phases and the position sensor polarity.
+#. Edit **user_config.h** in **config_motor** to set the motor parameters. The importants parameters are the number of poles pairs, the winding type, the commutation sensor and the commutation offsets. For the first start leave the offsets to their default values.
 
    .. code-block:: C
 
                 #define POLE_PAIRS                11
                 #define BLDC_WINDING_TYPE         STAR_WINDING
-                #define POLARITY                  NORMAL_POLARITY
                 #define MOTOR_COMMUTATION_SENSOR  AMS_SENSOR
                 #define COMMUTATION_OFFSET_CLK    0
                 #define COMMUTATION_OFFSET_CCLK   2048
@@ -89,7 +88,7 @@ Quick How-to
 
    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
-#. Set parameters for your :ref:`Motor Control Service <module_motorcontrol>` to use the values previously defined in **user_config.h**:
+#. Set parameters for your :ref:`Motor Control Service <module_motorcontrol>` to use the values previously defined in **user_config.h**. The motor polarity depends on the wiring of the phases and the position sensor polarity.
 
    .. code-block:: C
 
@@ -97,7 +96,7 @@ Quick How-to
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
-                    motorcontrol_config.polarity_type = POLARITY;
+                    motorcontrol_config.polarity_type = NORMAL_POLARITY;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
@@ -134,5 +133,6 @@ Quick How-to
 
                   - the motor configuration file **user_config.h**
                   - the sensor configuration file **ams_service.h** or **biss_service.h**
+                  - the **main.c** of your app (for the motor polarity)
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.

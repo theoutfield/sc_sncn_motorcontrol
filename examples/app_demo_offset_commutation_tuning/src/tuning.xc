@@ -82,7 +82,6 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
                 motorcontrol_config.hall_offset[1] = auto_tuning_current(i_commutation, i_adc, input_voltage);
                 printf("auto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[1]);
             }
-            i_commutation.set_config(motorcontrol_config);
             break;
         //set voltage
         case 'v':
@@ -179,7 +178,7 @@ int auto_tuning_current(interface MotorcontrolInterface client i_commutation, in
     else
         start_offset = motorcontrol_config.hall_offset[1];
     //starting peak current and offset
-    int best_offset = (start_offset & 4095);
+    int best_offset = start_offset;
     int min_current = find_peak_current(i_adc, 1000, 200);
     int last_min_current;
     //search forward then backward
@@ -188,7 +187,7 @@ int auto_tuning_current(interface MotorcontrolInterface client i_commutation, in
         do {
             last_min_current = min_current;
             for (int i=0; i<25; i++) {
-                unsigned int pos_offset = (offset & 4095);
+                unsigned int pos_offset = (offset & 4095); //positive offset
                 //update offset
                 if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
                     motorcontrol_config.hall_offset[0] = pos_offset;
@@ -207,5 +206,10 @@ int auto_tuning_current(interface MotorcontrolInterface client i_commutation, in
         } while (min_current < last_min_current);
         step = -step;
     }
+    if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
+        motorcontrol_config.hall_offset[0] = best_offset;
+    else
+        motorcontrol_config.hall_offset[1] = best_offset;
+    i_commutation.set_config(motorcontrol_config);
     return best_offset;
 }
