@@ -16,19 +16,19 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
     BISSConfig biss_config;
     AMSConfig ams_config;
     int offset = 0;
-    int polarity = -1;
+    int polarity = motorcontrol_config.polarity_type;
 
     if (motorcontrol_config.commutation_sensor == HALL_SENSOR) {
         printf("Hall tuning, ");
     } else if (motorcontrol_config.commutation_sensor == BISS_SENSOR){
         biss_config = i_biss.get_biss_config();
         offset = biss_config.offset_electrical;
-        polarity = biss_config.polarity;
+//        polarity = biss_config.polarity;
         printf("BiSS tuning, Polarity %d, Sensor offset %d, ", polarity, offset);
     } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR){
         ams_config = i_ams.get_ams_config();
         offset = ams_config.offset;
-        polarity = ams_config.polarity;
+//        polarity = ams_config.polarity;
         printf("AMS tuning, Polarity %d, Sensor offset %d, ", polarity, offset);
     }
     if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
@@ -138,21 +138,27 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             break;
         //reverse sensor direction
         case 'd':
-            if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
-                if (biss_config.polarity == BISS_POLARITY_NORMAL)
-                    biss_config.polarity = BISS_POLARITY_INVERTED;
-                else
-                    biss_config.polarity = BISS_POLARITY_NORMAL;
-                polarity = biss_config.polarity;
-                i_biss.set_biss_config(biss_config);
-            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
-                if (ams_config.polarity == AMS_POLARITY_NORMAL)
-                    ams_config.polarity = AMS_POLARITY_INVERTED;
-                else
-                    ams_config.polarity = AMS_POLARITY_NORMAL;
-                polarity = ams_config.polarity;
-                i_ams.set_ams_config(ams_config);
-            }
+//            if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+//                if (biss_config.polarity == BISS_POLARITY_NORMAL)
+//                    biss_config.polarity = BISS_POLARITY_INVERTED;
+//                else
+//                    biss_config.polarity = BISS_POLARITY_NORMAL;
+//                polarity = biss_config.polarity;
+//                i_biss.set_biss_config(biss_config);
+//            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
+//                if (ams_config.polarity == AMS_POLARITY_NORMAL)
+//                    ams_config.polarity = AMS_POLARITY_INVERTED;
+//                else
+//                    ams_config.polarity = AMS_POLARITY_NORMAL;
+//                polarity = ams_config.polarity;
+//                i_ams.set_ams_config(ams_config);
+//            }
+            if (motorcontrol_config.polarity_type == NORMAL_POLARITY)
+                motorcontrol_config.polarity_type = INVERTED_POLARITY;
+            else
+                motorcontrol_config.polarity_type = NORMAL_POLARITY;
+            i_commutation.set_config(motorcontrol_config);
+            polarity = motorcontrol_config.polarity_type;
             printf("Polarity %d\n", polarity);
             break;
         //set offset

@@ -90,7 +90,7 @@
 ///////////////////////////////////////////////
 
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [1,-1]
-#define POLARITY           1
+#define POLARITY           NORMAL_POLARITY
 
 // DEFAULT PROFILER SETTINGS FOR PROFILE ETHERCAT DRIVE
 #define PROFILE_VELOCITY        1000        // rpm

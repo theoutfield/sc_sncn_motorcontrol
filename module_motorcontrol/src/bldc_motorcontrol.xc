@@ -103,6 +103,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 } else if (sensor_select == AMS_SENSOR) {
                     angle = i_ams.get_ams_angle();
                 }
+                if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
+                    angle = 4096 - angle;
 
                 if (shutdown == 1) {    /* stop PWM */
                     pwm[0] = -1;
@@ -152,6 +154,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     motorcontrol_config.hall_offset[0] = new_parameters.hall_offset[0];
                     motorcontrol_config.hall_offset[1] = new_parameters.hall_offset[1];
                     motorcontrol_config.bldc_winding_type = new_parameters.bldc_winding_type;
+                    motorcontrol_config.polarity_type = new_parameters.polarity_type;
                     motorcontrol_config.commutation_sensor = new_parameters.commutation_sensor;
                     sensor_select = motorcontrol_config.commutation_sensor;
 
