@@ -1,8 +1,0 @@
-/**
-
-\page apps
-\section app_pwm_symmetrical_demo
-
-This simple demo application illustrates usage of the PWM service of module_pwm_symmetrical and also shows how to use the PWM client API.
-
-*/
