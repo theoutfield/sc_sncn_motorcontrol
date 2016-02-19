@@ -105,6 +105,7 @@ Examples
 	Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index>
 	Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>
 	Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>
+	Brushed DC Velocity Control with a potentiometer <examples/app_demo_brushed_dc_ext_control/doc/index>
 
 	Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index> 
 
@@ -130,6 +131,8 @@ Examples
 	* `Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index.html>`_: Simple example to make Position Control of your Brushed DC motor.
 	* `Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index.html>`_: Simple example to make Velocity Control of your Brushed DC motor.
 	* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index.html>`_: Simple example to make Torque Control of your Brushed DC motor.
+	* `Brushed DC Control with a potentiometer <examples/app_demo_brushed_dc_ext_control/doc/index.html>`_: Simple example to drive Brushed DC motor by an analog input signal.
+	
 	
 
 Motor Control Quick Guides
