@@ -19,7 +19,7 @@
 ////////////////////////////////////////////
 
 // MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-#define MOTOR_TYPE  BLDC_MOTOR
+#define MOTOR_TYPE  BDC_MOTOR
 
 // NUMBER OF POLE PAIRS (if applicable)
 #define POLE_PAIRS  3
