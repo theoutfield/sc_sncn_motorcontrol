@@ -44,7 +44,7 @@ int check_qei_config(QEIConfig &qei_config)
         return ERROR;
     }
 
-    if (qei_config.sensor_polarity < 0  || qei_config.sensor_polarity > 1) {
+    if (qei_config.sensor_polarity != -1 && qei_config.sensor_polarity != 1) {
         printstrln("Wrong QEI configuration: wrong polarity");
         return ERROR;
     }
