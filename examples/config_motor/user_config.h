@@ -1,31 +1,31 @@
 /**
- * @file bldc_motor_config.h
+ * @file user_config.h
  * @brief Motor Control config file (define your motor specifications here)
  * @author Synapticon GmbH <support@synapticon.com>
  */
-#pragma once
+
+ #pragma once
 
 #include <qei_service.h>
 #include <hall_service.h>
 #include <biss_service.h>
 #include <motorcontrol_service.h>
 
-/**************************************************
- *********      USER CONFIGURATION       **********
- **************************************************/
-
-/////////////////////////////////////////////
-//////  GENERAL MOTOR CONFIGURATION
-////////////////////////////////////////////
-
-// MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-#define MOTOR_TYPE  BLDC_MOTOR
-
-// NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  3
-
-// WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
-#define BLDC_WINDING_TYPE   DELTA_WINDING
+ //#include <motor_configs/motor_config_Nanotec_DB42C01.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42C02.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42C03.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42L01.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42M01.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42M02.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42M03.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42S01.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42S02.h>
+ //#include <motor_configs/motor_config_Nanotec_DB42S03.h>
+ //#include <motor_configs/motor_config_Nanotec_DB87S01.h>
+ //#include <motor_configs/motor_config_LDO_42BLS41.h>
+ //#include <motor_configs/motor_config_Moons_42BL30L2.h>
+ //#include <motor_config_Nanotec_DB59L024035-A.h>
+ #include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -100,7 +100,7 @@
 // PROFILER LIMITIS
 #define MAX_POSITION_LIMIT      20000000        // ticks (max range: 2^30, limited for safe operation)
 #define MIN_POSITION_LIMIT      -20000000       // ticks (min range: -2^30, limited for safe operation)
-#define MAX_VELOCITY            4000            // rpm
+#define MAX_VELOCITY            6000            // rpm
 #define MAX_ACCELERATION        4000            // rpm/s
 #define MAX_DECELERATION        4000            // rpm/s
 #define MAX_CURRENT_VARIATION   800             // adc_ticks/s

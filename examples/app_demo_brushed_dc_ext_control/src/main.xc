@@ -11,6 +11,7 @@
 #include <adc_service.h>
 #include <watchdog_service.h>
 #include <motorcontrol_service.h>
+#include <print.h>
 
 #include <user_config.h>
 
@@ -41,11 +42,11 @@ int main(void) {
                     int a, b, AI0, AI1;
 
                     {AI0 , AI1} =  i_adc[0].get_external_inputs();
-                    int normalized_value = AI1*13589/16383;
+                    int normalized_value = AI1*PWM_MAX_VALUE/MAX_ADC_VALUE;
                     printf("Voltage SP: %i\n", normalized_value);
 
                     i_motorcontrol[0].set_voltage(normalized_value);
-              }
+                }
             }
         }
 
