@@ -214,12 +214,23 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             calib_angle = 3072;
                         if (sensor_select == HALL_SENSOR) {
                             out_offset = (1024 - i_hall.get_hall_position()) & 4095;
-                            if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
-                                motorcontrol_config.hall_offset[0] = out_offset;
-                                motorcontrol_config.hall_offset[1] = (out_offset + 2731) & 4095; // + half a turn + 1 hall step (1/6 turn)
+                            //Hall has a low resolution so the offsets could need to be shifted by +/- 1/6 turn
+                            if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
+                                if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
+                                    motorcontrol_config.hall_offset[0] = (out_offset - 682) & 4095; // -1/6 turn
+                                    motorcontrol_config.hall_offset[1] = (out_offset + 682) & 4095; // + half turn - 1/6 turn
+                                } else {
+                                    motorcontrol_config.hall_offset[1] = (out_offset - 682) & 4095;
+                                    motorcontrol_config.hall_offset[0] = (out_offset + 682) & 4095;
+                                }
                             } else {
-                                motorcontrol_config.hall_offset[1] = out_offset;
-                                motorcontrol_config.hall_offset[0] = (out_offset + 2731) & 4095; // + half a turn + 1 hall step (1/6 turn)
+                                if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
+                                    motorcontrol_config.hall_offset[0] = out_offset;
+                                    motorcontrol_config.hall_offset[1] = (out_offset + 2731) & 4095; // + half turn + 1/6 turn
+                                } else {
+                                    motorcontrol_config.hall_offset[1] = out_offset;
+                                    motorcontrol_config.hall_offset[0] = (out_offset + 2731) & 4095;
+                                }
                             }
                         } else if (sensor_select == BISS_SENSOR) {
                             out_offset = i_biss.reset_biss_angle_electrical(calib_angle);// quarter turn

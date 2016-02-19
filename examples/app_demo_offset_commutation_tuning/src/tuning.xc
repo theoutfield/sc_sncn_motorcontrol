@@ -24,9 +24,9 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
         printf("AMS tuning, Sensor offset %d, ", offset);
     }
     if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
-        printf ( "Star winding, Polarity %d\noffset clk %d (for positive voltage)\noffset cclk %d (for negative voltage)\n", motorcontrol_config.hall_offset[0], motorcontrol_config.polarity_type, motorcontrol_config.hall_offset[1]);
+        printf ( "Star winding, Polarity %d\noffset clk %d (for positive voltage)\noffset cclk %d (for negative voltage)\n", motorcontrol_config.polarity_type, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
     else
-        printf ("Delta winding\noffset clk %d (for negative voltage)\noffset cclk %d (for positive voltage)\n", motorcontrol_config.hall_offset[0], motorcontrol_config.polarity_type, motorcontrol_config.hall_offset[1]);
+        printf ("Delta winding, Polarity %d\noffset clk %d (for negative voltage)\noffset cclk %d (for positive voltage)\n", motorcontrol_config.polarity_type, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
     printf("Enter a to start the auto sensor offset finding.\n");
     fflush(stdout);
     //read and adjust the offset.
