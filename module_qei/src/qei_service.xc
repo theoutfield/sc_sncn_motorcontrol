@@ -40,17 +40,17 @@ static const unsigned char lookup[16][4] = {
 int check_qei_config(QEIConfig &qei_config)
 {
     if (qei_config.index_type < 3  || qei_config.index_type > 4) {
-        printstrln("Wrong QEI configuration: wrong type");
+        printstrln("qei_service: ERROR: Wrong QEI configuration: wrong type");
         return ERROR;
     }
 
     if (qei_config.sensor_polarity < 0  || qei_config.sensor_polarity > 1) {
-        printstrln("Wrong QEI configuration: wrong polarity");
+        printstrln("qei_service: ERROR: Wrong QEI configuration: wrong polarity");
         return ERROR;
     }
 
     if (qei_config.ticks_resolution < 0) {
-        printstrln("Wrong QEI configuration: wrong resolution");
+        printstrln("qei_service: ERROR: Wrong QEI configuration: wrong resolution");
         return ERROR;
     }
 
@@ -65,7 +65,6 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
 
                // to compute velocity from qei
     if (check_qei_config(qei_config) == ERROR) {
-        printstrln("Error while checking the QEI sensor configuration");
         return;
     }
 

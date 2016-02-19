@@ -17,7 +17,7 @@
 int check_hall_config(HallConfig &hall_config){
 
     if (hall_config.pole_pairs < 1 || hall_config.pole_pairs > 10) {
-        printstrln("Wrong Hall configuration: wrong pole-pairs");
+        printstrln("hall_service: ERROR: Wrong Hall configuration: wrong pole-pairs");
         return ERROR;
     }
 
@@ -31,7 +31,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     if (check_hall_config(hall_config) == ERROR) {
-        printstrln("Error while checking the Hall sensor configuration");
+        printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
         return;
     }
 
