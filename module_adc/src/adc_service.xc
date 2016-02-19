@@ -16,7 +16,7 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
             adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config);
 
-        } else if(!isnull(adc_ports.ad7265_ports.clk)){
+        } else if(!isnull(adc_ports.ad7265_ports.xclk)){
 
             adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config);
 
@@ -31,7 +31,7 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
             adc_ad7949_triggered(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, c_trigger);
 
-        } else if(!isnull(adc_ports.ad7265_ports.clk)){
+        } else if(!isnull(adc_ports.ad7265_ports.xclk)){
 
             adc_ad7256_triggered(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, c_trigger);
 
