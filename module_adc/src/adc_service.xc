@@ -15,18 +15,30 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
         if(!isnull(adc_ports.ad7949_ports.clk)){ // Check which ADC is configured
 
             adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config);
-        }else{
+
+        } else if(!isnull(adc_ports.ad7265_ports.clk)){
 
             adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config);
+
+        } else {
+
+            printstr("adc_service: ERROR No ADC configured");
+
         }
-    }else{
+    } else{
 
         if(!isnull(adc_ports.ad7949_ports.clk)){  // Check which ADC is configured
 
             adc_ad7949_triggered(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, c_trigger);
-        }else{
+
+        } else if(!isnull(adc_ports.ad7265_ports.clk)){
 
             adc_ad7256_triggered(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, c_trigger);
+
+        } else {
+
+            printstr("adc_service: ERROR No ADC configured");
+
         }
     }
 }
