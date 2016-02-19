@@ -132,8 +132,7 @@ interface MotorcontrolInterface{
     /**
      * @brief Getter for the current state of the Service.
      *
-     * @return 0 - not initialized.
-     *         1 - initialized.
+     * @return 0 - not initialized, 1 - initialized.
      */
     int check_busy();
 };

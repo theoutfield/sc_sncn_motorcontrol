@@ -3,8 +3,7 @@
 #include <IFM_BOARD_REQUIRED>
 
 /**
- * @brief Test illustrates usage of
- * @date 17/06/2014
+ * @brief Test illustrates usage of external ADC inputs for controlling a brushed DC motor. Example can be easily adapted for BLDC.
  */
 
 #include <pwm_service.h>
