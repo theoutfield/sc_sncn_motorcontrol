@@ -10,10 +10,9 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
     printstr(">>   SOMANET ADC SERVICE STARTING...\n");
 
-    if(isnull(c_trigger)){
+    if(isnull(c_trigger)){ // Check for triggered sampling channel
 
-        // There is no triggered sampling
-        if(!isnull(adc_ports.ad7949_ports.clk)){
+        if(!isnull(adc_ports.ad7949_ports.clk)){ // Check which ADC is configured
 
             adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config);
         }else{
@@ -22,8 +21,7 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
         }
     }else{
 
-        // There is a triggering
-        if(!isnull(adc_ports.ad7949_ports.clk)){
+        if(!isnull(adc_ports.ad7949_ports.clk)){  // Check which ADC is configured
 
             adc_ad7949_triggered(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, c_trigger);
         }else{
