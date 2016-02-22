@@ -4,19 +4,50 @@
  *      Implements position profile control function
  * @author Synapticon GmbH <support@synapticon.com>
 */
-
-#include <position_ctrl_client.h>
 #include <refclk.h>
-#include <xscope_wrapper.h>
-#include <internal_config.h>
-#include <statemachine.h>
-#include <drive_modes.h>
 #include <print.h>
 #include <profile.h>
 #include <profile_control.h>
 
+void init_position_profiler(ProfilerConfig profile_position_config,
+                            interface PositionControlInterface client i_position_control,
+                            interface HallInterface client ?i_hall,
+                            interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss) {
+
+    ControlConfig control_config = i_position_control.get_position_control_config();
+
+    HallConfig hall_config;
+    QEIConfig qei_config;
+    BISSConfig biss_config;
+
+    if (!isnull(i_hall)) {
+        hall_config = i_hall.get_hall_config();
+    }
+
+    if (!isnull(i_qei)) {
+        qei_config = i_qei.get_qei_config();
+    }
+
+    if (!isnull(i_biss)) {
+        biss_config = i_biss.get_biss_config();
+    }
+
+    if(profile_position_config.max_acceleration <= 0 ||
+            profile_position_config.max_velocity <= 0){
+        printstrln("profile_position: ERROR: Wrong configuration provided to profiler");
+        return;
+    }
+
+    init_position_profile_limits(profile_position_config.max_acceleration,
+                                 profile_position_config.max_velocity,
+                                 qei_config, hall_config, biss_config, control_config.feedback_sensor,
+                                 profile_position_config.max_position,
+                                 profile_position_config.min_position);
+}
+
 void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,
-                          int sensor_select, chanend c_position_ctrl)
+                          interface PositionControlInterface client i_position_control )
 {
     int i;
     timer t;
@@ -25,33 +56,23 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     int position_ramp;
 
     int actual_position = 0;
+    int init_state = i_position_control.check_busy();
 
-    int init_state = __check_position_init(c_position_ctrl);
 
-    while(init_state == INIT_BUSY)
+    if (init_state == INIT_BUSY)
     {
-        set_position_sensor(sensor_select, c_position_ctrl);
-        init_state = init_position_control(c_position_ctrl);
-        /*if(init_state == INIT)
-          printstrln("position control intialized");
-          else
-          printstrln("intialize position control failed");*/
+        init_position_control(i_position_control);
     }
 
-    if(init_state == INIT)
+    actual_position = i_position_control.get_position();
+    steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
+    t :> time;
+    for(i = 1; i < steps; i++)
     {
-        actual_position = get_position(c_position_ctrl);
-        steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
-        t :> time;
-        for(i = 1; i < steps; i++)
-        {
-            position_ramp = position_profile_generate(i);
-            set_position(position_ramp, c_position_ctrl);
-            actual_position = get_position(c_position_ctrl);
-            t when timerafter(time + MSEC_STD) :> time;
-            /*xscope_int(0, actual_position);
-              xscope_int(1, position_ramp);*/
-        }
-        t when timerafter(time + 30 * MSEC_STD) :> time;
+        position_ramp = position_profile_generate(i);
+        i_position_control.set_position(position_ramp);
+        t when timerafter(time + MSEC_STD) :> time;
     }
+    t when timerafter(time + 30 * MSEC_STD) :> time;
+
 }

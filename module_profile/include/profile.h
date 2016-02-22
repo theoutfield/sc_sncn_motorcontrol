@@ -11,20 +11,20 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <internal_config.h>
-#include <hall_config.h>
-#include <qei_config.h>
+#include <mc_internal_constants.h>
+#include <hall_service.h>
+#include <qei_service.h>
+#include <biss_service.h>
+#include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/
 
 /**
- * @brief Initialise Quick Stop Velocity Profile
+ * @brief Initialize Quick Stop Velocity Profile
  *
- * @Input
  * @param actual_velocity
  * @param quick_stop_deceleration defines the deceleration for quick stop profile
  *
- * @Output
  * @return no. of steps for quick stop profile : range [1 - steps]
  */
 extern int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_deceleration);
@@ -32,38 +32,33 @@ extern int init_quick_stop_velocity_profile(int actual_velocity, int quick_stop_
 /**
  * @brief Generate Quick Stop Velocity Profile
  *
- * @Input
  * @param step current step of the profile
  *
- * @Output
  * @return corresponding target velocity at the step input
  */
 extern int quick_stop_velocity_profile_generate(int step);
 
 /*Profile Velocity Mode*/
 
+extern void init_velocity_profile_limits(int max_velocity, int max_acceleration, int max_deceleration);
+
 /**
- * @brief Initialise Velocity Profile
+ * @brief Initialize Velocity Profile
  *
- * @Input
  * @param target_velocity
  * @param actual_velocity
  * @param acceleration for the velocity profile
  * @param deceleration for the velocity profile
- * @param max_velocity for the velocity profile
  *
- * @Output
  * @return no. of steps for velocity profile : range [1 - steps]
  */
-extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration, int max_velocity);
+extern int init_velocity_profile(int target_velocity, int actual_velocity, int acceleration, int deceleration);
 
 /**
  * @brief Generate Velocity Profile
  *
- * @Input
  * @param step current step of the profile
  *
- * @Output
  * @return corresponding target velocity at the step input
  */
 extern int velocity_profile_generate(int step);
@@ -71,40 +66,40 @@ extern int velocity_profile_generate(int step);
 /*Profile Position Mode*/
 
 /**
- * @brief Initialise Position Profile Limits
+ * @brief Initialize Position Profile Limits
  *
- * @Input
- * @param gear_ratio
  * @param max_acceleration for the position profile
  * @param max_velocity for the position profile
+ * @param qei_config Incremental Encoder configuration
+ * @param hall_config Hall Sensor configuration
+ * @param biss_config BiSS Encoder configuration
+ * @param sensor_select
+ * @param max_position
+ * @param min_position
  *
  */
-extern void init_position_profile_limits(int max_acceleration, int max_velocity, qei_par qei_params, \
-                                         hall_par hall_params, int sensor_select, int max_position, int min_position);
+extern void init_position_profile_limits(int max_acceleration, int max_velocity, QEIConfig qei_config, \
+                                         HallConfig hall_config, BISSConfig biss_config, int sensor_select, int max_position, int min_position);
 
 /**
- * @brief Initialise Position Profile
+ * @brief Initialize Position Profile
  *
- * @Input
  * @param target_position
  * @param actual_position
  * @param velocity for the position profile
  * @param acceleration for the position profile
  * @param deceleration for the position profile
  *
- * @Output
  * @return no. of steps for position profile : range [1 - steps]
  */
-extern int init_position_profile(int target_position, int actual_position,      int velocity, int acceleration, \
+extern int init_position_profile(int target_position, int actual_position, int velocity, int acceleration, \
                                  int deceleration);
 
 /**
  * @brief Generate Position Profile
  *
- * @Input
  * @param step current step of the profile
  *
- * @Output
  * @return corresponding target position at the step input
  */
 extern int position_profile_generate(int step);
@@ -112,14 +107,12 @@ extern int position_profile_generate(int step);
 /*Profile Position Quick Stop*/
 
 /**
- * @brief Initialise Quick Stop Position Profile
+ * @brief Initialize Quick Stop Position Profile
  *
- * @Input
  * @param actual_velocity
  * @param actual_position
- * @param max_acceleration defines the deceleration for quick stop profile
+ * @param max_deceleration defines the deceleration for quick stop profile
  *
- * @Output
  * @return no. of steps for quick stop profile : range [1 - steps]
  */
 extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int max_deceleration) ;
@@ -127,42 +120,35 @@ extern int init_quick_stop_position_profile(int actual_velocity, int actual_posi
 /**
  * @brief Generate Quick Stop Position Profile
  *
- * @Input
- * @param step current step of the profile
+ * @param steps current step of the profile
  * @param actual_velocity
  *
- * @Output
  * @return corresponding target position at the step input
  */
 extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
 
+extern void init_linear_profile_limits(int max_value, int polarity);
+extern int get_linear_profile_polarity();
 /**
- * @brief Initialise Linear Profile
+ * @brief Initialize Linear Profile
  *
- * @Input
  * @param target_value
  * @param actual_value
  * @param acceleration for the Linear profile
  * @param deceleration for the Linear profile
- * @param max_value for the Linear profile
  *
- * @Output
  * @return no. of steps for linear profile : range [1 - steps]
  */
-extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration, int max_value);
+extern int init_linear_profile(int target_value, int actual_value, int acceleration, int deceleration);
 
 /**
  * @brief Generate Linear Profile
  *
- * @Input
  * @param step current step of the profile
  *
- * @Output
  * @return corresponding target value at the step input
  */
 extern int linear_profile_generate(int step);
-
-#ifndef __XC__
 
 typedef struct
 {
@@ -216,8 +202,9 @@ typedef struct
 
     float q;                    // position profile
 
-    qei_par qei_params;
-    hall_par hall_params;
+    QEIConfig qei_params;
+    HallConfig hall_params;
+    BISSConfig biss_params;
     int sensor_used;
     float max_position;
     float min_position;
@@ -226,12 +213,12 @@ typedef struct
 
 void __initialize_position_profile_limits( int max_acceleration, int max_velocity,
                                            int sensor_select, int max_position, int min_position,
-                                           profile_position_param *profile_pos_params );
+                                           REFERENCE_PARAM(profile_position_param, profile_pos_params) );
 
 int __initialize_position_profile( int target_position, int actual_position, int velocity, int acceleration,
-                                   int deceleration, profile_position_param *profile_pos_params );
+                                   int deceleration, REFERENCE_PARAM(profile_position_param, profile_pos_params) );
 
-int __position_profile_generate_in_steps(int step, profile_position_param *profile_pos_params);
+int __position_profile_generate_in_steps(int step, REFERENCE_PARAM(profile_position_param, profile_pos_params) );
 
 typedef struct
 {
@@ -247,9 +234,9 @@ typedef struct
 } profile_linear_param;
 
 int __init_linear_profile_float( float target_value, float actual_value, float acceleration,
-                                 float deceleration, float max_value, profile_linear_param * profile_linear_params );
+                                 float deceleration, float max_value, REFERENCE_PARAM(profile_linear_param, profile_linear_params) );
 
-float __linear_profile_generate_float( int step, profile_linear_param *profile_linear_params );
+float __linear_profile_generate_float( int step, REFERENCE_PARAM(profile_linear_param, profile_linear_params) );
 
 typedef struct
 {
@@ -265,9 +252,8 @@ typedef struct
 } profile_velocity_param;
 
 int __initialize_velocity_profile( int target_velocity, int actual_velocity, int acceleration,
-                                   int deceleration, int max_velocity, profile_velocity_param *profile_velocity_params );
+                                   int deceleration, int max_velocity, REFERENCE_PARAM(profile_velocity_param, profile_velocity_params) );
 
-int __velocity_profile_generate_in_steps( int step, profile_velocity_param *profile_velocity_params );
+int __velocity_profile_generate_in_steps( int step, REFERENCE_PARAM(profile_velocity_param, profile_velocity_params) );
 
-#endif  /* ifndef __XC__ */
 
