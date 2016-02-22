@@ -10,25 +10,35 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
     printstr(">>   SOMANET ADC SERVICE STARTING...\n");
 
-    if(isnull(c_trigger)){
+    if(isnull(c_trigger)){ // Check for triggered sampling channel
 
-        // There is no triggered sampling
-        if(!isnull(adc_ports.ad7949_ports.clk)){
+        if(!isnull(adc_ports.ad7949_ports.clk)){ // Check which ADC is configured
 
             adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config);
-        }else{
+
+        } else if(!isnull(adc_ports.ad7265_ports.xclk)){
 
             adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config);
-        }
-    }else{
 
-        // There is a triggering
-        if(!isnull(adc_ports.ad7949_ports.clk)){
+        } else {
+
+            printstr("adc_service: ERROR No ADC configured");
+
+        }
+    } else{
+
+        if(!isnull(adc_ports.ad7949_ports.clk)){  // Check which ADC is configured
 
             adc_ad7949_triggered(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, c_trigger);
-        }else{
+
+        } else if(!isnull(adc_ports.ad7265_ports.xclk)){
 
             adc_ad7256_triggered(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, c_trigger);
+
+        } else {
+
+            printstr("adc_service: ERROR No ADC configured");
+
         }
     }
 }

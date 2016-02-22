@@ -14,18 +14,18 @@
 int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
 {
     if(commutation_params.motor_type != BLDC_MOTOR && commutation_params.motor_type != BDC_MOTOR ){
-        printstrln("Wrong Motorcontrol configuration: motor type");
+        printstrln("motorcontrol_service: ERROR: Wrong configuration: motor type");
         return ERROR;
     }
 
     if(commutation_params.motor_type == BLDC_MOTOR){
         if(commutation_params.bldc_winding_type < 0 || commutation_params.bldc_winding_type > 2){
-            printstrln("Wrong Motorcontrol configuration: wrong winding");
+            printstrln("motorcontrol_service: ERROR: Wrong configuration: wrong winding");
             return ERROR;
         }
 
         if(commutation_params.commutation_sensor != HALL_SENSOR && commutation_params.commutation_sensor != BISS_SENSOR){
-            printstrln("Wrong Motorcontrol configuration: just HALL and BiSS sensors are supported as commutation sensor");
+            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL and BiSS sensors are supported as commutation sensor");
             return ERROR;
         }
     }
@@ -58,7 +58,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
     }
 
     if (check_motorcontrol_config(motorcontrol_config) == ERROR){
-        printstrln("Error while checking the Motorcontrol configuration");
         return;
     }
 

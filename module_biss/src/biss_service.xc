@@ -26,27 +26,27 @@ static inline void update_turns(int &turns, int last_position, int position, int
 int check_biss_config(BISSConfig & biss_config)
 {
     if(biss_config.polarity < 0  || biss_config.polarity > 1){
-        printstrln("Wrong BISS configuration: wrong polarity");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
         return ERROR;
     }
 
     if ( BISS_FRAME_BYTES < (( (3 + 2 + biss_config.multiturn_length + biss_config.singleturn_length + biss_config.status_length + 32 - clz(biss_config.crc_poly)) -1)/32 + 1) ){
-        printstrln("Wrong BISS configuration: wrong frame bytes number");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong frame bytes number");
         return ERROR;
     }
 
     if( BISS_USEC <= 0 ){
-        printstrln("Wrong BISS configuration: wrong BISS_USEC value");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong BISS_USEC value");
         return ERROR;
     }
 
     if(biss_config.timeout <= 0){
-        printstrln("Wrong BISS configuration: wrong timeout");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong timeout");
         return ERROR;
     }
 
     if(biss_config.pole_pairs < 1){
-        printstrln("Wrong BiSS configuration: wrong pole-pairs");
+        printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
         return ERROR;
     }
 
@@ -59,7 +59,6 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     if(check_biss_config(biss_config) == ERROR){
-        printstrln("Error while checking the BiSS sensor configuration");
         return;
     }
 

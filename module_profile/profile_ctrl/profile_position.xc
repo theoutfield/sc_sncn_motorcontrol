@@ -35,7 +35,7 @@ void init_position_profiler(ProfilerConfig profile_position_config,
 
     if(profile_position_config.max_acceleration <= 0 ||
             profile_position_config.max_velocity <= 0){
-        printstrln("Wrong configuration provided to profiler");
+        printstrln("profile_position: ERROR: Wrong configuration provided to profiler");
         return;
     }
 

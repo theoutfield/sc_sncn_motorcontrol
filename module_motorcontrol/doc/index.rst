@@ -58,7 +58,7 @@ How to use
 
 7. At whichever other core, now you can perform calls to the Motor-control Service through the interfaces connected to it.
 
-    .. code-block:: XC
+    .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
