@@ -542,6 +542,9 @@ int check_ams_config(AMSConfig &ams_config) {
     unsigned int next_velocity_read = 0;
     unsigned int last_ams_read = 0;
 
+    //first read
+    last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
+    t :> last_ams_read;
 
     //main loop
     while (1) {
