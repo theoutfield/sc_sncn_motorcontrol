@@ -8,9 +8,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc)
+void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface ADCInterface client ?i_adc)
 {
     delay_seconds(1);
+    printf(">>   SOMANET OFFSET TUNING SERVICE STARTING...\n");
     MotorcontrolConfig motorcontrol_config = i_commutation.get_config();
     int offset = 0;
 
@@ -74,13 +75,17 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             break;
         //auto tune the offset by mesuring the current consumption
         case 'c':
-            printf("Starting auto tuning...\n(This could take around 30 seconds)\n");
-            if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING)) {
-                motorcontrol_config.hall_offset[0] = auto_tuning_current(i_commutation, i_adc, input_voltage);
-                printf("auto tuned offset clk: %d\n", motorcontrol_config.hall_offset[0]);
+            if (!isnull(i_adc)) {
+                printf("Starting auto tuning...\n(This could take around 30 seconds)\n");
+                if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING)) {
+                    motorcontrol_config.hall_offset[0] = auto_tuning_current(i_commutation, i_adc, input_voltage);
+                    printf("auto tuned offset clk: %d\n", motorcontrol_config.hall_offset[0]);
+                } else {
+                    motorcontrol_config.hall_offset[1] = auto_tuning_current(i_commutation, i_adc, input_voltage);
+                    printf("auto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[1]);
+                }
             } else {
-                motorcontrol_config.hall_offset[1] = auto_tuning_current(i_commutation, i_adc, input_voltage);
-                printf("auto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[1]);
+                printf("No adc service provided\n");
             }
             break;
         //set voltage

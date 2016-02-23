@@ -18,6 +18,6 @@
 //#include <bldc_motor_config.h>
 #include <mc_internal_constants.h>
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc);
+void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface ADCInterface client ?i_adc);
 
 int auto_tuning_current(interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc, int input_voltage);

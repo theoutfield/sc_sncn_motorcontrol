@@ -1,8 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
 //#include <IFM_DC100-rev-b.bsp>
-#include <IFM_DC300-rev-a.bsp>
-//#include <IFM_DC1K-rev-c1.bsp>
+//#include <IFM_DC300-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -21,7 +21,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = { {
         IFM_TILE_CLOCK_2,
@@ -35,23 +35,16 @@ AMSPorts ams_ports = { {
 
 #define VOLTAGE 700 //+/- 4095
 
-void adc_client(interface ADCInterface client i_adc, interface HallInterface client ?i_hall){
-
-    int b, c;
-    unsigned state;
-
+void adc_client(interface ADCInterface client i_adc)
+{
     while (1) {
-
+        int b, c;
         {b, c} = i_adc.get_currents();
-        if (!isnull(i_hall)) {
-            state = i_hall.get_hall_pinstate();
-            xscope_int(HALL_PINS, state);
-        }
 
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
 
-        delay_milliseconds(2);
+        delay_milliseconds(1);
     }
 }
 
@@ -75,16 +68,10 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-        on tile[APP_TILE_2]: adc_client(i_adc[1], null);
         on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[0]);
-#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-        on tile[APP_TILE_2]: adc_client(i_adc[1], null);
-        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[0]);
-#else
-        on tile[APP_TILE_2]: adc_client(i_adc[1], i_hall[1]);
-        on tile[APP_TILE_1]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[0]);
-#endif
+
+        /* Display phases currents */
+        on tile[APP_TILE_2]: adc_client(i_adc[1]);
 
         on tile[IFM_TILE]:
         {
