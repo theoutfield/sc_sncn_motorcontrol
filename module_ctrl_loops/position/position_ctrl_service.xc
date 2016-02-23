@@ -96,6 +96,8 @@ void position_control_service(ControlConfig &position_control_config,
     } else if(position_control_config.feedback_sensor == BISS_SENSOR){
         if(isnull(i_biss)){
             printstrln("Position Control Loop ERROR: Interface for BiSS Service not provided");
+        } else {
+            biss_config = i_biss.get_biss_config();
         }
     } else if(position_control_config.feedback_sensor == AMS_SENSOR){
         if(isnull(i_ams)){

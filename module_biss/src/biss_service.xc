@@ -95,8 +95,21 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     configure_in_port(biss_ports.p_biss_data, biss_ports.clk);
 
     //first read
-    read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
-    t :> last_biss_read;
+    t :> time;
+    last_biss_read = time;
+    do {
+        t when timerafter(last_biss_read + biss_config.timeout) :> void;
+        last_count = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+        t :> last_biss_read;
+    } while (last_count != NoError && !timeafter(last_biss_read, time + 1000000*BISS_USEC));
+    if (last_count == CRCError)
+        printstrln("BiSS Error: CRC");
+    else if (last_count == NoStartBit)
+        printstrln("BiSS Error: No Start bit");
+    else if (last_count == NoAck)
+        printstrln("BiSS Error: No Ack bit");
+    else if (last_count != NoError)
+        printstrln("BiSS Error");
     last_count_read = last_biss_read;
     next_velocity_read = last_biss_read;
     { last_count , last_position, void } = biss_encoder(data, biss_config);
