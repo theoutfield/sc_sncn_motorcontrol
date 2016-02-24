@@ -53,3 +53,7 @@
 /* Digital Input types */
 #define GP_INPUT_TYPE                       40
 #define SWITCH_INPUT_TYPE                   50
+
+enum notification_type {
+    MOTCTRL_NTF_EMPTY, MOTCTRL_NTF_CONFIG_CHANGED
+};

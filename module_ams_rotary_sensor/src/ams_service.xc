@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <timer.h>
 #include <print.h>
+#include <mc_internal_constants.h>
 
 static char rotarySensorInitialized = 0;
 
@@ -542,6 +543,8 @@ int check_ams_config(AMSConfig &ams_config) {
     unsigned int next_velocity_read = 0;
     unsigned int last_ams_read = 0;
 
+    int notification = MOTCTRL_NTF_EMPTY;
+
     //first read
     last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
     t :> last_ams_read;
@@ -549,6 +552,10 @@ int check_ams_config(AMSConfig &ams_config) {
     //main loop
     while (1) {
         select {
+        case i_ams[int i].get_notification() -> int out_notification:
+                out_notification = notification;
+                break;
+
         //send electrical angle for commutation
         case i_ams[int i].get_ams_angle() -> unsigned int angle:
                 t :> time;
@@ -603,6 +610,12 @@ int check_ams_config(AMSConfig &ams_config) {
                 crossover = ticks_per_turn - ticks_per_turn/10;
                 velocity_loop = ams_config.velocity_loop * AMS_USEC;
                 velocity_factor = 60000000/ams_config.velocity_loop;
+
+                notification = MOTCTRL_NTF_CONFIG_CHANGED;
+                // TODO: Use a constant for the number of interfaces
+                for (int i = 0; i < 5; i++) {
+                    i_ams[i].notification();
+                }
 
                 break;
 

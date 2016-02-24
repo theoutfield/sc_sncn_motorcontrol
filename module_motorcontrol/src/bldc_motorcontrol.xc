@@ -25,7 +25,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[5],
+                            interface MotorcontrolInterface server i_motorcontrol[4],
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
                             MotorcontrolConfig &motorcontrol_config)
@@ -56,6 +56,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
     int shutdown = 0; //Disable FETS
     int sensor_select = motorcontrol_config.commutation_sensor;
+
+    int notification = MOTCTRL_NTF_EMPTY;
 
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
@@ -141,6 +143,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
                 break;
 
+            case i_motorcontrol[int i].get_notification() -> int out_notification:
+
+                out_notification = notification;
+                break;
 
             case i_motorcontrol[int i].set_voltage(int new_voltage):
                     if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
@@ -150,14 +156,15 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     break;
 
             case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
+                    motorcontrol_config = new_parameters;
 
-                    motorcontrol_config.hall_offset[0] = new_parameters.hall_offset[0];
-                    motorcontrol_config.hall_offset[1] = new_parameters.hall_offset[1];
-                    motorcontrol_config.bldc_winding_type = new_parameters.bldc_winding_type;
-                    motorcontrol_config.polarity_type = new_parameters.polarity_type;
-                    motorcontrol_config.commutation_sensor = new_parameters.commutation_sensor;
+                    notification = MOTCTRL_NTF_CONFIG_CHANGED;
+                    // TODO: Use a constant for the number of interfaces
+                    for (int i = 0; i < 4; i++) {
+                        i_motorcontrol[i].notification();
+                    }
+
                     sensor_select = motorcontrol_config.commutation_sensor;
-
                     break;
 
             case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:

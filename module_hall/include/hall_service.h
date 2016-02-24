@@ -1,5 +1,5 @@
 /**
- * @file hall_server.h
+ * @file hall_service.h
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
@@ -41,8 +41,24 @@ typedef struct {
  * @brief Interface type to communicate with the Hall Service.
  */
 interface HallInterface {
+
     /**
-     * @brief Getter for the current pinstate at the Hall port.
+     * @brief Notifies the interested parties that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
+
+    /**
+     * @brief Getter for the current pin state at the Hall port.
      *
      * @return UVW signals state.
      */
@@ -103,8 +119,7 @@ interface HallInterface {
     /**
      * @brief Getter for the current state of the Service.
      *
-     * @return 0 - not initialized.
-     *         1 - initialized.
+     * @return 0 - not initialized, 1 - initialized.
      */
     int check_busy();
 };
@@ -115,7 +130,7 @@ interface HallInterface {
  *
  * @param hall_ports Ports structure defining where to read the Hall signals.
  * @param hall_config Configuration for the service.
- * @param i_hall[5] Array of communication interfaces to handle up to 5 different clients.
+ * @param i_hall Array of communication interfaces to handle up to 5 different clients.
  */
 [[combinable]]
 void hall_service(HallPorts & hall_ports, HallConfig & hall_config,

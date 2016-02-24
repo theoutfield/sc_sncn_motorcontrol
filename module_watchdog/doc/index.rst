@@ -1,7 +1,7 @@
 .. _module_watchdog:
-=======================
-SOMANET Watchdog Module 
-=======================
+=================
+Watchdog Module 
+=================
 
 .. contents:: In this document
     :backlinks: none
@@ -34,19 +34,19 @@ How to use
         USED_MODULES = module_watchdog module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
 2. Include the Watchdog Service header **watchdog_service.h** in your app. 
 
-3. Instanciate the ports where the Service will be accessing the ports of the watchdog chip. 
+3. Instantiate the ports where the Service will be accessing the ports of the watchdog chip. 
 
-4. Inside your main function, instanciate the interfaces array for the Service-Clients communication.
+4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instanciate the Service.
+5. At your IFM tile, instantiate the Service.
 
 6. At whichever other core, now you can perform calls to the Watchdog Service through the interfaces connected to it.
 
-    .. code-block:: C
+    .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 

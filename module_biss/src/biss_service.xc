@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <print.h>
 
+#include <mc_internal_constants.h>
+
 static inline void update_turns(int &turns, int last_position, int position, int multiturn_resolution, int ticks_per_turn) {
     if (multiturn_resolution == 0) {
         int difference = position - last_position;
@@ -24,27 +26,27 @@ static inline void update_turns(int &turns, int last_position, int position, int
 int check_biss_config(BISSConfig & biss_config)
 {
     if(biss_config.polarity < 0  || biss_config.polarity > 1){
-        printstrln("Wrong BISS configuration: wrong polarity");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
         return ERROR;
     }
 
     if ( BISS_FRAME_BYTES < (( (3 + 2 + biss_config.multiturn_length + biss_config.singleturn_length + biss_config.status_length + 32 - clz(biss_config.crc_poly)) -1)/32 + 1) ){
-        printstrln("Wrong BISS configuration: wrong frame bytes number");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong frame bytes number");
         return ERROR;
     }
 
     if( BISS_USEC <= 0 ){
-        printstrln("Wrong BISS configuration: wrong BISS_USEC value");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong BISS_USEC value");
         return ERROR;
     }
 
     if(biss_config.timeout <= 0){
-        printstrln("Wrong BISS configuration: wrong timeout");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong timeout");
         return ERROR;
     }
 
     if(biss_config.pole_pairs < 1){
-        printstrln("Wrong BiSS configuration: wrong pole-pairs");
+        printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
         return ERROR;
     }
 
@@ -57,7 +59,6 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     if(check_biss_config(biss_config) == ERROR){
-        printstrln("Error while checking the BiSS sensor configuration");
         return;
     }
 
@@ -89,6 +90,8 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     unsigned int last_count_read = 0;
     unsigned int last_biss_read = 0;
 
+    int notification = MOTCTRL_NTF_EMPTY;
+
     //clock and port configuration
     configure_clock_rate(biss_ports.clk, biss_config.clock_dividend, biss_config.clock_divisor); // a/b MHz
     configure_out_port(biss_ports.p_biss_clk, biss_ports.clk, BISS_CLK_PORT_HIGH);
@@ -119,6 +122,10 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     while (1) {
         [[ordered]]
         select {
+        case i_biss[int i].get_notification() -> int out_notification:
+                out_notification = notification;
+                break;
+
         //send electrical angle for commutation, ajusted with electrical offset
         case i_biss[int i].get_biss_angle() -> unsigned int angle:
                 if (calib_flag == 0) {
@@ -232,6 +239,13 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 max_ticks_internal = (1 << (biss_config.multiturn_resolution -1 + biss_config.singleturn_resolution));
                 velocity_loop = (biss_config.velocity_loop * BISS_USEC);
                 velocity_factor = 60000000/biss_config.velocity_loop;
+
+                notification = MOTCTRL_NTF_CONFIG_CHANGED;
+                // TODO: Use a constant for the number of interfaces
+                for (int i = 0; i < 5; i++) {
+                    i_biss[i].notification();
+                }
+
                 break;
 
         //send biss_config

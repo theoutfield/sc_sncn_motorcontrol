@@ -11,6 +11,6 @@
 [[combinable]]
 void bdc_loop(chanend c_pwm_ctrl,
                interface WatchdogInterface client i_watchdog,
-               interface MotorcontrolInterface server i_commutation[5],
+               interface MotorcontrolInterface server i_commutation[4],
                FetDriverPorts &fet_driver_ports,
                MotorcontrolConfig &motorcontrol_config);

@@ -1,7 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+//#include <CORE_BOARD_REQUIRED>
+//#include <IFM_BOARD_REQUIRED>
 #include <CORE_C22-rev-a.bsp>
-//#include <IFM_DC100-rev-b.bsp>
-#include <IFM_DC300-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @brief Test illustrates usage of module_motorcontrol
@@ -21,7 +22,7 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = { {
         IFM_TILE_CLOCK_2,
@@ -35,7 +36,7 @@ AMSPorts ams_ports = { {
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
-#define VOLTAGE 700 //+/- 4095
+#define VOLTAGE 700 //+/- 13889
 
 void adc_client(interface ADCInterface client i_adc){
 

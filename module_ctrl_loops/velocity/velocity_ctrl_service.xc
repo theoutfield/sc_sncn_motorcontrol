@@ -12,13 +12,11 @@
 #include <limits.h>
 #include <refclk.h>
 #include <print.h>
-
-
-
+#include <stdlib.h>
 
 void init_velocity_control(interface VelocityControlInterface client i_velocity_control)
 {
-    int ctrl_state = INIT_BUSY;
+    int ctrl_state;
 
     while (1) {
         ctrl_state = i_velocity_control.check_busy();
@@ -26,9 +24,9 @@ void init_velocity_control(interface VelocityControlInterface client i_velocity_
             i_velocity_control.enable_velocity_ctrl();
         }
 
-        if(ctrl_state == INIT) {
+        if (ctrl_state == INIT) {
 #ifdef debug_print
-            printstrln("velocity control intialized");
+            printstrln("velocity_ctrl_service: velocity control initialized");
 #endif
             break;
         }
@@ -81,90 +79,90 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     int difference;
     int old_difference;
     int rpm_constant = 1000*60; // constant
-    int speed_factor_hall = 0;
-    int speed_factor_qei = 0;
+    int speed_factor;
+    int crossover;
     int activate = 0;
-    int init_state = INIT_BUSY;
-    int qei_crossover = 0;
-    int const hall_crossover = INT_MAX - INT_MAX/10;
     int compute_flag = 0;
-    int fet_state = 0;
 
-    HallConfig hall_config;
-    QEIConfig qei_config;
-    AMSConfig ams_config;
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
-
-   if(velocity_control_config.feedback_sensor != HALL_SENSOR
-           && velocity_control_config.feedback_sensor < QEI_SENSOR){
-       velocity_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
-   }
-
-    if(velocity_control_config.feedback_sensor == HALL_SENSOR){
-        if(isnull(i_hall)){
-            printstrln("Velocity Control Loop ERROR: Interface for Hall Service not provided");
-        }else{
-            hall_config = i_hall.get_hall_config();
-        }
-    } else if (velocity_control_config.feedback_sensor == QEI_SENSOR){
-        if(isnull(i_qei)){
-            printstrln("Velocity Control Loop ERROR: Interface for QEI Service not provided");
-        }else{
-            qei_config = i_qei.get_qei_config();
-        }
-    } else if (velocity_control_config.feedback_sensor == BISS_SENSOR){
-        if(isnull(i_biss)){
-            printstrln("Velocity Control Loop ERROR: Interface for BiSS Service not provided");
-        }
-    } else if (velocity_control_config.feedback_sensor == AMS_SENSOR){
-        if(isnull(i_ams)){
-            printstrln("Velocity Control Loop ERROR: Interface for AMS Service not provided");
-        }
-    }
-
-    motorcontrol_config = i_motorcontrol.get_config();
-
-    //Limits
-    if(motorcontrol_config.motor_type == BLDC_MOTOR){
-        velocity_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
-    }else if(motorcontrol_config.motor_type == BDC_MOTOR){
-        velocity_control_out_limit = BDC_PWM_CONTROL_LIMIT;
-    }
-
-    if(velocity_control_config.Ki_n != 0)
-        error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
-
-    init_filter(filter_buffer, index, FILTER_SIZE_MAX);
-
-    if (velocity_control_config.feedback_sensor == HALL_SENSOR){
-         speed_factor_hall = hall_config.pole_pairs*4096*(velocity_control_config.control_loop_period)/1000; // variable pole_pairs
-//       hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
-    }
-    else if (velocity_control_config.feedback_sensor == QEI_SENSOR){
-         speed_factor_qei = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * (velocity_control_config.control_loop_period)/1000;       // variable qei_real_max
-         qei_crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK )/10;
-    }
+    int config_update_flag = 1;
 
     printstr(">>   SOMANET VELOCITY CONTROL SERVICE STARTING...\n");
 
     t :> ts;
-    init_state = INIT;
 
     while (1) {
 //#pragma ordered
         select {
-        case t when timerafter (ts +  USEC_STD * velocity_control_config.control_loop_period) :> ts:
+            case t when timerafter (ts + USEC_STD * velocity_control_config.control_loop_period) :> ts:
 
-            if (compute_flag == 1) {
-                /* calculate actual velocity from hall/qei with filter*/
-                if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
-                    actual_velocity = i_biss.get_biss_velocity();
-                } else if (velocity_control_config.feedback_sensor == AMS_SENSOR) {
-                    actual_velocity = i_ams.get_ams_velocity();
-                } else {
+                if (config_update_flag) {
+                    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+
+                    //Limits
+                    if (motorcontrol_config.motor_type == BLDC_MOTOR) {
+                        velocity_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
+                    } else if (motorcontrol_config.motor_type == BDC_MOTOR) {
+                        velocity_control_out_limit = BDC_PWM_CONTROL_LIMIT;
+                    }
+
+                    if (velocity_control_config.feedback_sensor != HALL_SENSOR
+                           && velocity_control_config.feedback_sensor != QEI_SENSOR
+                           && velocity_control_config.feedback_sensor != BISS_SENSOR
+                           && velocity_control_config.feedback_sensor != AMS_SENSOR) {
+                        velocity_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
+                    }
+
                     if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
-                        if (init == 0) {
-                            position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                        if (isnull(i_hall)) {
+                            printstrln("velocity_ctrl_service: ERROR: Interface for Hall Service is not provided, but configured to be used");
+                            exit(-1);
+                        } else {
+                            speed_factor = i_hall.get_hall_config().pole_pairs * 4096 * velocity_control_config.control_loop_period / 1000; // variable pole_pairs
+                            crossover = INT_MAX - INT_MAX/10;
+                            //hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
+                        }
+                    } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
+                        if (isnull(i_qei)) {
+                            printstrln("velocity_ctrl_service: ERROR: Interface for QEI Service is not provided, but configured to be used");
+                            exit(-1);
+                        } else {
+                            QEIConfig qei_config = i_qei.get_qei_config();
+                            speed_factor = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * velocity_control_config.control_loop_period / 1000;       // variable qei_real_max
+                            crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) / 10;
+                        }
+                    } else if (velocity_control_config.feedback_sensor == BISS_SENSOR){
+                        if(isnull(i_biss)){
+                            printstrln("velocity_ctrl_service: ERROR: Interface for BiSS Service is not provided, but configured to be used");
+                            exit(-1);
+                        }
+                    } else if (velocity_control_config.feedback_sensor == AMS_SENSOR){
+                        if(isnull(i_ams)){
+                            printstrln("velocity_ctrl_service: ERROR: Interface for AMS Service is not provided, but configured to be used");
+                            exit(-1);
+                        }
+                    }
+
+                    if (velocity_control_config.Ki_n != 0) {
+                        error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
+                    }
+
+                    init_filter(filter_buffer, index, FILTER_SIZE_MAX);
+
+                    config_update_flag = 0;
+                }
+
+                if (compute_flag == 1) {
+                    /* calculate actual velocity from hall/qei with filter*/
+                    if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
+                        actual_velocity = i_biss.get_biss_velocity();
+                    } else if (velocity_control_config.feedback_sensor == AMS_SENSOR) {
+                        actual_velocity = i_ams.get_ams_velocity();
+                    } else {
+                        if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
+                            if(!isnull(i_hall)){
+                                position = i_hall.get_hall_position_absolute();
+                            }
+
                             if (position > 2049) {
                                 init = 1;
                                 previous_position = 2049;
@@ -174,204 +172,189 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                             }
                             raw_speed = 0;
                             //target_velocity = 0;
-                        } else if (init == 1) {
-                            position = i_hall.get_hall_position_absolute();//get_hall_position_absolute(c_hall);
+                        } else {
+                            if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
+                                position = i_hall.get_hall_position_absolute();
+                            } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
+                                position = i_qei.get_qei_position_absolute();
+                            }
+
                             difference = position - previous_position;
-                            if (difference > hall_crossover) {
-                                difference = old_difference;
-                            } else if (difference < -hall_crossover) {
+
+                            if (difference < -crossover || difference > crossover) {
                                 difference = old_difference;
                             }
-                            raw_speed = (difference*rpm_constant)/speed_factor_hall;
+
+                            raw_speed = (difference * rpm_constant) / speed_factor;
+
 #ifdef Debug_velocity_ctrl
                             //xscope_int(RAW_SPEED, raw_speed);
 #endif
                             previous_position = position;
                             old_difference = difference;
                         }
-                    } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
-                        position = i_qei.get_qei_position_absolute();
-                        difference = position - previous_position;
+                        /**
+                         * Or any other sensor interfaced to the IFM Module
+                         * place client functions here to acquire velocity/position
+                         */
 
-                        if (difference > qei_crossover) {
-                            difference = old_difference;
-                        }
-
-                        if (difference < -qei_crossover) {
-                            difference = old_difference;
-                        }
-
-                        raw_speed = (difference*rpm_constant)/speed_factor_qei;
-
-#ifdef Debug_velocity_ctrl
-                        //xscope_int(RAW_SPEED, raw_speed);
-#endif
-                        previous_position = position;
-                        old_difference = difference;
+                        actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
                     }
-                    /**
-                     * Or any other sensor interfaced to the IFM Module
-                     * place client functions here to acquire velocity/position
-                     */
-
-                    actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
                 }
-            }
 
-            if(activate == 1) {
+                if(activate == 1) {
 #ifdef Debug_velocity_ctrl
-                xscope_int(ACTUAL_VELOCITY, actual_velocity);
-                xscope_int(TARGET_VELOCITY, target_velocity);
+                    xscope_int(ACTUAL_VELOCITY, actual_velocity);
+                    xscope_int(TARGET_VELOCITY, target_velocity);
 #endif
-                compute_flag = 1;
-                /* Controller */
-                error_velocity   = (target_velocity - actual_velocity);
-                error_velocity_I = error_velocity_I + error_velocity;
-                error_velocity_D = error_velocity - previous_error;
+                    compute_flag = 1;
+                    /* Controller */
+                    error_velocity   = (target_velocity - actual_velocity);
+                    error_velocity_I = error_velocity_I + error_velocity;
+                    error_velocity_D = error_velocity - previous_error;
 
-                if (error_velocity_I > (error_velocity_I_limit)) {
-                    error_velocity_I = (error_velocity_I_limit);
-                } else if (error_velocity_I < -(error_velocity_I_limit)) {
-                    error_velocity_I = 0 -(error_velocity_I_limit);
+                    if (error_velocity_I > error_velocity_I_limit) {
+                        error_velocity_I = error_velocity_I_limit;
+                    } else if (error_velocity_I < -error_velocity_I_limit) {
+                        error_velocity_I = 0 -error_velocity_I_limit;
+                    }
+
+                    velocity_control_out = (velocity_control_config.Kp_n*error_velocity)  +
+                                           (velocity_control_config.Ki_n*error_velocity_I) +
+                                           (velocity_control_config.Kd_n*error_velocity_D);
+
+                    velocity_control_out /= PID_DENOMINATOR;
+
+                    if (velocity_control_out > velocity_control_out_limit) {
+                        velocity_control_out = velocity_control_out_limit;
+                    } else if (velocity_control_out < -velocity_control_out_limit) {
+                        velocity_control_out = -velocity_control_out_limit;
+                    }
+
+                    i_motorcontrol.set_voltage(velocity_control_out); //set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
+
+                    previous_error = error_velocity;
                 }
-
-                velocity_control_out = (velocity_control_config.Kp_n*error_velocity)  +
-                                       (velocity_control_config.Ki_n*error_velocity_I) +
-                                       (velocity_control_config.Kd_n*error_velocity_D);
-
-                velocity_control_out /= PID_DENOMINATOR;
-
-                if (velocity_control_out > velocity_control_out_limit) {
-                    velocity_control_out = velocity_control_out_limit;
-                } else if (velocity_control_out < -velocity_control_out_limit) {
-                    velocity_control_out = -velocity_control_out_limit;
-                }
-
-                i_motorcontrol.set_voltage(velocity_control_out);//set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
-
-                previous_error = error_velocity;
-
-            }
-    //        printf("looping %d\n", velocity_control_config.Loop_time);
-            break;
-
-        case i_velocity_control[int i].set_velocity(int in_velocity):
-
-            target_velocity = in_velocity;
-            break;
-
-        case i_velocity_control[int i].get_velocity()-> int out_velocity:
-
-            out_velocity = actual_velocity;
-            break;
-
-        case i_velocity_control[int i].get_target_velocity() -> int out_target_velocity:
-
-            out_target_velocity = target_velocity;
-            break;
-
-        case i_velocity_control[int i].set_velocity_control_config(ControlConfig in_params):
-
-            velocity_control_config.Kp_n = in_params.Kp_n;
-            velocity_control_config.Ki_n = in_params.Ki_n;
-            velocity_control_config.Kd_n = in_params.Kd_n;
-
-            error_velocity_I_limit = 0;
-            if(velocity_control_config.Ki_n != 0)
-                error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
-
-            break;
-
-        case i_velocity_control[int i].set_velocity_filter(int in_length):
-
-            filter_length = in_length;
-
-            if(filter_length > FILTER_SIZE_MAX)
-                filter_length = FILTER_SIZE_MAX;
-
-            break;
-
-        case i_velocity_control[int i].set_hall_config(HallConfig in_config):
-
-            hall_config.pole_pairs = in_config.pole_pairs;
-            //hall_config.max_ticks = in_config.max_ticks;
-            //hall_config.max_ticks_per_turn = in_config.max_ticks_per_turn;
-            break;
-
-        case i_velocity_control[int i].set_qei_config(QEIConfig in_params):
-
-            //qei_config.max_ticks = in_params.max_ticks;
-            qei_config.index_type = in_params.index_type;
-            qei_config.ticks_resolution = in_params.ticks_resolution;
-            //qei_config.max_ticks_per_turn = in_params.max_ticks_per_turn;
-            //qei_config.poles = in_params.poles;
-
-            break;
-
-        case i_velocity_control[int i].set_velocity_sensor(int in_sensor_used):
-
-            velocity_control_config.feedback_sensor = in_sensor_used;
-
-            if(in_sensor_used == HALL_SENSOR) {
-                speed_factor_hall = hall_config.pole_pairs * 4096 * (velocity_control_config.control_loop_period)/1000;
-                //hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
-
-            } else if(in_sensor_used >= QEI_SENSOR) {
-                speed_factor_qei = qei_config.ticks_resolution * QEI_CHANGES_PER_TICK * (velocity_control_config.control_loop_period)/1000;
-                qei_crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK )/10;
-            }
-            target_velocity = actual_velocity;
-            break;
-
-
-        case i_velocity_control[int i].disable_velocity_ctrl():
-
-            activate = 0;
-            error_velocity = 0;
-            error_velocity_D = 0;
-            error_velocity_I = 0;
-            previous_error = 0;
-            velocity_control_out = 0;
-            i_motorcontrol.set_voltage(0); //set_commutation_sinusoidal(c_commutation, 0);
-            i_motorcontrol.set_fets_state(0);//disable_motor(c_commutation);
-            delay_milliseconds(30);//wait_ms(30, 1, t);
-            break;
-
-        case i_velocity_control[int i].check_busy() -> int out_state:
-
-                out_state = activate;
+                //printf("looping %d\n", velocity_control_config.Loop_time);
                 break;
 
-        case i_velocity_control[int i].enable_velocity_ctrl():
+            case !isnull(i_hall) => i_hall.notification():
 
-            activate = 1;
-            while (1) {
-                init_state = i_motorcontrol.check_busy();//__check_commutation_init(c_commutation);
-                if (init_state == INIT) {
-#ifdef debug_print
-                    printf("commutation intialized\n");
-#endif
-                    fet_state = i_motorcontrol.get_fets_state();//check_fet_state(c_commutation);
-                    if (fet_state == 0) {
-                        i_motorcontrol.set_fets_state(1);//enable_motor(c_commutation);
-                        delay_milliseconds(2);//wait_ms(2, 1, t);
-                    }
-                    break;
+                switch (i_hall.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
                 }
-            }
+                break;
 
-#ifdef debug_print
-                printf("velocity control activated\n");
-#endif
-            break;
+            case !isnull(i_qei) => i_qei.notification():
 
-        case i_velocity_control[int i].get_velocity_control_config() -> ControlConfig out_config:
+                switch (i_qei.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case i_motorcontrol.notification():
+
+                switch (i_motorcontrol.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case i_velocity_control[int i].set_velocity(int in_velocity):
+
+                target_velocity = in_velocity;
+                break;
+
+            case i_velocity_control[int i].get_velocity()-> int out_velocity:
+
+                out_velocity = actual_velocity;
+                break;
+
+            case i_velocity_control[int i].get_target_velocity() -> int out_target_velocity:
+
+                out_target_velocity = target_velocity;
+                break;
+
+            case i_velocity_control[int i].get_velocity_control_config() -> ControlConfig out_config:
 
                 out_config = velocity_control_config;
                 break;
 
-            }
-           // break;
-        }
+            case i_velocity_control[int i].set_velocity_control_config(ControlConfig in_params):
 
+                velocity_control_config = in_params;
+                config_update_flag = 1;
+                break;
+
+            case i_velocity_control[int i].set_velocity_filter(int in_length):
+
+                filter_length = in_length;
+
+                if (filter_length > FILTER_SIZE_MAX) {
+                    filter_length = FILTER_SIZE_MAX;
+                }
+
+                config_update_flag = 1;
+
+                break;
+
+            case i_velocity_control[int i].set_velocity_sensor(int in_sensor_used):
+
+                velocity_control_config.feedback_sensor = in_sensor_used;
+                target_velocity = actual_velocity;
+                config_update_flag = 1;
+                break;
+
+            case i_velocity_control[int i].disable_velocity_ctrl():
+
+                activate = 0;
+                error_velocity = 0;
+                error_velocity_D = 0;
+                error_velocity_I = 0;
+                previous_error = 0;
+                velocity_control_out = 0;
+                i_motorcontrol.set_voltage(0); //set_commutation_sinusoidal(c_commutation, 0);
+                i_motorcontrol.set_fets_state(0); //disable_motor(c_commutation);
+                delay_milliseconds(30); //wait_ms(30, 1, t);
+                break;
+
+            case i_velocity_control[int i].check_busy() -> int out_state:
+
+                out_state = activate;
+                break;
+
+            case i_velocity_control[int i].enable_velocity_ctrl():
+
+                activate = 1;
+                while (1) {
+                    if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
+#ifdef debug_print
+                        printstrln("velocity_ctrl_service: commutation initialized");
+#endif
+                        if (i_motorcontrol.get_fets_state() == 0) { //check_fet_state(c_commutation);
+                            i_motorcontrol.set_fets_state(1); //enable_motor(c_commutation);
+                            delay_milliseconds(2); //wait_ms(2, 1, t);
+                        }
+                        break;
+                    }
+                }
+
+#ifdef debug_print
+                printstrln("velocity_ctrl_service: velocity control activated");
+#endif
+                break;
+
+        }
+    }
 }

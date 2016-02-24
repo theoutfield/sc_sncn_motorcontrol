@@ -1,6 +1,6 @@
 .. _pwm_symmetrical_module:
 ==============================
-SOMANET Symmetrical PWM module
+Symmetrical PWM Module
 ==============================
 
 .. contents:: In this document
@@ -11,7 +11,7 @@ This module offers a service that generates PWM signals over the provided ports.
 controlled by a client function. Two different versions of the service are available, one triggers a signal with
 every generated pulse (required sometimes for proper ADC sampling) and the other one does not. 
 
-These PWM signals are intended to control both high- and low-side switches of three H-brigdes. 
+These PWM signals are intended to control both high- and low-side switches of three H-bridges. 
 The three channels are center aligned which means that the outputs are symmetrical to the center of the pulses.
 
 When running the PWM Service, the **Reference Frequency** of the tile where the Service is allocated will be
@@ -43,16 +43,16 @@ How to use
 
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-          This will help solving internal dependancy issues.
+          This will help solving internal dependency issues.
 
 2. Include the PWM Service headers in your app, for Service **pwm_service.h** and Client **pwm_service_client.h**.
-3. Instanciate the ports where the Service will be outputting the PWM signals. 
+3. Instantiate the ports where the Service will be outputting the PWM signals. 
 4. Inside your main function, declare the channels for Service-Client communication.
-5. At your IFM tile, instanciate the Service.
+5. At your IFM tile, instantiate the Service.
 6. At whichever other core, you can update your PWM outputs through a client call. 
     But first you will need to initialize the communication by calling ``pwm_share_control_buffer_address_with_server``.
 
-    .. code-block:: C
+    .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 

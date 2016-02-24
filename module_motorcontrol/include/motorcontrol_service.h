@@ -30,7 +30,7 @@ typedef enum {
  */
 typedef enum {
     BDC_MOTOR = 10,  /**< Brushed DC Motor. */
-    BLDC_MOTOR = 11  /**< Brushless DC Motor. */
+    BLDC_MOTOR = 11  /**< Brush-less DC Motor. */
 } MotorType;
 
 /**
@@ -56,7 +56,7 @@ typedef struct {
 #include <mc_internal_constants.h>
 
 /**
- * @brief Structure type to define the ports to manage the fet-driver in your IFM SOMANET device (if applicable).
+ * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
  */
 typedef struct {
     port ?p_coast;  /**< [Nullable] Port for management signals. */
@@ -71,6 +71,21 @@ typedef struct {
 interface MotorcontrolInterface{
 
     /**
+     * @brief Notifies the interested parties that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
+
+    /**
      * @brief Sets an amplitude voltage on the sinusodial signals commutating the windings.
      *
      * @param voltage Voltage [-PWM_MAX_VALUE:PWM_MAX_VALUE]. By default PWM_MAX_VALUE = 13889.
@@ -83,7 +98,7 @@ interface MotorcontrolInterface{
      *
      * @param in_config New Service configuration.
      */
-    void set_config(MotorcontrolConfig new_config);
+    void set_config(MotorcontrolConfig in_config);
 
     /**
      * @brief Getter for current configuration used by the Service.
@@ -93,18 +108,18 @@ interface MotorcontrolInterface{
     MotorcontrolConfig get_config();
 
     /**
-     * @brief Setter for the status of the fets
+     * @brief Setter for the status of the FETs
      *
-     * @return 0 - Fets disabled.
-     *         1 - Fets enabled.
+     * @return 0 - FETs disabled.
+     *         1 - FETs enabled.
      */
     void set_fets_state(int state);
 
     /**
-     * @brief Getter for the status of the fets
+     * @brief Getter for the status of the FETs
      *
-     * @return 0 - Fets disabled.
-     *         1 - Fets enabled.
+     * @return 0 - FETs disabled.
+     *         1 - FETs enabled.
      */
     int get_fets_state();
 
@@ -127,8 +142,7 @@ interface MotorcontrolInterface{
     /**
      * @brief Getter for the current state of the Service.
      *
-     * @return 0 - not initialized.
-     *         1 - initialized.
+     * @return 0 - not initialized, 1 - initialized.
      */
     int check_busy();
 
@@ -150,22 +164,23 @@ interface MotorcontrolInterface{
  *        absolute position of your rotor is required, for the moment
  *        just Hall Service is suitable for commutation purposes.
  *
- * @param fet_driver_ports Ports structure defining where to access the fet-driver signals.
+ * @param fet_driver_ports Ports structure defining where to access the FET-driver signals.
  * @param motorcontrol_config Configuration for the Service.
- * @param c_pwm_ctrl Communication channel to the PWM Service.
- * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
- * @param i_qei [[Nullable]] Communication interface to the Encoder Service (if applicable).
- * @param i_watchdog Communication interface to the Watchdog Service.
- * @param i_motorcontrol[5] Array of communication interfaces to handle up to 5 different clients.
+ * @param c_pwm_ctrl Channel to PWM Service.
+ * @param i_hall [[Nullable]] Interface to Hall Sensor Service (if applicable).
+ * @param i_qei [[Nullable]] Interface to Incremental Encoder Service (if applicable).
+ * @param i_biss [[Nullable]] Interface to BiSS Encoder Service (if applicable).
+ * @param i_watchdog Interface to Watchdog Service.
+ * @param i_motorcontrol Array of communication interfaces to handle up to 5 different clients.
  */
 [[combinable]]
- void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
-                             chanend c_pwm_ctrl,
-                             interface HallInterface client ?i_hall,
-                             interface QEIInterface client ?i_qei,
-                             interface BISSInterface client ?i_biss,
-                             interface AMSInterface client ?i_ams,
-                             interface WatchdogInterface client i_watchdog,
-                             interface MotorcontrolInterface server i_motorcontrol[5]);
+void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
+                            chanend c_pwm_ctrl,
+                            interface HallInterface client ?i_hall,
+                            interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
+                            interface WatchdogInterface client i_watchdog,
+                            interface MotorcontrolInterface server i_motorcontrol[4]);
 
 #endif

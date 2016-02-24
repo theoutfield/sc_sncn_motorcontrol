@@ -1,8 +1,8 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
+//#include <CORE_BOARD_REQUIRED>
+//#include <IFM_BOARD_REQUIRED>
 #include <CORE_C22-rev-a.bsp>
-//#include <IFM_DC100-rev-b.bsp>
-#include <IFM_DC300-rev-a.bsp>
-//#include <IFM_DC1K-rev-c1.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @file test_torque-ctrl.xc
@@ -29,8 +29,8 @@
 /* Test Profile Torque Function */
 void profile_torque_test(interface TorqueControlInterface client i_torque_control)
 {
-    int target_torque = 800;    //(desired torque/torque_constant)  * IFM resolution
-    int torque_slope  = 1000;   //(desired torque_slope/torque_constant)  * IFM resolution
+    int target_torque = 150;    //(desired torque/torque_constant)  * IFM resolution
+    int torque_slope  = 100;   //(desired torque_slope/torque_constant)  * IFM resolution
 
     ProfilerConfig profiler_config;
     profiler_config.polarity = POLARITY;

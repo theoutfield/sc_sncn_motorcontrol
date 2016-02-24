@@ -1,5 +1,5 @@
 /**
- * @file velocity_ctrl_server.h
+ * @file velocity_ctrl_service.h
  * @brief Velocity Control Loop Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
  */
@@ -46,7 +46,7 @@ interface VelocityControlInterface{
     /**
      * @brief Getter for the current target velocity in the controller.
      *
-     * @param Current target velocity [RPMs].
+     * @return Current target velocity [RPMs].
      */
     int get_target_velocity();
 
@@ -62,12 +62,12 @@ interface VelocityControlInterface{
      *
      * @param in_config New Service configuration.
      */
-    void set_velocity_control_config(ControlConfig velocity_ctrl_params);
+    void set_velocity_control_config(ControlConfig in_config);
 
     /**
      * @brief Allows you to change the sensor for velocity control on runtime.
      *
-     * @param sensor New sensor [HALL_SENSOR, QEI_SENSOR].
+     * @param sensor_used New sensor [HALL_SENSOR, QEI_SENSOR].
      */
     void set_velocity_sensor(int sensor_used);
 
@@ -77,20 +77,6 @@ interface VelocityControlInterface{
      * @param in_length New length [0:128].
      */
     void set_velocity_filter(int in_length);
-
-    /**
-     * @brief Setter for new configuration in the Hall Sensor Service.
-     *
-     * @param in_config New Hall Sensor Service configuration.
-     */
-    void set_hall_config(HallConfig hall_config);
-
-    /**
-     * @brief Setter for new configuration in the Encoder Service.
-     *
-     * @param in_config New Encoder Service configuration.
-     */
-    void set_qei_config(QEIConfig qei_params);
 
     /**
      * @brief Getter for the current state of the Service.
@@ -122,7 +108,7 @@ int max_speed_limit(int velocity, int max_speed);
 
 /**
  * @brief Service to perform a Velocity PID Control Loop on top of a Motor Control Service.
- *        You will need a Motor Control Stack running parallely to this Service,
+ *        You will need a Motor Control Stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
@@ -130,8 +116,10 @@ int max_speed_limit(int velocity, int max_speed);
  * @param velocity_ctrl_config Configuration for the Velocity Control Service.
  * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
  * @param i_qei [[Nullable]] Communication interface to the Encoder Service (if applicable).
+ * @param i_biss [[Nullable]] Communication interface to the BiSSEncoder Service (if applicable).
+ * @param i_ams [[Nullable]] Communication interface to the AMSEncoder Service (if applicable).
  * @param i_motorcontrol Communication interface to the Motor Control Service.
- * @param i_velocity_control[3] Array of communication interfaces to handle up to 3 different clients.
+ * @param i_velocity_control Array of communication interfaces to handle up to 3 different clients.
  */
 [[combinable]]
 void velocity_control_service(ControlConfig & velocity_ctrl_config,

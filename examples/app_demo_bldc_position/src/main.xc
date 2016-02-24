@@ -1,8 +1,8 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
+//#include <CORE_BOARD_REQUIRED>
+//#include <IFM_BOARD_REQUIRED>
 #include <CORE_C22-rev-a.bsp>
-//#include <IFM_DC100-rev-b.bsp>
-#include <IFM_DC300-rev-a.bsp>
-//#include <IFM_DC1K-rev-c1.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @file test_position-ctrl.xc
@@ -14,6 +14,7 @@
 #include <qei_service.h>
 #include <hall_service.h>
 #include <ams_service.h>
+#include <biss_service.h>
 #include <pwm_service.h>
 #include <watchdog_service.h>
 #include <motorcontrol_service.h>
@@ -26,7 +27,11 @@
 #include <user_config.h>
 
 /* Test Profile Position function */
-void position_profile_test(interface PositionControlInterface client i_position_control)
+void position_profile_test(interface PositionControlInterface client i_position_control,
+                           interface HallInterface client ?i_hall,
+                           interface QEIInterface client ?i_qei,
+                           interface BISSInterface client ?i_biss,
+                           interface AMSInterface client ?i_ams)
 {
     const int target = 16000;
     int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
@@ -46,7 +51,8 @@ void position_profile_test(interface PositionControlInterface client i_position_
     profiler_config.max_deceleration = MAX_DECELERATION;
 
     /* Initialise the position profile generator */
-    init_position_profiler(profiler_config, i_position_control);
+    init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss, i_ams);
+
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
 
@@ -115,7 +121,16 @@ int main(void)
     par
     {
         /* Test Profile Position Client function*/
-        on tile[APP_TILE]: position_profile_test(i_position_control[0]);      // test PPM on slave side
+        on tile[APP_TILE]:
+        {
+#if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
+            position_profile_test(i_position_control[0], i_hall[2], i_qei[2], null, null);      // test PPM on slave side
+#elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
+            position_profile_test(i_position_control[0], i_hall[2], null, null, i_ams[2]);      // test PPM on slave side
+#else
+            position_profile_test(i_position_control[0], i_hall[2], null, i_biss[2], null);      // test PPM on slave side
+#endif
+        }
 
         on tile[APP_TILE]:
         /* XScope monitoring */

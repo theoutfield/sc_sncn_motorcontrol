@@ -205,6 +205,7 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
 void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                                 CurrentSensorsConfig &current_sensor_config, chanend c_trig)
 {
+    //#define AUTOCALIBRATION //FixMe: autocalibration should take place before PWM is activated.
     timer t;
     unsigned int ts;
 
@@ -223,6 +224,7 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
 
     configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
+#ifdef AUTOCALIBRATION
     //Calibration
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
@@ -242,6 +244,11 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
 
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
+#else
+   i_calib_a = 10002;
+   i_calib_b = 10002;
+#endif
+
 
     while (1)
     {

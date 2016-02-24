@@ -10,31 +10,48 @@
 #include <profile_control.h>
 
 void init_position_profiler(ProfilerConfig profile_position_config,
-                                interface PositionControlInterface client i_position_control){
+                            interface PositionControlInterface client i_position_control,
+                            interface HallInterface client ?i_hall,
+                            interface QEIInterface client ?i_qei,
+                            interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams) {
 
     ControlConfig control_config = i_position_control.get_position_control_config();
-    QEIConfig qei_config = i_position_control.get_qei_config();
-    HallConfig hall_config = i_position_control.get_hall_config();
-    BISSConfig biss_config = i_position_control.get_biss_config();
-    AMSConfig ams_config   = i_position_control.get_ams_config();
+
+    HallConfig hall_config;
+    QEIConfig qei_config;
+    BISSConfig biss_config;
+    AMSConfig ams_config;
+
+    if (!isnull(i_hall)) {
+        hall_config = i_hall.get_hall_config();
+    }
+
+    if (!isnull(i_qei)) {
+        qei_config = i_qei.get_qei_config();
+    }
+
+    if (!isnull(i_biss)) {
+        biss_config = i_biss.get_biss_config();
+    }
+
+    if (!isnull(i_ams)) {
+        ams_config = i_ams.get_ams_config();
+    }
 
     if(profile_position_config.max_acceleration <= 0 ||
             profile_position_config.max_velocity <= 0){
-        printstrln("Wrong configuration provided to profiler");
+        printstrln("profile_position: ERROR: Wrong configuration provided to profiler");
         return;
     }
 
     init_position_profile_limits(profile_position_config.max_acceleration,
-                                    profile_position_config.max_velocity,
-                                    qei_config, hall_config, biss_config, ams_config,
-                                    control_config.feedback_sensor,
-                                    profile_position_config.max_position,
-                                    profile_position_config.min_position);
-
-    return;
-
+                                 profile_position_config.max_velocity,
+                                 qei_config, hall_config, biss_config, ams_config,
+                                 control_config.feedback_sensor,
+                                 profile_position_config.max_position,
+                                 profile_position_config.min_position);
 }
-
 
 void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,
                           interface PositionControlInterface client i_position_control )
