@@ -25,7 +25,7 @@ static inline void update_turns(int &turns, int last_position, int position, int
 
 int check_biss_config(BISSConfig & biss_config)
 {
-    if(biss_config.polarity < 0  || biss_config.polarity > 1){
+    if(biss_config.polarity != BISS_POLARITY_NORMAL && biss_config.polarity != BISS_POLARITY_INVERTED){
         printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
         return ERROR;
     }
@@ -106,13 +106,13 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
         t :> last_biss_read;
     } while (last_count != NoError && !timeafter(last_biss_read, time + 1000000*BISS_USEC));
     if (last_count == CRCError)
-        printstrln("BiSS Error: CRC");
+        printstrln("biss_service: ERROR: CRC");
     else if (last_count == NoStartBit)
-        printstrln("BiSS Error: No Start bit");
+        printstrln("biss_service: ERROR: No Start bit");
     else if (last_count == NoAck)
-        printstrln("BiSS Error: No Ack bit");
+        printstrln("biss_service: ERROR: No Ack bit");
     else if (last_count != NoError)
-        printstrln("BiSS Error");
+        printstrln("biss_service: ERROR: initialization");
     last_count_read = last_biss_read;
     next_velocity_read = last_biss_read;
     { last_count , last_position, void } = biss_encoder(data, biss_config);

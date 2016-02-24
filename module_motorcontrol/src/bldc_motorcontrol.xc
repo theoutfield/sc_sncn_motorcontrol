@@ -9,8 +9,6 @@
 #include <a4935.h>
 #include <sine_table_big.h>
 
-#define MILLISECOND 250000
-
 static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
     unsigned int pwm[3] = {0, 0, 0};  // PWM OFF (break mode; short all phases)
@@ -63,7 +61,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
     // enable watchdog
     t :> ts;
-    t when timerafter (ts + MILLISECOND*4):> ts;
+    t when timerafter (ts + 250000*4):> ts; /* FIXME: replace with constant */
     i_watchdog.start();
 
     t :> ts;
