@@ -29,10 +29,13 @@ void position_profile_test(interface PositionControlInterface client i_position_
                            interface QEIInterface client ?i_qei,
                            interface BISSInterface client ?i_biss)
 {
-    int target_position = 16000;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
-    int velocity        = 2000;         // rpm
-    int acceleration    = 4000;         // rpm/s
-    int deceleration    = 4000;         // rpm/s
+    const int target = 16000;
+    int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
+    int velocity        = 1000;         // rpm
+    int acceleration    = 100;         // rpm/s
+    int deceleration    = 100;         // rpm/s
+    int follow_error = 0;
+    int actual_position = 0;
 
     ProfilerConfig profiler_config;
     profiler_config.polarity = POLARITY;
@@ -48,6 +51,30 @@ void position_profile_test(interface PositionControlInterface client i_position_
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
+
+    while(1)
+    {
+        // Read actual position from the Position Control Server
+        actual_position = i_position_control.get_position();
+        follow_error = target_position - actual_position;
+
+        /*
+        xscope_core_int(0, actual_position);
+        xscope_core_int(1, target_position);
+        xscope_core_int(2, follow_error);
+        */
+        // Keep motor turning when reaching target position
+        if ((target_position == target) && (follow_error < 100)){
+
+            target_position = 0;
+            set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
+
+        } else if ((target_position == 0) && (follow_error < 100)){
+
+            target_position = target;
+            set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
+        }
+    }
 }
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -57,7 +84,7 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #else
-BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
 
 int main(void)
@@ -66,7 +93,7 @@ int main(void)
     chan c_pwm_ctrl;            // pwm channel
 
     interface WatchdogInterface i_watchdog[2];
-    interface MotorcontrolInterface i_motorcontrol[5];
+    interface MotorcontrolInterface i_motorcontrol[4];
     interface HallInterface i_hall[5];
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
     interface QEIInterface i_qei[5];
@@ -102,7 +129,7 @@ int main(void)
                 xscope_int(TARGET_POSITION, target_position/10); //Divided by 10 for better displaying
                 xscope_int(ACTUAL_POSITION, actual_position/10); //Divided by 10 for better displaying
 
-                delay_milliseconds(10); /* 1 ms wait */
+                delay_milliseconds(1); /* 1 ms wait */
             }
         }
 

@@ -44,7 +44,7 @@ void biss_test(client interface BISSInterface i_biss) {
     }
 }
 
-BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 
 int main() {
     interface BISSInterface i_biss[5]; //array of interfaces for biss server

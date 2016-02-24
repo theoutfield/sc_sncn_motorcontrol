@@ -20,7 +20,7 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 
 #define VOLTAGE 2000 //+/- 13889
 
@@ -42,8 +42,8 @@ int main(void) {
     // Motor control interfaces
     chan c_pwm_ctrl, c_adctrig; // pwm channels
     interface WatchdogInterface i_watchdog[2];
-    interface ADCInterface i_adc[5];
-    interface MotorcontrolInterface i_motorcontrol[5];
+    interface ADCInterface i_adc[2];
+    interface MotorcontrolInterface i_motorcontrol[4];
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
 #else

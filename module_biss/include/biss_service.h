@@ -15,7 +15,7 @@
 #define ERROR                      0
 #define SUCCESS                    1
 
-#define SET_ALL_AS_QEI             0b0011
+#define SET_ALL_AS_QEI                 0b0011
 #define SET_PORT1_AS_HALL_PORT2_AS_QEI 0b0010
 #define SET_PORT1_AS_QEI_PORT2_AS_HALL 0b0001
 
@@ -31,15 +31,15 @@
 #define BISS_POLARITY              BISS_POLARITY_NORMAL
 #define BISS_MAX_TICKS             0x7fffffff   // the count is reset to 0 if greater than this
 #define BISS_CRC_POLY              0b110000     // poly in reverse representation:  x^0 + x^1 + x^4 is 0b1100
-#define BISS_DATA_PORT_BIT         1            // bit number (0 = rightmost bit) when inputing from a multibit port
-#define BISS_CLK_PORT_HIGH         1            // high clock value when outputting the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
-#define BISS_CLK_PORT_LOW          0            // low  clock value when outputting the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
+#define BISS_DATA_PORT_BIT         0            // bit number (0 = rightmost bit) when inputing from a multibit port
+#define BISS_CLK_PORT_HIGH         (0b1000 | SET_PORT1_AS_HALL_PORT2_AS_QEI)    // high clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
+#define BISS_CLK_PORT_LOW          SET_PORT1_AS_HALL_PORT2_AS_QEI               // low  clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
 #define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequency: dividend/divisor in MHz
-#define BISS_CLOCK_DIVISOR         8            // supported frequencies are (tile frequency) / 2n
+#define BISS_CLOCK_DIVISOR         22           // supported frequencies are (tile frequency) / 2n
 #define BISS_USEC                  USEC_FAST    // number of ticks in a microsecond
 #define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
 #define BISS_TIMEOUT               14*BISS_USEC // BiSS timeout in clock ticks
-#define BISS_OFFSET_ELECTRICAL     600
+#define BISS_OFFSET_ELECTRICAL     4000
 
 /**
  * @brief Structure type to define the BiSS Service configuration.
@@ -159,13 +159,6 @@ interface BISSInterface {
      * @return new electrical angle offset
      */
     unsigned int reset_biss_angle_electrical(unsigned int angle);
-
-    /**
-     * @brief Set calib flag in the BiSS Server so it will alway return 0 as electrical angle
-     *
-     * @param flag 1 to activate, 0 to deactivate calibration
-     */
-    void set_biss_calib(int flag);
 
     /**
      * @brief Getter for current configuration used by the Service.

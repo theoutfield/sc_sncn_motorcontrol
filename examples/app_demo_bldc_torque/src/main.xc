@@ -54,7 +54,7 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #else
-BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
 
 int main(void)
@@ -65,7 +65,7 @@ int main(void)
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
     interface HallInterface i_hall[5];
-    interface MotorcontrolInterface i_motorcontrol[5];
+    interface MotorcontrolInterface i_motorcontrol[4];
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
     interface QEIInterface i_qei[5];
 #else
