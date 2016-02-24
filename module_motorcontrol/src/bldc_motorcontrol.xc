@@ -32,6 +32,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
     unsigned int ts;
     t_pwm_control pwm_ctrl;
     int check_fet;
+    int calib_flag = 0;
     int init_state = INIT_BUSY;
 
     unsigned int pwm[3] = { 0, 0, 0 };
@@ -85,7 +86,9 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
         select {
 
             case t when timerafter(ts + USEC_FAST * motorcontrol_config.commutation_loop_period) :> ts: //XX kHz commutation loop
-                if (sensor_select == HALL_SENSOR) {
+                if (calib_flag != 0) {
+                    angle = 0;
+                } else if (sensor_select == HALL_SENSOR) {
                     //hall only
                     angle = i_hall.get_hall_position();
                 } else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
@@ -97,6 +100,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 } else if (sensor_select == BISS_SENSOR) {
                     angle = i_biss.get_biss_angle();
                 }
+                if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
+                    angle = 4096 - angle;
 
                 if (shutdown == 1) {    /* stop PWM */
                     pwm[0] = -1;
@@ -104,12 +109,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     pwm[2] = -1;
                 } else {
                     if (voltage >= 0) {
-                        if (sensor_select == HALL_SENSOR) {
-                            angle_pwm = ((angle + motorcontrol_config.hall_offset[0]) >> 2) & 0x3ff;
-                        } else if (sensor_select == QEI_SENSOR ) {
+                        if (sensor_select == QEI_SENSOR ) {
                             angle_pwm = (angle >> 2) & 0x3ff; //512
-                        } else if (sensor_select == BISS_SENSOR) {
-                            angle_pwm = angle >> 2;
+                        } else {
+                            angle_pwm = ((angle + motorcontrol_config.hall_offset[0]) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
                         angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
@@ -117,12 +120,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                         angle_pwm = (angle_pwm + 342) & 0x3ff;
                         pwm[2] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half;
                     } else { /* voltage < 0 */
-                        if (sensor_select == HALL_SENSOR) {
-                            angle_pwm = ((angle + motorcontrol_config.hall_offset[1]) >> 2) & 0x3ff;
-                        } else if (sensor_select == QEI_SENSOR) {
+                        if (sensor_select == QEI_SENSOR ) {
                             angle_pwm = (angle >> 2) & 0x3ff; //3100
-                        } else if (sensor_select == BISS_SENSOR) {
-                            angle_pwm = ((angle + 2048) >> 2) & 0x3ff;
+                        } else {
+                            angle_pwm = ((angle + motorcontrol_config.hall_offset[1]) >> 2) & 0x3ff;
                         }
                         pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
                         angle_pwm = (angle_pwm + 341) & 0x3ff;
@@ -171,6 +172,14 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     motorcontrol_config.commutation_sensor = sensor_select;
                     break;
 
+            case i_motorcontrol[int i].set_sensor_offset(int in_offset):
+                    if (sensor_select == BISS_SENSOR ) {
+                        BISSConfig out_biss_config = i_biss.get_biss_config();
+                        out_biss_config.offset_electrical = in_offset;
+                        i_biss.set_biss_config(out_biss_config);
+                    }
+                    break;
+
             case i_motorcontrol[int i].set_fets_state(int new_state):
 
                     if(new_state == 0){
@@ -188,6 +197,43 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
             case i_motorcontrol[int i].check_busy() -> int state_return:
                     state_return = init_state;
+                    break;
+
+            case i_motorcontrol[int i].set_calib(int in_flag) -> int out_offset:
+                    calib_flag = in_flag;
+                    if (calib_flag == 1) {
+                        motorcontrol_config.hall_offset[0] = 0;
+                        motorcontrol_config.hall_offset[1] = 2048;
+                    } else {
+                        int calib_angle;
+                        if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
+                            calib_angle = 1024;
+                        else
+                            calib_angle = 3072;
+                        if (sensor_select == HALL_SENSOR) {
+                            out_offset = (1024 - i_hall.get_hall_position()) & 4095;
+                            //Hall has a low resolution so the offsets could need to be shifted by +/- 1/6 turn
+                            if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
+                                if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
+                                    motorcontrol_config.hall_offset[0] = (out_offset - 682) & 4095; // -1/6 turn
+                                    motorcontrol_config.hall_offset[1] = (out_offset + 682) & 4095; // + half turn - 1/6 turn
+                                } else {
+                                    motorcontrol_config.hall_offset[1] = (out_offset - 682) & 4095;
+                                    motorcontrol_config.hall_offset[0] = (out_offset + 682) & 4095;
+                                }
+                            } else {
+                                if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
+                                    motorcontrol_config.hall_offset[0] = out_offset;
+                                    motorcontrol_config.hall_offset[1] = (out_offset + 2731) & 4095; // + half turn + 1/6 turn
+                                } else {
+                                    motorcontrol_config.hall_offset[1] = out_offset;
+                                    motorcontrol_config.hall_offset[0] = (out_offset + 2731) & 4095;
+                                }
+                            }
+                        } else if (sensor_select == BISS_SENSOR) {
+                            out_offset = i_biss.reset_biss_angle_electrical(calib_angle);// quarter turn
+                        }
+                    }
                     break;
 
             case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,

@@ -18,6 +18,14 @@ typedef enum {
 } BLDCWindingType;
 
 /**
+ * @brief Type for the polarity of a motor.
+ */
+typedef enum {
+    NORMAL_POLARITY=1, /**< Normal polarity. */
+    INVERTED_POLARITY   /**< Inverted polarity. */
+} PolarityType;
+
+/**
  * @brief Type for motors.
  */
 typedef enum {
@@ -31,6 +39,7 @@ typedef enum {
 typedef struct {
     MotorType motor_type;               /**< Type of motor to drive. */
     BLDCWindingType bldc_winding_type;  /**< Type of winding of your motor (if using a BLDC motor). */
+    PolarityType polarity_type;         /**< Type of polarity of your motor. */
     int commutation_sensor;             /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
     int hall_offset[2];                 /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
     int commutation_loop_period;        /**< Period for the commutation loop [microseconds]. */
@@ -135,6 +144,20 @@ interface MotorcontrolInterface{
      * @return 0 - not initialized, 1 - initialized.
      */
     int check_busy();
+
+    /**
+     * @brief Set calib flag in the Motorcontrol service so it will alway set 0 as electrical angle
+     *
+     * @param flag 1 to activate, 0 to deactivate calibration
+     */
+    int set_calib(int flag);
+
+    /**
+     * @brief Set the sensor offset of the current position sensor
+     *
+     * @param Sensor offset
+     */
+    void set_sensor_offset(int in_offset);
 };
 
 /**
