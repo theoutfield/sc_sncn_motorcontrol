@@ -1,6 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+//#include <CORE_BOARD_REQUIRED>
+//#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @brief Test illustrates usage of module_motorcontrol
@@ -19,21 +21,34 @@ PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+AMSPorts ams_ports = { {
+        IFM_TILE_CLOCK_2,
+        IFM_TILE_CLOCK_3,
+        SOMANET_IFM_GPIO_D3, //D3,    //mosi
+        SOMANET_IFM_GPIO_D1, //D1,    //sclk
+        SOMANET_IFM_GPIO_D2  },//D2     //miso
+        SOMANET_IFM_GPIO_D0 //D0         //slave select
+};
+#else
+HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+#endif
 
-#define VOLTAGE 1000 //+/- 13889
+#define VOLTAGE 700 //+/- 13889
 
 void adc_client(interface ADCInterface client i_adc){
 
     int b, c;
 
     while (1) {
-
         {b, c} = i_adc.get_currents();
 
         xscope_int(PHASE_B, b);
         xscope_int(PHASE_C, c);
+
+        delay_milliseconds(1);
     }
 }
 
@@ -46,6 +61,8 @@ int main(void) {
     interface MotorcontrolInterface i_motorcontrol[4];
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+    interface AMSInterface i_ams[5];
 #else
     interface HallInterface i_hall[5];
 #endif
@@ -91,6 +108,28 @@ int main(void) {
 
                     biss_service(biss_ports, biss_config, i_biss);
                 }
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+                /* AMS Rotary Sensor Service */
+                {
+                    AMSConfig ams_config;
+                    ams_config.factory_settings = 1;
+                    ams_config.polarity = AMS_POLARITY;
+                    ams_config.hysteresis = 1;
+                    ams_config.noise_setting = AMS_NOISE_NORMAL;
+                    ams_config.uvw_abi = 0;
+                    ams_config.dyn_angle_comp = 0;
+                    ams_config.data_select = 0;
+                    ams_config.pwm_on = AMS_PWM_OFF;
+                    ams_config.abi_resolution = 0;
+                    ams_config.resolution_bits = AMS_RESOLUTION;
+                    ams_config.offset = AMS_OFFSET;
+                    ams_config.pole_pairs = POLE_PAIRS;
+                    ams_config.max_ticks = 0x7fffffff;
+                    ams_config.cache_time = AMS_CACHE_TIME;
+                    ams_config.velocity_loop = AMS_VELOCITY_LOOP;
+
+                    ams_service(ams_ports, ams_config, i_ams);
+                }
 #else
                 /* Hall sensor Service */
                 {
@@ -113,10 +152,13 @@ int main(void) {
 
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, null, null, i_biss[0], i_watchdog[0], i_motorcontrol, null);
+                                         c_pwm_ctrl, null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                         c_pwm_ctrl, null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, i_hall[0], null, null, i_watchdog[0], i_motorcontrol, null);
+                                         c_pwm_ctrl, i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }

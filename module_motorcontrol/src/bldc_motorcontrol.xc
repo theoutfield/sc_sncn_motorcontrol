@@ -26,6 +26,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[4],
                             chanend c_pwm_ctrl,
@@ -104,6 +105,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     }
                 } else if (sensor_select == BISS_SENSOR) {
                     angle = i_biss.get_biss_angle();
+                } else if (sensor_select == AMS_SENSOR) {
+                    angle = i_ams.get_ams_angle();
                 }
                 if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
                     angle = 4096 - angle;
@@ -182,6 +185,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                         BISSConfig out_biss_config = i_biss.get_biss_config();
                         out_biss_config.offset_electrical = in_offset;
                         i_biss.set_biss_config(out_biss_config);
+                    } else if (sensor_select == AMS_SENSOR ) {
+                        AMSConfig out_ams_config = i_ams.get_ams_config();
+                        out_ams_config.offset = in_offset;
+                        i_ams.set_ams_config(out_ams_config);
                     }
                     break;
 
@@ -237,6 +244,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             }
                         } else if (sensor_select == BISS_SENSOR) {
                             out_offset = i_biss.reset_biss_angle_electrical(calib_angle);// quarter turn
+                        } else if (sensor_select == AMS_SENSOR) {
+                            out_offset = i_ams.reset_ams_angle(calib_angle);// quarter turn
                         }
                     }
                     break;

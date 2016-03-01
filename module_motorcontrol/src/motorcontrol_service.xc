@@ -24,8 +24,10 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
             return ERROR;
         }
 
-        if(commutation_params.commutation_sensor != HALL_SENSOR && commutation_params.commutation_sensor != BISS_SENSOR){
-            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL and BiSS sensors are supported as commutation sensor");
+        if(commutation_params.commutation_sensor != HALL_SENSOR &&
+           commutation_params.commutation_sensor != BISS_SENSOR &&
+           commutation_params.commutation_sensor != AMS_SENSOR) {
+            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL, BiSS and AMS sensors are supported as commutation sensor");
             return ERROR;
         }
     }
@@ -40,6 +42,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[4],
                             server interface foc_base ?i_foc)
@@ -77,11 +80,11 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                         if(motorcontrol_config.commutation_method == FOC && !isnull(i_adc) && !isnull(i_foc)){
 
                             foc_loop( fet_driver_ports, i_foc,
-                                      c_pwm_ctrl, i_adc, i_hall,  i_watchdog);
+                                      c_pwm_ctrl, i_adc, i_hall, i_watchdog);
                         }
                         else{
-                            bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_watchdog, i_motorcontrol,
-                                      c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
+                            bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
+                                c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
                         }
 
 

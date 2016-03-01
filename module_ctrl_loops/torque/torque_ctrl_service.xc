@@ -155,6 +155,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                       interface HallInterface client ?i_hall,
                       interface QEIInterface client ?i_qei,
                       interface BISSInterface client ?i_biss,
+                      interface AMSInterface client ?i_ams,
                       interface MotorcontrolInterface client i_motorcontrol,
                       interface TorqueControlInterface server i_torque_control[3])
 {
@@ -239,6 +240,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     HallConfig hall_config;
                     QEIConfig qei_config;
                     BISSConfig biss_config;
+                    AMSConfig ams_config;
                     motorcontrol_config = i_motorcontrol.get_config();
 
                     //Limits
@@ -273,9 +275,18 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                         }
                     }
 
+                    if (torque_control_config.feedback_sensor == AMS_SENSOR) {
+                        if (isnull(i_ams)) {
+                            printstrln("torque_ctrl_service: ERROR: Interface for AMS Service not provided");
+                        } else {
+                            ams_config = i_ams.get_ams_config();
+                        }
+                    }
+
                     if (torque_control_config.feedback_sensor != HALL_SENSOR
                            && torque_control_config.feedback_sensor != QEI_SENSOR
-                           && torque_control_config.feedback_sensor != BISS_SENSOR) {
+                           && torque_control_config.feedback_sensor != BISS_SENSOR
+                           && torque_control_config.feedback_sensor != AMS_SENSOR) {
                         torque_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
@@ -294,6 +305,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
 
                     if(torque_control_config.feedback_sensor == BISS_SENSOR) {
                         filter_length_variance = filter_length / biss_config.pole_pairs;
+                    } else if (torque_control_config.feedback_sensor == AMS_SENSOR) {
+                        filter_length_variance = filter_length /ams_config.pole_pairs;
                     } else {
                         filter_length_variance = filter_length / hall_config.pole_pairs;
                     }
@@ -320,6 +333,11 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                             angle = i_biss.get_biss_angle() >> 2; //  << 10 ) >> 12 /
                         }
                         actual_speed = i_biss.get_biss_velocity();
+                    } else if (torque_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                        if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
+                            angle = i_ams.get_ams_angle() >> 2; //  << 10 ) >> 12 /
+                        }
+                        actual_speed = i_ams.get_ams_velocity();
                     }
 
                     c_current <: 2;
@@ -545,6 +563,17 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                 }
                 break;
 
+            case !isnull(i_ams) => i_ams.notification():
+
+                switch (i_ams.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
             case i_motorcontrol.notification():
 
                 switch (i_motorcontrol.get_notification()) {
@@ -658,6 +687,7 @@ void torque_control_service(ControlConfig &torque_control_config,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
                             interface MotorcontrolInterface client i_motorcontrol,
                             interface TorqueControlInterface server i_torque_control[3])
 {
@@ -665,6 +695,6 @@ void torque_control_service(ControlConfig &torque_control_config,
 
     par {
         current_filter(adc_if, c_current);
-        torque_ctrl_loop(torque_control_config, c_current, i_hall, i_qei, i_biss, i_motorcontrol, i_torque_control);
+        torque_ctrl_loop(torque_control_config, c_current, i_hall, i_qei, i_biss, i_ams, i_motorcontrol, i_torque_control);
     }
 }

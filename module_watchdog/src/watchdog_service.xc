@@ -36,7 +36,7 @@ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface
                     watchdog_ports.p_enable <: shared_out; // go low
 
                     t :> ts2;
-                    t when timerafter(ts2+25000) :> ts2;
+                    t when timerafter(ts2+25000) :> ts2; // FIXME Magic numbers. Magic numbers everywhere...
 
                     if (isnull(watchdog_ports.p_tick)){
                         shared_out &= 0x7;
@@ -48,7 +48,7 @@ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface
                     watchdog_ports.p_enable <: shared_out; // go high
 
                     t :> ts2;
-                    t when timerafter (ts2 + 25000) :> ts2;
+                    t when timerafter (ts2 + 25000) :> ts2; // FIXME Magic numbers. Magic numbers everywhere...
 
                     if (isnull(watchdog_ports.p_tick)){
                         shared_out |= (1 << 2);             // prepare the kicking
@@ -64,7 +64,7 @@ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface
                     wd_enabled = 0;
                     break;
 
-                case t when timerafter(ts + 250000) :> ts:
+                case t when timerafter(ts + 250000) :> ts: // FIXME Magic numbers. Magic numbers everywhere...
                     if (wd_enabled == 1) {
                         if (isnull(watchdog_ports.p_tick)){
                             shared_out ^= (1 << 1) ; //toggle the second bit (DC1K)

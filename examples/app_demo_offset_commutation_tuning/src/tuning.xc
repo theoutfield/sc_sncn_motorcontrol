@@ -20,6 +20,9 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
     } else if (motorcontrol_config.commutation_sensor == BISS_SENSOR){
         offset = BISS_OFFSET_ELECTRICAL;
         printf("BiSS tuning, Sensor offset %d, ", offset);
+    } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR){
+        offset = AMS_OFFSET;
+        printf("AMS tuning, Sensor offset %d, ", offset);
     }
     if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
         printf ( "Star winding, Polarity %d\noffset clk %d (for positive voltage)\noffset cclk %d (for negative voltage)\n", motorcontrol_config.polarity_type, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
@@ -61,7 +64,7 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             //start turning the motor and print the offsets found
             i_commutation.set_voltage(input_voltage);
             motorcontrol_config = i_commutation.get_config();
-            if (motorcontrol_config.commutation_sensor == BISS_SENSOR)
+            if (motorcontrol_config.commutation_sensor == BISS_SENSOR || motorcontrol_config.commutation_sensor == AMS_SENSOR)
                 printf("Sensor offset: %d, ", offset);
             printf("Voltage %d, Polarity %d\n", input_voltage, motorcontrol_config.polarity_type);
             if ((input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
@@ -122,7 +125,7 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             break;
         //print offsets, voltage and polarity
         case 'p':
-            if (motorcontrol_config.commutation_sensor == BISS_SENSOR)
+            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR)
                 printf("Sensor offset %d, ", offset);
             if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
                 printf("Polarity %d, Voltage %d\noffset clk %d (for positive voltage)\noffset cclk %d (for negative voltage)\n", motorcontrol_config.polarity_type, input_voltage, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);

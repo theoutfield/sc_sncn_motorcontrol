@@ -11,6 +11,8 @@
 #include <profile.h>
 #include <profile_control.h>
 
+#define USE_XSCOPE
+
 void init_velocity_profiler(ProfilerConfig profile_velocity_config,
                                 interface VelocityControlInterface client i_velocity_control){
 
@@ -44,9 +46,11 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 
         t when timerafter(time + MSEC_STD) :> time;
 
-        /*xscope_int(0, actual_velocity);
-          actual_velocity = i_velocity_control.get_velocity();
-          xscope_int(1, velocity_ramp);*/
+#ifdef USE_XSCOPE
+        actual_velocity = i_velocity_control.get_velocity();
+        xscope_int(0, actual_velocity);
+        xscope_int(1, velocity_ramp);
+#endif
     }
     if (target_velocity == 0) {
         i_velocity_control.set_velocity(target_velocity);

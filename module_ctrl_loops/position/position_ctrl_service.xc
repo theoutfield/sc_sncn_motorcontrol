@@ -47,6 +47,7 @@ void position_control_service(ControlConfig &position_control_config,
                               interface HallInterface client ?i_hall,
                               interface QEIInterface client ?i_qei,
                               interface BISSInterface client ?i_biss,
+                              interface AMSInterface client ?i_ams,
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionControlInterface server i_position_control[3])
 {
@@ -88,7 +89,8 @@ void position_control_service(ControlConfig &position_control_config,
 
                     if (position_control_config.feedback_sensor != HALL_SENSOR
                            && position_control_config.feedback_sensor != QEI_SENSOR
-                           && position_control_config.feedback_sensor != BISS_SENSOR) {
+                           && position_control_config.feedback_sensor != BISS_SENSOR
+                           && position_control_config.feedback_sensor != AMS_SENSOR) {
                         position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
@@ -102,6 +104,8 @@ void position_control_service(ControlConfig &position_control_config,
                         actual_position = i_qei.get_qei_position_absolute();
                     } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
                         { actual_position, void, void } = i_biss.get_biss_position();
+                    } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                        { actual_position, void } = i_ams.get_ams_position();
                     }
 
                     config_update_flag = 0;
@@ -137,6 +141,17 @@ void position_control_service(ControlConfig &position_control_config,
                             }
                             else{
                                 printstrln("position_ctrl_service: ERROR: BiSS interface is not provided but requested");
+                                exit(-1);
+                            }
+                            break;
+
+                        case AMS_SENSOR:
+                            if(!isnull(i_ams)){
+                            {
+                                actual_position, void } = i_ams.get_ams_position();
+                            }
+                            else{
+                                printstrln("position_ctrl_service: ERROR: AMS interface is not provided but requested");
                                 exit(-1);
                             }
                             break;
