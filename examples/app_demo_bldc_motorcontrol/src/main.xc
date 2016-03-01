@@ -22,7 +22,7 @@ ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 
-#define VOLTAGE 2000 //+/- 13889
+#define VOLTAGE 1000 //+/- 13889
 
 void adc_client(interface ADCInterface client i_adc){
 
@@ -113,10 +113,10 @@ int main(void) {
 
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, null, i_biss[0], i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, null, null, null, i_biss[0], i_watchdog[0], i_motorcontrol, null);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_hall[0], null, null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, null, i_hall[0], null, null, i_watchdog[0], i_motorcontrol, null);
 #endif
                 }
             }

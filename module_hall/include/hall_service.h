@@ -58,6 +58,17 @@ interface HallInterface {
     int get_notification();
 
     /**
+     * @brief Getter for the current pin state at the Hall port,
+     * electrical angle, and velocity.
+     *
+     * @return UVW signals state,
+     *         Position within one electrical rotation [0:4095],
+     *         Raw velocity
+     *
+     */
+    {unsigned, int, int} get_hall_pinstate_angle_velocity();
+
+    /**
      * @brief Getter for the current pin state at the Hall port.
      *
      * @return UVW signals state.

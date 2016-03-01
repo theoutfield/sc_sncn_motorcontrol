@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <adc_service.h>
+
 #define ERROR 0
 #define SUCCESS 1
 
@@ -34,15 +36,24 @@ typedef enum {
 } MotorType;
 
 /**
+ * @brief Commutation method.
+ */
+typedef enum {
+    SINE = 20,  /**< Sine commutation. */
+    FOC = 21  /**< Vector control. */
+} CommutationMethod;
+
+/**
  * Structure type for Motorcontrol Service configuration.
  */
 typedef struct {
-    MotorType motor_type;               /**< Type of motor to drive. */
-    BLDCWindingType bldc_winding_type;  /**< Type of winding of your motor (if using a BLDC motor). */
-    PolarityType polarity_type;         /**< Type of polarity of your motor. */
-    int commutation_sensor;             /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
-    int hall_offset[2];                 /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
-    int commutation_loop_period;        /**< Period for the commutation loop [microseconds]. */
+    MotorType motor_type;                   /**< Type of motor to drive. */
+    CommutationMethod commutation_method;   /**< Commutation method. */
+    BLDCWindingType bldc_winding_type;      /**< Type of winding of your motor (if using a BLDC motor). */
+    PolarityType polarity_type;             /**< Type of polarity of your motor. */
+    int commutation_sensor;                 /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
+    int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
+    int commutation_loop_period;            /**< Period for the commutation loop [microseconds]. */
 } MotorcontrolConfig;
 
 #ifdef __XC__
@@ -160,6 +171,15 @@ interface MotorcontrolInterface{
     void set_sensor_offset(int in_offset);
 };
 
+
+/**
+ * @brief Interface type to communicate with the FOC Service.
+ */
+interface foc_base {
+  void set_q(int q_value);
+  int get_torque_actual(void);
+};
+
 /**
  * @brief Service to drive BLDC and Brushed DC Motors.
  *        You will need additionally to have a PWM and Watchdog Services running.
@@ -177,13 +197,15 @@ interface MotorcontrolInterface{
  * @param i_watchdog Interface to Watchdog Service.
  * @param i_motorcontrol Array of communication interfaces to handle up to 5 different clients.
  */
-[[combinable]]
+//[[combinable]]
 void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
                             chanend c_pwm_ctrl,
+                            interface ADCInterface client ?i_adc,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
                             interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[4]);
+                            interface MotorcontrolInterface server i_motorcontrol[4],
+                            server interface foc_base ?i_foc);
 
 #endif

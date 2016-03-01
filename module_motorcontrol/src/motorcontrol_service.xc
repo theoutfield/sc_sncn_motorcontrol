@@ -33,14 +33,16 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
     return SUCCESS;
 }
 
-[[combinable]]
+//[[combinable]]
 void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
                             chanend c_pwm_ctrl,
+                            interface ADCInterface client ?i_adc,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
                             interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[4])
+                            interface MotorcontrolInterface server i_motorcontrol[4],
+                            server interface foc_base ?i_foc)
 {
     //Set freq to 250MHz (always needed for proper timing)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -72,8 +74,16 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                     if(motorcontrol_config.motor_type == BLDC_MOTOR){
 
-                        bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_watchdog, i_motorcontrol,
-                                c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
+                        if(motorcontrol_config.commutation_method == FOC && !isnull(i_adc) && !isnull(i_foc)){
+
+                            foc_loop( fet_driver_ports, i_foc,
+                                      c_pwm_ctrl, i_adc, i_hall,  i_watchdog);
+                        }
+                        else{
+                            bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_watchdog, i_motorcontrol,
+                                      c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
+                        }
+
 
                     }else if(motorcontrol_config.motor_type == BDC_MOTOR){
 

@@ -1,19 +1,16 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-
-# Possible SOMANET targets:
-# SOMANET-C22
-# SOMANET-C21-DX
 TARGET = SOMANET-C22
+#TARGET = SOMANET-C21_Motor-Control_xSCOPE
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_demo_motorcontrol
+APP_NAME = app_demo_foc
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_biss module_board-support module_ctrl_loops module_foc module_hall module_misc module_motorcontrol module_pwm_symmetrical module_qei module_watchdog
+USED_MODULES = config_motor module_adc module_biss module_board-support module_foc module_hall module_misc module_motorcontrol module_pwm_symmetrical module_qei module_watchdog
 
 
 # The flags passed to xcc when building the application
@@ -21,7 +18,7 @@ USED_MODULES = config_motor module_adc module_biss module_board-support module_c
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O0 -report
+XCC_FLAGS_Debug = -g -O0
 XCC_FLAGS_Release = -g -O3
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this

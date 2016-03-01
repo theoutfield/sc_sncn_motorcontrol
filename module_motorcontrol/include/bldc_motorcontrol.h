@@ -7,6 +7,7 @@
 #pragma once
 
 #include <motorcontrol_service.h>
+#include <adc_service.h>
 
 /**
  * @brief Sinusoidal based Commutation Loop
@@ -33,3 +34,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
                             MotorcontrolConfig &commutation_params);
+
+void foc_loop  (    FetDriverPorts &fet_driver_ports, server interface foc_base i_foc,
+                    chanend c_pwm_ctrl, interface ADCInterface client ?i_adc, interface HallInterface client ?i_hall, interface WatchdogInterface client i_watchdog);
+
+void space_vector_pwm(int umot, int angle,  int pwm_on_off, unsigned pwmout[]);
