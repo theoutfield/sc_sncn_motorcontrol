@@ -43,21 +43,6 @@ typedef struct {
 interface HallInterface {
 
     /**
-     * @brief Notifies the interested parties that a new notification
-     * is available.
-     */
-    [[notification]]
-    slave void notification();
-
-    /**
-     * @brief Provides the type of notification currently available.
-     *
-     * @return type of the notification
-     */
-    [[clears_notification]]
-    int get_notification();
-
-    /**
      * @brief Getter for the current pin state at the Hall port.
      *
      * @return UVW signals state.
@@ -125,6 +110,21 @@ interface HallInterface {
      *         1 - initialized.
      */
     int check_busy();
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 /**

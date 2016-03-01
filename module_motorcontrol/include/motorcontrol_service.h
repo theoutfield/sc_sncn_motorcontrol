@@ -61,21 +61,6 @@ typedef struct {
 interface MotorcontrolInterface{
 
     /**
-     * @brief Notifies the interested parties that a new notification
-     * is available.
-     */
-    [[notification]]
-    slave void notification();
-
-    /**
-     * @brief Provides the type of notification currently available.
-     *
-     * @return type of the notification
-     */
-    [[clears_notification]]
-    int get_notification();
-
-    /**
      * @brief Sets an amplitude voltage on the sinusodial signals commutating the windings.
      *
      * @param voltage Voltage [-PWM_MAX_VALUE:PWM_MAX_VALUE]. By default PWM_MAX_VALUE = 13889.
@@ -136,6 +121,21 @@ interface MotorcontrolInterface{
      *         1 - initialized.
      */
     int check_busy();
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 /**

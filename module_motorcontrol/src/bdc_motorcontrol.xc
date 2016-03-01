@@ -98,11 +98,6 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                 break;
 
-        case i_motorcontrol[int i].get_notification() -> int out_notification:
-
-            out_notification = notification;
-            break;
-
         case i_motorcontrol[int i].set_voltage(int new_voltage):
 
             voltage = new_voltage;
@@ -148,6 +143,10 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                                             QEIConfig in_qei_config,
                                                             MotorcontrolConfig in_commutation_config):
                break;
+
+        case i_motorcontrol[int i].get_notification() -> int out_notification:
+            out_notification = notification;
+            break;
         }
     }
 }

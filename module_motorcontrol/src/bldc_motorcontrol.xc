@@ -158,11 +158,6 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
                 break;
 
-            case i_motorcontrol[int i].get_notification() -> int out_notification:
-
-                out_notification = notification;
-                break;
-
             case i_motorcontrol[int i].set_voltage(int new_voltage):
                     if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
                         voltage = -new_voltage;
@@ -247,6 +242,9 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
                     break;
 
+            case i_motorcontrol[int i].get_notification() -> int out_notification:
+                out_notification = notification;
+                break;
             }
 
  //       t_loop :> end_time;

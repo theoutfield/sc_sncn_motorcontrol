@@ -221,11 +221,6 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
 
                 break;
 
-            case i_qei[int i].get_notification() -> int out_notification:
-
-                out_notification = notification;
-                break;
-
             case i_qei[int i].get_qei_position() -> {unsigned int out_count, unsigned int out_valid}:
 
                 out_count = count;
@@ -311,6 +306,9 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
 
                 break;
 
+            case i_qei[int i].get_notification() -> int out_notification:
+                out_notification = notification;
+                break;
         }
 
         if (status == 1) {

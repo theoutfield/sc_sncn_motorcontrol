@@ -122,11 +122,6 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
 //#pragma xta endpoint "hall_loop"
       //[[ordered]] //FixMe ordered is not supported for combinable functions
         select {
-            case i_hall[int i].get_notification() -> int out_notification:
-
-                out_notification = notification;
-                break;
-
             case i_hall[int i].get_hall_pinstate() -> unsigned out_pinstate:
 
                 out_pinstate = pin_state_monitor;
@@ -370,6 +365,10 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                     old_difference = difference1;
                 }
                 raw_velocity = _modified_internal_filter(filter_buffer, index, filter_length, velocity);
+                break;
+
+            case i_hall[int i].get_notification() -> int out_notification:
+                out_notification = notification;
                 break;
 
         }

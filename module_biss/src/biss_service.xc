@@ -111,11 +111,6 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
         [[ordered]]
         select {
         //send electrical angle for commutation, ajusted with electrical offset
-            case i_biss[int i].get_notification() -> int out_notification:
-
-                out_notification = notification;
-                break;
-
         case i_biss[int i].get_biss_angle() -> unsigned int angle:
                 if (calib_flag == 0) {
                     t :> time;
@@ -317,6 +312,10 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
             velocity = (difference * velocity_factor) / ticks_per_turn;
+            break;
+
+        case i_biss[int i].get_notification() -> int out_notification:
+            out_notification = notification;
             break;
         }
     }
