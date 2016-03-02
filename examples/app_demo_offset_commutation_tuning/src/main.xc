@@ -2,7 +2,8 @@
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC1K-rev-c3.bsp>
+//#include <IFM_DC1K-rev-c3.bsp>
+#include <IFM_DC100-rev-b.bsp>
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
@@ -151,13 +152,14 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, null, null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol, null);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, null, null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol, null);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, null, i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol, null);
+                                                  //i_adc  i_hall    i_qei i_biss i_ams i_watchdog     i_motorcontrol i_foc
 #endif
                 }
             }

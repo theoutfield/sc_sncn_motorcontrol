@@ -5,10 +5,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.2117039820" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
-					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -317,6 +317,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1605921113" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -620,27 +627,6 @@
 									<listOptionValue builtIn="false" value="__xcore__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_16__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_32__=1"/>
-									<listOptionValue builtIn="false" value="__DEC_EVAL_METHOD__=2"/>
-									<listOptionValue builtIn="false" value="__DEC32_MANT_DIG__=7"/>
-									<listOptionValue builtIn="false" value="__DEC32_MIN_EXP__=(-95)"/>
-									<listOptionValue builtIn="false" value="__DEC32_MAX_EXP__=96"/>
-									<listOptionValue builtIn="false" value="__DEC32_MIN__=1E-95DF"/>
-									<listOptionValue builtIn="false" value="__DEC32_MAX__=9.999999E96DF"/>
-									<listOptionValue builtIn="false" value="__DEC32_EPSILON__=1E-6DF"/>
-									<listOptionValue builtIn="false" value="__DEC64_MANT_DIG__=16"/>
-									<listOptionValue builtIn="false" value="__DEC64_MIN_EXP__=(-383)"/>
-									<listOptionValue builtIn="false" value="__DEC64_MAX_EXP__=384"/>
-									<listOptionValue builtIn="false" value="__DEC64_MIN__=1E-383DD"/>
-									<listOptionValue builtIn="false" value="__DEC64_MAX__=9.999999999999999E384DD"/>
-									<listOptionValue builtIn="false" value="__DEC64_EPSILON__=1E-15DD"/>
-									<listOptionValue builtIn="false" value="__DEC128_MANT_DIG__=34"/>
-									<listOptionValue builtIn="false" value="__DEC128_MIN_EXP__=(-6143)"/>
-									<listOptionValue builtIn="false" value="__DEC128_MAX_EXP__=6144"/>
-									<listOptionValue builtIn="false" value="__DEC128_MIN__=1E-6143DL"/>
-									<listOptionValue builtIn="false" value="__DEC128_MAX__=9.999999999999999999999999999999999E6144DL"/>
-									<listOptionValue builtIn="false" value="__DEC128_EPSILON__=1E-33DL"/>
-									<listOptionValue builtIn="false" value="__REGISTER_PREFIX__"/>
-									<listOptionValue builtIn="false" value="__ELF__=1"/>
 								</option>
 								<option id="com.xmos.c.compiler.option.include.paths.386587629" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
@@ -786,6 +772,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.277344476" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1093,27 +1086,6 @@
 									<listOptionValue builtIn="false" value="__xcore__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_16__=1"/>
 									<listOptionValue builtIn="false" value="__STDC_UTF_32__=1"/>
-									<listOptionValue builtIn="false" value="__DEC_EVAL_METHOD__=2"/>
-									<listOptionValue builtIn="false" value="__DEC32_MANT_DIG__=7"/>
-									<listOptionValue builtIn="false" value="__DEC32_MIN_EXP__=(-95)"/>
-									<listOptionValue builtIn="false" value="__DEC32_MAX_EXP__=96"/>
-									<listOptionValue builtIn="false" value="__DEC32_MIN__=1E-95DF"/>
-									<listOptionValue builtIn="false" value="__DEC32_MAX__=9.999999E96DF"/>
-									<listOptionValue builtIn="false" value="__DEC32_EPSILON__=1E-6DF"/>
-									<listOptionValue builtIn="false" value="__DEC64_MANT_DIG__=16"/>
-									<listOptionValue builtIn="false" value="__DEC64_MIN_EXP__=(-383)"/>
-									<listOptionValue builtIn="false" value="__DEC64_MAX_EXP__=384"/>
-									<listOptionValue builtIn="false" value="__DEC64_MIN__=1E-383DD"/>
-									<listOptionValue builtIn="false" value="__DEC64_MAX__=9.999999999999999E384DD"/>
-									<listOptionValue builtIn="false" value="__DEC64_EPSILON__=1E-15DD"/>
-									<listOptionValue builtIn="false" value="__DEC128_MANT_DIG__=34"/>
-									<listOptionValue builtIn="false" value="__DEC128_MIN_EXP__=(-6143)"/>
-									<listOptionValue builtIn="false" value="__DEC128_MAX_EXP__=6144"/>
-									<listOptionValue builtIn="false" value="__DEC128_MIN__=1E-6143DL"/>
-									<listOptionValue builtIn="false" value="__DEC128_MAX__=9.999999999999999999999999999999999E6144DL"/>
-									<listOptionValue builtIn="false" value="__DEC128_EPSILON__=1E-33DL"/>
-									<listOptionValue builtIn="false" value="__REGISTER_PREFIX__"/>
-									<listOptionValue builtIn="false" value="__ELF__=1"/>
 								</option>
 								<option id="com.xmos.cxx.compiler.option.include.paths.148542306" name="com.xmos.cxx.compiler.option.include.paths" superClass="com.xmos.cxx.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
@@ -1262,6 +1234,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_qei/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_misc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/sc_sncn_motorcontrol/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1122502185" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -1300,10 +1279,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.508386041" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
-					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
