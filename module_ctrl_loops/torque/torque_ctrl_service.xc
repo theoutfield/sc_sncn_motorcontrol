@@ -206,13 +206,11 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
     int torque_control_output_limit = 0;
     int error_torque_integral_limit = 0;
 
-    int compute_flag = 0;
     int qei_counts_per_hall;
 
     int start_flag = 0;
     int offset_fw_flag = 0;
     int offset_bw_flag = 0;
-    int activate = 0;
 
     int max_ph_a = 0, max_ph_a_actual = 0;
     int max_ph_b = 0, max_ph_b_actual = 0;
@@ -221,6 +219,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
     int phase_a_prev = 0;
     int phase_b_prev = 0;
     int reset1 = 0, reset2 = 0, reset3 = 0, reset4 = 0;
+
+    int mode = MOTCTRL_MODE_STOP;
 
     MotorcontrolConfig motorcontrol_config;
 
@@ -305,7 +305,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     config_update_flag = 0;
                 }
 
-                if (compute_flag == 1) {
+                if (mode >= MOTCTRL_MODE_PASSIVE) {
                     if (torque_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
                         angle = (i_hall.get_hall_position() >> 2) & 0x3ff; //  << 10 ) >> 12 /
                         actual_speed = i_hall.get_hall_velocity();
@@ -462,12 +462,10 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     }
                 }
 
-                if (activate == 1) {
+                if(mode == MOTCTRL_MODE_ACTIVE) {
 #ifdef ENABLE_xscope_torq
                     xscope_int(ACTUAL_TORQUE, actual_torque);
 #endif
-                    compute_flag = 1;
-
                     absolute_torque = target_torque;
                     if (target_torque < 0) {
                         absolute_torque = 0 - target_torque;
@@ -559,6 +557,14 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
             case i_torque_control[int i].set_torque(int in_torque):
 
                 target_torque = in_torque;
+                if (target_torque == 0) {
+                    mode = MOTCTRL_MODE_PASSIVE;
+                    i_motorcontrol.set_voltage(0);
+                    i_motorcontrol.set_fets_state(0);
+                } else {
+                    mode = MOTCTRL_MODE_ACTIVE;
+                    i_motorcontrol.set_fets_state(1);
+                }
 #ifdef ENABLE_xscope_torq
                 xscope_int(TARGET_TORQUE, target_torque);
 #endif
@@ -595,20 +601,24 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
 
                 torque_control_config.feedback_sensor = in_sensor;
                 target_torque = actual_torque;
-                if (!compute_flag) {
-                    compute_flag = 1;
+                if (mode == MOTCTRL_MODE_STOP) {
+                    mode = MOTCTRL_MODE_PASSIVE;
                 }
                 config_update_flag = 1;
                 break;
 
             case i_torque_control[int i].check_busy() -> int out_state:
 
-                out_state = activate;
+                if (mode > MOTCTRL_MODE_STOP) {
+                    out_state = INIT;
+                } else {
+                    out_state = INIT_BUSY;
+                }
                 break;
 
             case i_torque_control[int i].enable_torque_ctrl():
 
-                activate = 1;
+                mode = MOTCTRL_MODE_PASSIVE;
                 int init_state = i_motorcontrol.check_busy(); //__check_commutation_init(c_commutation);
                 if (init_state == INIT) {
 #ifdef debug_print
@@ -620,7 +630,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                         // wait_ms(2, 1, tc);
                     }
 
-                    if (compute_flag == 0) {
+                    if (mode == MOTCTRL_MODE_STOP) {
                         init_state = INIT_BUSY;
                         // c_current <: 1;
                     }
@@ -637,7 +647,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
 
             case i_torque_control[int i].disable_torque_ctrl():
 
-                activate = 0;
+                mode = MOTCTRL_MODE_STOP;
                 error_torque = 0;
                 error_torque_integral = 0;
                 error_torque_derivative = 0;

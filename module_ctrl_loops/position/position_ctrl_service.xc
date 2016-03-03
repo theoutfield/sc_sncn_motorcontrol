@@ -64,7 +64,7 @@ void position_control_service(ControlConfig &position_control_config,
     timer t;
     unsigned int ts;
 
-    int activate = 0;
+    int mode = MOTCTRL_MODE_STOP;
 
     int config_update_flag = 1;
 
@@ -107,7 +107,7 @@ void position_control_service(ControlConfig &position_control_config,
                     config_update_flag = 0;
                 }
 
-                if (activate == 1) {
+                if (mode >= MOTCTRL_MODE_PASSIVE) {
                     /* acquire actual position hall/qei/sensor */
                     switch (position_control_config.feedback_sensor) {
                         case HALL_SENSOR:
@@ -146,7 +146,9 @@ void position_control_service(ControlConfig &position_control_config,
                      * Or any other sensor interfaced to the IFM Module
                      * place client functions here to acquire position
                      */
+                }
 
+                if(mode == MOTCTRL_MODE_ACTIVE) {
                     /* PID Controller */
 
                     error_position = (target_position - actual_position);
@@ -221,7 +223,14 @@ void position_control_service(ControlConfig &position_control_config,
             case i_position_control[int i].set_position(int in_target_position):
 
                 target_position = in_target_position;
-
+                if (target_position == 0) {
+                    mode = MOTCTRL_MODE_PASSIVE;
+                    i_motorcontrol.set_voltage(0);
+                    i_motorcontrol.set_fets_state(0);
+                } else {
+                    mode = MOTCTRL_MODE_ACTIVE;
+                    i_motorcontrol.set_fets_state(1);
+                }
                 break;
 
             case i_position_control[int i].get_position() -> int out_position:
@@ -253,14 +262,18 @@ void position_control_service(ControlConfig &position_control_config,
 
                 break;
 
-            case i_position_control[int i].check_busy() -> int out_activate:
+            case i_position_control[int i].check_busy() -> int out_state:
 
-                out_activate = activate;
+                if (mode > MOTCTRL_MODE_STOP) {
+                    out_state = INIT;
+                } else {
+                    out_state = INIT_BUSY;
+                }
                 break;
 
             case i_position_control[int i].enable_position_ctrl():
 
-                activate = 1;
+                mode = MOTCTRL_MODE_PASSIVE;
                 while (1) {
                     if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
 #ifdef debug_print
@@ -281,7 +294,7 @@ void position_control_service(ControlConfig &position_control_config,
 
             case i_position_control[int i].disable_position_ctrl():
 
-                activate = 0;
+                mode = MOTCTRL_MODE_STOP;
                 i_motorcontrol.set_voltage(0); //set_commutation_sinusoidal(c_commutation, 0);
                 error_position = 0;
                 error_position_D = 0;
