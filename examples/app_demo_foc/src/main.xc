@@ -1,7 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C21-rev-a.bsp>
-//#include <IFM_DC100-rev-b.bsp>
-#include <IFM_DC1K-rev-c2.bsp>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC100-rev-b.bsp>
+//#include <IFM_DC1K-rev-c2.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -96,8 +96,8 @@ int main(void) {
                 pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc);
-       //         adc_service(adc_ports, null, i_adc);
+       //         adc_service(adc_ports, c_adctrig, i_adc);
+                adc_service(adc_ports, null, i_adc);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
