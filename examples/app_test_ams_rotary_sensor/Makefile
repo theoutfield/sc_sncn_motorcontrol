@@ -1,8 +1,8 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = SOMANET-C22
-#TARGET = SOMANET-C21-DX
+#TARGET = SOMANET-C22
+TARGET = SOMANET-C21-DX
 
 
 # The APP_NAME variable determines the name of the final .xe file. It should
@@ -11,7 +11,7 @@ TARGET = SOMANET-C22
 APP_NAME = app_test_ams_rotary_sensor
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_ams_rotary_sensor module_board-support module_misc module_spi_master
+USED_MODULES = module_ams_rotary_sensor module_board-support module_misc module_pwm_symmetrical module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

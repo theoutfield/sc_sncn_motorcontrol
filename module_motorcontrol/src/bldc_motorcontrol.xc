@@ -13,6 +13,7 @@
 #include <foc_utilities.h>
 #include <print.h>
 #include <xscope.h>
+#include <stdlib.h>
 
 static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
@@ -299,7 +300,12 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 #define HALL_OFFSET 3500
 
 void foc_loop( FetDriverPorts &fet_driver_ports, server interface foc_base i_foc,
-                    chanend c_pwm_ctrl,  interface ADCInterface client ?i_adc,  interface HallInterface client ?i_hall, interface WatchdogInterface client i_watchdog)
+                    chanend c_pwm_ctrl, interface ADCInterface client ?i_adc,
+                                        interface HallInterface client ?i_hall,
+                                        interface QEIInterface client ?i_qei,
+                                        interface BISSInterface client ?i_biss,
+                                        interface AMSInterface client ?i_ams,
+                                        interface WatchdogInterface client i_watchdog)
 {
     //Set freq to 250MHz (always needed for proper timing)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -460,8 +466,19 @@ void foc_loop( FetDriverPorts &fet_driver_ports, server interface foc_base i_foc
  //   fp.measure_tick = 0;
 
 
-
-        {hall_pin_state, angle_electrical, velocity} = i_hall.get_hall_pinstate_angle_velocity();//2 - 17 usec
+        if(!isnull(i_hall)){
+            {hall_pin_state, angle_electrical, velocity} = i_hall.get_hall_pinstate_angle_velocity();//2 - 17 usec
+        }
+        else if(!isnull(i_ams)){
+            angle_electrical = i_ams.get_ams_angle();
+        }
+        else if(!isnull(i_biss)){
+            angle_electrical = i_biss.get_biss_angle();
+        }
+        else{
+            printstr("\n > FOC loop feedback sensor error\n");
+            exit(-1);
+        }
         xscope_int(HALL_PINS, hall_pin_state);
         xscope_int(ANGLE_ELECTRICAL, angle_electrical);
 
@@ -470,9 +487,6 @@ void foc_loop( FetDriverPorts &fet_driver_ports, server interface foc_base i_foc
 
     //==========================  clarke transformation  ===========================================================================
     {clarke_alpha, clarke_beta} = clarke_transformation(current_ph_b, current_ph_c);
-
-    xscope_int(CLARKE_ALPHA, clarke_alpha);
-    xscope_int(CLARKE_BETA, clarke_beta);
 
     //========================== park transform ============================
     mmTheta = angle_electrical/4; //normalization: sine table is with 1024 base points, angle is 0 - 4095
@@ -489,30 +503,34 @@ void foc_loop( FetDriverPorts &fet_driver_ports, server interface foc_base i_foc
     xscope_int(TORQUE_RAW, torq_new);
 
    //========================= filter torque  =======================================================================
-    torq_period          = calc_mean_one_periode(iCX, iXX, torq_new, torq_period, hall_pin_state, 16);  // every cycle
+ //   torq_period          = calc_mean_one_periode(iCX, iXX, torq_new, torq_period, hall_pin_state, 16);  // every cycle
 
     torq_pt1             = low_pass_pt1_filter(filter_sum, fftorque, 4,  torq_new);
 
-    xscope_int(TORQUE_PERIOD, torq_period);
     xscope_int(TORQUE_PT1, torq_pt1);
 
    //========================= filter field ===========================================================
-
-    field_mean           = calc_mean_one_periode(iCX, iXX, field_new, field_mean, hall_pin_state, 32);  // every cycle
-    xscope_int(FIELD_MEAN, field_mean);
-    xscope_int(FIELD_RAW, field_new);
-
+   //ToDo: find a better filtering way
+ //   field_mean           = calc_mean_one_periode(iCX, iXX, field_new, field_mean, hall_pin_state, 32);  // every cycle
 
     //================================= calculate iVectorCurrent ===============================================
+    //ToDo: check if it is still needed
+    //{iTemp1, angle_current}  = cartesian_to_polar_conversion( clarke_alpha, clarke_beta);
 
-    {iTemp1, angle_current}  = cartesian_to_polar_conversion( clarke_alpha, clarke_beta);
+    //vector_current    = calc_mean_one_periode(iCX, iXX, iTemp1, vector_current, hall_pin_state, 0);  // every cycle
 
-    vector_current    = calc_mean_one_periode(iCX, iXX, iTemp1, vector_current, hall_pin_state, 0);  // every cycle
+    //was used to check overcurrent
+    //    if(vector_current   > (par_nominal_current * 2))
+    //    {
+    //          vector_current_max  = vector_current;
+    //          status_foc          = stFaultOverCurrent20;  // Motor stop
+    //    }
+
 
 //FixMe: Once per electrical rotation, but why? measure tick takes values 0x80 41 42 43 44 45
 //    if(fp.measure_tick & 0x80)   field_control(fp);
 //    if(hall_pin_state == 6)
-        field_out = field_control(field_mean, field_e1, field_e2, q_value, field_out_p_part, field_out_i_part, par_field_kp, par_field_ki, field_out1, field_out2, filter_sum); //ToDo: analyze the condition
+        field_out = field_control(field_new, field_e1, field_e2, q_value, field_out_p_part, field_out_i_part, par_field_kp, par_field_ki, field_out1, field_out2, filter_sum); //ToDo: analyze the condition
 
     xscope_int(FIELD_CONTROLLER_OUTPUT, field_out);
     //====================================================================================================

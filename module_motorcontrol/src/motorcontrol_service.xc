@@ -79,8 +79,8 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                         if(motorcontrol_config.commutation_method == FOC && !isnull(i_adc) && !isnull(i_foc)){
 
-                            foc_loop( fet_driver_ports, i_foc,
-                                      c_pwm_ctrl, i_adc, i_hall, i_watchdog);
+                            foc_loop( fet_driver_ports, i_foc, c_pwm_ctrl, i_adc,
+                                    i_hall, i_qei, i_biss, i_ams, i_watchdog);
                         }
                         else{
                             bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
