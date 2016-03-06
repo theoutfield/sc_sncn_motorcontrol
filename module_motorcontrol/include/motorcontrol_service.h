@@ -174,14 +174,6 @@ interface MotorcontrolInterface{
 
 
 /**
- * @brief Interface type to communicate with the FOC Service.
- */
-interface foc_base {
-  void set_q(int q_value);
-  int get_torque_actual(void);
-};
-
-/**
  * @brief Service to drive BLDC and Brushed DC Motors.
  *        You will need additionally to have a PWM and Watchdog Services running.
  *
