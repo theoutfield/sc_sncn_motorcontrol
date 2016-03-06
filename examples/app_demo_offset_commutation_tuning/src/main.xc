@@ -80,7 +80,6 @@ int main(void) {
             {
                 /* Triggered PWM Service */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
-                //pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc);
