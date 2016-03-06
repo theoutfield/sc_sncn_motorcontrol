@@ -57,7 +57,6 @@ int main(void) {
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[3];
     interface MotorcontrolInterface i_motorcontrol[4];
-    interface foc_base i_foc;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
@@ -155,14 +154,13 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol, null);
+                                         c_pwm_ctrl, i_adc[2], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[2], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol, i_foc);
+                                         c_pwm_ctrl, i_adc[2], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, i_hall[2], null, null, null, i_watchdog[0], i_motorcontrol, null);
-                                                  //i_adc  i_hall    i_qei i_biss i_ams i_watchdog     i_motorcontrol i_foc
+                                         c_pwm_ctrl, i_adc[2], i_hall[2], null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }

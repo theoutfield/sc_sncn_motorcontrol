@@ -72,7 +72,7 @@ int main(void) {
     {
         on tile[APP_TILE]: i_motorcontrol[0].set_voltage(VOLTAGE);
 
-        on tile[APP_TILE]: adc_client(i_adc[0]);
+        on tile[APP_TILE]: adc_client(i_adc[1]);
 
         on tile[IFM_TILE]:
         {
@@ -153,13 +153,13 @@ int main(void) {
 
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol, null);
+                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol, null);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, null, i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol, null);
+                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }
