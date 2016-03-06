@@ -27,7 +27,7 @@
  * this also configures the PWM frequency at the same time. The relation is as follows:
  * PWM_MAX_VALUE = PWM_CLOCK / PWM_FREQUENCY (e.g. 250 MHz / 18 kHz = 13889)
  */
-#define PWM_MAX_VALUE 13889 //DC100/300 - 13889, DC1K/5K - 12500
+#define PWM_MAX_VALUE 12500 //DC100/300 - 13889, DC1K/5K - 12500
 /*******************************************/
 
 #ifndef __ASSEMBLER__

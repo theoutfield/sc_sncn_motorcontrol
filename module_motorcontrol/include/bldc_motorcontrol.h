@@ -36,8 +36,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             FetDriverPorts &fet_driver_ports,
                             MotorcontrolConfig &commutation_params);
 
-void foc_loop(FetDriverPorts &fet_driver_ports, server interface foc_base i_foc,
-                    chanend c_pwm_ctrl, interface ADCInterface client ?i_adc,
+void foc_loop(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
+                            HallConfig hall_config, QEIConfig qei_config,
+                            interface MotorcontrolInterface server i_motorcontrol[4],
+        chanend c_pwm_ctrl, interface ADCInterface client ?i_adc,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,

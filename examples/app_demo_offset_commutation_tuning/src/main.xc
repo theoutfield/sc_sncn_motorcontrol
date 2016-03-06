@@ -80,8 +80,8 @@ int main(void) {
             par
             {
                 /* Triggered PWM Service */
-                //pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
-                pwm_service(pwm_ports, c_pwm_ctrl);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
+                //pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc);
@@ -147,7 +147,7 @@ int main(void) {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.polarity_type = NORMAL_POLARITY;
-                    motorcontrol_config.commutation_method = FOC;
+                    motorcontrol_config.commutation_method = SINE;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;

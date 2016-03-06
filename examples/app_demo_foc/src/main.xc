@@ -1,7 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
-//#include <IFM_DC1K-rev-c2.bsp>
+#include <CORE_C21-rev-a.bsp>
+//#include <IFM_DC100-rev-b.bsp>
+#include <IFM_DC1K-rev-c2.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -14,9 +14,7 @@
 #include <xscope.h>
 #include <adc_service.h>
 #include <watchdog_service.h>
-//#include <foc_base.h>
 #include <motorcontrol_service.h>
-//#include <torque_control.h>
 
 #include <user_config.h>
 
@@ -32,32 +30,32 @@ AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
-#define TORQUE 1000 //+/- 4095
+#define Q_DIRECT 500 //+/- 4095
 #define Q_MAX 3000
 
-void simple_torque_controller(client interface foc_base i_foc_base){
-    delay_seconds(5);
-    int torque_actual = 0, error = 0, setpoint = 0, feedforward = 200;
-    while(1){
-        error = TORQUE - i_foc_base.get_torque_actual();
-        if (error > 0) setpoint++;
-        else setpoint--;
-
-        if (setpoint > Q_MAX) setpoint = Q_MAX;
-        if (setpoint < -Q_MAX) setpoint = -Q_MAX;
-
-        if((setpoint > 0)  && (setpoint < 50)) setpoint = 50;
-        else if ((setpoint < 0)  && (setpoint > -50)) setpoint = -50;
-
-        if (setpoint < feedforward) setpoint = feedforward;
-
-        xscope_int(DEBUG_VALUE, setpoint);
-        xscope_int(CONTROL_ERROR, error);
-
-        i_foc_base.set_q(setpoint);
-        delay_milliseconds(1);
-    }
-}
+//void simple_torque_controller(client interface foc_base i_foc_base){
+//    delay_seconds(5);
+//    int torque_actual = 0, error = 0, setpoint = 0, feedforward = 200;
+//    while(1){
+//        error = TORQUE - i_foc_base.get_torque_actual();
+//        if (error > 0) setpoint++;
+//        else setpoint--;
+//
+//        if (setpoint > Q_MAX) setpoint = Q_MAX;
+//        if (setpoint < -Q_MAX) setpoint = -Q_MAX;
+//
+//        if((setpoint > 0)  && (setpoint < 50)) setpoint = 50;
+//        else if ((setpoint < 0)  && (setpoint > -50)) setpoint = -50;
+//
+//        if (setpoint < feedforward) setpoint = feedforward;
+//
+//   //     xscope_int(DEBUG_VALUE, setpoint);
+//        xscope_int(CONTROL_ERROR, error);
+//
+//        i_foc_base.set_q(setpoint);
+//        delay_milliseconds(1);
+//    }
+//}
 
 
 int main(void) {
@@ -66,7 +64,6 @@ int main(void) {
     chan c_pwm_ctrl, c_adctrig;  // pwm channels
 
     interface ADCInterface i_adc[2];
-    interface foc_base i_foc;
     interface WatchdogInterface i_watchdog[2];
     interface MotorcontrolInterface i_motorcontrol[4];
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
@@ -82,7 +79,7 @@ int main(void) {
 
         on tile[APP_TILE]:
         {
-            i_foc.set_q(TORQUE);
+            i_motorcontrol[0].set_voltage(Q_DIRECT);
         }
 
         on tile[IFM_TILE]:
@@ -115,13 +112,13 @@ int main(void) {
 
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol, i_foc);
+                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol, i_foc);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol, i_foc);
+                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
 

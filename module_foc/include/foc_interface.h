@@ -3,7 +3,7 @@
 //------------- ff ==>> filter enum index used with  filter_sum[8] --------------------------
 enum
 {
-fffield_e1,
+fffield,
 ff_field_out,
 ffCurrVector,
 ffSpeedActual,

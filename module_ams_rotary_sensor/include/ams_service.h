@@ -11,8 +11,8 @@
 #include <refclk.h>
 
 
-#define AMS_OFFSET          3696
-#define AMS_POLARITY        AMS_POLARITY_NORMAL
+#define AMS_OFFSET          10219//3696
+#define AMS_POLARITY        AMS_POLARITY_INVERTED//AMS_POLARITY_NORMAL
 #define AMS_USEC            USEC_FAST
 #define AMS_CACHE_TIME      (60*AMS_USEC)
 #define AMS_RESOLUTION      14

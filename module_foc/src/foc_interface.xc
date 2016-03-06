@@ -1,18 +1,17 @@
 #include <foc_interface.h>
 #include <foc_utilities.h>
+#include <xscope.h>
 
 //==============================================================================================
 #define def_FIELD_RANGE  32768
-#define FIELD_CONTROLLER_LIMIT 2048 //2048
+#define FIELD_CONTROLLER_LIMIT 4096 //2048
 
 int field_control(int field_new, int field_e1, int field_e2, int q_value, int field_out_p_part, int field_out_i_part, int par_field_kp, int par_field_ki, int field_out1, int field_out2, int filter_sum[]){
 
-    int control_output;
-
     field_e1       =   -field_new;   // 0 - field_new
 
-    field_e2       = calc_hysteresis_and_limit(field_e1, 10, 80);
-
+    field_e2       = calc_hysteresis_and_limit(field_e1, 100, 150);//10, 80
+    xscope_int(CONTROL_ERROR, field_e1);
 
     if(q_value == 0)  // if q zero field_integrator must go to zero
     {
@@ -29,16 +28,17 @@ int field_control(int field_new, int field_e1, int field_e2, int q_value, int fi
     }
 
     field_out_i_part         +=   field_e2 * par_field_ki;
-    field_out_i_part          =   check_limits(field_out_i_part, 512 * def_FIELD_RANGE);//512 * def_FIELD_RANGE
+    field_out_i_part          =   check_limits(field_out_i_part, def_FIELD_RANGE * 512);//512 * def_FIELD_RANGE
 
 
-    field_out1 = (field_out_p_part + field_out_i_part);
+    field_out1 = (field_out_p_part + field_out_i_part) / def_FIELD_RANGE;
 
     field_out2 =    low_pass_pt1_filter(filter_sum, ff_field_out, 32,  field_out1);//ToDo: check if it works properly
 
-    control_output  = field_out2 / def_FIELD_RANGE;
+    xscope_int(CONTROL_I_PART, field_out_i_part);
+    xscope_int(CONTROL_P_PART, field_out_p_part/def_FIELD_RANGE);
 
-    return control_output = calc_hysteresis_and_limit(control_output, 5, FIELD_CONTROLLER_LIMIT);//2048
+    return calc_hysteresis_and_limit(field_out2, 5, FIELD_CONTROLLER_LIMIT);//2048
 
 }
 

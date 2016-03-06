@@ -44,8 +44,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[4],
-                            server interface foc_base ?i_foc)
+                            interface MotorcontrolInterface server i_motorcontrol[4])
 {
     //Set freq to 250MHz (always needed for proper timing)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -77,10 +76,13 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                     if(motorcontrol_config.motor_type == BLDC_MOTOR){
 
-                        if(motorcontrol_config.commutation_method == FOC && !isnull(i_adc) && !isnull(i_foc)){
+                        if(motorcontrol_config.commutation_method == FOC && !isnull(i_adc)){
 
-                            foc_loop( fet_driver_ports, i_foc, c_pwm_ctrl, i_adc,
+                            foc_loop( fet_driver_ports, motorcontrol_config,
+                                    hall_config, qei_config,
+                                    i_motorcontrol, c_pwm_ctrl, i_adc,
                                     i_hall, i_qei, i_biss, i_ams, i_watchdog);
+
                         }
                         else{
                             bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
