@@ -29,8 +29,8 @@
     <Probe name="Torque_pt1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Field_controller_output" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="CONTROL_ERROR" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="CONTROL I part" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="CONTROL P part" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="CONTROL I part" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="CONTROL P part" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 
 </xSCOPEconfig>

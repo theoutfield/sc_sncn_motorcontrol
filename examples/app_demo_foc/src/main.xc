@@ -31,31 +31,32 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
 #define Q_DIRECT 1000 //+/- 4095
+#define TORQUE 500
 #define Q_MAX 3000
 
-//void simple_torque_controller(client interface foc_base i_foc_base){
-//    delay_seconds(5);
-//    int torque_actual = 0, error = 0, setpoint = 0, feedforward = 200;
-//    while(1){
-//        error = TORQUE - i_foc_base.get_torque_actual();
-//        if (error > 0) setpoint++;
-//        else setpoint--;
-//
-//        if (setpoint > Q_MAX) setpoint = Q_MAX;
-//        if (setpoint < -Q_MAX) setpoint = -Q_MAX;
-//
-//        if((setpoint > 0)  && (setpoint < 50)) setpoint = 50;
-//        else if ((setpoint < 0)  && (setpoint > -50)) setpoint = -50;
-//
-//        if (setpoint < feedforward) setpoint = feedforward;
-//
-//   //     xscope_int(DEBUG_VALUE, setpoint);
-//        xscope_int(CONTROL_ERROR, error);
-//
-//        i_foc_base.set_q(setpoint);
-//        delay_milliseconds(1);
-//    }
-//}
+void simple_torque_controller(interface MotorcontrolInterface client i_motorcontrol){
+    delay_seconds(5);
+    int torque_actual = 0, error = 0, setpoint = 0, feedforward = 200;
+    while(1){
+        error = TORQUE - i_motorcontrol.get_torque_actual();
+        if (error > 0) setpoint++;
+        else setpoint--;
+
+        if (setpoint > Q_MAX) setpoint = Q_MAX;
+        if (setpoint < -Q_MAX) setpoint = -Q_MAX;
+
+        if((setpoint > 0)  && (setpoint < 50)) setpoint = 50;
+        else if ((setpoint < 0)  && (setpoint > -50)) setpoint = -50;
+
+        if (setpoint < feedforward) setpoint = feedforward;
+
+   //     xscope_int(DEBUG_VALUE, setpoint);
+        xscope_int(CONTROL_ERROR, error);
+
+        i_motorcontrol.set_voltage(setpoint);
+        delay_milliseconds(1);
+    }
+}
 
 
 int main(void) {
@@ -86,15 +87,15 @@ int main(void) {
         {
             par
             {
-               // simple_torque_controller(i_foc_base);
+          //      simple_torque_controller(i_motorcontrol[0]);
 
                 /* Triggered PWM Service */
-          //      pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
-                pwm_service(pwm_ports, c_pwm_ctrl);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
+          //      pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* ADC Service */
-       //         adc_service(adc_ports, c_adctrig, i_adc);
-                adc_service(adc_ports, null, i_adc);
+                adc_service(adc_ports, c_adctrig, i_adc);
+         //       adc_service(adc_ports, null, i_adc);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
