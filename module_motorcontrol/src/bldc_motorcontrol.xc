@@ -389,29 +389,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
 
     //================ init PWM ===============================
-    //ToDo: define it as function (see bldc_motorcontrol.xc)
-//    unsigned pwm[3] = { 0, 0, 0 };
-//    pwm_share_control_buffer_address_with_server(c_pwm_ctrl, s_pwm_control);
-//    update_pwm_inv(s_pwm_control, c_pwm_ctrl, pwm);
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
-
-/* ToDo: this is an old initialization sequence. Check if ADC calibration can be done before initialization
-    tx :> ts;
-    tx when timerafter (ts + t_delay) :> ts;
-
-
-    //=== init driver =============
-    a4935_initialize(p_ifm_esf_rstn_pwml_pwmh, p_ifm_coastn, A4935_BIT_PWML | A4935_BIT_PWMH);
-
-    tx when timerafter (ts + t_delay) :> ts;
-
-    watchdog_start(c_watchdog);
-
-    calib_data I_calib;
-    do_adc_calibration_ad7949(c_adc, I_calib);
-
-    watchdog_enable_motors(c_watchdog);
-*/
 
     // enable watchdog
     tx :> ts;
@@ -438,7 +416,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     pwm_enabled = 1;
 
 //=================55,6 usec ============= F O C - L O O P =================================================================================
-//FixMe: in reality it is 110 usec
+//FixMe: Make proper synchronization with PWM and ADC. Currently loop period is 110 usec
 //==========================================================================================================================================
 
     while(1)
