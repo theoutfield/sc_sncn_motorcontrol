@@ -147,6 +147,9 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
                 break;
 
+            case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
+                break;
+
             case i_motorcontrol[int i].get_notification() -> int out_notification:
 
                 out_notification = notification;
@@ -382,12 +385,6 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     int field_out2 = 0;
     unsigned start_time = 0, end_time = 0;
 
-
-    printstr("\n*********************************************************");
-    printstr("\n                F O C - L O O P                          \n");
-    printstr("*********************************************************\n");
-
-
     //================ init PWM ===============================
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
@@ -443,21 +440,32 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
              //====================== get sensor angle and velocity ======================================
 
-             if(!isnull(i_hall)){
+             if (calib_flag != 0) {
+                 angle_electrical = 0;
+             } else if (sensor_select == HALL_SENSOR) {
+                 //hall only
                  {hall_pin_state, angle_electrical, velocity} = i_hall.get_hall_pinstate_angle_velocity();//2 - 17 usec
-             }
-             else if(!isnull(i_ams)){
+             } else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
+                 { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
+                 angle_electrical = (angle_electrical << 12) / max_count_per_hall;
+                 if ((q_value >= 0 && fw_flag == 0) || (q_value < 0 && bw_flag == 0)) {
+                     angle_electrical = i_hall.get_hall_position();
+                 }
+             } else if (sensor_select == BISS_SENSOR) {
+                 angle_electrical = i_biss.get_biss_angle();
+             } else if (sensor_select == AMS_SENSOR) {
                  //ToDo: preferably merge to a single interface call. Still currently does not introduce much of a delay.
                  angle_electrical = i_ams.get_ams_angle();
                  velocity = i_ams.get_ams_velocity();
-             }
-             else if(!isnull(i_biss)){
-                 angle_electrical = i_biss.get_biss_angle();
              }
              else{
                  printstr("\n > FOC loop feedback sensor error\n");
                  exit(-1);
              }
+
+             if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
+                 angle_electrical = 4096 - angle_electrical;
+
              xscope_int(HALL_PINS, hall_pin_state);
              xscope_int(ANGLE_ELECTRICAL, angle_electrical);
 
@@ -530,7 +538,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
               //speed_actual = velocity;
 
-              angle_pwm  =  adjust_angle_reference_pwm(angle_inv_park, motorcontrol_config.hall_offset[0], hall_pin_state, speed_actual, q_value, filter_sum);
+              angle_pwm  =  adjust_angle_reference_pwm(angle_inv_park, motorcontrol_config.hall_offset[0], hall_pin_state, speed_actual, q_value, filter_sum, sensor_select);
 
 
               //==================== umot_out follows umot_motor with a ramp ==========================
@@ -577,6 +585,11 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              else
                  q_value = q_value_;
              break;
+
+         case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
+                 torque_actual = torq_pt1;
+             break;
+
          case i_motorcontrol[int i].get_notification() -> int out_notification:
 
              out_notification = notification;
@@ -595,7 +608,6 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  break;
 
          case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
-
                  out_config = motorcontrol_config;
                  break;
 

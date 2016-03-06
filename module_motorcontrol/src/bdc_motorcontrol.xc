@@ -87,6 +87,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                 break;
 
+        case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
+            break;
+
         case i_motorcontrol[int i].get_notification() -> int out_notification:
 
             out_notification = notification;
