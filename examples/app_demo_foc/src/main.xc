@@ -30,7 +30,7 @@ AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
-#define Q_DIRECT 500 //+/- 4095
+#define Q_DIRECT 1000 //+/- 4095
 #define Q_MAX 3000
 
 //void simple_torque_controller(client interface foc_base i_foc_base){

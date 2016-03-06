@@ -54,7 +54,7 @@
 ////////////////////////////////////////////
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     60
+#define COMMUTATION_LOOP_PERIOD     110
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CLK      3200//0
