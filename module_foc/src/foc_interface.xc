@@ -11,7 +11,7 @@ int field_control(int field_new, int field_e1, int field_e2, int q_value, int fi
     field_e1       =   -field_new;   // 0 - field_new
 
     field_e2       = calc_hysteresis_and_limit(field_e1, 100, 150);//10, 80
-    xscope_int(CONTROL_ERROR, field_e1);
+ //   xscope_int(CONTROL_ERROR, field_e1);
 
     if(q_value == 0)  // if q zero field_integrator must go to zero
     {
@@ -28,15 +28,15 @@ int field_control(int field_new, int field_e1, int field_e2, int q_value, int fi
     }
 
     field_out_i_part         +=   field_e2 * par_field_ki;
-    field_out_i_part          =   check_limits(field_out_i_part, def_FIELD_RANGE * 512);//512 * def_FIELD_RANGE
+    field_out_i_part          =   check_limits(field_out_i_part, def_FIELD_RANGE);//512 * def_FIELD_RANGE
 
 
     field_out1 = (field_out_p_part + field_out_i_part) / def_FIELD_RANGE;
 
     field_out2 =    low_pass_pt1_filter(filter_sum, ff_field_out, 32,  field_out1);//ToDo: check if it works properly
 
-    xscope_int(CONTROL_I_PART, field_out_i_part);
-    xscope_int(CONTROL_P_PART, field_out_p_part/def_FIELD_RANGE);
+ //   xscope_int(CONTROL_I_PART, field_out_i_part);
+  //  xscope_int(CONTROL_P_PART, field_out_p_part/def_FIELD_RANGE);
 
     return calc_hysteresis_and_limit(field_out2, 5, FIELD_CONTROLLER_LIMIT);//2048
 

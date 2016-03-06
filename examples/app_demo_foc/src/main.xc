@@ -31,30 +31,53 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
 #define Q_DIRECT 1000 //+/- 4095
-#define TORQUE 500
-#define Q_MAX 3000
+#define TORQUE 200
 
 void simple_torque_controller(interface MotorcontrolInterface client i_motorcontrol){
-    delay_seconds(5);
-    int torque_actual = 0, error = 0, setpoint = 0, feedforward = 200;
+    int target_torque = TORQUE;
+    int actual_torque = 0;
+    int error_torque = 0, error_torque_previous = 0;
+    int error_torque_integral = 0;
+    int error_torque_derivative = 0;
+    int error_torque_integral_limit = 100000;
+    int Kp_n = 800, Ki_n = 100, Kd_n = 1;
+    int torque_control_output = 0;
+    int pid_denominator = 1000;
+    int torque_control_output_limit = 4095;
+
+
     while(1){
-        error = TORQUE - i_motorcontrol.get_torque_actual();
-        if (error > 0) setpoint++;
-        else setpoint--;
+        actual_torque = i_motorcontrol.get_torque_actual();
 
-        if (setpoint > Q_MAX) setpoint = Q_MAX;
-        if (setpoint < -Q_MAX) setpoint = -Q_MAX;
+        error_torque = target_torque - actual_torque; // 350
+        error_torque_integral = error_torque_integral + error_torque;
+        error_torque_derivative = error_torque - error_torque_previous;
 
-        if((setpoint > 0)  && (setpoint < 50)) setpoint = 50;
-        else if ((setpoint < 0)  && (setpoint > -50)) setpoint = -50;
+        if (error_torque_integral > error_torque_integral_limit) {
+           error_torque_integral = error_torque_integral_limit;
+        } else if (error_torque_integral < -error_torque_integral_limit) {
+           error_torque_integral = -error_torque_integral_limit;
+        }
 
-        if (setpoint < feedforward) setpoint = feedforward;
+        torque_control_output = (Kp_n * error_torque) +
+                               (Ki_n * error_torque_integral) +
+                               (Kd_n * error_torque_derivative);
 
-   //     xscope_int(DEBUG_VALUE, setpoint);
-        xscope_int(CONTROL_ERROR, error);
+        torque_control_output /= pid_denominator;
 
-        i_motorcontrol.set_voltage(setpoint);
-        delay_milliseconds(1);
+        error_torque_previous = error_torque;
+
+        if (torque_control_output > torque_control_output_limit) {
+           torque_control_output = torque_control_output_limit;
+        }else if (torque_control_output < -torque_control_output_limit) {
+           torque_control_output = -torque_control_output_limit;
+        }
+
+        i_motorcontrol.set_voltage(torque_control_output);
+
+//            printf("acl: %i, er: %i, outp: %i\n", actual_torque, error_torque, torque_control_output);
+        delay_microseconds(500);
+
     }
 }
 
@@ -80,14 +103,14 @@ int main(void) {
 
         on tile[APP_TILE]:
         {
-            i_motorcontrol[0].set_voltage(Q_DIRECT);
+  //          i_motorcontrol[0].set_voltage(Q_DIRECT);
         }
 
         on tile[IFM_TILE]:
         {
             par
             {
-          //      simple_torque_controller(i_motorcontrol[0]);
+                simple_torque_controller(i_motorcontrol[0]);
 
                 /* Triggered PWM Service */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);

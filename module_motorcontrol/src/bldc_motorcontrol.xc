@@ -297,7 +297,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 #define defBOOST 128
 
 #define defADD 65536
-#define RAMP_UMOT 2500 // msec  50 - 1000
+#define RAMP_UMOT 65536 // 1 - 65536 max
 //#define PWM_MAX_LIMIT (PWM_MAX_VALUE - PWM_DEAD_TIME)
 
 #define ANGLE_OFFSET 3200//1200-ccw
@@ -378,7 +378,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     int field_e2 = 0;
     int field_out_p_part = 0;
     int field_out_i_part = 0;
-    int par_field_kp = 16000;//16000
+    int par_field_kp = 32000;//16000
     int par_field_ki = 0;//2000
     int field_out = 0;
     int field_out1 = 0;
@@ -466,7 +466,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
                  angle_electrical = 4096 - angle_electrical;
 
-             xscope_int(HALL_PINS, hall_pin_state);
+  //           xscope_int(HALL_PINS, hall_pin_state);
              xscope_int(ANGLE_ELECTRICAL, angle_electrical);
 
              xscope_int(VELOCITY, velocity);
