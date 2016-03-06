@@ -47,7 +47,7 @@ int field_control(int field_new, int field_e1, int field_e2, int q_value, int fi
  * to
  *
  */
-int    adjust_angle_reference_pwm(int angle_inv_park, int angle_offset, int measure_tick, int speed_actual, int q_value, int filter_sum[]);
+int    adjust_angle_reference_pwm(int angle_inv_park, int angle_offset, int measure_tick, int speed_actual, int q_value, int filter_sum[], int feedback_sensor);
 
 
 
