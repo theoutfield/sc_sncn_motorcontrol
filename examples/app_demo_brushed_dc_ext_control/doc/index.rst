@@ -8,7 +8,7 @@ Brushed DC Velocity Control with a potentiometer
     :backlinks: none
     :depth: 3
 
-With this app (app_demo_brushed_dc_ext_control) it is possible to control the speed of your Brushed DC motor with the help of a potentiometer.
+With this app (app_demo_brushed_dc_ext_control) it is possible to control the speed/voltage of your Brushed DC motor with the help of a potentiometer.
 
 * **Minimum Number of Cores**: 5
 * **Minimum Number of Tiles**: 2

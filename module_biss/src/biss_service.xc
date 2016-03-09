@@ -25,28 +25,28 @@ static inline void update_turns(int &turns, int last_position, int position, int
 
 int check_biss_config(BISSConfig & biss_config)
 {
-    if(biss_config.polarity < 0  || biss_config.polarity > 1){
-        printstrln("Wrong BISS configuration: wrong polarity");
+    if(biss_config.polarity != BISS_POLARITY_NORMAL && biss_config.polarity != BISS_POLARITY_INVERTED){
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
         return ERROR;
     }
 
     if ( BISS_FRAME_BYTES < (( (3 + 2 + biss_config.multiturn_length + biss_config.singleturn_length + biss_config.status_length + 32 - clz(biss_config.crc_poly)) -1)/32 + 1) ){
-        printstrln("Wrong BISS configuration: wrong frame bytes number");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong frame bytes number");
         return ERROR;
     }
 
     if( BISS_USEC <= 0 ){
-        printstrln("Wrong BISS configuration: wrong BISS_USEC value");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong BISS_USEC value");
         return ERROR;
     }
 
     if(biss_config.timeout <= 0){
-        printstrln("Wrong BISS configuration: wrong timeout");
+        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong timeout");
         return ERROR;
     }
 
     if(biss_config.pole_pairs < 1){
-        printstrln("Wrong BiSS configuration: wrong pole-pairs");
+        printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
         return ERROR;
     }
 
@@ -59,7 +59,6 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     if(check_biss_config(biss_config) == ERROR){
-        printstrln("Error while checking the BiSS sensor configuration");
         return;
     }
 
@@ -80,7 +79,6 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     int last_count = 0;
     int count_offset = 0;
     int turns = 0;
-    int calib_flag = 0;
     int biss_data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
     int biss_before_singleturn_length = biss_config.multiturn_length + biss_config.singleturn_length - biss_config.singleturn_resolution;
     int max_ticks_internal = (1 << (biss_config.multiturn_resolution -1 + biss_config.singleturn_resolution));
@@ -99,8 +97,21 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     configure_in_port(biss_ports.p_biss_data, biss_ports.clk);
 
     //first read
-    read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
-    t :> last_biss_read;
+    t :> time;
+    last_biss_read = time;
+    do {
+        t when timerafter(last_biss_read + biss_config.timeout) :> void;
+        last_count = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+        t :> last_biss_read;
+    } while (last_count != NoError && !timeafter(last_biss_read, time + 1000000*BISS_USEC));
+    if (last_count == CRCError)
+        printstrln("biss_service: ERROR: CRC");
+    else if (last_count == NoStartBit)
+        printstrln("biss_service: ERROR: No Start bit");
+    else if (last_count == NoAck)
+        printstrln("biss_service: ERROR: No Ack bit");
+    else if (last_count != NoError)
+        printstrln("biss_service: ERROR: initialization");
     last_count_read = last_biss_read;
     next_velocity_read = last_biss_read;
     { last_count , last_position, void } = biss_encoder(data, biss_config);
@@ -110,29 +121,25 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     while (1) {
         [[ordered]]
         select {
-        //send electrical angle for commutation, ajusted with electrical offset
-            case i_biss[int i].get_notification() -> int out_notification:
-
+        case i_biss[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
 
+        //send electrical angle for commutation, ajusted with electrical offset
         case i_biss[int i].get_biss_angle() -> unsigned int angle:
-                if (calib_flag == 0) {
-                    t :> time;
-                    if (timeafter(time, last_biss_read + biss_config.timeout)) {
-                        angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
-                        t :> last_biss_read;
-                        last_position = angle;
-                    } else
-                        angle = last_position;
-                    if (biss_config.polarity == BISS_POLARITY_INVERTED)
-                        angle = ticks_per_turn - angle;
-                    if (biss_config.singleturn_resolution > 12)
-                        angle = (biss_config.pole_pairs * (angle >> (biss_config.singleturn_resolution-12)) + biss_config.offset_electrical ) & 4095;
-                    else
-                        angle = (biss_config.pole_pairs * (angle << (12-biss_config.singleturn_resolution)) + biss_config.offset_electrical ) & 4095;
+                t :> time;
+                if (timeafter(time, last_biss_read + biss_config.timeout)) {
+                    angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
+                    t :> last_biss_read;
+                    last_position = angle;
                 } else
-                    angle = 0;
+                    angle = last_position;
+                if (biss_config.polarity == BISS_POLARITY_INVERTED)
+                    angle = ticks_per_turn - angle;
+                if (biss_config.singleturn_resolution > 12)
+                    angle = (biss_config.pole_pairs * (angle >> (biss_config.singleturn_resolution-12)) + biss_config.offset_electrical ) & 4095;
+                else
+                    angle = (biss_config.pole_pairs * (angle << (12-biss_config.singleturn_resolution)) + biss_config.offset_electrical ) & 4095;
                 break;
 
         //send singleturn position fast
@@ -278,11 +285,6 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 else
                     biss_config.offset_electrical = (new_angle - biss_config.pole_pairs * (angle >> (12-biss_config.singleturn_resolution)) ) & 4095;
                 offset = biss_config.offset_electrical;
-                break;
-
-        //set the calib flag, the server will alway send 0 as electrical angle
-        case i_biss[int i].set_biss_calib(int flag):
-                calib_flag = flag;
                 break;
 
         //compute velocity

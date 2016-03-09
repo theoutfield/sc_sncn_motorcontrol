@@ -21,6 +21,16 @@
     <!-- From the target code, call: xscope_int(PROBE_NAME, value); -->
     <Probe name="Phase B" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Phase C" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="HALL pins" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="HALL pins" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Angle_electrical" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Field" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Torque_raw" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Torque_pt1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Field_controller_output" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="CONTROL_ERROR" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="CONTROL I part" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="CONTROL P part" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
 </xSCOPEconfig>

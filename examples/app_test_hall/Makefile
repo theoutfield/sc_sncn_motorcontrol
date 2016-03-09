@@ -10,7 +10,7 @@ TARGET =
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = test_hall
+APP_NAME = app_test_hall
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = module_misc module_board-support module_hall  module_pwm_symmetrical

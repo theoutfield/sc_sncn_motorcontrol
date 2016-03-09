@@ -15,6 +15,7 @@
 #include <hall_service.h>
 #include <qei_service.h>
 #include <biss_service.h>
+#include <ams_service.h>
 #include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/
@@ -79,7 +80,7 @@ extern int velocity_profile_generate(int step);
  *
  */
 extern void init_position_profile_limits(int max_acceleration, int max_velocity, QEIConfig qei_config, \
-                                         HallConfig hall_config, BISSConfig biss_config, int sensor_select, int max_position, int min_position);
+                                         HallConfig hall_config, BISSConfig biss_config, AMSConfig ams_config, int sensor_select, int max_position, int min_position);
 
 /**
  * @brief Initialize Position Profile
@@ -205,6 +206,7 @@ typedef struct
     QEIConfig qei_params;
     HallConfig hall_params;
     BISSConfig biss_params;
+    AMSConfig ams_params;
     int sensor_used;
     float max_position;
     float min_position;

@@ -106,6 +106,7 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
  * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
  * @param i_qei [[Nullable]] Communication interface to the Incremental Encoder Service (if applicable).
  * @param i_biss [[Nullable]] Communication interface to the BiSSEncoder Service (if applicable).
+ * @param i_ams [[Nullable]] Communication interface to the AMSEncoder Service (if applicable).
  * @param i_motorcontrol Communication interface to the Motor Control Service.
  * @param i_position_control Array of communication interfaces to handle up to 3 different clients.
  */
@@ -113,5 +114,6 @@ void position_control_service(ControlConfig & position_ctrl_config,
                     interface HallInterface client ?i_hall,
                     interface QEIInterface client ?i_qei,
                     interface BISSInterface client ?i_biss,
+                    interface AMSInterface client ?i_ams,
                     interface MotorcontrolInterface client i_motorcontrol,
                     interface PositionControlInterface server i_position_control[3]);
