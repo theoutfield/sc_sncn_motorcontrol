@@ -13,7 +13,7 @@ TARGET =
 APP_NAME = app_demo_watchdog
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_biss module_board-support module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_pwm_symmetrical module_qei module_watchdog
+USED_MODULES = config_motor module_adc module_ams_rotary_sensor module_biss module_board-support module_ctrl_loops module_foc module_hall module_misc module_motorcontrol module_profile module_pwm_symmetrical module_qei module_spi_master module_watchdog
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

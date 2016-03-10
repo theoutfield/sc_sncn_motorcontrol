@@ -32,10 +32,10 @@
 ///////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   AMS_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
-#define MOTOR_FEEDBACK_SENSOR      HALL_SENSOR
+#define MOTOR_FEEDBACK_SENSOR      AMS_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
 #define QEI_SENSOR_INDEX_TYPE      QEI_WITH_INDEX
@@ -54,23 +54,23 @@
 ////////////////////////////////////////////
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     60
+#define COMMUTATION_LOOP_PERIOD     110
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      910
+#define COMMUTATION_OFFSET_CLK      3200//0
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     2460
+#define COMMUTATION_OFFSET_CCLK     2048
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION
 /////////////////////////////////////////////
 
 // CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     100
+#define CONTROL_LOOP_PERIOD     1000
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
-#define POSITION_Kp       1000
+#define POSITION_Kp       10000
 #define POSITION_Ki       1
 #define POSITION_Kd       0
 

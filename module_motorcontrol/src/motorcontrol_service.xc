@@ -14,18 +14,20 @@
 int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
 {
     if(commutation_params.motor_type != BLDC_MOTOR && commutation_params.motor_type != BDC_MOTOR ){
-        printstrln("Wrong Motorcontrol configuration: motor type");
+        printstrln("motorcontrol_service: ERROR: Wrong configuration: motor type");
         return ERROR;
     }
 
     if(commutation_params.motor_type == BLDC_MOTOR){
         if(commutation_params.bldc_winding_type < 0 || commutation_params.bldc_winding_type > 2){
-            printstrln("Wrong Motorcontrol configuration: wrong winding");
+            printstrln("motorcontrol_service: ERROR: Wrong configuration: wrong winding");
             return ERROR;
         }
 
-        if(commutation_params.commutation_sensor != HALL_SENSOR && commutation_params.commutation_sensor != BISS_SENSOR){
-            printstrln("Wrong Motorcontrol configuration: just HALL and BiSS sensors are supported as commutation sensor");
+        if(commutation_params.commutation_sensor != HALL_SENSOR &&
+           commutation_params.commutation_sensor != BISS_SENSOR &&
+           commutation_params.commutation_sensor != AMS_SENSOR) {
+            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL, BiSS and AMS sensors are supported as commutation sensor");
             return ERROR;
         }
     }
@@ -33,12 +35,14 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
     return SUCCESS;
 }
 
-[[combinable]]
+//[[combinable]]
 void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
                             chanend c_pwm_ctrl,
+                            interface ADCInterface client ?i_adc,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
+                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorcontrolInterface server i_motorcontrol[4])
 {
@@ -58,7 +62,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
     }
 
     if (check_motorcontrol_config(motorcontrol_config) == ERROR){
-        printstrln("Error while checking the Motorcontrol configuration");
         return;
     }
 
@@ -73,8 +76,19 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                     if(motorcontrol_config.motor_type == BLDC_MOTOR){
 
-                        bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_watchdog, i_motorcontrol,
+                        if(motorcontrol_config.commutation_method == FOC && !isnull(i_adc)){
+
+                            foc_loop( fet_driver_ports, motorcontrol_config,
+                                    hall_config, qei_config,
+                                    i_motorcontrol, c_pwm_ctrl, i_adc,
+                                    i_hall, i_qei, i_biss, i_ams, i_watchdog);
+
+                        }
+                        else{
+                            bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
                                 c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
+                        }
+
 
                     }else if(motorcontrol_config.motor_type == BDC_MOTOR){
 

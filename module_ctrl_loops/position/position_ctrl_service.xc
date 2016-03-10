@@ -26,7 +26,7 @@ void init_position_control(interface PositionControlInterface client i_position_
 
         if (ctrl_state == INIT) {
 #ifdef debug_print
-            printstrln("position control intialized");
+            printstrln("position_ctrl_service: position control initialized");
 #endif
             break;
         }
@@ -47,6 +47,7 @@ void position_control_service(ControlConfig &position_control_config,
                               interface HallInterface client ?i_hall,
                               interface QEIInterface client ?i_qei,
                               interface BISSInterface client ?i_biss,
+                              interface AMSInterface client ?i_ams,
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionControlInterface server i_position_control[3])
 {
@@ -88,7 +89,8 @@ void position_control_service(ControlConfig &position_control_config,
 
                     if (position_control_config.feedback_sensor != HALL_SENSOR
                            && position_control_config.feedback_sensor != QEI_SENSOR
-                           && position_control_config.feedback_sensor != BISS_SENSOR) {
+                           && position_control_config.feedback_sensor != BISS_SENSOR
+                           && position_control_config.feedback_sensor != AMS_SENSOR) {
                         position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
@@ -102,6 +104,8 @@ void position_control_service(ControlConfig &position_control_config,
                         actual_position = i_qei.get_qei_position_absolute();
                     } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
                         { actual_position, void, void } = i_biss.get_biss_position();
+                    } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                        { actual_position, void } = i_ams.get_ams_position();
                     }
 
                     config_update_flag = 0;
@@ -115,7 +119,7 @@ void position_control_service(ControlConfig &position_control_config,
                                 actual_position = i_hall.get_hall_position_absolute();
                             }
                             else{
-                                printstrln("ERROR: Hall interface is not provided but requested");
+                                printstrln("position_ctrl_service: ERROR: Hall interface is not provided but requested");
                                 exit(-1);
                             }
                             break;
@@ -125,7 +129,7 @@ void position_control_service(ControlConfig &position_control_config,
                                 actual_position =  i_qei.get_qei_position_absolute();
                             }
                             else{
-                                printstrln("ERROR: Encoder interface is not provided but requested");
+                                printstrln("position_ctrl_service: ERROR: Encoder interface is not provided but requested");
                                 exit(-1);
                             }
                             break;
@@ -136,7 +140,18 @@ void position_control_service(ControlConfig &position_control_config,
                                 actual_position, void, void } = i_biss.get_biss_position();
                             }
                             else{
-                                printstrln("ERROR: BiSS interface is not provided but requested");
+                                printstrln("position_ctrl_service: ERROR: BiSS interface is not provided but requested");
+                                exit(-1);
+                            }
+                            break;
+
+                        case AMS_SENSOR:
+                            if(!isnull(i_ams)){
+                            {
+                                actual_position, void } = i_ams.get_ams_position();
+                            }
+                            else{
+                                printstrln("position_ctrl_service: ERROR: AMS interface is not provided but requested");
                                 exit(-1);
                             }
                             break;
@@ -264,7 +279,7 @@ void position_control_service(ControlConfig &position_control_config,
                 while (1) {
                     if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
 #ifdef debug_print
-                        printstrln("commutation intialized");
+                        printstrln("position_ctrl_service: commutation initialized");
 #endif
                         if (i_motorcontrol.get_fets_state() == 0) { // check_fet_state(c_commutation);
                             i_motorcontrol.set_fets_state(1);
@@ -275,7 +290,7 @@ void position_control_service(ControlConfig &position_control_config,
                     }
                 }
 #ifdef debug_print
-                printstrln("position control activated");
+                printstrln("position_ctrl_service: position control activated");
 #endif
                 break;
 
@@ -291,7 +306,7 @@ void position_control_service(ControlConfig &position_control_config,
                 i_motorcontrol.set_fets_state(0); // disable_motor(c_commutation);
                 delay_milliseconds(30); //wait_ms(30, 1, ts); //
 #ifdef debug_print
-                printstrln("position control disabled");
+                printstrln("position_ctrl_service: position control disabled");
 #endif
                 break;
         }

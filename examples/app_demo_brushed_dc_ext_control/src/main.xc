@@ -3,8 +3,7 @@
 #include <IFM_BOARD_REQUIRED>
 
 /**
- * @brief Test illustrates usage of
- * @date 17/06/2014
+ * @brief Test illustrates usage of external ADC inputs for controlling a brushed DC motor. Example can be easily adapted for BLDC.
  */
 
 #include <pwm_service.h>
@@ -70,10 +69,11 @@ int main(void) {
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BDC_MOTOR;
+                    motorcontrol_config.commutation_method = SINE;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, null, i_watchdog[0],
-                                                i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[1], null, null, null, null, i_watchdog[0],
+                                         i_motorcontrol);
                 }
             }
         }

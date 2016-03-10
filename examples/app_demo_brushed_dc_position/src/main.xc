@@ -16,7 +16,8 @@
 void position_profile_test(interface PositionControlInterface client i_position_control,
                            interface HallInterface client ?i_hall,
                            interface QEIInterface client ?i_qei,
-                           interface BISSInterface client ?i_biss)
+                           interface BISSInterface client ?i_biss,
+                           interface AMSInterface client ?i_ams)
 {
     int target_position = 2000;         // ticks
     int velocity        = 100;          // rpm
@@ -33,7 +34,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
     profiler_config.max_deceleration = MAX_DECELERATION;
 
     /* Initialise the position profile generator */
-    init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss);
+    init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss, i_ams);
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
@@ -59,7 +60,7 @@ int main(void)
     {
 
         /* Test Profile Position Client function*/
-        on tile[APP_TILE]: position_profile_test(i_position_control[0], null, i_qei[2], null);        // test PPM on slave side
+        on tile[APP_TILE]: position_profile_test(i_position_control[0], null, i_qei[2], null, null);        // test PPM on slave side
 
         /* XScope monitoring */
         on tile[APP_TILE]: {
@@ -93,7 +94,7 @@ int main(void)
                 position_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; //us
 
                 /* Control Loop */
-                position_control_service(position_control_config, null, i_qei[1], null, i_motorcontrol[0],
+                position_control_service(position_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
                                          i_position_control);
             }
         }
@@ -126,10 +127,11 @@ int main(void)
                  {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BDC_MOTOR;
+                    motorcontrol_config.commutation_method = SINE;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, null, i_watchdog[0],
-                                                 i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, i_qei[0], null, null, i_watchdog[0],
+                                         i_motorcontrol);
                  }
 
             }

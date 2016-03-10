@@ -4,17 +4,17 @@ SOMANET Motor Control Library
 ==============================
 
 The **SOMANET Motor Control Library** provides services and utilities to perform BLDC/BDC Motor Control using SOMANET devices.
-The library is consisting of different modules which offer different functionalities:
+The library offer following functionalities:
 
-* BLDC and Brushed DC motors support
+* BLDC and Brushed DC motors control
+* Sinusoidal BLDC commutation
 * Position, Velocity and torque control loops (up to 18KHz)
-* Sinusoidal commutation
 * Feedback sensor support (Hall Sensor, Incremental Encoder, BiSS, AMS Magnetic Rotary sensor via SPI)
 * Basic Motion Profile Generation
 * Fully featured ADC driver
 * Configurable software defined PWM module 
-* Watchdog driver
-* GPIO server (eg for homing-related functions)
+* Watchdog
+* GPIO server (e.g. for homing-related functions)
 
 .. cssclass:: downloadable-button 
 
@@ -71,17 +71,17 @@ Modules
 
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
 
-* `Symmetrical PWM Module <module_pwm_symmetrical/doc/index>`_ : Service for PWM generation. 
-* `Hall Sensor Feedback Module <module_hall/doc/index>`_ : Driver to read the signals from your feedback Hall sensor.
-* `Incremental Encoder Feedback Module <module_qei/doc/index>`_ : Driver to read the signals from your feedback Encoder Interface.
-* `BiSS Encoder Feedback Module <module_biss/doc/index>`_ : Driver to read data from BiSS Encoder.
-* `ADC Module <module_adc/doc/index>`_ : Driver for the ADC on your IFM DC board.
-* `Watchdog Module <module_watchdog/doc/index>`_ : Driver for the Watchdog on your IFM DC board.
-* `GPIO Server Module <module_gpio/doc/index>`_ : Contains a service to handle the external digital input/outputs of your board.
-* `Motor Control Module <module_motorcontrol/doc/index>`_ : Provide a service to commutate BLDC motors and drive Brushed DC motors.
-* `Control Loops Module <module_ctrl_loops/doc/index>`_ : Provide services for position, velocity and control loops. 
-* `Profile Module <module_profile/doc/index>`_ : Contains software for profile ramps generation.
-* `Miscellaneous Module <module_misc/doc/index>`_ : Contains constants and utilities used by the library.
+* `Symmetrical PWM Module <module_pwm_symmetrical/doc/index.html>`_: Service for PWM generation. 
+* `Hall Sensor Feedback Module <module_hall/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
+* `Incremental Encoder Feedback Module <module_qei/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
+* `BiSS Encoder Feedback Module <module_biss/doc/index.html>`_: Driver to read data from BiSS Encoder.
+* `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC on your IFM DC board.
+* `Watchdog Module <module_watchdog/doc/index.html>`_: Driver for the Watchdog on your IFM DC board.
+* `GPIO Server Module <module_gpio/doc/index.html>`_: Contains a service to handle the external digital input/outputs of your board.
+* `Motor Control Module <module_motorcontrol/doc/index.html>`_: Provide a service to commutate BLDC motors and drive Brushed DC motors.
+* `Control Loops Module <module_ctrl_loops/doc/index.html>`_: Provide services for position, velocity and control loops. 
+* `Profile Module <module_profile/doc/index.html>`_: Contains software for profile ramps generation.
+* `Miscellaneous Module <module_misc/doc/index.html>`_: Contains constants and utilities used by the library.
 
 Examples
 --------
@@ -105,31 +105,34 @@ Examples
 	Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index>
 	Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>
 	Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>
+	Brushed DC Velocity Control with a potentiometer <examples/app_demo_brushed_dc_ext_control/doc/index>
 
 	Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index> 
 
 * **Low level functionality tests:**
 
-	* `PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index>`_: Simple example on PWM signal output.
-	* `Incremental Encoder Interface Test <examples/app_test_qei/doc/index>`_: Shows data acquired from incremental Encoder.
-	* `Hall Sensor Feedback Test <examples/app_test_hall/doc/index>`_: Shows data acquired from Hall sensor.
-	* `BiSS Encoder Feedback Test <examples/app_test_biss/doc/index>`_: Shows data acquired from BiSS Encoder 
-	* `Watchdog Demo <examples/app_demo_watchdog/doc/index>`_: Simple example on how to use the Watchdog.
+	* `PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index.html>`_: Simple example on PWM signal output.
+	* `Incremental Encoder Interface Test <examples/app_test_qei/doc/index.html>`_: Shows data acquired from incremental Encoder.
+	* `Hall Sensor Feedback Test <examples/app_test_hall/doc/index.html>`_: Shows data acquired from Hall sensor.
+	* `BiSS Encoder Feedback Test <examples/app_test_biss/doc/index.html>`_: Shows data acquired from BiSS Encoder 
+	* `Watchdog Demo <examples/app_demo_watchdog/doc/index.html>`_: Simple example on how to use the Watchdog.
 
 * **BLDC Motor Control demos:**
 
-	* `BLDC Motor Control Demo <examples/app_demo_bldc_motorcontrol/doc/index>`_: Plain Sinusoidal commutation of your BLDC motor.
-	* `BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index>`_: Simple example to make Position Control of your BLDC motor.
-	* `BLDC Velocity Control Demo <examples/app_demo_bldc_velocity/doc/index>`_: Simple example to make Velocity Control of your BLDC motor.
-	* `BLDC Torque Control Demo <examples/app_demo_bldc_torque/doc/index>`_: Simple example to make Torque Control of your BLDC motor.
-	* `Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index>`_: Example to help you calibrating the commutation offsets of your Hall sensor.
+	* `BLDC Motor Control Demo <examples/app_demo_bldc_motorcontrol/doc/index.html>`_: Plain Sinusoidal commutation of your BLDC motor.
+	* `BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index.html>`_: Simple example to make Position Control of your BLDC motor.
+	* `BLDC Velocity Control Demo <examples/app_demo_bldc_velocity/doc/index.html>`_: Simple example to make Velocity Control of your BLDC motor.
+	* `BLDC Torque Control Demo <examples/app_demo_bldc_torque/doc/index.html>`_: Simple example to make Torque Control of your BLDC motor.
+	* `Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index.html>`_: Example to help you calibrating the commutation offsets of your Hall sensor.
 
 * **Brushed DC Motor Control demos:**
 
-	* `Brushed DC Motor Control Demo <examples/app_demo_brushed_dc/doc/index>`_: Simple example to drive your Brushed DC motor.
-	* `Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index>`_: Simple example to make Position Control of your Brushed DC motor.
-	* `Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>`_: Simple example to make Velocity Control of your Brushed DC motor.
-	* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>`_: Simple example to make Torque Control of your Brushed DC motor.
+	* `Brushed DC Motor Control Demo <examples/app_demo_brushed_dc/doc/index.html>`_: Simple example to drive your Brushed DC motor.
+	* `Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index.html>`_: Simple example to make Position Control of your Brushed DC motor.
+	* `Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index.html>`_: Simple example to make Velocity Control of your Brushed DC motor.
+	* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index.html>`_: Simple example to make Torque Control of your Brushed DC motor.
+	* `Brushed DC Control with a potentiometer <examples/app_demo_brushed_dc_ext_control/doc/index.html>`_: Simple example to drive Brushed DC motor by an analog input signal.
+	
 	
 
 Motor Control Quick Guides
@@ -144,8 +147,8 @@ Motor Control Quick Guides
 
 In order to learn how to proceed with the configuration of the motors we highly recommend to read the following tutorials:
 
-* `Motor Control Library configuration <doc/motor_configuration>`_ : Learn how to configure your Motor Control Library. 
-* `Commutation offsets adjustment <doc/motor_tuning>`_ : Learn how to adjust your feedback Hall sensor offsets for an optimal commutation.
+* `Motor Control Library configuration <doc/motor_configuration.html>`_ : Learn how to configure your Motor Control Library. 
+* `Commutation offsets adjustment <doc/motor_tuning.html>`_ : Learn how to adjust your feedback Hall sensor offsets for an optimal commutation.
 
 Dependencies
 ------------

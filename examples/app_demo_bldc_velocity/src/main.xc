@@ -11,6 +11,7 @@
 //BLDC Motor drive libs
 #include <qei_service.h>
 #include <hall_service.h>
+#include <ams_service.h>
 #include <pwm_service.h>
 #include <watchdog_service.h>
 #include <motorcontrol_service.h>
@@ -28,14 +29,23 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+#elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
+AMSPorts ams_ports = { {
+        IFM_TILE_CLOCK_2,
+        IFM_TILE_CLOCK_3,
+        SOMANET_IFM_GPIO_D3, //D3,    //mosi
+        SOMANET_IFM_GPIO_D1, //D1,    //sclk
+        SOMANET_IFM_GPIO_D2  },//D2     //miso
+        SOMANET_IFM_GPIO_D0 //D0         //slave select
+};
 #else
-BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
+BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
 
 /* Test Profile Velocity function */
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
-    int target_velocity = 900;          // rpm
+    int target_velocity = 1000;          // rpm
     int acceleration    = 100;          // rpm/s
     int deceleration    = 100;          // rpm/s
 
@@ -57,10 +67,12 @@ int main(void)
 
     interface WatchdogInterface i_watchdog[2];
     interface HallInterface i_hall[5];
-    interface MotorcontrolInterface i_motorcontrol[5];
+    interface MotorcontrolInterface i_motorcontrol[4];
     interface VelocityControlInterface i_velocity_control[3];
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
     interface QEIInterface i_qei[5];
+#elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
+    interface AMSInterface i_ams[5];
 #else
     interface BISSInterface i_biss[5];
 #endif
@@ -103,10 +115,13 @@ int main(void)
 
             /* Control Loop */
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
-            velocity_control_service(velocity_control_config, i_hall[1], i_qei[1], null, i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, i_hall[1], i_qei[1], null, null, i_motorcontrol[0],
                                         i_velocity_control);
+#elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
+            velocity_control_service(velocity_control_config, i_hall[1], null, null, i_ams[1], i_motorcontrol[0],
+                                                    i_velocity_control);
 #else
-            velocity_control_service(velocity_control_config, i_hall[1], null, i_biss[1], i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, i_hall[1], null, i_biss[1], null, i_motorcontrol[0],
                                         i_velocity_control);
 #endif
         }
@@ -143,6 +158,28 @@ int main(void)
 
                     qei_service(qei_ports, qei_config, i_qei);
                 }
+#elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
+                /* AMS Rotary Sensor Service */
+                {
+                    AMSConfig ams_config;
+                    ams_config.factory_settings = 1;
+                    ams_config.polarity = AMS_POLARITY;
+                    ams_config.hysteresis = 1;
+                    ams_config.noise_setting = AMS_NOISE_NORMAL;
+                    ams_config.uvw_abi = 0;
+                    ams_config.dyn_angle_comp = 0;
+                    ams_config.data_select = 0;
+                    ams_config.pwm_on = AMS_PWM_OFF;
+                    ams_config.abi_resolution = 0;
+                    ams_config.resolution_bits = AMS_RESOLUTION;
+                    ams_config.offset = AMS_OFFSET;
+                    ams_config.pole_pairs = POLE_PAIRS;
+                    ams_config.max_ticks = 0x7fffffff;
+                    ams_config.cache_time = AMS_CACHE_TIME;
+                    ams_config.velocity_loop = AMS_VELOCITY_LOOP;
+
+                    ams_service(ams_ports, ams_config, i_ams);
+                }
 #else
                 /* BiSS service */
                 {
@@ -170,6 +207,7 @@ int main(void)
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
+                    motorcontrol_config.commutation_method = SINE;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] =  COMMUTATION_OFFSET_CLK;
@@ -177,11 +215,14 @@ int main(void)
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_hall[0], i_qei[0], null, i_watchdog[0], i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null,
+                                         i_hall[0], i_qei[0], null, null, i_watchdog[0], i_motorcontrol);
+#elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null,
+                                         i_hall[0], null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_hall[0], null, i_biss[0], i_watchdog[0], i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null,
+                                         i_hall[0], null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }

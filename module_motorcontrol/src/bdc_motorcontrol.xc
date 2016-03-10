@@ -98,6 +98,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                 break;
 
+        case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
+            break;
+
         case i_motorcontrol[int i].set_voltage(int new_voltage):
 
             voltage = new_voltage;
@@ -107,6 +110,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                   state_return = init_state;
                   break;
+
+        case i_motorcontrol[int i].set_calib(int flag) -> int out_offset:
+                break;
 /*
         case i_motorcontrol[int i].disable_fets():
 
@@ -129,12 +135,16 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                 break;
         case i_motorcontrol[int i].set_sensor(int new_sensor):
                 break;
+
         case i_motorcontrol[int i].set_config(MotorcontrolConfig new_config) -> int result:
                 result = check_bdc_motorcontrol_config(new_config);
                 if (result == ERROR) {
                     break;
                 }
+
+        case i_motorcontrol[int i].set_sensor_offset(int in_offset):
                 break;
+
         case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
 
                   out_config = motorcontrol_config;

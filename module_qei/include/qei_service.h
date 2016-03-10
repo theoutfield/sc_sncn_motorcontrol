@@ -138,8 +138,7 @@ interface QEIInterface{
     /**
      * @brief Getter for the current state of the Service.
      *
-     * @return 0 if not initialized.
-     *         1 if initialized.
+     * @return 0 if not initialized, 1 if initialized.
      */
     int check_busy();
 
