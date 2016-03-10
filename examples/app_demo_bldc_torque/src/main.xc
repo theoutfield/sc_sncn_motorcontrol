@@ -1,8 +1,6 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
-//#include <CORE_BOARD_REQUIRED>
-//#include <IFM_BOARD_REQUIRED>
-#include <CORE_C22-rev-a.bsp>
-#include <IFM_DC1K-rev-c3.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 /**
  * @file test_torque-ctrl.xc
@@ -75,7 +73,7 @@ int main(void)
     chan c_pwm_ctrl, c_adctrig;
 
     interface WatchdogInterface i_watchdog[2];
-    interface ADCInterface i_adc[2];
+    interface ADCInterface i_adc[3];
     interface HallInterface i_hall[5];
     interface MotorcontrolInterface i_motorcontrol[4];
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
@@ -219,6 +217,7 @@ int main(void)
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
+                    motorcontrol_config.commutation_method = SINE;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] =  COMMUTATION_OFFSET_CLK;
@@ -226,14 +225,14 @@ int main(void)
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_hall[0], i_qei[0], null, null, i_watchdog[0], i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[2],
+                                         i_hall[0], i_qei[0], null, null, i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_hall[0], null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[2],
+                                         i_hall[0], null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_hall[0], null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[2],
+                                         i_hall[0], null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }

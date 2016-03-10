@@ -435,8 +435,10 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              //====================== get phase currents ======================================
              {current_ph_b, current_ph_c} = i_adc.get_currents();//42 usec in triggered, 15 usec on request
 
+#ifdef DEBUG_bldc_motorcontrol
              xscope_int(PHASE_B, current_ph_b);
              xscope_int(PHASE_C, current_ph_c);
+#endif
 
              //====================== get sensor angle and velocity ======================================
 
@@ -466,10 +468,12 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
                  angle_electrical = 4096 - angle_electrical;
 
+#ifdef DEBUG_bldc_motorcontrol
   //           xscope_int(HALL_PINS, hall_pin_state);
              xscope_int(ANGLE_ELECTRICAL, angle_electrical);
 
              xscope_int(VELOCITY, velocity);
+#endif
 
 
              //==========================  clarke transformation  ===========================================================================
@@ -487,15 +491,19 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              torq_new   = (((clarke_beta  * mmCosinus )  /16384) - ((clarke_alpha * mmSinus ) /16384));
 
              field_lpf = low_pass_pt1_filter(filter_sum, fffield, 4,  field_new);
+#ifdef DEBUG_bldc_motorcontrol
              xscope_int(FIELD, field_lpf);
              xscope_int(TORQUE_RAW, torq_new);
+#endif
 
              //========================= filter torque  =======================================================================
              //   torq_period          = calc_mean_one_periode(iCX, iXX, torq_new, torq_period, hall_pin_state, 16);  // every cycle
 
              torq_pt1             = low_pass_pt1_filter(filter_sum, fftorque, 4,  torq_new);
 
+#ifdef DEBUG_bldc_motorcontrol
              xscope_int(TORQUE_PT1, torq_pt1);
+#endif
 
              //========================= filter field ===========================================================
              //ToDo: find a better filtering way
@@ -520,7 +528,9 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              //    if(hall_pin_state == 6)
              field_out = field_control(field_lpf, field_e1, field_e2, q_value, field_out_p_part, field_out_i_part, par_field_kp, par_field_ki, field_out1, field_out2, filter_sum); //ToDo: analyze the condition
 
+#ifdef DEBUG_bldc_motorcontrol
              xscope_int(FIELD_CONTROLLER_OUTPUT, field_out);
+#endif
              //====================================================================================================
 
              //============== FOC INVERS PARK =====================================================================
@@ -575,7 +585,9 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
               update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);  // !!!  must be the last function in this loop; 55 usec @ 18kHz config, why?
 
               tx :> end_time;
+#ifdef DEBUG_bldc_motorcontrol
               xscope_int(CYCLE_TIME, (end_time - start_time)/250);
+#endif
 
              break;
 
