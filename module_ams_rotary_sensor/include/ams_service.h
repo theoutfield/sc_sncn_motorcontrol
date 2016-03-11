@@ -177,7 +177,7 @@ interface AMSInterface
 
     AMSConfig get_ams_config(void);
 
-    void set_ams_config(AMSConfig in_config);
+    int set_ams_config(AMSConfig in_config);
 
     void reset_ams_position(int in_count);
 
