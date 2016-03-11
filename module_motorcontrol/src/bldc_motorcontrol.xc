@@ -170,11 +170,6 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
             case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
                 break;
 
-            case i_motorcontrol[int i].get_notification() -> int out_notification:
-
-                out_notification = notification;
-                break;
-
             case i_motorcontrol[int i].set_voltage(int new_voltage):
                     if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
                         voltage = -new_voltage;
@@ -630,7 +625,12 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  torque_actual = torq_pt1;
              break;
 
-         case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
+         case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters) -> int result:
+                 result = check_bldc_motorcontrol_config(new_parameters);
+                 if (result == ERROR) {
+                     break;
+                 }
+
                  motorcontrol_config = new_parameters;
 
                  notification = MOTCTRL_NTF_CONFIG_CHANGED;
@@ -750,6 +750,10 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                fw_flag = 0;
                bw_flag = 0;
 
+             break;
+
+         case i_motorcontrol[int i].get_notification() -> int out_notification:
+             out_notification = notification;
              break;
 
      }

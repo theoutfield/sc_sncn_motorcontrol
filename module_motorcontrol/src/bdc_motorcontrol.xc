@@ -141,6 +141,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                 if (result == ERROR) {
                     break;
                 }
+                break;
 
         case i_motorcontrol[int i].set_sensor_offset(int in_offset):
                 break;
