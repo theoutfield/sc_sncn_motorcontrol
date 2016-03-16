@@ -11,8 +11,6 @@
 #include <profile.h>
 #include <profile_control.h>
 
-#define USE_XSCOPE
-
 void init_velocity_profiler(ProfilerConfig profile_velocity_config,
                                 interface VelocityControlInterface client i_velocity_control){
 
