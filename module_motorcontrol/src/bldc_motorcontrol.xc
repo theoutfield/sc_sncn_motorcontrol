@@ -162,6 +162,9 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                         voltage = new_voltage;
                     break;
 
+            case i_motorcontrol[int i].set_torque(int torque_sp):
+                    break;
+
             case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
                     motorcontrol_config = new_parameters;
 
@@ -298,9 +301,6 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
 #define defADD 65536
 #define RAMP_UMOT 65536 // 1 - 65536 max
-//#define PWM_MAX_LIMIT (PWM_MAX_VALUE - PWM_DEAD_TIME)
-
-#define ANGLE_OFFSET 3200//1200-ccw
 
 void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
                                         HallConfig hall_config, QEIConfig qei_config,
@@ -318,8 +318,8 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     t_pwm_control pwm_ctrl;
     unsigned int pwm[3] = { 0, 0, 0 };
     const unsigned t_delay = 300*USEC_FAST;
-    timer tx;
-    unsigned ts;
+    timer tx, tmr;
+    unsigned ts, tt;
     int check_fet;
     int init_state = INIT_BUSY;
     //unsigned loop_start_time;
@@ -367,6 +367,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     int par_ramp_umot = RAMP_UMOT;//FixMe: this define should be a parameter
     int pwm_enabled = 0;
     int umot_out = 0;
+    unsigned umot_init = 0;
     int q_value = 0;
 
     int iXX[64];
@@ -384,6 +385,18 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     int field_out1 = 0;
     int field_out2 = 0;
     unsigned start_time = 0, end_time = 0;
+
+    //FOC Torque control
+    int target_torque = 0;
+    int actual_torque = 0;
+    int error_torque = 0, error_torque_previous = 0;
+    int error_torque_integral = 0;
+    int error_torque_derivative = 0;
+    int error_torque_integral_limit = 100000;
+    int Kp_n = 800, Ki_n = 100, Kd_n = 1;
+    int torque_control_output = 0;
+    int pid_denominator = 1000;
+    int torque_control_output_limit = 4095;
 
     //================ init PWM ===============================
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
@@ -416,6 +429,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 //FixMe: Make proper synchronization with PWM and ADC. Currently loop period is 110 usec
 //==========================================================================================================================================
     tx :> ts;
+    tmr :> tt;
     while(1)
     {
 
@@ -513,7 +527,8 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              //          vector_current_max  = vector_current;
              //          status_foc          = stFaultOverCurrent20;  // Motor stop
              //    }
-
+             xscope_int(Q_VALUE, q_value);
+             xscope_int(TORQUE_SP, target_torque);
 
              //FixMe: Was once per electrical rotation, but why? measure tick takes values 0x80 41 42 43 44 45
              //    if(fp.measure_tick & 0x80)   field_control(fp);
@@ -544,19 +559,24 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
               //==================== umot_out follows umot_motor with a ramp ==========================
               umot_temp   = umot_motor * 65536;
 
-              if(umot_out  < umot_temp)
-              {
-                  umot_out += par_ramp_umot;
-                  if(umot_out > umot_temp) umot_out = umot_temp;
+              if(umot_init < 5000){
+                  if(umot_out  < umot_temp)
+                  {
+                      umot_out += par_ramp_umot;
+                      if(umot_out > umot_temp) umot_out = umot_temp;
+                  }
+                  if(umot_out  > umot_temp)
+                  {
+                      umot_out -= par_ramp_umot;
+                      if(umot_out < umot_temp) umot_out = umot_temp;
+                  }
+                  umot_init++;
               }
-              if(umot_out  > umot_temp)
-              {
-                  umot_out -= par_ramp_umot;
-                  if(umot_out < umot_temp) umot_out = umot_temp;
-              }
+              else
+                  umot_out = umot_motor * 65536;
               //=======================================================================================
 
-
+           //   umot_out = umot_motor;
 
              //========== prepare PWM =================================================================
 
@@ -567,7 +587,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
               }
               else if(pwm_enabled)
               {
-                  space_vector_pwm((umot_out/65536),  angle_pwm,  pwm_enabled, pwm);
+                  space_vector_pwm(umot_out/65536,  angle_pwm,  pwm_enabled, pwm);
               }
 
               /*till this point 55 usec loop period*/
@@ -579,12 +599,49 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
              break;
 
+         case tmr when timerafter(tt) :> void:
+
+             tt += USEC_FAST * 500; //usec  ToDo: make it a configurable parameter
+
+             actual_torque = torq_pt1;
+
+             error_torque = target_torque - actual_torque; // 350
+             error_torque_integral = error_torque_integral + error_torque;
+             error_torque_derivative = error_torque - error_torque_previous;
+
+             if (error_torque_integral > error_torque_integral_limit) {
+                error_torque_integral = error_torque_integral_limit;
+             } else if (error_torque_integral < -error_torque_integral_limit) {
+                error_torque_integral = -error_torque_integral_limit;
+             }
+
+             torque_control_output = (Kp_n * error_torque) +
+                                    (Ki_n * error_torque_integral) +
+                                    (Kd_n * error_torque_derivative);
+
+             torque_control_output /= pid_denominator;
+
+             error_torque_previous = error_torque;
+
+             if (torque_control_output > torque_control_output_limit) {
+                torque_control_output = torque_control_output_limit;
+             }else if (torque_control_output < -torque_control_output_limit) {
+                torque_control_output = -torque_control_output_limit;
+             }
+
+             q_value = torque_control_output;
+
+             break;
          case i_motorcontrol[int i].set_voltage(int q_value_):
              if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
                  q_value = -q_value_;
              else
                  q_value = q_value_;
              break;
+
+         case i_motorcontrol[int i].set_torque(int torque_sp):
+                 target_torque = torque_sp;
+                 break;
 
          case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
                  torque_actual = torq_pt1;

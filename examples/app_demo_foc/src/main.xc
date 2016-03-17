@@ -33,55 +33,6 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #define Q_DIRECT 1000 //+/- 4095
 #define TORQUE 200
 
-void simple_torque_controller(interface MotorcontrolInterface client i_motorcontrol){
-    int target_torque = TORQUE;
-    int actual_torque = 0;
-    int error_torque = 0, error_torque_previous = 0;
-    int error_torque_integral = 0;
-    int error_torque_derivative = 0;
-    int error_torque_integral_limit = 100000;
-    int Kp_n = 800, Ki_n = 100, Kd_n = 1;
-    int torque_control_output = 0;
-    int pid_denominator = 1000;
-    int torque_control_output_limit = 4095;
-
-
-    while(1){
-        actual_torque = i_motorcontrol.get_torque_actual();
-
-        error_torque = target_torque - actual_torque; // 350
-        error_torque_integral = error_torque_integral + error_torque;
-        error_torque_derivative = error_torque - error_torque_previous;
-
-        if (error_torque_integral > error_torque_integral_limit) {
-           error_torque_integral = error_torque_integral_limit;
-        } else if (error_torque_integral < -error_torque_integral_limit) {
-           error_torque_integral = -error_torque_integral_limit;
-        }
-
-        torque_control_output = (Kp_n * error_torque) +
-                               (Ki_n * error_torque_integral) +
-                               (Kd_n * error_torque_derivative);
-
-        torque_control_output /= pid_denominator;
-
-        error_torque_previous = error_torque;
-
-        if (torque_control_output > torque_control_output_limit) {
-           torque_control_output = torque_control_output_limit;
-        }else if (torque_control_output < -torque_control_output_limit) {
-           torque_control_output = -torque_control_output_limit;
-        }
-
-        i_motorcontrol.set_voltage(torque_control_output);
-
-//            printf("acl: %i, er: %i, outp: %i\n", actual_torque, error_torque, torque_control_output);
-        delay_microseconds(500);
-
-    }
-}
-
-
 int main(void) {
 
     // Motor control channels
@@ -104,21 +55,18 @@ int main(void) {
         on tile[APP_TILE]:
         {
   //          i_motorcontrol[0].set_voltage(Q_DIRECT);
+            i_motorcontrol[0].set_torque(TORQUE);
         }
 
         on tile[IFM_TILE]:
         {
             par
             {
-                simple_torque_controller(i_motorcontrol[0]);
-
                 /* Triggered PWM Service */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
-          //      pwm_service(pwm_ports, c_pwm_ctrl);
 
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc);
-         //       adc_service(adc_ports, null, i_adc);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
