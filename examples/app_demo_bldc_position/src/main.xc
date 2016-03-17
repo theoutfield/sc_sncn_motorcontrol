@@ -83,7 +83,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
-#else
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #endif
 
@@ -97,7 +97,7 @@ int main(void)
     interface HallInterface i_hall[5];
 #if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
-#else
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
     interface QEIInterface i_qei[5];
 #endif
 
@@ -110,8 +110,10 @@ int main(void)
         {
 #if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
             position_profile_test(i_position_control[0], i_hall[2], null, i_biss[2]);      // test PPM on slave side
-#else
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
             position_profile_test(i_position_control[0], i_hall[2], i_qei[2], null);      // test PPM on slave side
+#else
+            position_profile_test(i_position_control[0], i_hall[2], null, null);      // test PPM on slave side
 #endif
         }
 
@@ -150,8 +152,11 @@ int main(void)
 #if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
             position_control_service(position_control_config, i_hall[1], null, i_biss[1], i_motorcontrol[0],
                                      i_position_control);
-#else
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
             position_control_service(position_control_config, i_hall[1], i_qei[1], null, i_motorcontrol[0],
+                                     i_position_control);
+#else
+            position_control_service(position_control_config, i_hall[1], null, null, i_motorcontrol[0],
                                      i_position_control);
 #endif
         }
@@ -198,7 +203,7 @@ int main(void)
 
                     biss_service(biss_ports, biss_config, i_biss);
                 }
-#else
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                 /* Quadrature Encoder sensor Service */
                 {
                     QEIConfig qei_config;
@@ -225,9 +230,12 @@ int main(void)
 #if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, i_hall[0], null, i_biss[0], i_watchdog[0], i_motorcontrol);
-#else
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, i_hall[0], i_qei[0], null, i_watchdog[0], i_motorcontrol);
+#else
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                         c_pwm_ctrl, i_hall[0], null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }
