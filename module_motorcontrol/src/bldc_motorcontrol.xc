@@ -369,6 +369,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     int umot_out = 0;
     unsigned umot_init = 0;
     int q_value = 0;
+    int q_direct_select = 0;
 
     int iXX[64];
     int iCX[64];
@@ -602,37 +603,48 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
          case tmr when timerafter(tt) :> void:
 
              tt += USEC_FAST * 500; //usec  ToDo: make it a configurable parameter
+             if(!q_direct_select){
+                 if (shutdown == 1 || pwm_enabled != 1) {
+                     torque_control_output = 0;
+                     error_torque = 0;
+                     error_torque_integral = 0;
+                     error_torque_derivative = 0;
+                 }
+                 else{
 
-             actual_torque = torq_pt1;
+                     actual_torque = torq_pt1;
 
-             error_torque = target_torque - actual_torque; // 350
-             error_torque_integral = error_torque_integral + error_torque;
-             error_torque_derivative = error_torque - error_torque_previous;
+                     error_torque = target_torque - actual_torque; // 350
+                     error_torque_integral = error_torque_integral + error_torque;
+                     error_torque_derivative = error_torque - error_torque_previous;
 
-             if (error_torque_integral > error_torque_integral_limit) {
-                error_torque_integral = error_torque_integral_limit;
-             } else if (error_torque_integral < -error_torque_integral_limit) {
-                error_torque_integral = -error_torque_integral_limit;
+                     if (error_torque_integral > error_torque_integral_limit) {
+                        error_torque_integral = error_torque_integral_limit;
+                     } else if (error_torque_integral < -error_torque_integral_limit) {
+                        error_torque_integral = -error_torque_integral_limit;
+                     }
+
+                     torque_control_output = (Kp_n * error_torque) +
+                                            (Ki_n * error_torque_integral) +
+                                            (Kd_n * error_torque_derivative);
+
+                     torque_control_output /= pid_denominator;
+
+                     error_torque_previous = error_torque;
+
+                     if (torque_control_output > torque_control_output_limit) {
+                        torque_control_output = torque_control_output_limit;
+                     }else if (torque_control_output < -torque_control_output_limit) {
+                        torque_control_output = -torque_control_output_limit;
+                     }
+                 }
+
+                 q_value = torque_control_output;
              }
-
-             torque_control_output = (Kp_n * error_torque) +
-                                    (Ki_n * error_torque_integral) +
-                                    (Kd_n * error_torque_derivative);
-
-             torque_control_output /= pid_denominator;
-
-             error_torque_previous = error_torque;
-
-             if (torque_control_output > torque_control_output_limit) {
-                torque_control_output = torque_control_output_limit;
-             }else if (torque_control_output < -torque_control_output_limit) {
-                torque_control_output = -torque_control_output_limit;
-             }
-
-             q_value = torque_control_output;
 
              break;
          case i_motorcontrol[int i].set_voltage(int q_value_):
+             q_direct_select = 1;
              if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
                  q_value = -q_value_;
              else
