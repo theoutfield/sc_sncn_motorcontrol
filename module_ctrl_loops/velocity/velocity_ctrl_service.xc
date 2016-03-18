@@ -231,7 +231,12 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         velocity_control_out = -velocity_control_out_limit;
                     }
 
-                    i_motorcontrol.set_voltage(velocity_control_out); //set_commutation_sinusoidal(c_commutation, velocity_control_out);//velocity_control_out
+                    if(velocity_control_config.cascade_with_torque == 1){
+                        i_motorcontrol.set_torque(velocity_control_out);  //cascades with FOC's torque controller
+                    }
+                    else {
+                        i_motorcontrol.set_voltage(velocity_control_out); //in case of FOC sets Q value, torque controller in FOC is disabled
+                    }
 
                     previous_error = error_velocity;
                 }

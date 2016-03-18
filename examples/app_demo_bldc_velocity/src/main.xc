@@ -117,6 +117,7 @@ int main(void)
             velocity_control_config.Kd_n = VELOCITY_Kd;
 
             velocity_control_config.control_loop_period =  CONTROL_LOOP_PERIOD;
+            velocity_control_config.cascade_with_torque = 0;
 
             /* Control Loop */
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
