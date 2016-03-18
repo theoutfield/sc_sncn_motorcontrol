@@ -54,7 +54,8 @@ int main(void) {
 
         on tile[APP_TILE]:
         {
-  //          i_motorcontrol[0].set_voltage(Q_DIRECT);
+            //i_motorcontrol[0].set_voltage(Q_DIRECT);
+            delay_milliseconds(400);
             i_motorcontrol[0].set_torque(TORQUE);
         }
 
