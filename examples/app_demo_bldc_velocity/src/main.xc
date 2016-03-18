@@ -34,14 +34,7 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-AMSPorts ams_ports = { {
-        IFM_TILE_CLOCK_2,
-        IFM_TILE_CLOCK_3,
-        SOMANET_IFM_GPIO_D3, //D3,    //mosi
-        SOMANET_IFM_GPIO_D1, //D1,    //sclk
-        SOMANET_IFM_GPIO_D2  },//D2     //miso
-        SOMANET_IFM_GPIO_D0 //D0         //slave select
-};
+AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
 #else
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
@@ -92,7 +85,7 @@ int main(void)
         /* XScope monitoring */
         {
             int target_velocity, actual_velocity;
-
+            delay_milliseconds(500);
             while(1) {
 
                 actual_velocity = i_velocity_control[1].get_velocity();
