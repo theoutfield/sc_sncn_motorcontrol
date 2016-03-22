@@ -263,15 +263,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             case i_velocity_control[int i].set_velocity(int in_velocity):
 
-                target_velocity = in_velocity;
-
-                if (target_velocity == 0) {
-                    mode = MOTCTRL_MODE_PASSIVE;
-                    i_motorcontrol.set_voltage(0);
-                    i_motorcontrol.set_fets_state(0);
-                } else {
-                    mode = MOTCTRL_MODE_ACTIVE;
-                    i_motorcontrol.set_fets_state(1);
+                if (mode == MOTCTRL_MODE_ACTIVE) {
+                    target_velocity = in_velocity;
                 }
                 break;
 
@@ -330,16 +323,16 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             case i_velocity_control[int i].check_busy() -> int out_state:
 
-                if (mode > MOTCTRL_MODE_STOP) {
-                    out_state = INIT;
-                } else {
+                if (mode < MOTCTRL_MODE_ACTIVE) {
                     out_state = INIT_BUSY;
+                } else {
+                    out_state = INIT;
                 }
                 break;
 
             case i_velocity_control[int i].enable_velocity_ctrl():
 
-                mode = MOTCTRL_MODE_PASSIVE;
+                mode = MOTCTRL_MODE_ACTIVE;
                 while (1) {
                     if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
 #ifdef debug_print
@@ -357,7 +350,23 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 printstrln("velocity control activated");
 #endif
                 break;
+            case i_velocity_control[int i].enable_passive_mode():
 
+                mode = MOTCTRL_MODE_PASSIVE;
+                while (1) {
+                    if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
+                        i_motorcontrol.set_voltage(0);
+                        if (i_motorcontrol.get_fets_state() == 1) { //check_fet_state(c_commutation);
+                            i_motorcontrol.set_fets_state(0); //enable_motor(c_commutation);
+                            delay_milliseconds(2); //wait_ms(2, 1, t);
+                        }
+                        break;
+                    }
+                }
+                break;
+            case i_velocity_control[int i].get_mode() -> int out_mode:
+                out_mode = mode;
+                break;
         }
     }
 }
