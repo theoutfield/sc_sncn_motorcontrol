@@ -39,7 +39,7 @@
 #define BISS_USEC                  USEC_FAST    // number of ticks in a microsecond
 #define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
 #define BISS_TIMEOUT               14*BISS_USEC // BiSS timeout in clock ticks
-#define BISS_OFFSET_ELECTRICAL     4000
+#define BISS_OFFSET_ELECTRICAL     0
 
 /**
  * @brief Structure type to define the BiSS Service configuration.

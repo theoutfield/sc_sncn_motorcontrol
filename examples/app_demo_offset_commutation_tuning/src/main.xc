@@ -1,8 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
-#include <CORE_C21-rev-a.bsp>
-#include <IFM_DC1K-rev-c2.bsp>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 //#include <IFM_DC100-rev-b.bsp>
 /**
  * @brief Test illustrates usage of module_commutation
@@ -34,7 +34,7 @@ AMSPorts ams_ports = { {
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
-#define VOLTAGE 700 //+/- 4095
+#define VOLTAGE 0 //+/- 4095
 
 void adc_client(interface ADCInterface client i_adc)
 {
@@ -49,13 +49,23 @@ void adc_client(interface ADCInterface client i_adc)
     }
 }
 
+void velocity_client(interface BISSInterface client i_biss)
+{
+    while(1) {
+        int velocity = i_biss.get_biss_velocity();
+        xscope_int(VELOCITY, velocity);
+
+        delay_milliseconds(1);
+    }
+}
+
 int main(void) {
 
     // Motor control interfaces
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
     interface WatchdogInterface i_watchdog[2];
-    interface ADCInterface i_adc[3];
+    interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
@@ -69,10 +79,11 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[0]);
+        on tile[APP_TILE]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[1]);
 
         /* Display phases currents */
-        on tile[IFM_TILE]: adc_client(i_adc[1]);
+//        on tile[IFM_TILE]: adc_client(i_adc[1]);
+        on tile[IFM_TILE]: velocity_client(i_biss[1]);
 
         on tile[IFM_TILE]:
         {
@@ -145,7 +156,7 @@ int main(void) {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.polarity_type = NORMAL_POLARITY;
-                    motorcontrol_config.commutation_method = SINE;
+                    motorcontrol_config.commutation_method = FOC;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
@@ -153,13 +164,13 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[2], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[2], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[2], i_hall[2], null, null, null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_hall[2], null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }
