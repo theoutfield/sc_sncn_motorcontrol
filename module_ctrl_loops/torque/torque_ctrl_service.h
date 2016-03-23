@@ -90,6 +90,21 @@ interface TorqueControlInterface{
      *         1 - initialized.
      */
     int check_busy();
+
+    /**
+     * @brief Enable the passive mode in which the controller does not control the motor voltage.
+     *
+     */
+    void enable_passive_mode();
+
+    /**
+     * @brief Get the current mode that the service is running in.
+     *
+     * @return MOTCTRL_MODE_STOP - service completely stopped
+     *         MOTCTRL_MODE_PASSIVE - service monitoring the actual values only
+     *         MOTCTRL_MODE_ACTIVE - service actively controlling the motor
+     */
+    int get_mode();
 };
 
 /**
