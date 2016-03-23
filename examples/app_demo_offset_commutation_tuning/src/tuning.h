@@ -13,11 +13,26 @@
 #include <pwm_service.h>
 #include <refclk.h>
 #include <adc_service.h>
+#include <position_ctrl_service.h>
+#include <profile_control.h>
 
 #include <xscope.h>
 //#include <bldc_motor_config.h>
 #include <mc_internal_constants.h>
+#include <user_config.h>
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface ADCInterface client ?i_adc);
+interface TuningInterface {
+    void tune(int voltage);
+    void set_limit(int limit);
+    void set_position(int position);
+};
+
+
+void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning, interface ADCInterface client ?i_adc);
 
 int auto_tuning_current(interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc, int input_voltage);
+
+[[combinable]]
+void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_commutation,
+                    interface ADCInterface client i_adc, interface PositionControlInterface client i_position_control,
+                    interface BISSInterface client i_biss);

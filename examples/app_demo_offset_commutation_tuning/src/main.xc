@@ -67,6 +67,8 @@ int main(void) {
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
+    interface PositionControlInterface i_position_control[3];
+    interface TuningInterface i_tuning;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
@@ -79,16 +81,39 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[1]);
+        on tile[APP_TILE]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_tuning, null);
 
         /* Display phases currents */
 //        on tile[IFM_TILE]: adc_client(i_adc[1]);
-        on tile[IFM_TILE]: velocity_client(i_biss[1]);
+//        on tile[IFM_TILE]: velocity_client(i_biss[1]);
+//        on tile[IFM_TILE]: tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
+
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], i_biss[1]);
+
+        on tile[APP_TILE_2]:
+        /* Position Control Loop */
+        {
+            ControlConfig position_control_config;
+
+            position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
+
+            position_control_config.Kp_n = POSITION_Kp;    // Divided by 10000
+            position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
+            position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
+
+            position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
+
+            /* Control Loop */
+            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
+                    i_position_control);
+        }
 
         on tile[IFM_TILE]:
         {
             par
             {
+//                tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
+
                 /* Triggered PWM Service */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
 
