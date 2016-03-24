@@ -144,7 +144,7 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
         //go to 0 position
         case 'z':
             if (!isnull(i_tuning))
-                i_tuning.set_position(0);
+                i_tuning.set_position(value);
             break;
         case 'f':
             if (motorcontrol_config.commutation_method == FOC) {
@@ -278,15 +278,16 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 
 [[combinable]]
  void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_commutation,
-                     interface ADCInterface client i_adc, interface PositionControlInterface client i_position_control,
-                     interface BISSInterface client i_biss)
+                     interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
+                     interface HallInterface client ?i_hall, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams)
 {
     timer t;
     unsigned ts;
     t :> ts;
     MotorcontrolConfig motorcontrol_config = i_commutation.get_config();
     int count = 0;
-    int position_limit = 0x7fffffff;
+    int velocity = 0;
+    int position_limit = 0;
     int position_limit_reached = 0;
     int voltage = 0;
     int current_sampling = 0;
@@ -299,45 +300,62 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
     int range_pos, range_neg, step_pos, step_neg;
     int tuning_done_pos, tuning_done_neg;
 
-    /* Initialise the position profile generator */
-    ProfilerConfig profiler_config;
-    profiler_config.polarity = POLARITY;
-    profiler_config.max_position = MAX_POSITION_LIMIT;
-    profiler_config.min_position = MIN_POSITION_LIMIT;
-    profiler_config.max_velocity = MAX_VELOCITY;
-    profiler_config.max_acceleration = MAX_ACCELERATION;
-    profiler_config.max_deceleration = MAX_DECELERATION;
-    init_position_profiler(profiler_config, i_position_control, null, null, i_biss, null);
+    if (!isnull(i_position_control)) {
+        /* Initialise the position profile generator */
+        ProfilerConfig profiler_config;
+        profiler_config.polarity = POLARITY;
+        profiler_config.max_position = MAX_POSITION_LIMIT;
+        profiler_config.min_position = MIN_POSITION_LIMIT;
+        profiler_config.max_velocity = MAX_VELOCITY;
+        profiler_config.max_acceleration = MAX_ACCELERATION;
+        profiler_config.max_deceleration = MAX_DECELERATION;
+        init_position_profiler(profiler_config, i_position_control, i_hall, null, i_biss, i_ams);
+    }
 
     while(1) {
         select {
         case t when timerafter(ts) :> void:
             ts += USEC_STD * 1000;
-            int velocity = i_biss.get_biss_velocity();
-            { count, void, void } = i_biss.get_biss_position();
 
-            if (count >= position_limit && velocity > 10) {
-                position_limit_reached = 1;
-                i_commutation.set_voltage(0);
-                printf("up limit reached\n");
-            } else if (count <= -position_limit && velocity < -10) {
-                position_limit_reached = 1;
-                i_commutation.set_voltage(0);
-                printf("down limit reached\n");
+            if (motorcontrol_config.commutation_sensor == BISS_SENSOR && !isnull(i_biss)) {
+                velocity = i_biss.get_biss_velocity();
+                { count, void, void } = i_biss.get_biss_position();
+            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                velocity = i_ams.get_ams_velocity();
+                { count, void } = i_ams.get_ams_position();
+            } else if (motorcontrol_config.commutation_sensor == HALL_SENSOR && !isnull(i_hall)) {
+                count = i_hall.get_hall_position_absolute();
+                velocity = i_hall.get_hall_velocity();
             }
 
-            {phase_b, phase_c} = i_adc.get_currents();
-
-            if (current_sampling > 0) {
-                current_sampling--;
-                //find the peak current by sampling every [period] microseconds [times] times
-                if (phase_b > peak_current)
-                    peak_current = phase_b;
-                else if (phase_b < -peak_current)
-                    peak_current = -phase_b;
+            if (position_limit > 0) {
+                if (count >= position_limit && velocity > 10) {
+                    position_limit_reached = 1;
+                    i_commutation.set_voltage(0);
+                    printf("up limit reached\n");
+                } else if (count <= -position_limit && velocity < -10) {
+                    position_limit_reached = 1;
+                    i_commutation.set_voltage(0);
+                    printf("down limit reached\n");
+                }
             }
 
+            if (!isnull(i_adc)) {
+                {phase_b, phase_c} = i_adc.get_currents();
+
+                if (current_sampling > 0) {
+                    current_sampling--;
+                    //find the peak current by sampling every [period] microseconds [times] times
+                    if (phase_b > peak_current)
+                        peak_current = phase_b;
+                    else if (phase_b < -peak_current)
+                        peak_current = -phase_b;
+                }
+            }
+
+            //tuning loop
             if (enable_tuning) {
+                //reverse direction if the position limit is reached
                 if (position_limit_reached) {
                     position_limit_reached = 0;
                     voltage = -voltage;
@@ -356,7 +374,8 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                             min_current_pos = peak_current;
                             best_offset_pos = (offset_pos & 4095);
                         }
-                        if (range_pos <= 0) { //end of a range, check if the peak current is decreasing
+                        //end of a range, check if the peak current is decreasing
+                        if (range_pos <= 0) {
                             printf("offset pos %d, %d -> %d\n", offset_pos, last_min_current_pos, min_current_pos);
                             if (min_current_pos >= last_min_current_pos) {
                                 if (step_pos > 0) { //now search by decreasing the offset
@@ -421,8 +440,6 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         i_commutation.set_config(motorcontrol_config); //update offset
                     }
                 } //end new measured peak current
-
-
             } //end tuning
 
             if (current_sampling <= 0) {
@@ -437,62 +454,80 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
             break;
 
         case i_tuning.tune(int in_voltage):
-            voltage = in_voltage;
-            if (voltage && enable_tuning == 0) {
-                motorcontrol_config = i_commutation.get_config();
-                if (motorcontrol_config.commutation_method == FOC) {
-                    start_offset_pos = motorcontrol_config.hall_offset[0];
-                    start_offset_neg = start_offset_pos;
-                } else if (voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) {
-                    start_offset_pos = motorcontrol_config.hall_offset[0];
-                    start_offset_neg = motorcontrol_config.hall_offset[1];
+            if (!isnull(i_adc)) {
+                voltage = in_voltage;
+                if (voltage && enable_tuning == 0) {
+                    motorcontrol_config = i_commutation.get_config();
+                    if (motorcontrol_config.commutation_method == FOC) {
+                        start_offset_pos = motorcontrol_config.hall_offset[0];
+                        start_offset_neg = start_offset_pos;
+                    } else if (voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) {
+                        start_offset_pos = motorcontrol_config.hall_offset[0];
+                        start_offset_neg = motorcontrol_config.hall_offset[1];
+                    } else {
+                        start_offset_pos = motorcontrol_config.hall_offset[1];
+                        start_offset_neg = motorcontrol_config.hall_offset[0];
+                    }
+                    best_offset_pos = start_offset_pos;
+                    offset_pos = start_offset_pos;
+                    best_offset_neg = start_offset_neg;
+                    offset_neg = start_offset_neg;
+                    enable_tuning = 1;
+                    last_min_current_pos = 10000;
+                    min_current_pos = 10000;
+                    last_min_current_neg = 10000;
+                    min_current_neg = 10000;
+                    peak_current = 0;
+                    current_sampling = 200;
+                    range_pos = 0;
+                    step_pos = 2;
+                    range_neg = 0;
+                    step_neg = 2;
+                    tuning_done_pos = 0;
+                    tuning_done_neg = 0;
+                    printf("Starting auto tuning...\n");
                 } else {
-                    start_offset_pos = motorcontrol_config.hall_offset[1];
-                    start_offset_neg = motorcontrol_config.hall_offset[0];
+                    enable_tuning = 0;
+                    if (motorcontrol_config.commutation_method == FOC || motorcontrol_config.bldc_winding_type == STAR_WINDING) {
+                        motorcontrol_config.hall_offset[0] = best_offset_pos;
+                        motorcontrol_config.hall_offset[1] = best_offset_neg;
+                    } else {
+                        motorcontrol_config.hall_offset[1] = best_offset_pos;
+                        motorcontrol_config.hall_offset[0] = best_offset_neg;
+                    }
+                    i_commutation.set_config(motorcontrol_config);
+                    printf("Tuning aborted!\nauto tuned offset clk: %d\nauto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
                 }
-                best_offset_pos = start_offset_pos;
-                offset_pos = start_offset_pos;
-                best_offset_neg = start_offset_neg;
-                offset_neg = start_offset_neg;
-                enable_tuning = 1;
-                last_min_current_pos = 10000;
-                min_current_pos = 10000;
-                last_min_current_neg = 10000;
-                min_current_neg = 10000;
-                peak_current = 0;
-                current_sampling = 200;
-                range_pos = 0;
-                step_pos = 2;
-                range_neg = 0;
-                step_neg = 2;
-                tuning_done_pos = 0;
-                tuning_done_neg = 0;
-                printf("Starting auto tuning...\n");
-            } else {
-                enable_tuning = 0;
-                if (motorcontrol_config.commutation_method == FOC || motorcontrol_config.bldc_winding_type == STAR_WINDING) {
-                    motorcontrol_config.hall_offset[0] = best_offset_pos;
-                    motorcontrol_config.hall_offset[1] = best_offset_neg;
-                } else {
-                    motorcontrol_config.hall_offset[1] = best_offset_pos;
-                    motorcontrol_config.hall_offset[0] = best_offset_neg;
-                }
-                i_commutation.set_config(motorcontrol_config);
-                printf("Tuning aborted!\nauto tuned offset clk: %d\nauto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
             }
-
             break;
 
         case i_tuning.set_position(int in_position):
-            /* Set new target position for profile position control */
-            set_profile_position(0, 200, 10, 10, i_position_control);
-            printf("Returned to 0\n");
-            i_position_control.disable_position_ctrl();
-            i_commutation.set_fets_state(1);
+            if (!isnull(i_position_control)) {
+                /* Set new target position for profile position control */
+                set_profile_position(0, 200, 10, 10, i_position_control);
+                printf("Returned to 0\n");
+                i_position_control.disable_position_ctrl();
+                i_commutation.set_fets_state(1);
+            } else {
+                printf("No position control\n");
+            }
             break;
 
         case i_tuning.set_limit(int in_limit):
-            position_limit = in_limit;
+            if (motorcontrol_config.commutation_sensor == BISS_SENSOR && !isnull(i_biss)) {
+                i_biss.reset_biss_position(0);
+            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                i_ams.reset_ams_position(0);
+            } else if (motorcontrol_config.commutation_sensor == HALL_SENSOR && !isnull(i_hall)) {
+                i_hall.reset_hall_absolute_position(0);
+            }
+            if (in_limit < 0) {
+                position_limit = in_limit;
+                printf("Position limit disabled\n");
+            } else if (in_limit > 0) {
+                printf("Position limited to %d ticks around here\n", in_limit);
+                position_limit = in_limit;
+            }
             break;
         }
     }
