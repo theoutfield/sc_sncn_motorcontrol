@@ -55,7 +55,7 @@ int main(void) {
         on tile[APP_TILE]:
         {
             //i_motorcontrol[0].set_voltage(Q_DIRECT);
-            delay_milliseconds(400);
+            delay_milliseconds(500);//let the servers start before sending clien requests
             i_motorcontrol[0].set_torque(TORQUE);
         }
 
