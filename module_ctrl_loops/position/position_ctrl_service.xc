@@ -187,8 +187,12 @@ void position_control_service(ControlConfig &position_control_config,
                     }
 
 
-                   // set_commutation_sinusoidal(c_commutation, position_control_out);
-                    i_motorcontrol.set_voltage(position_control_out);
+                    if(position_control_config.cascade_with_torque == 1){
+                        i_motorcontrol.set_torque(position_control_out);  //cascades with FOC's torque controller
+                    }
+                    else {
+                        i_motorcontrol.set_voltage(position_control_out); //in case of FOC sets Q value, torque controller in FOC is disabled
+                    }
 
 #ifdef DEBUG
                     xscope_int(ACTUAL_POSITION, actual_position);

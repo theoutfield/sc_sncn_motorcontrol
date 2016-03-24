@@ -100,6 +100,12 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
             voltage = new_voltage;
             break;
 
+        case i_motorcontrol[int i].set_torque(int torque_sp):
+                break;
+
+        case i_motorcontrol[int i].set_control(int in_flag):
+                break;
+
         case i_motorcontrol[int i].check_busy() -> int state_return:
 
                   state_return = init_state;

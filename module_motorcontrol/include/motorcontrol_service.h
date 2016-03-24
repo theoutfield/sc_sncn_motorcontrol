@@ -97,11 +97,18 @@ interface MotorcontrolInterface{
     int get_notification();
 
     /**
-     * @brief Sets an amplitude voltage on the sinusodial signals commutating the windings.
+     * @brief Sets an amplitude voltage on the sinusodial signals commutating the windings or Q value when FOC is used.
      *
      * @param voltage Voltage [-PWM_MAX_VALUE:PWM_MAX_VALUE]. By default PWM_MAX_VALUE = 13889.
      */
     void set_voltage(int voltage);
+
+    /**
+     * @brief Sets torque target value when FOC is used.
+     *
+     * @param torque_sp Torque [-4095:4095].
+     */
+    void set_torque(int torque_sp);
 
     /**
      * @brief Setter for the configuration used by the Service.
@@ -177,6 +184,8 @@ interface MotorcontrolInterface{
      * @param Sensor offset
      */
     void set_sensor_offset(int in_offset);
+
+    void set_control(int flag);
 };
 
 

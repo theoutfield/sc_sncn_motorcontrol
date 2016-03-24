@@ -32,7 +32,7 @@ AMSPorts ams_ports = { {
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
-#define VOLTAGE 700 //+/- 4095
+#define VOLTAGE 0 //+/- 4095
 
 void adc_client(interface ADCInterface client i_adc)
 {
@@ -47,14 +47,26 @@ void adc_client(interface ADCInterface client i_adc)
     }
 }
 
+void velocity_client(interface BISSInterface client i_biss)
+{
+    while(1) {
+        int velocity = i_biss.get_biss_velocity();
+        xscope_int(VELOCITY, velocity);
+
+        delay_milliseconds(1);
+    }
+}
+
 int main(void) {
 
     // Motor control interfaces
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
     interface WatchdogInterface i_watchdog[2];
-    interface ADCInterface i_adc[3];
+    interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
+    interface PositionControlInterface i_position_control[3];
+    interface TuningInterface i_tuning;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
@@ -67,15 +79,50 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_adc[0]);
+        on tile[APP_TILE]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_tuning, null);
 
         /* Display phases currents */
-        on tile[IFM_TILE]: adc_client(i_adc[1]);
+//        on tile[IFM_TILE]: adc_client(i_adc[1]);
+//        on tile[IFM_TILE]: velocity_client(i_biss[1]);
+//        on tile[IFM_TILE]: tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
+
+#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, i_biss[1], null);
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, null, i_ams[1]);
+#else
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], i_hall[1], null, null);
+#endif
+
+        on tile[APP_TILE_2]:
+        /* Position Control Loop */
+        {
+            ControlConfig position_control_config;
+            position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
+            position_control_config.Kp_n = POSITION_Kp;    // Divided by 10000
+            position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
+            position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
+            position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
+            /* Control Loop */
+#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
+            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
+                    i_position_control);
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+            position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
+                    i_position_control);
+#else
+            position_control_service(position_control_config, i_hall[2], null, null, null, i_motorcontrol[3],
+                    i_position_control);
+#endif
+        }
+
 
         on tile[IFM_TILE]:
         {
             par
             {
+//                tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
+
                 /* Triggered PWM Service */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
 
@@ -143,7 +190,7 @@ int main(void) {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.polarity_type = NORMAL_POLARITY;
-                    motorcontrol_config.commutation_method = SINE;
+                    motorcontrol_config.commutation_method = FOC;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
@@ -151,13 +198,13 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[2], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[2], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[2], i_hall[2], null, null, null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }
