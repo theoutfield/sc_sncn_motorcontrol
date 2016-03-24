@@ -81,8 +81,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     int rpm_constant = 1000*60; // constant
     int speed_factor;
     int crossover;
-    int activate = 0;
-    int compute_flag = 0;
+
+    int mode = MOTCTRL_MODE_STOP;
 
     int config_update_flag = 1;
 
@@ -151,7 +151,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                     config_update_flag = 0;
                 }
 
-                if (compute_flag == 1) {
+                if (mode >= MOTCTRL_MODE_PASSIVE) {
                     /* calculate actual velocity from hall/qei with filter*/
                     if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
                         actual_velocity = i_biss.get_biss_velocity();
@@ -202,12 +202,11 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                     }
                 }
 
-                if(activate == 1) {
+                if(mode == MOTCTRL_MODE_ACTIVE) {
 #ifdef Debug_velocity_ctrl
                     xscope_int(ACTUAL_VELOCITY, actual_velocity);
                     xscope_int(TARGET_VELOCITY, target_velocity);
 #endif
-                    compute_flag = 1;
                     /* Controller */
                     error_velocity   = (target_velocity - actual_velocity);
                     error_velocity_I = error_velocity_I + error_velocity;
@@ -278,7 +277,9 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             case i_velocity_control[int i].set_velocity(int in_velocity):
 
-                target_velocity = in_velocity;
+                if (mode == MOTCTRL_MODE_ACTIVE) {
+                    target_velocity = in_velocity;
+                }
                 break;
 
             case i_velocity_control[int i].get_velocity()-> int out_velocity:
@@ -323,7 +324,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             case i_velocity_control[int i].disable_velocity_ctrl():
 
-                activate = 0;
+                mode = MOTCTRL_MODE_STOP;
                 error_velocity = 0;
                 error_velocity_D = 0;
                 error_velocity_I = 0;
@@ -336,12 +337,16 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
             case i_velocity_control[int i].check_busy() -> int out_state:
 
-                out_state = activate;
+                if (mode < MOTCTRL_MODE_ACTIVE) {
+                    out_state = INIT_BUSY;
+                } else {
+                    out_state = INIT;
+                }
                 break;
 
             case i_velocity_control[int i].enable_velocity_ctrl():
 
-                activate = 1;
+                mode = MOTCTRL_MODE_ACTIVE;
                 while (1) {
                     if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
 #ifdef debug_print
@@ -359,7 +364,23 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 printstrln("velocity_ctrl_service: velocity control activated");
 #endif
                 break;
+            case i_velocity_control[int i].enable_passive_mode():
 
+                mode = MOTCTRL_MODE_PASSIVE;
+                while (1) {
+                    if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
+                        i_motorcontrol.set_voltage(0);
+                        if (i_motorcontrol.get_fets_state() == 1) { //check_fet_state(c_commutation);
+                            i_motorcontrol.set_fets_state(0); //enable_motor(c_commutation);
+                            delay_milliseconds(2); //wait_ms(2, 1, t);
+                        }
+                        break;
+                    }
+                }
+                break;
+            case i_velocity_control[int i].get_mode() -> int out_mode:
+                out_mode = mode;
+                break;
         }
     }
 }
