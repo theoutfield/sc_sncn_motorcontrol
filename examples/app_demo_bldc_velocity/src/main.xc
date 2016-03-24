@@ -29,12 +29,12 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-#if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
+#if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
+BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
-#else
-BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
 
 /* Test Profile Velocity function */
@@ -65,12 +65,12 @@ int main(void)
     interface HallInterface i_hall[5];
     interface MotorcontrolInterface i_motorcontrol[4];
     interface VelocityControlInterface i_velocity_control[3];
-#if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
+#if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
+    interface BISSInterface i_biss[5];
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
     interface QEIInterface i_qei[5];
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
     interface AMSInterface i_ams[5];
-#else
-    interface BISSInterface i_biss[5];
 #endif
 
     par
@@ -111,8 +111,11 @@ int main(void)
             velocity_control_config.cascade_with_torque = 0;
 
             /* Control Loop */
-#if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
-            velocity_control_service(velocity_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
+#if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
+            velocity_control_service(velocity_control_config, i_hall[1], null, i_biss[1], null, i_motorcontrol[0],
+                                        i_velocity_control);
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
+            velocity_control_service(velocity_control_config, i_hall[1], i_qei[1], null, null, i_motorcontrol[0],
                                         i_velocity_control);
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
             velocity_control_service(velocity_control_config, null, null, null, i_ams[1], i_motorcontrol[0],
@@ -150,7 +153,28 @@ int main(void)
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 
-#if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
+#if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
+                /* BiSS service */
+                {
+                    BISSConfig biss_config;
+                    biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
+                    biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                    biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
+                    biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
+                    biss_config.status_length = BISS_STATUS_LENGTH;
+                    biss_config.crc_poly = BISS_CRC_POLY;
+                    biss_config.pole_pairs = POLE_PAIRS;
+                    biss_config.polarity = BISS_POLARITY;
+                    biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
+                    biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+                    biss_config.timeout = BISS_TIMEOUT;
+                    biss_config.max_ticks = BISS_MAX_TICKS;
+                    biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                    biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+
+                    biss_service(biss_ports, biss_config, i_biss);
+                }
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                 /* Quadrature encoder sensor Service */
                 {
                     QEIConfig qei_config;
@@ -183,27 +207,6 @@ int main(void)
 
                     ams_service(ams_ports, ams_config, i_ams);
                 }
-#else
-                /* BiSS service */
-                {
-                    BISSConfig biss_config;
-                    biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-                    biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                    biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-                    biss_config.status_length = BISS_STATUS_LENGTH;
-                    biss_config.crc_poly = BISS_CRC_POLY;
-                    biss_config.pole_pairs = POLE_PAIRS;
-                    biss_config.polarity = BISS_POLARITY;
-                    biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-                    biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-                    biss_config.timeout = BISS_TIMEOUT;
-                    biss_config.max_ticks = BISS_MAX_TICKS;
-                    biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                    biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-
-                    biss_service(biss_ports, biss_config, i_biss);
-                }
 #endif
 
                 /* Motor Commutation Service */
@@ -211,24 +214,28 @@ int main(void)
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.commutation_method = SINE;
+                    motorcontrol_config.polarity_type = POLARITY;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] =  COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-#if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
+#if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
+                                         i_hall[0], null, i_biss[0], i_watchdog[0], i_motorcontrol);
+#elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
                                          i_hall[0], i_qei[0], null, null, i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
-                                         i_hall[0], null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
+                                         i_hall[0], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
-                                         i_hall[0], null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
+                                         i_hall[0], null, i_biss[0], null, null, i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
-                                         i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
+                                         i_hall[0], null, null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }
@@ -237,3 +244,4 @@ int main(void)
 
     return 0;
 }
+

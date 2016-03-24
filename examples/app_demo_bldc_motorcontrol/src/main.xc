@@ -148,6 +148,7 @@ int main(void) {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.commutation_method = SINE;
+                    motorcontrol_config.polarity_type = POLARITY;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] =  COMMUTATION_OFFSET_CLK;
@@ -171,3 +172,4 @@ int main(void) {
 
     return 0;
 }
+
