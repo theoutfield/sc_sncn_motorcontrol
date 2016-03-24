@@ -167,6 +167,22 @@ typedef struct
 interface AMSInterface
 {
 
+    unsigned int get_ams_angle(void);
+
+    { int, unsigned int } get_ams_position(void);
+
+    unsigned int get_ams_real_position(void);
+
+    int get_ams_velocity(void);
+
+    AMSConfig get_ams_config(void);
+
+    int set_ams_config(AMSConfig in_config);
+
+    void reset_ams_position(int in_count);
+
+    unsigned int reset_ams_angle(unsigned int in_angle);
+
     /**
      * @brief Notifies the interested parties that a new notification
      * is available.
@@ -181,22 +197,6 @@ interface AMSInterface
      */
     [[clears_notification]]
     int get_notification();
-
-    unsigned int get_ams_angle(void);
-
-    { int, unsigned int } get_ams_position(void);
-
-    unsigned int get_ams_real_position(void);
-
-    int get_ams_velocity(void);
-
-    AMSConfig get_ams_config(void);
-
-    void set_ams_config(AMSConfig in_config);
-
-    void reset_ams_position(int in_count);
-
-    unsigned int reset_ams_angle(unsigned int in_angle);
 };
 
 void initRotarySensorInterface(AMSPorts &ams_ports);

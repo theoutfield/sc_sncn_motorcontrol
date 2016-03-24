@@ -7,6 +7,7 @@
 #include <bdc_motorcontrol.h>
 #include <pwm_service_client.h>
 #include <a4935.h>
+#include <print.h>
 
 static int init_state;
 
@@ -15,6 +16,16 @@ static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
     unsigned int pwm[3] = {0, 0, 0};  // PWM OFF
     pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
+}
+
+int check_bdc_motorcontrol_config(MotorcontrolConfig &commutation_params)
+{
+    if (commutation_params.motor_type != BDC_MOTOR ) {
+        printstrln("Wrong Motorcontrol configuration: motor type");
+        return ERROR;
+    }
+
+    return SUCCESS;
 }
 
 [[combinable]]
@@ -90,11 +101,6 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
         case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
             break;
 
-        case i_motorcontrol[int i].get_notification() -> int out_notification:
-
-            out_notification = notification;
-            break;
-
         case i_motorcontrol[int i].set_voltage(int new_voltage):
 
             voltage = new_voltage;
@@ -135,10 +141,17 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                 break;
         case i_motorcontrol[int i].set_sensor(int new_sensor):
                 break;
+
+        case i_motorcontrol[int i].set_config(MotorcontrolConfig new_config) -> int result:
+                result = check_bdc_motorcontrol_config(new_config);
+                if (result == ERROR) {
+                    break;
+                }
+                break;
+
         case i_motorcontrol[int i].set_sensor_offset(int in_offset):
                 break;
-        case i_motorcontrol[int i].set_config(MotorcontrolConfig new_config):
-                break;
+
         case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
 
                   out_config = motorcontrol_config;
@@ -147,6 +160,10 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                                             QEIConfig in_qei_config,
                                                             MotorcontrolConfig in_commutation_config):
                break;
+
+        case i_motorcontrol[int i].get_notification() -> int out_notification:
+            out_notification = notification;
+            break;
         }
     }
 }

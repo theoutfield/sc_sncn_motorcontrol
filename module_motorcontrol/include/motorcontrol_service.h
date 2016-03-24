@@ -82,21 +82,6 @@ typedef struct {
 interface MotorcontrolInterface{
 
     /**
-     * @brief Notifies the interested parties that a new notification
-     * is available.
-     */
-    [[notification]]
-    slave void notification();
-
-    /**
-     * @brief Provides the type of notification currently available.
-     *
-     * @return type of the notification
-     */
-    [[clears_notification]]
-    int get_notification();
-
-    /**
      * @brief Sets an amplitude voltage on the sinusodial signals commutating the windings or Q value when FOC is used.
      *
      * @param voltage Voltage [-PWM_MAX_VALUE:PWM_MAX_VALUE]. By default PWM_MAX_VALUE = 13889.
@@ -116,7 +101,7 @@ interface MotorcontrolInterface{
      *
      * @param in_config New Service configuration.
      */
-    void set_config(MotorcontrolConfig in_config);
+    int set_config(MotorcontrolConfig in_config);
 
     /**
      * @brief Getter for current configuration used by the Service.
@@ -172,7 +157,7 @@ interface MotorcontrolInterface{
     int check_busy();
 
     /**
-     * @brief Set calib flag in the Motorcontrol service so it will alway set 0 as electrical angle
+    * @brief Set calib flag in the Motorcontrol service so it will alway set 0 as electrical angle
      *
      * @param flag 1 to activate, 0 to deactivate calibration
      */
@@ -185,7 +170,23 @@ interface MotorcontrolInterface{
      */
     void set_sensor_offset(int in_offset);
 
+
     void set_control(int flag);
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 

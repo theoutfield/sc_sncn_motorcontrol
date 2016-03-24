@@ -122,11 +122,6 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
 //#pragma xta endpoint "hall_loop"
       //[[ordered]] //FixMe ordered is not supported for combinable functions
         select {
-            case i_hall[int i].get_notification() -> int out_notification:
-
-                out_notification = notification;
-                break;
-
             case i_hall[int i].get_hall_pinstate_angle_velocity() -> {unsigned out_pinstate, int out_position, int out_velocity}:
 
                 out_pinstate = pin_state_monitor;
@@ -169,7 +164,12 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                 out_config = hall_config;
                 break;
 
-            case i_hall[int i].set_hall_config(HallConfig in_config):
+            case i_hall[int i].set_hall_config(HallConfig in_config) -> int result:
+
+                result = check_hall_config(in_config);
+                if (result == ERROR) {
+                    break;
+                }
 
                 hall_config = in_config;
                 config_max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
@@ -372,6 +372,10 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                     old_difference = difference1;
                 }
                 raw_velocity = _modified_internal_filter(filter_buffer, index, filter_length, velocity);
+                break;
+
+            case i_hall[int i].get_notification() -> int out_notification:
+                out_notification = notification;
                 break;
 
         }

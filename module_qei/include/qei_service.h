@@ -80,21 +80,6 @@ typedef struct {
 interface QEIInterface{
 
     /**
-     * @brief Notifies the interested parties that a new notification
-     * is available.
-     */
-    [[notification]]
-    slave void notification();
-
-    /**
-     * @brief Provides the type of notification currently available.
-     *
-     * @return type of the notification
-     */
-    [[clears_notification]]
-    int get_notification();
-
-    /**
      * @brief Getter for current position.
      *
      * @return  Position within one mechanical rotation [0: 4 x Encoder resolution].
@@ -145,8 +130,10 @@ interface QEIInterface{
      * @brief Setter for the configuration used by the Service.
      *
      * @param in_config New Service configuration.
+     * @return 0 New Service configuration is not valid.
+     *         1 New Service configuration is valid.
      */
-    void set_qei_config(QEIConfig in_config);
+    int set_qei_config(QEIConfig in_config);
 
     /**
      * @brief Getter for the current state of the Service.
@@ -160,6 +147,21 @@ interface QEIInterface{
 
     // For internal use
     void set_qei_sync_offset(int, int);
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 

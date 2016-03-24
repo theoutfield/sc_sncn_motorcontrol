@@ -43,21 +43,6 @@ typedef struct {
 interface HallInterface {
 
     /**
-     * @brief Notifies the interested parties that a new notification
-     * is available.
-     */
-    [[notification]]
-    slave void notification();
-
-    /**
-     * @brief Provides the type of notification currently available.
-     *
-     * @return type of the notification
-     */
-    [[clears_notification]]
-    int get_notification();
-
-    /**
      * @brief Getter for the current pin state at the Hall port,
      * electrical angle, and velocity.
      *
@@ -124,8 +109,10 @@ interface HallInterface {
      * @brief Setter for the configuration used by the Service.
      *
      * @param in_config New Service configuration.
+     * @return 0 New Service configuration is not valid.
+     *         1 New Service configuration is valid.
      */
-    void set_hall_config(HallConfig in_config);
+    int set_hall_config(HallConfig in_config);
 
     /**
      * @brief Getter for the current state of the Service.
@@ -133,6 +120,21 @@ interface HallInterface {
      * @return 0 - not initialized, 1 - initialized.
      */
     int check_busy();
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 /**

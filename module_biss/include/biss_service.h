@@ -91,21 +91,6 @@ typedef struct {
 interface BISSInterface {
 
     /**
-     * @brief Notifies the interested parties that a new notification
-     * is available.
-     */
-    [[notification]]
-    slave void notification();
-
-    /**
-     * @brief Provides the type of notification currently available.
-     *
-     * @return type of the notification
-     */
-    [[clears_notification]]
-    int get_notification();
-
-    /**
      * @brief Getter for absolute and singleturn position.
      *
      * @return absolute position
@@ -171,8 +156,25 @@ interface BISSInterface {
      * @brief Setter for the configuration used by the Service.
      *
      * @param in_config New Service configuration.
+     * @return 0 New Service configuration is not valid.
+     *         1 New Service configuration is valid.
      */
-    void set_biss_config(BISSConfig in_config);
+    int set_biss_config(BISSConfig in_config);
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 

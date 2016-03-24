@@ -599,7 +599,13 @@ int check_ams_config(AMSConfig &ams_config) {
                 break;
 
         //receive new ams_config
-        case i_ams[int i].set_ams_config(AMSConfig in_config):
+        case i_ams[int i].set_ams_config(AMSConfig in_config) -> int result:
+
+                result = check_ams_config(in_config);
+                if (result == ERROR) {
+                    break;
+                }
+
                 //update variables which depend on ams_config
                 if (ams_config.polarity != in_config.polarity)
                     initRotarySensor(ams_ports,  in_config);

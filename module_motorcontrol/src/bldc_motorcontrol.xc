@@ -22,6 +22,26 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
 
+int check_bldc_motorcontrol_config(MotorcontrolConfig &commutation_params)
+{
+    if (commutation_params.motor_type != BLDC_MOTOR) {
+        printstrln("Wrong Motorcontrol configuration: motor type");
+        return ERROR;
+    } else {
+        if (commutation_params.bldc_winding_type < 0 || commutation_params.bldc_winding_type > 2) {
+            printstrln("Wrong Motorcontrol configuration: wrong winding");
+            return ERROR;
+        }
+
+        if (commutation_params.commutation_sensor != HALL_SENSOR && commutation_params.commutation_sensor != BISS_SENSOR) {
+            printstrln("Wrong Motorcontrol configuration: just HALL and BiSS sensors are supported as commutation sensor");
+            return ERROR;
+        }
+    }
+
+    return SUCCESS;
+}
+
 [[combinable]]
 void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface HallInterface client ?i_hall,
@@ -150,11 +170,6 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
             case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
                 break;
 
-            case i_motorcontrol[int i].get_notification() -> int out_notification:
-
-                out_notification = notification;
-                break;
-
             case i_motorcontrol[int i].set_voltage(int new_voltage):
                     if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
                         voltage = -new_voltage;
@@ -168,7 +183,12 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
             case i_motorcontrol[int i].set_control(int in_flag):
                     break;
 
-            case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
+            case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters) -> int result:
+                    result = check_bldc_motorcontrol_config(new_parameters);
+                    if (result == ERROR) {
+                        break;
+                    }
+
                     motorcontrol_config = new_parameters;
 
                     notification = MOTCTRL_NTF_CONFIG_CHANGED;
@@ -291,6 +311,9 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
                     break;
 
+            case i_motorcontrol[int i].get_notification() -> int out_notification:
+                out_notification = notification;
+                break;
             }
 
  //       t_loop :> end_time;
@@ -636,14 +659,16 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  torque_actual = torq_pt1;
              break;
 
-         case i_motorcontrol[int i].get_notification() -> int out_notification:
+         case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters) -> int result:
+                 result = check_bldc_motorcontrol_config(new_parameters);
+                 if (result == ERROR) {
+                     break;
+                 }
 
-             out_notification = notification;
-             break;
-
-         case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
-                 if (motorcontrol_config.bldc_winding_type != new_parameters.bldc_winding_type)
+                 if (motorcontrol_config.bldc_winding_type != new_parameters.bldc_winding_type) {
                      q_value = -q_value;
+                 }
+
                  motorcontrol_config = new_parameters;
 
                  notification = MOTCTRL_NTF_CONFIG_CHANGED;
@@ -766,6 +791,10 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                 fw_flag = 0;
                 bw_flag = 0;
 
+             break;
+
+         case i_motorcontrol[int i].get_notification() -> int out_notification:
+             out_notification = notification;
              break;
 
      }

@@ -121,10 +121,6 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
     while (1) {
         [[ordered]]
         select {
-        case i_biss[int i].get_notification() -> int out_notification:
-                out_notification = notification;
-                break;
-
         //send electrical angle for commutation, ajusted with electrical offset
         case i_biss[int i].get_biss_angle() -> unsigned int angle:
                 t :> time;
@@ -223,7 +219,13 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 break;
 
         //receive new biss_config
-        case i_biss[int i].set_biss_config(BISSConfig in_config):
+        case i_biss[int i].set_biss_config(BISSConfig in_config) -> int result:
+
+                result = check_biss_config(in_config);
+                if (result == ERROR) {
+                    break;
+                }
+
                 //update variables which depend on biss_config
                 if (biss_config.clock_dividend != in_config.clock_dividend || biss_config.clock_divisor != in_config.clock_divisor)
                     configure_clock_rate(biss_ports.clk, in_config.clock_dividend, in_config.clock_divisor) ; // a/b MHz
@@ -313,6 +315,10 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
             velocity = (difference * velocity_factor) / ticks_per_turn;
+            break;
+
+        case i_biss[int i].get_notification() -> int out_notification:
+            out_notification = notification;
             break;
         }
     }
