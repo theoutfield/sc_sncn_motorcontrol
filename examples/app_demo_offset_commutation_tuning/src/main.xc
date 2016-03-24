@@ -88,25 +88,36 @@ int main(void) {
 //        on tile[IFM_TILE]: velocity_client(i_biss[1]);
 //        on tile[IFM_TILE]: tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
 
-        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], i_biss[1]);
+#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, i_biss[1], null);
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, null, i_ams[1]);
+#else
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], i_hall[1], null, null);
+#endif
 
         on tile[APP_TILE_2]:
         /* Position Control Loop */
         {
             ControlConfig position_control_config;
-
             position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
-
             position_control_config.Kp_n = POSITION_Kp;    // Divided by 10000
             position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
             position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
-
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
-
             /* Control Loop */
+#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
             position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
                     i_position_control);
+#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
+            position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
+                    i_position_control);
+#else
+            position_control_service(position_control_config, i_hall[2], null, null, null, i_motorcontrol[3],
+                    i_position_control);
+#endif
         }
+
 
         on tile[IFM_TILE]:
         {
@@ -195,7 +206,7 @@ int main(void) {
                                          c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[2], null, null, null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }
