@@ -592,7 +592,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  //========== prepare PWM =================================================================
 
              } else {
-                 umot_motor = 1000;
+                 umot_motor = 500;
                  angle_pwm = 0;
              }
 
