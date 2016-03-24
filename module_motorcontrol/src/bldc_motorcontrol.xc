@@ -739,6 +739,8 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                          motorcontrol_config.hall_offset[1] = out_offset;
                      } else if (sensor_select == AMS_SENSOR) {
                          out_offset = i_ams.reset_ams_angle(calib_angle);// quarter turn
+                         motorcontrol_config.hall_offset[0] = 0;
+                         motorcontrol_config.hall_offset[1] = 0;
                      }
                  }
                  break;

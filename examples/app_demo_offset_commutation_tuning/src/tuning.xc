@@ -73,8 +73,11 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             //start turning the motor and print the offsets found
             i_commutation.set_voltage(input_voltage);
             motorcontrol_config = i_commutation.get_config();
-            if (motorcontrol_config.commutation_sensor == BISS_SENSOR || motorcontrol_config.commutation_sensor == AMS_SENSOR)
+            if (motorcontrol_config.commutation_sensor == AMS_SENSOR)
                 printf("Sensor offset: %d, ", offset);
+            else if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+                offset = 0;
+            }
             printf("Voltage %d, Polarity %d\n", input_voltage, motorcontrol_config.polarity_type);
             if (motorcontrol_config.commutation_method == FOC || (input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
                 printf("Now you can tune the offset clk: %d\n", motorcontrol_config.hall_offset[0]);
@@ -130,7 +133,7 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
                     motorcontrol_config.bldc_winding_type = STAR_WINDING;
                 i_commutation.set_config(motorcontrol_config);
                 printf("Reverse motor direction\n");
-            } else {
+            } else { //flip offsets
                 int temp = motorcontrol_config.hall_offset[0];
                 motorcontrol_config.hall_offset[0] = motorcontrol_config.hall_offset[1];
                 motorcontrol_config.hall_offset[1] = temp;
@@ -185,10 +188,8 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             break;
         //position limit
         case 'l':
-            if (value == 0)
-                value = 0x7fffffff;
             i_tuning.set_limit(value);
-            printf("Set position limit to %d\n", value);
+//            printf("Set position limit to %d\n", value);
             break;
         //set offset
         default:
