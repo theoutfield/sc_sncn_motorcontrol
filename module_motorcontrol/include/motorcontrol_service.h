@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <adc_service.h>
-
 #define ERROR 0
 #define SUCCESS 1
 
@@ -63,6 +61,7 @@ typedef struct {
 #include <qei_service.h>
 #include <biss_service.h>
 #include <ams_service.h>
+#include <adc_service.h>
 
 #include <mc_internal_constants.h>
 
