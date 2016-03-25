@@ -11,6 +11,7 @@
 #include <biss_service.h>
 #include <motorcontrol_service.h>
 #include <control_loops_common.h>
+#include <profiler_config.h>
 
 #define DEFAULT_FILTER_LENGTH 8
 
@@ -49,6 +50,8 @@ interface VelocityControlInterface{
      * @return Current target velocity [RPMs].
      */
     int get_target_velocity();
+
+    void set_profile_velocity(int in_target_velocity, int acceleration, int deceleration);
 
     /**
      * @brief Getter for current configuration used by the Service.
@@ -137,7 +140,8 @@ int max_speed_limit(int velocity, int max_speed);
  * @param i_velocity_control Array of communication interfaces to handle up to 3 different clients.
  */
 [[combinable]]
-void velocity_control_service(ControlConfig & velocity_ctrl_config,
+void velocity_control_service(ProfilerConfig & profiler_config,
+                        ControlConfig & velocity_ctrl_config,
                         interface HallInterface client ?i_hall,
                         interface QEIInterface client ?i_qei,
                         interface BISSInterface client ?i_biss,

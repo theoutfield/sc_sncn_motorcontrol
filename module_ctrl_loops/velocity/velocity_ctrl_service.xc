@@ -8,11 +8,14 @@
 #include <motorcontrol_service.h>
 #include <mc_internal_constants.h>
 
+#include "profile_velocity_internal.h"
+
 #include <filter_blocks.h>
 #include <limits.h>
 #include <refclk.h>
 #include <print.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 void init_velocity_control(interface VelocityControlInterface client i_velocity_control)
 {
@@ -43,7 +46,8 @@ int max_speed_limit(int velocity, int max_speed) {
 }
 
 [[combinable]]
-void velocity_control_service(ControlConfig &velocity_control_config,
+void velocity_control_service(ProfilerConfig & profiler_config,
+                        ControlConfig & velocity_control_config,
                        interface HallInterface client ?i_hall,
                        interface QEIInterface client ?i_qei,
                        interface BISSInterface client ?i_biss,
@@ -84,15 +88,38 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
     int mode = MOTCTRL_MODE_STOP;
 
+    // Profile
+    int profile_steps = -1;
+    int profile_step_counter = 1;
+    timer t_profile;
+    int32_t time_profile;
+    ProfileVelocityParams profile_velocity_params;
+    profile_velocity_params.max_velocity = profiler_config.max_velocity;
+    profile_velocity_params.max_acceleration = profiler_config.max_acceleration;
+    profile_velocity_params.max_deceleration = profiler_config.max_deceleration;
+
     int config_update_flag = 1;
 
     printstr(">>   SOMANET VELOCITY CONTROL SERVICE STARTING...\n");
 
     t :> ts;
+    t_profile :> time_profile;
 
     while (1) {
 //#pragma ordered
         select {
+            case (profile_step_counter <= profile_steps) => t_profile when timerafter(time_profile + MSEC_STD) :> time_profile:
+                if (profile_step_counter == profile_steps) {
+                    if (target_velocity == 0) {
+                        target_velocity = 0;
+                    }
+                    profile_steps = -1;
+                    profile_step_counter = 1;
+                } else {
+                    target_velocity = generate_profile_step_velocity(profile_velocity_params, profile_step_counter);
+                }
+                profile_step_counter++;
+                break;
             case t when timerafter (ts + USEC_STD * velocity_control_config.control_loop_period) :> ts:
 
                 if (config_update_flag) {
@@ -290,6 +317,15 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             case i_velocity_control[int i].get_target_velocity() -> int out_target_velocity:
 
                 out_target_velocity = target_velocity;
+                break;
+
+            case i_velocity_control[int i].set_profile_velocity(int in_target_velocity, int acceleration, int deceleration):
+                profile_velocity_params.v_d = in_target_velocity;
+                profile_velocity_params.u = actual_velocity;
+                profile_velocity_params.acc = acceleration;
+                profile_velocity_params.dec = deceleration;
+                profile_steps = calculate_profile_steps(profile_velocity_params);
+                profile_step_counter = 1;
                 break;
 
             case i_velocity_control[int i].get_velocity_control_config() -> ControlConfig out_config:
