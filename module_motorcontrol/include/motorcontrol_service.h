@@ -98,16 +98,23 @@ interface MotorcontrolInterface{
     /**
      * @brief Sets an amplitude voltage on the sinusodial signals commutating the windings or Q value when FOC is used.
      *
-     * @param voltage Voltage [-PWM_MAX_VALUE:PWM_MAX_VALUE]. By default PWM_MAX_VALUE = 13889.
+     * @param voltage Voltage [-PWM_MAX_VALUE:PWM_MAX_VALUE]. By default PWM_MAX_VALUE = 13889. In case of FOC [-4096:4096]
      */
     void set_voltage(int voltage);
 
     /**
      * @brief Sets torque target value when FOC is used.
      *
-     * @param torque_sp Torque [-4095:4095].
+     * @param torque_sp Torque [-4096:4096].
      */
     void set_torque(int torque_sp);
+
+    /**
+     * @brief Sets maximum torque control value when FOC is used.
+     *
+     * @param torque_sp Torque [-4096:4096].
+     */
+    void set_torque_max(int torque_sp);
 
     /**
      * @brief Setter for the configuration used by the Service.
