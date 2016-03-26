@@ -68,6 +68,7 @@ void position_control_service(ControlConfig &position_control_config,
     int activate = 0;
 
     int config_update_flag = 1;
+    MotorcontrolConfig motorcontrol_config;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
@@ -78,11 +79,15 @@ void position_control_service(ControlConfig &position_control_config,
         select {
             case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
                 if (config_update_flag) {
-                    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+                    motorcontrol_config = i_motorcontrol.get_config();
 
                     //Limits
                     if (motorcontrol_config.motor_type == BLDC_MOTOR) {
-                        position_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
+                        if(motorcontrol_config.commutation_method == FOC){
+                            position_control_out_limit = 4096;//FOC control range [-4096:4096]
+                        } else {
+                            position_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
+                        }
                     } else if(motorcontrol_config.motor_type == BDC_MOTOR) {
                         position_control_out_limit = BDC_PWM_CONTROL_LIMIT;
                     }
@@ -187,7 +192,7 @@ void position_control_service(ControlConfig &position_control_config,
                     }
 
 
-                    if(position_control_config.cascade_with_torque == 1){
+                    if(position_control_config.cascade_with_torque == 1 && motorcontrol_config.commutation_method == FOC){
                         i_motorcontrol.set_torque(position_control_out);  //cascades with FOC's torque controller
                     }
                     else {
