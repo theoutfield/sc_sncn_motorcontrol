@@ -337,6 +337,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 
     configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
+#ifdef AUTOCALIBRATION
     //Calibration
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
@@ -356,6 +357,10 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
+#else
+   i_calib_a = 10002;
+   i_calib_b = 10002;
+#endif
 
     while (1)
     {

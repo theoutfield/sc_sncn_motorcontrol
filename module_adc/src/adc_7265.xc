@@ -185,8 +185,8 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
 #else
-   i_calib_a = 2048;
-   i_calib_b = 2048;
+   i_calib_a = 8191;
+   i_calib_b = 8191;
 #endif
 
     while(1){
@@ -269,6 +269,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
     configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
     //Calibration
+#ifdef AUTOCALIBRATION
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
 
@@ -286,6 +287,10 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
+#else
+   i_calib_a = 8191;
+   i_calib_b = 8191;
+#endif
 
     while(1){
 
