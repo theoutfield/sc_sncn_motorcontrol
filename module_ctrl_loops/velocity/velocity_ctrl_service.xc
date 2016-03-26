@@ -329,8 +329,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 error_velocity_I = 0;
                 previous_error = 0;
                 velocity_control_out = 0;
-                i_motorcontrol.set_voltage(0); //set_commutation_sinusoidal(c_commutation, 0);
-                i_motorcontrol.set_fets_state(0); //disable_motor(c_commutation);
+                i_motorcontrol.set_voltage(0);
+                i_motorcontrol.set_fets_state(0); //disable_motor;
                 delay_milliseconds(30); //wait_ms(30, 1, t);
                 break;
 
