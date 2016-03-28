@@ -103,6 +103,21 @@ interface VelocityControlInterface{
      *         MOTCTRL_MODE_ACTIVE - service actively controlling the motor
      */
     int get_mode();
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 /**

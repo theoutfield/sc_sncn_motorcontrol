@@ -92,11 +92,14 @@ void velocity_control_service(ProfilerConfig & profiler_config,
     int profile_steps = -1;
     int profile_step_counter = 1;
     timer t_profile;
-    int32_t time_profile;
+    uint32_t time_profile;
     ProfileVelocityParams profile_velocity_params;
     profile_velocity_params.max_velocity = profiler_config.max_velocity;
     profile_velocity_params.max_acceleration = profiler_config.max_acceleration;
     profile_velocity_params.max_deceleration = profiler_config.max_deceleration;
+
+    // Notification
+    int notification = MOTCTRL_NTF_EMPTY;
 
     int config_update_flag = 1;
 
@@ -110,15 +113,21 @@ void velocity_control_service(ProfilerConfig & profiler_config,
         select {
             case (profile_step_counter <= profile_steps) => t_profile when timerafter(time_profile + MSEC_STD) :> time_profile:
                 if (profile_step_counter == profile_steps) {
-                    if (target_velocity == 0) {
+                    if (profile_velocity_params.v_d == 0) {
                         target_velocity = 0;
                     }
                     profile_steps = -1;
                     profile_step_counter = 1;
+
+                    notification = MOTCTRL_NTF_PROFILE_DONE;
+                    // TODO: Use a constant for the number of interfaces
+                    for (int i = 0; i < 3; i++) {
+                        i_velocity_control[i].notification();
+                    }
                 } else {
                     target_velocity = generate_profile_step_velocity(profile_velocity_params, profile_step_counter);
+                    profile_step_counter++;
                 }
-                profile_step_counter++;
                 break;
             case t when timerafter (ts + USEC_STD * velocity_control_config.control_loop_period) :> ts:
 
@@ -326,6 +335,7 @@ void velocity_control_service(ProfilerConfig & profiler_config,
                 profile_velocity_params.dec = deceleration;
                 profile_steps = calculate_profile_steps(profile_velocity_params);
                 profile_step_counter = 1;
+                t_profile :> time_profile;
                 break;
 
             case i_velocity_control[int i].get_velocity_control_config() -> ControlConfig out_config:
@@ -416,6 +426,9 @@ void velocity_control_service(ProfilerConfig & profiler_config,
                 break;
             case i_velocity_control[int i].get_mode() -> int out_mode:
                 out_mode = mode;
+                break;
+            case i_velocity_control[int i].get_notification() -> int out_notification:
+                out_notification = notification;
                 break;
         }
     }

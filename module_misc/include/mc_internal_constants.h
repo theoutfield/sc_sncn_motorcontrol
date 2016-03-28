@@ -55,7 +55,7 @@
 #define SWITCH_INPUT_TYPE                   50
 
 enum notification_type {
-    MOTCTRL_NTF_EMPTY, MOTCTRL_NTF_CONFIG_CHANGED
+    MOTCTRL_NTF_EMPTY, MOTCTRL_NTF_CONFIG_CHANGED, MOTCTRL_NTF_PROFILE_DONE
 };
 
 enum mode {
