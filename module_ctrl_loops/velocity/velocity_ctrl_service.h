@@ -155,7 +155,7 @@ int max_speed_limit(int velocity, int max_speed);
  * @param i_velocity_control Array of communication interfaces to handle up to 3 different clients.
  */
 [[combinable]]
-void velocity_control_service(ProfilerConfig & profiler_config,
+void velocity_control_service(ProfilerConfig profiler_config,
                         ControlConfig & velocity_ctrl_config,
                         interface HallInterface client ?i_hall,
                         interface QEIInterface client ?i_qei,

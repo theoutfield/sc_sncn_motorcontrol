@@ -46,7 +46,7 @@ int max_speed_limit(int velocity, int max_speed) {
 }
 
 [[combinable]]
-void velocity_control_service(ProfilerConfig & profiler_config,
+void velocity_control_service(ProfilerConfig profiler_config,
                         ControlConfig & velocity_control_config,
                        interface HallInterface client ?i_hall,
                        interface QEIInterface client ?i_qei,
