@@ -111,57 +111,49 @@ void position_control_service(ControlConfig &position_control_config,
                     config_update_flag = 0;
                 }
 
-                if (mode >= MOTCTRL_MODE_PASSIVE) {
-                    /* acquire actual position hall/qei/sensor */
-                    switch (position_control_config.feedback_sensor) {
-                        case HALL_SENSOR:
-                            if(!isnull(i_hall)){
-                                actual_position = i_hall.get_hall_position_absolute();
-                            }
-                            else{
-                                printstrln("position_ctrl_service: ERROR: Hall interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
+                /* acquire actual position */
+                switch (position_control_config.feedback_sensor) {
+                    case HALL_SENSOR:
+                        if (!isnull(i_hall)) {
+                            actual_position = i_hall.get_hall_position_absolute();
+                        } else {
+                            printstrln("position_ctrl_service: ERROR: Hall interface is not provided but requested");
+                            exit(-1);
+                        }
+                        break;
 
-                        case QEI_SENSOR:
-                            if(!isnull(i_qei)){
-                                actual_position =  i_qei.get_qei_position_absolute();
-                            }
-                            else{
-                                printstrln("position_ctrl_service: ERROR: Encoder interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
+                    case QEI_SENSOR:
+                        if (!isnull(i_qei)) {
+                            actual_position =  i_qei.get_qei_position_absolute();
+                        } else {
+                            printstrln("position_ctrl_service: ERROR: Encoder interface is not provided but requested");
+                            exit(-1);
+                        }
+                        break;
 
-                        case BISS_SENSOR:
-                            if(!isnull(i_biss)){
-                            {
-                                actual_position, void, void } = i_biss.get_biss_position();
-                            }
-                            else{
-                                printstrln("position_ctrl_service: ERROR: BiSS interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
+                    case BISS_SENSOR:
+                        if (!isnull(i_biss)) {
+                            { actual_position, void, void } = i_biss.get_biss_position();
+                        } else {
+                            printstrln("position_ctrl_service: ERROR: BiSS interface is not provided but requested");
+                            exit(-1);
+                        }
+                        break;
 
-                        case AMS_SENSOR:
-                            if(!isnull(i_ams)){
-                            {
-                                actual_position, void } = i_ams.get_ams_position();
-                            }
-                            else{
-                                printstrln("position_ctrl_service: ERROR: AMS interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
+                    case AMS_SENSOR:
+                        if (!isnull(i_ams)) {
+                            { actual_position, void } = i_ams.get_ams_position();
+                        } else {
+                            printstrln("position_ctrl_service: ERROR: AMS interface is not provided but requested");
+                            exit(-1);
+                        }
+                        break;
 
-                    }
-                    /*
-                     * Or any other sensor interfaced to the IFM Module
-                     * place client functions here to acquire position
-                     */
                 }
+                /*
+                 * Or any other sensor interfaced to the IFM Module
+                 * place client functions here to acquire position
+                 */
 
                 if(mode == MOTCTRL_MODE_ACTIVE) {
                     /* PID Controller */
