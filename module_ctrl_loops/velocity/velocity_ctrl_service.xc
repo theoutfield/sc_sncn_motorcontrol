@@ -331,7 +331,7 @@ void velocity_control_service(ProfilerConfig & profiler_config,
                 profile_velocity_params.u = actual_velocity;
                 profile_velocity_params.acc = acceleration;
                 profile_velocity_params.dec = deceleration;
-                profile_steps = calculate_profile_steps(profile_velocity_params);
+                profile_steps = calculate_profile_velocity_steps(profile_velocity_params);
                 profile_step_counter = 1;
                 t_profile :> time_profile;
                 break;

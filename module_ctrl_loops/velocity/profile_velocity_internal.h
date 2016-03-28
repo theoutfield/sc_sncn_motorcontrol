@@ -21,5 +21,5 @@ typedef struct
     int oldst;                                 // old state of acc/dec
 } ProfileVelocityParams;
 
-int calculate_profile_steps(ProfileVelocityParams & profile_velocity_params);
+int calculate_profile_velocity_steps(ProfileVelocityParams & profile_velocity_params);
 int generate_profile_step_velocity(ProfileVelocityParams profile_velocity_params, int step);

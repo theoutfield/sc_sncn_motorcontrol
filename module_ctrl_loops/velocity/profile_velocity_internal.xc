@@ -8,7 +8,7 @@
 #include <profile_velocity_internal.h>
 #include <math.h>
 
-int calculate_profile_steps(ProfileVelocityParams & profile_velocity_params) {
+int calculate_profile_velocity_steps(ProfileVelocityParams & profile_velocity_params) {
     if (profile_velocity_params.v_d > profile_velocity_params.max_velocity) {
         profile_velocity_params.v_d = profile_velocity_params.max_velocity;
     } else if (profile_velocity_params.v_d < -profile_velocity_params.max_velocity) {
