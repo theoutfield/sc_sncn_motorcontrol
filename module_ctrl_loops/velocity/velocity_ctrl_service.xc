@@ -187,55 +187,53 @@ void velocity_control_service(ProfilerConfig & profiler_config,
                     config_update_flag = 0;
                 }
 
-                if (mode >= MOTCTRL_MODE_PASSIVE) {
-                    /* calculate actual velocity from hall/qei with filter*/
-                    if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
-                        actual_velocity = i_biss.get_biss_velocity();
-                    } else if (velocity_control_config.feedback_sensor == AMS_SENSOR) {
-                        actual_velocity = i_ams.get_ams_velocity();
+                /* Get the actual velocity */
+                if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
+                    actual_velocity = i_biss.get_biss_velocity();
+                } else if (velocity_control_config.feedback_sensor == AMS_SENSOR) {
+                    actual_velocity = i_ams.get_ams_velocity();
+                } else { // calculate actual velocity from hall/qei with filter
+                    if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
+                        if(!isnull(i_hall)){
+                            position = i_hall.get_hall_position_absolute();
+                        }
+
+                        if (position > 2049) {
+                            init = 1;
+                            previous_position = 2049;
+                        } else if (position < -2049) {
+                            init = 1;
+                            previous_position = -2049;
+                        }
+                        raw_speed = 0;
+                        //target_velocity = 0;
                     } else {
-                        if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
-                            if(!isnull(i_hall)){
-                                position = i_hall.get_hall_position_absolute();
-                            }
+                        if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
+                            position = i_hall.get_hall_position_absolute();
+                        } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
+                            position = i_qei.get_qei_position_absolute();
+                        }
 
-                            if (position > 2049) {
-                                init = 1;
-                                previous_position = 2049;
-                            } else if (position < -2049) {
-                                init = 1;
-                                previous_position = -2049;
-                            }
-                            raw_speed = 0;
-                            //target_velocity = 0;
-                        } else {
-                            if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
-                                position = i_hall.get_hall_position_absolute();
-                            } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
-                                position = i_qei.get_qei_position_absolute();
-                            }
+                        difference = position - previous_position;
 
-                            difference = position - previous_position;
+                        if (difference < -crossover || difference > crossover) {
+                            difference = old_difference;
+                        }
 
-                            if (difference < -crossover || difference > crossover) {
-                                difference = old_difference;
-                            }
-
-                            raw_speed = (difference * rpm_constant) / speed_factor;
+                        raw_speed = (difference * rpm_constant) / speed_factor;
 
 #ifdef Debug_velocity_ctrl
-                            //xscope_int(RAW_SPEED, raw_speed);
+                        //xscope_int(RAW_SPEED, raw_speed);
 #endif
-                            previous_position = position;
-                            old_difference = difference;
-                        }
-                        /**
-                         * Or any other sensor interfaced to the IFM Module
-                         * place client functions here to acquire velocity/position
-                         */
-
-                        actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
+                        previous_position = position;
+                        old_difference = difference;
                     }
+                    /**
+                     * Or any other sensor interfaced to the IFM Module
+                     * place client functions here to acquire velocity/position
+                     */
+
+                    actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
                 }
 
                 if(mode == MOTCTRL_MODE_ACTIVE) {
