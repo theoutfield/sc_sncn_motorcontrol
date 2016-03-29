@@ -8,6 +8,7 @@
 
 #include <motorcontrol_service.h>
 #include <control_loops_common.h>
+#include <profiler_config_internal.h>
 
 /**
  * @brief Interface type to communicate with the Position Control Service.
@@ -44,6 +45,18 @@ interface PositionControlInterface{
      * @return Current target position [INT_MIN:INT_MAX].
      */
     int get_target_position();
+
+    /**
+     * @brief Generates a profile ramp from the current position to the defined target position
+     *        according to the provided parameters. Then sequentially uses each point of the profile
+     *        as target.
+     *
+     * @param in_target_position New target position in [INT_MIN:INT_MAX].
+     * @param velocity in [RPM].
+     * @param acceleration in [RPM/s].
+     * @param deceleration [RPM/s].
+     */
+    void set_profile_position(int in_target_position, int velocity, int acceleration, int deceleration);
 
     /**
      * @brief Getter for current configuration used by the Service.
@@ -88,6 +101,21 @@ interface PositionControlInterface{
      *         MOTCTRL_MODE_ACTIVE - service actively controlling the motor
      */
     int get_mode();
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 /**
@@ -125,10 +153,11 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
  * @param i_motorcontrol Communication interface to the Motor Control Service.
  * @param i_position_control Array of communication interfaces to handle up to 3 different clients.
  */
-void position_control_service(ControlConfig & position_ctrl_config,
-                    interface HallInterface client ?i_hall,
-                    interface QEIInterface client ?i_qei,
-                    interface BISSInterface client ?i_biss,
-                    interface AMSInterface client ?i_ams,
-                    interface MotorcontrolInterface client i_motorcontrol,
-                    interface PositionControlInterface server i_position_control[3]);
+void position_control_service(ProfilerConfigInternal profiler_config,
+                              ControlConfig & position_ctrl_config,
+                              interface HallInterface client ?i_hall,
+                              interface QEIInterface client ?i_qei,
+                              interface BISSInterface client ?i_biss,
+                              interface AMSInterface client ?i_ams,
+                              interface MotorcontrolInterface client i_motorcontrol,
+                              interface PositionControlInterface server i_position_control[3]);

@@ -11,6 +11,7 @@
 #include <hall_service.h>
 #include <qei_service.h>
 #include <adc_service.h>
+#include <profiler_config_internal.h>
 
 #define FILTER_LENGTH_TORQUE 20
 #define FILTER_LENGTH_ADC 80
@@ -63,6 +64,14 @@ interface TorqueControlInterface{
     int get_target_torque();
 
     /**
+     * @brief Set profile torque with Torque Control loop
+     *
+     * @param target_torque is the new target torque in (mNm * current resolution)
+     * @param torque_slope in (mNm/s * current resolution)
+     */
+    void set_profile_torque(int int_target_torque, int current_slope);
+
+    /**
      * @brief Getter for current configuration used by the Service.
      *
      * @return Current Service configuration.
@@ -105,6 +114,21 @@ interface TorqueControlInterface{
      *         MOTCTRL_MODE_ACTIVE - service actively controlling the motor
      */
     int get_mode();
+
+    /**
+     * @brief Notifies all available clients that a new notification
+     * is available.
+     */
+    [[notification]]
+    slave void notification();
+
+    /**
+     * @brief Provides the type of notification currently available.
+     *
+     * @return type of the notification
+     */
+    [[clears_notification]]
+    int get_notification();
 };
 
 /**
@@ -143,7 +167,8 @@ int torque_limit(int torque, int max_torque_limit);
  * @param i_motorcontrol Communication interface to the Motor Control Service.
  * @param i_torque_control Array of communication interfaces to handle up to 3 different clients.
  */
-void torque_control_service(ControlConfig &torque_ctrl_config,
+void torque_control_service(ProfilerConfigInternal profiler_config,
+                            ControlConfig & torque_ctrl_config,
                             interface ADCInterface client i_adc,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,

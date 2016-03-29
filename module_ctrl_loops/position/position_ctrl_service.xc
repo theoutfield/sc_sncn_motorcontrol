@@ -14,6 +14,8 @@
 #include <hall_service.h>
 #include <qei_service.h>
 
+#include "profile_position_internal.h"
+
 void init_position_control(interface PositionControlInterface client i_position_control)
 {
     int ctrl_state;
@@ -43,7 +45,8 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
     return position;
 }
 
-void position_control_service(ControlConfig &position_control_config,
+void position_control_service(ProfilerConfigInternal profiler_config,
+                              ControlConfig &position_control_config,
                               interface HallInterface client ?i_hall,
                               interface QEIInterface client ?i_qei,
                               interface BISSInterface client ?i_biss,
@@ -67,6 +70,50 @@ void position_control_service(ControlConfig &position_control_config,
 
     int mode = MOTCTRL_MODE_STOP;
 
+    // Profile
+    int profile_steps = -1;
+    int profile_step_counter = 1;
+    timer t_profile;
+    uint32_t time_profile;
+    ProfilePositionParams profile_pos_params;
+
+    if (!isnull(i_hall)) {
+        profile_pos_params.hall_config = i_hall.get_hall_config();
+    }
+
+    if (!isnull(i_qei)) {
+        profile_pos_params.qei_params = i_qei.get_qei_config();
+    }
+
+    if (!isnull(i_biss)) {
+        profile_pos_params.biss_config = i_biss.get_biss_config();
+    }
+
+    if (!isnull(i_ams)) {
+        profile_pos_params.ams_config = i_ams.get_ams_config();
+    }
+
+    profile_pos_params.max_position =  profiler_config.max_position;
+    profile_pos_params.min_position = profiler_config.min_position;
+    profile_pos_params.sensor_used = position_control_config.feedback_sensor;
+    if (profile_pos_params.sensor_used == HALL_SENSOR) {
+        profile_pos_params.max_acceleration =  position_internal_rpm_to_ticks_hall(profiler_config.max_acceleration, profile_pos_params.hall_config);
+        profile_pos_params.max_velocity = position_internal_rpm_to_ticks_hall(profiler_config.max_velocity, profile_pos_params.hall_config);
+    } else if (profile_pos_params.sensor_used == QEI_SENSOR) {
+        profile_pos_params.max_acceleration =  position_internal_rpm_to_ticks_qei(profiler_config.max_acceleration, profile_pos_params.qei_params);
+        profile_pos_params.max_velocity = position_internal_rpm_to_ticks_qei(profiler_config.max_velocity, profile_pos_params.qei_params);
+    } else if (profile_pos_params.sensor_used == BISS_SENSOR) {
+        profile_pos_params.max_acceleration =  position_internal_rpm_to_ticks_biss(profiler_config.max_acceleration, profile_pos_params.biss_config);
+        profile_pos_params.max_velocity = position_internal_rpm_to_ticks_biss(profiler_config.max_velocity, profile_pos_params.biss_config);
+    } else if (profile_pos_params.sensor_used == AMS_SENSOR) {
+        profile_pos_params.max_acceleration =  position_internal_rpm_to_ticks_ams(profiler_config.max_acceleration, profile_pos_params.ams_config);
+        profile_pos_params.max_velocity = position_internal_rpm_to_ticks_ams(profiler_config.max_velocity, profile_pos_params.ams_config);
+    }
+    profile_pos_params.limit_factor = 10;
+
+    // Notification
+    int notification = MOTCTRL_NTF_EMPTY;
+
     int config_update_flag = 1;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
@@ -76,6 +123,21 @@ void position_control_service(ControlConfig &position_control_config,
     while(1) {
 #pragma ordered
         select {
+            case (profile_step_counter <= profile_steps) => t_profile when timerafter(time_profile + MSEC_STD) :> time_profile:
+                if (profile_step_counter == profile_steps) {
+                    profile_steps = -1;
+                    profile_step_counter = 1;
+
+                    notification = MOTCTRL_NTF_PROFILE_DONE;
+                    // TODO: Use a constant for the number of interfaces
+                    for (int i = 0; i < 3; i++) {
+                        i_position_control[i].notification();
+                    }
+                } else {
+                    target_position = generate_profile_step_position(profile_pos_params, profile_step_counter);
+                    profile_step_counter++;
+                }
+                break;
             case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
                 if (config_update_flag) {
                     MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
@@ -248,6 +310,17 @@ void position_control_service(ControlConfig &position_control_config,
                 out_target_position = target_position;
                 break;
 
+            case i_position_control[int i].set_profile_position(int in_target_position, int velocity, int acceleration, int deceleration):
+                profile_pos_params.qf = in_target_position;
+                profile_pos_params.qi = actual_position;
+                profile_pos_params.vi = velocity;
+                profile_pos_params.acc = acceleration;
+                profile_pos_params.dec = deceleration;
+                profile_steps = calculate_profile_position_steps(profile_pos_params);
+                profile_step_counter = 1;
+                t_profile :> time_profile;
+                break;
+
             case i_position_control[int i].set_position_control_config(ControlConfig in_params):
 
                 position_control_config = in_params;
@@ -328,6 +401,9 @@ void position_control_service(ControlConfig &position_control_config,
                 break;
             case i_position_control[int i].get_mode() -> int out_mode:
                 out_mode = mode;
+                break;
+            case i_position_control[int i].get_notification() -> int out_notification:
+                out_notification = notification;
                 break;
         }
     }

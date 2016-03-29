@@ -17,6 +17,8 @@
 #include <motorcontrol_service.h>
 #include <filter_blocks.h>
 
+#include "profile_linear_internal.h"
+
 #define CURRENT_CONTROL
 
 #include <string.h>
@@ -150,7 +152,8 @@ void current_filter(interface ADCInterface client adc_if, chanend c_current)
     }
 }
 
-void torque_ctrl_loop(ControlConfig &torque_control_config,
+void torque_ctrl_loop(ProfilerConfigInternal & profiler_config,
+                      ControlConfig & torque_control_config,
                       chanend c_current,
                       interface HallInterface client ?i_hall,
                       interface QEIInterface client ?i_qei,
@@ -223,6 +226,18 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
 
     int mode = MOTCTRL_MODE_STOP;
 
+    // Profile
+    int profile_steps = -1;
+    int profile_step_counter = 1;
+    timer t_profile;
+    uint32_t time_profile;
+    ProfileLinearParams profile_linear_params;
+    profile_linear_params.polarity = profiler_config.polarity;
+    profile_linear_params.max_value = profiler_config.max_current;
+
+    // Notification
+    int notification = MOTCTRL_NTF_EMPTY;
+
     MotorcontrolConfig motorcontrol_config;
 
     int config_update_flag = 1;
@@ -234,6 +249,21 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
     while(1) {
 #pragma ordered
         select {
+            case (profile_step_counter <= profile_steps) => t_profile when timerafter(time_profile + MSEC_STD) :> time_profile:
+                    if (profile_step_counter == profile_steps) {
+                        profile_steps = -1;
+                        profile_step_counter = 1;
+
+                        notification = MOTCTRL_NTF_PROFILE_DONE;
+                        // TODO: Use a constant for the number of interfaces
+                        for (int i = 0; i < 3; i++) {
+                            i_torque_control[i].notification();
+                        }
+                    } else {
+                        target_torque = generate_profile_step_torque(profile_linear_params, profile_step_counter);
+                        profile_step_counter++;
+                    }
+                    break;
             case tc when timerafter(time + USEC_STD * torque_control_config.control_loop_period) :> time:
 
                 if (config_update_flag) {
@@ -608,6 +638,16 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                 out_target_torque = target_torque;
                 break;
 
+            case i_torque_control[int i].set_profile_torque(int in_target_torque, int torque_slope):
+                profile_linear_params.v_d = in_target_torque;
+                profile_linear_params.u = actual_torque * profile_linear_params.polarity;
+                profile_linear_params.acc = torque_slope;
+                profile_linear_params.dec = torque_slope;
+                profile_steps = calculate_profile_linear_steps(profile_linear_params);
+                profile_step_counter = 1;
+                t_profile :> time_profile;
+                break;
+
             case i_torque_control[int i].set_torque_control_config(ControlConfig in_params):
 
                 torque_control_config = in_params;
@@ -697,11 +737,15 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
             case i_torque_control[int i].get_mode() -> int out_mode:
                 out_mode = mode;
                 break;
+            case i_torque_control[int i].get_notification() -> int out_notification:
+                out_notification = notification;
+                break;
         }
     }
 }
 
-void torque_control_service(ControlConfig &torque_control_config,
+void torque_control_service(ProfilerConfigInternal profiler_config,
+                            ControlConfig & torque_control_config,
                             interface ADCInterface client adc_if,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
@@ -714,6 +758,6 @@ void torque_control_service(ControlConfig &torque_control_config,
 
     par {
         current_filter(adc_if, c_current);
-        torque_ctrl_loop(torque_control_config, c_current, i_hall, i_qei, i_biss, i_ams, i_motorcontrol, i_torque_control);
+        torque_ctrl_loop(profiler_config, torque_control_config, c_current, i_hall, i_qei, i_biss, i_ams, i_motorcontrol, i_torque_control);
     }
 }

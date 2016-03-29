@@ -46,14 +46,14 @@ int max_speed_limit(int velocity, int max_speed) {
 }
 
 [[combinable]]
-void velocity_control_service(ProfilerConfig profiler_config,
-                        ControlConfig & velocity_control_config,
-                       interface HallInterface client ?i_hall,
-                       interface QEIInterface client ?i_qei,
-                       interface BISSInterface client ?i_biss,
-                       interface AMSInterface client ?i_ams,
-                       interface MotorcontrolInterface client i_motorcontrol,
-                       interface VelocityControlInterface server i_velocity_control[3])
+void velocity_control_service(ProfilerConfigInternal profiler_config,
+                              ControlConfig & velocity_control_config,
+                              interface HallInterface client ?i_hall,
+                              interface QEIInterface client ?i_qei,
+                              interface BISSInterface client ?i_biss,
+                              interface AMSInterface client ?i_ams,
+                              interface MotorcontrolInterface client i_motorcontrol,
+                              interface VelocityControlInterface server i_velocity_control[3])
 {
     /* Controller declarations */
     int actual_velocity = 0;
