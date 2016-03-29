@@ -109,6 +109,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
         case i_motorcontrol[int i].set_torque(int torque_sp):
                 break;
 
+        case i_motorcontrol[int i].set_torque_max(int torque_max):
+                break;
+
         case i_motorcontrol[int i].set_control(int in_flag):
                 break;
 

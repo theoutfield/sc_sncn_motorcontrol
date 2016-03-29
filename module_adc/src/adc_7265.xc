@@ -19,7 +19,7 @@
 void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
                             unsigned char config,
                             unsigned char &port_id,
-                            unsigned int stabilizing_ticks){
+                            unsigned int stabilizing_ticks, interface WatchdogInterface client ?i_watchdog){
 
     unsigned inp_val = 0, tmp_val = 0;
     unsigned time_stamp; // Time stamp
@@ -60,6 +60,13 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
     adc_data[1][0] = (int)tmp_val;
     adc_data[1][0] = adc_data[1][0] << 2;  // So we extend to 14Bit: 0 - 16384
 
+    if ( (adc_data[0][0] > OVERCURRENT_IN_ADC_TICKS) || (adc_data[1][0] > OVERCURRENT_IN_ADC_TICKS)
+        || (adc_data[0][0] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (adc_data[1][0] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
+        if(!isnull(i_watchdog)){
+            i_watchdog.stop();
+            printstr("\n> Overcurrent!\n");
+        }
+    }
 
     if(port_id == 0)
         return;
@@ -155,7 +162,7 @@ void configure_adc_ports_7265( // Configure all ADC data ports
 
 } // configure_adc_ports_7265
 
-void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config)
+void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog)
 {
     int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
     unsigned char sampling_port = 0;
@@ -185,8 +192,8 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
 #else
-   i_calib_a = 2048;
-   i_calib_b = 2048;
+   i_calib_a = MAX_ADC_VALUE/2;
+   i_calib_b = MAX_ADC_VALUE/2;
 #endif
 
     while(1){
@@ -198,7 +205,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
                 // Config: 1 Port: 1
                 sampling_port = 0;  // If provided port is 0, just once sampling takes place: current,
                                     // and no additional sampling is done
-                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
                 Icalibrated_a = ((int) adc_data[0][0]) - i_calib_a;
                 Icalibrated_b =((int) adc_data[1][0]) - i_calib_b;
 
@@ -210,7 +217,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
         case iADC[int i].get_temperature() -> {int out_temp}:
 
                 sampling_port = 5;
-                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
 
                 out_temp = adc_data[0][4];
 
@@ -221,7 +228,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
                 //We sample the external inputs as differential inputs: ch3 - ch4
                 // Config: 0 Port: 3
                 sampling_port = 3;
-                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200);
+                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200, i_watchdog);
 
                 ext_a = adc_data[0][2];
                 ext_b = adc_data[1][2];
@@ -255,7 +262,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
     }//eof while
 }
 
-void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, chanend c_trig)
+void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, chanend c_trig, interface WatchdogInterface client ?i_watchdog)
 {
     timer t;
     unsigned int ts;
@@ -269,6 +276,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
     configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
     //Calibration
+#ifdef AUTOCALIBRATION
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
 
@@ -286,6 +294,10 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
+#else
+   i_calib_a = MAX_ADC_VALUE/2;
+   i_calib_b = MAX_ADC_VALUE/2;
+#endif
 
     while(1){
 
@@ -303,7 +315,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
                     t when timerafter(ts + 7080) :> ts; // 6200
                     //Sampling
-                    adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200);
+                    adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
                 }
 
                 break;
@@ -326,7 +338,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
                 //We sample the external inputs as differential inputs: ch3 - ch4
                 // Config: 0 Port: 3
                 sampling_port = 3;
-                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200);
+                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200, i_watchdog);
 
                 ext_a = adc_data[0][2];
                 ext_b = adc_data[1][2];

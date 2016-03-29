@@ -178,6 +178,11 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     break;
 
             case i_motorcontrol[int i].set_torque(int torque_sp):
+                    printstr("\n> ERROR: setting torque directly is not supported for SINE commutation, please check your motorcontrol configuration!");
+                    break;
+
+            case i_motorcontrol[int i].set_torque_max(int torque_max_):
+                    printstr("\n> ERROR: controlling torque directly is not supported for SINE commutation, please check your motorcontrol configuration!");
                     break;
 
             case i_motorcontrol[int i].set_control(int in_flag):
@@ -416,6 +421,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
     //FOC Torque control
     int target_torque = 0;
+    int torque_max = 4096;//max default value
     int actual_torque = 0;
     int error_torque = 0, error_torque_previous = 0;
     int error_torque_integral = 0;
@@ -451,6 +457,13 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
         init_state = 1;
     }
 
+    if(motorcontrol_config.commutation_loop_period < 110){
+        printstr("\n > WARNING: FOC loop period defined too short, setting to 110 usec\n");
+        motorcontrol_config.commutation_loop_period = 110;
+    } else if (motorcontrol_config.commutation_loop_period > 110){
+        printstr("\n > WARNING: FOC loop period defined too long, setting to 110 usec\n");
+        motorcontrol_config.commutation_loop_period = 110;
+    }
 //=================55,6 usec ============= F O C - L O O P =================================================================================
 //FixMe: Make proper synchronization with PWM and ADC. Currently loop period is 110 usec
 //==========================================================================================================================================
@@ -541,7 +554,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  //{iTemp1, angle_current}  = cartesian_to_polar_conversion( clarke_alpha, clarke_beta);
                  //vector_current    = calc_mean_one_periode(iCX, iXX, iTemp1, vector_current, hall_pin_state, 0);  // every cycle
 
-                 //==== Torque Controller ====
+                 //==== PID Torque Controller ====
                  if(!q_direct_select){
                      if (shutdown == 1 || pwm_enabled != 1) {
                          torque_control_output = 0;
@@ -550,9 +563,12 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                          error_torque_derivative = 0;
                      }
                      else{
-
+                         //take the set point
                          actual_torque = torq_pt1;
-
+                         //limit the control range
+                         if(target_torque > torque_max) target_torque = torque_max;
+                         else if (target_torque < -torque_max) target_torque = -torque_max;
+                         //compute the control output
                          error_torque = target_torque - actual_torque; // 350
                          error_torque_integral = error_torque_integral + error_torque;
                          error_torque_derivative = error_torque - error_torque_previous;
@@ -614,7 +630,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
                  //========== prepare PWM =================================================================
 
-             } else {
+             } else {//offset calibration
                  umot_motor = 500;
                  angle_pwm = 0;
              }
@@ -648,11 +664,21 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  q_value = -q_value_;
              else
                  q_value = q_value_;
+
+             if(q_value > 4096) q_value = 4096;//[-4096:4096] is the maximum control range
+             else if (q_value < -4096) q_value = -4096;
              break;
 
          case i_motorcontrol[int i].set_torque(int torque_sp):
              target_torque = torque_sp;
+             if(target_torque > 4096) target_torque = 4096;//[-4096:4096] is the maximum control range
+             else if (target_torque < -4096) target_torque = -4096;
              pwm_enabled = 1;
+             break;
+
+         case i_motorcontrol[int i].set_torque_max(int torque_max_):
+             torque_max = torque_max_;
+             if(torque_max > 4096) torque_max = 4096;
              break;
 
          case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
@@ -705,6 +731,8 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
                  if(new_state == 0){
                      shutdown = 1;
+                     q_direct_select = 0;
+                     target_torque = 0;
                  }else{
                      shutdown = 0;
                      q_value = 0;
