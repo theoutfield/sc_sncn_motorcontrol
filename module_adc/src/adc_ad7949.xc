@@ -157,7 +157,8 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
                                    timer t,
                                    unsigned int adc_data_a[],
                                    unsigned int adc_data_b[],
-                                   unsigned short &adc_index )
+                                   unsigned short &adc_index,
+                                   interface WatchdogInterface client ?i_watchdog)
 {
     unsigned int ts;
     unsigned int data_raw_a;
@@ -198,12 +199,20 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
     p_data_b :> data_raw_b;
     adc_data_b[4] = convert(data_raw_b);
 
+    if ( (adc_data_a[4] > OVERCURRENT_IN_ADC_TICKS) || (adc_data_b[4] > OVERCURRENT_IN_ADC_TICKS)
+        || (adc_data_a[4] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (adc_data_b[4] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
+        if(!isnull(i_watchdog)){
+            i_watchdog.stop();
+            printstr("\n> Overcurrent!\n");
+        }
+    }
+
     SPI_IDLE;
     t :> ts;
 }
 
 void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
-                                CurrentSensorsConfig &current_sensor_config, chanend c_trig)
+                                CurrentSensorsConfig &current_sensor_config, chanend c_trig, interface WatchdogInterface client ?i_watchdog)
 {
     //#define AUTOCALIBRATION //FixMe: autocalibration should take place before PWM is activated.
     timer t;
@@ -264,7 +273,7 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
 
                 adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
                                         adc_ports.clk, adc_config_mot,	adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index);
+                                        adc_data_b, adc_index, i_watchdog);
             }
 
             break;
@@ -320,7 +329,7 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
 
 
 void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
-                                CurrentSensorsConfig &current_sensor_config)
+                                CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog)
 {
     timer t;
     const unsigned int adc_config_mot     =   0b11110001001001;   /* Motor current (ADC Channel 0), unipolar, referenced to GND */
@@ -337,6 +346,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 
     configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
+#ifdef AUTOCALIBRATION
     //Calibration
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
@@ -356,6 +366,10 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 
    i_calib_a = (i_calib_a >> Factor);
    i_calib_b = (i_calib_b >> Factor);
+#else
+   i_calib_a = 10002;
+   i_calib_b = 10002;
+#endif
 
     while (1)
     {
@@ -369,7 +383,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                 //If no trigger exists on the system, we sample on request
                 adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
                                         adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index);
+                                        adc_data_b, adc_index, i_watchdog);
 
                 Icalibrated_a = ((int) adc_data_a[4]) - i_calib_a;
                 Icalibrated_b = ((int) adc_data_b[4]) - i_calib_b;
@@ -385,7 +399,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                 adc_index = 1;
                 adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
                                         adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index);
+                                        adc_data_b, adc_index, i_watchdog);
 
                 out_temp = adc_data_a[1];
 
@@ -397,7 +411,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                 adc_index = 3;
                 adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
                                         adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index);
+                                        adc_data_b, adc_index, i_watchdog);
 
                 ext_a = adc_data_a[3];
                 ext_b = adc_data_b[3];

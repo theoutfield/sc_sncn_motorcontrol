@@ -53,8 +53,7 @@ int main(void) {
 
         on tile[APP_TILE]:
         {
-            //i_motorcontrol[0].set_voltage(Q_DIRECT);
-            delay_milliseconds(400);
+           // i_motorcontrol[0].set_voltage(Q_DIRECT);
             i_motorcontrol[0].set_torque(TORQUE);
         }
 
@@ -66,7 +65,7 @@ int main(void) {
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc);
+                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);

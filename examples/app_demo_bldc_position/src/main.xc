@@ -64,6 +64,8 @@ void position_profile_test(interface PositionControlInterface client i_position_
     /* Initialise the position profile generator */
     init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss, i_ams);
 
+    delay_milliseconds(500);//let the servers start before sending clien requests
+
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
 
@@ -157,7 +159,7 @@ int main(void)
             position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
 
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
-            position_control_config.cascade_with_torque = 1;
+            position_control_config.cascade_with_torque = 0;
 
             /* Control Loop */
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
@@ -186,7 +188,7 @@ int main(void)
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc);
+                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
                 /* Hall sensor Service */
                 {

@@ -6,11 +6,16 @@
 #pragma once
 
 #include <xs1.h>
+#include <watchdog_service.h>
 
 /**
  * Max value the ADC can provide.
  */
 #define MAX_ADC_VALUE 16383
+/**
+ * Max allowed value in ADC ticks till overcurrent protection is triggered.
+ */
+#define OVERCURRENT_IN_ADC_TICKS 12800 //modify the value to match your motor operating conditions. Should be lower than MAX_ADC_VALUE!
 
 /**
  * @brief Interface type to communicate with the ADC Service.
@@ -108,4 +113,4 @@ typedef struct {
  * @param c_trigger [[Nullable]] Channel communication to trigger sampling. If not provided, sampling takes place on request.
  * @param i_adc Array of communication interfaces to handle up to 5 different clients.
  */
-void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2]);
+void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog);

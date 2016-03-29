@@ -147,7 +147,7 @@ int main(void)
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc);
+                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
                 /* Hall sensor Service */
                 {

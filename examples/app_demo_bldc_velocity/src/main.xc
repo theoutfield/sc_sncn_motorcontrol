@@ -52,6 +52,8 @@ void profile_velocity_test(interface VelocityControlInterface client i_velocity_
     /* Initialise the velocity profile generator */
     init_velocity_profiler(profiler_config, i_velocity_control);
 
+    delay_milliseconds(500);//let the servers start before sending clien requests
+
     /* Set new target velocity for profile velocity control */
     set_profile_velocity(target_velocity, acceleration, deceleration, i_velocity_control);
 }
@@ -83,7 +85,7 @@ int main(void)
         /* XScope monitoring */
         {
             int target_velocity, actual_velocity;
-            delay_milliseconds(500);
+
             while(1) {
 
                 actual_velocity = i_velocity_control[1].get_velocity();
@@ -140,7 +142,7 @@ int main(void)
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc);
+                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
                 /* Hall sensor Service */
                 {

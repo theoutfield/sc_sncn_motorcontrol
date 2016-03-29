@@ -85,6 +85,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
     int compute_flag = 0;
 
     int config_update_flag = 1;
+    MotorcontrolConfig motorcontrol_config;
 
     printstr(">>   SOMANET VELOCITY CONTROL SERVICE STARTING...\n");
 
@@ -96,11 +97,15 @@ void velocity_control_service(ControlConfig &velocity_control_config,
             case t when timerafter (ts + USEC_STD * velocity_control_config.control_loop_period) :> ts:
 
                 if (config_update_flag) {
-                    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+                    motorcontrol_config = i_motorcontrol.get_config();
 
                     //Limits
                     if (motorcontrol_config.motor_type == BLDC_MOTOR) {
-                        velocity_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
+                        if(motorcontrol_config.commutation_method == FOC){
+                            velocity_control_out_limit = 4096;//FOC control range [-4096:4096]
+                        } else {
+                            velocity_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
+                        }
                     } else if (motorcontrol_config.motor_type == BDC_MOTOR) {
                         velocity_control_out_limit = BDC_PWM_CONTROL_LIMIT;
                     }
@@ -231,7 +236,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         velocity_control_out = -velocity_control_out_limit;
                     }
 
-                    if(velocity_control_config.cascade_with_torque == 1){
+                    if(velocity_control_config.cascade_with_torque == 1 && motorcontrol_config.commutation_method == FOC){
                         i_motorcontrol.set_torque(velocity_control_out);  //cascades with FOC's torque controller
                     }
                     else {
@@ -329,8 +334,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 error_velocity_I = 0;
                 previous_error = 0;
                 velocity_control_out = 0;
-                i_motorcontrol.set_voltage(0); //set_commutation_sinusoidal(c_commutation, 0);
-                i_motorcontrol.set_fets_state(0); //disable_motor(c_commutation);
+                i_motorcontrol.set_voltage(0);
+                i_motorcontrol.set_fets_state(0); //disable_motor;
                 delay_milliseconds(30); //wait_ms(30, 1, t);
                 break;
 
