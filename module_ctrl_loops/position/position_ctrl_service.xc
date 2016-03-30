@@ -285,6 +285,16 @@ void position_control_service(ControlConfig &position_control_config,
             case i_position_control[int i].enable_position_ctrl():
 
                 activate = 1;
+                if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
+                    actual_position = i_hall.get_hall_position_absolute();
+                } else if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
+                    actual_position = i_qei.get_qei_position_absolute();
+                } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
+                    { actual_position, void, void } = i_biss.get_biss_position();
+                } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                    { actual_position, void } = i_ams.get_ams_position();
+                }
+                target_position = actual_position;
                 while (1) {
                     if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
 #ifdef debug_print
