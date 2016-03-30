@@ -41,14 +41,16 @@ void disable_fets(PwmPorts &ports);
  * @param ports Structure containing ports and other hardware information.
  * @param c_adc_trig Channel for communication with the ADC service.
  * @param c_pwm Channel for communication with the service client.
+ * @param brake_enable Set to 1 (or ENABLE_BRAKE) to enable the brake release.
  *
  */
-void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm);
+void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm, int brake_enable);
 
 /**
  * @brief Service to generate center-aligned inverted pair PWM signals
  *
  * @param ports Structure containing ports and other hardware information.
  * @param c_pwm Channel for communication with the service client.
+ * @param brake_enable Set to 1 (or ENABLE_BRAKE) to enable the brake release.
  */
-void pwm_service(PwmPorts &ports, chanend c_pwm);
+void pwm_service(PwmPorts &ports, chanend ?c_pwm, int brake_enable);

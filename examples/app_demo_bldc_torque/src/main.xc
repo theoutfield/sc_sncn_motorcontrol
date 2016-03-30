@@ -141,7 +141,7 @@ int main(void)
             par
             {
                 /* Triggered PWM Service */
-                pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl);
+                pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl, BRAKE_ENABLE);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);

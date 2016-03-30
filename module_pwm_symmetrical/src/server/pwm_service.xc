@@ -16,6 +16,8 @@
 #include <xs1.h>
 
 #include <pwm_service.h>
+#include <refclk.h>
+#include <print.h>
 
 void disable_fets(PwmPorts &ports){
 
@@ -73,57 +75,113 @@ static void do_pwm_port_config_inv_adc_trig( in port dummy, buffered out port:32
     start_clock(clk);
 }
 
+void pwm_output(buffered out port:32 p_pwm, buffered out port:32 p_pwm_inv, int duty, int period, int msec) {
+    const unsigned delay = 5*USEC_FAST;
+    timer t;
+    unsigned int ts;
+    if (msec) {
+        t :> ts;
+        msec = ts + msec*MSEC_FAST;
+    }
+
+    while(1) {
+        p_pwm <: 0xffffffff;
+        delay_ticks(period*duty);
+        p_pwm <: 0x00000000;
+        delay_ticks(delay);
+        p_pwm_inv<: 0xffffffff;
+        delay_ticks(period*(100-duty) + 2*delay);
+        p_pwm_inv <: 0x00000000;
+        delay_ticks(delay);
+
+        if (msec) {
+            t :> ts;
+            if (timeafter(ts, msec))
+                break;
+        }
+    }
+}
+
 extern unsigned pwm_op_inv( unsigned buf, buffered out port:32 p_pwm[], buffered out port:32 (&?p_pwm_inv)[], chanend c, unsigned control );
 
-void pwm_service( PwmPorts &ports, chanend c_pwm)
+void pwm_service( PwmPorts &ports, chanend ?c_pwm, int brake_enable)
 {
     //Set Tile Ref Freq to 250MHz
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     disable_fets(ports);
 
-    unsigned buf, control;
+    par {
+        /* brake pwm */
+        {
+            if(brake_enable == ENABLE_BRAKE && !isnull(ports.p_pwm_phase_d) && !isnull(ports.p_pwm_phase_d_inv)) {
+                printstr(">>   SOMANET BRAKE RELEASE STARTING...\n");
+                pwm_output(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, 100, 100, 100);
+                pwm_output(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, 28, 10, 0);
+            }
+        }
 
-    /* First read the shared memory buffer address from the client */
-    c_pwm :> control;
+        /* motor pwm */
+        {
+            if (!isnull(c_pwm)) {
+                unsigned buf, control;
 
-    /* configure the ports */
-    do_pwm_port_config_inv( ports.p_pwm, ports.p_pwm_inv, ports.clk);
+                /* First read the shared memory buffer address from the client */
+                c_pwm :> control;
 
-    /* wait for initial update */
-    c_pwm :> buf;
+                /* configure the ports */
+                do_pwm_port_config_inv( ports.p_pwm, ports.p_pwm_inv, ports.clk);
 
-    while (1)
-    {
-        buf = pwm_op_inv( buf, ports.p_pwm, ports.p_pwm_inv, c_pwm, control );
+                /* wait for initial update */
+                c_pwm :> buf;
+
+                while (1)
+                {
+                    buf = pwm_op_inv( buf, ports.p_pwm, ports.p_pwm_inv, c_pwm, control );
+                }
+            }
+        }
     }
-
 }
 
 extern unsigned pwm_op_inv_trig( unsigned buf, buffered out port:32 p_pwm[], buffered out port:32 (&?p_pwm_inv)[], chanend c, unsigned control, chanend c_trig, in port dummy_port );
 
-void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm)
+void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm, int brake_enable)
 {
-
     //Set Tile Ref Freq to 250MHz
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     disable_fets(ports);
 
-    unsigned buf, control;
+    par {
+        /* brake pwm */
+        {
+            if(brake_enable == ENABLE_BRAKE && !isnull(ports.p_pwm_phase_d) && !isnull(ports.p_pwm_phase_d_inv)) {
+                printstr(">>   SOMANET BRAKE RELEASE STARTING...\n");
+                pwm_output(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, 100, 100, 100);
+                pwm_output(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, 28, 10, 0);
+            }
+        }
 
-    /* First read the shared memory buffer address from the client */
-    c_pwm :> control;
+        /* motor pwm */
+        {
+            unsigned buf, control;
 
-    /* configure the ports */
-    do_pwm_port_config_inv_adc_trig( ports.dummy_port, ports.p_pwm, ports.p_pwm_inv, ports.clk );
+            /* First read the shared memory buffer address from the client */
+            c_pwm :> control;
 
-    /* wait for initial update */
-    c_pwm :> buf;
+            /* configure the ports */
+            do_pwm_port_config_inv_adc_trig( ports.dummy_port, ports.p_pwm, ports.p_pwm_inv, ports.clk );
 
-    while (1)
-    {
-        buf = pwm_op_inv_trig( buf, ports.p_pwm, ports.p_pwm_inv, c_pwm, control, c_adc_trig, ports.dummy_port );
+            /* wait for initial update */
+            c_pwm :> buf;
+
+            while (1)
+            {
+                buf = pwm_op_inv_trig( buf, ports.p_pwm, ports.p_pwm_inv, c_pwm, control, c_adc_trig, ports.dummy_port );
+            }
+        }
     }
-
 }
+
+

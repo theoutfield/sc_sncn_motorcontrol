@@ -49,6 +49,9 @@
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1
 
+// BRAKE ENABLE [DISABLE_BRAKE, ENABLE_BRAKE]
+#define BRAKE_ENABLE               ENABLE_BRAKE
+
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 ////////////////////////////////////////////
