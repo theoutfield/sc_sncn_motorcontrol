@@ -93,6 +93,19 @@ int main(void)
 
         on tile[APP_TILE]:
         {
+            ProfilerConfigInternal profiler_config;
+            profiler_config.velocity = PROFILE_VELOCITY;
+            profiler_config.acceleration = PROFILE_ACCELERATION;
+            profiler_config.deceleration = PROFILE_DECELERATION;
+            profiler_config.current_slope = PROFILE_TORQUE_SLOPE;
+            profiler_config.max_velocity = MAX_VELOCITY;
+            profiler_config.max_acceleration = MAX_ACCELERATION;
+            profiler_config.max_deceleration = MAX_DECELERATION;
+            profiler_config.polarity = POLARITY;
+            profiler_config.max_position = MAX_POSITION_LIMIT;
+            profiler_config.min_position = MIN_POSITION_LIMIT;
+            profiler_config.max_current = MAX_CURRENT;
+
             /* Torque Control Loop */
             ControlConfig torque_control_config;
 
@@ -106,13 +119,13 @@ int main(void)
 
             /* Control Loop */
 #if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
-            torque_control_service(torque_control_config, i_adc[0], i_hall[1], null, i_biss[1], null, i_motorcontrol[0], i_torque_control);
+            torque_control_service(profiler_config, torque_control_config, i_adc[0], i_hall[1], null, i_biss[1], null, i_motorcontrol[0], i_torque_control);
 #elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
-            torque_control_service(torque_control_config, i_adc[0], i_hall[1], i_qei[1], null, null, i_motorcontrol[0], i_torque_control);
+            torque_control_service(profiler_config, torque_control_config, i_adc[0], i_hall[1], i_qei[1], null, null, i_motorcontrol[0], i_torque_control);
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-            torque_control_service(torque_control_config, i_adc[0], i_hall[1], null, null, i_ams[1], i_motorcontrol[0], i_torque_control);
+            torque_control_service(profiler_config, torque_control_config, i_adc[0], i_hall[1], null, null, i_ams[1], i_motorcontrol[0], i_torque_control);
 #else
-            torque_control_service(torque_control_config, i_adc[0], i_hall[1], null, null, null, i_motorcontrol[0], i_torque_control);
+            torque_control_service(profiler_config, torque_control_config, i_adc[0], i_hall[1], null, null, null, i_motorcontrol[0], i_torque_control);
 #endif
         }
 

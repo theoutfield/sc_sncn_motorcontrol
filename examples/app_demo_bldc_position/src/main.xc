@@ -126,7 +126,7 @@ int main(void)
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
             position_profile_test(i_position_control[0], i_hall[2], null, null, i_ams[2]);      // test PPM on slave side
 #else
-            position_profile_test(i_position_control[0], i_hall[2], null, null, null, null);      // test PPM on slave side
+            position_profile_test(i_position_control[0], i_hall[2], null, null, null);      // test PPM on slave side
 #endif
         }
 
@@ -150,7 +150,21 @@ int main(void)
 
         on tile[APP_TILE]:
         /* Position Control Loop */
+
         {
+            ProfilerConfigInternal profiler_config;
+            profiler_config.velocity = PROFILE_VELOCITY;
+            profiler_config.acceleration = PROFILE_ACCELERATION;
+            profiler_config.deceleration = PROFILE_DECELERATION;
+            profiler_config.current_slope = PROFILE_TORQUE_SLOPE;
+            profiler_config.max_velocity = MAX_VELOCITY;
+            profiler_config.max_acceleration = MAX_ACCELERATION;
+            profiler_config.max_deceleration = MAX_DECELERATION;
+            profiler_config.polarity = POLARITY;
+            profiler_config.max_position = MAX_POSITION_LIMIT;
+            profiler_config.min_position = MIN_POSITION_LIMIT;
+            profiler_config.max_current = MAX_CURRENT;
+
             ControlConfig position_control_config;
 
             position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
@@ -164,16 +178,16 @@ int main(void)
 
             /* Control Loop */
 #if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
-            position_control_service(position_control_config, i_hall[1], null, i_biss[1], null, i_motorcontrol[0],
+            position_control_service(profiler_config, position_control_config, i_hall[1], null, i_biss[1], null, i_motorcontrol[0],
                                      i_position_control);
 #elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
-            position_control_service(position_control_config, i_hall[1], i_qei[1], null, null, i_motorcontrol[0],
+            position_control_service(profiler_config, position_control_config, i_hall[1], i_qei[1], null, null, i_motorcontrol[0],
                                      i_position_control);
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-            position_control_service(position_control_config, i_hall[1], null, null, i_ams[1], i_motorcontrol[0],
+            position_control_service(profiler_config, position_control_config, i_hall[1], null, null, i_ams[1], i_motorcontrol[0],
                                      i_position_control);
 #else
-            position_control_service(position_control_config, i_hall[1], null, null, null, null, i_motorcontrol[0],
+            position_control_service(profiler_config, position_control_config, i_hall[1], null, null, null, i_motorcontrol[0],
                                      i_position_control);
 #endif
         }
@@ -272,7 +286,7 @@ int main(void)
 
 #if(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
-                                         i_hall[0], null, i_biss[0],, null i_watchdog[0], i_motorcontrol);
+                                         i_hall[0], null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
                                          i_hall[0], i_qei[0], null, null, i_watchdog[0], i_motorcontrol);
@@ -284,7 +298,7 @@ int main(void)
                                          i_hall[0], null, i_biss[0], null, null, i_watchdog[0], i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
-                                         i_hall[0], null, null, null, null, i_watchdog[0], i_motorcontrol);
+                                         i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
 #endif
                 }
             }
@@ -293,4 +307,3 @@ int main(void)
 
     return 0;
 }
-

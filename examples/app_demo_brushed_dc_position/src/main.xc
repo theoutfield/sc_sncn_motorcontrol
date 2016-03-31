@@ -84,6 +84,19 @@ int main(void)
         {
             /* Position Control Loop */
             {
+                ProfilerConfigInternal profiler_config;
+                profiler_config.velocity = PROFILE_VELOCITY;
+                profiler_config.acceleration = PROFILE_ACCELERATION;
+                profiler_config.deceleration = PROFILE_DECELERATION;
+                profiler_config.current_slope = PROFILE_TORQUE_SLOPE;
+                profiler_config.max_velocity = MAX_VELOCITY;
+                profiler_config.max_acceleration = MAX_ACCELERATION;
+                profiler_config.max_deceleration = MAX_DECELERATION;
+                profiler_config.polarity = POLARITY;
+                profiler_config.max_position = MAX_POSITION_LIMIT;
+                profiler_config.min_position = MIN_POSITION_LIMIT;
+                profiler_config.max_current = MAX_CURRENT;
+
                 ControlConfig position_control_config;
                 position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
 
@@ -94,7 +107,7 @@ int main(void)
                 position_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; //us
 
                 /* Control Loop */
-                position_control_service(position_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
+                position_control_service(profiler_config, position_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
                                          i_position_control);
             }
         }

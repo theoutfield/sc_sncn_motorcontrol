@@ -97,6 +97,19 @@ int main(void) {
         on tile[APP_TILE_2]:
         /* Position Control Loop */
         {
+            ProfilerConfigInternal profiler_config;
+            profiler_config.velocity = PROFILE_VELOCITY;
+            profiler_config.acceleration = PROFILE_ACCELERATION;
+            profiler_config.deceleration = PROFILE_DECELERATION;
+            profiler_config.current_slope = PROFILE_TORQUE_SLOPE;
+            profiler_config.max_velocity = MAX_VELOCITY;
+            profiler_config.max_acceleration = MAX_ACCELERATION;
+            profiler_config.max_deceleration = MAX_DECELERATION;
+            profiler_config.polarity = POLARITY;
+            profiler_config.max_position = MAX_POSITION_LIMIT;
+            profiler_config.min_position = MIN_POSITION_LIMIT;
+            profiler_config.max_current = MAX_CURRENT;
+
             ControlConfig position_control_config;
             position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
             position_control_config.Kp_n = POSITION_Kp;    // Divided by 10000
@@ -105,13 +118,13 @@ int main(void) {
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
             /* Control Loop */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
+            position_control_service(profiler_config, position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
                     i_position_control);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-            position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
+            position_control_service(profiler_config, position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
                     i_position_control);
 #else
-            position_control_service(position_control_config, i_hall[2], null, null, null, i_motorcontrol[3],
+            position_control_service(profiler_config, position_control_config, i_hall[2], null, null, null, i_motorcontrol[3],
                     i_position_control);
 #endif
         }

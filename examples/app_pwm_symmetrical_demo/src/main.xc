@@ -4,6 +4,8 @@
 #include <pwm_service.h>
 #include <pwm_test.h>
 
+#define BRAKE_ENABLE 1
+
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 
 int main (void)

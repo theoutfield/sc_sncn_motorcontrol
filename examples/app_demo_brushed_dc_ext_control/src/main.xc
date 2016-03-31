@@ -57,7 +57,7 @@ int main(void) {
             par
             {
                 /* ADC Loop */
-                adc_service(adc_ports, null, i_adc);
+                adc_service(adc_ports, null, i_adc, i_watchdog[1]);
 
                 /* PWM Loop */
                 pwm_service(pwm_ports, c_pwm_ctrl, BRAKE_ENABLE);

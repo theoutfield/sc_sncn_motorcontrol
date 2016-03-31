@@ -71,6 +71,19 @@ int main(void)
         on tile[APP_TILE]:
         /* Velocity Control Loop */
         {
+            ProfilerConfigInternal profiler_config;
+            profiler_config.velocity = PROFILE_VELOCITY;
+            profiler_config.acceleration = PROFILE_ACCELERATION;
+            profiler_config.deceleration = PROFILE_DECELERATION;
+            profiler_config.current_slope = PROFILE_TORQUE_SLOPE;
+            profiler_config.max_velocity = MAX_VELOCITY;
+            profiler_config.max_acceleration = MAX_ACCELERATION;
+            profiler_config.max_deceleration = MAX_DECELERATION;
+            profiler_config.polarity = POLARITY;
+            profiler_config.max_position = MAX_POSITION_LIMIT;
+            profiler_config.min_position = MIN_POSITION_LIMIT;
+            profiler_config.max_current = MAX_CURRENT;
+
             ControlConfig velocity_control_config;
 
             velocity_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR ;
@@ -82,7 +95,7 @@ int main(void)
             velocity_control_config.control_loop_period =  CONTROL_LOOP_PERIOD; //us
 
             /* Control Loop */
-            velocity_control_service(velocity_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
+            velocity_control_service(profiler_config, velocity_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
                                      i_velocity_control);
         }
 

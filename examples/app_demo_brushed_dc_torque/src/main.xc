@@ -71,6 +71,19 @@ int main(void)
 
         on tile[APP_TILE]:
         {
+            ProfilerConfigInternal profiler_config;
+            profiler_config.velocity = PROFILE_VELOCITY;
+            profiler_config.acceleration = PROFILE_ACCELERATION;
+            profiler_config.deceleration = PROFILE_DECELERATION;
+            profiler_config.current_slope = PROFILE_TORQUE_SLOPE;
+            profiler_config.max_velocity = MAX_VELOCITY;
+            profiler_config.max_acceleration = MAX_ACCELERATION;
+            profiler_config.max_deceleration = MAX_DECELERATION;
+            profiler_config.polarity = POLARITY;
+            profiler_config.max_position = MAX_POSITION_LIMIT;
+            profiler_config.min_position = MIN_POSITION_LIMIT;
+            profiler_config.max_current = MAX_CURRENT;
+
             /* Torque Control Loop */
             ControlConfig torque_control_config;
 
@@ -83,7 +96,7 @@ int main(void)
             torque_control_config.control_loop_period = CONTROL_LOOP_PERIOD; // us
 
             /* Control Loop */
-            torque_control_service(torque_control_config, i_adc[0], null, i_qei[1], null, null, i_motorcontrol[0], i_torque_control);
+            torque_control_service(profiler_config, torque_control_config, i_adc[0], null, i_qei[1], null, null, i_motorcontrol[0], i_torque_control);
         }
 
         /* Currents monitoring in XScope */
@@ -118,7 +131,7 @@ int main(void)
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc);
+                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
                 /* Quadrature encoder sensor Service */
                 {
