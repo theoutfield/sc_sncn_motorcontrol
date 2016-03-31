@@ -66,11 +66,14 @@ void position_control_service(ControlConfig &position_control_config,
     unsigned int ts;
 
     int activate = 0;
+    int cascade_with_torque = position_control_config.cascade_with_torque;
 
     int config_update_flag = 1;
     MotorcontrolConfig motorcontrol_config;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
+    if (position_control_config.cascade_with_torque == 1)
+        printstrln("POSITION CONTROL CASCADED WITH TORQUE");
 
     t :> ts;
 
@@ -80,6 +83,13 @@ void position_control_service(ControlConfig &position_control_config,
             case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
                 if (config_update_flag) {
                     motorcontrol_config = i_motorcontrol.get_config();
+
+                    //FIXME: using the cclk offset to enable cascaded control with torque
+                    if (motorcontrol_config.hall_offset[1] >= 9000 && motorcontrol_config.commutation_method == FOC) {
+                        cascade_with_torque = 1;
+                    } else {
+                        cascade_with_torque = 0;
+                    }
 
                     //Limits
                     if (motorcontrol_config.motor_type == BLDC_MOTOR) {
@@ -192,7 +202,7 @@ void position_control_service(ControlConfig &position_control_config,
                     }
 
 
-                    if(position_control_config.cascade_with_torque == 1 && motorcontrol_config.commutation_method == FOC){
+                    if(cascade_with_torque == 1 && motorcontrol_config.commutation_method == FOC){
                         i_motorcontrol.set_torque(position_control_out);  //cascades with FOC's torque controller
                     }
                     else {
