@@ -95,7 +95,7 @@ int main(void)
             par
             {
                 /* PWM Service */
-                pwm_service(pwm_ports, c_pwm_ctrl);
+                pwm_service(pwm_ports, c_pwm_ctrl, BRAKE_ENABLE);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);

@@ -60,7 +60,7 @@ int main(void) {
                 adc_service(adc_ports, null, i_adc);
 
                 /* PWM Loop */
-                pwm_service(pwm_ports, c_pwm_ctrl);
+                pwm_service(pwm_ports, c_pwm_ctrl, BRAKE_ENABLE);
 
                 /* Watchdog Server */
                 watchdog_service(wd_ports, i_watchdog);

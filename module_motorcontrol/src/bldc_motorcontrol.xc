@@ -639,7 +639,6 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                   pwm[0] = -1;
                   pwm[1] = -1;
                   pwm[2] = -1;
-                  update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
               }
               else if(pwm_enabled)
               {
@@ -736,6 +735,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  }else{
                      shutdown = 0;
                      q_value = 0;
+                     q_direct_select = 1;
                  }
 
                  break;

@@ -65,7 +65,7 @@ int main(void) {
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* PWM Loop */
-                pwm_service(pwm_ports, c_pwm_ctrl);
+                pwm_service(pwm_ports, c_pwm_ctrl, BRAKE_ENABLE);
 
                 /* Hall sensor Service */
                 {

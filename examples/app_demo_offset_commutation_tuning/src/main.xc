@@ -124,10 +124,10 @@ int main(void) {
 //                tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
 
                 /* Triggered PWM Service */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, BRAKE_ENABLE);
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc);
+                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
