@@ -10,10 +10,12 @@
 
 void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning, interface ADCInterface client ?i_adc)
 {
-    delay_seconds(1);
+    delay_milliseconds(500);
     printf(">>   SOMANET OFFSET TUNING SERVICE STARTING...\n");
     int offset = 0;
     int field_control_flag = 1;
+    if (BRAKE_ENABLE == ENABLE_BRAKE && !isnull(i_tuning))
+        i_tuning.set_limit(3932160);
     MotorcontrolConfig motorcontrol_config = i_commutation.get_config();
     if (motorcontrol_config.commutation_method == FOC) {
         field_control_flag = 0;
@@ -106,14 +108,14 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
 //                printf("Stop auto tuning...\n");
             i_tuning.tune(input_voltage);
             break;
-        //set voltage
-        case 'v':
-            input_voltage = value * sign;
-            i_commutation.set_voltage(input_voltage);
-            if (motorcontrol_config.commutation_method == FOC || (input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
-                printf("voltage: %i, offset clk: %d\n", input_voltage, motorcontrol_config.hall_offset[0]);
-            else
-                printf("voltage: %i, offset cclk: %d\n", input_voltage, motorcontrol_config.hall_offset[1]);
+        //set torque
+        case 't':
+            if (motorcontrol_config.commutation_method == FOC) {
+                field_control_flag = 1;
+                input_voltage = value * sign;
+                i_commutation.set_torque(input_voltage);
+                printf("torque %d\n", input_voltage);
+            }
             break;
         //reverse voltage
         case 'r':
@@ -173,9 +175,9 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR)
                 printf("Sensor offset %d, ", offset);
             if (motorcontrol_config.bldc_winding_type == STAR_WINDING)
-                printf("Polarity %d, Voltage %d\noffset clk %d (for positive voltage)\noffset cclk %d (for negative voltage)\n", motorcontrol_config.polarity_type, input_voltage, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
+                printf("Star winding\nPolarity %d, Voltage %d\noffset clk %d (for positive voltage)\noffset cclk %d (for negative voltage)\n", motorcontrol_config.polarity_type, input_voltage, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
             else
-                printf("Polarity %d, Voltage %d\noffset clk %d (for negative voltage)\noffset cclk %d (for positive voltage)\n", motorcontrol_config.polarity_type, input_voltage, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
+                printf("Delta winding\nPolarity %d, Voltage %d\noffset clk %d (for negative voltage)\noffset cclk %d (for positive voltage)\n", motorcontrol_config.polarity_type, input_voltage, motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
             break;
         //reverse sensor direction
         case 'w':
@@ -188,11 +190,11 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
             break;
         //position limit
         case 'l':
-            i_tuning.set_limit(value);
+            i_tuning.set_limit(value * sign);
 //            printf("Set position limit to %d\n", value);
             break;
         //set offset
-        default:
+        case 'o':
             if (motorcontrol_config.commutation_method == FOC || (input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING)) {
                 motorcontrol_config.hall_offset[0] = value;
                 printf("offset clk: %d\n", value);
@@ -201,6 +203,15 @@ void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client
                 printf("offset cclk: %d\n", value);
             }
             i_commutation.set_config(motorcontrol_config);
+            break;
+        //set voltage
+        default:
+            input_voltage = value * sign;
+            i_commutation.set_voltage(input_voltage);
+            if (motorcontrol_config.commutation_method == FOC || (input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
+                printf("voltage: %i, offset clk: %d\n", input_voltage, motorcontrol_config.hall_offset[0]);
+            else
+                printf("voltage: %i, offset cclk: %d\n", input_voltage, motorcontrol_config.hall_offset[1]);
             break;
         }
         delay_milliseconds(10);
@@ -288,8 +299,10 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
     MotorcontrolConfig motorcontrol_config = i_commutation.get_config();
     int count = 0;
     int velocity = 0;
+//    int position_limit = 3932160;
     int position_limit = 0;
     int position_limit_reached = 0;
+    int print_position_limit = 0;
     int voltage = 0;
     int current_sampling = 0;
     int peak_current = 0;
@@ -329,15 +342,24 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                 velocity = i_hall.get_hall_velocity();
             }
 
+            //postion limiter
             if (position_limit > 0) {
                 if (count >= position_limit && velocity > 10) {
-                    position_limit_reached = 1;
                     i_commutation.set_voltage(0);
-                    printf("up limit reached\n");
+                    if (print_position_limit >= 0) {
+                        print_position_limit = -1;
+                        printf("up limit reached\n");
+                    }
+                    position_limit_reached = 1;
                 } else if (count <= -position_limit && velocity < -10) {
-                    position_limit_reached = 1;
                     i_commutation.set_voltage(0);
-                    printf("down limit reached\n");
+                    if (print_position_limit <= 0) {
+                        print_position_limit = 1;
+                        printf("down limit reached\n");
+                    }
+                    position_limit_reached = 1;
+                } else {
+                    position_limit_reached = 0;
                 }
             }
 
@@ -505,7 +527,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
         case i_tuning.set_position(int in_position):
             if (!isnull(i_position_control)) {
                 /* Set new target position for profile position control */
-                set_profile_position(0, 200, 10, 10, i_position_control);
+                set_profile_position(0, 100, 10, 10, i_position_control);
                 printf("Returned to 0\n");
                 i_position_control.disable_position_ctrl();
                 i_commutation.set_fets_state(1);
