@@ -379,6 +379,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     unsigned umot_init = 0;
     int q_value = 0;
     int q_direct_select = 0;
+    int q_limit = 2000;
 
     int iXX[64];
     int iCX[64];
@@ -407,7 +408,6 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     int Kp_n = 800, Ki_n = 100, Kd_n = 1;
     int torque_control_output = 0;
     int pid_denominator = 1000;
-    int torque_control_output_limit = 4095;
 
     //================ init PWM ===============================
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
@@ -455,96 +455,86 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              ts += USEC_FAST * motorcontrol_config.commutation_loop_period; //XX kHz commutation loop
              tx :> start_time;
 
-             //====================== get phase currents ======================================
-             {current_ph_b, current_ph_c} = i_adc.get_currents();//42 usec in triggered, 15 usec on request
+             if (shutdown == 0) {
+                 //====================== get phase currents ======================================
+                 {current_ph_b, current_ph_c} = i_adc.get_currents();//42 usec in triggered, 15 usec on request
 #ifdef USE_XSCOPE
-             xscope_int(PHASE_B, current_ph_b);
-             xscope_int(PHASE_C, current_ph_c);
+                 xscope_int(PHASE_B, current_ph_b);
+                 xscope_int(PHASE_C, current_ph_c);
 #endif
-             //====================== get sensor angle and velocity ======================================
+                 //====================== get sensor angle and velocity ======================================
 
-             if (calib_flag == 0) {
-                 if (sensor_select == HALL_SENSOR) {
-                     //hall only
-                     {hall_pin_state, angle_electrical, velocity} = i_hall.get_hall_pinstate_angle_velocity();//2 - 17 usec
-                 } else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
-                     { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
-                     angle_electrical = (angle_electrical << 12) / max_count_per_hall;
-                     if ((q_value >= 0 && fw_flag == 0) || (q_value < 0 && bw_flag == 0)) {
-                         angle_electrical = i_hall.get_hall_position();
-                     }
-                 } else if (sensor_select == BISS_SENSOR) {
-                     angle_electrical = i_biss.get_biss_angle();
-                     velocity = i_biss.get_biss_velocity();
-                 } else if (sensor_select == AMS_SENSOR) {
-                     //ToDo: preferably merge to a single interface call. Still currently does not introduce much of a delay.
-                     angle_electrical = i_ams.get_ams_angle();
-                     velocity = i_ams.get_ams_velocity();
-                 }
-                 else{
-                     printstr("\n > FOC loop feedback sensor error\n");
-                     exit(-1);
-                 }
-
-                 if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
-                     angle_electrical = 4096 - angle_electrical;
-
-#ifdef USE_XSCOPE
-                 xscope_int(ANGLE_ELECTRICAL, angle_electrical);
-
-                 xscope_int(VELOCITY, velocity);
-#endif
-
-                 //==========================  clarke transformation  ===========================================================================
-                 {clarke_alpha, clarke_beta} = clarke_transformation(current_ph_b, current_ph_c);
-
-                 //========================== park transform ============================
-                 mmTheta = angle_electrical/4; //normalization: sine table is with 1024 base points, angle is 0 - 4095
-                 mmTheta &= 0x3FF;
-                 mmSinus  = sine_table_1024[mmTheta];         // sine( fp.Minp[mmTheta] );
-                 mmTheta = (256 - mmTheta);              // 90-fp.Minp[mmTheta]
-                 mmTheta &= 0x3FF;
-                 mmCosinus  = sine_table_1024[mmTheta];       // values from 0 to +/- 16384
-
-                 field_new  = (((clarke_alpha * mmCosinus )  /16384) + ((clarke_beta *  mmSinus ) /16384));
-                 torq_new   = (((clarke_beta  * mmCosinus )  /16384) - ((clarke_alpha * mmSinus ) /16384));
-
-                 field_lpf = low_pass_pt1_filter(filter_sum, fffield, 4,  field_new);
-#ifdef USE_XSCOPE
-                 xscope_int(FIELD, field_lpf);
-                 xscope_int(TORQUE_RAW, torq_new);
-#endif
-                 //========================= filter torque  =======================================================================
-                 //ToDo: find a better filtering way
-                 //torq_period = calc_mean_one_periode(iCX, iXX, torq_new, torq_period, hall_pin_state, 16);  // every cycle
-
-                 torq_pt1             = low_pass_pt1_filter(filter_sum, fftorque, 4,  torq_new);
-#ifdef USE_XSCOPE
-                 xscope_int(TORQUE_PT1, torq_pt1);
-#endif
-                 //========================= filter field ===========================================================
-                 //ToDo: find a better filtering way
-                 //field_mean = calc_mean_one_periode(iCX, iXX, field_new, field_mean, hall_pin_state, 32);  // every cycle
-
-                 //================================= calculate iVectorCurrent ===============================================
-                 //ToDo: check if it is still needed, was used to check overcurrent (if(vector_current > (par_nominal_current * 2)){status_foc = stFaultOverCurrent20;// Motor stop})
-                 //{iTemp1, angle_current}  = cartesian_to_polar_conversion( clarke_alpha, clarke_beta);
-                 //vector_current    = calc_mean_one_periode(iCX, iXX, iTemp1, vector_current, hall_pin_state, 0);  // every cycle
-
-                 //==== PID Torque Controller ====
-                 if(!q_direct_select){
-                     if (shutdown == 1 || pwm_enabled != 1) {
-                         torque_control_output = 0;
-                         error_torque = 0;
-                         error_torque_integral = 0;
-                         error_torque_derivative = 0;
+                 if (calib_flag == 0) {
+                     if (sensor_select == HALL_SENSOR) {
+                         //hall only
+                         {hall_pin_state, angle_electrical, velocity} = i_hall.get_hall_pinstate_angle_velocity();//2 - 17 usec
+                     } else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
+                         { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
+                         angle_electrical = (angle_electrical << 12) / max_count_per_hall;
+                         if ((q_value >= 0 && fw_flag == 0) || (q_value < 0 && bw_flag == 0)) {
+                             angle_electrical = i_hall.get_hall_position();
+                         }
+                     } else if (sensor_select == BISS_SENSOR) {
+                         angle_electrical = i_biss.get_biss_angle();
+                         velocity = i_biss.get_biss_velocity();
+                     } else if (sensor_select == AMS_SENSOR) {
+                         //ToDo: preferably merge to a single interface call. Still currently does not introduce much of a delay.
+                         angle_electrical = i_ams.get_ams_angle();
+                         velocity = i_ams.get_ams_velocity();
                      }
                      else{
-                         //take the set point
+                         printstr("\n > FOC loop feedback sensor error\n");
+                         exit(-1);
+                     }
+
+                     if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
+                         angle_electrical = 4096 - angle_electrical;
+
+#ifdef USE_XSCOPE
+                     xscope_int(ANGLE_ELECTRICAL, angle_electrical);
+
+                     xscope_int(VELOCITY, velocity);
+#endif
+
+                     //==========================  clarke transformation  ===========================================================================
+                     {clarke_alpha, clarke_beta} = clarke_transformation(current_ph_b, current_ph_c);
+
+                     //========================== park transform ============================
+                     mmTheta = angle_electrical/4; //normalization: sine table is with 1024 base points, angle is 0 - 4095
+                     mmTheta &= 0x3FF;
+                     mmSinus  = sine_table_1024[mmTheta];         // sine( fp.Minp[mmTheta] );
+                     mmTheta = (256 - mmTheta);              // 90-fp.Minp[mmTheta]
+                     mmTheta &= 0x3FF;
+                     mmCosinus  = sine_table_1024[mmTheta];       // values from 0 to +/- 16384
+
+                     field_new  = (((clarke_alpha * mmCosinus )  /16384) + ((clarke_beta *  mmSinus ) /16384));
+                     torq_new   = (((clarke_beta  * mmCosinus )  /16384) - ((clarke_alpha * mmSinus ) /16384));
+
+                     field_lpf = low_pass_pt1_filter(filter_sum, fffield, 4,  field_new);
+#ifdef USE_XSCOPE
+                     xscope_int(FIELD, field_lpf);
+                     xscope_int(TORQUE_RAW, torq_new);
+#endif
+                     //========================= filter torque  =======================================================================
+                     //ToDo: find a better filtering way
+                     //torq_period = calc_mean_one_periode(iCX, iXX, torq_new, torq_period, hall_pin_state, 16);  // every cycle
+
+                     torq_pt1             = low_pass_pt1_filter(filter_sum, fftorque, 4,  torq_new);
+#ifdef USE_XSCOPE
+                     xscope_int(TORQUE_PT1, torq_pt1);
+#endif
+                     //========================= filter field ===========================================================
+                     //ToDo: find a better filtering way
+                     //field_mean = calc_mean_one_periode(iCX, iXX, field_new, field_mean, hall_pin_state, 32);  // every cycle
+
+                     //================================= calculate iVectorCurrent ===============================================
+                     //ToDo: check if it is still needed, was used to check overcurrent (if(vector_current > (par_nominal_current * 2)){status_foc = stFaultOverCurrent20;// Motor stop})
+                     //{iTemp1, angle_current}  = cartesian_to_polar_conversion( clarke_alpha, clarke_beta);
+                     //vector_current    = calc_mean_one_periode(iCX, iXX, iTemp1, vector_current, hall_pin_state, 0);  // every cycle
+
+                     //==== PID Torque Controller ====
+                     if(!q_direct_select){
                          actual_torque = torq_pt1;
-                         //limit the control range
-                         if(target_torque > torque_max) target_torque = torque_max;
-                         else if (target_torque < -torque_max) target_torque = -torque_max;
                          //compute the control output
                          error_torque = target_torque - actual_torque; // 350
                          error_torque_integral = error_torque_integral + error_torque;
@@ -564,73 +554,69 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
                          error_torque_previous = error_torque;
 
-                         if (torque_control_output > torque_control_output_limit) {
-                             torque_control_output = torque_control_output_limit;
-                         }else if (torque_control_output < -torque_control_output_limit) {
-                             torque_control_output = -torque_control_output_limit;
+                         //limit q (voltage) output
+                         if (torque_control_output > q_limit) {
+                             torque_control_output = q_limit;
+                         }else if (torque_control_output < -q_limit) {
+                             torque_control_output = -q_limit;
                          }
+
+                         q_value = torque_control_output;
                      }
+                     //===========================
+#ifdef USE_XSCOPE
+                     xscope_int(Q_VALUE, q_value);
+                     xscope_int(TORQUE_SP, target_torque);
+#endif
+                     //==== Field Controller ====
+                     if (field_control_flag == 1)
+                         field_out = field_control(field_lpf, field_e1, field_e2, q_value, field_out_p_part, field_out_i_part, par_field_kp, par_field_ki, field_out1, field_out2, filter_sum); //ToDo: analyze the condition
+                     else
+                         field_out = 0;
+#ifdef USE_XSCOPE
+                     xscope_int(FIELD_CONTROLLER_OUTPUT, field_out);
+#endif
+                     //====================================================================================================
 
-                     q_value = torque_control_output;
+                     //============== FOC INVERS PARK =====================================================================
+                     if(boost > 0) boost--;
+                     if(boost < 0) boost++;
+
+
+                     {park_alpha, park_beta }      = invers_park(mmSinus, mmCosinus, field_out, (q_value + boost/def_BOOST_RANGE));
+
+                     {umot_motor, angle_inv_park}  = cartesian_to_polar_conversion(park_alpha, park_beta);
+
+
+                     if(umot_motor > 4096) umot_motor = 4096;     // limit high
+                     if(umot_motor <   40) umot_motor = 0;        // limit low
+
+                     //speed_actual = velocity;
+
+                     angle_pwm  =  adjust_angle_reference_pwm(angle_inv_park, motorcontrol_config.hall_offset[0], hall_pin_state, speed_actual, q_value, filter_sum, sensor_select);
+
+                     //========== prepare PWM =================================================================
+
+                 } else {//offset calibration
+                     umot_motor = 500;
+                     angle_pwm = 0;
                  }
-                 //===========================
-#ifdef USE_XSCOPE
-                 xscope_int(Q_VALUE, q_value);
-                 xscope_int(TORQUE_SP, target_torque);
-#endif
-                 //==== Field Controller ====
-                 if (field_control_flag == 1)
-                     field_out = field_control(field_lpf, field_e1, field_e2, q_value, field_out_p_part, field_out_i_part, par_field_kp, par_field_ki, field_out1, field_out2, filter_sum); //ToDo: analyze the condition
-                 else
-                     field_out = 0;
-#ifdef USE_XSCOPE
-                 xscope_int(FIELD_CONTROLLER_OUTPUT, field_out);
-#endif
-                 //====================================================================================================
 
-                 //============== FOC INVERS PARK =====================================================================
-                 if(boost > 0) boost--;
-                 if(boost < 0) boost++;
-
-
-                 {park_alpha, park_beta }      = invers_park(mmSinus, mmCosinus, field_out, (q_value + boost/def_BOOST_RANGE));
-
-                 {umot_motor, angle_inv_park}  = cartesian_to_polar_conversion(park_alpha, park_beta);
-
-
-                 if(umot_motor > 4096) umot_motor = 4096;     // limit high
-                 if(umot_motor <   40) umot_motor = 0;        // limit low
-
-                 //speed_actual = velocity;
-
-                 angle_pwm  =  adjust_angle_reference_pwm(angle_inv_park, motorcontrol_config.hall_offset[0], hall_pin_state, speed_actual, q_value, filter_sum, sensor_select);
-
-                 //========== prepare PWM =================================================================
-
-             } else {//offset calibration
-                 umot_motor = 500;
-                 angle_pwm = 0;
+                 space_vector_pwm(umot_motor,  angle_pwm,  pwm_enabled, pwm);
+             } else {    /* stop PWM */
+                 pwm[0] = -1;
+                 pwm[1] = -1;
+                 pwm[2] = -1;
              }
 
-              if (shutdown == 1) {    /* stop PWM */
-                  pwm[0] = -1;
-                  pwm[1] = -1;
-                  pwm[2] = -1;
-              }
-              else if(pwm_enabled)
-              {
-                  space_vector_pwm(umot_motor,  angle_pwm,  pwm_enabled, pwm);
-              }
+             /*till this point 55 usec loop period*/
 
-              /*till this point 55 usec loop period*/
-
-              update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);  // !!!  must be the last function in this loop; 55 usec @ 18kHz config, why?
+             update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);  // !!!  must be the last function in this loop; 55 usec @ 18kHz config, why?
 
               tx :> end_time;
 #ifdef USE_XSCOPE
               xscope_int(CYCLE_TIME, (end_time - start_time)/250);
 #endif
-
              break;
 
          case i_motorcontrol[int i].set_voltage(int q_value_):
@@ -641,20 +627,41 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              else
                  q_value = q_value_;
 
-             if(q_value > 4096) q_value = 4096;//[-4096:4096] is the maximum control range
-             else if (q_value < -4096) q_value = -4096;
+             if (q_value > q_limit) //limit q (voltage)
+                 q_value = q_limit;
+             else if (q_value < -q_limit)
+                 q_value = -q_limit;
+
+             error_torque_previous = 0;
+             error_torque_integral = 0;
              break;
 
          case i_motorcontrol[int i].set_torque(int torque_sp):
+             q_direct_select = 0;
+             field_control_flag = 1;
+             if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
+                 torque_sp = -torque_sp;
+             if ((target_torque ^ torque_sp) < 0) { //target torque sign changed, reset torque control
+                 error_torque_previous = 0;
+                 error_torque_integral = 0;
+             }
              target_torque = torque_sp;
-             if(target_torque > 4096) target_torque = 4096;//[-4096:4096] is the maximum control range
-             else if (target_torque < -4096) target_torque = -4096;
+             //limit torque
+             if(target_torque > torque_max)
+                 target_torque = torque_max;
+             else if (target_torque < -torque_max)
+                 target_torque = -torque_max;
              pwm_enabled = 1;
              break;
 
          case i_motorcontrol[int i].set_torque_max(int torque_max_):
              torque_max = torque_max_;
              if(torque_max > 4096) torque_max = 4096;
+             if(target_torque > torque_max)
+                 target_torque = torque_max;
+             else if (target_torque < -torque_max)
+                 target_torque = -torque_max;
+             printstrln("torque max set");
              break;
 
          case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
@@ -705,12 +712,13 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
                  if(new_state == 0){
                      shutdown = 1;
-                     q_direct_select = 0;
-                     target_torque = 0;
+                     pwm_enabled = 0;
                  }else{
                      shutdown = 0;
                      q_value = 0;
                      q_direct_select = 1;
+                     error_torque_previous = 0;
+                     error_torque_integral = 0;
                  }
 
                  break;
