@@ -30,24 +30,28 @@ The app uses commands to set the offsets and voltage over the console:
     Automatically find the sensor offset, the clockwise or counterclockwise commutation offsets are set to 0 and 2048 (half a turn). This is not very precise but should suffice to turn the motor.
 - c
     Automatically tune the commutation offset, this works by searching the offset with minimum peak current consumption.
-- s VALUE
-    Set the sensor offset to VALUE
-- VALUE
-    Set the commutation offset to VALUE (clockwise or counterclockwise offset depending on the voltage sign and winding type)
-- w
-    Reverse motor polarity, use this when the the motor is not moving. It happens when the phases wiring or the position sensor polarity is changed.
 - d
-    Reverse the motor direction. For FOC it is done by changing the winding type. For Sinusoidal commutation it is done by fliping the clockwise and counterclockwise commutation offsets,
+    Reverse the motor direction. For FOC it is done by changing the winding type. For Sinusoidal commutation it is done by fliping the clockwise and counterclockwise commutation offsets.
+- f
+    For FOC only. Toggle the field controller.
 - l VALUE
     Limit position to VALUE tick around the current position. The voltage will be set to ``0`` when the limit is reached and the motor will only be be able to move in the oposite direction. If VALUE is ``0`` this set the current position as the center position for the limiter. If VALUE is negative the position limiter is disabled.
-- z 
-    Return to the zero position (can be set with the ``l`` command). This will work only if the direction of the motor is right. That means positive voltage corresponds to positive velocity.
-- v VALUE
-    Set the voltage to VALUE, accept negative values
+- m
+    Reverse motor polarity, use this when the the motor is not moving. It happens when the phases wiring or the position sensor polarity is changed.
+- o VALUE
+    Set the commutation offset to VALUE (clockwise or counterclockwise offset depending on the voltage sign and winding type).
+- p
+    Print the offsets, sensor polarity and voltage.
 - r
     Reverse the voltage
-- p
-    Print the offsets, sensor polarity and voltage
+- s VALUE
+    Set the sensor offset to VALUE.
+- t VALUE
+    Set the torque to VALUE, accept negative values.
+- z
+    Return to the zero position (can be set with the ``l`` command). This will work only if the direction of the motor is right. That means positive voltage corresponds to positive velocity.
+- VALUE
+    Set the voltage to VALUE, accept negative values.
 
 
 Quick How-to

@@ -34,7 +34,7 @@ AMSPorts ams_ports = { {
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
-#define VOLTAGE 0 //+/- 4095
+#define POSITION_LIMIT 0 //+/- 4095
 
 void adc_client(interface ADCInterface client i_adc)
 {
@@ -69,6 +69,7 @@ int main(void) {
     interface MotorcontrolInterface i_motorcontrol[4];
     interface PositionControlInterface i_position_control[3];
     interface TuningInterface i_tuning;
+    interface BrakeInterface i_brake;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
@@ -81,7 +82,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(VOLTAGE, i_motorcontrol[0], i_tuning, null);
+        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning, null);
 
         /* Display phases currents */
 //        on tile[IFM_TILE]: adc_client(i_adc[1]);
@@ -123,10 +124,9 @@ int main(void) {
         {
             par
             {
-//                tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
-
                 /* Triggered PWM Service */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, BRAKE_ENABLE);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
+                i_brake.set_brake(1);
 
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
@@ -200,13 +200,13 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);
 #endif
                 }
             }
