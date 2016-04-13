@@ -7,12 +7,12 @@
 #define BISS_POLARITY              BISS_POLARITY_INVERTED
 #define BISS_MAX_TICKS             0x7fffffff   // the count is reset to 0 if greater than this
 #define BISS_CRC_POLY              0b110000     // poly in reverse representation:  x^0 + x^1 + x^4 is 0b1100
-#define BISS_DATA_PORT_BIT         1            // bit number (0 = rightmost bit) when inputing from a multibit port
-#define BISS_CLK_PORT_HIGH         (0b0100 | SET_PORT1_AS_QEI_PORT2_AS_HALL) // high clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
-#define BISS_CLK_PORT_LOW          SET_PORT1_AS_QEI_PORT2_AS_HALL // low clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
-#define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequercy: dividend/divisor in MHz
-#define BISS_CLOCK_DIVISOR         128          // supported frequencies are (tile frequency) / 2^n
+#define BISS_DATA_PORT_BIT         0            // bit number (0 = rightmost bit) when inputing from a multibit port
+#define BISS_CLK_PORT_HIGH         (0b1000 | SET_PORT1_AS_HALL_PORT2_AS_QEI)    // high clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
+#define BISS_CLK_PORT_LOW          SET_PORT1_AS_HALL_PORT2_AS_QEI               // low  clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
+#define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequency: dividend/divisor in MHz
+#define BISS_CLOCK_DIVISOR         26           // supported frequencies are (tile frequency) / 2n
 #define BISS_USEC                  USEC_FAST    // number of ticks in a microsecond
 #define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
 #define BISS_TIMEOUT               20*BISS_USEC // BiSS timeout in clock ticks
-#define BISS_OFFSET_ELECTRICAL     1800
+#define BISS_OFFSET_ELECTRICAL     0

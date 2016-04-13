@@ -7,8 +7,6 @@
 #include <biss_service.h>
 #include <xclib.h>
 #include <xs1.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <print.h>
 
 #include <mc_internal_constants.h>
@@ -119,7 +117,6 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
 
     //main loop
     while (1) {
-        [[ordered]]
         select {
         case i_biss[int i].get_notification() -> int out_notification:
                 out_notification = notification;
@@ -161,16 +158,18 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 t :> time;
                 if (timeafter(time, last_count_read + biss_config.timeout)) {
                     t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                    read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+                    int error = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
                     t :> last_biss_read;
                     last_count_read = last_biss_read;
                     { count_internal, position, status } = biss_encoder(data, biss_config);
+                    status = status + (error << 2);
                     update_turns(turns, last_count, count_internal, biss_config.multiturn_resolution, ticks_per_turn);
                     last_count = count_internal;
                     last_position = position;
                 } else {
                     count_internal = last_count;
                     position = last_position;
+                    status = 0;
                 }
                 //add offset
                 if (biss_config.multiturn_resolution) { //multiturn encoder
@@ -197,21 +196,15 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
 
         //send count, position and status (error and warning bits) as returned by the encoder (not ajusted)
         case i_biss[int i].get_biss_real_position() -> { int count, unsigned int position, unsigned int status }:
-                t :> time;
-                if (timeafter(time, last_count_read + biss_config.timeout)) {
-                    t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                    read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
-                    t :> last_biss_read;
-                    last_count_read = last_biss_read;
-                    { count, position, status } = biss_encoder(data, biss_config);
-                    update_turns(turns, last_count, count, biss_config.multiturn_resolution, ticks_per_turn);
-                    last_count = count;
-                    last_position = position;
-                } else {
-                    count = last_count;
-                    position = last_position;
-                    status = 0;
-                }
+                t when timerafter(last_biss_read + biss_config.timeout) :> void;
+                int error = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+                t :> last_biss_read;
+                last_count_read = last_biss_read;
+                { count, position, status } = biss_encoder(data, biss_config);
+                status = status + (error << 2);
+                update_turns(turns, last_count, count, biss_config.multiturn_resolution, ticks_per_turn);
+                last_count = count;
+                last_position = position;
                 break;
 
         //send velocity
@@ -344,6 +337,7 @@ unsigned int read_biss_sensor_data(BISSPorts & biss_ports, BISSConfig & biss_con
         unsigned int bit;
         biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
         biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+//        sync(biss_ports.p_biss_clk);
         biss_ports.p_biss_data :> bit;
         readbuf = readbuf << 1;
         readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
@@ -396,7 +390,9 @@ unsigned int read_biss_sensor_data(BISSPorts & biss_ports, BISSConfig & biss_con
         //check crc
         if (biss_config.crc_poly && crc != biss_crc(data, data_length, biss_config.crc_poly) ) {
             biss_crc_correct(data, data_length, frame_bytes, crc,  biss_config.crc_poly); //try 1 bit error correction
-            if (crc != biss_crc(data, data_length, biss_config.crc_poly))
+            if (crc == biss_crc(data, data_length, biss_config.crc_poly))
+                status = CRCCorrected;
+            else
                 status = CRCError;
         }
     } else if (status)
@@ -475,11 +471,12 @@ unsigned int read_biss_sensor_data_fast(BISSPorts & biss_ports, int before_lengt
         }
         readbuf = readbuf << 1;
     }
+    status = (~status) & ((1 << biss_config.status_length)-1);
     count &= ~(~0U <<  biss_config.multiturn_resolution);
     position &= ~(~0U <<  biss_config.singleturn_resolution);
     count = sext(count, biss_config.multiturn_resolution);  //convert multiturn to signed
     { void, count } = macs(1 << biss_config.singleturn_resolution, count, 0, position); //convert multiturn to absolute count: ticks per turn * number of turns + position
-    return { count, position, ~status };
+    return { count, position, status };
 }
 
 
