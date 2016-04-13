@@ -32,10 +32,10 @@
 ///////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   AMS_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   BISS_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
-#define MOTOR_FEEDBACK_SENSOR      AMS_SENSOR
+#define MOTOR_FEEDBACK_SENSOR      BISS_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
 #define QEI_SENSOR_INDEX_TYPE      QEI_WITH_INDEX
@@ -49,9 +49,6 @@
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1
 
-// BRAKE ENABLE [DISABLE_BRAKE, ENABLE_BRAKE]
-#define BRAKE_ENABLE               ENABLE_BRAKE
-
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 ////////////////////////////////////////////
@@ -60,10 +57,10 @@
 #define COMMUTATION_LOOP_PERIOD     110
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      3200//0
+#define COMMUTATION_OFFSET_CLK      2200//0
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     2048
+#define COMMUTATION_OFFSET_CCLK     50
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION
@@ -73,7 +70,7 @@
 #define CONTROL_LOOP_PERIOD     1000
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
-#define POSITION_Kp       10000
+#define POSITION_Kp       100
 #define POSITION_Ki       1
 #define POSITION_Kd       0
 
@@ -101,8 +98,8 @@
 #define PROFILE_TORQUE_SLOPE    400         // adc_ticks
 
 // PROFILER LIMITIS
-#define MAX_POSITION_LIMIT      20000000        // ticks (max range: 2^30, limited for safe operation)
-#define MIN_POSITION_LIMIT      -20000000       // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT      0x7fffffff        // ticks (max range: 2^30, limited for safe operation)
+#define MIN_POSITION_LIMIT      -0x7fffffff       // ticks (min range: -2^30, limited for safe operation)
 #define MAX_VELOCITY            6000            // rpm
 #define MAX_ACCELERATION        4000            // rpm/s
 #define MAX_DECELERATION        4000            // rpm/s
