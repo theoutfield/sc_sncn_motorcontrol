@@ -100,6 +100,10 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
             voltage = new_voltage;
             break;
 
+        case i_motorcontrol[int i].get_voltage() -> int out_voltage:
+                out_voltage =  voltage;
+                break;
+
         case i_motorcontrol[int i].set_torque(int torque_sp):
                 break;
 

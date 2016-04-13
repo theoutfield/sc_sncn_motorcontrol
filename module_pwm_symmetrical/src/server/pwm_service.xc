@@ -17,7 +17,6 @@
 
 #include <pwm_service.h>
 #include <refclk.h>
-#include <print.h>
 
 void disable_fets(PwmPorts &ports){
 
@@ -75,36 +74,68 @@ static void do_pwm_port_config_inv_adc_trig( in port dummy, buffered out port:32
     start_clock(clk);
 }
 
-void pwm_output(buffered out port:32 p_pwm, buffered out port:32 p_pwm_inv, int duty, int period, int msec) {
+void brake_service(buffered out port:32 p_pwm, buffered out port:32 p_pwm_inv, interface BrakeInterface server i_brake) {
     const unsigned delay = 5*USEC_FAST;
+    const int duty = 32;
+    const int period = 10;
+    const int period_init = 100;
+    const int init_duration = 100*MSEC_FAST;
+    int brake_enable = 0;
+    int brake_init = 0;
     timer t;
     unsigned int ts;
-    if (msec) {
-        t :> ts;
-        msec = ts + msec*MSEC_FAST;
-    }
+    unsigned int t_init;
+    t :> ts;
+    t_init = ts + delay;
 
     while(1) {
-        p_pwm <: 0xffffffff;
-        delay_ticks(period*duty);
-        p_pwm <: 0x00000000;
-        delay_ticks(delay);
-        p_pwm_inv<: 0xffffffff;
-        delay_ticks(period*(100-duty) + 2*delay);
-        p_pwm_inv <: 0x00000000;
-        delay_ticks(delay);
+        select {
+        case t when timerafter(ts + delay) :> ts:
+            if (brake_enable) {
+                if (brake_init == 0) {
+                    //pwm release
+                    p_pwm <: 0xffffffff;
+                    delay_ticks(period*duty);
+                    p_pwm <: 0x00000000;
+                    delay_ticks(delay);
+                    p_pwm_inv<: 0xffffffff;
+                    delay_ticks(period*(100-duty) + 2*delay);
+                    p_pwm_inv <: 0x00000000;
+                } else {
+                    if (timeafter(ts, t_init+init_duration))
+                        brake_init = 0;
+                    //pwm init
+                    p_pwm <: 0xffffffff;
+                    delay_ticks(period_init*100);
+                    p_pwm <: 0x00000000;
+                    delay_ticks(delay);
+                    p_pwm_inv<: 0xffffffff;
+                    delay_ticks(2*delay);
+                    p_pwm_inv <: 0x00000000;
+                }
+                t :> ts;
+            }
+            break;
 
-        if (msec) {
-            t :> ts;
-            if (timeafter(ts, msec))
-                break;
+        case i_brake.set_brake(int enable):
+            if (enable && brake_enable == 0) {
+                brake_init = 1;
+                t :> ts;
+                t_init = ts + delay;
+            }
+            brake_enable = enable;
+            break;
+
+        case i_brake.get_brake() -> int out_brake:
+            out_brake = brake_enable;
+            break;
         }
     }
 }
 
 extern unsigned pwm_op_inv( unsigned buf, buffered out port:32 p_pwm[], buffered out port:32 (&?p_pwm_inv)[], chanend c, unsigned control );
 
-void pwm_service( PwmPorts &ports, chanend ?c_pwm, int brake_enable)
+void pwm_service( PwmPorts &ports, chanend ?c_pwm, interface BrakeInterface server ?i_brake)
 {
     //Set Tile Ref Freq to 250MHz
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -114,10 +145,8 @@ void pwm_service( PwmPorts &ports, chanend ?c_pwm, int brake_enable)
     par {
         /* brake pwm */
         {
-            if(brake_enable == ENABLE_BRAKE && !isnull(ports.p_pwm_phase_d) && !isnull(ports.p_pwm_phase_d_inv)) {
-                printstr(">>   SOMANET BRAKE RELEASE STARTING...\n");
-                pwm_output(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, 100, 100, 100);
-                pwm_output(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, 28, 10, 0);
+            if(!isnull(ports.p_pwm_phase_d) && !isnull(ports.p_pwm_phase_d_inv) && !isnull(i_brake)) {
+                brake_service(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, i_brake);
             }
         }
 
@@ -146,7 +175,7 @@ void pwm_service( PwmPorts &ports, chanend ?c_pwm, int brake_enable)
 
 extern unsigned pwm_op_inv_trig( unsigned buf, buffered out port:32 p_pwm[], buffered out port:32 (&?p_pwm_inv)[], chanend c, unsigned control, chanend c_trig, in port dummy_port );
 
-void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm, int brake_enable)
+void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm, interface BrakeInterface server ?i_brake)
 {
     //Set Tile Ref Freq to 250MHz
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -156,10 +185,8 @@ void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm, i
     par {
         /* brake pwm */
         {
-            if(brake_enable == ENABLE_BRAKE && !isnull(ports.p_pwm_phase_d) && !isnull(ports.p_pwm_phase_d_inv)) {
-                printstr(">>   SOMANET BRAKE RELEASE STARTING...\n");
-                pwm_output(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, 100, 100, 100);
-                pwm_output(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, 28, 10, 0);
+            if(!isnull(ports.p_pwm_phase_d) && !isnull(ports.p_pwm_phase_d_inv) && !isnull(i_brake)) {
+                brake_service(ports.p_pwm_phase_d, ports.p_pwm_phase_d_inv, i_brake);
             }
         }
 
@@ -183,5 +210,3 @@ void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm, i
         }
     }
 }
-
-

@@ -39,14 +39,6 @@ typedef enum PWM_OUTPUT_CAT
 	DOUBLE
 } e_pwm_cat;
 
-/**
- * @brief Type for enabling the brake.
- */
-typedef enum {
-    ENABLE_BRAKE=1, /**< Brake enabled. */
-    DISABLE_BRAKE   /**< Brake disabled. */
-} BrakeEnable;
-
 /* if changing this then change the corresponding value in dsc_pwm_common.h */
 typedef struct PWM_OUT_DATA
 {

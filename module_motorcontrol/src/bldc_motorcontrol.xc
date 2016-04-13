@@ -162,6 +162,10 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                         voltage = new_voltage;
                     break;
 
+            case i_motorcontrol[int i].get_voltage() -> int out_voltage:
+                    out_voltage =  voltage;
+                    break;
+
             case i_motorcontrol[int i].set_torque(int torque_sp):
                     printstr("\n> ERROR: setting torque directly is not supported for SINE commutation, please check your motorcontrol configuration!");
                     break;
@@ -318,7 +322,8 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                                         interface QEIInterface client ?i_qei,
                                         interface BISSInterface client ?i_biss,
                                         interface AMSInterface client ?i_ams,
-                                        interface WatchdogInterface client i_watchdog)
+                                        interface WatchdogInterface client i_watchdog,
+                                        interface BrakeInterface client ?i_brake)
 {
     //Set freq to 250MHz (always needed for proper timing)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -350,6 +355,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
     //ADC
     int current_ph_b = 0, current_ph_c = 0;
+    int adc_a, adc_b;
     //Hall
     int angle_electrical = 0;
     unsigned hall_pin_state = 0;
@@ -379,7 +385,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     unsigned umot_init = 0;
     int q_value = 0;
     int q_direct_select = 0;
-    int q_limit = 2000;
+    int q_limit = 4096;
 
     int iXX[64];
     int iCX[64];
@@ -404,10 +410,15 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     int error_torque = 0, error_torque_previous = 0;
     int error_torque_integral = 0;
     int error_torque_derivative = 0;
-    int error_torque_integral_limit = 100000;
-    int Kp_n = 800, Ki_n = 100, Kd_n = 1;
     int torque_control_output = 0;
-    int pid_denominator = 1000;
+    int pid_denominator = 10000;
+    int torque_offset = 0;
+    int error_torque_integral_limit = 100000;
+    int Kp_n = 8000, Ki_n = 1000, Kd_n = 10;
+
+    { adc_a, adc_b } = i_adc.get_external_inputs();
+//    torque_offset = adc_b - adc_a;
+//    torque_offset = 0;
 
     //================ init PWM ===============================
     commutation_init_to_zero(c_pwm_ctrl, pwm_ctrl);
@@ -458,6 +469,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              if (shutdown == 0) {
                  //====================== get phase currents ======================================
                  {current_ph_b, current_ph_c} = i_adc.get_currents();//42 usec in triggered, 15 usec on request
+                 { adc_a, adc_b } = i_adc.get_external_inputs();
 #ifdef USE_XSCOPE
                  xscope_int(PHASE_B, current_ph_b);
                  xscope_int(PHASE_C, current_ph_c);
@@ -532,8 +544,10 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                      //{iTemp1, angle_current}  = cartesian_to_polar_conversion( clarke_alpha, clarke_beta);
                      //vector_current    = calc_mean_one_periode(iCX, iXX, iTemp1, vector_current, hall_pin_state, 0);  // every cycle
 
+                     torq_pt1 = (adc_b -adc_a - torque_offset)/4;
                      //==== PID Torque Controller ====
                      if(!q_direct_select){
+//                         { adc_a, adc_b } = i_adc.get_external_inputs();
                          actual_torque = torq_pt1;
                          //compute the control output
                          error_torque = target_torque - actual_torque; // 350
@@ -636,6 +650,10 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              error_torque_integral = 0;
              break;
 
+         case i_motorcontrol[int i].get_voltage() -> int out_voltage:
+                 out_voltage =  q_value;
+                 break;
+
          case i_motorcontrol[int i].set_torque(int torque_sp):
              q_direct_select = 0;
              field_control_flag = 1;
@@ -661,7 +679,6 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  target_torque = torque_max;
              else if (target_torque < -torque_max)
                  target_torque = -torque_max;
-             printstrln("torque max set");
              break;
 
          case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
@@ -713,12 +730,18 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  if(new_state == 0){
                      shutdown = 1;
                      pwm_enabled = 0;
+                     if (!isnull(i_brake))
+                         i_brake.set_brake(0);
                  }else{
                      shutdown = 0;
                      q_value = 0;
                      q_direct_select = 1;
                      error_torque_previous = 0;
                      error_torque_integral = 0;
+                     if (!isnull(i_brake)) {
+                         i_brake.set_brake(1);
+                         delay_ticks(100*MSEC_STD);
+                     }
                  }
 
                  break;

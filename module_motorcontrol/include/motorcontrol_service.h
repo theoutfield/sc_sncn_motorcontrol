@@ -62,6 +62,7 @@ typedef struct {
 #include <biss_service.h>
 #include <ams_service.h>
 #include <adc_service.h>
+#include <pwm_service.h>
 
 #include <mc_internal_constants.h>
 
@@ -101,6 +102,8 @@ interface MotorcontrolInterface{
      * @param voltage Voltage [-PWM_MAX_VALUE:PWM_MAX_VALUE]. By default PWM_MAX_VALUE = 13889. In case of FOC [-4096:4096]
      */
     void set_voltage(int voltage);
+
+    int get_voltage();
 
     /**
      * @brief Sets torque target value when FOC is used.
@@ -221,6 +224,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
+                            interface BrakeInterface client ?i_brake,
                             interface MotorcontrolInterface server i_motorcontrol[4]);
 
 #endif

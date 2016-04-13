@@ -29,6 +29,10 @@ typedef struct{
     in port ?dummy_port; /**< Any unused port. Used internally for accurate timming */
 } PwmPorts;
 
+interface BrakeInterface {
+    void set_brake(int enable);
+    int get_brake();
+};
 
 void disable_fets(PwmPorts &ports);
 
@@ -41,16 +45,20 @@ void disable_fets(PwmPorts &ports);
  * @param ports Structure containing ports and other hardware information.
  * @param c_adc_trig Channel for communication with the ADC service.
  * @param c_pwm Channel for communication with the service client.
- * @param brake_enable Set to 1 (or ENABLE_BRAKE) to enable the brake release.
+ * @param i_brake interface to the brake service.
  *
  */
-void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm, int brake_enable);
+void pwm_triggered_service(PwmPorts &ports, chanend c_adc_trig, chanend c_pwm, interface BrakeInterface server ?i_brake);
 
 /**
  * @brief Service to generate center-aligned inverted pair PWM signals
  *
  * @param ports Structure containing ports and other hardware information.
  * @param c_pwm Channel for communication with the service client.
- * @param brake_enable Set to 1 (or ENABLE_BRAKE) to enable the brake release.
+ * @param i_brake interface to the brake service.
  */
-void pwm_service(PwmPorts &ports, chanend ?c_pwm, int brake_enable);
+void pwm_service(PwmPorts &ports, chanend ?c_pwm, interface BrakeInterface server ?i_brake);
+
+void brake_service(buffered out port:32 p_pwm, buffered out port:32 p_pwm_inv, interface BrakeInterface server i_brake);
+
+

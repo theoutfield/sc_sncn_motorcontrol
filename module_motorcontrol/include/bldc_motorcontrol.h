@@ -44,6 +44,7 @@ void foc_loop(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
-                            interface WatchdogInterface client i_watchdog);
+                            interface WatchdogInterface client i_watchdog,
+                            interface BrakeInterface client ?i_brake);
 
 void space_vector_pwm(int umot, int angle,  int pwm_on_off, unsigned pwmout[]);

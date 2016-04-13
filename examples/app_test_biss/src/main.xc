@@ -66,6 +66,7 @@ int main() {
     interface ADCInterface i_adc[2];
     interface WatchdogInterface i_watchdog[2];
     interface BISSInterface i_biss[5]; //array of interfaces for biss server
+    interface BrakeInterface i_brake;
 
     par {
         /* Test BiSS Encoder Client */
@@ -77,7 +78,8 @@ int main() {
          ************************************************************/
         on tile[IFM_TILE]: par {
             /* Triggered PWM Service */
-            pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, 1);
+            pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
+            i_brake.set_brake(1);
 
             /* ADC Service */
             adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
