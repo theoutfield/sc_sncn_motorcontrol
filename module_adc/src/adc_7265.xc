@@ -335,10 +335,10 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
         case iADC[int i].get_external_inputs() -> {int ext_a, int ext_b}:
 
-                //We sample the external inputs as differential inputs: ch3 - ch4
+                //We sample the external inputs on ch3 as non differential
                 // Config: 0 Port: 3
                 sampling_port = 3;
-                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200, i_watchdog);
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
 
                 ext_a = adc_data[0][2];
                 ext_b = adc_data[1][2];
