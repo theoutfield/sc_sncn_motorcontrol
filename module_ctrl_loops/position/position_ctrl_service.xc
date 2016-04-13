@@ -67,6 +67,7 @@ void position_control_service(ControlConfig &position_control_config,
 
     int activate = 0;
     int cascade_with_torque = position_control_config.cascade_with_torque;
+    int cascade_with_torque_update = cascade_with_torque;
 
     int config_update_flag = 1;
     MotorcontrolConfig motorcontrol_config;
@@ -85,8 +86,9 @@ void position_control_service(ControlConfig &position_control_config,
                     motorcontrol_config = i_motorcontrol.get_config();
 
                     //FIXME: using the cclk offset to enable cascaded control with torque
-                    if (motorcontrol_config.hall_offset[1] >= 9000 && motorcontrol_config.commutation_method == FOC) {
+                    if (cascade_with_torque_update == 1 && motorcontrol_config.hall_offset[1] > 0 && motorcontrol_config.commutation_method == FOC) {
                         cascade_with_torque = 1;
+                        i_motorcontrol.set_torque_max(motorcontrol_config.hall_offset[1]);
                     } else {
                         cascade_with_torque = 0;
                     }
@@ -208,6 +210,7 @@ void position_control_service(ControlConfig &position_control_config,
                     else {
                         i_motorcontrol.set_voltage(position_control_out); //in case of FOC sets Q value, torque controller in FOC is disabled
                     }
+//                    xscope_int(POSITION_CONTROL_OUT, position_control_out);
 
 #ifdef DEBUG
                     xscope_int(ACTUAL_POSITION, actual_position);
@@ -313,6 +316,8 @@ void position_control_service(ControlConfig &position_control_config,
                         if (i_motorcontrol.get_fets_state() == 0) { // check_fet_state(c_commutation);
                             i_motorcontrol.set_fets_state(1);
                             delay_milliseconds(2);
+                        } else {
+                            i_motorcontrol.set_fets_state(1);
                         }
 
                         break;
