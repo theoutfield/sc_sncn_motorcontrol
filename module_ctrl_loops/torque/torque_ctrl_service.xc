@@ -251,11 +251,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     }
 
                     // The Hall configuration for BLDC motor must always be loaded because of qei_counts_per_hall computation
-                    if (isnull(i_hall)) {
-                        if(motorcontrol_config.motor_type == BLDC_MOTOR){
-                            printstrln("torque_ctrl_service: ERROR: Interface for Hall Service not provided");
-                        }
-                    } else {
+                    if (!isnull(i_hall)) {
                         hall_config = i_hall.get_hall_config();
                     }
 
