@@ -2,7 +2,7 @@
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC1K-rev-c3.bsp>
+#include <IFM_DC1K-rev-c2.bsp>
 //#include <IFM_DC100-rev-b.bsp>
 /**
  * @brief Test illustrates usage of module_commutation
@@ -126,7 +126,7 @@ int main(void) {
             {
                 /* Triggered PWM Service */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
-                i_brake.set_brake(1);
+                i_brake.set_brake(0);
 
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
