@@ -783,9 +783,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  calib_flag = in_flag;
                  if (calib_flag == 0) {
                      int calib_angle;
-                     if (motorcontrol_config.commutation_method == FOC) {
-                         calib_angle = 2048;
-                     } else if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
+                     if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
                          calib_angle = 1024;
                      } else {
                          calib_angle = 3072;
@@ -817,6 +815,12 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                          motorcontrol_config.hall_offset[1] = out_offset;
                      } else if (sensor_select == AMS_SENSOR) {
                          out_offset = i_ams.reset_ams_angle(calib_angle);// quarter turn
+//                         AMSConfig out_ams_config = i_ams.get_ams_config();
+//                         out_ams_config.offset = 0;
+//                         i_ams.set_ams_config(out_ams_config);
+//                         out_offset = i_ams.get_ams_real_position();
+//                         out_ams_config.offset = 16384-out_offset;
+//                         i_ams.set_ams_config(out_ams_config);
                          motorcontrol_config.hall_offset[0] = 0;
                          motorcontrol_config.hall_offset[1] = 0;
 //                         out_offset = (calib_angle - i_ams.get_ams_angle()) & 4095;

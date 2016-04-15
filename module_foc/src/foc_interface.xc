@@ -94,9 +94,9 @@ int angle_rpm_adjust = 0;
   //  angle_new  = angle_inv_park  + 1024 + angle_offset;//why do we need 1024?
  //   angle_new  = angle_inv_park + angle_offset + 512;//why do we need 1024? For the hall sensor a correction of 1/4 of electrical rotation is required.
 
-    if (q_value >= 0) angle_new  = angle_inv_park + angle_offset;
+    if (q_value >= 0) angle_new  = angle_inv_park + angle_offset + 3072;
     else if(feedback_sensor == 1) angle_new  = angle_inv_park + angle_offset + 512;//HALL_SENSOR FixMe: remove fixed number!
-    else angle_new  = angle_inv_park + angle_offset;
+    else angle_new  = angle_inv_park + angle_offset + 3072;
 
     if(measure_tick)
     {
