@@ -100,10 +100,6 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
             voltage = new_voltage;
             break;
 
-        case i_motorcontrol[int i].get_voltage() -> int out_voltage:
-                out_voltage =  voltage;
-                break;
-
         case i_motorcontrol[int i].set_torque(int torque_sp):
                 break;
 
@@ -112,6 +108,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
         case i_motorcontrol[int i].set_control(int in_flag):
                 break;
+
+        case i_motorcontrol[int i].set_torque_pid(int Kp, int Ki, int Kd) -> { int out_Kp, int out_Ki, int out_Kd }:
+            break;
 
         case i_motorcontrol[int i].check_busy() -> int state_return:
 
@@ -154,6 +153,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                                             QEIConfig in_qei_config,
                                                             MotorcontrolConfig in_commutation_config):
                break;
+
+        case i_motorcontrol[int i].restart_watchdog():
+                break;
         }
     }
 }

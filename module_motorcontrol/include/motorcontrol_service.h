@@ -103,8 +103,6 @@ interface MotorcontrolInterface{
      */
     void set_voltage(int voltage);
 
-    int get_voltage();
-
     /**
      * @brief Sets torque target value when FOC is used.
      *
@@ -195,6 +193,10 @@ interface MotorcontrolInterface{
     void set_sensor_offset(int in_offset);
 
     void set_control(int flag);
+
+    {int, int, int} set_torque_pid(int Kp, int Ki, int Kd);
+
+    void restart_watchdog();
 };
 
 
