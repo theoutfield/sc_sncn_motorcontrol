@@ -51,7 +51,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
     int fw_flag = 0;
     int bw_flag = 0;
 
-    int shutdown = 0; //Disable FETS
+    int shutdown = 1; //Disable FETS
     int sensor_select = motorcontrol_config.commutation_sensor;
 
     int notification = MOTCTRL_NTF_EMPTY;
