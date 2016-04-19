@@ -273,6 +273,8 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 update_turns(turns, last_count, count, biss_config.multiturn_resolution, ticks_per_turn);
                 last_count = count;
                 last_position = angle;
+                if (biss_config.polarity == BISS_POLARITY_INVERTED)
+                    angle = ticks_per_turn - angle;
                 if (biss_config.singleturn_resolution > 12)
                     biss_config.offset_electrical = (new_angle - biss_config.pole_pairs * (angle >> (biss_config.singleturn_resolution-12)) ) & 4095;
                 else
