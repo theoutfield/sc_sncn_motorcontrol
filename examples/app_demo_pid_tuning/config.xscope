@@ -25,5 +25,10 @@
     <Probe name="Error Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Error Torque Integral" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Voltage" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Phase B" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Phase C" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Field" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Angle electrical" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
 </xSCOPEconfig>

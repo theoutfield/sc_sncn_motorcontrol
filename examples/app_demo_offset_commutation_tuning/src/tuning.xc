@@ -82,7 +82,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 //                offset = 0;
                 printf("Sensor offset: %d, ", offset);
             } else if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
-                offset = 0;
+//                offset = 0;
+                printf("Sensor offset: %d, ", offset);
             }
             printf("Voltage %d, Polarity %d\n", input_voltage, motorcontrol_config.polarity_type);
             if (motorcontrol_config.commutation_method == FOC || (input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
@@ -364,8 +365,6 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
     while(1) {
         select {
         case t when timerafter(ts) :> void:
-            ts += USEC_STD * 1000;
-
             //get position and velocity
             if (motorcontrol_config.commutation_sensor == BISS_SENSOR && !isnull(i_biss)) {
                 velocity = i_biss.get_biss_velocity();
@@ -444,6 +443,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 
                 //new measured peak current
                 if (current_sampling <= 0) {
+
                     if (voltage > 0 && tuning_done_pos == 0) {
                         //update min current and best offset
                         if (peak_current < min_current_pos) {
@@ -468,7 +468,14 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         }
                         range_pos--;
                         offset_pos += step_pos;
-                        update_offset(motorcontrol_config, voltage, (offset_pos & 4095));
+                        if (motorcontrol_config.commutation_method == FOC) {
+                            if (motorcontrol_config.commutation_sensor == BISS_SENSOR)
+                                i_commutation.set_sensor_offset(offset_pos & 4095);
+                            else
+                                i_commutation.set_sensor_offset(offset_pos);
+                        } else {
+                            update_offset(motorcontrol_config, voltage, (offset_pos & 4095));
+                        }
                     } else if (voltage < 0 && tuning_done_neg == 0){ //negative voltage
                         //update min current and best offset
                         if (peak_current < min_current_neg) {
@@ -492,9 +499,15 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         }
                         range_neg--;
                         offset_neg += step_neg;
-                        update_offset(motorcontrol_config, voltage, (offset_neg & 4095));
+                        if (motorcontrol_config.commutation_method == FOC) {
+                            if (motorcontrol_config.commutation_sensor == BISS_SENSOR)
+                                i_commutation.set_sensor_offset(offset_pos & 4095);
+                            else
+                                i_commutation.set_sensor_offset(offset_pos);
+                        } else {
+                            update_offset(motorcontrol_config, voltage, (offset_pos & 4095));
+                        }
                     }
-
 
                     if((tuning_done_pos + tuning_done_neg) >= 2) {//tuning is done
                         enable_tuning = 0;
@@ -507,8 +520,10 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         }
                         printf("Tuning done\nauto tuned offset clk: %d\nauto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
                         if (motorcontrol_config.commutation_method == FOC) {
-                            motorcontrol_config.hall_offset[0] = (best_offset_pos+best_offset_neg)/2;
-                            printf("mean offset: %d\n", motorcontrol_config.hall_offset[0]);
+                            i_commutation.set_sensor_offset(best_offset_pos);
+                            motorcontrol_config.hall_offset[0] = 0;
+                            motorcontrol_config.hall_offset[1] = 0;
+                            printf("mean offset: %d\n", (best_offset_pos+best_offset_neg)/2);
                         }
                         i_commutation.set_config(motorcontrol_config);
                         voltage = 0;
@@ -527,6 +542,8 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                 current_sampling = 200;
                 peak_current = 0;
             }
+            t :> ts;
+            ts += USEC_STD * 1000;
             break;
 
         case i_tuning.tune(int in_voltage):
@@ -535,7 +552,13 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                 if (voltage && enable_tuning == 0) {
                     motorcontrol_config = i_commutation.get_config();
                     if (motorcontrol_config.commutation_method == FOC) {
-                        start_offset_pos = motorcontrol_config.hall_offset[0];
+                        if (motorcontrol_config.commutation_sensor == BISS_SENSOR && !isnull(i_biss)) {
+                            BISSConfig biss_config = i_biss.get_biss_config();
+                            start_offset_pos = biss_config.offset_electrical;
+                        } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                            AMSConfig ams_config = i_ams.get_ams_config();
+                            start_offset_pos = ams_config.offset;
+                        }
                         start_offset_neg = start_offset_pos;
                     } else if (voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) {
                         start_offset_pos = motorcontrol_config.hall_offset[0];
@@ -564,7 +587,9 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                     printf("Starting auto tuning...\n");
                 } else {
                     enable_tuning = 0;
-                    if (motorcontrol_config.commutation_method == FOC || motorcontrol_config.bldc_winding_type == STAR_WINDING) {
+                    if (motorcontrol_config.commutation_method == FOC) {
+                        i_commutation.set_sensor_offset(best_offset_pos);
+                    } else if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
                         motorcontrol_config.hall_offset[0] = best_offset_pos;
                         motorcontrol_config.hall_offset[1] = best_offset_neg;
                     } else {

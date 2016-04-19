@@ -2,7 +2,7 @@
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC1K-rev-c2.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 //#include <IFM_DC100-rev-b.bsp>
 /**
  * @brief Test illustrates usage of module_commutation
