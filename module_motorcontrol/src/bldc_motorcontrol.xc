@@ -411,6 +411,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
     //FOC Torque control
     int target_torque = 0;
     int torque_max = 4096;//max default value
+    int velocity_limit = 6000; //max velocity during torque control
     int actual_torque = 0;
     int error_torque = 0, error_torque_previous = 0;
     int error_torque_integral = 0;
@@ -509,7 +510,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                          angle_electrical = 4096 - angle_electrical;
 
 #ifdef USE_XSCOPE
-//                     xscope_int(ANGLE_ELECTRICAL, angle_electrical);
+                     xscope_int(ANGLE_ELECTRICAL, angle_electrical);
 
                      xscope_int(VELOCITY, velocity);
 #endif
@@ -553,6 +554,10 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
                      //==== PID Torque Controller ====
                      if(!q_direct_select){
+                         //velocity limit
+                         if (velocity > velocity_limit || velocity < -velocity_limit)
+                             target_torque = 0;
+
                          actual_torque = torq_pt1;
                          //compute the control output
                          error_torque = target_torque - actual_torque; // 350
@@ -636,7 +641,7 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
               tx :> end_time;
 #ifdef USE_XSCOPE
-//              xscope_int(CYCLE_TIME, (end_time - start_time)/250);
+              xscope_int(CYCLE_TIME, (end_time - start_time)/250);
 #endif
              break;
 
@@ -809,10 +814,12 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                              }
                          }
                      } else if (sensor_select == BISS_SENSOR) {
-                         //out_offset = i_biss.reset_biss_angle_electrical(calib_angle);// quarter turn
-                         out_offset = (calib_angle - i_biss.get_biss_angle()) & 4095;
-                         motorcontrol_config.hall_offset[0] = out_offset;
-                         motorcontrol_config.hall_offset[1] = out_offset;
+                         out_offset = i_biss.reset_biss_angle_electrical(calib_angle);// quarter turn
+//                         out_offset = (calib_angle - i_biss.get_biss_angle()) & 4095;
+//                         motorcontrol_config.hall_offset[0] = out_offset;
+//                         motorcontrol_config.hall_offset[1] = out_offset;
+                         motorcontrol_config.hall_offset[0] = 0;
+                         motorcontrol_config.hall_offset[1] = 0;
                      } else if (sensor_select == AMS_SENSOR) {
                          out_offset = i_ams.reset_ams_angle(calib_angle);// quarter turn
 //                         AMSConfig out_ams_config = i_ams.get_ams_config();
