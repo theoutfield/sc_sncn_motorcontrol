@@ -30,7 +30,7 @@
     <Probe name="Voltage" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Torque Sensor" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="HALL pins" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="Angle electrical" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Angle electrical" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Field" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Torque_raw" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Torque_pt1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>

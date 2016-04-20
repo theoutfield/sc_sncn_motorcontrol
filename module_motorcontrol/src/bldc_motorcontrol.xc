@@ -195,15 +195,21 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     motorcontrol_config.commutation_sensor = sensor_select;
                     break;
 
-            case i_motorcontrol[int i].set_sensor_offset(int in_offset):
+            case i_motorcontrol[int i].set_sensor_offset(int in_offset) -> int out_offset:
                     if (sensor_select == BISS_SENSOR ) {
                         BISSConfig out_biss_config = i_biss.get_biss_config();
-                        out_biss_config.offset_electrical = in_offset;
-                        i_biss.set_biss_config(out_biss_config);
+                        if (in_offset >= 0) {
+                            out_biss_config.offset_electrical = in_offset;
+                            i_biss.set_biss_config(out_biss_config);
+                        }
+                        out_offset = out_biss_config.offset_electrical;
                     } else if (sensor_select == AMS_SENSOR ) {
                         AMSConfig out_ams_config = i_ams.get_ams_config();
-                        out_ams_config.offset = in_offset;
-                        i_ams.set_ams_config(out_ams_config);
+                        if (in_offset >= 0) {
+                            out_ams_config.offset = in_offset;
+                            i_ams.set_ams_config(out_ams_config);
+                        }
+                        out_offset = out_ams_config.offset;
                     }
                     break;
 
@@ -506,12 +512,26 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                          exit(-1);
                      }
 
-                     if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
-                         angle_electrical = 4096 - angle_electrical;
+                     //normalization: sine table is with 1024 base points, angle is 0 - 4095
+                     //and applying commutation offset
+                     if (motorcontrol_config.polarity_type != INVERTED_POLARITY) {
+                         if (sensor_select != HALL_SENSOR || q_value >= 0) {
+                             mmTheta = ((angle_electrical + motorcontrol_config.hall_offset[0]) >> 2) & 1023;
+                         } else {
+                             mmTheta = ((angle_electrical + motorcontrol_config.hall_offset[1]) >> 2) & 1023;
+                         }
+                     } else {
+                         if (sensor_select != HALL_SENSOR || q_value >= 0) {
+                             mmTheta = ((4096 - angle_electrical - motorcontrol_config.hall_offset[0]) >> 2) & 1023;
+                         } else {
+                             mmTheta = ((4096 - angle_electrical - motorcontrol_config.hall_offset[1]) >> 2) & 1023;
+                         }
+                     }
+//                     if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
+//                         angle_electrical = 4096 - angle_electrical;
 
 #ifdef USE_XSCOPE
                      xscope_int(ANGLE_ELECTRICAL, angle_electrical);
-
                      xscope_int(VELOCITY, velocity);
 #endif
 
@@ -519,8 +539,8 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                      {clarke_alpha, clarke_beta} = clarke_transformation(current_ph_b, current_ph_c);
 
                      //========================== park transform ============================
-                     mmTheta = angle_electrical/4; //normalization: sine table is with 1024 base points, angle is 0 - 4095
-                     mmTheta &= 0x3FF;
+//                     mmTheta = angle_electrical/4; //normalization: sine table is with 1024 base points, angle is 0 - 4095
+//                     mmTheta &= 0x3FF;
                      mmSinus  = sine_table_1024[mmTheta];         // sine( fp.Minp[mmTheta] );
                      mmTheta = (256 - mmTheta);              // 90-fp.Minp[mmTheta]
                      mmTheta &= 0x3FF;
@@ -619,7 +639,9 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
 
                      //speed_actual = velocity;
 
-                     angle_pwm  =  adjust_angle_reference_pwm(angle_inv_park, motorcontrol_config.hall_offset[0], hall_pin_state, speed_actual, q_value, filter_sum, sensor_select);
+                     //FIXME angle adjust, using constant for now
+//                     angle_pwm  =  adjust_angle_reference_pwm(angle_inv_park, 0, hall_pin_state, speed_actual, q_value, filter_sum, sensor_select);
+                     angle_pwm = (angle_inv_park + 3072) & 4095;
 
                      //========== prepare PWM =================================================================
 
@@ -737,15 +759,21 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                  motorcontrol_config.commutation_sensor = sensor_select;
                  break;
 
-         case i_motorcontrol[int i].set_sensor_offset(int in_offset):
+         case i_motorcontrol[int i].set_sensor_offset(int in_offset) -> int out_offset:
                  if (sensor_select == BISS_SENSOR ) {
                      BISSConfig out_biss_config = i_biss.get_biss_config();
-                     out_biss_config.offset_electrical = in_offset;
-                     i_biss.set_biss_config(out_biss_config);
+                     if (in_offset >= 0) {
+                         out_biss_config.offset_electrical = in_offset;
+                         i_biss.set_biss_config(out_biss_config);
+                     }
+                     out_offset = out_biss_config.offset_electrical;
                  } else if (sensor_select == AMS_SENSOR ) {
                      AMSConfig out_ams_config = i_ams.get_ams_config();
-                     out_ams_config.offset = in_offset;
-                     i_ams.set_ams_config(out_ams_config);
+                     if (in_offset >= 0) {
+                         out_ams_config.offset = in_offset;
+                         i_ams.set_ams_config(out_ams_config);
+                     }
+                     out_offset = out_ams_config.offset;
                  }
                  break;
 
@@ -799,18 +827,18 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                          if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
                              if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
                                  motorcontrol_config.hall_offset[0] = (out_offset - 682) & 4095; // -1/6 turn
-                                 motorcontrol_config.hall_offset[1] = (out_offset + 682) & 4095; // + half turn - 1/6 turn
+                                 motorcontrol_config.hall_offset[1] = out_offset; // offset clk + 1/6 turn
                              } else {
-                                 motorcontrol_config.hall_offset[1] = (out_offset - 682) & 4095;
-                                 motorcontrol_config.hall_offset[0] = (out_offset + 682) & 4095;
+                                 motorcontrol_config.hall_offset[1] = (out_offset - 682 + 2048) & 4095; // + half turn -1/6 turn
+                                 motorcontrol_config.hall_offset[0] = (out_offset + 2048) & 4095; // offset cclk + 1/6 turn
                              }
                          } else {
                              if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
                                  motorcontrol_config.hall_offset[0] = out_offset;
-                                 motorcontrol_config.hall_offset[1] = (out_offset + 2731) & 4095; // + half turn + 1/6 turn
+                                 motorcontrol_config.hall_offset[1] = (out_offset + 682) & 4095; // offset clk + 1/6 turn
                              } else {
-                                 motorcontrol_config.hall_offset[1] = out_offset;
-                                 motorcontrol_config.hall_offset[0] = (out_offset + 2731) & 4095;
+                                 motorcontrol_config.hall_offset[1] = (out_offset + 2048) & 4095; // half turn + 1/6 turn
+                                 motorcontrol_config.hall_offset[0] = (out_offset + 2048 + 682) & 4095; // offset cclk + 1/6 turn
                              }
                          }
                      } else if (sensor_select == BISS_SENSOR) {

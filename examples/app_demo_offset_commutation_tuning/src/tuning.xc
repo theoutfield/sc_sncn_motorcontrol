@@ -161,7 +161,9 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //set offset
         case 'o':
-            if (motorcontrol_config.commutation_method == FOC || (input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING)) {
+            if ((motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) ||
+                (input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) ||
+                (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING)) {
                 motorcontrol_config.hall_offset[0] = value;
                 printf("offset clk: %d\n", value);
             } else {
@@ -174,6 +176,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         case 'p':
             motorcontrol_config = i_commutation.get_config();
             if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+                offset = i_commutation.set_sensor_offset(-1);
                 printf("Sensor offset %d, ", offset);
             }
             if (motorcontrol_config.commutation_sensor == AMS_SENSOR && motorcontrol_config.commutation_method == FOC && offset==0 && motorcontrol_config.hall_offset[0]) {
@@ -308,7 +311,7 @@ int auto_tuning_current(interface MotorcontrolInterface client i_commutation, in
 
 static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int voltage, int offset)
 {
-    if (motorcontrol_config.commutation_method == FOC || (voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
+    if ((voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
         motorcontrol_config.hall_offset[0] =  offset;
     else
         motorcontrol_config.hall_offset[1] =  offset;
@@ -510,6 +513,8 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                     }
 
                     if((tuning_done_pos + tuning_done_neg) >= 2) {//tuning is done
+                        voltage = 0;
+                        i_commutation.set_voltage(voltage);
                         enable_tuning = 0;
                         if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
                             motorcontrol_config.hall_offset[0] = best_offset_pos;
@@ -520,14 +525,12 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         }
                         printf("Tuning done\nauto tuned offset clk: %d\nauto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
                         if (motorcontrol_config.commutation_method == FOC) {
-                            i_commutation.set_sensor_offset(best_offset_pos);
+                            i_commutation.set_sensor_offset((best_offset_pos+best_offset_neg)/2);
                             motorcontrol_config.hall_offset[0] = 0;
                             motorcontrol_config.hall_offset[1] = 0;
                             printf("mean offset: %d\n", (best_offset_pos+best_offset_neg)/2);
                         }
                         i_commutation.set_config(motorcontrol_config);
-                        voltage = 0;
-                        i_commutation.set_voltage(voltage);
                     } else {
                         last_peak_current = peak_current; //for displaying peak current
                         peak_current = 0;       // reset
@@ -558,6 +561,8 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
                             AMSConfig ams_config = i_ams.get_ams_config();
                             start_offset_pos = ams_config.offset;
+                        } else if (motorcontrol_config.commutation_sensor == HALL_SENSOR) {
+                            start_offset_pos = motorcontrol_config.hall_offset[0];
                         }
                         start_offset_neg = start_offset_pos;
                     } else if (voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) {

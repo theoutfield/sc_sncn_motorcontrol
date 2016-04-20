@@ -141,7 +141,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                 break;
         case i_motorcontrol[int i].set_sensor(int new_sensor):
                 break;
-        case i_motorcontrol[int i].set_sensor_offset(int in_offset):
+        case i_motorcontrol[int i].set_sensor_offset(int in_offset) -> int out_offset:
                 break;
         case i_motorcontrol[int i].set_config(MotorcontrolConfig new_config):
                 break;

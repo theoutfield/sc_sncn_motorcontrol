@@ -190,7 +190,7 @@ interface MotorcontrolInterface{
      *
      * @param Sensor offset
      */
-    void set_sensor_offset(int in_offset);
+    int set_sensor_offset(int in_offset);
 
     void set_control(int flag);
 
