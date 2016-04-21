@@ -601,9 +601,7 @@ int check_ams_config(AMSConfig &ams_config) {
         //receive new ams_config
         case i_ams[int i].set_ams_config(AMSConfig in_config):
                 ticks_per_turn = (1 << in_config.resolution_bits);
-                //adjust offset if negative
-                if (in_config.offset < 0)
-                    in_config.offset += ticks_per_turn;
+                in_config.offset &= (ticks_per_turn-1);
                 //update variables which depend on ams_config
                 if (ams_config.polarity != in_config.polarity)
                     initRotarySensor(ams_ports,  in_config);

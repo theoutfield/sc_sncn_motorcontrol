@@ -224,6 +224,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 biss_data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
                 biss_before_singleturn_length = biss_config.multiturn_length + biss_config.singleturn_length - biss_config.singleturn_resolution;
                 ticks_per_turn = (1 << biss_config.singleturn_resolution);
+                biss_config.offset_electrical &= 4095;
                 crossover = ticks_per_turn - ticks_per_turn/10;
                 max_ticks_internal = (1 << (biss_config.multiturn_resolution -1 + biss_config.singleturn_resolution));
                 velocity_loop = (biss_config.velocity_loop * BISS_USEC);
