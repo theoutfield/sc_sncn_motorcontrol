@@ -35,7 +35,7 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
-#else
+#elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
 
@@ -46,12 +46,12 @@ void position_profile_test(interface PositionControlInterface client i_position_
                            interface BISSInterface client ?i_biss,
                            interface AMSInterface client ?i_ams)
 {
-//    const int target = 409600;
-    const int target = 2620000;
+    const int target = 163840;
+//    const int target = 2620000;
     int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
-    int velocity        = 100;         // rpm
-    int acceleration    = 10;         // rpm/s
-    int deceleration    = 10;         // rpm/s
+    int velocity        = 200;         // rpm
+    int acceleration    = 200;         // rpm/s
+    int deceleration    = 200;         // rpm/s
     int follow_error = 0;
     int actual_position = 0;
 
@@ -94,7 +94,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
             target_position = target;
             set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
         }
-        delay_milliseconds(10);
+        delay_milliseconds(1);
     }
 }
 
@@ -128,11 +128,11 @@ int main(void)
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
             position_profile_test(i_position_control[0], i_hall[2], i_qei[2], null, null);      // test PPM on slave side
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-            position_profile_test(i_position_control[0], i_hall[2], null, null, i_ams[2]);      // test PPM on slave side
+            position_profile_test(i_position_control[0], null, null, null, i_ams[2]);      // test PPM on slave side
 #elif(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
             position_profile_test(i_position_control[0], null, null, i_biss[2], null);      // test PPM on slave side
 #else
-            position_profile_test(i_position_control[0], i_hall[2], null, i_biss[2], null);      // test PPM on slave side
+            position_profile_test(i_position_control[0], i_hall[2], null, null, null);      // test PPM on slave side
 #endif
         }
 
@@ -174,7 +174,7 @@ int main(void)
             position_control_service(position_control_config, i_hall[1], i_qei[1], null, null, i_motorcontrol[0],
                                      i_position_control);
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-            position_control_service(position_control_config, i_hall[1], null, null, i_ams[1], i_motorcontrol[0],
+            position_control_service(position_control_config, null, null, null, i_ams[1], i_motorcontrol[0],
                                      i_position_control);
 #elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
             position_control_service(position_control_config, null, null, i_biss[1], null, i_motorcontrol[0],
@@ -193,7 +193,7 @@ int main(void)
             par
             {
                 /* Triggered PWM Service */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, null);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
@@ -201,9 +201,10 @@ int main(void)
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
-#if(MOTOR_FEEDBACK_SENSOR != BISS_SENSOR)
+#if(MOTOR_FEEDBACK_SENSOR != BISS_SENSOR && MOTOR_FEEDBACK_SENSOR != AMS_SENSOR)
                 /* Hall sensor Service */
                 {
+//                    biss_ports.p_biss_clk <:0;
                     HallConfig hall_config;
                     hall_config.pole_pairs = POLE_PAIRS;
 
@@ -243,7 +244,7 @@ int main(void)
 
                     ams_service(ams_ports, ams_config, i_ams);
                 }
-#else
+#elif(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                 /* BiSS service */
                 {
                     BISSConfig biss_config;
@@ -271,6 +272,7 @@ int main(void)
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.commutation_method = FOC;
+                    motorcontrol_config.polarity_type = INVERTED_POLARITY;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
@@ -282,10 +284,10 @@ int main(void)
                                          c_pwm_ctrl, i_adc[0], i_hall[0], i_qei[0], null, null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], i_brake, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);
