@@ -197,6 +197,8 @@ interface MotorcontrolInterface{
     {int, int, int} set_torque_pid(int Kp, int Ki, int Kd);
 
     void restart_watchdog();
+
+    int get_field();
 };
 
 

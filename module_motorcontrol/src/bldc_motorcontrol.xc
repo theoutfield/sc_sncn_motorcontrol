@@ -311,6 +311,8 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     i_watchdog.start();
                     break;
 
+            case i_motorcontrol[int i].get_field() -> int out_field:
+                    break;
             }
 
  //       t_loop :> end_time;
@@ -662,6 +664,10 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
              update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);  // !!!  must be the last function in this loop; 55 usec @ 18kHz config, why?
 
               tx :> end_time;
+
+              //FIXME: this is to prevent blocking by adding a microsecond before the next loop when time is more than 110 us
+              if (timeafter(end_time, ts))
+                  ts = end_time + USEC_FAST;
 #ifdef USE_XSCOPE
               xscope_int(CYCLE_TIME, (end_time - start_time)/250);
 #endif
@@ -730,6 +736,10 @@ void foc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
          case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
                  torque_actual = torq_pt1;
              break;
+
+         case i_motorcontrol[int i].get_field() -> int out_field:
+                 out_field = field_lpf;
+                 break;
 
          case i_motorcontrol[int i].get_notification() -> int out_notification:
 

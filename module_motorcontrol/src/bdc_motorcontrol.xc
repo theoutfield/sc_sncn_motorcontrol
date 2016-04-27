@@ -156,6 +156,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
         case i_motorcontrol[int i].restart_watchdog():
                 break;
+
+        case i_motorcontrol[int i].get_field() -> int out_field:
+                break;
         }
     }
 }
