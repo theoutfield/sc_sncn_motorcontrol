@@ -16,6 +16,8 @@
 
 #define SHIFTING_BITS   1
 
+int overcurrent_count = 0;
+
 void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
                             unsigned char config,
                             unsigned char &port_id,
@@ -62,9 +64,15 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
 
     if ( (adc_data[0][0] > OVERCURRENT_IN_ADC_TICKS) || (adc_data[1][0] > OVERCURRENT_IN_ADC_TICKS)
         || (adc_data[0][0] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (adc_data[1][0] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
+        overcurrent_count++;
         if(!isnull(i_watchdog)){
             i_watchdog.stop();
-            printstr("\n> Overcurrent!\n");
+            if (overcurrent_count == 1) {
+                printstr("\n> Overcurrent at start, ignoring...");
+            } else {
+                printstr("\n> Overcurrent! ");
+                printintln(overcurrent_count);
+            }
         }
     }
 
@@ -162,6 +170,23 @@ void configure_adc_ports_7265( // Configure all ADC data ports
 
 } // configure_adc_ports_7265
 
+
+int statusTemperature_adc2degrees(int adcValue)
+{
+    int temp = 0;
+
+    if(adcValue >= (ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR)){ //over zero degrees
+       temp = ((adcValue - (ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR)) / ADC_VALUE_PER_DEGREE);
+    } else if (adcValue < ADC_VALUE_0_DEGREES) { //under zero
+       temp = -1*(((ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR) - adcValue) / ADC_VALUE_PER_DEGREE);
+    }
+
+    if(temp > 140 || temp < -50)
+        temp = 0;
+
+    return temp;
+}
+
 void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog)
 {
     int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
@@ -219,7 +244,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
                 sampling_port = 5;
                 adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
 
-                out_temp = adc_data[0][4];
+                out_temp = statusTemperature_adc2degrees(adc_data[0][4]);
 
              break;
 
@@ -329,7 +354,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
         case iADC[int i].get_temperature() -> {int out_temp}:
 
-                out_temp = adc_data[0][4];
+                out_temp = statusTemperature_adc2degrees(adc_data[0][4]);
 
              break;
 

@@ -67,6 +67,11 @@ interface ADC{
 #define ADC_POST_PAD_BITS 0 // 0..2 No. of post-padding bits after Least-Significant active bit of sample
 #define ADC_MIN_BITS (ADC_ACTIVE_BITS + ADC_PRE_PAD_BITS) // Minimum No. of bits to transmit in ADC sample (including pre-padding bits)
 
+/* Temperature */
+#define ADC_VALUE_0_DEGREES 1640     //0.5V
+#define ADC_TEMP_ERROR      1120
+#define ADC_VALUE_PER_DEGREE 32    //10mV/deg
+
 /** Define Bits in Byte */
 #define BITS_IN_BYTE 8
 #define WORD16_BITS (sizeof(short) * BITS_IN_BYTE) // No. of bits in 16-bit word
@@ -95,5 +100,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
                     CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog);
 void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
                     CurrentSensorsConfig &current_sensor_config, chanend c_trig, interface WatchdogInterface client ?i_watchdog);
+
+int statusTemperature_adc2degrees(int adcValue);
 
 /*****************************************************************************/
