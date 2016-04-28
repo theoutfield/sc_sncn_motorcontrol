@@ -36,29 +36,6 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
 #define POSITION_LIMIT 0 //+/- 4095
 
-void adc_client(interface ADCInterface client i_adc)
-{
-    while (1) {
-        int b, c;
-        {b, c} = i_adc.get_currents();
-
-        xscope_int(PHASE_B, b);
-        xscope_int(PHASE_C, c);
-
-        delay_milliseconds(1);
-    }
-}
-
-void velocity_client(interface BISSInterface client i_biss)
-{
-    while(1) {
-        int velocity = i_biss.get_biss_velocity();
-        xscope_int(VELOCITY, velocity);
-
-        delay_milliseconds(1);
-    }
-}
-
 int main(void) {
 
     // Motor control interfaces
@@ -84,11 +61,7 @@ int main(void) {
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning, null);
 
-        /* Display phases currents */
-//        on tile[IFM_TILE]: adc_client(i_adc[1]);
-//        on tile[IFM_TILE]: velocity_client(i_biss[1]);
-//        on tile[IFM_TILE]: tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
-
+        /* Tuning service */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
         on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, i_biss[1], null);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
@@ -191,7 +164,7 @@ int main(void) {
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
-                    motorcontrol_config.polarity_type = NORMAL_POLARITY;
+                    motorcontrol_config.polarity_type = MOTOR_POLARITY;
                     motorcontrol_config.commutation_method = FOC;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
