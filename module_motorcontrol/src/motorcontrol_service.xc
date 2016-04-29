@@ -10,6 +10,7 @@
 #include <motorcontrol_service.h>
 #include <bldc_motorcontrol.h>
 #include <bdc_motorcontrol.h>
+#include <stdlib.h>
 
 int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
 {
@@ -77,7 +78,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                     if(motorcontrol_config.motor_type == BLDC_MOTOR){
 
-                        if(motorcontrol_config.commutation_method == FOC && !isnull(i_adc)){
+                        if(!isnull(i_adc)){
 
                             foc_loop( fet_driver_ports, motorcontrol_config,
                                     hall_config, qei_config,
@@ -86,8 +87,11 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                         }
                         else{
-                            bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
-                                c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
+                            printstr(">! ADC interface is not provided to the motorcontrol service...\n");
+                            printstr(">! stopping the service...\n");
+                            exit(-1);
+//                            bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
+//                                c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
                         }
 
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <foc_config.h>
 
 //------------- ff ==>> filter enum index used with  filter_sum[8] --------------------------
 enum
@@ -18,7 +19,7 @@ fftorque,
  *
  * D-value for invers-park
  */
-int field_control(int field_new, int field_e1, int field_e2, int q_value, int field_out_p_part, int field_out_i_part, int par_field_kp, int par_field_ki, int field_out1, int field_out2, int filter_sum[]);
+int field_control(FieldControlParams &field_control_params, int field_new, int q_value, int filter_sum[]);
 
 
 

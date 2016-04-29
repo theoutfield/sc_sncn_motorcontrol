@@ -6,34 +6,34 @@
 #define def_FIELD_RANGE  32768
 #define FIELD_CONTROLLER_LIMIT 4096 //2048
 
-int field_control(int field_new, int field_e1, int field_e2, int q_value, int field_out_p_part, int field_out_i_part, int par_field_kp, int par_field_ki, int field_out1, int field_out2, int filter_sum[]){
+int field_control(FieldControlParams &field_control_params, int field_new, int q_value, int filter_sum[]){
 
-    field_e1       =   -field_new;   // 0 - field_new
+    field_control_params.field_e1       =   -field_new;   // 0 - field_new
 
-    field_e2       = calc_hysteresis_and_limit(field_e1, 100, 150);//10, 80
+    field_control_params.field_e2       = calc_hysteresis_and_limit(field_control_params.field_e1, 100, 150);//10, 80
  //   xscope_int(CONTROL_ERROR, field_e1);
 
     if(q_value == 0)  // if q zero field_integrator must go to zero
     {
-        if(field_out_i_part > 0) field_out_i_part -= field_out_i_part/8;
-        if(field_out_i_part < 0) field_out_i_part -= field_out_i_part/8;
+        if(field_control_params.field_out_i_part > 0) field_control_params.field_out_i_part -= field_control_params.field_out_i_part/8;
+        if(field_control_params.field_out_i_part < 0) field_control_params.field_out_i_part -= field_control_params.field_out_i_part/8;
     }
     //===================================== field ===============================================
-    field_out_p_part          =  field_e1 * par_field_kp;
+    field_control_params.field_out_p_part          =  field_control_params.field_e1 * field_control_params.kP;
     
     if(q_value == 0)  //  if q zero, reduce P part if it was too big
     {
-        if(field_out_p_part > 0) field_out_p_part -= field_out_p_part/8;
-        if(field_out_p_part < 0) field_out_p_part -= field_out_p_part/8;
+        if(field_control_params.field_out_p_part > 0) field_control_params.field_out_p_part -= field_control_params.field_out_p_part/8;
+        if(field_control_params.field_out_p_part < 0) field_control_params.field_out_p_part -= field_control_params.field_out_p_part/8;
     }
 
-    field_out_i_part         +=   field_e2 * par_field_ki;
-    field_out_i_part          =   check_limits(field_out_i_part, def_FIELD_RANGE);//512 * def_FIELD_RANGE
+    field_control_params.field_out_i_part         +=   field_control_params.field_e2 * field_control_params.kI;
+    field_control_params.field_out_i_part          =   check_limits(field_control_params.field_out_i_part, def_FIELD_RANGE);//512 * def_FIELD_RANGE
 
 
-    field_out1 = (field_out_p_part + field_out_i_part) / def_FIELD_RANGE;
+    int field_out1 = (field_control_params.field_out_p_part + field_control_params.field_out_i_part) / def_FIELD_RANGE;
 
-    field_out2 =    low_pass_pt1_filter(filter_sum, ff_field_out, 32,  field_out1);//ToDo: check if it works properly
+    int field_out2 =    low_pass_pt1_filter(filter_sum, ff_field_out, 32,  field_out1);//ToDo: check if it works properly
 
  //   xscope_int(CONTROL_I_PART, field_out_i_part);
   //  xscope_int(CONTROL_P_PART, field_out_p_part/def_FIELD_RANGE);

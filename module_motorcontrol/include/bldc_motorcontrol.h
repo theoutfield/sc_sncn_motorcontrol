@@ -36,6 +36,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             FetDriverPorts &fet_driver_ports,
                             MotorcontrolConfig &commutation_params);
 
+[[combinable]]
 void foc_loop(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
                             HallConfig hall_config, QEIConfig qei_config,
                             interface MotorcontrolInterface server i_motorcontrol[4],
