@@ -1,7 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C21-rev-a.bsp>
+#include <CORE_C22-rev-a.bsp>
 //#include <IFM_DC300-rev-a.bsp>
-#include <IFM_DC1K-rev-c2.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @file app_test_ams_rotary_sensor.xc
@@ -33,10 +33,9 @@ void ams_rotary_sensor_test(client interface AMSInterface i_ams)
     while(1) {
         /* get position from AMS Sensor */
         {count, position} = i_ams.get_ams_position();
-        electrical_angle = i_ams.get_ams_angle();
 
-        /* get velocity from AMS Sensor */
-        velocity = i_ams.get_ams_velocity();
+        /* get angle and velocity from AMS Sensor */
+        { electrical_angle, velocity } = i_ams.get_ams_angle_velocity();
 
         xscope_int(COUNT, count);
         xscope_int(POSITION, position);
@@ -75,7 +74,7 @@ int main(void)
                 ams_config.resolution_bits = AMS_RESOLUTION;
                 ams_config.offset = AMS_OFFSET;
                 ams_config.max_ticks = 0x7fffffff;
-                ams_config.pole_pairs = 3;
+                ams_config.pole_pairs = 5;
                 ams_config.cache_time = AMS_CACHE_TIME;
                 ams_config.velocity_loop = AMS_VELOCITY_LOOP;
 

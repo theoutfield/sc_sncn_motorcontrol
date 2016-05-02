@@ -326,12 +326,14 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                         actual_speed = i_qei.get_qei_velocity();
                     } else if (torque_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
                         if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
-                            angle = i_biss.get_biss_angle() >> 2; //  << 10 ) >> 12 /
+                            { angle, void } = i_biss.get_biss_angle_velocity();
+                            angle = angle >> 2; //  << 10 ) >> 12 /
                         }
                         actual_speed = i_biss.get_biss_velocity();
                     } else if (torque_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
                         if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
-                            angle = i_ams.get_ams_angle() >> 2; //  << 10 ) >> 12 /
+                            { angle, void } = i_ams.get_ams_angle_velocity();
+                            angle = angle >> 2; //  << 10 ) >> 12 /
                         }
                         actual_speed = i_ams.get_ams_velocity();
                     }

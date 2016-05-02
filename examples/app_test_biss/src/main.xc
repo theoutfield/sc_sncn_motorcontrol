@@ -15,42 +15,67 @@
 #include <pwm_service.h>
 #include <adc_service.h>
 
+//
+//#define ADC_VALUE_0_DEGREES 1640     //0.5V
+//#define ADC_TEMP_ERROR      1120
+//#define ADC_VALUE_PER_DEGREE 32    //10mV/deg
+//
+//int statusTemperature_adc2degrees(int adcValue)
+//{
+//    int temp = 0;
+//
+//    if(adcValue >= (ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR)){ //over zero degrees
+//       temp = ((adcValue - (ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR)) / ADC_VALUE_PER_DEGREE);
+//    } else if (adcValue < ADC_VALUE_0_DEGREES) { //under zero
+//       temp = -1*(((ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR) - adcValue) / ADC_VALUE_PER_DEGREE);
+//    }
+//
+//    if(temp > 140 || temp < -50)
+//        temp = 0;
+//
+//    return temp;
+//}
+
 /* Test BiSS Encoder Client */
 void biss_test(client interface BISSInterface i_biss, client interface ADCInterface i_adc) {
     timer t;
     unsigned int start_time, end_time;
     int count = 0;
     int real_count = 0;
+    int angle = 0;
     int velocity = 0;
     unsigned int position = 0;
     unsigned int status = 0;
     int adc_a = 0, adc_b = 0;
+    { adc_a, adc_b } = i_adc.get_external_inputs();
+    int torque_offset = adc_a-adc_b;
 
     while(1) {
 
         /* get position from BiSS Encoder */
         { count, position, void } = i_biss.get_biss_position();
-        t :> start_time;
         { real_count, void, status } = i_biss.get_biss_real_position();
+
+        t :> start_time;
+        /* get angle and velocity from BiSS Encoder */
+        { angle, velocity } = i_biss.get_biss_angle_velocity();
         t :> end_time;
 
-        /* get velocity from BiSS Encoder */
-        velocity = i_biss.get_biss_velocity();
-
         //get adc
-        { adc_a, adc_b } = i_adc.get_external_inputs();
+//        { adc_a, adc_b } = i_adc.get_external_inputs();
+        adc_a = i_adc.get_temperature();
 
         xscope_int(COUNT, count);                           //absolute count
         xscope_int(REAL_COUNT, real_count);                 //real internal absolute count
         xscope_int(POSITION, position);                     //singleturn position
+        xscope_int(ANGLE, angle);                     //singleturn position
         xscope_int(VELOCITY, velocity);                     //velocity in rpm
         xscope_int(ERROR_BIT, (status&0b10) * 500);         //error bit, should be 0
         xscope_int(WARNING_BIT, (status&0b01) * 1000);      //warning bit, should be 0
         xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
 
-        xscope_int(ADC_A, adc_a);
-        xscope_int(ADC_B, adc_b);
-        xscope_int(ADC_AB, (adc_b-adc_a)/4);
+//        xscope_int(TORQUE, (adc_b-adc_a + torque_offset)/4);
+        xscope_int(TORQUE, adc_a);
 
         delay_milliseconds(1);
     }
@@ -78,11 +103,13 @@ int main() {
          ************************************************************/
         on tile[IFM_TILE]: par {
             /* Triggered PWM Service */
-            pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
+//            pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
+            pwm_service( pwm_ports, c_pwm_ctrl, i_brake);
             i_brake.set_brake(1);
 
             /* ADC Service */
-            adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
+//            adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
+            adc_service(adc_ports, null, i_adc, i_watchdog[1]);
 
             /* Watchdog Service */
             watchdog_service(wd_ports, i_watchdog);
@@ -102,7 +129,7 @@ int main() {
                 biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
                 biss_config.status_length = BISS_STATUS_LENGTH;
                 biss_config.crc_poly = BISS_CRC_POLY;
-                biss_config.pole_pairs = 15;
+                biss_config.pole_pairs = 2;
                 biss_config.polarity = BISS_POLARITY;
                 biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
                 biss_config.clock_divisor = BISS_CLOCK_DIVISOR;

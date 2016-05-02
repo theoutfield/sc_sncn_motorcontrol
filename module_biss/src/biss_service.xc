@@ -123,7 +123,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 break;
 
         //send electrical angle for commutation, ajusted with electrical offset
-        case i_biss[int i].get_biss_angle() -> unsigned int angle:
+        case i_biss[int i].get_biss_angle_velocity() -> { unsigned int angle, int out_velocity }:
                 t :> time;
                 if (timeafter(time, last_biss_read + biss_config.timeout)) {
                     angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
@@ -131,8 +131,12 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                     last_position = angle;
                 } else
                     angle = last_position;
-                if (biss_config.polarity == BISS_POLARITY_INVERTED)
+                if (biss_config.polarity == BISS_POLARITY_INVERTED) {
                     angle = ticks_per_turn - angle;
+                    out_velocity = -velocity;
+                } else {
+                    out_velocity = velocity;
+                }
                 if (biss_config.singleturn_resolution > 12)
                     angle = (biss_config.pole_pairs * (angle >> (biss_config.singleturn_resolution-12)) + biss_config.offset_electrical ) & 4095;
                 else

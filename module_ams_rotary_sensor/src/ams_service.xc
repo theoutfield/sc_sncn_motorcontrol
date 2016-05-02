@@ -557,7 +557,7 @@ int check_ams_config(AMSConfig &ams_config) {
                 break;
 
         //send electrical angle for commutation
-        case i_ams[int i].get_ams_angle() -> unsigned int angle:
+        case i_ams[int i].get_ams_angle_velocity() -> { unsigned int angle, int out_velocity }:
                 t :> time;
                 if (timeafter(time, last_ams_read + ams_config.cache_time)) {
                     angle = readRotarySensorAngleWithCompensation(ams_ports);
@@ -570,6 +570,7 @@ int check_ams_config(AMSConfig &ams_config) {
                     angle = (ams_config.pole_pairs * (angle >> (ams_config.resolution_bits-12)) ) & 4095;
                 else
                     angle = (ams_config.pole_pairs * (angle << (12-ams_config.resolution_bits)) ) & 4095;
+                out_velocity = velocity;
                 break;
 
         //send multiturn count and position

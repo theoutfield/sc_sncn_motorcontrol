@@ -80,7 +80,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
 
                         if(!isnull(i_adc)){
 
-                            foc_loop( fet_driver_ports, motorcontrol_config,
+                            bldc_loop( fet_driver_ports, motorcontrol_config,
                                     hall_config, qei_config,
                                     i_motorcontrol, c_pwm_ctrl, i_adc,
                                     i_hall, i_qei, i_biss, i_ams, i_watchdog, i_brake);
