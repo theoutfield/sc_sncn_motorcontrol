@@ -168,10 +168,9 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
 //#define USE_XSCOPE
      select {
 
-         case tx when timerafter(ts) :> void:
+         case tx when timerafter(ts) :> start_time:
 
              ts += USEC_FAST * motorcontrol_config.commutation_loop_period; //XX kHz commutation loop
-             tx :> start_time;
 
              if (shutdown == 0) { //commutation is enabled
                  //====================== get sensor angle and velocity ======================================
@@ -182,12 +181,6 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
                  } else if (sensor_select == AMS_SENSOR) {
                      //ToDo: preferably merge to a single interface call. Still currently does not introduce much of a delay.
                      { angle_electrical, velocity } = i_ams.get_ams_angle_velocity();
-                 } else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
-                     { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
-                     angle_electrical = (angle_electrical << 12) / max_count_per_hall;
-                     if ((q_value >= 0 && fw_flag == 0) || (q_value < 0 && bw_flag == 0)) {
-                         angle_electrical = i_hall.get_hall_position();
-                     }
                  } else {
                      printstr("\n > BLDC loop feedback sensor error\n");
                      exit(-1);
@@ -195,38 +188,41 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
 
                  //=========== SINE commutation ============//
                  if(motorcontrol_config.commutation_method == SINE){
-                     if (motorcontrol_config.polarity_type == INVERTED_POLARITY)
-                         angle_electrical = 4096 - angle_electrical;
-                     if (calib_flag)
-                         angle_electrical = 0;
-
-                     if (voltage >= 0) {
-                         if (sensor_select == QEI_SENSOR ) {
-                             angle_pwm = (angle_electrical >> 2) & 0x3ff; //512
+                     int voltage_pwm;
+                     if (calib_flag == 0) {
+                         //normalization: sine table is with 1024 base points, angle is 0 - 4095
+                         //applying commutation offset and motor polarity
+                         //we shift the angle by half a turn for positive voltage to correspond to the FOC commutation
+                         if (motorcontrol_config.polarity_type != INVERTED_POLARITY) {
+                             if (voltage >= 0) {
+                                 angle_pwm = ((angle_electrical + 2048 + motorcontrol_config.hall_offset[0]) >> 2) & 1023;
+                                 voltage_pwm = voltage;
+                             } else {
+                                 angle_pwm = ((angle_electrical + motorcontrol_config.hall_offset[1]) >> 2) & 1023;
+                                 voltage_pwm = -voltage;
+                             }
                          } else {
-                             angle_pwm = ((angle_electrical + motorcontrol_config.hall_offset[0]) >> 2) & 0x3ff;
+                             if (voltage >= 0) {
+                                 angle_pwm = ((4096 - angle_electrical + 2048 - motorcontrol_config.hall_offset[0]) >> 2) & 1023;
+                                 voltage_pwm = voltage;
+                             } else {
+                                 angle_pwm = ((4096 - angle_electrical - motorcontrol_config.hall_offset[1]) >> 2) & 1023;
+                                 voltage_pwm = -voltage;
+                             }
                          }
-                         pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half; // 6944 -- 6867range
-                         angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
-                         pwm[1] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half;
-                         angle_pwm = (angle_pwm + 342) & 0x3ff;
-                         pwm[2] = ((sine_third_expanded(angle_pwm)) * voltage) / pwm_half + pwm_half;
-                     } else { /* voltage < 0 */
-                         if (sensor_select == QEI_SENSOR ) {
-                             angle_pwm = (angle_electrical >> 2) & 0x3ff; //3100
-                         } else {
-                             angle_pwm = ((angle_electrical + motorcontrol_config.hall_offset[1]) >> 2) & 0x3ff;
-                         }
-                         pwm[0] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
-                         angle_pwm = (angle_pwm + 341) & 0x3ff;
-                         pwm[1] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
-                         angle_pwm = (angle_pwm + 342) & 0x3ff;
-                         pwm[2] = ((sine_third_expanded(angle_pwm)) * -voltage) / pwm_half + pwm_half;
+                     } else {
+                         angle_pwm = 256; //1/4 turn (10 bit angle)
+                         voltage_pwm = voltage;
                      }
+
+                     pwm[0] = ((sine_third_expanded(angle_pwm)) * voltage_pwm) / pwm_half + pwm_half; // 6944 -- 6867range
+                     angle_pwm = (angle_pwm + 341) & 0x3ff; /* +120 degrees (sine LUT size divided by 3) */
+                     pwm[1] = ((sine_third_expanded(angle_pwm)) * voltage_pwm) / pwm_half + pwm_half;
+                     angle_pwm = (angle_pwm + 342) & 0x3ff;
+                     pwm[2] = ((sine_third_expanded(angle_pwm)) * voltage_pwm) / pwm_half + pwm_half;
 
                      /* Limiting PWM values (and suppression of short pulses) is done in
                       * update_pwm_inv() */
-                     //update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
                  //=================55,6 usec ============= F O C - L O O P =================================================================================
                  //FixMe: Make proper synchronization with PWM and ADC. Currently loop period is 110 usec
@@ -236,14 +232,11 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
                      //====================== get phase currents ======================================
                      {current_ph_b, current_ph_c} = i_adc.get_currents();//42 usec in triggered, 15 usec on request
     //                 { adc_a, adc_b } = i_adc.get_external_inputs();
-#ifdef USE_XSCOPE
-                     xscope_int(PHASE_B, current_ph_b);
-                     xscope_int(PHASE_C, current_ph_c);
-#endif
 
                      if (calib_flag == 0) {
                          //normalization: sine table is with 1024 base points, angle is 0 - 4095
-                         //and applying commutation offset and motor polarity
+                         //applying commutation offset and motor polarity
+                         //the cclk commutation offset is only used for Hall sensor
                          if (motorcontrol_config.polarity_type != INVERTED_POLARITY) {
                              if (sensor_select != HALL_SENSOR || q_value >= 0) {
                                  mmTheta = ((angle_electrical + motorcontrol_config.hall_offset[0]) >> 2) & 1023;
@@ -258,37 +251,23 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
                              }
                          }
 
-#ifdef USE_XSCOPE
-                         xscope_int(ANGLE_ELECTRICAL, angle_electrical);
-                         xscope_int(VELOCITY, velocity);
-#endif
-
                          //==========================  clarke transformation  ===========================================================================
                          {clarke_alpha, clarke_beta} = clarke_transformation(current_ph_b, current_ph_c);
 
                          //========================== park transform ============================
-                         mmSinus  = sine_table_1024[mmTheta];         // sine( fp.Minp[mmTheta] );
-                         mmTheta = (256 - mmTheta);              // 90-fp.Minp[mmTheta]
-                         mmTheta &= 0x3FF;
-                         mmCosinus  = sine_table_1024[mmTheta];       // values from 0 to +/- 16384
+                         mmSinus   = sine_table_1024[mmTheta];                 //  sine( fp.Minp[mmTheta] )  values from 0 to +/- 16384
+                         mmCosinus = sine_table_1024[(256 - mmTheta) & 1023];  //cosine(90-fp.Minp[mmTheta])
 
                          field_new  = (((clarke_alpha * mmCosinus )  /16384) + ((clarke_beta *  mmSinus ) /16384));
                          torq_new   = (((clarke_beta  * mmCosinus )  /16384) - ((clarke_alpha * mmSinus ) /16384));
 
                          field_lpf = low_pass_pt1_filter(filter_sum, fffield, 4,  field_new);
-#ifdef USE_XSCOPE
-                         xscope_int(FIELD, field_lpf);
-    //                     xscope_int(TORQUE_RAW, torq_new);
-#endif
                          //========================= filter torque  =======================================================================
                          //ToDo: find a better filtering way
                          //torq_period = calc_mean_one_periode(iCX, iXX, torq_new, torq_period, hall_pin_state, 16);  // every cycle
 
                          torq_pt1             = low_pass_pt1_filter(filter_sum, fftorque, 4,  torq_new);
     //                     torq_pt1 = (adc_b -adc_a + torque_offset)/4;
-#ifdef USE_XSCOPE
-                         xscope_int(TORQUE, torq_pt1);
-#endif
                          //========================= filter field ===========================================================
                          //ToDo: find a better filtering way
                          //field_mean = calc_mean_one_periode(iCX, iXX, field_new, field_mean, hall_pin_state, 32);  // every cycle
@@ -334,26 +313,16 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
                              q_value = torque_control_output;
                          }
                          //===========================
-#ifdef USE_XSCOPE
-                         xscope_int(VOLTAGE, q_value);
-                         xscope_int(TARGET_TORQUE, target_torque);
-                         xscope_int(ERROR_TORQUE, target_torque-actual_torque);
-                         xscope_int(ERROR_TORQUE_INTEGRAL, error_torque_integral);
-#endif
                          //==== Field Controller ====
                          if (field_control_flag == 1)
                              field_out = field_control(field_control_params, field_lpf, q_value, filter_sum); //ToDo: analyze the condition
                          else
                              field_out = 0;
-#ifdef USE_XSCOPE
-    //                     xscope_int(FIELD_CONTROLLER_OUTPUT, field_out);
-#endif
                          //====================================================================================================
 
                          //============== FOC INVERS PARK =====================================================================
                          if(boost > 0) boost--;
                          if(boost < 0) boost++;
-
 
                          {park_alpha, park_beta }      = invers_park(mmSinus, mmCosinus, field_out, (q_value + boost/def_BOOST_RANGE));
 
@@ -365,15 +334,15 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
 
                          //speed_actual = velocity;
 
-                         //FIXME angle adjust, using constant for now
+                         //FIXME shift angle by 1/4 turn because it's the difference between angle_electrical and angle_inv_park
     //                     angle_pwm  =  adjust_angle_reference_pwm(angle_inv_park, 0, hall_pin_state, speed_actual, q_value, filter_sum, sensor_select);
-                         angle_pwm = (angle_inv_park + 3072) & 4095;
+                         angle_pwm = (angle_inv_park + 1024) & 4095;
 
                          //========== prepare PWM =================================================================
 
                      } else {//offset calibration
-                         umot_motor = 500;
-                         angle_pwm = 0;
+                         umot_motor = q_value/2;
+                         angle_pwm = 1024; //1/4 turn
                      }
 
                      space_vector_pwm(umot_motor,  angle_pwm,  pwm_enabled, pwm);
@@ -390,29 +359,39 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
 
              tx :> end_time;
 
-              //FIXME: this is to prevent blocking by adding a microsecond before the next loop when time is more than 110 us
+#ifdef USE_XSCOPE
+             if (motorcontrol_config.commutation_method == FOC) {
+                 xscope_int(PHASE_B, current_ph_b);
+                 xscope_int(PHASE_C, current_ph_c);
+                 xscope_int(VELOCITY, velocity);
+                 xscope_int(FIELD, field_lpf);
+                 xscope_int(VOLTAGE, q_value);
+                 xscope_int(TORQUE, torq_pt1);
+                 xscope_int(TARGET_TORQUE, target_torque);
+                 xscope_int(ERROR_TORQUE, target_torque-actual_torque);
+                 xscope_int(ERROR_TORQUE_INTEGRAL, error_torque_integral);
+                 xscope_int(ANGLE_ELECTRICAL, mmTheta);
+                 xscope_int(ANGLE_PWM, angle_pwm>>2);
+                 xscope_int(CYCLE_TIME, (end_time - start_time)/USEC_FAST);
+             }
+#endif
+
+              //FIXME: this is to prevent blocking by adding a microsecond before the next loop when the time is more than 110 us
              if (timeafter(end_time, ts))
                  ts = end_time + USEC_FAST;
-#ifdef USE_XSCOPE
-              xscope_int(CYCLE_TIME, (end_time - start_time)/250);
-#endif
              break;
 
-         case i_motorcontrol[int i].set_voltage(int q_value_):
-             q_direct_select = 1;
-             pwm_enabled = 1;
-             if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
-                 q_value = -q_value_;
-             else
-                 q_value = q_value_;
+         case i_motorcontrol[int i].set_voltage(int in_q_value):
+             q_value = in_q_value;
 
              if (q_value > q_limit) //limit q (voltage)
                  q_value = q_limit;
              else if (q_value < -q_limit)
                  q_value = -q_limit;
 
-             if(motorcontrol_config.commutation_method == SINE) voltage = q_value;
-
+             voltage = q_value;
+             q_direct_select = 1;
+             pwm_enabled = 1;
              error_torque_previous = 0;
              error_torque_integral = 0;
              break;
@@ -420,8 +399,6 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
          case i_motorcontrol[int i].set_torque(int torque_sp):
              q_direct_select = 0;
              field_control_flag = 1;
-             if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
-                 torque_sp = -torque_sp;
              if ((target_torque ^ torque_sp) < 0) { //target torque sign changed, reset torque control
                  error_torque_previous = 0;
                  error_torque_integral = 0;
@@ -474,8 +451,6 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
              break;
 
          case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
-                 if (motorcontrol_config.bldc_winding_type != new_parameters.bldc_winding_type)
-                     q_value = -q_value;
                  motorcontrol_config = new_parameters;
 
                  notification = MOTCTRL_NTF_CONFIG_CHANGED;
@@ -553,63 +528,33 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
                  calib_flag = in_flag;
                  if (calib_flag == 0) {
                      int calib_angle;
-                     if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
-                         calib_angle = 1024;
+                     if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
+                         calib_angle = 2048;
                      } else {
-                         calib_angle = 3072;
+                         calib_angle = 0;
                      }
                      if (sensor_select == HALL_SENSOR) {
-                         //Hall has a low resolution so the offsets could need to be shifted by +/- 1/6 turn
-                         out_offset = (1024 - i_hall.get_hall_position()) & 4095;
-                         if (motorcontrol_config.commutation_method == FOC) {
-                             if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
-                                 if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
-                                     motorcontrol_config.hall_offset[0] = (out_offset - 682) & 4095; // -1/6 turn
-                                     motorcontrol_config.hall_offset[1] = out_offset; // offset clk + 1/6 turn
-                                 } else {
-                                     motorcontrol_config.hall_offset[1] = (out_offset - 682 + 2048) & 4095; // + half turn -1/6 turn
-                                     motorcontrol_config.hall_offset[0] = (out_offset + 2048) & 4095; // offset cclk + 1/6 turn
-                                 }
-                             } else {
-                                 if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
-                                     motorcontrol_config.hall_offset[0] = out_offset;
-                                     motorcontrol_config.hall_offset[1] = (out_offset + 682) & 4095; // offset clk + 1/6 turn
-                                 } else {
-                                     motorcontrol_config.hall_offset[1] = (out_offset + 2048) & 4095; // half turn + 1/6 turn
-                                     motorcontrol_config.hall_offset[0] = (out_offset + 2048 + 682) & 4095; // offset cclk + 1/6 turn
-                                 }
-                             }
-                         } else { //SINE
-                             if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
-                                 if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
-                                     motorcontrol_config.hall_offset[0] = (out_offset - 682) & 4095; // -1/6 turn
-                                     motorcontrol_config.hall_offset[1] = (out_offset + 682) & 4095; // + half turn - 1/6 turn
-                                 } else {
-                                     motorcontrol_config.hall_offset[1] = (out_offset - 682) & 4095;
-                                     motorcontrol_config.hall_offset[0] = (out_offset + 682) & 4095;
-                                 }
-                             } else {
-                                 if (motorcontrol_config.bldc_winding_type == STAR_WINDING) {
-                                     motorcontrol_config.hall_offset[0] = out_offset;
-                                     motorcontrol_config.hall_offset[1] = (out_offset + 2731) & 4095; // + half turn + 1/6 turn
-                                 } else {
-                                     motorcontrol_config.hall_offset[1] = out_offset;
-                                     motorcontrol_config.hall_offset[0] = (out_offset + 2731) & 4095;
-                                 }
-                             }
+                         //We send the motor to 1/4 position, Hall has a 1/6 turn resolution so the offsets need to be shifted by +/- 1/12 turn
+                         out_offset = (calib_angle - i_hall.get_hall_position()) & 4095;
+                         if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
+                             motorcontrol_config.hall_offset[0] = (out_offset + 2048 - 4096/12) & 4095;
+                             motorcontrol_config.hall_offset[1] = (out_offset + 2048 + 4096/12) & 4095;
+                         } else {
+                             motorcontrol_config.hall_offset[0] = (out_offset + 2048 + 4096/12) & 4095;
+                             motorcontrol_config.hall_offset[1] = (out_offset + 2048 - 4096/12) & 4095;
                          }
                      } else if (sensor_select == BISS_SENSOR) {
-                         out_offset = i_biss.reset_biss_angle_electrical(calib_angle);// quarter turn
+                         out_offset = i_biss.reset_biss_angle_electrical(calib_angle);
                          motorcontrol_config.hall_offset[0] = 0;
-                         motorcontrol_config.hall_offset[1] = 2048;
+                         motorcontrol_config.hall_offset[1] = 0;
                      } else if (sensor_select == AMS_SENSOR) {
-                         out_offset = i_ams.reset_ams_angle(calib_angle);// quarter turn
+                         out_offset = i_ams.reset_ams_angle(calib_angle);
                          motorcontrol_config.hall_offset[0] = 0;
-                         motorcontrol_config.hall_offset[1] = 2048;
+                         motorcontrol_config.hall_offset[1] = 0;
                      }
                  } else {
                      motorcontrol_config.hall_offset[0] = 0;
-                     motorcontrol_config.hall_offset[1] = 2048;
+                     motorcontrol_config.hall_offset[1] = 0;
                  }
                  break;
 
@@ -622,7 +567,6 @@ void bldc_loop( FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontr
 
                 motorcontrol_config.hall_offset[0] = in_commutation_config.hall_offset[0];
                 motorcontrol_config.hall_offset[1] = in_commutation_config.hall_offset[1];
-                motorcontrol_config.bldc_winding_type = in_commutation_config.bldc_winding_type;
                 //motorcontrol_config.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
 
                 q_value = 0;
@@ -661,11 +605,11 @@ void space_vector_pwm(int umot, int angle, int pwm_on_off, unsigned pwmout[])
 
      // pwm 13889 * 4 nsec = 55,6 microsec  18Khz
     // space vector table with 1024 base points   Umax = 6944
-     pwmout[1] = ((SPACE_TABLE[angle]) * umot)/4096   + PWM_MAX_VALUE/2;  // PhaseB
+     pwmout[0] = ((SPACE_TABLE[angle]) * umot)/4096   + PWM_MAX_VALUE/2;  // PhaseB
      angle = (angle +341) & 0x3ff;
-     pwmout[2] = ((SPACE_TABLE[angle])*  umot)/4096   + PWM_MAX_VALUE/2;  // PhaseC
+     pwmout[1] = ((SPACE_TABLE[angle])*  umot)/4096   + PWM_MAX_VALUE/2;  // PhaseC
      angle = (angle + 342) & 0x3ff;
-     pwmout[0] = ((SPACE_TABLE[angle])* umot)/4096    + PWM_MAX_VALUE/2;  // PhaseA
+     pwmout[2] = ((SPACE_TABLE[angle])* umot)/4096    + PWM_MAX_VALUE/2;  // PhaseA
 
 
      if(pwmout[0] < PWM_MIN_LIMIT)      pwmout[0] = 0;
