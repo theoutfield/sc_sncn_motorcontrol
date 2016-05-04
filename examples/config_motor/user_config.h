@@ -32,10 +32,10 @@
 ///////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   BISS_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   AMS_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
-#define MOTOR_FEEDBACK_SENSOR      BISS_SENSOR
+#define MOTOR_FEEDBACK_SENSOR      AMS_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
 #define QEI_SENSOR_INDEX_TYPE      QEI_WITH_INDEX
@@ -57,10 +57,10 @@
 #define COMMUTATION_LOOP_PERIOD     110
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      2200//0
+#define COMMUTATION_OFFSET_CLK      0//0
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     50
+#define COMMUTATION_OFFSET_CCLK     0
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION
@@ -100,8 +100,8 @@
 // PROFILER LIMITIS
 #define MAX_POSITION_LIMIT      0x7fffffff        // ticks (max range: 2^30, limited for safe operation)
 #define MIN_POSITION_LIMIT      -0x7fffffff       // ticks (min range: -2^30, limited for safe operation)
-#define MAX_VELOCITY            6000            // rpm
-#define MAX_ACCELERATION        4000            // rpm/s
-#define MAX_DECELERATION        4000            // rpm/s
+#define MAX_VELOCITY            7000            // rpm
+#define MAX_ACCELERATION        7000            // rpm/s
+#define MAX_DECELERATION        7000            // rpm/s
 #define MAX_CURRENT_VARIATION   800             // adc_ticks/s
 #define MAX_CURRENT             800             // adc_ticks

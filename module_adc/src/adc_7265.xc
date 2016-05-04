@@ -14,9 +14,23 @@
 
 #include "adc_7265.h"
 
+
+
 #define SHIFTING_BITS   1
 
+//Takes 8ms for the filter to react to a current spike
+#define OVERCURRENT_SAMPLES 20
+
+#ifdef DISPLAY_MAX_CURRENTS
+#include <xscope.h>
+#endif
+
+
 int overcurrent_count = 0;
+
+int averageB = 0;
+int averageC = 0;
+
 
 void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
                             unsigned char config,
@@ -28,6 +42,26 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
     unsigned char mux_config;
     timer t;
     unsigned int ts;
+
+    #ifdef GET_ADC_CYCLE_TIME
+    timer tt;
+    int last_time, current_time;
+    last_time = current_time;
+    tt :> current_time;
+    if(current_time > 900000000)
+    {
+        printstr("\nADC cycle:");
+        printint(current_time-last_time);
+    }
+    #endif
+
+    #ifdef GET_DURATION
+    timer tt;
+    int start,end;
+    tt :> start;
+    #endif
+
+
 
 ///////////////First we sample currents///////////////////
     mux_config = (1 << 3); //Channel 0 - Config 1 : Currents
@@ -62,22 +96,60 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
     adc_data[1][0] = (int)tmp_val;
     adc_data[1][0] = adc_data[1][0] << 2;  // So we extend to 14Bit: 0 - 16384
 
-    if ( (adc_data[0][0] > OVERCURRENT_IN_ADC_TICKS) || (adc_data[1][0] > OVERCURRENT_IN_ADC_TICKS)
-        || (adc_data[0][0] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (adc_data[1][0] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
-        overcurrent_count++;
-        if(!isnull(i_watchdog)){
-            i_watchdog.stop();
-            if (overcurrent_count == 1) {
-                printstr("\n> Overcurrent at start, ignoring...");
-            } else {
-                printstr("\n> Overcurrent! ");
-                printintln(overcurrent_count);
+    if(averageB == 0)
+        {
+            averageB = adc_data[0][0]/2;
+        }
+        else
+        {
+            //Simplified moving average
+            averageB = (averageB*(OVERCURRENT_SAMPLES-1))/OVERCURRENT_SAMPLES + adc_data[0][0]/OVERCURRENT_SAMPLES;
+        }
+
+        if(averageC == 0)
+        {
+            averageC = adc_data[1][0]/2;
+        }
+        else
+        {
+            //Simplified moving average
+            averageC = (averageC*(OVERCURRENT_SAMPLES-1))/OVERCURRENT_SAMPLES + adc_data[1][0]/OVERCURRENT_SAMPLES;
+        }
+
+        #ifdef DISPLAY_MAX_CURRENTS
+        xscope_int(MAX_HIGH,OVERCURRENT_IN_ADC_TICKS-MAX_ADC_VALUE/2);
+        xscope_int(MAX_LOW,(MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)-MAX_ADC_VALUE/2);
+        xscope_int(AVERAGEC, averageC-MAX_ADC_VALUE/2);
+        xscope_int(AVERAGEB, averageB-MAX_ADC_VALUE/2);
+        #endif
+
+        if ( (averageB > OVERCURRENT_IN_ADC_TICKS) || (averageC > OVERCURRENT_IN_ADC_TICKS)
+            || (averageB < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (averageC < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
+            overcurrent_count++;
+            if(!isnull(i_watchdog)){
+                //We discard the first data
+                if (overcurrent_count == 1) {
+                    printstr("\n> Overcurrent at start, ignoring...");
+                } else {
+                    //Reinit average
+                    averageB = 0;
+                    averageC = 0;
+                    i_watchdog.stop();
+                    printstr("\n> Overcurrent! ");
+                    printintln(overcurrent_count);
+                }
             }
         }
-    }
 
-    if(port_id == 0)
-        return;
+        #ifdef GET_DURATION
+        tt :> end;
+        printstr("\nLoop time :");
+        printint(end-start);
+        #endif
+
+        if(port_id == 0)
+               return;
+
 
 /////////////Then we sample the requested index///////////////////////
     mux_config = (config << 3) | (port_id - 1);

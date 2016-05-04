@@ -46,12 +46,12 @@ void position_profile_test(interface PositionControlInterface client i_position_
                            interface BISSInterface client ?i_biss,
                            interface AMSInterface client ?i_ams)
 {
-    const int target = 163840;
+    const int target = 700000;
 //    const int target = 2620000;
     int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
-    int velocity        = 200;         // rpm
-    int acceleration    = 200;         // rpm/s
-    int deceleration    = 200;         // rpm/s
+    int velocity        = 7000;         // rpm
+    int acceleration    = 7000;         // rpm/s
+    int deceleration    = 7000;         // rpm/s
     int follow_error = 0;
     int actual_position = 0;
 
