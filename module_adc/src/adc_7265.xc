@@ -14,8 +14,17 @@
 
 #include "adc_7265.h"
 
+
+
 #define SHIFTING_BITS   1
-#define OVERCURRENT_SAMPLES 50
+
+//Takes 8ms for the filter to react to a current spike
+#define OVERCURRENT_SAMPLES 20
+
+#ifdef DISPLAY_MAX_CURRENTS
+#include <xscope.h>
+#endif
+
 
 int overcurrent_count = 0;
 
@@ -34,11 +43,24 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
     timer t;
     unsigned int ts;
 
-    #ifdef GET_CYCLE_TIME
+    #ifdef GET_ADC_CYCLE_TIME
+    timer tt;
+    int last_time, current_time;
+    last_time = current_time;
+    tt :> current_time;
+    if(current_time > 900000000)
+    {
+        printstr("\nADC cycle:");
+        printint(current_time-last_time);
+    }
+    #endif
+
+    #ifdef GET_DURATION
     timer tt;
     int start,end;
     tt :> start;
     #endif
+
 
 
 ///////////////First we sample currents///////////////////
@@ -91,8 +113,15 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
         else
         {
             //Simplified moving average
-            averageC = (averageB*(OVERCURRENT_SAMPLES-1))/OVERCURRENT_SAMPLES + adc_data[1][0]/OVERCURRENT_SAMPLES;
+            averageC = (averageC*(OVERCURRENT_SAMPLES-1))/OVERCURRENT_SAMPLES + adc_data[1][0]/OVERCURRENT_SAMPLES;
         }
+
+        #ifdef DISPLAY_MAX_CURRENTS
+        xscope_int(MAX_HIGH,OVERCURRENT_IN_ADC_TICKS-MAX_ADC_VALUE/2);
+        xscope_int(MAX_LOW,(MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)-MAX_ADC_VALUE/2);
+        xscope_int(AVERAGEC, averageC-MAX_ADC_VALUE/2);
+        xscope_int(AVERAGEB, averageB-MAX_ADC_VALUE/2);
+        #endif
 
         if ( (averageB > OVERCURRENT_IN_ADC_TICKS) || (averageC > OVERCURRENT_IN_ADC_TICKS)
             || (averageB < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (averageC < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
@@ -112,7 +141,7 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
             }
         }
 
-        #ifdef GET_CYCLE_TIME
+        #ifdef GET_DURATION
         tt :> end;
         printstr("\nLoop time :");
         printint(end-start);

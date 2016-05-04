@@ -5,10 +5,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.2117039820" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -327,6 +327,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_position_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_velocity_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/quick_stop_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_SERIAL}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_ctrl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_linear_mode}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1605921113" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -785,6 +793,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_position_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_velocity_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/quick_stop_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_SERIAL}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_ctrl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_linear_mode}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.277344476" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1250,6 +1266,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_position_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_velocity_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/quick_stop_mode}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_SERIAL}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_ctrl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_linear_mode}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1122502185" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -1288,10 +1312,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.508386041" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">

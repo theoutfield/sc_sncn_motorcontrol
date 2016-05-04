@@ -100,8 +100,8 @@
 // PROFILER LIMITIS
 #define MAX_POSITION_LIMIT      0x7fffffff        // ticks (max range: 2^30, limited for safe operation)
 #define MIN_POSITION_LIMIT      -0x7fffffff       // ticks (min range: -2^30, limited for safe operation)
-#define MAX_VELOCITY            6000            // rpm
-#define MAX_ACCELERATION        4000            // rpm/s
-#define MAX_DECELERATION        4000            // rpm/s
+#define MAX_VELOCITY            7000            // rpm
+#define MAX_ACCELERATION        7000            // rpm/s
+#define MAX_DECELERATION        7000            // rpm/s
 #define MAX_CURRENT_VARIATION   800             // adc_ticks/s
 #define MAX_CURRENT             800             // adc_ticks

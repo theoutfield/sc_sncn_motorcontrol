@@ -24,9 +24,9 @@
     <Probe name="Phase C" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Peak current" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Target Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Error Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Error Torque Integral" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Target Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Error Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Error Torque Integral" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Voltage" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Torque Sensor" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="HALL pins" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
@@ -38,7 +38,10 @@
     <Probe name="CONTROL_ERROR" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="CONTROL I part" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="CONTROL P part" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="position control out" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-
+    <Probe name="Max High" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Max Low" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Averagec" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Averageb" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 </xSCOPEconfig>
