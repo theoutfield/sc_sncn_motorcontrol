@@ -131,16 +131,16 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                     last_position = angle;
                 } else
                     angle = last_position;
-                if (biss_config.polarity == BISS_POLARITY_INVERTED) {
-                    angle = ticks_per_turn - angle;
-                    out_velocity = -velocity;
-                } else {
-                    out_velocity = velocity;
-                }
                 if (biss_config.singleturn_resolution > 12)
                     angle = (biss_config.pole_pairs * (angle >> (biss_config.singleturn_resolution-12)) + biss_config.offset_electrical ) & 4095;
                 else
                     angle = (biss_config.pole_pairs * (angle << (12-biss_config.singleturn_resolution)) + biss_config.offset_electrical ) & 4095;
+                if (biss_config.polarity == BISS_POLARITY_INVERTED) {
+                    angle = (4096 - angle) & 4095;
+                    out_velocity = -velocity;
+                } else {
+                    out_velocity = velocity;
+                }
                 break;
 
         //send singleturn position fast
@@ -279,7 +279,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 last_count = count;
                 last_position = angle;
                 if (biss_config.polarity == BISS_POLARITY_INVERTED)
-                    angle = ticks_per_turn - angle;
+                    new_angle = (4096 - new_angle) & 4095;
                 if (biss_config.singleturn_resolution > 12)
                     biss_config.offset_electrical = (new_angle - biss_config.pole_pairs * (angle >> (biss_config.singleturn_resolution-12)) ) & 4095;
                 else
