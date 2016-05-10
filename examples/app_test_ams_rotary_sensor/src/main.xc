@@ -12,15 +12,8 @@
 #include <ams_service.h>
 #include <ctype.h>
 
-AMSPorts ams_ports = { {
-        IFM_TILE_CLOCK_2,
-        IFM_TILE_CLOCK_3,
-        SOMANET_IFM_GPIO_D3, //D3,    //mosi
-        SOMANET_IFM_GPIO_D1, //D1,    //sclk
-        SOMANET_IFM_GPIO_D2  },//D2     //miso
-        SOMANET_IFM_GPIO_D0 //D0         //slave select
-};
 
+AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
 
 /* Test AMS Sensor Client */
 void ams_rotary_sensor_test(client interface AMSInterface i_ams)
