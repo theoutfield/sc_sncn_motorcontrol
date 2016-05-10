@@ -26,22 +26,17 @@
 #endif
 
 
-int overcurrent_count = 0;
-
-int averageB = 0;
-int averageC = 0;
-
-
-void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
+static int adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
                             unsigned char config,
                             unsigned char &port_id,
-                            unsigned int stabilizing_ticks, interface WatchdogInterface client ?i_watchdog){
+                            unsigned int stabilizing_ticks, int overcurrent_protection_is_active, interface WatchdogInterface client ?i_watchdog){
 
     unsigned inp_val = 0, tmp_val = 0;
     unsigned time_stamp; // Time stamp
     unsigned char mux_config;
     timer t;
     unsigned int ts;
+    int overcurrent_status;
 
     #ifdef GET_ADC_CYCLE_TIME
     timer tt;
@@ -96,25 +91,25 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
     adc_data[1][0] = (int)tmp_val;
     adc_data[1][0] = adc_data[1][0] << 2;  // So we extend to 14Bit: 0 - 16384
 
-    if(averageB == 0)
-        {
-            averageB = adc_data[0][0]/2;
-        }
-        else
-        {
-            //Simplified moving average
-            averageB = (averageB*(OVERCURRENT_SAMPLES-1))/OVERCURRENT_SAMPLES + adc_data[0][0]/OVERCURRENT_SAMPLES;
-        }
-
-        if(averageC == 0)
-        {
-            averageC = adc_data[1][0]/2;
-        }
-        else
-        {
-            //Simplified moving average
-            averageC = (averageC*(OVERCURRENT_SAMPLES-1))/OVERCURRENT_SAMPLES + adc_data[1][0]/OVERCURRENT_SAMPLES;
-        }
+//    if(averageB == 0)
+//        {
+//            averageB = adc_data[0][0]/2;
+//        }
+//        else
+//        {
+//            //Simplified moving average
+//            averageB = (averageB*(OVERCURRENT_SAMPLES-1))/OVERCURRENT_SAMPLES + adc_data[0][0]/OVERCURRENT_SAMPLES;
+//        }
+//
+//        if(averageC == 0)
+//        {
+//            averageC = adc_data[1][0]/2;
+//        }
+//        else
+//        {
+//            //Simplified moving average
+//            averageC = (averageC*(OVERCURRENT_SAMPLES-1))/OVERCURRENT_SAMPLES + adc_data[1][0]/OVERCURRENT_SAMPLES;
+//        }
 
         #ifdef DISPLAY_MAX_CURRENTS
         xscope_int(MAX_HIGH,OVERCURRENT_IN_ADC_TICKS-MAX_ADC_VALUE/2);
@@ -123,22 +118,15 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
         xscope_int(AVERAGEB, averageB-MAX_ADC_VALUE/2);
         #endif
 
-        if ( (averageB > OVERCURRENT_IN_ADC_TICKS) || (averageC > OVERCURRENT_IN_ADC_TICKS)
-            || (averageB < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (averageC < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
-            overcurrent_count++;
-            if(!isnull(i_watchdog)){
-                //We discard the first data
-                if (overcurrent_count == 1) {
-                    printstr("\n> Overcurrent at start, ignoring...");
-                } else {
-                    //Reinit average
-                    averageB = 0;
-                    averageC = 0;
+        if ( (adc_data[0][0] > OVERCURRENT_IN_ADC_TICKS) || (adc_data[1][0] > OVERCURRENT_IN_ADC_TICKS)
+            || (adc_data[0][0] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (adc_data[1][0] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
+
+            if(!isnull(i_watchdog) && overcurrent_protection_is_active){
                     i_watchdog.stop();
-                    printstr("\n> Overcurrent! ");
-                    printintln(overcurrent_count);
-                }
+                    overcurrent_status = 1;
+                    printstr("\n> Overcurrent! ");printint(adc_data[0][0]);printstr(" ");printint(adc_data[1][0]);
             }
+            else overcurrent_status = 0;
         }
 
         #ifdef GET_DURATION
@@ -186,6 +174,7 @@ void adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
     adc_data[1][port_id - 1] = (int)tmp_val;
     adc_data[1][port_id - 1] = adc_data[1][port_id - 1] << 2; // So we extend to 14Bit: 0 - 16384
 
+    return overcurrent_status;
 }
 
 /*****************************************************************************/
@@ -263,6 +252,8 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 {
     int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
     unsigned char sampling_port = 0;
+    int overcurrent_protection_was_triggered = 0;
+    int overcurrent_protection_is_active = 0;
 
     //Calibration variables
     int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
@@ -274,7 +265,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
 
-        adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 0);
+        adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
 
         if (adc_data[0][0]>0 && adc_data[0][0]<16382  &&  adc_data[1][0]>0 && adc_data[1][0]<16382) {
             i_calib_a += adc_data[0][0];
@@ -302,7 +293,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
                 // Config: 1 Port: 1
                 sampling_port = 0;  // If provided port is 0, just once sampling takes place: current,
                                     // and no additional sampling is done
-                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
+                overcurrent_protection_was_triggered = adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
                 Icalibrated_a = ((int) adc_data[0][0]) - i_calib_a;
                 Icalibrated_b =((int) adc_data[1][0]) - i_calib_b;
 
@@ -314,7 +305,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
         case iADC[int i].get_temperature() -> {int out_temp}:
 
                 sampling_port = 5;
-                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
 
                 out_temp = statusTemperature_adc2degrees(adc_data[0][4]);
 
@@ -325,7 +316,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
                 //We sample the external inputs as differential inputs: ch3 - ch4
                 // Config: 0 Port: 3
                 sampling_port = 3;
-                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200, i_watchdog);
+                adc_ad7265_singleshot(adc_ports, adc_data, 0, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
 
                 ext_a = adc_data[0][2];
                 ext_b = adc_data[1][2];
@@ -355,6 +346,15 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
                 break;
 
+        case iADC[int i].enable_overcurrent_protection():
+            //    printstr("\n> Overcurrent protection enabled");
+                overcurrent_protection_is_active = 1;
+                break;
+
+        case iADC[int i].get_overcurrent_protection_status() -> int status:
+                status = overcurrent_protection_was_triggered;
+                break;
+
         }//eof select
     }//eof while
 }
@@ -366,6 +366,8 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
     unsigned char ct;
     int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
     unsigned char sampling_port = 0;
+    int overcurrent_protection_was_triggered = 0;
+    int overcurrent_protection_is_active = 0;
 
     //Calibration variables
     int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
@@ -377,7 +379,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
     while (i < ADC_CALIB_POINTS) {
         // get ADC reading
 
-        adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 0);
+        adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
 
         if (adc_data[0][0]>0 && adc_data[0][0]<16382  &&  adc_data[1][0]>0 && adc_data[1][0]<16382) {
             i_calib_a += adc_data[0][0];
@@ -412,7 +414,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
                     t when timerafter(ts + 7080) :> ts; // 6200
                     //Sampling
-                    adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
+                    overcurrent_protection_was_triggered = adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
                 }
 
                 break;
@@ -435,7 +437,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
                 //We sample the external inputs on ch3 as non differential
                 // Config: 0 Port: 3
                 sampling_port = 3;
-                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, i_watchdog);
+                adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
 
                 ext_a = adc_data[0][2];
                 ext_b = adc_data[1][2];
@@ -463,6 +465,15 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
                 out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
 
+                break;
+
+        case iADC[int i].enable_overcurrent_protection():
+               // printstr("\n> Overcurrent protection enabled");
+                overcurrent_protection_is_active = 1;
+                break;
+
+        case iADC[int i].get_overcurrent_protection_status() -> int status:
+                status = overcurrent_protection_was_triggered;
                 break;
 
         }//eof select

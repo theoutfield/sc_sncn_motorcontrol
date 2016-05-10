@@ -63,6 +63,19 @@ interface ADCInterface{
      * @return Amps [A].
      */
     float helper_ticks_to_amps(int ticks);
+
+    /**
+     * @brief Enable overcurrent protection.
+     *
+     */
+    void enable_overcurrent_protection();
+
+    /**
+     * @brief Get status if overcurrent protection was triggered.
+     *
+     * @return status [0/1]
+     */
+    int get_overcurrent_protection_status();
 };
 
 /**

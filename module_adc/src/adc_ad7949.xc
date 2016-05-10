@@ -147,7 +147,7 @@ static inline unsigned convert(unsigned raw)
  */
 
 #pragma unsafe arrays
-static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
+static int adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
                                    in buffered port:32 p_data_a,
                                    in buffered port:32 p_data_b,
                                    clock clk,
@@ -158,11 +158,13 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
                                    unsigned int adc_data_a[],
                                    unsigned int adc_data_b[],
                                    unsigned short &adc_index,
+                                   int overcurrent_protection_is_active,
                                    interface WatchdogInterface client ?i_watchdog)
 {
     unsigned int ts;
     unsigned int data_raw_a;
     unsigned int data_raw_b;
+    int overcurrent_status;
 
     /* Reading/Writing after conversion (RAC)
        Read previous conversion result
@@ -201,14 +203,18 @@ static void adc_ad7949_singleshot( buffered out port:32 p_sclk_conv_mosib_mosia,
 
     if ( (adc_data_a[4] > OVERCURRENT_IN_ADC_TICKS) || (adc_data_b[4] > OVERCURRENT_IN_ADC_TICKS)
         || (adc_data_a[4] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS)) || (adc_data_b[4] < (MAX_ADC_VALUE - OVERCURRENT_IN_ADC_TICKS))){//overcurrent condition
-        if(!isnull(i_watchdog)){
-            i_watchdog.stop();
-            printstr("\n> Overcurrent!\n");
+
+        if(!isnull(i_watchdog) && overcurrent_protection_is_active){
+                i_watchdog.stop();
+                overcurrent_status = 1;
+                printstr("\n> Overcurrent! ");printint(adc_data_a[4]);printstr(" ");printint(adc_data_b[4]);
         }
     }
+    else overcurrent_status = 0;
 
     SPI_IDLE;
     t :> ts;
+    return overcurrent_status;
 }
 
 void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
@@ -230,6 +236,8 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
     unsigned int adc_data_b[5];
     unsigned short adc_index = 0;
     int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+    int overcurrent_protection_was_triggered = 0;
+    int overcurrent_protection_is_active = 0;
 
     configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
@@ -239,7 +247,7 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
         // get ADC reading
 
         adc_ad7949_singleshot(adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
-                                               adc_config_mot,  adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
+                                               adc_config_mot,  adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
 
         if (adc_data_a[4]>0 && adc_data_a[4]<16384  &&  adc_data_b[4]>0 && adc_data_b[4]<16384) {
             i_calib_a += adc_data_a[4];
@@ -271,9 +279,9 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
                 t :> ts;
                 t when timerafter(ts + 7080) :> ts; // 6200
 
-                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
-                                        adc_ports.clk, adc_config_mot,	adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index, i_watchdog);
+                overcurrent_protection_was_triggered = adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+                                                                              adc_ports.clk, adc_config_mot,	adc_config_other, delay, t, adc_data_a,
+                                                                              adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
             }
 
             break;
@@ -320,6 +328,15 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
                 out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
 
                 break;
+
+        case i_adc[int i].enable_overcurrent_protection():
+              //  printstr("\n> Overcurrent protection enabled");
+                overcurrent_protection_is_active = 1;
+                break;
+
+        case i_adc[int i].get_overcurrent_protection_status() -> int status:
+                status = overcurrent_protection_was_triggered;
+                break;
         }
 
         Icalibrated_a = ((int) adc_data_a[4]) - i_calib_a;
@@ -343,6 +360,8 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
     unsigned int adc_data_b[5];
     unsigned short adc_index = 0;
     int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+    int overcurrent_protection_was_triggered = 0;
+    int overcurrent_protection_is_active = 0;
 
     configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
@@ -352,7 +371,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
         // get ADC reading
 
         adc_ad7949_singleshot(adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b, adc_ports.clk,
-                                               adc_config_mot,  adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index);
+                                               adc_config_mot,  adc_config_other, delay, t, adc_data_a, adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
 
         if (adc_data_a[4]>0 && adc_data_a[4]<16384  &&  adc_data_b[4]>0 && adc_data_b[4]<16384) {
             i_calib_a += adc_data_a[4];
@@ -381,9 +400,9 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 
 
                 //If no trigger exists on the system, we sample on request
-                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
-                                        adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index, i_watchdog);
+                overcurrent_protection_was_triggered =  adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+                                                                               adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
+                                                                               adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
 
                 Icalibrated_a = ((int) adc_data_a[4]) - i_calib_a;
                 Icalibrated_b = ((int) adc_data_b[4]) - i_calib_b;
@@ -399,7 +418,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                 adc_index = 1;
                 adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
                                         adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index, i_watchdog);
+                                        adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
 
                 out_temp = adc_data_a[1];
 
@@ -411,7 +430,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                 adc_index = 3;
                 adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
                                         adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index, i_watchdog);
+                                        adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
 
                 ext_a = adc_data_a[3];
                 ext_b = adc_data_b[3];
@@ -439,6 +458,15 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 
                 out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
 
+                break;
+
+        case i_adc[int i].enable_overcurrent_protection():
+          //      printstr("\n> Overcurrent protection enabled");
+                overcurrent_protection_is_active = 1;
+                break;
+
+        case i_adc[int i].get_overcurrent_protection_status() -> int status:
+                status = overcurrent_protection_was_triggered;
                 break;
         }
     }
