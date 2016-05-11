@@ -59,6 +59,10 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     //commutation
     int angle_electrical = 0;
     int angle_pwm = 0;
+    if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
+        motorcontrol_config.polarity_type = INVERTED_POLARITY;
+    else
+        motorcontrol_config.polarity_type = NORMAL_POLARITY;
     unsigned int pwm[3] = { 0, 0, 0 };
     int velocity = 0;
     int shutdown = 0; //Disable FETS
@@ -444,6 +448,10 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
         case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
                 motorcontrol_config = new_parameters;
+                if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
+                    motorcontrol_config.polarity_type = INVERTED_POLARITY;
+                else
+                    motorcontrol_config.polarity_type = NORMAL_POLARITY;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
@@ -554,6 +562,10 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
                 motorcontrol_config.hall_offset[0] = in_commutation_config.hall_offset[0];
                 motorcontrol_config.hall_offset[1] = in_commutation_config.hall_offset[1];
+                if (in_commutation_config.bldc_winding_type == DELTA_WINDING)
+                    motorcontrol_config.polarity_type = INVERTED_POLARITY;
+                else
+                    motorcontrol_config.polarity_type = NORMAL_POLARITY;
                 //motorcontrol_config.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
 
                 voltage_q = 0;
