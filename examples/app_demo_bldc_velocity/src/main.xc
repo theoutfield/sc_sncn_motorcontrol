@@ -1,8 +1,8 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
-#include <CORE_C21-rev-a.bsp>
-#include <IFM_DC1K-rev-c2.bsp>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC100-rev-b.bsp>
 
 /**
  * @file test_velocity-ctrl.xc
@@ -138,7 +138,7 @@ int main(void)
             par
             {
                 /* Triggered PWM Service */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, BRAKE_ENABLE);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, null);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
@@ -187,7 +187,7 @@ int main(void)
 
                     ams_service(ams_ports, ams_config, i_ams);
                 }
-#else
+#elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                 /* BiSS service */
                 {
                     BISSConfig biss_config;
@@ -223,16 +223,16 @@ int main(void)
 
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], i_qei[0], null, null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_hall[0], i_qei[0], null, null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, i_ams[0], i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, i_biss[0], null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);
 #endif
                 }
             }

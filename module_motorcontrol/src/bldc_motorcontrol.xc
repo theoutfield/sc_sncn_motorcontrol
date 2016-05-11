@@ -154,6 +154,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     }
 
     tx :> ts;
+
+    i_adc.enable_overcurrent_protection();
+
     while(1) {
         select {
 

@@ -90,8 +90,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             printstr(">! ADC interface is not provided to the motorcontrol service...\n");
                             printstr(">! stopping the service...\n");
                             exit(-1);
-//                            bldc_loop(hall_config, qei_config, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_motorcontrol,
-//                                c_pwm_ctrl, fet_driver_ports, motorcontrol_config);
                         }
 
 
