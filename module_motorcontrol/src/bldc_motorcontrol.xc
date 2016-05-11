@@ -82,9 +82,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     int field_new = 0;
     int field_lpf = 0;
     int torq_new = 0;
-    int torq_period = 0;
+//    int torq_period = 0;
     int torq_pt1 = 0;
-    int field_mean = 0;
+//    int field_mean = 0;
     int boost = defBOOST;
     int umot_motor = 0;
     int pwm_enabled = 0;
@@ -110,10 +110,12 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     int velocity_limit = 0x7fffffff; //max velocity during torque control
     int actual_torque = 0;
     int error_torque = 0, error_torque_previous = 0;
+    int torque_control_output_previous = 0;
     int error_torque_integral = 0;
     int error_torque_derivative = 0;
     int pid_denominator = 10000;
     int error_torque_integral_limit = 100000;
+    int k1 = 20, k2 = 100, k3 = 10;
     int Kp_n = 8000, Ki_n = 1000, Kd_n = 10;
 
     //torque sensor
@@ -285,24 +287,11 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                                 target_torque = 0;
 
                             actual_torque = torq_pt1;
-                            //compute the control output
-                            error_torque = target_torque - actual_torque; // 350
-                            error_torque_integral = error_torque_integral + error_torque;
-                            error_torque_derivative = error_torque - error_torque_previous;
-
-                            if (error_torque_integral > error_torque_integral_limit) {
-                                error_torque_integral = error_torque_integral_limit;
-                            } else if (error_torque_integral < -error_torque_integral_limit) {
-                                error_torque_integral = -error_torque_integral_limit;
-                            }
-
-                            voltage_q = (Kp_n * error_torque) +
-                                    (Ki_n * error_torque_integral) +
-                                    (Kd_n * error_torque_derivative);
-
-                            voltage_q /= pid_denominator;
-
-                            error_torque_previous = error_torque;
+                            error_torque = ((k1 * target_torque)/10) - actual_torque;
+                            voltage_q = ((10000+k2) * error_torque) -
+                                    ( 10000     * error_torque_previous) +
+                                    ((10000-k3) * torque_control_output_previous);
+                            voltage_q /= 10000;
 
                             //limit q (voltage) output
                             if (voltage_q > voltage_q_limit) {
@@ -310,6 +299,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                             }else if (voltage_q < -voltage_q_limit) {
                                 voltage_q = -voltage_q_limit;
                             }
+
+                            error_torque_previous = error_torque;
+                            torque_control_output_previous = voltage_q;
                         }
                         //===========================
                         //==== Field Controller ====
