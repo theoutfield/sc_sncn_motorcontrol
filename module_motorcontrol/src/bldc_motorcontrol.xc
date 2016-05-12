@@ -234,7 +234,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
                     //====================== get phase currents ======================================
                     {current_ph_b, current_ph_c} = i_adc.get_currents();//42 usec in triggered, 15 usec on request
-                    //{ adc_a, adc_b } = i_adc.get_external_inputs();
+                    { adc_a, adc_b } = i_adc.get_external_inputs();
 
                     if (calib_flag == 0) {
                         //normalization: sine table is with 1024 base points, angle is 0 - 4095
@@ -387,10 +387,6 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
         case i_motorcontrol[int i].set_torque(int torque_sp):
                 q_direct_select = 0;
                 field_control_flag = 1;
-                if ((target_torque ^ torque_sp) < 0) { //target torque sign changed, reset torque control
-                    error_torque_previous = 0;
-                    error_torque_integral = 0;
-                }
                 target_torque = torque_sp;
                 //limit torque
                 if(target_torque > torque_max)
@@ -426,7 +422,8 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 break;
 
         case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
-                torque_actual = torq_pt1;
+//                torque_actual = torq_pt1;
+                torque_actual = adc_b - adc_a;
                 break;
 
         case i_motorcontrol[int i].get_field() -> int out_field:

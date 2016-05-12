@@ -73,6 +73,8 @@ interface PositionControlInterface{
      *         1 - initialized.
      */
     int check_busy();
+
+    void set_torque_limit(int in_torque_limit);
 };
 
 /**

@@ -13,6 +13,7 @@
 #include <mc_internal_constants.h>
 #include <hall_service.h>
 #include <qei_service.h>
+#include <filters.h>
 
 void init_position_control(interface PositionControlInterface client i_position_control)
 {
@@ -62,19 +63,86 @@ void position_control_service(ControlConfig &position_control_config,
     int position_control_out_limit = 0;
     int error_position_I_limit = 0;
 
+    /* for cascaded control */
+    int adc_a, adc_b;
+    int velocity = 0;
+    //General Control Variables
+//    int first_loop_counter = 0;
+    unsigned T_k = 0, T_k_1n = 0;
+    unsigned T_s_desired = 1000; //us
+    unsigned T_s = T_s_desired;
+
+    //Joint Torque Control
+    int i1_torque_j_ref = 0;
+    int f1_torque_j_lim = 50000;
+    float f1_torque_j_sens_measured = 0;
+    int i1_torque_j_sens_offset = 0;
+    int i1_torque_j_sens_offset_accumulator = 0;
+    float f1_torque_j_sens = 0;
+    int i1_torque_j_sens = 0;
+    int i1_torque_j_sens_1n = 0;
+    float f1_torque_j_sens_1n = 0;
+    float f1_torque_j_sens_2n = 0;
+    SecondOrderLPfilterParam torque_sensor_SO_LP_filter_param;
+    int torque_j_error = 0;
+    int torque_j_derivative = 0;
+    int torque_j_Kp = 0;
+    int torque_j_Ki = 0;
+    int torque_j_Kd = 0;
+    int torque_j_ctrl_cmd = 0;
+    int torque_j_error_integral = 0;
+    int torque_j_error_integral_limit = 0;
+    int torque_j_ctrl_cmd_lim = 200;
+
+    // Position Control
+    int position_sens = 0;
+    float f1_velocity_sens = 0;
+    float f1_velocity_sens_1n = 0;
+    float f1_velocity_sens_2n = 0;
+    float f1_velocity_sens_measured = 0;
+    SecondOrderLPfilterParam velocity_sensor_SO_LP_filter_param;
+    int i1_velocity_sens = 0;
+    int position_error = 0;
+    int position_error_integral = 0;
+    int position_error_limited = 0;
+    int position_Kp = 0;
+    int position_Ki = 0;
+    int position_Kd = 0;
+    int position_ctrl_cmd = 0;
+    int position_ctrl_cmd_lim = 0;
+    int position_error_integral_limit = 0;
+
+    // A2
+//    second_order_LP_filter_init(/*f_c=*//*18*/120, /*T_s=*/T_s_desired, torque_sensor_SO_LP_filter_param);
+//    second_order_LP_filter_init(/*f_c=*//*80*/140, /*T_s=*/T_s_desired, velocity_sensor_SO_LP_filter_param);
+
+    // A6
+    second_order_LP_filter_init(/*f_c=*/18, /*T_s=*/T_s_desired, torque_sensor_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/80, /*T_s=*/T_s_desired, velocity_sensor_SO_LP_filter_param);
+    /* end cascaded */
+
     timer t;
     unsigned int ts;
 
     int activate = 0;
-    int cascade_with_torque = position_control_config.cascade_with_torque;
-    int cascade_with_torque_update = cascade_with_torque;
 
     int config_update_flag = 1;
     MotorcontrolConfig motorcontrol_config;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
-    if (position_control_config.cascade_with_torque == 1)
-        printstrln("POSITION CONTROL CASCADED WITH TORQUE");
+
+
+    if (position_control_config.cascade_with_torque == 1) {
+        i_motorcontrol.set_torque(0);
+        delay_milliseconds(10);
+        for (int i=0 ; i<2000; i++) {
+            delay_milliseconds(1);
+            i1_torque_j_sens_offset_accumulator += (i_motorcontrol.get_torque_actual());
+        }
+        i1_torque_j_sens_offset = i1_torque_j_sens_offset_accumulator / 2000;
+        i_motorcontrol.set_voltage(0);
+        printstrln(">>   POSITION CONTROL CASCADED WITH TORQUE");
+    }
 
     t :> ts;
 
@@ -84,14 +152,6 @@ void position_control_service(ControlConfig &position_control_config,
             case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
                 if (config_update_flag) {
                     motorcontrol_config = i_motorcontrol.get_config();
-
-                    //FIXME: using the cclk offset to enable cascaded control with torque
-                    if (cascade_with_torque_update == 1 && motorcontrol_config.hall_offset[1] > 0 && motorcontrol_config.commutation_method == FOC) {
-                        cascade_with_torque = 1;
-                        i_motorcontrol.set_torque_max(motorcontrol_config.hall_offset[1]);
-                    } else {
-                        cascade_with_torque = 0;
-                    }
 
                     //Limits
                     if (motorcontrol_config.motor_type == BLDC_MOTOR) {
@@ -133,9 +193,9 @@ void position_control_service(ControlConfig &position_control_config,
                     switch (position_control_config.feedback_sensor) {
                         case HALL_SENSOR:
                             if(!isnull(i_hall)){
+                                velocity = i_hall.get_hall_velocity();
                                 actual_position = i_hall.get_hall_position_absolute();
-                            }
-                            else{
+                            } else{
                                 printstrln("position_ctrl_service: ERROR: Hall interface is not provided but requested");
                                 exit(-1);
                             }
@@ -144,8 +204,7 @@ void position_control_service(ControlConfig &position_control_config,
                         case QEI_SENSOR:
                             if(!isnull(i_qei)){
                                 actual_position =  i_qei.get_qei_position_absolute();
-                            }
-                            else{
+                            } else{
                                 printstrln("position_ctrl_service: ERROR: Encoder interface is not provided but requested");
                                 exit(-1);
                             }
@@ -153,10 +212,9 @@ void position_control_service(ControlConfig &position_control_config,
 
                         case BISS_SENSOR:
                             if(!isnull(i_biss)){
-                            {
-                                actual_position, void, void } = i_biss.get_biss_position();
-                            }
-                            else{
+                                { actual_position, void, void } = i_biss.get_biss_position();
+                                velocity = i_biss.get_biss_velocity();
+                            } else{
                                 printstrln("position_ctrl_service: ERROR: BiSS interface is not provided but requested");
                                 exit(-1);
                             }
@@ -164,52 +222,188 @@ void position_control_service(ControlConfig &position_control_config,
 
                         case AMS_SENSOR:
                             if(!isnull(i_ams)){
-                            {
-                                actual_position, void } = i_ams.get_ams_position();
-                            }
-                            else{
+                                { actual_position, void } = i_ams.get_ams_position();
+                                velocity = i_ams.get_ams_velocity();
+                            } else{
                                 printstrln("position_ctrl_service: ERROR: AMS interface is not provided but requested");
                                 exit(-1);
                             }
                             break;
-
                     }
+                    adc_b = i_motorcontrol.get_torque_actual();
                     /*
                      * Or any other sensor interfaced to the IFM Module
                      * place client functions here to acquire position
                      */
 
-                    /* PID Controller */
+                    /* cascaded control */
+                    if(position_control_config.cascade_with_torque == 1 && motorcontrol_config.commutation_method == FOC){
+                        t :> T_k;
+                        T_s = (T_k - T_k_1n) / USEC_STD;
+                        if ((T_k & 0x80000000) != (T_k_1n & 0x80000000))
+                            T_s += 0xffffffff;
+                        T_k_1n = T_k;
 
-                    error_position = (target_position - actual_position);
-                    error_position_I = error_position_I + error_position;
-                    error_position_D = error_position - previous_error;
+//                        { adc_a, adc_b } = i_adc.get_external_inputs();
+                        adc_a = 0;
 
-                    if (error_position_I > error_position_I_limit) {
-                        error_position_I = error_position_I_limit;
-                    } else if (error_position_I < -error_position_I_limit) {
-                        error_position_I = - error_position_I_limit;
-                    }
+//                        if (first_loop_counter > 5000) {
+//
+//                        } else if (first_loop_counter < 3000) {
+//                            enable_motor_command = 0;
+//                            T_s = T_s_desired;
+//                            first_loop_counter++;
+//                        } else if (first_loop_counter < 5000) {
+//                            i1_torque_j_sens_offset_accumulator += (adc_b - adc_a);
+//                            enable_motor_command = 0;
+//                            T_s = T_s_desired;
+//                            first_loop_counter++;
+//                        } else if (first_loop_counter == 5000) {
+//                            printstrln("cascaded");
+//                            enable_motor_command = 1;
+//                            i1_torque_j_sens_offset = i1_torque_j_sens_offset_accumulator / 2000;
+//                            first_loop_counter++;
+//                        }
 
-                    position_control_out = (position_control_config.Kp_n * error_position) +
-                                           (position_control_config.Ki_n * error_position_I) +
-                                           (position_control_config.Kd_n * error_position_D);
+                        f1_torque_j_sens_measured = 10 * ((float) (adc_b - adc_a - i1_torque_j_sens_offset));
 
-                    position_control_out /= PID_DENOMINATOR;
+                        second_order_LP_filter_update(&f1_torque_j_sens,
+                                &f1_torque_j_sens_1n,
+                                &f1_torque_j_sens_2n,
+                                &f1_torque_j_sens_measured, T_s, torque_sensor_SO_LP_filter_param);
 
-                    if (position_control_out > position_control_out_limit) {
-                        position_control_out = position_control_out_limit;
-                    } else if (position_control_out < -position_control_out_limit) {
-                        position_control_out =  -position_control_out_limit;
-                    }
+                        f1_velocity_sens_measured = ((float) velocity);
+                        second_order_LP_filter_update(&f1_velocity_sens,
+                                &f1_velocity_sens_1n,
+                                &f1_velocity_sens_2n,
+                                &f1_velocity_sens_measured, T_s, velocity_sensor_SO_LP_filter_param);
+                        i1_velocity_sens = ((int) f1_velocity_sens);
+
+                        i1_torque_j_sens = (int) f1_torque_j_sens;
+
+                        position_sens = (actual_position/1000);
+
+                        position_error = target_position/1000 - position_sens;
+                        if (position_error > 100)
+                            position_error = 100;
+                        else if (position_error < -100)
+                            position_error = -100;
+
+                        position_error_limited = position_error;
+                        if (position_error_limited > 2)
+                            position_error_limited = 2;
+                        else if (position_error_limited < -2)
+                            position_error_limited = -2;
+
+                        // A2
+//                        position_Kp = 700;
+//                        position_Ki = 69;
+//                        position_Kd = 200;
+
+                        // A6
+                        position_Kp = 50;
+                        position_Ki = 1;
+                        position_Kd = 22;
+
+                        position_error_integral += position_error_limited;
+                        position_error_integral_limit = 4000 / (position_Ki+1);
+                        if (position_error_integral > position_error_integral_limit) {
+                            position_error_integral = position_error_integral_limit;
+                        } else if (position_error_integral < -position_error_integral_limit) {
+                            position_error_integral = -position_error_integral_limit;
+                        }
+
+                        position_ctrl_cmd = position_Kp * position_error + (position_Ki+1) * position_error_integral
+                                                        - position_Kd * i1_velocity_sens;
+
+                        //limit command value
+                        position_ctrl_cmd_lim = 50000;
+                        if (position_ctrl_cmd > position_ctrl_cmd_lim) {
+                            position_ctrl_cmd = position_ctrl_cmd_lim;
+                        }else if (position_ctrl_cmd < -position_ctrl_cmd_lim) {
+                            position_ctrl_cmd = -position_ctrl_cmd_lim;
+                        }
 
 
-                    if(cascade_with_torque == 1 && motorcontrol_config.commutation_method == FOC){
-                        i_motorcontrol.set_torque(position_control_out);  //cascades with FOC's torque controller
-                    }
-                    else {
+                        i1_torque_j_ref = position_ctrl_cmd;
+
+
+                        //limit torque on the secondary side of the gearbox
+                        //            f1_torque_j_lim = 50000; //50000 is the maximum with which the motor torque has been tested
+                        if (i1_torque_j_ref > f1_torque_j_lim) {
+                            i1_torque_j_ref = f1_torque_j_lim;
+                        }else if (i1_torque_j_ref < -f1_torque_j_lim) {
+                            i1_torque_j_ref = -f1_torque_j_lim;
+                        }
+
+                        adc_b = i1_torque_j_sens;
+
+                        torque_j_error = i1_torque_j_ref - i1_torque_j_sens;
+                        torque_j_error_integral = torque_j_error_integral + torque_j_error;
+                        torque_j_error_integral_limit = 1;
+                        if (torque_j_error_integral > torque_j_error_integral_limit) {
+                            torque_j_error_integral = torque_j_error_integral_limit;
+                        } else if (torque_j_error_integral < -torque_j_error_integral_limit) {
+                            torque_j_error_integral = -torque_j_error_integral_limit;
+                        }
+                        torque_j_derivative = i1_torque_j_sens - i1_torque_j_sens_1n;
+
+                        torque_j_Kp = 500;
+                        torque_j_Ki = 0;
+                        torque_j_Kd = 600;
+
+                        torque_j_ctrl_cmd = torque_j_Kp * torque_j_error + torque_j_Ki * torque_j_error_integral - torque_j_Kd * torque_j_derivative;
+
+                        torque_j_ctrl_cmd /= 10000;
+
+                        //limit command value
+                        torque_j_ctrl_cmd_lim = 400; //400 is the maximum with which the motor torque has been tested
+                        if (torque_j_ctrl_cmd > torque_j_ctrl_cmd_lim) {
+                            torque_j_ctrl_cmd = torque_j_ctrl_cmd_lim;
+                        }else if (torque_j_ctrl_cmd < -torque_j_ctrl_cmd_lim) {
+                            torque_j_ctrl_cmd = -torque_j_ctrl_cmd_lim;
+                        }
+                        i_motorcontrol.set_torque(torque_j_ctrl_cmd);
+
+                        i1_torque_j_sens_1n = i1_torque_j_sens;
+
+
+                        second_order_LP_filter_shift_buffers(&f1_torque_j_sens,
+                                &f1_torque_j_sens_1n,
+                                &f1_torque_j_sens_2n);
+                        second_order_LP_filter_shift_buffers(&f1_velocity_sens,
+                                &f1_velocity_sens_1n,
+                                &f1_velocity_sens_2n);
+
+                        velocity = i1_velocity_sens;
+                    } else {
+                        /* PID Controller */
+
+                        error_position = (target_position - actual_position);
+                        error_position_I = error_position_I + error_position;
+                        error_position_D = error_position - previous_error;
+                        previous_error = error_position;
+
+                        if (error_position_I > error_position_I_limit) {
+                            error_position_I = error_position_I_limit;
+                        } else if (error_position_I < -error_position_I_limit) {
+                            error_position_I = - error_position_I_limit;
+                        }
+
+                        position_control_out = (position_control_config.Kp_n * error_position) +
+                                (position_control_config.Ki_n * error_position_I) +
+                                (position_control_config.Kd_n * error_position_D);
+
+                        position_control_out /= PID_DENOMINATOR;
+
+                        if (position_control_out > position_control_out_limit) {
+                            position_control_out = position_control_out_limit;
+                        } else if (position_control_out < -position_control_out_limit) {
+                            position_control_out =  -position_control_out_limit;
+                        }
+
                         i_motorcontrol.set_voltage(position_control_out); //in case of FOC sets Q value, torque controller in FOC is disabled
-                    }
+                    } // end control
 //                    xscope_int(POSITION_CONTROL_OUT, position_control_out);
 
 #ifdef DEBUG
@@ -217,8 +411,14 @@ void position_control_service(ControlConfig &position_control_config,
                     xscope_int(TARGET_POSITION, target_position);
 #endif
                     //xscope_int(TARGET_POSITION, target_position);
-                    previous_error = error_position;
-                }
+                } // end control activated
+
+#ifdef USE_XSCOPE
+//                        xscope_int(TARGET_POSITION, target_position);
+//                        xscope_int(ACTUAL_POSITION, actual_position);
+//                        xscope_int(VELOCITY, velocity);
+//                        xscope_int(TORQUE, adc_b);
+#endif
 
                 break;
 
@@ -261,6 +461,12 @@ void position_control_service(ControlConfig &position_control_config,
 
                 break;
 
+            case i_position_control[int i].set_torque_limit(int in_torque_limit):
+
+                f1_torque_j_lim = in_torque_limit;
+
+                break;
+
             case i_position_control[int i].get_position() -> int out_position:
 
                 out_position = actual_position;
@@ -297,7 +503,6 @@ void position_control_service(ControlConfig &position_control_config,
 
             case i_position_control[int i].enable_position_ctrl():
 
-                activate = 1;
                 if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
                     actual_position = i_hall.get_hall_position_absolute();
                 } else if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
@@ -323,6 +528,12 @@ void position_control_service(ControlConfig &position_control_config,
                         break;
                     }
                 }
+                if (activate == 0) {
+                    t :> ts;
+                    T_k_1n = ts - 500*USEC_STD;// fake older T_k_1n to avoid error in filters
+                    ts -= USEC_STD * position_control_config.control_loop_period; //run the control loop right affter
+                }
+                activate = 1;
 #ifdef debug_print
                 printstrln("position_ctrl_service: position control activated");
 #endif
