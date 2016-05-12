@@ -202,7 +202,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         //go to 0 position
         case 'z':
             if (!isnull(i_tuning))
-                i_tuning.set_position(value);
+                i_tuning.set_position(value * sign);
             break;
         //set voltage
         default:
@@ -509,10 +509,10 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
         case i_tuning.set_position(int in_position):
             if (!isnull(i_position_control)) {
                 /* Set new target position for profile position control */
-                set_profile_position(0, 200, 200, 200, i_position_control);
-                printf("Returned to 0\n");
+                set_profile_position(in_position, 200, 200, 200, i_position_control);
+                printf("Returned to %d\n", in_position);
                 i_position_control.disable_position_ctrl();
-                delay_milliseconds(500);
+//                delay_milliseconds(500);
                 i_commutation.set_fets_state(1);
             } else {
                 printf("No position control\n");
