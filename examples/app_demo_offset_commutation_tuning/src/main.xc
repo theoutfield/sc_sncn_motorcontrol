@@ -72,6 +72,7 @@ int main(void) {
             position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
             position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
+            position_control_config.cascade_with_torque = 0;
             /* Control Loop */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
             position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
@@ -91,8 +92,8 @@ int main(void) {
             par
             {
                 /* Triggered PWM Service */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
-                i_brake.set_brake(0);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, null);
+//                i_brake.set_brake(1);
 
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
@@ -125,6 +126,8 @@ int main(void) {
                 /* AMS Rotary Sensor Service */
                 {
                     AMSConfig ams_config;
+                    ams_config.sensor_type = CONTELEC_SENSOR;
+                    ams_config.filter = 0x02;
                     ams_config.factory_settings = 1;
                     ams_config.polarity = AMS_POLARITY;
                     ams_config.hysteresis = 1;

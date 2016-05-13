@@ -47,6 +47,7 @@ void spi_encoder_test(client interface AMSInterface i_ams) {
     unsigned int singleturn_raw;
 
     delay_milliseconds(500);
+    AMSConfig ams_config = i_ams.get_ams_config();
     printf("Start!\n");
 
     while(1) {
@@ -67,11 +68,16 @@ void spi_encoder_test(client interface AMSInterface i_ams) {
 
         switch(mode) {
         case 'a':
-            i_ams.reset_ams_angle(value);
+            printf("Set angle to %d\nnew offset %d\n", value, i_ams.reset_ams_angle(value));
             break;
         case 'd':
             i_ams.command_ams(0x55, value, 8);
             printf("direction\n");
+            break;
+        case 'o':
+            ams_config.offset = value * sign;
+            i_ams.set_ams_config(ams_config);
+            printf("offset %d\n", value * sign);
             break;
         case 'p':
             i_ams.reset_ams_position(value*sign);
@@ -80,13 +86,13 @@ void spi_encoder_test(client interface AMSInterface i_ams) {
             i_ams.command_ams(0x59, value*sign, 16);
             printf("multiturn\n");
             break;
-        case 'n':
-            i_ams.command_ams(0x57, value, 16);
-            printf("singleturn\n");
-            break;
         case 'r':
             i_ams.command_ams(0x00, 0, 0);
             printf("reset\n");
+            break;
+        case 's':
+            i_ams.command_ams(0x57, value, 16);
+            printf("singleturn\n");
             break;
         case 'z':
             i_ams.command_ams(0x56, 0, 0);
@@ -125,6 +131,7 @@ int main(void)
             {
                 AMSConfig ams_config;
                 ams_config.sensor_type = CONTELEC_SENSOR;
+                ams_config.filter = 0x02;
                 ams_config.factory_settings = 1;
                 ams_config.polarity = AMS_POLARITY;
                 ams_config.hysteresis = 1;

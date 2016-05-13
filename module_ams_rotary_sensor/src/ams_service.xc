@@ -35,6 +35,48 @@ void initams_ports(AMSPorts &ams_ports)
     }
 }
 
+{ char, int, unsigned int, unsigned int } contelec_encoder_read(AMSPorts &ams_ports)
+{
+    char status;
+    int count;
+    unsigned int singleturn_filtered;
+    unsigned int singleturn_raw;
+    unsigned int checksum;
+
+    configure_out_port(ams_ports.spi_interface.mosi, ams_ports.spi_interface.blk2, 1);
+    slave_select(ams_ports.slave_select);
+    delay_ticks(10*USEC_FAST);
+    count = spi_master_in_short(ams_ports.spi_interface);
+    singleturn_filtered = spi_master_in_short(ams_ports.spi_interface);
+    singleturn_raw = spi_master_in_short(ams_ports.spi_interface);
+    checksum = spi_master_in_byte(ams_ports.spi_interface);
+    slave_deselect(ams_ports.slave_select);
+    delay_ticks(10*USEC_FAST);
+
+    status = count >> 12;
+    count = sext(count & 0xfff, 12);  //convert multiturn to signed
+    { void, count } = macs(1 << 16, count, 0, singleturn_filtered); //convert multiturn to absolute count: ticks per turn * number of turns + position
+
+    return { status, count, singleturn_filtered, singleturn_raw };
+}
+
+void contelec_encoder_write(AMSPorts &ams_ports, int opcode, int data, int data_bits)
+{
+    configure_out_port(ams_ports.spi_interface.mosi, ams_ports.spi_interface.blk2, 1);
+    slave_select(ams_ports.slave_select);
+    delay_ticks(100*USEC_FAST);
+    spi_master_out_byte(ams_ports.spi_interface, opcode);
+    if (data_bits == 8) {
+        spi_master_out_byte(ams_ports.spi_interface, data);
+    } else if (data_bits == 16) {
+        spi_master_out_short(ams_ports.spi_interface, data);
+    }
+    configure_out_port(ams_ports.spi_interface.mosi, ams_ports.spi_interface.blk2, 1);
+    slave_deselect(ams_ports.slave_select);
+    delay_ticks(200020*USEC_FAST);
+
+}
+
 {unsigned short, unsigned short} transform_settings(AMSConfig config)
 {
     unsigned short settings1 = 0, settings2 = 0;
@@ -58,42 +100,59 @@ void initams_ports(AMSPorts &ams_ports)
     return {settings1, settings2};
 }
 
-int initRotarySensor(AMSPorts &ams_ports, AMSConfig config)
+int initRotarySensor(AMSPorts &ams_ports, AMSConfig ams_config)
 {
-    int data_in;
-
-    unsigned short settings1, settings2;
-
-    {settings1, settings2} = transform_settings(config);
-
+    int status;
     initams_ports(ams_ports);
 
-    data_in = writeSettings1(ams_ports, settings1);
-
-    if(data_in < 0){
-
-       return data_in;
+    if (ams_config.sensor_type == CONTELEC_SENSOR) {
+        //reset
+        contelec_encoder_write(ams_ports, 0x00, 0, 0);
+        //read status
+        { status, void, void, void } = contelec_encoder_read(ams_ports);
+        if (status != 0)
+            return status;
+        //direction
+        if (ams_config.polarity == AMS_POLARITY_INVERTED)
+            contelec_encoder_write(ams_ports, 0x55, 0x01, 8);
+        else
+            contelec_encoder_write(ams_ports, 0x55, 0x00, 8);
+        //offset
+        int position;
+        { void, void, position, void } = contelec_encoder_read(ams_ports); //read actual position
+        contelec_encoder_write(ams_ports, 0x57, (position + ams_config.offset) & 65535, 16); //write singleturn
+        //filter
+        if (ams_config.filter == 1 || ams_config.filter < 0 || ams_config.filter > 9) {
+            ams_config.filter = 0x02;
+        }
+        contelec_encoder_write(ams_ports, 0x5B, ams_config.filter, 8);
+        //read status
+        { status, void, void, void } = contelec_encoder_read(ams_ports);
+        if (status == 0)
+            return SUCCESS_WRITING;
+        else
+            return status;
+    } else {
+        //parse settings
+        unsigned short settings1, settings2;
+        {settings1, settings2} = transform_settings(ams_config);
+        //set settings 1
+        status = writeSettings1(ams_ports, settings1);
+        if(status < 0)
+            return status;
+        delay_milliseconds(1);
+        //set settings 2
+        status = writeSettings2(ams_ports, settings2);
+        if(status < 0)
+            return status;
+        delay_milliseconds(1);
+        //set offset
+        status = writeZeroPosition(ams_ports, ams_config.offset);
+        if(status < 0)
+            return status;
+        return SUCCESS_WRITING;
     }
-
-    delay_milliseconds(1);
-
-    data_in = writeSettings2(ams_ports, settings2);
-
-    if(data_in < 0){
-
-       return data_in;
-    }
-
-    delay_milliseconds(1);
-
-    data_in = writeZeroPosition(ams_ports, config.offset);
-
-    if(data_in < 0){
-
-       return data_in;
-    }
-
-    return SUCCESS_WRITING;
+    return -1;
 }
 
 /**
@@ -505,6 +564,10 @@ int check_ams_config(AMSConfig &ams_config) {
         printstrln("Wrong AMS configuration: wrong pole-pairs");
         return ERROR;
     }
+    if (ams_config.sensor_type == CONTELEC_SENSOR && (ams_config.filter == 1 || ams_config.filter < 0 || ams_config.filter > 9)) {
+        printstrln("Wrong filter configuration");
+        ams_config.filter = 0x02;
+    }
     return SUCCESS;
 }
 
@@ -518,8 +581,10 @@ int check_ams_config(AMSConfig &ams_config) {
         printstrln("Error while checking the AMS sensor configuration");
         return;
     }
-    if (initRotarySensor(ams_ports,  ams_config) != SUCCESS_WRITING) {
-        printstrln("Error with SPI AMS sensor");
+    int init_status = initRotarySensor(ams_ports,  ams_config);
+    if (init_status != SUCCESS_WRITING) {
+        printstr("Error with SPI AMS sensor ");
+        printintln(init_status);
         return;
     }
 
@@ -546,7 +611,11 @@ int check_ams_config(AMSConfig &ams_config) {
     int notification = MOTCTRL_NTF_EMPTY;
 
     //first read
-    last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
+    if (ams_config.sensor_type == CONTELEC_SENSOR) {
+        { void, count, void, last_position } = contelec_encoder_read(ams_ports);
+    } else {
+        last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
+    }
     t :> last_ams_read;
 
     //main loop
@@ -560,12 +629,17 @@ int check_ams_config(AMSConfig &ams_config) {
         case i_ams[int i].get_ams_angle_velocity() -> { unsigned int angle, int out_velocity }:
                 t :> time;
                 if (timeafter(time, last_ams_read + ams_config.cache_time)) {
-                    angle = readRotarySensorAngleWithCompensation(ams_ports);
+                    if (ams_config.sensor_type == CONTELEC_SENSOR) {
+                        { void, count, angle, void } = contelec_encoder_read(ams_ports);
+                    } else {
+                        angle = readRotarySensorAngleWithCompensation(ams_ports);
+                        multiturn(count, last_position, angle, ticks_per_turn);
+                    }
                     t :> last_ams_read;
-                    multiturn(count, last_position, angle, ticks_per_turn);
                     last_position = angle;
-                } else
+                } else {
                     angle = last_position;
+                }
                 if (ams_config.resolution_bits > 12)
                     angle = (ams_config.pole_pairs * (angle >> (ams_config.resolution_bits-12)) ) & 4095;
                 else
@@ -577,21 +651,33 @@ int check_ams_config(AMSConfig &ams_config) {
         case i_ams[int i].get_ams_position() -> { int out_count, unsigned int position }:
                 t :> time;
                 if (timeafter(time, last_ams_read + ams_config.cache_time)) {
-                    position = readRotarySensorAngleWithCompensation(ams_ports);
+                    if (ams_config.sensor_type == CONTELEC_SENSOR) {
+                        { void, count, position, void } = contelec_encoder_read(ams_ports);
+                    } else {
+                        position = readRotarySensorAngleWithCompensation(ams_ports);
+                        multiturn(count, last_position, position, ticks_per_turn);
+                        //count reset
+                        if (count >= ams_config.max_ticks || count < -ams_config.max_ticks)
+                            count = 0;
+                    }
                     t :> last_ams_read;
-                    multiturn(count, last_position, position, ticks_per_turn);
                     last_position = position;
                 } else
                     position = last_position;
-                //count reset
-                if (count >= ams_config.max_ticks || count < -ams_config.max_ticks)
-                    count = 0;
                 out_count = count;
                 break;
 
         //send position
-        case i_ams[int i].get_ams_real_position() -> unsigned int position:
-                position = readRotarySensorAngleWithoutCompensation(ams_ports);
+        case i_ams[int i].get_ams_real_position() -> { int out_count, unsigned int position }:
+                if (ams_config.sensor_type == CONTELEC_SENSOR) {
+                    { void, out_count, void, position } = contelec_encoder_read(ams_ports);
+                } else {
+                    position = readRotarySensorAngleWithoutCompensation(ams_ports);
+                    multiturn(count, last_position, position, ticks_per_turn);
+                    out_count = count;
+                }
+                t :> last_ams_read;
+                last_position = position;
                 break;
 
         //send velocity
@@ -604,10 +690,26 @@ int check_ams_config(AMSConfig &ams_config) {
                 ticks_per_turn = (1 << in_config.resolution_bits);
                 in_config.offset &= (ticks_per_turn-1);
                 //update variables which depend on ams_config
-                if (ams_config.polarity != in_config.polarity)
-                    initRotarySensor(ams_ports,  in_config);
-                else if (ams_config.offset != in_config.offset)
-                    writeZeroPosition(ams_ports, in_config.offset);
+                if (ams_config.sensor_type == CONTELEC_SENSOR) {
+                    if (ams_config.offset != in_config.offset) {
+                        initRotarySensor(ams_ports, in_config);
+                    } else {
+                        if (ams_config.polarity != in_config.polarity) {
+                            contelec_encoder_write(ams_ports, 0x55, in_config.polarity, 8);
+                        }
+                        if (ams_config.filter != in_config.filter) {
+                            if (in_config.filter == 1 || in_config.filter < 0 || in_config.filter > 9) {
+                                in_config.filter = 0x02;
+                            }
+                            contelec_encoder_write(ams_ports, 0x5B, in_config.filter, 8);
+                        }
+                    }
+                } else {
+                    if (ams_config.polarity != in_config.polarity)
+                        initRotarySensor(ams_ports, in_config);
+                    else if (ams_config.offset != in_config.offset)
+                        writeZeroPosition(ams_ports, in_config.offset);
+                }
                 ams_config = in_config;
                 crossover = ticks_per_turn - ticks_per_turn/10;
                 velocity_loop = ams_config.velocity_loop * AMS_USEC;
@@ -628,21 +730,53 @@ int check_ams_config(AMSConfig &ams_config) {
 
         //receive the new count to set and set the offset accordingly
         case i_ams[int i].reset_ams_position(int new_count):
-                last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
+                if (ams_config.sensor_type == CONTELEC_SENSOR) {
+                    int multiturn = new_count / ticks_per_turn;
+                    unsigned int singleturn = new_count % ticks_per_turn;
+                    int test_count;
+                    { void, test_count } = macs(ticks_per_turn, multiturn, 0, singleturn); //convert multiturn to absolute count: ticks per turn * number of turns + position
+                    if (test_count != new_count) {
+                        printstrln("error new count computation");
+                    } else {
+                        contelec_encoder_write(ams_ports, 0x57, singleturn, 16);
+                        contelec_encoder_write(ams_ports, 0x59, multiturn, 16);
+                    }
+                    last_position = singleturn;
+                } else {
+                    last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
+                }
                 t :> last_ams_read;
                 count = new_count;
                 break;
 
-        //receive the new elecrical angle to set the offset accordingly
+        //receive the new electrical angle to set the offset accordingly
         case i_ams[int i].reset_ams_angle(unsigned int new_angle) -> unsigned int out_offset:
-                writeZeroPosition(ams_ports, 0);
-                int position = readRotarySensorAngleWithoutCompensation(ams_ports);
-                if (ams_config.resolution_bits > 12)
-                    out_offset = (ticks_per_turn - ((new_angle << (ams_config.resolution_bits-12)) / ams_config.pole_pairs) + position) & (ticks_per_turn-1);
-                else
-                    out_offset = (ticks_per_turn - ((new_angle >> (12-ams_config.resolution_bits)) / ams_config.pole_pairs) + position) & (ticks_per_turn-1);
-                writeZeroPosition(ams_ports, out_offset);
+                if (ams_config.resolution_bits > 12) {
+                    new_angle = (new_angle << (ams_config.resolution_bits-12));
+                } else {
+                    new_angle = (new_angle >> (12-ams_config.resolution_bits));
+                }
+                if (ams_config.sensor_type == CONTELEC_SENSOR) {
+                    contelec_encoder_write(ams_ports, 0x0, 0, 0);//reset
+                    int real_position;
+                    { void, void, real_position, void } = contelec_encoder_read(ams_ports);
+                    contelec_encoder_write(ams_ports, 0x57, new_angle / ams_config.pole_pairs, 16);
+                    { void, void, out_offset, void } = contelec_encoder_read(ams_ports);
+                    out_offset = (out_offset - real_position) & (ticks_per_turn-1);
+                } else {
+                    writeZeroPosition(ams_ports, 0);
+                    int position = readRotarySensorAngleWithoutCompensation(ams_ports);
+                    out_offset = (ticks_per_turn - (new_angle / ams_config.pole_pairs) + position) & (ticks_per_turn-1);
+                    writeZeroPosition(ams_ports, out_offset);
+                }
                 ams_config.offset = out_offset;
+                break;
+
+        //execute command
+        case i_ams[int i].command_ams(int opcode, int data, int data_bits) -> unsigned int status:
+                if (ams_config.sensor_type == CONTELEC_SENSOR) {
+                    contelec_encoder_write(ams_ports, opcode, data, data_bits);
+                }
                 break;
 
         //compute velocity
@@ -651,9 +785,13 @@ int check_ams_config(AMSConfig &ams_config) {
             int position;
             t :> time;
             if (timeafter(time, last_ams_read + ams_config.cache_time)) {
-                position = readRotarySensorAngleWithCompensation(ams_ports);
+                if (ams_config.sensor_type == CONTELEC_SENSOR) {
+                    { void, count, position, void } = contelec_encoder_read(ams_ports);
+                } else {
+                    position = readRotarySensorAngleWithCompensation(ams_ports);
+                    multiturn(count, last_position, position, ticks_per_turn);
+                }
                 t :> last_ams_read;
-                multiturn(count, last_position, position, ticks_per_turn);
                 last_position = position;
             }
             int difference = count - old_count;
