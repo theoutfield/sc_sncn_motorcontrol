@@ -88,6 +88,15 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                 break;
 
         case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
+                //ToDo: implement!
+            break;
+
+        case i_motorcontrol[int i].get_velocity_actual() -> int velocity_actual:
+                //ToDo: implement!
+            break;
+
+        case i_motorcontrol[int i].get_position_actual() -> int position_actual:
+                //ToDo: implement!
             break;
 
         case i_motorcontrol[int i].get_notification() -> int out_notification:

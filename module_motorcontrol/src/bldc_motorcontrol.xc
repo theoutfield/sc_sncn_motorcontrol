@@ -422,8 +422,17 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 break;
 
         case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
+                //FixMe: implement separated inteface call for the torque sensor if needed
 //                torque_actual = torq_pt1;
                 torque_actual = adc_b - adc_a;
+                break;
+
+        case i_motorcontrol[int i].get_velocity_actual() -> int velocity_actual:
+                //ToDo: Implement!
+                break;
+
+        case i_motorcontrol[int i].get_position_actual() -> int position_actual:
+                //ToDo: Implement!
                 break;
 
         case i_motorcontrol[int i].get_field() -> int out_field:
