@@ -66,6 +66,7 @@ interface GPIOInterface{
  * @param i_gpio Array of communication interfaces to handle one client.
  *
  */
+[[combinable]]
 void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[1]);
 
 #endif
