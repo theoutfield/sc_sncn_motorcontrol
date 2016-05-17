@@ -1,6 +1,8 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+//#include <CORE_BOARD_REQUIRED>
+//#include <IFM_BOARD_REQUIRED>
 #include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
