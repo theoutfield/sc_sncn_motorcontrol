@@ -11,22 +11,17 @@
 #include <refclk.h>
 
 
-#define AMS_OFFSET          59938//3696
-#define AMS_POLARITY        AMS_POLARITY_NORMAL//AMS_POLARITY_NORMAL
+#define AMS_OFFSET          13473//3696
+#define AMS_POLARITY        AMS_POLARITY_INVERTED//AMS_POLARITY_NORMAL
 #define AMS_USEC            USEC_FAST
 #define AMS_CACHE_TIME      (60*AMS_USEC)
-#define AMS_RESOLUTION      16
+#define AMS_RESOLUTION      14
 #define AMS_VELOCITY_LOOP   1000
+#define DEFAULT_SPI_CLOCK_DIV 32        // 250/DIV MHz
 #define AMS_SENSOR_EXECUTING_TIME (AMS_USEC/2)       //0.5 us
 #define AMS_SENSOR_SAVING_TIME    (AMS_USEC/5)       //0.2 us
 
-//SPI config
-#define DEFAULT_SPI_CLOCK_DIV 32        // 250/DIV MHz
-#define SPI_MASTER_MODE 1 //clock active high
-#define SPI_MASTER_SD_CARD_COMPAT 1 //MOSI high during input
-
 #define AMS_SENSOR      5
-#define CONTELEC_SENSOR 6
 
 #define ERROR       0
 #define SUCCESS     1
@@ -36,6 +31,7 @@
 
 #define AMS_SENSOR_TYPE AS5047
 
+#define SPI_MASTER_MODE 1
 
 #define AMS_POLARITY_NORMAL      0
 #define AMS_POLARITY_INVERTED    1
@@ -75,8 +71,6 @@ typedef enum {
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    int sensor_type;            /**< sensor type */
-    int multiturn_resolution;   /**< Multiturn resolution in bits. */
     int resolution_bits;        /**< Encoder resolution in bits. */
 #if AMS_SENSOR_TYPE == AS5147
     int width_index_pulse;      /**< Width of the index pulse I (0 = 3LSB, 1 = 1LSB). */
@@ -117,8 +111,6 @@ typedef struct {
     int velocity_loop;          /**< Velcity loop time in microseconds */
 
     int max_ticks;              /**< The count is reset to 0 if greater than this */
-
-    int filter;                 /**< filter parameter for contelect encoder */
 } AMSConfig;
 
 
@@ -158,7 +150,7 @@ typedef struct {
 #define ROTATION_SENSE_CCW_MASK 0x
 
 //RETURN VALUES
-#define SUCCESS_WRITING  0
+#define SUCCESS_WRITING  1
 #define PARITY_ERROR    -1
 #define ERROR_WRITING   -2
 
@@ -194,7 +186,7 @@ interface AMSInterface
 
     { int, unsigned int } get_ams_position(void);
 
-    { int, unsigned int } get_ams_real_position(void);
+    unsigned int get_ams_real_position(void);
 
     int get_ams_velocity(void);
 
@@ -205,8 +197,6 @@ interface AMSInterface
     void reset_ams_position(int in_count);
 
     unsigned int reset_ams_angle(unsigned int in_angle);
-
-    unsigned int command_ams(int opcode, int data, int data_bits);
 };
 
 void initRotarySensorInterface(AMSPorts &ams_ports);
@@ -236,9 +226,5 @@ int writeNumberPolePairs(AMSPorts &ams_ports, unsigned short data);
 
 [[combinable]]
 void ams_service(AMSPorts &ams_ports, AMSConfig &config, interface AMSInterface server i_ams[5]);
-
-{ char, int, unsigned int, unsigned int } spi_encoder_read(AMSPorts &ams_ports);
-
-void spi_encoder_write(AMSPorts &ams_ports, int opcode, int data, int data_bits);
 
 #endif
