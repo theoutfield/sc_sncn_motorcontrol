@@ -109,6 +109,11 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             }
             printf("Direction inverted\n");
             break;
+        //pole pairs
+        case 'e':
+            i_tuning.set_pole_pairs(value);
+            printf("Pole pairs %d\n", value);
+            break;
         //toggle field controler
         case 'f':
             if (motorcontrol_config.commutation_method == FOC) {
@@ -128,10 +133,14 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //reverse sensor direction
         case 'm':
-            if (motorcontrol_config.polarity_type == NORMAL_POLARITY)
+            motorcontrol_config = i_commutation.get_config();
+            if (motorcontrol_config.polarity_type == NORMAL_POLARITY) {
                 motorcontrol_config.polarity_type = INVERTED_POLARITY;
-            else
+                motorcontrol_config.bldc_winding_type = DELTA_WINDING;
+            } else {
                 motorcontrol_config.polarity_type = NORMAL_POLARITY;
+                motorcontrol_config.bldc_winding_type = STAR_WINDING;
+            }
             i_commutation.set_config(motorcontrol_config);
             printf("Polarity %d\n", motorcontrol_config.polarity_type);
             break;
@@ -540,6 +549,18 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 
         case i_tuning.set_torque(int in_torque):
             target_torque = in_torque;
+            break;
+
+        case i_tuning.set_pole_pairs(int in_pole_pairs):
+            if (motorcontrol_config.commutation_sensor == BISS_SENSOR && !isnull(i_biss)) {
+                BISSConfig biss_config = i_biss.get_biss_config();
+                biss_config.pole_pairs = in_pole_pairs;
+                i_biss.set_biss_config(biss_config);
+            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                AMSConfig ams_config = i_ams.get_ams_config();
+                ams_config.pole_pairs = in_pole_pairs;
+                i_ams.set_ams_config(ams_config);
+            }
             break;
         }
     }

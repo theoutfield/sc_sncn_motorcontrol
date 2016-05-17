@@ -25,6 +25,7 @@ interface TuningInterface {
     void set_limit(int limit);
     void set_position(int position);
     void set_torque(int in_torque);
+    void set_pole_pairs(int in_pole_pairs);
 };
 
 
