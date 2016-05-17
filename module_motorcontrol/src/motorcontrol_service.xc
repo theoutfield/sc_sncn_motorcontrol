@@ -27,8 +27,9 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
 
         if(commutation_params.commutation_sensor != HALL_SENSOR &&
            commutation_params.commutation_sensor != BISS_SENSOR &&
-           commutation_params.commutation_sensor != AMS_SENSOR) {
-            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL, BiSS and AMS sensors are supported as commutation sensor");
+           commutation_params.commutation_sensor != AMS_SENSOR &&
+           commutation_params.commutation_sensor != CONTELEC_SENSOR) {
+            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL, BiSS, AMS and CONTELEC sensors are supported as commutation sensor");
             return ERROR;
         }
     }
@@ -44,6 +45,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
+                            interface CONTELECInterface client ?i_contelec,
                             interface WatchdogInterface client i_watchdog,
                             interface BrakeInterface client ?i_brake,
                             interface MotorcontrolInterface server i_motorcontrol[4])
@@ -83,7 +85,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             bldc_loop( fet_driver_ports, motorcontrol_config,
                                     hall_config, qei_config,
                                     i_motorcontrol, c_pwm_ctrl, i_adc,
-                                    i_hall, i_qei, i_biss, i_ams, i_watchdog, i_brake);
+                                    i_hall, i_qei, i_biss, i_ams, i_contelec, i_watchdog, i_brake);
 
                         }
                         else{

@@ -23,19 +23,19 @@
  //#include <motor_configs/motor_config_Nanotec_DB42S03.h>
  //#include <motor_configs/motor_config_Nanotec_DB87S01.h>
  //#include <motor_configs/motor_config_LDO_42BLS41.h>
- //#include <motor_configs/motor_config_Moons_42BL30L2.h>
+// #include <motor_configs/motor_config_Moons_42BL30L2.h>
  //#include <motor_config_Nanotec_DB59L024035-A.h>
- #include <motor_config.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 ///////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   AMS_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
-#define MOTOR_FEEDBACK_SENSOR      AMS_SENSOR
+#define MOTOR_FEEDBACK_SENSOR      CONTELEC_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
 #define QEI_SENSOR_INDEX_TYPE      QEI_WITH_INDEX
@@ -57,10 +57,13 @@
 #define COMMUTATION_LOOP_PERIOD     110
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      0//0
+#define COMMUTATION_OFFSET_CLK      2048//0
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     0
+#define COMMUTATION_OFFSET_CCLK     1500
+
+// MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
+#define MOTOR_POLARITY      NORMAL_POLARITY
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION

@@ -14,6 +14,8 @@
 #include <mc_internal_constants.h>
 
 
+static char rotarySensorInitialized = 0;
+
 static inline void slave_select(out port spi_ss)
 {
     spi_ss <: 0;
@@ -26,8 +28,12 @@ static inline void slave_deselect(out port spi_ss)
 
 void init_spi_ports(SPIPorts &spi_ports)
 {
-    spi_master_init(spi_ports.spi_interface, DEFAULT_SPI_CLOCK_DIV);
-    slave_deselect(spi_ports.slave_select); // Ensure slave select is in correct start state
+    if (rotarySensorInitialized != 1){
+
+        spi_master_init(spi_ports.spi_interface, DEFAULT_SPI_CLOCK_DIV);
+        slave_deselect(spi_ports.slave_select); // Ensure slave select is in correct start state
+        rotarySensorInitialized = 1;
+    }
 }
 
 { char, int, unsigned int, unsigned int } contelec_encoder_read(SPIPorts &spi_ports)

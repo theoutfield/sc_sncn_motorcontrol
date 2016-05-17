@@ -61,6 +61,7 @@ typedef struct {
 #include <qei_service.h>
 #include <biss_service.h>
 #include <ams_service.h>
+#include <contelec_service.h>
 #include <adc_service.h>
 #include <pwm_service.h>
 
@@ -241,6 +242,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
+                            interface CONTELECInterface client ?i_contelec,
                             interface WatchdogInterface client i_watchdog,
                             interface BrakeInterface client ?i_brake,
                             interface MotorcontrolInterface server i_motorcontrol[4]);

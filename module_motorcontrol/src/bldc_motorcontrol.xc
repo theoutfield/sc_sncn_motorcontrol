@@ -32,6 +32,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 interface QEIInterface client ?i_qei,
                 interface BISSInterface client ?i_biss,
                 interface AMSInterface client ?i_ams,
+                interface CONTELECInterface client ?i_contelec,
                 interface WatchdogInterface client i_watchdog,
                 interface BrakeInterface client ?i_brake)
 {
@@ -178,6 +179,8 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                     { angle_electrical, velocity } = i_biss.get_biss_angle_velocity();
                 } else if (sensor_select == AMS_SENSOR) {
                     { angle_electrical, velocity } = i_ams.get_ams_angle_velocity();
+                } else if (sensor_select == CONTELEC_SENSOR) {
+                    { angle_electrical, velocity } = i_contelec.get_contelec_angle_velocity();
                 }  else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
                     { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
                     angle_electrical = (angle_electrical << 12) / max_count_per_hall;
@@ -484,6 +487,13 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                         i_ams.set_ams_config(out_ams_config);
                     }
                     out_offset = out_ams_config.offset;
+                } else if (sensor_select == CONTELEC_SENSOR ) {
+                    CONTELECConfig out_contelec_config = i_contelec.get_contelec_config();
+                    if (in_offset >= 0) {
+                        out_contelec_config.offset = in_offset;
+                        i_contelec.set_contelec_config(out_contelec_config);
+                    }
+                    out_offset = out_contelec_config.offset;
                 }
                 break;
 
@@ -542,6 +552,10 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                         motorcontrol_config.hall_offset[1] = 0;
                     } else if (sensor_select == AMS_SENSOR) {
                         out_offset = i_ams.reset_ams_angle(calib_angle);
+                        motorcontrol_config.hall_offset[0] = 0;
+                        motorcontrol_config.hall_offset[1] = 0;
+                    } else if (sensor_select == CONTELEC_SENSOR) {
+                        out_offset = i_contelec.reset_contelec_angle(calib_angle);
                         motorcontrol_config.hall_offset[0] = 0;
                         motorcontrol_config.hall_offset[1] = 0;
                     }

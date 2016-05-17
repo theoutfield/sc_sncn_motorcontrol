@@ -36,6 +36,9 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR){
         offset = i_commutation.set_sensor_offset(-1);
         printf("AMS tuning, Sensor offset %d, ", offset);
+    } else if (motorcontrol_config.commutation_sensor == CONTELEC_SENSOR){
+        offset = i_commutation.set_sensor_offset(-1);
+        printf("CONTELEC tuning, Sensor offset %d, ", offset);
     }
     if (motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) {
         printf ( "Polarity %d\noffset %d\n", motorcontrol_config.polarity_type, motorcontrol_config.hall_offset[0]);
@@ -75,7 +78,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             //start turning the motor and print the offsets found
             i_commutation.set_voltage(input_voltage);
             motorcontrol_config = i_commutation.get_config();
-            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR || motorcontrol_config.commutation_sensor == CONTELEC_SENSOR) {
                 printf("Sensor offset: %d, ", offset);
             }
             printf("Voltage %d, Polarity %d\n", input_voltage, motorcontrol_config.polarity_type);
@@ -103,7 +106,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             } else if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
                 offset = (offset + 2048) & 4095;
                 i_commutation.set_sensor_offset(offset);
-            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
+            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == CONTELEC_SENSOR) {
                 motorcontrol_config.hall_offset[0] = (motorcontrol_config.hall_offset[0] + 2048) & 4095;
                 i_commutation.set_config(motorcontrol_config);
             }
@@ -158,7 +161,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         //print offsets, voltage and polarity
         case 'p':
             motorcontrol_config = i_commutation.get_config();
-            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR || motorcontrol_config.commutation_sensor == CONTELEC_SENSOR) {
                 offset = i_commutation.set_sensor_offset(-1);
                 printf("Sensor offset %d, ", offset);
             }
@@ -239,7 +242,8 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 [[combinable]]
  void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_commutation,
                      interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
-                     interface HallInterface client ?i_hall, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams)
+                     interface HallInterface client ?i_hall, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams,
+                     interface CONTELECInterface client ?i_contelec)
 {
     timer t;
     unsigned ts;
@@ -295,6 +299,9 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
             } else if (motorcontrol_config.commutation_sensor == HALL_SENSOR && !isnull(i_hall)) {
                 count = i_hall.get_hall_position_absolute();
                 velocity = i_hall.get_hall_velocity();
+            } else if (motorcontrol_config.commutation_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
+                velocity = i_contelec.get_contelec_velocity();
+                { count, void } = i_contelec.get_contelec_position();
             }
             if (motorcontrol_config.commutation_method == SINE)
                 xscope_int(VELOCITY, velocity);
