@@ -13,7 +13,7 @@
 #include <mc_internal_constants.h>
 #include <hall_service.h>
 #include <qei_service.h>
-#include <filters.h>
+#include <filters_lib.h>
 
 void init_position_control(interface PositionControlInterface client i_position_control)
 {

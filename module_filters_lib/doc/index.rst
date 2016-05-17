@@ -1,7 +1,7 @@
-.. _module_filters:
+.. _module_filters_lib:
 
 =====================
-Filters Module
+Filters Library Module
 =====================
 
 .. contents:: In this document
