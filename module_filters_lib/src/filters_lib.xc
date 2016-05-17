@@ -1,10 +1,10 @@
 /**
- * @file filters.xc
+ * @file filters_lib.xc
  * @brief Filters Libraries
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <filters.h>
+#include <filters_lib.h>
 #include <stdio.h>
 
 
