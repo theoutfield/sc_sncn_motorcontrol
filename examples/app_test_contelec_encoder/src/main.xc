@@ -24,18 +24,23 @@ void contelec_encoder_test(client interface CONTELECInterface i_contelec)
     int velocity = 0;
     int position = 0;
     int electrical_angle = 0;
+    int status = 0;
 
     while(1) {
         /* get position from CONTELEC Sensor */
+        {void, void, status} = i_contelec.get_contelec_real_position();
         {count, position} = i_contelec.get_contelec_position();
 
         /* get angle and velocity from CONTELEC Sensor */
         { electrical_angle, velocity } = i_contelec.get_contelec_angle_velocity();
 
+
+
         xscope_int(COUNT, count);
         xscope_int(POSITION, position);
         xscope_int(ANGLE, electrical_angle);
         xscope_int(VELOCITY, velocity);
+        xscope_int(STATUS, status*1000);
 
         delay_milliseconds(1);
     }
@@ -45,7 +50,7 @@ void contelec_encoder_commands_test(client interface CONTELECInterface i_contele
     char status;
     int multiturn;
 //    unsigned int singleturn_filtered;
-//    unsigned int singleturn_raw;
+    unsigned int singleturn_raw;
     unsigned start_time, end_time;
     timer t;
 
@@ -74,10 +79,20 @@ void contelec_encoder_commands_test(client interface CONTELECInterface i_contele
         case 'a':
             printf("Set angle to %d\nnew offset %d\n", value, i_contelec.reset_contelec_angle(value));
             break;
+        //set calibration point
+        case 'c':
+            i_contelec.command_contelec(0x3E, value, 16);
+            printf("set calibration point %d\n", value);
+            break;
         //change direction
         case 'd':
             i_contelec.command_contelec(0x55, value, 8);
-            printf("direction\n");
+            printf("direction %d\n", value);
+            break;
+        //filter
+        case 'f':
+            i_contelec.command_contelec(0x5B, value, 8);
+            printf("filter %d\n", value);
             break;
         //set offset
         case 'o':
@@ -104,6 +119,17 @@ void contelec_encoder_commands_test(client interface CONTELECInterface i_contele
             i_contelec.command_contelec(0x57, value, 16);
             printf("singleturn\n");
             break;
+        //calibration table size
+        case 't':
+            i_contelec.command_contelec(0x3D, value, 16);
+            printf("calibration table size %d\n", value);
+            break;
+        //save
+        case 'v':
+            i_contelec.command_contelec(0x1C, 0, 0);
+            i_contelec.command_contelec(0x00, 0, 0);
+            printf("save\n");
+            break;
         //set zero position
         case 'z':
             i_contelec.command_contelec(0x56, 0, 0);
@@ -112,7 +138,7 @@ void contelec_encoder_commands_test(client interface CONTELECInterface i_contele
         //print the count and the time to get it
         default:
             t :> start_time;
-            {multiturn, status} = i_contelec.get_contelec_real_position();
+            {multiturn, singleturn_raw, status} = i_contelec.get_contelec_real_position();
             t :> end_time;
             printf("time %d, count %d\n", (end_time-start_time)/USEC_STD, multiturn);
             break;

@@ -87,7 +87,7 @@ interface CONTELECInterface
 
     { int, unsigned int } get_contelec_position(void);
 
-    { int, unsigned int } get_contelec_real_position(void);
+    { int, unsigned int, unsigned int } get_contelec_real_position(void);
 
     int get_contelec_velocity(void);
 

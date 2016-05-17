@@ -176,7 +176,7 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
     int notification = MOTCTRL_NTF_EMPTY;
 
     //first read
-    contelec_encoder_write(spi_ports, 0x59, 0, 16); //set multiturn to 0
+//    contelec_encoder_write(spi_ports, 0x59, 0, 16); //set multiturn to 0
     { void, count, last_position, void } = contelec_encoder_read(spi_ports);
     t :> last_read;
 
@@ -217,9 +217,10 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
                 break;
 
         //send position
-        case i_contelec[int i].get_contelec_real_position() -> { int out_count, unsigned int position }:
+        case i_contelec[int i].get_contelec_real_position() -> { int out_count, unsigned int position, unsigned int status }:
                 t when timerafter(last_read + contelec_config.timeout) :> void;
-                { void, out_count, void, position } = contelec_encoder_read(spi_ports);
+                { status, out_count, void, position } = contelec_encoder_read(spi_ports);
+                t :> last_read;
                 last_position = position;
                 break;
 
@@ -232,6 +233,7 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
         case i_contelec[int i].set_contelec_config(CONTELECConfig in_config):
                 ticks_per_turn = (1 << in_config.resolution_bits);
                 in_config.offset &= (ticks_per_turn-1);
+                delay_ticks(10*USEC_FAST);
                 //update variables which depend on contelec_config
                 if (contelec_config.offset != in_config.offset) {
                     contelec_encoder_init(spi_ports, in_config);
@@ -266,16 +268,18 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
 
         //receive the new count to set and set the offset accordingly
         case i_contelec[int i].reset_contelec_position(int new_count):
-                int multiturn = new_count / ticks_per_turn;
+                int multiturn = (new_count / ticks_per_turn) & 4095;
                 unsigned int singleturn = new_count % ticks_per_turn;
-                int test_count;
-                { void, test_count } = macs(ticks_per_turn, multiturn, 0, singleturn); //convert multiturn to absolute count: ticks per turn * number of turns + position
-                if (test_count != new_count) {
-                    printstrln("error new count computation");
-                } else {
+//                int test_count;
+//                { void, test_count } = macs(ticks_per_turn, multiturn, 0, singleturn); //convert multiturn to absolute count: ticks per turn * number of turns + position
+//                if (test_count != new_count) {
+//                    printstrln("error new count computation");
+//                } else {
+//                    printf("multiturn %d, singleturn %d\n", multiturn, singleturn);
+                    delay_ticks(10*USEC_FAST);
                     contelec_encoder_write(spi_ports, 0x57, singleturn, 16);
                     contelec_encoder_write(spi_ports, 0x59, multiturn, 16);
-                }
+//                }
                 last_position = singleturn;
                 t :> last_read;
                 count = new_count;
@@ -288,19 +292,24 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
                 } else {
                     new_angle = (new_angle >> (12-contelec_config.resolution_bits));
                 }
+                delay_ticks(10*USEC_FAST);
                 contelec_encoder_write(spi_ports, 0x0, 0, 0);//reset
                 int real_position;
                 { void, void, real_position, void } = contelec_encoder_read(spi_ports);
+                delay_ticks(10*USEC_FAST);
                 contelec_encoder_write(spi_ports, 0x57, new_angle / contelec_config.pole_pairs, 16);
                 { void, void, out_offset, void } = contelec_encoder_read(spi_ports);
+                t :> last_read;
                 out_offset = (out_offset - real_position) & (ticks_per_turn-1);
                 contelec_config.offset = out_offset;
                 break;
 
         //execute command
         case i_contelec[int i].command_contelec(int opcode, int data, int data_bits) -> unsigned int status:
+                delay_ticks(10*USEC_FAST);
                 contelec_encoder_write(spi_ports, opcode, data, data_bits);
                 { status, void, void, void } = contelec_encoder_read(spi_ports);
+                t :> last_read;
                 break;
 
         //compute velocity
