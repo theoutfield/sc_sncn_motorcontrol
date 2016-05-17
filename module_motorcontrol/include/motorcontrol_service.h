@@ -149,11 +149,25 @@ interface MotorcontrolInterface{
     int get_fets_state();
 
     /**
-     * @brief Getter for actual torque when FOC is used.
+     * @brief Getter for actual torque.
      *
      * @return Torque actual.
      */
     int get_torque_actual();
+
+    /**
+     * @brief Getter for actual velocity.
+     *
+     * @return Velocity actual.
+     */
+    int get_velocity_actual();
+
+    /**
+     * @brief Getter for actual position.
+     *
+     * @return Position actual.
+     */
+    int get_position_actual();
 
     /**
      * @brief Setter for Service new configuration. Also sets new configuration for the Hall Service and Encoder Service if possible.

@@ -1,8 +1,8 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
-#include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 /**
  * @file test_velocity-ctrl.xc
