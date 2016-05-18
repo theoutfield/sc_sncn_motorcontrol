@@ -58,6 +58,8 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     int fw_flag = 0;
     int bw_flag = 0;
     //commutation
+    int count = 0;
+    unsigned int position = 0;
     int angle_electrical = 0;
     int angle_pwm = 0;
     if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
@@ -180,7 +182,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 } else if (sensor_select == AMS_SENSOR) {
                     { angle_electrical, velocity } = i_ams.get_ams_angle_velocity();
                 } else if (sensor_select == CONTELEC_SENSOR) {
-                    { angle_electrical, velocity } = i_contelec.get_contelec_angle_velocity();
+                    { angle_electrical, velocity, count, position } = i_contelec.get_contelec_angle_velocity();
                 }  else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
                     { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
                     angle_electrical = (angle_electrical << 12) / max_count_per_hall;
@@ -365,6 +367,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 xscope_int(ANGLE_ELECTRICAL, mmTheta);
                 xscope_int(ANGLE_PWM, angle_pwm>>2);
                 xscope_int(CYCLE_TIME, (end_time - start_time)/USEC_FAST);
+            } else {
+                xscope_int(COUNT, count);
+                xscope_int(POSITION, position);
             }
 #endif
 

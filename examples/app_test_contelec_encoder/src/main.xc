@@ -25,24 +25,29 @@ void contelec_encoder_test(client interface CONTELECInterface i_contelec)
     int position = 0;
     int electrical_angle = 0;
     int status = 0;
+    timer t;
+    unsigned start_time, end_time;
 
     while(1) {
         /* get position from CONTELEC Sensor */
-        {void, void, status} = i_contelec.get_contelec_real_position();
-        {count, position} = i_contelec.get_contelec_position();
+        t :> start_time;
+        {count, position, status} = i_contelec.get_contelec_real_position();
+        t :> end_time;
+//        {void, position} = i_contelec.get_contelec_position();
 
         /* get angle and velocity from CONTELEC Sensor */
-        { electrical_angle, velocity } = i_contelec.get_contelec_angle_velocity();
+//        { electrical_angle, velocity } = i_contelec.get_contelec_angle_velocity();
 
 
 
         xscope_int(COUNT, count);
         xscope_int(POSITION, position);
-        xscope_int(ANGLE, electrical_angle);
-        xscope_int(VELOCITY, velocity);
-        xscope_int(STATUS, status*1000);
+//        xscope_int(ANGLE, electrical_angle);
+//        xscope_int(VELOCITY, velocity);
+//        xscope_int(STATUS, status*1000);
+        xscope_int(TIME, status);
 
-        delay_milliseconds(1);
+        delay_microseconds(10);
     }
 }
 
@@ -116,7 +121,7 @@ void contelec_encoder_commands_test(client interface CONTELECInterface i_contele
             break;
         //set singleturn
         case 's':
-            i_contelec.command_contelec(0x57, value, 16);
+            i_contelec.command_contelec(0x50, value, 16);
             printf("singleturn\n");
             break;
         //calibration table size

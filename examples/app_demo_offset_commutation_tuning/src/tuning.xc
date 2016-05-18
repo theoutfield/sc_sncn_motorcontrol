@@ -290,21 +290,21 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
         select {
         case t when timerafter(ts) :> void:
             //get position and velocity
-            if (motorcontrol_config.commutation_sensor == BISS_SENSOR && !isnull(i_biss)) {
-                velocity = i_biss.get_biss_velocity();
-                { count, void, void } = i_biss.get_biss_position();
-            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
-                velocity = i_ams.get_ams_velocity();
-                { count, void } = i_ams.get_ams_position();
-            } else if (motorcontrol_config.commutation_sensor == HALL_SENSOR && !isnull(i_hall)) {
-                count = i_hall.get_hall_position_absolute();
-                velocity = i_hall.get_hall_velocity();
-            } else if (motorcontrol_config.commutation_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
-                velocity = i_contelec.get_contelec_velocity();
-                { count, void } = i_contelec.get_contelec_position();
-            }
-            if (motorcontrol_config.commutation_method == SINE)
-                xscope_int(VELOCITY, velocity);
+//            if (motorcontrol_config.commutation_sensor == BISS_SENSOR && !isnull(i_biss)) {
+//                velocity = i_biss.get_biss_velocity();
+//                { count, void, void } = i_biss.get_biss_position();
+//            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
+//                velocity = i_ams.get_ams_velocity();
+//                { count, void } = i_ams.get_ams_position();
+//            } else if (motorcontrol_config.commutation_sensor == HALL_SENSOR && !isnull(i_hall)) {
+//                count = i_hall.get_hall_position_absolute();
+//                velocity = i_hall.get_hall_velocity();
+//            } else if (motorcontrol_config.commutation_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
+//                velocity = i_contelec.get_contelec_velocity();
+//                { count, void } = i_contelec.get_contelec_position();
+//            }
+//            if (motorcontrol_config.commutation_method == SINE)
+//                xscope_int(VELOCITY, velocity);
 //
 //            //torque display
 //            if (motorcontrol_config.commutation_method == FOC) {
@@ -351,10 +351,10 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                     else if (phase_b < -peak_current)
                         peak_current = -phase_b;
                 }
-                if (motorcontrol_config.commutation_method == SINE) {
-                    xscope_int(PHASE_B, phase_b);
-                    xscope_int(PHASE_C, phase_c);
-                }
+//                if (motorcontrol_config.commutation_method == SINE) {
+//                    xscope_int(PHASE_B, phase_b);
+//                    xscope_int(PHASE_C, phase_c);
+//                }
 //                xscope_int(PEAK_CURRENT, last_peak_current);
 //                xscope_int(TORQUE_SENSOR, (adc_b-adc_a-torque_offset)/4);
             }

@@ -14,7 +14,7 @@
 #define CONTELEC_OFFSET          0//3696
 #define CONTELEC_POLARITY        CONTELEC_POLARITY_NORMAL//CONTELEC_POLARITY_NORMAL
 #define CONTELEC_USEC            USEC_FAST
-#define CONTELEC_TIMEOUT         60*CONTELEC_USEC
+#define CONTELEC_TIMEOUT         40*CONTELEC_USEC
 #define CONTELEC_RESOLUTION      16
 #define CONTELEC_VELOCITY_LOOP   1000
 #define CONTELEC_FILTER          0x05
@@ -83,7 +83,7 @@ interface CONTELECInterface
     [[clears_notification]]
     int get_notification();
 
-    { unsigned int, int } get_contelec_angle_velocity(void);
+    { unsigned int, int, int, unsigned int } get_contelec_angle_velocity(void);
 
     { int, unsigned int } get_contelec_position(void);
 
