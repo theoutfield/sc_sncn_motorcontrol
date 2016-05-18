@@ -1,6 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
+
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
@@ -49,7 +50,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning, null);
+        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning);
 
         /* Tuning service */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)

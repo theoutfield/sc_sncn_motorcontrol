@@ -8,8 +8,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning,
-                       interface ADCInterface client ?i_adc)
+void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET OFFSET TUNING SERVICE STARTING...\n");
@@ -91,7 +90,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //auto tune the offset by mesuring the current consumption
         case 'c':
-            i_tuning.tune(input_voltage);
+            if (!isnull(i_tuning))
+                i_tuning.tune(input_voltage);
             break;
         //reverse motor direction
         case 'd':
@@ -111,8 +111,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //pole pairs
         case 'e':
-            i_tuning.set_pole_pairs(value);
-            printf("Pole pairs %d\n", value);
+            if (!isnull(i_tuning)) {
+                i_tuning.set_pole_pairs(value);
+                printf("Pole pairs %d\n", value);
+            }
             break;
         //toggle field controler
         case 'f':
@@ -129,7 +131,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //position limit
         case 'l':
-            i_tuning.set_limit(value * sign);
+            if (!isnull(i_tuning))
+                i_tuning.set_limit(value * sign);
             break;
         //reverse sensor direction
         case 'm':

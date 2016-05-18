@@ -8,12 +8,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning,
-                       interface ADCInterface client ?i_adc)
+void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
-    int offset = 0;
     int field_control_flag = 1;
     int torque_flag = 0;
     int input_voltage = 0;
@@ -85,7 +83,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //position limit
         case 'l':
-            i_tuning.set_limit(value * sign);
+            if (!isnull(i_tuning))
+                i_tuning.set_limit(value * sign);
             break;
         //go to position with profile
         case 'p':
@@ -108,7 +107,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         //set torque limit
         case 't':
             if (mode_2 == 'l') {
-                i_tuning.set_torque_limit(value);
+                if (!isnull(i_tuning))
+                    i_tuning.set_torque_limit(value);
                 printf("torgue limit %d\n", value);
             } else {
                 field_control_flag = 1;
@@ -122,7 +122,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //set voltage
         default:
-            i_tuning.set_position_direct(0x7fffffff);
+            if (!isnull(i_tuning))
+                i_tuning.set_position_direct(0x7fffffff);
             i_commutation.set_fets_state(1);
             torque_flag = 0;
             input_voltage = value * sign;
