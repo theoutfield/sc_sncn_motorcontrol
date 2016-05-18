@@ -28,6 +28,11 @@ interface WatchdogInterface{
      * @brief Stops ticking the watchdog. Therefore, any output through the phases is disabled.
      */
     void stop(void);
+
+    /**
+     * @reacts on any detected fault. Any output through the phases will be disabled.
+     */
+    void protect(int fault_id);
 };
 
 /**

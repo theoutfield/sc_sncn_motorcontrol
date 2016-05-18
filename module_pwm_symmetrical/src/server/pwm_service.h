@@ -14,20 +14,11 @@
  **/
 #pragma once
 
-#include <pwm_common.h>
 #include <xs1.h>
 
-/**
- * @brief Structure type for PWM ports.
- */
-typedef struct{
-    buffered out port:32 p_pwm[3]; /**< Array of 3 ports for the high-side PWM signals output */
-    buffered out port:32 p_pwm_inv[3]; /**< Array of 3 ports for the low-side PWM signals output */
-    buffered out port:32 ?p_pwm_phase_d; /**< Port for the high-side PWM signal output of an optional 4th phase */
-    buffered out port:32 ?p_pwm_phase_d_inv; /**< Port for the low-side PWM signal output of an optional 4th phase */
-    clock clk; /**< Hardware clock used as time reference */
-    in port ?dummy_port; /**< Any unused port. Used internally for accurate timming */
-} PwmPorts;
+#include <pwm_common.h>
+#include <pwm_ports.h>
+
 
 interface BrakeInterface {
     void set_brake(int enable);

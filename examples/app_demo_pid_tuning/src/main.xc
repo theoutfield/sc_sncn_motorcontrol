@@ -9,7 +9,8 @@
  * @date 17/06/2014
  */
 
-#include <pwm_service.h>
+//#include <pwm_service.h>
+#include <pwm_server.h>
 #include <hall_service.h>
 #include <adc_service.h>
 #include <user_config.h>
@@ -104,6 +105,15 @@ int main(void) {
         {
             par
             {
+
+                {
+                    pwm_config(pwm_ports);
+
+//                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+//                    delay_milliseconds(1000);
+//                    pwm_service_task( MOTOR_ID, pwm_ports, i_update_pwm);
+                }
+
                 /* Triggered PWM Service */
 //                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
 //                i_brake.set_brake(0);
@@ -111,8 +121,12 @@ int main(void) {
                 /* ADC Service */
 //                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
-                /* Watchdog Service */
-//                watchdog_service(wd_ports, i_watchdog);
+                {
+                    /* Watchdog Service */
+                    delay_milliseconds(500);
+                    watchdog_service(wd_ports,i_watchdog);
+
+                }
 
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                 /* BiSS service */
