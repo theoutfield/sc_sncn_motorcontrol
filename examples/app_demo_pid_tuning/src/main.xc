@@ -109,7 +109,7 @@ int main(void) {
                 {
                     pwm_config(pwm_ports);
 
-//                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
 //                    delay_milliseconds(1000);
 //                    pwm_service_task( MOTOR_ID, pwm_ports, i_update_pwm);
                 }
