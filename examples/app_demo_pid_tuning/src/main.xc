@@ -15,6 +15,7 @@
 #include <adc_service.h>
 #include <user_config.h>
 #include <tuning.h>
+#include <torque_control.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -46,6 +47,7 @@ int main(void) {
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
     interface WatchdogInterface i_watchdog[2];
+    interface update_pwm i_update_pwm;
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
     interface PositionControlInterface i_position_control[3];
@@ -105,13 +107,19 @@ int main(void) {
         {
             par
             {
+                {
+                    /* Watchdog Service */
+                    delay_milliseconds(500);
+                    watchdog_service(wd_ports,i_watchdog);
+
+                }
 
                 {
                     pwm_config(pwm_ports);
 
-                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-//                    delay_milliseconds(1000);
-//                    pwm_service_task( MOTOR_ID, pwm_ports, i_update_pwm);
+//                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    delay_milliseconds(1000);
+                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm);
                 }
 
                 /* Triggered PWM Service */
@@ -121,12 +129,7 @@ int main(void) {
                 /* ADC Service */
 //                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
-                {
-                    /* Watchdog Service */
-                    delay_milliseconds(500);
-                    watchdog_service(wd_ports,i_watchdog);
 
-                }
 
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                 /* BiSS service */
@@ -193,6 +196,11 @@ int main(void) {
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
+
+                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
+                            null, null, i_biss[0], null,
+                            i_watchdog[0], null, i_motorcontrol, i_update_pwm);
+
 //                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
 //                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)

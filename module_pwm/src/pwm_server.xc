@@ -23,7 +23,7 @@ static void do_pwm_port_config(PwmPorts &ports)
     unsigned i;
 
     // Loop through PWM phases
-    for (i = 0; i < NUM_PWM_PHASES; i++)
+    for (i = 0; i < _NUM_PWM_PHASES; i++)
     {   // Configure ports for this phase
 
         configure_out_port( ports.p_pwm[i] , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
@@ -37,7 +37,7 @@ static void do_pwm_port_config(PwmPorts &ports)
 
 
     // Check of ADC synchronisation is being used
-    if (1 == LOCK_ADC_TO_PWM)
+    if (1 == _LOCK_ADC_TO_PWM)
     {   // ADC synchronisation activated
 
         // Configure dummy input port used to send ADC synchronisation pulse
@@ -52,20 +52,20 @@ void pwm_config(PwmPorts &ports)
     int motor_cnt; // motor counter
 
     // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz) -> in our application it is 250 MHz
-//    configure_clock_rate( ports.clk ,PLATFORM_REFERENCE_MHZ ,1 );
+    //configure_clock_rate( ports.clk ,PLATFORM_REFERENCE_MHZ ,1 );
 
     do_pwm_port_config(ports);
 
     start_clock( ports.clk ); // Start common PWM clock, once all ports configured
 
-    ports.p_pwm[PWM_PHASE_A]  <: 0x00000000;
-    ports.p_pwm_inv[PWM_PHASE_A]  <: 0xFFFFFFFF;
+    ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
+    ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
 
-    ports.p_pwm[PWM_PHASE_B]  <: 0x00000000;
-    ports.p_pwm_inv[PWM_PHASE_B]  <: 0xFFFFFFFF;
+    ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
+    ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
 
-    ports.p_pwm[PWM_PHASE_C]  <: 0x00000000;
-    ports.p_pwm_inv[PWM_PHASE_C]  <: 0xFFFFFFFF;
+    ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
+    ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
 
     ports.p_pwm_phase_d  <: 0x00000000;
     ports.p_pwm_phase_d_inv  <: 0xFFFFFFFF;
@@ -128,47 +128,47 @@ void pwm_check(PwmPorts &ports)
     while(1)
     {
 
-        ports.p_pwm[PWM_PHASE_A]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[PWM_PHASE_A]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_A]  <: 0xFFFFFFFF;
+        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
 
-        ports.p_pwm[PWM_PHASE_B]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[PWM_PHASE_B]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_B]  <: 0xFFFFFFFF;
+        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
 
-        ports.p_pwm[PWM_PHASE_C]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[PWM_PHASE_C]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_C]  <: 0xFFFFFFFF;
+        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
         delay_microseconds(100);
 
 
-        ports.p_pwm[PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_A]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
 
-        ports.p_pwm[PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_B]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
 
-        ports.p_pwm[PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_C]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
         delay_microseconds(3);
 
 
-        ports.p_pwm[PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_A]  <: 0x00000000;
+        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0x00000000;
 
-        ports.p_pwm[PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_B]  <: 0x00000000;
+        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0x00000000;
 
-        ports.p_pwm[PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_C]  <: 0x00000000;
+        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0x00000000;
         delay_microseconds(100);
 
 
-        ports.p_pwm[PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_A]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
 
-        ports.p_pwm[PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_B]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
 
-        ports.p_pwm[PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[PWM_PHASE_C]  <: 0xFFFFFFFF;
+        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
+        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
         delay_microseconds(3);
 
     }
@@ -265,7 +265,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
                 pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
                 pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
-                pwm_serv_s.ref_time += HALF_SYNC_INCREMENT;
+                pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
 
                 break;
         }
@@ -274,65 +274,65 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         {
 
             // Rising edges - these have negative time offsets - 44 Cycles
-            ports.p_pwm[PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_A].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_A].hi.pattern;
-            ports.p_pwm_inv[PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_A].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_A].lo.pattern;
+            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.pattern;
 
-            ports.p_pwm[PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_B].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_B].hi.pattern;
-            ports.p_pwm_inv[PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_B].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_B].lo.pattern;
+            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.pattern;
 
-            ports.p_pwm[PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].hi.pattern;
-            ports.p_pwm_inv[PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].lo.pattern;
+            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
 
             if(break_counter < 15000)
             {
                 break_counter++;
                 if(break_active == 1)
                 {
-                    ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[PWM_PHASE_C].hi.pattern;
-                    ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[PWM_PHASE_C].lo.pattern;
+                    ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                    ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
                 }
             }
             else if(break_active == 1)
             {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[PWM_PHASE_C].lo.pattern;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
 
             }
             else if(break_active == 0)
             {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].hi.time_off) <: 0x00000000;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
             }
 
 
             // Falling edges - these have positive time offsets - 44 Cycles
-            ports.p_pwm[PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_A].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_A].hi.pattern;
-            ports.p_pwm_inv[PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_A].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_A].lo.pattern;
+            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.pattern;
 
-            ports.p_pwm[PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_B].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_B].hi.pattern;
-            ports.p_pwm_inv[PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_B].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_B].lo.pattern;
+            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.pattern;
 
-            ports.p_pwm[PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_C].hi.pattern;
-            ports.p_pwm_inv[PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_C].lo.pattern;
+            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
 
             if(break_counter < 15000)
             {
                 if(break_active == 1)
                 {
-                    ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[PWM_PHASE_C].hi.pattern;
-                    ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[PWM_PHASE_C].lo.pattern;
+                    ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                    ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
                 }
             }
             else if(break_active == 1)
             {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[PWM_PHASE_C].lo.pattern;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
 
             }
             else if(break_active == 0)
             {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].hi.time_off) <: 0x00000000;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
             }
 
 
@@ -341,25 +341,25 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         else if (pwm_on==0)
         {
             // Rising edges - these have negative time offsets - 44 Cycles
-            ports.p_pwm[PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_A].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
 
-            ports.p_pwm[PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_B].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
 
-            ports.p_pwm[PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
 
 
             // Falling edges - these have positive time offsets - 44 Cycles
-            ports.p_pwm[PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_A].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
 
-            ports.p_pwm[PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_B].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
 
-            ports.p_pwm[PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_C].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
         }
 
     } // while(1)

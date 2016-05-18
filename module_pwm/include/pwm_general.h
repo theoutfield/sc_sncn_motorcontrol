@@ -18,14 +18,14 @@
 #define _PWM_GENERAL_H_
 
 /** Define Number of buffers in storage ring */
-#define NUM_PWM_BUFS 2  // Double-buffered
+#define _NUM_PWM_BUFS 2  // Double-buffered
 
 /** Define PWM port width resolution */
-#define PORT_RES_BITS 5 // PWM port width resoltion (e.g. 5 for 32-bits)
+#define _PORT_RES_BITS 5 // PWM port width resoltion (e.g. 5 for 32-bits)
 
 /** Define PWM port width in bits */
-#define PWM_PORT_WID (1 << PORT_RES_BITS) // PWM port width in bits
-#define HALF_PORT_WID (PWM_PORT_WID >> 1) // Half of PWM port width in bits
+#define _PWM_PORT_WID (1 << _PORT_RES_BITS) // PWM port width in bits
+#define _HALF_PORT_WID (_PWM_PORT_WID >> 1) // Half of PWM port width in bits
 
 /** Different PWM Control Commands (Client --> Server) */
 typedef enum CMD_PWM_ETAG
@@ -38,16 +38,16 @@ typedef enum CMD_PWM_ETAG
 /** Different PWM Phases */
 typedef enum PWM_PHASE_ETAG
 {
-  PWM_PHASE_A = 0,    // 1st Phase
-  PWM_PHASE_B,		  // 2nd Phase
-  PWM_PHASE_C,		  // 3rd Phase
-  NUM_PWM_PHASES      // Handy Value!-)
+  _PWM_PHASE_A = 0,    // 1st Phase
+  _PWM_PHASE_B,		  // 2nd Phase
+  _PWM_PHASE_C,		  // 3rd Phase
+  _NUM_PWM_PHASES      // Handy Value!-)
 } PWM_PHASE_ENUM;
 
 /** Structure containing PWM parameters for one motor */
 typedef struct PWM_PARAM_TAG //
 {
-	unsigned widths[NUM_PWM_PHASES]; // Array of PWM width values
+	unsigned widths[_NUM_PWM_PHASES]; // Array of PWM width values
 	int id; // Unique Motor identifier e.g. 0 or 1 (NB -1 used to signal termination)
 } PWM_PARAM_TYP;
 
@@ -76,7 +76,7 @@ typedef struct PWM_PHASE_TAG // Structure containing string
 // Structure containing data for one pulse edge for all phases
 typedef struct PWM_EDGE_TAG
 {
-	PWM_PHASE_TYP phase_data[NUM_PWM_PHASES]; // Array of phase-data structures, one for each phase
+	PWM_PHASE_TYP phase_data[_NUM_PWM_PHASES]; // Array of phase-data structures, one for each phase
 } PWM_EDGE_TYP;
 
 // Structure containing pwm output data for one buffer
@@ -89,7 +89,7 @@ typedef struct PWM_BUFFER_TAG
 // Structure containing pwm output data for all buffers
 typedef struct PWM_ARRAY_TAG
 {
-	PWM_BUFFER_TYP buf_data[NUM_PWM_BUFS]; // Array of buffer-data structures, one for each buffer
+	PWM_BUFFER_TYP buf_data[_NUM_PWM_BUFS]; // Array of buffer-data structures, one for each buffer
 } PWM_ARRAY_TYP;
 
 
