@@ -1,6 +1,4 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
-//#include <CORE_BOARD_REQUIRED>
-//#include <IFM_BOARD_REQUIRED>
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
@@ -106,7 +104,6 @@ int main(void)
 
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
-    interface BrakeInterface i_brake;
     interface MotorcontrolInterface i_motorcontrol[4];
     interface HallInterface i_hall[5];
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)

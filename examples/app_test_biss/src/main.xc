@@ -1,6 +1,4 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-//#include <CORE_BOARD_REQUIRED>
-//#include <IFM_BOARD_REQUIRED>
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
@@ -14,27 +12,6 @@
 #include <watchdog_service.h>
 #include <pwm_service.h>
 #include <adc_service.h>
-
-//
-//#define ADC_VALUE_0_DEGREES 1640     //0.5V
-//#define ADC_TEMP_ERROR      1120
-//#define ADC_VALUE_PER_DEGREE 32    //10mV/deg
-//
-//int statusTemperature_adc2degrees(int adcValue)
-//{
-//    int temp = 0;
-//
-//    if(adcValue >= (ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR)){ //over zero degrees
-//       temp = ((adcValue - (ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR)) / ADC_VALUE_PER_DEGREE);
-//    } else if (adcValue < ADC_VALUE_0_DEGREES) { //under zero
-//       temp = -1*(((ADC_VALUE_0_DEGREES + ADC_TEMP_ERROR) - adcValue) / ADC_VALUE_PER_DEGREE);
-//    }
-//
-//    if(temp > 140 || temp < -50)
-//        temp = 0;
-//
-//    return temp;
-//}
 
 /* Test BiSS Encoder Client */
 void biss_test(client interface BISSInterface i_biss, client interface ADCInterface i_adc) {

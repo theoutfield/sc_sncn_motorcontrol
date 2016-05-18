@@ -33,7 +33,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
     profiler_config.max_deceleration = MAX_DECELERATION;
 
     /* Initialise the position profile generator */
-    init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss);
+    init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss, null);
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
@@ -93,7 +93,7 @@ int main(void)
                 position_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; //us
 
                 /* Control Loop */
-                position_control_service(position_control_config, null, i_qei[1], null, i_motorcontrol[0],
+                position_control_service(position_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
                                          i_position_control);
             }
         }
@@ -106,7 +106,7 @@ int main(void)
             par
             {
                 /* PWM Loop */
-                pwm_service(pwm_ports, c_pwm_ctrl, BRAKE_ENABLE);
+                pwm_service(pwm_ports, c_pwm_ctrl, null);
 
                 /* Watchdog Server */
                 watchdog_service(wd_ports, i_watchdog);
@@ -128,8 +128,8 @@ int main(void)
                     motorcontrol_config.motor_type = BDC_MOTOR;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, null, i_watchdog[0],
-                                                 i_motorcontrol);
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config, c_pwm_ctrl, null, null, null, null, null, i_watchdog[0],
+                                         null, i_motorcontrol);
                  }
 
             }

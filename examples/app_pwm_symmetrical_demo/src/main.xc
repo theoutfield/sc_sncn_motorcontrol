@@ -18,7 +18,7 @@ int main (void)
 
             t :> ts;
             t when timerafter (ts + 42000) :> void;
-            pwm_service(pwm_ports, c_pwm_ctrl, BRAKE_ENABLE);
+            pwm_service(pwm_ports, c_pwm_ctrl, null);
         }
 
         /* PWM client */
