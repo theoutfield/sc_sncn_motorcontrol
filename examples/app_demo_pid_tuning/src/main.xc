@@ -111,7 +111,6 @@ int main(void) {
                     /* Watchdog Service */
                     delay_milliseconds(500);
                     watchdog_service(wd_ports,i_watchdog);
-
                 }
 
                 {
@@ -122,13 +121,12 @@ int main(void) {
                     pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm);
                 }
 
-                /* Triggered PWM Service */
-//                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
-//                i_brake.set_brake(0);
-
                 /* ADC Service */
-//                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
+                {
+                    delay_milliseconds(1500);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
 
+                }
 
 
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)

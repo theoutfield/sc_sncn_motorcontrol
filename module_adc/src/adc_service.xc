@@ -18,7 +18,10 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
         } else if(!isnull(adc_ports.ad7265_ports.xclk)){
 
-            adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
+            if(ADC_FIXED_CHANNEL_OPERATION)
+                adc_ad7256_fixed_channel(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
+            else
+                adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
 
         } else {
 
