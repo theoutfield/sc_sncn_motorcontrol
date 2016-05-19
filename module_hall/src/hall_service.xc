@@ -127,11 +127,12 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                 out_notification = notification;
                 break;
 
-            case i_hall[int i].get_hall_pinstate_angle_velocity() -> {unsigned out_pinstate, int out_position, int out_velocity}:
+            case i_hall[int i].get_hall_pinstate_angle_velocity_position() -> {unsigned out_pinstate, int out_position, int out_velocity, int out_count}:
 
                 out_pinstate = pin_state_monitor;
                 out_position = angle;
                 out_velocity = raw_velocity;
+                out_count = count;
                 break;
 
             case i_hall[int i].get_hall_pinstate() -> unsigned out_pinstate:

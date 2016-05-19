@@ -132,12 +132,13 @@ interface BISSInterface {
     unsigned int get_biss_position_fast();
 
     /**
-     * @brief Getter for electrical angle which is singleturn position * pole pairs and velocity.
+     * @brief Getter for electrical angle which is singleturn position * pole pairs and velocity and count.
      *
      * @return electrical angle
      * @return velocity
+     * @return count
      */
-    { unsigned int , int } get_biss_angle_velocity();
+    { unsigned int , int , int } get_biss_angle_velocity_position();
 
     /**
      * @brief Getter for calculated velocity.

@@ -316,8 +316,8 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
 
                 if (compute_flag == 1) {
                     if (torque_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
-                        angle = (i_hall.get_hall_position() >> 2) & 0x3ff; //  << 10 ) >> 12 /
-                        actual_speed = i_hall.get_hall_velocity();
+                        {void, angle, actual_speed, void } = i_hall.get_hall_pinstate_angle_velocity_position();
+                        angle = (angle >> 2) & 0x3ff; //  << 10 ) >> 12 /
                     } else if (torque_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
                         { angle, offset_fw_flag, offset_bw_flag } = i_qei.get_qei_sync_position();
                         if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
@@ -326,16 +326,18 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                         actual_speed = i_qei.get_qei_velocity();
                     } else if (torque_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
                         if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
-                            { angle, void } = i_biss.get_biss_angle_velocity();
+                            { angle, actual_speed, void } = i_biss.get_biss_angle_velocity_position();
                             angle = angle >> 2; //  << 10 ) >> 12 /
+                        } else {
+                            actual_speed = i_biss.get_biss_velocity();
                         }
-                        actual_speed = i_biss.get_biss_velocity();
                     } else if (torque_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
                         if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
-                            { angle, void } = i_ams.get_ams_angle_velocity();
+                            { angle, actual_speed, void } = i_ams.get_ams_angle_velocity_position();
                             angle = angle >> 2; //  << 10 ) >> 12 /
+                        } else {
+                            actual_speed = i_ams.get_ams_velocity();
                         }
-                        actual_speed = i_ams.get_ams_velocity();
                     }
 
                     c_current <: 2;

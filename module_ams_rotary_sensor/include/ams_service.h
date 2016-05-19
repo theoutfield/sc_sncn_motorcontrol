@@ -11,8 +11,8 @@
 #include <refclk.h>
 
 
-#define AMS_OFFSET          13473//3696
-#define AMS_POLARITY        AMS_POLARITY_INVERTED//AMS_POLARITY_NORMAL
+#define AMS_OFFSET          4684
+#define AMS_POLARITY        AMS_POLARITY_NORMAL//AMS_POLARITY_NORMAL
 #define AMS_USEC            USEC_FAST
 #define AMS_CACHE_TIME      (60*AMS_USEC)
 #define AMS_RESOLUTION      14
@@ -182,7 +182,7 @@ interface AMSInterface
     [[clears_notification]]
     int get_notification();
 
-    { unsigned int, int } get_ams_angle_velocity(void);
+    { unsigned int, int, int } get_ams_angle_velocity_position(void);
 
     { int, unsigned int } get_ams_position(void);
 

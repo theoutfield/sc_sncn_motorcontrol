@@ -104,7 +104,13 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                 offset = (offset + 2048) & 4095;
                 i_commutation.set_sensor_offset(offset);
             } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
-                motorcontrol_config.hall_offset[0] = (motorcontrol_config.hall_offset[0] + 2048) & 4095;
+                if (motorcontrol_config.commutation_method == FOC) {
+                    motorcontrol_config.hall_offset[0] = (motorcontrol_config.hall_offset[0] + 2048) & 4095;
+                } else {
+                    int temp = motorcontrol_config.hall_offset[0];
+                    motorcontrol_config.hall_offset[0] = (motorcontrol_config.hall_offset[1] + 2048) & 4095;
+                    motorcontrol_config.hall_offset[1] = (temp + 2048) & 4095;
+                }
                 i_commutation.set_config(motorcontrol_config);
             }
             printf("Direction inverted\n");
