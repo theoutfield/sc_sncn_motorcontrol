@@ -81,6 +81,10 @@ void update_pwm(control_variables& cv, PWM_COMMS_TYP& pwm_comms_s)
     /*********************************************/
     // battery boost
     // (warning: EMI increment)
+
+    //FIXME: USING BOOST MODE CAN LEAD TO ET_APPLICATION_SIGNAL ERROR.
+    //MUST BE EVALUATED BEFORE ACTIVATING THIS MODE
+
     //        cv.angle_applied_flux_est = cv.angle_u_motor + angle_test;
     cv.angle_applied_flux_est = cv.angle_u_motor + cv.angle_actual;
 
@@ -106,9 +110,11 @@ void update_pwm(control_variables& cv, PWM_COMMS_TYP& pwm_comms_s)
 
     cv.EMI_V = (cv.mmCosinus*cv.u_motor)/(16384*6);
 
+    /*
     cv.pwm_a -=  cv.EMI_V;
     cv.pwm_b -=  cv.EMI_V;
     cv.pwm_c -=  cv.EMI_V;
+    */
 
     cv.pwm_values[0] = (cv.pwm_a*cv.pwm_dif)/(2*3341) + (cv.pwm_av);
     cv.pwm_values[1] = (cv.pwm_b*cv.pwm_dif)/(2*3341) + (cv.pwm_av);
