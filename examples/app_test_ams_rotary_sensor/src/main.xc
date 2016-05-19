@@ -27,7 +27,7 @@ void ams_rotary_sensor_test(client interface AMSInterface i_ams)
         {count, position} = i_ams.get_ams_position();
 
         /* get angle and velocity from AMS Sensor */
-        { electrical_angle, velocity } = i_ams.get_ams_angle_velocity();
+        { electrical_angle, velocity, void } = i_ams.get_ams_angle_velocity_position();
 
         xscope_int(COUNT, count);
         xscope_int(POSITION, position);

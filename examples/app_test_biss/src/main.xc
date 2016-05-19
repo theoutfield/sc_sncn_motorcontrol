@@ -35,7 +35,7 @@ void biss_test(client interface BISSInterface i_biss, client interface ADCInterf
 
         t :> start_time;
         /* get angle and velocity from BiSS Encoder */
-        { angle, velocity } = i_biss.get_biss_angle_velocity();
+        { angle, velocity, void } = i_biss.get_biss_angle_velocity_position();
         t :> end_time;
 
         //get adc
