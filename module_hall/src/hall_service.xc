@@ -187,7 +187,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                 out_status = init_state;
                 break;
 
-            case tmr when timerafter(ts + PULL_PERIOD_USEC * 250) :> ts: //12 usec 3000
+            case tmr when timerafter(ts + PULL_PERIOD_USEC * USEC_FAST) :> ts: //12 usec 3000
                 switch (xreadings) {
                     case 0:
                         hall_ports.p_hall :> new1;
@@ -371,7 +371,12 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                     previous_position1 = count;
                     old_difference = difference1;
                 }
-                raw_velocity = _modified_internal_filter(filter_buffer, index, filter_length, velocity);
+                //FIXME check if the velocity computation is disturbing the position measurement
+//                raw_velocity = _modified_internal_filter(filter_buffer, index, filter_length, velocity);
+                raw_velocity = filter(filter_buffer, index, filter_length, velocity);
+                // velocity in rpm = ( difference ticks * (1 minute / 1 ms) ) / ticks per turn
+                //                 = ( difference ticks * (60,000 ms / 1 ms) ) / ticks per turn
+                raw_velocity = (raw_velocity * 60000 ) / config_max_ticks_per_turn;
                 break;
 
         }

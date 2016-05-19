@@ -33,7 +33,7 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
-#else
+#elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
 

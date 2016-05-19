@@ -162,6 +162,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         actual_velocity = i_biss.get_biss_velocity();
                     } else if (velocity_control_config.feedback_sensor == AMS_SENSOR) {
                         actual_velocity = i_ams.get_ams_velocity();
+                    } else if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
+                        actual_velocity = i_hall.get_hall_velocity();
                     } else {
                         if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
                             if(!isnull(i_hall)){

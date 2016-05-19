@@ -29,7 +29,7 @@ void hall_test(interface HallInterface client i_hall)
         /* get velocity from Hall Sensor */
         velocity = i_hall.get_hall_velocity();
 
-        printintln(position);
+//        printintln(position);
 
         xscope_int(COUNT, count);
         xscope_int(VELOCITY, velocity);
