@@ -150,7 +150,7 @@ int main(void) {
                     biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                     biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
 
-//                    biss_service(biss_ports, biss_config, i_biss);
+                    biss_service(biss_ports, biss_config, i_biss);
                 }
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                 /* AMS Rotary Sensor Service */

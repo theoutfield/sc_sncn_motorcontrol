@@ -89,6 +89,29 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
 
     int notification = MOTCTRL_NTF_EMPTY;
 
+    // variables added for "get_biss_delayed" interface:
+    timer t1;
+    unsigned int time1;
+    int flag_send_normal=1;
+    int flag_angle=0;
+    int angle;
+    int biss_angle;
+    int last_angle;
+    int counter=0;
+    int count, position, difference;
+    int first_count_sample, second_count_sample;
+    int first_position_sample, second_position_sample;
+    int biss_filter_order = 3;
+    int biss_filter_index_newest=0;
+    int f[3] = {300, 380, 320};
+    int biss_filter_buffer[3]={0, 0, 0};
+    int biss_speed=0;
+    int biss_filtered_speed=0;
+    int k;
+    int y;
+    int speed_index=0;
+
+
     //clock and port configuration
     configure_clock_rate(biss_ports.clk, biss_config.clock_dividend, biss_config.clock_divisor); // a/b MHz
     configure_out_port(biss_ports.p_biss_clk, biss_ports.clk, BISS_CLK_PORT_HIGH);
@@ -219,6 +242,89 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                     out_velocity = -velocity;
                 break;
 
+        //send biss information with delay (previous angle and filtered speed).
+        //FIXME: speed filter delay should be decreased, and should use current angle (not previous angle)
+        case i_biss[int i].get_biss_delayed() -> { unsigned int biss_angle, int biss_velocity}:
+                biss_angle    = last_angle    ;
+                biss_velocity = biss_filtered_speed ;
+
+                flag_send_normal=0;
+                flag_angle = 1;
+                t1 :> time1;
+                break;
+
+        case flag_angle => t1 when timerafter(time1) :> void:
+            // read biss angle:
+            t :> time;
+            if (timeafter(time, last_biss_read + biss_config.timeout)) {
+                angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
+                t :> last_biss_read;
+                last_position = angle;
+            } else
+                angle = last_position;
+            if (biss_config.polarity == BISS_POLARITY_INVERTED)
+                angle = ticks_per_turn - angle;
+            if (biss_config.singleturn_resolution > 12)
+                angle = (biss_config.pole_pairs * (angle >> (biss_config.singleturn_resolution-12)) + biss_config.offset_electrical ) & 4095;
+            else
+                angle = (biss_config.pole_pairs * (angle << (12-biss_config.singleturn_resolution)) + biss_config.offset_electrical ) & 4095;
+
+            last_angle = angle;
+
+            // read biss velocity:
+            if(counter==0)
+            {
+                    read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+                    { count, position, void } = biss_encoder(data, biss_config);
+                    update_turns(turns, last_count, count, biss_config.multiturn_resolution, ticks_per_turn);
+                    last_count = count;
+                    last_position = position;
+                if (biss_config.multiturn_resolution == 0)
+                    count += turns*ticks_per_turn;
+
+                first_count_sample = last_count;
+            }
+
+            counter++;
+            if(counter==20)
+            {
+                    read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+                    { count, position, void } = biss_encoder(data, biss_config);
+                    update_turns(turns, last_count, count, biss_config.multiturn_resolution, ticks_per_turn);
+                    last_count = count;
+                    last_position = position;
+                if (biss_config.multiturn_resolution == 0)
+                    count += turns*ticks_per_turn;
+
+                second_count_sample = last_count;
+
+                difference = second_count_sample - first_count_sample;
+                if(difference > crossover || difference < -crossover)
+                    difference = old_difference;
+
+                old_difference = difference;
+                // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
+                //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
+                velocity = (difference * velocity_factor) / ticks_per_turn;
+                biss_speed = velocity;
+                ++ biss_filter_index_newest;
+                if( biss_filter_index_newest ==  biss_filter_order)  biss_filter_index_newest = 0;
+                biss_filter_buffer[ biss_filter_index_newest] =  biss_speed;
+                y = 0;
+                speed_index = biss_filter_index_newest;
+                for(k=0;k< biss_filter_order;k++)
+                {
+                    y +=  f[k] *  biss_filter_buffer[speed_index];
+                    --speed_index;
+                    if(speed_index == -1)   speed_index =  biss_filter_order -1;
+                }
+                biss_filtered_speed = y / 1000;
+                counter=0;
+            }
+            flag_angle=0;
+
+            break;
+
         //receive new biss_config
         case i_biss[int i].set_biss_config(BISSConfig in_config):
                 //update variables which depend on biss_config
@@ -288,7 +394,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
                 break;
 
         //compute velocity
-        case t when timerafter(next_velocity_read) :> void:
+        case flag_send_normal => t when timerafter(next_velocity_read) :> void:
             next_velocity_read += velocity_loop;
             int count, position;
             t :> time;
