@@ -28,7 +28,7 @@
 #define BISS_MULTITURN_LENGTH      BISS_MULTITURN_RESOLUTION //resolution + filling bits
 #define BISS_SINGLETURN_LENGTH     BISS_SINGLETURN_RESOLUTION + 1
 #define BISS_FRAME_BYTES           (( (3 + 2 + BISS_MULTITURN_LENGTH + BISS_SINGLETURN_LENGTH + BISS_STATUS_LENGTH + 6) -1)/32 + 1) //at least 3 bits + ack and start bits + data + crc
-#define BISS_POLARITY              BISS_POLARITY_INVERTED
+#define BISS_POLARITY              BISS_POLARITY_NORMAL
 #define BISS_MAX_TICKS             0x7fffffff   // the count is reset to 0 if greater than this
 #define BISS_CRC_POLY              0b110000     // poly in reverse representation:  x^0 + x^1 + x^4 is 0b1100
 #define BISS_DATA_PORT_BIT         0            // bit number (0 = rightmost bit) when inputing from a multibit port

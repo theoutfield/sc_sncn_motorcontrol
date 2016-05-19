@@ -77,55 +77,9 @@ void pwm_config(PwmPorts &ports)
 
 void update_pwm(control_variables& cv, PWM_COMMS_TYP& pwm_comms_s)
 {
-
-    /*********************************************/
-    // battery boost
-    // (warning: EMI increment)
-
-    //FIXME: USING BOOST MODE CAN LEAD TO ET_APPLICATION_SIGNAL ERROR.
-    //MUST BE EVALUATED BEFORE ACTIVATING THIS MODE
-
-    //        cv.angle_applied_flux_est = cv.angle_u_motor + angle_test;
-    cv.angle_applied_flux_est = cv.angle_u_motor + cv.angle_actual;
-
-    if(cv.angle_applied_flux_est>4095) cv.angle_applied_flux_est -= 4096;
-    if(cv.angle_applied_flux_est<   0) cv.angle_applied_flux_est += 4096;
-
-
-    cv.angle_applied_flux_est *=3;
-    if (cv.angle_applied_flux_est>4095)   cv.angle_applied_flux_est -= 4096;
-    if (cv.angle_applied_flux_est>4095)   cv.angle_applied_flux_est -= 4096;
-
-    cv.pwm_a =  (816*cv.park_alpha)/1000;
-    cv.pwm_b =  ((-408)*cv.park_alpha + 707*cv.park_beta)/1000;
-    cv.pwm_c =  ((-408)*cv.park_alpha - 707*cv.park_beta)/1000;
-
-
-    cv.mmTheta = cv.angle_applied_flux_est/4;
-    cv.mmTheta &= 0x3FF;
-    cv.mmSinus  = sine_table_control[cv.mmTheta];         // sine( fp.Minp[mmTheta] );
-    cv.mmTheta = (256 - cv.mmTheta);              // 90-fp.Minp[mmTheta]
-    cv.mmTheta &= 0x3FF;
-    cv.mmCosinus  = sine_table_control[cv.mmTheta];       // values from 0 to +/- 16384
-
-    cv.EMI_V = (cv.mmCosinus*cv.u_motor)/(16384*6);
-
-    /*
-    cv.pwm_a -=  cv.EMI_V;
-    cv.pwm_b -=  cv.EMI_V;
-    cv.pwm_c -=  cv.EMI_V;
-    */
-
-    cv.pwm_values[0] = (cv.pwm_a*cv.pwm_dif)/(2*3341) + (cv.pwm_av);
-    cv.pwm_values[1] = (cv.pwm_b*cv.pwm_dif)/(2*3341) + (cv.pwm_av);
-    cv.pwm_values[2] = (cv.pwm_c*cv.pwm_dif)/(2*3341) + (cv.pwm_av);
-
-
     pwm_comms_s.params.widths[0] =  cv.pwm_values[0];
     pwm_comms_s.params.widths[1] =  cv.pwm_values[1];
     pwm_comms_s.params.widths[2] =  cv.pwm_values[2];
-
-
 }
 
 void pwm_check(PwmPorts &ports)
