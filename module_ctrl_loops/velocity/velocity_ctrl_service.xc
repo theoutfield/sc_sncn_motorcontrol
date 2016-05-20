@@ -117,35 +117,6 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         velocity_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
-                    if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
-                        if (isnull(i_hall)) {
-                            printstrln("velocity_ctrl_service: ERROR: Interface for Hall Service is not provided, but configured to be used");
-                            exit(-1);
-                        } else {
-                            speed_factor = i_hall.get_hall_config().pole_pairs * 4096 * velocity_control_config.control_loop_period / 1000; // variable pole_pairs
-                            crossover = INT_MAX - INT_MAX/10;
-                            //hall_crossover = hall_config.max_ticks - hall_config.max_ticks/10;
-                        }
-                    } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
-                        if (isnull(i_qei)) {
-                            printstrln("velocity_ctrl_service: ERROR: Interface for QEI Service is not provided, but configured to be used");
-                            exit(-1);
-                        } else {
-                            QEIConfig qei_config = i_qei.get_qei_config();
-                            speed_factor = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) * velocity_control_config.control_loop_period / 1000;       // variable qei_real_max
-                            crossover = (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) - (qei_config.ticks_resolution * QEI_CHANGES_PER_TICK ) / 10;
-                        }
-                    } else if (velocity_control_config.feedback_sensor == BISS_SENSOR){
-                        if(isnull(i_biss)){
-                            printstrln("velocity_ctrl_service: ERROR: Interface for BiSS Service is not provided, but configured to be used");
-                            exit(-1);
-                        }
-                    } else if (velocity_control_config.feedback_sensor == AMS_SENSOR){
-                        if(isnull(i_ams)){
-                            printstrln("velocity_ctrl_service: ERROR: Interface for AMS Service is not provided, but configured to be used");
-                            exit(-1);
-                        }
-                    }
 
                     if (velocity_control_config.Ki_n != 0) {
                         error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
@@ -157,56 +128,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 }
 
                 if (compute_flag == 1) {
-                    /* calculate actual velocity from hall/qei with filter*/
-                    if (velocity_control_config.feedback_sensor == BISS_SENSOR) {
-                        actual_velocity = i_biss.get_biss_velocity();
-                    } else if (velocity_control_config.feedback_sensor == AMS_SENSOR) {
-                        actual_velocity = i_ams.get_ams_velocity();
-                    } else if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
-                        actual_velocity = i_hall.get_hall_velocity();
-                    } else {
-                        if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
-                            if(!isnull(i_hall)){
-                                position = i_hall.get_hall_position_absolute();
-                            }
-
-                            if (position > 2049) {
-                                init = 1;
-                                previous_position = 2049;
-                            } else if (position < -2049) {
-                                init = 1;
-                                previous_position = -2049;
-                            }
-                            raw_speed = 0;
-                            //target_velocity = 0;
-                        } else {
-                            if (velocity_control_config.feedback_sensor == HALL_SENSOR) {
-                                position = i_hall.get_hall_position_absolute();
-                            } else if (velocity_control_config.feedback_sensor == QEI_SENSOR) {
-                                position = i_qei.get_qei_position_absolute();
-                            }
-
-                            difference = position - previous_position;
-
-                            if (difference < -crossover || difference > crossover) {
-                                difference = old_difference;
-                            }
-
-                            raw_speed = (difference * rpm_constant) / speed_factor;
-
-#ifdef Debug_velocity_ctrl
-                            //xscope_int(RAW_SPEED, raw_speed);
-#endif
-                            previous_position = position;
-                            old_difference = difference;
-                        }
-                        /**
-                         * Or any other sensor interfaced to the IFM Module
-                         * place client functions here to acquire velocity/position
-                         */
-
-                        actual_velocity = filter(filter_buffer, index, filter_length, raw_speed);
-                    }
+                    actual_velocity = i_motorcontrol.get_velocity_actual();
                 }
 
                 if(activate == 1) {

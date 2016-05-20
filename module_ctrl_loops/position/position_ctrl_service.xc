@@ -175,14 +175,10 @@ void position_control_service(ControlConfig &position_control_config,
                         error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
                     }
 
-                    if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
-                        actual_position = i_hall.get_hall_position_absolute();
-                    } else if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
+                    if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
                         actual_position = i_qei.get_qei_position_absolute();
-                    } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
-                        { actual_position, void, void } = i_biss.get_biss_position();
-                    } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
-                        { actual_position, void } = i_ams.get_ams_position();
+                    } else {
+                        actual_position = i_motorcontrol.get_position_actual();
                     }
 
                     config_update_flag = 0;
@@ -190,45 +186,16 @@ void position_control_service(ControlConfig &position_control_config,
 
                 if (activate == 1) {
                     /* acquire actual position hall/qei/sensor */
-                    switch (position_control_config.feedback_sensor) {
-                        case HALL_SENSOR:
-                            if(!isnull(i_hall)){
-                                velocity = i_hall.get_hall_velocity();
-                                actual_position = i_hall.get_hall_position_absolute();
-                            } else{
-                                printstrln("position_ctrl_service: ERROR: Hall interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
-
-                        case QEI_SENSOR:
-                            if(!isnull(i_qei)){
-                                actual_position =  i_qei.get_qei_position_absolute();
-                            } else{
-                                printstrln("position_ctrl_service: ERROR: Encoder interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
-
-                        case BISS_SENSOR:
-                            if(!isnull(i_biss)){
-                                { actual_position, void, void } = i_biss.get_biss_position();
-                                velocity = i_biss.get_biss_velocity();
-                            } else{
-                                printstrln("position_ctrl_service: ERROR: BiSS interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
-
-                        case AMS_SENSOR:
-                            if(!isnull(i_ams)){
-                                { actual_position, void } = i_ams.get_ams_position();
-                                velocity = i_ams.get_ams_velocity();
-                            } else{
-                                printstrln("position_ctrl_service: ERROR: AMS interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
+                    if (position_control_config.feedback_sensor == QEI_SENSOR) {
+                        if (!isnull(i_qei)) {
+                            actual_position = i_qei.get_qei_position_absolute();
+                        } else {
+                            printstrln("position_ctrl_service: ERROR: Encoder interface is not provided but requested");
+                            exit(-1);
+                        }
+                    } else {
+                        actual_position = i_motorcontrol.get_position_actual();
+                        velocity = i_motorcontrol.get_velocity_actual();
                     }
                     adc_b = i_motorcontrol.get_torque_actual();
                     /*
@@ -503,14 +470,10 @@ void position_control_service(ControlConfig &position_control_config,
 
             case i_position_control[int i].enable_position_ctrl():
 
-                if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
-                    actual_position = i_hall.get_hall_position_absolute();
-                } else if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
+                if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
                     actual_position = i_qei.get_qei_position_absolute();
-                } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
-                    { actual_position, void, void } = i_biss.get_biss_position();
-                } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
-                    { actual_position, void } = i_ams.get_ams_position();
+                } else {
+                    actual_position = i_motorcontrol.get_position_actual();
                 }
                 target_position = actual_position;
                 while (1) {
