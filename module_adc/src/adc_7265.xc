@@ -451,7 +451,7 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
                 out_b = (int)tmp_val;
 
-                phaseB = +(out_a - 2048);
+                phaseB = -(out_a - 2048);
                 phaseC = +(out_b - 2048);
 
 
