@@ -111,6 +111,8 @@ typedef struct {
     int velocity_loop;          /**< Velcity loop time in microseconds */
 
     int max_ticks;              /**< The count is reset to 0 if greater than this */
+
+    int enable_push_service;
 } AMSConfig;
 
 
@@ -164,6 +166,13 @@ typedef struct
     out port slave_select;
 } AMSPorts;
 
+typedef enum {
+    AMSNoPush=0,
+    AMSPushAngle,
+    AMSPushPosition,
+    AMSPushAll
+} AMSPushType;
+
 interface AMSInterface
 {
 
@@ -197,6 +206,8 @@ interface AMSInterface
     void reset_ams_position(int in_count);
 
     unsigned int reset_ams_angle(unsigned int in_angle);
+
+    { int, int, unsigned int, unsigned int, unsigned int } get_ams_all();
 };
 
 void initRotarySensorInterface(AMSPorts &ams_ports);

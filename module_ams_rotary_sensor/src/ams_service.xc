@@ -545,6 +545,13 @@ int check_ams_config(AMSConfig &ams_config) {
 
     int notification = MOTCTRL_NTF_EMPTY;
 
+    int actual_velocity = 0;
+    int actual_count = 0;
+    unsigned int actual_position = 0;
+    unsigned int actual_angle = 0;
+    unsigned int measurement_time = 0;
+    unsigned int start_time, end_time;
+
     //first read
     last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
     t :> last_ams_read;
@@ -552,6 +559,14 @@ int check_ams_config(AMSConfig &ams_config) {
     //main loop
     while (1) {
         select {
+        case i_ams[int i].get_ams_all() -> { int out_count, int out_velocity, unsigned int out_position, unsigned int out_angle, unsigned int out_time }:
+                out_count = actual_count;
+                out_velocity = actual_velocity;
+                out_position = actual_position;
+                out_angle = actual_angle;
+                out_time = measurement_time;
+                break;
+
         case i_ams[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
@@ -647,16 +662,20 @@ int check_ams_config(AMSConfig &ams_config) {
                 break;
 
         //compute velocity
-        case t when timerafter(next_velocity_read) :> void:
+        case t when timerafter(next_velocity_read) :> start_time:
             next_velocity_read += velocity_loop;
-            int position;
+            int position, angle;
             t :> time;
-            if (timeafter(time, last_ams_read + ams_config.cache_time)) {
-                position = readRotarySensorAngleWithCompensation(ams_ports);
-                t :> last_ams_read;
-                multiturn(count, last_position, position, ticks_per_turn);
-                last_position = position;
-            }
+            position = readRotarySensorAngleWithCompensation(ams_ports);
+            t :> last_ams_read;
+            multiturn(count, last_position, position, ticks_per_turn);
+            last_position = position;
+
+            if (ams_config.resolution_bits > 12)
+                angle = (ams_config.pole_pairs * (position >> (ams_config.resolution_bits-12)) ) & 4095;
+            else
+                angle = (ams_config.pole_pairs * (position << (12-ams_config.resolution_bits)) ) & 4095;
+
             int difference = count - old_count;
             if(difference > crossover || difference < -crossover)
                 difference = old_difference;
@@ -665,6 +684,22 @@ int check_ams_config(AMSConfig &ams_config) {
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
             velocity = (difference * velocity_factor) / ticks_per_turn;
+
+            if (ams_config.enable_push_service == AMSPushAll) {
+                actual_count = count;
+                actual_velocity = velocity;
+                actual_angle = angle;
+                actual_position = position;
+            } else if (ams_config.enable_push_service == AMSPushAngle) {
+                actual_angle = angle;
+            } else if (ams_config.enable_push_service == AMSPushPosition) {
+                actual_count = count;
+                actual_velocity = velocity;
+                actual_position = position;
+            }
+            t :> end_time;
+
+            measurement_time = (end_time-start_time)/USEC_FAST;
             break;
         }
     }

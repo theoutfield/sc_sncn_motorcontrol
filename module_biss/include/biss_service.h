@@ -59,6 +59,7 @@ typedef struct {
     int velocity_loop;          /**< Velocity loop time in microseconds */
     int max_ticks;              /**< The count is reset to 0 if greater than this */
     int offset_electrical;      /**< Offset for the electrical angle */
+    int enable_push_service;
 } BISSConfig;
 
 
@@ -72,6 +73,13 @@ typedef enum {
     NoAck,           /**< Ack bit not found. */
     NoStartBit       /**< Start bit not found */
 } BISS_ErrorType;
+
+typedef enum {
+    BISSNoPush=0,
+    BISSPushAngle,
+    BISSPushPosition,
+    BISSPushAll
+} BISSPushType;
 
 #ifdef __XC__
 
@@ -90,7 +98,7 @@ typedef struct {
  * @brief Interface type to communicate with the BiSS Service.
  */
 interface BISSInterface {
-
+    { int, int, unsigned int, unsigned int, unsigned int } get_biss_all();
     /**
      * @brief Notifies the interested parties that a new notification
      * is available.
