@@ -61,10 +61,13 @@ typedef struct {
     QEI_IndexType index_type;   /**< Encoder index type. */
     int sensor_polarity;        /**< Encoder direction. */
     QEI_SignalType signal_type; /**< Encoder output signal type (if applicable in your SOMANET device). */
+    int enable_push_service;
 } QEIConfig;
 
 
 #ifdef __XC__
+
+#include <memory_manager.h>
 
 /**
  * @brief Structure type to define the Encoder Service ports.
@@ -170,7 +173,7 @@ interface QEIInterface{
  * @param qei_config Configuration for the service.
  * @param i_qei Array of communication interfaces to handle up to 5 different clients.
  */
-void qei_service(QEIPorts & qei_ports, QEIConfig qei_config,
+void qei_service(QEIPorts & qei_ports, QEIConfig qei_config, client interface shared_memory_interface ?i_shared_memory,
                 interface QEIInterface server i_qei[5]);
 
 #endif

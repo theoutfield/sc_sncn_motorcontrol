@@ -108,7 +108,7 @@ int main(void)
                     qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;    // Encoder resolution
                     qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
-                    qei_service(qei_ports, qei_config, i_qei);
+                    qei_service(qei_ports, qei_config, null, i_qei);
                 }
 
                 /* Motor Drive Service */

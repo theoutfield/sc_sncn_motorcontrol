@@ -159,19 +159,13 @@ typedef struct {
 #ifdef __XC__
 
 #include <spi_master.h>
+#include <memory_manager.h>
 
 typedef struct
 {
     spi_master_interface spi_interface;
     out port slave_select;
 } AMSPorts;
-
-typedef enum {
-    AMSNoPush=0,
-    AMSPushAngle,
-    AMSPushPosition,
-    AMSPushAll
-} AMSPushType;
 
 interface AMSInterface
 {
@@ -236,6 +230,6 @@ int writeZeroPosition(AMSPorts &ams_ports, unsigned short data);
 int writeNumberPolePairs(AMSPorts &ams_ports, unsigned short data);
 
 [[combinable]]
-void ams_service(AMSPorts &ams_ports, AMSConfig &config, interface AMSInterface server i_ams[5]);
+void ams_service(AMSPorts &ams_ports, AMSConfig &config, client interface shared_memory_interface ?i_shared_memory, interface AMSInterface server i_ams[5]);
 
 #endif

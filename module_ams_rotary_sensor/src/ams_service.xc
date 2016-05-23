@@ -509,7 +509,7 @@ int check_ams_config(AMSConfig &ams_config) {
 }
 
 [[combinable]]
- void ams_service(AMSPorts &ams_ports, AMSConfig & ams_config, interface AMSInterface server i_ams[5])
+ void ams_service(AMSPorts &ams_ports, AMSConfig & ams_config, client interface shared_memory_interface ?i_shared_memory, interface AMSInterface server i_ams[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -685,17 +685,22 @@ int check_ams_config(AMSConfig &ams_config) {
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
             velocity = (difference * velocity_factor) / ticks_per_turn;
 
-            if (ams_config.enable_push_service == AMSPushAll) {
-                actual_count = count;
-                actual_velocity = velocity;
-                actual_angle = angle;
-                actual_position = position;
-            } else if (ams_config.enable_push_service == AMSPushAngle) {
-                actual_angle = angle;
-            } else if (ams_config.enable_push_service == AMSPushPosition) {
-                actual_count = count;
-                actual_velocity = velocity;
-                actual_position = position;
+            if (!isnull(i_shared_memory)) {
+                if (ams_config.enable_push_service == PushAll) {
+                    i_shared_memory.write_angle_velocity_position(angle, velocity, count);
+                    actual_count = count;
+                    actual_velocity = velocity;
+                    actual_angle = angle;
+                    actual_position = position;
+                } else if (ams_config.enable_push_service == PushAngle) {
+                    i_shared_memory.write_angle_electrical(angle);
+                    actual_angle = angle;
+                } else if (ams_config.enable_push_service == PushPosition) {
+                    i_shared_memory.write_velocity_position(velocity, count);
+                    actual_count = count;
+                    actual_velocity = velocity;
+                    actual_position = position;
+                }
             }
             t :> end_time;
 

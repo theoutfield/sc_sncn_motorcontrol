@@ -25,7 +25,7 @@ int check_hall_config(HallConfig &hall_config){
 }
 
 [[combinable]]
-void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface HallInterface server i_hall[5])
+void hall_service(HallPorts & hall_ports, HallConfig & hall_config, client interface shared_memory_interface ?i_shared_memory, interface HallInterface server i_hall[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -347,6 +347,16 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
 
                 if (status == 1) {
                      status = 0;
+                }
+
+                if (!isnull(i_shared_memory)) {
+                    if (hall_config.enable_push_service == PushAll) {
+                        i_shared_memory.write_angle_velocity_position(angle, raw_velocity, count);
+                    } else if (hall_config.enable_push_service == PushAngle) {
+                        i_shared_memory.write_angle_electrical(angle);
+                    } else if (hall_config.enable_push_service == PushPosition) {
+                        i_shared_memory.write_velocity_position(raw_velocity, count);
+                    }
                 }
 
                 break;

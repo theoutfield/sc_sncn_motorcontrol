@@ -51,7 +51,7 @@ int check_biss_config(BISSConfig & biss_config)
     return SUCCESS;
 }
 
-void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BISSInterface server i_biss[5])
+void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface BISSInterface i_biss[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -348,17 +348,22 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BI
             else
                 angle = (biss_config.pole_pairs * (position << (12-biss_config.singleturn_resolution)) + biss_config.offset_electrical ) & 4095;
 
-            if (biss_config.enable_push_service == BISSPushAll) {
-                actual_count = count;
-                actual_velocity = velocity;
-                actual_angle = angle;
-                actual_position = position;
-            } else if (biss_config.enable_push_service == BISSPushAngle) {
-                actual_angle = angle;
-            } else if (biss_config.enable_push_service == BISSPushPosition) {
-                actual_count = count;
-                actual_velocity = velocity;
-                actual_position = position;
+            if (!isnull(i_shared_memory)) {
+                if (biss_config.enable_push_service == PushAll) {
+                    i_shared_memory.write_angle_velocity_position(angle, velocity, count);
+                    actual_count = count;
+                    actual_velocity = velocity;
+                    actual_angle = angle;
+                    actual_position = position;
+                } else if (biss_config.enable_push_service == PushAngle) {
+                    i_shared_memory.write_angle_electrical(angle);
+                    actual_angle = angle;
+                } else if (biss_config.enable_push_service == PushPosition) {
+                    i_shared_memory.write_velocity_position(velocity, count);
+                    actual_count = count;
+                    actual_velocity = velocity;
+                    actual_position = position;
+                }
             }
             t :> end_time;
 

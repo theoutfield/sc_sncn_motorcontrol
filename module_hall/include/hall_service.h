@@ -25,10 +25,13 @@
  */
 typedef struct {
     int pole_pairs; /**< Number of pole pairs in your motor. */
+    int enable_push_service;
 } HallConfig;
 
 
 #ifdef __XC__
+
+#include <memory_manager.h>
 
 /**
 * Structure type for Hall Service ports
@@ -146,6 +149,7 @@ interface HallInterface {
  */
 [[combinable]]
 void hall_service(HallPorts & hall_ports, HallConfig & hall_config,
-                    interface HallInterface server i_hall[5]);
+                  client interface shared_memory_interface ?i_shared_memory,
+                  interface HallInterface server i_hall[5]);
 
 #endif

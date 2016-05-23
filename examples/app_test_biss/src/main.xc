@@ -14,7 +14,7 @@
 #include <adc_service.h>
 
 /* Test BiSS Encoder Client */
-void biss_test(client interface BISSInterface i_biss, client interface ADCInterface i_adc) {
+void biss_test(client interface BISSInterface i_biss, client interface shared_memory_interface ?i_shared_memory, client interface ADCInterface i_adc) {
     timer t;
     unsigned int start_time, end_time;
     int count = 0;
@@ -36,11 +36,16 @@ void biss_test(client interface BISSInterface i_biss, client interface ADCInterf
         t :> start_time;
         /* get angle and velocity from BiSS Encoder */
         { angle, velocity, void } = i_biss.get_biss_angle_velocity_position();
+//        { count, velocity, position, angle, status } = i_biss.get_biss_all();
         t :> end_time;
 
+
+        if (!isnull(i_shared_memory)) {
+            { angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
+        }
         //get adc
 //        { adc_a, adc_b } = i_adc.get_external_inputs();
-        adc_a = i_adc.get_temperature();
+//        adc_a = i_adc.get_temperature();
 
         xscope_int(COUNT, count);                           //absolute count
         xscope_int(REAL_COUNT, real_count);                 //real internal absolute count
@@ -50,9 +55,10 @@ void biss_test(client interface BISSInterface i_biss, client interface ADCInterf
         xscope_int(ERROR_BIT, (status&0b10) * 500);         //error bit, should be 0
         xscope_int(WARNING_BIT, (status&0b01) * 1000);      //warning bit, should be 0
         xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
+        xscope_int(TIME_INTERNAL, status);   //time to get the data in microseconds
 
 //        xscope_int(TORQUE, (adc_b-adc_a + torque_offset)/4);
-        xscope_int(TORQUE, adc_a);
+//        xscope_int(TORQUE, adc_a);
 
         delay_milliseconds(1);
     }
@@ -69,10 +75,11 @@ int main() {
     interface WatchdogInterface i_watchdog[2];
     interface BISSInterface i_biss[5]; //array of interfaces for biss server
     interface BrakeInterface i_brake;
+    interface shared_memory_interface i_shared_memory[2];
 
     par {
         /* Test BiSS Encoder Client */
-        on tile[APP_TILE]: biss_test(i_biss[0], i_adc[0]);
+        on tile[APP_TILE]: biss_test(i_biss[0], null, i_adc[0]);
 
 
         /************************************************************
@@ -97,6 +104,8 @@ int main() {
                 i_watchdog[0].start();
             }
 
+            memory_manager(i_shared_memory, 2);
+
             /* BiSS server */
             {
                 BISSConfig biss_config;
@@ -114,8 +123,9 @@ int main() {
                 biss_config.max_ticks = BISS_MAX_TICKS;
                 biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                 biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+                biss_config.enable_push_service = PushAll;
 
-                biss_service(biss_ports, biss_config, i_biss);
+                biss_service(biss_ports, biss_config, i_shared_memory[0], i_biss);
             }
         }
     }

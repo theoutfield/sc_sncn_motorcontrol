@@ -74,16 +74,10 @@ typedef enum {
     NoStartBit       /**< Start bit not found */
 } BISS_ErrorType;
 
-typedef enum {
-    BISSNoPush=0,
-    BISSPushAngle,
-    BISSPushPosition,
-    BISSPushAll
-} BISSPushType;
-
 #ifdef __XC__
 
 #include <platform.h>
+#include <memory_manager.h>
 
 /**
  * @brief Structure type to define the BiSS Service ports.
@@ -192,9 +186,10 @@ interface BISSInterface {
  *
  * @param biss_ports Ports structure defining where to read the BiSS signal, outputting the clock and which clock block to use.
  * @param biss_config Configuration for the service.
+ * @param i_shared_memory Communication interface to the shared memory service.
  * @param i_biss Array of communication interfaces to handle up to 5 different clients.
  */
-void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BISSInterface server i_biss[5]);
+void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface BISSInterface i_biss[5]);
 
 
 /**

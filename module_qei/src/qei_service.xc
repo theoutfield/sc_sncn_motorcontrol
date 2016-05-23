@@ -58,7 +58,7 @@ int check_qei_config(QEIConfig &qei_config)
 }
 
 #pragma unsafe arrays
-void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIInterface server i_qei[5])
+void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, client interface shared_memory_interface ?i_shared_memory, interface QEIInterface server i_qei[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -214,6 +214,12 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, interface QEIIn
 
                         if (sync_out >= qei_count_per_hall ) {
                             sync_out = 0;
+                        }
+                    }
+
+                    if (!isnull(i_shared_memory)) {
+                        if (qei_config.enable_push_service == PushPosition) {
+                            i_shared_memory.write_velocity_position(velocity, count);
                         }
                     }
                 }

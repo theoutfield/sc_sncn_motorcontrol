@@ -58,7 +58,7 @@ int main(void)
             qei_config.ticks_resolution = 4000;                     // Encoder resolution
             qei_config.sensor_polarity = QEI_POLARITY_NORMAL;       // CW
 
-            qei_service(qei_ports, qei_config, i_qei);
+            qei_service(qei_ports, qei_config, null, i_qei);
         }
     }
 

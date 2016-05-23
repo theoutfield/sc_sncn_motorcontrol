@@ -77,7 +77,7 @@ int main(void) {
                     HallConfig hall_config;
                     hall_config.pole_pairs = POLE_PAIRS;
 
-                    hall_service(hall_ports, hall_config, i_hall);
+                    hall_service(hall_ports, hall_config, null, i_hall);
                 }
 
                 /* BiSS service */
@@ -98,7 +98,7 @@ int main(void) {
                     biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                     biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
 
-                    biss_service(biss_ports, biss_config, i_biss);
+                    biss_service(biss_ports, biss_config, null, i_biss);
                 }
 
                 /* Motor Commutation Service */
