@@ -40,6 +40,7 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
 void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
                             chanend c_pwm_ctrl,
                             interface ADCInterface client ?i_adc,
+                            client interface shared_memory_interface ?i_shared_memory,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
@@ -83,7 +84,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             bldc_loop( fet_driver_ports, motorcontrol_config,
                                     hall_config, qei_config,
                                     i_motorcontrol, c_pwm_ctrl, i_adc,
-                                    i_hall, i_qei, i_biss, i_ams, i_watchdog, i_brake);
+                                    i_shared_memory, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_brake);
 
                         }
                         else{

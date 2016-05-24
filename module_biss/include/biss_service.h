@@ -37,7 +37,7 @@
 #define BISS_CLOCK_DIVIDEND        250          // BiSS output clock frequency: dividend/divisor in MHz
 #define BISS_CLOCK_DIVISOR         22           // supported frequencies are (tile frequency) / 2n
 #define BISS_USEC                  USEC_FAST    // number of ticks in a microsecond
-#define BISS_VELOCITY_LOOP         1000         // velocity loop time in microseconds
+#define BISS_VELOCITY_LOOP         100         // velocity loop time in microseconds
 #define BISS_TIMEOUT               20*BISS_USEC // BiSS timeout in clock ticks
 #define BISS_OFFSET_ELECTRICAL     4020
 

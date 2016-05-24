@@ -32,6 +32,6 @@
     <Probe name="Torque Sensor" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Angle electrical" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Angle PWM" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 
 </xSCOPEconfig>

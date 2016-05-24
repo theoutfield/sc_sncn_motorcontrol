@@ -28,6 +28,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 HallConfig hall_config, QEIConfig qei_config,
                 interface MotorcontrolInterface server i_motorcontrol[4],
                 chanend c_pwm_ctrl, interface ADCInterface client ?i_adc,
+                client interface shared_memory_interface ?i_shared_memory,
                 interface HallInterface client ?i_hall,
                 interface QEIInterface client ?i_qei,
                 interface BISSInterface client ?i_biss,
@@ -173,7 +174,11 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
             if (shutdown == 0) { //commutation is enabled
                 //====================== get sensor angle and velocity ======================================
-                if (sensor_select == HALL_SENSOR) {
+                //from shared memory
+                if (!isnull(i_shared_memory)) {
+                    { angle_electrical, velocity, count } = i_shared_memory.get_angle_velocity_position();
+                //directly from sensor
+                } else if (sensor_select == HALL_SENSOR) {
                     {hall_pin_state, angle_electrical, velocity, count } = i_hall.get_hall_pinstate_angle_velocity_position();//2 - 17 usec
                 } else if (sensor_select == BISS_SENSOR) {
                     { angle_electrical, velocity, count } = i_biss.get_biss_angle_velocity_position();

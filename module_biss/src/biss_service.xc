@@ -33,15 +33,15 @@ int check_biss_config(BISSConfig & biss_config)
         return ERROR;
     }
 
-    if( BISS_USEC <= 0 ){
-        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong BISS_USEC value");
-        return ERROR;
-    }
-
-    if(biss_config.timeout <= 0){
-        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong timeout");
-        return ERROR;
-    }
+//    if( BISS_USEC <= 0 ){
+//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong BISS_USEC value");
+//        return ERROR;
+//    }
+//
+//    if(biss_config.timeout <= 0){
+//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong timeout");
+//        return ERROR;
+//    }
 
     if(biss_config.pole_pairs < 1){
         printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
@@ -84,6 +84,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
     timer t;
     unsigned int time;
     unsigned int next_velocity_read = 0;
+    unsigned int last_velocity_read = 0;
     unsigned int last_count_read = 0;
     unsigned int last_biss_read = 0;
 
@@ -335,7 +336,9 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
             old_difference = difference;
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-            velocity = (difference * velocity_factor) / ticks_per_turn;
+//            velocity = (difference * velocity_factor) / ticks_per_turn;
+            velocity = (difference * (60000000/((int)(last_biss_read-last_velocity_read)/BISS_USEC))) / ticks_per_turn;
+            last_velocity_read = last_biss_read;
 
             //polarity
             if (biss_config.polarity == BISS_POLARITY_INVERTED) {
@@ -367,7 +370,10 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
             }
             t :> end_time;
 
-            measurement_time = (end_time-start_time)/USEC_FAST;
+            measurement_time = (end_time-start_time)/BISS_USEC;
+
+            if (timeafter(end_time, next_velocity_read))
+                next_velocity_read = end_time + BISS_USEC;
             break;
         }
     }
