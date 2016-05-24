@@ -10,7 +10,7 @@ TARGET = SOMANET-C22
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_demo_offset_commutation_tuning
+APP_NAME = app_demo_bldc_velocity_position
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = config_motor module_adc module_ams_rotary_sensor module_biss module_board-support module_ctrl_loops module_filters_lib module_foc module_hall module_misc module_motorcontrol module_profile module_pwm_symmetrical module_qei module_spi_master module_watchdog

@@ -3,7 +3,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
-#include <CORE_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
 #include <IFM_DC1K-rev-c3.bsp>
 
 /**
@@ -88,6 +88,7 @@ int main(void) {
             position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
             position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
+            position_control_config.cascade_with_torque = 1;
             /* Control Loop */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
             position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
@@ -108,7 +109,7 @@ int main(void) {
             {
                 /* Triggered PWM Service */
                 pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
-                i_brake.set_brake(0);
+                i_brake.set_brake(1);
 
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);

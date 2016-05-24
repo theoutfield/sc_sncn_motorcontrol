@@ -49,6 +49,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         case 'd':
             if (!isnull(i_tuning))
                 i_tuning.set_position_direct(value*sign);
+                delay_milliseconds(400);
+                i_tuning.set_position_direct(-value*sign);
+                delay_milliseconds(400);
+                i_tuning.set_position_direct(0);
             break;
         //toggle field controler
         case 'f':
