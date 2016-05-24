@@ -13,7 +13,7 @@ TARGET =
 APP_NAME = app_demo_bldc_velocity_position
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_ams_rotary_sensor module_biss module_board-support module_ctrl_loops module_filters_lib module_foc module_hall module_misc module_motorcontrol module_profile module_pwm_symmetrical module_qei module_spi_master module_watchdog
+USED_MODULES = config_motor module_adc module_ams_rotary_sensor module_biss module_board-support module_ctrl_loops module_filters_lib module_foc module_hall module_misc module_motorcontrol module_memory_manager module_profile module_pwm_symmetrical module_qei module_spi_master module_watchdog
 
 
 # The flags passed to xcc when building the application
@@ -22,7 +22,7 @@ USED_MODULES = config_motor module_adc module_ams_rotary_sensor module_biss modu
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 XCC_FLAGS_Debug = -g -O0 -report
-XCC_FLAGS_Release = -g -O3
+XCC_FLAGS_Release = -g -O0
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
 # project to create both xCORE and ARM binaries.
