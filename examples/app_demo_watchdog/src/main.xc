@@ -15,6 +15,7 @@
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
+ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
@@ -22,11 +23,12 @@ BISSPorts biss_ports = {QEI_PORT, SOMANET_IFM_GPIO_D0, IFM_TILE_CLOCK_2};
 int main(void) {
 
     // Motor control interfaces
-    chan c_pwm_ctrl; // pwm channels
+    chan c_pwm_ctrl, c_adctrig; // pwm channels
 
     interface WatchdogInterface i_watchdog[2];
     interface HallInterface i_hall[5];
     interface BISSInterface i_biss[5];
+    interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[5];
 
     par
@@ -65,14 +67,17 @@ int main(void) {
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* PWM Loop */
-                pwm_service(pwm_ports, c_pwm_ctrl, BRAKE_ENABLE);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, null);
+
+                /* ADC Service */
+                adc_service(adc_ports, c_adctrig, i_adc, null);
 
                 /* Hall sensor Service */
                 {
                     HallConfig hall_config;
                     hall_config.pole_pairs = POLE_PAIRS;
 
-                    hall_service(hall_ports, hall_config, i_hall);
+                    hall_service(hall_ports, hall_config, null, i_hall);
                 }
 
                 /* BiSS service */
@@ -93,7 +98,7 @@ int main(void) {
                     biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                     biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
 
-                    biss_service(biss_ports, biss_config, i_biss);
+                    biss_service(biss_ports, biss_config, null, i_biss);
                 }
 
                 /* Motor Commutation Service */
@@ -107,7 +112,7 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], null, i_biss[0], i_watchdog[0], i_motorcontrol);
+                                            c_pwm_ctrl, i_adc[0], i_hall[0], null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
                 }
             }
         }

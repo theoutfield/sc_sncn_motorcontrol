@@ -25,7 +25,9 @@
  //#include <motor_configs/motor_config_LDO_42BLS41.h>
  //#include <motor_configs/motor_config_Moons_42BL30L2.h>
  //#include <motor_config_Nanotec_DB59L024035-A.h>
- #include <motor_config.h>
+#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
+
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -38,13 +40,13 @@
 #define MOTOR_FEEDBACK_SENSOR      BISS_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
-#define QEI_SENSOR_INDEX_TYPE      QEI_WITH_INDEX
+#define QEI_SENSOR_INDEX_TYPE       QEI_WITH_INDEX
 
 // TYPE OF SIGNAL FOR INCREMENTAL ENCODER (if applicable) [QEI_RS422_SIGNAL, QEI_TTL_SIGNAL]
-#define QEI_SENSOR_SIGNAL_TYPE     QEI_RS422_SIGNAL
+#define QEI_SENSOR_SIGNAL_TYPE      QEI_RS422_SIGNAL
 
 // RESOLUTION OF YOUR INCREMENTAL ENCODER (if applicable)
-#define QEI_SENSOR_RESOLUTION      4000
+#define QEI_SENSOR_RESOLUTION       4000
 
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1
@@ -61,6 +63,9 @@
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
+
+// MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
+#define MOTOR_POLARITY              NORMAL_POLARITY
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION

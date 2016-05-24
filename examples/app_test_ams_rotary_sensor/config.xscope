@@ -20,8 +20,10 @@
     <!-- <Probe name="Probe Name" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/> -->
     <!-- From the target code, call: xscope_int(PROBE_NAME, value); -->
     <Probe name="Count" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Angle" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Time" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Time Internal" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
 </xSCOPEconfig>

@@ -509,7 +509,7 @@ int check_ams_config(AMSConfig &ams_config) {
 }
 
 [[combinable]]
- void ams_service(AMSPorts &ams_ports, AMSConfig & ams_config, interface AMSInterface server i_ams[5])
+ void ams_service(AMSPorts &ams_ports, AMSConfig & ams_config, client interface shared_memory_interface ?i_shared_memory, interface AMSInterface server i_ams[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -545,6 +545,13 @@ int check_ams_config(AMSConfig &ams_config) {
 
     int notification = MOTCTRL_NTF_EMPTY;
 
+    int actual_velocity = 0;
+    int actual_count = 0;
+    unsigned int actual_position = 0;
+    unsigned int actual_angle = 0;
+    unsigned int measurement_time = 0;
+    unsigned int start_time, end_time;
+
     //first read
     last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
     t :> last_ams_read;
@@ -552,12 +559,20 @@ int check_ams_config(AMSConfig &ams_config) {
     //main loop
     while (1) {
         select {
+        case i_ams[int i].get_ams_all() -> { int out_count, int out_velocity, unsigned int out_position, unsigned int out_angle, unsigned int out_time }:
+                out_count = actual_count;
+                out_velocity = actual_velocity;
+                out_position = actual_position;
+                out_angle = actual_angle;
+                out_time = measurement_time;
+                break;
+
         case i_ams[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
 
         //send electrical angle for commutation
-        case i_ams[int i].get_ams_angle_velocity() -> { unsigned int angle, int out_velocity }:
+        case i_ams[int i].get_ams_angle_velocity_position() -> { unsigned int angle, int out_velocity, int out_count }:
                 t :> time;
                 if (timeafter(time, last_ams_read + ams_config.cache_time)) {
                     angle = readRotarySensorAngleWithCompensation(ams_ports);
@@ -571,6 +586,7 @@ int check_ams_config(AMSConfig &ams_config) {
                 else
                     angle = (ams_config.pole_pairs * (angle << (12-ams_config.resolution_bits)) ) & 4095;
                 out_velocity = velocity;
+                out_count = count;
                 break;
 
         //send multiturn count and position
@@ -646,16 +662,20 @@ int check_ams_config(AMSConfig &ams_config) {
                 break;
 
         //compute velocity
-        case t when timerafter(next_velocity_read) :> void:
+        case t when timerafter(next_velocity_read) :> start_time:
             next_velocity_read += velocity_loop;
-            int position;
+            int position, angle;
             t :> time;
-            if (timeafter(time, last_ams_read + ams_config.cache_time)) {
-                position = readRotarySensorAngleWithCompensation(ams_ports);
-                t :> last_ams_read;
-                multiturn(count, last_position, position, ticks_per_turn);
-                last_position = position;
-            }
+            position = readRotarySensorAngleWithCompensation(ams_ports);
+            t :> last_ams_read;
+            multiturn(count, last_position, position, ticks_per_turn);
+            last_position = position;
+
+            if (ams_config.resolution_bits > 12)
+                angle = (ams_config.pole_pairs * (position >> (ams_config.resolution_bits-12)) ) & 4095;
+            else
+                angle = (ams_config.pole_pairs * (position << (12-ams_config.resolution_bits)) ) & 4095;
+
             int difference = count - old_count;
             if(difference > crossover || difference < -crossover)
                 difference = old_difference;
@@ -664,6 +684,27 @@ int check_ams_config(AMSConfig &ams_config) {
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
             velocity = (difference * velocity_factor) / ticks_per_turn;
+
+            if (!isnull(i_shared_memory)) {
+                if (ams_config.enable_push_service == PushAll) {
+                    i_shared_memory.write_angle_velocity_position(angle, velocity, count);
+                    actual_count = count;
+                    actual_velocity = velocity;
+                    actual_angle = angle;
+                    actual_position = position;
+                } else if (ams_config.enable_push_service == PushAngle) {
+                    i_shared_memory.write_angle_electrical(angle);
+                    actual_angle = angle;
+                } else if (ams_config.enable_push_service == PushPosition) {
+                    i_shared_memory.write_velocity_position(velocity, count);
+                    actual_count = count;
+                    actual_velocity = velocity;
+                    actual_position = position;
+                }
+            }
+            t :> end_time;
+
+            measurement_time = (end_time-start_time)/USEC_FAST;
             break;
         }
     }

@@ -9,7 +9,6 @@
 /**************************************************
  *********      USER CONFIGURATION       **********
  **************************************************/
-#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
 
 /////////////////////////////////////////////
 //////  APPLICATION CONFIGURATIONS
@@ -28,11 +27,5 @@
 
 // WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
 #define BLDC_WINDING_TYPE   STAR_WINDING
-
-// MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY      NORMAL_POLARITY
-
-
-
 
 

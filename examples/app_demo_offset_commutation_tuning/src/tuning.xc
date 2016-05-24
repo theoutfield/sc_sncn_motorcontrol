@@ -8,8 +8,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning,
-                       interface ADCInterface client ?i_adc)
+void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET OFFSET TUNING SERVICE STARTING...\n");
@@ -91,7 +90,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //auto tune the offset by mesuring the current consumption
         case 'c':
-            i_tuning.tune(input_voltage);
+            if (!isnull(i_tuning))
+                i_tuning.tune(input_voltage);
             break;
         //reverse motor direction
         case 'd':
@@ -104,10 +104,23 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                 offset = (offset + 2048) & 4095;
                 i_commutation.set_sensor_offset(offset);
             } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
-                motorcontrol_config.hall_offset[0] = (motorcontrol_config.hall_offset[0] + 2048) & 4095;
+                if (motorcontrol_config.commutation_method == FOC) {
+                    motorcontrol_config.hall_offset[0] = (motorcontrol_config.hall_offset[0] + 2048) & 4095;
+                } else {
+                    int temp = motorcontrol_config.hall_offset[0];
+                    motorcontrol_config.hall_offset[0] = (motorcontrol_config.hall_offset[1] + 2048) & 4095;
+                    motorcontrol_config.hall_offset[1] = (temp + 2048) & 4095;
+                }
                 i_commutation.set_config(motorcontrol_config);
             }
             printf("Direction inverted\n");
+            break;
+        //pole pairs
+        case 'e':
+            if (!isnull(i_tuning)) {
+                i_tuning.set_pole_pairs(value);
+                printf("Pole pairs %d\n", value);
+            }
             break;
         //toggle field controler
         case 'f':
@@ -124,14 +137,19 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //position limit
         case 'l':
-            i_tuning.set_limit(value * sign);
+            if (!isnull(i_tuning))
+                i_tuning.set_limit(value * sign);
             break;
         //reverse sensor direction
         case 'm':
-            if (motorcontrol_config.polarity_type == NORMAL_POLARITY)
+            motorcontrol_config = i_commutation.get_config();
+            if (motorcontrol_config.polarity_type == NORMAL_POLARITY) {
                 motorcontrol_config.polarity_type = INVERTED_POLARITY;
-            else
+                motorcontrol_config.bldc_winding_type = DELTA_WINDING;
+            } else {
                 motorcontrol_config.polarity_type = NORMAL_POLARITY;
+                motorcontrol_config.bldc_winding_type = STAR_WINDING;
+            }
             i_commutation.set_config(motorcontrol_config);
             printf("Polarity %d\n", motorcontrol_config.polarity_type);
             break;
@@ -540,6 +558,18 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 
         case i_tuning.set_torque(int in_torque):
             target_torque = in_torque;
+            break;
+
+        case i_tuning.set_pole_pairs(int in_pole_pairs):
+            if (motorcontrol_config.commutation_sensor == BISS_SENSOR && !isnull(i_biss)) {
+                BISSConfig biss_config = i_biss.get_biss_config();
+                biss_config.pole_pairs = in_pole_pairs;
+                i_biss.set_biss_config(biss_config);
+            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                AMSConfig ams_config = i_ams.get_ams_config();
+                ams_config.pole_pairs = in_pole_pairs;
+                i_ams.set_ams_config(ams_config);
+            }
             break;
         }
     }

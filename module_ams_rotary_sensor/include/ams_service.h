@@ -11,8 +11,8 @@
 #include <refclk.h>
 
 
-#define AMS_OFFSET          13473//3696
-#define AMS_POLARITY        AMS_POLARITY_INVERTED//AMS_POLARITY_NORMAL
+#define AMS_OFFSET          4684
+#define AMS_POLARITY        AMS_POLARITY_NORMAL//AMS_POLARITY_NORMAL
 #define AMS_USEC            USEC_FAST
 #define AMS_CACHE_TIME      (60*AMS_USEC)
 #define AMS_RESOLUTION      14
@@ -111,6 +111,8 @@ typedef struct {
     int velocity_loop;          /**< Velcity loop time in microseconds */
 
     int max_ticks;              /**< The count is reset to 0 if greater than this */
+
+    int enable_push_service;
 } AMSConfig;
 
 
@@ -157,6 +159,7 @@ typedef struct {
 #ifdef __XC__
 
 #include <spi_master.h>
+#include <memory_manager.h>
 
 typedef struct
 {
@@ -182,7 +185,7 @@ interface AMSInterface
     [[clears_notification]]
     int get_notification();
 
-    { unsigned int, int } get_ams_angle_velocity(void);
+    { unsigned int, int, int } get_ams_angle_velocity_position(void);
 
     { int, unsigned int } get_ams_position(void);
 
@@ -197,6 +200,8 @@ interface AMSInterface
     void reset_ams_position(int in_count);
 
     unsigned int reset_ams_angle(unsigned int in_angle);
+
+    { int, int, unsigned int, unsigned int, unsigned int } get_ams_all();
 };
 
 void initRotarySensorInterface(AMSPorts &ams_ports);
@@ -225,6 +230,6 @@ int writeZeroPosition(AMSPorts &ams_ports, unsigned short data);
 int writeNumberPolePairs(AMSPorts &ams_ports, unsigned short data);
 
 [[combinable]]
-void ams_service(AMSPorts &ams_ports, AMSConfig &config, interface AMSInterface server i_ams[5]);
+void ams_service(AMSPorts &ams_ports, AMSConfig &config, client interface shared_memory_interface ?i_shared_memory, interface AMSInterface server i_ams[5]);
 
 #endif

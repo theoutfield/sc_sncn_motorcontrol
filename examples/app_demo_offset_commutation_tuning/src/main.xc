@@ -1,9 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-//#include <CORE_BOARD_REQUIRED>
-//#include <IFM_BOARD_REQUIRED>
-#include <CORE_C22-rev-a.bsp>
-//#include <IFM_DC1K-rev-c3.bsp>
-#include <IFM_DC100-rev-b.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
+
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
@@ -52,7 +50,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning, null);
+        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning);
 
         /* Tuning service */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
@@ -119,7 +117,7 @@ int main(void) {
                     biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                     biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
 
-                    biss_service(biss_ports, biss_config, i_biss);
+                    biss_service(biss_ports, biss_config, null, i_biss);
                 }
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                 /* AMS Rotary Sensor Service */
@@ -141,7 +139,7 @@ int main(void) {
                     ams_config.cache_time = AMS_CACHE_TIME;
                     ams_config.velocity_loop = AMS_VELOCITY_LOOP;
 
-                    ams_service(ams_ports, ams_config, i_ams);
+                    ams_service(ams_ports, ams_config, null, i_ams);
                 }
 #else
                 /* Hall sensor Service */
@@ -149,7 +147,7 @@ int main(void) {
                     HallConfig hall_config;
                     hall_config.pole_pairs = POLE_PAIRS;
 
-                    hall_service(hall_ports, hall_config, i_hall);
+                    hall_service(hall_ports, hall_config, null, i_hall);
                 }
 #endif
 

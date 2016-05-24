@@ -59,6 +59,7 @@ typedef struct {
     int velocity_loop;          /**< Velocity loop time in microseconds */
     int max_ticks;              /**< The count is reset to 0 if greater than this */
     int offset_electrical;      /**< Offset for the electrical angle */
+    int enable_push_service;
 } BISSConfig;
 
 
@@ -76,6 +77,7 @@ typedef enum {
 #ifdef __XC__
 
 #include <platform.h>
+#include <memory_manager.h>
 
 /**
  * @brief Structure type to define the BiSS Service ports.
@@ -90,7 +92,7 @@ typedef struct {
  * @brief Interface type to communicate with the BiSS Service.
  */
 interface BISSInterface {
-
+    { int, int, unsigned int, unsigned int, unsigned int } get_biss_all();
     /**
      * @brief Notifies the interested parties that a new notification
      * is available.
@@ -132,12 +134,13 @@ interface BISSInterface {
     unsigned int get_biss_position_fast();
 
     /**
-     * @brief Getter for electrical angle which is singleturn position * pole pairs and velocity.
+     * @brief Getter for electrical angle which is singleturn position * pole pairs and velocity and count.
      *
      * @return electrical angle
      * @return velocity
+     * @return count
      */
-    { unsigned int , int } get_biss_angle_velocity();
+    { unsigned int , int , int } get_biss_angle_velocity_position();
 
     /**
      * @brief Getter for calculated velocity.
@@ -189,9 +192,10 @@ interface BISSInterface {
  *
  * @param biss_ports Ports structure defining where to read the BiSS signal, outputting the clock and which clock block to use.
  * @param biss_config Configuration for the service.
+ * @param i_shared_memory Communication interface to the shared memory service.
  * @param i_biss Array of communication interfaces to handle up to 5 different clients.
  */
-void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, interface BISSInterface server i_biss[5]);
+void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface BISSInterface i_biss[5]);
 
 
 /**

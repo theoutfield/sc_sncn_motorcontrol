@@ -1,6 +1,4 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
-//#include <CORE_BOARD_REQUIRED>
-//#include <IFM_BOARD_REQUIRED>
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
@@ -35,16 +33,16 @@ HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
-#else
+#elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #endif
 
 /* Test Profile Velocity function */
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
-    int target_velocity = 1000;          // rpm
-    int acceleration    = 100;          // rpm/s
-    int deceleration    = 100;          // rpm/s
+    int target_velocity = 2000;          // rpm
+    int acceleration    = 500;          // rpm/s
+    int deceleration    = 500;          // rpm/s
 
     ProfilerConfig profiler_config;
     profiler_config.max_velocity = MAX_VELOCITY;
@@ -151,7 +149,7 @@ int main(void)
                     HallConfig hall_config;
                     hall_config.pole_pairs = POLE_PAIRS;
 
-                    hall_service(hall_ports, hall_config, i_hall);
+                    hall_service(hall_ports, hall_config, null, i_hall);
                 }
 
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
@@ -163,7 +161,7 @@ int main(void)
                     qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;   // Encoder resolution
                     qei_config.sensor_polarity = QEI_SENSOR_POLARITY;      // CW
 
-                    qei_service(qei_ports, qei_config, i_qei);
+                    qei_service(qei_ports, qei_config, null, i_qei);
                 }
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
                 /* AMS Rotary Sensor Service */
@@ -185,7 +183,7 @@ int main(void)
                     ams_config.cache_time = AMS_CACHE_TIME;
                     ams_config.velocity_loop = AMS_VELOCITY_LOOP;
 
-                    ams_service(ams_ports, ams_config, i_ams);
+                    ams_service(ams_ports, ams_config, null, i_ams);
                 }
 #elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                 /* BiSS service */
@@ -206,7 +204,7 @@ int main(void)
                     biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                     biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
 
-                    biss_service(biss_ports, biss_config, i_biss);
+                    biss_service(biss_ports, biss_config, null, i_biss);
                 }
 #endif
 

@@ -59,6 +59,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     //commutation
     int angle_electrical = 0;
     int angle_pwm = 0;
+    int count = 0;
     if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
         motorcontrol_config.polarity_type = INVERTED_POLARITY;
     else
@@ -173,11 +174,11 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
             if (shutdown == 0) { //commutation is enabled
                 //====================== get sensor angle and velocity ======================================
                 if (sensor_select == HALL_SENSOR) {
-                    {hall_pin_state, angle_electrical, velocity} = i_hall.get_hall_pinstate_angle_velocity();//2 - 17 usec
+                    {hall_pin_state, angle_electrical, velocity, count } = i_hall.get_hall_pinstate_angle_velocity_position();//2 - 17 usec
                 } else if (sensor_select == BISS_SENSOR) {
-                    { angle_electrical, velocity } = i_biss.get_biss_angle_velocity();
+                    { angle_electrical, velocity, count } = i_biss.get_biss_angle_velocity_position();
                 } else if (sensor_select == AMS_SENSOR) {
-                    { angle_electrical, velocity } = i_ams.get_ams_angle_velocity();
+                    { angle_electrical, velocity, count } = i_ams.get_ams_angle_velocity_position();
                 }  else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
                     { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
                     angle_electrical = (angle_electrical << 12) / max_count_per_hall;
@@ -429,10 +430,12 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
         case i_motorcontrol[int i].get_velocity_actual() -> int velocity_actual:
                 //ToDo: Implement!
+                velocity_actual = velocity;
                 break;
 
         case i_motorcontrol[int i].get_position_actual() -> int position_actual:
                 //ToDo: Implement!
+                position_actual = count;
                 break;
 
         case i_motorcontrol[int i].get_field() -> int out_field:

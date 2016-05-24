@@ -83,7 +83,7 @@ int main(void)
             torque_control_config.control_loop_period = CONTROL_LOOP_PERIOD; // us
 
             /* Control Loop */
-            torque_control_service(torque_control_config, i_adc[0], null, i_qei[1], null, i_motorcontrol[0], i_torque_control);
+            torque_control_service(torque_control_config, i_adc[0], null, i_qei[1], null, null, i_motorcontrol[0], i_torque_control);
         }
 
         /* Currents monitoring in XScope */
@@ -112,13 +112,13 @@ int main(void)
             par
             {
                 /* Triggered PWM Service */
-                pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl, BRAKE_ENABLE);
+                pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl, null);
 
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc);
+                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
                 /* Quadrature encoder sensor Service */
                 {
@@ -128,7 +128,7 @@ int main(void)
                     qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;    // Encoder resolution
                     qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
-                    qei_service(qei_ports, qei_config, i_qei);
+                    qei_service(qei_ports, qei_config, null, i_qei);
                 }
 
                 /* Motor Commutation loop */
@@ -138,7 +138,7 @@ int main(void)
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, null, i_qei[0], null, i_watchdog[0], i_motorcontrol);
+                                            c_pwm_ctrl, null, null, i_qei[0], null, null, i_watchdog[0], null, i_motorcontrol);
                 }
             }
         }

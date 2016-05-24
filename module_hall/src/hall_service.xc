@@ -25,7 +25,7 @@ int check_hall_config(HallConfig &hall_config){
 }
 
 [[combinable]]
-void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface HallInterface server i_hall[5])
+void hall_service(HallPorts & hall_ports, HallConfig & hall_config, client interface shared_memory_interface ?i_shared_memory, interface HallInterface server i_hall[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -127,11 +127,12 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                 out_notification = notification;
                 break;
 
-            case i_hall[int i].get_hall_pinstate_angle_velocity() -> {unsigned out_pinstate, int out_position, int out_velocity}:
+            case i_hall[int i].get_hall_pinstate_angle_velocity_position() -> {unsigned out_pinstate, int out_position, int out_velocity, int out_count}:
 
                 out_pinstate = pin_state_monitor;
                 out_position = angle;
                 out_velocity = raw_velocity;
+                out_count = count;
                 break;
 
             case i_hall[int i].get_hall_pinstate() -> unsigned out_pinstate:
@@ -187,7 +188,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                 out_status = init_state;
                 break;
 
-            case tmr when timerafter(ts + PULL_PERIOD_USEC * 250) :> ts: //12 usec 3000
+            case tmr when timerafter(ts + PULL_PERIOD_USEC * USEC_FAST) :> ts: //12 usec 3000
                 switch (xreadings) {
                     case 0:
                         hall_ports.p_hall :> new1;
@@ -348,6 +349,16 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                      status = 0;
                 }
 
+                if (!isnull(i_shared_memory)) {
+                    if (hall_config.enable_push_service == PushAll) {
+                        i_shared_memory.write_angle_velocity_position(angle, raw_velocity, count);
+                    } else if (hall_config.enable_push_service == PushAngle) {
+                        i_shared_memory.write_angle_electrical(angle);
+                    } else if (hall_config.enable_push_service == PushPosition) {
+                        i_shared_memory.write_velocity_position(raw_velocity, count);
+                    }
+                }
+
                 break;
 
             case tx when timerafter(time1 + MSEC_FAST) :> time1:
@@ -371,7 +382,12 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface Ha
                     previous_position1 = count;
                     old_difference = difference1;
                 }
-                raw_velocity = _modified_internal_filter(filter_buffer, index, filter_length, velocity);
+                //FIXME check if the velocity computation is disturbing the position measurement
+//                raw_velocity = _modified_internal_filter(filter_buffer, index, filter_length, velocity);
+                raw_velocity = filter(filter_buffer, index, filter_length, velocity);
+                // velocity in rpm = ( difference ticks * (1 minute / 1 ms) ) / ticks per turn
+                //                 = ( difference ticks * (60,000 ms / 1 ms) ) / ticks per turn
+                raw_velocity = (raw_velocity * 60000 ) / config_max_ticks_per_turn;
                 break;
 
         }

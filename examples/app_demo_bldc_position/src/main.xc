@@ -1,6 +1,4 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
-//#include <CORE_BOARD_REQUIRED>
-//#include <IFM_BOARD_REQUIRED>
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
@@ -46,12 +44,12 @@ void position_profile_test(interface PositionControlInterface client i_position_
                            interface BISSInterface client ?i_biss,
                            interface AMSInterface client ?i_ams)
 {
-    const int target = 700000;
+    const int target = 16000;
 //    const int target = 2620000;
     int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
-    int velocity        = 7000;         // rpm
-    int acceleration    = 7000;         // rpm/s
-    int deceleration    = 7000;         // rpm/s
+    int velocity        = 500;         // rpm
+    int acceleration    = 500;         // rpm/s
+    int deceleration    = 500;         // rpm/s
     int follow_error = 0;
     int actual_position = 0;
 
@@ -67,7 +65,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
     /* Initialise the position profile generator */
     init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss, i_ams);
 
-    delay_milliseconds(500);//let the servers start before sending clien requests
+    delay_milliseconds(500);//let the servers start before sending client requests
 
     /* Set new target position for profile position control */
     set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
@@ -106,7 +104,6 @@ int main(void)
 
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
-    interface BrakeInterface i_brake;
     interface MotorcontrolInterface i_motorcontrol[4];
     interface HallInterface i_hall[5];
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
@@ -208,7 +205,7 @@ int main(void)
                     HallConfig hall_config;
                     hall_config.pole_pairs = POLE_PAIRS;
 
-                    hall_service(hall_ports, hall_config, i_hall);
+                    hall_service(hall_ports, hall_config, null, i_hall);
                 }
 #endif
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
@@ -220,7 +217,7 @@ int main(void)
                     qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;    // Encoder resolution
                     qei_config.sensor_polarity = QEI_SENSOR_POLARITY;       // CW
 
-                    qei_service(qei_ports, qei_config, i_qei);
+                    qei_service(qei_ports, qei_config, null, i_qei);
                 }
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
                 /* AMS Rotary Sensor Service */
@@ -242,7 +239,7 @@ int main(void)
                     ams_config.cache_time = AMS_CACHE_TIME;
                     ams_config.velocity_loop = AMS_VELOCITY_LOOP;
 
-                    ams_service(ams_ports, ams_config, i_ams);
+                    ams_service(ams_ports, ams_config, null, i_ams);
                 }
 #elif(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                 /* BiSS service */
@@ -263,7 +260,7 @@ int main(void)
                     biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                     biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
 
-                    biss_service(biss_ports, biss_config, i_biss);
+                    biss_service(biss_ports, biss_config, null, i_biss);
                 }
 #endif
 
