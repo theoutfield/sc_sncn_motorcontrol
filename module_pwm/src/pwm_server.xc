@@ -220,6 +220,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
                 pwm_ctrl_s = recieved_pwm_ctrl_s;
 
                 pwm_on     = recieved_pwm_on;
+                if(pwm_on==0) break_counter=0;
 
                 break_active = recieved_break_active;
 

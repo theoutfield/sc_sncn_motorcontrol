@@ -87,6 +87,15 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                 break;
 
+        case i_motorcontrol[int i].set_torque_control_enabled():
+            break;
+
+        case i_motorcontrol[int i].set_torque_control_disabled():
+            break;
+
+        case i_motorcontrol[int i].set_offset_detection_enabled():
+            break;
+
         case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
                 //ToDo: implement!
             break;

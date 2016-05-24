@@ -92,8 +92,8 @@ int main(void) {
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
             /* Control Loop */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-//            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
-//                    i_position_control);
+            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
+                    i_position_control);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
 //            position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
 //                    i_position_control);

@@ -371,6 +371,15 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 ts = end_time + USEC_FAST;
             break;
 
+        case i_motorcontrol[int i].set_torque_control_enabled():
+            break;
+
+        case i_motorcontrol[int i].set_torque_control_disabled():
+            break;
+
+        case i_motorcontrol[int i].set_offset_detection_enabled():
+            break;
+
         case i_motorcontrol[int i].set_voltage(int in_voltage_q):
                 voltage_q = in_voltage_q;
 
