@@ -330,7 +330,7 @@ void position_control_service(ControlConfig &position_control_config,
                         }else if (torque_j_ctrl_cmd < -torque_j_ctrl_cmd_lim) {
                             torque_j_ctrl_cmd = -torque_j_ctrl_cmd_lim;
                         }
-                        i_motorcontrol.set_torque(torque_j_ctrl_cmd);
+                        i_motorcontrol.set_torque(target_position);//torque_j_ctrl_cmd);
 
                         i1_torque_j_sens_1n = i1_torque_j_sens;
 
