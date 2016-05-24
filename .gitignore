@@ -8,6 +8,7 @@
 *.DS_Store
 *.swp
 *.out
+._*
 
 ## build files and bins
 .build_Debug/
