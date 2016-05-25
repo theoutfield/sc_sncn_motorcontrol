@@ -40,7 +40,7 @@ BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 /* Test Profile Velocity function */
 void profile_velocity_test(interface VelocityControlInterface client i_velocity_control)
 {
-    int target_velocity = 2000;          // rpm
+    int target_velocity = 2345;          // rpm
     int acceleration    = 500;          // rpm/s
     int deceleration    = 500;          // rpm/s
 
@@ -74,6 +74,7 @@ int main(void)
 #else
     interface BISSInterface i_biss[5];
 #endif
+    interface shared_memory_interface i_shared_memory[2];
 
     par
     {
@@ -120,7 +121,7 @@ int main(void)
             velocity_control_service(velocity_control_config, null, null, null, i_ams[1], i_motorcontrol[0],
                                                     i_velocity_control);
 #elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
-            velocity_control_service(velocity_control_config, null, null, i_biss[1], null, i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, null, null, null, null, i_motorcontrol[0],
                                                     i_velocity_control);
 #else
             velocity_control_service(velocity_control_config, i_hall[1], null, null, null, i_motorcontrol[0],
@@ -144,13 +145,6 @@ int main(void)
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
 
-                /* Hall sensor Service */
-                {
-                    HallConfig hall_config;
-                    hall_config.pole_pairs = POLE_PAIRS;
-
-                    hall_service(hall_ports, hall_config, null, i_hall);
-                }
 
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                 /* Quadrature encoder sensor Service */
@@ -203,10 +197,21 @@ int main(void)
                     biss_config.max_ticks = BISS_MAX_TICKS;
                     biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                     biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+                    biss_config.enable_push_service = PushAll;
 
-                    biss_service(biss_ports, biss_config, null, i_biss);
+                    biss_service(biss_ports, biss_config, i_shared_memory[1], i_biss);
+                }
+#else
+                /* Hall sensor Service */
+                {
+                    HallConfig hall_config;
+                    hall_config.pole_pairs = POLE_PAIRS;
+
+                    hall_service(hall_ports, hall_config, null, i_hall);
                 }
 #endif
+
+                memory_manager(i_shared_memory, 2);
 
                 /* Motor Commutation Service */
                 {
@@ -221,16 +226,16 @@ int main(void)
 
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], i_qei[0], null, null, i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, i_hall[0], i_qei[0], null, null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, i_hall[0], null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_shared_memory[0], null, null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);
 #endif
                 }
             }

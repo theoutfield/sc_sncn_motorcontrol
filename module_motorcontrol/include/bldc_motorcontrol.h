@@ -29,6 +29,7 @@ void bldc_loop(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                             HallConfig hall_config, QEIConfig qei_config,
                             interface MotorcontrolInterface server i_motorcontrol[4],
         chanend c_pwm_ctrl, interface ADCInterface client ?i_adc,
+                            client interface shared_memory_interface ?i_shared_memory,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,

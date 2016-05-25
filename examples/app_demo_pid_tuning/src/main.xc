@@ -193,7 +193,6 @@ int main(void) {
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-
                     Motor_Control_Service( fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
                             null, null, i_biss[0], null,
                             i_watchdog[0], null, i_motorcontrol, i_update_pwm);
