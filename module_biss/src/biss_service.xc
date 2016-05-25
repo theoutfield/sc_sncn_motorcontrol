@@ -372,6 +372,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
 
             measurement_time = (end_time-start_time)/BISS_USEC;
 
+            //to prevent blocking
             if (timeafter(end_time, next_velocity_read))
                 next_velocity_read = end_time + BISS_USEC;
             break;

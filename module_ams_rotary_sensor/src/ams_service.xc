@@ -542,6 +542,7 @@ int check_ams_config(AMSConfig &ams_config) {
     unsigned int time;
     unsigned int next_velocity_read = 0;
     unsigned int last_ams_read = 0;
+    unsigned int last_velocity_read= 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
 
@@ -683,7 +684,9 @@ int check_ams_config(AMSConfig &ams_config) {
             old_difference = difference;
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-            velocity = (difference * velocity_factor) / ticks_per_turn;
+//            velocity = (difference * velocity_factor) / ticks_per_turn;
+            velocity = (difference * (60000000/((int)(last_ams_read-last_velocity_read)/AMS_USEC))) / ticks_per_turn;
+            last_velocity_read = last_ams_read;
 
             if (!isnull(i_shared_memory)) {
                 if (ams_config.enable_push_service == PushAll) {
@@ -705,6 +708,10 @@ int check_ams_config(AMSConfig &ams_config) {
             t :> end_time;
 
             measurement_time = (end_time-start_time)/USEC_FAST;
+
+            //to prevent blocking
+            if (timeafter(end_time, next_velocity_read))
+                next_velocity_read = end_time + AMS_USEC;
             break;
         }
     }

@@ -52,12 +52,14 @@ typedef struct {
     int max_ticks;              /**< The count is reset to 0 if greater than this */
 
     int filter;                 /**< filter parameter for contelect encoder */
+    int enable_push_service;
 } CONTELECConfig;
 
 
 #ifdef __XC__
 
 #include <spi_master.h>
+#include <memory_manager.h>
 
 typedef struct
 {
@@ -107,7 +109,7 @@ void init_spi_ports(SPIPorts &spi_ports);
 
 
 [[combinable]]
-void contelec_service(SPIPorts &contelec_ports, CONTELECConfig &config, interface CONTELECInterface server i_contelec[5]);
+void contelec_service(SPIPorts &contelec_ports, CONTELECConfig &config, client interface shared_memory_interface ?i_shared_memory, interface CONTELECInterface server i_contelec[5]);
 
 { char, int, unsigned int, unsigned int } contelec_encoder_read(SPIPorts &contelec_ports);
 

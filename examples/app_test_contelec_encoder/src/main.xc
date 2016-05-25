@@ -16,7 +16,7 @@
 SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
 
 /* Test CONTELEC Sensor Client */
-void contelec_encoder_test(client interface CONTELECInterface i_contelec)
+void contelec_encoder_test(client interface CONTELECInterface i_contelec, client interface shared_memory_interface ?i_shared_memory)
 {
     int count = 0;
     int velocity = 0;
@@ -36,12 +36,15 @@ void contelec_encoder_test(client interface CONTELECInterface i_contelec)
         /* get angle and velocity from CONTELEC Sensor */
 //        { electrical_angle, velocity } = i_contelec.get_contelec_angle_velocity();
 
+        if (!isnull(i_shared_memory)) {
+            { void, velocity, count } = i_shared_memory.get_angle_velocity_position();
+        }
 
 
         xscope_int(COUNT, count);
         xscope_int(POSITION, position);
 //        xscope_int(ANGLE, electrical_angle);
-//        xscope_int(VELOCITY, velocity);
+        xscope_int(VELOCITY, velocity);
 //        xscope_int(STATUS, status*1000);
         xscope_int(TIME, status);
 
@@ -154,13 +157,17 @@ void contelec_encoder_commands_test(client interface CONTELECInterface i_contele
 int main(void)
 {
     interface CONTELECInterface i_contelec[5];
+    interface shared_memory_interface i_shared_memory[2];
 
     par
     {
         on tile[APP_TILE]: contelec_encoder_commands_test(i_contelec[1]);
 
         on tile[IFM_TILE]: par {
-            contelec_encoder_test(i_contelec[0]);
+            contelec_encoder_test(i_contelec[0], i_shared_memory[1]);
+
+            /* Shared memory Service */
+            memory_manager(i_shared_memory, 2);
 
 
             /* CONTELEC Sensor Service */
@@ -173,8 +180,9 @@ int main(void)
                 contelec_config.pole_pairs = 2;
                 contelec_config.timeout = CONTELEC_TIMEOUT;
                 contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                contelec_config.enable_push_service = PushAll;
 
-                contelec_service(spi_ports, contelec_config, i_contelec);
+                contelec_service(spi_ports, contelec_config, i_shared_memory[0], i_contelec);
             }
         }
     }
