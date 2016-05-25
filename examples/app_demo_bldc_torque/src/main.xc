@@ -219,13 +219,13 @@ int main(void)
 
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, i_hall[0], i_qei[0], null, null, i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, i_hall[0], null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, i_watchdog[0], null, i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, i_hall[0], null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, i_watchdog[0], null, i_motorcontrol);
 #endif
                 }
             }

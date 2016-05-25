@@ -26,12 +26,14 @@ interface TuningInterface {
     void set_position(int position);
     void set_torque(int in_torque);
     void set_pole_pairs(int in_pole_pairs);
+    int  set_sensor_offset(int in_offset);
+    int  auto_offset();
 };
 
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning);
+void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol, interface TuningInterface client ?i_tuning);
 
 [[combinable]]
-void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_commutation,
+void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_motorcontrol,
                     interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
                     interface HallInterface client ?i_hall, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams);

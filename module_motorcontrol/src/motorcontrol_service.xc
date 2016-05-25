@@ -41,10 +41,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             chanend c_pwm_ctrl,
                             interface ADCInterface client ?i_adc,
                             client interface shared_memory_interface ?i_shared_memory,
-                            interface HallInterface client ?i_hall,
-                            interface QEIInterface client ?i_qei,
-                            interface BISSInterface client ?i_biss,
-                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface BrakeInterface client ?i_brake,
                             interface MotorcontrolInterface server i_motorcontrol[4])
@@ -56,13 +52,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
     QEIConfig qei_config;
     timer t;
     unsigned ts = 0;
-
-    if(!isnull(i_hall))
-        hall_config = i_hall.get_hall_config();
-
-    if(!isnull(i_qei)){
-        qei_config = i_qei.get_qei_config();
-    }
 
     if (check_motorcontrol_config(motorcontrol_config) == ERROR){
         return;
@@ -82,9 +71,8 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                         if(!isnull(i_adc)){
 
                             bldc_loop( fet_driver_ports, motorcontrol_config,
-                                    hall_config, qei_config,
                                     i_motorcontrol, c_pwm_ctrl, i_adc,
-                                    i_shared_memory, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_brake);
+                                    i_shared_memory, i_watchdog, i_brake);
 
                         }
                         else{

@@ -238,10 +238,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             chanend c_pwm_ctrl,
                             interface ADCInterface client ?i_adc,
                             client interface shared_memory_interface ?i_shared_memory,
-                            interface HallInterface client ?i_hall,
-                            interface QEIInterface client ?i_qei,
-                            interface BISSInterface client ?i_biss,
-                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface BrakeInterface client ?i_brake,
                             interface MotorcontrolInterface server i_motorcontrol[4]);

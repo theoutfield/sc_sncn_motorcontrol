@@ -99,8 +99,6 @@ int main(void) {
                 /* Watchdog Service */
                 watchdog_service(wd_ports, i_watchdog);
 
-                memory_manager(i_shared_memory, 2);
-
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                 /* BiSS service */
                 {
@@ -142,18 +140,23 @@ int main(void) {
                     ams_config.max_ticks = 0x7fffffff;
                     ams_config.cache_time = AMS_CACHE_TIME;
                     ams_config.velocity_loop = AMS_VELOCITY_LOOP;
+                    ams_config.enable_push_service = PushAll;
 
-                    ams_service(ams_ports, ams_config, null, i_ams);
+                    ams_service(ams_ports, ams_config, i_shared_memory[1], i_ams);
                 }
 #else
                 /* Hall sensor Service */
                 {
                     HallConfig hall_config;
                     hall_config.pole_pairs = POLE_PAIRS;
+                    hall_config.enable_push_service = PushAll;
 
-                    hall_service(hall_ports, hall_config, null, i_hall);
+                    hall_service(hall_ports, hall_config, i_shared_memory[1], i_hall);
                 }
 #endif
+
+                /* Shared memory Service */
+                memory_manager(i_shared_memory, 2);
 
                 /* Motor Control Service */
                 {
@@ -168,13 +171,13 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_shared_memory[0], null, null, null, null, i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);
 #endif
                 }
             }

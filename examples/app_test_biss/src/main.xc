@@ -104,6 +104,7 @@ int main() {
                 i_watchdog[0].start();
             }
 
+            /* Shared memory Service */
             memory_manager(i_shared_memory, 2);
 
             /* BiSS server */
