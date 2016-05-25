@@ -16,7 +16,7 @@
 					<folderInfo id="com.xmos.cdt.toolchain.831412560.1141640311" name="/" resourcePath="">
 						<toolChain id="com.xmos.cdt.toolchain.1759694227" name="com.xmos.cdt.toolchain" superClass="com.xmos.cdt.toolchain">
 							<targetPlatform archList="all" binaryParser="com.xmos.cdt.core.XEBinaryParser;org.eclipse.cdt.core.GNU_ELF" id="com.xmos.cdt.core.platform.650019052" isAbstract="false" osList="linux,win32,macosx" superClass="com.xmos.cdt.core.platform"/>
-							<builder id="com.xmos.cdt.builder.base.591738417" keepEnvironmentInBuildfile="false" managedBuildOn="false" superClass="com.xmos.cdt.builder.base"/>
+							<builder arguments="CONFIG=Debug" command="xmake" id="com.xmos.cdt.builder.base.591738417" keepEnvironmentInBuildfile="false" managedBuildOn="false" superClass="com.xmos.cdt.builder.base"/>
 							<tool id="com.xmos.cdt.xc.compiler.301066861" name="com.xmos.cdt.xc.compiler" superClass="com.xmos.cdt.xc.compiler">
 								<inputType id="com.xmos.cdt.xc.compiler.input.330645778" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -40,5 +40,9 @@
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/app_test_contelec_encoder"/>
+		</configuration>
+	</storageModule>
 </cproject>
