@@ -373,8 +373,6 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
     int out_a = 0, out_b= 0;
     int V_dc=0;
 
-    timer t;
-
     int flag=0;
 
     int I_a=0;

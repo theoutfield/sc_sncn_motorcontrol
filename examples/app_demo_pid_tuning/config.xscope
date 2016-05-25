@@ -25,7 +25,7 @@
 	<!-- Motor Torque Control Loop -->
 	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Target Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="Voltage" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="VOLTAGE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
     <Probe name="I_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="I_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
