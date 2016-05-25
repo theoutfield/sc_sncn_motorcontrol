@@ -157,30 +157,58 @@ void position_control_service(ControlConfig &position_control_config,
     while(1)
     {
 
+        printf("\n\n\n\n\nsending offset_detection command ...\n");
         i_motorcontrol.set_offset_detection_enabled();
         delay_milliseconds(10000);
 
+
         offset=i_motorcontrol.set_calib(0);
-        printf("offset: %i\n", offset);
+        printf("detected offset is: %i\n", offset);
+        delay_milliseconds(2000);
 
 
-//
-//        i_motorcontrol.set_torque_control_disabled();
-//        delay_milliseconds(1000);
-//
-//        i_motorcontrol.set_torque_control_enabled();
-//        delay_milliseconds(1000);
-//
-//        for(int i=0;i<=10;i++)
-//        {
-//            torque_ref = 100;
-//            i_motorcontrol.set_torque(torque_ref);
-//            delay_milliseconds(200);
-//
-//            torque_ref = -100;
-//            i_motorcontrol.set_torque(torque_ref);
-//            delay_milliseconds(200);
-//        }
+        printf("setting offset to (detected_offset+10) ...\n");
+        i_motorcontrol.set_offset_value(offset+10);
+        delay_milliseconds(2000);
+
+
+        offset=i_motorcontrol.set_calib(0);
+        printf("set offset is: %i\n", offset);
+        delay_milliseconds(2000);
+
+
+        printf("Enabling torque controller ...\n");
+        i_motorcontrol.set_torque_control_enabled();
+        delay_milliseconds(5000);
+
+
+        for(int i=0;i<=10;i++)
+        {
+            torque_ref = 100;
+            printf("sending positive torque command ...\n");
+            i_motorcontrol.set_torque(torque_ref);
+            delay_milliseconds(200);
+
+            torque_ref = -100;
+            printf("sending negative torque command ...\n");
+            i_motorcontrol.set_torque(torque_ref);
+            delay_milliseconds(200);
+        }
+
+
+        printf("sending zero torque command ...\n");
+        torque_ref = 0;
+        i_motorcontrol.set_torque(torque_ref);
+        delay_milliseconds(5000);
+
+
+        printf("Disabling torque controller ...\n");
+        i_motorcontrol.set_torque_control_disabled();
+        delay_milliseconds(5000);
+
+        delay_milliseconds(20000);
+
+
     }
 //
 //    while(1) {

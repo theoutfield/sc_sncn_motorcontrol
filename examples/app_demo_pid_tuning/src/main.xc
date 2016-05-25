@@ -183,6 +183,8 @@ int main(void) {
 
                 /* Motor Control Service */
                 {
+                    delay_milliseconds(2000);
+
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.polarity_type = NORMAL_POLARITY;
