@@ -11,10 +11,10 @@ TARGET =
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_test_spi_encoder
+APP_NAME = app_test_contelec_encoder
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_board-support module_misc module_pwm_symmetrical module_spi_encoder module_spi_master
+USED_MODULES = module_board-support module_contelec_encoder module_misc module_pwm_symmetrical module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
