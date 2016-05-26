@@ -25,12 +25,15 @@
 	<!-- Motor Torque Control Loop -->
 	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Target Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="VOLTAGE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="VOLTAGE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
     <Probe name="I_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="I_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
-    <Probe name="ANGLE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="RECIEVED_ANGLE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="RECIEVED_VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+        
+    <Probe name="ANGLE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="ANGLE_ERROR" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>  
 

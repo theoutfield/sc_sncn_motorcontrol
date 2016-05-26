@@ -158,7 +158,7 @@ interface BISSInterface {
     /**
      * @brief Getter position data with delay (previous angle and filtered speed)
      */
-    {unsigned int, int} get_biss_delayed();
+    {unsigned int, int, int} get_biss_delayed();
 
     void reset_biss_position(int new_count);
 

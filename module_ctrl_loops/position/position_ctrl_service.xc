@@ -115,7 +115,8 @@ void position_control_service(ControlConfig &position_control_config,
     int position_ctrl_cmd_lim = 0;
     int position_error_integral_limit = 0;
 
-    int torque_ref=100;
+    int torque_ref=0;
+    int delay_counter=0;
 
     // A2
 //    second_order_LP_filter_init(/*f_c=*//*18*/120, /*T_s=*/T_s_desired, torque_sensor_SO_LP_filter_param);
@@ -154,12 +155,11 @@ void position_control_service(ControlConfig &position_control_config,
     }
 
     t :> ts;
-    while(1)
-    {
+
 
         printf("\n\n\n\n\nsending offset_detection command ...\n");
         i_motorcontrol.set_offset_detection_enabled();
-        delay_milliseconds(10000);
+        delay_milliseconds(20000);
 
 
         offset=i_motorcontrol.set_calib(0);
@@ -167,49 +167,69 @@ void position_control_service(ControlConfig &position_control_config,
         delay_milliseconds(2000);
 
 
-        printf("setting offset to (detected_offset+10) ...\n");
-        i_motorcontrol.set_offset_value(offset+10);
-        delay_milliseconds(2000);
-
-
-        offset=i_motorcontrol.set_calib(0);
-        printf("set offset is: %i\n", offset);
-        delay_milliseconds(2000);
+//        printf("setting offset to (detected_offset+10) ...\n");
+//        i_motorcontrol.set_offset_value(offset+10);
+//        delay_milliseconds(2000);
+//
+//
+//        offset=i_motorcontrol.set_calib(0);
+//        printf("set offset is: %i\n", offset);
+//        delay_milliseconds(2000);
 
 
         printf("Enabling torque controller ...\n");
         i_motorcontrol.set_torque_control_enabled();
-        delay_milliseconds(5000);
+        delay_milliseconds(1000);
 
 
-        for(int i=0;i<=10;i++)
+        for(int i=1;i<=2;i++)
         {
             torque_ref = 100;
             printf("sending positive torque command ...\n");
             i_motorcontrol.set_torque(torque_ref);
-            delay_milliseconds(200);
+            delay_milliseconds(100);
 
             torque_ref = -100;
             printf("sending negative torque command ...\n");
             i_motorcontrol.set_torque(torque_ref);
-            delay_milliseconds(200);
+            delay_milliseconds(100);
         }
 
 
         printf("sending zero torque command ...\n");
         torque_ref = 0;
         i_motorcontrol.set_torque(torque_ref);
-        delay_milliseconds(5000);
+        delay_milliseconds(1000);
 
 
-        printf("Disabling torque controller ...\n");
-        i_motorcontrol.set_torque_control_disabled();
-        delay_milliseconds(5000);
-
-        delay_milliseconds(20000);
 
 
-    }
+
+        torque_ref=22;
+        while(1)
+        {
+            delay_counter++;
+            if(delay_counter==500)
+            {
+                torque_ref=-torque_ref;
+                delay_counter=0;
+                i_motorcontrol.set_torque(torque_ref);
+            }
+            xscope_int(RECIEVED_ANGLE, i_motorcontrol.get_position_actual());
+            xscope_int(RECIEVED_VELOCITY,i_motorcontrol.get_velocity_actual() );
+
+            delay_milliseconds(2);
+        }
+//        printf("Disabling torque controller ...\n");
+//        i_motorcontrol.set_torque_control_disabled();
+//        delay_milliseconds(5000);
+
+
+
+
+
+
+
 //
 //    while(1) {
 //#pragma ordered
