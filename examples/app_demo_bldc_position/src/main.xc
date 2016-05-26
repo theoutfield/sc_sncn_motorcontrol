@@ -239,7 +239,7 @@ int main(void)
                     ams_config.velocity_loop = AMS_VELOCITY_LOOP;
                     ams_config.enable_push_service = PushAll;
 
-                    ams_service(ams_ports, ams_config, _shared_memory[1], i_ams);
+                    ams_service(ams_ports, ams_config, i_shared_memory[1], i_ams);
                 }
 #elif(MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
                 /* BiSS service */
