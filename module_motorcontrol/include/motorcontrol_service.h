@@ -96,6 +96,12 @@ interface MotorcontrolInterface{
     [[clears_notification]]
     int get_notification();
 
+
+    /**
+     * @brief Sets break status to ON (no movement) or OFF (possible to move)
+     */
+    void set_break_status(int break_status);
+
     /**
      * @brief Enables the torque control
      */

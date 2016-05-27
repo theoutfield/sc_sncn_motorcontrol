@@ -55,76 +55,79 @@ void position_control_service(ControlConfig &position_control_config,
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionControlInterface server i_position_control[3])
 {
-    int actual_position = 0;
-    int target_position = 0;
-    int error_position = 0;
-    int error_position_D = 0;
-    int error_position_I = 0;
-    int previous_error = 0;
-    int position_control_out = 0;
-
-    int position_control_out_limit = 0;
-    int error_position_I_limit = 0;
-
-    /* for cascaded control */
-    int adc_a, adc_b;
-    int velocity = 0;
-    //General Control Variables
-//    int first_loop_counter = 0;
-    unsigned T_k = 0, T_k_1n = 0;
-    unsigned T_s_desired = 1000; //us
-    unsigned T_s = T_s_desired;
-
-    //Joint Torque Control
-    int i1_torque_j_ref = 0;
-    int f1_torque_j_lim = 50000;
-    float f1_torque_j_sens_measured = 0;
-    int i1_torque_j_sens_offset = 0;
-    int i1_torque_j_sens_offset_accumulator = 0;
-    float f1_torque_j_sens = 0;
-    int i1_torque_j_sens = 0;
-    int i1_torque_j_sens_1n = 0;
-    float f1_torque_j_sens_1n = 0;
-    float f1_torque_j_sens_2n = 0;
-    SecondOrderLPfilterParam torque_sensor_SO_LP_filter_param;
-    int torque_j_error = 0;
-    int torque_j_derivative = 0;
-    int torque_j_Kp = 0;
-    int torque_j_Ki = 0;
-    int torque_j_Kd = 0;
-    int torque_j_ctrl_cmd = 0;
-    int torque_j_error_integral = 0;
-    int torque_j_error_integral_limit = 0;
-    int torque_j_ctrl_cmd_lim = 200;
-
-    // Position Control
-    int position_sens = 0;
-    float f1_velocity_sens = 0;
-    float f1_velocity_sens_1n = 0;
-    float f1_velocity_sens_2n = 0;
-    float f1_velocity_sens_measured = 0;
-    SecondOrderLPfilterParam velocity_sensor_SO_LP_filter_param;
-    int i1_velocity_sens = 0;
-    int position_error = 0;
-    int position_error_integral = 0;
-    int position_error_limited = 0;
-    int position_Kp = 0;
-    int position_Ki = 0;
-    int position_Kd = 0;
-    int position_ctrl_cmd = 0;
-    int position_ctrl_cmd_lim = 0;
-    int position_error_integral_limit = 0;
+//    int actual_position = 0;
+//    int target_position = 0;
+//    int error_position = 0;
+//    int error_position_D = 0;
+//    int error_position_I = 0;
+//    int previous_error = 0;
+//    int position_control_out = 0;
+//
+//    int position_control_out_limit = 0;
+//    int error_position_I_limit = 0;
+//
+//    /* for cascaded control */
+//    int adc_a, adc_b;
+//    int velocity = 0;
+//    //General Control Variables
+////    int first_loop_counter = 0;
+//    unsigned T_k = 0, T_k_1n = 0;
+//    unsigned T_s_desired = 1000; //us
+//    unsigned T_s = T_s_desired;
+//
+//    //Joint Torque Control
+//    int i1_torque_j_ref = 0;
+//    int f1_torque_j_lim = 50000;
+//    float f1_torque_j_sens_measured = 0;
+//    int i1_torque_j_sens_offset = 0;
+//    int i1_torque_j_sens_offset_accumulator = 0;
+//    float f1_torque_j_sens = 0;
+//    int i1_torque_j_sens = 0;
+//    int i1_torque_j_sens_1n = 0;
+//    float f1_torque_j_sens_1n = 0;
+//    float f1_torque_j_sens_2n = 0;
+//    SecondOrderLPfilterParam torque_sensor_SO_LP_filter_param;
+//    int torque_j_error = 0;
+//    int torque_j_derivative = 0;
+//    int torque_j_Kp = 0;
+//    int torque_j_Ki = 0;
+//    int torque_j_Kd = 0;
+//    int torque_j_ctrl_cmd = 0;
+//    int torque_j_error_integral = 0;
+//    int torque_j_error_integral_limit = 0;
+//    int torque_j_ctrl_cmd_lim = 200;
+//
+//    // Position Control
+//    int position_sens = 0;
+//    float f1_velocity_sens = 0;
+//    float f1_velocity_sens_1n = 0;
+//    float f1_velocity_sens_2n = 0;
+//    float f1_velocity_sens_measured = 0;
+//    SecondOrderLPfilterParam velocity_sensor_SO_LP_filter_param;
+//    int i1_velocity_sens = 0;
+//    int position_error = 0;
+//    int position_error_integral = 0;
+//    int position_error_limited = 0;
+//    int position_Kp = 0;
+//    int position_Ki = 0;
+//    int position_Kd = 0;
+//    int position_ctrl_cmd = 0;
+//    int position_ctrl_cmd_lim = 0;
+//    int position_error_integral_limit = 0;
 
     int torque_ref=0;
     int delay_counter=0;
+
+    int break_counter=0;
+    int break_on=0;
 
     // A2
 //    second_order_LP_filter_init(/*f_c=*//*18*/120, /*T_s=*/T_s_desired, torque_sensor_SO_LP_filter_param);
 //    second_order_LP_filter_init(/*f_c=*//*80*/140, /*T_s=*/T_s_desired, velocity_sensor_SO_LP_filter_param);
 
     // A6
-    second_order_LP_filter_init(/*f_c=*/18, /*T_s=*/T_s_desired, torque_sensor_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/80, /*T_s=*/T_s_desired, velocity_sensor_SO_LP_filter_param);
+//    second_order_LP_filter_init(/*f_c=*/18, /*T_s=*/T_s_desired, torque_sensor_SO_LP_filter_param);
+//    second_order_LP_filter_init(/*f_c=*/80, /*T_s=*/T_s_desired, velocity_sensor_SO_LP_filter_param);
     /* end cascaded */
 
     timer t;
@@ -142,34 +145,34 @@ void position_control_service(ControlConfig &position_control_config,
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
 
-    if (position_control_config.cascade_with_torque == 1) {
-        i_motorcontrol.set_torque(0);
-        delay_milliseconds(10);
-        for (int i=0 ; i<2000; i++) {
-            delay_milliseconds(1);
-            i1_torque_j_sens_offset_accumulator += (i_motorcontrol.get_torque_actual());
-        }
-        i1_torque_j_sens_offset = i1_torque_j_sens_offset_accumulator / 2000;
-        i_motorcontrol.set_voltage(0);
-        printstrln(">>   POSITION CONTROL CASCADED WITH TORQUE");
-    }
+//    if (position_control_config.cascade_with_torque == 1) {
+//        i_motorcontrol.set_torque(0);
+//        delay_milliseconds(10);
+//        for (int i=0 ; i<2000; i++) {
+//            delay_milliseconds(1);
+//            i1_torque_j_sens_offset_accumulator += (i_motorcontrol.get_torque_actual());
+//        }
+//        i1_torque_j_sens_offset = i1_torque_j_sens_offset_accumulator / 2000;
+//        i_motorcontrol.set_voltage(0);
+//        printstrln(">>   POSITION CONTROL CASCADED WITH TORQUE");
+//    }
 
     t :> ts;
 
 
-        printf("\n\n\n\n\nsending offset_detection command ...\n");
-        i_motorcontrol.set_offset_detection_enabled();
-        delay_milliseconds(20000);
-
-
-        offset=i_motorcontrol.set_calib(0);
-        printf("detected offset is: %i\n", offset);
-        delay_milliseconds(2000);
-
-
-//        printf("setting offset to (detected_offset+10) ...\n");
-//        i_motorcontrol.set_offset_value(offset+10);
+//        printf("\n\n\n\n\nsending offset_detection command ...\n");
+//        i_motorcontrol.set_offset_detection_enabled();
+//        delay_milliseconds(20000);
+//
+//
+//        offset=i_motorcontrol.set_calib(0);
+//        printf("detected offset is: %i\n", offset);
 //        delay_milliseconds(2000);
+
+
+        printf("setting offset to 1980 ...\n");
+        i_motorcontrol.set_offset_value(1980);
+        delay_milliseconds(2000);
 //
 //
 //        offset=i_motorcontrol.set_calib(0);
@@ -181,19 +184,19 @@ void position_control_service(ControlConfig &position_control_config,
         i_motorcontrol.set_torque_control_enabled();
         delay_milliseconds(1000);
 
-
-        for(int i=1;i<=2;i++)
-        {
-            torque_ref = 100;
-            printf("sending positive torque command ...\n");
-            i_motorcontrol.set_torque(torque_ref);
-            delay_milliseconds(100);
-
-            torque_ref = -100;
-            printf("sending negative torque command ...\n");
-            i_motorcontrol.set_torque(torque_ref);
-            delay_milliseconds(100);
-        }
+//
+//        for(int i=1;i<=2;i++)
+//        {
+//            torque_ref = 20;
+//            printf("sending positive torque command ...\n");
+//            i_motorcontrol.set_torque(torque_ref);
+//            delay_milliseconds(100);
+//
+//            torque_ref = -20;
+//            printf("sending negative torque command ...\n");
+//            i_motorcontrol.set_torque(torque_ref);
+//            delay_milliseconds(100);
+//        }
 
 
         printf("sending zero torque command ...\n");
@@ -205,16 +208,30 @@ void position_control_service(ControlConfig &position_control_config,
 
 
 
+        printf("sending a small value of reference torque ...\n");
         torque_ref=22;
         while(1)
         {
             delay_counter++;
-            if(delay_counter==500)
+            if(delay_counter==1000)
             {
+                printf("changing torque direction ...\n");
                 torque_ref=-torque_ref;
-                delay_counter=0;
                 i_motorcontrol.set_torque(torque_ref);
+                delay_counter=0;
             }
+
+            break_counter++;
+            if(break_counter==5000)
+            {
+                printf("toggling break ...\n");
+                if(break_on==0) break_on=1; else if (break_on==1) break_on=0;
+
+                i_motorcontrol.set_break_status(break_on);
+
+                break_counter=0;
+            }
+
             xscope_int(RECIEVED_ANGLE, i_motorcontrol.get_position_actual());
             xscope_int(RECIEVED_VELOCITY,i_motorcontrol.get_velocity_actual() );
 

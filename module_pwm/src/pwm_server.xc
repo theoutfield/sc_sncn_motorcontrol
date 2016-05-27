@@ -220,8 +220,10 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
                 pwm_ctrl_s = recieved_pwm_ctrl_s;
 
                 pwm_on     = recieved_pwm_on;
-                if(pwm_on==0) break_counter=0;
 
+//                if(pwm_on==0) break_counter=0;
+
+                if(break_active != recieved_break_active) break_counter=0;
                 break_active = recieved_break_active;
 
                 pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
@@ -259,11 +261,6 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
                 ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
 
             }
-            else if(break_active == 0)
-            {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
-            }
 
 
             // Falling edges - these have positive time offsets - 44 Cycles
@@ -290,13 +287,6 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
                 ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
 
             }
-            else if(break_active == 0)
-            {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
-            }
-
-
         }
 
         else if (pwm_on==0)
