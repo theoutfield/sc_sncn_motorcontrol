@@ -502,28 +502,6 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 }
                 break;
 
-        case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,
-                QEIConfig in_qei_config,
-                MotorcontrolConfig in_commutation_config):
-
-//                qei_config.index_type = in_qei_config.index_type;
-//                qei_config.ticks_resolution = in_qei_config.ticks_resolution;
-
-                motorcontrol_config.hall_offset[0] = in_commutation_config.hall_offset[0];
-                motorcontrol_config.hall_offset[1] = in_commutation_config.hall_offset[1];
-                if (in_commutation_config.bldc_winding_type == DELTA_WINDING)
-                    motorcontrol_config.polarity_type = INVERTED_POLARITY;
-                else
-                    motorcontrol_config.polarity_type = NORMAL_POLARITY;
-                //motorcontrol_config.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
-
-                voltage_q = 0;
-                //max_count_per_hall = qei_config.ticks_resolution  * QEI_CHANGES_PER_TICK / hall_config.pole_pairs;
-                fw_flag = 0;
-                bw_flag = 0;
-
-                break;
-
         case i_motorcontrol[int i].restart_watchdog():
                 i_watchdog.start();
                 delay_milliseconds(1250);

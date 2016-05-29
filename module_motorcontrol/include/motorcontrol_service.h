@@ -57,12 +57,10 @@ typedef struct {
 #ifdef __XC__
 
 #include <watchdog_service.h>
-#include <hall_service.h>
-#include <qei_service.h>
-#include <biss_service.h>
-#include <ams_service.h>
 #include <adc_service.h>
 #include <pwm_service.h>
+#include <hall_service.h>
+#include <memory_manager.h>
 
 #include <mc_internal_constants.h>
 
@@ -170,15 +168,6 @@ interface MotorcontrolInterface{
     int get_position_actual();
 
     /**
-     * @brief Setter for Service new configuration. Also sets new configuration for the Hall Service and Encoder Service if possible.
-     *
-     * @param hall_config New configuration for Hall Service.
-     * @param qei_config New configuration for Encoder Service.
-     * @param motorcontrol_config New configuration for Motorcontrol service.
-     */
-    void set_all_parameters(HallConfig hall_config, QEIConfig qei_config, MotorcontrolConfig motorcontrol_config);
-
-    /**
      * @brief Allows you to change the commutation sensor on runtime.
      *
      * @param sensor New sensor [HALL_SENSOR]. (So far, just Hall sensor is available for commutation)
@@ -227,9 +216,6 @@ interface MotorcontrolInterface{
  * @param fet_driver_ports Ports structure defining where to access the FET-driver signals.
  * @param motorcontrol_config Configuration for the Service.
  * @param c_pwm_ctrl Channel to PWM Service.
- * @param i_hall [[Nullable]] Interface to Hall Sensor Service (if applicable).
- * @param i_qei [[Nullable]] Interface to Incremental Encoder Service (if applicable).
- * @param i_biss [[Nullable]] Interface to BiSS Encoder Service (if applicable).
  * @param i_watchdog Interface to Watchdog Service.
  * @param i_motorcontrol Array of communication interfaces to handle up to 5 different clients.
  */

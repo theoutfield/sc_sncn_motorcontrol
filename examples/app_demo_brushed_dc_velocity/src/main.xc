@@ -82,7 +82,7 @@ int main(void)
             velocity_control_config.control_loop_period =  CONTROL_LOOP_PERIOD; //us
 
             /* Control Loop */
-            velocity_control_service(velocity_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, i_motorcontrol[0],
                                         i_velocity_control);
         }
 

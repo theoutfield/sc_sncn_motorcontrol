@@ -87,13 +87,13 @@ int main(void) {
             position_control_config.cascade_with_torque = 1;
             /* Control Loop */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
+            position_control_service(position_control_config, i_motorcontrol[3],
                     i_position_control);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-            position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
+            position_control_service(position_control_config, i_motorcontrol[3],
                     i_position_control);
 #else
-            position_control_service(position_control_config, i_hall[2], null, null, null, i_motorcontrol[3],
+            position_control_service(position_control_config, i_motorcontrol[3],
                     i_position_control);
 #endif
         }

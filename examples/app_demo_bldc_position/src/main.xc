@@ -167,16 +167,16 @@ int main(void)
 
             /* Control Loop */
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
-            position_control_service(position_control_config, i_hall[1], i_qei[1], null, null, i_motorcontrol[0],
+            position_control_service(position_control_config, i_motorcontrol[0],
                                      i_position_control);
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-            position_control_service(position_control_config, null, null, null, i_ams[1], i_motorcontrol[0],
+            position_control_service(position_control_config, i_motorcontrol[0],
                                      i_position_control);
 #elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
-            position_control_service(position_control_config, null, null, i_biss[1], null, i_motorcontrol[0],
+            position_control_service(position_control_config, i_motorcontrol[0],
                                      i_position_control);
 #else
-            position_control_service(position_control_config, i_hall[1], null, i_biss[1], null, i_motorcontrol[0],
+            position_control_service(position_control_config, i_motorcontrol[0],
                                      i_position_control);
 #endif
         }

@@ -93,7 +93,7 @@ int main(void)
                 position_control_config.control_loop_period = COMMUTATION_LOOP_PERIOD; //us
 
                 /* Control Loop */
-                position_control_service(position_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
+                position_control_service(position_control_config, i_motorcontrol[0],
                                          i_position_control);
             }
         }

@@ -12,6 +12,7 @@
 #include <qei_service.h>
 #include <hall_service.h>
 #include <ams_service.h>
+#include <biss_service.h>
 #include <pwm_service.h>
 #include <adc_service.h>
 #include <watchdog_service.h>
@@ -115,16 +116,16 @@ int main(void)
 
             /* Control Loop */
 #if(MOTOR_FEEDBACK_SENSOR == QEI_SENSOR)
-            velocity_control_service(velocity_control_config, null, i_qei[1], null, null, i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, i_motorcontrol[0],
                                         i_velocity_control);
 #elif (MOTOR_FEEDBACK_SENSOR == AMS_SENSOR)
-            velocity_control_service(velocity_control_config, null, null, null, i_ams[1], i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, i_motorcontrol[0],
                                                     i_velocity_control);
 #elif (MOTOR_FEEDBACK_SENSOR == BISS_SENSOR)
-            velocity_control_service(velocity_control_config, null, null, null, null, i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, i_motorcontrol[0],
                                                     i_velocity_control);
 #else
-            velocity_control_service(velocity_control_config, i_hall[1], null, null, null, i_motorcontrol[0],
+            velocity_control_service(velocity_control_config, i_motorcontrol[0],
                                         i_velocity_control);
 #endif
         }

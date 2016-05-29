@@ -11,8 +11,6 @@
 #include <position_ctrl_service.h>
 #include <a4935.h>
 #include <mc_internal_constants.h>
-#include <hall_service.h>
-#include <qei_service.h>
 #include <filters_lib.h>
 
 void init_position_control(interface PositionControlInterface client i_position_control)
@@ -45,10 +43,6 @@ int position_limit(int position, int max_position_limit, int min_position_limit)
 }
 
 void position_control_service(ControlConfig &position_control_config,
-                              interface HallInterface client ?i_hall,
-                              interface QEIInterface client ?i_qei,
-                              interface BISSInterface client ?i_biss,
-                              interface AMSInterface client ?i_ams,
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionControlInterface server i_position_control[3])
 {
@@ -164,44 +158,20 @@ void position_control_service(ControlConfig &position_control_config,
                         position_control_out_limit = BDC_PWM_CONTROL_LIMIT;
                     }
 
-                    if (position_control_config.feedback_sensor != HALL_SENSOR
-                           && position_control_config.feedback_sensor != QEI_SENSOR
-                           && position_control_config.feedback_sensor != BISS_SENSOR
-                           && position_control_config.feedback_sensor != AMS_SENSOR) {
-                        position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
-                    }
-
                     if (position_control_config.Ki_n != 0) {
                         error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
                     }
 
-                    if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
-                        actual_position = i_qei.get_qei_position_absolute();
-                    } else {
-                        actual_position = i_motorcontrol.get_position_actual();
-                    }
+                    actual_position = i_motorcontrol.get_position_actual();
 
                     config_update_flag = 0;
                 }
 
                 if (activate == 1) {
-                    /* acquire actual position hall/qei/sensor */
-                    if (position_control_config.feedback_sensor == QEI_SENSOR) {
-                        if (!isnull(i_qei)) {
-                            actual_position = i_qei.get_qei_position_absolute();
-                        } else {
-                            printstrln("position_ctrl_service: ERROR: Encoder interface is not provided but requested");
-                            exit(-1);
-                        }
-                    } else {
-                        actual_position = i_motorcontrol.get_position_actual();
-                        velocity = i_motorcontrol.get_velocity_actual();
-                    }
+                    /* acquire actual position */
+                    actual_position = i_motorcontrol.get_position_actual();
+                    velocity = i_motorcontrol.get_velocity_actual();
                     adc_b = i_motorcontrol.get_torque_actual();
-                    /*
-                     * Or any other sensor interfaced to the IFM Module
-                     * place client functions here to acquire position
-                     */
 
                     /* cascaded control */
                     if(position_control_config.cascade_with_torque == 1 && motorcontrol_config.commutation_method == FOC){
@@ -389,28 +359,6 @@ void position_control_service(ControlConfig &position_control_config,
 
                 break;
 
-            case !isnull(i_hall) => i_hall.notification():
-
-                switch (i_hall.get_notification()) {
-                    case MOTCTRL_NTF_CONFIG_CHANGED:
-                        config_update_flag = 1;
-                        break;
-                    default:
-                        break;
-                }
-                break;
-
-            case !isnull(i_qei) => i_qei.notification():
-
-                switch (i_qei.get_notification()) {
-                    case MOTCTRL_NTF_CONFIG_CHANGED:
-                        config_update_flag = 1;
-                        break;
-                    default:
-                        break;
-                }
-                break;
-
             case i_motorcontrol.notification():
 
                 switch (i_motorcontrol.get_notification()) {
@@ -470,11 +418,7 @@ void position_control_service(ControlConfig &position_control_config,
 
             case i_position_control[int i].enable_position_ctrl():
 
-                if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
-                    actual_position = i_qei.get_qei_position_absolute();
-                } else {
-                    actual_position = i_motorcontrol.get_position_actual();
-                }
+                actual_position = i_motorcontrol.get_position_actual();
                 target_position = actual_position;
                 while (1) {
                     if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);

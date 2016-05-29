@@ -10,6 +10,8 @@
 #include <motorcontrol_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
+#include <biss_service.h>
+#include <ams_service.h>
 #include <adc_service.h>
 
 #define FILTER_LENGTH_TORQUE 20

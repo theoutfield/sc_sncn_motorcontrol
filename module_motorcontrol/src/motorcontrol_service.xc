@@ -25,12 +25,13 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
             return ERROR;
         }
 
-        if(commutation_params.commutation_sensor != HALL_SENSOR &&
-           commutation_params.commutation_sensor != BISS_SENSOR &&
-           commutation_params.commutation_sensor != AMS_SENSOR) {
-            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL, BiSS and AMS sensors are supported as commutation sensor");
-            return ERROR;
-        }
+        //FIXME check commutation sensor
+//        if(commutation_params.commutation_sensor != HALL_SENSOR &&
+//           commutation_params.commutation_sensor != BISS_SENSOR &&
+//           commutation_params.commutation_sensor != AMS_SENSOR) {
+//            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL, BiSS and AMS sensors are supported as commutation sensor");
+//            return ERROR;
+//        }
     }
 
     return SUCCESS;
@@ -48,8 +49,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
     //Set freq to 250MHz (always needed for proper timing)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    HallConfig hall_config;
-    QEIConfig qei_config;
     timer t;
     unsigned ts = 0;
 

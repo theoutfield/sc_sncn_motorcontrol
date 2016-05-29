@@ -15,6 +15,9 @@
 #include <adc_service.h>
 #include <position_ctrl_service.h>
 #include <profile_control.h>
+#include <hall_service.h>
+#include <biss_service.h>
+#include <ams_service.h>
 
 #include <xscope.h>
 #include <mc_internal_constants.h>
