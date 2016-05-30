@@ -10,7 +10,6 @@
 
 #include <position_ctrl_service.h>
 #include <velocity_ctrl_service.h>
-#include <torque_ctrl_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 #include <biss_service.h>
@@ -74,8 +73,8 @@ void init_velocity_profiler(ProfilerConfig profile_velocity_config,
  * @param profile_torque_config Configuration for the Torque Profiler.
  * @param i_torque_control Communication interface to the Torque Control Service.
  */
-void init_torque_profiler(ProfilerConfig profile_torque_config,
-                                interface TorqueControlInterface client i_torque_control);
+//void init_torque_profiler(ProfilerConfig profile_torque_config,
+//                                interface TorqueControlInterface client i_torque_control);
 
 /**
  * @brief Generates a profile ramp from the current position to the defined target position
@@ -109,6 +108,7 @@ void set_profile_velocity( int target_velocity, int acceleration, int decelerati
  * @param torque_slope in (mNm/s * current resolution)
  * @param i_torque_control for communicating with the Torque Control Server
  */
-void set_profile_torque( int target_torque, int torque_slope,
-                         interface TorqueControlInterface client i_torque_control );
+//FIXME
+//void set_profile_torque( int target_torque, int torque_slope,
+//                         interface TorqueControlInterface client i_torque_control );
 
