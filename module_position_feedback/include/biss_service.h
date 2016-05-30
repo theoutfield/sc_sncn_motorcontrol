@@ -56,7 +56,7 @@ typedef enum {
 
 #include <platform.h>
 #include <memory_manager.h>
-#include <position_service.h>
+#include <position_feedback_service.h>
 
 
 
@@ -68,7 +68,7 @@ typedef enum {
  * @param i_shared_memory Communication interface to the shared memory service.
  * @param i_biss Array of communication interfaces to handle up to 5 different clients.
  */
-void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionInterface i_position[3]);
+void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3]);
 
 
 /**

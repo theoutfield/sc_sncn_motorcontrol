@@ -11,11 +11,11 @@
 #include <watchdog_service.h>
 #include <pwm_service.h>
 #include <biss_service.h>
-#include <position_service.h>
+#include <position_feedback_service.h>
 #include <refclk.h>
 
 /* Test BiSS Encoder Client */
-void biss_test(client interface PositionInterface i_position, client interface shared_memory_interface ?i_shared_memory) {
+void biss_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory) {
     timer t;
     unsigned int start_time, end_time;
     int count = 0;
@@ -28,14 +28,14 @@ void biss_test(client interface PositionInterface i_position, client interface s
     while(1) {
 
         /* get position from BiSS Encoder */
-        { count, position } = i_position.get_position();
-        { real_count, void, status } = i_position.get_real_position();
+        { count, position } = i_position_feedback.get_position();
+        { real_count, void, status } = i_position_feedback.get_real_position();
 
         t :> start_time;
         /* get angle and velocity from BiSS Encoder */
-        angle = i_position.get_angle();
-        velocity = i_position.get_velocity();
-//        { count, velocity, position, angle, status } = i_position.get_all();
+        angle = i_position_feedback.get_angle();
+        velocity = i_position_feedback.get_velocity();
+//        { count, velocity, position, angle, status } = i_position_feedback.get_all();
         t :> end_time;
 
 
@@ -60,8 +60,8 @@ void biss_test(client interface PositionInterface i_position, client interface s
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 //BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
-//PositionPorts position_ports = { SOMANET_IFM_BISS_PORTS, null};
-PositionPorts position_ports = { SOMANET_IFM_BISS_PORTS, {{null, null, null, null, null},null}};
+//PositionFeedbackPorts position_feedback_ports = { SOMANET_IFM_BISS_PORTS, null};
+PositionFeedbackPorts position_feedback_ports = { SOMANET_IFM_BISS_PORTS, {{null, null, null, null, null},null}};
 
 int main() {
     chan c_pwm_ctrl; // pwm channels
@@ -69,11 +69,11 @@ int main() {
 //    interface BISSInterface i_biss[5]; //array of interfaces for biss server
     interface BrakeInterface i_brake;
     interface shared_memory_interface i_shared_memory[2];
-    interface PositionInterface i_position[3];
+    interface PositionFeedbackInterface i_position_feedback[3];
 
     par {
         /* Test BiSS Encoder Client */
-        on tile[APP_TILE]: biss_test(i_position[0], null);
+        on tile[APP_TILE]: biss_test(i_position_feedback[0], null);
 
 
         /************************************************************
@@ -120,26 +120,26 @@ int main() {
 
             /* Position service */
             {
-                PositionConfig position_config;
-                position_config.sensor_type[0] = BISS_SENSOR;
-                position_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-                position_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                position_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                position_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-                position_config.biss_config.status_length = BISS_STATUS_LENGTH;
-                position_config.biss_config.crc_poly = BISS_CRC_POLY;
-                position_config.biss_config.pole_pairs = 2;
-                position_config.biss_config.polarity = BISS_POLARITY;
-                position_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-                position_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-                position_config.biss_config.timeout = BISS_TIMEOUT;
-                position_config.biss_config.max_ticks = BISS_MAX_TICKS;
-                position_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                position_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-                position_config.biss_config.enable_push_service = PushAll;
+                PositionFeedbackConfig position_feedback_config;
+                position_feedback_config.sensor_type[0] = BISS_SENSOR;
+                position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
+                position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
+                position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
+                position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
+                position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
+                position_feedback_config.biss_config.pole_pairs = 2;
+                position_feedback_config.biss_config.polarity = BISS_POLARITY;
+                position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
+                position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+                position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
+                position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
+                position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+                position_feedback_config.biss_config.enable_push_service = PushAll;
 
 
-                position_service(position_ports, position_config, i_shared_memory[0], i_position);
+                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback);
             }
         }
     }

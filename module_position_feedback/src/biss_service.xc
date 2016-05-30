@@ -51,7 +51,7 @@ static inline void update_turns(int &turns, int last_position, int position, int
 //    return SUCCESS;
 //}
 
-void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionInterface i_position[3])
+void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -126,7 +126,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
     //main loop
     while (1) {
         select {
-//        case i_position[int i].get_all() -> { int out_count, int out_velocity, unsigned int out_position, unsigned int out_angle, unsigned int out_time }:
+//        case i_position_feedback[int i].get_all() -> { int out_count, int out_velocity, unsigned int out_position, unsigned int out_angle, unsigned int out_time }:
 //                out_count = actual_count;
 //                out_velocity = actual_velocity;
 //                out_position = actual_position;
@@ -134,12 +134,12 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
 //                out_time = measurement_time;
 //                break;
 
-        case i_position[int i].get_notification() -> int out_notification:
+        case i_position_feedback[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
 
         //send electrical angle for commutation, ajusted with electrical offset
-        case i_position[int i].get_angle() -> unsigned int angle:
+        case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 t :> time;
                 if (timeafter(time, last_biss_read + biss_config.timeout)) {
                     angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
@@ -157,7 +157,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 break;
 
         //send singleturn position fast
-//        case i_position[int i].get_position_fast() -> unsigned int position:
+//        case i_position_feedback[int i].get_position_fast() -> unsigned int position:
 //                t :> time;
 //                if (timeafter(time, last_biss_read + biss_config.timeout)) {
 //                    position = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
@@ -170,7 +170,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
 //                break;
 
         //send count, position and status (error and warning bits), ajusted with count offset and polarity
-        case i_position[int i].get_position() -> { int count, unsigned int position }:
+        case i_position_feedback[int i].get_position() -> { int count, unsigned int position }:
                 int count_internal;
                 t :> time;
                 if (timeafter(time, last_count_read + biss_config.timeout)) {
@@ -209,7 +209,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 break;
 
         //send count, position and status (error and warning bits) as returned by the encoder (not ajusted)
-        case i_position[int i].get_real_position() -> { int count, unsigned int position, unsigned int status }:
+        case i_position_feedback[int i].get_real_position() -> { int count, unsigned int position, unsigned int status }:
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
                 int error = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
@@ -222,12 +222,12 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 break;
 
         //send velocity
-        case i_position[int i].get_velocity() -> int out_velocity:
+        case i_position_feedback[int i].get_velocity() -> int out_velocity:
                 out_velocity = velocity;
                 break;
 
         //receive new biss_config
-        case i_position[int i].set_config(PositionConfig in_config):
+        case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 //update variables which depend on biss_config
                 biss_config = in_config.biss_config;
                 biss_data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
@@ -242,18 +242,18 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {
-                    i_position[i].notification();
+                    i_position_feedback[i].notification();
                 }
 
                 break;
 
         //send biss_config
-        case i_position[int i].get_config() -> PositionConfig out_config:
+        case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
                 out_config.biss_config = biss_config;
                 break;
 
         //receive the new count to set and set the offset accordingly
-        case i_position[int i].set_position(int new_count):
+        case i_position_feedback[int i].set_position(int new_count):
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
                 read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
@@ -273,7 +273,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 break;
 
         //receive the new elecrical angle to set and set the offset accordingly
-        case i_position[int i].set_angle(unsigned int new_angle) -> unsigned int offset:
+        case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int offset:
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
                 read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
@@ -292,7 +292,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 offset = biss_config.offset_electrical;
                 break;
 
-        case i_position[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
+        case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
                 break;
 
         //compute velocity

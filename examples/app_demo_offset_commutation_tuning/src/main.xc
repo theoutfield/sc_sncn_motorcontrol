@@ -11,7 +11,7 @@
 #include <hall_service.h>
 #include <biss_service.h>
 #include <ams_service.h>
-#include <position_service.h>
+#include <position_feedback_service.h>
 #include <adc_service.h>
 #include <user_config.h>
 #include <tuning.h>
@@ -22,7 +22,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
 //BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
-PositionPorts position_ports = { SOMANET_IFM_BISS_PORTS, {{null, null, null, null, null},null}};
+PositionFeedbackPorts position_feedback_ports = { SOMANET_IFM_BISS_PORTS, {{null, null, null, null, null},null}};
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
 #else
@@ -44,7 +44,7 @@ int main(void) {
     interface BrakeInterface i_brake;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
 //    interface BISSInterface i_biss[5];
-    interface PositionInterface i_position[3];
+    interface PositionFeedbackInterface i_position_feedback[3];
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
     interface AMSInterface i_ams[5];
 #else
@@ -60,7 +60,7 @@ int main(void) {
 
         /* Tuning service */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], null, i_position[0]);
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], null, i_position_feedback[0]);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
         on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, null, i_ams[1]);
 #else
@@ -129,25 +129,25 @@ int main(void) {
 
                 /* Position service */
                 {
-                    PositionConfig position_config;
-                    position_config.sensor_type[0] = MOTOR_COMMUTATION_SENSOR;
-                    position_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-                    position_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    position_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                    position_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-                    position_config.biss_config.status_length = BISS_STATUS_LENGTH;
-                    position_config.biss_config.crc_poly = BISS_CRC_POLY;
-                    position_config.biss_config.pole_pairs = POLE_PAIRS;
-                    position_config.biss_config.polarity = BISS_POLARITY;
-                    position_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-                    position_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-                    position_config.biss_config.timeout = BISS_TIMEOUT;
-                    position_config.biss_config.max_ticks = BISS_MAX_TICKS;
-                    position_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                    position_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-                    position_config.biss_config.enable_push_service = PushAll;
+                    PositionFeedbackConfig position_feedback_config;
+                    position_feedback_config.sensor_type[0] = MOTOR_COMMUTATION_SENSOR;
+                    position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
+                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                    position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
+                    position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
+                    position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
+                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
+                    position_feedback_config.biss_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.biss_config.polarity = BISS_POLARITY;
+                    position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
+                    position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
+                    position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
+                    position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                    position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+                    position_feedback_config.biss_config.enable_push_service = PushAll;
 
-                    position_service(position_ports, position_config, i_shared_memory[1], i_position);
+                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback);
                 }
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                 /* AMS Rotary Sensor Service */

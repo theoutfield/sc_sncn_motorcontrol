@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol,
-                client interface PositionInterface i_position)
+                client interface PositionFeedbackInterface i_position_feedback)
 {
     const int calib_voltage = 1000;
     const int calib_time = 500;
@@ -33,11 +33,11 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol,
     //get the offsets
     if (motorcontrol_config.commutation_sensor == HALL_SENSOR) {
         //We send the motor to 1/4 position, Hall has a 1/6 turn resolution so the offsets need to be shifted by +/- 1/12 turn
-        offset = (calib_angle - i_position.get_angle()) & 4095;
+        offset = (calib_angle - i_position_feedback.get_angle()) & 4095;
         motorcontrol_config.hall_offset[0] = (offset - 4096/12) & 4095;
         motorcontrol_config.hall_offset[1] = (offset + 4096/12) & 4095;
     } else {
-        offset = i_position.set_angle(calib_angle);
+        offset = i_position_feedback.set_angle(calib_angle);
         motorcontrol_config.hall_offset[0] = 0;
         motorcontrol_config.hall_offset[1] = 0;
     }
@@ -49,17 +49,17 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol,
     return offset;
 }
 
-int set_sensor_offset(int in_offset, int sensor_select, client interface PositionInterface i_position)
+int set_sensor_offset(int in_offset, int sensor_select, client interface PositionFeedbackInterface i_position_feedback)
 {
     int out_offset;
-    PositionConfig position_config = i_position.get_config();
+    PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
 
     if (sensor_select == BISS_SENSOR) {
         if (in_offset >= 0) {
-            position_config.biss_config.offset_electrical = in_offset;
-            i_position.set_config(position_config);
+            position_feedback_config.biss_config.offset_electrical = in_offset;
+            i_position_feedback.set_config(position_feedback_config);
         }
-        out_offset = position_config.biss_config.offset_electrical;
+        out_offset = position_feedback_config.biss_config.offset_electrical;
     }
 
     return out_offset;
@@ -297,7 +297,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 [[combinable]]
  void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_motorcontrol,
                      interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
-                     client interface PositionInterface i_position)
+                     client interface PositionFeedbackInterface i_position_feedback)
 {
     timer t;
     unsigned ts;
@@ -444,7 +444,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         range_pos--;
                         offset_pos += step_pos;
                         if (motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) {
-                            set_sensor_offset(offset_pos, motorcontrol_config.commutation_sensor, i_position);
+                            set_sensor_offset(offset_pos, motorcontrol_config.commutation_sensor, i_position_feedback);
                         } else {
                             update_offset(motorcontrol_config, voltage, (offset_pos & 4095));
                         }
@@ -472,7 +472,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         range_neg--;
                         offset_neg += step_neg;
                         if (motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) {
-                            set_sensor_offset(offset_neg, motorcontrol_config.commutation_sensor, i_position);
+                            set_sensor_offset(offset_neg, motorcontrol_config.commutation_sensor, i_position_feedback);
                         } else {
                             update_offset(motorcontrol_config, voltage, (offset_neg & 4095));
                         }
@@ -495,7 +495,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                         motorcontrol_config.hall_offset[1] = best_offset_neg;
                         printf("Tuning done\nauto tuned offset clk: %d\nauto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
                         if (motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) {
-                            set_sensor_offset((best_offset_pos+best_offset_neg)/2, motorcontrol_config.commutation_sensor, i_position);
+                            set_sensor_offset((best_offset_pos+best_offset_neg)/2, motorcontrol_config.commutation_sensor, i_position_feedback);
                             motorcontrol_config.hall_offset[0] = 0;
                             motorcontrol_config.hall_offset[1] = 0;
                             printf("mean offset: %d\n", (best_offset_pos+best_offset_neg)/2);
@@ -525,7 +525,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                 if (voltage && enable_tuning == 0) {
                     motorcontrol_config = i_motorcontrol.get_config();
                     if (motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) {
-                        start_offset_pos = set_sensor_offset(-1, motorcontrol_config.commutation_sensor, i_position);
+                        start_offset_pos = set_sensor_offset(-1, motorcontrol_config.commutation_sensor, i_position_feedback);
                         start_offset_neg = start_offset_pos;
                     } else {
                         start_offset_pos = motorcontrol_config.hall_offset[0];
@@ -555,7 +555,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                     motorcontrol_config.hall_offset[1] = best_offset_neg;
                     printf("Tuning aborted!\nauto tuned offset clk: %d\nauto tuned offset cclk: %d\n", motorcontrol_config.hall_offset[0], motorcontrol_config.hall_offset[1]);
                     if (motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) {
-                        set_sensor_offset((best_offset_pos+best_offset_neg)/2, motorcontrol_config.commutation_sensor, i_position);
+                        set_sensor_offset((best_offset_pos+best_offset_neg)/2, motorcontrol_config.commutation_sensor, i_position_feedback);
                         motorcontrol_config.hall_offset[0] = 0;
                         motorcontrol_config.hall_offset[1] = 0;
                         printf("mean offset: %d\n", (best_offset_pos+best_offset_neg)/2);
@@ -579,7 +579,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
             break;
 
         case i_tuning.set_limit(int in_limit):
-            i_position.set_position(0);
+            i_position_feedback.set_position(0);
             if (in_limit < 0) {
                 position_limit = in_limit;
                 printf("Position limit disabled\n");
@@ -596,18 +596,18 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
             break;
 
         case i_tuning.set_pole_pairs(int in_pole_pairs):
-            PositionConfig position_config = i_position.get_config();
-            position_config.biss_config.pole_pairs = in_pole_pairs;
-//            position_config.ams_config.pole_pairs = in_pole_pairs;
-            i_position.set_config(position_config);
+            PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
+            position_feedback_config.biss_config.pole_pairs = in_pole_pairs;
+//            position_feedback_config.ams_config.pole_pairs = in_pole_pairs;
+            i_position_feedback.set_config(position_feedback_config);
             break;
 
         case i_tuning.auto_offset() -> int out_offset:
-            out_offset = auto_offset(i_motorcontrol, i_position);
+            out_offset = auto_offset(i_motorcontrol, i_position_feedback);
             break;
 
         case i_tuning.set_sensor_offset(int in_offset) -> int out_offset:
-            out_offset = set_sensor_offset(in_offset, motorcontrol_config.commutation_sensor, i_position);
+            out_offset = set_sensor_offset(in_offset, motorcontrol_config.commutation_sensor, i_position_feedback);
             break;
         }
     }

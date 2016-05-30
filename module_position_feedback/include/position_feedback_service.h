@@ -1,5 +1,5 @@
 /*
- * position_service.h
+ * position_feedback_service.h
  *
  *  Created on: May 27, 2016
  *      Author: romuald
@@ -62,7 +62,7 @@ typedef struct {
     int sensor_type[2];
     BISSConfig biss_config;
     CONTELECConfig contelec_config;
-} PositionConfig;
+} PositionFeedbackConfig;
 
 
 #ifdef __XC__
@@ -91,9 +91,9 @@ typedef struct
 {
     BISSPorts biss_ports;
     SPIPorts spi_ports;
-} PositionPorts;
+} PositionFeedbackPorts;
 
-interface PositionInterface
+interface PositionFeedbackInterface
 {
     /**
      * @brief Notifies the interested parties that a new notification
@@ -118,9 +118,9 @@ interface PositionInterface
 
     int get_velocity(void);
 
-    PositionConfig get_config(void);
+    PositionFeedbackConfig get_config(void);
 
-    void set_config(PositionConfig in_config);
+    void set_config(PositionFeedbackConfig in_config);
 
     void set_position(int in_count);
 
@@ -129,8 +129,8 @@ interface PositionInterface
     unsigned int send_command(int opcode, int data, int data_bits);
 };
 
-void position_service(PositionPorts &position_ports, PositionConfig &position_config,
+void position_feedback_service(PositionFeedbackPorts &position_feedback_ports, PositionFeedbackConfig &position_feedback_config,
                       client interface shared_memory_interface ?i_shared_memory,
-                      server interface PositionInterface i_position[3]);
+                      server interface PositionFeedbackInterface i_position_feedback[3]);
 
 #endif

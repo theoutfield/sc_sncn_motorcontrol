@@ -137,7 +137,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
 //}
 
 [[combinable]]
- void contelec_service(SPIPorts &spi_ports, CONTELECConfig &contelec_config, client interface shared_memory_interface ?i_shared_memory, interface PositionInterface server i_position[3])
+ void contelec_service(SPIPorts &spi_ports, CONTELECConfig &contelec_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -191,12 +191,12 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     //main loop
     while (1) {
         select {
-        case i_position[int i].get_notification() -> int out_notification:
+        case i_position_feedback[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
 
         //send electrical angle for commutation
-        case i_position[int i].get_angle() -> unsigned int angle:
+        case i_position_feedback[int i].get_angle() -> unsigned int angle:
 //                t :> time;
 //                if (timeafter(time, last_read + contelec_config.timeout)) {
                 t when timerafter(last_read + contelec_config.timeout) :> void;
@@ -213,7 +213,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
                 break;
 
         //send multiturn count and position
-        case i_position[int i].get_position() -> { int out_count, unsigned int position }:
+        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position }:
                 t :> time;
                 if (timeafter(time, last_read + contelec_config.timeout)) {
                     { void, count, position, void } = contelec_encoder_read(spi_ports);
@@ -225,7 +225,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
                 break;
 
         //send position
-        case i_position[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
+        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
                 t when timerafter(last_read + contelec_config.timeout) :> void;
                 unsigned start_time;
                 t :> start_time;
@@ -236,12 +236,12 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
                 break;
 
         //send velocity
-        case i_position[int i].get_velocity() -> int out_velocity:
+        case i_position_feedback[int i].get_velocity() -> int out_velocity:
                 out_velocity = velocity;
                 break;
 
         //receive new contelec_config
-        case i_position[int i].set_config(PositionConfig in_config):
+        case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 ticks_per_turn = (1 << in_config.contelec_config.resolution_bits);
                 in_config.contelec_config.offset &= (ticks_per_turn-1);
                 delay_ticks(10*USEC_FAST);
@@ -267,18 +267,18 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {
-                    i_position[i].notification();
+                    i_position_feedback[i].notification();
                 }
 
                 break;
 
         //send contelec_config
-        case i_position[int i].get_config() -> PositionConfig out_config:
+        case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
                 out_config.contelec_config = contelec_config;
                 break;
 
         //receive the new count to set and set the offset accordingly
-        case i_position[int i].set_position(int new_count):
+        case i_position_feedback[int i].set_position(int new_count):
                 int multiturn = (new_count / ticks_per_turn) & 4095;
                 unsigned int singleturn = new_count % ticks_per_turn;
 //                int test_count;
@@ -297,7 +297,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
                 break;
 
         //receive the new electrical angle to set the offset accordingly
-        case i_position[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
+        case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
                 if (contelec_config.resolution_bits > 12) {
                     new_angle = (new_angle << (contelec_config.resolution_bits-12));
                 } else {
@@ -316,7 +316,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
                 break;
 
         //execute command
-        case i_position[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
+        case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
                 delay_ticks(10*USEC_FAST);
                 contelec_encoder_write(spi_ports, opcode, data, data_bits);
                 { status, void, void, void } = contelec_encoder_read(spi_ports);

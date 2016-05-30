@@ -36,7 +36,7 @@
 
 #include <spi_master.h>
 #include <memory_manager.h>
-#include <position_service.h>
+#include <position_feedback_service.h>
 
 
 int contelec_encoder_init(SPIPorts &contelec_ports, CONTELECConfig config);
@@ -44,7 +44,7 @@ void init_spi_ports(SPIPorts &spi_ports);
 
 
 [[combinable]]
-void contelec_service(SPIPorts &contelec_ports, CONTELECConfig &config, client interface shared_memory_interface ?i_shared_memory, interface PositionInterface server i_position[3]);
+void contelec_service(SPIPorts &contelec_ports, CONTELECConfig &config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3]);
 
 { char, int, unsigned int, unsigned int } contelec_encoder_read(SPIPorts &contelec_ports);
 
