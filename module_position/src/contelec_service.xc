@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <timer.h>
-#include <print.h>
+//#include <print.h>
 #include <mc_internal_constants.h>
 
 
@@ -108,33 +108,33 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     return status;
 }
 
-int check_contelec_config(CONTELECConfig &contelec_config) {
-    if(contelec_config.polarity < 0  || contelec_config.polarity > 1){
-        printstrln("Wrong CONTELEC configuration: wrong direction");
-        return ERROR;
-    }
-    if( CONTELEC_USEC <= 0 ){
-        printstrln("Wrong CONTELEC configuration: wrong CONTELEC_USEC value");
-        return ERROR;
-    }
-    if(contelec_config.timeout < 0){
-        printstrln("Wrong CONTELEC configuration: wrong timeout");
-        return ERROR;
-    }
-    if(contelec_config.pole_pairs < 1){
-        printstrln("Wrong CONTELEC configuration: wrong pole-pairs");
-        return ERROR;
-    }
-    if (contelec_config.filter == 1 || contelec_config.filter < 0 || contelec_config.filter > 9) {
-        printstrln("Wrong filter configuration");
-        contelec_config.filter = 0x02;
-    }
-    if (contelec_config.timeout < 10*USEC_FAST) {
-        printstrln("Timeout time too low");
-        contelec_config.timeout = 10*USEC_FAST;
-    }
-    return SUCCESS;
-}
+//int check_contelec_config(CONTELECConfig &contelec_config) {
+//    if(contelec_config.polarity < 0  || contelec_config.polarity > 1){
+//        printstrln("Wrong CONTELEC configuration: wrong direction");
+//        return ERROR;
+//    }
+//    if( CONTELEC_USEC <= 0 ){
+//        printstrln("Wrong CONTELEC configuration: wrong CONTELEC_USEC value");
+//        return ERROR;
+//    }
+//    if(contelec_config.timeout < 0){
+//        printstrln("Wrong CONTELEC configuration: wrong timeout");
+//        return ERROR;
+//    }
+//    if(contelec_config.pole_pairs < 1){
+//        printstrln("Wrong CONTELEC configuration: wrong pole-pairs");
+//        return ERROR;
+//    }
+//    if (contelec_config.filter == 1 || contelec_config.filter < 0 || contelec_config.filter > 9) {
+//        printstrln("Wrong filter configuration");
+//        contelec_config.filter = 0x02;
+//    }
+//    if (contelec_config.timeout < 10*USEC_FAST) {
+//        printstrln("Timeout time too low");
+//        contelec_config.timeout = 10*USEC_FAST;
+//    }
+//    return SUCCESS;
+//}
 
 [[combinable]]
  void contelec_service(SPIPorts &spi_ports, CONTELECConfig &contelec_config, client interface shared_memory_interface ?i_shared_memory, interface PositionInterface server i_position[3])
@@ -142,18 +142,18 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    if(check_contelec_config(contelec_config) == ERROR){
-        printstrln("Error while checking the CONTELEC sensor configuration");
-        return;
-    }
+//    if(check_contelec_config(contelec_config) == ERROR){
+//        printstrln("Error while checking the CONTELEC sensor configuration");
+//        return;
+//    }
     int init_status = contelec_encoder_init(spi_ports, contelec_config);
     if (init_status) {
-        printstr("Error with SPI CONTELEC sensor ");
-        printintln(init_status);
+//        printstr("Error with SPI CONTELEC sensor ");
+//        printintln(init_status);
         return;
     }
 
-    printstr(">>   SOMANET CONTELEC SENSOR SERVICE STARTING...\n");
+//    printstr(">>   SOMANET CONTELEC SENSOR SERVICE STARTING...\n");
 
     //init variables
     //velocity

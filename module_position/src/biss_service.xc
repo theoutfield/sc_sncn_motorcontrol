@@ -21,18 +21,18 @@ static inline void update_turns(int &turns, int last_position, int position, int
     }
 }
 
-int check_biss_config(BISSConfig & biss_config)
-{
-    if(biss_config.polarity != BISS_POLARITY_NORMAL && biss_config.polarity != BISS_POLARITY_INVERTED){
-        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
-        return ERROR;
-    }
-
-    if ( BISS_FRAME_BYTES < (( (3 + 2 + biss_config.multiturn_length + biss_config.singleturn_length + biss_config.status_length + 32 - clz(biss_config.crc_poly)) -1)/32 + 1) ){
-        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong frame bytes number");
-        return ERROR;
-    }
-
+//int check_biss_config(BISSConfig & biss_config)
+//{
+//    if(biss_config.polarity != BISS_POLARITY_NORMAL && biss_config.polarity != BISS_POLARITY_INVERTED){
+//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
+//        return ERROR;
+//    }
+//
+//    if ( BISS_FRAME_BYTES < (( (3 + 2 + biss_config.multiturn_length + biss_config.singleturn_length + biss_config.status_length + 32 - clz(biss_config.crc_poly)) -1)/32 + 1) ){
+//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong frame bytes number");
+//        return ERROR;
+//    }
+//
 //    if( BISS_USEC <= 0 ){
 //        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong BISS_USEC value");
 //        return ERROR;
@@ -42,23 +42,23 @@ int check_biss_config(BISSConfig & biss_config)
 //        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong timeout");
 //        return ERROR;
 //    }
-
-    if(biss_config.pole_pairs < 1){
-        printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
-        return ERROR;
-    }
-
-    return SUCCESS;
-}
+//
+//    if(biss_config.pole_pairs < 1){
+//        printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
+//        return ERROR;
+//    }
+//
+//    return SUCCESS;
+//}
 
 void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionInterface i_position[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    if(check_biss_config(biss_config) == ERROR){
-        return;
-    }
+//    if(check_biss_config(biss_config) == ERROR){
+//        return;
+//    }
 
     printstr(">>   SOMANET BISS SENSOR SERVICE STARTING...\n");
 

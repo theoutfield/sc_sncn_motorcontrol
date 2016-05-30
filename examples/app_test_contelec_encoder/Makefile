@@ -14,7 +14,7 @@ TARGET =
 APP_NAME = app_test_contelec_encoder
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_board-support module_contelec_encoder module_memory_manager module_misc module_pwm_symmetrical module_spi_master
+USED_MODULES = module_board-support module_memory_manager module_misc module_position module_pwm_symmetrical module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
