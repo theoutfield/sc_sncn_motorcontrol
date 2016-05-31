@@ -8,14 +8,15 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <contelec_service.h>
 #include <position_feedback_service.h>
 #include <ctype.h>
 #include <stdio.h>
 
 
 //SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
-PositionFeedbackPorts position_feedback_ports = { {null, null, null}, SOMANET_IFM_AMS_PORTS};
+//PositionFeedbackPorts position_feedback_ports = { {null, null, null}, SOMANET_IFM_AMS_PORTS};
+PositionFeedbackPorts position_feedback_ports = { QEI_PORT, QEI_PORT_INPUT_MODE_SELECTION,SOMANET_IFM_GPIO_D0,
+        {IFM_TILE_CLOCK_2, IFM_TILE_CLOCK_3, SOMANET_IFM_GPIO_D3,SOMANET_IFM_GPIO_D1,SOMANET_IFM_GPIO_D2 } };
 
 
 /* Test CONTELEC Sensor Client */
@@ -39,14 +40,16 @@ void contelec_encoder_test(client interface PositionFeedbackInterface i_position
         /* get angle and velocity from CONTELEC Sensor */
         velocity = i_position_feedback.get_velocity();
 
+        //electrical_angle = i_position_feedback.get_angle();
+
         if (!isnull(i_shared_memory)) {
-            { void, velocity, count } = i_shared_memory.get_angle_velocity_position();
+            { electrical_angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
         }
 
 
         xscope_int(COUNT, count);
         xscope_int(POSITION, position);
-//        xscope_int(ANGLE, electrical_angle);
+        xscope_int(ANGLE, electrical_angle);
         xscope_int(VELOCITY, velocity);
 //        xscope_int(STATUS, status*1000);
         xscope_int(TIME, status);
@@ -192,7 +195,7 @@ int main(void)
             /* Position service */
             {
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type[0] = CONTELEC_SENSOR;
+                position_feedback_config.sensor_type = CONTELEC_SENSOR;
                 position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
                 position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
                 position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
@@ -202,7 +205,7 @@ int main(void)
                 position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                 position_feedback_config.contelec_config.enable_push_service = PushAll;
 
-                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback);
+                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
             }
         }
     }

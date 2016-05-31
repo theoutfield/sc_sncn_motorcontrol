@@ -10,7 +10,6 @@
 //BiSS libs
 #include <watchdog_service.h>
 #include <pwm_service.h>
-#include <biss_service.h>
 #include <position_feedback_service.h>
 #include <refclk.h>
 
@@ -60,8 +59,9 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 //BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
-//PositionFeedbackPorts position_feedback_ports = { SOMANET_IFM_BISS_PORTS, null};
-PositionFeedbackPorts position_feedback_ports = { SOMANET_IFM_BISS_PORTS, {{null, null, null, null, null},null}};
+//PositionFeedbackPorts position_feedback_ports = { QEI_PORT, QEI_PORT_INPUT_MODE_SELECTION,SOMANET_IFM_GPIO_D0,
+//        {IFM_TILE_CLOCK_2, IFM_TILE_CLOCK_3, SOMANET_IFM_GPIO_D3,SOMANET_IFM_GPIO_D1,SOMANET_IFM_GPIO_D2 } };
+PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
 int main() {
     chan c_pwm_ctrl; // pwm channels
@@ -121,7 +121,7 @@ int main() {
             /* Position service */
             {
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type[0] = BISS_SENSOR;
+                position_feedback_config.sensor_type = BISS_SENSOR;
                 position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                 position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
@@ -139,7 +139,7 @@ int main() {
                 position_feedback_config.biss_config.enable_push_service = PushAll;
 
 
-                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback);
+                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
             }
         }
     }
