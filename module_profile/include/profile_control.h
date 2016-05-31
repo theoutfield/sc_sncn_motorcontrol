@@ -10,10 +10,6 @@
 
 #include <position_ctrl_service.h>
 #include <velocity_ctrl_service.h>
-#include <hall_service.h>
-#include <qei_service.h>
-#include <biss_service.h>
-#include <ams_service.h>
 
 /**
  * @brief Structure definition for Profiler configuration.
@@ -49,12 +45,10 @@ typedef struct{
  * @param i_qei Interface to Incremental Encoder Service (QEI)
  * @param i_biss Interface to BiSS Encoder Service (QEI)
  */
+//FIXME find a proper way to send the ticks per turn
 void init_position_profiler(ProfilerConfig profile_position_config,
                             interface PositionControlInterface client i_position_control,
-                            interface HallInterface client ?i_hall,
-                            interface QEIInterface client ?i_qei,
-                            interface BISSInterface client ?i_biss,
-                            interface AMSInterface client ?i_ams);
+                            int ticks_per_turn);
 
 /**
  * @brief Velocity Profiler Initializer. It sets the profiler configuration.
