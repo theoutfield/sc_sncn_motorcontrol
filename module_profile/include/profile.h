@@ -79,8 +79,7 @@ extern int velocity_profile_generate(int step);
  * @param min_position
  *
  */
-extern void init_position_profile_limits(int max_acceleration, int max_velocity, QEIConfig qei_config, \
-                                         HallConfig hall_config, BISSConfig biss_config, AMSConfig ams_config, int sensor_select, int max_position, int min_position);
+extern void init_position_profile_limits(int max_acceleration, int max_velocity, int sensor_select, int ticks_per_turn, int max_position, int min_position);
 
 /**
  * @brief Initialize Position Profile

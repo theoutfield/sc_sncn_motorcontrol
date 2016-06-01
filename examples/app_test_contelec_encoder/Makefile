@@ -7,13 +7,14 @@
 # SOMANET-C21-DX
 TARGET = 
 
+
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_demo_brushed_dc_torque
+APP_NAME = app_test_contelec_encoder
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_ams_rotary_sensor module_biss module_board-support module_ctrl_loops module_filters_lib module_foc module_hall module_misc module_motorcontrol module_memory_manager module_profile module_pwm_symmetrical module_qei module_spi_master module_watchdog
+USED_MODULES = module_biss module_board-support module_contelec_encoder module_memory_manager module_misc module_position_feedback module_pwm_symmetrical module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

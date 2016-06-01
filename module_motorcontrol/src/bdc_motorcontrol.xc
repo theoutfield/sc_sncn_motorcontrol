@@ -175,10 +175,6 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                   out_config = motorcontrol_config;
                   break;
-        case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,
-                                                            QEIConfig in_qei_config,
-                                                            MotorcontrolConfig in_commutation_config):
-               break;
 
         case i_motorcontrol[int i].restart_watchdog():
                 break;

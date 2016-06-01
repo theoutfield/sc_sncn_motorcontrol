@@ -12,12 +12,13 @@
 #include <user_config.h>
 #include <tuning.h>
 #include <torque_control.h>
+#include <position_feedback_service.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
+PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
 #define POSITION_LIMIT 0 //+/- 4095
 
@@ -31,8 +32,8 @@ int main(void) {
     interface MotorcontrolInterface i_motorcontrol[4];
     interface PositionControlInterface i_position_control[3];
     interface TuningInterface i_tuning;
-    interface BISSInterface i_biss[5];
     interface shared_memory_interface i_shared_memory[2];
+    interface PositionFeedbackInterface i_position_feedback[3];
     interface update_pwm i_update_pwm;
 
     par
@@ -83,29 +84,42 @@ int main(void) {
                     watchdog_service(wd_ports, i_watchdog);
                 }
 
-                memory_manager(i_shared_memory, 2);
-
-                /* BiSS service */
+                /* Position feedback service */
                 {
-                    BISSConfig biss_config;
-                    biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-                    biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                    biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-                    biss_config.status_length = BISS_STATUS_LENGTH;
-                    biss_config.crc_poly = BISS_CRC_POLY;
-                    biss_config.pole_pairs = POLE_PAIRS;
-                    biss_config.polarity = BISS_POLARITY;
-                    biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-                    biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-                    biss_config.timeout = BISS_TIMEOUT;
-                    biss_config.max_ticks = BISS_MAX_TICKS;
-                    biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                    biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-                    biss_config.enable_push_service = PushAll;
+                    PositionFeedbackConfig position_feedback_config;
+                    position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
 
-                    biss_service(biss_ports, biss_config, i_shared_memory[1], i_biss);
+                    position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
+                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                    position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
+                    position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
+                    position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
+                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
+                    position_feedback_config.biss_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.biss_config.polarity = BISS_POLARITY;
+                    position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
+                    position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
+                    position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
+                    position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                    position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+                    position_feedback_config.biss_config.enable_push_service = PushAll;
+
+                    position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
+                    position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
+                    position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
+                    position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
+                    position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
+                    position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                    position_feedback_config.contelec_config.enable_push_service = PushAll;
+
+                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
                 }
+
+
+                /* Shared memory Service */
+                memory_manager(i_shared_memory, 2);
 
                 /* Motor Control Service */
                 {
@@ -122,7 +136,7 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     Motor_Control_Service( fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
-                            null, null, i_biss[0], null,
+                            i_shared_memory[0],
                             i_watchdog[0], null, i_motorcontrol, i_update_pwm);
                 }
             }

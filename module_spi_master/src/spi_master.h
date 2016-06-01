@@ -35,11 +35,11 @@
  */
 typedef struct spi_master_interface
 {
-    clock blk1;
-    clock blk2;
-    out buffered port:8 mosi;
-    out buffered port:8 sclk;
-    in buffered port:8 miso;
+    clock ?blk1;
+    clock ?blk2;
+    out buffered port:8 ?mosi;
+    out buffered port:8 ?sclk;
+    in buffered port:8 ?miso;
 } spi_master_interface;
 
 #ifdef __spi_conf_h_exists__

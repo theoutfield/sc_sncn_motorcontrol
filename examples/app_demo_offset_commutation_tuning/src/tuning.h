@@ -18,7 +18,7 @@
 #include <hall_service.h>
 #include <biss_service.h>
 #include <ams_service.h>
-//#include <position_feedback_service.h>
+#include <position_feedback_service.h>
 
 #include <xscope.h>
 #include <mc_internal_constants.h>
@@ -39,4 +39,5 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
 [[combinable]]
 void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_motorcontrol,
-                    interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control);
+                    interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
+                    client interface PositionFeedbackInterface i_position_feedback);

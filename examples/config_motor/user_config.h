@@ -4,11 +4,8 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
- #pragma once
+#pragma once
 
-#include <qei_service.h>
-#include <hall_service.h>
-#include <biss_service.h>
 #include <motorcontrol_service.h>
 
  //#include <motor_configs/motor_config_Nanotec_DB42C01.h>

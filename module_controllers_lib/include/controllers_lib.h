@@ -5,22 +5,25 @@
 
 #pragma once
 
-
+#define INT8_DENOMINATOR 127 //0x7f
+#define UINT8_DENOMINATOR 255 //0xff
+#define INT16_DENOMINATOR 32767 //0x7fff
+#define UINT16_DENOMINATOR 65535 //0xffff
 
 /**
  * @brief Structure type to set the parameters of the PID controller.
  */
 typedef struct {
-    int i1_P;
-    int i1_I;
-    int i1_D;
-    int i1_P_error_limit;
-    int i1_I_error_limit;
-    int i1_integral_limit;
-    int i1_cmd_limit;
-    int i1_feedback_1n;
-    int i1_error_integral;
-    int i1_T_s;    //Sampling-Time in microseconds
+    int int8_P;
+    int int8_I;
+    int int8_D;
+    int int16_P_error_limit;
+    int int16_I_error_limit;
+    int int16_integral_limit;
+    int int16_cmd_limit;
+    int int16_feedback_1n;
+    int int16_error_integral;
+    int int16_T_s;    //Sampling-Time in microseconds
 } PIDparam;
 
 
@@ -36,8 +39,15 @@ typedef struct {
  * @param the output of the controller will be limited to this value
  * @param the parameters of the controller
  */
-void PID_init(int i1_P, int i1_I, int i1_D, int i1_P_error_limit, int i1_I_error_limit, int i1_itegral_limit, int i1_cmd_limit, int i1_T_s, PIDparam &param);
+void pid_init(int int8_P, int int8_I, int int8_D, int int16_P_error_limit, int int16_I_error_limit,
+              int int16_itegral_limit, int int32_cmd_limit, int int16_T_s, PIDparam &param);
 
+
+
+
+void pid_set_coefficients(int int8_P, int int8_I, int int8_D, PIDparam &param);
+
+void pid_set_limits(int int16_P_error_limit, int int16_I_error_limit, int in16_itegral_limit, int int16_cmd_limit, PIDparam &param);
 
 /**
  * @brief updating the controller.
@@ -49,5 +59,4 @@ void PID_init(int i1_P, int i1_I, int i1_D, int i1_P_error_limit, int i1_I_error
  * @param sample-time in us (microseconds).
  * @param the parameters of the controller
  */
-int PID_update(int i1_setpoint, int i1_feedback, int i1_T_s, PIDparam &param);
-
+int pid_update(int int16_setpoint, int int16_feedback, int int16_T_s, PIDparam &param);

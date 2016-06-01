@@ -7,7 +7,7 @@
 #include <biss_service.h>
 #include <xclib.h>
 #include <xs1.h>
-#include <print.h>
+//#include <print.h>
 
 #include <mc_internal_constants.h>
 
@@ -21,18 +21,18 @@ static inline void update_turns(int &turns, int last_position, int position, int
     }
 }
 
-int check_biss_config(BISSConfig & biss_config)
-{
-    if(biss_config.polarity != BISS_POLARITY_NORMAL && biss_config.polarity != BISS_POLARITY_INVERTED){
-        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
-        return ERROR;
-    }
-
-    if ( BISS_FRAME_BYTES < (( (3 + 2 + biss_config.multiturn_length + biss_config.singleturn_length + biss_config.status_length + 32 - clz(biss_config.crc_poly)) -1)/32 + 1) ){
-        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong frame bytes number");
-        return ERROR;
-    }
-
+//int check_biss_config(BISSConfig & biss_config)
+//{
+//    if(biss_config.polarity != BISS_POLARITY_NORMAL && biss_config.polarity != BISS_POLARITY_INVERTED){
+//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
+//        return ERROR;
+//    }
+//
+//    if ( BISS_FRAME_BYTES < (( (3 + 2 + biss_config.multiturn_length + biss_config.singleturn_length + biss_config.status_length + 32 - clz(biss_config.crc_poly)) -1)/32 + 1) ){
+//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong frame bytes number");
+//        return ERROR;
+//    }
+//
 //    if( BISS_USEC <= 0 ){
 //        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong BISS_USEC value");
 //        return ERROR;
@@ -42,25 +42,25 @@ int check_biss_config(BISSConfig & biss_config)
 //        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong timeout");
 //        return ERROR;
 //    }
+//
+//    if(biss_config.pole_pairs < 1){
+//        printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
+//        return ERROR;
+//    }
+//
+//    return SUCCESS;
+//}
 
-    if(biss_config.pole_pairs < 1){
-        printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
-        return ERROR;
-    }
-
-    return SUCCESS;
-}
-
-void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface BISSInterface i_biss[5])
+void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    if(check_biss_config(biss_config) == ERROR){
-        return;
-    }
+//    if(check_biss_config(biss_config) == ERROR){
+//        return;
+//    }
 
-    printstr(">>   SOMANET BISS SENSOR SERVICE STARTING...\n");
+//    printstr(">>   SOMANET BISS SENSOR SERVICE STARTING...\n");
 
     //init variables
     //velocity
@@ -97,51 +97,27 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
 
     int notification = MOTCTRL_NTF_EMPTY;
 
-    // variables added for "get_biss_delayed" interface:
-    timer t1;
-    unsigned int time1;
-    int flag_send_normal=1;
-    int flag_angle=0;
-    int angle;
-    int biss_angle;
-    int last_angle;
-    int counter=0;
-    int count, position, difference;
-    int first_count_sample, second_count_sample;
-    int first_position_sample, second_position_sample;
-    int biss_filter_order = 3;
-    int biss_filter_index_newest=0;
-    int f[3] = {300, 380, 320};
-    int biss_filter_buffer[3]={0, 0, 0};
-    int biss_speed=0;
-    int biss_filtered_speed=0;
-    int k;
-    int y;
-    int speed_index=0;
-    int biss_last_count=0;
-
-
     //clock and port configuration
-    configure_clock_rate(biss_ports.clk, biss_config.clock_dividend, biss_config.clock_divisor); // a/b MHz
-    configure_out_port(biss_ports.p_biss_clk, biss_ports.clk, BISS_CLK_PORT_HIGH);
-    configure_in_port(biss_ports.p_biss_data, biss_ports.clk);
+    configure_clock_rate(position_feedback_ports.spi_interface.blk1, biss_config.clock_dividend, biss_config.clock_divisor); // a/b MHz
+    configure_out_port(position_feedback_ports.p_biss_clk, position_feedback_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
+    configure_in_port(position_feedback_ports.p_biss_data, position_feedback_ports.spi_interface.blk1);
 
     //first read
     t :> time;
     last_biss_read = time;
     do {
         t when timerafter(last_biss_read + biss_config.timeout) :> void;
-        last_count = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+        last_count = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
         t :> last_biss_read;
     } while (last_count != NoError && !timeafter(last_biss_read, time + 1000000*BISS_USEC));
-    if (last_count == CRCError)
-        printstrln("biss_service: ERROR: CRC");
-    else if (last_count == NoStartBit)
-        printstrln("biss_service: ERROR: No Start bit");
-    else if (last_count == NoAck)
-        printstrln("biss_service: ERROR: No Ack bit");
-    else if (last_count != NoError)
-        printstrln("biss_service: ERROR: initialization");
+//    if (last_count == CRCError)
+//        printstrln("biss_service: ERROR: CRC");
+//    else if (last_count == NoStartBit)
+//        printstrln("biss_service: ERROR: No Start bit");
+//    else if (last_count == NoAck)
+//        printstrln("biss_service: ERROR: No Ack bit");
+//    else if (last_count != NoError)
+//        printstrln("biss_service: ERROR: initialization");
     last_count_read = last_biss_read;
     next_velocity_read = last_biss_read;
     { last_count , last_position, void } = biss_encoder(data, biss_config);
@@ -150,23 +126,23 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
     //main loop
     while (1) {
         select {
-        case i_biss[int i].get_biss_all() -> { int out_count, int out_velocity, unsigned int out_position, unsigned int out_angle, unsigned int out_time }:
-                out_count = actual_count;
-                out_velocity = actual_velocity;
-                out_position = actual_position;
-                out_angle = actual_angle;
-                out_time = measurement_time;
-                break;
+//        case i_position_feedback[int i].get_all() -> { int out_count, int out_velocity, unsigned int out_position, unsigned int out_angle, unsigned int out_time }:
+//                out_count = actual_count;
+//                out_velocity = actual_velocity;
+//                out_position = actual_position;
+//                out_angle = actual_angle;
+//                out_time = measurement_time;
+//                break;
 
-        case i_biss[int i].get_notification() -> int out_notification:
+        case i_position_feedback[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
 
         //send electrical angle for commutation, ajusted with electrical offset
-        case i_biss[int i].get_biss_angle_velocity_position() -> { unsigned int angle, int out_velocity, int out_count }:
+        case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 t :> time;
                 if (timeafter(time, last_biss_read + biss_config.timeout)) {
-                    angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
+                    angle = read_biss_sensor_data_fast(position_feedback_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
                     t :> last_biss_read;
                     last_position = angle;
                 } else
@@ -177,45 +153,38 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                     angle = (biss_config.pole_pairs * (angle << (12-biss_config.singleturn_resolution)) + biss_config.offset_electrical ) & 4095;
                 if (biss_config.polarity == BISS_POLARITY_INVERTED) {
                     angle = (4096 - angle) & 4095;
-                    out_velocity = -velocity;
-                    out_count = -last_count;
-                } else {
-                    out_velocity = velocity;
-                    out_count = last_count;
                 }
                 break;
 
         //send singleturn position fast
-        case i_biss[int i].get_biss_position_fast() -> unsigned int position:
-                t :> time;
-                if (timeafter(time, last_biss_read + biss_config.timeout)) {
-                    position = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
-                    t :> last_biss_read;
-                    last_position = position;
-                } else
-                    position = last_position;
-                if (biss_config.polarity == BISS_POLARITY_INVERTED)
-                    position = ticks_per_turn - position;
-                break;
+//        case i_position_feedback[int i].get_position_fast() -> unsigned int position:
+//                t :> time;
+//                if (timeafter(time, last_biss_read + biss_config.timeout)) {
+//                    position = read_biss_sensor_data_fast(position_feedback_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
+//                    t :> last_biss_read;
+//                    last_position = position;
+//                } else
+//                    position = last_position;
+//                if (biss_config.polarity == BISS_POLARITY_INVERTED)
+//                    position = ticks_per_turn - position;
+//                break;
 
         //send count, position and status (error and warning bits), ajusted with count offset and polarity
-        case i_biss[int i].get_biss_position() -> { int count, unsigned int position, unsigned int status }:
+        case i_position_feedback[int i].get_position() -> { int count, unsigned int position }:
                 int count_internal;
                 t :> time;
                 if (timeafter(time, last_count_read + biss_config.timeout)) {
                     t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                    int error = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+                    int error = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
                     t :> last_biss_read;
                     last_count_read = last_biss_read;
-                    { count_internal, position, status } = biss_encoder(data, biss_config);
-                    status = status + (error << 2);
+                    { count_internal, position, void } = biss_encoder(data, biss_config);
                     update_turns(turns, last_count, count_internal, biss_config.multiturn_resolution, ticks_per_turn);
                     last_count = count_internal;
                     last_position = position;
                 } else {
                     count_internal = last_count;
                     position = last_position;
-                    status = 0;
                 }
                 //add offset
                 if (biss_config.multiturn_resolution) { //multiturn encoder
@@ -235,15 +204,14 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 if (count >= biss_config.max_ticks || count < -biss_config.max_ticks) {
                     count_offset = -count_internal;
                     count = 0;
-                    status = 0;
                     turns = 0;
                 }
                 break;
 
         //send count, position and status (error and warning bits) as returned by the encoder (not ajusted)
-        case i_biss[int i].get_biss_real_position() -> { int count, unsigned int position, unsigned int status }:
+        case i_position_feedback[int i].get_real_position() -> { int count, unsigned int position, unsigned int status }:
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                int error = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+                int error = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 { count, position, status } = biss_encoder(data, biss_config);
@@ -254,92 +222,14 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 break;
 
         //send velocity
-        case i_biss[int i].get_biss_velocity() -> int out_velocity:
+        case i_position_feedback[int i].get_velocity() -> int out_velocity:
                 out_velocity = velocity;
                 break;
 
-                //send biss information with delay (previous angle and filtered speed).
-                //FIXME: speed filter delay should be decreased, and should use current angle (not previous angle)
-        case i_biss[int i].get_biss_delayed() -> { unsigned int biss_angle, int biss_velocity, int biss_count}:
-                biss_angle    = last_angle    ;
-                biss_velocity = biss_filtered_speed ;
-                biss_count = last_position;//last_count;
-
-                flag_send_normal=0;
-                flag_angle = 1;
-                t1 :> time1;
-                break;
-
-        case flag_angle => t1 when timerafter(time1) :> void:
-                // read biss angle:
-                t :> time;
-                if (timeafter(time, last_biss_read + biss_config.timeout)) {
-                    angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
-                    t :> last_biss_read;
-                    last_position = angle;
-                } else
-                    angle = last_position;
-                if (biss_config.polarity == BISS_POLARITY_INVERTED)
-                    angle = ticks_per_turn - angle;
-                if (biss_config.singleturn_resolution > 12)
-                    angle = (biss_config.pole_pairs * (angle >> (biss_config.singleturn_resolution-12)) + biss_config.offset_electrical ) & 4095;
-                else
-                    angle = (biss_config.pole_pairs * (angle << (12-biss_config.singleturn_resolution)) + biss_config.offset_electrical ) & 4095;
-
-                last_angle = angle;// angle is now updated
-
-                read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
-                { count, position, void } = biss_encoder(data, biss_config);
-                update_turns(turns, last_count, count, biss_config.multiturn_resolution, ticks_per_turn);
-                last_count = count;
-                last_position = position;
-                if (biss_config.multiturn_resolution == 0)
-                    count += turns*ticks_per_turn;
-
-                // read biss velocity:
-                if(counter==0)
-                {
-                    first_count_sample = last_count;
-                }
-
-                counter++;
-                if(counter==20)
-                {
-                    second_count_sample = last_count;
-
-                    difference = second_count_sample - first_count_sample;
-                    if(difference > crossover || difference < -crossover)
-                        difference = old_difference;
-
-                    old_difference = difference;
-                    // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
-                            //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-                    velocity = (difference * velocity_factor) / ticks_per_turn;
-                    biss_speed = velocity;
-                    ++ biss_filter_index_newest;
-                    if( biss_filter_index_newest ==  biss_filter_order)  biss_filter_index_newest = 0;
-                    biss_filter_buffer[ biss_filter_index_newest] =  biss_speed;
-                    y = 0;
-                    speed_index = biss_filter_index_newest;
-                    for(k=0;k< biss_filter_order;k++)
-                    {
-                        y +=  f[k] *  biss_filter_buffer[speed_index];
-                        --speed_index;
-                        if(speed_index == -1)   speed_index =  biss_filter_order -1;
-                    }
-                    biss_filtered_speed = y / 1000;
-                    counter=0;
-                }
-                flag_angle=0;
-
-                break;
-
         //receive new biss_config
-        case i_biss[int i].set_biss_config(BISSConfig in_config):
+        case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 //update variables which depend on biss_config
-                if (biss_config.clock_dividend != in_config.clock_dividend || biss_config.clock_divisor != in_config.clock_divisor)
-                    configure_clock_rate(biss_ports.clk, in_config.clock_dividend, in_config.clock_divisor) ; // a/b MHz
-                biss_config = in_config;
+                biss_config = in_config.biss_config;
                 biss_data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
                 biss_before_singleturn_length = biss_config.multiturn_length + biss_config.singleturn_length - biss_config.singleturn_resolution;
                 ticks_per_turn = (1 << biss_config.singleturn_resolution);
@@ -351,21 +241,21 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
-                for (int i = 0; i < 5; i++) {
-                    i_biss[i].notification();
+                for (int i = 0; i < 3; i++) {
+                    i_position_feedback[i].notification();
                 }
 
                 break;
 
         //send biss_config
-        case i_biss[int i].get_biss_config() -> BISSConfig out_config:
-                out_config = biss_config;
+        case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
+                out_config.biss_config = biss_config;
                 break;
 
         //receive the new count to set and set the offset accordingly
-        case i_biss[int i].reset_biss_position(int new_count):
+        case i_position_feedback[int i].set_position(int new_count):
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+                read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 int count, position;
@@ -383,9 +273,9 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 break;
 
         //receive the new elecrical angle to set and set the offset accordingly
-        case i_biss[int i].reset_biss_angle_electrical(unsigned int new_angle) -> unsigned int offset:
+        case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int offset:
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+                read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 int count, angle;
@@ -402,13 +292,15 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 offset = biss_config.offset_electrical;
                 break;
 
-        //compute velocity
-        case flag_send_normal => t when timerafter(next_velocity_read) :> void:
+        case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
+                break;
 
+        //compute velocity
+        case t when timerafter(next_velocity_read) :> start_time:
             next_velocity_read += velocity_loop;
             int count, position, angle, count_internal, difference;
             t when timerafter(last_biss_read + biss_config.timeout) :> void;
-            read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
+            read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
             t :> last_biss_read;
             last_count_read = last_biss_read;
             { count, position, void } = biss_encoder(data, biss_config);
@@ -473,6 +365,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
 
             measurement_time = (end_time-start_time)/BISS_USEC;
 
+            //to prevent blocking
             if (timeafter(end_time, next_velocity_read))
                 next_velocity_read = end_time + BISS_USEC;
             break;
@@ -481,7 +374,7 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
 }
 
 
-unsigned int read_biss_sensor_data(BISSPorts & biss_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes) {
+unsigned int read_biss_sensor_data(PositionFeedbackPorts &position_feedback_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes) {
     unsigned int frame[frame_bytes];
     unsigned int crc  =  0;
     unsigned int status = 0;
@@ -495,7 +388,7 @@ unsigned int read_biss_sensor_data(BISSPorts & biss_ports, BISSConfig & biss_con
         data[i] = 0;
 
     //get the raw data
-    start_clock(biss_ports.clk);
+    start_clock(position_feedback_ports.spi_interface.blk1);
     for (int i=0; i<timeout+data_length+crc_length; i++) {
         if (bitindex == 32) {
             frame[byteindex] = readbuf;
@@ -504,15 +397,15 @@ unsigned int read_biss_sensor_data(BISSPorts & biss_ports, BISSConfig & biss_con
             byteindex++;
         }
         unsigned int bit;
-        biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-        biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-//        sync(biss_ports.p_biss_clk);
-        biss_ports.p_biss_data :> bit;
+        position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
+        position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+//        sync(position_feedback_ports.p_biss_clk);
+        position_feedback_ports.p_biss_data :> bit;
         readbuf = readbuf << 1;
         readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         bitindex++;
     }
-    configure_out_port(biss_ports.p_biss_clk, biss_ports.clk, BISS_CLK_PORT_HIGH);
+    configure_out_port(position_feedback_ports.p_biss_clk, position_feedback_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
     readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
     frame[byteindex] = readbuf;
     byteindex = 0;
@@ -572,18 +465,18 @@ unsigned int read_biss_sensor_data(BISSPorts & biss_ports, BISSConfig & biss_con
 }
 
 
-unsigned int read_biss_sensor_data_fast(BISSPorts & biss_ports, int before_length, int data_length) {
+unsigned int read_biss_sensor_data_fast(PositionFeedbackPorts &position_feedback_ports, int before_length, int data_length) {
     unsigned int data = 0;
     int status = 0;
     int timeout = 5; //3 bits to read before then the ack and start bits
 
-    start_clock(biss_ports.clk);
+    start_clock(position_feedback_ports.spi_interface.blk1);
     while(status < 2 && timeout > 0) {
         timeout--;
         unsigned int bit;
-        biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-        biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-        biss_ports.p_biss_data :> bit;
+        position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
+        position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+        position_feedback_ports.p_biss_data :> bit;
         bit = (bit & (1 << BISS_DATA_PORT_BIT));
         if (status) {
             if (bit) //status = 2, ack and start bit found
@@ -593,21 +486,21 @@ unsigned int read_biss_sensor_data_fast(BISSPorts & biss_ports, int before_lengt
     }
     if (timeout >= 0) {
         for (int i=0; i<before_length; i++) {
-            biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-            biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-            biss_ports.p_biss_data :> void;
+            position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
+            position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+            position_feedback_ports.p_biss_data :> void;
         }
         for (int i=0; i<data_length; i++) {
             unsigned int bit;
-            biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-            biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-            biss_ports.p_biss_data :> bit;
+            position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
+            position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+            position_feedback_ports.p_biss_data :> bit;
             data = data << 1;
             data |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         }
     }
-    stop_clock(biss_ports.clk);
-    configure_out_port(biss_ports.p_biss_clk, biss_ports.clk, BISS_CLK_PORT_HIGH);
+    stop_clock(position_feedback_ports.spi_interface.blk1);
+    configure_out_port(position_feedback_ports.p_biss_clk, position_feedback_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
 
     return data;
 }

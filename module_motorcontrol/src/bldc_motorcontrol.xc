@@ -25,14 +25,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
 [[combinable]]
  void bldc_loop(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontrol_config,
-                HallConfig hall_config, QEIConfig qei_config,
                 interface MotorcontrolInterface server i_motorcontrol[4],
                 chanend c_pwm_ctrl, interface ADCInterface client ?i_adc,
                 client interface shared_memory_interface ?i_shared_memory,
-                interface HallInterface client ?i_hall,
-                interface QEIInterface client ?i_qei,
-                interface BISSInterface client ?i_biss,
-                interface AMSInterface client ?i_ams,
                 interface WatchdogInterface client i_watchdog,
                 interface BrakeInterface client ?i_brake)
 {
@@ -177,22 +172,6 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 //from shared memory
                 if (!isnull(i_shared_memory)) {
                     { angle_electrical, velocity, count } = i_shared_memory.get_angle_velocity_position();
-                //directly from sensor
-                } else if (sensor_select == HALL_SENSOR) {
-                    {hall_pin_state, angle_electrical, velocity, count } = i_hall.get_hall_pinstate_angle_velocity_position();//2 - 17 usec
-                } else if (sensor_select == BISS_SENSOR) {
-                    { angle_electrical, velocity, count } = i_biss.get_biss_angle_velocity_position();
-                } else if (sensor_select == AMS_SENSOR) {
-                    { angle_electrical, velocity, count } = i_ams.get_ams_angle_velocity_position();
-                }  else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
-                    { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
-                    angle_electrical = (angle_electrical << 12) / max_count_per_hall;
-                    if ((voltage_q >= 0 && fw_flag == 0) || (voltage_q < 0 && bw_flag == 0)) {
-                        angle_electrical = i_hall.get_hall_position();
-                    }
-                } else {
-                    printstr("\n > BLDC loop feedback sensor error\n");
-                    exit(-1);
                 }
 
                 //=========== SINE commutation ============//
@@ -496,21 +475,6 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 break;
 
         case i_motorcontrol[int i].set_sensor_offset(int in_offset) -> int out_offset:
-                if (sensor_select == BISS_SENSOR ) {
-                    BISSConfig out_biss_config = i_biss.get_biss_config();
-                    if (in_offset >= 0) {
-                        out_biss_config.offset_electrical = in_offset;
-                        i_biss.set_biss_config(out_biss_config);
-                    }
-                    out_offset = out_biss_config.offset_electrical;
-                } else if (sensor_select == AMS_SENSOR ) {
-                    AMSConfig out_ams_config = i_ams.get_ams_config();
-                    if (in_offset >= 0) {
-                        out_ams_config.offset = in_offset;
-                        i_ams.set_ams_config(out_ams_config);
-                    }
-                    out_offset = out_ams_config.offset;
-                }
                 break;
 
         case i_motorcontrol[int i].set_fets_state(int new_state):
@@ -550,56 +514,10 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
         case i_motorcontrol[int i].set_calib(int in_flag) -> int out_offset:
                 calib_flag = in_flag;
-                if (calib_flag == 0) {
-                    int calib_angle;
-                    if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
-                        calib_angle = 0;
-                    } else {
-                        calib_angle = 2048;
-                    }
-                    if (sensor_select == HALL_SENSOR) {
-                        //We send the motor to 1/4 position, Hall has a 1/6 turn resolution so the offsets need to be shifted by +/- 1/12 turn
-                        out_offset = (calib_angle - i_hall.get_hall_position()) & 4095;
-                        motorcontrol_config.hall_offset[0] = (out_offset - 4096/12) & 4095;
-                        motorcontrol_config.hall_offset[1] = (out_offset + 4096/12) & 4095;
-                    } else if (sensor_select == BISS_SENSOR) {
-                        out_offset = i_biss.reset_biss_angle_electrical(calib_angle);
-                        motorcontrol_config.hall_offset[0] = 0;
-                        motorcontrol_config.hall_offset[1] = 0;
-                    } else if (sensor_select == AMS_SENSOR) {
-                        out_offset = i_ams.reset_ams_angle(calib_angle);
-                        motorcontrol_config.hall_offset[0] = 0;
-                        motorcontrol_config.hall_offset[1] = 0;
-                    }
-                } else {
+                if (calib_flag != 0) {
                     motorcontrol_config.hall_offset[0] = 0;
                     motorcontrol_config.hall_offset[1] = 0;
                 }
-                break;
-
-        case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,
-                QEIConfig in_qei_config,
-                MotorcontrolConfig in_commutation_config):
-
-                qei_config.index_type = in_qei_config.index_type;
-                qei_config.ticks_resolution = in_qei_config.ticks_resolution;
-
-                motorcontrol_config.hall_offset[0] = in_commutation_config.hall_offset[0];
-                motorcontrol_config.hall_offset[1] = in_commutation_config.hall_offset[1];
-                if (in_commutation_config.bldc_winding_type == DELTA_WINDING)
-                    motorcontrol_config.polarity_type = INVERTED_POLARITY;
-                else
-                    motorcontrol_config.polarity_type = NORMAL_POLARITY;
-                //motorcontrol_config.angle_variance = (60 * 4096) / (hall_config.pole_pairs * 2 * 360);
-
-                voltage_q = 0;
-                if (!isnull(i_hall)) {
-                    if(!isnull(i_qei))
-                        max_count_per_hall = qei_config.ticks_resolution  * QEI_CHANGES_PER_TICK / hall_config.pole_pairs;
-                }
-                fw_flag = 0;
-                bw_flag = 0;
-
                 break;
 
         case i_motorcontrol[int i].restart_watchdog():
