@@ -7,12 +7,12 @@
  * @date 17/06/2014
  */
 
-#include <pwm_server.h>
+#include <pwm_service.h>
+#include <position_feedback_service.h>
 #include <adc_service.h>
 #include <user_config.h>
-#include <tuning.h>
 #include <torque_control.h>
-#include <position_feedback_service.h>
+#include <tuning.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -30,20 +30,21 @@ int main(void) {
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
-    interface PositionControlInterface i_position_control[3];
+//    interface PositionControlInterface i_position_control[3];
     interface TuningInterface i_tuning;
-    interface shared_memory_interface i_shared_memory[2];
+    interface BrakeInterface i_brake;
     interface PositionFeedbackInterface i_position_feedback[3];
+    interface shared_memory_interface i_shared_memory[2];
     interface update_pwm i_update_pwm;
 
     par
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], null);
+        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning);
 
         /* Tuning service */
-//        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], null);
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], null, i_position_feedback[0]);
 
 //        on tile[APP_TILE_2]:
 //        /* Position Control Loop */
@@ -55,8 +56,7 @@ int main(void) {
 //            position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
 //            position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
 //            /* Control Loop */
-//            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
-//                    i_position_control);
+//            position_control_service(position_control_config, i_motorcontrol[3], i_position_control);
 //        }
 
 
@@ -64,18 +64,23 @@ int main(void) {
         {
             par
             {
-                /* PWM Service */
+                /* Triggered PWM Service */
                 {
-                    pwm_config(pwm_ports);
-                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                    delay_milliseconds(1000);
-                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm);
+                    pwm_triggered_service(pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
+
+//                    pwm_config(pwm_ports);
+//                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+//                    delay_milliseconds(1000);
+//                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm);
                 }
+                //brake
+//                i_brake.set_brake(0);
 
                 /* ADC Service */
                 {
-                    delay_milliseconds(1500);
-                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+                    adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
+//                    delay_milliseconds(1500);
+//                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
                 }
 
                 /* Watchdog Service */
@@ -84,7 +89,7 @@ int main(void) {
                     watchdog_service(wd_ports, i_watchdog);
                 }
 
-                /* Position feedback service */
+                /* Position service */
                 {
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
@@ -123,8 +128,6 @@ int main(void) {
 
                 /* Motor Control Service */
                 {
-                    delay_milliseconds(2000);
-
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.polarity_type = MOTOR_POLARITY;
@@ -134,10 +137,11 @@ int main(void) {
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                         c_pwm_ctrl, i_adc[0], i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);
 
-                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
-                            i_shared_memory[0],
-                            i_watchdog[0], null, i_motorcontrol, i_update_pwm);
+//                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
+//                                                i_shared_memory[0], i_watchdog[0], null, i_motorcontrol, i_update_pwm);
                 }
             }
         }

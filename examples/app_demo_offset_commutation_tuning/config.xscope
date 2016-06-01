@@ -33,7 +33,7 @@
     <Probe name="Angle electrical" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Angle PWM" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Cycle time" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Velocity cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="Velocity ref" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="VELOCITY_REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="VELOCITY_CMD" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
 </xSCOPEconfig>
