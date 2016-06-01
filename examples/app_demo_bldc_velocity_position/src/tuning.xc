@@ -8,6 +8,18 @@
 #include <stdio.h>
 #include <ctype.h>
 
+int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
+{
+    printf("\n\n\n\n\nsending offset_detection command ...\n");
+    i_motorcontrol.set_offset_detection_enabled();
+
+    delay_milliseconds(30000);
+
+    int offset=i_motorcontrol.set_calib(0);
+    printf("detected offset is: %i\n", offset);
+    return offset;
+}
+
 void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation,
                        interface PositionControlInterface client ?i_position_control)
 {
@@ -21,8 +33,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     int int16_I_error_limit = 5;
     int int16_integral_limit = 200;
     int int16_cmd_limit = 400;
+    int torque = 0;
 
     delay_milliseconds(2000);
+    i_commutation.set_break_status(1);
 
     i_position_control.set_velocity_pid_limits(int16_P_error_limit, int16_I_error_limit, int16_integral_limit, int16_cmd_limit);
     i_position_control.set_velocity_pid_coefficients(int8_Kp, int8_Ki, int8_Kd);
@@ -116,7 +130,29 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             }
             break;
 
+        //auto offset tuning
+        case 'a':
+            auto_offset(i_commutation);
+            break;
+
+        //set offset
+        case 'o':
+            i_commutation.set_offset_value(value);
+            printf("set offset to %d\n", value);
+            break;
+
+        //reverse torque
+        case 'r':
+            torque = -torque;
+            i_commutation.set_torque(torque);
+            printf("Torque %d\n", torque);
+            break;
+
+        //set torque
         default:
+            torque = value*sign;
+            i_commutation.set_torque(torque);
+            printf("Torque %d\n", torque);
             break;
         }
         delay_milliseconds(10);
