@@ -1,17 +1,22 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+//#include <CORE_BOARD_REQUIRED>
+//#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
+
 
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
  */
 
-#include <pwm_service.h>
+//#include <pwm_service.h>
+#include <pwm_server.h>
 #include <hall_service.h>
 #include <adc_service.h>
 #include <user_config.h>
 #include <tuning.h>
+#include <torque_control.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -43,10 +48,10 @@ int main(void) {
     chan c_pwm_ctrl, c_adctrig; // pwm channels
 
     interface WatchdogInterface i_watchdog[2];
+    interface update_pwm i_update_pwm;
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
     interface PositionControlInterface i_position_control[3];
-    interface TuningInterface i_tuning;
     interface BrakeInterface i_brake;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
     interface BISSInterface i_biss[5];
@@ -60,20 +65,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning, null);
-
-        /* Display phases currents */
-//        on tile[IFM_TILE]: adc_client(i_adc[1]);
-//        on tile[IFM_TILE]: velocity_client(i_biss[1]);
-//        on tile[IFM_TILE]: tuning_service(i_motorcontrol[1], i_adc[1], i_biss[1]);
-
-#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, i_biss[1], null);
-#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, null, i_ams[1]);
-#else
-        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], i_hall[1], null, null);
-#endif
+        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_position_control[1]);
 
         on tile[APP_TILE_2]:
         /* Position Control Loop */
@@ -84,18 +76,8 @@ int main(void) {
             position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
             position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
-            position_control_config.cascade_with_torque = 1;
             /* Control Loop */
-#if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
-                    i_position_control);
-#elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-            position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
-                    i_position_control);
-#else
-            position_control_service(position_control_config, i_hall[2], null, null, null, i_motorcontrol[3],
-                    i_position_control);
-#endif
+            position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3], i_position_control);
         }
 
 
@@ -103,15 +85,27 @@ int main(void) {
         {
             par
             {
-                /* Triggered PWM Service */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
-                i_brake.set_brake(1);
+                {
+                    /* Watchdog Service */
+                    delay_milliseconds(500);
+                    watchdog_service(wd_ports,i_watchdog);
+                }
+
+                {
+                    pwm_config(pwm_ports);
+
+//                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    delay_milliseconds(1000);
+                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm);
+                }
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
+                {
+                    delay_milliseconds(1500);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
 
-                /* Watchdog Service */
-                watchdog_service(wd_ports, i_watchdog);
+                }
+
 
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                 /* BiSS service */
@@ -153,7 +147,6 @@ int main(void) {
                     ams_config.max_ticks = 0x7fffffff;
                     ams_config.cache_time = AMS_CACHE_TIME;
                     ams_config.velocity_loop = AMS_VELOCITY_LOOP;
-
                     ams_service(ams_ports, ams_config, null, i_ams);
                 }
 #else
@@ -161,13 +154,14 @@ int main(void) {
                 {
                     HallConfig hall_config;
                     hall_config.pole_pairs = POLE_PAIRS;
-
                     hall_service(hall_ports, hall_config, null, i_hall);
                 }
 #endif
 
                 /* Motor Control Service */
                 {
+                    delay_milliseconds(2000);
+
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.polarity_type = NORMAL_POLARITY;
@@ -178,14 +172,18 @@ int main(void) {
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
+                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
+                            null, null, i_biss[0], null,
+                            i_watchdog[0], null, i_motorcontrol, i_update_pwm);
+
+//                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+//                                         c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
+//                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+//                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
 #else
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);
+//                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+//                                         c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);
 #endif
                 }
             }
