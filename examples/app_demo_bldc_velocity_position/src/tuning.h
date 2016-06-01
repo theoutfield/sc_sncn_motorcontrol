@@ -14,7 +14,6 @@
 #include <refclk.h>
 #include <adc_service.h>
 #include <position_ctrl_service.h>
-#include <profile_control.h>
 
 #include <xscope.h>
 //#include <bldc_motor_config.h>
