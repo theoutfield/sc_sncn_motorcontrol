@@ -98,6 +98,9 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
         case i_motorcontrol[int i].set_offset_detection_enabled():
             break;
 
+        case i_motorcontrol[int i].get_sensor_polarity_state() -> int proper_sensor_polarity:
+            break;
+
         case i_motorcontrol[int i].set_offset_value(int offset_value):
             break;
 

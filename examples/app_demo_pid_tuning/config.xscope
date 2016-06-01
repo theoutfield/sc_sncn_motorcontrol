@@ -36,6 +36,9 @@
     <Probe name="ANGLE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="ANGLE_ERROR" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>  
+    
+    <Probe name="BREAK_ON" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>  
+    
 
     <Probe name="TARGET_POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="ACTUAL_POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/> 

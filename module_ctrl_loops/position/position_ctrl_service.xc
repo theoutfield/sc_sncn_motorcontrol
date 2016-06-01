@@ -137,8 +137,10 @@ void position_control_service(ControlConfig &position_control_config,
 
     int config_update_flag = 1;
 
+
     int i=0;
     int offset=0;
+    int proper_sensor_polarity_state=0;
 
     MotorcontrolConfig motorcontrol_config;
 
@@ -160,10 +162,48 @@ void position_control_service(ControlConfig &position_control_config,
     t :> ts;
 
 
-//        printf("\n\n\n\n\nsending offset_detection command ...\n");
-//        i_motorcontrol.set_offset_detection_enabled();
-//        delay_milliseconds(20000);
-//
+    printf("\n\n\n\n\n enabling the control ...\n");
+    i_motorcontrol.set_torque_control_enabled();
+    delay_milliseconds(1000);
+
+    while(1)
+    {
+    printf("\nreleasing the breaks ...\n");
+    i_motorcontrol.set_break_status(1);
+    delay_milliseconds(2000);
+
+    printf("\n\n\n\n\nsending offset_detection command ...\n");
+    i_motorcontrol.set_offset_detection_enabled();
+    while(1);
+    delay_milliseconds(30000);
+
+
+    printf("\nactivating the breaks ...\n");
+    i_motorcontrol.set_break_status(0);
+    delay_milliseconds(2000);
+    }
+
+
+
+
+
+
+        proper_sensor_polarity_state = i_motorcontrol.get_sensor_polarity_state();
+
+        if(proper_sensor_polarity_state==0)
+        {
+            printf("ERROR! WRONG SENSOR POLARITY ...\n");
+            printf("CHANGE THE SENSOR POLARITY OR MOTOR TERMINALS ...\n");
+            i_motorcontrol.set_torque_control_disabled();
+            while(1);
+        }
+
+        if(proper_sensor_polarity_state==1)
+        {
+            printf("PROPER SENSOR POLARITY ...\n");
+            while(1);
+        }
+
 //
 //        offset=i_motorcontrol.set_calib(0);
 //        printf("detected offset is: %i\n", offset);

@@ -118,6 +118,13 @@ interface MotorcontrolInterface{
     void set_offset_detection_enabled();
 
     /**
+     * @brief Shows if sensor polarity is true or wrong.
+     * If the returned value is 0, then sensor polarity is wrong (sensor polarity should be changed, or motor phases should be flipped)
+     * If the returned value is 1, then sensor polarity is true.
+     */
+    int get_sensor_polarity_state();
+
+    /**
      * @brief Sets offset value
      */
     void set_offset_value(int offset_value);
@@ -180,6 +187,7 @@ interface MotorcontrolInterface{
      * @return Torque actual.
      */
     int get_torque_actual();
+
 
     /**
      * @brief Getter for actual velocity.
