@@ -262,8 +262,13 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                 //FIXME: speed filter delay should be decreased, and should use current angle (not previous angle)
         case i_biss[int i].get_biss_delayed() -> { unsigned int biss_angle, int biss_velocity, int biss_count}:
                 biss_angle    = last_angle    ;
-                biss_velocity = biss_filtered_speed ;
-                biss_count = last_position;//last_count;
+                if (biss_config.polarity == BISS_POLARITY_INVERTED) {
+                    biss_velocity = -biss_filtered_speed ;
+                    biss_count = -last_count;//last_count;
+                } else {
+                    biss_velocity = biss_filtered_speed ;
+                    biss_count = last_count;//last_count;
+                }
 
                 flag_send_normal=0;
                 flag_angle = 1;
@@ -314,7 +319,9 @@ void biss_service(BISSPorts & biss_ports, BISSConfig & biss_config, client inter
                     old_difference = difference;
                     // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
                             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-                    velocity = (difference * velocity_factor) / ticks_per_turn;
+//                    velocity = (difference * velocity_factor) / ticks_per_turn;
+                    velocity = (difference * (60000000/((int)(last_biss_read-last_velocity_read)/BISS_USEC))) / ticks_per_turn;
+                    last_velocity_read = last_biss_read;
                     biss_speed = velocity;
                     ++ biss_filter_index_newest;
                     if( biss_filter_index_newest ==  biss_filter_order)  biss_filter_index_newest = 0;
