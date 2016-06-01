@@ -25,12 +25,13 @@ int check_motorcontrol_config(MotorcontrolConfig &commutation_params)
             return ERROR;
         }
 
-        if(commutation_params.commutation_sensor != HALL_SENSOR &&
-           commutation_params.commutation_sensor != BISS_SENSOR &&
-           commutation_params.commutation_sensor != AMS_SENSOR) {
-            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL, BiSS and AMS sensors are supported as commutation sensor");
-            return ERROR;
-        }
+        //FIXME check commutation sensor
+//        if(commutation_params.commutation_sensor != HALL_SENSOR &&
+//           commutation_params.commutation_sensor != BISS_SENSOR &&
+//           commutation_params.commutation_sensor != AMS_SENSOR) {
+//            printstrln("motorcontrol_service: ERROR: Wrong configuration: just HALL, BiSS and AMS sensors are supported as commutation sensor");
+//            return ERROR;
+//        }
     }
 
     return SUCCESS;
@@ -41,10 +42,6 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             chanend c_pwm_ctrl,
                             interface ADCInterface client ?i_adc,
                             client interface shared_memory_interface ?i_shared_memory,
-                            interface HallInterface client ?i_hall,
-                            interface QEIInterface client ?i_qei,
-                            interface BISSInterface client ?i_biss,
-                            interface AMSInterface client ?i_ams,
                             interface WatchdogInterface client i_watchdog,
                             interface BrakeInterface client ?i_brake,
                             interface MotorcontrolInterface server i_motorcontrol[4])
@@ -52,17 +49,8 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
     //Set freq to 250MHz (always needed for proper timing)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    HallConfig hall_config;
-    QEIConfig qei_config;
     timer t;
     unsigned ts = 0;
-
-    if(!isnull(i_hall))
-        hall_config = i_hall.get_hall_config();
-
-    if(!isnull(i_qei)){
-        qei_config = i_qei.get_qei_config();
-    }
 
     if (check_motorcontrol_config(motorcontrol_config) == ERROR){
         return;
@@ -82,9 +70,8 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                         if(!isnull(i_adc)){
 
                             bldc_loop( fet_driver_ports, motorcontrol_config,
-                                    hall_config, qei_config,
                                     i_motorcontrol, c_pwm_ctrl, i_adc,
-                                    i_shared_memory, i_hall, i_qei, i_biss, i_ams, i_watchdog, i_brake);
+                                    i_shared_memory, i_watchdog, i_brake);
 
                         }
                         else{

@@ -10,7 +10,6 @@
 
 #include <position_ctrl_service.h>
 #include <velocity_ctrl_service.h>
-#include <torque_ctrl_service.h>
 
 /**
  * @brief Structure definition for Profiler configuration.
@@ -46,12 +45,10 @@ typedef struct{
  * @param i_qei Interface to Incremental Encoder Service (QEI)
  * @param i_biss Interface to BiSS Encoder Service (QEI)
  */
+//FIXME find a proper way to send the ticks per turn
 void init_position_profiler(ProfilerConfig profile_position_config,
                             interface PositionControlInterface client i_position_control,
-                            interface HallInterface client ?i_hall,
-                            interface QEIInterface client ?i_qei,
-                            interface BISSInterface client ?i_biss,
-                            interface AMSInterface client ?i_ams);
+                            int ticks_per_turn);
 
 /**
  * @brief Velocity Profiler Initializer. It sets the profiler configuration.
@@ -70,8 +67,8 @@ void init_velocity_profiler(ProfilerConfig profile_velocity_config,
  * @param profile_torque_config Configuration for the Torque Profiler.
  * @param i_torque_control Communication interface to the Torque Control Service.
  */
-void init_torque_profiler(ProfilerConfig profile_torque_config,
-                                interface TorqueControlInterface client i_torque_control);
+//void init_torque_profiler(ProfilerConfig profile_torque_config,
+//                                interface TorqueControlInterface client i_torque_control);
 
 /**
  * @brief Generates a profile ramp from the current position to the defined target position
@@ -105,6 +102,7 @@ void set_profile_velocity( int target_velocity, int acceleration, int decelerati
  * @param torque_slope in (mNm/s * current resolution)
  * @param i_torque_control for communicating with the Torque Control Server
  */
-void set_profile_torque( int target_torque, int torque_slope,
-                         interface TorqueControlInterface client i_torque_control );
+//FIXME
+//void set_profile_torque( int target_torque, int torque_slope,
+//                         interface TorqueControlInterface client i_torque_control );
 

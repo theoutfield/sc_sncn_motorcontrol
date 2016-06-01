@@ -44,10 +44,6 @@ int max_speed_limit(int velocity, int max_speed) {
 
 [[combinable]]
 void velocity_control_service(ControlConfig &velocity_control_config,
-                       interface HallInterface client ?i_hall,
-                       interface QEIInterface client ?i_qei,
-                       interface BISSInterface client ?i_biss,
-                       interface AMSInterface client ?i_ams,
                        interface MotorcontrolInterface client i_motorcontrol,
                        interface VelocityControlInterface server i_velocity_control[3])
 {
@@ -110,14 +106,6 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         velocity_control_out_limit = BDC_PWM_CONTROL_LIMIT;
                     }
 
-                    if (velocity_control_config.feedback_sensor != HALL_SENSOR
-                           && velocity_control_config.feedback_sensor != QEI_SENSOR
-                           && velocity_control_config.feedback_sensor != BISS_SENSOR
-                           && velocity_control_config.feedback_sensor != AMS_SENSOR) {
-                        velocity_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
-                    }
-
-
                     if (velocity_control_config.Ki_n != 0) {
                         error_velocity_I_limit = velocity_control_out_limit * PID_DENOMINATOR / velocity_control_config.Ki_n;
                     }
@@ -170,28 +158,6 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                     previous_error = error_velocity;
                 }
                 //printf("looping %d\n", velocity_control_config.Loop_time);
-                break;
-
-            case !isnull(i_hall) => i_hall.notification():
-
-                switch (i_hall.get_notification()) {
-                    case MOTCTRL_NTF_CONFIG_CHANGED:
-                        config_update_flag = 1;
-                        break;
-                    default:
-                        break;
-                }
-                break;
-
-            case !isnull(i_qei) => i_qei.notification():
-
-                switch (i_qei.get_notification()) {
-                    case MOTCTRL_NTF_CONFIG_CHANGED:
-                        config_update_flag = 1;
-                        break;
-                    default:
-                        break;
-                }
                 break;
 
             case i_motorcontrol.notification():

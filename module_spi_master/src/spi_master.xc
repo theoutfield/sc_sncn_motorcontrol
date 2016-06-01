@@ -10,7 +10,7 @@
 #include <print.h> //TODO remove
 #include "spi_master.h"
 
-unsigned sclk_val;
+//static unsigned SCLK_VAL;
 
 void spi_master_init(spi_master_interface &spi_if, unsigned spi_clock_div)
 {
@@ -20,19 +20,19 @@ void spi_master_init(spi_master_interface &spi_if, unsigned spi_clock_div)
 #if SPI_MASTER_MODE == 0
     set_port_no_inv(spi_if.sclk);
     configure_out_port(spi_if.sclk, spi_if.blk1, 0);
-    sclk_val = 0x55;
+    #define SCLK_VAL 0x55
 #elif SPI_MASTER_MODE == 1
     set_port_inv(spi_if.sclk); // invert port and values used
     configure_out_port(spi_if.sclk, spi_if.blk1, 1);
-    sclk_val = 0xAA;
+    #define SCLK_VAL 0xAA
 #elif SPI_MASTER_MODE == 2
     set_port_inv(spi_if.sclk); // invert port and values used
     configure_out_port(spi_if.sclk, spi_if.blk1, 0);
-    sclk_val = 0x55;
+    #define SCLK_VAL 0x55
 #elif SPI_MASTER_MODE == 3
     set_port_no_inv(spi_if.sclk);
     configure_out_port(spi_if.sclk, spi_if.blk1, 1);
-    sclk_val = 0xAA;
+    #define SCLK_VAL 0xAA
 #else
     #error "Unrecognised SPI mode."
 #endif
@@ -65,8 +65,8 @@ static inline unsigned char spi_master_in_byte_internal(spi_master_interface &sp
         spi_if.mosi <: 0xFF; // Pull MOSI high
     }
     clearbuf(spi_if.miso);
-    spi_if.sclk <: sclk_val;
-    spi_if.sclk <: sclk_val;
+    spi_if.sclk <: SCLK_VAL;
+    spi_if.sclk <: SCLK_VAL;
     sync(spi_if.sclk);
     spi_if.miso :> x;
     return bitrev(x) >> 24;
@@ -128,8 +128,8 @@ static inline void spi_master_out_byte_internal(spi_master_interface &spi_if, un
 #else
     spi_if.mosi <: x;
 #endif
-    spi_if.sclk <: sclk_val;
-    spi_if.sclk <: sclk_val;
+    spi_if.sclk <: SCLK_VAL;
+    spi_if.sclk <: SCLK_VAL;
     sync(spi_if.sclk);
     spi_if.miso :> void;
 }
