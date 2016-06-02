@@ -13,3 +13,10 @@
 
 void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol);
 
+/** BREAK COMMANDS */
+typedef enum BREAK_CMD
+{
+    // activating and deactivating the breaks
+    LOCK   = (0), // powering off the breaks (leads to locked joint)
+    UNLOCK = (1), // powering on the breaks  (free rotating joint)
+} BREAK_CMD;

@@ -27,13 +27,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     printf(">>  ADVANCED FOC DEMO STARTING ...\n");
 
     printf(">>   applicable commands:\n");
-    printf(">>   a        => auto offset detection\n");
-    printf(">>   b        => enable/disable the breaks\n");
-    printf(">>   t        => enable/disable torque controller\n");
-    printf(">>   ox       => set offset to x \n");
-    printf(">>   p        => print the actual offset\n");
-    printf(">>   r        => reverse the torque\n");
-    printf(">>   Enter    => set torque to 0\n");
+    printf(" a => auto offset detection,           |    b  => enable/disable the breaks\n");
+    printf(" t => enable/disable torque controller,|    ox => set offset to x \n");
+    printf(" p => print the actual offset,         |    r  => reverse the torque\n");
+    printf("                                       | Enter => set torque to 0\n");
 
     int torque_ref = 0;
     int brake_flag = 1;
