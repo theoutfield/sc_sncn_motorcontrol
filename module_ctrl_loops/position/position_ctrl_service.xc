@@ -133,7 +133,8 @@ void position_control_service(ControlConfig &position_control_config,
                 if (activate == 1) {
 
                     // velocity controller
-                    int16_velocity_k = int32_velocity_k;
+                    int16_velocity_k = int32_velocity_k * 20; //the received velocity is smaller than the int16 range and I just multiply by a big number to expand the range.
+
                     int16_velocity_temp1 = velocity_control_pid_param.int16_feedback_d_filter_1n;
                     int16_velocity_temp2 = int16_velocity_k - velocity_control_pid_param.int16_feedback_d_filter_1n;
 
