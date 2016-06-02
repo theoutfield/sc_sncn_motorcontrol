@@ -7,69 +7,69 @@
 #include <controllers_lib.h>
 
 
-void pid_init(int int8_P, int int8_I, int int8_D, int int16_P_error_limit, int int16_I_error_limit,
-              int int16_itegral_limit, int int16_cmd_limit, int int16_T_s, PIDparam &param)
+void pid_init(int int9_P, int int9_I, int int9_D, int int21_P_error_limit, int int21_I_error_limit,
+              int int22_integral_limit, int int32_cmd_limit, int int16_T_s, PIDparam &param)
 {
-    param.int8_P = int8_P;
-    param.int8_I = int8_I;
-    param.int8_D = int8_D;
-    param.int16_P_error_limit = int16_P_error_limit;
-    param.int16_I_error_limit = int16_I_error_limit;
-    param.int16_integral_limit = int16_itegral_limit;
-    param.int16_cmd_limit = int16_cmd_limit;
+    param.int9_P = int9_P;
+    param.int9_I = int9_I;
+    param.int9_D = int9_D;
+    param.int21_P_error_limit = int21_P_error_limit;
+    param.int21_I_error_limit = int21_I_error_limit;
+    param.int22_integral_limit = int22_integral_limit;
+    param.int32_cmd_limit = int32_cmd_limit;
     param.int16_T_s = int16_T_s;    //Sampling-Time in microseconds
-    param.int16_feedback_p_filter_1n = 0;
-    param.int16_feedback_d_filter_1n = 0;
-    param.int16_error_integral = 0;
+    param.int20_feedback_p_filter_1n = 0;
+    param.int20_feedback_d_filter_1n = 0;
+    param.int22_error_integral = 0;
 }
 
-void pid_set_coefficients(int int8_P, int int8_I, int int8_D, PIDparam &param)
+void pid_set_coefficients(int int9_P, int int9_I, int int9_D, PIDparam &param)
 {
-    param.int8_P = int8_P;
-    param.int8_I = int8_I;
-    param.int8_D = int8_D;
+    param.int9_P = int9_P;
+    param.int9_I = int9_I;
+    param.int9_D = int9_D;
 }
 
-void pid_set_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit, PIDparam &param)
+void pid_set_limits(int int21_P_error_limit, int int21_I_error_limit, int int22_integral_limit, int int32_cmd_limit, PIDparam &param)
 {
-    param.int16_P_error_limit = int16_P_error_limit;
-    param.int16_I_error_limit = int16_I_error_limit;
-    param.int16_integral_limit = int16_itegral_limit;
-    param.int16_cmd_limit = int16_cmd_limit;
+    param.int21_P_error_limit = int21_P_error_limit;
+    param.int21_I_error_limit = int21_I_error_limit;
+    param.int22_integral_limit = int22_integral_limit;
+    param.int32_cmd_limit = int32_cmd_limit;
 }
 
-int pid_update(int int16_setpoint, int int16_feedback_p_filter, int int16_feedback_d_filter, int int16_T_s, PIDparam &param)
+int pid_update(int int20_setpoint, int int20_feedback_p_filter, int int20_feedback_d_filter, int int16_T_s, PIDparam &param)
 {
-    int int16_P_error, int16_I_error, int16_derivative, int16_cmd;
+    int int21_P_error, int21_I_error, int21_derivative, int32_cmd;
 
-    int16_P_error = int16_setpoint - int16_feedback_p_filter;
-    if (int16_P_error > param.int16_P_error_limit)
-        int16_P_error = param.int16_P_error_limit;
-    else if (int16_P_error < -param.int16_P_error_limit)
-        int16_P_error = -param.int16_P_error_limit;
+    int21_P_error = int20_setpoint - int20_feedback_p_filter;
+    if (int21_P_error > param.int21_P_error_limit)
+        int21_P_error = param.int21_P_error_limit;
+    else if (int21_P_error < -param.int21_P_error_limit)
+        int21_P_error = -param.int21_P_error_limit;
 
-    int16_I_error = int16_P_error;
-    if (int16_I_error > param.int16_I_error_limit)
-        int16_I_error = param.int16_I_error_limit;
-    else if (int16_I_error < -param.int16_I_error_limit)
-        int16_I_error = -param.int16_I_error_limit;
+    int21_I_error = int21_P_error;
+    if (int21_I_error > param.int21_I_error_limit)
+        int21_I_error = param.int21_I_error_limit;
+    else if (int21_I_error < -param.int21_I_error_limit)
+        int21_I_error = -param.int21_I_error_limit;
 
-    param.int16_error_integral += int16_I_error;
-    if (param.int16_error_integral > param.int16_integral_limit)
-        param.int16_error_integral = param.int16_integral_limit;
-    else if (param.int16_error_integral < -param.int16_integral_limit)
-        param.int16_error_integral = -param.int16_integral_limit;
+    param.int22_error_integral += int21_I_error;
+    if (param.int22_error_integral > param.int22_integral_limit)
+        param.int22_error_integral = param.int22_integral_limit;
+    else if (param.int22_error_integral < -param.int22_integral_limit)
+        param.int22_error_integral = -param.int22_integral_limit;
 
-    int16_derivative = int16_feedback_d_filter - param.int16_feedback_d_filter_1n;
+    int21_derivative = int20_feedback_d_filter - param.int20_feedback_d_filter_1n;
 
-    int16_cmd = (((param.int8_P * int16_P_error) + (param.int8_I * param.int16_error_integral) - (param.int8_D * int16_derivative)) / INT8_DENOMINATOR);
-    if (int16_cmd > param.int16_cmd_limit)
-        int16_cmd = param.int16_cmd_limit;
-    else if (int16_cmd < -param.int16_cmd_limit)
-        int16_cmd = -param.int16_cmd_limit;
+    int32_cmd = (((param.int9_P * int21_P_error) + (param.int9_I * param.int22_error_integral) - (param.int9_D * int21_derivative)) / int9_DENOMINATOR);
+    if (int32_cmd > param.int32_cmd_limit)
+        int32_cmd = param.int32_cmd_limit;
+    else if (int32_cmd < -param.int32_cmd_limit)
+        int32_cmd = -param.int32_cmd_limit;
 
-    param.int16_feedback_p_filter_1n = int16_feedback_p_filter;
-    param.int16_feedback_d_filter_1n = int16_feedback_d_filter;
+    param.int20_feedback_p_filter_1n = int20_feedback_p_filter;
+    param.int20_feedback_d_filter_1n = int20_feedback_d_filter;
 
-    return int16_cmd;
+    return int32_cmd;
 }

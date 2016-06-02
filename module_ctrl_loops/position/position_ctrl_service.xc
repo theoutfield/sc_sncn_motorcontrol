@@ -178,7 +178,7 @@ void position_control_service(ControlConfig &position_control_config,
                                                   &float_velocity_d_measured_k, 1000, velocity_d_SO_LP_filter_param);
                     int16_velocity_d_k = ((int) float_velocity_d_k);
 
-                    int16_velocity_temp2 = int16_velocity_d_k - velocity_control_pid_param.int16_feedback_d_filter_1n;
+                    int16_velocity_temp2 = int16_velocity_d_k - velocity_control_pid_param.int20_feedback_d_filter_1n;
                     int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, int16_velocity_d_k, 1000, velocity_control_pid_param);
                     i_motorcontrol.set_torque(int16_velocity_cmd_k);
 
