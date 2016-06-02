@@ -126,7 +126,7 @@ void position_control_service(ControlConfig &position_control_config,
     t :> ts;
 
     second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/70, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
 
     pid_init(/*i1_P*/0, /*i1_I*/0, /*i1_D*/0, /*i1_P_error_limit*/0,
              /*i1_I_error_limit*/0, /*i1_itegral_limit*/0, /*i1_cmd_limit*/0, /*i1_T_s*/1000, velocity_control_pid_param);
