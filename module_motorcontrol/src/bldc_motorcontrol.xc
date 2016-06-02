@@ -17,7 +17,7 @@
 
 static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
-    unsigned int pwm[3] = {0, 0, 0};  // PWM OFF (break mode; short all phases)
+    unsigned int pwm[3] = {0, 0, 0};  // PWM OFF (brake mode; short all phases)
     pwm_share_control_buffer_address_with_server(c_pwm_ctrl, pwm_ctrl);
     update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 }
@@ -355,7 +355,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 ts = end_time + USEC_FAST;
             break;
 
-        case i_motorcontrol[int i].set_break_status(int break_status):
+        case i_motorcontrol[int i].set_brake_status(int brake_status):
             break;
 
         case i_motorcontrol[int i].set_torque_control_enabled():

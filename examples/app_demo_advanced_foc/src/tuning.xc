@@ -27,7 +27,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     printf(">>  ADVANCED FOC DEMO STARTING ...\n");
 
     printf(">>   applicable commands:\n");
-    printf(" a => auto offset detection,           |    b  => enable/disable the breaks\n");
+    printf(" a => auto offset detection,           |    b  => enable/disable the brake\n");
     printf(" t => enable/disable torque controller,|    ox => set offset to x \n");
     printf(" p => print the actual offset,         |    r  => reverse the torque\n");
     printf("                                       | Enter => set torque to 0\n");
@@ -36,7 +36,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     int brake_flag = 1;
     int torque_control_flag = 1;
 
-    i_motorcontrol.set_break_status(1);
+    i_motorcontrol.set_brake_status(1);
     i_motorcontrol.set_torque_control_enabled();
     if (!isnull(i_tuning))
         i_tuning.set_limit(position_limit);
@@ -73,7 +73,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                 brake_flag = 1;
                 printf("Brake released\n");
             }
-            i_motorcontrol.set_break_status(brake_flag);
+            i_motorcontrol.set_brake_status(brake_flag);
             break;
 
         //position limit

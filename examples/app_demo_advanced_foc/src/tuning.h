@@ -13,13 +13,13 @@
 
 
 
-/** BREAK COMMANDS */
-typedef enum BREAK_CMD
+/** BRAKE COMMANDS */
+typedef enum BRAKE_CMD
 {
-    // activating and deactivating the breaks
-    LOCK   = (0), // powering off the breaks (leads to locked joint)
-    UNLOCK = (1), // powering on the breaks  (free rotating joint)
-} BREAK_CMD;
+    // activating and deactivating the brake
+    LOCK   = (0), // powering off the brake (leads to locked joint)
+    UNLOCK = (1), // powering on the brake  (free rotating joint)
+} BRAKE_CMD;
 
 
 interface TuningInterface {

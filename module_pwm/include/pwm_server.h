@@ -42,7 +42,7 @@ typedef struct PWM_SERV_TAG
 
 interface update_pwm
 {
-    void update_server_control_data(PWM_ARRAY_TYP pwm_ctrl_s, int pwm_test, int pwm_on, int break_active);
+    void update_server_control_data(PWM_ARRAY_TYP pwm_ctrl_s, int pwm_test, int pwm_on, int brake_active);
 };
 
 void pwm_config(PwmPorts &ports);

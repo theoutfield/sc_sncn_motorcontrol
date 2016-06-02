@@ -150,36 +150,36 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     PWM_COMMS_TYP pwm_comms_s; // Structure containing PWM communication data
 
 
-    PWM_ARRAY_TYP pwm_ctrl_s_start_break ; // Structure containing double-buffered PWM output data
-    PWM_COMMS_TYP pwm_comms_s_start_break; // Structure containing PWM communication data
+    PWM_ARRAY_TYP pwm_ctrl_s_start_brake ; // Structure containing double-buffered PWM output data
+    PWM_COMMS_TYP pwm_comms_s_start_brake; // Structure containing PWM communication data
 
-    int break_active  = 0;
-    int break_counter =0;
+    int brake_active  = 0;
+    int brake_counter =0;
 
-    //parameters for starting the break
-    pwm_comms_s_start_break.params.widths[0] = 8500;
-    pwm_comms_s_start_break.params.widths[1] = 8500;
-    pwm_comms_s_start_break.params.widths[2] = 8500;
+    //parameters for starting the brake
+    pwm_comms_s_start_brake.params.widths[0] = 8500;
+    pwm_comms_s_start_brake.params.widths[1] = 8500;
+    pwm_comms_s_start_brake.params.widths[2] = 8500;
 
-    pwm_comms_s_start_break.params.id = 0; // Unique Motor identifier e.g. 0 or 1
-    pwm_comms_s_start_break.buf = 0;
+    pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+    pwm_comms_s_start_brake.buf = 0;
 
-    convert_all_pulse_widths( pwm_comms_s_start_break ,pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf] ); // Max 178 Cycles
+    convert_all_pulse_widths( pwm_comms_s_start_brake ,pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf] ); // Max 178 Cycles
 
 
-    //parameters for maintaining the break
+    //parameters for maintaining the brake
 
-    PWM_ARRAY_TYP pwm_ctrl_s_maintain_break ; // Structure containing double-buffered PWM output data
-    PWM_COMMS_TYP pwm_comms_s_maintain_break; // Structure containing PWM communication data
+    PWM_ARRAY_TYP pwm_ctrl_s_maintain_brake ; // Structure containing double-buffered PWM output data
+    PWM_COMMS_TYP pwm_comms_s_maintain_brake; // Structure containing PWM communication data
 
-    pwm_comms_s_maintain_break.params.widths[0] = 1000;
-    pwm_comms_s_maintain_break.params.widths[1] = 1000;
-    pwm_comms_s_maintain_break.params.widths[2] = 1000;
+    pwm_comms_s_maintain_brake.params.widths[0] = 1000;
+    pwm_comms_s_maintain_brake.params.widths[1] = 1000;
+    pwm_comms_s_maintain_brake.params.widths[2] = 1000;
 
-    pwm_comms_s_maintain_break.params.id = 0; // Unique Motor identifier e.g. 0 or 1
-    pwm_comms_s_maintain_break.buf = 0;
+    pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+    pwm_comms_s_maintain_brake.buf = 0;
 
-    convert_all_pulse_widths( pwm_comms_s_maintain_break ,pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf] ); // Max 178 Cycles
+    convert_all_pulse_widths( pwm_comms_s_maintain_brake ,pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf] ); // Max 178 Cycles
 
 
 
@@ -216,15 +216,15 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     {
         select
         {
-        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP recieved_pwm_ctrl_s, int recieved_pwm_test, int recieved_pwm_on, int recieved_break_active):
+        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP recieved_pwm_ctrl_s, int recieved_pwm_test, int recieved_pwm_on, int recieved_brake_active):
                 pwm_ctrl_s = recieved_pwm_ctrl_s;
 
                 pwm_on     = recieved_pwm_on;
 
-//                if(pwm_on==0) break_counter=0;
+//                if(pwm_on==0) brake_counter=0;
 
-                if(break_active != recieved_break_active) break_counter=0;
-                break_active = recieved_break_active;
+                if(brake_active != recieved_brake_active) brake_counter=0;
+                brake_active = recieved_brake_active;
 
                 pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
                 pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
@@ -246,19 +246,19 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
             ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
         }
 
-        if(break_active)
+        if(brake_active)
         {
-            if(break_counter < 15000)
+            if(brake_counter < 15000)
             {
-                break_counter++;
+                brake_counter++;
 
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
             }
             else
             {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
             }
         }
 
@@ -275,17 +275,17 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
             ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
         }
 
-        if(break_active)
+        if(brake_active)
         {
-            if(break_counter < 15000)
+            if(brake_counter < 15000)
             {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_break.buf_data[pwm_comms_s_start_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
             }
             else
             {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_break.buf_data[pwm_comms_s_maintain_break.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
             }
         }
 
