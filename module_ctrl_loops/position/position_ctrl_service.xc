@@ -150,7 +150,7 @@ void position_control_service(ControlConfig &position_control_config,
                 if (activate == 1) {
 
                     // position controller
-                    int16_position_k = int32_position_k / 1000;
+                    int16_position_k = int32_position_k / 100;
 
                     int16_position_cmd_k = pid_update(int16_position_ref_k, int16_position_k, int16_position_k, 1000, position_control_pid_param);
 
@@ -214,7 +214,7 @@ void position_control_service(ControlConfig &position_control_config,
                 break;
 
             case i_position_control[int i].set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit):
-                pid_set_limits(int16_P_error_limit, int16_I_error_limit, int16_itegral_limit, int16_cmd_limit, velocity_control_pid_param);
+                pid_set_limits(int16_P_error_limit, int16_I_error_limit, int16_itegral_limit, int16_cmd_limit, position_control_pid_param);
                 break;
 
             case i_position_control[int i].set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
