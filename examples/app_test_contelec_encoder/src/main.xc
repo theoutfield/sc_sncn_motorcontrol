@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @file app_test_contelec_rotary_sensor.xc
@@ -13,10 +13,7 @@
 #include <stdio.h>
 
 
-//SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
-//PositionFeedbackPorts position_feedback_ports = { {null, null, null}, SOMANET_IFM_AMS_PORTS};
-PositionFeedbackPorts position_feedback_ports = { QEI_PORT, QEI_PORT_INPUT_MODE_SELECTION,SOMANET_IFM_GPIO_D0,
-        {IFM_TILE_CLOCK_2, IFM_TILE_CLOCK_3, SOMANET_IFM_GPIO_D3,SOMANET_IFM_GPIO_D1,SOMANET_IFM_GPIO_D2 } };
+PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
 
 /* Test CONTELEC Sensor Client */
@@ -176,23 +173,7 @@ int main(void)
             memory_manager(i_shared_memory, 2);
 
 
-            /* CONTELEC Sensor Service */
-//            {
-//                CONTELECConfig contelec_config;
-//                contelec_config.filter = CONTELEC_FILTER;
-//                contelec_config.polarity = CONTELEC_POLARITY;
-//                contelec_config.resolution_bits = CONTELEC_RESOLUTION;
-//                contelec_config.offset = CONTELEC_OFFSET;
-//                contelec_config.pole_pairs = 2;
-//                contelec_config.timeout = CONTELEC_TIMEOUT;
-//                contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
-//                contelec_config.enable_push_service = PushAll;
-//
-//                contelec_service(spi_ports, contelec_config, i_shared_memory[0], i_position_feedback);
-//            }
-
-
-            /* Position service */
+            /* Position feedback service */
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = CONTELEC_SENSOR;

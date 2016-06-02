@@ -7,7 +7,7 @@
 #include <biss_service.h>
 #include <xclib.h>
 #include <xs1.h>
-//#include <print.h>
+#include <print.h>
 
 #include <mc_internal_constants.h>
 
@@ -60,7 +60,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
 //        return;
 //    }
 
-//    printstr(">>   SOMANET BISS SENSOR SERVICE STARTING...\n");
+    printstr(">>   SOMANET BISS SENSOR SERVICE STARTING...\n");
 
     //init variables
     //velocity
@@ -110,18 +110,18 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
         last_count = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
         t :> last_biss_read;
     } while (last_count != NoError && !timeafter(last_biss_read, time + 1000000*BISS_USEC));
-//    if (last_count == CRCError)
-//        printstrln("biss_service: ERROR: CRC");
-//    else if (last_count == NoStartBit)
-//        printstrln("biss_service: ERROR: No Start bit");
-//    else if (last_count == NoAck)
-//        printstrln("biss_service: ERROR: No Ack bit");
-//    else if (last_count != NoError)
-//        printstrln("biss_service: ERROR: initialization");
+    if (last_count == CRCError)
+        printstrln("biss_service: ERROR: CRC");
+    else if (last_count == NoStartBit)
+        printstrln("biss_service: ERROR: No Start bit");
+    else if (last_count == NoAck)
+        printstrln("biss_service: ERROR: No Ack bit");
+    else if (last_count != NoError)
+        printstrln("biss_service: ERROR: initialization");
     last_count_read = last_biss_read;
     next_velocity_read = last_biss_read;
     { last_count , last_position, void } = biss_encoder(data, biss_config);
-    count_offset = -last_count;
+//    count_offset = -last_count;
 
     //main loop
     while (1) {

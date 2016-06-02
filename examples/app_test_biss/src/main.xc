@@ -61,15 +61,11 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-//BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
-//PositionFeedbackPorts position_feedback_ports = { QEI_PORT, QEI_PORT_INPUT_MODE_SELECTION,SOMANET_IFM_GPIO_D0,
-//        {IFM_TILE_CLOCK_2, IFM_TILE_CLOCK_3, SOMANET_IFM_GPIO_D3,SOMANET_IFM_GPIO_D1,SOMANET_IFM_GPIO_D2 } };
 PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
 int main() {
     chan c_pwm_ctrl; // pwm channels
     interface WatchdogInterface i_watchdog[2];
-//    interface BISSInterface i_biss[5]; //array of interfaces for biss server
     interface BrakeInterface i_brake;
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
@@ -99,29 +95,7 @@ int main() {
             /* Shared memory Service */
             memory_manager(i_shared_memory, 2);
 
-//            /* BiSS server */
-//            {
-//                BISSConfig biss_config;
-//                biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-//                biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-//                biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-//                biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-//                biss_config.status_length = BISS_STATUS_LENGTH;
-//                biss_config.crc_poly = BISS_CRC_POLY;
-//                biss_config.pole_pairs = 2;
-//                biss_config.polarity = BISS_POLARITY;
-//                biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-//                biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-//                biss_config.timeout = BISS_TIMEOUT;
-//                biss_config.max_ticks = BISS_MAX_TICKS;
-//                biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-//                biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-//                biss_config.enable_push_service = PushAll;
-//
-//                biss_service(biss_ports, biss_config, i_shared_memory[0], i_biss);
-//            }
-
-            /* Position service */
+            /* Position feedback service */
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = BISS_SENSOR;

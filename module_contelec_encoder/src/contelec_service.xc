@@ -7,10 +7,8 @@
 
 #include <xs1.h>
 #include <contelec_service.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <timer.h>
-//#include <print.h>
+#include <print.h>
 #include <mc_internal_constants.h>
 
 
@@ -41,7 +39,7 @@ void init_position_feedback_ports(PositionFeedbackPorts &position_feedback_ports
 
     configure_out_port(position_feedback_ports.spi_interface.mosi, position_feedback_ports.spi_interface.blk2, 1); //set mosi to 1
     slave_select(position_feedback_ports.slave_select);
-    delay_ticks(10*USEC_FAST); //wait for the data buffer to fill
+    delay_ticks(10*CONTELEC_USEC); //wait for the data buffer to fill
     count = spi_master_in_short(position_feedback_ports.spi_interface);
     singleturn_filtered = spi_master_in_short(position_feedback_ports.spi_interface);
     singleturn_raw = spi_master_in_short(position_feedback_ports.spi_interface);
@@ -60,7 +58,7 @@ void contelec_encoder_write(PositionFeedbackPorts &position_feedback_ports, int 
 {
     configure_out_port(position_feedback_ports.spi_interface.mosi, position_feedback_ports.spi_interface.blk2, 1);
     slave_select(position_feedback_ports.slave_select);
-    delay_ticks(100*USEC_FAST);
+    delay_ticks(100*CONTELEC_USEC);
     spi_master_out_byte(position_feedback_ports.spi_interface, opcode);
     if (data_bits == 8) {
         spi_master_out_byte(position_feedback_ports.spi_interface, data);
@@ -69,7 +67,7 @@ void contelec_encoder_write(PositionFeedbackPorts &position_feedback_ports, int 
     }
     configure_out_port(position_feedback_ports.spi_interface.mosi, position_feedback_ports.spi_interface.blk2, 1);
     slave_deselect(position_feedback_ports.slave_select);
-    delay_ticks(200020*USEC_FAST);
+    delay_ticks(200020*CONTELEC_USEC);
 
 }
 
@@ -84,6 +82,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     { status, void, void, void } = contelec_encoder_read(position_feedback_ports);
     if (status != 0)
         return status;
+    delay_ticks(20*CONTELEC_USEC);
     //direction
     if (contelec_config.polarity == CONTELEC_POLARITY_INVERTED)
         contelec_encoder_write(position_feedback_ports, 0x55, 0x01, 8);
@@ -92,6 +91,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     //offset
     int position;
     { void, void, position, void } = contelec_encoder_read(position_feedback_ports); //read actual position
+    delay_ticks(20*CONTELEC_USEC);
     contelec_encoder_write(position_feedback_ports, 0x50, (position + contelec_config.offset) & 65535, 16); //write singleturn
     //filter
     if (contelec_config.filter == 1 || contelec_config.filter < 0 || contelec_config.filter > 9) {
@@ -100,6 +100,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     contelec_encoder_write(position_feedback_ports, 0x5B, contelec_config.filter, 8);
     //read status
     { status, void, void, void } = contelec_encoder_read(position_feedback_ports);
+    delay_ticks(20*CONTELEC_USEC);
     return status;
 }
 
@@ -124,9 +125,9 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
 //        printstrln("Wrong filter configuration");
 //        contelec_config.filter = 0x02;
 //    }
-//    if (contelec_config.timeout < 10*USEC_FAST) {
+//    if (contelec_config.timeout < 10*CONTELEC_USEC) {
 //        printstrln("Timeout time too low");
-//        contelec_config.timeout = 10*USEC_FAST;
+//        contelec_config.timeout = 10*CONTELEC_USEC;
 //    }
 //    return SUCCESS;
 //}
@@ -144,12 +145,12 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     init_position_feedback_ports(position_feedback_ports);
     int init_status = contelec_encoder_init(position_feedback_ports, contelec_config);
     if (init_status) {
-//        printstr("Error with SPI CONTELEC sensor ");
-//        printintln(init_status);
+        printstr("Error with SPI CONTELEC sensor ");
+        printintln(init_status);
         return;
     }
 
-//    printstr(">>   SOMANET CONTELEC SENSOR SERVICE STARTING...\n");
+    printstr(">>   SOMANET CONTELEC SENSOR SERVICE STARTING...\n");
 
     //init variables
     //velocity
@@ -227,7 +228,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
                 t :> start_time;
                 { status, out_count, position, void } = contelec_encoder_read(position_feedback_ports);
                 t :> last_read;
-                status = (last_read-start_time)/USEC_FAST;
+                status = (last_read-start_time)/CONTELEC_USEC;
                 last_position = position;
                 break;
 
@@ -240,7 +241,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 ticks_per_turn = (1 << in_config.contelec_config.resolution_bits);
                 in_config.contelec_config.offset &= (ticks_per_turn-1);
-                delay_ticks(10*USEC_FAST);
+                delay_ticks(10*CONTELEC_USEC);
                 //update variables which depend on contelec_config
                 if (contelec_config.offset != in_config.contelec_config.offset) {
                     contelec_encoder_init(position_feedback_ports, in_config.contelec_config);
@@ -283,7 +284,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
 //                    printstrln("error new count computation");
 //                } else {
 //                    printf("multiturn %d, singleturn %d\n", multiturn, singleturn);
-                    delay_ticks(10*USEC_FAST);
+                    delay_ticks(10*CONTELEC_USEC);
                     contelec_encoder_write(position_feedback_ports, 0x50, singleturn, 16);
                     contelec_encoder_write(position_feedback_ports, 0x59, multiturn, 16);
 //                }
@@ -299,11 +300,11 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
                 } else {
                     new_angle = (new_angle >> (12-contelec_config.resolution_bits));
                 }
-                delay_ticks(10*USEC_FAST);
+                delay_ticks(10*CONTELEC_USEC);
                 contelec_encoder_write(position_feedback_ports, 0x0, 0, 0);//reset
                 int real_position;
                 { void, void, real_position, void } = contelec_encoder_read(position_feedback_ports);
-                delay_ticks(10*USEC_FAST);
+                delay_ticks(10*CONTELEC_USEC);
                 contelec_encoder_write(position_feedback_ports, 0x50, new_angle / contelec_config.pole_pairs, 16);
                 { void, void, out_offset, void } = contelec_encoder_read(position_feedback_ports);
                 t :> last_read;
@@ -313,7 +314,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
 
         //execute command
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
-                delay_ticks(10*USEC_FAST);
+                delay_ticks(10*CONTELEC_USEC);
                 contelec_encoder_write(position_feedback_ports, opcode, data, data_bits);
                 { status, void, void, void } = contelec_encoder_read(position_feedback_ports);
                 t :> last_read;
@@ -363,7 +364,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             }
             t :> end_time;
 
-            measurement_time = (end_time-start_time)/USEC_FAST;
+            measurement_time = (end_time-start_time)/CONTELEC_USEC;
 
             //to prevent blocking
             if (timeafter(end_time, next_velocity_read))
