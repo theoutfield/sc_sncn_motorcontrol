@@ -69,13 +69,18 @@ void position_control_service(ControlConfig &position_control_config,
     int i1_torque_j_sens_offset = 0;
     int i1_torque_j_sens_offset_accumulator = 0;
 
+    // velocity controller
     PIDparam velocity_control_pid_param;
+    int int32_velocity_k = 0;
     int int16_velocity_k = 0;
     int int16_velocity_ref_k = 0;
     int int16_velocity_cmd_k = 0;
 
+    // position controller
+    int int32_position_k = 0;
     int int16_position_k = 0;
     int int16_position_ref_k = 0;
+    int int16_position_cmd_k = 0;
 
     timer t;
     unsigned int ts;
@@ -110,32 +115,43 @@ void position_control_service(ControlConfig &position_control_config,
              /*i1_I_error_limit*/0, /*i1_itegral_limit*/0, /*i1_cmd_limit*/0, /*i1_T_s*/1000, velocity_control_pid_param);
 
 
-    i_motorcontrol.set_offset_value(2440);
-    delay_milliseconds(2000);
+    i_motorcontrol.set_offset_value(3040);
+    delay_milliseconds(1000);
     i_motorcontrol.set_torque_control_enabled();
     delay_milliseconds(1000);
 
     while(1) {
 #pragma ordered
         select {
-            case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
+            case t when timerafter(ts + USEC_STD * 1000/*position_control_config.control_loop_period*/) :> ts:
+
+                int32_velocity_k = i_motorcontrol.get_velocity_actual();
+                int32_position_k = i_motorcontrol.get_position_actual();
 
                 if (activate == 1) {
-                        /* PID Controller */
+
+                    // velocity controller
+                    int16_velocity_k = int32_velocity_k;
 
                     int16_velocity_ref_k = int16_position_ref_k;
 
-                    int16_velocity_k = i_motorcontrol.get_velocity_actual();
-
                     int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, 1000, velocity_control_pid_param);
 
-                    i_motorcontrol.set_torque(int16_velocity_cmd_k);
 
+                    // position controller
+                    int16_position_k = int32_position_k / 1000;
+                    int16_position_cmd_k = int16_velocity_cmd_k;
+                    i_motorcontrol.set_torque(int16_position_cmd_k);
                 } // end control activated
 
-                        xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-                        xscope_int(VELOCITY, int16_velocity_k);
-                        xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+                xscope_int(VELOCITY_REF, int16_velocity_ref_k);
+                xscope_int(VELOCITY, int16_velocity_k);
+                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+
+                xscope_int(POSITION_REF, int16_position_ref_k);
+                xscope_int(POSITION, int16_position_k);
+                xscope_int(POSITION_CMD, int16_velocity_cmd_k);
+
 
                 break;
 
