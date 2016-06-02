@@ -67,7 +67,7 @@ int pid_update(int int16_setpoint, int int16_feedback, int int16_T_s, PIDparam &
     else if (int16_cmd < -param.int16_cmd_limit)
         int16_cmd = -param.int16_cmd_limit;
 
-    param.int16_feedback_1n = int16_derivative;
+    param.int16_feedback_1n = int16_feedback;
 
     return int16_cmd;
 }

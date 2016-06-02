@@ -75,6 +75,8 @@ void position_control_service(ControlConfig &position_control_config,
     int int16_velocity_k = 0;
     int int16_velocity_ref_k = 0;
     int int16_velocity_cmd_k = 0;
+    int int16_velocity_temp1 = 0;
+    int int16_velocity_temp2 = 0;
 
     // position controller
     int int32_position_k = 0;
@@ -132,6 +134,8 @@ void position_control_service(ControlConfig &position_control_config,
 
                     // velocity controller
                     int16_velocity_k = int32_velocity_k;
+                    int16_velocity_temp1 = velocity_control_pid_param.int16_feedback_1n;
+                    int16_velocity_temp2 = int16_velocity_k - velocity_control_pid_param.int16_feedback_1n;
 
                     int16_velocity_ref_k = int16_position_ref_k;
 
@@ -147,6 +151,8 @@ void position_control_service(ControlConfig &position_control_config,
                 xscope_int(VELOCITY_REF, int16_velocity_ref_k);
                 xscope_int(VELOCITY, int16_velocity_k);
                 xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+                xscope_int(VELOCITY_TEMP1, int16_velocity_temp1);
+                xscope_int(VELOCITY_TEMP2, int16_velocity_temp2);
 
                 xscope_int(POSITION_REF, int16_position_ref_k);
                 xscope_int(POSITION, int16_position_k);
