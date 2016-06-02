@@ -134,12 +134,12 @@ void position_control_service(ControlConfig &position_control_config,
 
                     // velocity controller
                     int16_velocity_k = int32_velocity_k;
-                    int16_velocity_temp1 = velocity_control_pid_param.int16_feedback_1n;
-                    int16_velocity_temp2 = int16_velocity_k - velocity_control_pid_param.int16_feedback_1n;
+                    int16_velocity_temp1 = velocity_control_pid_param.int16_feedback_d_filter_1n;
+                    int16_velocity_temp2 = int16_velocity_k - velocity_control_pid_param.int16_feedback_d_filter_1n;
 
                     int16_velocity_ref_k = int16_position_ref_k;
 
-                    int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, 1000, velocity_control_pid_param);
+                    int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, int16_velocity_k, 1000, velocity_control_pid_param);
 
 
                     // position controller

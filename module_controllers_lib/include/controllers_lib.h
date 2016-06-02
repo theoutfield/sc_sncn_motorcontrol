@@ -21,11 +21,11 @@ typedef struct {
     int int16_I_error_limit;
     int int16_integral_limit;
     int int16_cmd_limit;
-    int int16_feedback_1n;
+    int int16_feedback_p_filter_1n;
+    int int16_feedback_d_filter_1n;
     int int16_error_integral;
     int int16_T_s;    //Sampling-Time in microseconds
 } PIDparam;
-
 
 /**
  * @brief intializing the parameters of the PID controller.
@@ -59,4 +59,4 @@ void pid_set_limits(int int16_P_error_limit, int int16_I_error_limit, int in16_i
  * @param sample-time in us (microseconds).
  * @param the parameters of the controller
  */
-int pid_update(int int16_setpoint, int int16_feedback, int int16_T_s, PIDparam &param);
+int pid_update(int int16_setpoint, int int16_feedback_p_filter, int int16_feedback_d_filter, int int16_T_s, PIDparam &param);
