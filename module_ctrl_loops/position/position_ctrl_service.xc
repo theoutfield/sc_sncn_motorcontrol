@@ -91,6 +91,7 @@ void position_control_service(ControlConfig &position_control_config,
     int int16_velocity_temp2 = 0;
 
     // position controller
+    PIDparam position_control_pid_param;
     int int32_position_k = 0;
     int int16_position_k = 0;
     int int16_position_ref_k = 0;
@@ -130,7 +131,8 @@ void position_control_service(ControlConfig &position_control_config,
 
     pid_init(/*i1_P*/0, /*i1_I*/0, /*i1_D*/0, /*i1_P_error_limit*/0,
              /*i1_I_error_limit*/0, /*i1_itegral_limit*/0, /*i1_cmd_limit*/0, /*i1_T_s*/1000, velocity_control_pid_param);
-
+    pid_init(/*i1_P*/0, /*i1_I*/0, /*i1_D*/0, /*i1_P_error_limit*/0,
+             /*i1_I_error_limit*/0, /*i1_itegral_limit*/0, /*i1_cmd_limit*/0, /*i1_T_s*/1000, position_control_pid_param);
 
     i_motorcontrol.set_offset_value(3040);
     delay_milliseconds(1000);
@@ -147,7 +149,20 @@ void position_control_service(ControlConfig &position_control_config,
 
                 if (activate == 1) {
 
+                    // position controller
+                    int16_position_k = int32_position_k / 1000;
+
+                    int16_position_cmd_k = pid_update(int16_position_ref_k, int16_position_k, int16_position_k, 1000, position_control_pid_param);
+
+                    xscope_int(POSITION_REF, int16_position_ref_k);
+                    xscope_int(POSITION, int16_position_k);
+                    xscope_int(POSITION_CMD, int16_position_cmd_k);
+//                    xscope_int(POSITION_TEMP1, 0);
+//                    xscope_int(POSITION_TEMP2, 0);
+
+
                     // velocity controller
+                    int16_velocity_ref_k = int16_position_cmd_k;
                     float_velocity_measured_k = int32_velocity_k * 20;//the received velocity is smaller than the int16 range and I just multiply by a big number to expand the range.
                     float_velocity_d_measured_k = float_velocity_measured_k;
 
@@ -164,16 +179,9 @@ void position_control_service(ControlConfig &position_control_config,
                     int16_velocity_d_k = ((int) float_velocity_d_k);
 
                     int16_velocity_temp2 = int16_velocity_d_k - velocity_control_pid_param.int16_feedback_d_filter_1n;
-
-                    int16_velocity_ref_k = int16_position_ref_k;
-
                     int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, int16_velocity_d_k, 1000, velocity_control_pid_param);
+                    i_motorcontrol.set_torque(int16_velocity_cmd_k);
 
-
-                    // position controller
-                    int16_position_k = int32_position_k / 1000;
-                    int16_position_cmd_k = int16_velocity_cmd_k;
-                    i_motorcontrol.set_torque(int16_position_cmd_k);
 
 
                     second_order_LP_filter_shift_buffers(&float_velocity_k,
@@ -186,14 +194,10 @@ void position_control_service(ControlConfig &position_control_config,
                 } // end control activated
 
                 xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-                xscope_int(VELOCITY, int32_velocity_k * 20);//int16_velocity_k);
-                xscope_int(VELOCITY_CMD, int16_velocity_k);//int16_velocity_cmd_k);
-                xscope_int(VELOCITY_TEMP1, int16_velocity_d_k);
-                xscope_int(VELOCITY_TEMP2, int16_velocity_temp2);
-
-                xscope_int(POSITION_REF, int16_velocity_cmd_k);//int16_position_ref_k);
-                xscope_int(POSITION, int16_position_k);
-                xscope_int(POSITION_CMD, int16_velocity_cmd_k);
+                xscope_int(VELOCITY, int16_velocity_k);
+                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+//                xscope_int(VELOCITY_TEMP1, 0);
+//                xscope_int(VELOCITY_TEMP2, 0);
 
 
                 break;
@@ -203,6 +207,14 @@ void position_control_service(ControlConfig &position_control_config,
 
             case i_position_control[int i].set_position(int in_target_position):
                     int16_position_ref_k = in_target_position;
+                break;
+
+            case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
+                pid_set_coefficients(int8_Kp, int8_Ki, int8_Kd, position_control_pid_param);
+                break;
+
+            case i_position_control[int i].set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit):
+                pid_set_limits(int16_P_error_limit, int16_I_error_limit, int16_itegral_limit, int16_cmd_limit, velocity_control_pid_param);
                 break;
 
             case i_position_control[int i].set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):

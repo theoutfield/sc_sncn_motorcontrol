@@ -31,6 +31,10 @@ interface PositionControlInterface{
      */
     void set_position(int target_position);
 
+    void set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
+
+    void set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_integral_limit, int int32_cmd_limit);
+
     void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
 
     void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_integral_limit, int int32_cmd_limit);
