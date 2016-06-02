@@ -164,6 +164,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_loop = contelec_config.velocity_loop * CONTELEC_USEC; //velocity loop time in clock ticks
     int velocity_factor = 60000000/contelec_config.velocity_loop;
+    int velotity_count = 0;
     //position
     unsigned int last_position = 0;
     int count = 0;
@@ -198,9 +199,8 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
         //send electrical angle for commutation
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 t when timerafter(last_read + contelec_config.timeout) :> void;
-                { void, count, angle, void } = contelec_encoder_read(position_feedback_ports);
+                { void, count, last_position, angle } = contelec_encoder_read(position_feedback_ports);
                 t :> last_read;
-                last_position = angle;
                 if (contelec_config.resolution_bits > 12)
                     angle = (contelec_config.pole_pairs * (angle >> (contelec_config.resolution_bits-12)) ) & 4095;
                 else
@@ -224,6 +224,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
                 { status, out_count, position, void } = contelec_encoder_read(position_feedback_ports);
                 t :> last_read;
 //                status = (last_read-start_time)/CONTELEC_USEC;
+//                status = measurement_time;
                 last_position = position;
                 break;
 
@@ -318,24 +319,29 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             next_velocity_read += velocity_loop;
             int position, angle;
             t when timerafter(last_read + contelec_config.timeout) :> void;
-            { void, count, position, void } = contelec_encoder_read(position_feedback_ports);
+            { void, count, position, angle } = contelec_encoder_read(position_feedback_ports);
             t :> last_read;
             last_position = position;
-            int difference = count - old_count;
-            if(difference > crossover || difference < -crossover)
-                difference = old_difference;
-            old_count = count;
-            old_difference = difference;
-            // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
-            //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-//            velocity = (difference * velocity_factor) / ticks_per_turn;
-            velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
-            last_velocity_read = last_read;
+
+//            velotity_count++;
+//            if (velotity_count >= 10) {
+                int difference = count - old_count;
+                if(difference > crossover || difference < -crossover)
+                    difference = old_difference;
+                old_count = count;
+                old_difference = difference;
+                // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
+                //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
+                //            velocity = (difference * velocity_factor) / ticks_per_turn;
+                velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
+                last_velocity_read = last_read;
+                velotity_count = 0;
+//            }
 
             if (contelec_config.resolution_bits > 12)
-                angle = (contelec_config.pole_pairs * (position >> (contelec_config.resolution_bits-12)) ) & 4095;
+                angle = (contelec_config.pole_pairs * (angle >> (contelec_config.resolution_bits-12)) ) & 4095;
             else
-                angle = (contelec_config.pole_pairs * (position << (12-contelec_config.resolution_bits)) ) & 4095;
+                angle = (contelec_config.pole_pairs * (angle << (12-contelec_config.resolution_bits)) ) & 4095;
 
             if (!isnull(i_shared_memory)) {
                 if (contelec_config.enable_push_service == PushAll) {
