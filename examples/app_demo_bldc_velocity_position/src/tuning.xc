@@ -32,7 +32,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     int int16_P_error_limit = 10000;
     int int16_I_error_limit = 0;
     int int16_integral_limit = 0;
-    int int16_cmd_limit = 1200;
+    int int16_cmd_limit = 2000;
     int torque = 0;
 
     delay_milliseconds(2000);

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include <controllers_lib.h>
+#include <filters_lib.h>
 
 #include <position_ctrl_service.h>
 #include <a4935.h>
@@ -71,8 +72,19 @@ void position_control_service(ControlConfig &position_control_config,
 
     // velocity controller
     PIDparam velocity_control_pid_param;
+    SecondOrderLPfilterParam velocity_SO_LP_filter_param;
+    SecondOrderLPfilterParam velocity_d_SO_LP_filter_param;
     int int32_velocity_k = 0;
+    float float_velocity_measured_k = 0;
+    float float_velocity_k = 0;
+    float float_velocity_k_1n = 0;
+    float float_velocity_k_2n = 0;
+    float float_velocity_d_measured_k = 0;
+    float float_velocity_d_k = 0;
+    float float_velocity_d_k_1n = 0;
+    float float_velocity_d_k_2n = 0;
     int int16_velocity_k = 0;
+    int int16_velocity_d_k = 0;
     int int16_velocity_ref_k = 0;
     int int16_velocity_cmd_k = 0;
     int int16_velocity_temp1 = 0;
@@ -113,6 +125,9 @@ void position_control_service(ControlConfig &position_control_config,
 
     t :> ts;
 
+    second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/70, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
+
     pid_init(/*i1_P*/0, /*i1_I*/0, /*i1_D*/0, /*i1_P_error_limit*/0,
              /*i1_I_error_limit*/0, /*i1_itegral_limit*/0, /*i1_cmd_limit*/0, /*i1_T_s*/1000, velocity_control_pid_param);
 
@@ -133,29 +148,50 @@ void position_control_service(ControlConfig &position_control_config,
                 if (activate == 1) {
 
                     // velocity controller
-                    int16_velocity_k = int32_velocity_k * 20; //the received velocity is smaller than the int16 range and I just multiply by a big number to expand the range.
+                    float_velocity_measured_k = int32_velocity_k * 20;//the received velocity is smaller than the int16 range and I just multiply by a big number to expand the range.
+                    float_velocity_d_measured_k = float_velocity_measured_k;
 
-                    int16_velocity_temp1 = velocity_control_pid_param.int16_feedback_d_filter_1n;
-                    int16_velocity_temp2 = int16_velocity_k - velocity_control_pid_param.int16_feedback_d_filter_1n;
+                    second_order_LP_filter_update(&float_velocity_k,
+                                                  &float_velocity_k_1n,
+                                                  &float_velocity_k_2n,
+                                                  &float_velocity_measured_k, 1000, velocity_SO_LP_filter_param);
+                    int16_velocity_k = ((int) float_velocity_k);
+
+                    second_order_LP_filter_update(&float_velocity_d_k,
+                                                  &float_velocity_d_k_1n,
+                                                  &float_velocity_d_k_2n,
+                                                  &float_velocity_d_measured_k, 1000, velocity_d_SO_LP_filter_param);
+                    int16_velocity_d_k = ((int) float_velocity_d_k);
+
+                    int16_velocity_temp2 = int16_velocity_d_k - velocity_control_pid_param.int16_feedback_d_filter_1n;
 
                     int16_velocity_ref_k = int16_position_ref_k;
 
-                    int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, int16_velocity_k, 1000, velocity_control_pid_param);
+                    int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, int16_velocity_d_k, 1000, velocity_control_pid_param);
 
 
                     // position controller
                     int16_position_k = int32_position_k / 1000;
                     int16_position_cmd_k = int16_velocity_cmd_k;
                     i_motorcontrol.set_torque(int16_position_cmd_k);
+
+
+                    second_order_LP_filter_shift_buffers(&float_velocity_k,
+                                                         &float_velocity_k_1n,
+                                                         &float_velocity_k_2n);
+
+                    second_order_LP_filter_shift_buffers(&float_velocity_d_k,
+                                                         &float_velocity_d_k_1n,
+                                                         &float_velocity_d_k_2n);
                 } // end control activated
 
                 xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-                xscope_int(VELOCITY, int16_velocity_k);
-                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
-                xscope_int(VELOCITY_TEMP1, int16_velocity_temp1);
+                xscope_int(VELOCITY, int32_velocity_k * 20);//int16_velocity_k);
+                xscope_int(VELOCITY_CMD, int16_velocity_k);//int16_velocity_cmd_k);
+                xscope_int(VELOCITY_TEMP1, int16_velocity_d_k);
                 xscope_int(VELOCITY_TEMP2, int16_velocity_temp2);
 
-                xscope_int(POSITION_REF, int16_position_ref_k);
+                xscope_int(POSITION_REF, int16_velocity_cmd_k);//int16_position_ref_k);
                 xscope_int(POSITION, int16_position_k);
                 xscope_int(POSITION_CMD, int16_velocity_cmd_k);
 
