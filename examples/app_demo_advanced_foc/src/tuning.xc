@@ -11,17 +11,17 @@
 
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 {
-    printf("\n\n\n\n\nsending offset_detection command ...\n");
+    printf("Sending offset_detection command ...\n");
     i_motorcontrol.set_offset_detection_enabled();
 
     delay_milliseconds(30000);
 
     int offset=i_motorcontrol.set_calib(0);
-    printf("detected offset is: %i\n", offset);
+    printf("Detected offset is: %i\n", offset);
     return offset;
 }
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol)
+void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol, client interface TuningInterface ?i_tuning)
 {
     delay_milliseconds(500);
     printf(">>  ADVANCED FOC DEMO STARTING ...\n");
@@ -34,10 +34,12 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
     int torque_ref = 0;
     int brake_flag = 1;
-    int torque_control_flag = 0;
+    int torque_control_flag = 1;
 
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
     i_motorcontrol.set_break_status(1);
+    i_motorcontrol.set_torque_control_enabled();
+    if (!isnull(i_tuning))
+        i_tuning.set_limit(position_limit);
 
 
     fflush(stdout);
@@ -62,16 +64,39 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         case 'a':
             auto_offset(i_motorcontrol);
             break;
+        //set brake
         case 'b':
-            if (brake_flag)
-            {
+            if (brake_flag) {
                 brake_flag = 0;
-            }
-            else
-            {
+                printf("Brake blocking\n");
+            } else {
                 brake_flag = 1;
+                printf("Brake released\n");
             }
             i_motorcontrol.set_break_status(brake_flag);
+            break;
+
+        //position limit
+        case 'l':
+            if (!isnull(i_tuning))
+                i_tuning.set_limit(value * sign);
+            break;
+
+        //set offset
+        case 'o':
+            printf("set offset to %d\n", value);
+            i_motorcontrol.set_offset_value(value);
+            break;
+
+        //print offset
+        case 'p':
+            printf("offset %d\n", i_motorcontrol.set_calib(0));
+            break;
+        //reverse voltage
+        case 'r':
+            torque_ref = -torque_ref;
+            i_motorcontrol.set_torque(torque_ref);
+            printf("torque %d\n", torque_ref);
             break;
 
         //enable and disable torque controller
@@ -87,23 +112,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             }
             break;
 
-        //set offset
-        case 'o':
-            printf("set offset to %d\n", value);
-            i_motorcontrol.set_offset_value(value);
-            break;
-
-        //print offsets, voltage and polarity
-        case 'p':
-            printf("offset %d\n", i_motorcontrol.set_calib(0));
-            break;
-        //reverse voltage
-        case 'r':
-            torque_ref = -torque_ref;
-            i_motorcontrol.set_torque(torque_ref);
-            break;
-
-        //set torque to 0
+        //set torque
         default:
             torque_ref = value * sign;
             i_motorcontrol.set_torque(torque_ref);
@@ -115,4 +124,53 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 }
 
 
+void position_limiter(interface TuningInterface server i_tuning, client interface MotorcontrolInterface i_motorcontrol)
+{
+    timer t;
+    unsigned ts;
+    t :> ts;
+    int position_limit = 0;
+    int print_position_limit = 0;
+    int count = 0;
+    int velocity = 0;
 
+    while(1) {
+        select {
+        case t when timerafter(ts) :> void:
+
+            count = i_motorcontrol.get_position_actual();
+            velocity = i_motorcontrol.get_velocity_actual();
+
+            //postion limiter
+            if (position_limit > 0) {
+                if (count >= position_limit && velocity > 10) {
+                    i_motorcontrol.set_torque(0);
+                    if (print_position_limit >= 0) {
+                        print_position_limit = -1;
+                        printf("up limit reached\n");
+                    }
+                } else if (count <= -position_limit && velocity < -10) {
+                    i_motorcontrol.set_torque(0);
+                    if (print_position_limit <= 0) {
+                        print_position_limit = 1;
+                        printf("down limit reached\n");
+                    }
+                }
+            }
+            t :> ts;
+            ts += USEC_STD * 1000;
+            break;
+
+        case i_tuning.set_limit(int in_limit):
+            if (in_limit < 0) {
+                position_limit = in_limit;
+                printf("Position limit disabled\n");
+            } else if (in_limit > 0) {
+                printf("Position limited to %d ticks\n", in_limit);
+                position_limit = in_limit;
+            }
+            break;
+
+        }//end select
+    }//end while
+}//end function
