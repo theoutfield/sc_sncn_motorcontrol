@@ -216,15 +216,15 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     {
         select
         {
-        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP recieved_pwm_ctrl_s, int recieved_pwm_test, int recieved_pwm_on, int recieved_brake_active):
-                pwm_ctrl_s = recieved_pwm_ctrl_s;
+        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP received_pwm_ctrl_s, int received_pwm_test, int received_pwm_on, int received_brake_active):
+                pwm_ctrl_s = received_pwm_ctrl_s;
 
-                pwm_on     = recieved_pwm_on;
+                pwm_on     = received_pwm_on;
 
 //                if(pwm_on==0) brake_counter=0;
 
-                if(brake_active != recieved_brake_active) brake_counter=0;
-                brake_active = recieved_brake_active;
+                if(brake_active != received_brake_active) brake_counter=0;
+                brake_active = received_brake_active;
 
                 pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
                 pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
