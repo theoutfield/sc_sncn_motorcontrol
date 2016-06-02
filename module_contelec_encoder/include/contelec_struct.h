@@ -22,6 +22,17 @@
 #define CONTELEC_POLARITY_NORMAL      0
 #define CONTELEC_POLARITY_INVERTED    1
 
+#define CONTELEC_CTRL_RESET         0x00
+#define CONTELEC_CONF_DIR           0x55
+#define CONTELEC_CONF_NULL          0x56
+#define CONTELEC_CONF_PRESET        0x57
+#define CONTELEC_CONF_STPRESET      0x50
+#define CONTELEC_CONF_MTPRESET      0x59
+#define CONTELEC_CONF_FILTER        0x5B
+#define CONTELEC_CALIB_TBL_SIZE     0x3D
+#define CONTELEC_CALIB_TBL_POINT    0x3E
+#define CONTELEC_CTRL_SAVE          0x1C
+
 
 /**
  * @brief Structure type to define the Encoder Service configuration.

@@ -35,7 +35,7 @@ void contelec_encoder_test(client interface PositionFeedbackInterface i_position
         {count, position} = i_position_feedback.get_position();
 
         /* get angle and velocity from CONTELEC Sensor */
-        velocity = i_position_feedback.get_velocity();
+//        velocity = i_position_feedback.get_velocity();
 
         //electrical_angle = i_position_feedback.get_angle();
 
@@ -48,8 +48,8 @@ void contelec_encoder_test(client interface PositionFeedbackInterface i_position
         xscope_int(POSITION, position);
         xscope_int(ANGLE, electrical_angle);
         xscope_int(VELOCITY, velocity);
-//        xscope_int(STATUS, status*1000);
-        xscope_int(TIME, status);
+        xscope_int(STATUS, status*1000);
+//        xscope_int(TIME, status);
 
         delay_microseconds(10);
     }
@@ -90,21 +90,22 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
             break;
         //set calibration point
         case 'c':
-            i_position_feedback.send_command(0x3E, value, 16);
+            i_position_feedback.send_command(CONTELEC_CALIB_TBL_POINT, value, 16);
             printf("set calibration point %d\n", value);
             break;
         //change direction
         case 'd':
-            i_position_feedback.send_command(0x55, value, 8);
+            i_position_feedback.send_command(CONTELEC_CONF_DIR, value, 8);
             printf("direction %d\n", value);
             break;
         //filter
         case 'f':
-            i_position_feedback.send_command(0x5B, value, 8);
+            i_position_feedback.send_command(CONTELEC_CONF_FILTER, value, 8);
             printf("filter %d\n", value);
             break;
         //set offset
         case 'o':
+            position_feedback_config = i_position_feedback.get_config();
             position_feedback_config.contelec_config.offset = value * sign;
             i_position_feedback.set_config(position_feedback_config);
             printf("offset %d\n", value * sign);
@@ -115,33 +116,33 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
             break;
         //set multiturn
         case 'm':
-            i_position_feedback.send_command(0x59, value*sign, 16);
+            i_position_feedback.send_command(CONTELEC_CONF_MTPRESET, value*sign, 16);
             printf("multiturn\n");
             break;
         //reset sensor
         case 'r':
-            i_position_feedback.send_command(0x00, 0, 0);
+            i_position_feedback.send_command(CONTELEC_CTRL_RESET, 0, 0);
             printf("reset\n");
             break;
         //set singleturn
         case 's':
-            i_position_feedback.send_command(0x50, value, 16);
+            i_position_feedback.send_command(CONTELEC_CONF_STPRESET, value, 16);
             printf("singleturn\n");
             break;
         //calibration table size
         case 't':
-            i_position_feedback.send_command(0x3D, value, 16);
+            i_position_feedback.send_command(CONTELEC_CALIB_TBL_SIZE, value, 16);
             printf("calibration table size %d\n", value);
             break;
         //save
         case 'v':
-            i_position_feedback.send_command(0x1C, 0, 0);
-            i_position_feedback.send_command(0x00, 0, 0);
+            i_position_feedback.send_command(CONTELEC_CTRL_SAVE, 0, 0);
+            i_position_feedback.send_command(CONTELEC_CTRL_RESET, 0, 0);
             printf("save\n");
             break;
         //set zero position
         case 'z':
-            i_position_feedback.send_command(0x56, 0, 0);
+            i_position_feedback.send_command(CONTELEC_CONF_NULL, 0, 0);
             printf("zero\n");
             break;
         //print the count and the time to get it
