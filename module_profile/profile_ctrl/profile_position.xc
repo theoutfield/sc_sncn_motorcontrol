@@ -9,12 +9,7 @@
 #include <profile.h>
 #include <profile_control.h>
 
-void init_position_profiler(ProfilerConfig profile_position_config,
-                            interface PositionControlInterface client i_position_control,
-                            int ticks_per_turn) {
-
-    ControlConfig control_config = i_position_control.get_position_control_config();
-
+void init_position_profiler(ProfilerConfig profile_position_config) {
 
     if(profile_position_config.max_acceleration <= 0 ||
             profile_position_config.max_velocity <= 0){
@@ -24,9 +19,9 @@ void init_position_profiler(ProfilerConfig profile_position_config,
 
     init_position_profile_limits(profile_position_config.max_acceleration,
                                  profile_position_config.max_velocity,
-                                 control_config.feedback_sensor, ticks_per_turn,
                                  profile_position_config.max_position,
-                                 profile_position_config.min_position);
+                                 profile_position_config.min_position,
+                                 profile_position_config.ticks_per_turn);
 }
 
 void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,

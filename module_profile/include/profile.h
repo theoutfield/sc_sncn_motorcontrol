@@ -14,7 +14,6 @@
 #include <mc_internal_constants.h>
 #include <hall_service.h>
 #include <qei_service.h>
-#include <biss_service.h>
 #include <ams_service.h>
 #include <xccompat.h>
 
@@ -79,7 +78,7 @@ extern int velocity_profile_generate(int step);
  * @param min_position
  *
  */
-extern void init_position_profile_limits(int max_acceleration, int max_velocity, int sensor_select, int ticks_per_turn, int max_position, int min_position);
+extern void init_position_profile_limits(int max_acceleration, int max_velocity, int max_position, int min_position, int ticks_per_turn);
 
 /**
  * @brief Initialize Position Profile
@@ -204,7 +203,6 @@ typedef struct
 
     QEIConfig qei_params;
     HallConfig hall_params;
-    BISSConfig biss_params;
     AMSConfig ams_params;
     int sensor_used;
     float max_position;

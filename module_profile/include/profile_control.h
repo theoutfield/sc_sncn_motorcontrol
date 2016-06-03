@@ -21,6 +21,7 @@ typedef struct{
     int velocity;   /**< Default velocity for Position Profile ramps generation [RPM]. */
     int max_position;    /**< Max. reachable position. */
     int min_position;    /**< Min. reachable position. */
+    int ticks_per_turn;  /**< Number of ticks per turn. */
 
     //Velocity
     int acceleration;    /**< Default acceleration for Velocity Profile ramps generation [RPM/s].  */
@@ -46,9 +47,7 @@ typedef struct{
  * @param i_biss Interface to BiSS Encoder Service (QEI)
  */
 //FIXME find a proper way to send the ticks per turn
-void init_position_profiler(ProfilerConfig profile_position_config,
-                            interface PositionControlInterface client i_position_control,
-                            int ticks_per_turn);
+void init_position_profiler(ProfilerConfig profile_position_config);
 
 /**
  * @brief Velocity Profiler Initializer. It sets the profiler configuration.

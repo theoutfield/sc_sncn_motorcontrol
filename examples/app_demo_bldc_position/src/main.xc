@@ -44,13 +44,14 @@ void position_profile_test(interface PositionControlInterface client i_position_
     profiler_config.polarity = POLARITY;
     profiler_config.max_position = MAX_POSITION_LIMIT;
     profiler_config.min_position = MIN_POSITION_LIMIT;
+    profiler_config.ticks_per_turn = ticks_per_turn;
 
     profiler_config.max_velocity = MAX_VELOCITY;
     profiler_config.max_acceleration = MAX_ACCELERATION;
     profiler_config.max_deceleration = MAX_DECELERATION;
 
     /* Initialise the position profile generator */
-    init_position_profiler(profiler_config, i_position_control, ticks_per_turn);
+    init_position_profiler(profiler_config);
 
     delay_milliseconds(500);//let the servers start before sending client requests
 
