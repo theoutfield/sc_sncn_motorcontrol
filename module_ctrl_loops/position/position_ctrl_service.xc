@@ -20,7 +20,7 @@
 
 
 
-void position_control_service(ControlConfig &position_control_config,
+void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ctrl_config,
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionControlInterface server i_position_control[3])
 {
@@ -33,8 +33,6 @@ void position_control_service(ControlConfig &position_control_config,
     int int16_position_ref_k = 0;
     int int16_position_ref_k_in = 0;
     int int16_position_cmd_k = 0;
-    int position_ref_min_limit = 0;
-    int position_ref_max_limit = 0;
 
     // velocity controller
     int int1_velocity_enable_flag = 0;
@@ -57,14 +55,10 @@ void position_control_service(ControlConfig &position_control_config,
     int int16_velocity_cmd_k = 0;
     int int16_velocity_temp1 = 0;
     int int16_velocity_temp2 = 0;
-    int velocity_ref_min_limit = 0;
-    int velocity_ref_max_limit = 0;
 
     // torque
     int int1_torque_enable_flag = 0;
     int int16_torque_ref = 0;
-    int torque_ref_min_limit = 0;
-    int torque_ref_max_limit = 0;
 
 
     timer t;
@@ -74,10 +68,16 @@ void position_control_service(ControlConfig &position_control_config,
     second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_SO_LP_filter_param);
     second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
 
-    pid_init(/*i1_P*/0, /*i1_I*/0, /*i1_D*/0, /*i1_P_error_limit*/0,
-             /*i1_I_error_limit*/0, /*i1_itegral_limit*/0, /*i1_cmd_limit*/0, /*i1_T_s*/1000, velocity_control_pid_param);
-    pid_init(/*i1_P*/0, /*i1_I*/0, /*i1_D*/0, /*i1_P_error_limit*/0,
-             /*i1_I_error_limit*/0, /*i1_itegral_limit*/0, /*i1_cmd_limit*/0, /*i1_T_s*/1000, position_control_pid_param);
+    pid_init(pos_velocity_ctrl_config.int9_P_velocity, pos_velocity_ctrl_config.int9_I_velocity, pos_velocity_ctrl_config.int9_D_velocity,
+             pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity,
+             pos_velocity_ctrl_config.int22_integral_limit_velocity, pos_velocity_ctrl_config.int32_cmd_limit_velocity,
+             pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+
+    pid_init(pos_velocity_ctrl_config.int9_P_position, pos_velocity_ctrl_config.int9_I_position, pos_velocity_ctrl_config.int9_D_position,
+             pos_velocity_ctrl_config.int21_P_error_limit_position, pos_velocity_ctrl_config.int21_I_error_limit_position,
+             pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.int32_cmd_limit_position,
+             pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+
 
     i_motorcontrol.set_offset_value(3040);
     delay_milliseconds(1000);
@@ -100,10 +100,10 @@ void position_control_service(ControlConfig &position_control_config,
                 if (int1_position_enable_flag == 1) {
                     int20_position_k = int32_position_k / 100;
                     int16_position_ref_k = int16_position_ref_k_in;
-                    if(int16_position_ref_k > position_ref_max_limit)
-                        int16_position_ref_k = position_ref_max_limit;
-                    else if (int16_position_ref_k < position_ref_min_limit)
-                        int16_position_ref_k = position_ref_min_limit;
+                    if(int16_position_ref_k > pos_velocity_ctrl_config.int21_target_max_position)
+                        int16_position_ref_k = pos_velocity_ctrl_config.int21_target_max_position;
+                    else if (int16_position_ref_k < pos_velocity_ctrl_config.int21_target_min_position)
+                        int16_position_ref_k = pos_velocity_ctrl_config.int21_target_min_position;
 
                     int16_position_cmd_k = pid_update(int16_position_ref_k, int20_position_k, int20_position_k, 1000, position_control_pid_param);
                     int16_velocity_ref_k = int16_position_cmd_k;
@@ -115,10 +115,10 @@ void position_control_service(ControlConfig &position_control_config,
 
                 // velocity control
                 if (int1_velocity_enable_flag == 1 || int1_position_enable_flag == 1) {
-                    if (int16_velocity_ref_k > velocity_ref_max_limit)
-                        int16_velocity_ref_k = velocity_ref_max_limit;
-                    else if (int16_velocity_ref_k < velocity_ref_min_limit)
-                        int16_velocity_ref_k = velocity_ref_min_limit;
+                    if (int16_velocity_ref_k > pos_velocity_ctrl_config.int21_target_max_velocity)
+                        int16_velocity_ref_k = pos_velocity_ctrl_config.int21_target_max_velocity;
+                    else if (int16_velocity_ref_k < pos_velocity_ctrl_config.int21_target_min_velocity)
+                        int16_velocity_ref_k = pos_velocity_ctrl_config.int21_target_min_velocity;
 
                     float_velocity_measured_k = int32_velocity_k * 20;//the received velocity is smaller than the int16 range and I just multiply by a big number to expand the range.
                     float_velocity_d_measured_k = float_velocity_measured_k;
@@ -140,10 +140,10 @@ void position_control_service(ControlConfig &position_control_config,
 
                     int16_velocity_cmd_k /= 127;
 
-                    if(int16_velocity_cmd_k > torque_ref_max_limit)
-                        int16_velocity_cmd_k = torque_ref_max_limit;
-                    else if (int16_velocity_cmd_k < torque_ref_min_limit)
-                        int16_velocity_cmd_k = torque_ref_min_limit;
+                    if(int16_velocity_cmd_k > pos_velocity_ctrl_config.int21_target_max_torque)
+                        int16_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_max_torque;
+                    else if (int16_velocity_cmd_k < pos_velocity_ctrl_config.int21_target_min_torque)
+                        int16_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_min_torque;
                     i_motorcontrol.set_torque(int16_velocity_cmd_k);
 
 
@@ -161,14 +161,14 @@ void position_control_service(ControlConfig &position_control_config,
 
 
 
-                xscope_int(POSITION_REF, int32_position_k / 100);//int16_position_ref_k);
-                xscope_int(POSITION, int20_position_k);
-                xscope_int(POSITION_CMD, int16_position_cmd_k);
+//                xscope_int(POSITION_REF, int32_position_k / 100);//int16_position_ref_k);
+//                xscope_int(POSITION, int20_position_k);
+//                xscope_int(POSITION_CMD, int16_position_cmd_k);
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
-                xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-                xscope_int(VELOCITY, int32_velocity_k);//int16_velocity_k);
-                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+//                xscope_int(VELOCITY_REF, int16_velocity_ref_k);
+//                xscope_int(VELOCITY, int32_velocity_k);//int16_velocity_k);
+//                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
 //                xscope_int(VELOCITY_TEMP1, 0);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
@@ -196,8 +196,8 @@ void position_control_service(ControlConfig &position_control_config,
                 pid_set_limits(int16_P_error_limit, int16_I_error_limit, int16_itegral_limit, int16_cmd_limit, position_control_pid_param);
                 break;
             case i_position_control[int i].set_position_limits(int position_min_limit, int position_max_limit):
-                position_ref_min_limit = position_min_limit;
-                position_ref_max_limit = position_max_limit;
+                pos_velocity_ctrl_config.int21_target_min_position = position_min_limit;
+                pos_velocity_ctrl_config.int21_target_max_position = position_max_limit;
                 break;
 
 
@@ -218,8 +218,8 @@ void position_control_service(ControlConfig &position_control_config,
                 pid_set_limits(int16_P_error_limit, int16_I_error_limit, int16_itegral_limit, int16_cmd_limit, velocity_control_pid_param);
                 break;
             case i_position_control[int i].set_velocity_limits(int velocity_min_limit, int velocity_max_limit):
-                velocity_ref_min_limit = velocity_min_limit;
-                velocity_ref_max_limit = velocity_max_limit;
+                pos_velocity_ctrl_config.int21_target_min_velocity = velocity_min_limit;
+                pos_velocity_ctrl_config.int21_target_max_velocity = velocity_max_limit;
                 break;
 
             case i_position_control[int i].enable_torque_ctrl():
@@ -232,8 +232,8 @@ void position_control_service(ControlConfig &position_control_config,
                 int16_torque_ref = in_target_torque;
                 break;
             case i_position_control[int i].set_torque_limits(int torque_min_limit, int torque_max_limit):
-                torque_ref_min_limit = torque_min_limit;
-                torque_ref_max_limit = torque_max_limit;
+                pos_velocity_ctrl_config.int21_target_min_torque = torque_min_limit;
+                pos_velocity_ctrl_config.int21_target_max_torque = torque_max_limit;
                 break;
 
 

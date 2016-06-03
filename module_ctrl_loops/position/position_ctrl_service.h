@@ -136,6 +136,6 @@ interface PositionControlInterface{
  * @param i_motorcontrol Communication interface to the Motor Control Service.
  * @param i_position_control Array of communication interfaces to handle up to 3 different clients.
  */
-void position_control_service(ControlConfig & position_ctrl_config,
+void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_control_config,
                     interface MotorcontrolInterface client i_motorcontrol,
                     interface PositionControlInterface server i_position_control[3]);
