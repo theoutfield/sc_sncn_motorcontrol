@@ -12,6 +12,8 @@
 
 
 void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol);
+void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol);
+
 
 /** BREAK COMMANDS */
 typedef enum BREAK_CMD
