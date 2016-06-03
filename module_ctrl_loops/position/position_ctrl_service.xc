@@ -19,10 +19,15 @@
 
 
 
+void init_position_velocity_control(interface PositionVelocityCtrlInterface client i_position_control)
+{
+
+}
+
 
 void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ctrl_config,
                               interface MotorcontrolInterface client i_motorcontrol,
-                              interface PositionControlInterface server i_position_control[3])
+                              interface PositionVelocityCtrlInterface server i_position_control[3])
 {
 
     // position controller
@@ -234,6 +239,14 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
             case i_position_control[int i].set_torque_limits(int torque_min_limit, int torque_max_limit):
                 pos_velocity_ctrl_config.int21_target_min_torque = torque_min_limit;
                 pos_velocity_ctrl_config.int21_target_max_torque = torque_max_limit;
+                break;
+
+            case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
+                    pos_velocity_ctrl_config = in_config;
+                break;
+
+            case i_position_control[int i].get_position_velocity_control_config() ->  PosVelocityControlConfig out_config:
+                    out_config = pos_velocity_ctrl_config;
                 break;
 
 

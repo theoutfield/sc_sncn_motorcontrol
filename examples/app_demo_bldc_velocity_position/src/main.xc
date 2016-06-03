@@ -33,7 +33,7 @@ int main(void) {
     interface update_pwm i_update_pwm;
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
-    interface PositionControlInterface i_position_control[3];
+    interface PositionVelocityCtrlInterface i_position_control[3];
     interface PositionFeedbackInterface i_position_feedback[3];
     interface shared_memory_interface i_shared_memory[2];
 

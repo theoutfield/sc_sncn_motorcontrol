@@ -20,4 +20,4 @@
 #include <mc_internal_constants.h>
 #include <user_config.h>
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface PositionControlInterface client ?i_position_control);
+void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface PositionVelocityCtrlInterface client ?i_position_control);

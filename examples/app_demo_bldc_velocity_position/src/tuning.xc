@@ -21,7 +21,7 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 }
 
 void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation,
-                       interface PositionControlInterface client ?i_position_control)
+                       interface PositionVelocityCtrlInterface client ?i_position_control)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
