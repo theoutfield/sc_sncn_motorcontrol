@@ -33,31 +33,31 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     // position controller
     int int1_position_enable_flag = 0;
     PIDparam position_control_pid_param;
-    int int32_position_k = 0;
+    int int20_position_k_sens = 0;
     int int20_position_k = 0; // range: -7FFFF to 7FFFF  OR  -524287 to 524287
-    int int16_position_ref_k = 0;
-    int int16_position_ref_k_in = 0;
-    int int16_position_cmd_k = 0;
+    int int20_position_ref_k = 0;
+    int int20_position_ref_k_in = 0;
+    int int31_position_cmd_k = 0;
 
     // velocity controller
     int int1_velocity_enable_flag = 0;
     PIDparam velocity_control_pid_param;
     SecondOrderLPfilterParam velocity_SO_LP_filter_param;
     SecondOrderLPfilterParam velocity_d_SO_LP_filter_param;
-    int int32_velocity_k = 0;
-    float float_velocity_measured_k = 0;
-    float float_velocity_k = 0;
-    float float_velocity_k_1n = 0;
-    float float_velocity_k_2n = 0;
-    float float_velocity_d_measured_k = 0;
-    float float_velocity_d_k = 0;
-    float float_velocity_d_k_1n = 0;
-    float float_velocity_d_k_2n = 0;
     int int16_velocity_k = 0;
-    int int16_velocity_d_k = 0;
-    int int16_velocity_ref_k = 0;
-    int int16_velocity_ref_k_in = 0;
-    int int16_velocity_cmd_k = 0;
+    float flt20_velocity_measured_k = 0;
+    float flt20_velocity_k = 0;
+    float flt20_velocity_k_1n = 0;
+    float flt20_velocity_k_2n = 0;
+    float flt20_velocity_d_measured_k = 0;
+    float flt20_velocity_d_k = 0;
+    float flt20_velocity_d_k_1n = 0;
+    float flt20_velocity_d_k_2n = 0;
+    int int20_velocity_k = 0;
+    int int20_velocity_d_k = 0;
+    int int20_velocity_ref_k = 0;
+    int int20_velocity_ref_k_in = 0;
+    int int32_velocity_cmd_k = 0;
     int int16_velocity_temp1 = 0;
     int int16_velocity_temp2 = 0;
 
@@ -89,7 +89,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     i_motorcontrol.set_torque_control_enabled();
     delay_milliseconds(1000);
 
-//    int16_position_ref_k = i_motorcontrol.get_position_actual();
+//    int20_position_ref_k = i_motorcontrol.get_position_actual();
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
     t :> ts;
@@ -98,82 +98,82 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
         select {
             case t when timerafter(ts + USEC_STD * 1000/*position_control_config.control_loop_period*/) :> ts:
 
-                int32_velocity_k = i_motorcontrol.get_velocity_actual();
-                int32_position_k = i_motorcontrol.get_position_actual();
+                int16_velocity_k = i_motorcontrol.get_velocity_actual();
+                int20_position_k_sens = i_motorcontrol.get_position_actual();
 
                 // position control
                 if (int1_position_enable_flag == 1) {
-                    int20_position_k = int32_position_k / 100;
-                    int16_position_ref_k = int16_position_ref_k_in;
-                    if(int16_position_ref_k > pos_velocity_ctrl_config.int21_target_max_position)
-                        int16_position_ref_k = pos_velocity_ctrl_config.int21_target_max_position;
-                    else if (int16_position_ref_k < pos_velocity_ctrl_config.int21_target_min_position)
-                        int16_position_ref_k = pos_velocity_ctrl_config.int21_target_min_position;
+                    int20_position_k = int20_position_k_sens;// / 100; //100 ro bayad hazf konim
+                    int20_position_ref_k = int20_position_ref_k_in;
+                    if(int20_position_ref_k > pos_velocity_ctrl_config.int21_target_max_position)
+                        int20_position_ref_k = pos_velocity_ctrl_config.int21_target_max_position;
+                    else if (int20_position_ref_k < pos_velocity_ctrl_config.int21_target_min_position)
+                        int20_position_ref_k = pos_velocity_ctrl_config.int21_target_min_position;
 
-                    int16_position_cmd_k = pid_update(int16_position_ref_k, int20_position_k, int20_position_k, 1000, position_control_pid_param);
-                    int16_velocity_ref_k = int16_position_cmd_k;
+                    // PID parameters should be int8
+                    int31_position_cmd_k = pid_update(int20_position_ref_k, int20_position_k, int20_position_k, 1000, position_control_pid_param);
+                    int20_velocity_ref_k = int31_position_cmd_k / 2048; //use 11 times shift to right
                 }
                 else if (int1_position_enable_flag == 0)
-                    int16_velocity_ref_k = int16_velocity_ref_k_in;
+                    int20_velocity_ref_k = int20_velocity_ref_k_in;
 
 
 
                 // velocity control
                 if (int1_velocity_enable_flag == 1 || int1_position_enable_flag == 1) {
-                    if (int16_velocity_ref_k > pos_velocity_ctrl_config.int21_target_max_velocity)
-                        int16_velocity_ref_k = pos_velocity_ctrl_config.int21_target_max_velocity;
-                    else if (int16_velocity_ref_k < pos_velocity_ctrl_config.int21_target_min_velocity)
-                        int16_velocity_ref_k = pos_velocity_ctrl_config.int21_target_min_velocity;
+                    if (int20_velocity_ref_k > pos_velocity_ctrl_config.int21_target_max_velocity) //int21_target_max_velocity should be int20
+                        int20_velocity_ref_k = pos_velocity_ctrl_config.int21_target_max_velocity;
+                    else if (int20_velocity_ref_k < pos_velocity_ctrl_config.int21_target_min_velocity)
+                        int20_velocity_ref_k = pos_velocity_ctrl_config.int21_target_min_velocity;
 
-                    float_velocity_measured_k = int32_velocity_k * 20;//the received velocity is smaller than the int16 range and I just multiply by a big number to expand the range.
-                    float_velocity_d_measured_k = float_velocity_measured_k;
+                    flt20_velocity_measured_k = int16_velocity_k * 16; //use 4 times shit to left
+                    flt20_velocity_d_measured_k = flt20_velocity_measured_k;
 
-                    second_order_LP_filter_update(&float_velocity_k,
-                                                  &float_velocity_k_1n,
-                                                  &float_velocity_k_2n,
-                                                  &float_velocity_measured_k, 1000, velocity_SO_LP_filter_param);
-                    int16_velocity_k = ((int) float_velocity_k);
+                    second_order_LP_filter_update(&flt20_velocity_k,
+                                                  &flt20_velocity_k_1n,
+                                                  &flt20_velocity_k_2n,
+                                                  &flt20_velocity_measured_k, 1000, velocity_SO_LP_filter_param);
+                    int20_velocity_k = ((int) flt20_velocity_k);
 
-                    second_order_LP_filter_update(&float_velocity_d_k,
-                                                  &float_velocity_d_k_1n,
-                                                  &float_velocity_d_k_2n,
-                                                  &float_velocity_d_measured_k, 1000, velocity_d_SO_LP_filter_param);
-                    int16_velocity_d_k = ((int) float_velocity_d_k);
+                    second_order_LP_filter_update(&flt20_velocity_d_k,
+                                                  &flt20_velocity_d_k_1n,
+                                                  &flt20_velocity_d_k_2n,
+                                                  &flt20_velocity_d_measured_k, 1000, velocity_d_SO_LP_filter_param);
+                    int20_velocity_d_k = ((int) flt20_velocity_d_k);
 
-                    int16_velocity_temp2 = int16_velocity_d_k - velocity_control_pid_param.int20_feedback_d_filter_1n;
-                    int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, int16_velocity_d_k, 1000, velocity_control_pid_param);
+                    // PID parameters should be int9
+                    int32_velocity_cmd_k = pid_update(int20_velocity_ref_k, int20_velocity_k, int20_velocity_d_k, 1000, velocity_control_pid_param);
 
-                    int16_velocity_cmd_k /= 127;
+                    if(int32_velocity_cmd_k > pos_velocity_ctrl_config.int21_target_max_torque) //int21_target_max_torque should be int32
+                        int32_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_max_torque;
+                    else if (int32_velocity_cmd_k < pos_velocity_ctrl_config.int21_target_min_torque)
+                        int32_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_min_torque;
 
-                    if(int16_velocity_cmd_k > pos_velocity_ctrl_config.int21_target_max_torque)
-                        int16_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_max_torque;
-                    else if (int16_velocity_cmd_k < pos_velocity_ctrl_config.int21_target_min_torque)
-                        int16_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_min_torque;
-                    i_motorcontrol.set_torque(int16_velocity_cmd_k);
-
+                    i_motorcontrol.set_torque((int32_velocity_cmd_k / 65535 /*16 times shift*/ )/4); //when Ramin fixes the range to int16 remove the /4
 
 
-                    second_order_LP_filter_shift_buffers(&float_velocity_k,
-                                                         &float_velocity_k_1n,
-                                                         &float_velocity_k_2n);
 
-                    second_order_LP_filter_shift_buffers(&float_velocity_d_k,
-                                                         &float_velocity_d_k_1n,
-                                                         &float_velocity_d_k_2n);
+                    second_order_LP_filter_shift_buffers(&flt20_velocity_k,
+                                                         &flt20_velocity_k_1n,
+                                                         &flt20_velocity_k_2n);
+
+                    second_order_LP_filter_shift_buffers(&flt20_velocity_d_k,
+                                                         &flt20_velocity_d_k_1n,
+                                                         &flt20_velocity_d_k_2n);
                 }
                 else if (int1_velocity_enable_flag == 0 && int1_torque_enable_flag == 1)
-                    i_motorcontrol.set_torque(int16_torque_ref);
+                    i_motorcontrol.set_torque(int16_torque_ref/4); //when Ramin fixes the range to int16 remove the /4
 
 
 
-//                xscope_int(POSITION_REF, int32_position_k / 100);//int16_position_ref_k);
-//                xscope_int(POSITION, int20_position_k);
-//                xscope_int(POSITION_CMD, int16_position_cmd_k);
+                xscope_int(POSITION_REF, int20_position_k_sens / 100);//int20_position_ref_k);
+                xscope_int(POSITION, int20_position_k);
+                xscope_int(POSITION_CMD, int31_position_cmd_k);
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
-//                xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-//                xscope_int(VELOCITY, int32_velocity_k);//int16_velocity_k);
-//                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+                xscope_int(VELOCITY_REF, int20_velocity_ref_k);
+                xscope_int(VELOCITY, int16_velocity_k);//int20_velocity_k);
+                xscope_int(VELOCITY_CMD, int32_velocity_cmd_k);
 //                xscope_int(VELOCITY_TEMP1, 0);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
@@ -192,7 +192,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int1_position_enable_flag = 0;
                 break;
             case i_position_control[int i].set_position(int in_target_position):
-                    int16_position_ref_k_in = in_target_position;
+                    int20_position_ref_k_in = in_target_position;
                 break;
             case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
                 pid_set_coefficients(int8_Kp, int8_Ki, int8_Kd, position_control_pid_param);
@@ -214,7 +214,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int1_velocity_enable_flag = 0;
                 break;
             case i_position_control[int i].set_velocity(int in_target_velocity):
-                    int16_velocity_ref_k_in = in_target_velocity;
+                    int20_velocity_ref_k_in = in_target_velocity;
                 break;
             case i_position_control[int i].set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
                 pid_set_coefficients(int8_Kp, int8_Ki, int8_Kd, velocity_control_pid_param);
