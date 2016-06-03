@@ -62,7 +62,7 @@ int pid_update(int int20_setpoint, int int20_feedback_p_filter, int int20_feedba
 
     int21_derivative = int20_feedback_d_filter - param.int20_feedback_d_filter_1n;
 
-    int32_cmd = (((param.int9_P * int21_P_error) + (param.int9_I * param.int22_error_integral) - (param.int9_D * int21_derivative)) / int9_DENOMINATOR);
+    int32_cmd = ((param.int9_P * int21_P_error) + (param.int9_I * param.int22_error_integral) - (param.int9_D * int21_derivative));
     if (int32_cmd > param.int32_cmd_limit)
         int32_cmd = param.int32_cmd_limit;
     else if (int32_cmd < -param.int32_cmd_limit)

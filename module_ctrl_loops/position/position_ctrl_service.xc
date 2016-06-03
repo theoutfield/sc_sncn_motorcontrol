@@ -162,7 +162,7 @@ void position_control_service(ControlConfig &position_control_config,
 
 
                     // velocity controller
-                    int16_velocity_ref_k = int16_position_cmd_k;
+                    int16_velocity_ref_k = int16_position_ref_k;//int16_position_cmd_k;
                     float_velocity_measured_k = int32_velocity_k * 20;//the received velocity is smaller than the int16 range and I just multiply by a big number to expand the range.
                     float_velocity_d_measured_k = float_velocity_measured_k;
 
@@ -180,7 +180,7 @@ void position_control_service(ControlConfig &position_control_config,
 
                     int16_velocity_temp2 = int16_velocity_d_k - velocity_control_pid_param.int20_feedback_d_filter_1n;
                     int16_velocity_cmd_k = pid_update(int16_velocity_ref_k, int16_velocity_k, int16_velocity_d_k, 1000, velocity_control_pid_param);
-                    i_motorcontrol.set_torque(int16_velocity_cmd_k);
+                    i_motorcontrol.set_torque(int16_velocity_cmd_k/127);
 
 
 

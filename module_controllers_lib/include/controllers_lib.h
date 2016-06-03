@@ -5,11 +5,6 @@
 
 #pragma once
 
-#define int9_DENOMINATOR 127 //0x7f
-#define Uint9_DENOMINATOR 255 //0xff
-#define INT16_DENOMINATOR 32767 //0x7fff
-#define UINT16_DENOMINATOR 65535 //0xffff
-
 /**
  * @brief Structure type to set the parameters of the PID controller.
  */

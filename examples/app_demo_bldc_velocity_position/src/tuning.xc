@@ -26,7 +26,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
-    int int8_Kp_position = 5000;
+    int int8_Kp_position = 1000;
     int int8_Ki_position = 0;
     int int8_Kd_position = 0;
     int int16_P_error_limit_position = 10000;
@@ -40,7 +40,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     int int16_P_error_limit_velocity = 10000;
     int int16_I_error_limit_velocity = 10;
     int int16_integral_limit_velocity = 1000;
-    int int16_cmd_limit_velocity = 2000;
+    int int16_cmd_limit_velocity = 2000*127;
 
     int torque = 0;
 
@@ -92,26 +92,26 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
         //velocity pid coefficients
         case 'k':
-//            switch(mode_2) {
-//            case 'p':
-//                int8_Kp_velocity = value;
-//                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                break;
-//            case 'i':
-//                int8_Ki_velocity = value;
-//                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                break;
-//            case 'd':
-//                int8_Kd_velocity = value;
-//                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                break;
-//            default:
-//                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                break;
-//            }
+            switch(mode_2) {
+            case 'p':
+                int8_Kp_velocity = value;
+                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                break;
+            case 'i':
+                int8_Ki_velocity = value;
+                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                break;
+            case 'd':
+                int8_Kd_velocity = value;
+                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                break;
+            default:
+                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                break;
+            }
             break;
         //velocity pid limits
         case 'l':
