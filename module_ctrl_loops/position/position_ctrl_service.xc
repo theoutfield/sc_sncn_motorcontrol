@@ -29,8 +29,9 @@ void position_control_service(ControlConfig &position_control_config,
     int int1_position_enable_flag = 0;
     PIDparam position_control_pid_param;
     int int32_position_k = 0;
-    int int16_position_k = 0;
+    int int20_position_k = 0; // range: -7FFFF to 7FFFF  OR  -524287 to 524287
     int int16_position_ref_k = 0;
+    int int16_position_ref_k_in = 0;
     int int16_position_cmd_k = 0;
     int position_ref_min_limit = 0;
     int position_ref_max_limit = 0;
@@ -95,17 +96,16 @@ void position_control_service(ControlConfig &position_control_config,
                 int32_velocity_k = i_motorcontrol.get_velocity_actual();
                 int32_position_k = i_motorcontrol.get_position_actual();
 
-
-
                 // position control
                 if (int1_position_enable_flag == 1) {
-                    int16_position_k = int32_position_k / 100;
-                    if(int16_position_k > position_ref_max_limit)
-                        int16_position_k = position_ref_max_limit;
-                    else if (int16_position_k < position_ref_min_limit)
-                        int16_position_k = position_ref_min_limit;
+                    int20_position_k = int32_position_k / 100;
+                    int16_position_ref_k = int16_position_ref_k_in;
+                    if(int16_position_ref_k > position_ref_max_limit)
+                        int16_position_ref_k = position_ref_max_limit;
+                    else if (int16_position_ref_k < position_ref_min_limit)
+                        int16_position_ref_k = position_ref_min_limit;
 
-                    int16_position_cmd_k = pid_update(int16_position_ref_k, int16_position_k, int16_position_k, 1000, position_control_pid_param);
+                    int16_position_cmd_k = pid_update(int16_position_ref_k, int20_position_k, int20_position_k, 1000, position_control_pid_param);
                     int16_velocity_ref_k = int16_position_cmd_k;
                 }
                 else if (int1_position_enable_flag == 0)
@@ -161,13 +161,13 @@ void position_control_service(ControlConfig &position_control_config,
 
 
 
-                xscope_int(POSITION_REF, int16_position_ref_k);
-                xscope_int(POSITION, int16_position_k);
+                xscope_int(POSITION_REF, int32_position_k / 100);//int16_position_ref_k);
+                xscope_int(POSITION, int20_position_k);
                 xscope_int(POSITION_CMD, int16_position_cmd_k);
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
                 xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-                xscope_int(VELOCITY, int16_velocity_k);
+                xscope_int(VELOCITY, int32_velocity_k);//int16_velocity_k);
                 xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
 //                xscope_int(VELOCITY_TEMP1, 0);
 //                xscope_int(VELOCITY_TEMP2, 0);
@@ -187,7 +187,7 @@ void position_control_service(ControlConfig &position_control_config,
                     int1_position_enable_flag = 0;
                 break;
             case i_position_control[int i].set_position(int in_target_position):
-                    int16_position_ref_k = in_target_position;
+                    int16_position_ref_k_in = in_target_position;
                 break;
             case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
                 pid_set_coefficients(int8_Kp, int8_Ki, int8_Kd, position_control_pid_param);

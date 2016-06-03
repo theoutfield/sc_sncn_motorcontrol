@@ -54,7 +54,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
 
     i_position_control.set_torque_limits(-1000, 1000);
-    i_position_control.set_velocity_limits( -5000, 5000);
+    i_position_control.set_velocity_limits( -15000, 15000);
     i_position_control.set_position_limits(-8000, 8000);
 
     fflush(stdout);
