@@ -29,8 +29,6 @@ PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PO
 int main(void) {
 
     // Motor control interfaces
-    chan c_pwm_ctrl, c_adctrig; // pwm channels
-
     interface WatchdogInterface i_watchdog[2];
     interface update_pwm i_update_pwm;
     interface ADCInterface i_adc[2];
@@ -136,9 +134,9 @@ int main(void) {
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
+                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
                             i_shared_memory[0],
-                            i_watchdog[0], null, i_motorcontrol, i_update_pwm);
+                            i_watchdog[0], i_motorcontrol, i_update_pwm);
                 }
             }
         }

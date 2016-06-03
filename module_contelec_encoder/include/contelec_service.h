@@ -1,5 +1,5 @@
 /*
- * rotary_sensor.h
+ * contelec_service.h
  *
  *  Created on: Sep 5, 2014
  *      Author: atena
@@ -7,19 +7,7 @@
 
 #pragma once
 
-#include <contelec_config.h>
-
-
 #ifdef __XC__
-
-#include <spi_master.h>
-#include <memory_manager.h>
-
-typedef struct
-{
-    spi_master_interface spi_interface;
-    out port ?slave_select;
-} SPIPorts;
 
 #include <position_feedback_service.h>
 

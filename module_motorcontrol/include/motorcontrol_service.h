@@ -96,9 +96,9 @@ interface MotorcontrolInterface{
 
 
     /**
-     * @brief Sets break status to ON (no movement) or OFF (possible to move)
+     * @brief Sets brake status to ON (no movement) or OFF (possible to move)
      */
-    void set_break_status(int break_status);
+    void set_brake_status(int brake_status);
 
     /**
      * @brief Enables the torque control

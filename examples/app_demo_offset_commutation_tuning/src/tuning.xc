@@ -60,6 +60,12 @@ int set_sensor_offset(int in_offset, int sensor_select, client interface Positio
             i_position_feedback.set_config(position_feedback_config);
         }
         out_offset = position_feedback_config.biss_config.offset_electrical;
+    } else if (sensor_select == CONTELEC_SENSOR) {
+        if (in_offset >= 0) {
+            position_feedback_config.contelec_config.offset = in_offset;
+            i_position_feedback.set_config(position_feedback_config);
+        }
+        out_offset = position_feedback_config.contelec_config.offset;
     }
 
     return out_offset;
@@ -92,6 +98,9 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR){
         offset = i_tuning.set_sensor_offset(-1);
         printf("AMS tuning, Sensor offset %d, ", offset);
+    } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR){
+        offset = i_tuning.set_sensor_offset(-1);
+        printf("CONTELEC tuning, Sensor offset %d, ", offset);
     }
     if (motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) {
         printf ( "Polarity %d\noffset %d\n", motorcontrol_config.polarity_type, motorcontrol_config.hall_offset[0]);
@@ -123,7 +132,9 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                 offset = i_tuning.auto_offset();
 
             motorcontrol_config = i_motorcontrol.get_config();
-            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+            if (motorcontrol_config.commutation_sensor == AMS_SENSOR ||
+                motorcontrol_config.commutation_sensor == BISS_SENSOR ||
+                motorcontrol_config.commutation_sensor == CONTELEC_SENSOR) {
                 printf("Sensor offset: %d, ", offset);
             }
             printf("Voltage %d, Polarity %d\n", input_voltage, motorcontrol_config.polarity_type);
@@ -152,7 +163,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             } else if (motorcontrol_config.commutation_sensor == BISS_SENSOR) {
                 offset = (offset + 2048) & 4095;
                 i_tuning.set_sensor_offset(offset);
-            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR) {
+            } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == CONTELEC_SENSOR) {
                 if (motorcontrol_config.commutation_method == FOC) {
                     motorcontrol_config.hall_offset[0] = (motorcontrol_config.hall_offset[0] + 2048) & 4095;
                 } else {
@@ -216,7 +227,9 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         //print offsets, voltage and polarity
         case 'p':
             motorcontrol_config = i_motorcontrol.get_config();
-            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR) {
+            if (motorcontrol_config.commutation_sensor == AMS_SENSOR ||
+                motorcontrol_config.commutation_sensor == BISS_SENSOR ||
+                motorcontrol_config.commutation_sensor == CONTELEC_SENSOR) {
                 offset = i_tuning.set_sensor_offset(-1);
                 printf("Sensor offset %d, ", offset);
             }
@@ -598,6 +611,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
         case i_tuning.set_pole_pairs(int in_pole_pairs):
             PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
             position_feedback_config.biss_config.pole_pairs = in_pole_pairs;
+            position_feedback_config.contelec_config.pole_pairs = in_pole_pairs;
 //            position_feedback_config.ams_config.pole_pairs = in_pole_pairs;
             i_position_feedback.set_config(position_feedback_config);
             break;

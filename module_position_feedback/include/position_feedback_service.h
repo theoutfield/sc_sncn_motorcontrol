@@ -10,6 +10,9 @@
 #include <biss_config.h>
 #include <contelec_config.h>
 
+#include <biss_struct.h>
+#include <contelec_struct.h>
+
 typedef struct {
     int sensor_type;
     BISSConfig biss_config;

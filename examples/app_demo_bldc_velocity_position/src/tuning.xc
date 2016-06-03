@@ -36,7 +36,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     int torque = 0;
 
     delay_milliseconds(2000);
-    i_commutation.set_break_status(1);
+    i_commutation.set_brake_status(1);
 
     i_position_control.set_velocity_pid_limits(int16_P_error_limit, int16_I_error_limit, int16_integral_limit, int16_cmd_limit);
     i_position_control.set_velocity_pid_coefficients(int8_Kp, int8_Ki, int8_Kd);

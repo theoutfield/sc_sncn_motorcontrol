@@ -20,25 +20,26 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
-#define POSITION_LIMIT 0 //+/- 4095
+#define POSITION_LIMIT 5000000 //+/- 4095
 
 int main(void) {
 
     // Motor control interfaces
-    chan c_pwm_ctrl, c_adctrig; // pwm channels
-
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
     interface update_pwm i_update_pwm;
+    interface TuningInterface i_tuning;
 
     par
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0]);
+        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
+
+        on tile[IFM_TILE]: position_limiter(i_tuning, i_motorcontrol[1]);
 
         on tile[IFM_TILE]:
         {
@@ -115,9 +116,9 @@ int main(void) {
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, c_pwm_ctrl, i_adc[0],
+                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
                             i_shared_memory[0],
-                            i_watchdog[0], null, i_motorcontrol, i_update_pwm);
+                            i_watchdog[0], i_motorcontrol, i_update_pwm);
                 }
             }
         }

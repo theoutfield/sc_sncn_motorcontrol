@@ -5,33 +5,7 @@
 
 #pragma once
 
-#include <biss_config.h>
-
-/**
- * @brief Type for the return status when reading BiSS data
- */
-typedef enum {
-    NoError=0,       /**< no error */
-    CRCCorrected=1,  /**< CRC corrected  */
-    CRCError=2,      /**< CRC mismatch  */
-    NoAck,           /**< Ack bit not found. */
-    NoStartBit       /**< Start bit not found */
-} BISS_ErrorType;
-
 #ifdef __XC__
-
-#include <platform.h>
-#include <memory_manager.h>
-
-/**
- * @brief Structure type to define the BiSS Service ports.
- */
-typedef struct {
-    port ?p_biss_data;   /**< Port for BiSS Interface signal input. */
-    port ?p_biss_clk;    /**< Port for BiSS Interface clock output. */
-    clock ?clk;          /**< Hardware clock used as time reference */
-} BISSPorts;
-
 
 #include <position_feedback_service.h>
 
