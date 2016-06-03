@@ -28,9 +28,8 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
 /* Test Profile Position function */
-void position_profile_test(interface PositionControlInterface client i_position_control)
+void position_profile_test(interface PositionControlInterface client i_position_control, client interface PositionFeedbackInterface ?i_position_feedback)
 {
-    const int ticks_per_turn = 8192;
     const int target = 16000;
 //    const int target = 2620000;
     int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
@@ -44,8 +43,11 @@ void position_profile_test(interface PositionControlInterface client i_position_
     profiler_config.polarity = POLARITY;
     profiler_config.max_position = MAX_POSITION_LIMIT;
     profiler_config.min_position = MIN_POSITION_LIMIT;
-    profiler_config.ticks_per_turn = ticks_per_turn;
-
+    if (!isnull(i_position_feedback)) {
+        profiler_config.ticks_per_turn = i_position_feedback.get_ticks_per_turn();
+    } else {
+        profiler_config.ticks_per_turn = QEI_SENSOR_RESOLUTION;
+    }
     profiler_config.max_velocity = MAX_VELOCITY;
     profiler_config.max_acceleration = MAX_ACCELERATION;
     profiler_config.max_deceleration = MAX_DECELERATION;
@@ -102,7 +104,7 @@ int main(void)
         /* Test Profile Position Client function*/
         on tile[APP_TILE]:
         {
-            position_profile_test(i_position_control[0]);      // test PPM on slave side
+            position_profile_test(i_position_control[0], i_position_feedback[0]);      // test PPM on slave side
         }
 
         on tile[APP_TILE]:
@@ -114,7 +116,7 @@ int main(void)
             {
                 /* Read actual position from the Position Control Server */
                 actual_position = i_position_control[1].get_position();
-                target_position = i_position_control[1].get_target_position();
+//                target_position = i_position_control[1].get_target_position();
 
                 xscope_int(TARGET_POSITION, target_position/10); //Divided by 10 for better displaying
                 xscope_int(ACTUAL_POSITION, actual_position/10); //Divided by 10 for better displaying

@@ -47,8 +47,7 @@ void init_position_feedback_ports(PositionFeedbackPorts &position_feedback_ports
     slave_deselect(position_feedback_ports.slave_select);
 
     status = count >> 12;
-    count = sext(count & 0xfff, 12);  //convert multiturn to signed
-    { void, count } = macs(1 << 16, count, 0, singleturn_filtered); //convert multiturn to absolute count: ticks per turn * number of turns + position
+    count = (sext(count & 0xfff, 12) * (1 << 16)) + singleturn_filtered; //convert multiturn to signed absolute count
 
     return { status, count, singleturn_filtered, singleturn_raw };
 }
@@ -231,6 +230,11 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
         //send velocity
         case i_position_feedback[int i].get_velocity() -> int out_velocity:
                 out_velocity = velocity;
+                break;
+
+        //send ticks per turn
+        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
+                out_ticks_per_turn = ticks_per_turn;
                 break;
 
         //receive new contelec_config

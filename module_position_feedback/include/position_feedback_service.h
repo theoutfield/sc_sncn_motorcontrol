@@ -49,6 +49,8 @@ interface PositionFeedbackInterface
 
     int get_velocity(void);
 
+    unsigned int get_ticks_per_turn();
+
     PositionFeedbackConfig get_config(void);
 
     void set_config(PositionFeedbackConfig in_config);

@@ -226,6 +226,11 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
                 out_velocity = velocity;
                 break;
 
+        //send ticks per turn
+        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
+                out_ticks_per_turn = ticks_per_turn;
+                break;
+
         //receive new biss_config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 //update variables which depend on biss_config
@@ -536,8 +541,8 @@ unsigned int read_biss_sensor_data_fast(PositionFeedbackPorts &position_feedback
     status = (~status) & ((1 << biss_config.status_length)-1);
     count &= ~(~0U <<  biss_config.multiturn_resolution);
     position &= ~(~0U <<  biss_config.singleturn_resolution);
-    count = sext(count, biss_config.multiturn_resolution);  //convert multiturn to signed
-    { void, count } = macs(1 << biss_config.singleturn_resolution, count, 0, position); //convert multiturn to absolute count: ticks per turn * number of turns + position
+    count = (sext(count, biss_config.multiturn_resolution) * (1 << biss_config.singleturn_resolution)) + position;  //convert multiturn to signed absolute count
+
     return { count, position, status };
 }
 
