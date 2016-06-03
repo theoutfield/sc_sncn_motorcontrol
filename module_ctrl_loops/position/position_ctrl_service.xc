@@ -115,16 +115,16 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int20_velocity_ref_k = int31_position_cmd_k / 2048; //use 11 times shift to right
                 }
                 else if (int1_position_enable_flag == 0)
-                    int20_velocity_ref_k = int20_velocity_ref_k_in;
+                    int20_velocity_ref_k = int20_velocity_ref_k_in; // -524000 to 524000
 
 
 
                 // velocity control
                 if (int1_velocity_enable_flag == 1 || int1_position_enable_flag == 1) {
-                    if (int20_velocity_ref_k > pos_velocity_ctrl_config.int21_target_max_velocity) //int21_target_max_velocity should be int20
-                        int20_velocity_ref_k = pos_velocity_ctrl_config.int21_target_max_velocity;
-                    else if (int20_velocity_ref_k < pos_velocity_ctrl_config.int21_target_min_velocity)
-                        int20_velocity_ref_k = pos_velocity_ctrl_config.int21_target_min_velocity;
+//                    if (int20_velocity_ref_k > pos_velocity_ctrl_config.int21_target_max_velocity) //int21_target_max_velocity should be int20
+//                        int20_velocity_ref_k = pos_velocity_ctrl_config.int21_target_max_velocity;
+//                    else if (int20_velocity_ref_k < pos_velocity_ctrl_config.int21_target_min_velocity)
+//                        int20_velocity_ref_k = pos_velocity_ctrl_config.int21_target_min_velocity;
 
                     flt20_velocity_measured_k = int16_velocity_k * 16; //use 4 times shit to left
                     flt20_velocity_d_measured_k = flt20_velocity_measured_k;
@@ -141,15 +141,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                                   &flt20_velocity_d_measured_k, 1000, velocity_d_SO_LP_filter_param);
                     int20_velocity_d_k = ((int) flt20_velocity_d_k);
 
-                    // PID parameters should be int9
+                    // PID parameters should be int9 -> -256 to 256
                     int32_velocity_cmd_k = pid_update(int20_velocity_ref_k, int20_velocity_k, int20_velocity_d_k, 1000, velocity_control_pid_param);
 
-                    if(int32_velocity_cmd_k > pos_velocity_ctrl_config.int21_target_max_torque) //int21_target_max_torque should be int32
-                        int32_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_max_torque;
-                    else if (int32_velocity_cmd_k < pos_velocity_ctrl_config.int21_target_min_torque)
-                        int32_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_min_torque;
+//                    if(int32_velocity_cmd_k > pos_velocity_ctrl_config.int21_target_max_torque) //int21_target_max_torque should be int32
+//                        int32_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_max_torque;
+//                    else if (int32_velocity_cmd_k < pos_velocity_ctrl_config.int21_target_min_torque)
+//                        int32_velocity_cmd_k = pos_velocity_ctrl_config.int21_target_min_torque;
 
-                    i_motorcontrol.set_torque((int32_velocity_cmd_k / 65535 /*16 times shift*/ )/4); //when Ramin fixes the range to int16 remove the /4
+                    i_motorcontrol.set_torque(int32_velocity_cmd_k / 65535 /*16 times shift*/);
 
 
 
@@ -162,7 +162,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                                          &flt20_velocity_d_k_2n);
                 }
                 else if (int1_velocity_enable_flag == 0 && int1_torque_enable_flag == 1)
-                    i_motorcontrol.set_torque(int16_torque_ref/4); //when Ramin fixes the range to int16 remove the /4
+                    i_motorcontrol.set_torque(int16_torque_ref);
 
 
 
@@ -172,8 +172,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
                 xscope_int(VELOCITY_REF, int20_velocity_ref_k);
-                xscope_int(VELOCITY, int16_velocity_k);//int20_velocity_k);
-                xscope_int(VELOCITY_CMD, int32_velocity_cmd_k);
+                xscope_int(VELOCITY, int20_velocity_k);
+                xscope_int(VELOCITY_CMD, int32_velocity_cmd_k / 65535 /*16 times shift*/);//int32_velocity_cmd_k);
 //                xscope_int(VELOCITY_TEMP1, 0);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
