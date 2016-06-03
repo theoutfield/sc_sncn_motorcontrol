@@ -32,8 +32,8 @@ void position_control_service(ControlConfig &position_control_config,
     int int16_position_k = 0;
     int int16_position_ref_k = 0;
     int int16_position_cmd_k = 0;
-    int position_ref_min_limit = -8000;
-    int position_ref_max_limit = 8000;
+    int position_ref_min_limit = 0;
+    int position_ref_max_limit = 0;
 
     // velocity controller
     int int1_velocity_enable_flag = 0;
@@ -56,14 +56,14 @@ void position_control_service(ControlConfig &position_control_config,
     int int16_velocity_cmd_k = 0;
     int int16_velocity_temp1 = 0;
     int int16_velocity_temp2 = 0;
-    int velocity_ref_min_limit = -5000;
-    int velocity_ref_max_limit = 5000;
+    int velocity_ref_min_limit = 0;
+    int velocity_ref_max_limit = 0;
 
     // torque
     int int1_torque_enable_flag = 0;
     int int16_torque_ref = 0;
-    int torque_ref_min_limit = -1000;
-    int torque_ref_max_limit = 1000;
+    int torque_ref_min_limit = 0;
+    int torque_ref_max_limit = 0;
 
 
     timer t;
@@ -161,14 +161,14 @@ void position_control_service(ControlConfig &position_control_config,
 
 
 
-//                xscope_int(POSITION_REF, int16_position_ref_k);
-//                xscope_int(POSITION, int16_position_k);
-//                xscope_int(POSITION_CMD, int16_position_cmd_k);
+                xscope_int(POSITION_REF, int16_position_ref_k);
+                xscope_int(POSITION, int16_position_k);
+                xscope_int(POSITION_CMD, int16_position_cmd_k);
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
-//                xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-//                xscope_int(VELOCITY, int16_velocity_k);
-//                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+                xscope_int(VELOCITY_REF, int16_velocity_ref_k);
+                xscope_int(VELOCITY, int16_velocity_k);
+                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
 //                xscope_int(VELOCITY_TEMP1, 0);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
