@@ -216,7 +216,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     {
         select
         {
-        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP received_pwm_ctrl_s, int received_pwm_test, int received_pwm_on, int received_brake_active):
+        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP received_pwm_ctrl_s, int received_pwm_on, int received_brake_active):
                 pwm_ctrl_s = received_pwm_ctrl_s;
 
                 pwm_on     = received_pwm_on;

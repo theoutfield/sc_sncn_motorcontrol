@@ -184,7 +184,7 @@ void position_limiter(interface TuningInterface server i_tuning, client interfac
  *  - independently enable and disable the control
  *  - send the reference value of torque to torque controller
  *
- *  As a demo, the motor generates an oscilating torque with a frequency range between 10 Hz  to  3 kHz.
+ *  As a demo, the motor generates an oscilating torque with a frequency range between 10 Hz  and  3 kHz.
  */
 void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 {
@@ -226,15 +226,15 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     delay_milliseconds(2000);
 
 
-    ref_torque=200;
+    ref_torque=30;
 
     while(1)
     {
-        for(period_us=400;period_us<=(100*1000);(period_us+=400))
+        for(period_us=400;period_us<=(5*1000);(period_us+=400))
         {
             if(period_us<3000) period_us-=300;
 
-            for(pulse_counter=0;pulse_counter<=(100000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+            for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
             {
                 i_motorcontrol.set_torque(ref_torque);
                 delay_microseconds(period_us);
