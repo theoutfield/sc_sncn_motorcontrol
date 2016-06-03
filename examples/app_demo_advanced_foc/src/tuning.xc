@@ -175,24 +175,41 @@ void position_limiter(interface TuningInterface server i_tuning, client interfac
     }//end while
 }//end function
 
+/*
+ * The following function shows how to work with torque controller.
+ * It is able to:
+ *  - independently lock and unlock the brakes
+ *  - automatically find the offset
+ *  - read or set the offset
+ *  - independently enable and disable the control
+ *  - send the reference value of torque to torque controller
+ *
+ *  As a demo, the motor generates an oscilating torque with a frequency range between 10 Hz  to  3 kHz.
+ */
 void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 {
+
+    int period_us;     // torque generation period in micro-seconds
+    int pulse_counter; // number of generated pulses
+    int ref_torque;    // reference torque
+
     int offset=0;
 
     printf(">>  DEMO TORQUE CONTROL STARTING ...\n");
     delay_milliseconds(4000);
 
-    printf(">>  UNLOCKING THE BRAKE ...\n");
+    printf(">>  UNLOCK THE BRAKE ...\n");
     i_motorcontrol.set_brake_status(1);
     delay_milliseconds(2000);
 
-    printf(">>  STARTING OFFSET DETECTION ...\n");
-    auto_offset(i_motorcontrol);
+    printf(">>  START OFFSET DETECTION ...\n");
+    i_motorcontrol.set_offset_detection_enabled();
     delay_milliseconds(30000);
-    offset=i_motorcontrol.set_calib(0);
-    printf("DETECTED OFFSET IS %d\n", offset);
 
-    printf(">>  LOCKING THE BRAKE ...\n");
+    offset=i_motorcontrol.set_calib(0);
+    printf("detected offset is %d\n", offset);
+
+    printf(">>  LOCK THE BRAKE ...\n");
     i_motorcontrol.set_brake_status(0);
     delay_milliseconds(2000);
 
@@ -200,9 +217,31 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     i_motorcontrol.set_offset_value(offset);
     delay_milliseconds(2000);
 
-
     printf(">>  ENABLING THE CONTROL ...\n");
     i_motorcontrol.set_torque_control_enabled();
     delay_milliseconds(2000);
+
+    printf(">>  UNLOCK THE BRAKE ...\n");
+    i_motorcontrol.set_brake_status(1);
+    delay_milliseconds(2000);
+
+
+    ref_torque=200;
+
+    while(1)
+    {
+        for(period_us=400;period_us<=(100*1000);(period_us+=400))
+        {
+            if(period_us<3000) period_us-=300;
+
+            for(pulse_counter=0;pulse_counter<=(100000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+            {
+                i_motorcontrol.set_torque(ref_torque);
+                delay_microseconds(period_us);
+                i_motorcontrol.set_torque(-ref_torque);
+                delay_microseconds(period_us);
+            }
+        }
+    }
 
 }
