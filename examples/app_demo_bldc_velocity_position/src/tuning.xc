@@ -26,7 +26,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
-    int int8_Kp_position = 1000;
+    int int8_Kp_position = 5;
     int int8_Ki_position = 0;
     int int8_Kd_position = 0;
     int int16_P_error_limit_position = 10000;

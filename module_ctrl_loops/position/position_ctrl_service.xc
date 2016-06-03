@@ -161,14 +161,14 @@ void position_control_service(ControlConfig &position_control_config,
 
 
 
-                xscope_int(POSITION_REF, int16_position_ref_k);
-                xscope_int(POSITION, int16_position_k);
-                xscope_int(POSITION_CMD, int16_position_cmd_k);
+//                xscope_int(POSITION_REF, int16_position_ref_k);
+//                xscope_int(POSITION, int16_position_k);
+//                xscope_int(POSITION_CMD, int16_position_cmd_k);
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
-                xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-                xscope_int(VELOCITY, int16_velocity_k);
-                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+//                xscope_int(VELOCITY_REF, int16_velocity_ref_k);
+//                xscope_int(VELOCITY, int16_velocity_k);
+//                xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
 //                xscope_int(VELOCITY_TEMP1, 0);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
