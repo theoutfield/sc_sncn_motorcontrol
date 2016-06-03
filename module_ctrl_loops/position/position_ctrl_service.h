@@ -14,61 +14,99 @@
  */
 interface PositionControlInterface{
 
+
+
+            void enable_position_ctrl();
+            void disable_position_ctrl();
+            void set_position(int in_target_position);
+            void set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
+            void set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
+            void set_position_limits(int position_min_limit, int position_max_limit);
+
+
+
+            void enable_velocity_ctrl();
+            void disable_velocity_ctrl();
+            void set_velocity(int in_target_velocity);
+            void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
+            void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
+            void set_velocity_limits(int velocity_min_limit, int velocity_max_limit);
+
+
+
+            void enable_torque_ctrl();
+            void disable_torque_ctrl();
+            void set_torque(int in_target_torque);
+            void set_torque_limits(int torque_min_limit, int torque_max_limit);
+
+
+
+            int get_position();
+
+
+            int get_velocity();
+
+
+
     /**
      * @brief Enables the Service operation.
      */
-    void enable_position_ctrl();
+//    void enable_position_ctrl();
 
     /**
      * @brief Disables the Service operation.
      */
-    void disable_position_ctrl();
+//    void disable_position_ctrl();
 
     /**
      * @brief Setter for new target position in the controller.
      *
      * @param target_position New target position [INT_MIN:INT_MAX].
      */
-    void set_position(int target_position);
-
-    void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
-
-    void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_integral_limit, int int32_cmd_limit);
+//    void set_position(int target_position);
+//
+//    void set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
+//
+//    void set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_integral_limit, int int32_cmd_limit);
+//
+//    void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
+//
+//    void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_integral_limit, int int32_cmd_limit);
 
     /**
      * @brief Getter for the current position of your motor.
      *
      * @return Current position [INT_MIN:INT_MAX].
      */
-    int get_position();
+//    int get_position();
 
     /**
      * @brief Getter for the current target position in the controller.
      *
      * @return Current target position [INT_MIN:INT_MAX].
      */
-    int get_target_position();
+//    int get_target_position();
 
     /**
      * @brief Getter for current configuration used by the Service.
      *
      * @return Current Service configuration.
      */
-    ControlConfig get_position_control_config();
+//    ControlConfig get_position_control_config();
 
     /**
      * @brief Setter for new configuration in the Service.
      *
      * @param in_config New Service configuration.
      */
-    void set_position_control_config(ControlConfig in_config);
+//    void set_position_control_config(ControlConfig in_config);
 
     /**
      * @brief Allows you to change the position control sensor on runtime.
      *
      * @param sensor_used New sensor [HALL_SENSOR, QEI_SENSOR].
      */
-    void set_position_sensor(int sensor_used);
+//    void set_position_sensor(int sensor_used);
 
     /**
      * @brief Getter for the current state of the Service.
@@ -76,30 +114,12 @@ interface PositionControlInterface{
      * @return 0 - not initialized.
      *         1 - initialized.
      */
-    int check_busy();
+//    int check_busy();
 
-    void set_torque_limit(int in_torque_limit);
+//    void set_torque_limit(int in_torque_limit);
 };
 
-/**
- * @brief Initializer helper for the Position Control Service.
- *        It is required the client to call this function before
- *        starting to perform position control.
- *
- * @param i_position_control Communication interface to the Position Control Service.
- */
-void init_position_control(interface PositionControlInterface client i_position_control);
 
-/**
- * @brief Position limiter helper.
- *
- * @param position The input position to be limited in range.
- * @param max_position_limit Upper limit that can be reached.
- * @param min_position_limit Lower limit that can be reached.
- *
- * @return position in the range [min_position_limit:max_position_limit].
- */
-int position_limit(int position, int max_position_limit, int min_position_limit);
 
 /**
  * @brief Service to perform a Position PID Control Loop on top of a Motor Control Service.
