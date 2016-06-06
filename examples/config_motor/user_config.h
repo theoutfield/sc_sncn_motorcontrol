@@ -24,7 +24,7 @@
  //#include <motor_config_Nanotec_DB59L024035-A.h>
 #include <motor_config_MABI_Hohlwellenservomotor_A5.h>
 
-#include <motor_config.h>
+//#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -51,6 +51,7 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 ////////////////////////////////////////////
+#define VDC             48
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     110
