@@ -22,7 +22,8 @@
  //#include <motor_configs/motor_config_LDO_42BLS41.h>
  //#include <motor_configs/motor_config_Moons_42BL30L2.h>
  //#include <motor_config_Nanotec_DB59L024035-A.h>
-#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
+//#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
+#include <motor_config_qmot_qbl5704.h>
 
 #include <motor_config.h>
 
