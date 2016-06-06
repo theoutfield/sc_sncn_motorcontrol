@@ -1,6 +1,6 @@
 /* INCLUDE BOARD SUPPORT FILES FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @file test_position-ctrl.xc
@@ -10,9 +10,9 @@
 
 //BLDC Motor drive libs
 #include <position_feedback_service.h>
-#include <pwm_service.h>
+#include <pwm_server.h>
 #include <watchdog_service.h>
-#include <motorcontrol_service.h>
+#include <torque_control.h>
 
 //Position control + profile libs
 #include <position_ctrl_service.h>
@@ -28,7 +28,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
 /* Test Profile Position function */
-void position_profile_test(interface PositionControlInterface client i_position_control, client interface PositionFeedbackInterface ?i_position_feedback)
+void position_profile_test(interface PositionVelocityCtrlInterface client i_position_control, client interface PositionFeedbackInterface ?i_position_feedback)
 {
     const int target = 16000;
 //    const int target = 2620000;
@@ -95,8 +95,9 @@ int main(void)
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
+    interface update_pwm i_update_pwm;
     interface shared_memory_interface i_shared_memory[2];
-    interface PositionControlInterface i_position_control[3];
+    interface PositionVelocityCtrlInterface i_position_control[3];
     interface PositionFeedbackInterface i_position_feedback[3];
 
     par
@@ -129,19 +130,34 @@ int main(void)
         on tile[APP_TILE]:
         /* Position Control Loop */
         {
-            ControlConfig position_control_config;
-
-            position_control_config.feedback_sensor = MOTOR_FEEDBACK_SENSOR;
-
-            position_control_config.Kp_n = POSITION_Kp;    // Divided by 10000
-            position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
-            position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
-
-            position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
-            position_control_config.cascade_with_torque = 0;
-
+            PosVelocityControlConfig pos_velocity_ctrl_config;
             /* Control Loop */
-            position_control_service(position_control_config, i_motorcontrol[0], i_position_control);
+            pos_velocity_ctrl_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
+
+            pos_velocity_ctrl_config.int21_target_min_position =-8000;
+            pos_velocity_ctrl_config.int21_target_max_position = 8000;
+            pos_velocity_ctrl_config.int9_P_position = 5;
+            pos_velocity_ctrl_config.int9_I_position = 0;
+            pos_velocity_ctrl_config.int9_D_position = 0;
+            pos_velocity_ctrl_config.int21_P_error_limit_position = 10000;
+            pos_velocity_ctrl_config.int21_I_error_limit_position = 0;
+            pos_velocity_ctrl_config.int22_integral_limit_position = 0;
+            pos_velocity_ctrl_config.int32_cmd_limit_position = 15000;
+
+            pos_velocity_ctrl_config.int21_target_min_velocity =-15000;
+            pos_velocity_ctrl_config.int21_target_max_velocity = 15000;
+            pos_velocity_ctrl_config.int9_P_velocity = 18;
+            pos_velocity_ctrl_config.int9_I_velocity = 22;
+            pos_velocity_ctrl_config.int9_D_velocity =25;
+            pos_velocity_ctrl_config.int21_P_error_limit_velocity = 10000;
+            pos_velocity_ctrl_config.int21_I_error_limit_velocity =10;
+            pos_velocity_ctrl_config.int22_integral_limit_velocity = 1000;
+            pos_velocity_ctrl_config.int32_cmd_limit_velocity = 200000;
+
+            pos_velocity_ctrl_config.int21_target_min_torque =-1000;
+            pos_velocity_ctrl_config.int21_target_max_torque = 1000;
+
+            position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
         }
 
         /************************************************************
@@ -151,14 +167,25 @@ int main(void)
         {
             par
             {
-                /* Triggered PWM Service */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, null);
-
-                /* Watchdog Service */
-                watchdog_service(wd_ports, i_watchdog);
+                /* PWM Service */
+                {
+                    pwm_config(pwm_ports);
+                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    delay_milliseconds(1000);
+                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm);
+                }
 
                 /* ADC Service */
-                adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
+                {
+                    delay_milliseconds(1500);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+                }
+
+                /* Watchdog Service */
+                {
+                    delay_milliseconds(500);
+                    watchdog_service(wd_ports, i_watchdog);
+                }
 
                 /* Position feedback service */
                 {
@@ -208,8 +235,9 @@ int main(void)
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);
+                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
+                                                i_shared_memory[0],
+                                                i_watchdog[0], i_motorcontrol, i_update_pwm);
                 }
             }
         }

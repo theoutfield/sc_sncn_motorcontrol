@@ -25,7 +25,7 @@ void init_position_profiler(ProfilerConfig profile_position_config) {
 }
 
 void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,
-                          interface PositionControlInterface client i_position_control )
+                          interface PositionVelocityCtrlInterface client i_position_control )
 {
     int i;
     timer t;
@@ -39,7 +39,7 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
 
     if (init_state == INIT_BUSY)
     {
-        init_position_control(i_position_control);
+        init_position_velocity_control(i_position_control);
     }
 
     actual_position = i_position_control.get_position();

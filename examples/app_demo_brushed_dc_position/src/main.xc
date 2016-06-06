@@ -13,7 +13,7 @@
 #include <user_config.h>
 
 /* Test Profile Position function */
-void position_profile_test(interface PositionControlInterface client i_position_control,
+void position_profile_test(interface PositionVelocityCtrlInterface client i_position_control,
                            interface HallInterface client ?i_hall,
                            interface QEIInterface client ?i_qei,
                            interface BISSInterface client ?i_biss)
@@ -53,7 +53,7 @@ int main(void)
     interface QEIInterface i_qei[5];
     interface MotorcontrolInterface i_motorcontrol[5];
 
-    interface PositionControlInterface i_position_control[3];
+    interface PositionVelocityCtrlInterface i_position_control[3];
 
     par
     {

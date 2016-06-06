@@ -62,7 +62,7 @@ interface PositionVelocityCtrlInterface{
 
     int get_velocity();
 
-
+    int check_busy();
 };
 
 

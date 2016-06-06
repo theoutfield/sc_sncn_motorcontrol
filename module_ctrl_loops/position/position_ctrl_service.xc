@@ -21,7 +21,21 @@
 
 void init_position_velocity_control(interface PositionVelocityCtrlInterface client i_position_control)
 {
+    int ctrl_state;
 
+    while (1) {
+        ctrl_state = i_position_control.check_busy();
+        if (ctrl_state == INIT_BUSY) {
+            i_position_control.enable_position_ctrl();
+        }
+
+        if (ctrl_state == INIT) {
+#ifdef debug_print
+            printstrln("position_ctrl_service: position control initialized");
+#endif
+            break;
+        }
+    }
 }
 
 
@@ -256,6 +270,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
             case i_position_control[int i].get_velocity() -> int out_velocity:
+                break;
+
+            case i_position_control[int i].check_busy() -> int out_activate:
+                out_activate = int1_position_enable_flag;
                 break;
 
         }
