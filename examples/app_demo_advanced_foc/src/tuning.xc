@@ -7,6 +7,7 @@
 #include <tuning.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <xscope.h>
 
 
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
@@ -194,6 +195,9 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     int ref_torque;    // reference torque
 
     int offset=0;
+    int loop_counter=0;
+
+    GeneralControlData general_control_data_low_level, general_control_data_high_level;
 
     printf(">>  DEMO TORQUE CONTROL STARTING ...\n");
     delay_milliseconds(4000);
@@ -226,22 +230,51 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     delay_milliseconds(2000);
 
 
-    ref_torque=30;
+    ref_torque=100;
 
     while(1)
     {
-        for(period_us=400;period_us<=(5*1000);(period_us+=400))
-        {
-            if(period_us<3000) period_us-=300;
+        loop_counter++;
 
-            for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
-            {
-                i_motorcontrol.set_torque(ref_torque);
-                delay_microseconds(period_us);
-                i_motorcontrol.set_torque(-ref_torque);
-                delay_microseconds(period_us);
-            }
+        if(loop_counter==300)
+            i_motorcontrol.set_torque(ref_torque);
+
+        if(loop_counter==600)
+        {
+            i_motorcontrol.set_torque(-ref_torque);
+            loop_counter=0;
         }
+
+
+
+        general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
+
+        xscope_int(ERROR_STATUS, general_control_data_low_level.velocity);
+        xscope_int(REFERENCE_TORQUE, general_control_data_low_level.reference_torque);
+        xscope_int(COMPUTED_TORQUE, general_control_data_low_level.computed_torque);
+        xscope_int(V_DC, general_control_data_low_level.V_dc);
+        xscope_int(ANGLE, general_control_data_low_level.angle);
+        xscope_int(POSITION, general_control_data_low_level.position);
+        xscope_int(VELOCITY, general_control_data_low_level.velocity);
+        xscope_int(TEMPERATURE, general_control_data_low_level.temperature);
+
+        delay_milliseconds(1);
+
+        //for(period_us=400;period_us<=(5*1000);(period_us+=400))
+        //{
+        //    if(period_us<3000) period_us-=300;
+        //
+        //    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+        //    {
+        //        i_motorcontrol.set_torque(ref_torque);
+        //        delay_microseconds(period_us);
+        //        i_motorcontrol.set_torque(-ref_torque);
+        //        delay_microseconds(period_us);
+        //    }
+        //}
     }
 
 }
+
+
+

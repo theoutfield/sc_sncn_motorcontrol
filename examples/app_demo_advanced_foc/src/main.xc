@@ -33,6 +33,7 @@ int main(void) {
     interface update_pwm i_update_pwm;
     interface TuningInterface i_tuning;
 
+
     par
     {
         /* WARNING: only one blocking task is possible per tile. */
