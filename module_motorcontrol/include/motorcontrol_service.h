@@ -88,6 +88,7 @@ typedef struct
     int V_dc;
 
     int angle;
+    int offset;
     int position;
     int velocity;
 

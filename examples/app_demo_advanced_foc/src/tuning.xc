@@ -247,8 +247,6 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             loop_counter=0;
         }
 
-
-
         general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
 
         xscope_int(ERROR_STATUS, general_control_data_low_level.velocity);
@@ -256,6 +254,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         xscope_int(COMPUTED_TORQUE, general_control_data_low_level.computed_torque);
         xscope_int(V_DC, general_control_data_low_level.V_dc);
         xscope_int(ANGLE, general_control_data_low_level.angle);
+        xscope_int(OFFSET, general_control_data_low_level.offset);
         xscope_int(POSITION, general_control_data_low_level.position);
         xscope_int(VELOCITY, general_control_data_low_level.velocity);
         xscope_int(TEMPERATURE, general_control_data_low_level.temperature);

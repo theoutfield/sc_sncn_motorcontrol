@@ -41,6 +41,7 @@
     <Probe name="COMPUTED_TORQUE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="V_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="ANGLE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="OFFSET" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TEMPERATURE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
