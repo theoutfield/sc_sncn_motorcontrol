@@ -367,6 +367,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
         case i_motorcontrol[int i].set_offset_detection_enabled():
             break;
 
+        case i_motorcontrol[int i].update_general_control_data(GeneralControlData control_data_high_level)-> GeneralControlData control_data_low_level:
+                break;
+
         case i_motorcontrol[int i].get_sensor_polarity_state() -> int proper_sensor_polarity:
             break;
 
