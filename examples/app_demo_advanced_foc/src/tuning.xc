@@ -237,11 +237,13 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         loop_counter++;
 
         if(loop_counter==300)
-            i_motorcontrol.set_torque(ref_torque);
+        {
+            general_control_data_high_level.reference_torque = ref_torque;
+        }
 
         if(loop_counter==600)
         {
-            i_motorcontrol.set_torque(-ref_torque);
+            general_control_data_high_level.reference_torque = - ref_torque;
             loop_counter=0;
         }
 
