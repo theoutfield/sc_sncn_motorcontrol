@@ -7,12 +7,12 @@
 #include <controllers_lib.h>
 
 
-void pid_init(int int9_P, int int9_I, int int9_D, int int21_P_error_limit, int int21_I_error_limit,
+void pid_init(int int10_P, int int10_I, int int10_D, int int21_P_error_limit, int int21_I_error_limit,
               int int22_integral_limit, int int32_cmd_limit, int int16_T_s, PIDparam &param)
 {
-    param.int9_P = int9_P;
-    param.int9_I = int9_I;
-    param.int9_D = int9_D;
+    param.int10_P = int10_P;
+    param.int10_I = int10_I;
+    param.int10_D = int10_D;
     param.int21_P_error_limit = int21_P_error_limit;
     param.int21_I_error_limit = int21_I_error_limit;
     param.int22_integral_limit = int22_integral_limit;
@@ -23,11 +23,11 @@ void pid_init(int int9_P, int int9_I, int int9_D, int int21_P_error_limit, int i
     param.int22_error_integral = 0;
 }
 
-void pid_set_coefficients(int int9_P, int int9_I, int int9_D, PIDparam &param)
+void pid_set_coefficients(int int10_P, int int10_I, int int10_D, PIDparam &param)
 {
-    param.int9_P = int9_P;
-    param.int9_I = int9_I;
-    param.int9_D = int9_D;
+    param.int10_P = int10_P;
+    param.int10_I = int10_I;
+    param.int10_D = int10_D;
 }
 
 void pid_set_limits(int int21_P_error_limit, int int21_I_error_limit, int int22_integral_limit, int int32_cmd_limit, PIDparam &param)
@@ -62,7 +62,7 @@ int pid_update(int int20_setpoint, int int20_feedback_p_filter, int int20_feedba
 
     int21_derivative = int20_feedback_d_filter - param.int20_feedback_d_filter_1n;
 
-    int32_cmd = ((param.int9_P * int21_P_error) + (param.int9_I * param.int22_error_integral) - (param.int9_D * int21_derivative));
+    int32_cmd = ((param.int10_P * int21_P_error) + (param.int10_I * param.int22_error_integral) - (param.int10_D * int21_derivative));
     if (int32_cmd > param.int32_cmd_limit)
         int32_cmd = param.int32_cmd_limit;
     else if (int32_cmd < -param.int32_cmd_limit)

@@ -9,9 +9,9 @@
  * @brief Structure type to set the parameters of the PID controller.
  */
 typedef struct {
-    int int9_P;
-    int int9_I;
-    int int9_D;
+    int int10_P;
+    int int10_I;
+    int int10_D;
     int int21_P_error_limit;
     int int21_I_error_limit;
     int int22_integral_limit;
@@ -34,13 +34,13 @@ typedef struct {
  * @param the output of the controller will be limited to this value
  * @param the parameters of the controller
  */
-void pid_init(int int9_P, int int9_I, int int9_D, int int21_P_error_limit, int int21_I_error_limit,
+void pid_init(int int10_P, int int10_I, int int10_D, int int21_P_error_limit, int int21_I_error_limit,
               int int16_itegral_limit, int int32_cmd_limit, int int16_T_s, PIDparam &param);
 
 
 
 
-void pid_set_coefficients(int int9_P, int int9_I, int int9_D, PIDparam &param);
+void pid_set_coefficients(int int10_P, int int10_I, int int10_D, PIDparam &param);
 
 void pid_set_limits(int int21_P_error_limit, int int21_I_error_limit, int in16_itegral_limit, int int32_cmd_limit, PIDparam &param);
 
@@ -53,8 +53,8 @@ void pid_set_limits(int int21_P_error_limit, int int21_I_error_limit, int in16_i
  * @param input, measured value
  * @param sample-time in us (microseconds).
  * @param the parameters of the controller
- * NOTE: If the biggest input is int20 and the bigest PID parameter is int9, then the output is int(20+9+3)=int32
- * NOTE: If the biggest input is int15 and the bigest PID parameter is int8, then the output is int(15+8+3)=int26
+ * NOTE: If the biggest input is int20 and the bigest PID parameter is int10, then the output is int((20+10+2)=int32
+ * NOTE: If the biggest input is int15 and the bigest PID parameter is int8, then the output is int(15+8+2)=int25
  */
 int pid_update(int int20_setpoint, int int20_feedback_p_filter, int int20_feedback_d_filter, int int16_T_s, PIDparam &param);
 
