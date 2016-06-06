@@ -45,7 +45,7 @@ int main(void) {
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[4];
-    interface PositionControlInterface i_position_control[3];
+    interface PositionVelocityCtrlInterface i_position_control[3];
     interface TuningInterface i_tuning;
     interface BrakeInterface i_brake;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)

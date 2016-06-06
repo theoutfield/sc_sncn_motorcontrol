@@ -207,7 +207,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 
 [[combinable]]
  void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_commutation,
-                     interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
+                     interface ADCInterface client ?i_adc, interface PositionVelocityCtrlInterface client ?i_position_control,
                      interface HallInterface client ?i_hall, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams)
 {
     timer t;

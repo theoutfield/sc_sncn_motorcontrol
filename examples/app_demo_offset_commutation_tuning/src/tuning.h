@@ -39,5 +39,5 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
 [[combinable]]
 void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_motorcontrol,
-                    interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
+                    interface ADCInterface client ?i_adc, interface PositionVelocityCtrlInterface client ?i_position_control,
                     client interface PositionFeedbackInterface i_position_feedback);
