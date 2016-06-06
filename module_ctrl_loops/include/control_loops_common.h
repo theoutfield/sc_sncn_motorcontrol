@@ -32,9 +32,9 @@ typedef struct {
 
     int int21_target_min_position;
     int int21_target_max_position;
-    int int9_P_position;
-    int int9_I_position;
-    int int9_D_position;
+    int int10_P_position;
+    int int10_I_position;
+    int int10_D_position;
     int int21_P_error_limit_position;
     int int21_I_error_limit_position;
     int int22_integral_limit_position;
@@ -42,9 +42,9 @@ typedef struct {
 
     int int21_target_min_velocity;
     int int21_target_max_velocity;
-    int int9_P_velocity;
-    int int9_I_velocity;
-    int int9_D_velocity;
+    int int10_P_velocity;
+    int int10_I_velocity;
+    int int10_D_velocity;
     int int21_P_error_limit_velocity;
     int int21_I_error_limit_velocity;
     int int22_integral_limit_velocity;

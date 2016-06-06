@@ -7,69 +7,149 @@
 #include <controllers_lib.h>
 
 
-void pid_init(int int10_P, int int10_I, int int10_D, int int21_P_error_limit, int int21_I_error_limit,
-              int int22_integral_limit, int int32_cmd_limit, int int16_T_s, PIDparam &param)
+void pid_init(int int9_P, int int9_I, int int9_D, int int23_P_error_limit, int int23_I_error_limit,
+              int int23_integral_limit, int int23_cmd_limit, int int16_T_s, PIDparam &param)
 {
-    param.int10_P = int10_P;
-    param.int10_I = int10_I;
-    param.int10_D = int10_D;
-    param.int21_P_error_limit = int21_P_error_limit;
-    param.int21_I_error_limit = int21_I_error_limit;
-    param.int22_integral_limit = int22_integral_limit;
-    param.int32_cmd_limit = int32_cmd_limit;
+    param.int9_P = int9_P;
+    if (param.int9_P > INT9_MAX)
+        param.int9_P = INT9_MAX;
+    else if (param.int9_P < INT9_MIN)
+        param.int9_P = INT9_MIN;
+
+    param.int9_I = int9_I;
+    if (param.int9_I > INT9_MAX)
+        param.int9_I = INT9_MAX;
+    else if (param.int9_I < INT9_MIN)
+        param.int9_I = INT9_MIN;
+
+    param.int9_D = int9_D;
+    if (param.int9_D > INT9_MAX)
+        param.int9_D = INT9_MAX;
+    else if (param.int9_D < INT9_MIN)
+        param.int9_D = INT9_MIN;
+
+    param.int23_P_error_limit = int23_P_error_limit;
+    if (param.int23_P_error_limit > INT23_MAX)
+        param.int23_P_error_limit = INT23_MAX;
+    else if (param.int23_P_error_limit < INT23_MIN)
+        param.int23_P_error_limit = INT23_MIN;
+
+    param.int23_I_error_limit = int23_I_error_limit;
+    if (param.int23_I_error_limit > INT23_MAX)
+        param.int23_I_error_limit = INT23_MAX;
+    else if (param.int23_I_error_limit < INT23_MIN)
+        param.int23_I_error_limit = INT23_MIN;
+
+    param.int23_integral_limit = int23_integral_limit;
+    if (param.int23_integral_limit > INT23_MAX)
+        param.int23_integral_limit = INT23_MAX;
+    else if (param.int23_integral_limit < INT23_MIN)
+        param.int23_integral_limit = INT23_MIN;
+
+    param.int23_cmd_limit = int23_cmd_limit;
+    if (param.int23_cmd_limit > INT23_MAX)
+        param.int23_cmd_limit = INT23_MAX;
+    else if (param.int23_cmd_limit < INT23_MIN)
+        param.int23_cmd_limit = INT23_MIN;
+
     param.int16_T_s = int16_T_s;    //Sampling-Time in microseconds
-    param.int20_feedback_p_filter_1n = 0;
-    param.int20_feedback_d_filter_1n = 0;
-    param.int22_error_integral = 0;
+    if (param.int16_T_s > INT16_MAX)
+        param.int16_T_s = INT16_MAX;
+    else if (param.int16_T_s < INT16_MIN)
+        param.int16_T_s = INT16_MIN;
+
+    param.int23_feedback_p_filter_1n = 0;
+    param.int23_feedback_d_filter_1n = 0;
+    param.int23_error_integral = 0;
 }
 
-void pid_set_coefficients(int int10_P, int int10_I, int int10_D, PIDparam &param)
+void pid_set_coefficients(int int9_P, int int9_I, int int9_D, PIDparam &param)
 {
-    param.int10_P = int10_P;
-    param.int10_I = int10_I;
-    param.int10_D = int10_D;
+    param.int9_P = int9_P;
+    if (param.int9_P > INT9_MAX)
+        param.int9_P = INT9_MAX;
+    else if (param.int9_P < INT9_MIN)
+        param.int9_P = INT9_MIN;
+
+    param.int9_I = int9_I;
+    if (param.int9_I > INT9_MAX)
+        param.int9_I = INT9_MAX;
+    else if (param.int9_I < INT9_MIN)
+        param.int9_I = INT9_MIN;
+
+    param.int9_D = int9_D;
+    if (param.int9_D > INT9_MAX)
+        param.int9_D = INT9_MAX;
+    else if (param.int9_D < INT9_MIN)
+        param.int9_D = INT9_MIN;
 }
 
-void pid_set_limits(int int21_P_error_limit, int int21_I_error_limit, int int22_integral_limit, int int32_cmd_limit, PIDparam &param)
+void pid_set_limits(int int23_P_error_limit, int int23_I_error_limit, int int23_integral_limit, int int23_cmd_limit, PIDparam &param)
 {
-    param.int21_P_error_limit = int21_P_error_limit;
-    param.int21_I_error_limit = int21_I_error_limit;
-    param.int22_integral_limit = int22_integral_limit;
-    param.int32_cmd_limit = int32_cmd_limit;
+    param.int23_P_error_limit = int23_P_error_limit;
+    if (param.int23_P_error_limit > INT23_MAX)
+        param.int23_P_error_limit = INT23_MAX;
+    else if (param.int23_P_error_limit < INT23_MIN)
+        param.int23_P_error_limit = INT23_MIN;
+
+    param.int23_I_error_limit = int23_I_error_limit;
+    if (param.int23_I_error_limit > INT23_MAX)
+        param.int23_I_error_limit = INT23_MAX;
+    else if (param.int23_I_error_limit < INT23_MIN)
+        param.int23_I_error_limit = INT23_MIN;
+
+    param.int23_integral_limit = int23_integral_limit;
+    if (param.int23_integral_limit > INT23_MAX)
+        param.int23_integral_limit = INT23_MAX;
+    else if (param.int23_integral_limit < INT23_MIN)
+        param.int23_integral_limit = INT23_MIN;
+
+    param.int23_cmd_limit = int23_cmd_limit;
+    if (param.int23_cmd_limit > INT23_MAX)
+        param.int23_cmd_limit = INT23_MAX;
+    else if (param.int23_cmd_limit < INT23_MIN)
+        param.int23_cmd_limit = INT23_MIN;
 }
 
-int pid_update(int int20_setpoint, int int20_feedback_p_filter, int int20_feedback_d_filter, int int16_T_s, PIDparam &param)
+int pid_update(int int23_setpoint, int int23_feedback_p_filter, int int23_feedback_d_filter, int int16_T_s, PIDparam &param)
 {
-    int int21_P_error, int21_I_error, int21_derivative, int32_cmd;
+    int int23_P_error, int23_I_error, int23_derivative, int31_cmd, int23_cmd;
 
-    int21_P_error = int20_setpoint - int20_feedback_p_filter;
-    if (int21_P_error > param.int21_P_error_limit)
-        int21_P_error = param.int21_P_error_limit;
-    else if (int21_P_error < -param.int21_P_error_limit)
-        int21_P_error = -param.int21_P_error_limit;
+    int23_P_error = int23_setpoint - int23_feedback_p_filter;
+    if (int23_P_error > param.int23_P_error_limit)
+        int23_P_error = param.int23_P_error_limit;
+    else if (int23_P_error < -param.int23_P_error_limit)
+        int23_P_error = -param.int23_P_error_limit;
 
-    int21_I_error = int21_P_error;
-    if (int21_I_error > param.int21_I_error_limit)
-        int21_I_error = param.int21_I_error_limit;
-    else if (int21_I_error < -param.int21_I_error_limit)
-        int21_I_error = -param.int21_I_error_limit;
+    int23_I_error = int23_P_error;
+    if (int23_I_error > param.int23_I_error_limit)
+        int23_I_error = param.int23_I_error_limit;
+    else if (int23_I_error < -param.int23_I_error_limit)
+        int23_I_error = -param.int23_I_error_limit;
 
-    param.int22_error_integral += int21_I_error;
-    if (param.int22_error_integral > param.int22_integral_limit)
-        param.int22_error_integral = param.int22_integral_limit;
-    else if (param.int22_error_integral < -param.int22_integral_limit)
-        param.int22_error_integral = -param.int22_integral_limit;
+    param.int23_error_integral += int23_I_error;
+    if (param.int23_error_integral > param.int23_integral_limit)
+        param.int23_error_integral = param.int23_integral_limit;
+    else if (param.int23_error_integral < -param.int23_integral_limit)
+        param.int23_error_integral = -param.int23_integral_limit;
 
-    int21_derivative = int20_feedback_d_filter - param.int20_feedback_d_filter_1n;
+    int23_derivative = int23_feedback_d_filter - param.int23_feedback_d_filter_1n;
+    if (int23_derivative > INT23_MAX)
+        int23_derivative = INT23_MAX;
+    else if (int23_derivative < INT23_MIN)
+        int23_derivative = INT23_MIN;
 
-    int32_cmd = ((param.int10_P * int21_P_error) + (param.int10_I * param.int22_error_integral) - (param.int10_D * int21_derivative));
-    if (int32_cmd > param.int32_cmd_limit)
-        int32_cmd = param.int32_cmd_limit;
-    else if (int32_cmd < -param.int32_cmd_limit)
-        int32_cmd = -param.int32_cmd_limit;
+    int31_cmd = ((param.int9_P * int23_P_error) + (param.int9_I * param.int23_error_integral) - (param.int9_D * int23_derivative));
+    int31_cmd /= param.scale_factor;
+    if (int31_cmd > param.int23_cmd_limit)
+        int23_cmd = param.int23_cmd_limit;
+    else if (int31_cmd < -param.int23_cmd_limit)
+        int23_cmd = -param.int23_cmd_limit;
+    else
+        int23_cmd = int31_cmd;
 
-    param.int20_feedback_p_filter_1n = int20_feedback_p_filter;
-    param.int20_feedback_d_filter_1n = int20_feedback_d_filter;
+    param.int23_feedback_p_filter_1n = int23_feedback_p_filter;
+    param.int23_feedback_d_filter_1n = int23_feedback_d_filter;
 
-    return int32_cmd;
+    return int23_cmd;
 }
