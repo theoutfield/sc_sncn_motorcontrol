@@ -138,6 +138,11 @@ interface MotorcontrolInterface{
     void set_offset_detection_enabled();
 
     /**
+     * @brief Enables the safe-torque-off mode
+     */
+    void set_safe_torque_off_enabled();
+
+    /**
      * @brief Shows if sensor polarity is true or wrong.
      * If the returned value is 0, then sensor polarity is wrong (sensor polarity should be changed, or motor phases should be flipped)
      * If the returned value is 1, then sensor polarity is true.

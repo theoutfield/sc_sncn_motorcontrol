@@ -229,6 +229,43 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     i_motorcontrol.set_brake_status(1);
     delay_milliseconds(2000);
 
+    printf(">>  SEND OSCILATING TORQUE_REF ...\n");
+    ref_torque=100;
+    for(int i=1;i<=10;i++)
+    {
+            general_control_data_high_level.reference_torque = ref_torque;
+            general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
+            delay_milliseconds(200);
+
+            general_control_data_high_level.reference_torque = - ref_torque;
+            general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
+            delay_milliseconds(200);
+    }
+
+
+
+    ref_torque=0;
+    general_control_data_high_level.reference_torque = ref_torque;
+    general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
+    delay_milliseconds(2000);
+
+
+    printf(">>  GO TO SAFE_TORQUE_OFF MODE IN TWO SECONDS ...\n");
+    delay_milliseconds(2000);
+    i_motorcontrol.set_safe_torque_off_enabled();
+
+    delay_milliseconds(2000);
+    printf(">>  ENABLING THE CONTROL ...\n");
+    i_motorcontrol.set_torque_control_enabled();
+    delay_milliseconds(2000);
+
+
+    printf(">>  UNLOCK THE BRAKE ...\n");
+    i_motorcontrol.set_brake_status(1);
+    delay_milliseconds(2000);
+
+
+    printf(">>  SEND OSCILATING TORQUE_REF AND MONITORING THE DATA ...\n");
 
     ref_torque=100;
 

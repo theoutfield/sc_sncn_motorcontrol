@@ -231,6 +231,33 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
                 pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
 
                 break;
+
+        case i_update_pwm.safe_torque_off_enabled():
+
+                pwm_on     = 0;
+
+                // Rising edges - these have negative time offsets - 44 Cycles
+                ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
+                ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
+                ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: 0x00000000;
+                ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
+                ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
+                ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
+
+                // Falling edges - these have positive time offsets - 44 Cycles
+                ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
+                ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
+                ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: 0x00000000;
+                ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
+                ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
+                ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
+
+                pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
+                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
+                pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
+
+
+                break;
         }
 
         if (pwm_on)
