@@ -153,3 +153,20 @@ int pid_update(int int23_setpoint, int int23_feedback_p_filter, int int23_feedba
 
     return int23_cmd;
 }
+
+
+void pid_reset(PIDparam &param)
+{
+    param.int23_feedback_p_filter_1n = 0;
+    param.int23_feedback_d_filter_1n = 0;
+    param.int23_error_integral = 0;
+}
+
+
+
+
+
+
+
+
+

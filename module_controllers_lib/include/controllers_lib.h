@@ -74,6 +74,8 @@ void pid_set_limits(int int23_P_error_limit, int int23_I_error_limit, int in23_i
  */
 int pid_update(int int23_setpoint, int int23_feedback_p_filter, int int23_feedback_d_filter, int int16_T_s, PIDparam &param);
 
+void pid_reset(PIDparam &param);
+
 
 
 
