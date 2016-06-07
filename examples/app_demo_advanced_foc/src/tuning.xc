@@ -197,7 +197,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     int offset=0;
     int loop_counter=0;
 
-    GeneralControlData general_control_data_low_level, general_control_data_high_level;
+    UpstreamControlData upstream_control_data;
 
     printf(">>  DEMO TORQUE CONTROL STARTING ...\n");
     delay_milliseconds(4000);
@@ -230,23 +230,20 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     delay_milliseconds(2000);
 
     printf(">>  SEND OSCILATING TORQUE_REF ...\n");
+
     ref_torque=100;
     for(int i=1;i<=10;i++)
     {
-            general_control_data_high_level.reference_torque = ref_torque;
-            general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
-            delay_milliseconds(200);
+        i_motorcontrol.set_torque(ref_torque);
+        delay_milliseconds(200);
 
-            general_control_data_high_level.reference_torque = - ref_torque;
-            general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
-            delay_milliseconds(200);
+        i_motorcontrol.set_torque(-ref_torque);
+        delay_milliseconds(200);
     }
 
 
-
     ref_torque=0;
-    general_control_data_high_level.reference_torque = ref_torque;
-    general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
+    i_motorcontrol.set_torque(ref_torque);
     delay_milliseconds(2000);
 
 
@@ -275,26 +272,23 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
         if(loop_counter==300)
         {
-            general_control_data_high_level.reference_torque = ref_torque;
+            i_motorcontrol.set_torque(ref_torque);
         }
 
         if(loop_counter==600)
         {
-            general_control_data_high_level.reference_torque = - ref_torque;
+            i_motorcontrol.set_torque(-ref_torque);
             loop_counter=0;
         }
 
-        general_control_data_low_level = i_motorcontrol.update_general_control_data(general_control_data_high_level);
+        upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-        xscope_int(ERROR_STATUS, general_control_data_low_level.velocity);
-        xscope_int(REFERENCE_TORQUE, general_control_data_low_level.reference_torque);
-        xscope_int(COMPUTED_TORQUE, general_control_data_low_level.computed_torque);
-        xscope_int(V_DC, general_control_data_low_level.V_dc);
-        xscope_int(ANGLE, general_control_data_low_level.angle);
-        xscope_int(OFFSET, general_control_data_low_level.offset);
-        xscope_int(POSITION, general_control_data_low_level.position);
-        xscope_int(VELOCITY, general_control_data_low_level.velocity);
-        xscope_int(TEMPERATURE, general_control_data_low_level.temperature);
+        xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
+        xscope_int(V_DC, upstream_control_data.V_dc);
+        xscope_int(ANGLE, upstream_control_data.angle);
+        xscope_int(POSITION, upstream_control_data.position);
+        xscope_int(VELOCITY, upstream_control_data.velocity);
+        xscope_int(TEMPERATURE, upstream_control_data.temperature);
 
         delay_milliseconds(1);
 

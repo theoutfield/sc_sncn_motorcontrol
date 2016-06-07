@@ -133,9 +133,9 @@ void position_control_service(ControlConfig &position_control_config,
 
                 } // end control activated
 
-                        xscope_int(VELOCITY_REF, int16_velocity_ref_k);
-                        xscope_int(VELOCITY, int16_velocity_k);
-                        xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
+//                        xscope_int(VELOCITY_REF, int16_velocity_ref_k);
+//                        xscope_int(VELOCITY, int16_velocity_k);
+//                        xscope_int(VELOCITY_CMD, int16_velocity_cmd_k);
 
                 break;
 
