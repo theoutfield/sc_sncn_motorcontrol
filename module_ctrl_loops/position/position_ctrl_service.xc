@@ -43,6 +43,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionVelocityCtrlInterface server i_position_control[3])
 {
+    UpstreamControlData upstream_control_data;
 
     // position controller
     int int1_position_enable_flag = 0;
@@ -111,7 +112,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     i_motorcontrol.set_torque_control_enabled();
     delay_milliseconds(1000);
 
-    int25_position_k_sens_ofset = i_motorcontrol.get_position_actual();
+//    int25_position_k_sens_ofset = i_motorcontrol.get_position_actual();
+    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    int25_position_k_sens = upstream_control_data.position;// - int25_position_k_sens_ofset;
+    int23_position_k_sens = int25_position_k_sens / 4; //-4194303 to 4194303
+    int23_position_ref_k_in = int23_position_k_sens;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
     t :> ts;
@@ -120,9 +125,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
         select {
             case t when timerafter(ts + USEC_STD * 1000/*position_control_config.control_loop_period*/) :> ts:
 
-                int14_velocity_k_sens = i_motorcontrol.get_velocity_actual(); //-8191RPM to 8191RPM
+                upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                int14_velocity_k_sens = upstream_control_data.velocity;
                 int23_velocity_k_sens = int14_velocity_k_sens * 512; //-4194303 to 4194303
-                int25_position_k_sens = i_motorcontrol.get_position_actual() - int25_position_k_sens_ofset;
+
+                int25_position_k_sens = upstream_control_data.position;// - int25_position_k_sens_ofset;
                 int23_position_k_sens = int25_position_k_sens / 4; //-4194303 to 4194303
 
                 // position control
@@ -141,7 +149,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 else if (int1_position_enable_flag == 0)
                 {
                     pid_reset(position_control_pid_param);
-                    int25_position_k_sens_ofset = i_motorcontrol.get_position_actual();
+                    int23_position_ref_k_in = int23_position_k_sens;
+//                    int25_position_k_sens_ofset = i_motorcontrol.get_position_actual();
                     int23_velocity_ref_k = int23_velocity_ref_k_in; // -524287 to 524287 [verified on 06.June.16]
                 }
 
@@ -202,14 +211,14 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
 
-//                xscope_int(POSITION_REF, int23_position_ref_k);
-//                xscope_int(POSITION, int23_position_k);
-//                xscope_int(POSITION_CMD, int23_velocity_ref_k);
+                xscope_int(POSITION_REF, int23_position_ref_k);
+                xscope_int(POSITION, int23_position_k);
+                xscope_int(POSITION_CMD, int23_velocity_ref_k);
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
-//                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
-//                xscope_int(VELOCITY, int23_velocity_k);
-//                xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
+                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
+                xscope_int(VELOCITY, int23_velocity_k);
+                xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
 //                xscope_int(VELOCITY_TEMP1, int23_torque_ref_in);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
