@@ -36,7 +36,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     int int16_P_error_limit_position = pos_velocity_ctrl_config.int21_P_error_limit_position;
     int int16_I_error_limit_position = pos_velocity_ctrl_config.int21_I_error_limit_position;
     int int16_integral_limit_position = pos_velocity_ctrl_config.int22_integral_limit_position;
-    int int16_cmd_limit_position = pos_velocity_ctrl_config.int32_cmd_limit_position;
+    int int16_cmd_limit_position = pos_velocity_ctrl_config.int21_max_position;
 
     int int8_Kp_velocity = pos_velocity_ctrl_config.int10_P_velocity;
     int int8_Ki_velocity = pos_velocity_ctrl_config.int10_I_velocity;//50;
@@ -44,7 +44,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     int int16_P_error_limit_velocity = pos_velocity_ctrl_config.int21_P_error_limit_velocity;
     int int16_I_error_limit_velocity = pos_velocity_ctrl_config.int21_I_error_limit_velocity;
     int int16_integral_limit_velocity = pos_velocity_ctrl_config.int22_integral_limit_velocity;
-    int int16_cmd_limit_velocity = pos_velocity_ctrl_config.int32_cmd_limit_velocity;
+    int int16_cmd_limit_velocity = pos_velocity_ctrl_config.int21_max_speed;
 
     int torque = 0;
 
@@ -134,11 +134,6 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                 i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
                 printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
                 break;
-            case 'c':
-                int16_cmd_limit_velocity = value * sign;
-                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-                break;
             default:
                 printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
                 break;
@@ -183,11 +178,6 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                 break;
             case 'l':
                 int16_integral_limit_position = value * sign;
-                i_position_control.set_position_pid_limits(int16_P_error_limit_position, int16_I_error_limit_position, int16_integral_limit_position, int16_cmd_limit_position);
-                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_position, int16_I_error_limit_position, int16_integral_limit_position, int16_cmd_limit_position);
-                break;
-            case 'c':
-                int16_cmd_limit_position = value * sign;
                 i_position_control.set_position_pid_limits(int16_P_error_limit_position, int16_I_error_limit_position, int16_integral_limit_position, int16_cmd_limit_position);
                 printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_position, int16_I_error_limit_position, int16_integral_limit_position, int16_cmd_limit_position);
                 break;
