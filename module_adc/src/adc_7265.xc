@@ -289,6 +289,9 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
     #pragma ordered
         select {
+        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out}:
+                break;
+
         case iADC[int i].get_currents() -> {int adc_A, int adc_B}:
 
                 // Config: 1 Port: 1
@@ -365,6 +368,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog)
 {
 
+    timer t;
     unsigned time_stamp; // Time stamp
 
     unsigned inp_val = 0, tmp_val = 0;
@@ -379,6 +383,8 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
     int I_b=0;
     int I_c=0;
     int current_limit = (I_MAX * 56)/10;
+
+    int torque=0;
 
     configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
@@ -422,6 +428,63 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 #pragma ordered
         select
         {
+        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out}:
+
+                adc_ports.p4_mux <: 0b1000;//mux_config;
+                clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
+                clearbuf( adc_ports.p32_data[1] );
+                adc_ports.p1_ready <: 1 @ time_stamp; // Switch ON input reads (and ADC conversion)
+                time_stamp += (ADC_TOTAL_BITS+2); // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
+                adc_ports.p1_ready @ time_stamp <: 0; // Switch OFF input reads, (and ADC conversion)
+
+                sync( adc_ports.p1_ready ); // Wait until port has completed any pending outputs
+
+                // Get data from port a
+                endin( adc_ports.p32_data[0] );   // End the previous input on this buffered port
+                adc_ports.p32_data[0] :> inp_val; // Get new input
+                tmp_val = bitrev( inp_val );      // Reverse bit order. WARNING. Machine dependent
+                tmp_val = tmp_val >> (SHIFTING_BITS+1);
+                tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+                out_a = (int)tmp_val;
+
+                // Get data from port b
+                endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
+                adc_ports.p32_data[1] :> inp_val; // Get new input
+                tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
+                tmp_val = tmp_val >> (SHIFTING_BITS+1);
+                tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+                out_b = (int)tmp_val;
+
+                phaseB_out = -(out_a - 2048);
+                phaseC_out = +(out_b - 2048);
+
+
+                I_b = phaseB_out;
+                I_c = phaseC_out;
+                I_a = -I_b-I_c;
+
+
+                if( I_a<(-current_limit) || current_limit<I_a)
+                {
+                    i_watchdog.protect(1);
+                }
+
+                if( I_b<(-current_limit) || current_limit<I_b)
+                {
+                    i_watchdog.protect(2);
+                }
+
+                if( I_c<(-current_limit) || current_limit<I_c)
+                {
+                    i_watchdog.protect(3);
+                }
+
+                V_dc_out = V_dc;
+                torque_out = torque;
+
+                flag=1;
+                break;
+
         case iADC[int i].get_currents() -> {int phaseB, int phaseC}:
 
                 adc_ports.p4_mux <: 0b1000;//mux_config;
@@ -473,7 +536,6 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                     i_watchdog.protect(3);
                 }
 
-
                 flag=1;
                 break;
 
@@ -500,8 +562,7 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 
         if(flag==1)
         {
-
-
+            // change the channel to measure V_dc and I_dc
             for(i=0;i<=20;i++)  adc_ports.p4_mux <: 0b1001;
             for(i=0;i<=1;i++)
             {
@@ -546,10 +607,40 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 
             }
 
+            // change the channel to measure Torque
+            for(i=0;i<=20;i++)  adc_ports.p4_mux <: 0b1010;
+            for(i=0;i<=1;i++)
+            {
+                clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
+                clearbuf( adc_ports.p32_data[1] );
+
+                adc_ports.p1_ready <: 1 @ time_stamp; // Switch ON input reads (and ADC conversion)
+                time_stamp += (ADC_TOTAL_BITS+2);     // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
+                adc_ports.p1_ready @ time_stamp <: 0; // Switch OFF input reads, (and ADC conversion)
+                sync( adc_ports.p1_ready );           // Wait until port has completed any pending outputs
+
+                // Get data from port a
+                endin( adc_ports.p32_data[0] ); // End the previous input on this buffered port
+                adc_ports.p32_data[0] :> inp_val; // Get new input
+                tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
+                tmp_val = tmp_val >> (SHIFTING_BITS+1);
+                tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+                out_a = (int)tmp_val;
+
+                // Get data from port b
+                endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
+                adc_ports.p32_data[1] :> inp_val; // Get new input
+                tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
+                tmp_val = tmp_val >> (SHIFTING_BITS+1);
+                tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+                out_b = (int)tmp_val;
+
+                if(i==1) torque = out_a-out_b;
+            }
 
             // current measurement:
             for(i=0;i<=20;i++)  adc_ports.p4_mux <: 0b1000;
-            for (i=0;i<=10;i++)
+            for (i=0;i<=15;i++)
             {
                 adc_ports.p4_mux <: 0b1000;//mux_config;
                 clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
@@ -596,6 +687,7 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 }
             }
             flag=0;
+
         }
     }//eof while(1)
 
@@ -661,6 +753,9 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
                     overcurrent_protection_was_triggered = adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
                 }
 
+                break;
+
+        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out}:
                 break;
 
         case iADC[int i].get_currents() -> {int adc_A, int adc_B}:

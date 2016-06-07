@@ -21,6 +21,18 @@
  * @brief Interface type to communicate with the ADC Service.
  */
 interface ADCInterface{
+
+    /**
+     * @brief Get all measured parameters at once
+     * The parameters include:
+     *  - Current on Phase B
+     *  - Current on Phase C
+     *  - Vdc
+     *  - Torque
+     */
+    {int, int, int, int} get_all_measurements();
+
+
     // *Max adc ticks are 8192 and corresponds with the max current your DC can handle:
     // DC100: 5A, DC300: 20A, DC1K 50A
     /**
