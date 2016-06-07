@@ -196,6 +196,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
     int offset=0;
     int loop_counter=0;
+    int proper_sensor_polarity=0;
 
     UpstreamControlData upstream_control_data;
 
@@ -209,6 +210,20 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     printf(">>  START OFFSET DETECTION ...\n");
     i_motorcontrol.set_offset_detection_enabled();
     delay_milliseconds(30000);
+
+
+    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
+    proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+    if(proper_sensor_polarity==0)
+    {
+        printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+        while(1);
+    }
+    else if(proper_sensor_polarity==1)
+    {
+        printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+    }
+
 
     offset=i_motorcontrol.set_calib(0);
     printf("detected offset is %d\n", offset);
