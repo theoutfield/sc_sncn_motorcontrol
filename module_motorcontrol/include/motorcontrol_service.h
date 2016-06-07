@@ -94,6 +94,21 @@ typedef struct
 
 }UpstreamControlData;
 
+
+/**
+ * @brief Structure type to send the data from higher controlling levels
+ * to higher controlling levels
+ */
+typedef struct
+{
+    int position_cmd;
+    int velocity_cmd;
+    int torque_cmd;
+    int offset_torque;
+}DownstreamControlData;
+
+
+
 /**
  * @brief Interface type to communicate with the Motor Control Service.
  */

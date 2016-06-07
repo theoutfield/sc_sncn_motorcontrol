@@ -15,6 +15,8 @@
 interface PositionVelocityCtrlInterface{
 
 
+    void enable();
+    void disable();
 
 
     void enable_position_ctrl();
@@ -59,6 +61,8 @@ interface PositionVelocityCtrlInterface{
     int get_velocity();
 
     int check_busy();
+
+    UpstreamControlData update_control_data(DownstreamControlData downstream_control_data_);
 };
 
 

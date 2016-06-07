@@ -26,6 +26,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
+    DownstreamControlData downstream_control_data;
+
     int int8_Kp_position = 50;
     int int8_Ki_position = 50;
     int int8_Kd_position = 0;
@@ -194,7 +196,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                         printf("position ctrl enabled\n");
                     }
                     else {
-                        i_position_control.disable_position_ctrl();
+                        i_position_control.disable();
                         printf("position ctrl disabled\n");
                     }
                     break;
@@ -204,7 +206,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                         printf("velocity ctrl enabled\n");
                     }
                     else {
-                        i_position_control.disable_velocity_ctrl();
+                        i_position_control.disable();
                         printf("velocity ctrl disabled\n");
                     }
                     break;
@@ -214,7 +216,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                         printf("torque ctrl enabled\n");
                     }
                     else {
-                        i_position_control.disable_torque_ctrl();
+                        i_position_control.disable();
                         printf("torque ctrl disabled\n");
                     }
                     break;
@@ -225,27 +227,39 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             switch(mode_2) {
                 case 'p':
                     printf("position cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    i_position_control.set_position(value*sign);
+                    downstream_control_data.position_cmd = value*sign;
+                    i_position_control.update_control_data(downstream_control_data);
                     delay_milliseconds(1000);
-                    i_position_control.set_position(-value*sign);
+                    downstream_control_data.position_cmd = -value*sign;
+                    i_position_control.update_control_data(downstream_control_data);
                     delay_milliseconds(1000);
-                    i_position_control.set_position(0);
+                    downstream_control_data.position_cmd = 0;
+                    i_position_control.update_control_data(downstream_control_data);
                     break;
                 case 'v':
                     printf("velocity cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    i_position_control.set_velocity(value*sign);
+                    downstream_control_data.velocity_cmd = value*sign;
+                    i_position_control.update_control_data(downstream_control_data);
+//                    i_position_control.set_velocity(value*sign);
                     delay_milliseconds(200);
-                    i_position_control.set_velocity(-value*sign);
+                    downstream_control_data.velocity_cmd = -value*sign;
+                    i_position_control.update_control_data(downstream_control_data);
                     delay_milliseconds(200);
-                    i_position_control.set_velocity(0);
+                    downstream_control_data.velocity_cmd = 0;//value*sign;
+                    i_position_control.update_control_data(downstream_control_data);
                     break;
                 case 't':
                     printf("torque cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    i_position_control.set_torque(value*sign);
+                    downstream_control_data.torque_cmd = value*sign;
+                    i_position_control.update_control_data(downstream_control_data);
+//                    i_position_control.set_torque(value*sign);
                     delay_milliseconds(200);
-                    i_position_control.set_torque(-value*sign);
+                    downstream_control_data.torque_cmd = -value*sign;
+                    i_position_control.update_control_data(downstream_control_data);
+//                    i_position_control.set_torque(-value*sign);
                     delay_milliseconds(200);
-                    i_position_control.set_torque(0);
+                    downstream_control_data.torque_cmd = 0;
+                    i_position_control.update_control_data(downstream_control_data);
                     break;
                     }
             break;
