@@ -363,10 +363,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
             case i_position_control[int i].get_position() -> int out_position:
+                    out_position = upstream_control_data.position;
                 break;
 
 
             case i_position_control[int i].get_velocity() -> int out_velocity:
+                    out_velocity = upstream_control_data.velocity;
                 break;
 
             case i_position_control[int i].check_busy() -> int out_activate:
