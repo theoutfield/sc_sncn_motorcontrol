@@ -95,8 +95,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     unsigned int ts;
 
 
-    second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/60, /*T_s=*/1000, velocity_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/60, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
 
     pid_init(pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity,
              pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity,
@@ -218,16 +218,19 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 }
 
-//                xscope_int(POSITION_REF, int23_position_ref_k);
-//                xscope_int(POSITION, int23_position_k);
+#ifdef XSCOPE_POSITION_CTRL
+                xscope_int(POSITION_REF, int23_position_ref_k_in*4);
+                xscope_int(POSITION, upstream_control_data.position);
 //                xscope_int(POSITION_CMD, int23_velocity_ref_k);
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
 //                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
-//                xscope_int(VELOCITY, int23_velocity_k);
-//                xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
-//                xscope_int(VELOCITY_TEMP1, int23_torque_ref_in);
+                xscope_int(VELOCITY, upstream_control_data.velocity);
+                xscope_int(VELOCITY_CMD, int13_torque_ref);
+                xscope_int(VELOCITY_FILTERED, int23_velocity_k);
+                xscope_int(TORQUE, upstream_control_data.computed_torque);
 //                xscope_int(VELOCITY_TEMP2, 0);
+#endif
 
 
                 break;
