@@ -109,7 +109,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
              pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
 
 
-    i_motorcontrol.set_offset_value(3040);
+
 //    delay_milliseconds(1000);
 //    i_motorcontrol.set_torque_control_enabled();
 //    delay_milliseconds(1000);
@@ -156,7 +156,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
                 else if (int1_position_enable_flag == 0)
                 {
-                    pid_reset(position_control_pid_param);
+
                     int23_position_ref_k_in = int23_position_k_sens;
 //                    int25_position_k_sens_ofset = i_motorcontrol.get_position_actual();
                     int23_velocity_ref_k = int23_velocity_ref_k_in; // -524287 to 524287 [verified on 06.June.16]
@@ -209,7 +209,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                                          &flt23_velocity_d_k_2n);
                 }
                 else if (int1_velocity_enable_flag == 0) {
-                    pid_reset(velocity_control_pid_param);
                     if(int1_torque_enable_flag == 1) {
                         int13_torque_ref = int23_torque_ref_in / 1024;
                         //                    int13_torque_ref = int16_torque_ref / 8;
@@ -219,14 +218,14 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 }
 
-                xscope_int(POSITION_REF, int23_position_ref_k);
-                xscope_int(POSITION, int23_position_k);
-                xscope_int(POSITION_CMD, int23_velocity_ref_k);
+//                xscope_int(POSITION_REF, int23_position_ref_k);
+//                xscope_int(POSITION, int23_position_k);
+//                xscope_int(POSITION_CMD, int23_velocity_ref_k);
 //                    xscope_int(POSITION_TEMP1, 0);
 //                    xscope_int(POSITION_TEMP2, 0);
-                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
-                xscope_int(VELOCITY, int23_velocity_k);
-                xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
+//                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
+//                xscope_int(VELOCITY, int23_velocity_k);
+//                xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
 //                xscope_int(VELOCITY_TEMP1, int23_torque_ref_in);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
@@ -260,6 +259,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int25_position_k_sens = upstream_control_data.position;// - int25_position_k_sens_ofset;
                     int23_position_k_sens = int25_position_k_sens / 4; //-4194303 to 4194303
                     int23_position_ref_k_in = int23_position_k_sens;
+                    pid_reset(position_control_pid_param);
                     i_motorcontrol.set_torque_control_enabled();
                 break;
             case i_position_control[int i].disable_position_ctrl():
@@ -291,6 +291,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int1_velocity_enable_flag = 1;
                     int1_torque_enable_flag = 0;
                     int23_velocity_ref_k_in = 0;
+                    pid_reset(velocity_control_pid_param);
                     i_motorcontrol.set_torque_control_enabled();
                 break;
                 //remove
@@ -340,6 +341,16 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
             case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
                     pos_velocity_ctrl_config = in_config;
+                    pid_init(pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity,
+                             pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity,
+                             pos_velocity_ctrl_config.int22_integral_limit_velocity, pos_velocity_ctrl_config.int32_cmd_limit_velocity,
+                             pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+
+                    pid_init(pos_velocity_ctrl_config.int10_P_position, pos_velocity_ctrl_config.int10_I_position, pos_velocity_ctrl_config.int10_D_position,
+                             pos_velocity_ctrl_config.int21_P_error_limit_position, pos_velocity_ctrl_config.int21_I_error_limit_position,
+                             pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.int32_cmd_limit_position,
+                             pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+
                 break;
 
             case i_position_control[int i].get_position_velocity_control_config() ->  PosVelocityControlConfig out_config:
@@ -367,8 +378,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
             case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_) -> UpstreamControlData upstream_control_data_:
                     upstream_control_data_ = upstream_control_data;
                     downstream_control_data = downstream_control_data_;
-                    int23_position_ref_k_in = downstream_control_data.position_cmd;
-                    int23_velocity_ref_k_in = downstream_control_data.velocity_cmd;
+                    int23_position_ref_k_in = downstream_control_data.position_cmd / 4;
+                    int23_velocity_ref_k_in = downstream_control_data.velocity_cmd * 512;
                     int23_torque_ref_in = downstream_control_data.torque_cmd;
 //                    downstream_control_data.torque_ofset = 0;
                 break;
