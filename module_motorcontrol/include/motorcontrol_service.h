@@ -75,26 +75,24 @@ typedef struct {
 } FetDriverPorts;
 
 /**
- * @brief Structure type to share (control) data between
- * different controlling layers (torque controller, speed controller, position controller ...)
+ * @brief Structure type to send the data from lower controlling levels
+ * to higher controlling levels
  */
 typedef struct
 {
     int error_status;
 
-    int reference_torque;
     int computed_torque;
 
     int V_dc;
 
     int angle;
-    int offset;
     int position;
     int velocity;
 
     int temperature;
 
-}GeneralControlData;
+}UpstreamControlData;
 
 /**
  * @brief Interface type to communicate with the Motor Control Service.
@@ -136,6 +134,11 @@ interface MotorcontrolInterface{
      * @brief Enables the offset detection process
      */
     void set_offset_detection_enabled();
+
+    /**
+     * @brief Enables the safe-torque-off mode
+     */
+    void set_safe_torque_off_enabled();
 
     /**
      * @brief Shows if sensor polarity is true or wrong.
@@ -259,7 +262,7 @@ interface MotorcontrolInterface{
 
     int get_field();
 
-    GeneralControlData update_general_control_data (GeneralControlData general_control_data);
+    UpstreamControlData update_upstream_control_data ();
 };
 
 

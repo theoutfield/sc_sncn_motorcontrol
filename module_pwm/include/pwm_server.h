@@ -43,6 +43,7 @@ typedef struct PWM_SERV_TAG
 interface update_pwm
 {
     void update_server_control_data(PWM_ARRAY_TYP pwm_ctrl_s, int pwm_on, int brake_active);
+    void safe_torque_off_enabled(void);
 };
 
 void pwm_config(PwmPorts &ports);

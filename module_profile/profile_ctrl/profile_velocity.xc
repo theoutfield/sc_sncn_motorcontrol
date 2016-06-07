@@ -48,8 +48,8 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 
 #ifdef USE_XSCOPE
         actual_velocity = i_velocity_control.get_velocity();
-        xscope_int(0, actual_velocity);
-        xscope_int(1, velocity_ramp);
+//        xscope_int(0, actual_velocity);
+//        xscope_int(1, velocity_ramp);
 #endif
     }
     if (target_velocity == 0) {
