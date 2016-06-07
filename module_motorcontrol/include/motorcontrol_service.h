@@ -84,6 +84,8 @@ typedef struct
 
     int computed_torque;
 
+    int sensor_torque;
+
     int V_dc;
 
     int angle;

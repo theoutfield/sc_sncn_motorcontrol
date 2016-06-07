@@ -32,6 +32,7 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     unsigned int time;
     int steps;
     int position_ramp;
+    DownstreamControlData downstream_control_data;
 
     int actual_position = 0;
     int init_state = i_position_control.check_busy();
@@ -50,7 +51,8 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     for(i = 1; i < steps; i++)
     {
         position_ramp = position_profile_generate(i);
-        i_position_control.set_position(position_ramp);
+        downstream_control_data.position_cmd = position_ramp;
+        i_position_control.update_control_data(downstream_control_data);
         t when timerafter(time + MSEC_STD) :> time;
     }
     t when timerafter(time + 30 * MSEC_STD) :> time;
