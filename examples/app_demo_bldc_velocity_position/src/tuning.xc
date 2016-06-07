@@ -26,21 +26,21 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
-    int int8_Kp_position = 120;
-    int int8_Ki_position = 0;
+    int int8_Kp_position = 50;
+    int int8_Ki_position = 50;
     int int8_Kd_position = 0;
     int int16_P_error_limit_position = 200000;
-    int int16_I_error_limit_position = 1000;
-    int int16_integral_limit_position = 50000;
-    int int16_cmd_limit_position = 600000;
+    int int16_I_error_limit_position = 1;
+    int int16_integral_limit_position = 1000;
+    int int16_cmd_limit_position = 1000000;
 
-    int int8_Kp_velocity = 0;
-    int int8_Ki_velocity = 0;
-    int int8_Kd_velocity = 0;
-    int int16_P_error_limit_velocity = 1073741824;
-    int int16_I_error_limit_velocity = 1073741824;
-    int int16_integral_limit_velocity = 1073741824;
-    int int16_cmd_limit_velocity = 1073741824;
+    int int8_Kp_velocity = 70;
+    int int8_Ki_velocity = 0;//50;
+    int int8_Kd_velocity = 90;
+    int int16_P_error_limit_velocity = 200000;
+    int int16_I_error_limit_velocity = 2000;
+    int int16_integral_limit_velocity = 60000;
+    int int16_cmd_limit_velocity = 1000000;
 
     int torque = 0;
 
@@ -84,54 +84,54 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
         //velocity pid coefficients
         case 'k':
-//            switch(mode_2) {
-//            case 'p':
-//                int8_Kp_velocity = value;
-//                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                break;
-//            case 'i':
-//                int8_Ki_velocity = value;
-//                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                break;
-//            case 'd':
-//                int8_Kd_velocity = value;
-//                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                break;
-//            default:
-//                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
-//                break;
-//            }
+            switch(mode_2) {
+            case 'p':
+                int8_Kp_velocity = value;
+                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                break;
+            case 'i':
+                int8_Ki_velocity = value;
+                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                break;
+            case 'd':
+                int8_Kd_velocity = value;
+                i_position_control.set_velocity_pid_coefficients(int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                break;
+            default:
+                printf("Kp:%d Ki:%d Kd:%d\n", int8_Kp_velocity, int8_Ki_velocity, int8_Kd_velocity);
+                break;
+            }
             break;
         //velocity pid limits
         case 'l':
-//            switch(mode_2) {
-//            case 'p':
-//                int16_P_error_limit_velocity = value * sign;
-//                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                break;
-//            case 'i':
-//                int16_I_error_limit_velocity = value * sign;
-//                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                break;
-//            case 'l':
-//                int16_integral_limit_velocity = value * sign;
-//                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                break;
-//            case 'c':
-//                int16_cmd_limit_velocity = value * sign;
-//                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                break;
-//            default:
-//                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
-//                break;
-//            }
+            switch(mode_2) {
+            case 'p':
+                int16_P_error_limit_velocity = value * sign;
+                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                break;
+            case 'i':
+                int16_I_error_limit_velocity = value * sign;
+                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                break;
+            case 'l':
+                int16_integral_limit_velocity = value * sign;
+                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                break;
+            case 'c':
+                int16_cmd_limit_velocity = value * sign;
+                i_position_control.set_velocity_pid_limits(int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                break;
+            default:
+                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", int16_P_error_limit_velocity, int16_I_error_limit_velocity, int16_integral_limit_velocity, int16_cmd_limit_velocity);
+                break;
+            }
             break;
 
             //position pid coefficients

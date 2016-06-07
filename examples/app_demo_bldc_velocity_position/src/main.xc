@@ -50,28 +50,28 @@ int main(void) {
             /* Control Loop */
             pos_velocity_ctrl_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
 
-            pos_velocity_ctrl_config.int21_target_min_position =-1000000000;
-            pos_velocity_ctrl_config.int21_target_max_position = 1000000000;
-            pos_velocity_ctrl_config.int10_P_position = 120;
-            pos_velocity_ctrl_config.int10_I_position = 0;
+            pos_velocity_ctrl_config.int21_target_min_position =-500000; //mechanical restrictions
+            pos_velocity_ctrl_config.int21_target_max_position = 500000; //mechanical restrictions
+            pos_velocity_ctrl_config.int10_P_position = 50;
+            pos_velocity_ctrl_config.int10_I_position = 50;
             pos_velocity_ctrl_config.int10_D_position = 0;
             pos_velocity_ctrl_config.int21_P_error_limit_position = 200000;
-            pos_velocity_ctrl_config.int21_I_error_limit_position = 1000;
-            pos_velocity_ctrl_config.int22_integral_limit_position = 50000;
-            pos_velocity_ctrl_config.int32_cmd_limit_position = 600000;
+            pos_velocity_ctrl_config.int21_I_error_limit_position = 1;
+            pos_velocity_ctrl_config.int22_integral_limit_position = 1000;
+            pos_velocity_ctrl_config.int32_cmd_limit_position = 1000000;
 
-            pos_velocity_ctrl_config.int21_target_min_velocity =-1073741824;
-            pos_velocity_ctrl_config.int21_target_max_velocity = 1073741824;
+            pos_velocity_ctrl_config.int21_target_min_velocity =-500000; //mechanical restrictions
+            pos_velocity_ctrl_config.int21_target_max_velocity = 500000; //mechanical restrictions
             pos_velocity_ctrl_config.int10_P_velocity = 70;
-            pos_velocity_ctrl_config.int10_I_velocity = 50;
+            pos_velocity_ctrl_config.int10_I_velocity = 0;//50;
             pos_velocity_ctrl_config.int10_D_velocity = 90;
             pos_velocity_ctrl_config.int21_P_error_limit_velocity = 200000;
             pos_velocity_ctrl_config.int21_I_error_limit_velocity = 2000;
             pos_velocity_ctrl_config.int22_integral_limit_velocity = 60000;
             pos_velocity_ctrl_config.int32_cmd_limit_velocity = 1000000;
 
-            pos_velocity_ctrl_config.int21_target_min_torque =-1073741824;
-            pos_velocity_ctrl_config.int21_target_max_torque = 1073741824;
+            pos_velocity_ctrl_config.int21_target_min_torque =-1000000; //mechanical restrictions
+            pos_velocity_ctrl_config.int21_target_max_torque = 1000000; //mechanical restrictions
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
         }

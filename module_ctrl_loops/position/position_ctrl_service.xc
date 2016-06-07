@@ -114,10 +114,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 if (int1_position_enable_flag == 1) {
                     int23_position_k = int23_position_k_sens;// / 100; //100 ro bayad hazf konim
                     int23_position_ref_k = int23_position_ref_k_in;
-//                    if(int23_position_ref_k > pos_velocity_ctrl_config.int21_target_max_position)
-//                        int23_position_ref_k = pos_velocity_ctrl_config.int21_target_max_position;
-//                    else if (int23_position_ref_k < pos_velocity_ctrl_config.int21_target_min_position)
-//                        int23_position_ref_k = pos_velocity_ctrl_config.int21_target_min_position;
+                    if(int23_position_ref_k > pos_velocity_ctrl_config.int21_target_max_position)
+                        int23_position_ref_k = pos_velocity_ctrl_config.int21_target_max_position;
+                    else if (int23_position_ref_k < pos_velocity_ctrl_config.int21_target_min_position)
+                        int23_position_ref_k = pos_velocity_ctrl_config.int21_target_min_position;
 
                     // PID parameters should be int9 -> -255 to 255
                     int23_position_cmd_k = pid_update(int23_position_ref_k, int23_position_k, int23_position_k, 1000, position_control_pid_param);
@@ -130,10 +130,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 // velocity control
                 if (int1_velocity_enable_flag == 1 || int1_position_enable_flag == 1) {
-//                    if (int23_velocity_ref_k > pos_velocity_ctrl_config.int21_target_max_velocity) //int21_target_max_velocity should be int20
-//                        int23_velocity_ref_k = pos_velocity_ctrl_config.int21_target_max_velocity;
-//                    else if (int23_velocity_ref_k < pos_velocity_ctrl_config.int21_target_min_velocity)
-//                        int23_velocity_ref_k = pos_velocity_ctrl_config.int21_target_min_velocity;
+                    if (int23_velocity_ref_k > pos_velocity_ctrl_config.int21_target_max_velocity) //int21_target_max_velocity should be int20
+                        int23_velocity_ref_k = pos_velocity_ctrl_config.int21_target_max_velocity;
+                    else if (int23_velocity_ref_k < pos_velocity_ctrl_config.int21_target_min_velocity)
+                        int23_velocity_ref_k = pos_velocity_ctrl_config.int21_target_min_velocity;
 
                     flt23_velocity_measured_k = int23_velocity_k_sens;
                     flt23_velocity_d_measured_k = flt23_velocity_measured_k;
