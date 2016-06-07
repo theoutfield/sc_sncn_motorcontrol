@@ -41,6 +41,20 @@ typedef enum {
     FOC = 21  /**< Vector control. */
 } CommutationMethod;
 
+
+/**
+ * @brief Fault Codes
+ */
+typedef enum {
+    NO_FAULT=0,
+    OVER_CURRENT_PHASE_A = 1,
+    OVER_CURRENT_PHASE_B = 2,
+    OVER_CURRENT_PHASE_C = 3,
+    UNDER_VOLTAGE = 4,
+    OVER_VOLTAGE = 5
+} FaultCode;
+
+
 /**
  * Structure type for Motorcontrol Service configuration.
  */

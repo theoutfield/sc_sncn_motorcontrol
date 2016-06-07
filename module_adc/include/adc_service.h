@@ -29,8 +29,9 @@ interface ADCInterface{
      *  - Current on Phase C
      *  - Vdc
      *  - Torque
+     *  - fault code
      */
-    {int, int, int, int} get_all_measurements();
+    {int, int, int, int, int} get_all_measurements();
 
 
     // *Max adc ticks are 8192 and corresponds with the max current your DC can handle:

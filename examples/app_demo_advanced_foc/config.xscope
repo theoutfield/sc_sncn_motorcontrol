@@ -42,5 +42,8 @@
     <Probe name="POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TEMPERATURE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="FAULT_CODE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    
+    
 
 </xSCOPEconfig>

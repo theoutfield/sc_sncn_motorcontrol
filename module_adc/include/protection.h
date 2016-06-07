@@ -22,10 +22,10 @@ interface fault_type
 };
 
 
-#define V_DC_MAX    2000
-#define V_DC_MIN    0
+#define V_DC_MAX    48
+#define V_DC_MIN    10
 
-#define I_MAX          3000
+#define I_MAX          60
 #define TEMP_BOARD_MAX 100
 
 

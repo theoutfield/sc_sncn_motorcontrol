@@ -15,6 +15,7 @@
 #include "adc_7265.h"
 #include <protection.h>
 #include <xscope.h>
+#include <motorcontrol_service.h>
 
 
 #define SHIFTING_BITS   1
@@ -289,7 +290,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
     #pragma ordered
         select {
-        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out}:
+        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
 
         case iADC[int i].get_currents() -> {int adc_A, int adc_B}:
@@ -371,6 +372,8 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
     timer t;
     unsigned time_stamp; // Time stamp
 
+    int fault_code=NO_FAULT;
+
     unsigned inp_val = 0, tmp_val = 0;
     int i=0;
 
@@ -428,7 +431,7 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 #pragma ordered
         select
         {
-        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out}:
+        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
 
                 adc_ports.p4_mux <: 0b1000;//mux_config;
                 clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
@@ -466,21 +469,27 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 
                 if( I_a<(-current_limit) || current_limit<I_a)
                 {
-                    i_watchdog.protect(1);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_A);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_A;
+
                 }
 
                 if( I_b<(-current_limit) || current_limit<I_b)
                 {
-                    i_watchdog.protect(2);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
+
                 }
 
                 if( I_c<(-current_limit) || current_limit<I_c)
                 {
-                    i_watchdog.protect(3);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
                 }
 
                 V_dc_out = V_dc;
                 torque_out = torque;
+                fault_code_out=fault_code;
 
                 flag=1;
                 break;
@@ -523,17 +532,20 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 
                 if( I_a<(-current_limit) || current_limit<I_a)
                 {
-                    i_watchdog.protect(1);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_A);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_A;
                 }
 
                 if( I_b<(-current_limit) || current_limit<I_b)
                 {
-                    i_watchdog.protect(2);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
                 }
 
                 if( I_c<(-current_limit) || current_limit<I_c)
                 {
-                    i_watchdog.protect(3);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
                 }
 
                 flag=1;
@@ -596,12 +608,14 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 {
                     if (V_dc<V_DC_MIN)
                     {
-                        i_watchdog.protect(4);
+                        i_watchdog.protect(UNDER_VOLTAGE);
+                        if(fault_code==0) fault_code=UNDER_VOLTAGE;
                     }
 
                     if (V_DC_MAX<V_dc)
                     {
-                        i_watchdog.protect(5);
+                        i_watchdog.protect(OVER_VOLTAGE);
+                        if(fault_code==0) fault_code=OVER_VOLTAGE;
                     }
                 }
 
@@ -673,17 +687,20 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 
                 if( I_a<(-current_limit) || current_limit<I_a)
                 {
-                    i_watchdog.protect(1);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_A);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_A;
                 }
 
                 if( I_b<(-current_limit) || current_limit<I_b)
                 {
-                    i_watchdog.protect(2);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
                 }
 
                 if( I_c<(-current_limit) || current_limit<I_c)
                 {
-                    i_watchdog.protect(3);
+                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
                 }
             }
             flag=0;
@@ -755,7 +772,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
                 break;
 
-        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out}:
+        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
 
         case iADC[int i].get_currents() -> {int adc_A, int adc_B}:

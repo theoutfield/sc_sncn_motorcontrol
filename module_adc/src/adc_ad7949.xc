@@ -286,7 +286,7 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
 
             break;
 
-        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out}:
+        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
 
         case i_adc[int i].get_currents() -> {int Ia, int Ib}:
@@ -399,7 +399,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
         select
         {
 
-        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out}:
+        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
 
         case i_adc[int i].get_currents() -> {int Ia, int Ib}:
