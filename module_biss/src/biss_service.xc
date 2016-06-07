@@ -8,6 +8,7 @@
 #include <xclib.h>
 #include <xs1.h>
 #include <print.h>
+#include <xscope.h>
 
 #include <mc_internal_constants.h>
 
@@ -71,6 +72,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_loop = (biss_config.velocity_loop * BISS_USEC); //velocity loop time in clock ticks
     int velocity_factor = 60000000/biss_config.velocity_loop;
+    int velocity_count = 0;
     //position
     unsigned int data[BISS_FRAME_BYTES];
     unsigned int last_position = 0;
@@ -305,13 +307,18 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
             next_velocity_read += velocity_loop;
             int count, position, angle, count_internal, difference;
             t when timerafter(last_biss_read + biss_config.timeout) :> void;
-            read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
+            int error = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
             t :> last_biss_read;
+//            if (error == 1) {
             last_count_read = last_biss_read;
             { count, position, void } = biss_encoder(data, biss_config);
             update_turns(turns, last_count, count, biss_config.multiturn_resolution, ticks_per_turn);
             last_count = count;
             last_position = position;
+//            } else {
+//                count = last_count;
+//                position = last_position;
+//            }
 
             //add offset
             if (biss_config.multiturn_resolution) { //multiturn encoder
@@ -328,15 +335,19 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
                 old_count = count;
                 count += count_offset;
             }
-            //check crossover
+//            velocity_count++;
+//            if (velocity_count >= 0) {
+                //check crossover
             if(difference > crossover || difference < -crossover)
                 difference = old_difference;
             old_difference = difference;
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-//            velocity = (difference * velocity_factor) / ticks_per_turn;
-            velocity = (difference * (60000000/((int)(last_biss_read-last_velocity_read)/BISS_USEC))) / ticks_per_turn;
+            //            velocity = (difference * velocity_factor) / ticks_per_turn;
+            velocity = (difference * (60000000/((int)(last_count_read-last_velocity_read)/BISS_USEC))) / ticks_per_turn;
             last_velocity_read = last_biss_read;
+//                velocity_count = 0;
+//            }
 
             //polarity
             if (biss_config.polarity == BISS_POLARITY_INVERTED) {
@@ -369,6 +380,12 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
             t :> end_time;
 
             measurement_time = (end_time-start_time)/BISS_USEC;
+#ifdef XSCOPE_BISS
+            xscope_int(POSITION, count);
+            xscope_int(VELOCITY, velocity);
+            xscope_int(VELOCITY_FILTERED, error);
+            xscope_int(TIME, measurement_time);
+#endif
 
             //to prevent blocking
             if (timeafter(end_time, next_velocity_read))
