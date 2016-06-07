@@ -69,5 +69,13 @@
 
 /*********************************************/
 
+/////////////////////////////////////////////
+//////  GENERAL MOTOR CONFIGURATION
+////////////////////////////////////////////
 
+// MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+#define MOTOR_TYPE  BLDC_MOTOR
+
+// WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
+#define BLDC_WINDING_TYPE   STAR_WINDING
 
