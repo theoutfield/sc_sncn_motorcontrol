@@ -50,29 +50,28 @@ int main(void) {
             /* Control Loop */
             pos_velocity_ctrl_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
 
-            pos_velocity_ctrl_config.int21_min_position =-2000000;
-            pos_velocity_ctrl_config.int21_max_position = 2000000;
-            pos_velocity_ctrl_config.int21_max_speed = 1000;
-            pos_velocity_ctrl_config.int21_max_torque = 1000000;
+            pos_velocity_ctrl_config.int21_min_position =0;
+            pos_velocity_ctrl_config.int21_max_position = 0;
+            pos_velocity_ctrl_config.int21_max_speed = 0;
+            pos_velocity_ctrl_config.int21_max_torque = 0;
 
 
-            pos_velocity_ctrl_config.int10_P_position = 55;
-            pos_velocity_ctrl_config.int10_I_position = 50;
+            pos_velocity_ctrl_config.int10_P_position = 0;
+            pos_velocity_ctrl_config.int10_I_position = 0;
             pos_velocity_ctrl_config.int10_D_position = 0;
-            pos_velocity_ctrl_config.int21_P_error_limit_position = 200000;
-            pos_velocity_ctrl_config.int21_I_error_limit_position = 1;
-            pos_velocity_ctrl_config.int22_integral_limit_position = 1000;
+            pos_velocity_ctrl_config.int21_P_error_limit_position = 0;
+            pos_velocity_ctrl_config.int21_I_error_limit_position = 0;
+            pos_velocity_ctrl_config.int22_integral_limit_position = 0;
 
-            pos_velocity_ctrl_config.int10_P_velocity = 70;
-            pos_velocity_ctrl_config.int10_I_velocity = 0;//50;
-            pos_velocity_ctrl_config.int10_D_velocity = 90;
-            pos_velocity_ctrl_config.int21_P_error_limit_velocity = 200000;
-            pos_velocity_ctrl_config.int21_I_error_limit_velocity = 2000;
-            pos_velocity_ctrl_config.int22_integral_limit_velocity = 60000;
+            pos_velocity_ctrl_config.int10_P_velocity = 0;
+            pos_velocity_ctrl_config.int10_I_velocity = 0;
+            pos_velocity_ctrl_config.int10_D_velocity = 0;
+            pos_velocity_ctrl_config.int21_P_error_limit_velocity = 0;
+            pos_velocity_ctrl_config.int21_I_error_limit_velocity = 0;
+            pos_velocity_ctrl_config.int22_integral_limit_velocity = 0;
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
         }
-
 
         on tile[IFM_TILE]:
         {
