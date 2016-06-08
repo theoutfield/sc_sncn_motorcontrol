@@ -199,14 +199,14 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
 #ifdef XSCOPE_POSITION_CTRL
-                xscope_int(POSITION_REF, int23_position_ref_k);
-                xscope_int(POSITION, int23_position_k);
-                xscope_int(POSITION_CMD, int23_velocity_ref_k);
+                xscope_int(POSITION_REF, int23_position_ref_k_in * 4);
+                xscope_int(POSITION, upstream_control_data.position);
+//                xscope_int(POSITION_CMD, int23_velocity_ref_k);
 //                xscope_int(POSITION_TEMP1, 0);
 //                xscope_int(POSITION_TEMP2, 0);
-                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
-                xscope_int(VELOCITY, int23_velocity_k);
-                xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
+//                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
+                xscope_int(VELOCITY, upstream_control_data.velocity);
+                xscope_int(VELOCITY_CMD, int13_torque_ref / 1024);
 //                xscope_int(VELOCITY_TEMP1, int23_torque_ref_in);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
@@ -219,7 +219,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 //                xscope_int(VELOCITY, upstream_control_data.velocity);
 //                xscope_int(VELOCITY_CMD, int13_torque_ref);
 //                xscope_int(VELOCITY_FILTERED, int23_velocity_k);
-//                xscope_int(TORQUE, upstream_control_data.computed_torque);
+                xscope_int(TORQUE, upstream_control_data.computed_torque);
 //                xscope_int(VELOCITY_TEMP2, 0);
 #endif
 
