@@ -61,9 +61,6 @@
 // PHASE INDUCTANCE
 #define PHASE_INDUCTANCE 1000    // uH
 
-// COMMUTATION PERIOD
-#define COMMUTATION_PERIOD 66   // uS
-
 // MAXIMUM TORQUE
 #define MAXIMUM_TORQUE   63    //maximum torque (Nm) at 1000 Amp
 
