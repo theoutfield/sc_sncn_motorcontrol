@@ -118,6 +118,15 @@ int main(void) {
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                    motorcontrol_config.home_offset=MOTOR_OFFSET;
+                    motorcontrol_config.current_P_gain =  TORQUE_Kp;
+                    motorcontrol_config.current_I_gain =  TORQUE_Ki;
+                    motorcontrol_config.current_D_gain =  TORQUE_Kd;
+
+                    motorcontrol_config.pole_pair =  POLE_PAIRS;
+                    motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
+                    motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
+                    motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
 
                     Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
                             i_shared_memory[0],
