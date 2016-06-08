@@ -24,6 +24,7 @@
  //#include <motor_config_Nanotec_DB59L024035-A.h>
 #include <motor_config_MABI_Hohlwellenservomotor_A5.h>
 //#include <motor_config_qmot_qbl5704.h>
+//#include <motor_config_AMK_DT3.h>
 
 //#include <motor_config.h>
 
