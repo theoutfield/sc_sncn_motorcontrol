@@ -111,7 +111,7 @@ void pid_set_limits(int int23_P_error_limit, int int23_I_error_limit, int int23_
         param.int23_cmd_limit = INT23_MIN;
 }
 
-int pid_update(int int23_setpoint, int int23_feedback_p_filter, int int23_feedback_d_filter, int int16_T_s, PIDparam &param)
+int pid_update(int int23_setpoint, int int23_feedback_p_filter, int int23_feedback_d_filter, int int23_feedforward_ctrl_effort, int int16_T_s, PIDparam &param)
 {
     int int23_P_error, int23_I_error, int23_derivative, int31_cmd, int23_cmd;
 
@@ -141,6 +141,7 @@ int pid_update(int int23_setpoint, int int23_feedback_p_filter, int int23_feedba
 
     int31_cmd = ((param.int9_P * int23_P_error) + (param.int9_I * param.int23_error_integral) - (param.int9_D * int23_derivative));
     int31_cmd /= param.scale_factor;
+    int31_cmd += int23_feedforward_ctrl_effort;
     if (int31_cmd > param.int23_cmd_limit)
         int23_cmd = param.int23_cmd_limit;
     else if (int31_cmd < -param.int23_cmd_limit)

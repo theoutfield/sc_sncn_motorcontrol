@@ -72,7 +72,7 @@ void pid_set_limits(int int23_P_error_limit, int int23_I_error_limit, int in23_i
  * NOTE: If the biggest input is int23 and the bigest PID parameter is int9, then the output is int((23+9-1)=int31
  * NOTE: If the biggest input is int15 and the bigest PID parameter is int8, then the output is int(15+8-1)=int22
  */
-int pid_update(int int23_setpoint, int int23_feedback_p_filter, int int23_feedback_d_filter, int int16_T_s, PIDparam &param);
+int pid_update(int int23_setpoint, int int23_feedback_p_filter, int int23_feedback_d_filter, int int23_feedforward_ctrl_effort, int int16_T_s, PIDparam &param);
 
 void pid_reset(PIDparam &param);
 

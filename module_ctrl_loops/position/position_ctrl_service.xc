@@ -79,6 +79,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int23_velocity_ref_k_in = 0;
     int int23_velocity_cmd_k = 0;
     int int14_velocity_k_sens = 0;
+    int int23_feedforward_effort = 0;
+    int int23_feedforward_effort_in = 0;
 
     // torque
     int int1_torque_enable_flag = 0;
@@ -133,6 +135,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 int25_position_k_sens = upstream_control_data.position;
                 int23_position_k_sens = int25_position_k_sens / 4;
                 int23_velocity_ref_k = int23_velocity_ref_k_in;
+                int23_feedforward_effort = int23_feedforward_effort_in;
+
 
                 int13_torque_ref = int23_torque_ref_in;
 
@@ -147,7 +151,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             int23_position_ref_k = pos_velocity_ctrl_config.int21_min_position;
 
                         // PID parameters should be int9 -> -255 to 255
-                        int23_position_cmd_k = pid_update(int23_position_ref_k, int23_position_k, int23_position_k, 1000, position_control_pid_param);
+                        int23_position_cmd_k = pid_update(int23_position_ref_k, int23_position_k, int23_position_k, 0, 1000, position_control_pid_param);
                         int23_velocity_ref_k = int23_position_cmd_k;
                     }
 
@@ -174,7 +178,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         int23_velocity_d_k = ((int) flt23_velocity_d_k);
 
                         // PID parameters should be int9 -> -255 to 255
-                        int23_velocity_cmd_k = pid_update(int23_velocity_ref_k, int23_velocity_k, int23_velocity_d_k, 1000, velocity_control_pid_param);
+                        int23_velocity_cmd_k = pid_update(int23_velocity_ref_k, int23_velocity_k, int23_velocity_d_k, int23_feedforward_effort, 1000, velocity_control_pid_param);
 
                         int13_torque_ref = int23_velocity_cmd_k;
 
@@ -272,6 +276,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
             case i_position_control[int i].set_velocity(int in_target_velocity):
                     int23_velocity_ref_k_in = in_target_velocity * 512;
                 break;
+            case i_position_control[int i].set_offset_torque(int offset_torque_):
+                    int23_feedforward_effort_in = offset_torque_;
+                break;
             case i_position_control[int i].set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
                 pid_set_coefficients(int8_Kp, int8_Ki, int8_Kd, velocity_control_pid_param);
                 break;
@@ -340,7 +347,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int23_position_ref_k_in = downstream_control_data.position_cmd / 4;
                     int23_velocity_ref_k_in = downstream_control_data.velocity_cmd * 512;
                     int23_torque_ref_in = downstream_control_data.torque_cmd;
-//                    downstream_control_data.torque_ofset = 0;
+                    int23_feedforward_effort_in = downstream_control_data.offset_torque;
                 break;
 
 

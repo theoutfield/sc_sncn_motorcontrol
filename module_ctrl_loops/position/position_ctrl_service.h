@@ -25,6 +25,7 @@ interface PositionVelocityCtrlInterface{
 
     void enable_velocity_ctrl();
     void set_velocity(int in_target_velocity);
+    void set_offset_torque(int offset_torque_);
     void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
     void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
     void set_velocity_limits(int velocity_min_limit, int velocity_max_limit);
