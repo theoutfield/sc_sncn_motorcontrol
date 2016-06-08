@@ -383,7 +383,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
 #ifdef XSCOPE_BISS
             xscope_int(POSITION, count);
             xscope_int(VELOCITY, velocity);
-            xscope_int(VELOCITY_FILTERED, error);
+            xscope_int(ERROR, error);
             xscope_int(TIME, measurement_time);
 #endif
 
