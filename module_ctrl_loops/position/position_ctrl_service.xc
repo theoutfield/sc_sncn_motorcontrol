@@ -87,6 +87,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int23_torque_ref_in = 0;
     int int13_torque_ref = 0;
 
+    //protection
+    int temp = 0;
+
 
     timer t;
     unsigned int ts;
@@ -95,8 +98,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     pos_velocity_ctrl_config.int21_min_position /= 4;
     pos_velocity_ctrl_config.int21_max_position /= 4;
 
-    second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/75, /*T_s=*/1000, velocity_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/75, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
 
     pid_init(pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity,
              pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity,
@@ -121,6 +124,13 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
+    //protection -> to be cleaned later
+//    delay_milliseconds(1000);
+//    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+//    int25_position_k_sens = upstream_control_data.position;
+//    int23_position_k_sens = int25_position_k_sens / 4;
+//    temp = int23_position_k_sens;
+
     t :> ts;
     while(1) {
 #pragma ordered
@@ -137,8 +147,16 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 int23_velocity_ref_k = int23_velocity_ref_k_in;
                 int23_feedforward_effort = int23_feedforward_effort_in;
 
-
                 int13_torque_ref = int23_torque_ref_in;
+
+                //protection -> to be cleaned later
+//                if (((int23_position_k_sens-temp) > pos_velocity_ctrl_config.int21_max_position) || ((int23_position_k_sens-temp) < pos_velocity_ctrl_config.int21_min_position))
+//                {
+//                    int1_enable_flag = 0;
+//                    i_motorcontrol.set_brake_status(0);
+//                    i_motorcontrol.set_torque_control_disabled();
+//                    i_motorcontrol.set_safe_torque_off_enabled();
+//                }
 
                 if(int1_enable_flag) {
                     // position control
@@ -207,7 +225,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(VELOCITY_REF, int23_velocity_ref_k);
                 xscope_int(VELOCITY, int23_velocity_k);
                 xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
-//                xscope_int(VELOCITY_TEMP1, int23_torque_ref_in);
+                xscope_int(VELOCITY_TEMP1, int23_velocity_k_sens);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
 //                xscope_int(POSITION_REF, int23_position_ref_k_in*4);
