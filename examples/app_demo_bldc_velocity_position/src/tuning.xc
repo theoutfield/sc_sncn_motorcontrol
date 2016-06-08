@@ -31,29 +31,13 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
     int torque = 0;
 
-    int int8_Kp_position = 50;
-    int int8_Ki_position = 50;
-    int int8_Kd_position = 0;
-    int int16_P_error_limit_position = 200000;
-    int int16_I_error_limit_position = 1;
-    int int16_integral_limit_position = 1000;
-    int int16_cmd_limit_position = 1000000;
-
-    int int8_Kp_velocity = 70;
-    int int8_Ki_velocity = 0;//50;
-    int int8_Kd_velocity = 90;
-    int int16_P_error_limit_velocity = 200000;
-    int int16_I_error_limit_velocity = 2000;
-    int int16_integral_limit_velocity = 60000;
-    int int16_cmd_limit_velocity = 1000000;
-
 
     pos_velocity_ctrl_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
 
     pos_velocity_ctrl_config.int21_min_position =0;
     pos_velocity_ctrl_config.int21_max_position = 0;
     pos_velocity_ctrl_config.int21_max_speed = 0;
-    pos_velocity_ctrl_config.int21_max_torque = 0;
+    pos_velocity_ctrl_config.int21_max_torque = 400000;
 
 
     pos_velocity_ctrl_config.int10_P_position = 0;
@@ -74,8 +58,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     delay_milliseconds(2000);
     i_commutation.set_brake_status(1);
 
-    i_commutation.set_offset_value(1360); //A2
+    i_commutation.set_offset_value(1415); //A2
     delay_milliseconds(1000);
+
+    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
 
     fflush(stdout);
     //read and adjust the offset.
