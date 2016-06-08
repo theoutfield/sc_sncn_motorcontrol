@@ -230,10 +230,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             switch(mode_2) {
                 case 'p':
                     printf("position cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    downstream_control_data.position_cmd = 0;
-                    downstream_control_data.velocity_cmd = 0;
                     downstream_control_data.offset_torque = 0;
-                    downstream_control_data.torque_cmd = 0;
                     downstream_control_data.position_cmd = value*sign;
                     i_position_control.update_control_data(downstream_control_data);
                     delay_milliseconds(1000);
@@ -245,10 +242,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                     break;
                 case 'v':
                     printf("velocity cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    downstream_control_data.position_cmd = 0;
-                    downstream_control_data.velocity_cmd = 0;
                     downstream_control_data.offset_torque = 0;
-                    downstream_control_data.torque_cmd = 0;
                     downstream_control_data.velocity_cmd = value*sign;
                     i_position_control.update_control_data(downstream_control_data);
                     delay_milliseconds(200);
@@ -260,10 +254,6 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                     break;
                 case 't':
                     printf("torque cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    downstream_control_data.position_cmd = 0;
-                    downstream_control_data.velocity_cmd = 0;
-                    downstream_control_data.offset_torque = 0;
-                    downstream_control_data.torque_cmd = 0;
                     downstream_control_data.torque_cmd = value*sign;
                     i_position_control.update_control_data(downstream_control_data);
                     delay_milliseconds(200);
@@ -277,8 +267,6 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                     printf("offset-torque cmd: %d to %d\n", value*sign, -value*sign);
                     downstream_control_data.position_cmd = 0;
                     downstream_control_data.velocity_cmd = 0;
-                    downstream_control_data.offset_torque = 0;
-                    downstream_control_data.torque_cmd = 0;
                     downstream_control_data.offset_torque = value*sign;
                     i_position_control.update_control_data(downstream_control_data);
                     delay_milliseconds(200);

@@ -243,6 +243,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int25_position_k_sens = upstream_control_data.position;
                     int23_position_k_sens = int25_position_k_sens / 4;
                     int23_position_ref_k_in = int23_position_k_sens;
+                    int23_feedforward_effort_in = 0;
                     pid_reset(position_control_pid_param);
                     i_motorcontrol.set_torque_control_enabled();
                 break;
@@ -269,6 +270,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int1_velocity_enable_flag = 1;
                     int1_torque_enable_flag = 0;
                     int23_velocity_ref_k_in = 0;
+                    int23_feedforward_effort_in = 0;
                     pid_reset(velocity_control_pid_param);
                     i_motorcontrol.set_torque_control_enabled();
                 break;
