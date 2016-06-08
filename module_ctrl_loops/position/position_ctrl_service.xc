@@ -190,10 +190,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                                              &flt23_velocity_d_k_2n);
                     }
 
-                    if(int23_velocity_cmd_k > pos_velocity_ctrl_config.int21_max_torque)
-                        int23_velocity_cmd_k = pos_velocity_ctrl_config.int21_max_torque;
-                    else if (int23_velocity_cmd_k < (-pos_velocity_ctrl_config.int21_max_torque))
-                        int23_velocity_cmd_k = (-pos_velocity_ctrl_config.int21_max_torque);
+                    if(int13_torque_ref > pos_velocity_ctrl_config.int21_max_torque)
+                        int13_torque_ref = pos_velocity_ctrl_config.int21_max_torque;
+                    else if (int13_torque_ref < (-pos_velocity_ctrl_config.int21_max_torque))
+                        int13_torque_ref = (-pos_velocity_ctrl_config.int21_max_torque);
                     i_motorcontrol.set_torque(int13_torque_ref / 1024);
                 }
 

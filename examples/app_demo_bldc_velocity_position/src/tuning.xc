@@ -74,7 +74,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     delay_milliseconds(2000);
     i_commutation.set_brake_status(1);
 
-    i_commutation.set_offset_value(3040);
+    i_commutation.set_offset_value(1360); //A2
     delay_milliseconds(1000);
 
     fflush(stdout);
