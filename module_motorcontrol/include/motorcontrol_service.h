@@ -89,6 +89,7 @@ typedef struct {
 
     int phase_resistance;                   /**< uOhm*/
     int phase_inductance;                   /**< uH*/
+    int v_dc;                               /**< dc bus voltage*/
 } MotorcontrolConfig;
 
 #ifdef __XC__

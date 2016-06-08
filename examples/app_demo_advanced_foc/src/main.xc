@@ -127,6 +127,7 @@ int main(void) {
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
+                    motorcontrol_config.v_dc =  VDC;
 
                     Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
                             i_shared_memory[0],
