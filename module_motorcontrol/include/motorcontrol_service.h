@@ -41,6 +41,20 @@ typedef enum {
     FOC = 21  /**< Vector control. */
 } CommutationMethod;
 
+
+/**
+ * @brief Fault Codes
+ */
+typedef enum {
+    NO_FAULT=0,
+    OVER_CURRENT_PHASE_A = 1,
+    OVER_CURRENT_PHASE_B = 2,
+    OVER_CURRENT_PHASE_C = 3,
+    UNDER_VOLTAGE = 4,
+    OVER_VOLTAGE = 5
+} FaultCode;
+
+
 /**
  * Structure type for Motorcontrol Service configuration.
  */
@@ -51,7 +65,31 @@ typedef struct {
     PolarityType polarity_type;             /**< Type of polarity of your motor. */
     int commutation_sensor;                 /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
     int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
+    int hall_state_1;                       /**< Hall port state while being in sector 1*/
+    int hall_state_2;                       /**< Hall port state while being in sector 2*/
+    int hall_state_3;                       /**< Hall port state while being in sector 3*/
+    int hall_state_4;                       /**< Hall port state while being in sector 4*/
+    int hall_state_5;                       /**< Hall port state while being in sector 5*/
+    int hall_state_6;                       /**< Hall port state while being in sector 6*/
+
     int commutation_loop_period;            /**< Period for the commutation loop [microseconds]. */
+
+
+    //variables added to be used in motor_control_service
+    int pole_pair;                          /**< motor pole pair*/
+    int max_torque;                         /**< maximum motor torque*/
+    int max_current;                        /**< maximum stator current*/
+    int rated_current;                      /**< rated motor phase current*/
+    int rated_torque;                       /**< rated motor torque*/
+    int home_offset;                        /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
+    int torque_constant;                    /**< motor torque constant*/
+    int current_P_gain;                     /**< proportional constant in torque controller*/
+    int current_I_gain;                     /**< integral constant in torque controller*/
+    int current_D_gain;                     /**< derivative constant in torque controller*/
+
+    int phase_resistance;                   /**< uOhm*/
+    int phase_inductance;                   /**< uH*/
+    int v_dc;                               /**< dc bus voltage*/
 } MotorcontrolConfig;
 
 #ifdef __XC__

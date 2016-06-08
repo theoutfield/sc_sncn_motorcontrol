@@ -28,3 +28,7 @@ bin/
 ## ignore xdoc outputs
 _build/
 run_xdoc.log
+/examples/app_demo_advanced_foc/decompressor-373412a9
+/examples/app_demo_advanced_foc/decompressor-9063d9a4
+/examples/app_demo_advanced_foc/spanning-xn-v0-b7665001
+/examples/app_demo_advanced_foc/target-xn-v0-64bbd1f6

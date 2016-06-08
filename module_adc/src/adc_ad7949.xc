@@ -286,6 +286,9 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
 
             break;
 
+        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
+                break;
+
         case i_adc[int i].get_currents() -> {int Ia, int Ib}:
 
                 Ia = current_sensor_config.sign_phase_b * Icalibrated_a;
@@ -395,6 +398,9 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 #pragma ordered
         select
         {
+
+        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
+                break;
 
         case i_adc[int i].get_currents() -> {int Ia, int Ib}:
 
