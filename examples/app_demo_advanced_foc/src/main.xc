@@ -38,7 +38,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        //on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
+//        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
 
         on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
 
@@ -110,15 +110,8 @@ int main(void) {
                     delay_milliseconds(2000);
 
                     MotorcontrolConfig motorcontrol_config;
-                    motorcontrol_config.motor_type = BLDC_MOTOR;
-                    motorcontrol_config.polarity_type = MOTOR_POLARITY;
-                    motorcontrol_config.commutation_method = FOC;
-                    motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
-                    motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
-                    motorcontrol_config.home_offset=MOTOR_OFFSET;
+                    motorcontrol_config.home_offset = COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
                     motorcontrol_config.current_I_gain =  TORQUE_Ki;
                     motorcontrol_config.current_D_gain =  TORQUE_Kd;

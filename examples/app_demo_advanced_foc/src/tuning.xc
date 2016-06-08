@@ -64,6 +64,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         //auto find offset
         case 'a':
             auto_offset(i_motorcontrol);
+            i_motorcontrol.set_torque_control_enabled();
             break;
         //set brake
         case 'b':
