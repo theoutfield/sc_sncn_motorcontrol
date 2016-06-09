@@ -34,6 +34,7 @@ typedef struct {
     int commutation_sensor;             /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
     int hall_offset[2];                 /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
     int commutation_loop_period;        /**< Period for the commutation loop [microseconds]. */
+    int init_state;                     /** internal use will be initialized at start**/
 } MotorcontrolConfig;
 
 #ifdef __XC__
