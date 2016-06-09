@@ -8,7 +8,6 @@
 #include <pwm_service_client.h>
 #include <a4935.h>
 
-static int init_state;
 
 static void pwm_init_to_zero(chanend c_pwm_ctrl, t_pwm_control &pwm_ctrl)
 {
@@ -99,7 +98,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
         case i_motorcontrol[int i].check_busy() -> int state_return:
 
-                  state_return = init_state;
+                  state_return = motorcontrol_config.init_state;
                   break;
 
         case i_motorcontrol[int i].set_calib(int flag) -> int out_offset:
@@ -154,7 +153,7 @@ void bdc_loop(chanend c_pwm_ctrl,
     unsigned int ts, check_fet;
     t_pwm_control pwm_ctrl;
     
-    init_state = INIT_BUSY;
+    motorcontrol_config.init_state = INIT_BUSY;
 
     pwm_init_to_zero(c_pwm_ctrl, pwm_ctrl);
 
@@ -169,15 +168,15 @@ void bdc_loop(chanend c_pwm_ctrl,
     if(!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast)){
         a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
         t when timerafter (ts + t_delay) :> ts;
-        fet_driver_ports.p_coast :> init_state;
+        fet_driver_ports.p_coast :> motorcontrol_config.init_state;
     }
 
     if(!isnull(fet_driver_ports.p_coast)){
         fet_driver_ports.p_coast :> check_fet;
-        init_state = check_fet;
+        motorcontrol_config.init_state = check_fet;
     }
     else {
-        init_state = 1;
+        motorcontrol_config.init_state = 1;
     }
 
     t :> ts;
