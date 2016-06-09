@@ -21,8 +21,8 @@ typedef enum {
  * @brief Type for the polarity of a motor.
  */
 typedef enum {
-    NORMAL_POLARITY=1, /**< Normal polarity. */
-    INVERTED_POLARITY   /**< Inverted polarity. */
+    NORMAL_POLARITY  =1, /**< Normal polarity. */
+    INVERTED_POLARITY=-1   /**< Inverted polarity. */
 } PolarityType;
 
 /**
@@ -81,7 +81,7 @@ typedef struct {
     int max_current;                        /**< maximum stator current*/
     int rated_current;                      /**< rated motor phase current*/
     int rated_torque;                       /**< rated motor torque*/
-    int commutation_offset;                 /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
+    int commutation_angle_offset;           /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
     int torque_constant;                    /**< motor torque constant*/
     int current_P_gain;                     /**< proportional constant in torque controller*/
     int current_I_gain;                     /**< integral constant in torque controller*/

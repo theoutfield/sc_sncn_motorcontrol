@@ -143,16 +143,17 @@ int main(void) {
 
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
-                    motorcontrol_config.home_offset = COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
-                    motorcontrol_config.current_I_gain =  TORQUE_Ki;
-                    motorcontrol_config.current_D_gain =  TORQUE_Kd;
-
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
                     motorcontrol_config.v_dc =  VDC;
+
+                    motorcontrol_config.protection_limit_over_current =  I_MAX;
+                    motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
+                    motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
                     Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
                             i_shared_memory[0],

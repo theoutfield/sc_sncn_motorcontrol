@@ -74,7 +74,7 @@
 
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              NORMAL_POLARITY
+#define MOTOR_POLARITY              INVERTED_POLARITY
 
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION
