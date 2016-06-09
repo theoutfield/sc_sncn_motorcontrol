@@ -67,7 +67,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      0 //3450 for qmot, 2435 mabi A2, 0 mabi A1
+#define COMMUTATION_OFFSET_CLK      0 //3450 for qmot, 2435 mabi A5, 0 mabi A6
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0

@@ -10,17 +10,25 @@
 
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 {
-    printf("\n\n\n\n\nsending offset_detection command ...\n");
+    printf("Sending offset_detection command ...\n");
     i_motorcontrol.set_offset_detection_enabled();
 
     delay_milliseconds(30000);
 
     int offset=i_motorcontrol.set_calib(0);
-    printf("detected offset is: %i\n", offset);
+    printf("Detected offset is: %i\n", offset);
+//    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
+    int proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+    if(proper_sensor_polarity == 1) {
+        printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+        i_motorcontrol.set_torque_control_enabled();
+    } else {
+        printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+    }
     return offset;
 }
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation,
+void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol,
                        interface PositionVelocityCtrlInterface client ?i_position_control)
 {
     delay_milliseconds(500);
@@ -48,12 +56,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
     int torque = 0;
 
-//    delay_milliseconds(2000);
-//    i_commutation.set_brake_status(1);
+    i_motorcontrol.set_brake_status(0);
 
-//    i_commutation.set_offset_value(3040);
-    i_commutation.set_torque_control_enabled();
-//    delay_milliseconds(1000);
+    i_motorcontrol.set_torque_control_enabled();
+    int torque_control_flag = 1;
 
     fflush(stdout);
     //read and adjust the offset.
@@ -267,28 +273,41 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
         //auto offset tuning
         case 'a':
-            auto_offset(i_commutation);
+            auto_offset(i_motorcontrol);
             break;
 
         //set offset
         case 'o':
-            i_commutation.set_offset_value(value);
+            i_motorcontrol.set_offset_value(value);
             printf("set offset to %d\n", value);
             break;
 
         //reverse torque
         case 'r':
             torque = -torque;
-            i_commutation.set_torque(torque);
+            i_motorcontrol.set_torque(torque);
             printf("Torque %d\n", torque);
+            break;
+
+        //enable and disable torque controller
+        case 't':
+            if (torque_control_flag == 0) {
+                torque_control_flag = 1;
+                i_motorcontrol.set_torque_control_enabled();
+                printf("Torque control activated\n");
+            } else {
+                torque_control_flag = 0;
+                i_motorcontrol.set_torque_control_disabled();
+                printf("Torque control deactivated\n");
+            }
             break;
 
         //set torque
         default:
             i_position_control.disable();
             torque = value*sign;
-            i_commutation.set_torque_control_enabled();
-            i_commutation.set_torque(torque);
+            i_motorcontrol.set_torque_control_enabled();
+            i_motorcontrol.set_torque(torque);
             printf("Torque %d\n", torque);
             break;
         }
