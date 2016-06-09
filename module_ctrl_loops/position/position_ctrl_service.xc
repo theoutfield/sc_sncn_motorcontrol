@@ -125,11 +125,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     //protection -> to be cleaned later
-//    delay_milliseconds(1000);
-//    upstream_control_data = i_motorcontrol.update_upstream_control_data();
-//    int25_position_k_sens = upstream_control_data.position;
-//    int23_position_k_sens = int25_position_k_sens / 4;
-//    temp = int23_position_k_sens;
+    delay_milliseconds(1000);
+    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    int25_position_k_sens = upstream_control_data.position;
+    int23_position_k_sens = int25_position_k_sens / 4;
+    temp = int23_position_k_sens;
 
     t :> ts;
     while(1) {
@@ -150,13 +150,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 int13_torque_ref = int23_torque_ref_in;
 
                 //protection -> to be cleaned later
-//                if (((int23_position_k_sens-temp) > pos_velocity_ctrl_config.int21_max_position) || ((int23_position_k_sens-temp) < pos_velocity_ctrl_config.int21_min_position))
-//                {
-//                    int1_enable_flag = 0;
-//                    i_motorcontrol.set_brake_status(0);
-//                    i_motorcontrol.set_torque_control_disabled();
-//                    i_motorcontrol.set_safe_torque_off_enabled();
-//                }
+                if (((int23_position_k_sens-temp) > pos_velocity_ctrl_config.int21_max_position) || ((int23_position_k_sens-temp) < pos_velocity_ctrl_config.int21_min_position))
+                {
+                    i_motorcontrol.set_brake_status(0);
+                    i_motorcontrol.set_torque_control_disabled();
+                    i_motorcontrol.set_safe_torque_off_enabled();
+                    if (int1_enable_flag == 1)
+                        printf("Protection: Position Limit Reached.\n* The max and min position limits should be also set before running the position_velocity control service\n");
+                    int1_enable_flag = 0;
+                }
 
                 if(int1_enable_flag) {
                     // position control
@@ -250,6 +252,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 int1_enable_flag = 0;
                 i_motorcontrol.set_torque_control_disabled();
                 i_motorcontrol.set_safe_torque_off_enabled();
+                i_motorcontrol.set_brake_status(0);
                 break;
 
             case i_position_control[int i].enable_position_ctrl():
@@ -264,6 +267,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int23_feedforward_effort_in = 0;
                     pid_reset(position_control_pid_param);
                     i_motorcontrol.set_torque_control_enabled();
+                    i_motorcontrol.set_brake_status(1);
                 break;
             case i_position_control[int i].set_position(int in_target_position):
                     int23_position_ref_k_in = in_target_position / 4;
@@ -291,6 +295,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int23_feedforward_effort_in = 0;
                     pid_reset(velocity_control_pid_param);
                     i_motorcontrol.set_torque_control_enabled();
+                    i_motorcontrol.set_brake_status(1);
                 break;
 
             case i_position_control[int i].set_velocity(int in_target_velocity):
@@ -317,6 +322,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int1_torque_enable_flag = 1;
                     int23_torque_ref_in = 0;
                     i_motorcontrol.set_torque_control_enabled();
+                    i_motorcontrol.set_brake_status(1);
                 break;
             case i_position_control[int i].set_torque(int in_target_torque):
                 int23_torque_ref_in = in_target_torque;

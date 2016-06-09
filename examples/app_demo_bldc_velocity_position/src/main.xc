@@ -50,8 +50,8 @@ int main(void) {
             /* Control Loop */
             pos_velocity_ctrl_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
 
-            pos_velocity_ctrl_config.int21_min_position =0;
-            pos_velocity_ctrl_config.int21_max_position = 0;
+            pos_velocity_ctrl_config.int21_min_position = -1000000;
+            pos_velocity_ctrl_config.int21_max_position = 1000000;
             pos_velocity_ctrl_config.int21_max_speed = 0;
             pos_velocity_ctrl_config.int21_max_torque = 0;
 
