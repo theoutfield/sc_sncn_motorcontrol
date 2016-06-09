@@ -53,7 +53,17 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     position_control_pid_param.scale_factor = 3;
     int int23_position_k_sens = 0;
     int int23_position_k = 0;
+    SecondOrderLPfilterParam position_SO_LP_filter_param;
+    float flt23_position_k = 0;
+    float flt23_position_in = 0;
+    float flt23_position_k_1n = 0;
+    float flt23_position_k_2n = 0;
     int int23_position_ref_k = 0;
+    SecondOrderLPfilterParam position_ref_SO_LP_filter_param;
+    float flt23_position_ref_in = 0;
+    float flt23_position_ref_k = 0;
+    float flt23_position_ref_k_1n = 0;
+    float flt23_position_ref_k_2n = 0;
     int int23_position_ref_k_in = 0;
     int int23_position_cmd_k = 0;
     int int25_position_k_sens = 0;
@@ -62,6 +72,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int1_velocity_enable_flag = 0;
     PIDparam velocity_control_pid_param;
     velocity_control_pid_param.scale_factor = 10;
+    SecondOrderLPfilterParam velocity_ref_SO_LP_filter_param;
     SecondOrderLPfilterParam velocity_SO_LP_filter_param;
     SecondOrderLPfilterParam velocity_d_SO_LP_filter_param;
     int int23_velocity_k = 0;
@@ -76,6 +87,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int23_velocity_k_sens = 0;
     int int23_velocity_d_k = 0;
     int int23_velocity_ref_k = 0;
+    float flt23_velocity_ref_in = 0;
+    float flt23_velocity_ref_k = 0;
+    float flt23_velocity_ref_k_1n = 0;
+    float flt23_velocity_ref_k_2n = 0;
     int int23_velocity_ref_k_in = 0;
     int int23_velocity_cmd_k = 0;
     int int14_velocity_k_sens = 0;
@@ -87,6 +102,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int23_torque_ref_in = 0;
     int int13_torque_ref = 0;
 
+    //protection
+    int temp = 0;
+
 
     timer t;
     unsigned int ts;
@@ -95,8 +113,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     pos_velocity_ctrl_config.int21_min_position /= 4;
     pos_velocity_ctrl_config.int21_max_position /= 4;
 
-    second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/100, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/80, /*T_s=*/1000, position_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/5, /*T_s=*/1000, position_ref_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/25, /*T_s=*/1000, velocity_ref_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/80, /*T_s=*/1000, velocity_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/75, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
 
     pid_init(pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity,
              pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity,
@@ -119,7 +140,21 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int23_position_k_sens = int25_position_k_sens / 4;
     int23_position_ref_k_in = int23_position_k_sens;
 
+    flt23_position_ref_k = int23_position_ref_k_in;
+    flt23_position_ref_k_1n = int23_position_ref_k_in;
+    flt23_position_ref_k_2n = int23_position_ref_k_in;
+    flt23_position_k = int23_position_ref_k_in;
+    flt23_position_k_1n = int23_position_ref_k_in;
+    flt23_position_k_2n = int23_position_ref_k_in;
+
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
+
+    //protection -> to be cleaned later
+    delay_milliseconds(1000);
+    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    int25_position_k_sens = upstream_control_data.position;
+    int23_position_k_sens = int25_position_k_sens / 4;
+    temp = int23_position_k_sens;
 
     t :> ts;
     while(1) {
@@ -137,14 +172,39 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 int23_velocity_ref_k = int23_velocity_ref_k_in;
                 int23_feedforward_effort = int23_feedforward_effort_in;
 
-
                 int13_torque_ref = int23_torque_ref_in;
+
+                //protection -> to be cleaned later
+                if (((int23_position_k_sens-temp) > pos_velocity_ctrl_config.int21_max_position) || ((int23_position_k_sens-temp) < pos_velocity_ctrl_config.int21_min_position))
+                {
+                    i_motorcontrol.set_brake_status(0);
+                    i_motorcontrol.set_torque_control_disabled();
+                    i_motorcontrol.set_safe_torque_off_enabled();
+                    if (int1_enable_flag == 1)
+                        printf("Protection: Position Limit Reached.\n* The max and min position limits should be also set before running the position_velocity control service\n");
+                    int1_enable_flag = 0;
+                }
 
                 if(int1_enable_flag) {
                     // position control
                     if (int1_position_enable_flag == 1) {
                         int23_position_k = int23_position_k_sens;
                         int23_position_ref_k = int23_position_ref_k_in;
+
+                        flt23_position_in = int23_position_k;
+                        second_order_LP_filter_update(&flt23_position_k,
+                                                      &flt23_position_k_1n,
+                                                      &flt23_position_k_2n,
+                                                      &flt23_position_in, 1000, position_SO_LP_filter_param);
+                        int23_position_k = ((int) flt23_position_in);
+
+                        flt23_position_ref_in = int23_position_ref_k;
+                        second_order_LP_filter_update(&flt23_position_ref_k,
+                                                      &flt23_position_ref_k_1n,
+                                                      &flt23_position_ref_k_2n,
+                                                      &flt23_position_ref_in, 1000, position_ref_SO_LP_filter_param);
+                        int23_position_ref_k = ((int) flt23_position_ref_k);
+
                         if(int23_position_ref_k > pos_velocity_ctrl_config.int21_max_position)
                             int23_position_ref_k = pos_velocity_ctrl_config.int21_max_position;
                         else if (int23_position_ref_k < pos_velocity_ctrl_config.int21_min_position)
@@ -153,10 +213,27 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         // PID parameters should be int9 -> -255 to 255
                         int23_position_cmd_k = pid_update(int23_position_ref_k, int23_position_k, int23_position_k, 0, 1000, position_control_pid_param);
                         int23_velocity_ref_k = int23_position_cmd_k;
+
+                        second_order_LP_filter_shift_buffers(&flt23_position_k,
+                                                             &flt23_position_k_1n,
+                                                             &flt23_position_k_2n);
+                        second_order_LP_filter_shift_buffers(&flt23_position_ref_k,
+                                                             &flt23_position_ref_k_1n,
+                                                             &flt23_position_ref_k_2n);
                     }
 
                     // velocity control
                     if (int1_velocity_enable_flag == 1 || int1_position_enable_flag == 1) {
+
+                        if (int1_position_enable_flag == 0) {
+                        flt23_velocity_ref_in = int23_velocity_ref_k;
+                        second_order_LP_filter_update(&flt23_velocity_ref_k,
+                                                      &flt23_velocity_ref_k_1n,
+                                                      &flt23_velocity_ref_k_2n,
+                                                      &flt23_velocity_ref_in, 1000, velocity_ref_SO_LP_filter_param);
+                        int23_velocity_ref_k = ((int) flt23_velocity_ref_k);
+                        }
+
                         if (int23_velocity_ref_k > pos_velocity_ctrl_config.int21_max_speed)
                             int23_velocity_ref_k = pos_velocity_ctrl_config.int21_max_speed;
                         else if (int23_velocity_ref_k < -pos_velocity_ctrl_config.int21_max_speed)
@@ -182,6 +259,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                         int13_torque_ref = int23_velocity_cmd_k;
 
+                        second_order_LP_filter_shift_buffers(&flt23_velocity_ref_k,
+                                                             &flt23_velocity_ref_k_1n,
+                                                             &flt23_velocity_ref_k_2n);
                         second_order_LP_filter_shift_buffers(&flt23_velocity_k,
                                                              &flt23_velocity_k_1n,
                                                              &flt23_velocity_k_2n);
@@ -190,24 +270,24 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                                              &flt23_velocity_d_k_2n);
                     }
 
-                    if(int23_velocity_cmd_k > pos_velocity_ctrl_config.int21_max_torque)
-                        int23_velocity_cmd_k = pos_velocity_ctrl_config.int21_max_torque;
-                    else if (int23_velocity_cmd_k < (-pos_velocity_ctrl_config.int21_max_torque))
-                        int23_velocity_cmd_k = (-pos_velocity_ctrl_config.int21_max_torque);
+                    if(int13_torque_ref > pos_velocity_ctrl_config.int21_max_torque)
+                        int13_torque_ref = pos_velocity_ctrl_config.int21_max_torque;
+                    else if (int13_torque_ref < (-pos_velocity_ctrl_config.int21_max_torque))
+                        int13_torque_ref = (-pos_velocity_ctrl_config.int21_max_torque);
                     i_motorcontrol.set_torque(int13_torque_ref / 1024);
                 }
 
 
 #ifdef XSCOPE_POSITION_CTRL
-                xscope_int(POSITION_REF, int23_position_ref_k_in * 4);
-                xscope_int(POSITION, upstream_control_data.position);
-//                xscope_int(POSITION_CMD, int23_velocity_ref_k);
+                xscope_int(POSITION_REF, int23_position_ref_k);
+                xscope_int(POSITION, int23_position_k);
+                xscope_int(POSITION_CMD, int23_velocity_ref_k);
 //                xscope_int(POSITION_TEMP1, 0);
 //                xscope_int(POSITION_TEMP2, 0);
-//                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
-                xscope_int(VELOCITY, upstream_control_data.velocity);
-                xscope_int(VELOCITY_CMD, int13_torque_ref / 1024);
-//                xscope_int(VELOCITY_TEMP1, int23_torque_ref_in);
+                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
+                xscope_int(VELOCITY, int23_velocity_k);
+                xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
+                xscope_int(VELOCITY_TEMP1, int23_velocity_k_sens);
 //                xscope_int(VELOCITY_TEMP2, 0);
 
 //                xscope_int(POSITION_REF, int23_position_ref_k_in*4);
@@ -219,7 +299,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 //                xscope_int(VELOCITY, upstream_control_data.velocity);
 //                xscope_int(VELOCITY_CMD, int13_torque_ref);
 //                xscope_int(VELOCITY_FILTERED, int23_velocity_k);
-                xscope_int(TORQUE, upstream_control_data.computed_torque);
+//                xscope_int(TORQUE, upstream_control_data.computed_torque);
 //                xscope_int(VELOCITY_TEMP2, 0);
 #endif
 
@@ -232,6 +312,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 int1_enable_flag = 0;
                 i_motorcontrol.set_torque_control_disabled();
                 i_motorcontrol.set_safe_torque_off_enabled();
+                i_motorcontrol.set_brake_status(0);
                 break;
 
             case i_position_control[int i].enable_position_ctrl():
@@ -243,9 +324,17 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int25_position_k_sens = upstream_control_data.position;
                     int23_position_k_sens = int25_position_k_sens / 4;
                     int23_position_ref_k_in = int23_position_k_sens;
+                    flt23_position_ref_k = int23_position_ref_k_in;
+                    flt23_position_ref_k_1n = int23_position_ref_k_in;
+                    flt23_position_ref_k_2n = int23_position_ref_k_in;
+                    flt23_position_k = int23_position_ref_k_in;
+                    flt23_position_k_1n = int23_position_ref_k_in;
+                    flt23_position_k_2n = int23_position_ref_k_in;
+
                     int23_feedforward_effort_in = 0;
                     pid_reset(position_control_pid_param);
                     i_motorcontrol.set_torque_control_enabled();
+                    i_motorcontrol.set_brake_status(1);
                 break;
             case i_position_control[int i].set_position(int in_target_position):
                     int23_position_ref_k_in = in_target_position / 4;
@@ -273,6 +362,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int23_feedforward_effort_in = 0;
                     pid_reset(velocity_control_pid_param);
                     i_motorcontrol.set_torque_control_enabled();
+                    i_motorcontrol.set_brake_status(1);
                 break;
 
             case i_position_control[int i].set_velocity(int in_target_velocity):
@@ -299,6 +389,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int1_torque_enable_flag = 1;
                     int23_torque_ref_in = 0;
                     i_motorcontrol.set_torque_control_enabled();
+                    i_motorcontrol.set_brake_status(1);
                 break;
             case i_position_control[int i].set_torque(int in_target_torque):
                 int23_torque_ref_in = in_target_torque;
