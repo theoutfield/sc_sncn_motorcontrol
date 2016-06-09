@@ -36,18 +36,18 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
     pos_velocity_ctrl_config.int21_min_position = -1000000;
     pos_velocity_ctrl_config.int21_max_position = 1000000;
-    pos_velocity_ctrl_config.int21_max_speed = 500;
+    pos_velocity_ctrl_config.int21_max_speed = 400;
     pos_velocity_ctrl_config.int21_max_torque = 1200000;
 
 
-    pos_velocity_ctrl_config.int10_P_position = 0;
-    pos_velocity_ctrl_config.int10_I_position = 0;
+    pos_velocity_ctrl_config.int10_P_position = 40;
+    pos_velocity_ctrl_config.int10_I_position = 50;
     pos_velocity_ctrl_config.int10_D_position = 0;
-    pos_velocity_ctrl_config.int21_P_error_limit_position = 0;
-    pos_velocity_ctrl_config.int21_I_error_limit_position = 0;
-    pos_velocity_ctrl_config.int22_integral_limit_position = 0;
+    pos_velocity_ctrl_config.int21_P_error_limit_position = 40000;
+    pos_velocity_ctrl_config.int21_I_error_limit_position = 5;
+    pos_velocity_ctrl_config.int22_integral_limit_position = 10000;
 
-    pos_velocity_ctrl_config.int10_P_velocity = 70;
+    pos_velocity_ctrl_config.int10_P_velocity = 60;
     pos_velocity_ctrl_config.int10_I_velocity = 0;
     pos_velocity_ctrl_config.int10_D_velocity = 65;
     pos_velocity_ctrl_config.int21_P_error_limit_velocity = 200000;
