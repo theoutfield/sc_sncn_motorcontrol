@@ -111,11 +111,7 @@ int main(void) {
 
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
-<<<<<<< HEAD
                     motorcontrol_config.commutation_offset=COMMUTATION_OFFSET_CLK;
-=======
-                    motorcontrol_config.home_offset = COMMUTATION_OFFSET_CLK;
->>>>>>> b16b2ddcee08f5c38a685e2287e604d0668883eb
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
