@@ -1,14 +1,20 @@
 /*
  * tuning.xc
+
  *
  *  Created on: Jul 13, 2015
  *      Author: Synapticon GmbH
  */
-#include <tuning.h>
+
 #include <stdio.h>
 #include <ctype.h>
-#include <xscope.h>
 
+#include <tuning.h>
+
+#include <position_feedback_service.h>
+#include <motorcontrol_service.h>
+
+#include <xscope.h>
 
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 {
@@ -204,6 +210,27 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     printf(">>  DEMO TORQUE CONTROL STARTING ...\n");
     delay_milliseconds(4000);
 
+    printf(">>  CHECK FAULTS ...\n");
+    delay_milliseconds(2000);
+
+    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+    while(upstream_control_data.error_status != NO_FAULT)
+    {
+        printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
+        delay_milliseconds(2000);
+
+        printf(">>  RESET FAULTS AND EVALUATE ERROR STATUS ...\n");
+        i_motorcontrol.reset_faults();
+        upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    }
+
+    if(upstream_control_data.error_status == NO_FAULT)
+    {
+        printf(">>  NO FAULT DETECTED ...\n\n\n");
+        delay_milliseconds(2000);
+    }
+
     printf(">>  UNLOCK THE BRAKE ...\n");
     i_motorcontrol.set_brake_status(1);
     delay_milliseconds(2000);
@@ -308,6 +335,30 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         xscope_int(FAULT_CODE, upstream_control_data.error_status);
 
         delay_milliseconds(1);
+
+
+        upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+        while(upstream_control_data.error_status != NO_FAULT)
+        {
+            printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
+            delay_milliseconds(2000);
+
+            printf(">>  RESET FAULTS IN 5 SECONDS ...\n");
+            delay_milliseconds(5000);
+            i_motorcontrol.reset_faults();
+
+            printf(">>  ENABLING THE CONTROL ...\n");
+            i_motorcontrol.set_torque_control_enabled();
+            delay_milliseconds(2000);
+
+            printf(">>  UNLOCK THE BRAKE ...\n");
+            i_motorcontrol.set_brake_status(1);
+            delay_milliseconds(2000);
+
+            upstream_control_data = i_motorcontrol.update_upstream_control_data();
+        }
+
 
         //for(period_us=400;period_us<=(5*1000);(period_us+=400))
         //{

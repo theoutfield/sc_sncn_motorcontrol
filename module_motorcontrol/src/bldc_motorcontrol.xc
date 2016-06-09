@@ -355,6 +355,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 ts = end_time + USEC_FAST;
             break;
 
+        case i_motorcontrol[int i].reset_faults():
+            break;
+
         case i_motorcontrol[int i].set_brake_status(int brake_status):
             break;
 

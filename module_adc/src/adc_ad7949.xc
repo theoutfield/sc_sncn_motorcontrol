@@ -341,6 +341,9 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
         case i_adc[int i].get_overcurrent_protection_status() -> int status:
                 status = overcurrent_protection_was_triggered;
                 break;
+
+        case i_adc[int i].reset_faults():
+                break;
         }
 
         Icalibrated_a = ((int) adc_data_a[4]) - i_calib_a;
@@ -476,6 +479,9 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 
         case i_adc[int i].get_overcurrent_protection_status() -> int status:
                 status = overcurrent_protection_was_triggered;
+                break;
+
+        case i_adc[int i].reset_faults():
                 break;
         }
     }

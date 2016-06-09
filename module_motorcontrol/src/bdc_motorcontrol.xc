@@ -86,6 +86,10 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                 update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
 
                 break;
+
+        case i_motorcontrol[int i].reset_faults():
+            break;
+
         case i_motorcontrol[int i].set_brake_status(int brake_status):
             break;
 
