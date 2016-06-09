@@ -36,7 +36,7 @@
 #define MOTOR_HALL_STATE_6     0
 
 #define POWER_FACTOR           0
-#define POLE_PAIRS             2
+#define POLE_PAIRS             5
 
 
 /////////////////////////////////////////////
@@ -44,25 +44,25 @@
 ////////////////////////////////////////////
 
 // RATED POWER
-#define RATED_POWER 140         // W
+#define RATED_POWER 162         // W
 
 // RATED TORQUE
-#define RATED_TORQUE 270        // mNm
+#define RATED_TORQUE 620        // mNm
 
 // RATED CURRENT
-#define RATED_CURRENT 5         // Amp
+#define RATED_CURRENT 4         // Amp
 
 // PEAK SPEED
-#define PEAK_SPEED    9000      // rpm
+#define PEAK_SPEED    3200      // rpm
 
 // PHASE RESISTANCE
-#define PHASE_RESISTANCE 350000 // uOhm
+#define PHASE_RESISTANCE 1270000 // uOhm
 
 // PHASE INDUCTANCE
-#define PHASE_INDUCTANCE 1000    // uH
+#define PHASE_INDUCTANCE 1330    // uH
 
 // MAXIMUM TORQUE
-#define MAXIMUM_TORQUE   63    //maximum torque (Nm) at 1000 Amp
+#define MAXIMUM_TORQUE   170    //maximum torque (Nm) at 1000 Amp
 
 /*********************************************/
 

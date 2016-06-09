@@ -81,6 +81,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         switch(mode) {
         //go to position directly
         case 'd':
+            downstream_control_data.offset_torque = 0;
             downstream_control_data.position_cmd = value*sign;
             i_position_control.update_control_data(downstream_control_data);
             printf("Go to %d\n", value*sign);
@@ -88,6 +89,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
         //set velocity
         case 'v':
+            downstream_control_data.offset_torque = 0;
             downstream_control_data.velocity_cmd = value*sign;
             i_position_control.update_control_data(downstream_control_data);
             printf("set velocity %d\n", value*sign);
