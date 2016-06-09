@@ -98,7 +98,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     pos_velocity_ctrl_config.int21_min_position /= 4;
     pos_velocity_ctrl_config.int21_max_position /= 4;
 
-    second_order_LP_filter_init(/*f_c=*/75, /*T_s=*/1000, velocity_SO_LP_filter_param);
+    second_order_LP_filter_init(/*f_c=*/90, /*T_s=*/1000, velocity_SO_LP_filter_param);
     second_order_LP_filter_init(/*f_c=*/75, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
 
     pid_init(pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity,
