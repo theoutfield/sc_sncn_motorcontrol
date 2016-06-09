@@ -89,6 +89,14 @@ interface ADCInterface{
      * @return status [0/1]
      */
     int get_overcurrent_protection_status();
+
+    /**
+     * @brief Sets the protection limits including:
+     *      - I_max
+     *      - V_dc_max
+     *      - V_dc_min
+     */
+    void set_protection_limits(int i_max, int v_dc_max, int v_dc_min);
 };
 
 /**

@@ -290,6 +290,9 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
     #pragma ordered
         select {
+        case iADC[int i].set_protection_limits(int i_max, int v_dc_max, int v_dc_min):
+                break;
+
         case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
 
@@ -372,6 +375,10 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
     timer t;
     unsigned time_stamp; // Time stamp
 
+    int i_max=100;
+    int v_dc_max=100;
+    int v_dc_min=0;
+
     int fault_code=NO_FAULT;
 
     unsigned inp_val = 0, tmp_val = 0;
@@ -385,7 +392,7 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
     int I_a=0;
     int I_b=0;
     int I_c=0;
-    int current_limit = (I_MAX * 56)/10;
+    int current_limit = (i_max * 56)/10;
 
     int torque=0;
 
@@ -431,6 +438,14 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 #pragma ordered
         select
         {
+
+        case iADC[int i].set_protection_limits(int i_max_in, int v_dc_max_in, int v_dc_min_in):
+                i_max=i_max_in;
+                v_dc_max=v_dc_max_in;
+                v_dc_min=v_dc_min_in;
+                current_limit = (i_max * 56)/10;
+                break;
+
         case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
 
                 adc_ports.p4_mux <: 0b1000;//mux_config;
@@ -606,13 +621,13 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 
                 if(i==1)
                 {
-                    if (V_dc<V_DC_MIN)
+                    if (V_dc<v_dc_min)
                     {
                         i_watchdog.protect(UNDER_VOLTAGE);
                         if(fault_code==0) fault_code=UNDER_VOLTAGE;
                     }
 
-                    if (V_DC_MAX<V_dc)
+                    if (v_dc_max<V_dc)
                     {
                         i_watchdog.protect(OVER_VOLTAGE);
                         if(fault_code==0) fault_code=OVER_VOLTAGE;
@@ -770,6 +785,9 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
                     overcurrent_protection_was_triggered = adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
                 }
 
+                break;
+
+        case iADC[int i].set_protection_limits(int i_max, int v_dc_max, int v_dc_min):
                 break;
 
         case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:

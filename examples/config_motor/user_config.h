@@ -50,10 +50,18 @@
 #define QEI_SENSOR_POLARITY         1
 
 //////////////////////////////////////////////
+//////  PROTECTION CONFIGURATION
+////////////////////////////////////////////
+#define I_MAX           60      //maximum tolerable value of phase current (under abnormal conditions)
+#define V_DC_MAX        50      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+#define V_DC_MIN        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+#define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
+
+
+//////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 ////////////////////////////////////////////
 #define VDC             48
-
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     66
 

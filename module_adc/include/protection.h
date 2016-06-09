@@ -22,12 +22,4 @@ interface fault_type
 };
 
 
-#define V_DC_MAX    48
-#define V_DC_MIN    10
-
-#define I_MAX          60
-#define TEMP_BOARD_MAX 100
-
-
-
 #endif /* PROTECTION_H_ */

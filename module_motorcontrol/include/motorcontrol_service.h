@@ -81,7 +81,7 @@ typedef struct {
     int max_current;                        /**< maximum stator current*/
     int rated_current;                      /**< rated motor phase current*/
     int rated_torque;                       /**< rated motor torque*/
-    int home_offset;                        /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
+    int commutation_offset;                 /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
     int torque_constant;                    /**< motor torque constant*/
     int current_P_gain;                     /**< proportional constant in torque controller*/
     int current_I_gain;                     /**< integral constant in torque controller*/
@@ -90,6 +90,15 @@ typedef struct {
     int phase_resistance;                   /**< uOhm*/
     int phase_inductance;                   /**< uH*/
     int v_dc;                               /**< dc bus voltage*/
+
+    // protection limits
+    // comment: there are some definitions in standard dictionary (such as MAX_TORQUE, MAX_CURRENT, ...) but
+    //          these values are for normal operation. (with high probability) the protection limits are different
+    //          than these maximum values...
+
+    int protection_limit_over_current;  //maximum tolerable value of phase current (under abnormal conditions)
+    int protection_limit_over_voltage;  //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+    int protection_limit_under_voltage; //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 } MotorcontrolConfig;
 
 #ifdef __XC__
@@ -318,6 +327,7 @@ interface MotorcontrolInterface{
     int get_field();
 
     UpstreamControlData update_upstream_control_data ();
+
 };
 
 

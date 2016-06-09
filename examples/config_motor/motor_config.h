@@ -28,7 +28,7 @@
  * Set the Motor offset and position of the hall state sensors.
  * Unless for adding a new motor or fixing motor settings do not touch this.
  */
-#define MOTOR_OFFSET           0
+
 
 #define MOTOR_HALL_STATE_1     0
 #define MOTOR_HALL_STATE_2     0
