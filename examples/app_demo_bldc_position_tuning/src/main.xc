@@ -72,6 +72,13 @@ int main(void) {
             pos_velocity_ctrl_config.int22_integral_limit_velocity = 60000;
 
 
+            pos_velocity_ctrl_config.position_ref_fc = POSITION_REF_FC;
+            pos_velocity_ctrl_config.position_fc = POSITION_FC;
+            pos_velocity_ctrl_config.velocity_ref_fc = VELOCITY_REF_FC;
+            pos_velocity_ctrl_config.velocity_fc = VELOCITY_FC;
+            pos_velocity_ctrl_config.velocity_d_fc = VELOCITY_D_FC;
+
+
             //MABI A1
 //            pos_velocity_ctrl_config.int21_min_position = -1000000;
 //            pos_velocity_ctrl_config.int21_max_position = 1000000;
@@ -165,14 +172,18 @@ int main(void) {
                     delay_milliseconds(2000);
 
                     MotorcontrolConfig motorcontrol_config;
+
+                    motorcontrol_config.v_dc =  VDC;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.polarity_type=MOTOR_POLARITY;
+
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
+
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
-                    motorcontrol_config.v_dc =  VDC;
 
                     motorcontrol_config.protection_limit_over_current =  I_MAX;
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
