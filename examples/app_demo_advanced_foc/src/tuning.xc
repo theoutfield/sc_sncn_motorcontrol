@@ -201,7 +201,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     int pulse_counter; // number of generated pulses
     int ref_torque;    // reference torque
 
-    int offset=0;
+    int offset=2440;
     int loop_counter=0;
     int proper_sensor_polarity=0;
 
@@ -210,6 +210,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     printf(">>  DEMO TORQUE CONTROL STARTING ...\n");
     delay_milliseconds(4000);
 
+/*
     printf(">>  CHECK FAULTS ...\n");
     delay_milliseconds(2000);
 
@@ -263,6 +264,11 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     printf("set offset to %d\n", offset);
     i_motorcontrol.set_offset_value(offset);
     delay_milliseconds(2000);
+*/
+
+    printf("set offset to %d\n", offset);
+    i_motorcontrol.set_offset_value(offset);
+    delay_milliseconds(2000);
 
     printf(">>  ENABLING THE CONTROL ...\n");
     i_motorcontrol.set_torque_control_enabled();
@@ -271,7 +277,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     printf(">>  UNLOCK THE BRAKE ...\n");
     i_motorcontrol.set_brake_status(1);
     delay_milliseconds(2000);
-
+/*
     printf(">>  SEND OSCILATING TORQUE_REF ...\n");
 
     ref_torque=100;
@@ -284,10 +290,10 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         delay_milliseconds(200);
     }
 
-
     ref_torque=0;
     i_motorcontrol.set_torque(ref_torque);
     delay_milliseconds(2000);
+
 
 
     printf(">>  GO TO SAFE_TORQUE_OFF MODE IN TWO SECONDS ...\n");
@@ -303,7 +309,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     printf(">>  UNLOCK THE BRAKE ...\n");
     i_motorcontrol.set_brake_status(1);
     delay_milliseconds(2000);
-
+*/
 
     printf(">>  SEND OSCILATING TORQUE_REF AND MONITORING THE DATA ...\n");
 
@@ -338,25 +344,35 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
 
         upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
         while(upstream_control_data.error_status != NO_FAULT)
         {
             printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
             delay_milliseconds(2000);
 
-            printf(">>  RESET FAULTS IN 5 SECONDS ...\n");
-            delay_milliseconds(5000);
+            printf(">>  RESET FAULTS ...\n");
+            delay_milliseconds(1000);
             i_motorcontrol.reset_faults();
-
-            printf(">>  ENABLING THE CONTROL ...\n");
-            i_motorcontrol.set_torque_control_enabled();
             delay_milliseconds(2000);
 
-            printf(">>  UNLOCK THE BRAKE ...\n");
-            i_motorcontrol.set_brake_status(1);
-            delay_milliseconds(2000);
 
+            printf(">>  EVALUATE FAULT ...\n");
+            delay_milliseconds(2000);
             upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+            if(upstream_control_data.error_status == NO_FAULT)
+            {
+
+                printf(">>  FAULT REMOVED ...\n");
+                delay_milliseconds(2000);
+
+                printf(">>  ENABLING THE CONTROL ...\n");
+                i_motorcontrol.set_torque_control_enabled();
+                delay_milliseconds(2000);
+
+                printf(">>  UNLOCK THE BRAKE ...\n");
+                i_motorcontrol.set_brake_status(1);
+                delay_milliseconds(2000);
+            }
         }
 
 

@@ -153,8 +153,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     PWM_ARRAY_TYP pwm_ctrl_s_start_brake ; // Structure containing double-buffered PWM output data
     PWM_COMMS_TYP pwm_comms_s_start_brake; // Structure containing PWM communication data
 
-    int brake_active  = 0;
-    int brake_counter =0;
+
 
     //parameters for starting the brake
     pwm_comms_s_start_brake.params.widths[0] = 8500;
@@ -187,6 +186,9 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
     int pwm_test=0;
     int pwm_on  =0;
+
+    int brake_active  = 0;
+    int brake_counter = 0;
 
     int pwm_flag=0;
 
@@ -221,13 +223,18 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
                 pwm_on     = received_pwm_on;
 
-//                if(pwm_on==0) brake_counter=0;
+                if(received_brake_active==0)  brake_active = 0;
 
-                if(brake_active != received_brake_active) brake_counter=0;
-                brake_active = received_brake_active;
+                if((brake_active == 0)&&(received_brake_active==1))
+                {
+                    brake_counter=0;
+                    brake_active = 1;
+                }
 
-                pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
-                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
+
+
+                pattern = peek( ports.p_pwm[_PWM_PHASE_A] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
+                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[_PWM_PHASE_A] ,1 ,pattern ); // Re-load output port with same bit-value
                 pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
 
                 break;
@@ -255,7 +262,6 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
                 pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
                 pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
                 pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
-
 
                 break;
         }
