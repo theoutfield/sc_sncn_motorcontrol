@@ -23,6 +23,7 @@
  //#include <motor_configs/motor_config_Moons_42BL30L2.h>
  //#include <motor_config_Nanotec_DB59L024035-A.h>
 #include <motor_config_MABI_Hohlwellenservomotor_A5.h>
+//#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
 //#include <motor_config_AMK_DT3.h>
 
@@ -36,7 +37,7 @@
 #define MOTOR_COMMUTATION_SENSOR   BISS_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
-#define MOTOR_FEEDBACK_SENSOR      BISS_SENSOR
+#define MOTOR_FEEDBACK_SENSOR      MOTOR_COMMUTATION_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
 #define QEI_SENSOR_INDEX_TYPE       QEI_WITH_INDEX
@@ -67,7 +68,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      0 //3450 for qmot, 2435 mabi A5, 0 mabi A6
+#define COMMUTATION_OFFSET_CLK      0 //3450 for qmot, 2435 mabi A5, 0 mabi A6, 1415 mabi A1, 2470 amk
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
