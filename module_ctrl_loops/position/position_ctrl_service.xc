@@ -113,11 +113,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     pos_velocity_ctrl_config.int21_min_position /= 4;
     pos_velocity_ctrl_config.int21_max_position /= 4;
 
-    second_order_LP_filter_init(/*f_c=*/80, /*T_s=*/1000, position_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/5, /*T_s=*/1000, position_ref_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/25, /*T_s=*/1000, velocity_ref_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/80, /*T_s=*/1000, velocity_SO_LP_filter_param);
-    second_order_LP_filter_init(/*f_c=*/75, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
+    second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, 1000, position_SO_LP_filter_param);
+    second_order_LP_filter_init(pos_velocity_ctrl_config.position_ref_fc, 1000, position_ref_SO_LP_filter_param);
+    second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_ref_fc, 1000, velocity_ref_SO_LP_filter_param);
+    second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, 1000, velocity_SO_LP_filter_param);
+    second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_d_fc, 1000, velocity_d_SO_LP_filter_param);
 
     pid_init(pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity,
              pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity,
@@ -160,7 +160,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     while(1) {
 #pragma ordered
         select {
-            case t when timerafter(ts + USEC_STD * 1000/*position_control_config.control_loop_period*/) :> ts:
+            case t when timerafter(ts + USEC_STD * pos_velocity_ctrl_config.control_loop_period) :> ts:
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
@@ -411,6 +411,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                              pos_velocity_ctrl_config.int21_P_error_limit_position, pos_velocity_ctrl_config.int21_I_error_limit_position,
                              pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.int21_max_speed,
                              pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                    second_order_LP_filter_init(/*f_c=*//*80*/pos_velocity_ctrl_config.position_fc, /*T_s=*/1000, position_SO_LP_filter_param);
+                    second_order_LP_filter_init(/*f_c=*//*5*/ pos_velocity_ctrl_config.position_ref_fc, /*T_s=*/1000, position_ref_SO_LP_filter_param);
+                    second_order_LP_filter_init(/*f_c=*//*25*/pos_velocity_ctrl_config.velocity_ref_fc, /*T_s=*/1000, velocity_ref_SO_LP_filter_param);
+                    second_order_LP_filter_init(/*f_c=*//*80*/pos_velocity_ctrl_config.velocity_fc, /*T_s=*/1000, velocity_SO_LP_filter_param);
+                    second_order_LP_filter_init(/*f_c=*//*75*/pos_velocity_ctrl_config.velocity_d_fc, /*T_s=*/1000, velocity_d_SO_LP_filter_param);
                 break;
 
             case i_position_control[int i].get_position_velocity_control_config() ->  PosVelocityControlConfig out_config:

@@ -53,8 +53,8 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 ////////////////////////////////////////////
-#define I_MAX           60      //maximum tolerable value of phase current (under abnormal conditions)
-#define V_DC_MAX        50      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+#define I_MAX           80      //maximum tolerable value of phase current (under abnormal conditions)
+#define V_DC_MAX        65      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define V_DC_MIN        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
 
@@ -84,14 +84,14 @@
 #define CONTROL_LOOP_PERIOD     1000
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
-#define POSITION_Kp       100
-#define POSITION_Ki       1
-#define POSITION_Kd       0
+//#define POSITION_Kp       100
+//#define POSITION_Ki       1
+//#define POSITION_Kd       0
 
 // PID FOR VELOCITY CONTROL (if applicable) [will be divided by 10000]
-#define VELOCITY_Kp       667
-#define VELOCITY_Ki       200
-#define VELOCITY_Kd       0
+//#define VELOCITY_Kp       667
+//#define VELOCITY_Ki       200
+//#define VELOCITY_Kd       0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
 #define TORQUE_Kp         1000
@@ -112,10 +112,47 @@
 #define PROFILE_TORQUE_SLOPE    400         // adc_ticks
 
 // PROFILER LIMITIS
-#define MAX_POSITION_LIMIT      0x7fffffff        // ticks (max range: 2^30, limited for safe operation)
-#define MIN_POSITION_LIMIT      -0x7fffffff       // ticks (min range: -2^30, limited for safe operation)
-#define MAX_VELOCITY            7000            // rpm
+//#define MAX_POSITION_LIMIT      0x7fffffff        // ticks (max range: 2^30, limited for safe operation)
+//#define MIN_POSITION_LIMIT      -0x7fffffff       // ticks (min range: -2^30, limited for safe operation)
+//#define MAX_VELOCITY            7000            // rpm
 #define MAX_ACCELERATION        7000            // rpm/s
 #define MAX_DECELERATION        7000            // rpm/s
 #define MAX_CURRENT_VARIATION   800             // adc_ticks/s
 #define MAX_CURRENT             800             // adc_ticks
+
+
+
+
+// A2 Position Controller Config
+#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
+#define MAX_VELOCITY            200             // rpm
+#define MAX_TORQUE              1200000
+
+#define POSITION_Kp             40
+#define POSITION_Ki             50
+#define POSITION_Kd             0
+#define VELOCITY_Kp             60
+#define VELOCITY_Ki             0
+#define VELOCITY_Kd             65
+
+#define POSITION_P_ERROR_lIMIT  40000
+#define POSITION_I_ERROR_lIMIT  5
+#define POSITION_INTEGRAL_LIMIT 10000
+#define VELOCITY_P_ERROR_lIMIT  200000
+#define VELOCITY_I_ERROR_lIMIT  0
+#define VELOCITY_INTEGRAL_LIMIT 0
+#define POSITION_REF_FC         5
+#define POSITION_FC             80
+#define VELOCITY_REF_FC         25
+#define VELOCITY_FC             80
+#define VELOCITY_D_FC           75
+
+
+
+
+
+
+
+
+

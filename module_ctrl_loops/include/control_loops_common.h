@@ -49,4 +49,14 @@ typedef struct {
 
     int int21_max_torque;
 
+    int position_ref_fc;
+    int position_fc;
+    int velocity_ref_fc;
+    int velocity_fc;
+    int velocity_d_fc;
+
 } PosVelocityControlConfig;
+
+
+
+
