@@ -33,15 +33,18 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     int steps;
     int position_ramp;
     DownstreamControlData downstream_control_data;
+    downstream_control_data.offset_torque = 0;
 
     int actual_position = 0;
-    int init_state = i_position_control.check_busy();
-
-
-    if (init_state == INIT_BUSY)
-    {
-        init_position_velocity_control(i_position_control);
-    }
+    //FIXME check the state of the position control service
+//    int init_state = i_position_control.check_busy();
+//
+//
+//    if (init_state == INIT_BUSY)
+//    {
+//        init_position_velocity_control(i_position_control);
+//    }
+    i_position_control.enable_position_ctrl();
 
     actual_position = i_position_control.get_position();
 
