@@ -147,18 +147,18 @@ int main(void) {
                     delay_milliseconds(2000);
 
                     MotorcontrolConfig motorcontrol_config;
+
+                    motorcontrol_config.v_dc =  VDC;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
-<<<<<<< HEAD
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
-=======
-                    motorcontrol_config.commutation_offset=COMMUTATION_OFFSET_CLK;
->>>>>>> c5f66f2c50210d5ce8ff0ef3ff513df982f829fe
+                    motorcontrol_config.polarity_type=MOTOR_POLARITY;
+
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
+
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
-                    motorcontrol_config.v_dc =  VDC;
 
                     motorcontrol_config.protection_limit_over_current =  I_MAX;
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
