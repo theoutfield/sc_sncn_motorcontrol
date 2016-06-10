@@ -342,3 +342,61 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         delay_milliseconds(10);
     }
 }
+
+void position_limiter(int position_limit, interface PositionLimiterInterface server i_position_limiter, client interface MotorcontrolInterface i_motorcontrol)
+{
+    timer t;
+    unsigned ts;
+    t :> ts;
+    int print_position_limit = 0;
+    int count = 0;
+    int velocity = 0;
+
+    while(1) {
+        select {
+        case t when timerafter(ts) :> void:
+
+            count = i_motorcontrol.get_position_actual();
+            velocity = i_motorcontrol.get_velocity_actual();
+
+            //postion limiter
+            if (position_limit > 0) {
+                if (count >= position_limit && velocity > 10) {
+                    i_motorcontrol.set_torque_control_disabled();
+                    i_motorcontrol.set_safe_torque_off_enabled();
+                    i_motorcontrol.set_brake_status(0);
+                    if (print_position_limit >= 0) {
+                        print_position_limit = -1;
+                        printf("up limit reached\n");
+                    }
+                } else if (count <= -position_limit && velocity < -10) {
+                    i_motorcontrol.set_torque_control_disabled();
+                    i_motorcontrol.set_safe_torque_off_enabled();
+                    i_motorcontrol.set_brake_status(0);
+                    if (print_position_limit <= 0) {
+                        print_position_limit = 1;
+                        printf("down limit reached\n");
+                    }
+                }
+            }
+            t :> ts;
+            ts += USEC_FAST * 1000;
+            break;
+
+        case i_position_limiter.set_limit(int in_limit):
+            if (in_limit < 0) {
+                position_limit = in_limit;
+                printf("Position limit disabled\n");
+            } else if (in_limit > 0) {
+                printf("Position limited to %d ticks\n", in_limit);
+                position_limit = in_limit;
+            }
+            break;
+
+        case i_position_limiter.get_limit() -> int out_limit:
+            out_limit =  position_limit;
+            break;
+
+        }//end select
+    }//end while
+}//end function

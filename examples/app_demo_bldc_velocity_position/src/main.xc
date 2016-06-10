@@ -24,7 +24,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
-#define POSITION_LIMIT 0 //+/- 4095
+#define POSITION_LIMIT 1500000 //+/- 4095
 
 int main(void) {
 
@@ -36,6 +36,7 @@ int main(void) {
     interface PositionVelocityCtrlInterface i_position_control[3];
     interface PositionFeedbackInterface i_position_feedback[3];
     interface shared_memory_interface i_shared_memory[2];
+    interface PositionLimiterInterface i_position_limiter;
 
     par
     {
@@ -83,6 +84,8 @@ int main(void) {
         {
             par
             {
+                position_limiter(POSITION_LIMIT, i_position_limiter, i_motorcontrol[1]);
+
                 {
                     /* Watchdog Service */
                     delay_milliseconds(500);
