@@ -52,6 +52,12 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
     profiler_config.max_acceleration = MAX_ACCELERATION;
     profiler_config.max_deceleration = MAX_DECELERATION;
 
+    DownstreamControlData downstream_control_data;
+    downstream_control_data.velocity_cmd = 0;
+    downstream_control_data.torque_cmd = 0;
+    downstream_control_data.offset_torque = 0;
+    downstream_control_data.position_cmd = 0;
+
     int start_position = i_position_control.get_position();
     target_position = start_position + target;
 
@@ -60,8 +66,9 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
 
     delay_milliseconds(500);//let the servers start before sending client requests
 
+    downstream_control_data.position_cmd = target_position;
     /* Set new target position for profile position control */
-    set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
+    set_profile_position(downstream_control_data, velocity, acceleration, deceleration, i_position_control);
 
     while(1)
     {
@@ -81,7 +88,8 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
             } else {
                 target_position = start_position + target;
             }
-            set_profile_position(target_position, velocity, acceleration, deceleration, i_position_control);
+            downstream_control_data.position_cmd = target_position;
+            set_profile_position(downstream_control_data, velocity, acceleration, deceleration, i_position_control);
         }
         delay_milliseconds(1);
     }

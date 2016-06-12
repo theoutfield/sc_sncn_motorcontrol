@@ -80,7 +80,7 @@ void init_velocity_profiler(ProfilerConfig profile_velocity_config,
  * @param deceleration [RPM/s].
  * @param i_position_control Communication interface to the Position Control Service.
  */
-void set_profile_position( int target_position, int velocity, int acceleration, int deceleration,
+void set_profile_position( DownstreamControlData &downstream_control_data, int velocity, int acceleration, int deceleration,
                            interface PositionVelocityCtrlInterface client i_position_control );
 
 /**
