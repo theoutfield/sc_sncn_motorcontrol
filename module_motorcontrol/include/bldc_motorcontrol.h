@@ -29,7 +29,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
                             interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[4],
+                            interface MotorcontrolInterface server i_motorcontrol,
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
                             MotorcontrolConfig &commutation_params);

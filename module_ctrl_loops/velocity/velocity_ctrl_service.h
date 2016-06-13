@@ -126,4 +126,4 @@ void velocity_control_service(ControlConfig & velocity_ctrl_config,
                         interface QEIInterface client ?i_qei,
                         interface BISSInterface client ?i_biss,
                         interface MotorcontrolInterface client i_motorcontrol,
-                        interface VelocityControlInterface server i_velocity_control[3]);
+                        interface VelocityControlInterface server i_velocity_control);

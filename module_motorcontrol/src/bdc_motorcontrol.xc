@@ -21,7 +21,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                                t_pwm_control &pwm_ctrl,
                                chanend c_pwm_ctrl,
                                MotorcontrolConfig &motorcontrol_config,
-                               interface MotorcontrolInterface server i_motorcontrol[4])
+                               interface MotorcontrolInterface server i_motorcontrol)
 {
     timer t;
     unsigned int ts;
@@ -86,30 +86,30 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                 break;
 
-        case i_motorcontrol[int i].get_notification() -> int out_notification:
+        case i_motorcontrol.get_notification() -> int out_notification:
 
             out_notification = notification;
             break;
 
-        case i_motorcontrol[int i].set_voltage(int new_voltage):
+        case i_motorcontrol.set_voltage(int new_voltage):
 
             voltage = new_voltage;
             break;
 
-        case i_motorcontrol[int i].check_busy() -> int state_return:
+        case i_motorcontrol.check_busy() -> int state_return:
 
                   state_return = motorcontrol_config.init_state;
                   break;
 
-        case i_motorcontrol[int i].set_calib(int flag) -> int out_offset:
+        case i_motorcontrol.set_calib(int flag) -> int out_offset:
                 break;
 /*
-        case i_motorcontrol[int i].disable_fets():
+        case i_motorcontrol.disable_fets():
 
                 shutdown = 1;
                 break;
 */
-        case i_motorcontrol[int i].set_fets_state(int new_state):
+        case i_motorcontrol.set_fets_state(int new_state):
 
                 if(new_state == 0){
                     shutdown = 1;
@@ -120,20 +120,20 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                 break;
 
-        case i_motorcontrol[int i].get_fets_state() -> int fets_state:
+        case i_motorcontrol.get_fets_state() -> int fets_state:
                 fets_state = !shutdown;
                 break;
-        case i_motorcontrol[int i].set_sensor(int new_sensor):
+        case i_motorcontrol.set_sensor(int new_sensor):
                 break;
-        case i_motorcontrol[int i].set_sensor_offset(int in_offset):
+        case i_motorcontrol.set_sensor_offset(int in_offset):
                 break;
-        case i_motorcontrol[int i].set_config(MotorcontrolConfig new_config):
+        case i_motorcontrol.set_config(MotorcontrolConfig new_config):
                 break;
-        case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
+        case i_motorcontrol.get_config() -> MotorcontrolConfig out_config:
 
                   out_config = motorcontrol_config;
                   break;
-        case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,
+        case i_motorcontrol.set_all_parameters(HallConfig in_hall_config,
                                                             QEIConfig in_qei_config,
                                                             MotorcontrolConfig in_commutation_config):
                break;
@@ -144,7 +144,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 [[combinable]]
 void bdc_loop(chanend c_pwm_ctrl,
                 interface WatchdogInterface client i_watchdog,
-                interface MotorcontrolInterface server i_commutation[4],
+                interface MotorcontrolInterface server i_commutation,
                 FetDriverPorts &fet_driver_ports,
                 MotorcontrolConfig &motorcontrol_config)
 {

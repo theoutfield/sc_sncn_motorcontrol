@@ -25,7 +25,7 @@ int check_hall_config(HallConfig &hall_config){
 }
 
 [[combinable]]
-void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface HallInterface server i_hall[5])
+void hall_service(HallPorts & hall_ports, HallConfig & hall_config, interface HallInterface server i_hall[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz

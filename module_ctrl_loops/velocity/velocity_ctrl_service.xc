@@ -48,7 +48,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                        interface QEIInterface client ?i_qei,
                        interface BISSInterface client ?i_biss,
                        interface MotorcontrolInterface client i_motorcontrol,
-                       interface VelocityControlInterface server i_velocity_control[3])
+                       interface VelocityControlInterface server i_velocity_control)
 {
     /* Controller declarations */
     int actual_velocity = 0;
@@ -262,33 +262,33 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 }
                 break;
 
-            case i_velocity_control[int i].set_velocity(int in_velocity):
+            case i_velocity_control.set_velocity(int in_velocity):
 
                 target_velocity = in_velocity;
                 break;
 
-            case i_velocity_control[int i].get_velocity()-> int out_velocity:
+            case i_velocity_control.get_velocity()-> int out_velocity:
 
                 out_velocity = actual_velocity;
                 break;
 
-            case i_velocity_control[int i].get_target_velocity() -> int out_target_velocity:
+            case i_velocity_control.get_target_velocity() -> int out_target_velocity:
 
                 out_target_velocity = target_velocity;
                 break;
 
-            case i_velocity_control[int i].get_velocity_control_config() -> ControlConfig out_config:
+            case i_velocity_control.get_velocity_control_config() -> ControlConfig out_config:
 
                 out_config = velocity_control_config;
                 break;
 
-            case i_velocity_control[int i].set_velocity_control_config(ControlConfig in_params):
+            case i_velocity_control.set_velocity_control_config(ControlConfig in_params):
 
                 velocity_control_config = in_params;
                 config_update_flag = 1;
                 break;
 
-            case i_velocity_control[int i].set_velocity_filter(int in_length):
+            case i_velocity_control.set_velocity_filter(int in_length):
 
                 filter_length = in_length;
 
@@ -300,14 +300,14 @@ void velocity_control_service(ControlConfig &velocity_control_config,
 
                 break;
 
-            case i_velocity_control[int i].set_velocity_sensor(int in_sensor_used):
+            case i_velocity_control.set_velocity_sensor(int in_sensor_used):
 
                 velocity_control_config.feedback_sensor = in_sensor_used;
                 target_velocity = actual_velocity;
                 config_update_flag = 1;
                 break;
 
-            case i_velocity_control[int i].disable_velocity_ctrl():
+            case i_velocity_control.disable_velocity_ctrl():
 
                 activate = 0;
                 error_velocity = 0;
@@ -320,12 +320,12 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                 delay_milliseconds(30); //wait_ms(30, 1, t);
                 break;
 
-            case i_velocity_control[int i].check_busy() -> int out_state:
+            case i_velocity_control.check_busy() -> int out_state:
 
                 out_state = activate;
                 break;
 
-            case i_velocity_control[int i].enable_velocity_ctrl():
+            case i_velocity_control.enable_velocity_ctrl():
 
                 activate = 1;
                 while (1) {

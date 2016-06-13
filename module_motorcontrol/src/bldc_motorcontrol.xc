@@ -22,7 +22,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
                             interface WatchdogInterface client i_watchdog,
-                            interface MotorcontrolInterface server i_motorcontrol[4],
+                            interface MotorcontrolInterface server i_motorcontrol,
                             chanend c_pwm_ctrl,
                             FetDriverPorts &fet_driver_ports,
                             MotorcontrolConfig &motorcontrol_config)
@@ -138,41 +138,41 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                 update_pwm_inv(pwm_ctrl, c_pwm_ctrl, pwm);
                 break;
 
-            case i_motorcontrol[int i].get_notification() -> int out_notification:
+            case i_motorcontrol.get_notification() -> int out_notification:
 
                 out_notification = notification;
                 break;
 
-            case i_motorcontrol[int i].set_voltage(int new_voltage):
+            case i_motorcontrol.set_voltage(int new_voltage):
                     if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
                         voltage = -new_voltage;
                     else
                         voltage = new_voltage;
                     break;
 
-            case i_motorcontrol[int i].set_config(MotorcontrolConfig new_parameters):
+            case i_motorcontrol.set_config(MotorcontrolConfig new_parameters):
                     motorcontrol_config = new_parameters;
 
                     notification = MOTCTRL_NTF_CONFIG_CHANGED;
                     // TODO: Use a constant for the number of interfaces
                     for (int i = 0; i < 4; i++) {
-                        i_motorcontrol[i].notification();
+                        i_motorcontrol.notification();
                     }
 
                     sensor_select = motorcontrol_config.commutation_sensor;
                     break;
 
-            case i_motorcontrol[int i].get_config() -> MotorcontrolConfig out_config:
+            case i_motorcontrol.get_config() -> MotorcontrolConfig out_config:
 
                     out_config = motorcontrol_config;
                     break;
 
-            case i_motorcontrol[int i].set_sensor(int new_sensor):
+            case i_motorcontrol.set_sensor(int new_sensor):
                     sensor_select = new_sensor;
                     motorcontrol_config.commutation_sensor = sensor_select;
                     break;
 
-            case i_motorcontrol[int i].set_sensor_offset(int in_offset):
+            case i_motorcontrol.set_sensor_offset(int in_offset):
                     if (sensor_select == BISS_SENSOR ) {
                         BISSConfig out_biss_config = i_biss.get_biss_config();
                         out_biss_config.offset_electrical = in_offset;
@@ -180,7 +180,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     }
                     break;
 
-            case i_motorcontrol[int i].set_fets_state(int new_state):
+            case i_motorcontrol.set_fets_state(int new_state):
 
                     if(new_state == 0){
                         shutdown = 1;
@@ -191,15 +191,15 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
 
                     break;
 
-            case i_motorcontrol[int i].get_fets_state() -> int fets_state:
+            case i_motorcontrol.get_fets_state() -> int fets_state:
                     fets_state = !shutdown;
                     break;
 
-            case i_motorcontrol[int i].check_busy() -> int state_return:
+            case i_motorcontrol.check_busy() -> int state_return:
                     state_return = init_state;
                     break;
 
-            case i_motorcontrol[int i].set_calib(int in_flag) -> int out_offset:
+            case i_motorcontrol.set_calib(int in_flag) -> int out_offset:
                     calib_flag = in_flag;
                     if (calib_flag == 1) {
                         motorcontrol_config.hall_offset[0] = 0;
@@ -236,7 +236,7 @@ void bldc_loop(HallConfig hall_config, QEIConfig qei_config,
                     }
                     break;
 
-            case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,
+            case i_motorcontrol.set_all_parameters(HallConfig in_hall_config,
                                                                 QEIConfig in_qei_config,
                                                                 MotorcontrolConfig in_commutation_config):
 
