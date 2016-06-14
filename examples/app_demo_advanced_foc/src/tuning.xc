@@ -389,6 +389,11 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
                 }
                 break;
 
+            case 'z':
+                printf("reset faults ...\n");
+
+                break;
+
         //set torque
         default:
             torque_ref = value * sign;
