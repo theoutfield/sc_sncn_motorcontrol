@@ -19,7 +19,7 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 
     int offset=i_motorcontrol.set_calib(0);
     printf("Detected offset is: %i\n", offset);
-//    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
+
     int proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
     if(proper_sensor_polarity == 1) {
         printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
@@ -32,6 +32,10 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 
 void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol, client interface TuningInterface ?i_tuning)
 {
+
+    int period_us;     // torque generation period in micro-seconds
+    int pulse_counter; // number of generated pulses
+
     delay_milliseconds(500);
     printf(">>  ADVANCED FOC DEMO STARTING ...\n");
 
@@ -120,6 +124,23 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                 printf("Torque control deactivated\n");
             }
             break;
+
+            //play sound!
+            case 's':
+                for(period_us=400;period_us<=(1*1000);(period_us+=400))
+                {
+                    if(period_us<3000) period_us-=300;
+
+                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                    {
+                        i_motorcontrol.set_torque(80);
+                        delay_microseconds(period_us);
+                        i_motorcontrol.set_torque(-80);
+                        delay_microseconds(period_us);
+                    }
+                }
+                i_motorcontrol.set_torque(0);
+                break;
 
         //set torque
         default:
