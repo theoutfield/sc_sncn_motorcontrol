@@ -38,11 +38,11 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
+        //on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
 
-        //on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
+        on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
 
-        on tile[IFM_TILE]: position_limiter(i_tuning, i_motorcontrol[1]);
+        //on tile[IFM_TILE]: position_limiter(i_tuning, i_motorcontrol[1]);
 
         on tile[IFM_TILE]:
         {
@@ -68,38 +68,56 @@ int main(void) {
                     watchdog_service(wd_ports, i_watchdog);
                 }
 
+
                 /* Position feedback service */
                 {
                     PositionFeedbackConfig position_feedback_config;
-                    position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
-
-                    position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                    position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-                    position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
-                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-                    position_feedback_config.biss_config.pole_pairs = POLE_PAIRS;
-                    position_feedback_config.biss_config.polarity = BISS_POLARITY;
-                    position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-                    position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-                    position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
-                    position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                    position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-                    position_feedback_config.biss_config.enable_push_service = PushAll;
-
+                    position_feedback_config.sensor_type = CONTELEC_SENSOR;
                     position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
                     position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
                     position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                     position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
-                    position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.contelec_config.pole_pairs = 5;
                     position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
                     position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                     position_feedback_config.contelec_config.enable_push_service = PushAll;
 
                     position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
                 }
+
+
+//                /* Position feedback service */
+//                {
+//                    PositionFeedbackConfig position_feedback_config;
+//                    position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
+//
+//                    position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
+//                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+//                    position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
+//                    position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
+//                    position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
+//                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
+//                    position_feedback_config.biss_config.pole_pairs = POLE_PAIRS;
+//                    position_feedback_config.biss_config.polarity = BISS_POLARITY;
+//                    position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
+//                    position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+//                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
+//                    position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
+//                    position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+//                    position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+//                    position_feedback_config.biss_config.enable_push_service = PushAll;
+//
+//                    position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
+//                    position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
+//                    position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
+//                    position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
+//                    position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
+//                    position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
+//                    position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+//                    position_feedback_config.contelec_config.enable_push_service = PushAll;
+//
+//                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
+//                }
 
 
                 /* Shared memory Service */

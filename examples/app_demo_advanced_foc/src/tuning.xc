@@ -264,6 +264,18 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         delay_milliseconds(200);
     }
 
+    for(period_us=400;period_us<=(5*1000);(period_us+=400))
+    {
+        if(period_us<3000) period_us-=300;
+
+        for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+        {
+            i_motorcontrol.set_torque(ref_torque);
+            delay_microseconds(period_us);
+            i_motorcontrol.set_torque(-ref_torque);
+            delay_microseconds(period_us);
+        }
+    }
 
     ref_torque=0;
     i_motorcontrol.set_torque(ref_torque);
