@@ -45,6 +45,57 @@
 //////  MOTOR PARAMETERS
 ////////////////////////////////////////////
 
+/*
+// MABI AXIS_1 and AXIS_2
+// RATED POWER
+#define RATED_POWER 735         // W
+
+// RATED TORQUE
+#define RATED_TORQUE 540        // mNm
+
+// RATED CURRENT
+#define RATED_CURRENT 20         // Amp
+
+// PEAK SPEED
+#define PEAK_SPEED    3000      // rpm
+
+// PHASE RESISTANCE
+#define PHASE_RESISTANCE 125000 // uOhm
+
+// PHASE INDUCTANCE
+#define PHASE_INDUCTANCE 525    // uH
+
+// MAXIMUM TORQUE
+#define MAXIMUM_TORQUE   270    // Nm at 1000 Amp
+*/
+
+
+/*
+// MABI AXIS_3 and AXIS_4
+// RATED POWER
+#define RATED_POWER 450         // W
+
+// RATED TORQUE
+#define RATED_TORQUE 143        // mNm
+
+// RATED CURRENT
+#define RATED_CURRENT 11         // Amp
+
+// PEAK SPEED
+#define PEAK_SPEED    5000      // rpm
+
+// PHASE RESISTANCE
+#define PHASE_RESISTANCE 210000 // uOhm
+
+// PHASE INDUCTANCE
+#define PHASE_INDUCTANCE 470    // uH
+
+// MAXIMUM TORQUE
+#define MAXIMUM_TORQUE   130    // Nm at 1000 Amp
+*/
+
+
+// MABI AXIS_5 and AXIS_6
 // RATED POWER
 #define RATED_POWER 140         // W
 
@@ -63,17 +114,20 @@
 // PHASE INDUCTANCE
 #define PHASE_INDUCTANCE 720    // uH
 
-// COMMUTATION PERIOD
-#define COMMUTATION_PERIOD 66   // uS
-
 // MAXIMUM TORQUE
 #define MAXIMUM_TORQUE   57    // Nm at 1000 Amp
+
+
+
 
 /*********************************************/
 
 /////////////////////////////////////////////
 //////  GENERAL MOTOR CONFIGURATION
 ////////////////////////////////////////////
+
+// COMMUTATION PERIOD
+#define COMMUTATION_PERIOD 66   // uS
 
 // MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 #define MOTOR_TYPE  BLDC_MOTOR
