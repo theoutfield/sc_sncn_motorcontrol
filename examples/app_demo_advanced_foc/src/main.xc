@@ -33,16 +33,15 @@ int main(void) {
     interface update_pwm i_update_pwm;
     interface TuningInterface i_tuning;
 
-
     par
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
+        //on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
 
-        //on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
+        on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
 
-        on tile[IFM_TILE]: position_limiter(i_tuning, i_motorcontrol[1]);
+        //on tile[IFM_TILE]: position_limiter(i_tuning, i_motorcontrol[1]);
 
         on tile[IFM_TILE]:
         {
