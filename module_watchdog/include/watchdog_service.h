@@ -6,13 +6,21 @@
 
 #pragma once
 
-/**
- * Structure type for Watchdog Service ports
- */
-typedef struct {
-    out port p_enable; /**< 4-bit Port for Watchdog basic management. */
-    out port ?p_tick; /**< [Nullable] Port for the periodic tick signal (if applicable in your SOMANET device). */
+typedef struct wd_ports {
+    out port ? p_wd_tick;
+    out port ? p_shared_leds_wden;
+    out port ? p_wd_enable;
+    unsigned shared_pin_wd_enable;
+    unsigned shared_pin_wd_tick;
+    unsigned keep_alive_ticks;
 } WatchdogPorts;
+
+
+typedef enum {
+        WD_STATE_OFF,
+        WD_STATE_EN,
+}WatchdogState;
+
 
 /**
  * @brief Interface type to communicate with the Watchdog Service.
@@ -28,6 +36,20 @@ interface WatchdogInterface{
      * @brief Stops ticking the watchdog. Therefore, any output through the phases is disabled.
      */
     void stop(void);
+
+
+    void enableKeepAliveTimeout();
+
+    void disableKeepAliveTimeout();
+
+
+    WatchdogState getState();
+
+
+    /**
+     * @brief External keepalive from other processes, resets timeout
+     */
+    void keepalive();
 };
 
 /**
@@ -37,5 +59,5 @@ interface WatchdogInterface{
  * @param i_watchdog Array of communication interfaces to handle up to 2 different clients.
  */
 [[combinable]]
-void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2]);
+void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[4]);
 
