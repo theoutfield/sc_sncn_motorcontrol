@@ -285,14 +285,12 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
             delay_milliseconds(30000);
 
-    printf("set offset to %d\n", offset);
-    i_motorcontrol.set_offset_value(offset);
-    delay_milliseconds(2000);
-
-
-
-    offset=i_motorcontrol.set_calib(0);
+            offset=i_motorcontrol.set_calib(0);
             printf("Detected offset is: %i\n", offset);
+
+            printf("set offset to %d\n", offset);
+            i_motorcontrol.set_offset_value(offset);
+            delay_milliseconds(2000);
 
             proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
 
@@ -307,7 +305,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             }
             break;
 
-        //set brake
+            //set brake
         case 'b':
             if (brake_flag)
             {
@@ -322,25 +320,25 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             i_motorcontrol.set_brake_status(brake_flag);
             break;
 
-        //set offset
+            //set offset
         case 'o':
             printf("set offset to %d\n", value);
             i_motorcontrol.set_offset_value(value);
             break;
 
-        //print offset
+            //print offset
         case 'p':
             printf("offset %d\n", i_motorcontrol.set_calib(0));
             break;
 
-        //reverse torque
+            //reverse torque
         case 'r':
             torque_ref = -torque_ref;
             i_motorcontrol.set_torque(torque_ref);
             printf("torque %d\n", torque_ref);
             break;
 
-        //enable and disable torque controller
+            //enable and disable torque controller
         case 't':
             if (torque_control_flag == 0)
             {
@@ -357,100 +355,76 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             break;
 
             //play sound!
-            case 'm':
-                for(period_us=400;period_us<=(5*400);(period_us+=400))
+        case 'm':
+            for(period_us=400;period_us<=(5*400);(period_us+=400))
+            {
+                for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
                 {
-                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
-                    {
-                        i_motorcontrol.set_torque(20);
-                        delay_microseconds(period_us);
-                        i_motorcontrol.set_torque(-20);
-                        delay_microseconds(period_us);
-                    }
+                    i_motorcontrol.set_torque(20);
+                    delay_microseconds(period_us);
+                    i_motorcontrol.set_torque(-20);
+                    delay_microseconds(period_us);
                 }
+            }
 
 
-                for(period_us=(5*400);period_us>=400;(period_us-=400))
+            for(period_us=(5*400);period_us>=400;(period_us-=400))
+            {
+                for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
                 {
-                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
-                    {
-                        i_motorcontrol.set_torque(20);
-                        delay_microseconds(period_us);
-                        i_motorcontrol.set_torque(-20);
-                        delay_microseconds(period_us);
-                    }
+                    i_motorcontrol.set_torque(20);
+                    delay_microseconds(period_us);
+                    i_motorcontrol.set_torque(-20);
+                    delay_microseconds(period_us);
                 }
+            }
 
-                i_motorcontrol.set_torque(0);
-                break;
+            i_motorcontrol.set_torque(0);
+            break;
 
-                //go to safe mode torque
-                case 's':
+            //go to safe mode torque
+        case 's':
 
-                printf(">>  GO TO SAFE_TORQUE_OFF MODE IN TWO SECONDS ...\n");
-                delay_milliseconds(2000);
-                i_motorcontrol.set_safe_torque_off_enabled();
+            printf(">>  GO TO SAFE_TORQUE_OFF MODE IN TWO SECONDS ...\n");
+            delay_milliseconds(2000);
+            i_motorcontrol.set_safe_torque_off_enabled();
 
-                break;
+            break;
 
             //show on xscope for 10 seconds!
-            case 'x':
-                printf("activate xscope during 20 seconds ...\n");
-                for(int i=0; i<=20000;i++)
-                {
-                    upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
-                    xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
-                    xscope_int(V_DC, upstream_control_data.V_dc);
-                    xscope_int(ANGLE, upstream_control_data.angle);
-                    xscope_int(POSITION, upstream_control_data.position);
-                    xscope_int(VELOCITY, upstream_control_data.velocity);
-                    xscope_int(TEMPERATURE, upstream_control_data.temperature);
-                    xscope_int(FAULT_CODE, upstream_control_data.error_status);
-
-                    delay_milliseconds(1);
-                }
-                break;
-
-            case 'z':
-                printf("reset faults, and check status ...\n");
-                i_motorcontrol.reset_faults();
-                delay_milliseconds(1000);
-
+        case 'x':
+            printf("activate xscope during 20 seconds ...\n");
+            for(int i=0; i<=20000;i++)
+            {
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
-                while(upstream_control_data.error_status != NO_FAULT)
-                {
-                    printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
-                    delay_milliseconds(2000);
 
-                    printf(">>  RESET FAULTS ...\n");
-                    delay_milliseconds(1000);
+                xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
+                xscope_int(V_DC, upstream_control_data.V_dc);
+                xscope_int(ANGLE, upstream_control_data.angle);
+                xscope_int(POSITION, upstream_control_data.position);
+                xscope_int(VELOCITY, upstream_control_data.velocity);
+                xscope_int(TEMPERATURE, upstream_control_data.temperature);
+                xscope_int(FAULT_CODE, upstream_control_data.error_status);
 
-                    delay_milliseconds(2000);
+                delay_milliseconds(1);
+            }
+            break;
 
+        case 'z':
+            printf("reset faults, and check status ...\n");
+            i_motorcontrol.reset_faults();
 
-                    printf(">>  EVALUATE FAULT ...\n");
-                    delay_milliseconds(2000);
-                    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+            delay_milliseconds(500);
+            upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                    if(upstream_control_data.error_status == NO_FAULT)
-                    {
+            if(upstream_control_data.error_status != NO_FAULT)
+                printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
 
-                        printf(">>  FAULT REMOVED ...\n");
-                        delay_milliseconds(2000);
+            if(upstream_control_data.error_status == NO_FAULT)
+                printf(">>  FAULT REMOVED ...\n");
+            break;
 
-                        printf(">>  ENABLING THE CONTROL ...\n");
-                        i_motorcontrol.set_torque_control_enabled();
-                        delay_milliseconds(2000);
-
-                        printf(">>  UNLOCK THE BRAKE ...\n");
-                        i_motorcontrol.set_brake_status(1);
-                        delay_milliseconds(2000);
-                    }
-                }
-                break;
-
-        //set torque
+            //set torque
         default:
             torque_ref = value * sign;
             i_motorcontrol.set_torque(torque_ref);

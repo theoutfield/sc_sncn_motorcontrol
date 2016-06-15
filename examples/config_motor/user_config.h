@@ -56,7 +56,7 @@
 ////////////////////////////////////////////
 #define I_MAX           100      //maximum tolerable value of phase current (under abnormal conditions)
 #define V_DC_MAX        65      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
-#define V_DC_MIN        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+#define V_DC_MIN        20      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
 
 
