@@ -156,9 +156,9 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
 
     //parameters for starting the brake
-    pwm_comms_s_start_brake.params.widths[0] = 8500;
-    pwm_comms_s_start_brake.params.widths[1] = 8500;
-    pwm_comms_s_start_brake.params.widths[2] = 8500;
+    pwm_comms_s_start_brake.params.widths[0] = 12000;
+    pwm_comms_s_start_brake.params.widths[1] = 12000;
+    pwm_comms_s_start_brake.params.widths[2] = 12000;
 
     pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s_start_brake.buf = 0;
@@ -171,9 +171,9 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     PWM_ARRAY_TYP pwm_ctrl_s_maintain_brake ; // Structure containing double-buffered PWM output data
     PWM_COMMS_TYP pwm_comms_s_maintain_brake; // Structure containing PWM communication data
 
-    pwm_comms_s_maintain_brake.params.widths[0] = 1000;
-    pwm_comms_s_maintain_brake.params.widths[1] = 1000;
-    pwm_comms_s_maintain_brake.params.widths[2] = 1000;
+    pwm_comms_s_maintain_brake.params.widths[0] = 2000;
+    pwm_comms_s_maintain_brake.params.widths[1] = 2000;
+    pwm_comms_s_maintain_brake.params.widths[2] = 2000;
 
     pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s_maintain_brake.buf = 0;
