@@ -24,7 +24,7 @@ void init_position_profiler(ProfilerConfig profile_position_config) {
                                  profile_position_config.ticks_per_turn);
 }
 
-void set_profile_position(int target_position, int velocity, int acceleration, int deceleration,
+void set_profile_position(DownstreamControlData &downstream_control_data, int velocity, int acceleration, int deceleration,
                           interface PositionVelocityCtrlInterface client i_position_control )
 {
     int i;
@@ -32,20 +32,21 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     unsigned int time;
     int steps;
     int position_ramp;
-    DownstreamControlData downstream_control_data;
 
     int actual_position = 0;
-    int init_state = i_position_control.check_busy();
-
-
-    if (init_state == INIT_BUSY)
-    {
-        init_position_velocity_control(i_position_control);
-    }
+    //FIXME check the state of the position control service
+//    int init_state = i_position_control.check_busy();
+//
+//
+//    if (init_state == INIT_BUSY)
+//    {
+//        init_position_velocity_control(i_position_control);
+//    }
+    i_position_control.enable_position_ctrl();
 
     actual_position = i_position_control.get_position();
 
-    steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
+    steps = init_position_profile(downstream_control_data.position_cmd, actual_position, velocity, acceleration, deceleration);
 
     t :> time;
     for(i = 1; i < steps; i++)

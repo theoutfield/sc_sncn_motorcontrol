@@ -25,6 +25,14 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 
     int offset=i_motorcontrol.set_calib(0);
     printf("Detected offset is: %i\n", offset);
+//    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
+    int proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+    if(proper_sensor_polarity == 1) {
+        printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+        i_motorcontrol.set_torque_control_enabled();
+    } else {
+        printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+    }
     return offset;
 }
 
@@ -70,7 +78,6 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         //auto find offset
         case 'a':
             auto_offset(i_motorcontrol);
-            i_motorcontrol.set_torque_control_enabled();
             break;
         //set brake
         case 'b':
