@@ -356,13 +356,14 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
             //play sound!
         case 'm':
+            torque_ref=value;
             for(period_us=400;period_us<=(5*400);(period_us+=400))
             {
                 for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
                 {
-                    i_motorcontrol.set_torque(20);
+                    i_motorcontrol.set_torque(torque_ref);
                     delay_microseconds(period_us);
-                    i_motorcontrol.set_torque(-20);
+                    i_motorcontrol.set_torque(-torque_ref);
                     delay_microseconds(period_us);
                 }
             }
@@ -372,9 +373,9 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             {
                 for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
                 {
-                    i_motorcontrol.set_torque(20);
+                    i_motorcontrol.set_torque(torque_ref);
                     delay_microseconds(period_us);
-                    i_motorcontrol.set_torque(-20);
+                    i_motorcontrol.set_torque(-torque_ref);
                     delay_microseconds(period_us);
                 }
             }
@@ -421,7 +422,22 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
                 printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
 
             if(upstream_control_data.error_status == NO_FAULT)
+            {
                 printf(">>  FAULT REMOVED ...\n");
+
+                torque_control_flag = 1;
+                i_motorcontrol.set_torque_control_enabled();
+                printf("Torque control activated\n");
+
+                brake_flag = 1;
+                i_motorcontrol.set_brake_status(brake_flag);
+                printf("Brake released\n");
+
+                printf("set offset to %d\n", offset);
+                i_motorcontrol.set_offset_value(offset);
+
+
+            }
             break;
 
             //set torque
