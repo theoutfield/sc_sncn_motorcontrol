@@ -21,7 +21,7 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
     printf("Sending offset_detection command ...\n");
     i_motorcontrol.set_offset_detection_enabled();
 
-    delay_milliseconds(30000);
+    while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
 
     int offset=i_motorcontrol.set_calib(0);
     printf("Detected offset is: %i\n", offset);
@@ -283,7 +283,8 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             printf("Sending offset_detection command ...\n");
             i_motorcontrol.set_offset_detection_enabled();
 
-            delay_milliseconds(30000);
+            while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
+
 
             offset=i_motorcontrol.set_calib(0);
             printf("Detected offset is: %i\n", offset);
