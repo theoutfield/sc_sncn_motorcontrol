@@ -324,6 +324,12 @@ interface MotorcontrolInterface{
 
     void restart_watchdog();
 
+    /**
+     * @brief resets the state of motor controller from faulty to normal so that
+     *        the application can again be restarted.
+     */
+    void reset_faults();
+
     int get_field();
 
     UpstreamControlData update_upstream_control_data ();

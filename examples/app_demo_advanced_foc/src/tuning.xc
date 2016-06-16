@@ -1,25 +1,31 @@
 /*
  * tuning.xc
+
  *
  *  Created on: Jul 13, 2015
  *      Author: Synapticon GmbH
  */
-#include <tuning.h>
+
 #include <stdio.h>
 #include <ctype.h>
-#include <xscope.h>
 
+#include <tuning.h>
+
+#include <position_feedback_service.h>
+#include <motorcontrol_service.h>
+
+#include <xscope.h>
 
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 {
     printf("Sending offset_detection command ...\n");
     i_motorcontrol.set_offset_detection_enabled();
 
-    delay_milliseconds(30000);
+    while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
 
     int offset=i_motorcontrol.set_calib(0);
     printf("Detected offset is: %i\n", offset);
-//    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
+
     int proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
     if(proper_sensor_polarity == 1) {
         printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
@@ -32,6 +38,10 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 
 void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol, client interface TuningInterface ?i_tuning)
 {
+
+    int period_us;     // torque generation period in micro-seconds
+    int pulse_counter; // number of generated pulses
+
     delay_milliseconds(500);
     printf(">>  ADVANCED FOC DEMO STARTING ...\n");
 
@@ -121,6 +131,23 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             }
             break;
 
+            //play sound!
+            case 's':
+                for(period_us=400;period_us<=(1*1000);(period_us+=400))
+                {
+                    if(period_us<3000) period_us-=300;
+
+                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                    {
+                        i_motorcontrol.set_torque(80);
+                        delay_microseconds(period_us);
+                        i_motorcontrol.set_torque(-80);
+                        delay_microseconds(period_us);
+                    }
+                }
+                i_motorcontrol.set_torque(0);
+                break;
+
         //set torque
         default:
             torque_ref = value * sign;
@@ -192,142 +219,235 @@ void position_limiter(interface TuningInterface server i_tuning, client interfac
  *  - read or set the offset
  *  - independently enable and disable the control
  *  - send the reference value of torque to torque controller
+ *  - show the variables on xscope
  *
  *  As a demo, the motor generates an oscilating torque with a frequency range between 10 Hz  and  3 kHz.
  */
 void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 {
-
     int period_us;     // torque generation period in micro-seconds
     int pulse_counter; // number of generated pulses
-    int ref_torque;    // reference torque
 
-    int offset=0;
+
     int loop_counter=0;
     int proper_sensor_polarity=0;
 
+    int torque_ref = 0;
+    int brake_flag = 0;
+    int torque_control_flag = 0;
+
+    int offset=3600;
+
     UpstreamControlData upstream_control_data;
 
-    printf(">>  DEMO TORQUE CONTROL STARTING ...\n");
-    delay_milliseconds(4000);
 
-    printf(">>  UNLOCK THE BRAKE ...\n");
+    printf(">>  ADVANCED FOC DEMO STARTING ...\n");
+    printf(">>   applicable commands:\n");
+    printf(" a => auto offset detection,           |    b  => enable/disable the brake\n");
+    printf(" t => enable/disable torque controller,|    ox => set offset to x \n");
+    printf(" p => print the actual offset,         |    r  => reverse the torque\n");
+    printf(" x => show on xscope for 20 seconds,   | Enter => set torque to 0\n");
+
+
+
     i_motorcontrol.set_brake_status(1);
-    delay_milliseconds(2000);
-
-    printf(">>  START OFFSET DETECTION ...\n");
-    i_motorcontrol.set_offset_detection_enabled();
-    delay_milliseconds(30000);
-
-
-    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
-    proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
-    if(proper_sensor_polarity==0)
-    {
-        printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-        while(1);
-    }
-    else if(proper_sensor_polarity==1)
-    {
-        printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
-    }
-
-
-    offset=i_motorcontrol.set_calib(0);
-    printf("detected offset is %d\n", offset);
-
-    printf(">>  LOCK THE BRAKE ...\n");
-    i_motorcontrol.set_brake_status(0);
-    delay_milliseconds(2000);
-
-    printf("set offset to %d\n", offset);
-    i_motorcontrol.set_offset_value(offset);
-    delay_milliseconds(2000);
-
-    printf(">>  ENABLING THE CONTROL ...\n");
     i_motorcontrol.set_torque_control_enabled();
-    delay_milliseconds(2000);
 
-    printf(">>  UNLOCK THE BRAKE ...\n");
-    i_motorcontrol.set_brake_status(1);
-    delay_milliseconds(2000);
-
-    printf(">>  SEND OSCILATING TORQUE_REF ...\n");
-
-    ref_torque=100;
-    for(int i=1;i<=10;i++)
+    fflush(stdout);
+    //read and adjust the offset.
+    while (1)
     {
-        i_motorcontrol.set_torque(ref_torque);
-        delay_milliseconds(200);
-
-        i_motorcontrol.set_torque(-ref_torque);
-        delay_milliseconds(200);
-    }
-
-
-    ref_torque=0;
-    i_motorcontrol.set_torque(ref_torque);
-    delay_milliseconds(2000);
-
-
-    printf(">>  GO TO SAFE_TORQUE_OFF MODE IN TWO SECONDS ...\n");
-    delay_milliseconds(2000);
-    i_motorcontrol.set_safe_torque_off_enabled();
-
-    delay_milliseconds(2000);
-    printf(">>  ENABLING THE CONTROL ...\n");
-    i_motorcontrol.set_torque_control_enabled();
-    delay_milliseconds(2000);
-
-
-    printf(">>  UNLOCK THE BRAKE ...\n");
-    i_motorcontrol.set_brake_status(1);
-    delay_milliseconds(2000);
-
-
-    printf(">>  SEND OSCILATING TORQUE_REF AND MONITORING THE DATA ...\n");
-
-    ref_torque=100;
-
-    while(1)
-    {
-        loop_counter++;
-
-        if(loop_counter==300)
+        char mode = 0;
+        char c;
+        int value = 0;
+        int sign = 1;
+        //reading user input.
+        while((c = getchar ()) != '\n')
         {
-            i_motorcontrol.set_torque(ref_torque);
+            if(isdigit(c)>0)
+            {
+                value *= 10;
+                value += c - '0';
+            }
+            else if (c == '-')
+            {
+                sign = -1;
+            }
+            else if (c != ' ')
+                mode = c;
         }
-
-        if(loop_counter==600)
+        switch(mode)
         {
-            i_motorcontrol.set_torque(-ref_torque);
-            loop_counter=0;
+        //auto find offset
+        case 'a':
+            printf("Sending offset_detection command ...\n");
+            i_motorcontrol.set_offset_detection_enabled();
+
+            while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
+
+
+            offset=i_motorcontrol.set_calib(0);
+            printf("Detected offset is: %i\n", offset);
+
+            printf("set offset to %d\n", offset);
+            i_motorcontrol.set_offset_value(offset);
+            delay_milliseconds(2000);
+
+            proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+
+            if(proper_sensor_polarity == 1)
+            {
+                printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+                i_motorcontrol.set_torque_control_enabled();
+            }
+            else
+            {
+                printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+            }
+            break;
+
+            //set brake
+        case 'b':
+            if (brake_flag)
+            {
+                brake_flag = 0;
+                printf("Brake blocking\n");
+            }
+            else
+            {
+                brake_flag = 1;
+                printf("Brake released\n");
+            }
+            i_motorcontrol.set_brake_status(brake_flag);
+            break;
+
+            //set offset
+        case 'o':
+            printf("set offset to %d\n", value);
+            i_motorcontrol.set_offset_value(value);
+            break;
+
+            //print offset
+        case 'p':
+            printf("offset %d\n", i_motorcontrol.set_calib(0));
+            break;
+
+            //reverse torque
+        case 'r':
+            torque_ref = -torque_ref;
+            i_motorcontrol.set_torque(torque_ref);
+            printf("torque %d\n", torque_ref);
+            break;
+
+            //enable and disable torque controller
+        case 't':
+            if (torque_control_flag == 0)
+            {
+                torque_control_flag = 1;
+                i_motorcontrol.set_torque_control_enabled();
+                printf("Torque control activated\n");
+            }
+            else
+            {
+                torque_control_flag = 0;
+                i_motorcontrol.set_torque_control_disabled();
+                printf("Torque control deactivated\n");
+            }
+            break;
+
+            //play sound!
+        case 'm':
+            torque_ref=value;
+            for(period_us=400;period_us<=(5*400);(period_us+=400))
+            {
+                for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                {
+                    i_motorcontrol.set_torque(torque_ref);
+                    delay_microseconds(period_us);
+                    i_motorcontrol.set_torque(-torque_ref);
+                    delay_microseconds(period_us);
+                }
+            }
+
+
+            for(period_us=(5*400);period_us>=400;(period_us-=400))
+            {
+                for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                {
+                    i_motorcontrol.set_torque(torque_ref);
+                    delay_microseconds(period_us);
+                    i_motorcontrol.set_torque(-torque_ref);
+                    delay_microseconds(period_us);
+                }
+            }
+
+            i_motorcontrol.set_torque(0);
+            break;
+
+            //go to safe mode torque
+        case 's':
+
+            printf(">>  GO TO SAFE_TORQUE_OFF MODE IN TWO SECONDS ...\n");
+            delay_milliseconds(2000);
+            i_motorcontrol.set_safe_torque_off_enabled();
+
+            break;
+
+            //show on xscope for 10 seconds!
+        case 'x':
+            printf("activate xscope during 20 seconds ...\n");
+            for(int i=0; i<=20000;i++)
+            {
+                upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
+                xscope_int(V_DC, upstream_control_data.V_dc);
+                xscope_int(ANGLE, upstream_control_data.angle);
+                xscope_int(POSITION, upstream_control_data.position);
+                xscope_int(VELOCITY, upstream_control_data.velocity);
+                xscope_int(TEMPERATURE, upstream_control_data.temperature);
+                xscope_int(FAULT_CODE, upstream_control_data.error_status);
+
+                delay_milliseconds(1);
+            }
+            break;
+
+        case 'z':
+            printf("reset faults, and check status ...\n");
+            i_motorcontrol.reset_faults();
+
+            delay_milliseconds(500);
+            upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+            if(upstream_control_data.error_status != NO_FAULT)
+                printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
+
+            if(upstream_control_data.error_status == NO_FAULT)
+            {
+                printf(">>  FAULT REMOVED ...\n");
+
+                torque_control_flag = 1;
+                i_motorcontrol.set_torque_control_enabled();
+                printf("Torque control activated\n");
+
+                brake_flag = 1;
+                i_motorcontrol.set_brake_status(brake_flag);
+                printf("Brake released\n");
+
+                printf("set offset to %d\n", offset);
+                i_motorcontrol.set_offset_value(offset);
+
+
+            }
+            break;
+
+            //set torque
+        default:
+            torque_ref = value * sign;
+            i_motorcontrol.set_torque(torque_ref);
+            printf("torque %d\n", torque_ref);
+            break;
         }
-
-        upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
-        xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
-        xscope_int(V_DC, upstream_control_data.V_dc);
-        xscope_int(ANGLE, upstream_control_data.angle);
-        xscope_int(POSITION, upstream_control_data.position);
-        xscope_int(VELOCITY, upstream_control_data.velocity);
-        xscope_int(TEMPERATURE, upstream_control_data.temperature);
-        xscope_int(FAULT_CODE, upstream_control_data.error_status);
-
-        delay_milliseconds(1);
-
-        //for(period_us=400;period_us<=(5*1000);(period_us+=400))
-        //{
-        //    if(period_us<3000) period_us-=300;
-        //
-        //    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
-        //    {
-        //        i_motorcontrol.set_torque(ref_torque);
-        //        delay_microseconds(period_us);
-        //        i_motorcontrol.set_torque(-ref_torque);
-        //        delay_microseconds(period_us);
-        //    }
-        //}
     }
 
 }

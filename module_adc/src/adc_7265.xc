@@ -363,6 +363,9 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
                 status = overcurrent_protection_was_triggered;
                 break;
 
+        case iADC[int i].reset_faults():
+                break;
+
         }//eof select
     }//eof while
 }
@@ -443,7 +446,8 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
-                current_limit = (i_max * 20);
+                current_limit = i_max * 20;
+
                 break;
 
         case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
@@ -486,14 +490,12 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 {
                     i_watchdog.protect(OVER_CURRENT_PHASE_A);
                     if(fault_code==0) fault_code=OVER_CURRENT_PHASE_A;
-
                 }
 
                 if( I_b<(-current_limit) || current_limit<I_b)
                 {
                     i_watchdog.protect(OVER_CURRENT_PHASE_B);
                     if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
-
                 }
 
                 if( I_c<(-current_limit) || current_limit<I_c)
@@ -544,7 +546,6 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 I_c = phaseC;
                 I_a = -I_b-I_c;
 
-
                 if( I_a<(-current_limit) || current_limit<I_a)
                 {
                     i_watchdog.protect(OVER_CURRENT_PHASE_A);
@@ -582,6 +583,20 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 break;
 
         case iADC[int i].get_overcurrent_protection_status() -> int status:
+                break;
+
+        case iADC[int i].reset_faults():
+                I_a=0;
+                I_b=0;
+                I_c=0;
+                torque=0;
+                V_dc=(v_dc_min+v_dc_max)/2;
+
+                fault_code=NO_FAULT;
+                flag=0;
+
+                i_watchdog.reset_faults();
+
                 break;
         default:
             break;
@@ -848,6 +863,9 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
         case iADC[int i].get_overcurrent_protection_status() -> int status:
                 status = overcurrent_protection_was_triggered;
+                break;
+
+        case iADC[int i].reset_faults():
                 break;
 
         }//eof select

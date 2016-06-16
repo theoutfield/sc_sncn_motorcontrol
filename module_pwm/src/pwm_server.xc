@@ -153,13 +153,12 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     PWM_ARRAY_TYP pwm_ctrl_s_start_brake ; // Structure containing double-buffered PWM output data
     PWM_COMMS_TYP pwm_comms_s_start_brake; // Structure containing PWM communication data
 
-    int brake_active  = 0;
-    int brake_counter =0;
+
 
     //parameters for starting the brake
-    pwm_comms_s_start_brake.params.widths[0] = 8500;
-    pwm_comms_s_start_brake.params.widths[1] = 8500;
-    pwm_comms_s_start_brake.params.widths[2] = 8500;
+    pwm_comms_s_start_brake.params.widths[0] = 12000;
+    pwm_comms_s_start_brake.params.widths[1] = 12000;
+    pwm_comms_s_start_brake.params.widths[2] = 12000;
 
     pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s_start_brake.buf = 0;
@@ -172,9 +171,9 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     PWM_ARRAY_TYP pwm_ctrl_s_maintain_brake ; // Structure containing double-buffered PWM output data
     PWM_COMMS_TYP pwm_comms_s_maintain_brake; // Structure containing PWM communication data
 
-    pwm_comms_s_maintain_brake.params.widths[0] = 1000;
-    pwm_comms_s_maintain_brake.params.widths[1] = 1000;
-    pwm_comms_s_maintain_brake.params.widths[2] = 1000;
+    pwm_comms_s_maintain_brake.params.widths[0] = 2000;
+    pwm_comms_s_maintain_brake.params.widths[1] = 2000;
+    pwm_comms_s_maintain_brake.params.widths[2] = 2000;
 
     pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s_maintain_brake.buf = 0;
@@ -187,6 +186,9 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
     int pwm_test=0;
     int pwm_on  =0;
+
+    int brake_active  = 0;
+    int brake_counter = 0;
 
     int pwm_flag=0;
 
@@ -216,18 +218,26 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     {
         select
         {
-        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP received_pwm_ctrl_s, int received_pwm_on, int received_brake_active):
+        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP received_pwm_ctrl_s, int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode):
                 pwm_ctrl_s = received_pwm_ctrl_s;
 
-                pwm_on     = received_pwm_on;
+                if(recieved_safe_torque_off_mode ==0)
+                    pwm_on     = received_pwm_on;
+                else if(recieved_safe_torque_off_mode ==1)
+                    pwm_on     = 0;
 
-//                if(pwm_on==0) brake_counter=0;
+                if(received_brake_active==0)  brake_active = 0;
 
-                if(brake_active != received_brake_active) brake_counter=0;
-                brake_active = received_brake_active;
+                if((brake_active == 0)&&(received_brake_active==1))
+                {
+                    brake_counter=0;
+                    brake_active = 1;
+                }
 
-                pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
-                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
+
+
+                pattern = peek( ports.p_pwm[_PWM_PHASE_A] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
+                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[_PWM_PHASE_A] ,1 ,pattern ); // Re-load output port with same bit-value
                 pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
 
                 break;
@@ -235,6 +245,11 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         case i_update_pwm.safe_torque_off_enabled():
 
                 pwm_on     = 0;
+
+                pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
+                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
+                pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
+
 
                 // Rising edges - these have negative time offsets - 44 Cycles
                 ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
@@ -252,9 +267,6 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
                 ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
                 ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
 
-                pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
-                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
-                pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
 
 
                 break;

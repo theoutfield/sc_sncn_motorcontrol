@@ -94,7 +94,7 @@
 #define MAXIMUM_TORQUE   130    // Nm at 1000 Amp
 */
 
-
+/*
 // MABI AXIS_5 and AXIS_6
 // RATED POWER
 #define RATED_POWER 140         // W
@@ -116,7 +116,29 @@
 
 // MAXIMUM TORQUE
 #define MAXIMUM_TORQUE   57    // Nm at 1000 Amp
+*/
 
+// Foresight
+// RATED POWER
+#define RATED_POWER 590         // W
+
+// RATED TORQUE
+#define RATED_TORQUE 1310        // mNm
+
+// RATED CURRENT
+#define RATED_CURRENT 13         // Amp
+
+// PEAK SPEED
+#define PEAK_SPEED    6800      // rpm
+
+// PHASE RESISTANCE
+#define PHASE_RESISTANCE 128000 // uOhm
+
+// PHASE INDUCTANCE
+#define PHASE_INDUCTANCE 80    // uH
+
+// MAXIMUM TORQUE
+#define MAXIMUM_TORQUE   100    // Nm at 1000 Amp
 
 
 

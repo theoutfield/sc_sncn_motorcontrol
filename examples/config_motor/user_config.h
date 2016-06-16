@@ -37,7 +37,7 @@
 #define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
-#define MOTOR_FEEDBACK_SENSOR      MOTOR_COMMUTATION_SENSOR
+#define MOTOR_FEEDBACK_SENSOR      CONTELEC_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
 #define QEI_SENSOR_INDEX_TYPE       QEI_WITH_INDEX
@@ -54,9 +54,9 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 ////////////////////////////////////////////
-#define I_MAX           100      //maximum tolerable value of phase current (under abnormal conditions)
-#define V_DC_MAX        65      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
-#define V_DC_MIN        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+#define I_MAX           60      //maximum tolerable value of phase current (under abnormal conditions)
+#define V_DC_MAX        62      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+#define V_DC_MIN        12      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
 
 

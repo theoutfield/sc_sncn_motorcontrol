@@ -33,6 +33,11 @@ interface WatchdogInterface{
      * @reacts on any detected fault. Any output through the phases will be disabled.
      */
     void protect(int fault_id);
+
+    /**
+     * @resets the state of fault in watchdog service, and starts the watchdog from the beginning
+     */
+    void reset_faults();
 };
 
 /**
