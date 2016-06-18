@@ -294,26 +294,54 @@
 
 // AMK or qmot
 //**motor offset: AMK 2470, qmot 3450
-#define MIN_POSITION_LIMIT     -0x7fffffff         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      0x7fffffff         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            3000             // rpm
-#define MAX_TORQUE              1000000
+//#define MIN_POSITION_LIMIT     -0x7fffffff         // ticks (min range: -2^30, limited for safe operation)
+//#define MAX_POSITION_LIMIT      0x7fffffff         // ticks (max range: 2^30, limited for safe operation)
+//#define MAX_VELOCITY            3000             // rpm
+//#define MAX_TORQUE              1000000
+//
+//#define POSITION_Kp             200
+//#define POSITION_Ki             200
+//#define POSITION_Kd             0
+//#define VELOCITY_Kp             5
+//#define VELOCITY_Ki             0
+//#define VELOCITY_Kd             5
+//
+//#define POSITION_P_ERROR_lIMIT  200000
+//#define POSITION_I_ERROR_lIMIT  1
+//#define POSITION_INTEGRAL_LIMIT 1000
+//#define VELOCITY_P_ERROR_lIMIT  200000
+//#define VELOCITY_I_ERROR_lIMIT  2000
+//#define VELOCITY_INTEGRAL_LIMIT 60000
+//#define POSITION_REF_FC         25
+//#define POSITION_FC             82
+//#define VELOCITY_REF_FC         28
+//#define VELOCITY_FC             77
+//#define VELOCITY_D_FC           75
 
-#define POSITION_Kp             200
-#define POSITION_Ki             200
+
+// A6 Position Controller Config
+//**motor offset: 2040
+#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
+#define MAX_VELOCITY            500             // rpm
+#define MAX_TORQUE              1200000
+
+#define POSITION_Kp             80
+#define POSITION_Ki             20
 #define POSITION_Kd             0
-#define VELOCITY_Kp             5
+#define VELOCITY_Kp             60
 #define VELOCITY_Ki             0
-#define VELOCITY_Kd             5
+#define VELOCITY_Kd             60
 
-#define POSITION_P_ERROR_lIMIT  200000
-#define POSITION_I_ERROR_lIMIT  1
-#define POSITION_INTEGRAL_LIMIT 1000
+#define POSITION_P_ERROR_lIMIT  40000
+#define POSITION_I_ERROR_lIMIT  5
+#define POSITION_INTEGRAL_LIMIT 10000
 #define VELOCITY_P_ERROR_lIMIT  200000
-#define VELOCITY_I_ERROR_lIMIT  2000
-#define VELOCITY_INTEGRAL_LIMIT 60000
+#define VELOCITY_I_ERROR_lIMIT  0
+#define VELOCITY_INTEGRAL_LIMIT 0
 #define POSITION_REF_FC         25
 #define POSITION_FC             82
-#define VELOCITY_REF_FC         28
-#define VELOCITY_FC             77
-#define VELOCITY_D_FC           75
+#define VELOCITY_REF_FC         70
+#define VELOCITY_FC             80
+#define VELOCITY_D_FC           80
+
