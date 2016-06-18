@@ -158,6 +158,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     //init variables
     //velocity
     int velocity = 0;
+    int velocity_buffer[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int old_count = 0;
     int old_difference = 0;
     int ticks_per_turn = (1 << contelec_config.resolution_bits);
@@ -339,7 +340,13 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
             //            velocity = (difference * velocity_factor) / ticks_per_turn;
-            velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
+            velocity_buffer[0] = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
+            velocity = 0;
+            for(int ii=0; ii<10; ii++)
+                velocity += velocity_buffer[ii];
+            velocity = velocity/10;
+            for(int ii=9; ii>0; ii--)
+                velocity_buffer[ii] = velocity_buffer[ii-1];
             last_velocity_read = last_read;
                 velocity_count = 0;
             }
