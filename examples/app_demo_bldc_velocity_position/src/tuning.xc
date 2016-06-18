@@ -263,10 +263,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                     downstream_control_data.offset_torque = 0;
                     downstream_control_data.position_cmd = value*sign;
                     i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(1000);
+                    delay_milliseconds(2000);
                     downstream_control_data.position_cmd = -value*sign;
                     i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(1000);
+                    delay_milliseconds(2000);
                     downstream_control_data.position_cmd = 0;
                     i_position_control.update_control_data(downstream_control_data);
                     break;
