@@ -332,6 +332,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             i_commutation.set_brake_status(1);
             break;
 
+        case 'z':
+            i_commutation.reset_faults();
+            break;
+
         //set torque
         default:
             torque = value*sign;
