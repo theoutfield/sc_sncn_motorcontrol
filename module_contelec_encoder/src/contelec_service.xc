@@ -158,6 +158,8 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     //init variables
     //velocity
     int velocity = 0;
+    int velocity_1n = 0;
+    int corruption_flag = 0;
     int velocity_buffer[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int old_count = 0;
     int old_difference = 0;
@@ -345,6 +347,17 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             for(int ii=0; ii<10; ii++)
                 velocity += velocity_buffer[ii];
             velocity = velocity/10;
+
+            if (((velocity-velocity_1n) > 5000) || ((velocity-velocity_1n) < -5000)) {
+                if (corruption_flag == 0) {
+                    velocity = velocity_1n;
+                    corruption_flag = 1;
+                }
+            } else {
+                corruption_flag = 0;
+            }
+            velocity_1n = velocity;
+
             for(int ii=9; ii>0; ii--)
                 velocity_buffer[ii] = velocity_buffer[ii-1];
             last_velocity_read = last_read;
