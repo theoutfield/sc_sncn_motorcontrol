@@ -332,8 +332,8 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             t :> last_read;
             last_position = position;
 
-            velocity_count++;
-            if (velocity_count >= 10) {
+//            velocity_count++;
+//            if (velocity_count >= 10) {
             int difference = count - old_count;
             if(difference > crossover || difference < -crossover)
                 difference = old_difference;
@@ -361,8 +361,8 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             for(int ii=9; ii>0; ii--)
                 velocity_buffer[ii] = velocity_buffer[ii-1];
             last_velocity_read = last_read;
-                velocity_count = 0;
-            }
+//                velocity_count = 0;
+//            }
 
 #ifdef XSCOPE_CONTELEC
             xscope_int(VELOCITY, velocity);
