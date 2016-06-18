@@ -13,7 +13,6 @@
 #include <mc_internal_constants.h>
 
 
-
 static inline void slave_select(out port spi_ss)
 {
     spi_ss <: 0;
@@ -37,15 +36,19 @@ void init_position_feedback_ports(PositionFeedbackPorts &position_feedback_ports
     unsigned int singleturn_filtered;
     unsigned int singleturn_raw;
     unsigned int checksum;
+    unsigned int computed_checksum;
 
-    configure_out_port(position_feedback_ports.spi_interface.mosi, position_feedback_ports.spi_interface.blk2, 1); //set mosi to 1
-    slave_select(position_feedback_ports.slave_select);
-    delay_ticks(10*CONTELEC_USEC); //wait for the data buffer to fill
-    count = spi_master_in_short(position_feedback_ports.spi_interface);
-    singleturn_filtered = spi_master_in_short(position_feedback_ports.spi_interface);
-    singleturn_raw = spi_master_in_short(position_feedback_ports.spi_interface);
-    checksum = spi_master_in_byte(position_feedback_ports.spi_interface);
-    slave_deselect(position_feedback_ports.slave_select);
+    do {
+        configure_out_port(position_feedback_ports.spi_interface.mosi, position_feedback_ports.spi_interface.blk2, 1); //set mosi to 1
+        slave_select(position_feedback_ports.slave_select);
+        delay_ticks(10*CONTELEC_USEC); //wait for the data buffer to fill
+        count = spi_master_in_short(position_feedback_ports.spi_interface);
+        singleturn_filtered = spi_master_in_short(position_feedback_ports.spi_interface);
+        singleturn_raw = spi_master_in_short(position_feedback_ports.spi_interface);
+        checksum = spi_master_in_byte(position_feedback_ports.spi_interface);
+        slave_deselect(position_feedback_ports.slave_select);
+        computed_checksum = 0x5a ^ (1 + (singleturn_raw & 0xff)) ^ (2 + (singleturn_raw >> 8)) ^ (3 + (singleturn_filtered & 0xff)) ^ (4 + (singleturn_filtered >> 8)) ^ (5 + (count & 0xff)) ^ (6 + (count >> 8));
+    } while(computed_checksum != checksum);
 
     status = count >> 12;
     count = (sext(count & 0xfff, 12) * (1 << 16)) + singleturn_filtered; //convert multiturn to signed absolute count
