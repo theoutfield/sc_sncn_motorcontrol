@@ -400,23 +400,22 @@
 //#define VELOCITY_D_FC           60
 
 
-
-// Foresight: Joint 5 Position Controller Config
-//**motor offset: 1665
+// Foresight: Joint 4 Position Controller Config
+//**motor offset: 330
 #define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
 #define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
 #define MAX_VELOCITY            1200             // rpm
 #define MAX_TORQUE              1200000
 
-#define POSITION_Kp             210
-#define POSITION_Ki             40
+#define POSITION_Kp             150
+#define POSITION_Ki             30
 #define POSITION_Kd             0
 #define VELOCITY_Kp             25
 #define VELOCITY_Ki             0
-#define VELOCITY_Kd             15
+#define VELOCITY_Kd             10
 
 #define POSITION_P_ERROR_lIMIT  40000
-#define POSITION_I_ERROR_lIMIT  4
+#define POSITION_I_ERROR_lIMIT  10
 #define POSITION_INTEGRAL_LIMIT 25000
 #define VELOCITY_P_ERROR_lIMIT  150000
 #define VELOCITY_I_ERROR_lIMIT  0
@@ -426,3 +425,59 @@
 #define VELOCITY_REF_FC         100
 #define VELOCITY_FC             80
 #define VELOCITY_D_FC           60
+
+
+
+// Foresight: Joint 5 Position Controller Config
+//**motor offset: 1665
+//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
+//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
+//#define MAX_VELOCITY            1200             // rpm
+//#define MAX_TORQUE              1200000
+//
+//#define POSITION_Kp             210
+//#define POSITION_Ki             40
+//#define POSITION_Kd             0
+//#define VELOCITY_Kp             25
+//#define VELOCITY_Ki             0
+//#define VELOCITY_Kd             15
+//
+//#define POSITION_P_ERROR_lIMIT  40000
+//#define POSITION_I_ERROR_lIMIT  4
+//#define POSITION_INTEGRAL_LIMIT 25000
+//#define VELOCITY_P_ERROR_lIMIT  150000
+//#define VELOCITY_I_ERROR_lIMIT  0
+//#define VELOCITY_INTEGRAL_LIMIT 0
+//#define POSITION_REF_FC         140
+//#define POSITION_FC             80
+//#define VELOCITY_REF_FC         100
+//#define VELOCITY_FC             80
+//#define VELOCITY_D_FC           60
+
+
+
+// Foresight: Joint 6 Position Controller Config
+//**motor offset: 2850
+//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
+//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
+//#define MAX_VELOCITY            2500             // rpm
+//#define MAX_TORQUE              1200000
+//
+//#define POSITION_Kp             250
+//#define POSITION_Ki             90
+//#define POSITION_Kd             0
+//#define VELOCITY_Kp             25
+//#define VELOCITY_Ki             0
+//#define VELOCITY_Kd             10
+//
+//#define POSITION_P_ERROR_lIMIT  40000
+//#define POSITION_I_ERROR_lIMIT  4
+//#define POSITION_INTEGRAL_LIMIT 25000
+//#define VELOCITY_P_ERROR_lIMIT  150000
+//#define VELOCITY_I_ERROR_lIMIT  0
+//#define VELOCITY_INTEGRAL_LIMIT 0
+//#define POSITION_REF_FC         140
+//#define POSITION_FC             80
+//#define VELOCITY_REF_FC         100
+//#define VELOCITY_FC             80
+//#define VELOCITY_D_FC           60
