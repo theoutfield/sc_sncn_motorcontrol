@@ -59,6 +59,20 @@
 #define V_DC_MIN        12      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
 
+//////////////////////////////////////////////
+//////  BRAKE CONFIGURATION
+////////////////////////////////////////////
+
+/*
+//MABI PROJECT
+#define DUTY_START_BRAKE    12000   // duty cycles for brake release (should be a number between 1500 and 13000)
+#define DUTY_MAINTAIN_BRAKE 2000    // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
+*/
+
+//FORESIGHT PROJECT
+#define DUTY_START_BRAKE    10000   // duty cycles for brake release (should be a number between 1500 and 13000)
+#define DUTY_MAINTAIN_BRAKE 1500    // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
+
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
