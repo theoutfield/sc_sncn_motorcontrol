@@ -21,7 +21,7 @@
 	<Probe name="POSITION REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="POSITION CMD" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="POSITION TEMP1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="POSITION TEMP1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="POSITION TEMP2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
 	<Probe name="VELOCITY REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>

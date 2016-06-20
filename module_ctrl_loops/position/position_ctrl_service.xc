@@ -102,8 +102,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int23_torque_ref_in = 0;
     int int13_torque_ref = 0;
 
-    //protection
-    int temp = 0;
+    //temp
+//    int temp = 0;
 
 
     timer t;
@@ -265,6 +265,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(POSITION_REF, int23_position_ref_k);
                 xscope_int(POSITION, int23_position_k);
                 xscope_int(POSITION_CMD, int23_velocity_ref_k);
+                xscope_int(POSITION_TEMP1, 0);
                 xscope_int(VELOCITY_REF, int23_velocity_ref_k);
                 xscope_int(VELOCITY, int23_velocity_k);
                 xscope_int(VELOCITY_CMD, int23_velocity_cmd_k);
