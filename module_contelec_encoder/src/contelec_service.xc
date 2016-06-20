@@ -97,7 +97,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
         t :> last_read;
         computed_checksum = checksum_compute(count, singleturn_filtered, singleturn_raw);
         try_count++;
-    } while(computed_checksum != checksum);
+    } while(computed_checksum != checksum && try_count <= 3);
 
     status = count >> 12;
     count = (sext(count & 0xfff, 12) * (1 << 16)) + singleturn_filtered; //convert multiturn to signed absolute count
