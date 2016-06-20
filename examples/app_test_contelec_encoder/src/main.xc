@@ -168,7 +168,7 @@ int main(void)
         on tile[APP_TILE]: contelec_encoder_commands_test(i_position_feedback[1]);
 
         on tile[IFM_TILE]: par {
-            contelec_encoder_test(i_position_feedback[0], i_shared_memory[1]);
+//            contelec_encoder_test(i_position_feedback[0], i_shared_memory[1]);
 
             /* Shared memory Service */
             memory_manager(i_shared_memory, 2);

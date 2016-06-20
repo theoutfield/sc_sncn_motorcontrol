@@ -29,6 +29,47 @@ void init_position_feedback_ports(PositionFeedbackPorts &position_feedback_ports
     slave_deselect(position_feedback_ports.slave_select); // Ensure slave select is in correct start state
 }
 
+int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw) {
+    int computed_checksum = 0x5a ^ (1 + (singleturn_raw & 0xff)) ^ (2 + (singleturn_raw >> 8)) ^ (3 + (singleturn_filtered & 0xff)) ^ (4 + (singleturn_filtered >> 8)) ^ (5 + (count & 0xff)) ^ (6 + (count >> 8));
+    return computed_checksum;
+}
+
+{unsigned, unsigned, unsigned} checksum_correct(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw, unsigned checksum) {
+    if (checksum_compute(count, singleturn_filtered, singleturn_raw) == checksum) {
+        return {count, singleturn_filtered, singleturn_raw};
+    }
+
+    unsigned orig_count = count;
+    unsigned orig_singleturn_filtered = singleturn_filtered;
+    unsigned orig_singleturn_raw = singleturn_raw;
+    unsigned mask = 1;
+
+    for (int i=0 ; i<16 ; i++) {
+        count = orig_count ^ mask;
+        if (checksum_compute(count, singleturn_filtered, singleturn_raw) == checksum) {
+            return {count, singleturn_filtered, singleturn_raw};
+        }
+        mask = mask << 1;
+    }
+    count = orig_count;
+    mask = 1;
+    for (int i=0 ; i<16 ; i++) {
+        singleturn_filtered = orig_singleturn_filtered ^ mask;
+        mask = mask << 1;
+    }
+    mask = 1;
+    singleturn_filtered = orig_singleturn_filtered;
+    for (int i=0 ; i<16 ; i++) {
+        singleturn_raw = orig_singleturn_raw ^ mask;
+        if (checksum_compute(count, singleturn_filtered, singleturn_raw) == checksum) {
+            return {count, singleturn_filtered, singleturn_raw};
+        }
+        mask = mask << 1;
+    }
+
+    return {orig_count, orig_singleturn_filtered, orig_singleturn_raw};
+}
+
 { char, int, unsigned int, unsigned int } contelec_encoder_read(PositionFeedbackPorts &position_feedback_ports)
 {
     char status;
@@ -37,8 +78,14 @@ void init_position_feedback_ports(PositionFeedbackPorts &position_feedback_ports
     unsigned int singleturn_raw;
     unsigned int checksum;
     unsigned int computed_checksum;
+    unsigned int try_count = 0;
+    timer t;
+    unsigned last_read;
+    t :> last_read;
+    last_read = last_read - 40*CONTELEC_USEC - 1;
 
     do {
+        t when timerafter(last_read + 40*CONTELEC_USEC) :> void;
         configure_out_port(position_feedback_ports.spi_interface.mosi, position_feedback_ports.spi_interface.blk2, 1); //set mosi to 1
         slave_select(position_feedback_ports.slave_select);
         delay_ticks(10*CONTELEC_USEC); //wait for the data buffer to fill
@@ -47,11 +94,17 @@ void init_position_feedback_ports(PositionFeedbackPorts &position_feedback_ports
         singleturn_raw = spi_master_in_short(position_feedback_ports.spi_interface);
         checksum = spi_master_in_byte(position_feedback_ports.spi_interface);
         slave_deselect(position_feedback_ports.slave_select);
-        computed_checksum = 0x5a ^ (1 + (singleturn_raw & 0xff)) ^ (2 + (singleturn_raw >> 8)) ^ (3 + (singleturn_filtered & 0xff)) ^ (4 + (singleturn_filtered >> 8)) ^ (5 + (count & 0xff)) ^ (6 + (count >> 8));
+        t :> last_read;
+        computed_checksum = checksum_compute(count, singleturn_filtered, singleturn_raw);
+        try_count++;
     } while(computed_checksum != checksum);
 
     status = count >> 12;
     count = (sext(count & 0xfff, 12) * (1 << 16)) + singleturn_filtered; //convert multiturn to signed absolute count
+
+#ifdef XSCOPE_CONTELEC
+    xscope_int(CHECKSUM_ERROR, try_count*1000);
+#endif
 
     return { status, count, singleturn_filtered, singleturn_raw };
 }
@@ -326,9 +379,9 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
         case t when timerafter(next_velocity_read) :> start_time:
             next_velocity_read += velocity_loop;
             int position;
-            unsigned int angle;
+            unsigned int angle, status;
             t when timerafter(last_read + contelec_config.timeout) :> void;
-            { void, count, position, angle } = contelec_encoder_read(position_feedback_ports);
+            { status, count, position, angle } = contelec_encoder_read(position_feedback_ports);
             t :> last_read;
             last_position = position;
 
@@ -343,15 +396,17 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
             //            velocity = (difference * velocity_factor) / ticks_per_turn;
             velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
-            last_velocity_read = last_read;
-//                velocity_count = 0;
-//            }
-
 #ifdef XSCOPE_CONTELEC
             xscope_int(VELOCITY, velocity);
             xscope_int(POSITION, position);
             xscope_int(POSITION_RAW, angle);
+            xscope_int(STATUS, status*1000);
+            xscope_int(PERIOD, (int)(last_read-last_velocity_read)/CONTELEC_USEC);
 #endif
+            last_velocity_read = last_read;
+//                velocity_count = 0;
+//            }
+
 
             if (contelec_config.resolution_bits > 12)
                 angle = (contelec_config.pole_pairs * (angle >> (contelec_config.resolution_bits-12)) ) & 4095;
