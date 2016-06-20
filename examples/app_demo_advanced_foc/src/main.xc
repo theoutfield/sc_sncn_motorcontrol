@@ -99,6 +99,8 @@ int main(void) {
                     motorcontrol_config.polarity_type=MOTOR_POLARITY;
 
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
+                    motorcontrol_config.current_I_gain =  TORQUE_Ki;
+                    motorcontrol_config.current_D_gain =  TORQUE_Kd;
 
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
