@@ -102,6 +102,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int23_torque_ref_in = 0;
     int int13_torque_ref = 0;
 
+    int open_brake = 0;
+    int pos_ref_orig = 0;
+
     //temp
 //    int temp = 0;
 
@@ -166,6 +169,18 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 int23_feedforward_effort = int23_feedforward_effort_in;
 
                 int13_torque_ref = int23_torque_ref_in;
+
+                if (open_brake > 0) {
+                    switch(open_brake) {
+                    case 25:
+                        int23_position_ref_k_in = pos_ref_orig - 50;
+                        break;
+                    case 1:
+                        int23_position_ref_k_in = pos_ref_orig;
+                        break;
+                    }
+                    open_brake--;
+                }
 
 
                 if(int1_enable_flag) {
@@ -299,6 +314,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     upstream_control_data = i_motorcontrol.update_upstream_control_data();
                     int25_position_k_sens = upstream_control_data.position;
                     int23_position_k_sens = int25_position_k_sens / 4;
+//                    pos_ref_orig = int23_position_k_sens;
+//                    int23_position_ref_k_in = pos_ref_orig + 50;
+//                    open_brake = 50;
                     int23_position_ref_k_in = int23_position_k_sens;
                     flt23_position_ref_k = int23_position_ref_k_in;
                     flt23_position_ref_k_1n = int23_position_ref_k_in;
