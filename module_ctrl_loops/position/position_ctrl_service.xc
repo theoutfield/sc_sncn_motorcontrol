@@ -12,7 +12,7 @@
 #include <filters_lib.h>
 
 #include <position_ctrl_service.h>
-#include <a4935.h>
+#include <refclk.h>
 #include <mc_internal_constants.h>
 #include <filters_lib.h>
 #include <stdio.h>
