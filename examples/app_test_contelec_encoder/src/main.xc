@@ -8,12 +8,25 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
+/***** Sensor Test *****/
 #include <position_feedback_service.h>
 #include <ctype.h>
 #include <stdio.h>
 
+/***** Motor Test *****/
+#include <pwm_server.h>
+#include <adc_service.h>
+#include <user_config.h>
+#include <torque_control.h>
 
+/*********** Sensor Test ***********/
 PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
+
+/*********** Motor Test ***********/
+PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
+WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
 
 /* Test CONTELEC Sensor Client */
@@ -55,13 +68,39 @@ void contelec_encoder_test(client interface PositionFeedbackInterface i_position
     }
 }
 
-void contelec_encoder_commands_test(client interface PositionFeedbackInterface i_position_feedback) {
+//finding the offset function
+int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
+{
+    printf("Sending offset_detection command ...\n");
+    i_motorcontrol.set_offset_detection_enabled();
+
+    int offset = -1;
+    while (offset == -1) {
+        delay_milliseconds(50);//wait until offset is detected
+        offset = i_motorcontrol.set_calib(0);
+    }
+
+    printf("Detected offset is: %i\n", offset);
+//    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
+    int proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+    if(proper_sensor_polarity == 1) {
+        printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+        i_motorcontrol.set_torque_control_enabled();
+    } else {
+        printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+        printf(">>  Please either change CONTELEC_POLARITY parameter [0 - normal, 1 - inverted] or flip any two motor phases\n");
+    }
+    return offset;
+}
+
+void contelec_encoder_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorcontrolInterface client i_motorcontrol) {
     char status;
     int multiturn;
 //    unsigned int singleturn_filtered;
     unsigned int singleturn_raw;
     unsigned start_time, end_time;
     timer t;
+    int offset = -1;
 
     delay_milliseconds(500);
     PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
@@ -87,6 +126,11 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
         //set angle
         case 'a':
             printf("Set angle to %d\nnew offset %d\n", value, i_position_feedback.set_angle(value));
+            break;
+        //auto offset tuning
+        case 'b':
+            offset = auto_offset(i_motorcontrol);
+            printf("using commutation offset to %d\n", offset);
             break;
         //set calibration point
         case 'c':
@@ -118,6 +162,17 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
         case 'm':
             i_position_feedback.send_command(CONTELEC_CONF_MTPRESET, value*sign, 16);
             printf("multiturn\n");
+            break;
+        //set toruqe
+        case 'q':
+            if(offset != -1){
+                int torque = value*sign;
+                i_motorcontrol.set_torque(torque);
+                printf("Torque %d\n", torque);
+            }
+            else {
+                printf("Ofset is not found or invalid, please type command 'b' first \n");
+            }
             break;
         //reset sensor
         case 'r':
@@ -160,15 +215,73 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
 
 int main(void)
 {
+    /*********** Sensor Test ***********/
     interface PositionFeedbackInterface i_position_feedback[3];
     interface shared_memory_interface i_shared_memory[2];
+    /*********** Motor Test ***********/
+    interface WatchdogInterface i_watchdog[2];
+    interface update_pwm i_update_pwm;
+    interface ADCInterface i_adc[2];
+    interface MotorcontrolInterface i_motorcontrol[4];
+
 
     par
     {
-        on tile[APP_TILE]: contelec_encoder_commands_test(i_position_feedback[1]);
+        on tile[APP_TILE]: contelec_encoder_commands_test(i_position_feedback[1], i_motorcontrol[0]);
 
         on tile[IFM_TILE]: par {
 //            contelec_encoder_test(i_position_feedback[0], i_shared_memory[1]);
+
+            /*********** Motor Test ***********/
+
+            {
+                /* Watchdog Service */
+                delay_milliseconds(500);
+                watchdog_service(wd_ports,i_watchdog);
+            }
+
+            {
+                pwm_config(pwm_ports);
+
+                delay_milliseconds(1000);
+                pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
+            }
+
+            /* ADC Service */
+            {
+                delay_milliseconds(1500);
+                adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+            }
+
+
+            /* Motor Control Service */
+            {
+                delay_milliseconds(2000);
+
+                MotorcontrolConfig motorcontrol_config;
+
+                motorcontrol_config.v_dc =  VDC;
+                motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
+                motorcontrol_config.polarity_type=MOTOR_POLARITY;
+
+                motorcontrol_config.current_P_gain =  TORQUE_Kp;
+
+                motorcontrol_config.pole_pair =  POLE_PAIRS;
+                motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
+                motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
+                motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
+
+                motorcontrol_config.protection_limit_over_current =  I_MAX;
+                motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
+                motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
+
+                Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
+                        i_shared_memory[1],
+                        i_watchdog[0], i_motorcontrol, i_update_pwm);
+            }
+
+            /*********** Sensor Test ***********/
 
             /* Shared memory Service */
             memory_manager(i_shared_memory, 2);
@@ -182,13 +295,14 @@ int main(void)
                 position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
                 position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                 position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
-                position_feedback_config.contelec_config.pole_pairs = 2;
+                position_feedback_config.contelec_config.pole_pairs = 5;
                 position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
                 position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                 position_feedback_config.contelec_config.enable_push_service = PushAll;
 
                 position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
             }
+
         }
     }
 

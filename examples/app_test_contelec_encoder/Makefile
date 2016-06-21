@@ -14,14 +14,16 @@ TARGET = SOMANET-C22
 APP_NAME = app_test_contelec_encoder
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_biss module_board-support module_contelec_encoder module_memory_manager module_misc module_position_feedback module_pwm_symmetrical module_spi_master
+USED_MODULES = module_biss module_board-support module_contelec_encoder module_memory_manager module_misc module_position_feedback module_pwm_symmetrical module_spi_master 
+#For Motor Test
+USED_MODULES += config_motor module_adc module_advanced_foc module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_motorcontrol module_pwm module_watchdog
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O0 -report -DXSCOPE_CONTELEC
+XCC_FLAGS_Debug = -g -O1 -report -DXSCOPE_CONTELEC
 XCC_FLAGS_Release = -g -O3
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
