@@ -12,7 +12,6 @@
 #include <xscope.h>
 #include <mc_internal_constants.h>
 
-//#define RETRY
 
 static inline void slave_select(out port spi_ss)
 {
@@ -32,7 +31,7 @@ void init_position_feedback_ports(PositionFeedbackPorts &position_feedback_ports
 
 int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw) {
     int computed_checksum = 0x5a ^ (1 + (singleturn_raw & 0xff)) ^ (2 + (singleturn_raw >> 8)) ^ (3 + (singleturn_filtered & 0xff)) ^ (4 + (singleturn_filtered >> 8)) ^ (5 + (count & 0xff)) ^ (6 + (count >> 8));
-    return computed_checksum;
+    return computed_checksum & 0xff;
 }
 
 {unsigned, unsigned, unsigned} checksum_correct(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw, unsigned checksum) {
@@ -85,9 +84,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     t :> last_read;
     last_read = last_read - 40*CONTELEC_USEC - 1;
 
-#ifdef RETRY
     do {
-#endif
         t when timerafter(last_read + 40*CONTELEC_USEC) :> void;
         configure_out_port(position_feedback_ports.spi_interface.mosi, position_feedback_ports.spi_interface.blk2, 1); //set mosi to 1
         slave_select(position_feedback_ports.slave_select);
@@ -99,13 +96,8 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
         slave_deselect(position_feedback_ports.slave_select);
         t :> last_read;
         computed_checksum = checksum_compute(count, singleturn_filtered, singleturn_raw);
-#ifndef RETRY
-        if(computed_checksum != checksum)
-#endif
-            try_count++;
-#ifdef RETRY
+        try_count++;
     } while(computed_checksum != checksum && try_count <= 3);
-#endif
 
     status = count >> 12;
     count = (sext(count & 0xfff, 12) * (1 << 16)) + singleturn_filtered; //convert multiturn to signed absolute count
