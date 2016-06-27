@@ -91,6 +91,19 @@ typedef struct {
     int phase_inductance;                   /**< uH*/
     int v_dc;                               /**< dc bus voltage*/
 
+    // regenerative mode variables
+
+    int recuperation;
+
+    int battery_e_max;  // maximum energy status of battery
+    int battery_e_min;  // minimum energy status of battery
+
+    int regen_p_max;    // maximum regenerative power (in Watts)
+    int regen_p_min;    // minimum regenerative power (in Watts)
+
+    int regen_speed_max;
+    int regen_speed_min;
+
     // protection limits
     // comment: there are some definitions in standard dictionary (such as MAX_TORQUE, MAX_CURRENT, ...) but
     //          these values are for normal operation. (with high probability) the protection limits are different

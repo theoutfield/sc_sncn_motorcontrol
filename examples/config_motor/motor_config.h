@@ -11,20 +11,6 @@
  **************************************************/
 
 /*
- *  Motor specific offst settings
- */
-
-#define REGEN_V_HIGH          58
-#define REGEN_V_LOW           38
-
-#define REGEN_I_HIGH          60
-#define REGEN_I_LOW           0
-
-#define PERCENT_CHARGING_FACTOR_MAX  52
-#define PERCENT_CHARGING_FACTOR_MIN  1
-
-
-/*
  * Set the Motor offset and position of the hall state sensors.
  * Unless for adding a new motor or fixing motor settings do not touch this.
  */
@@ -119,11 +105,15 @@
 */
 
 // Foresight
+
 // RATED POWER
 #define RATED_POWER 590         // W
 
 // RATED TORQUE
 #define RATED_TORQUE 1310        // mNm
+
+// TORQUE CONSTANT
+#define PERCENT_TORQUE_CONSTANT     8
 
 // RATED CURRENT
 #define RATED_CURRENT 13         // Amp
@@ -139,7 +129,6 @@
 
 // MAXIMUM TORQUE
 #define MAXIMUM_TORQUE   100    // Nm at 1000 Amp
-
 
 
 /*********************************************/

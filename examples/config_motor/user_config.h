@@ -51,6 +51,25 @@
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1
 
+
+//////////////////////////////////////////////
+//////  RECUPERATION MODE PARAMETERS
+////////////////////////////////////////////
+/*recuperation mode
+ * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.*/
+#define RECUPERATION        1
+
+#define BATTERY_E_MAX       80         // maximum energy status of battery
+#define BATTERY_E_MIN       10         // minimum energy status of battery
+
+#define REGEN_P_MAX         1000        // maximum regenerative power (in Watts)
+#define REGEN_P_MIN         0           // minimum regenerative power (in Watts)
+
+#define REGEN_SPEED_MAX     650
+#define REGEN_SPEED_MIN     50          // minimum value of the speed which is considered in regenerative calculations
+
+
+
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 ////////////////////////////////////////////

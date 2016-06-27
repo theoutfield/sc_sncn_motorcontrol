@@ -28,6 +28,8 @@
 #define ADC_FIXED_CHANNEL_OPERATION 1 // the channels will be set directly inside adc server
                                       // adc channels can not be modified by server inputs
 
+#define ADC_CURRENT_RATIO           5       //adc output/phase current
+
 interface ADC{
     {int, int} get_adc_measurements(unsigned char port_id, unsigned char config);
 };
