@@ -95,8 +95,8 @@
 //#define VELOCITY_Kd       0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
-#define TORQUE_Kp         1000
-#define TORQUE_Ki         91
+#define TORQUE_Kp         10
+#define TORQUE_Ki         3
 #define TORQUE_Kd         0
 
 /////////////////////////////////////////////////
