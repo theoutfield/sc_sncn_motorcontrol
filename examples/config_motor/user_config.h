@@ -62,7 +62,7 @@
 #define BATTERY_E_MAX       80         // maximum energy status of battery
 #define BATTERY_E_MIN       10         // minimum energy status of battery
 
-#define REGEN_P_MAX         1000        // maximum regenerative power (in Watts)
+#define REGEN_P_MAX         50        // maximum regenerative power (in Watts)
 #define REGEN_P_MIN         0           // minimum regenerative power (in Watts)
 
 #define REGEN_SPEED_MAX     650
@@ -82,6 +82,9 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 ////////////////////////////////////////////
+#define CURRENT_RATIO           5     //ratio between current recieved in control core, and real phase current
+                                      //depends on ADC and current sensor ratios
+
 #define VDC             48
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     66

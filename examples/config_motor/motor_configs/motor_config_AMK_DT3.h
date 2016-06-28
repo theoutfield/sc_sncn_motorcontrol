@@ -49,6 +49,9 @@
 // RATED TORQUE
 #define RATED_TORQUE 620        // mNm
 
+// TORQUE CONSTANT
+#define PERCENT_TORQUE_CONSTANT     15
+
 // RATED CURRENT
 #define RATED_CURRENT 4         // Amp
 

@@ -106,6 +106,8 @@ int main(void) {
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
+                    motorcontrol_config.torque_constant =  PERCENT_TORQUE_CONSTANT;
+                    motorcontrol_config.current_ratio =  CURRENT_RATIO;
 
                     motorcontrol_config.recuperation = RECUPERATION;
                     motorcontrol_config.battery_e_max = BATTERY_E_MAX;
@@ -114,6 +116,10 @@ int main(void) {
                     motorcontrol_config.regen_p_min = REGEN_P_MIN;
                     motorcontrol_config.regen_speed_max = REGEN_SPEED_MAX;
                     motorcontrol_config.regen_speed_min = REGEN_SPEED_MIN;
+
+                    motorcontrol_config.protection_limit_over_current =  I_MAX;
+                    motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
+                    motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
                     Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
                             i_shared_memory[0],
