@@ -51,6 +51,25 @@
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1
 
+
+//////////////////////////////////////////////
+//////  RECUPERATION MODE PARAMETERS
+////////////////////////////////////////////
+/*recuperation mode
+ * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.*/
+#define RECUPERATION        1
+
+#define BATTERY_E_MAX       80         // maximum energy status of battery
+#define BATTERY_E_MIN       10         // minimum energy status of battery
+
+#define REGEN_P_MAX         50        // maximum regenerative power (in Watts)
+#define REGEN_P_MIN         0           // minimum regenerative power (in Watts)
+
+#define REGEN_SPEED_MAX     650
+#define REGEN_SPEED_MIN     50          // minimum value of the speed which is considered in regenerative calculations
+
+
+
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 ////////////////////////////////////////////
@@ -77,6 +96,9 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 ////////////////////////////////////////////
+#define CURRENT_RATIO           5     //ratio between current recieved in control core, and real phase current
+                                      //depends on ADC and current sensor ratios
+
 #define VDC             48
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     66
@@ -109,8 +131,8 @@
 //#define VELOCITY_Kd       0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
-#define TORQUE_Kp         1000
-#define TORQUE_Ki         91
+#define TORQUE_Kp         10
+#define TORQUE_Ki         3
 #define TORQUE_Kd         0
 
 /////////////////////////////////////////////////

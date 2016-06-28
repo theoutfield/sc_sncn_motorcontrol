@@ -86,10 +86,23 @@ typedef struct {
     int current_P_gain;                     /**< proportional constant in torque controller*/
     int current_I_gain;                     /**< integral constant in torque controller*/
     int current_D_gain;                     /**< derivative constant in torque controller*/
+    int current_ratio;                      //ratio between current recieved in control core, and real phase current
 
     int phase_resistance;                   /**< uOhm*/
     int phase_inductance;                   /**< uH*/
     int v_dc;                               /**< dc bus voltage*/
+
+    // regenerative mode variables
+    int recuperation;
+
+    int battery_e_max;  // maximum energy status of battery
+    int battery_e_min;  // minimum energy status of battery
+
+    int regen_p_max;    // maximum regenerative power (in Watts)
+    int regen_p_min;    // minimum regenerative power (in Watts)
+
+    int regen_speed_max;
+    int regen_speed_min;
 
     // protection limits
     // comment: there are some definitions in standard dictionary (such as MAX_TORQUE, MAX_CURRENT, ...) but

@@ -16,6 +16,7 @@
 
 #include <xscope.h>
 
+
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 {
     printf("Sending offset_detection command ...\n");
@@ -240,15 +241,20 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
     UpstreamControlData upstream_control_data;
 
+    MotorcontrolConfig motorcontrol_config;
 
+    printf("\n===================================================================\n");
     printf(">>  ADVANCED FOC DEMO STARTING ...\n");
     printf(">>   applicable commands:\n");
     printf(" a => auto offset detection,           |    b  => enable/disable the brake\n");
     printf(" t => enable/disable torque controller,|    ox => set offset to x \n");
     printf(" p => print the actual offset,         |    r  => reverse the torque\n");
     printf(" x => show on xscope for 20 seconds,   | Enter => set torque to 0\n");
+    printf("===================================================================\n");
 
 
+    i_motorcontrol.set_offset_value(offset);
+    printf("set offset to %d\n", i_motorcontrol.set_calib(0));
 
     i_motorcontrol.set_brake_status(1);
     i_motorcontrol.set_torque_control_enabled();
@@ -327,10 +333,45 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             i_motorcontrol.set_offset_value(value);
             break;
 
-            //print offset
         case 'p':
-            printf("offset %d\n", i_motorcontrol.set_calib(0));
+            motorcontrol_config = i_motorcontrol.get_config();
+            printf("previous value: %d\n", motorcontrol_config.current_P_gain);
+
+            i_motorcontrol.set_torque_control_disabled();
+            printf("Torque control disabled\n");
+            delay_milliseconds(100);
+
+            motorcontrol_config.current_P_gain =  value;
+            i_motorcontrol.set_config(motorcontrol_config);
+            printf("new value: %d\n", motorcontrol_config.current_P_gain);
+            delay_milliseconds(100);
+
+            i_motorcontrol.set_torque_control_enabled();
+            printf("Torque control enabled\n");
+            delay_milliseconds(100);
+
             break;
+
+            //print offset
+        case 'i':
+            motorcontrol_config = i_motorcontrol.get_config();
+            printf("previous reversed_delay: %d\n", motorcontrol_config.current_I_gain);
+
+            i_motorcontrol.set_torque_control_disabled();
+            printf("Torque control disabled\n");
+            delay_milliseconds(100);
+
+            motorcontrol_config.current_I_gain =  value;
+            i_motorcontrol.set_config(motorcontrol_config);
+            printf("new reversed_delay: %d\n", motorcontrol_config.current_I_gain);
+            delay_milliseconds(100);
+
+            i_motorcontrol.set_torque_control_enabled();
+            printf("Torque control enabled\n");
+            delay_milliseconds(100);
+
+            break;
+
 
             //reverse torque
         case 'r':
