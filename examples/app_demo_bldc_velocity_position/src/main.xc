@@ -140,11 +140,23 @@ int main(void) {
                     motorcontrol_config.polarity_type=MOTOR_POLARITY;
 
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
+                    motorcontrol_config.current_I_gain =  TORQUE_Ki;
+                    motorcontrol_config.current_D_gain =  TORQUE_Kd;
 
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
+                    motorcontrol_config.torque_constant =  PERCENT_TORQUE_CONSTANT;
+                    motorcontrol_config.current_ratio =  CURRENT_RATIO;
+
+                    motorcontrol_config.recuperation = RECUPERATION;
+                    motorcontrol_config.battery_e_max = BATTERY_E_MAX;
+                    motorcontrol_config.battery_e_min = BATTERY_E_MIN;
+                    motorcontrol_config.regen_p_max = REGEN_P_MAX;
+                    motorcontrol_config.regen_p_min = REGEN_P_MIN;
+                    motorcontrol_config.regen_speed_max = REGEN_SPEED_MAX;
+                    motorcontrol_config.regen_speed_min = REGEN_SPEED_MIN;
 
                     motorcontrol_config.protection_limit_over_current =  I_MAX;
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
