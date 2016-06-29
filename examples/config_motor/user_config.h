@@ -25,9 +25,9 @@
 //#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
-#include <motor_config_AMK_DT3.h>
+//#include <motor_config_AMK_DT3.h>
 
-//#include <motor_config.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -57,7 +57,8 @@
 ////////////////////////////////////////////
 /*recuperation mode
  * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.*/
-#define RECUPERATION        1
+#define RECUPERATION        0          // when RECUPERATION is 0, there will be no recuperation
+                                       // the default value is 0
 
 #define BATTERY_E_MAX       80         // maximum energy status of battery
 #define BATTERY_E_MIN       10         // minimum energy status of battery
@@ -96,7 +97,7 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 ////////////////////////////////////////////
-#define CURRENT_RATIO           5     //ratio between current recieved in control core, and real phase current
+#define CURRENT_RATIO           20    //ratio between current recieved in control core, and real phase current
                                       //depends on ADC and current sensor ratios
 
 #define VDC             48

@@ -8,19 +8,6 @@
  *********      USER CONFIGURATION       **********
  **************************************************/
 
-/*
- *  Motor specific offst settings
- */
-
-#define REGEN_V_HIGH          58
-#define REGEN_V_LOW           38
-
-#define REGEN_I_HIGH          60
-#define REGEN_I_LOW           0
-
-#define PERCENT_CHARGING_FACTOR_MAX  52
-#define PERCENT_CHARGING_FACTOR_MIN  1
-
 
 /*
  * Set the Motor offset and position of the hall state sensors.
