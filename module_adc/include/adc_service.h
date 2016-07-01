@@ -96,7 +96,7 @@ interface ADCInterface{
      *      - V_dc_max
      *      - V_dc_min
      */
-    void set_protection_limits(int i_max, int v_dc_max, int v_dc_min);
+    void set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min);
 
     /**
      * @brief Resets the fault state in adc service

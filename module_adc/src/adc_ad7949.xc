@@ -285,7 +285,7 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
             }
 
             break;
-        case i_adc[int i].set_protection_limits(int i_max, int v_dc_max, int v_dc_min):
+        case i_adc[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
         case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
@@ -402,7 +402,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 #pragma ordered
         select
         {
-        case i_adc[int i].set_protection_limits(int i_max, int v_dc_max, int v_dc_min):
+        case i_adc[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
 
         case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:

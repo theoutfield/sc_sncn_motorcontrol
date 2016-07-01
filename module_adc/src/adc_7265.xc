@@ -290,7 +290,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
     #pragma ordered
         select {
-        case iADC[int i].set_protection_limits(int i_max, int v_dc_max, int v_dc_min):
+        case iADC[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
 
         case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
@@ -442,11 +442,11 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
         select
         {
 
-        case iADC[int i].set_protection_limits(int i_max_in, int v_dc_max_in, int v_dc_min_in):
+        case iADC[int i].set_protection_limits(int i_max_in, int i_ratio, int v_dc_max_in, int v_dc_min_in):
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
-                current_limit = i_max * 20;
+                current_limit = i_max * i_ratio;
 
                 break;
 
@@ -802,7 +802,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
 
                 break;
 
-        case iADC[int i].set_protection_limits(int i_max, int v_dc_max, int v_dc_min):
+        case iADC[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
 
         case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
