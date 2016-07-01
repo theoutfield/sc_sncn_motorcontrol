@@ -3,7 +3,7 @@
 # or a valid argument for the --target option when compiling
 #TARGET = SOMANET-C21-DX
 #TARGET =
-TARGET = 
+TARGET = SOMANET-C22
 
 
 # The APP_NAME variable determines the name of the final .xe file. It should
@@ -12,7 +12,7 @@ TARGET =
 APP_NAME = app_test_ams_rotary_sensor
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_ams_rotary_sensor module_board-support module_memory_manager module_misc module_pwm_symmetrical module_spi_master
+USED_MODULES = module_ams_rotary_sensor module_biss module_board-support module_contelec_encoder module_memory_manager module_misc module_position_feedback module_pwm_symmetrical module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
