@@ -14,7 +14,11 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
         if(!isnull(adc_ports.ad7949_ports.clk)){ // Check which ADC is configured
 
-            adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
+            if (ADC_FIXED_CHANNEL_OPERATION)
+                adc_ad7949_fixed_channel(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
+            else
+                adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
+
 
         } else if(!isnull(adc_ports.ad7265_ports.xclk)){
 
@@ -35,7 +39,6 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
             adc_ad7949_triggered(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, c_trigger, i_watchdog);
 
         } else if(!isnull(adc_ports.ad7265_ports.xclk)){
-
             adc_ad7256_triggered(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, c_trigger, i_watchdog);
 
         } else {
