@@ -220,7 +220,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_loop = contelec_config.velocity_loop * CONTELEC_USEC; //velocity loop time in clock ticks
     int velocity_factor = 60000000/contelec_config.velocity_loop;
-//    int velocity_count = 0;
+    int velocity_count = 0;
     //position
     unsigned int last_position = 0;
     int count = 0;
@@ -385,27 +385,28 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             t :> last_read;
             last_position = position;
 
-//            velocity_count++;
-//            if (velocity_count >= 10) {
-            int difference = count - old_count;
-            if(difference > crossover || difference < -crossover)
-                difference = old_difference;
-            old_difference = difference;
-            old_count = count;
-            // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
-            //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-            //            velocity = (difference * velocity_factor) / ticks_per_turn;
-            velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
+            velocity_count++;
+            if (velocity_count >= 8) {
+                int difference = count - old_count;
+                if(difference > crossover || difference < -crossover)
+                    difference = old_difference;
+                old_difference = difference;
+                old_count = count;
+                // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
+                //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
+                //            velocity = (difference * velocity_factor) / ticks_per_turn;
+                velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
+                last_velocity_read = last_read;
+                velocity_count = 0;
+            }
+
 #ifdef XSCOPE_CONTELEC
-            xscope_int(VELOCITY, velocity);
-            xscope_int(POSITION, position);
-            xscope_int(POSITION_RAW, angle);
-            xscope_int(STATUS, status*1000);
-            xscope_int(PERIOD, (int)(last_read-last_velocity_read)/CONTELEC_USEC);
+        xscope_int(VELOCITY, velocity);
+        xscope_int(POSITION, position);
+        xscope_int(POSITION_RAW, angle);
+        xscope_int(STATUS, status*1000);
+//        xscope_int(PERIOD, (int)(last_read-last_velocity_read)/CONTELEC_USEC);
 #endif
-            last_velocity_read = last_read;
-//                velocity_count = 0;
-//            }
 
 
             if (contelec_config.resolution_bits > 12)
