@@ -24,7 +24,7 @@
 #define MOTOR_HALL_STATE_6     0
 
 #define POWER_FACTOR           0
-#define POLE_PAIRS             10
+#define POLE_PAIRS             5
 
 
 /////////////////////////////////////////////
