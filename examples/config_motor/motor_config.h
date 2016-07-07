@@ -116,7 +116,7 @@
 #define PERCENT_TORQUE_CONSTANT     10
 
 // RATED CURRENT
-#define RATED_CURRENT 13         // Amp
+#define RATED_CURRENT 4         // Amp
 
 // PEAK SPEED
 #define PEAK_SPEED    6800      // rpm

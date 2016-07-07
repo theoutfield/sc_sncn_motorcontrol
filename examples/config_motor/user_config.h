@@ -57,13 +57,18 @@
 ////////////////////////////////////////////
 /*recuperation mode
  * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.*/
-#define RECUPERATION        0          // when RECUPERATION is 0, there will be no recuperation
-                                       // the default value is 0
+
+// For not affecting higher controlling levels (such as position control),
+// RECUPERATION should be set to 1, and REGEN_P_MAX should be set to a much higher value than the rated power
+// (such as 50 kW),
+
+
+#define RECUPERATION        1          // when RECUPERATION is 0, there will be no recuperation
 
 #define BATTERY_E_MAX       80         // maximum energy status of battery
 #define BATTERY_E_MIN       10         // minimum energy status of battery
 
-#define REGEN_P_MAX         50        // maximum regenerative power (in Watts)
+#define REGEN_P_MAX         50000       // maximum regenerative power (in Watts)
 #define REGEN_P_MIN         0           // minimum regenerative power (in Watts)
 
 #define REGEN_SPEED_MAX     650
@@ -74,7 +79,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 ////////////////////////////////////////////
-#define I_MAX           120//60      //maximum tolerable value of phase current (under abnormal conditions)
+#define I_MAX           60      //maximum tolerable value of phase current (under abnormal conditions)
 #define V_DC_MAX        62      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define V_DC_MIN        12      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
