@@ -20,7 +20,7 @@
 
     unsigned char p_ifm_wdtick = 0b0000;
     unsigned char reset_wd_tick_mask = 0b0000;
-    unsigned char   set_wd_tick_mask = 0b1111;
+    unsigned char   set_wd_tick_mask = 0b0001;
 
     unsigned char p_ifm_led = 0b0000;
     unsigned char reset_led_mask = 0b0001;
