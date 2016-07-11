@@ -15,6 +15,9 @@
 
 #include "pwm_server.h"
 #include <lookup_tables.h>
+#include <motorcontrol_service.h>
+#include <a4935.h>
+
 
 
 /*****************************************************************************/
@@ -31,9 +34,10 @@ static void do_pwm_port_config(PwmPorts &ports)
         set_port_inv( ports.p_pwm_inv[i] );
     }
 
-    configure_out_port( ports.p_pwm_phase_d , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-    configure_out_port( ports.p_pwm_phase_d_inv , ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-    set_port_inv( ports.p_pwm_phase_d_inv );
+
+//    configure_out_port( ports.p_pwm_phase_d , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+//    configure_out_port( ports.p_pwm_phase_d_inv , ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+//    set_port_inv( ports.p_pwm_phase_d_inv );
 
 
     // Check of ADC synchronisation is being used
@@ -46,6 +50,7 @@ static void do_pwm_port_config(PwmPorts &ports)
 
 
 } // do_pwm_port_config
+
 /*****************************************************************************/
 void pwm_config(PwmPorts &ports)
 {
@@ -67,10 +72,37 @@ void pwm_config(PwmPorts &ports)
     ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
     ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
 
-    ports.p_pwm_phase_d  <: 0x00000000;
-    ports.p_pwm_phase_d_inv  <: 0xFFFFFFFF;
+//    ports.p_pwm_phase_d  <: 0x00000000;
+//    ports.p_pwm_phase_d_inv  <: 0xFFFFFFFF;
 
 
+
+
+} // foc_pwm_config
+
+
+/*****************************************************************************/
+void predriver(FetDriverPorts &fet_driver_ports)
+{
+    const unsigned t_delay = 300*250;
+    unsigned int ts;
+    int check_fet;
+    int init_state = INIT_BUSY;
+    timer t;
+
+
+    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast)){
+        a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
+        t when timerafter (ts + t_delay) :> ts;
+    }
+
+    if(!isnull(fet_driver_ports.p_coast)){
+        fet_driver_ports.p_coast :> check_fet;
+        init_state = check_fet;
+    }
+    else {
+        init_state = 1;
+    }
 
 
 } // foc_pwm_config
@@ -287,21 +319,21 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
             ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
         }
 
-        if(brake_active)
-        {
-            if(brake_counter < 15000)
-            {
-                brake_counter++;
-
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-            }
-            else
-            {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-            }
-        }
+//        if(brake_active)
+//        {
+//            if(brake_counter < 15000)
+//            {
+//                brake_counter++;
+//
+//                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+//                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+//            }
+//            else
+//            {
+//                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+//                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+//            }
+//        }
 
         if (pwm_on)
         {
@@ -316,19 +348,19 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
             ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
         }
 
-        if(brake_active)
-        {
-            if(brake_counter < 15000)
-            {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-            }
-            else
-            {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-            }
-        }
+//        if(brake_active)
+//        {
+//            if(brake_counter < 15000)
+//            {
+//                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+//                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+//            }
+//            else
+//            {
+//                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+//                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+//            }
+//        }
 
     } // while(1)
 

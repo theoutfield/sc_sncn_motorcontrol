@@ -31,6 +31,9 @@
 #include "pwm_convert_width.h"
 #include <pwm_ports.h>
 
+#include <motorcontrol_service.h>
+
+
 /** Structure containing pwm server control data */
 typedef struct PWM_SERV_TAG
 {
@@ -48,6 +51,7 @@ interface update_pwm
 
 void pwm_config(PwmPorts &ports);
 
+void predriver(FetDriverPorts &fet_driver_ports);
 
 void update_pwm(control_variables& cv, PWM_COMMS_TYP& pwm_comms_s);
 void pwm_check(PwmPorts &ports);

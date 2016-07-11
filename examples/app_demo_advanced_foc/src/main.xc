@@ -33,6 +33,8 @@ int main(void) {
     interface update_pwm i_update_pwm;
     interface TuningInterface i_tuning;
 
+
+
     par
     {
         /* WARNING: only one blocking task is possible per tile. */
@@ -47,13 +49,16 @@ int main(void) {
         {
             par
             {
-                ///* PWM Service */
-                //{
-                //    pwm_config(pwm_ports);
-                //    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                //    delay_milliseconds(1000);
-                //    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
-                //}
+                /* PWM Service */
+                {
+                    pwm_config(pwm_ports);
+
+                    predriver(fet_driver_ports);
+
+                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    //delay_milliseconds(1000);
+                    //pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
+                }
 
                 ///* ADC Service */
                 //{
