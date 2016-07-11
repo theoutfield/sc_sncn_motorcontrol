@@ -53,9 +53,9 @@ int main(void) {
                 {
                     pwm_config(pwm_ports);
 
-                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                    //delay_milliseconds(1000);
-                    //pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
+                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    delay_milliseconds(2000);
+                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
                 }
 
                 ///* ADC Service */
@@ -92,7 +92,6 @@ int main(void) {
 
                 /* Motor Control Service */
                 {
-                    delay_milliseconds(2000);
 
                     MotorcontrolConfig motorcontrol_config;
 
