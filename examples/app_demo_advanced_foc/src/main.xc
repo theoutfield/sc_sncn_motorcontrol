@@ -58,11 +58,11 @@ int main(void) {
                     pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
                 }
 
-                ///* ADC Service */
-                //{
-                //    delay_milliseconds(1500);
-                //    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
-                //}
+                /* ADC Service */
+                {
+                    delay_milliseconds(1500);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+                }
 
                 /* Watchdog Service */
                 {
