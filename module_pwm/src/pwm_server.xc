@@ -75,9 +75,6 @@ void pwm_config(PwmPorts &ports)
 //    ports.p_pwm_phase_d  <: 0x00000000;
 //    ports.p_pwm_phase_d_inv  <: 0xFFFFFFFF;
 
-
-
-
 } // foc_pwm_config
 
 
