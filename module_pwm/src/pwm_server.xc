@@ -81,23 +81,26 @@ void pwm_config(PwmPorts &ports)
 /*****************************************************************************/
 void predriver(FetDriverPorts &fet_driver_ports)
 {
-    const unsigned t_delay = 300*250;
+    const unsigned t_delay = 300*250;//300 us
     unsigned int ts;
     int check_fet;
     int init_state = INIT_BUSY;
     timer t;
 
 
-    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast)){
+    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
+    {
         a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
         t when timerafter (ts + t_delay) :> ts;
     }
 
-    if(!isnull(fet_driver_ports.p_coast)){
+    if(!isnull(fet_driver_ports.p_coast))
+    {
         fet_driver_ports.p_coast :> check_fet;
         init_state = check_fet;
     }
-    else {
+    else
+    {
         init_state = 1;
     }
 

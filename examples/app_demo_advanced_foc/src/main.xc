@@ -54,16 +54,22 @@ int main(void) {
                     // should be number 1 to be executed (dc100)
                     pwm_config(pwm_ports);
 
-//                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    // predriver should be number 3 to be executed (dc100)
+                    delay_milliseconds(1000);
+                    predriver(fet_driver_ports);
+
+                    // should be number 4 to be executed (dc100)
+                    delay_milliseconds(500);
+                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
 //                    delay_milliseconds(2000);
 //                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
                 }
 
                 /* ADC Service */
-                {
+//                {
 //                    delay_milliseconds(1500);
 //                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
-                }
+//                }
 
                 /* Watchdog Service */
                 {
@@ -94,6 +100,8 @@ int main(void) {
 //
 //                /* Motor Control Service */
 //                {
+//
+//
 //
 //                    MotorcontrolConfig motorcontrol_config;
 //
@@ -126,7 +134,7 @@ int main(void) {
 //                    motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
 //                    motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 //
-//                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
+//                    Motor_Control_Service(motorcontrol_config, i_adc[0],
 //                            i_shared_memory[0],
 //                            i_watchdog[0], i_motorcontrol, i_update_pwm);
 //                }

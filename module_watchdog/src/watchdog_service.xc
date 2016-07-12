@@ -35,7 +35,7 @@
     timer t;
 
     unsigned int LED_counter = 0;
-    int fault=5;//FIXME: this variable should be initialized to 0. here it is 3 to check the LED flashing of WD task
+    int fault=0;//FIXME: this variable should be initialized to 0. here it is 3 to check the LED flashing of WD task
     int fault_counter=0;
 
 
