@@ -102,8 +102,10 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 ////////////////////////////////////////////
-#define CURRENT_RATIO           20    //ratio between current recieved in control core, and real phase current
-                                      //depends on ADC and current sensor ratios
+#define CURRENT_RATIO           20   //ratio between current recieved in control core, and real phase current
+                                     //depends on ADC and current sensor ratios
+                                     //  20 -> DC1K
+                                     //  20 -> DC100
 
 #define VDC             48
 // COMMUTATION LOOP PERIOD (if applicable) [us]

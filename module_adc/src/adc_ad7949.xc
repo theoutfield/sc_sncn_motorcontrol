@@ -464,8 +464,8 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
                 configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-                phaseB_out = current_sensor_config.sign_phase_b * (((int) adc_data_a[4]) - i_calib_a);
-                phaseC_out = current_sensor_config.sign_phase_c * (((int) adc_data_b[4]) - i_calib_b);
+                phaseB_out = (-current_sensor_config.sign_phase_b * (((int) adc_data_a[4]) - i_calib_a))/30;
+                phaseC_out = (-current_sensor_config.sign_phase_c * (((int) adc_data_b[4]) - i_calib_b))/30;
 
                 t :> te;
 
