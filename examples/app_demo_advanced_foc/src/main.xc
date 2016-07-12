@@ -55,26 +55,26 @@ int main(void) {
                     pwm_config(pwm_ports);
 
                     // predriver should be number 3 to be executed (dc100)
-                    delay_milliseconds(1000);
+                    delay_milliseconds(10);
                     predriver(fet_driver_ports);
 
                     // should be number 4 to be executed (dc100)
-                    delay_milliseconds(500);
-                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-//                    delay_milliseconds(2000);
-//                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
+                    delay_milliseconds(5);
+                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
                 }
 
                 /* ADC Service */
-//                {
-//                    delay_milliseconds(1500);
-//                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
-//                }
+                {
+                    // should be number 6 to be executed (dc100)
+                    delay_milliseconds(10);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+                }
 
                 /* Watchdog Service */
                 {
                     // should be number 2 to be executed (dc100)
-                    delay_milliseconds(500);
+                    delay_milliseconds(5);
                     watchdog_service(wd_ports, i_watchdog);
                 }
 
@@ -98,46 +98,45 @@ int main(void) {
 //                /* Shared memory Service */
 //                memory_manager(i_shared_memory, 2);
 //
-//                /* Motor Control Service */
-//                {
-//
-//
-//
-//                    MotorcontrolConfig motorcontrol_config;
-//
-//                    motorcontrol_config.v_dc =  VDC;
-//                    motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
-//                    motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
-//                    motorcontrol_config.polarity_type=MOTOR_POLARITY;
-//
-//                    motorcontrol_config.current_P_gain =  TORQUE_Kp;
-//                    motorcontrol_config.current_I_gain =  TORQUE_Ki;
-//                    motorcontrol_config.current_D_gain =  TORQUE_Kd;
-//
-//                    motorcontrol_config.pole_pair =  POLE_PAIRS;
-//                    motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
-//                    motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
-//                    motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
-//                    motorcontrol_config.torque_constant =  PERCENT_TORQUE_CONSTANT;
-//                    motorcontrol_config.current_ratio =  CURRENT_RATIO;
-//                    motorcontrol_config.rated_current =  RATED_CURRENT;
-//
-//                    motorcontrol_config.recuperation = RECUPERATION;
-//                    motorcontrol_config.battery_e_max = BATTERY_E_MAX;
-//                    motorcontrol_config.battery_e_min = BATTERY_E_MIN;
-//                    motorcontrol_config.regen_p_max = REGEN_P_MAX;
-//                    motorcontrol_config.regen_p_min = REGEN_P_MIN;
-//                    motorcontrol_config.regen_speed_max = REGEN_SPEED_MAX;
-//                    motorcontrol_config.regen_speed_min = REGEN_SPEED_MIN;
-//
-//                    motorcontrol_config.protection_limit_over_current =  I_MAX;
-//                    motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
-//                    motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
-//
-//                    Motor_Control_Service(motorcontrol_config, i_adc[0],
-//                            i_shared_memory[0],
-//                            i_watchdog[0], i_motorcontrol, i_update_pwm);
-//                }
+                /* Motor Control Service */
+                {
+                    // should be number 6 to be executed (dc100)
+                    delay_milliseconds(20);
+
+                    MotorcontrolConfig motorcontrol_config;
+
+                    motorcontrol_config.v_dc =  VDC;
+                    motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
+                    motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.polarity_type=MOTOR_POLARITY;
+
+                    motorcontrol_config.current_P_gain =  TORQUE_Kp;
+                    motorcontrol_config.current_I_gain =  TORQUE_Ki;
+                    motorcontrol_config.current_D_gain =  TORQUE_Kd;
+
+                    motorcontrol_config.pole_pair =  POLE_PAIRS;
+                    motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
+                    motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
+                    motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
+                    motorcontrol_config.torque_constant =  PERCENT_TORQUE_CONSTANT;
+                    motorcontrol_config.current_ratio =  CURRENT_RATIO;
+                    motorcontrol_config.rated_current =  RATED_CURRENT;
+
+                    motorcontrol_config.recuperation = RECUPERATION;
+                    motorcontrol_config.battery_e_max = BATTERY_E_MAX;
+                    motorcontrol_config.battery_e_min = BATTERY_E_MIN;
+                    motorcontrol_config.regen_p_max = REGEN_P_MAX;
+                    motorcontrol_config.regen_p_min = REGEN_P_MIN;
+                    motorcontrol_config.regen_speed_max = REGEN_SPEED_MAX;
+                    motorcontrol_config.regen_speed_min = REGEN_SPEED_MIN;
+
+                    motorcontrol_config.protection_limit_over_current =  I_MAX;
+                    motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
+                    motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
+
+                    Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[0],
+                            i_watchdog[0], i_motorcontrol, i_update_pwm);
+                }
             }
         }
     }

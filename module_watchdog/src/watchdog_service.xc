@@ -38,6 +38,29 @@
     int fault=0;//FIXME: this variable should be initialized to 0. here it is 3 to check the LED flashing of WD task
     int fault_counter=0;
 
+    if (initialization == 0)
+    {
+//                    //motor on
+//                    p_ledblue_ledgreen_ledred_wden |= 0b0100;
+//                    watchdog_ports.p_enable <: p_ledblue_ledgreen_ledred_wden;
+
+
+        //reset WD_EN and LED
+        p_ledblue_ledgreen_ledred_wden &= 0b0000;
+        p_ledblue_ledgreen_ledred_wden |= 0b1110;
+        watchdog_ports.p_enable <: p_ledblue_ledgreen_ledred_wden;
+
+        //Enable WD
+        p_ledblue_ledgreen_ledred_wden |= set_wd_en_mask;
+        watchdog_ports.p_enable <: p_ledblue_ledgreen_ledred_wden;
+
+        initialization = 1;
+        wd_enabled = 1;
+
+        t :> ts;
+        t when timerafter (ts + 25000  ) :> void;
+    }
+
 
     t :> ts;
 
@@ -95,7 +118,7 @@
                 //                wd_enabled = 0;
                 break;
 
-        case t when timerafter(ts + 500) :> void: // 500 is equal to 2 us when reference frequency is 250 MHz
+        case t when timerafter(ts + 5000) :> void: // 5000 is equal to 20 us when reference frequency is 250 MHz
 
                 t :> ts;
 
@@ -128,7 +151,7 @@
                     }
 
                     LED_counter++;
-                    if (LED_counter >= 150000)
+                    if (LED_counter >= 15000)
                     {
                         fault_counter++;
 
@@ -206,25 +229,7 @@
 
                 }
 
-                if (initialization == 0)
-                {
-//                    //motor on
-//                    p_ledblue_ledgreen_ledred_wden |= 0b0100;
-//                    watchdog_ports.p_enable <: p_ledblue_ledgreen_ledred_wden;
 
-
-                    //reset WD_EN and LED
-                    p_ledblue_ledgreen_ledred_wden &= 0b0000;
-                    p_ledblue_ledgreen_ledred_wden |= 0b1110;
-                    watchdog_ports.p_enable <: p_ledblue_ledgreen_ledred_wden;
-
-                    //Enable WD
-                    p_ledblue_ledgreen_ledred_wden |= set_wd_en_mask;
-                    watchdog_ports.p_enable <: p_ledblue_ledgreen_ledred_wden;
-
-                    initialization = 1;
-                    wd_enabled = 1;
-                }
 
                 break;
 
