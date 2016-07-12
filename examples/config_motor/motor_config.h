@@ -24,7 +24,7 @@
 #define MOTOR_HALL_STATE_6     0
 
 #define POWER_FACTOR           0
-#define POLE_PAIRS             5
+#define POLE_PAIRS             7
 
 
 /////////////////////////////////////////////
@@ -119,7 +119,7 @@
 #define RATED_CURRENT 4         // Amp
 
 // PEAK SPEED
-#define PEAK_SPEED    6800      // rpm
+#define PEAK_SPEED    4000      // rpm
 
 // PHASE RESISTANCE
 #define PHASE_RESISTANCE 128000 // uOhm

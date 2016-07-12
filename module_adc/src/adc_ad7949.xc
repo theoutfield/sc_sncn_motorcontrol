@@ -469,7 +469,7 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
                 t :> te;
 
-                xscope_int(CYCLE_TIME, te-ts);
+                //xscope_int(CYCLE_TIME, te-ts);
 
                 break;
 

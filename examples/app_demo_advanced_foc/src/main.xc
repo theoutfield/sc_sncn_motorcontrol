@@ -89,7 +89,7 @@ int main(void) {
                     position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
                     position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                     position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
-                    position_feedback_config.contelec_config.pole_pairs = 5;
+                    position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
                     position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
                     position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                     position_feedback_config.contelec_config.enable_push_service = PushAll;
