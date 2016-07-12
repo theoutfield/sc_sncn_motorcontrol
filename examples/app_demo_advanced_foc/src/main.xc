@@ -41,7 +41,7 @@ int main(void) {
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         //on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
 
-//        on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
+        //on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
 
         //on tile[IFM_TILE]: position_limiter(i_tuning, i_motorcontrol[1]);
 
@@ -79,25 +79,30 @@ int main(void) {
                 }
 
 
-//                /* Position feedback service */
-//                {
-//                    PositionFeedbackConfig position_feedback_config;
-//                    position_feedback_config.sensor_type = CONTELEC_SENSOR;
-//                    position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
-//                    position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
-//                    position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
-//                    position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
-//                    position_feedback_config.contelec_config.pole_pairs = 5;
-//                    position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
-//                    position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
-//                    position_feedback_config.contelec_config.enable_push_service = PushAll;
-//
-//                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
-//                }
-//
-//                /* Shared memory Service */
-//                memory_manager(i_shared_memory, 2);
-//
+                /* Position feedback service */
+                {
+                    delay_milliseconds(10);
+
+                    PositionFeedbackConfig position_feedback_config;
+                    position_feedback_config.sensor_type = CONTELEC_SENSOR;
+                    position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
+                    position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
+                    position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
+                    position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
+                    position_feedback_config.contelec_config.pole_pairs = 5;
+                    position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
+                    position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                    position_feedback_config.contelec_config.enable_push_service = PushAll;
+
+                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
+                }
+
+                {
+                    /* Shared memory Service */
+                    memory_manager(i_shared_memory, 2);
+                }
+
+
                 /* Motor Control Service */
                 {
                     // should be number 6 to be executed (dc100)
