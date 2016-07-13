@@ -34,11 +34,12 @@ static void do_pwm_port_config(PwmPorts &ports)
         set_port_inv( ports.p_pwm_inv[i] );
     }
 
-
-//    configure_out_port( ports.p_pwm_phase_d , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-//    configure_out_port( ports.p_pwm_phase_d_inv , ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-//    set_port_inv( ports.p_pwm_phase_d_inv );
-
+    if (!isnull(ports.p_pwm_phase_d))
+    {
+        configure_out_port( ports.p_pwm_phase_d , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_phase_d_inv , ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        set_port_inv( ports.p_pwm_phase_d_inv );
+    }
 
     // Check of ADC synchronisation is being used
     if (1 == _LOCK_ADC_TO_PWM)
@@ -72,8 +73,12 @@ void pwm_config(PwmPorts &ports)
     ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
     ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
 
-//    ports.p_pwm_phase_d  <: 0x00000000;
-//    ports.p_pwm_phase_d_inv  <: 0xFFFFFFFF;
+    if (!isnull(ports.p_pwm_phase_d))
+    {
+        ports.p_pwm_phase_d  <: 0x00000000;
+        ports.p_pwm_phase_d_inv  <: 0xFFFFFFFF;
+    }
+
 
 } // foc_pwm_config
 
