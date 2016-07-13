@@ -313,6 +313,7 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
                 current_limit = i_max * i_ratio_in;
+
                 break;
 
         case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
@@ -334,73 +335,7 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
                 configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-//                #pragma unsafe arrays
-//                int bits[4];
-//
-//                bits[0]=0x80808000;
-//                if(adc_config_other[adc_index] & BIT13)
-//                    bits[0] |= 0x0000B300;
-//                if(adc_config_other[adc_index] & BIT12)
-//                    bits[0] |= 0x00B30000;
-//                if(adc_config_other[adc_index] & BIT11)
-//                    bits[0] |= 0xB3000000;
-//
-//                bits[1]=0x80808080;
-//                if(adc_config_other[adc_index] & BIT10)
-//                    bits[1] |= 0x000000B3;
-//                if(adc_config_other[adc_index] & BIT09)
-//                    bits[1] |= 0x0000B300;
-//                if(adc_config_other[adc_index] & BIT08)
-//                    bits[1] |= 0x00B30000;
-//                if(adc_config_other[adc_index] & BIT07)
-//                    bits[1] |= 0xB3000000;
-//
-//                bits[2]=0x80808080;
-//                if(adc_config_other[adc_index] & BIT06)
-//                    bits[2] |= 0x000000B3;
-//                if(adc_config_other[adc_index] & BIT05)
-//                    bits[2] |= 0x0000B300;
-//                if(adc_config_other[adc_index] & BIT04)
-//                    bits[2] |= 0x00B30000;
-//                if(adc_config_other[adc_index] & BIT03)
-//                    bits[2] |= 0xB3000000;
-//
-//                bits[3]=0x00808080;
-//                if(adc_config_other[adc_index] & BIT02)
-//                    bits[3] |= 0x000000B3;
-//                if(adc_config_other[adc_index] & BIT01)
-//                    bits[3] |= 0x0000B300;
-//                if(adc_config_other[adc_index] & BIT0)
-//                    bits[3] |= 0x00B30000;
-//
-//                stop_clock(clk);
-//                clearbuf(p_data_a);
-//                clearbuf(p_data_b);
-//                clearbuf(p_sclk_conv_mosib_mosia);
-//                p_sclk_conv_mosib_mosia <: bits[0];
-//                start_clock(clk);
-//
-//                p_sclk_conv_mosib_mosia <: bits[1];
-//                p_sclk_conv_mosib_mosia <: bits[2];
-//                p_sclk_conv_mosib_mosia <: bits[3];
-//
-//                sync(p_sclk_conv_mosib_mosia);
-//                stop_clock(clk);
-//
-//                SPI_IDLE;
-//
-//                t :> ts;
-//                p_data_a :> data_raw_a;
-//                adc_data_a[adc_index] = convert(data_raw_a);
-//                p_data_b :> data_raw_b;
-//                adc_data_b[adc_index] = convert(data_raw_b);
-//                adc_index++;
-//                adc_index &= 0x3; // modulo, reset index
-//                t when timerafter(ts + delay) :> ts;
 
-                //output_adc_config_data(clk, p_data_a, p_data_b, p_sclk_conv_mosib_mosia, adc_config_mot);
-
-                //void output_adc_config(clk, p_data_a, p_data_b, p_adc,                   adc_cfg_data);
                 #pragma unsafe arrays
                 int bits[4];
 
@@ -454,7 +389,6 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
                 sync(adc_ports.sclk_conv_mosib_mosia);
                 stop_clock(adc_ports.clk);
 
-
                 configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
                 adc_ports.data_a :> data_raw_a;
@@ -464,12 +398,10 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
                 configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-                phaseB_out = (-current_sensor_config.sign_phase_b * (((int) adc_data_a[4]) - i_calib_a))/30;
-                phaseC_out = (-current_sensor_config.sign_phase_c * (((int) adc_data_b[4]) - i_calib_b))/30;
+                phaseB_out = (current_sensor_config.sign_phase_b * (((int) adc_data_a[4]) - i_calib_a));
+                phaseC_out = (current_sensor_config.sign_phase_c * (((int) adc_data_b[4]) - i_calib_b));
 
                 t :> te;
-
-                //xscope_int(CYCLE_TIME, te-ts);
 
                 break;
 
