@@ -1,7 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC100-rev-b.bsp>
-//#include <IFM_DC1K-rev-c3.bsp>
+//#include <IFM_DC100-rev-b.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -52,15 +52,12 @@ int main(void) {
             {
                 /* PWM Service */
                 {
-                    // should be number 1 to be executed (dc100)
                     pwm_config(pwm_ports);
 
-                    // predriver should be number 3 to be executed (dc100)
                     delay_milliseconds(10);
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    // should be number 4 to be executed (dc100)
                     delay_milliseconds(5);
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                     pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
@@ -68,14 +65,12 @@ int main(void) {
 
                 /* ADC Service */
                 {
-                    // should be number 6 to be executed (dc100)
                     delay_milliseconds(10);
                     adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
                 }
 
                 /* Watchdog Service */
                 {
-                    // should be number 2 to be executed (dc100)
                     delay_milliseconds(5);
                     watchdog_service(wd_ports, i_watchdog);
                 }
@@ -107,7 +102,6 @@ int main(void) {
 
                 /* Motor Control Service */
                 {
-                    // should be number 6 to be executed (dc100)
                     delay_milliseconds(20);
 
                     MotorcontrolConfig motorcontrol_config;

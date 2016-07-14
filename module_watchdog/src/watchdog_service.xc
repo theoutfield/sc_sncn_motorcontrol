@@ -71,39 +71,6 @@
         select {
             // Get a command from the out loop
         case i_watchdog[int i].start(): // produce a rising edge on the WD_EN
-                /*
-
-                    if (isnull(watchdog_ports.p_tick)){
-                        shared_out = 0xe;
-                        shared_out &= ~0x5;//and shortly switch the LED to red (DC1K)
-                    }
-                    else {
-                        shared_out &= ~0x1;
-                    }
-                    watchdog_ports.p_enable <: shared_out; // go low
-
-                    t :> ts2;
-                    t when timerafter(ts2+25000) :> ts2; // FIXME Magic numbers. Magic numbers everywhere...
-
-                    if (isnull(watchdog_ports.p_tick)){
-                        shared_out &= 0x7;
-                        shared_out |= 0x1;
-                    }
-                    else{
-                        shared_out |= 0x1;
-                    }
-                    watchdog_ports.p_enable <: shared_out; // go high
-
-                    t :> ts2;
-                    t when timerafter (ts2 + 25000) :> ts2; // FIXME Magic numbers. Magic numbers everywhere...
-
-                    if (isnull(watchdog_ports.p_tick)){
-                        shared_out |= (1 << 2);             // prepare the kicking
-                        watchdog_ports.p_enable <: shared_out;
-                    }
-
-                    wd_enabled = 1;
-                 */
                 wd_enabled = 1;
                 break;
 
@@ -129,7 +96,6 @@
         case t when timerafter(ts + 5000) :> void: // 5000 is equal to 20 us when reference frequency is 250 MHz
 
                 t :> ts;
-
                 if (initialization == 1)
                 {
                     if (wd_enabled == 1)
@@ -166,7 +132,6 @@
 
                             WD_En_sent_flag++;
                         }
-
                     }
 
                     LED_counter++;
@@ -309,41 +274,36 @@
                 break;
 
         case i_watchdog[int i].reset_faults():
-                //
-                //                p_led_motoon_wdtick_wden_buffer = 0xC;
-                //
-                //                LED_counter = 0;
-                //                fault_counter=0;
-                //                WD_En_sent_flag =0;
-                //                fault=0;
-                //
-                //                t :> ts;
-                //                //motor on
-                //                p_led_motoon_wdtick_wden_buffer |= 0b0100;
-                //                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-                //
-                //                //reset WD_EN, WD_TICK and LED
-                //                p_led_motoon_wdtick_wden_buffer &= 0b0100;
-                //                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-                //
-                //                //Enable WD
-                //                p_led_motoon_wdtick_wden_buffer |= 0b0001;
-                //                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-                //
-                //                initialization = 1;
-                //                wd_enabled = 1;
-                //
-                //                // toggling WD_EN
-                //                if ((p_led_motoon_wdtick_wden_buffer & 0b0010) == 0)
-                //                    p_led_motoon_wdtick_wden_buffer |= 0b0010;
-                //                else
-                //                    p_led_motoon_wdtick_wden_buffer &= 0b1101;
-                //                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-                //
-                //                WD_En_sent_flag++;
-                break;
 
-                // Do a case: Separate the LED bits from the port XS1_PORT_4B. LSB enable watchdog.
+                p_led_motoon_wdtick_wden_buffer = 0b1000;
+                p_ifm_wdtick = 0b0000;
+                initialization  =0;
+                WD_En_sent_flag =0;
+                wd_enabled = 0;
+                LED_counter = 0;
+                fault=0;
+                fault_counter=0;
+
+                //motor on
+                p_led_motoon_wdtick_wden_buffer |= set_motoon_mask;
+                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
+
+                //reset WD_EN and LED
+                p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
+                p_led_motoon_wdtick_wden_buffer &= reset_wd_en_mask;
+
+                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
+
+                //Enable WD
+                p_led_motoon_wdtick_wden_buffer |= set_wd_en_mask;
+                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
+
+                initialization = 1;
+                wd_enabled = 1;
+                t :> ts;
+                t when timerafter (ts + 25000  ) :> void;
+                t :> ts;
+                break;
         }
     }
 }

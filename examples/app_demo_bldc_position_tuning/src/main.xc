@@ -84,49 +84,38 @@ int main(void) {
         {
             par
             {
-                {
-                    /* Watchdog Service */
-                    delay_milliseconds(500);
-                    watchdog_service(wd_ports,i_watchdog);
-                }
-
+                /* PWM Service */
                 {
                     pwm_config(pwm_ports);
 
-//                    pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                    delay_milliseconds(1000);
+                    delay_milliseconds(10);
+                    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
+                        predriver(fet_driver_ports);
+
+                    delay_milliseconds(5);
+                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                     pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
                 }
 
                 /* ADC Service */
                 {
-                    delay_milliseconds(1500);
+                    delay_milliseconds(10);
                     adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+                }
 
+                /* Watchdog Service */
+                {
+                    delay_milliseconds(5);
+                    watchdog_service(wd_ports, i_watchdog);
                 }
 
 
                 /* Position feedback service */
                 {
+                    delay_milliseconds(10);
+
                     PositionFeedbackConfig position_feedback_config;
-                    position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
-
-                    position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                    position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-                    position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
-                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-                    position_feedback_config.biss_config.pole_pairs = POLE_PAIRS;
-                    position_feedback_config.biss_config.polarity = BISS_POLARITY;
-                    position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-                    position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-                    position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
-                    position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                    position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-                    position_feedback_config.biss_config.enable_push_service = PushAll;
-
+                    position_feedback_config.sensor_type = CONTELEC_SENSOR;
                     position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
                     position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
                     position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
@@ -139,13 +128,15 @@ int main(void) {
                     position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
                 }
 
+                {
+                    /* Shared memory Service */
+                    memory_manager(i_shared_memory, 2);
+                }
 
-                /* Shared memory Service */
-                memory_manager(i_shared_memory, 2);
 
                 /* Motor Control Service */
                 {
-                    delay_milliseconds(2000);
+                    delay_milliseconds(20);
 
                     MotorcontrolConfig motorcontrol_config;
 
@@ -178,10 +169,10 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
-                    Motor_Control_Service( fet_driver_ports, motorcontrol_config, i_adc[0],
-                            i_shared_memory[0],
+                    Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[0],
                             i_watchdog[0], i_motorcontrol, i_update_pwm);
-                }            }
+                }
+            }
         }
     }
 
