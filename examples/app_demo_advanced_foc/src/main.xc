@@ -1,6 +1,7 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
 #include <IFM_DC100-rev-b.bsp>
+//#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -56,7 +57,8 @@ int main(void) {
 
                     // predriver should be number 3 to be executed (dc100)
                     delay_milliseconds(10);
-                    predriver(fet_driver_ports);
+                    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
+                        predriver(fet_driver_ports);
 
                     // should be number 4 to be executed (dc100)
                     delay_milliseconds(5);
