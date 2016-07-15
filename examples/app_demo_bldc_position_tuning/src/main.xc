@@ -41,7 +41,16 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_position_control[1]);
+        on tile[APP_TILE]: {
+            ProfilerConfig profiler_config;
+            profiler_config.polarity = POLARITY;
+            profiler_config.max_position = MAX_POSITION_LIMIT;
+            profiler_config.min_position = MIN_POSITION_LIMIT;
+            profiler_config.max_velocity = MAX_VELOCITY;
+            profiler_config.max_acceleration = MAX_ACCELERATION;
+            profiler_config.max_deceleration = MAX_DECELERATION;
+            run_offset_tuning(profiler_config, i_motorcontrol[0], i_position_control[1], i_position_feedback[0]);
+        }
 
         on tile[APP_TILE_2]:
         /* Position Control Loop */
@@ -125,7 +134,7 @@ int main(void) {
                     position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                     position_feedback_config.contelec_config.enable_push_service = PushAll;
 
-                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
+                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
                 }
 
                 {
@@ -169,7 +178,7 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
-                    Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[0],
+                    Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                             i_watchdog[0], i_motorcontrol, i_update_pwm);
                 }
             }
