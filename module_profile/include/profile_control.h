@@ -9,7 +9,6 @@
 #pragma once
 
 #include <position_ctrl_service.h>
-#include <velocity_ctrl_service.h>
 
 /**
  * @brief Structure definition for Profiler configuration.
@@ -56,8 +55,9 @@ void init_position_profiler(ProfilerConfig profile_position_config);
  * @param profile_velocity_config Configuration for the Velocity Profiler.
  * @param i_velocity_control Communication interface to the Velocity Control Service.
  */
-void init_velocity_profiler(ProfilerConfig profile_velocity_config,
-                                interface VelocityControlInterface client i_velocity_control);
+//FIXME: to be implemented for the new position/velocity controller
+//void init_velocity_profiler(ProfilerConfig profile_velocity_config,
+//                                interface VelocityControlInterface client i_velocity_control);
 
 /**
  * @brief Torque Profiler Initializer. It sets the profiler configuration.
@@ -91,8 +91,11 @@ void set_profile_position( DownstreamControlData &downstream_control_data, int v
  * @param deceleration in (rpm/s)
  * @param i_velocity_control for communicating with the Velocity Control Server
  */
+//FIXME: to be implemented for the new position/velocity controller
+#if 0
 void set_profile_velocity( int target_velocity, int acceleration, int deceleration,
                            interface VelocityControlInterface client i_velocity_control );
+#endif
 
 /**
  * @brief Set profile torque with Torque Control loop
@@ -102,6 +105,7 @@ void set_profile_velocity( int target_velocity, int acceleration, int decelerati
  * @param i_torque_control for communicating with the Torque Control Server
  */
 //FIXME
-//void set_profile_torque( int target_torque, int torque_slope,
-//                         interface TorqueControlInterface client i_torque_control );
-
+#if 0
+void set_profile_torque( int target_torque, int torque_slope,
+                         interface TorqueControlInterface client i_torque_control );
+#endif
