@@ -12,9 +12,11 @@
  */
 //BiSS libs
 #include <watchdog_service.h>
-#include <pwm_service.h>
 #include <position_feedback_service.h>
 #include <refclk.h>
+#include <torque_control.h>
+#include <pwm_server.h>
+#include <user_config.h>
 
 /* Test BiSS Encoder Client */
 void biss_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory) {
@@ -62,13 +64,14 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 int main() {
     chan c_pwm_ctrl; // pwm channels
     interface WatchdogInterface i_watchdog[2];
-    interface BrakeInterface i_brake;
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
+    interface update_pwm i_update_pwm;
 
     par {
         /* Test BiSS Encoder Client */
@@ -80,8 +83,17 @@ int main() {
          ************************************************************/
         on tile[IFM_TILE]: par {
             /* PWM Service */
-            pwm_service( pwm_ports, c_pwm_ctrl, i_brake);
-            i_brake.set_brake(0);
+            {
+                pwm_config(pwm_ports);
+
+                delay_milliseconds(10);
+                if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
+                    predriver(fet_driver_ports);
+
+                delay_milliseconds(5);
+                //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
+            }
 
             /* Watchdog Service */
             watchdog_service(wd_ports, i_watchdog);
