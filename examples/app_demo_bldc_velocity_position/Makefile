@@ -14,7 +14,7 @@ TARGET = SOMANET-C22
 APP_NAME = app_demo_bldc_velocity_position
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_advanced_foc module_biss module_board-support module_contelec_encoder module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_memory_manager module_misc module_motorcontrol module_position_feedback module_pwm module_pwm_symmetrical module_spi_master module_watchdog
+USED_MODULES = config_motor module_adc module_advanced_foc module_biss module_board-support module_contelec_encoder module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_memory_manager module_misc module_position_feedback module_pwm module_spi_master module_watchdog
 
 
 # The flags passed to xcc when building the application
