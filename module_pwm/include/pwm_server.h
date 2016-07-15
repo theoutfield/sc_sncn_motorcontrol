@@ -51,8 +51,6 @@ interface update_pwm
 
 void pwm_config(PwmPorts &ports);
 
-void predriver(FetDriverPorts &fet_driver_ports);
-
 void update_pwm(control_variables& cv, PWM_COMMS_TYP& pwm_comms_s);
 void pwm_check(PwmPorts &ports);
 void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, PWM server, with ADC synchronization
@@ -62,5 +60,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         int duty_start_brake,
         int duty_maintain_brake
 );
+
+
 
 #endif // _PWM_SERVER_H_

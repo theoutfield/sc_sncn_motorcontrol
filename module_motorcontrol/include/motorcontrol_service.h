@@ -118,8 +118,7 @@ typedef struct {
 
 #include <watchdog_service.h>
 #include <adc_service.h>
-#include <pwm_service.h>
-#include <hall_service.h>
+#include <pwm_server.h>
 #include <memory_manager.h>
 
 #include <mc_internal_constants.h>
@@ -170,6 +169,12 @@ typedef struct
 }DownstreamControlData;
 
 
+interface BrakeInterface {
+    void set_brake(int enable);
+    int get_brake();
+};
+
+void predriver(FetDriverPorts &fet_driver_ports);
 
 /**
  * @brief Interface type to communicate with the Motor Control Service.
