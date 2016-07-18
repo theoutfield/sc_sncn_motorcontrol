@@ -79,7 +79,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 ////////////////////////////////////////////
-#define I_MAX           60      //maximum tolerable value of phase current (under abnormal conditions)
+#define I_MAX           100      //maximum tolerable value of phase current (under abnormal conditions)
 #define V_DC_MAX        62      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define V_DC_MIN        12      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
@@ -137,7 +137,7 @@
 //#define VELOCITY_Kd       0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
-#define TORQUE_Kp         10
+#define TORQUE_Kp         7
 #define TORQUE_Ki         3
 #define TORQUE_Kd         0
 
@@ -339,26 +339,26 @@
 #define MIN_POSITION_LIMIT     -0x7fffffff         // ticks (min range: -2^30, limited for safe operation)
 #define MAX_POSITION_LIMIT      0x7fffffff         // ticks (max range: 2^30, limited for safe operation)
 #define MAX_VELOCITY            3000             // rpm
-#define MAX_TORQUE              1000000
+#define MAX_TORQUE              1200000
 
-#define POSITION_Kp             10
-#define POSITION_Ki             0
+#define POSITION_Kp             200
+#define POSITION_Ki             80
 #define POSITION_Kd             0
-#define VELOCITY_Kp             5
+#define VELOCITY_Kp             150
 #define VELOCITY_Ki             0
-#define VELOCITY_Kd             5
+#define VELOCITY_Kd             25
 
 #define POSITION_P_ERROR_lIMIT  2000000000
 #define POSITION_I_ERROR_lIMIT  1
-#define POSITION_INTEGRAL_LIMIT 1000
+#define POSITION_INTEGRAL_LIMIT 10000
 #define VELOCITY_P_ERROR_lIMIT  2000000000
 #define VELOCITY_I_ERROR_lIMIT  0
 #define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         10
+#define POSITION_REF_FC         1
 #define POSITION_FC             100
-#define VELOCITY_REF_FC         10
-#define VELOCITY_FC             100
-#define VELOCITY_D_FC           100
+#define VELOCITY_REF_FC         1
+#define VELOCITY_FC             90
+#define VELOCITY_D_FC           90
 
 
 // Foresight: Joint 1 Position Controller Config
