@@ -341,24 +341,24 @@
 #define MAX_VELOCITY            3000             // rpm
 #define MAX_TORQUE              1000000
 
-#define POSITION_Kp             200
-#define POSITION_Ki             200
+#define POSITION_Kp             10
+#define POSITION_Ki             0
 #define POSITION_Kd             0
 #define VELOCITY_Kp             5
 #define VELOCITY_Ki             0
 #define VELOCITY_Kd             5
 
-#define POSITION_P_ERROR_lIMIT  200000
+#define POSITION_P_ERROR_lIMIT  2000000000
 #define POSITION_I_ERROR_lIMIT  1
 #define POSITION_INTEGRAL_LIMIT 1000
-#define VELOCITY_P_ERROR_lIMIT  200000
-#define VELOCITY_I_ERROR_lIMIT  2000
-#define VELOCITY_INTEGRAL_LIMIT 60000
-#define POSITION_REF_FC         25
-#define POSITION_FC             82
-#define VELOCITY_REF_FC         28
-#define VELOCITY_FC             77
-#define VELOCITY_D_FC           75
+#define VELOCITY_P_ERROR_lIMIT  2000000000
+#define VELOCITY_I_ERROR_lIMIT  0
+#define VELOCITY_INTEGRAL_LIMIT 0
+#define POSITION_REF_FC         10
+#define POSITION_FC             100
+#define VELOCITY_REF_FC         10
+#define VELOCITY_FC             100
+#define VELOCITY_D_FC           100
 
 
 // Foresight: Joint 1 Position Controller Config
