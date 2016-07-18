@@ -237,7 +237,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     int brake_flag = 0;
     int torque_control_flag = 0;
 
-    int offset=3600;
+    int offset=0;
 
     UpstreamControlData upstream_control_data;
 
@@ -252,9 +252,6 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     printf(" x => show on xscope for 20 seconds,   | Enter => set torque to 0\n");
     printf("===================================================================\n");
 
-
-    i_motorcontrol.set_offset_value(offset);
-    printf("set offset to %d\n", i_motorcontrol.set_calib(0));
 
     i_motorcontrol.set_brake_status(1);
     i_motorcontrol.set_torque_control_enabled();
