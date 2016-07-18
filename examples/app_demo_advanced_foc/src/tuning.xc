@@ -289,18 +289,19 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
 
 
-            offset=i_motorcontrol.set_calib(0);
-            printf("Detected offset is: %i\n", offset);
-
-            printf("set offset to %d\n", offset);
-            i_motorcontrol.set_offset_value(offset);
-            delay_milliseconds(2000);
-
             proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
 
             if(proper_sensor_polarity == 1)
             {
                 printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+
+                offset=i_motorcontrol.set_calib(0);
+                printf("Detected offset is: %i\n", offset);
+
+                printf("set offset to %d\n", offset);
+                i_motorcontrol.set_offset_value(offset);
+                delay_milliseconds(2000);
+
                 i_motorcontrol.set_torque_control_enabled();
             }
             else
