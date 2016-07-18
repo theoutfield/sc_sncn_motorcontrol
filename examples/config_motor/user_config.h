@@ -79,10 +79,11 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 ////////////////////////////////////////////
-#define I_MAX           60      //maximum tolerable value of phase current (under abnormal conditions)
-#define V_DC_MAX        62      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+#define I_MAX           120      //maximum tolerable value of phase current (under abnormal conditions)
+#define V_DC_MAX        80      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define V_DC_MIN        12      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
+
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
