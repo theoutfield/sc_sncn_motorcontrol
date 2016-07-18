@@ -79,8 +79,8 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 ////////////////////////////////////////////
-#define I_MAX           120      //maximum tolerable value of phase current (under abnormal conditions)
-#define V_DC_MAX        80      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+#define I_MAX           60      //maximum tolerable value of phase current (under abnormal conditions)
+#define V_DC_MAX        62      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define V_DC_MIN        12      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
 
@@ -110,7 +110,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1400 //3450 for qmot, 2435 mabi A5, 0 mabi A6, 1415 mabi A1, 2470 amk
+#define COMMUTATION_OFFSET_CLK      1250 //3450 for qmot, 2435 mabi A5, 0 mabi A6, 1415 mabi A1, 2470 amk
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
