@@ -48,6 +48,7 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                        interface QEIInterface client ?i_qei,
                        interface BISSInterface client ?i_biss,
                        interface AMSInterface client ?i_ams,
+                       interface CONTELECInterface client ?i_contelec,
                        interface MotorcontrolInterface client i_motorcontrol,
                        interface VelocityControlInterface server i_velocity_control[3])
 {
@@ -145,6 +146,11 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                             printstrln("velocity_ctrl_service: ERROR: Interface for AMS Service is not provided, but configured to be used");
                             exit(-1);
                         }
+                    } else if (velocity_control_config.feedback_sensor == CONTELEC_SENSOR){
+                        if(isnull(i_contelec)){
+                            printstrln("velocity_ctrl_service: ERROR: Interface for CONTELEC Service is not provided, but configured to be used");
+                            exit(-1);
+                        }
                     }
 
                     if (velocity_control_config.Ki_n != 0) {
@@ -162,6 +168,8 @@ void velocity_control_service(ControlConfig &velocity_control_config,
                         actual_velocity = i_biss.get_biss_velocity();
                     } else if (velocity_control_config.feedback_sensor == AMS_SENSOR) {
                         actual_velocity = i_ams.get_ams_velocity();
+                    } else if (velocity_control_config.feedback_sensor == CONTELEC_SENSOR) {
+                        actual_velocity = i_contelec.get_contelec_velocity();
                     } else {
                         if (velocity_control_config.feedback_sensor == HALL_SENSOR && init == 0) {
                             if(!isnull(i_hall)){

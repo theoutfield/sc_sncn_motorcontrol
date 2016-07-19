@@ -51,7 +51,8 @@ void init_position_profiler(ProfilerConfig profile_position_config,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
-                            interface AMSInterface client ?i_ams);
+                            interface AMSInterface client ?i_ams,
+                            interface CONTELECInterface client ?i_contelec);
 
 /**
  * @brief Velocity Profiler Initializer. It sets the profiler configuration.

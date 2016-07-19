@@ -156,6 +156,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                       interface QEIInterface client ?i_qei,
                       interface BISSInterface client ?i_biss,
                       interface AMSInterface client ?i_ams,
+                      interface CONTELECInterface client ?i_contelec,
                       interface MotorcontrolInterface client i_motorcontrol,
                       interface TorqueControlInterface server i_torque_control[3])
 {
@@ -241,6 +242,7 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                     QEIConfig qei_config;
                     BISSConfig biss_config;
                     AMSConfig ams_config;
+                    CONTELECConfig contelec_config;
                     motorcontrol_config = i_motorcontrol.get_config();
 
                     //Limits
@@ -276,6 +278,14 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                             printstrln("torque_ctrl_service: ERROR: Interface for AMS Service not provided");
                         } else {
                             ams_config = i_ams.get_ams_config();
+                        }
+                    }
+
+                    if (torque_control_config.feedback_sensor == CONTELEC_SENSOR) {
+                        if (isnull(i_contelec)) {
+                            printstrln("torque_ctrl_service: ERROR: Interface for CONTELEC Service not provided");
+                        } else {
+                            contelec_config = i_contelec.get_contelec_config();
                         }
                     }
 
@@ -336,6 +346,12 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                             angle = angle >> 2; //  << 10 ) >> 12 /
                         }
                         actual_speed = i_ams.get_ams_velocity();
+                    } else if (torque_control_config.feedback_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
+                        if(motorcontrol_config.motor_type == BLDC_MOTOR){//angle is irrelevant for BDC motor
+                            { angle, void , void, void} = i_contelec.get_contelec_angle_velocity();
+                            angle = angle >> 2; //  << 10 ) >> 12 /
+                        }
+                        actual_speed = i_contelec.get_contelec_velocity();
                     }
 
                     c_current <: 2;
@@ -572,6 +588,17 @@ void torque_ctrl_loop(ControlConfig &torque_control_config,
                 }
                 break;
 
+            case !isnull(i_contelec) => i_contelec.notification():
+
+                switch (i_contelec.get_notification()) {
+                    case MOTCTRL_NTF_CONFIG_CHANGED:
+                        config_update_flag = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
             case i_motorcontrol.notification():
 
                 switch (i_motorcontrol.get_notification()) {
@@ -686,6 +713,7 @@ void torque_control_service(ControlConfig &torque_control_config,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
+                            interface CONTELECInterface client ?i_contelec,
                             interface MotorcontrolInterface client i_motorcontrol,
                             interface TorqueControlInterface server i_torque_control[3])
 {
@@ -693,6 +721,6 @@ void torque_control_service(ControlConfig &torque_control_config,
 
     par {
         current_filter(adc_if, c_current);
-        torque_ctrl_loop(torque_control_config, c_current, i_hall, i_qei, i_biss, i_ams, i_motorcontrol, i_torque_control);
+        torque_ctrl_loop(torque_control_config, c_current, i_hall, i_qei, i_biss, i_ams, i_contelec, i_motorcontrol, i_torque_control);
     }
 }

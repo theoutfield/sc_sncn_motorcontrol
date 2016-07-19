@@ -14,7 +14,8 @@ void init_position_profiler(ProfilerConfig profile_position_config,
                             interface HallInterface client ?i_hall,
                             interface QEIInterface client ?i_qei,
                             interface BISSInterface client ?i_biss,
-                            interface AMSInterface client ?i_ams) {
+                            interface AMSInterface client ?i_ams,
+                            interface CONTELECInterface client ?i_contelec) {
 
     ControlConfig control_config = i_position_control.get_position_control_config();
 
@@ -22,6 +23,7 @@ void init_position_profiler(ProfilerConfig profile_position_config,
     QEIConfig qei_config;
     BISSConfig biss_config;
     AMSConfig ams_config;
+    CONTELECConfig contelec_config;
 
     if (!isnull(i_hall)) {
         hall_config = i_hall.get_hall_config();
@@ -39,6 +41,10 @@ void init_position_profiler(ProfilerConfig profile_position_config,
         ams_config = i_ams.get_ams_config();
     }
 
+    if (!isnull(i_contelec)) {
+        contelec_config = i_contelec.get_contelec_config();
+    }
+
     if(profile_position_config.max_acceleration <= 0 ||
             profile_position_config.max_velocity <= 0){
         printstrln("profile_position: ERROR: Wrong configuration provided to profiler");
@@ -47,7 +53,7 @@ void init_position_profiler(ProfilerConfig profile_position_config,
 
     init_position_profile_limits(profile_position_config.max_acceleration,
                                  profile_position_config.max_velocity,
-                                 qei_config, hall_config, biss_config, ams_config,
+                                 qei_config, hall_config, biss_config, ams_config, contelec_config,
                                  control_config.feedback_sensor,
                                  profile_position_config.max_position,
                                  profile_position_config.min_position);

@@ -2,8 +2,8 @@
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC1K-rev-c3.bsp>
-//#include <IFM_DC100-rev-b.bsp>
+//#include <IFM_DC1K-rev-c3.bsp>
+#include <IFM_DC100-rev-b.bsp>
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
@@ -14,6 +14,7 @@
 #include <adc_service.h>
 #include <user_config.h>
 #include <tuning.h>
+#include <contelec_service.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -28,6 +29,7 @@ SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
 #else
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
+
 
 #define POSITION_LIMIT 0 //+/- 4095
 
@@ -87,8 +89,8 @@ int main(void) {
             position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
                     i_position_control);
 #elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
-//            position_control_service(position_control_config, null, null, null, null, i_contelec[2], i_motorcontrol[3],
-//                    i_position_control);
+            position_control_service(position_control_config, null, null, null, null, i_contelec[2], i_motorcontrol[3],
+                    i_position_control);
 #else
             position_control_service(position_control_config, i_hall[2], null, null, null, i_motorcontrol[3],
                     i_position_control);
@@ -161,7 +163,7 @@ int main(void) {
                     contelec_config.polarity = CONTELEC_POLARITY;
                     contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                     contelec_config.offset = CONTELEC_OFFSET;
-                    contelec_config.pole_pairs = POLE_PAIRS;
+                    contelec_config.pole_pairs = POLE_PAIRS*6;
                     contelec_config.timeout = CONTELEC_TIMEOUT;
                     contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
 

@@ -44,7 +44,8 @@ void position_profile_test(interface PositionControlInterface client i_position_
                            interface HallInterface client ?i_hall,
                            interface QEIInterface client ?i_qei,
                            interface BISSInterface client ?i_biss,
-                           interface AMSInterface client ?i_ams)
+                           interface AMSInterface client ?i_ams,
+                           interface CONTELECInterface client ?i_contelec)
 {
     const int target = 700000;
 //    const int target = 2620000;
@@ -65,7 +66,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
     profiler_config.max_deceleration = MAX_DECELERATION;
 
     /* Initialise the position profile generator */
-    init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss, i_ams);
+    init_position_profiler(profiler_config, i_position_control, i_hall, i_qei, i_biss, i_ams, i_contelec);
 
     delay_milliseconds(500);//let the servers start before sending clien requests
 

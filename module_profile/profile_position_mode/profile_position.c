@@ -64,6 +64,7 @@ struct {
     HallConfig hall_config;
     BISSConfig biss_config;
     AMSConfig ams_config;
+    CONTELECConfig contelec_config;
     int sensor_used;
     float max_position;
     float min_position;
@@ -94,6 +95,12 @@ int rpm_to_ticks_ams(int rpm, AMSConfig ams_config)
     return ticks;
 }
 
+int rpm_to_ticks_contelec(int rpm, CONTELECConfig contelec_config)
+{
+    int ticks = (rpm * (1 << contelec_config.resolution_bits))/60;
+    return ticks;
+}
+
 int rpm_to_ticks_sensor(int rpm, int max_ticks_per_turn)
 {
     int ticks = (rpm * max_ticks_per_turn)/60;
@@ -101,13 +108,15 @@ int rpm_to_ticks_sensor(int rpm, int max_ticks_per_turn)
 }
 
 void init_position_profile_limits(int max_acceleration, int max_velocity, QEIConfig qei_params,
-                                  HallConfig hall_config, BISSConfig biss_config, AMSConfig ams_config, int sensor_select, int max_position, int min_position)
+                                  HallConfig hall_config, BISSConfig biss_config, AMSConfig ams_config, CONTELECConfig contelec_config,
+                                  int sensor_select, int max_position, int min_position)
 {
 
     profile_pos_params.qei_params = qei_params;
     profile_pos_params.hall_config = hall_config;
     profile_pos_params.biss_config = biss_config;
     profile_pos_params.ams_config = ams_config;
+    profile_pos_params.contelec_config = contelec_config;
     profile_pos_params.max_position =  max_position;
     profile_pos_params.min_position = min_position;
     profile_pos_params.sensor_used = sensor_select;
@@ -123,6 +132,9 @@ void init_position_profile_limits(int max_acceleration, int max_velocity, QEICon
     } else if (profile_pos_params.sensor_used == AMS_SENSOR) {
         profile_pos_params.max_acceleration =  rpm_to_ticks_ams(max_acceleration, ams_config);
         profile_pos_params.max_velocity = rpm_to_ticks_ams(max_velocity, ams_config);
+    } else if (profile_pos_params.sensor_used == CONTELEC_SENSOR) {
+        profile_pos_params.max_acceleration =  rpm_to_ticks_contelec(max_acceleration, contelec_config);
+        profile_pos_params.max_velocity = rpm_to_ticks_contelec(max_velocity, contelec_config);
     } else {
         //profile_pos_params.max_acceleration =  rpm_to_ticks_sensor(max_acceleration, max_ticks_per_turn);
         //profile_pos_params.max_velocity = rpm_to_ticks_sensor(max_velocity, max_ticks_per_turn);
@@ -157,6 +169,10 @@ int init_position_profile(int target_position, int actual_position, int velocity
         profile_pos_params.vi =  rpm_to_ticks_ams(velocity, profile_pos_params.ams_config);
         profile_pos_params.acc =  rpm_to_ticks_ams(acceleration, profile_pos_params.ams_config);
         profile_pos_params.dec =  rpm_to_ticks_ams(deceleration, profile_pos_params.ams_config);
+    } else if (profile_pos_params.sensor_used == CONTELEC_SENSOR) {
+        profile_pos_params.vi =  rpm_to_ticks_contelec(velocity, profile_pos_params.contelec_config);
+        profile_pos_params.acc = rpm_to_ticks_contelec(acceleration, profile_pos_params.contelec_config);
+        profile_pos_params.dec = rpm_to_ticks_contelec(deceleration, profile_pos_params.contelec_config);
     } else {
         //profile_pos_params.vi = rpm_to_ticks_sensor(velocity, max_ticks_per_turn);
         //profile_pos_params.acc =  rpm_to_ticks_sensor(acceleration, max_ticks_per_turn);

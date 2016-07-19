@@ -117,5 +117,6 @@ void position_control_service(ControlConfig & position_ctrl_config,
                     interface QEIInterface client ?i_qei,
                     interface BISSInterface client ?i_biss,
                     interface AMSInterface client ?i_ams,
+                    interface CONTELECInterface client ?i_contelec,
                     interface MotorcontrolInterface client i_motorcontrol,
                     interface PositionControlInterface server i_position_control[3]);

@@ -49,6 +49,7 @@ void position_control_service(ControlConfig &position_control_config,
                               interface QEIInterface client ?i_qei,
                               interface BISSInterface client ?i_biss,
                               interface AMSInterface client ?i_ams,
+                              interface CONTELECInterface client ?i_contelec,
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionControlInterface server i_position_control[3])
 {
@@ -167,7 +168,8 @@ void position_control_service(ControlConfig &position_control_config,
                     if (position_control_config.feedback_sensor != HALL_SENSOR
                            && position_control_config.feedback_sensor != QEI_SENSOR
                            && position_control_config.feedback_sensor != BISS_SENSOR
-                           && position_control_config.feedback_sensor != AMS_SENSOR) {
+                           && position_control_config.feedback_sensor != AMS_SENSOR
+                           && position_control_config.feedback_sensor != CONTELEC_SENSOR) {
                         position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
                     }
 
@@ -183,6 +185,8 @@ void position_control_service(ControlConfig &position_control_config,
                         { actual_position, void, void } = i_biss.get_biss_position();
                     } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
                         { actual_position, void } = i_ams.get_ams_position();
+                    } else if (position_control_config.feedback_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
+                        { actual_position, void } = i_contelec.get_contelec_position();
                     }
 
                     config_update_flag = 0;
@@ -229,6 +233,16 @@ void position_control_service(ControlConfig &position_control_config,
                                 exit(-1);
                             }
                             break;
+
+                        case CONTELEC_SENSOR:
+                             if(!isnull(i_contelec)){
+                                 { actual_position, void } = i_contelec.get_contelec_position();
+                                 velocity = i_contelec.get_contelec_velocity();
+                             } else{
+                                 printstrln("position_ctrl_service: ERROR: CONTELEC interface is not provided but requested");
+                                 exit(-1);
+                             }
+                             break;
                     }
                     adc_b = i_motorcontrol.get_torque_actual();
                     /*
@@ -511,6 +525,8 @@ void position_control_service(ControlConfig &position_control_config,
                     { actual_position, void, void } = i_biss.get_biss_position();
                 } else if (position_control_config.feedback_sensor == AMS_SENSOR && !isnull(i_ams)) {
                     { actual_position, void } = i_ams.get_ams_position();
+                } else if (position_control_config.feedback_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
+                    { actual_position, void } = i_contelec.get_contelec_position();
                 }
                 target_position = actual_position;
                 while (1) {
