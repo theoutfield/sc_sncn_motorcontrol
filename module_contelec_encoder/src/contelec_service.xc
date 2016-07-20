@@ -137,7 +137,8 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
 }
 
 [[combinable]]
- void contelec_service(SPIPorts &spi_ports, CONTELECConfig & contelec_config, interface CONTELECInterface server i_contelec[5])
+ void contelec_service(SPIPorts &spi_ports, CONTELECConfig & contelec_config, client interface shared_memory_interface ?i_shared_memory,
+         interface CONTELECInterface server i_contelec[5])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -172,8 +173,16 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
     unsigned int time;
     unsigned int next_velocity_read = 0;
     unsigned int last_read = 0;
+    unsigned int last_velocity_read = 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
+
+    int actual_velocity = 0;
+    int actual_count = 0;
+    unsigned int actual_position = 0;
+    unsigned int actual_angle = 0;
+    unsigned int measurement_time = 0;
+    unsigned int start_time, end_time;
 
     //first read
 //    contelec_encoder_write(spi_ports, 0x59, 0, 16); //set multiturn to 0
@@ -318,25 +327,55 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
                 break;
 
         //compute velocity
-//        case t when timerafter(next_velocity_read) :> void:
-//            next_velocity_read += velocity_loop;
-//            int position;
-//            t :> time;
-//            if (timeafter(time, last_read + contelec_config.timeout)) {
-//                { void, count, position, void } = contelec_encoder_read(spi_ports);
-//                t :> last_read;
-//                last_position = position;
-//            }
-//            int difference = count - old_count;
-//            if(difference > crossover || difference < -crossover)
-//                difference = old_difference;
-//            old_count = count;
-//            old_difference = difference;
-//            // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
-//            //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
+        case t when timerafter(next_velocity_read) :> start_time:
+            next_velocity_read += velocity_loop;
+            int position, angle;
+            t :> time;
+            t when timerafter(last_read + contelec_config.timeout) :> void;
+            { void, count, position, void } = contelec_encoder_read(spi_ports);
+            t :> last_read;
+            last_position = position;
+            int difference = count - old_count;
+            if(difference > crossover || difference < -crossover)
+                difference = old_difference;
+            old_count = count;
+            old_difference = difference;
+            // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
+            //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
 //            velocity = (difference * velocity_factor) / ticks_per_turn;
-//            break;
+            velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
+            last_velocity_read = last_read;
+
+            if (contelec_config.resolution_bits > 12)
+                angle = (contelec_config.pole_pairs * (angle >> (contelec_config.resolution_bits-12)) ) & 4095;
+            else
+                angle = (contelec_config.pole_pairs * (angle << (12-contelec_config.resolution_bits)) ) & 4095;
+
+            if (!isnull(i_shared_memory)) {
+                if (contelec_config.enable_push_service == PushAll) {
+                    i_shared_memory.write_angle_velocity_position(angle, velocity, count);
+                    actual_count = count;
+                    actual_velocity = velocity;
+                    actual_angle = angle;
+                    actual_position = position;
+                } else if (contelec_config.enable_push_service == PushAngle) {
+                    i_shared_memory.write_angle_electrical(angle);
+                    actual_angle = angle;
+                } else if (contelec_config.enable_push_service == PushPosition) {
+                    i_shared_memory.write_velocity_position(velocity, count);
+                    actual_count = count;
+                    actual_velocity = velocity;
+                    actual_position = position;
+                }
+            }
+            t :> end_time;
+
+            measurement_time = (end_time-start_time)/USEC_FAST;
+
+            //to prevent blocking
+            if (timeafter(end_time, next_velocity_read))
+                next_velocity_read = end_time + CONTELEC_USEC;
+            break;
         }
     }
 }
-

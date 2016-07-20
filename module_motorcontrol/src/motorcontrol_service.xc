@@ -46,6 +46,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
                             interface CONTELECInterface client ?i_contelec,
+                            client interface shared_memory_interface ?i_shared_memory,
                             interface WatchdogInterface client i_watchdog,
                             interface BrakeInterface client ?i_brake,
                             interface MotorcontrolInterface server i_motorcontrol[4])
@@ -85,7 +86,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             bldc_loop( fet_driver_ports, motorcontrol_config,
                                     hall_config, qei_config,
                                     i_motorcontrol, c_pwm_ctrl, i_adc,
-                                    i_hall, i_qei, i_biss, i_ams, i_contelec, i_watchdog, i_brake);
+                                    i_hall, i_qei, i_biss, i_ams, i_contelec, i_shared_memory, i_watchdog, i_brake);
 
                         }
                         else{

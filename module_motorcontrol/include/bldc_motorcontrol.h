@@ -34,6 +34,7 @@ void bldc_loop(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &motorcontro
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
                             interface CONTELECInterface client ?i_contelec,
+                            interface shared_memory_interface client ?i_shared_memory,
                             interface WatchdogInterface client i_watchdog,
                             interface BrakeInterface client ?i_brake);
 

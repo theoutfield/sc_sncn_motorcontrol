@@ -20,6 +20,7 @@
     <!-- <Probe name="Probe Name" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/> -->
     <!-- From the target code, call: xscope_int(PROBE_NAME, value); -->
     <Probe name="actual position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="real target" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="target position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="follow error" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="position control out" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>

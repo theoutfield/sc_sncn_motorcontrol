@@ -54,6 +54,8 @@ int main(void) {
     interface HallInterface i_hall[5];
 #endif
 
+    interface shared_memory_interface i_shared_memory[2];
+
     par
     {
         /* WARNING: only one blocking task is possible per tile. */
@@ -163,11 +165,12 @@ int main(void) {
                     contelec_config.polarity = CONTELEC_POLARITY;
                     contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                     contelec_config.offset = CONTELEC_OFFSET;
-                    contelec_config.pole_pairs = POLE_PAIRS*6;
+                    contelec_config.pole_pairs = POLE_PAIRS;
                     contelec_config.timeout = CONTELEC_TIMEOUT;
                     contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                    contelec_config.enable_push_service = PushAll;
 
-                    contelec_service(spi_ports, contelec_config, i_contelec);
+                    contelec_service(spi_ports, contelec_config, i_shared_memory[1], i_contelec);
                 }
 #else
                 /* Hall sensor Service */
@@ -178,13 +181,14 @@ int main(void) {
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 #endif
+                memory_manager(i_shared_memory, 2);
 
                 /* Motor Control Service */
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.polarity_type = MOTOR_POLARITY;
-                    motorcontrol_config.commutation_method = SINE;
+                    motorcontrol_config.commutation_method = FOC;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
                     motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
@@ -198,7 +202,7 @@ int main(void) {
                                          c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, null, null, i_contelec[0], i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, null, null, i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, null, i_watchdog[0], null, i_motorcontrol);

@@ -26,6 +26,8 @@ interface TuningInterface {
     void set_position(int position);
     void set_torque(int in_torque);
     void set_pole_pairs(int in_pole_pairs);
+    int set_sensor_offset(int in_offset);
+    int auto_offset();
 };
 
 

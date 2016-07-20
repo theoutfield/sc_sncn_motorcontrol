@@ -64,6 +64,7 @@ typedef struct {
 #include <contelec_service.h>
 #include <adc_service.h>
 #include <pwm_service.h>
+#include <memory_manager.h>
 
 #include <mc_internal_constants.h>
 
@@ -243,6 +244,7 @@ void motorcontrol_service(FetDriverPorts &fet_driver_ports, MotorcontrolConfig &
                             interface BISSInterface client ?i_biss,
                             interface AMSInterface client ?i_ams,
                             interface CONTELECInterface client ?i_contelec,
+                            client interface shared_memory_interface ?i_shared_memory,
                             interface WatchdogInterface client i_watchdog,
                             interface BrakeInterface client ?i_brake,
                             interface MotorcontrolInterface server i_motorcontrol[4]);

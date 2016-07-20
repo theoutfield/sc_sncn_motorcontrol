@@ -16,6 +16,7 @@
 #include <qei_service.h>
 #include <biss_service.h>
 #include <ams_service.h>
+#include <contelec_service.h>
 #include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/

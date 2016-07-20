@@ -11,9 +11,14 @@
 #include <sine_table_foc.h>
 #include <foc_interface.h>
 #include <foc_utilities.h>
+#include <memory_manager.h>
 #include <print.h>
 #include <xscope.h>
 #include <stdlib.h>
+
+
+#define USE_XSCOPE
+
 
 static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)
 {
@@ -33,6 +38,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 interface BISSInterface client ?i_biss,
                 interface AMSInterface client ?i_ams,
                 interface CONTELECInterface client ?i_contelec,
+                interface shared_memory_interface client ?i_shared_memory,
                 interface WatchdogInterface client i_watchdog,
                 interface BrakeInterface client ?i_brake)
 {
@@ -175,24 +181,35 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
             if (shutdown == 0) { //commutation is enabled
                 //====================== get sensor angle and velocity ======================================
-                if (sensor_select == HALL_SENSOR) {
-                    {hall_pin_state, angle_electrical, velocity} = i_hall.get_hall_pinstate_angle_velocity();//2 - 17 usec
-                } else if (sensor_select == BISS_SENSOR) {
-                    { angle_electrical, velocity } = i_biss.get_biss_angle_velocity();
-                } else if (sensor_select == AMS_SENSOR) {
-                    { angle_electrical, velocity } = i_ams.get_ams_angle_velocity();
-                } else if (sensor_select == CONTELEC_SENSOR) {
-                    { angle_electrical, velocity, count, position } = i_contelec.get_contelec_angle_velocity();
-                }  else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
-                    { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
-                    angle_electrical = (angle_electrical << 12) / max_count_per_hall;
-                    if ((voltage_q >= 0 && fw_flag == 0) || (voltage_q < 0 && bw_flag == 0)) {
-                        angle_electrical = i_hall.get_hall_position();
-                    }
-                } else {
-                    printstr("\n > BLDC loop feedback sensor error\n");
-                    exit(-1);
+                if (!isnull(i_shared_memory)) {
+                    { angle_electrical, velocity, count } = i_shared_memory.get_angle_velocity_position();
                 }
+//                } else {
+//                    if (sensor_select == HALL_SENSOR) {
+//                        {hall_pin_state, angle_electrical, velocity} = i_hall.get_hall_pinstate_angle_velocity();//2 - 17 usec
+//                    } else if (sensor_select == BISS_SENSOR) {
+//                        { angle_electrical, velocity } = i_biss.get_biss_angle_velocity();
+//                    } else if (sensor_select == AMS_SENSOR) {
+//                        { angle_electrical, velocity } = i_ams.get_ams_angle_velocity();
+//                    } else if (sensor_select == CONTELEC_SENSOR) {
+//                        { angle_electrical, velocity, count, position } = i_contelec.get_contelec_angle_velocity();
+//                    }  else if (sensor_select == QEI_SENSOR && !isnull(i_qei)) {
+//                        { angle_electrical, fw_flag, bw_flag } = i_qei.get_qei_sync_position();
+//                        angle_electrical = (angle_electrical << 12) / max_count_per_hall;
+//                        if ((voltage_q >= 0 && fw_flag == 0) || (voltage_q < 0 && bw_flag == 0)) {
+//                            angle_electrical = i_hall.get_hall_position();
+//                        }
+//                    } else {
+//                        printstr("\n > BLDC loop feedback sensor error\n");
+//                        exit(-1);
+//                    }
+//                }
+
+
+
+//                xscope_int(ANGLE_ELECTRICAL, angle_electrical);
+//                xscope_int(VELOCITY, velocity);
+                //xscope_int(ANGLE_ELECTRICAL, mmTheta);
 
                 //=========== SINE commutation ============//
                 if(motorcontrol_config.commutation_method == SINE){
@@ -364,9 +381,11 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 xscope_int(TARGET_TORQUE, target_torque);
                 xscope_int(ERROR_TORQUE, target_torque-actual_torque);
                 xscope_int(ERROR_TORQUE_INTEGRAL, error_torque_integral);
-                xscope_int(ANGLE_ELECTRICAL, mmTheta);
+                xscope_int(ANGLE_ELECTRICAL, angle_electrical);//mmTheta);
                 xscope_int(ANGLE_PWM, angle_pwm>>2);
                 xscope_int(CYCLE_TIME, (end_time - start_time)/USEC_FAST);
+                xscope_int(COUNT, count);
+                xscope_int(POSITION, position);
             } else {
                 xscope_int(COUNT, count);
                 xscope_int(POSITION, position);
@@ -478,28 +497,28 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 break;
 
         case i_motorcontrol[int i].set_sensor_offset(int in_offset) -> int out_offset:
-                if (sensor_select == BISS_SENSOR ) {
-                    BISSConfig out_biss_config = i_biss.get_biss_config();
-                    if (in_offset >= 0) {
-                        out_biss_config.offset_electrical = in_offset;
-                        i_biss.set_biss_config(out_biss_config);
-                    }
-                    out_offset = out_biss_config.offset_electrical;
-                } else if (sensor_select == AMS_SENSOR ) {
-                    AMSConfig out_ams_config = i_ams.get_ams_config();
-                    if (in_offset >= 0) {
-                        out_ams_config.offset = in_offset;
-                        i_ams.set_ams_config(out_ams_config);
-                    }
-                    out_offset = out_ams_config.offset;
-                } else if (sensor_select == CONTELEC_SENSOR ) {
-                    CONTELECConfig out_contelec_config = i_contelec.get_contelec_config();
-                    if (in_offset >= 0) {
-                        out_contelec_config.offset = in_offset;
-                        i_contelec.set_contelec_config(out_contelec_config);
-                    }
-                    out_offset = out_contelec_config.offset;
-                }
+//                if (sensor_select == BISS_SENSOR ) {
+//                    BISSConfig out_biss_config = i_biss.get_biss_config();
+//                    if (in_offset >= 0) {
+//                        out_biss_config.offset_electrical = in_offset;
+//                        i_biss.set_biss_config(out_biss_config);
+//                    }
+//                    out_offset = out_biss_config.offset_electrical;
+//                } else if (sensor_select == AMS_SENSOR ) {
+//                    AMSConfig out_ams_config = i_ams.get_ams_config();
+//                    if (in_offset >= 0) {
+//                        out_ams_config.offset = in_offset;
+//                        i_ams.set_ams_config(out_ams_config);
+//                    }
+//                    out_offset = out_ams_config.offset;
+//                } else if (sensor_select == CONTELEC_SENSOR ) {
+//                    CONTELECConfig out_contelec_config = i_contelec.get_contelec_config();
+//                    if (in_offset >= 0) {
+//                        out_contelec_config.offset = in_offset;
+//                        i_contelec.set_contelec_config(out_contelec_config);
+//                    }
+//                    out_offset = out_contelec_config.offset;
+//                }
                 break;
 
         case i_motorcontrol[int i].set_fets_state(int new_state):
@@ -539,32 +558,36 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
 
         case i_motorcontrol[int i].set_calib(int in_flag) -> int out_offset:
                 calib_flag = in_flag;
-                if (calib_flag == 0) {
-                    int calib_angle;
-                    if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
-                        calib_angle = 0;
-                    } else {
-                        calib_angle = 2048;
-                    }
-                    if (sensor_select == HALL_SENSOR) {
-                        //We send the motor to 1/4 position, Hall has a 1/6 turn resolution so the offsets need to be shifted by +/- 1/12 turn
-                        out_offset = (calib_angle - i_hall.get_hall_position()) & 4095;
-                        motorcontrol_config.hall_offset[0] = (out_offset - 4096/12) & 4095;
-                        motorcontrol_config.hall_offset[1] = (out_offset + 4096/12) & 4095;
-                    } else if (sensor_select == BISS_SENSOR) {
-                        out_offset = i_biss.reset_biss_angle_electrical(calib_angle);
-                        motorcontrol_config.hall_offset[0] = 0;
-                        motorcontrol_config.hall_offset[1] = 0;
-                    } else if (sensor_select == AMS_SENSOR) {
-                        out_offset = i_ams.reset_ams_angle(calib_angle);
-                        motorcontrol_config.hall_offset[0] = 0;
-                        motorcontrol_config.hall_offset[1] = 0;
-                    } else if (sensor_select == CONTELEC_SENSOR) {
-                        out_offset = i_contelec.reset_contelec_angle(calib_angle);
-                        motorcontrol_config.hall_offset[0] = 0;
-                        motorcontrol_config.hall_offset[1] = 0;
-                    }
-                } else {
+//                if (calib_flag == 0) {
+//                    int calib_angle;
+//                    if (motorcontrol_config.polarity_type == INVERTED_POLARITY) {
+//                        calib_angle = 0;
+//                    } else {
+//                        calib_angle = 2048;
+//                    }
+//                    if (sensor_select == HALL_SENSOR) {
+//                        //We send the motor to 1/4 position, Hall has a 1/6 turn resolution so the offsets need to be shifted by +/- 1/12 turn
+//                        out_offset = (calib_angle - i_hall.get_hall_position()) & 4095;
+//                        motorcontrol_config.hall_offset[0] = (out_offset - 4096/12) & 4095;
+//                        motorcontrol_config.hall_offset[1] = (out_offset + 4096/12) & 4095;
+//                    } else if (sensor_select == BISS_SENSOR) {
+//                        out_offset = i_biss.reset_biss_angle_electrical(calib_angle);
+//                        motorcontrol_config.hall_offset[0] = 0;
+//                        motorcontrol_config.hall_offset[1] = 0;
+//                    } else if (sensor_select == AMS_SENSOR) {
+//                        out_offset = i_ams.reset_ams_angle(calib_angle);
+//                        motorcontrol_config.hall_offset[0] = 0;
+//                        motorcontrol_config.hall_offset[1] = 0;
+//                    } else if (sensor_select == CONTELEC_SENSOR) {
+//                        out_offset = i_contelec.reset_contelec_angle(calib_angle);
+//                        motorcontrol_config.hall_offset[0] = 0;
+//                        motorcontrol_config.hall_offset[1] = 0;
+//                    }
+//                } else {
+//                    motorcontrol_config.hall_offset[0] = 0;
+//                    motorcontrol_config.hall_offset[1] = 0;
+//                }
+                if (calib_flag != 0) {
                     motorcontrol_config.hall_offset[0] = 0;
                     motorcontrol_config.hall_offset[1] = 0;
                 }
