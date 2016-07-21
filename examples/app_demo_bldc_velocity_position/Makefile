@@ -23,7 +23,7 @@ USED_MODULES = config_motor module_adc module_advanced_foc module_biss module_bo
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 XCC_FLAGS_Debug = -g -O1 -report -DXSCOPE_POSITION_CTRL
-XCC_FLAGS_Release = -g -O0
+XCC_FLAGS_Release = -g -O1
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
 # project to create both xCORE and ARM binaries.
