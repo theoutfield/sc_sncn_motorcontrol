@@ -13,6 +13,7 @@
 
 #define USE_XSCOPE
 
+#if 0
 void init_velocity_profiler(ProfilerConfig profile_velocity_config,
                                 interface VelocityControlInterface client i_velocity_control){
 
@@ -58,3 +59,4 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
     t when timerafter(time + 30 * MSEC_STD) :> time;
 
 }
+#endif

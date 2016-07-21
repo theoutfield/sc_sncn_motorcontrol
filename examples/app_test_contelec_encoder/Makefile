@@ -5,7 +5,7 @@
 # Possible SOMANET targets:
 # SOMANET-C22
 # SOMANET-C21-DX
-TARGET = SOMANET-C22
+TARGET =
 
 
 # The APP_NAME variable determines the name of the final .xe file. It should
@@ -14,9 +14,9 @@ TARGET = SOMANET-C22
 APP_NAME = app_test_contelec_encoder
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_biss module_board-support module_contelec_encoder module_memory_manager module_misc module_position_feedback module_pwm_symmetrical module_spi_master 
+USED_MODULES = module_biss module_board-support module_contelec_encoder module_memory_manager module_misc module_position_feedback module_spi_master 
 #For Motor Test
-USED_MODULES += config_motor module_adc module_advanced_foc module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_motorcontrol module_pwm module_watchdog
+USED_MODULES += config_motor module_adc module_advanced_foc module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_pwm module_watchdog
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

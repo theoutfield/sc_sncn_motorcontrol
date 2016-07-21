@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>app_demo_bldc_velocity</name>
+	<name>module_spi_encoder</name>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>com.xmos.cdt.core.LegacyProjectCheckerBuilder</name>
+			<name>com.xmos.cdt.core.ProjectInfoSyncBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.xmos.cdt.core.ProjectInfoSyncBuilder</name>
+			<name>com.xmos.cdt.core.LegacyProjectCheckerBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -26,7 +26,7 @@
 			<arguments>
 				<dictionary>
 					<key>?children?</key>
-					<value>?name?=outputEntries\|?children?=?name?=entry\\\\|\\|\||</value>
+					<value>?name?=outputEntries\|?children?=?name?=entry\\\\\\\|\\\|\||</value>
 				</dictionary>
 				<dictionary>
 					<key>?name?</key>
@@ -38,7 +38,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildArguments</key>
-					<value>CONFIG=Debug</value>
+					<value>-f .makefile</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
