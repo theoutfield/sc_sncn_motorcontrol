@@ -215,14 +215,13 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     //init variables
     //velocity
     int velocity = 0;
-    int velocity_buffer[16] = {0};
+    int velocity_buffer[32] = {0};
     int index = 0;
     int old_count = 0;
     int old_difference = 0;
     int ticks_per_turn = (1 << contelec_config.resolution_bits);
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_loop = contelec_config.velocity_loop * CONTELEC_USEC; //velocity loop time in clock ticks
-    int velocity_factor = 60000000/contelec_config.velocity_loop;
     int velocity_count = 0;
     //position
     unsigned int last_position = 0;
@@ -235,6 +234,7 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
 
     int notification = MOTCTRL_NTF_EMPTY;
 
+    //debug
     int actual_velocity = 0;
     int actual_count = 0;
     unsigned int actual_position = 0;
@@ -244,7 +244,6 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
     unsigned int period_time = 0;
 
     //first read
-//    contelec_encoder_write(position_feedback_ports, CONTELEC_CONF_MTPRESET, 0, 16); //set multiturn to 0
     delay_ticks(100 * CONTELEC_USEC);
     { void, count, last_position, void } = contelec_encoder_read(position_feedback_ports);
     t :> last_read;
@@ -320,7 +319,6 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
                 contelec_config = in_config.contelec_config;
                 crossover = ticks_per_turn - ticks_per_turn/10;
                 velocity_loop = contelec_config.velocity_loop * CONTELEC_USEC;
-                velocity_factor = 60000000/contelec_config.velocity_loop;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
@@ -382,37 +380,28 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
         //compute velocity
         case t when timerafter(next_velocity_read) :> start_time:
             next_velocity_read += velocity_loop;
-            int position;
+            int position, difference;
             unsigned int angle, status;
             t when timerafter(last_read + contelec_config.timeout) :> void;
             { status, count, position, angle } = contelec_encoder_read(position_feedback_ports);
             t :> last_read;
             last_position = position;
 
-            int difference;
 //            velocity_count++;
 //            if (velocity_count >= 1) {
                 difference = count - old_count;
                 old_count = count;
                 if(difference > crossover || difference < -crossover)
                     difference = old_difference;
-//                if(difference == 0) //in case we read the same value two times
-//                    difference = old_difference;
+                else if (difference == 0) //in case we read the same value two times
+                    difference = old_difference;
                 old_difference = difference;
                 // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
                 //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-//                velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
-                /* filter */
-//                velocity = filter(velocity_buffer, index, 16, velocity);
-                /* another filter */
-                velocity_buffer[0] = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
-                velocity = 0;
-                for(int ii=0; ii<10; ii++)
-                    velocity += velocity_buffer[ii];
-                velocity = velocity/10;
-                for(int ii=9; ii>0; ii--)
-                    velocity_buffer[ii] = velocity_buffer[ii-1];
+                velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
                 last_velocity_read = last_read;
+                /* filter */
+                velocity = filter(velocity_buffer, index, 32, velocity);
 //                velocity_count = 0;
 //            }
 
@@ -422,8 +411,8 @@ int contelec_encoder_init(PositionFeedbackPorts &position_feedback_ports, CONTEL
             xscope_int(POSITION_RAW, angle);
             xscope_int(STATUS, status*1000);
             xscope_int(PERIOD, (int)(last_read-period_time)/CONTELEC_USEC);
-#endif
             period_time = last_read;
+#endif
 
 
             if (contelec_config.resolution_bits > 12)
