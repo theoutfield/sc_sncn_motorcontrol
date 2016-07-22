@@ -207,7 +207,8 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 [[combinable]]
  void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_commutation,
                      interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
-                     interface HallInterface client ?i_hall, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams)
+                     interface HallInterface client ?i_hall, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams,
+                             interface CONTELECInterface client ?i_contelec)
 {
     timer t;
     unsigned ts;
@@ -241,7 +242,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
         profiler_config.max_velocity = MAX_VELOCITY;
         profiler_config.max_acceleration = MAX_ACCELERATION;
         profiler_config.max_deceleration = MAX_DECELERATION;
-        init_position_profiler(profiler_config, i_position_control, i_hall, null, i_biss, i_ams);
+        init_position_profiler(profiler_config, i_position_control, i_hall, null, i_biss, i_ams, i_contelec);
     }
 
 
@@ -264,6 +265,9 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
             } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
                 velocity = i_ams.get_ams_velocity();
                 { count, void } = i_ams.get_ams_position();
+            } else if (motorcontrol_config.commutation_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
+                velocity = i_contelec.get_contelec_velocity();
+                { count, void } = i_contelec.get_contelec_position();
             } else if (motorcontrol_config.commutation_sensor == HALL_SENSOR && !isnull(i_hall)) {
                 count = i_hall.get_hall_position_absolute();
                 velocity = i_hall.get_hall_velocity();
@@ -344,6 +348,8 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                 i_biss.reset_biss_position(0);
             } else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
                 i_ams.reset_ams_position(0);
+            } else if (motorcontrol_config.commutation_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
+                i_contelec.reset_contelec_position(0);
             } else if (motorcontrol_config.commutation_sensor == HALL_SENSOR && !isnull(i_hall)) {
                 i_hall.reset_hall_absolute_position(0);
             }

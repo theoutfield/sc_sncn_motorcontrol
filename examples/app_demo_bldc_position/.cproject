@@ -171,6 +171,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 								</option>
 								<option id="com.xmos.xc.compiler.option.defined.symbols.1773252399" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SHRT_MAX__=32767"/>
@@ -790,6 +793,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.19038239" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1229,6 +1235,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.75101409" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

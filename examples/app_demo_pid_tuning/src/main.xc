@@ -1,8 +1,9 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 //#include <CORE_BOARD_REQUIRED>
 //#include <IFM_BOARD_REQUIRED>
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+//#include <IFM_DC1K-rev-c3.bsp>
+#include <IFM_DC100-rev-b.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -14,6 +15,7 @@
 #include <adc_service.h>
 #include <user_config.h>
 #include <tuning.h>
+#include <contelec_service.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -23,16 +25,18 @@ ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 BISSPorts biss_ports = SOMANET_IFM_BISS_PORTS;
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
 AMSPorts ams_ports = SOMANET_IFM_AMS_PORTS;
+#elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
+SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
 #else
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 #endif
 
 #define POSITION_LIMIT 0 //+/- 4095
 
-void velocity_client(interface BISSInterface client i_biss)
+void velocity_client(interface CONTELECInterface client i_contelec)
 {
     while(1) {
-        int velocity = i_biss.get_biss_velocity();
+        int velocity = i_contelec.get_contelec_velocity();
         xscope_int(VELOCITY, velocity);
 
         delay_milliseconds(1);
@@ -54,9 +58,13 @@ int main(void) {
     interface BISSInterface i_biss[5];
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
     interface AMSInterface i_ams[5];
+#elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
+    interface CONTELECInterface i_contelec[5];
 #else
     interface HallInterface i_hall[5];
 #endif
+
+    interface shared_memory_interface i_shared_memory[2];
 
     par
     {
@@ -73,6 +81,8 @@ int main(void) {
         on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, i_biss[1], null);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
         on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, null, i_ams[1]);
+#elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], null, null, null, null, i_contelec[1]);
 #else
         on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], i_hall[1], null, null);
 #endif
@@ -86,12 +96,16 @@ int main(void) {
             position_control_config.Ki_n = POSITION_Ki;    // Divided by 10000
             position_control_config.Kd_n = POSITION_Kd;    // Divided by 10000
             position_control_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
+            position_control_config.cascade_with_torque = 0;
             /* Control Loop */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
             position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
                     i_position_control);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
             position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
+                    i_position_control);
+#elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
+            position_control_service(position_control_config, null, null, null, null, i_contelec[2], i_motorcontrol[3],
                     i_position_control);
 #else
             position_control_service(position_control_config, i_hall[2], null, null, null, i_motorcontrol[3],
@@ -105,8 +119,8 @@ int main(void) {
             par
             {
                 /* Triggered PWM Service */
-                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, i_brake);
-                i_brake.set_brake(0);
+                pwm_triggered_service( pwm_ports, c_adctrig, c_pwm_ctrl, null);
+                //i_brake.set_brake(0);
 
                 /* ADC Service */
                 adc_service(adc_ports, c_adctrig, i_adc, i_watchdog[1]);
@@ -157,6 +171,21 @@ int main(void) {
 
                     ams_service(ams_ports, ams_config, i_ams);
                 }
+#elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
+                /* CONTELEC Sensor Service */
+                {
+                    CONTELECConfig contelec_config;
+                    contelec_config.filter = CONTELEC_FILTER;
+                    contelec_config.polarity = CONTELEC_POLARITY;
+                    contelec_config.resolution_bits = CONTELEC_RESOLUTION;
+                    contelec_config.offset = CONTELEC_OFFSET;
+                    contelec_config.pole_pairs = POLE_PAIRS;
+                    contelec_config.timeout = CONTELEC_TIMEOUT;
+                    contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                    contelec_config.enable_push_service = PushAll;
+
+                    contelec_service(spi_ports, contelec_config, i_shared_memory[1], i_contelec);
+                }
 #else
                 /* Hall sensor Service */
                 {
@@ -166,7 +195,7 @@ int main(void) {
                     hall_service(hall_ports, hall_config, i_hall);
                 }
 #endif
-
+                memory_manager(i_shared_memory, 2);
                 /* Motor Control Service */
                 {
                     MotorcontrolConfig motorcontrol_config;
@@ -184,6 +213,9 @@ int main(void) {
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], i_watchdog[0], null, i_motorcontrol);
+#elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
+                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
+                                         c_pwm_ctrl, i_adc[0], null, null, null, null, null, i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);
 #else
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, i_adc[0], i_hall[0], null, null, null, i_watchdog[0], null, i_motorcontrol);

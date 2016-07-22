@@ -416,7 +416,7 @@ void position_control_service(ControlConfig &position_control_config,
                             position_control_out =  -position_control_out_limit;
                         }
 
-                        i_motorcontrol.set_voltage(1500); //in case of FOC sets Q value, torque controller in FOC is disabled
+                        i_motorcontrol.set_voltage(position_control_out); //in case of FOC sets Q value, torque controller in FOC is disabled
                         //position_control_out
                     } // end control
 //                    xscope_int(POSITION_CONTROL_OUT, position_control_out);
@@ -489,7 +489,7 @@ void position_control_service(ControlConfig &position_control_config,
 
             case i_position_control[int i].get_target_position() -> int out_target_position:
 
-                out_target_position = 0;//target_position;
+                out_target_position = target_position;
                 break;
 
             case i_position_control[int i].set_position_control_config(ControlConfig in_params):

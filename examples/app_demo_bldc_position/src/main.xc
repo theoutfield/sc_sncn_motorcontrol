@@ -40,7 +40,7 @@ void position_profile_test(interface PositionControlInterface client i_position_
                            interface AMSInterface client ?i_ams,
                            interface CONTELECInterface client ?i_contelec)
 {
-    const int target = 10000;
+    const int target = 200000;
 //    const int target = 2620000;
     int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
     int velocity        = 100;         // rpm
@@ -104,7 +104,7 @@ int main(void)
     interface MotorcontrolInterface i_motorcontrol[4];
     interface CONTELECInterface i_contelec[5];
 
-
+    interface shared_memory_interface i_shared_memory[2];
     interface PositionControlInterface i_position_control[3];
 
     par
@@ -112,9 +112,7 @@ int main(void)
         /* Test Profile Position Client function*/
         on tile[APP_TILE]:
         {
-
            position_profile_test(i_position_control[0], null, null, null, null, i_contelec[2]);      // test PPM on slave side
-
         }
 
         on tile[APP_TILE]:
@@ -128,7 +126,7 @@ int main(void)
                 actual_position = i_position_control[1].get_position();
                 target_position = i_position_control[1].get_target_position();
 
-                xscope_int(REAL_TARGET, 1000);
+                //xscope_int(REAL_TARGET, 1000);
                 xscope_int(TARGET_POSITION, target_position/10); //Divided by 10 for better displaying
                 xscope_int(ACTUAL_POSITION, actual_position/10); //Divided by 10 for better displaying
                 xscope_int(FOLLOW_ERROR, (target_position-actual_position)/10); //Divided by 10 for better displaying
@@ -177,16 +175,20 @@ int main(void)
                     CONTELECConfig contelec_config;
                     contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                     contelec_config.polarity = CONTELEC_POLARITY_INVERTED;
-                    contelec_config.offset = 0;
+                    contelec_config.offset = 19236;
                     contelec_config.timeout = CONTELEC_TIMEOUT;
                     contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                     contelec_config.max_ticks = 0x7fffffff;
                     contelec_config.pole_pairs = POLE_PAIRS;
                     contelec_config.filter = CONTELEC_FILTER;
+                    contelec_config.enable_push_service = PushAll;
 
-                    contelec_service(spi_ports, contelec_config, i_contelec);
+                    contelec_service(spi_ports, contelec_config, i_shared_memory[1], i_contelec);
                 }
 
+                {
+                    memory_manager(i_shared_memory, 2);
+                }
 
                 /* Motor Control Service */
                 {
@@ -196,12 +198,12 @@ int main(void)
                     motorcontrol_config.polarity_type = MOTOR_POLARITY;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] = 2100;//COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset[1] = 2580;//COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, null, null, i_contelec[0], i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, null, null, i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);
                 }
             }
         }

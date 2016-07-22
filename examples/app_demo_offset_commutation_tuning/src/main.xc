@@ -64,7 +64,7 @@ int main(void) {
 
         /* Tuning service */
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
-        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, i_biss[1], null), null;
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, i_biss[1], null, null);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
         on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, null, i_ams[1], null);
 #elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
@@ -88,7 +88,7 @@ int main(void) {
             position_control_service(position_control_config, null, null, i_biss[2], null, i_motorcontrol[3],
                     i_position_control);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
-            position_control_service(position_control_config, null, null, null, i_ams[2], i_motorcontrol[3],
+            position_control_service(position_control_config, null, null, null, i_ams[2], null, i_motorcontrol[3],
                     i_position_control);
 #elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
             position_control_service(position_control_config, null, null, null, null, i_contelec[2], i_motorcontrol[3],
@@ -150,7 +150,7 @@ int main(void) {
                     ams_config.abi_resolution = 0;
                     ams_config.resolution_bits = AMS_RESOLUTION;
                     ams_config.offset = AMS_OFFSET;
-                    ams_config.pole_pairs = POLE_PAIRS;
+                    ams_config.pole_pairs = POLE_PAIRS*6;
                     ams_config.max_ticks = 0x7fffffff;
                     ams_config.cache_time = AMS_CACHE_TIME;
                     ams_config.velocity_loop = AMS_VELOCITY_LOOP;
@@ -199,7 +199,7 @@ int main(void) {
                                          c_pwm_ctrl, i_adc[0], null, null, i_biss[0], null, null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], null, i_watchdog[0], null, i_motorcontrol);
+                                         c_pwm_ctrl, i_adc[0], null, null, null, i_ams[0], null, null, i_watchdog[0], null, i_motorcontrol);
 #elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,
                                          c_pwm_ctrl, i_adc[0], null, null, null, null, null, i_shared_memory[0], i_watchdog[0], null, i_motorcontrol);

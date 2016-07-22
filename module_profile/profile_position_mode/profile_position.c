@@ -406,6 +406,10 @@ void __initialize_position_profile_limits(int max_acceleration, int max_velocity
         //FIXME get the biss resolution in a proper way instead of using QEI
         profile_pos_params->max_acceleration =  rpm_to_ticks_sensor(max_acceleration , profile_pos_params->qei_params.ticks_resolution);
         profile_pos_params->max_velocity = rpm_to_ticks_sensor(max_velocity, profile_pos_params->qei_params.ticks_resolution);
+    } else if (profile_pos_params->sensor_used == CONTELEC_SENSOR) {
+        //FIXME get the biss resolution in a proper way instead of using QEI
+        profile_pos_params->max_acceleration =  rpm_to_ticks_sensor(max_acceleration , profile_pos_params->qei_params.ticks_resolution);
+        profile_pos_params->max_velocity = rpm_to_ticks_sensor(max_velocity, profile_pos_params->qei_params.ticks_resolution);
     } else {
         //profile_pos_params.max_acceleration =  rpm_to_ticks_sensor(max_acceleration , max_ticks_per_turn);
         //profile_pos_params.max_velocity = rpm_to_ticks_sensor(max_velocity, max_ticks_per_turn);
@@ -448,6 +452,11 @@ int __initialize_position_profile(int target_position, int actual_position, int 
         profile_pos_params->dec =  rpm_to_ticks_sensor(deceleration, profile_pos_params->qei_params.ticks_resolution);
     } else if (profile_pos_params->sensor_used == AMS_SENSOR) {
         //FIXME get the biss resolution in a proper way instead of using QEI
+        profile_pos_params->vi = rpm_to_ticks_sensor(velocity, profile_pos_params->qei_params.ticks_resolution);
+        profile_pos_params->acc =  rpm_to_ticks_sensor(acceleration, profile_pos_params->qei_params.ticks_resolution);
+        profile_pos_params->dec =  rpm_to_ticks_sensor(deceleration, profile_pos_params->qei_params.ticks_resolution);
+    } else if (profile_pos_params->sensor_used == CONTELEC_SENSOR) {
+            //FIXME get the biss resolution in a proper way instead of using QEI
         profile_pos_params->vi = rpm_to_ticks_sensor(velocity, profile_pos_params->qei_params.ticks_resolution);
         profile_pos_params->acc =  rpm_to_ticks_sensor(acceleration, profile_pos_params->qei_params.ticks_resolution);
         profile_pos_params->dec =  rpm_to_ticks_sensor(deceleration, profile_pos_params->qei_params.ticks_resolution);

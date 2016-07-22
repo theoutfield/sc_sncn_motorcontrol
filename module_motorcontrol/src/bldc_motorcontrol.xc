@@ -17,7 +17,7 @@
 #include <stdlib.h>
 
 
-#define USE_XSCOPE
+//#define USE_XSCOPE
 
 
 static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctrl)

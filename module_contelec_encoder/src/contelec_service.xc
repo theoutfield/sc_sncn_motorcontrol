@@ -313,6 +313,7 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
                 delay_ticks(10*USEC_FAST);
                 contelec_encoder_write(spi_ports, 0x50, new_angle / contelec_config.pole_pairs, 16);
                 { void, void, out_offset, void } = contelec_encoder_read(spi_ports);
+                //printf("ouf_offset: %d\n", out_offset);
                 t :> last_read;
                 out_offset = (out_offset - real_position) & (ticks_per_turn-1);
                 contelec_config.offset = out_offset;
@@ -332,7 +333,7 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
             int position, angle;
             t :> time;
             t when timerafter(last_read + contelec_config.timeout) :> void;
-            { void, count, position, void } = contelec_encoder_read(spi_ports);
+            { void, count, position, angle } = contelec_encoder_read(spi_ports);
             t :> last_read;
             last_position = position;
             int difference = count - old_count;

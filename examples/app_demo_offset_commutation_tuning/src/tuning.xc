@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol,
-        interface CONTELECInterface client i_contelec)
+        interface CONTELECInterface client ?i_contelec, interface AMSInterface client ?i_ams)
 {
     const int calib_voltage = 1000;
     const int calib_time = 500;
@@ -31,8 +31,10 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol,
     //the motor will go to a fixed position
     delay_milliseconds(calib_time);
     //get the offsets
-
-    offset = i_contelec.reset_contelec_angle(calib_angle);
+    if (!isnull(i_contelec))
+        offset = i_contelec.reset_contelec_angle(calib_angle);
+    else if (!isnull(i_ams))
+        offset = i_ams.reset_ams_angle(calib_angle);
     motorcontrol_config.hall_offset[0] = 0;
     motorcontrol_config.hall_offset[1] = 0;
 
@@ -116,7 +118,8 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             if (!isnull(i_tuning))
                 offset = i_tuning.auto_offset();
             motorcontrol_config = i_commutation.get_config();
-            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR || motorcontrol_config.commutation_sensor == CONTELEC_SENSOR) {
+            if (motorcontrol_config.commutation_sensor == AMS_SENSOR || motorcontrol_config.commutation_sensor == BISS_SENSOR
+                    || motorcontrol_config.commutation_sensor == CONTELEC_SENSOR) {
                 printf("Sensor offset: %d, ", offset);
             }
             printf("Voltage %d, Polarity %d\n", input_voltage, motorcontrol_config.polarity_type);
@@ -520,8 +523,15 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                 if (voltage && enable_tuning == 0) {
                     motorcontrol_config = i_commutation.get_config();
                     if (motorcontrol_config.commutation_method == FOC && motorcontrol_config.commutation_sensor != HALL_SENSOR) {
-                        CONTELECConfig contelec_config = i_contelec.get_contelec_config();
-                        start_offset_pos = contelec_config.offset;
+                        if (!isnull(i_contelec)) {
+                            CONTELECConfig contelec_config = i_contelec.get_contelec_config();
+                            start_offset_pos = contelec_config.offset;
+                        }
+                        else if (!isnull(i_ams)) {
+                            AMSConfig ams_config = i_ams.get_ams_config();
+                            start_offset_pos = ams_config.offset;
+                        }
+
 
                         start_offset_neg = start_offset_pos;
                     } else {
@@ -616,7 +626,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
             break;
 
         case i_tuning.auto_offset() -> int out_offset:
-            out_offset = auto_offset(i_commutation, i_contelec);
+            out_offset = auto_offset(i_commutation, i_contelec, i_ams);
             break;
 
         case i_tuning.set_sensor_offset(int in_offset) -> int out_offset:
@@ -627,12 +637,21 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                     contelec_config.offset = in_offset;
                     i_contelec.set_contelec_config(contelec_config);
                 }
+                else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                    AMSConfig ams_config = i_ams.get_ams_config();
+                    ams_config.offset = in_offset;
+                    i_ams.set_ams_config(ams_config);
+                }
             }
             else
             {
                 if (motorcontrol_config.commutation_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
                                     CONTELECConfig contelec_config = i_contelec.get_contelec_config();
                                     out_offset = contelec_config.offset;
+                }
+                else if (motorcontrol_config.commutation_sensor == AMS_SENSOR && !isnull(i_ams)) {
+                                    AMSConfig ams_config = i_ams.get_ams_config();
+                                    out_offset = ams_config.offset;
                 }
             }
             break;
