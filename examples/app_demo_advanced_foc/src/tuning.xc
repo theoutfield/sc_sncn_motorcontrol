@@ -116,7 +116,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         case 'r':
             torque_ref = -torque_ref;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d\n", torque_ref);
+            printf("torque %d [milli-Nm]\n", torque_ref);
             break;
 
         //enable and disable torque controller
@@ -153,7 +153,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         default:
             torque_ref = value * sign;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d\n", torque_ref);
+            printf("torque %d [milli-Nm]\n", torque_ref);
             break;
         }
         delay_milliseconds(10);
@@ -237,7 +237,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     int brake_flag = 0;
     int torque_control_flag = 0;
 
-    int offset=3600;
+    int offset=0;
 
     UpstreamControlData upstream_control_data;
 
@@ -252,9 +252,6 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     printf(" x => show on xscope for 20 seconds,   | Enter => set torque to 0\n");
     printf("===================================================================\n");
 
-
-    i_motorcontrol.set_offset_value(offset);
-    printf("set offset to %d\n", i_motorcontrol.set_calib(0));
 
     i_motorcontrol.set_brake_status(1);
     i_motorcontrol.set_torque_control_enabled();
@@ -292,18 +289,19 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
 
 
-            offset=i_motorcontrol.set_calib(0);
-            printf("Detected offset is: %i\n", offset);
-
-            printf("set offset to %d\n", offset);
-            i_motorcontrol.set_offset_value(offset);
-            delay_milliseconds(2000);
-
             proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
 
             if(proper_sensor_polarity == 1)
             {
                 printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+
+                offset=i_motorcontrol.set_calib(0);
+                printf("Detected offset is: %i\n", offset);
+
+                printf("set offset to %d\n", offset);
+                i_motorcontrol.set_offset_value(offset);
+                delay_milliseconds(2000);
+
                 i_motorcontrol.set_torque_control_enabled();
             }
             else
@@ -377,7 +375,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         case 'r':
             torque_ref = -torque_ref;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d\n", torque_ref);
+            printf("torque %d [milli-Nm]\n", torque_ref);
             break;
 
             //enable and disable torque controller
@@ -486,7 +484,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         default:
             torque_ref = value * sign;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d\n", torque_ref);
+            printf("torque %d [milli-Nm]\n", torque_ref);
             break;
         }
     }
