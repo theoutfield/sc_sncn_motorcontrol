@@ -341,12 +341,12 @@
 #define MAX_VELOCITY            3000             // rpm
 #define MAX_TORQUE              1200000
 
-#define POSITION_Kp             200
+#define POSITION_Kp             100
 #define POSITION_Ki             80
 #define POSITION_Kd             0
-#define VELOCITY_Kp             150
-#define VELOCITY_Ki             0
-#define VELOCITY_Kd             25
+#define VELOCITY_Kp             90
+#define VELOCITY_Ki             100
+#define VELOCITY_Kd             0
 
 #define POSITION_P_ERROR_lIMIT  2000000000
 #define POSITION_I_ERROR_lIMIT  1

@@ -116,7 +116,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         case 'r':
             torque_ref = -torque_ref;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d\n", torque_ref);
+            printf("torque %d [milli-Nm]\n", torque_ref);
             break;
 
         //enable and disable torque controller
@@ -153,7 +153,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         default:
             torque_ref = value * sign;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d\n", torque_ref);
+            printf("torque %d [milli-Nm]\n", torque_ref);
             break;
         }
         delay_milliseconds(10);
@@ -375,7 +375,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         case 'r':
             torque_ref = -torque_ref;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d\n", torque_ref);
+            printf("torque %d [milli-Nm]\n", torque_ref);
             break;
 
             //enable and disable torque controller
@@ -484,7 +484,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         default:
             torque_ref = value * sign;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d\n", torque_ref);
+            printf("torque %d [milli-Nm]\n", torque_ref);
             break;
         }
     }

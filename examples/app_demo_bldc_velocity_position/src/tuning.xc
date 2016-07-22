@@ -326,7 +326,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         case 'r':
             torque = -torque;
             i_commutation.set_torque(torque);
-            printf("Torque %d\n", torque);
+            printf("Torque %d [milli-Nm]\n", torque);
             break;
 
         //reverse torque
@@ -342,7 +342,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         default:
             torque = value*sign;
             i_commutation.set_torque(torque);
-            printf("Torque %d\n", torque);
+            printf("Torque %d [milli-Nm]\n", torque);
             break;
         }
         delay_milliseconds(10);
