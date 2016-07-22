@@ -8,64 +8,63 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 //Hall libs
-#include <hall_service.h>
+#include <position_feedback_service.h>
 
 /* Test Hall Sensor Client */
-void hall_test(interface HallInterface client i_hall, client interface shared_memory_interface ?i_shared_memory)
+void hall_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
 {
-    int position = 0;
+    int angle = 0;
     int velocity = 0;
     int count = 0;
-
-    xscope_int(COUNT, count);
-    xscope_int(VELOCITY, velocity);
 
     while(1)
     {
         /* get position from Hall Sensor */
-        count = i_hall.get_hall_position_absolute();
-        position = i_hall.get_hall_position();
+        { count, void } = i_position_feedback.get_position();
+        angle = i_position_feedback.get_angle();
 
         /* get velocity from Hall Sensor */
-        velocity = i_hall.get_hall_velocity();
+        velocity = i_position_feedback.get_velocity();
 
         if (!isnull(i_shared_memory)) {
-            { void, velocity, count } = i_shared_memory.get_angle_velocity_position();
+            { angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
         }
 
 //        printintln(position);
 
         xscope_int(COUNT, count);
         xscope_int(VELOCITY, velocity);
+        xscope_int(ANGLE, angle);
     }
 }
 
-HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
 
 int main(void)
 {
-    interface HallInterface i_hall[5];
+    interface PositionFeedbackInterface i_position_feedback[3];
     interface shared_memory_interface i_shared_memory[2];
 
     par
     {
         /* Client side */
-        on tile[APP_TILE]: hall_test(i_hall[0], null);
+        on tile[APP_TILE]: hall_test(i_position_feedback[0], null);
 
         /***************************************************
          * IFM TILE
          ***************************************************/
         on tile[IFM_TILE]: par {
-        memory_manager(i_shared_memory, 2);
+            memory_manager(i_shared_memory, 2);
 
-        /* Hall Service */
-        {
-            HallConfig hall_config;
-            hall_config.pole_pairs = 1;
-            hall_config.enable_push_service = PushAll;
+            /* Position feedback service */
+            {
+                PositionFeedbackConfig position_feedback_config;
+                position_feedback_config.sensor_type = HALL_SENSOR;
+                position_feedback_config.hall_config.pole_pairs = 5;
+                position_feedback_config.hall_config.enable_push_service = PushAll;
 
-            hall_service(hall_ports, hall_config, i_shared_memory[0], i_hall);
-        }
+                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
+            }
         }
     }
 

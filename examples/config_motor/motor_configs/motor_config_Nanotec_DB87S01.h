@@ -18,5 +18,26 @@
 // NUMBER OF POLE PAIRS (if applicable)
 #define POLE_PAIRS  4
 
-// WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
-#define BLDC_WINDING_TYPE   STAR_WINDING
+// RATED POWER
+#define RATED_POWER 220         // W
+
+// RATED TORQUE
+#define RATED_TORQUE 700        // mNm
+
+// RATED CURRENT
+#define RATED_CURRENT 6         // Amp
+
+// PEAK SPEED
+#define PEAK_SPEED    4500      // rpm
+
+// PHASE RESISTANCE
+#define PHASE_RESISTANCE 180000 // uOhm
+
+// PHASE INDUCTANCE
+#define PHASE_INDUCTANCE 350    // uH
+
+// MAXIMUM TORQUE
+#define MAXIMUM_TORQUE   112    // Nm at 1000 Amp
+
+// TORQUE CONSTANT
+#define PERCENT_TORQUE_CONSTANT    (MAXIMUM_TORQUE/10)  //Nm at 100 Amp ???

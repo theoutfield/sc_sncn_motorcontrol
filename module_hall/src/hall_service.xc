@@ -9,7 +9,6 @@
 #include <filter_blocks.h>
 #include <refclk.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <print.h>
 
 #include <mc_internal_constants.h>
@@ -25,7 +24,9 @@ int check_hall_config(HallConfig &hall_config){
 }
 
 [[combinable]]
-void hall_service(HallPorts & hall_ports, HallConfig & hall_config, client interface shared_memory_interface ?i_shared_memory, interface HallInterface server i_hall[5])
+ void hall_service(PositionFeedbackPorts &position_feedback_ports, HallConfig & hall_config,
+                   client interface shared_memory_interface ?i_shared_memory,
+                   server interface PositionFeedbackInterface i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -91,7 +92,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, client inter
     int notification = MOTCTRL_NTF_EMPTY;
 
     /* Init hall sensor */
-    hall_ports.p_hall :> pin_state;
+    position_feedback_ports.p_hall :> pin_state;
     pin_state &= 0x07;
     pin_state_monitor = pin_state;
     switch (pin_state) {
@@ -122,81 +123,85 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, client inter
 //#pragma xta endpoint "hall_loop"
       //[[ordered]] //FixMe ordered is not supported for combinable functions
         select {
-            case i_hall[int i].get_notification() -> int out_notification:
+            case i_position_feedback[int i].get_notification() -> int out_notification:
 
                 out_notification = notification;
                 break;
 
-            case i_hall[int i].get_hall_pinstate_angle_velocity_position() -> {unsigned out_pinstate, int out_position, int out_velocity, int out_count}:
+//            case i_position_feedback[int i].get_hall_pinstate_angle_velocity_position() -> {unsigned out_pinstate, int out_position, int out_velocity, int out_count}:
+//
+//                out_pinstate = pin_state_monitor;
+//                out_position = angle;
+//                out_velocity = raw_velocity;
+//                out_count = count;
+//                break;
 
-                out_pinstate = pin_state_monitor;
-                out_position = angle;
-                out_velocity = raw_velocity;
+//            case i_position_feedback[int i].get_hall_pinstate() -> unsigned out_pinstate:
+//
+//                out_pinstate = pin_state_monitor;
+//                break;
+
+            case i_position_feedback[int i].get_angle() -> unsigned int out_angle:
+
+                out_angle = angle;
+                break;
+
+            case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position }:
+
                 out_count = count;
-                break;
-
-            case i_hall[int i].get_hall_pinstate() -> unsigned out_pinstate:
-
-                out_pinstate = pin_state_monitor;
-                break;
-
-            case i_hall[int i].get_hall_position() -> int out_position:
-
                 out_position = angle;
                 break;
 
-            case i_hall[int i].get_hall_position_absolute() -> int out_position:
-
-                out_position = count;
-                break;
-
-            case i_hall[int i].get_hall_velocity() -> int out_velocity:
+            case i_position_feedback[int i].get_velocity() -> int out_velocity:
 
                 out_velocity = raw_velocity;
                 break;
 
-            case i_hall[int i].get_hall_direction() -> int out_direction:
+            case i_position_feedback[int i].set_position(int in_count):
 
-                out_direction = direction;
+                count = in_count;
                 break;
 
-            case i_hall[int i].reset_hall_absolute_position(int offset):
+            case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
 
-                count = offset;
+                out_config.hall_config = hall_config;
                 break;
 
-            case i_hall[int i].get_hall_config() -> HallConfig out_config:
+            case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
 
-                out_config = hall_config;
-                break;
-
-            case i_hall[int i].set_hall_config(HallConfig in_config):
-
-                hall_config = in_config;
+                hall_config = in_config.hall_config;
                 config_max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
                 status = 1;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 5; i++) {
-                    i_hall[i].notification();
+                    i_position_feedback[i].notification();
                 }
                 break;
 
-            case i_hall[int i].check_busy() -> int out_status:
+            case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
+                out_ticks_per_turn = HALL_TICKS_PER_ELECTRICAL_ROTATION;
+                break;
 
-                out_status = init_state;
+            case i_position_feedback[int i].set_angle(unsigned int in_angle) -> unsigned int out_offset:
+                break;
+
+            case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int out_position,  unsigned int out_status}:
+                break;
+
+            case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
                 break;
 
             case tmr when timerafter(ts + PULL_PERIOD_USEC * USEC_FAST) :> ts: //12 usec 3000
                 switch (xreadings) {
                     case 0:
-                        hall_ports.p_hall :> new1;
+                        position_feedback_ports.p_hall :> new1;
                         new1 &= 0x07;
                         xreadings++;
                         break;
                     case 1:
-                        hall_ports.p_hall :> new2;
+                        position_feedback_ports.p_hall :> new2;
                         new2 &= 0x07;
                         if (new2 == new1) {
                             xreadings++;
@@ -205,7 +210,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, client inter
                         }
                         break;
                     case 2:
-                        hall_ports.p_hall :> new2;
+                        position_feedback_ports.p_hall :> new2;
                         new2 &= 0x07;
                         if (new2 == new1) {
                             pin_state = new2;
@@ -215,7 +220,7 @@ void hall_service(HallPorts & hall_ports, HallConfig & hall_config, client inter
                         break;
                 }//eof switch
 
-                hall_ports.p_hall :> pin_state_monitor;
+                position_feedback_ports.p_hall :> pin_state_monitor;
                 pin_state_monitor &= 0x07;
 
                 iCountMicroSeconds = iCountMicroSeconds + PULL_PERIOD_USEC; // period in 12 usec

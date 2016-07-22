@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <mc_internal_constants.h>
-#include <hall_service.h>
+#include <hall_struct.h>
 #include <qei_service.h>
 #include <ams_service.h>
 #include <xccompat.h>

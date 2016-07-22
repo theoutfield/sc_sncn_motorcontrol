@@ -12,11 +12,13 @@
 
 #include <biss_struct.h>
 #include <contelec_struct.h>
+#include <hall_struct.h>
 
 typedef struct {
     int sensor_type;
     BISSConfig biss_config;
     CONTELECConfig contelec_config;
+    HallConfig hall_config;
 } PositionFeedbackConfig;
 
 
@@ -67,6 +69,7 @@ typedef struct
 {
     port ?p_biss_data;   /**< Port for BiSS Interface signal input. */
     port ?p_biss_clk;    /**< Port for BiSS Interface clock output. */
+    port ?p_hall;        /**< Port for Hall signals. */
     out port ?slave_select;
     spi_master_interface spi_interface;
 } PositionFeedbackPorts;
@@ -74,6 +77,7 @@ typedef struct
 #include <memory_manager.h>
 #include <biss_service.h>
 #include <contelec_service.h>
+#include <hall_service.h>
 
 
 void position_feedback_service(PositionFeedbackPorts &?position_feedback_ports_1, PositionFeedbackConfig &?position_feedback_config_1,

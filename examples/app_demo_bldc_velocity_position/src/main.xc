@@ -1,6 +1,4 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-//#include <CORE_BOARD_REQUIRED>
-//#include <IFM_BOARD_REQUIRED>
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
@@ -113,31 +111,6 @@ int main(void) {
                     watchdog_service(wd_ports, i_watchdog);
                 }
 
-
-                /* Position feedback service */
-                {
-                    delay_milliseconds(10);
-
-                    PositionFeedbackConfig position_feedback_config;
-                    position_feedback_config.sensor_type = CONTELEC_SENSOR;
-                    position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
-                    position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
-                    position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
-                    position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
-                    position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
-                    position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
-                    position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
-                    position_feedback_config.contelec_config.enable_push_service = PushAll;
-
-                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
-                }
-
-                {
-                    /* Shared memory Service */
-                    memory_manager(i_shared_memory, 2);
-                }
-
-
                 /* Motor Control Service */
                 {
                     delay_milliseconds(20);
@@ -173,8 +146,51 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
-                    Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[0],
+                    Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                             i_watchdog[0], i_motorcontrol, i_update_pwm);
+                }
+
+                /* Shared memory Service */
+                {
+                    memory_manager(i_shared_memory, 2);
+                }
+
+                /* Position feedback service */
+                {
+                    delay_milliseconds(10);
+
+                    PositionFeedbackConfig position_feedback_config;
+                    position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
+
+                    position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
+                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                    position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
+                    position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
+                    position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
+                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
+                    position_feedback_config.biss_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.biss_config.polarity = BISS_POLARITY;
+                    position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
+                    position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
+                    position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
+                    position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                    position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+                    position_feedback_config.biss_config.enable_push_service = PushAll;
+
+                    position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
+                    position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
+                    position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
+                    position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
+                    position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
+                    position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                    position_feedback_config.contelec_config.enable_push_service = PushAll;
+
+                    position_feedback_config.hall_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.hall_config.enable_push_service = PushAll;
+
+                    position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
                 }
             }
         }
