@@ -8,61 +8,18 @@
  *********      USER CONFIGURATION       **********
  **************************************************/
 
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS              5       //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT 15      //motor torque constant multiplied by 100
+#define RATED_CURRENT           4       //rated phase current (RMS)
+#define MAXIMUM_TORQUE          170    //maximum value of torque which can be produced by motor [milli-Nm]
 
-/*
- * Set the Motor offset and position of the hall state sensors.
- * Unless for adding a new motor or fixing motor settings do not touch this.
- */
-#define MOTOR_OFFSET           0
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER             162     // rated power [W]
+#define RATED_TORQUE            620     // rated motor torque [milli-Nm]
+#define PEAK_SPEED              3200    // maximum motor speed [rpm]
+#define PHASE_RESISTANCE        1270000 // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE        1330    // motor phase inductance [micro-Hunnry]
 
-#define MOTOR_HALL_STATE_1     0
-#define MOTOR_HALL_STATE_2     0
-#define MOTOR_HALL_STATE_3     0
-#define MOTOR_HALL_STATE_4     0
-#define MOTOR_HALL_STATE_5     0
-#define MOTOR_HALL_STATE_6     0
-
-#define POWER_FACTOR           0
-#define POLE_PAIRS             5
-
-
-/////////////////////////////////////////////
-//////  MOTOR PARAMETERS
-////////////////////////////////////////////
-
-// RATED POWER
-#define RATED_POWER 162         // W
-
-// RATED TORQUE
-#define RATED_TORQUE 620        // mNm
-
-// TORQUE CONSTANT
-#define PERCENT_TORQUE_CONSTANT     15
-
-// RATED CURRENT
-#define RATED_CURRENT 4         // Amp
-
-// PEAK SPEED
-#define PEAK_SPEED    3200      // rpm
-
-// PHASE RESISTANCE
-#define PHASE_RESISTANCE 1270000 // uOhm
-
-// PHASE INDUCTANCE
-#define PHASE_INDUCTANCE 1330    // uH
-
-// MAXIMUM TORQUE
-#define MAXIMUM_TORQUE   170    //maximum torque (Nm) at 1000 Amp
-
-/*********************************************/
-
-/////////////////////////////////////////////
-//////  GENERAL MOTOR CONFIGURATION
-////////////////////////////////////////////
-
-// MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-#define MOTOR_TYPE  BLDC_MOTOR
-
-// WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
-#define BLDC_WINDING_TYPE   STAR_WINDING
-
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]

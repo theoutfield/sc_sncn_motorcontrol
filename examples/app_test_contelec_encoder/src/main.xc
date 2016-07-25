@@ -256,31 +256,6 @@ int main(void)
                 watchdog_service(wd_ports, i_watchdog);
             }
 
-
-            /* Position feedback service */
-            {
-                delay_milliseconds(10);
-
-                PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = CONTELEC_SENSOR;
-                position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
-                position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
-                position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
-                position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
-                position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
-                position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
-                position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
-                position_feedback_config.contelec_config.enable_push_service = PushAll;
-
-                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[1], i_position_feedback, null, null, null, null);
-            }
-
-            {
-                /* Shared memory Service */
-                memory_manager(i_shared_memory, 2);
-            }
-
-
             /* Motor Control Service */
             {
                 delay_milliseconds(20);
@@ -303,6 +278,9 @@ int main(void)
                 motorcontrol_config.torque_constant =  PERCENT_TORQUE_CONSTANT;
                 motorcontrol_config.current_ratio =  CURRENT_RATIO;
                 motorcontrol_config.rated_current =  RATED_CURRENT;
+                motorcontrol_config.rated_torque  =  RATED_TORQUE;
+                motorcontrol_config.percent_offset_torque =  PERCENT_OFFSET_TORQUE;
+
 
                 motorcontrol_config.recuperation = RECUPERATION;
                 motorcontrol_config.battery_e_max = BATTERY_E_MAX;
@@ -316,8 +294,31 @@ int main(void)
                 motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                 motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
-                Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[0],
+                Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                         i_watchdog[0], i_motorcontrol, i_update_pwm);
+            }
+
+            /* Shared memory Service */
+            {
+                memory_manager(i_shared_memory, 2);
+            }
+
+            /* Position feedback service */
+            {
+                delay_milliseconds(10);
+
+                PositionFeedbackConfig position_feedback_config;
+                position_feedback_config.sensor_type = CONTELEC_SENSOR;
+                position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
+                position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
+                position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
+                position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
+                position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
+                position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
+                position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                position_feedback_config.contelec_config.enable_push_service = PushAll;
+
+                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
             }
         }
     }

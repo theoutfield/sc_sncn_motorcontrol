@@ -8,36 +8,18 @@
  *********      USER CONFIGURATION       **********
  **************************************************/
 
-/////////////////////////////////////////////
-//////  GENERAL MOTOR CONFIGURATION
-////////////////////////////////////////////
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS              4       //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT (MAXIMUM_TORQUE/10)      //motor torque constant multiplied by 100
+#define RATED_CURRENT           6       //rated phase current (RMS)
+#define MAXIMUM_TORQUE          112    //maximum value of torque which can be produced by motor [milli-Nm]
 
-// MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-#define MOTOR_TYPE  BLDC_MOTOR
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER             220     // rated power [W]
+#define RATED_TORQUE            700     // rated motor torque [milli-Nm]
+#define PEAK_SPEED              4500    // maximum motor speed [rpm]
+#define PHASE_RESISTANCE        180000  // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE        350     // motor phase inductance [micro-Hunnry]
 
-// NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  4
-
-// RATED POWER
-#define RATED_POWER 220         // W
-
-// RATED TORQUE
-#define RATED_TORQUE 700        // mNm
-
-// RATED CURRENT
-#define RATED_CURRENT 6         // Amp
-
-// PEAK SPEED
-#define PEAK_SPEED    4500      // rpm
-
-// PHASE RESISTANCE
-#define PHASE_RESISTANCE 180000 // uOhm
-
-// PHASE INDUCTANCE
-#define PHASE_INDUCTANCE 350    // uH
-
-// MAXIMUM TORQUE
-#define MAXIMUM_TORQUE   112    // Nm at 1000 Amp
-
-// TORQUE CONSTANT
-#define PERCENT_TORQUE_CONSTANT    (MAXIMUM_TORQUE/10)  //Nm at 100 Amp ???
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
