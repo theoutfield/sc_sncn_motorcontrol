@@ -58,7 +58,9 @@ int check_qei_config(QEIConfig &qei_config)
 }
 
 #pragma unsafe arrays
-void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, client interface shared_memory_interface ?i_shared_memory, interface QEIInterface server i_qei[5])
+void qei_service(PositionFeedbackPorts &position_feedback_ports, QEIConfig qei_config,
+                 client interface shared_memory_interface ?i_shared_memory,
+                 server interface PositionFeedbackInterface i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -71,12 +73,12 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, client interfac
     printstr(">>   SOMANET ENCODER SENSOR SERVICE STARTING...\n");
 
     //Check if we are using a dc board with configurable qei port
-    if (!isnull(encoder_ports.p_qei_config)) {
+    if (!isnull(position_feedback_ports.p_biss_clk)) {
         //Our board has a configurable qei port, lets check now the configuration provided by the user
         if (qei_config.signal_type == QEI_TTL_SIGNAL) {
-            encoder_ports.p_qei_config <: QEI_PORT_AS_TTL;
+            position_feedback_ports.p_biss_clk <: QEI_PORT_AS_TTL;
         } else {
-            encoder_ports.p_qei_config <: QEI_PORT_AS_RS422;
+            position_feedback_ports.p_biss_clk <: QEI_PORT_AS_RS422;
         }
     }
 
@@ -122,17 +124,17 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, client interfac
 
     t_velocity :> ts_velocity;
 
-    encoder_ports.p_qei :> new_pins;
+    position_feedback_ports.p_biss_data :> new_pins;
 
     while (1) {
 #pragma xta endpoint "qei_loop"
 #pragma ordered
         select {
-            case encoder_ports.p_qei when pinsneq(new_pins) :> new_pins :
-                encoder_ports.p_qei :> new_pins_1;
-                encoder_ports.p_qei :> new_pins_1;
+            case position_feedback_ports.p_biss_data when pinsneq(new_pins) :> new_pins :
+                position_feedback_ports.p_biss_data :> new_pins_1;
+                position_feedback_ports.p_biss_data :> new_pins_1;
                 if (new_pins_1 == new_pins) {
-                    encoder_ports.p_qei :> new_pins;
+                    position_feedback_ports.p_biss_data :> new_pins;
                     if (new_pins_1 == new_pins) {
                         v = lookup[new_pins][old_pins];
 
@@ -226,73 +228,85 @@ void qei_service(QEIPorts & encoder_ports, QEIConfig qei_config, client interfac
 
                 break;
 
-            case i_qei[int i].get_notification() -> int out_notification:
+            case i_position_feedback[int i].get_notification() -> int out_notification:
 
                 out_notification = notification;
                 break;
 
-            case i_qei[int i].get_qei_position() -> {unsigned int out_count, unsigned int out_valid}:
+//            case i_position_feedback[int i].get_qei_position() -> {unsigned int out_count, unsigned int out_valid}:
+//
+//                out_count = count;
+//                out_count &= (config_qei_changes_per_turn - 1);
+//                out_valid = ok;
+//                break;
+
+            case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position }:
 
                 out_count = count;
-                out_count &= (config_qei_changes_per_turn - 1);
-                out_valid = ok;
+                out_position = count & (config_qei_changes_per_turn - 1);
                 break;
 
-            case i_qei[int i].get_qei_position_absolute() -> int out_count:
+//            case i_position_feedback[int i].get_qei_sync_position() -> {int out_position, int out_calib_fw, int out_calib_bw}:
+//
+//                out_position = sync_out;
+//                out_calib_fw = calib_fw_flag;
+//                out_calib_bw = calib_bw_flag;
+//                break;
 
-                out_count = count;
-                break;
-
-            case i_qei[int i].get_qei_direction() -> int out_direction:
-
-                out_direction = direction;
-                break;
-
-            case i_qei[int i].get_qei_sync_position() -> {int out_position, int out_calib_fw, int out_calib_bw}:
-
-                out_position = sync_out;
-                out_calib_fw = calib_fw_flag;
-                out_calib_bw = calib_bw_flag;
-                break;
-
-            case i_qei[int i].get_qei_velocity() -> int out_velocity:
+            case i_position_feedback[int i].get_velocity() -> int out_velocity:
 
                 out_velocity = velocity;
                 break;
 
-            case i_qei[int i].set_qei_sync_offset(int in_fw, int in_bw):
+//            case i_position_feedback[int i].set_qei_sync_offset(int in_fw, int in_bw):
+//
+//                offset_fw = in_fw;
+//                offset_bw = in_bw;
+//                calib_bw_flag = 0;
+//                calib_fw_flag = 0;
+//                break;
 
-                offset_fw = in_fw;
-                offset_bw = in_bw;
-                calib_bw_flag = 0;
-                calib_fw_flag = 0;
-                break;
+            case i_position_feedback[int i].set_position(int in_count):
 
-            case i_qei[int i].reset_qei_absolute_position(int in_offset):
-
-                 count = in_offset;
+                 count = in_count;
                  break;
 
-            case i_qei[int i].get_qei_config() -> QEIConfig out_config:
+            case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
 
-                out_config = qei_config;
+                out_config.qei_config = qei_config;
                 break;
 
-            case i_qei[int i].set_qei_config(QEIConfig in_config):
+            case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
 
-                qei_config = in_config;
+                qei_config = in_config.qei_config;
                 status = 1;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 5; i++) {
-                    i_qei[i].notification();
+                    i_position_feedback[i].notification();
                 }
                 break;
 
-            case i_qei[int i].check_busy() -> int out_status:
+//            case i_position_feedback[int i].check_busy() -> int out_status:
+//
+//                out_status = init_state;
+//                break;
 
-                out_status = init_state;
+            case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
+                out_ticks_per_turn = config_qei_changes_per_turn;
+                break;
+
+            case i_position_feedback[int i].get_angle() -> unsigned int out_angle:
+                break;
+
+            case i_position_feedback[int i].set_angle(unsigned int in_angle) -> unsigned int out_offset:
+                break;
+
+            case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int out_position,  unsigned int out_status}:
+                break;
+
+            case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
                 break;
 
             case t_velocity when timerafter(ts_velocity + MILLISECOND) :> ts_velocity:

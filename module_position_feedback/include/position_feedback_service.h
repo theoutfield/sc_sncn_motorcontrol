@@ -13,12 +13,14 @@
 #include <biss_struct.h>
 #include <contelec_struct.h>
 #include <hall_struct.h>
+#include <qei_struct.h>
 
 typedef struct {
     int sensor_type;
     BISSConfig biss_config;
     CONTELECConfig contelec_config;
     HallConfig hall_config;
+    QEIConfig qei_config;
 } PositionFeedbackConfig;
 
 
@@ -78,6 +80,7 @@ typedef struct
 #include <biss_service.h>
 #include <contelec_service.h>
 #include <hall_service.h>
+#include <qei_service.h>
 
 
 void position_feedback_service(PositionFeedbackPorts &?position_feedback_ports_1, PositionFeedbackConfig &?position_feedback_config_1,

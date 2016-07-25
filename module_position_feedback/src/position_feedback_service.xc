@@ -33,6 +33,9 @@ void position_feedback_service(PositionFeedbackPorts &?position_feedback_ports_1
                     }
                     hall_service(position_feedback_ports_1, position_feedback_config_1.hall_config, i_shared_memory_1, i_position_feedback_1);
                     break;
+                case QEI_SENSOR:
+                    qei_service(position_feedback_ports_1, position_feedback_config_1.qei_config, i_shared_memory_1, i_position_feedback_1);
+                    break;
                 }
             }
         }
@@ -51,6 +54,9 @@ void position_feedback_service(PositionFeedbackPorts &?position_feedback_ports_1
                         position_feedback_ports_2.p_biss_clk <: 0;
                     }
                     hall_service(position_feedback_ports_2, position_feedback_config_2.hall_config, i_shared_memory_2, i_position_feedback_2);
+                    break;
+                case QEI_SENSOR:
+                    qei_service(position_feedback_ports_2, position_feedback_config_2.qei_config, i_shared_memory_2, i_position_feedback_2);
                     break;
                 }
             }

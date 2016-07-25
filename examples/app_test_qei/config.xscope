@@ -20,6 +20,7 @@
     <!-- <Probe name="Probe Name" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/> -->
     <!-- From the target code, call: xscope_int(PROBE_NAME, value); -->
     
+    <Probe name="count" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 
