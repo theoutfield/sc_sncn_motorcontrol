@@ -11,139 +11,128 @@
  **************************************************/
 
 /*
- * Set the Motor offset and position of the hall state sensors.
- * Unless for adding a new motor or fixing motor settings do not touch this.
+ * Should be set in case HALL sensor is used.
+ * FIXME: Now it is being set manualy. Should be set automatically.
  */
-
-
 #define MOTOR_HALL_STATE_1     0
 #define MOTOR_HALL_STATE_2     0
 #define MOTOR_HALL_STATE_3     0
 #define MOTOR_HALL_STATE_4     0
 #define MOTOR_HALL_STATE_5     0
 #define MOTOR_HALL_STATE_6     0
-
 #define POWER_FACTOR           0
-#define POLE_PAIRS             5
-
 
 /////////////////////////////////////////////
 //////  MOTOR PARAMETERS
 ////////////////////////////////////////////
 
+// uncomment, and complete the following part depending on your motor model.
+// There are some examples in the following...
+
 /*
-// MABI AXIS_1 and AXIS_2
-// RATED POWER
-#define RATED_POWER 735         // W
+// motor model:
 
-// RATED TORQUE
-#define RATED_TORQUE 540        // mNm
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS                      //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT         //motor torque constant multiplied by 100
+#define RATED_CURRENT                   //rated phase current (RMS)
+#define MAXIMUM_TORQUE                  //maximum value of torque which can be produced by motor [milli-Nm]
 
-// RATED CURRENT
-#define RATED_CURRENT 20         // Amp
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER                     // rated power [W]
+#define RATED_TORQUE                    // rated motor torque [milli-Nm]
+#define PEAK_SPEED                      // maximum motor speed [rpm]
+#define PHASE_RESISTANCE                // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE                // motor phase inductance [micro-Hunnry]
 
-// PEAK SPEED
-#define PEAK_SPEED    3000      // rpm
-
-// PHASE RESISTANCE
-#define PHASE_RESISTANCE 125000 // uOhm
-
-// PHASE INDUCTANCE
-#define PHASE_INDUCTANCE 525    // uH
-
-// MAXIMUM TORQUE
-#define MAXIMUM_TORQUE   270    // Nm at 1000 Amp
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+#define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 */
 
 
+// motor model: DT4
+
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS              5       //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT 15      //motor torque constant multiplied by 100
+#define RATED_CURRENT           8       //rated phase current (RMS)
+#define MAXIMUM_TORQUE          2500    //maximum value of torque which can be produced by motor [milli-Nm]
+
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER             300     // rated power [W]
+#define RATED_TORQUE            1250    // rated motor torque [milli-Nm]
+#define PEAK_SPEED              3700    // maximum motor speed [rpm]
+#define PHASE_RESISTANCE        490000  // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE        580     // motor phase inductance [micro-Hunnry]
+
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+#define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+
+
 /*
-// MABI AXIS_3 and AXIS_4
-// RATED POWER
-#define RATED_POWER 450         // W
+// motor model: MABI AXIS_1 and AXIS_2
 
-// RATED TORQUE
-#define RATED_TORQUE 143        // mNm
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS              ?       //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT         //motor torque constant multiplied by 100
+#define RATED_CURRENT           20      //rated phase current (RMS)
+#define MAXIMUM_TORQUE          ?       //maximum value of torque which can be produced by motor [milli-Nm]
 
-// RATED CURRENT
-#define RATED_CURRENT 11         // Amp
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER             735     // rated power [W]
+#define RATED_TORQUE            540     // rated motor torque [milli-Nm]
+#define PEAK_SPEED              3000    // maximum motor speed [rpm]
+#define PHASE_RESISTANCE        125000  // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE        525     // motor phase inductance [micro-Hunnry]
 
-// PEAK SPEED
-#define PEAK_SPEED    5000      // rpm
-
-// PHASE RESISTANCE
-#define PHASE_RESISTANCE 210000 // uOhm
-
-// PHASE INDUCTANCE
-#define PHASE_INDUCTANCE 470    // uH
-
-// MAXIMUM TORQUE
-#define MAXIMUM_TORQUE   130    // Nm at 1000 Amp
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+#define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 */
 
 /*
-// MABI AXIS_5 and AXIS_6
-// RATED POWER
-#define RATED_POWER 140         // W
+// motor model: MABI AXIS_3 and AXIS_4
 
-// RATED TORQUE
-#define RATED_TORQUE 270        // mNm
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS              ?       //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT ?       //motor torque constant multiplied by 100
+#define RATED_CURRENT           11      //rated phase current (RMS)
+#define MAXIMUM_TORQUE          ?       //maximum value of torque which can be produced by motor [milli-Nm]
 
-// RATED CURRENT
-#define RATED_CURRENT 5         // Amp
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER             450     // rated power [W]
+#define RATED_TORQUE            143     // rated motor torque [milli-Nm]
+#define PEAK_SPEED              5000    // maximum motor speed [rpm]
+#define PHASE_RESISTANCE        210000  // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE        470     // motor phase inductance [micro-Hunnry]
 
-// PEAK SPEED
-#define PEAK_SPEED    9000      // rpm
-
-// PHASE RESISTANCE
-#define PHASE_RESISTANCE 552000 // uOhm
-
-// PHASE INDUCTANCE
-#define PHASE_INDUCTANCE 720    // uH
-
-// MAXIMUM TORQUE
-#define MAXIMUM_TORQUE   57    // Nm at 1000 Amp
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+#define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 */
 
-// Foresight
+/*
+// motor model: MABI AXIS_5 and AXIS_6
 
-// RATED POWER
-#define RATED_POWER 590         // W
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS              ?       //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT ?       //motor torque constant multiplied by 100
+#define RATED_CURRENT           5       //rated phase current (RMS)
+#define MAXIMUM_TORQUE          ?       //maximum value of torque which can be produced by motor [milli-Nm]
 
-// RATED TORQUE
-#define RATED_TORQUE 1310        // mNm
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER             140     // rated power [W]
+#define RATED_TORQUE            270     // rated motor torque [milli-Nm]
+#define PEAK_SPEED              9000    // maximum motor speed [rpm]
+#define PHASE_RESISTANCE        552000  // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE        720     // motor phase inductance [micro-Hunnry]
 
-// TORQUE CONSTANT
-#define PERCENT_TORQUE_CONSTANT     10
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+#define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+*/
 
-// RATED CURRENT
-#define RATED_CURRENT 4         // Amp
-
-// PEAK SPEED
-#define PEAK_SPEED    4000      // rpm
-
-// PHASE RESISTANCE
-#define PHASE_RESISTANCE 128000 // uOhm
-
-// PHASE INDUCTANCE
-#define PHASE_INDUCTANCE 80    // uH
-
-// MAXIMUM TORQUE
-#define MAXIMUM_TORQUE   100    // Nm at 1000 Amp
-
-
-/*********************************************/
-
-/////////////////////////////////////////////
-//////  GENERAL MOTOR CONFIGURATION
-////////////////////////////////////////////
-
-// COMMUTATION PERIOD
-#define COMMUTATION_PERIOD 66   // uS
-
-// MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-#define MOTOR_TYPE  BLDC_MOTOR
-
-// WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
-#define BLDC_WINDING_TYPE   STAR_WINDING
 
 

@@ -8,20 +8,20 @@
 
 #include <motorcontrol_service.h>
 
- //#include <motor_configs/motor_config_Nanotec_DB42C01.h>
- //#include <motor_configs/motor_config_Nanotec_DB42C02.h>
- //#include <motor_configs/motor_config_Nanotec_DB42C03.h>
- //#include <motor_configs/motor_config_Nanotec_DB42L01.h>
- //#include <motor_configs/motor_config_Nanotec_DB42M01.h>
- //#include <motor_configs/motor_config_Nanotec_DB42M02.h>
- //#include <motor_configs/motor_config_Nanotec_DB42M03.h>
- //#include <motor_configs/motor_config_Nanotec_DB42S01.h>
- //#include <motor_configs/motor_config_Nanotec_DB42S02.h>
- //#include <motor_configs/motor_config_Nanotec_DB42S03.h>
- //#include <motor_configs/motor_config_Nanotec_DB87S01.h>
- //#include <motor_configs/motor_config_LDO_42BLS41.h>
- //#include <motor_configs/motor_config_Moons_42BL30L2.h>
- //#include <motor_config_Nanotec_DB59L024035-A.h>
+//#include <motor_configs/motor_config_Nanotec_DB42C01.h>
+//#include <motor_configs/motor_config_Nanotec_DB42C02.h>
+//#include <motor_configs/motor_config_Nanotec_DB42C03.h>
+//#include <motor_configs/motor_config_Nanotec_DB42L01.h>
+//#include <motor_configs/motor_config_Nanotec_DB42M01.h>
+//#include <motor_configs/motor_config_Nanotec_DB42M02.h>
+//#include <motor_configs/motor_config_Nanotec_DB42M03.h>
+//#include <motor_configs/motor_config_Nanotec_DB42S01.h>
+//#include <motor_configs/motor_config_Nanotec_DB42S02.h>
+//#include <motor_configs/motor_config_Nanotec_DB42S03.h>
+//#include <motor_configs/motor_config_Nanotec_DB87S01.h>
+//#include <motor_configs/motor_config_LDO_42BLS41.h>
+//#include <motor_configs/motor_config_Moons_42BL30L2.h>
+//#include <motor_config_Nanotec_DB59L024035-A.h>
 //#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
@@ -31,7 +31,7 @@
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
-///////////////////////////////////////////
+/////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
 #define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
@@ -54,41 +54,41 @@
 
 //////////////////////////////////////////////
 //////  RECUPERATION MODE PARAMETERS
-////////////////////////////////////////////
-/*recuperation mode
- * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.*/
+//////////////////////////////////////////////
+
+/*
+ * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.
+ * */
 
 // For not affecting higher controlling levels (such as position control),
 // RECUPERATION should be set to 1, and REGEN_P_MAX should be set to a much higher value than the rated power
 // (such as 50 kW),
-
 
 #define RECUPERATION        1          // when RECUPERATION is 0, there will be no recuperation
 
 #define BATTERY_E_MAX       80         // maximum energy status of battery
 #define BATTERY_E_MIN       10         // minimum energy status of battery
 
-#define REGEN_P_MAX         50000       // maximum regenerative power (in Watts)
-#define REGEN_P_MIN         0           // minimum regenerative power (in Watts)
+#define REGEN_P_MAX         50000      // maximum regenerative power (in Watts)
+#define REGEN_P_MIN         0          // minimum regenerative power (in Watts)
 
 #define REGEN_SPEED_MAX     650
-#define REGEN_SPEED_MIN     50          // minimum value of the speed which is considered in regenerative calculations
-
+#define REGEN_SPEED_MIN     50         // minimum value of the speed which is considered in regenerative calculations
 
 
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
-////////////////////////////////////////////
+//////////////////////////////////////////////
+
 #define I_MAX           100      //maximum tolerable value of phase current (under abnormal conditions)
-#define V_DC_MAX        62      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
-#define V_DC_MIN        12      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+#define V_DC_MAX        60      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+#define V_DC_MIN        15      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
 
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
-////////////////////////////////////////////
-
+//////////////////////////////////////////////
 /*
 //MABI PROJECT
 #define DUTY_START_BRAKE    12000   // duty cycles for brake release (should be a number between 1500 and 13000)
@@ -100,28 +100,29 @@
 #define DUTY_MAINTAIN_BRAKE 1500    // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
 
 
+
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
-////////////////////////////////////////////
-
+//////////////////////////////////////////////
 
 #define VDC             48
+
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1660 //3450 for qmot, 2435 mabi A5, 0 mabi A6, 1415 mabi A1, 2470 amk
+#define COMMUTATION_OFFSET_CLK      1660
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
 
-
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
 #define MOTOR_POLARITY              NORMAL_POLARITY
 
+
 ///////////////////////////////////////////////
 //////  MOTOR CONTROL CONFIGURATION
-/////////////////////////////////////////////
+///////////////////////////////////////////////
 
 // CONTROL LOOP PERIOD [us]
 #define CONTROL_LOOP_PERIOD     1000
@@ -141,9 +142,13 @@
 #define TORQUE_Ki         90  //3
 #define TORQUE_Kd         0
 
+// (maximum) generated torque while finding offset value as a percentage of rated torque
+#define PERCENT_OFFSET_TORQUE 50
+
+
 /////////////////////////////////////////////////
 //////  PROFILES AND LIMITS CONFIGURATION
-///////////////////////////////////////////////
+/////////////////////////////////////////////////
 
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [1,-1]
 #define POLARITY           1
@@ -156,8 +161,8 @@
 
 // PROFILER LIMITIS
 //#define MAX_POSITION_LIMIT      0x7fffffff        // ticks (max range: 2^30, limited for safe operation)
-//#define MIN_POSITION_LIMIT      -0x7fffffff       // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_VELOCITY            7000            // rpm
+//#define MIN_POSITION_LIMIT     -0x7fffffff        // ticks (min range: -2^30, limited for safe operation)
+//#define MAX_VELOCITY            7000              // rpm
 #define MAX_ACCELERATION        7000            // rpm/s
 #define MAX_DECELERATION        7000            // rpm/s
 #define MAX_CURRENT_VARIATION   800             // adc_ticks/s
