@@ -484,7 +484,16 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
         default:
             torque_ref = value * sign;
             i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d [milli-Nm]\n", torque_ref);
+
+            delay_milliseconds(1);
+            motorcontrol_config = i_motorcontrol.get_config();
+            if(torque_ref>motorcontrol_config.max_torque || torque_ref<-motorcontrol_config.max_torque)
+            {
+                    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+                    printf("above limits! torque %d [milli-Nm]\n", upstream_control_data.torque_set);
+            }
+            else
+                printf("torque %d [milli-Nm]\n", torque_ref);
             break;
         }
     }
