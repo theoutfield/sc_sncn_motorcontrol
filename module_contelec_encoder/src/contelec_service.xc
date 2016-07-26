@@ -201,7 +201,7 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
 //                t :> time;
 //                if (timeafter(time, last_read + contelec_config.timeout)) {
                 t when timerafter(last_read + contelec_config.timeout) :> void;
-                    { void, count, angle, void } = contelec_encoder_read(spi_ports);
+                    { void, count, void, angle } = contelec_encoder_read(spi_ports);
                     t :> last_read;
                     position = angle;
                     last_position = angle;
@@ -321,7 +321,7 @@ int check_contelec_config(CONTELECConfig &contelec_config) {
 
         //execute command
         case i_contelec[int i].command_contelec(int opcode, int data, int data_bits) -> unsigned int status:
-                delay_ticks(10*USEC_FAST);
+                delay_ticks(50*USEC_FAST);
                 contelec_encoder_write(spi_ports, opcode, data, data_bits);
                 { status, void, void, void } = contelec_encoder_read(spi_ports);
                 t :> last_read;

@@ -516,6 +516,24 @@ void position_control_service(ControlConfig &position_control_config,
                 out_activate = activate;
                 break;
 
+            case i_position_control[int i].set_pid_values(int Kp_in, int Ki_in, int Kd_in) -> {int Kp_out, int Ki_out, int Kd_out}:
+                    if (Kp_in >= 0)
+                        position_control_config.Kp_n = Kp_in;
+                    if (Ki_in >= 0)
+                        position_control_config.Ki_n = Ki_in;
+                    if (Kd_in >= 0)
+                        position_control_config.Kd_n = Kd_in;
+                    Kp_out = position_control_config.Kp_n;
+                    Ki_out = position_control_config.Ki_n;
+                    Kd_out = position_control_config.Kd_n;
+                    if ((Kp_in+Ki_in+Kd_in) > -3) { //at least on coeff changed
+                        error_position = 0;
+                        error_position_D = 0;
+                        error_position_I = 0;
+                        previous_error = 0;
+                    }
+                    break;
+
             case i_position_control[int i].enable_position_ctrl():
 
                 if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {

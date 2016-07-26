@@ -24,14 +24,18 @@
 interface TuningInterface {
     void tune(int voltage);
     void set_limit(int limit);
-    void set_position(int position);
+    void set_position(int in_position, int velocity, int acc);
     void set_position_direct(int position);
     void set_torque(int in_torque);
     void set_torque_limit(int in_torque_limit);
 };
 
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning, interface ADCInterface client ?i_adc);
+void run_offset_tuning(int input_voltage,
+        interface MotorcontrolInterface client i_commutation,
+        interface PositionControlInterface client i_pos,
+        interface TuningInterface client ?i_tuning,
+        interface ADCInterface client ?i_adc);
 
 int auto_tuning_current(interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc, int input_voltage);
 

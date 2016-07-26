@@ -22,6 +22,7 @@
     <Probe name="Actual Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Target Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Count" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Target Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Error Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>

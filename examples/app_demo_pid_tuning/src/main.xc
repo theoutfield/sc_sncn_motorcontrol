@@ -70,8 +70,27 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_tuning, null);
+        on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0], i_position_control[1], i_tuning, null);
 
+        on tile[APP_TILE]:
+        /* XScope monitoring */
+        {
+            int actual_position, target_position;
+
+            while(1)
+            {
+                /* Read actual position from the Position Control Server */
+                actual_position = i_position_control[2].get_position();
+                target_position = i_position_control[2].get_target_position();
+
+                //xscope_int(REAL_TARGET, 1000);
+                xscope_int(TARGET_POSITION, target_position/10); //Divided by 10 for better displaying
+                xscope_int(ACTUAL_POSITION, actual_position/10); //Divided by 10 for better displaying
+//                xscope_int(FOLLOW_ERROR, (target_position-actual_position)/10); //Divided by 10 for better displaying
+
+                delay_milliseconds(1); /* 1 ms wait */
+            }
+        }
         /* Display phases currents */
 //        on tile[IFM_TILE]: adc_client(i_adc[1]);
 //        on tile[IFM_TILE]: velocity_client(i_biss[1]);
@@ -82,7 +101,7 @@ int main(void) {
 #elif(MOTOR_COMMUTATION_SENSOR == AMS_SENSOR)
         on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, null, i_ams[1]);
 #elif(MOTOR_COMMUTATION_SENSOR == CONTELEC_SENSOR)
-        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], null, null, null, null, i_contelec[1]);
+        on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], null, null, null, i_contelec[1]);
 #else
         on tile[APP_TILE_2]: tuning_service(i_tuning, i_motorcontrol[1], i_adc[1], i_position_control[0], i_hall[1], null, null);
 #endif
@@ -112,7 +131,6 @@ int main(void) {
                     i_position_control);
 #endif
         }
-
 
         on tile[IFM_TILE]:
         {
@@ -176,10 +194,10 @@ int main(void) {
                 {
                     CONTELECConfig contelec_config;
                     contelec_config.filter = CONTELEC_FILTER;
-                    contelec_config.polarity = CONTELEC_POLARITY;
+                    contelec_config.polarity = CONTELEC_POLARITY;//_INVERTED;
                     contelec_config.resolution_bits = CONTELEC_RESOLUTION;
-                    contelec_config.offset = CONTELEC_OFFSET;
-                    contelec_config.pole_pairs = POLE_PAIRS;
+                    contelec_config.offset = 29170;//CONTELEC_OFFSET;
+                    contelec_config.pole_pairs = POLE_PAIRS*6;
                     contelec_config.timeout = CONTELEC_TIMEOUT;
                     contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                     contelec_config.enable_push_service = PushAll;
@@ -204,8 +222,8 @@ int main(void) {
                     motorcontrol_config.commutation_method = FOC;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.hall_offset[0] = 2700;//COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset[1] = 2700;//COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 #if(MOTOR_COMMUTATION_SENSOR == BISS_SENSOR)
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,

@@ -171,12 +171,12 @@ int main(void)
                 contelec_config.filter = CONTELEC_FILTER;
                 contelec_config.polarity = CONTELEC_POLARITY;
                 contelec_config.resolution_bits = CONTELEC_RESOLUTION;
-                contelec_config.offset = CONTELEC_OFFSET;
-                contelec_config.pole_pairs = 2;
+                contelec_config.offset = 19236;//CONTELEC_OFFSET; //
+                contelec_config.pole_pairs = 7;
                 contelec_config.timeout = CONTELEC_TIMEOUT;
                 contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
 
-                contelec_service(spi_ports, contelec_config, i_contelec);
+                contelec_service(spi_ports, contelec_config, null, i_contelec);
             }
         }
     }

@@ -75,6 +75,8 @@ interface PositionControlInterface{
     int check_busy();
 
     void set_torque_limit(int in_torque_limit);
+
+    {int, int, int} set_pid_values(int Kp_in, int Ki_in, int Kd_in);
 };
 
 /**

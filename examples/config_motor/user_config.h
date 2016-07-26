@@ -57,7 +57,7 @@
 #define COMMUTATION_LOOP_PERIOD     110
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      2850//0
+#define COMMUTATION_OFFSET_CLK      0//2870//0
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     COMMUTATION_OFFSET_CLK
@@ -73,8 +73,8 @@
 #define CONTROL_LOOP_PERIOD     1000
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
-#define POSITION_Kp       1000
-#define POSITION_Ki       1
+#define POSITION_Kp       7000
+#define POSITION_Ki       5
 #define POSITION_Kd       0
 
 // PID FOR VELOCITY CONTROL (if applicable) [will be divided by 10000]
@@ -103,8 +103,8 @@
 // PROFILER LIMITIS
 #define MAX_POSITION_LIMIT      0x7fffffff        // ticks (max range: 2^30, limited for safe operation)
 #define MIN_POSITION_LIMIT      -0x7fffffff       // ticks (min range: -2^30, limited for safe operation)
-#define MAX_VELOCITY            7000            // rpm
+#define MAX_VELOCITY            3750            // rpm
 #define MAX_ACCELERATION        7000            // rpm/s
 #define MAX_DECELERATION        7000            // rpm/s
-#define MAX_CURRENT_VARIATION   800             // adc_ticks/s
-#define MAX_CURRENT             800             // adc_ticks
+#define MAX_CURRENT_VARIATION   8000             // adc_ticks/s
+#define MAX_CURRENT             8000             // adc_ticks

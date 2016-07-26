@@ -40,10 +40,10 @@ void position_profile_test(interface PositionControlInterface client i_position_
                            interface AMSInterface client ?i_ams,
                            interface CONTELECInterface client ?i_contelec)
 {
-    const int target = 200000;
+    const int target = 1000000;
 //    const int target = 2620000;
     int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
-    int velocity        = 100;         // rpm
+    int velocity        = 500;         // rpm
     int acceleration    = 100;         // rpm/s
     int deceleration    = 100;         // rpm/s
     int follow_error = 0;
@@ -175,7 +175,7 @@ int main(void)
                     CONTELECConfig contelec_config;
                     contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                     contelec_config.polarity = CONTELEC_POLARITY_INVERTED;
-                    contelec_config.offset = 19236;
+                    contelec_config.offset = 29661;//24542;//24267;//19236;
                     contelec_config.timeout = CONTELEC_TIMEOUT;
                     contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                     contelec_config.max_ticks = 0x7fffffff;
@@ -195,11 +195,11 @@ int main(void)
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
                     motorcontrol_config.commutation_method = FOC;
-                    motorcontrol_config.polarity_type = MOTOR_POLARITY;
+                    motorcontrol_config.polarity_type = MOTOR_POLARITY; //INVERTED_POLARITY;//
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.hall_offset[0] = 300;//COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset[1] = 300;//COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,

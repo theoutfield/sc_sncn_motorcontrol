@@ -67,6 +67,7 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     unsigned int time;
     int steps;
     int position_ramp;
+//    static int tmp_target = 0;
 
     int actual_position = 0;
     int init_state = i_position_control.check_busy();
@@ -78,6 +79,10 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     }
 
     actual_position = i_position_control.get_position();
+//    if (tmp_target == 0)
+//        actual_position = i_position_control.get_position();
+//    else
+//        actual_position = tmp_target;
 
     steps = init_position_profile(target_position, actual_position, velocity, acceleration, deceleration);
 
@@ -90,4 +95,5 @@ void set_profile_position(int target_position, int velocity, int acceleration, i
     }
     t when timerafter(time + 30 * MSEC_STD) :> time;
 
+//    tmp_target = target_position;
 }

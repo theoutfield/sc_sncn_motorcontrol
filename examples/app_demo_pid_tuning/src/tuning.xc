@@ -8,8 +8,11 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation, interface TuningInterface client ?i_tuning,
-                       interface ADCInterface client ?i_adc)
+void run_offset_tuning(int position_limit,
+        interface MotorcontrolInterface client i_motorcontrol,
+        interface PositionControlInterface client i_pos,
+        interface TuningInterface client ?i_tuning,
+        interface ADCInterface client ?i_adc)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
@@ -17,6 +20,9 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     int field_control_flag = 1;
     int torque_flag = 0;
     int input_voltage = 0;
+
+    int velocity = 250, acceleration = 50;
+
     //set position limit
     if (position_limit && !isnull(i_tuning))
         i_tuning.set_limit(position_limit);
@@ -59,29 +65,51 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                 field_control_flag = 0;
                 printf("Field and Torque controlers deactivated\n");
             }
-            i_commutation.set_control(field_control_flag);
+            i_motorcontrol.set_control(field_control_flag);
             break;
         //pid
+//        case 'k':
+//            int Kp, Ki, Kd;
+//            switch(mode_2) {
+//            case 'p':
+//                { Kp, Ki, Kd } = i_motorcontrol.set_torque_pid(value, -1, -1);
+//                printf("Kp torque: %d\n", value);
+//                break;
+//            case 'i':
+//                { Kp, Ki, Kd } = i_motorcontrol.set_torque_pid(-1, value, -1);
+//                printf("Ki torque: %d\n", value);
+//                break;
+//            case 'd':
+//                { Kp, Ki, Kd } = i_motorcontrol.set_torque_pid(-1, -1, value);
+//                printf("Kd torque: %d\n", value);
+//                break;
+//            default:
+//                { Kp, Ki, Kd } = i_motorcontrol.set_torque_pid(-1, -1, -1);
+//                break;
+//            }
+//            printf("Kp_t: %d, Ki_t:%d, Kd_t: %d\n", Kp, Ki, Kd);
+//            break;
+
         case 'k':
             int Kp, Ki, Kd;
             switch(mode_2) {
             case 'p':
-                { Kp, Ki, Kd } = i_commutation.set_torque_pid(value, -1, -1);
-                printf("Kp torque: %d\n", value);
+                { Kp, Ki, Kd } = i_pos.set_pid_values(value, -1, -1);
+                printf("Kp position: %d\n", value);
                 break;
             case 'i':
-                { Kp, Ki, Kd } = i_commutation.set_torque_pid(-1, value, -1);
-                printf("Ki torque: %d\n", value);
+                { Kp, Ki, Kd } = i_pos.set_pid_values(-1, value, -1);
+                printf("Ki position: %d\n", value);
                 break;
             case 'd':
-                { Kp, Ki, Kd } = i_commutation.set_torque_pid(-1, -1, value);
-                printf("Kd torque: %d\n", value);
+                { Kp, Ki, Kd } = i_pos.set_pid_values(-1, -1, value);
+                printf("Kd position: %d\n", value);
                 break;
             default:
-                { Kp, Ki, Kd } = i_commutation.set_torque_pid(-1, -1, -1);
+                { Kp, Ki, Kd } = i_pos.set_pid_values(-1, -1, -1);
                 break;
             }
-            printf("Kp_t: %d, Ki_t:%d, Kd_t: %d\n", Kp, Ki, Kd);
+            printf("Kp_p: %d, Ki_p:%d, Kd_p: %d\n", Kp, Ki, Kd);
             break;
         //position limit
         case 'l':
@@ -90,18 +118,56 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         //go to position with profile
         case 'p':
             if (!isnull(i_tuning))
-                i_tuning.set_position(value*sign);
+                i_tuning.set_position(value*sign, 600, 200);
+
             break;
+
+        case 'q':
+            switch(mode_2) {
+                case 'v':
+                    velocity = value * sign;
+                    printf("Velocity: %d, acceleration: %d\n", velocity, acceleration);
+                break;
+                case 'a':
+                    acceleration = value * sign;
+                    printf("Velocity: %d, acceleration: %d\n", velocity, acceleration);
+                break;
+                case 'c':
+                    printf("Velocity: %d, acceleration: %d\n", velocity, acceleration);
+                    int act_pos;
+                    if (!isnull(i_tuning))
+                    {
+                        act_pos = i_pos.get_position();
+                        printf("Position: %d\n", act_pos);
+                        i_tuning.set_position(act_pos + value*sign, velocity, acceleration);
+//                        delay_milliseconds(20);
+                        i_tuning.set_position(act_pos - value*sign, velocity, acceleration);
+                        //delay_milliseconds(20);
+                        //i_tuning.set_position(act_pos, velocity, acceleration);
+
+                        i_tuning.set_position(act_pos + value*sign, velocity, acceleration);
+//                        delay_milliseconds(20);
+                        i_tuning.set_position(act_pos - value*sign, velocity, acceleration);
+                        //delay_milliseconds(20);
+                        i_tuning.set_position(act_pos, velocity, acceleration);
+                    }
+                    break;
+                default:
+                    printf("Velocity: %d, acceleration: %d\n", velocity, acceleration);
+                    break;
+            }
+            break;
+
         //reverse voltage
         case 'r':
             input_voltage = -input_voltage;
             if (torque_flag) {
-                i_commutation.set_torque(input_voltage);
+                i_motorcontrol.set_torque(input_voltage);
                 if (!isnull(i_tuning))
                     i_tuning.set_torque(input_voltage);
                 printf("torque %d\n", input_voltage);
             } else {
-                i_commutation.set_voltage(input_voltage);
+                i_motorcontrol.set_voltage(input_voltage);
                 printf("voltage: %i\n", input_voltage);
             }
             break;
@@ -113,7 +179,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             } else {
                 field_control_flag = 1;
                 input_voltage = value * sign;
-                i_commutation.set_torque(input_voltage);
+                i_motorcontrol.set_torque(input_voltage);
                 torque_flag = 1;
                 if (!isnull(i_tuning))
                     i_tuning.set_torque(input_voltage);
@@ -123,10 +189,11 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         //set voltage
         default:
             i_tuning.set_position_direct(0x7fffffff);
-            i_commutation.set_fets_state(1);
+            i_motorcontrol.set_fets_state(1);
             torque_flag = 0;
+            if (value > 1500) value = 1500;
             input_voltage = value * sign;
-            i_commutation.set_voltage(input_voltage);
+            i_motorcontrol.set_voltage(input_voltage);
             printf("voltage: %i\n", input_voltage);
             break;
         }
@@ -150,11 +217,11 @@ int find_peak_current(interface ADCInterface client i_adc, int period, int times
 }
 
 
-int auto_tuning_current(interface MotorcontrolInterface client i_commutation, interface ADCInterface client i_adc, int input_voltage)
+int auto_tuning_current(interface MotorcontrolInterface client i_motorcontrol, interface ADCInterface client i_adc, int input_voltage)
 {
     int step = 2;
     int start_offset = 0;
-    MotorcontrolConfig motorcontrol_config = i_commutation.get_config();
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
     if (motorcontrol_config.commutation_method == FOC || (input_voltage >= 0 && motorcontrol_config.bldc_winding_type == STAR_WINDING) || (input_voltage <= 0 && motorcontrol_config.bldc_winding_type == DELTA_WINDING))
         start_offset = motorcontrol_config.hall_offset[0];
     else
@@ -175,7 +242,7 @@ int auto_tuning_current(interface MotorcontrolInterface client i_commutation, in
                     motorcontrol_config.hall_offset[0] = pos_offset;
                 else
                     motorcontrol_config.hall_offset[1] = pos_offset;
-                i_commutation.set_config(motorcontrol_config);
+                i_motorcontrol.set_config(motorcontrol_config);
                 //find the peak current
                 int peak_current = find_peak_current(i_adc, 1000, 200);
                 //update minimum current and best offset
@@ -192,7 +259,7 @@ int auto_tuning_current(interface MotorcontrolInterface client i_commutation, in
         motorcontrol_config.hall_offset[0] = best_offset;
     else
         motorcontrol_config.hall_offset[1] = best_offset;
-    i_commutation.set_config(motorcontrol_config);
+    i_motorcontrol.set_config(motorcontrol_config);
     return best_offset;
 }
 
@@ -205,7 +272,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 }
 
 [[combinable]]
- void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_commutation,
+ void tuning_service(interface TuningInterface server i_tuning, interface MotorcontrolInterface client i_motorcontrol,
                      interface ADCInterface client ?i_adc, interface PositionControlInterface client ?i_position_control,
                      interface HallInterface client ?i_hall, interface BISSInterface client ?i_biss, interface AMSInterface client ?i_ams,
                              interface CONTELECInterface client ?i_contelec)
@@ -213,7 +280,7 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
     timer t;
     unsigned ts;
     t :> ts;
-    MotorcontrolConfig motorcontrol_config = i_commutation.get_config();
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
     int count = 0;
     int torque_offset = 0;
     int velocity = 0;
@@ -245,6 +312,8 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
         init_position_profiler(profiler_config, i_position_control, i_hall, null, i_biss, i_ams, i_contelec);
     }
 
+    //i_contelec.reset_contelec_position(0);
+    //i_contelec.command_contelec(0x56, 0, 0);
 
 //    if (!isnull(i_adc)) {
 //        { adc_a, adc_b } = i_adc.get_external_inputs();
@@ -272,13 +341,13 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
                 count = i_hall.get_hall_position_absolute();
                 velocity = i_hall.get_hall_velocity();
             }
-            xscope_int(VELOCITY, velocity);
+//            xscope_int(VELOCITY, velocity);
 
 //            //torque display
 //            if (motorcontrol_config.commutation_method == FOC) {
-//                int torque = i_commutation.get_torque_actual();
+//                int torque = i_motorcontrol.get_torque_actual();
 //                int actual_voltage, error_torque_integral;
-//                {actual_voltage, error_torque_integral} = i_commutation.get_torque_control_out();
+//                {actual_voltage, error_torque_integral} = i_motorcontrol.get_torque_control_out();
 //                xscope_int(VOLTAGE, actual_voltage);
 //                xscope_int(TORQUE, torque);
 //                xscope_int(TARGET_TORQUE, target_torque);
@@ -286,22 +355,24 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 //                xscope_int(ERROR_TORQUE_INTEGRAL, error_torque_integral);
 //            }
 
-            if (!isnull(i_position_control)) {
-                xscope_int(TARGET_POSITION, i_position_control.get_target_position());
-                xscope_int(ACTUAL_POSITION, i_position_control.get_position());
-            }
+//            if (!isnull(i_position_control)) {
+////                xscope_int(TARGET_POSITION, i_position_control.get_target_position());
+////                xscope_int(ACTUAL_POSITION, i_position_control.get_position());
+////                xscope_int(COUNT, count);
+//                //xscope_int(ACTUAL_POSITION, i_contelec.get_contelec_position);
+//            }
 
             //postion limiter
             if (position_limit > 0) {
                 if (count >= position_limit && velocity > 10) {
-                    i_commutation.set_voltage(0);
+                    i_motorcontrol.set_voltage(0);
                     if (print_position_limit >= 0) {
                         print_position_limit = -1;
                         printf("up limit reached\n");
                     }
                     position_limit_reached = 1;
                 } else if (count <= -position_limit && velocity < -10) {
-                    i_commutation.set_voltage(0);
+                    i_motorcontrol.set_voltage(0);
                     if (print_position_limit <= 0) {
                         print_position_limit = 1;
                         printf("down limit reached\n");
@@ -316,14 +387,14 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
         case i_tuning.tune(int in_voltage):
             break;
 
-        case i_tuning.set_position(int in_position):
+        case i_tuning.set_position(int in_position, int velocity, int acc):
             if (!isnull(i_position_control)) {
                 /* Set new target position for profile position control */
-                set_profile_position(in_position, 600, 200, 200, i_position_control);
+                set_profile_position(in_position, velocity, acc, acc, i_position_control);
                 printf("Returned to %d\n", in_position);
-                i_position_control.disable_position_ctrl();
+                //i_position_control.disable_position_ctrl();
 //                delay_milliseconds(500);
-                i_commutation.set_fets_state(1);
+                //i_motorcontrol.set_fets_state(1);
             } else {
                 printf("No position control\n");
             }

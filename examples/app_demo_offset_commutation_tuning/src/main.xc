@@ -162,7 +162,7 @@ int main(void) {
                 {
                     CONTELECConfig contelec_config;
                     contelec_config.filter = CONTELEC_FILTER;
-                    contelec_config.polarity = CONTELEC_POLARITY;
+                    contelec_config.polarity = CONTELEC_POLARITY_INVERTED;
                     contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                     contelec_config.offset = CONTELEC_OFFSET;
                     contelec_config.pole_pairs = POLE_PAIRS;
@@ -187,7 +187,7 @@ int main(void) {
                 {
                     MotorcontrolConfig motorcontrol_config;
                     motorcontrol_config.motor_type = BLDC_MOTOR;
-                    motorcontrol_config.polarity_type = MOTOR_POLARITY;
+                    motorcontrol_config.polarity_type = MOTOR_POLARITY;//INVERTED_POLARITY;//MOTOR_POLARITY;
                     motorcontrol_config.commutation_method = FOC;
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;

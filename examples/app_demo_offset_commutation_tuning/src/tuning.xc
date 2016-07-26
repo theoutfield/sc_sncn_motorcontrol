@@ -234,6 +234,11 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             i_tuning.set_sensor_offset(offset);
             printf("Sensor offset: %d\n", offset);
             break;
+
+        case 'b':
+            i_tuning.set_sensor_polarity();
+            break;
+
         //set torque
         case 't':
             if (motorcontrol_config.commutation_method == FOC) {
@@ -627,6 +632,23 @@ static inline void update_offset(MotorcontrolConfig &motorcontrol_config, int vo
 
         case i_tuning.auto_offset() -> int out_offset:
             out_offset = auto_offset(i_commutation, i_contelec, i_ams);
+            break;
+
+        case i_tuning.set_sensor_polarity(void):
+            if (motorcontrol_config.commutation_sensor == CONTELEC_SENSOR && !isnull(i_contelec)) {
+                CONTELECConfig contelec_config = i_contelec.get_contelec_config();
+                if (contelec_config.polarity == CONTELEC_POLARITY_NORMAL)
+                {
+                    contelec_config.polarity = CONTELEC_POLARITY_INVERTED;
+                    printf("Sensor polarity: Inverted\n");
+                }
+                else
+                {
+                    contelec_config.polarity = CONTELEC_POLARITY_NORMAL;
+                    printf("Sensor polarity: Normal\n");
+                }
+                i_contelec.set_contelec_config(contelec_config);
+            }
             break;
 
         case i_tuning.set_sensor_offset(int in_offset) -> int out_offset:
