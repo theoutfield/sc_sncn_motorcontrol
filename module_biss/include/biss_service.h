@@ -17,7 +17,7 @@
  * @param i_shared_memory Communication interface to the shared memory service.
  * @param i_biss Array of communication interfaces to handle up to 5 different clients.
  */
-void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3]);
+void biss_service(BISSPorts &biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3]);
 
 
 /**
@@ -30,7 +30,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
  *
  * @return error status (NoError, CRCError, NoAck, NoStartBit)
  */
-unsigned int read_biss_sensor_data(PositionFeedbackPorts &position_feedback_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes);
+unsigned int read_biss_sensor_data(BISSPorts &biss_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes);
 
 
 /**
@@ -42,7 +42,7 @@ unsigned int read_biss_sensor_data(PositionFeedbackPorts &position_feedback_port
  *
  * @return data
  */
-unsigned int read_biss_sensor_data_fast(PositionFeedbackPorts &position_feedback_ports, int before_length, int data_length);
+unsigned int read_biss_sensor_data_fast(BISSPorts &biss_ports, int before_length, int data_length);
 
 
 /**

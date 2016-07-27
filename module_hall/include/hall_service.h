@@ -18,8 +18,8 @@
  * @param hall_config Configuration for the service.
  * @param i_hall Array of communication interfaces to handle up to 5 different clients.
  */
-[[combinable]]
-void hall_service(PositionFeedbackPorts &position_feedback_ports, HallConfig & hall_config,
+//[[combinable]]
+void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedback_config,
                   client interface shared_memory_interface ?i_shared_memory,
                   server interface PositionFeedbackInterface i_position_feedback[3]);
 

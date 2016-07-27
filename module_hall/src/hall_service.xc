@@ -23,15 +23,15 @@ int check_hall_config(HallConfig &hall_config){
     return SUCCESS;
 }
 
-[[combinable]]
- void hall_service(PositionFeedbackPorts &position_feedback_ports, HallConfig & hall_config,
+//[[combinable]]
+ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedback_config,
                    client interface shared_memory_interface ?i_shared_memory,
                    server interface PositionFeedbackInterface i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    if (check_hall_config(hall_config) == ERROR) {
+    if (check_hall_config(position_feedback_config.hall_config) == ERROR) {
         printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
         return;
     }
@@ -85,14 +85,14 @@ int check_hall_config(HallConfig &hall_config){
     int hall_crossover = (4096 * 9 )/10;
     int status = 0; //1 changed
 
-    int config_max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
+    int config_max_ticks_per_turn = position_feedback_config.hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
     int const config_hall_max_count = INT_MAX;
     int const config_hall_min_count = INT_MIN;
 
     int notification = MOTCTRL_NTF_EMPTY;
 
     /* Init hall sensor */
-    position_feedback_ports.p_hall :> pin_state;
+    hall_ports.p_hall :> pin_state;
     pin_state &= 0x07;
     pin_state_monitor = pin_state;
     switch (pin_state) {
@@ -119,7 +119,8 @@ int check_hall_config(HallConfig &hall_config){
     t1 :> time1;
     tmr :> ts;
 
-    while (1) {
+    int loop_flag = 1;
+    while (loop_flag) {
 //#pragma xta endpoint "hall_loop"
       //[[ordered]] //FixMe ordered is not supported for combinable functions
         select {
@@ -164,18 +165,18 @@ int check_hall_config(HallConfig &hall_config){
 
             case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
 
-                out_config.hall_config = hall_config;
+                out_config = position_feedback_config;
                 break;
 
             case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
 
-                hall_config = in_config.hall_config;
-                config_max_ticks_per_turn = hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
+                position_feedback_config = in_config;
+                config_max_ticks_per_turn = position_feedback_config.hall_config.pole_pairs * HALL_TICKS_PER_ELECTRICAL_ROTATION;
                 status = 1;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 3; i++) {
                     i_position_feedback[i].notification();
                 }
                 break;
@@ -193,15 +194,19 @@ int check_hall_config(HallConfig &hall_config){
             case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
                 break;
 
+            case i_position_feedback[int i].exit():
+                loop_flag = 0;
+                continue;
+
             case tmr when timerafter(ts + PULL_PERIOD_USEC * USEC_FAST) :> ts: //12 usec 3000
                 switch (xreadings) {
                     case 0:
-                        position_feedback_ports.p_hall :> new1;
+                        hall_ports.p_hall :> new1;
                         new1 &= 0x07;
                         xreadings++;
                         break;
                     case 1:
-                        position_feedback_ports.p_hall :> new2;
+                        hall_ports.p_hall :> new2;
                         new2 &= 0x07;
                         if (new2 == new1) {
                             xreadings++;
@@ -210,7 +215,7 @@ int check_hall_config(HallConfig &hall_config){
                         }
                         break;
                     case 2:
-                        position_feedback_ports.p_hall :> new2;
+                        hall_ports.p_hall :> new2;
                         new2 &= 0x07;
                         if (new2 == new1) {
                             pin_state = new2;
@@ -220,7 +225,7 @@ int check_hall_config(HallConfig &hall_config){
                         break;
                 }//eof switch
 
-                position_feedback_ports.p_hall :> pin_state_monitor;
+                hall_ports.p_hall :> pin_state_monitor;
                 pin_state_monitor &= 0x07;
 
                 iCountMicroSeconds = iCountMicroSeconds + PULL_PERIOD_USEC; // period in 12 usec
@@ -355,11 +360,11 @@ int check_hall_config(HallConfig &hall_config){
                 }
 
                 if (!isnull(i_shared_memory)) {
-                    if (hall_config.enable_push_service == PushAll) {
+                    if (position_feedback_config.hall_config.enable_push_service == PushAll) {
                         i_shared_memory.write_angle_velocity_position(angle, raw_velocity, count);
-                    } else if (hall_config.enable_push_service == PushAngle) {
+                    } else if (position_feedback_config.hall_config.enable_push_service == PushAngle) {
                         i_shared_memory.write_angle_electrical(angle);
-                    } else if (hall_config.enable_push_service == PushPosition) {
+                    } else if (position_feedback_config.hall_config.enable_push_service == PushPosition) {
                         i_shared_memory.write_velocity_position(raw_velocity, count);
                     }
                 }

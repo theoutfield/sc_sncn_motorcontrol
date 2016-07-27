@@ -52,7 +52,7 @@ static inline void update_turns(int &turns, int last_position, int position, int
 //    return SUCCESS;
 //}
 
-void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
+void biss_service(BISSPorts &biss_ports, BISSConfig & biss_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -100,16 +100,16 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
     int notification = MOTCTRL_NTF_EMPTY;
 
     //clock and port configuration
-    configure_clock_rate(position_feedback_ports.spi_interface.blk1, biss_config.clock_dividend, biss_config.clock_divisor); // a/b MHz
-    configure_out_port(position_feedback_ports.p_biss_clk, position_feedback_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
-    configure_in_port(position_feedback_ports.p_biss_data, position_feedback_ports.spi_interface.blk1);
+//    configure_clock_rate(biss_ports.spi_interface.blk1, biss_config.clock_dividend, biss_config.clock_divisor); // a/b MHz
+//    configure_out_port(biss_ports.p_biss_clk, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
+//    configure_in_port(biss_ports.p_biss_data, biss_ports.spi_interface.blk1);
 
     //first read
     t :> time;
     last_biss_read = time;
     do {
         t when timerafter(last_biss_read + biss_config.timeout) :> void;
-        last_count = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
+        last_count = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
         t :> last_biss_read;
     } while (last_count != NoError && !timeafter(last_biss_read, time + 1000000*BISS_USEC));
     if (last_count == CRCError)
@@ -144,7 +144,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 t :> time;
                 if (timeafter(time, last_biss_read + biss_config.timeout)) {
-                    angle = read_biss_sensor_data_fast(position_feedback_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
+                    angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
                     t :> last_biss_read;
                     last_position = angle;
                 } else
@@ -162,7 +162,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
 //        case i_position_feedback[int i].get_position_fast() -> unsigned int position:
 //                t :> time;
 //                if (timeafter(time, last_biss_read + biss_config.timeout)) {
-//                    position = read_biss_sensor_data_fast(position_feedback_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
+//                    position = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, biss_config.singleturn_resolution);
 //                    t :> last_biss_read;
 //                    last_position = position;
 //                } else
@@ -177,7 +177,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
                 t :> time;
                 if (timeafter(time, last_count_read + biss_config.timeout)) {
                     t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                    int error = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
+                    int error = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
                     t :> last_biss_read;
                     last_count_read = last_biss_read;
                     { count_internal, position, void } = biss_encoder(data, biss_config);
@@ -213,7 +213,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
         //send count, position and status (error and warning bits) as returned by the encoder (not ajusted)
         case i_position_feedback[int i].get_real_position() -> { int count, unsigned int position, unsigned int status }:
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                int error = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
+                int error = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 { count, position, status } = biss_encoder(data, biss_config);
@@ -262,7 +262,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
         //receive the new count to set and set the offset accordingly
         case i_position_feedback[int i].set_position(int new_count):
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
+                read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 int count, position;
@@ -282,7 +282,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
         //receive the new elecrical angle to set and set the offset accordingly
         case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int offset:
                 t when timerafter(last_biss_read + biss_config.timeout) :> void;
-                read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
+                read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 int count, angle;
@@ -302,12 +302,15 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
                 break;
 
+        case i_position_feedback[int i].exit():
+                break;
+
         //compute velocity
         case t when timerafter(next_velocity_read) :> start_time:
             next_velocity_read += velocity_loop;
             int count, position, angle, count_internal, difference;
             t when timerafter(last_biss_read + biss_config.timeout) :> void;
-            int error = read_biss_sensor_data(position_feedback_ports, biss_config, data, BISS_FRAME_BYTES);
+            int error = read_biss_sensor_data(biss_ports, biss_config, data, BISS_FRAME_BYTES);
             t :> last_biss_read;
 //            if (error == 1) {
             last_count_read = last_biss_read;
@@ -396,7 +399,7 @@ void biss_service(PositionFeedbackPorts &position_feedback_ports, BISSConfig & b
 }
 
 
-unsigned int read_biss_sensor_data(PositionFeedbackPorts &position_feedback_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes) {
+unsigned int read_biss_sensor_data(BISSPorts &biss_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes) {
     unsigned int frame[frame_bytes];
     unsigned int crc  =  0;
     unsigned int status = 0;
@@ -410,7 +413,7 @@ unsigned int read_biss_sensor_data(PositionFeedbackPorts &position_feedback_port
         data[i] = 0;
 
     //get the raw data
-    start_clock(position_feedback_ports.spi_interface.blk1);
+//    start_clock(biss_ports.spi_interface.blk1);
     for (int i=0; i<timeout+data_length+crc_length; i++) {
         if (bitindex == 32) {
             frame[byteindex] = readbuf;
@@ -419,15 +422,16 @@ unsigned int read_biss_sensor_data(PositionFeedbackPorts &position_feedback_port
             byteindex++;
         }
         unsigned int bit;
-        position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-        position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-//        sync(position_feedback_ports.p_biss_clk);
-        position_feedback_ports.p_biss_data :> bit;
+        biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
+        biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+//        sync(biss_ports.p_biss_clk);
+        biss_ports.p_biss_data :> bit;
         readbuf = readbuf << 1;
         readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         bitindex++;
     }
-    configure_out_port(position_feedback_ports.p_biss_clk, position_feedback_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
+    biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+//    configure_out_port(biss_ports.p_biss_clk, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
     readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
     frame[byteindex] = readbuf;
     byteindex = 0;
@@ -487,18 +491,18 @@ unsigned int read_biss_sensor_data(PositionFeedbackPorts &position_feedback_port
 }
 
 
-unsigned int read_biss_sensor_data_fast(PositionFeedbackPorts &position_feedback_ports, int before_length, int data_length) {
+unsigned int read_biss_sensor_data_fast(BISSPorts &biss_ports, int before_length, int data_length) {
     unsigned int data = 0;
     int status = 0;
     int timeout = 5; //3 bits to read before then the ack and start bits
 
-    start_clock(position_feedback_ports.spi_interface.blk1);
+//    start_clock(biss_ports.spi_interface.blk1);
     while(status < 2 && timeout > 0) {
         timeout--;
         unsigned int bit;
-        position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-        position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-        position_feedback_ports.p_biss_data :> bit;
+        biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
+        biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+        biss_ports.p_biss_data :> bit;
         bit = (bit & (1 << BISS_DATA_PORT_BIT));
         if (status) {
             if (bit) //status = 2, ack and start bit found
@@ -508,21 +512,22 @@ unsigned int read_biss_sensor_data_fast(PositionFeedbackPorts &position_feedback
     }
     if (timeout >= 0) {
         for (int i=0; i<before_length; i++) {
-            position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-            position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-            position_feedback_ports.p_biss_data :> void;
+            biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
+            biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+            biss_ports.p_biss_data :> void;
         }
         for (int i=0; i<data_length; i++) {
             unsigned int bit;
-            position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-            position_feedback_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-            position_feedback_ports.p_biss_data :> bit;
+            biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
+            biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+            biss_ports.p_biss_data :> bit;
             data = data << 1;
             data |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         }
     }
-    stop_clock(position_feedback_ports.spi_interface.blk1);
-    configure_out_port(position_feedback_ports.p_biss_clk, position_feedback_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
+    biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+//    stop_clock(biss_ports.spi_interface.blk1);
+//    configure_out_port(biss_ports.p_biss_clk, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
 
     return data;
 }

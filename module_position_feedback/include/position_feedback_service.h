@@ -64,6 +64,8 @@ interface PositionFeedbackInterface
     unsigned int set_angle(unsigned int in_angle);
 
     unsigned int send_command(int opcode, int data, int data_bits);
+
+    void exit();
 };
 
 
@@ -76,6 +78,21 @@ typedef struct
     spi_master_interface spi_interface;
 } PositionFeedbackPorts;
 
+typedef struct {
+    spi_master_interface spi_interface;
+    port ?slave_select;
+} SPIPorts;
+
+typedef struct {
+    port ?p_biss_data;   /**< Port for BiSS Interface signal input. */
+    port ?p_biss_clk;    /**< Port for BiSS Interface clock output. */
+} BISSPorts;
+
+typedef struct {
+    port ?p_hall;        /**< Port for Hall signals. */
+} HallPorts;
+
+
 #include <memory_manager.h>
 #include <biss_service.h>
 #include <contelec_service.h>
@@ -83,10 +100,11 @@ typedef struct
 #include <qei_service.h>
 
 
-void position_feedback_service(PositionFeedbackPorts &?position_feedback_ports_1, PositionFeedbackConfig &?position_feedback_config_1,
+void position_feedback_service(HallPorts &?hall_ports, BISSPorts &?biss_ports, SPIPorts &?spi_ports,
+                               PositionFeedbackConfig &?position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
                                server interface PositionFeedbackInterface ?i_position_feedback_1[3],
-                               PositionFeedbackPorts &?position_feedback_ports_2, PositionFeedbackConfig &?position_feedback_config_2,
+                               PositionFeedbackConfig &?position_feedback_config_2,
                                client interface shared_memory_interface ?i_shared_memory_2,
                                server interface PositionFeedbackInterface ?i_position_feedback_2[3]);
 
