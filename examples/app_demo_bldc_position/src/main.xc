@@ -175,7 +175,7 @@ int main(void)
                     CONTELECConfig contelec_config;
                     contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                     contelec_config.polarity = CONTELEC_POLARITY_INVERTED;
-                    contelec_config.offset = 29661;//24542;//24267;//19236;
+                    contelec_config.offset = 33120;//24542;//24267;//19236;
                     contelec_config.timeout = CONTELEC_TIMEOUT;
                     contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                     contelec_config.max_ticks = 0x7fffffff;
@@ -198,8 +198,8 @@ int main(void)
                     motorcontrol_config.polarity_type = MOTOR_POLARITY; //INVERTED_POLARITY;//
                     motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
                     motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] = 300;//COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset[1] = 300;//COMMUTATION_OFFSET_CCLK;
+                    motorcontrol_config.hall_offset[0] = 3700;//COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_offset[1] = 3700;//COMMUTATION_OFFSET_CCLK;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
 
                     motorcontrol_service(fet_driver_ports, motorcontrol_config,

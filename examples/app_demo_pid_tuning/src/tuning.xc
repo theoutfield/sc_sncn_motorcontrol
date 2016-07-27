@@ -118,7 +118,7 @@ void run_offset_tuning(int position_limit,
         //go to position with profile
         case 'p':
             if (!isnull(i_tuning))
-                i_tuning.set_position(value*sign, 600, 200);
+                i_tuning.set_position(value*sign, 20, 10);
 
             break;
 
