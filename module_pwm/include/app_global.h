@@ -41,9 +41,7 @@
 #define _INIT_SYNC_INCREMENT (_PWM_MAX_VALUE)
 #define _HALF_SYNC_INCREMENT (_INIT_SYNC_INCREMENT >> 1)
 
-#define _ADC_TRIG_INCREMENT  (50*(_INIT_SYNC_INCREMENT/100))
 
-#define _PWM_TRIG_INCREMENT  (80*(_INIT_SYNC_INCREMENT/100))
 
 
 // The time each motor starts the PWM is staggered by this amount

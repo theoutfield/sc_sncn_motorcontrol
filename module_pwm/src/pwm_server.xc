@@ -112,12 +112,6 @@ void predriver(FetDriverPorts &fet_driver_ports)
 
 } // foc_pwm_config
 
-void update_pwm(control_variables& cv, PWM_COMMS_TYP& pwm_comms_s)
-{
-    pwm_comms_s.params.widths[0] =  cv.pwm_values[0];
-    pwm_comms_s.params.widths[1] =  cv.pwm_values[1];
-    pwm_comms_s.params.widths[2] =  cv.pwm_values[2];
-}
 
 void pwm_check(PwmPorts &ports)
 {
@@ -260,8 +254,11 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     {
         select
         {
-        case i_update_pwm.update_server_control_data(PWM_ARRAY_TYP received_pwm_ctrl_s, int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode):
-                pwm_ctrl_s = received_pwm_ctrl_s;
+        case i_update_pwm.update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode):
+                pwm_comms_s.params.widths[0] =  pwm_a;
+                pwm_comms_s.params.widths[1] =  pwm_b;
+                pwm_comms_s.params.widths[2] =  pwm_c;
+                convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf] ); // Max 178 Cycles
 
                 if(recieved_safe_torque_off_mode ==0)
                     pwm_on     = received_pwm_on;
