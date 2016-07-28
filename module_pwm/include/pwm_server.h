@@ -57,7 +57,8 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         PwmPorts &ports,
         server interface update_pwm i_update_pwm,
         int duty_start_brake,
-        int duty_maintain_brake
+        int duty_maintain_brake,
+        int time_start_brake
 );
 
 

@@ -171,7 +171,8 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         PwmPorts &ports,
         server interface update_pwm i_update_pwm,
         int duty_start_brake,
-        int duty_maintain_brake
+        int duty_maintain_brake,
+        int time_start_brake
 )
 {
 
@@ -222,6 +223,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
     int brake_active  = 0;
     int brake_counter = 0;
+    int brake_start   = (time_start_brake*15000)/1000;
 
     int pwm_flag=0;
 
@@ -326,7 +328,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
         if(brake_active && brake_defined)
         {
-            if(brake_counter < 15000)
+            if(brake_counter < brake_start)
             {
                 brake_counter++;
 
@@ -355,7 +357,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
         if(brake_active && brake_defined)
         {
-            if(brake_counter < 15000)
+            if(brake_counter < brake_start)
             {
                 ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
                 ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
