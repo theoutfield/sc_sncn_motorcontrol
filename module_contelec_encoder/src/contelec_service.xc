@@ -389,7 +389,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
         case i_position_feedback[int i].exit():
                 reset_spi_ports(spi_ports);
                 loop_flag = 0;
-                break;
+                continue;
 
         //compute velocity
         case t when timerafter(next_velocity_read) :> start_time:

@@ -13,20 +13,31 @@
 #include <stdio.h>
 
 /* Test Sensor Client */
-void position_feedback_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
+void position_feedback_test(client interface PositionFeedbackInterface i_position_feedback_1,
+                            client interface PositionFeedbackInterface ?i_position_feedback_2,
+                            client interface shared_memory_interface ?i_shared_memory)
 {
     int angle = 0;
     int velocity = 0;
     int count = 0;
+    int angle_2 = 0;
+    int velocity_2 = 0;
+    int count_2 = 0;
 
     while(1)
     {
         /* get position from Hall Sensor */
-        { count, void } = i_position_feedback.get_position();
-        angle = i_position_feedback.get_angle();
+        { count, void } = i_position_feedback_1.get_position();
+        angle = i_position_feedback_1.get_angle();
 
         /* get velocity from Hall Sensor */
-        velocity = i_position_feedback.get_velocity();
+        velocity = i_position_feedback_1.get_velocity();
+
+        if (!isnull(i_position_feedback_2)) {
+            { count_2, void } = i_position_feedback_2.get_position();
+            angle_2 = i_position_feedback_2.get_angle();
+            velocity_2 = i_position_feedback_2.get_velocity();
+        }
 
         if (!isnull(i_shared_memory)) {
             { angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
@@ -37,6 +48,9 @@ void position_feedback_test(client interface PositionFeedbackInterface i_positio
         xscope_int(COUNT, count);
         xscope_int(VELOCITY, velocity);
         xscope_int(ANGLE, angle);
+        xscope_int(COUNT_2, count_2);
+        xscope_int(VELOCITY_2, velocity_2);
+        xscope_int(ANGLE_2, angle_2);
 
         delay_milliseconds(1);
     }
@@ -82,6 +96,12 @@ void commands_test(client interface PositionFeedbackInterface i_position_feedbac
             i_position_feedback_1.set_config(position_feedback_config_1);
             printf("sensor 1 set to %d\n", position_feedback_config_1.sensor_type);
             break;
+        //set sensor 2
+        case 'b':
+            position_feedback_config_2.sensor_type = value;
+            i_position_feedback_2.set_config(position_feedback_config_2);
+            printf("sensor 2 set to %d\n", position_feedback_config_2.sensor_type);
+            break;
         }
         delay_milliseconds(10);
     }
@@ -94,18 +114,19 @@ BISSPorts biss_ports = { QEI_PORT, QEI_PORT_INPUT_MODE_SELECTION };
 int main(void)
 {
     interface PositionFeedbackInterface i_position_feedback[3];
+    interface PositionFeedbackInterface i_position_feedback_2[3];
     interface shared_memory_interface i_shared_memory[3];
 
     par
     {
         /* Client side */
-        on tile[APP_TILE]: commands_test(i_position_feedback[1], null);
+        on tile[APP_TILE]: commands_test(i_position_feedback[1], i_position_feedback_2[1]);
 
         /***************************************************
          * IFM TILE
          ***************************************************/
         on tile[IFM_TILE]: par {
-            position_feedback_test(i_position_feedback[0], null);
+            position_feedback_test(i_position_feedback[0], i_position_feedback_2[0], null);
 
             memory_manager(i_shared_memory, 3);
 
@@ -148,7 +169,13 @@ int main(void)
                 position_feedback_config.qei_config.signal_type = QEI_RS422_SIGNAL;
                 position_feedback_config.qei_config.enable_push_service = PushPosition;
 
-                position_feedback_service(hall_ports, biss_ports, spi_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null);
+                PositionFeedbackConfig position_feedback_config_2;
+                position_feedback_config_2 = position_feedback_config;
+                position_feedback_config_2.sensor_type = BISS_SENSOR;
+
+                position_feedback_service(hall_ports, biss_ports, spi_ports,
+                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                          position_feedback_config_2, null, i_position_feedback_2);
             }
         }
     }
