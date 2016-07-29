@@ -68,25 +68,15 @@ interface PositionFeedbackInterface
     void exit();
 };
 
-
-typedef struct
-{
-    port ?p_biss_data;   /**< Port for BiSS Interface signal input. */
-    port ?p_biss_clk;    /**< Port for BiSS Interface clock output. */
-    port ?p_hall;        /**< Port for Hall signals. */
-    out port ?slave_select;
-    spi_master_interface spi_interface;
-} PositionFeedbackPorts;
-
 typedef struct {
     spi_master_interface spi_interface;
     port ?slave_select;
 } SPIPorts;
 
 typedef struct {
-    port ?p_biss_data;   /**< Port for BiSS Interface signal input. */
-    port ?p_biss_clk;    /**< Port for BiSS Interface clock output. */
-} BISSPorts;
+    port ?p_qei_config; /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). Also used for the BiSS clock output */
+    port p_qei; /**< 4-bit Port for Encoder Interface signals input. Also used for BiSS data*/
+} QEIPorts;
 
 typedef struct {
     port ?p_hall;        /**< Port for Hall signals. */
@@ -100,7 +90,7 @@ typedef struct {
 #include <qei_service.h>
 
 
-void position_feedback_service(HallPorts &?hall_ports, BISSPorts &?biss_ports, SPIPorts &?spi_ports,
+void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?biss_ports, SPIPorts &?spi_ports,
                                PositionFeedbackConfig &?position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
                                server interface PositionFeedbackInterface ?i_position_feedback_1[3],

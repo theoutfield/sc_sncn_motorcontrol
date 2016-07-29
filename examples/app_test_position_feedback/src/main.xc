@@ -64,7 +64,7 @@ void commands_test(client interface PositionFeedbackInterface i_position_feedbac
     if (!isnull(i_position_feedback_2))
         position_feedback_config_2 = i_position_feedback_2.get_config();
 
-    printstr(">>   SOMANET SENSOR COMMANDS SERVICE STARTING...\n");
+    printstr(">>   SOMANET POSITON FEEDBACK COMMANDS SERVICE STARTING...\n");
 
     while(1) {
         char mode = 0;
@@ -109,7 +109,7 @@ void commands_test(client interface PositionFeedbackInterface i_position_feedbac
 
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
-BISSPorts biss_ports = { QEI_PORT, QEI_PORT_INPUT_MODE_SELECTION };
+QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
 int main(void)
 {
@@ -173,7 +173,7 @@ int main(void)
                 position_feedback_config_2 = position_feedback_config;
                 position_feedback_config_2.sensor_type = BISS_SENSOR;
 
-                position_feedback_service(hall_ports, biss_ports, spi_ports,
+                position_feedback_service(hall_ports, qei_ports, spi_ports,
                                           position_feedback_config, i_shared_memory[0], i_position_feedback,
                                           position_feedback_config_2, null, i_position_feedback_2);
             }

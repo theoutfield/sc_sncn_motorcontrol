@@ -52,7 +52,7 @@ static inline void update_turns(int &turns, int last_position, int position, int
 //    return SUCCESS;
 //}
 
-void biss_service(BISSPorts &biss_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
+void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -101,8 +101,8 @@ void biss_service(BISSPorts &biss_ports, PositionFeedbackConfig &position_feedba
 
     //clock and port configuration
 //    configure_clock_rate(biss_ports.spi_interface.blk1, position_feedback_config.biss_config.clock_dividend, position_feedback_config.biss_config.clock_divisor); // a/b MHz
-//    configure_out_port(biss_ports.p_biss_clk, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
-//    configure_in_port(biss_ports.p_biss_data, biss_ports.spi_interface.blk1);
+//    configure_out_port(biss_ports.p_qei_config, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
+//    configure_in_port(biss_ports.p_qei, biss_ports.spi_interface.blk1);
 
     //first read
     t :> time;
@@ -401,7 +401,7 @@ void biss_service(BISSPorts &biss_ports, PositionFeedbackConfig &position_feedba
 }
 
 
-unsigned int read_biss_sensor_data(BISSPorts &biss_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes) {
+unsigned int read_biss_sensor_data(QEIPorts &biss_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes) {
     unsigned int frame[frame_bytes];
     unsigned int crc  =  0;
     unsigned int status = 0;
@@ -424,16 +424,16 @@ unsigned int read_biss_sensor_data(BISSPorts &biss_ports, BISSConfig & biss_conf
             byteindex++;
         }
         unsigned int bit;
-        biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-        biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-//        sync(biss_ports.p_biss_clk);
-        biss_ports.p_biss_data :> bit;
+        biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
+        biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+//        sync(biss_ports.p_qei_config);
+        biss_ports.p_qei :> bit;
         readbuf = readbuf << 1;
         readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         bitindex++;
     }
-    biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-//    configure_out_port(biss_ports.p_biss_clk, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
+    biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+//    configure_out_port(biss_ports.p_qei_config, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
     readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
     frame[byteindex] = readbuf;
     byteindex = 0;
@@ -493,7 +493,7 @@ unsigned int read_biss_sensor_data(BISSPorts &biss_ports, BISSConfig & biss_conf
 }
 
 
-unsigned int read_biss_sensor_data_fast(BISSPorts &biss_ports, int before_length, int data_length) {
+unsigned int read_biss_sensor_data_fast(QEIPorts &biss_ports, int before_length, int data_length) {
     unsigned int data = 0;
     int status = 0;
     int timeout = 5; //3 bits to read before then the ack and start bits
@@ -502,9 +502,9 @@ unsigned int read_biss_sensor_data_fast(BISSPorts &biss_ports, int before_length
     while(status < 2 && timeout > 0) {
         timeout--;
         unsigned int bit;
-        biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-        biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-        biss_ports.p_biss_data :> bit;
+        biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
+        biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+        biss_ports.p_qei :> bit;
         bit = (bit & (1 << BISS_DATA_PORT_BIT));
         if (status) {
             if (bit) //status = 2, ack and start bit found
@@ -514,22 +514,22 @@ unsigned int read_biss_sensor_data_fast(BISSPorts &biss_ports, int before_length
     }
     if (timeout >= 0) {
         for (int i=0; i<before_length; i++) {
-            biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-            biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-            biss_ports.p_biss_data :> void;
+            biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
+            biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+            biss_ports.p_qei :> void;
         }
         for (int i=0; i<data_length; i++) {
             unsigned int bit;
-            biss_ports.p_biss_clk <: BISS_CLK_PORT_LOW;
-            biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
-            biss_ports.p_biss_data :> bit;
+            biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
+            biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+            biss_ports.p_qei :> bit;
             data = data << 1;
             data |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         }
     }
-    biss_ports.p_biss_clk <: BISS_CLK_PORT_HIGH;
+    biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
 //    stop_clock(biss_ports.spi_interface.blk1);
-//    configure_out_port(biss_ports.p_biss_clk, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
+//    configure_out_port(biss_ports.p_qei_config, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
 
     return data;
 }

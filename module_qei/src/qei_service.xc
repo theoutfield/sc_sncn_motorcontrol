@@ -58,7 +58,7 @@ int check_qei_config(QEIConfig &qei_config)
 }
 
 #pragma unsafe arrays
-void qei_service(BISSPorts &qei_ports, PositionFeedbackConfig &position_feedback_config,
+void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_config,
                  client interface shared_memory_interface ?i_shared_memory,
                  server interface PositionFeedbackInterface i_position_feedback[3])
 {
@@ -73,12 +73,12 @@ void qei_service(BISSPorts &qei_ports, PositionFeedbackConfig &position_feedback
     printstr(">>   SOMANET ENCODER SENSOR SERVICE STARTING...\n");
 
     //Check if we are using a dc board with configurable qei port
-    if (!isnull(qei_ports.p_biss_clk)) {
+    if (!isnull(qei_ports.p_qei_config)) {
         //Our board has a configurable qei port, lets check now the configuration provided by the user
         if (position_feedback_config.qei_config.signal_type == QEI_TTL_SIGNAL) {
-            qei_ports.p_biss_clk <: QEI_PORT_AS_TTL;
+            qei_ports.p_qei_config <: QEI_PORT_AS_TTL;
         } else {
-            qei_ports.p_biss_clk <: QEI_PORT_AS_RS422;
+            qei_ports.p_qei_config <: QEI_PORT_AS_RS422;
         }
     }
 
@@ -124,18 +124,18 @@ void qei_service(BISSPorts &qei_ports, PositionFeedbackConfig &position_feedback
 
     t_velocity :> ts_velocity;
 
-    qei_ports.p_biss_data :> new_pins;
+    qei_ports.p_qei :> new_pins;
 
     int loop_flag = 1;
     while (loop_flag) {
 #pragma xta endpoint "qei_loop"
 #pragma ordered
         select {
-            case qei_ports.p_biss_data when pinsneq(new_pins) :> new_pins :
-                qei_ports.p_biss_data :> new_pins_1;
-                qei_ports.p_biss_data :> new_pins_1;
+            case qei_ports.p_qei when pinsneq(new_pins) :> new_pins :
+                qei_ports.p_qei :> new_pins_1;
+                qei_ports.p_qei :> new_pins_1;
                 if (new_pins_1 == new_pins) {
-                    qei_ports.p_biss_data :> new_pins;
+                    qei_ports.p_qei :> new_pins;
                     if (new_pins_1 == new_pins) {
                         v = lookup[new_pins][old_pins];
 
