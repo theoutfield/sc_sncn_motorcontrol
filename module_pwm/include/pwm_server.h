@@ -45,20 +45,20 @@ typedef struct PWM_SERV_TAG
 
 interface update_pwm
 {
-    void update_server_control_data(PWM_ARRAY_TYP pwm_ctrl_s, int pwm_on, int brake_active, int recieved_safe_torque_off_mode);
+    void update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int pwm_on, int brake_active, int recieved_safe_torque_off_mode);
     void safe_torque_off_enabled();
 };
 
 void pwm_config(PwmPorts &ports);
 
-void update_pwm(control_variables& cv, PWM_COMMS_TYP& pwm_comms_s);
 void pwm_check(PwmPorts &ports);
 void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, PWM server, with ADC synchronization
         unsigned motor_id, // Motor identifier
         PwmPorts &ports,
         server interface update_pwm i_update_pwm,
         int duty_start_brake,
-        int duty_maintain_brake
+        int duty_maintain_brake,
+        int time_start_brake
 );
 
 
