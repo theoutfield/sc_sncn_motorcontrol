@@ -101,7 +101,7 @@ int main(void) {
 
                     delay_milliseconds(5);
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE);
+                    pwm_service_task(_MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE);
                 }
 
                 /* ADC Service */
@@ -140,7 +140,6 @@ int main(void) {
                     motorcontrol_config.rated_current =  RATED_CURRENT;
                     motorcontrol_config.rated_torque  =  RATED_TORQUE;
                     motorcontrol_config.percent_offset_torque =  PERCENT_OFFSET_TORQUE;
-
 
                     motorcontrol_config.recuperation = RECUPERATION;
                     motorcontrol_config.battery_e_max = BATTERY_E_MAX;
