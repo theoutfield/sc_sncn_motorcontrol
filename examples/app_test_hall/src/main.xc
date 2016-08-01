@@ -38,7 +38,7 @@ void hall_test(client interface PositionFeedbackInterface i_position_feedback, c
     }
 }
 
-PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
+HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 
 int main(void)
 {
@@ -63,7 +63,9 @@ int main(void)
                 position_feedback_config.hall_config.pole_pairs = 5;
                 position_feedback_config.hall_config.enable_push_service = PushAll;
 
-                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
+                position_feedback_service(hall_ports, null, null,
+                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                          null, null, null);
             }
         }
     }

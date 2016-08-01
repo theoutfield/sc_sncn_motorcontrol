@@ -20,7 +20,7 @@
 #include <torque_control.h>
 
 /*********** Sensor Test ***********/
-PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
+SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
 
 /*********** Motor Test ***********/
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -305,10 +305,9 @@ int main(void)
 
             /* Position feedback service */
             {
-                delay_milliseconds(10);
-
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = CONTELEC_SENSOR;
+
                 position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
                 position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
                 position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
@@ -318,7 +317,9 @@ int main(void)
                 position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
                 position_feedback_config.contelec_config.enable_push_service = PushAll;
 
-                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
+                position_feedback_service(null, null, spi_ports,
+                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                          null, null, null);
             }
         }
     }

@@ -61,7 +61,8 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-PositionFeedbackPorts position_feedback_ports = SOMANET_IFM_POSITION_FEEDBACK_PORTS;
+SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
+QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 int main() {
@@ -112,6 +113,7 @@ int main() {
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = BISS_SENSOR;
+
                 position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                 position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
@@ -128,8 +130,9 @@ int main() {
                 position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
                 position_feedback_config.biss_config.enable_push_service = PushAll;
 
-
-                position_feedback_service(position_feedback_ports, position_feedback_config, i_shared_memory[0], i_position_feedback, null, null, null, null);
+                position_feedback_service(null, qei_ports, spi_ports,
+                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                          null, null, null);
             }
         }
     }
