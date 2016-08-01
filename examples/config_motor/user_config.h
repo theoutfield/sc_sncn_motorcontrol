@@ -138,8 +138,8 @@
 //#define VELOCITY_Kd       0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
-#define TORQUE_Kp         210 //7
-#define TORQUE_Ki         90  //3
+#define TORQUE_Kp         40 //7
+#define TORQUE_Ki         160  //3
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
