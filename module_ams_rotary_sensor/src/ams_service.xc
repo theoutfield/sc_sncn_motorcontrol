@@ -9,11 +9,11 @@
 #include <ams_service.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <timer.h>
 #include <print.h>
 #include <mc_internal_constants.h>
 
-static char rotarySensorInitialized = 0;
 
 static inline void slave_select(out port spi_ss)
 {
@@ -25,14 +25,10 @@ static inline void slave_deselect(out port spi_ss)
     spi_ss <: 1;
 }
 
-void initams_ports(AMSPorts &ams_ports)
+void initspi_ports(SPIPorts &spi_ports)
 {
-    if (rotarySensorInitialized != 1){
-
-        spi_master_init(ams_ports.spi_interface, DEFAULT_SPI_CLOCK_DIV);
-        slave_deselect(ams_ports.slave_select); // Ensure slave select is in correct start state
-        rotarySensorInitialized = 1;
-    }
+    spi_master_init(spi_ports.spi_interface, DEFAULT_SPI_CLOCK_DIV);
+    slave_deselect(spi_ports.slave_select); // Ensure slave select is in correct start state
 }
 
 {unsigned short, unsigned short} transform_settings(AMSConfig config)
@@ -58,7 +54,7 @@ void initams_ports(AMSPorts &ams_ports)
     return {settings1, settings2};
 }
 
-int initRotarySensor(AMSPorts &ams_ports, AMSConfig config)
+int initRotarySensor(SPIPorts &spi_ports, AMSConfig config)
 {
     int data_in;
 
@@ -66,18 +62,9 @@ int initRotarySensor(AMSPorts &ams_ports, AMSConfig config)
 
     {settings1, settings2} = transform_settings(config);
 
-    initams_ports(ams_ports);
+    initspi_ports(spi_ports);
 
-    data_in = writeSettings1(ams_ports, settings1);
-
-    if(data_in < 0){
-
-       return data_in;
-    }
-
-    delay_milliseconds(1);
-
-    data_in = writeSettings2(ams_ports, settings2);
+    data_in = writeSettings1(spi_ports, settings1);
 
     if(data_in < 0){
 
@@ -86,7 +73,16 @@ int initRotarySensor(AMSPorts &ams_ports, AMSConfig config)
 
     delay_milliseconds(1);
 
-    data_in = writeZeroPosition(ams_ports, config.offset);
+    data_in = writeSettings2(spi_ports, settings2);
+
+    if(data_in < 0){
+
+       return data_in;
+    }
+
+    delay_milliseconds(1);
+
+    data_in = writeZeroPosition(spi_ports, config.offset);
 
     if(data_in < 0){
 
@@ -127,29 +123,29 @@ unsigned char checkEvenParity(unsigned short bitStream){
      return (calc_parity(bitStream) == ((bitStream >> 15) & 1));    //comparison the parity bit the the real one
 }
 
-short SPIReadTransaction(AMSPorts &ams_ports, unsigned short reg) {
+short SPIReadTransaction(SPIPorts &spi_ports, unsigned short reg) {
     unsigned short data_in = 0;
 
     reg |= READ_MASK;                           //read command
     reg = addEvenParity(reg);                   //parity
 
-    slave_select(ams_ports.slave_select);                   //start transaction
+    slave_select(spi_ports.slave_select);                   //start transaction
 
-    spi_master_out_short(ams_ports.spi_interface, reg);     //send command
-    ams_ports.spi_interface.mosi <: 0;
+    spi_master_out_short(spi_ports.spi_interface, reg);     //send command
+    spi_ports.spi_interface.mosi <: 0;
 
-    slave_deselect(ams_ports.slave_select);                 //pause for
+    slave_deselect(spi_ports.slave_select);                 //pause for
     delay_ticks(AMS_SENSOR_EXECUTING_TIME);                 //executing the command
-    slave_select(ams_ports.slave_select);                   //on the sensor
+    slave_select(spi_ports.slave_select);                   //on the sensor
 
-    data_in = spi_master_in_short(ams_ports.spi_interface); //handle response
+    data_in = spi_master_in_short(spi_ports.spi_interface); //handle response
 
-    slave_deselect(ams_ports.slave_select);                 //end transaction
+    slave_deselect(spi_ports.slave_select);                 //end transaction
 
     return data_in;
 }
 
-short SPIWriteTransaction(AMSPorts &ams_ports, unsigned short reg, unsigned short data) {
+short SPIWriteTransaction(SPIPorts &spi_ports, unsigned short reg, unsigned short data) {
     unsigned short data_in = 0;
 
     reg &= WRITE_MASK;                          //action
@@ -158,36 +154,36 @@ short SPIWriteTransaction(AMSPorts &ams_ports, unsigned short reg, unsigned shor
     data &= WRITE_MASK;                         //action
     data = addEvenParity(data);                 //parity
 
-    slave_select(ams_ports.slave_select);                   //start transaction
+    slave_select(spi_ports.slave_select);                   //start transaction
 
-    spi_master_out_short(ams_ports.spi_interface, reg);     //send command
+    spi_master_out_short(spi_ports.spi_interface, reg);     //send command
 
-    slave_deselect(ams_ports.slave_select);                 //pause for
+    slave_deselect(spi_ports.slave_select);                 //pause for
     delay_ticks(AMS_SENSOR_EXECUTING_TIME);                 //executing the command
-    slave_select(ams_ports.slave_select);                   //on the sensor
+    slave_select(spi_ports.slave_select);                   //on the sensor
 
-    spi_master_out_short(ams_ports.spi_interface, data);
-    ams_ports.spi_interface.mosi <: 0;
+    spi_master_out_short(spi_ports.spi_interface, data);
+    spi_ports.spi_interface.mosi <: 0;
 
-    slave_deselect(ams_ports.slave_select);                 //pause for
+    slave_deselect(spi_ports.slave_select);                 //pause for
     delay_ticks(AMS_SENSOR_SAVING_TIME);                    //saving the data
-    slave_select(ams_ports.slave_select);                   //on the reg
+    slave_select(spi_ports.slave_select);                   //on the reg
 
-    data_in = spi_master_in_short(ams_ports.spi_interface); //handle response
+    data_in = spi_master_in_short(spi_ports.spi_interface); //handle response
    // printhex(data_in);
    // printstrln("");
 
-    slave_deselect(ams_ports.slave_select);                 //end transaction
+    slave_deselect(spi_ports.slave_select);                 //end transaction
 
     return data_in;
 }
 
 
-int readRedundancyReg(AMSPorts &ams_ports){
+int readRedundancyReg(SPIPorts &spi_ports){
 
     unsigned short data_in;
 
-    data_in = SPIReadTransaction(ams_ports,ADDR_RED);
+    data_in = SPIReadTransaction(spi_ports,ADDR_RED);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -198,11 +194,11 @@ int readRedundancyReg(AMSPorts &ams_ports){
     }
 }
 
-int readProgrammingReg(AMSPorts &ams_ports){
+int readProgrammingReg(SPIPorts &spi_ports){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(ams_ports, ADDR_PROG);
+    data_in = SPIReadTransaction(spi_ports, ADDR_PROG);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -214,11 +210,11 @@ int readProgrammingReg(AMSPorts &ams_ports){
     }
 }
 
-int readSettings1(AMSPorts &ams_ports){
+int readSettings1(SPIPorts &spi_ports){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(ams_ports, ADDR_SETTINGS1);
+    data_in = SPIReadTransaction(spi_ports, ADDR_SETTINGS1);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -230,11 +226,11 @@ int readSettings1(AMSPorts &ams_ports){
     }
 }
 
-int readSettings2(AMSPorts &ams_ports){
+int readSettings2(SPIPorts &spi_ports){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(ams_ports, ADDR_SETTINGS2);
+    data_in = SPIReadTransaction(spi_ports, ADDR_SETTINGS2);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -246,11 +242,11 @@ int readSettings2(AMSPorts &ams_ports){
     }
 }
 
-int readZeroPosition(AMSPorts &ams_ports){
+int readZeroPosition(SPIPorts &spi_ports){
 
     unsigned short data_in = 0, data_in_tmp = 0;
 
-    data_in_tmp = SPIReadTransaction(ams_ports, ADDR_ZPOSM);   //register address (MSB)
+    data_in_tmp = SPIReadTransaction(spi_ports, ADDR_ZPOSM);   //register address (MSB)
 
     if(checkEvenParity(data_in_tmp)){                            //check right parity
 
@@ -263,7 +259,7 @@ int readZeroPosition(AMSPorts &ams_ports){
         return PARITY_ERROR;
     }
 
-    data_in_tmp = SPIReadTransaction(ams_ports, ADDR_ZPOSL);   //register address (LSB)
+    data_in_tmp = SPIReadTransaction(spi_ports, ADDR_ZPOSL);   //register address (LSB)
 
     if(checkEvenParity(data_in_tmp)){                            //check right parity
 
@@ -278,11 +274,11 @@ int readZeroPosition(AMSPorts &ams_ports){
         }
 }
 
-int readCORDICMagnitude(AMSPorts &ams_ports){
+int readCORDICMagnitude(SPIPorts &spi_ports){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(ams_ports, ADDR_MAG);  //register address
+    data_in = SPIReadTransaction(spi_ports, ADDR_MAG);  //register address
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -295,11 +291,11 @@ int readCORDICMagnitude(AMSPorts &ams_ports){
 }
 
 
-int readRotaryDiagnosticAndAutoGainControl(AMSPorts &ams_ports){
+int readRotaryDiagnosticAndAutoGainControl(SPIPorts &spi_ports){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(ams_ports, ADDR_DIAAGC);
+    data_in = SPIReadTransaction(spi_ports, ADDR_DIAAGC);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -311,11 +307,11 @@ int readRotaryDiagnosticAndAutoGainControl(AMSPorts &ams_ports){
     }
 }
 
-int readRotarySensorError(AMSPorts &ams_ports){
+int readRotarySensorError(SPIPorts &spi_ports){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(ams_ports, ADDR_ERRFL);
+    data_in = SPIReadTransaction(spi_ports, ADDR_ERRFL);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -327,11 +323,11 @@ int readRotarySensorError(AMSPorts &ams_ports){
     }
 }
 
-int readRotarySensorAngleWithoutCompensation(AMSPorts &ams_ports){
+int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports){
 
    unsigned short data_in = 0;
 
-   data_in = SPIReadTransaction(ams_ports, ADDR_ANGLEUNC);
+   data_in = SPIReadTransaction(spi_ports, ADDR_ANGLEUNC);
 
    if(checkEvenParity(data_in)){             //check right parity
 
@@ -344,11 +340,11 @@ int readRotarySensorAngleWithoutCompensation(AMSPorts &ams_ports){
 }
 
 
-int readRotarySensorAngleWithCompensation(AMSPorts &ams_ports){
+int readRotarySensorAngleWithCompensation(SPIPorts &spi_ports){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(ams_ports, ADDR_ANGLECOM);
+    data_in = SPIReadTransaction(spi_ports, ADDR_ANGLECOM);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -360,11 +356,11 @@ int readRotarySensorAngleWithCompensation(AMSPorts &ams_ports){
     }
 }
 
-int readNumberPolePairs(AMSPorts &ams_ports){
+int readNumberPolePairs(SPIPorts &spi_ports){
 
     int data_in = 0;
 
-    data_in = readSettings2(ams_ports);                //read current settings
+    data_in = readSettings2(spi_ports);                //read current settings
 
     if(data_in < 0){
         return data_in;
@@ -377,12 +373,12 @@ int readNumberPolePairs(AMSPorts &ams_ports){
 }
 
 
-int writeSettings1(AMSPorts &ams_ports, unsigned short data){
+int writeSettings1(SPIPorts &spi_ports, unsigned short data){
 
     unsigned short data_in = 0;
 
     data &= BITS_8_MASK;
-    data_in = SPIWriteTransaction(ams_ports, ADDR_SETTINGS1, data);
+    data_in = SPIWriteTransaction(spi_ports, ADDR_SETTINGS1, data);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -399,12 +395,12 @@ int writeSettings1(AMSPorts &ams_ports, unsigned short data){
     }
 }
 
-int writeSettings2(AMSPorts &ams_ports, unsigned short data){
+int writeSettings2(SPIPorts &spi_ports, unsigned short data){
 
     unsigned short data_in = 0;
 
     data &= BITS_8_MASK;
-    data_in = SPIWriteTransaction(ams_ports, ADDR_SETTINGS2, data);
+    data_in = SPIWriteTransaction(spi_ports, ADDR_SETTINGS2, data);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -421,13 +417,13 @@ int writeSettings2(AMSPorts &ams_ports, unsigned short data){
     }
 }
 
-int writeZeroPosition(AMSPorts &ams_ports, unsigned short data){
+int writeZeroPosition(SPIPorts &spi_ports, unsigned short data){
 
     unsigned short data_in = 0, msb_data = 0, lsb_data = 0;
 
     msb_data = (data >> 6) & BITS_8_MASK;
 
-    data_in = SPIWriteTransaction(ams_ports, ADDR_ZPOSM, msb_data);
+    data_in = SPIWriteTransaction(spi_ports, ADDR_ZPOSM, msb_data);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -441,7 +437,7 @@ int writeZeroPosition(AMSPorts &ams_ports, unsigned short data){
     }
 
     lsb_data = data & BITS_6_MASK;
-    data_in = SPIWriteTransaction(ams_ports, ADDR_ZPOSL, lsb_data);
+    data_in = SPIWriteTransaction(spi_ports, ADDR_ZPOSL, lsb_data);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -458,14 +454,14 @@ int writeZeroPosition(AMSPorts &ams_ports, unsigned short data){
         }
 }
 
-int writeNumberPolePairs(AMSPorts &ams_ports, unsigned short data){
+int writeNumberPolePairs(SPIPorts &spi_ports, unsigned short data){
 
     int data_in = 0;
 
     data -= 1;                                              //substract 1 because of AMS sensor convention
     data &= POLE_PAIRS_SET_MASK;                            //mask pole pairs bits
 
-    data_in = readSettings2(ams_ports);                     //read current settings
+    data_in = readSettings2(spi_ports);                     //read current settings
 
     if(data_in < 0){                                        //something went wrong
         return data_in;
@@ -473,7 +469,7 @@ int writeNumberPolePairs(AMSPorts &ams_ports, unsigned short data){
 
     data_in &= POLE_PAIRS_ZERO_MASK;                             //clean pole pairs bits
     data_in |= data;                                        //add new pole pairs bits
-    data_in = writeSettings2(ams_ports, data_in);           //write new settings
+    data_in = writeSettings2(spi_ports, data_in);           //write new settings
 
     return data_in;
 }
@@ -508,18 +504,19 @@ int check_ams_config(AMSConfig &ams_config) {
     return SUCCESS;
 }
 
-[[combinable]]
- void ams_service(AMSPorts &ams_ports, AMSConfig & ams_config, client interface shared_memory_interface ?i_shared_memory, interface AMSInterface server i_ams[5])
+ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    if(check_ams_config(ams_config) == ERROR){
+    if(check_ams_config(position_feedback_config.ams_config) == ERROR){
         printstrln("Error while checking the AMS sensor configuration");
+        position_feedback_config.sensor_type = 0;
         return;
     }
-    if (initRotarySensor(ams_ports,  ams_config) != SUCCESS_WRITING) {
+    if (initRotarySensor(spi_ports,  position_feedback_config.ams_config) != SUCCESS_WRITING) {
         printstrln("Error with SPI AMS sensor");
+        position_feedback_config.sensor_type = 0;
         return;
     }
 
@@ -530,10 +527,10 @@ int check_ams_config(AMSConfig &ams_config) {
     int velocity = 0;
     int old_count = 0;
     int old_difference = 0;
-    int ticks_per_turn = (1 << ams_config.resolution_bits);
+    int ticks_per_turn = (1 << position_feedback_config.ams_config.resolution_bits);
     int crossover = ticks_per_turn - ticks_per_turn/10;
-    int velocity_loop = ams_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
-    int velocity_factor = 60000000/ams_config.velocity_loop;
+    int velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
+    int velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
     //position
     unsigned int last_position = 0;
     int count = 0;
@@ -554,128 +551,132 @@ int check_ams_config(AMSConfig &ams_config) {
     unsigned int start_time, end_time;
 
     //first read
-    last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
+    last_position = readRotarySensorAngleWithoutCompensation(spi_ports);
     t :> last_ams_read;
 
     //main loop
-    while (1) {
+    int loop_flag = 1;
+    while (loop_flag) {
         select {
-        case i_ams[int i].get_ams_all() -> { int out_count, int out_velocity, unsigned int out_position, unsigned int out_angle, unsigned int out_time }:
-                out_count = actual_count;
-                out_velocity = actual_velocity;
-                out_position = actual_position;
-                out_angle = actual_angle;
-                out_time = measurement_time;
-                break;
-
-        case i_ams[int i].get_notification() -> int out_notification:
+        case i_position_feedback[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
 
         //send electrical angle for commutation
-        case i_ams[int i].get_ams_angle_velocity_position() -> { unsigned int angle, int out_velocity, int out_count }:
+        case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 t :> time;
-                if (timeafter(time, last_ams_read + ams_config.cache_time)) {
-                    angle = readRotarySensorAngleWithCompensation(ams_ports);
+                if (timeafter(time, last_ams_read + position_feedback_config.ams_config.cache_time)) {
+                    angle = readRotarySensorAngleWithCompensation(spi_ports);
                     t :> last_ams_read;
                     multiturn(count, last_position, angle, ticks_per_turn);
                     last_position = angle;
                 } else
                     angle = last_position;
-                if (ams_config.resolution_bits > 12)
-                    angle = (ams_config.pole_pairs * (angle >> (ams_config.resolution_bits-12)) ) & 4095;
+                if (position_feedback_config.ams_config.resolution_bits > 12)
+                    angle = (position_feedback_config.ams_config.pole_pairs * (angle >> (position_feedback_config.ams_config.resolution_bits-12)) ) & 4095;
                 else
-                    angle = (ams_config.pole_pairs * (angle << (12-ams_config.resolution_bits)) ) & 4095;
-                out_velocity = velocity;
-                out_count = count;
+                    angle = (position_feedback_config.ams_config.pole_pairs * (angle << (12-position_feedback_config.ams_config.resolution_bits)) ) & 4095;
                 break;
 
         //send multiturn count and position
-        case i_ams[int i].get_ams_position() -> { int out_count, unsigned int position }:
+        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position }:
                 t :> time;
-                if (timeafter(time, last_ams_read + ams_config.cache_time)) {
-                    position = readRotarySensorAngleWithCompensation(ams_ports);
+                if (timeafter(time, last_ams_read + position_feedback_config.ams_config.cache_time)) {
+                    position = readRotarySensorAngleWithCompensation(spi_ports);
                     t :> last_ams_read;
                     multiturn(count, last_position, position, ticks_per_turn);
                     last_position = position;
                 } else
                     position = last_position;
                 //count reset
-                if (count >= ams_config.max_ticks || count < -ams_config.max_ticks)
+                if (count >= position_feedback_config.ams_config.max_ticks || count < -position_feedback_config.ams_config.max_ticks)
                     count = 0;
                 out_count = count;
                 break;
 
         //send position
-        case i_ams[int i].get_ams_real_position() -> unsigned int position:
-                position = readRotarySensorAngleWithoutCompensation(ams_ports);
+        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
+                position = readRotarySensorAngleWithoutCompensation(spi_ports);
                 break;
 
         //send velocity
-        case i_ams[int i].get_ams_velocity() -> int out_velocity:
+        case i_position_feedback[int i].get_velocity() -> int out_velocity:
                 out_velocity = velocity;
                 break;
 
+        //send ticks per turn
+        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
+                out_ticks_per_turn = ticks_per_turn;
+                break;
+
         //receive new ams_config
-        case i_ams[int i].set_ams_config(AMSConfig in_config):
-                ticks_per_turn = (1 << in_config.resolution_bits);
-                in_config.offset &= (ticks_per_turn-1);
+        case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
+                ticks_per_turn = (1 << in_config.ams_config.resolution_bits);
+                in_config.ams_config.offset &= (ticks_per_turn-1);
                 //update variables which depend on ams_config
-                if (ams_config.polarity != in_config.polarity)
-                    initRotarySensor(ams_ports,  in_config);
-                else if (ams_config.offset != in_config.offset)
-                    writeZeroPosition(ams_ports, in_config.offset);
-                ams_config = in_config;
+                if (position_feedback_config.ams_config.polarity != in_config.ams_config.polarity)
+                    initRotarySensor(spi_ports,  in_config.ams_config);
+                else if (position_feedback_config.ams_config.offset != in_config.ams_config.offset)
+                    writeZeroPosition(spi_ports, in_config.ams_config.offset);
+                position_feedback_config = in_config;
                 crossover = ticks_per_turn - ticks_per_turn/10;
-                velocity_loop = ams_config.velocity_loop * AMS_USEC;
-                velocity_factor = 60000000/ams_config.velocity_loop;
+                velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC;
+                velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
-                for (int i = 0; i < 5; i++) {
-                    i_ams[i].notification();
+                for (int i = 0; i < 3; i++) {
+                    i_position_feedback[i].notification();
                 }
 
                 break;
 
         //send ams_config
-        case i_ams[int i].get_ams_config() -> AMSConfig out_config:
-                out_config = ams_config;
+        case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
+                out_config = position_feedback_config;
                 break;
 
         //receive the new count to set and set the offset accordingly
-        case i_ams[int i].reset_ams_position(int new_count):
-                last_position = readRotarySensorAngleWithoutCompensation(ams_ports);
+        case i_position_feedback[int i].set_position(int new_count):
+                last_position = readRotarySensorAngleWithoutCompensation(spi_ports);
                 t :> last_ams_read;
                 count = new_count;
                 break;
 
         //receive the new elecrical angle to set the offset accordingly
-        case i_ams[int i].reset_ams_angle(unsigned int new_angle) -> unsigned int out_offset:
-                writeZeroPosition(ams_ports, 0);
-                int position = readRotarySensorAngleWithoutCompensation(ams_ports);
-                if (ams_config.resolution_bits > 12)
-                    out_offset = (ticks_per_turn - ((new_angle << (ams_config.resolution_bits-12)) / ams_config.pole_pairs) + position) & (ticks_per_turn-1);
+        case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
+                writeZeroPosition(spi_ports, 0);
+                int position = readRotarySensorAngleWithoutCompensation(spi_ports);
+                if (position_feedback_config.ams_config.resolution_bits > 12)
+                    out_offset = (ticks_per_turn - ((new_angle << (position_feedback_config.ams_config.resolution_bits-12)) / position_feedback_config.ams_config.pole_pairs) + position) & (ticks_per_turn-1);
                 else
-                    out_offset = (ticks_per_turn - ((new_angle >> (12-ams_config.resolution_bits)) / ams_config.pole_pairs) + position) & (ticks_per_turn-1);
-                writeZeroPosition(ams_ports, out_offset);
-                ams_config.offset = out_offset;
+                    out_offset = (ticks_per_turn - ((new_angle >> (12-position_feedback_config.ams_config.resolution_bits)) / position_feedback_config.ams_config.pole_pairs) + position) & (ticks_per_turn-1);
+                writeZeroPosition(spi_ports, out_offset);
+                position_feedback_config.ams_config.offset = out_offset;
                 break;
+
+        //execute command
+        case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
+                break;
+
+        case i_position_feedback[int i].exit():
+                loop_flag = 0;
+                continue;
 
         //compute velocity
         case t when timerafter(next_velocity_read) :> start_time:
             next_velocity_read += velocity_loop;
             int position, angle;
             t :> time;
-            position = readRotarySensorAngleWithCompensation(ams_ports);
+            position = readRotarySensorAngleWithCompensation(spi_ports);
             t :> last_ams_read;
             multiturn(count, last_position, position, ticks_per_turn);
             last_position = position;
 
-            if (ams_config.resolution_bits > 12)
-                angle = (ams_config.pole_pairs * (position >> (ams_config.resolution_bits-12)) ) & 4095;
+            if (position_feedback_config.ams_config.resolution_bits > 12)
+                angle = (position_feedback_config.ams_config.pole_pairs * (position >> (position_feedback_config.ams_config.resolution_bits-12)) ) & 4095;
             else
-                angle = (ams_config.pole_pairs * (position << (12-ams_config.resolution_bits)) ) & 4095;
+                angle = (position_feedback_config.ams_config.pole_pairs * (position << (12-position_feedback_config.ams_config.resolution_bits)) ) & 4095;
 
             int difference = count - old_count;
             if(difference > crossover || difference < -crossover)
@@ -689,16 +690,16 @@ int check_ams_config(AMSConfig &ams_config) {
             last_velocity_read = last_ams_read;
 
             if (!isnull(i_shared_memory)) {
-                if (ams_config.enable_push_service == PushAll) {
+                if (position_feedback_config.ams_config.enable_push_service == PushAll) {
                     i_shared_memory.write_angle_velocity_position(angle, velocity, count);
                     actual_count = count;
                     actual_velocity = velocity;
                     actual_angle = angle;
                     actual_position = position;
-                } else if (ams_config.enable_push_service == PushAngle) {
+                } else if (position_feedback_config.ams_config.enable_push_service == PushAngle) {
                     i_shared_memory.write_angle_electrical(angle);
                     actual_angle = angle;
-                } else if (ams_config.enable_push_service == PushPosition) {
+                } else if (position_feedback_config.ams_config.enable_push_service == PushPosition) {
                     i_shared_memory.write_velocity_position(velocity, count);
                     actual_count = count;
                     actual_velocity = velocity;

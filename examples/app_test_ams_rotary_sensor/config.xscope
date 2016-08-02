@@ -23,7 +23,7 @@
     <Probe name="Angle" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Time" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Time" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Time Internal" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
 </xSCOPEconfig>

@@ -66,6 +66,9 @@ void start_service(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_
     case CONTELEC_SENSOR:
         contelec_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
+    case AMS_SENSOR:
+        ams_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        break;
     case HALL_SENSOR:
         hall_service(*hall_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
