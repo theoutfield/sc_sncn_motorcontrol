@@ -67,6 +67,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
 
                // to compute velocity from qei
     if (check_qei_config(position_feedback_config.qei_config) == ERROR) {
+        position_feedback_config.sensor_type = 0;
         return;
     }
 

@@ -33,6 +33,7 @@ int check_hall_config(HallConfig &hall_config){
 
     if (check_hall_config(position_feedback_config.hall_config) == ERROR) {
         printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
+        position_feedback_config.sensor_type = 0;
         return;
     }
 
