@@ -86,12 +86,14 @@ void check_ports(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_po
     //if ports are missing use fallback service
     if ( (position_feedback_config.sensor_type == HALL_SENSOR && hall_ports == null) ||
          ((position_feedback_config.sensor_type == BISS_SENSOR || position_feedback_config.sensor_type == QEI_SENSOR) && qei_ports == null) ||
-         (position_feedback_config.sensor_type == CONTELEC_SENSOR && spi_ports == null) ) {
+         ((position_feedback_config.sensor_type == CONTELEC_SENSOR || position_feedback_config.sensor_type == AMS_SENSOR) && spi_ports == null) ) {
         position_feedback_config.sensor_type = 0;
     }
     if (position_feedback_config.sensor_type == BISS_SENSOR) {
         if (!isnull((*qei_ports).p_qei_config))
                 position_feedback_config.sensor_type = 0;
+        if (spi_ports == null)
+            position_feedback_config.sensor_type = 0;
     }
 }
 
@@ -159,7 +161,7 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
                 if (isnull(position_feedback_config_2)) {
                     set_clock_biss(qei_ports_1, spi_ports_1, position_feedback_config_1);
                 } else {
-                    if (position_feedback_config_2.sensor_type != CONTELEC_SENSOR) {
+                    if (position_feedback_config_2.sensor_type != CONTELEC_SENSOR && position_feedback_config_2.sensor_type != AMS_SENSOR) {
                         set_clock_biss(qei_ports_1, spi_ports_1, position_feedback_config_1);
                     }
                 }
@@ -178,7 +180,7 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
                 hall_ports_2 = move(hall_ports_1);
             if (qei_ports_1 != null && position_feedback_config_1.sensor_type != BISS_SENSOR && position_feedback_config_1.sensor_type != QEI_SENSOR)
                 qei_ports_2 = move(qei_ports_1);
-            if (spi_ports_1 != null && position_feedback_config_1.sensor_type != CONTELEC_SENSOR)
+            if (spi_ports_1 != null && position_feedback_config_1.sensor_type != CONTELEC_SENSOR &&  position_feedback_config_1.sensor_type != AMS_SENSOR)
                 spi_ports_2 = move(spi_ports_1);
             //check ports
             check_ports(hall_ports_2, qei_ports_2, spi_ports_2, position_feedback_config_2);
