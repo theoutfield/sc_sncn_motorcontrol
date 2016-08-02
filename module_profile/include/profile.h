@@ -14,7 +14,7 @@
 #include <mc_internal_constants.h>
 #include <hall_struct.h>
 #include <qei_struct.h>
-#include <ams_service.h>
+#include <ams_struct.h>
 #include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/
