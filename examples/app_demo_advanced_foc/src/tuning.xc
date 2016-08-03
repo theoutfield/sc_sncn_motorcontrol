@@ -256,6 +256,21 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     i_motorcontrol.set_brake_status(1);
     i_motorcontrol.set_torque_control_enabled();
 
+    printf("check licence ...\n");
+    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+    if(upstream_control_data.error_status == WRONG_LICENCE)
+    {
+        printf(">>  WRONG LICENCE NUMBER ...\n");
+    }
+    else
+    {
+        printf(">>  TRUE LICENCE NUMBER ...\n");
+    }
+
+
+
+
     fflush(stdout);
     //read and adjust the offset.
     while (1)
@@ -458,7 +473,9 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             delay_milliseconds(500);
             upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-            if(upstream_control_data.error_status != NO_FAULT)
+            if(upstream_control_data.error_status == WRONG_LICENCE)
+                printf(">>  WRONG LICENCE NUMBER ...\n");
+            else if(upstream_control_data.error_status != NO_FAULT)
                 printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
 
             if(upstream_control_data.error_status == NO_FAULT)

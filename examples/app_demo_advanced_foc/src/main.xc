@@ -79,6 +79,7 @@ int main(void) {
 
                     MotorcontrolConfig motorcontrol_config;
 
+                    motorcontrol_config.licence =  ADVANCED_MOTOR_CONTROL_LICENCE;
                     motorcontrol_config.v_dc =  VDC;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
