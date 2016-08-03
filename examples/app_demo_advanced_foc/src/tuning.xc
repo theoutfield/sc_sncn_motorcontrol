@@ -12,7 +12,7 @@
 #include <tuning.h>
 
 #include <position_feedback_service.h>
-#include <motorcontrol_service.h>
+#include <motor_control_interfaces.h>
 
 #include <xscope.h>
 

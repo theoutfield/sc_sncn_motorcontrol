@@ -15,7 +15,7 @@
 #include "adc_7265.h"
 #include <protection.h>
 #include <xscope.h>
-#include <motorcontrol_service.h>
+#include <motor_control_interfaces.h>
 
 
 #define SHIFTING_BITS   1

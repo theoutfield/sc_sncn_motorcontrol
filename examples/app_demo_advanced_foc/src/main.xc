@@ -8,11 +8,12 @@
  * @date 17/06/2014
  */
 
+#include <tuning.h>
 #include <pwm_server.h>
 #include <adc_service.h>
 #include <user_config.h>
-#include <tuning.h>
-#include <torque_control.h>
+#include <motor_control_interfaces.h>
+#include <advanced_motor_control.h>
 #include <position_feedback_service.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -34,8 +35,6 @@ int main(void) {
     interface update_pwm i_update_pwm;
     interface TuningInterface i_tuning;
 
-
-
     par
     {
         /* WARNING: only one blocking task is possible per tile. */
@@ -43,8 +42,6 @@ int main(void) {
         //on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
 
         on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
-
-        //on tile[IFM_TILE]: position_limiter(i_tuning, i_motorcontrol[1]);
 
         on tile[IFM_TILE]:
         {
@@ -85,11 +82,9 @@ int main(void) {
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.polarity_type=MOTOR_POLARITY;
-
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
                     motorcontrol_config.current_I_gain =  TORQUE_Ki;
                     motorcontrol_config.current_D_gain =  TORQUE_Kd;
-
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
@@ -99,8 +94,6 @@ int main(void) {
                     motorcontrol_config.rated_current =  RATED_CURRENT;
                     motorcontrol_config.rated_torque  =  RATED_TORQUE;
                     motorcontrol_config.percent_offset_torque =  PERCENT_OFFSET_TORQUE;
-
-
                     motorcontrol_config.recuperation = RECUPERATION;
                     motorcontrol_config.battery_e_max = BATTERY_E_MAX;
                     motorcontrol_config.battery_e_min = BATTERY_E_MIN;
@@ -108,7 +101,6 @@ int main(void) {
                     motorcontrol_config.regen_p_min = REGEN_P_MIN;
                     motorcontrol_config.regen_speed_max = REGEN_SPEED_MAX;
                     motorcontrol_config.regen_speed_min = REGEN_SPEED_MIN;
-
                     motorcontrol_config.protection_limit_over_current =  I_MAX;
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;

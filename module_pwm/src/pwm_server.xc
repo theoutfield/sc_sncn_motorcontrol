@@ -14,10 +14,8 @@
  **/
 
 #include "pwm_server.h"
-#include <lookup_tables.h>
-#include <motorcontrol_service.h>
 #include <a4935.h>
-
+#include <mc_internal_constants.h>
 
 
 /*****************************************************************************/

@@ -20,8 +20,6 @@
 #include <xclib.h> // NB Contains bitrev()
 #include <xccompat.h>
 
-
-
 #include <xs1.h>
 #include <assert.h>
 #include <xccompat.h>
