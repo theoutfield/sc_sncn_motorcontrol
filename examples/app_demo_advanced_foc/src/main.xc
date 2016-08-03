@@ -14,6 +14,7 @@
 #include <user_config.h>
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
+#include <advanced_motorcontrol_licence.h>
 #include <position_feedback_service.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
