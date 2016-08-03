@@ -25,14 +25,22 @@
 #include <print.h>
 
 #include "app_global.h"
-#include <control_variables.h>
 
 #include "pwm_general.h"
 #include "pwm_convert_width.h"
 #include <pwm_ports.h>
 
-#include <motorcontrol_service.h>
+#include <motor_control_interfaces.h>
 
+/**
+ * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
+ */
+typedef struct {
+    port ?p_coast;  /**< [Nullable] Port for management signals. */
+    out port ?p_esf_rst_pwml_pwmh; /**< [Nullable] 4-bit Port to  enabling operation signals (if applicable in your SOMANET device). */
+    port ?p_ff1; /**< [Nullable] Port to read out faults (if applicable in your SOMANET device). */
+    port ?p_ff2; /**< [Nullable] Port to read out faults (if applicable in your SOMANET device). */
+} FetDriverPorts;
 
 /** Structure containing pwm server control data */
 typedef struct PWM_SERV_TAG
@@ -42,15 +50,8 @@ typedef struct PWM_SERV_TAG
 	int data_ready; //Data ready flag
 } PWM_SERV_TYP;
 
-
-interface update_pwm
-{
-    void update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int pwm_on, int brake_active, int recieved_safe_torque_off_mode);
-    void safe_torque_off_enabled();
-};
-
+void predriver(FetDriverPorts &fet_driver_ports);
 void pwm_config(PwmPorts &ports);
-
 void pwm_check(PwmPorts &ports);
 void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, PWM server, with ADC synchronization
         unsigned motor_id, // Motor identifier

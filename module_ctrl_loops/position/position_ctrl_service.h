@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <motorcontrol_service.h>
 #include <control_loops_common.h>
 
 /**
