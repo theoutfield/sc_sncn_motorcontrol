@@ -7,6 +7,9 @@
 #pragma once
 
 #include <control_loops_common.h>
+#include <motor_control_interfaces.h>
+#include <advanced_motor_control.h>
+#include <advanced_motorcontrol_licence.h>
 
 /**
  * @brief Interface type to communicate with the Position Control Service.

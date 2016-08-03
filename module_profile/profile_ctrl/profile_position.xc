@@ -8,6 +8,7 @@
 #include <print.h>
 #include <profile.h>
 #include <profile_control.h>
+#include <xs1.h>
 
 void init_position_profiler(ProfilerConfig profile_position_config) {
 
