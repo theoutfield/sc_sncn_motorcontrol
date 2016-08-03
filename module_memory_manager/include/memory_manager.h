@@ -7,7 +7,7 @@
 #pragma once
 
 #include <motor_control_interfaces.h>
-
+#include <advanced_motor_control.h>
 
 
 /**
