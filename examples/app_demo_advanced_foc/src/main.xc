@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 
 /**
@@ -11,7 +11,7 @@
 #include <tuning.h>
 #include <pwm_server.h>
 #include <adc_service.h>
-#include <user_config.h>
+#include <user_config_schunk.h>
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
 #include <advanced_motorcontrol_licence.h>
