@@ -153,10 +153,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                int14_velocity_k_sens = upstream_control_data.velocity;
+                int14_velocity_k_sens = -upstream_control_data.velocity;
                 int23_velocity_k_sens = int14_velocity_k_sens * 512;
 
-                int25_position_k_sens = upstream_control_data.position;
+                int25_position_k_sens = -upstream_control_data.position;
                 int23_position_k_sens = int25_position_k_sens / 4;
                 int23_velocity_ref_k = int23_velocity_ref_k_in;
                 int23_feedforward_effort = int23_feedforward_effort_in;

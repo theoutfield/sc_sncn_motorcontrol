@@ -110,7 +110,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1660
+#define COMMUTATION_OFFSET_CLK      3390//1660
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
@@ -138,7 +138,7 @@
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
 #define TORQUE_Kp         40 //7
-#define TORQUE_Ki         160  //3
+#define TORQUE_Ki         120//160  //3
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
@@ -345,12 +345,12 @@
 #define MAX_VELOCITY            3000             // rpm
 #define MAX_TORQUE              1200000
 
-#define POSITION_Kp             100
-#define POSITION_Ki             80
+#define POSITION_Kp             300
+#define POSITION_Ki             100
 #define POSITION_Kd             0
-#define VELOCITY_Kp             90
-#define VELOCITY_Ki             100
-#define VELOCITY_Kd             0
+#define VELOCITY_Kp             200
+#define VELOCITY_Ki             0
+#define VELOCITY_Kd             100
 
 #define POSITION_P_ERROR_lIMIT  2000000000
 #define POSITION_I_ERROR_lIMIT  1
@@ -358,9 +358,9 @@
 #define VELOCITY_P_ERROR_lIMIT  2000000000
 #define VELOCITY_I_ERROR_lIMIT  0
 #define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         1
+#define POSITION_REF_FC         20
 #define POSITION_FC             100
-#define VELOCITY_REF_FC         1
+#define VELOCITY_REF_FC         50
 #define VELOCITY_FC             90
 #define VELOCITY_D_FC           90
 
