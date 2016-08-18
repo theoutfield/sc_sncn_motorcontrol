@@ -51,22 +51,18 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int1_position_enable_flag = 0;
     PIDparam position_control_pid_param;
     position_control_pid_param.scale_factor = 3;
-    int int23_position_k_sens = 0;
-    int int23_position_k = 0;
     SecondOrderLPfilterParam position_SO_LP_filter_param;
-    float flt23_position_k = 0;
-    float flt23_position_in = 0;
-    float flt23_position_k_1n = 0;
-    float flt23_position_k_2n = 0;
-    int int23_position_ref_k = 0;
     SecondOrderLPfilterParam position_ref_SO_LP_filter_param;
-    float flt23_position_ref_in = 0;
-    float flt23_position_ref_k = 0;
-    float flt23_position_ref_k_1n = 0;
-    float flt23_position_ref_k_2n = 0;
-    int int23_position_ref_k_in = 0;
-    int int23_position_cmd_k = 0;
-    int int25_position_k_sens = 0;
+    float position_k = 0;
+    float position_sens_k = 0;
+    float position_k_1n = 0;
+    float position_k_2n = 0;
+    float position_ref_in_k = 0;
+    float position_ref_k = 0;
+    float position_ref_k_1n = 0;
+    float position_ref_k_2n = 0;
+    float position_cmd_k = 0;
+    int position_ref_input_k = 0;
 
     // velocity controller
     int int1_velocity_enable_flag = 0;
@@ -127,16 +123,16 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     downstream_control_data.offset_torque = 0;
 
     upstream_control_data = i_motorcontrol.update_upstream_control_data();
-    int25_position_k_sens = upstream_control_data.position;
-    int23_position_k_sens = int25_position_k_sens / 4;
-    int23_position_ref_k_in = int23_position_k_sens;
+    position_sens_k = ((float) upstream_control_data.position);
+    position_sens_k /= -4;
+    position_ref_input_k = ((int) position_sens_k);
 
-    flt23_position_ref_k = int23_position_ref_k_in;
-    flt23_position_ref_k_1n = int23_position_ref_k_in;
-    flt23_position_ref_k_2n = int23_position_ref_k_in;
-    flt23_position_k = int23_position_ref_k_in;
-    flt23_position_k_1n = int23_position_ref_k_in;
-    flt23_position_k_2n = int23_position_ref_k_in;
+    position_ref_k = ((int) position_sens_k);
+    position_ref_k_1n = ((int) position_sens_k);
+    position_ref_k_2n = ((int) position_sens_k);
+    position_k = position_sens_k;
+    position_k_1n = position_sens_k;
+    position_k_2n = position_sens_k;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
@@ -150,10 +146,14 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 velocity_sens_k = (float) upstream_control_data.velocity;
                 velocity_sens_k *= -512;
+
                 velocity_sens_d_k = velocity_sens_k;
 
-                int25_position_k_sens = -upstream_control_data.position;
-                int23_position_k_sens = int25_position_k_sens / 4;
+                position_sens_k = ((float) upstream_control_data.position);
+                position_sens_k /= -4;
+
+                position_ref_in_k = ((float) position_ref_input_k);
+
                 velocity_ref_in_k = ((float) velocity_ref_input_k);
                 int23_feedforward_effort = int23_feedforward_effort_in;
 
@@ -162,38 +162,33 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 if(int1_enable_flag) {
                     // position control
                     if (int1_position_enable_flag == 1) {
-                        int23_position_k = int23_position_k_sens;
-                        int23_position_ref_k = int23_position_ref_k_in;
 
-                        flt23_position_in = int23_position_k;
-                        second_order_LP_filter_update(&flt23_position_k,
-                                                      &flt23_position_k_1n,
-                                                      &flt23_position_k_2n,
-                                                      &flt23_position_in, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
-                        int23_position_k = ((int) flt23_position_in);
+                        second_order_LP_filter_update(&position_k,
+                                                      &position_k_1n,
+                                                      &position_k_2n,
+                                                      &position_sens_k, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
 
-                        flt23_position_ref_in = int23_position_ref_k;
-                        second_order_LP_filter_update(&flt23_position_ref_k,
-                                                      &flt23_position_ref_k_1n,
-                                                      &flt23_position_ref_k_2n,
-                                                      &flt23_position_ref_in, pos_velocity_ctrl_config.control_loop_period, position_ref_SO_LP_filter_param);
-                        int23_position_ref_k = ((int) flt23_position_ref_k);
+                        second_order_LP_filter_update(&position_ref_k,
+                                                      &position_ref_k_1n,
+                                                      &position_ref_k_2n,
+                                                      &position_ref_in_k, pos_velocity_ctrl_config.control_loop_period, position_ref_SO_LP_filter_param);
 
-                        if(int23_position_ref_k > pos_velocity_ctrl_config.int21_max_position)
-                            int23_position_ref_k = pos_velocity_ctrl_config.int21_max_position;
-                        else if (int23_position_ref_k < pos_velocity_ctrl_config.int21_min_position)
-                            int23_position_ref_k = pos_velocity_ctrl_config.int21_min_position;
+                        if(position_ref_k > pos_velocity_ctrl_config.int21_max_position)
+                            position_ref_k = pos_velocity_ctrl_config.int21_max_position;
+                        else if (position_ref_k < pos_velocity_ctrl_config.int21_min_position)
+                            position_ref_k = pos_velocity_ctrl_config.int21_min_position;
 
                         // PID parameters should be int9 -> -255 to 255
-                        int23_position_cmd_k = pid_update(int23_position_ref_k, int23_position_k, int23_position_k, 0, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                        velocity_ref_k = (float) int23_position_cmd_k;
+                        position_cmd_k = ((float) pid_update(((int) position_ref_k), ((int) position_k), ((int) position_k), 0, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param));
 
-                        second_order_LP_filter_shift_buffers(&flt23_position_k,
-                                                             &flt23_position_k_1n,
-                                                             &flt23_position_k_2n);
-                        second_order_LP_filter_shift_buffers(&flt23_position_ref_k,
-                                                             &flt23_position_ref_k_1n,
-                                                             &flt23_position_ref_k_2n);
+                        velocity_ref_in_k = position_cmd_k;
+
+                        second_order_LP_filter_shift_buffers(&position_k,
+                                                             &position_k_1n,
+                                                             &position_k_2n);
+                        second_order_LP_filter_shift_buffers(&position_ref_k,
+                                                             &position_ref_k_1n,
+                                                             &position_ref_k_2n);
                     }
 
                     // velocity control
@@ -247,8 +242,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
 #ifdef XSCOPE_POSITION_CTRL
-                xscope_int(POSITION_REF, int23_position_ref_k);
-                xscope_int(POSITION, int23_position_k);
+//                xscope_int(POSITION_REF, int23_position_ref_k);
+//                xscope_int(POSITION, int23_position_k);
 //                xscope_int(POSITION_CMD, int23_velocity_ref_k);
 //                xscope_int(POSITION_TEMP1, 0);
 //                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
@@ -260,7 +255,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);
-                xscope_int(POSITION_REF, int23_position_ref_k_in * 4);
+                xscope_int(POSITION_REF, position_ref_input_k * 4);
                 xscope_int(TORQUE_CMD, torque_ref_k / 1024);
 #endif
 
@@ -282,15 +277,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int1_velocity_enable_flag = 0;
                     int1_torque_enable_flag = 0;
                     upstream_control_data = i_motorcontrol.update_upstream_control_data();
-                    int25_position_k_sens = upstream_control_data.position;
-                    int23_position_k_sens = int25_position_k_sens / 4;
-                    int23_position_ref_k_in = int23_position_k_sens;
-                    flt23_position_ref_k = int23_position_ref_k_in;
-                    flt23_position_ref_k_1n = int23_position_ref_k_in;
-                    flt23_position_ref_k_2n = int23_position_ref_k_in;
-                    flt23_position_k = int23_position_ref_k_in;
-                    flt23_position_k_1n = int23_position_ref_k_in;
-                    flt23_position_k_2n = int23_position_ref_k_in;
+                    position_sens_k = ((float) upstream_control_data.position);
+                    position_sens_k /= -4;
+                    position_ref_input_k = ((int) position_sens_k);
+                    position_ref_k = position_sens_k;
+                    position_ref_k_1n = position_sens_k;
+                    position_ref_k_2n = position_sens_k;
+                    position_k = position_sens_k;
+                    position_k_1n = position_sens_k;
+                    position_k_2n = position_sens_k;
 
                     int23_feedforward_effort_in = 0;
                     pid_reset(position_control_pid_param);
@@ -298,7 +293,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_brake_status(1);
                 break;
             case i_position_control[int i].set_position(int in_target_position):
-                    int23_position_ref_k_in = in_target_position / 4;
+                    position_ref_input_k = in_target_position / 4;
                 break;
             case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
                 pid_set_coefficients(int8_Kp, int8_Ki, int8_Kd, position_control_pid_param);
@@ -403,7 +398,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
             case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_) -> UpstreamControlData upstream_control_data_:
                     upstream_control_data_ = upstream_control_data;
                     downstream_control_data = downstream_control_data_;
-                    int23_position_ref_k_in = downstream_control_data.position_cmd / 4;
+                    position_ref_input_k = downstream_control_data.position_cmd / 4;
                     velocity_ref_input_k = downstream_control_data.velocity_cmd * 512;
                     int23_torque_ref_in = downstream_control_data.torque_cmd;
                     int23_feedforward_effort_in = downstream_control_data.offset_torque;
