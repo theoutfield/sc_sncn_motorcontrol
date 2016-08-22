@@ -116,7 +116,7 @@
 #define COMMUTATION_OFFSET_CCLK     0
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              NORMAL_POLARITY
+#define MOTOR_POLARITY              INVERTED_POLARITY//NORMAL_POLARITY
 
 
 ///////////////////////////////////////////////
@@ -142,7 +142,7 @@
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 50
+#define PERCENT_OFFSET_TORQUE 150
 
 
 /////////////////////////////////////////////////

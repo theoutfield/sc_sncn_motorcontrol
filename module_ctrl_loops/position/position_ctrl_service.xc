@@ -145,12 +145,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
                 velocity_sens_k = (float) upstream_control_data.velocity;
-                velocity_sens_k *= -512;
+                velocity_sens_k *= 512;
 
                 velocity_sens_d_k = velocity_sens_k;
 
                 position_sens_k = ((float) upstream_control_data.position);
-                position_sens_k /= -4;
+                position_sens_k /= 4;
 
                 position_ref_in_k = ((float) position_ref_input_k);
 
@@ -181,7 +181,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         // PID parameters should be int9 -> -255 to 255
                         position_cmd_k = ((float) pid_update(((int) position_ref_k), ((int) position_k), ((int) position_k), 0, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param));
 
-                        velocity_ref_in_k = position_cmd_k;
+                        velocity_ref_k = position_cmd_k;
 
                         second_order_LP_filter_shift_buffers(&position_k,
                                                              &position_k_1n,
