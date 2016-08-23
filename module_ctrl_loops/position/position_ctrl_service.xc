@@ -225,19 +225,19 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     else if (torque_ref_k < (-pos_velocity_ctrl_config.int21_max_torque))
                         torque_ref_k = (-pos_velocity_ctrl_config.int21_max_torque);
 
-                    i_motorcontrol.set_torque(((int) (torque_ref_k / 1024)));
+                    i_motorcontrol.set_torque((int) (torque_ref_k / 1024));
                 }
 
 
 #ifdef XSCOPE_POSITION_CTRL
-//                xscope_int(POSITION_REF, int23_position_ref_k);
-//                xscope_int(POSITION, int23_position_k);
-//                xscope_int(POSITION_CMD, int23_velocity_ref_k);
-//                xscope_int(POSITION_TEMP1, 0);
-//                xscope_int(VELOCITY_REF, int23_velocity_ref_k);
-//                xscope_int(VELOCITY, int23_velocity_k);
-                xscope_int(VELOCITY_CMD, velocity_cmd_k);
-//                xscope_int(VELOCITY_TEMP1, int23_velocity_k_sens);
+                xscope_int(POSITION_REF, (int) position_ref_k);
+                xscope_int(POSITION, (int) position_k);
+                xscope_int(POSITION_CMD, (int) position_cmd_k);
+                xscope_int(POSITION_TEMP1, (int) velocity_control_pid_param.Kp);
+                xscope_int(VELOCITY_REF, (int) velocity_ref_k);
+                xscope_int(VELOCITY, (int) velocity_k);
+                xscope_int(VELOCITY_CMD, (int) velocity_cmd_k);
+                xscope_int(VELOCITY_TEMP1, (int) (torque_ref_k / 1024));
 #endif
 #ifdef XSCOPE_POSITION_CTRL_2
                 xscope_int(VELOCITY, upstream_control_data.velocity);
