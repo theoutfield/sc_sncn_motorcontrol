@@ -342,8 +342,9 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
             //set offset
         case 'o':
-            printf("set offset to %d\n", value);
-            i_motorcontrol.set_offset_value(value);
+            offset = value;
+            printf("set offset to %d\n", offset);
+            i_motorcontrol.set_offset_value(offset);
             break;
 
         case 'p':
