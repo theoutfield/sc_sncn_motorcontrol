@@ -12,14 +12,14 @@
 
 /*
  * Should be set in case HALL sensor is used.
- * FIXME: Now it is being set manualy. Should be set automatically.
  */
-#define MOTOR_HALL_STATE_1     0
-#define MOTOR_HALL_STATE_2     0
-#define MOTOR_HALL_STATE_3     0
-#define MOTOR_HALL_STATE_4     0
-#define MOTOR_HALL_STATE_5     0
-#define MOTOR_HALL_STATE_6     0
+#define HALL_STATE_1_ANGLE     0
+#define HALL_STATE_2_ANGLE     0
+#define HALL_STATE_3_ANGLE     0
+#define HALL_STATE_4_ANGLE     0
+#define HALL_STATE_5_ANGLE     0
+#define HALL_STATE_6_ANGLE     0
+
 #define POWER_FACTOR           0
 
 /////////////////////////////////////////////

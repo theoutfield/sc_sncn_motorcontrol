@@ -81,6 +81,13 @@ int main(void) {
 
                     MotorcontrolConfig motorcontrol_config;
 
+                    motorcontrol_config.hall_state_1_angle=HALL_STATE_1_ANGLE;
+                    motorcontrol_config.hall_state_2_angle=HALL_STATE_2_ANGLE;
+                    motorcontrol_config.hall_state_3_angle=HALL_STATE_3_ANGLE;
+                    motorcontrol_config.hall_state_4_angle=HALL_STATE_4_ANGLE;
+                    motorcontrol_config.hall_state_5_angle=HALL_STATE_5_ANGLE;
+                    motorcontrol_config.hall_state_6_angle=HALL_STATE_6_ANGLE;
+
                     motorcontrol_config.licence =  ADVANCED_MOTOR_CONTROL_LICENCE;
                     motorcontrol_config.v_dc =  VDC;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
