@@ -50,7 +50,25 @@
 #define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 */
 
+// chinese black motore
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS              4       //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT 20      //motor torque constant multiplied by 100
+#define RATED_CURRENT           20000   //rated phase current [milli-Amp-RMS]
+#define MAXIMUM_TORQUE          10000   //maximum value of torque which can be produced by motor [milli-Nm]
 
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER             4000    // rated power [W]
+#define RATED_TORQUE            6000    // rated motor torque [milli-Nm]
+#define PEAK_SPEED              1500    // maximum motor speed [rpm]
+#define PHASE_RESISTANCE        1000    // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE         500    // motor phase inductance [micro-Hunnry]
+
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+#define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+
+/*
 // motor model: DT4
 
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
@@ -68,7 +86,7 @@
 
 // GENERAL PARAMETERS
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-
+*/
 
 /*
 // motor model: MABI AXIS_1 and AXIS_2
