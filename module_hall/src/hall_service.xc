@@ -10,6 +10,7 @@
 #include <refclk.h>
 #include <stdlib.h>
 #include <print.h>
+#include <xscope.h>
 
 #include <mc_internal_constants.h>
 
@@ -148,6 +149,8 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     int hall_sector_and_state;
     hall_sector_and_state=0;
 
+    int angle_out=0;
+
     int hall_sector_and_state_temp;
 
     // This variable must be an unsigned integer. other formats will lead to error
@@ -216,6 +219,8 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     // motor pole pairs
     hv.hall_pole_pairs = position_feedback_config.hall_config.pole_pairs;
     hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
+
+    hv.sensor_polarity=position_feedback_config.hall_config.polarity;
 
 
     do
@@ -501,7 +506,17 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
 
                 //                    i_update_control_position.update_control_angle(hv.hall_interpolated_angle, hv.hall_filtered_speed, hall_state_new);
 
-                i_shared_memory.write_angle_velocity_position(hv.hall_interpolated_angle, hv.hall_filtered_speed, 0);
+
+
+                angle_out = hv.hall_interpolated_angle;
+
+                if (hv.sensor_polarity==1)//inverted polarity
+                    angle_out = 4095 - hv.hall_interpolated_angle;
+
+                if(angle_out>4095) angle_out-=4096;
+                if(angle_out<0)    angle_out+=4096;
+
+                i_shared_memory.write_angle_velocity_position(angle_out, hv.hall_filtered_speed, 0);
 
 
 
@@ -848,9 +863,8 @@ void hall_calculate_angle(hall_variables & hv)
         hv.hall_increment = 0;
     }
 
-    if (hv.hall_interpolated_angle >= 4096)  hv.hall_interpolated_angle -= 4096;
+    if (hv.hall_interpolated_angle > 4095)   hv.hall_interpolated_angle -= 4096;
     if (hv.hall_interpolated_angle <    0)   hv.hall_interpolated_angle += 4096;
-
 }
 
 

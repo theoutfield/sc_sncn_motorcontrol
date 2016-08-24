@@ -142,7 +142,7 @@
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 50
+#define PERCENT_OFFSET_TORQUE 20
 
 
 /////////////////////////////////////////////////

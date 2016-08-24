@@ -17,6 +17,8 @@
 #define FILTER_LENGTH_HALL  16
 #define PULL_PERIOD_USEC 12
 
+#define HALL_POLARITY_NORMAL       0
+#define HALL_POLARITY_INVERTED     1
 
 #define HALL_TICKS_PER_ELECTRICAL_ROTATION 4096
 
@@ -26,6 +28,7 @@
 typedef struct {
     int pole_pairs; /**< Number of pole pairs in your motor. */
     int enable_push_service;
+    int polarity;
 } HallConfig;
 
 
@@ -80,6 +83,7 @@ typedef struct
 
     unsigned int hall_f_clock;
     int hall_pole_pairs;
+    int sensor_polarity;
 
     // filter constants
     int hall_filter_order;
