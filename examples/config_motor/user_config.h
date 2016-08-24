@@ -110,13 +110,13 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      3390//1660
+#define COMMUTATION_OFFSET_CLK      150//3390//1660
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              INVERTED_POLARITY//NORMAL_POLARITY
+#define MOTOR_POLARITY              NORMAL_POLARITY
 
 
 ///////////////////////////////////////////////
@@ -142,7 +142,7 @@
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 150
+#define PERCENT_OFFSET_TORQUE 100
 
 
 /////////////////////////////////////////////////
@@ -345,24 +345,24 @@
 #define MAX_VELOCITY            3000             // rpm
 #define MAX_TORQUE              1200000
 
-#define POSITION_Kp             300
-#define POSITION_Ki             100
+#define POSITION_Kp             8000
+#define POSITION_Ki             15
 #define POSITION_Kd             0
-#define VELOCITY_Kp             200
+#define VELOCITY_Kp             1400
 #define VELOCITY_Ki             0
-#define VELOCITY_Kd             100
+#define VELOCITY_Kd             500
 
-#define POSITION_P_ERROR_lIMIT  2000000000
-#define POSITION_I_ERROR_lIMIT  1
-#define POSITION_INTEGRAL_LIMIT 10000
-#define VELOCITY_P_ERROR_lIMIT  2000000000
-#define VELOCITY_I_ERROR_lIMIT  0
+#define POSITION_P_ERROR_lIMIT  0 //not used anymore
+#define POSITION_I_ERROR_lIMIT  0 //not used anymore
+#define POSITION_INTEGRAL_LIMIT 5000000
+#define VELOCITY_P_ERROR_lIMIT  0 //not used anymore
+#define VELOCITY_I_ERROR_lIMIT  0 //not used anymore
 #define VELOCITY_INTEGRAL_LIMIT 0
 #define POSITION_REF_FC         20
 #define POSITION_FC             100
 #define VELOCITY_REF_FC         50
 #define VELOCITY_FC             90
-#define VELOCITY_D_FC           90
+#define VELOCITY_D_FC           90 //not used anymore
 
 
 // Foresight: Joint 1 Position Controller Config
