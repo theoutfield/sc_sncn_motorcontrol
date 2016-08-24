@@ -43,7 +43,7 @@ void pid_set_limits(int int23_P_error_limit, int int23_I_error_limit, int in23_i
  * @param sample-time in us (microseconds).
  * @param the parameters of the controller
  */
-int pid_update(float desired_value, float actual_value, int feedforward_ctrl_effort, int T_s, PIDparam &param);
+float pid_update(float desired_value, float actual_value, int feedforward_ctrl_effort, int T_s, PIDparam &param);
 
 void pid_reset(PIDparam &param);
 

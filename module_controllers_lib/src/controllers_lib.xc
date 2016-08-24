@@ -28,7 +28,7 @@ void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int 
 }
 
 
-int pid_update(float desired_value, float actual_value, int feedforward_ctrl_effort, int T_s, PIDparam &param)
+float pid_update(float desired_value, float actual_value, int feedforward_ctrl_effort, int T_s, PIDparam &param)
 {
     float error, cmd, integral_term;
 
@@ -54,9 +54,6 @@ void pid_reset(PIDparam &param)
     param.actual_value_1n = 0;
     param.integral = 0;
 }
-
-
-
 
 
 

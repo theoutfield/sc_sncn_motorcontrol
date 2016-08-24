@@ -118,14 +118,13 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     downstream_control_data.torque_cmd = 0;
     downstream_control_data.offset_torque = 0;
 
-    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    position_ref_input_k = upstream_control_data.position;
     position_sens_k = ((float) upstream_control_data.position);
-    position_sens_k /= 1;
-    position_ref_input_k = ((int) position_sens_k);
-
-    position_ref_k = ((int) position_sens_k);
-    position_ref_k_1n = ((int) position_sens_k);
-    position_ref_k_2n = ((int) position_sens_k);
+    position_sens_k /= 512;// 2^(24-15);
+    position_sens_k *= 1; // 2^(15-bits);
+    position_ref_k = position_sens_k;
+    position_ref_k_1n = position_sens_k;
+    position_ref_k_2n = position_sens_k;
     position_k = position_sens_k;
     position_k_1n = position_sens_k;
     position_k_2n = position_sens_k;
@@ -139,6 +138,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
             case t when timerafter(ts + USEC_STD * pos_velocity_ctrl_config.control_loop_period) :> ts:
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                if ((upstream_control_data.position > 300000) || (upstream_control_data.position < -300000))
+                {
+                    int1_enable_flag = 0;
+                    i_motorcontrol.set_torque_control_disabled();
+                    i_motorcontrol.set_safe_torque_off_enabled();
+                    i_motorcontrol.set_brake_status(0);
+                }
+
 
                 position_sens_k = ((float) upstream_control_data.position);
                 position_sens_k /= 512;// 2^(24-15);
@@ -268,9 +276,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     int1_velocity_enable_flag = 0;
                     int1_torque_enable_flag = 0;
                     upstream_control_data = i_motorcontrol.update_upstream_control_data();
+                    position_ref_input_k = upstream_control_data.position;
                     position_sens_k = ((float) upstream_control_data.position);
-                    position_sens_k /= 1;
-                    position_ref_input_k = ((int) position_sens_k);
+                    position_sens_k /= 512;// 2^(24-15);
+                    position_sens_k *= 1; // 2^(15-bits);
                     position_ref_k = position_sens_k;
                     position_ref_k_1n = position_sens_k;
                     position_ref_k_2n = position_sens_k;
@@ -284,7 +293,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_brake_status(1);
                 break;
             case i_position_control[int i].set_position(int in_target_position):
-                    position_ref_input_k = in_target_position / 1;
+                    position_ref_input_k = in_target_position;
                 break;
             case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
                     pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
