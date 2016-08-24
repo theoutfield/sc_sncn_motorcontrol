@@ -104,12 +104,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_d_fc, pos_velocity_ctrl_config.control_loop_period, velocity_d_SO_LP_filter_param);
 
     pid_init(velocity_control_pid_param);
+    pid_set_parameters((float)pos_velocity_ctrl_config.int10_P_velocity, (float)pos_velocity_ctrl_config.int10_I_velocity,
+                       (float)pos_velocity_ctrl_config.int10_D_velocity, (float)pos_velocity_ctrl_config.int22_integral_limit_velocity,
+                              pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
     pid_init(position_control_pid_param);
     pid_set_parameters((float)pos_velocity_ctrl_config.int10_P_position, (float)pos_velocity_ctrl_config.int10_I_position,
                        (float)pos_velocity_ctrl_config.int10_D_position, (float)pos_velocity_ctrl_config.int22_integral_limit_position,
-                              pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-    pid_set_parameters((float)pos_velocity_ctrl_config.int10_P_velocity, (float)pos_velocity_ctrl_config.int10_I_velocity,
-                       (float)pos_velocity_ctrl_config.int10_D_velocity, (float)pos_velocity_ctrl_config.int22_integral_limit_velocity,
                               pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
 
 
@@ -350,12 +350,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     pos_velocity_ctrl_config.int21_min_position /= 4;
                     pos_velocity_ctrl_config.int21_max_position /= 4;
                     pid_init(velocity_control_pid_param);
+                    pid_set_parameters((float)pos_velocity_ctrl_config.int10_P_velocity, (float)pos_velocity_ctrl_config.int10_I_velocity,
+                                       (float)pos_velocity_ctrl_config.int10_D_velocity, (float)pos_velocity_ctrl_config.int22_integral_limit_velocity,
+                                              pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
                     pid_init(position_control_pid_param);
                     pid_set_parameters((float)pos_velocity_ctrl_config.int10_P_position, (float)pos_velocity_ctrl_config.int10_I_position,
                                        (float)pos_velocity_ctrl_config.int10_D_position, (float)pos_velocity_ctrl_config.int22_integral_limit_position,
-                                              pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                    pid_set_parameters((float)pos_velocity_ctrl_config.int10_P_velocity, (float)pos_velocity_ctrl_config.int10_I_velocity,
-                                       (float)pos_velocity_ctrl_config.int10_D_velocity, (float)pos_velocity_ctrl_config.int22_integral_limit_velocity,
                                               pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                     second_order_LP_filter_init(/*f_c=*//*80*/pos_velocity_ctrl_config.position_fc, /*T_s=*/pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
                     second_order_LP_filter_init(/*f_c=*//*5*/ pos_velocity_ctrl_config.position_ref_fc, /*T_s=*/pos_velocity_ctrl_config.control_loop_period, position_ref_SO_LP_filter_param);
