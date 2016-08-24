@@ -138,7 +138,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                if ((upstream_control_data.position > 300000) || (upstream_control_data.position < -300000))
+                if ((upstream_control_data.position > pos_velocity_ctrl_config.int21_max_position) || (upstream_control_data.position < pos_velocity_ctrl_config.int21_min_position))
                 {
                     int1_enable_flag = 0;
                     i_motorcontrol.set_torque_control_disabled();

@@ -340,9 +340,9 @@
 
 // AMK or qmot
 //**motor offset: AMK 2470, qmot 3450
-#define MIN_POSITION_LIMIT     -0x7fffffff         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      0x7fffffff         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            3000             // rpm
+#define MIN_POSITION_LIMIT     -400000         // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT      400000         // ticks (max range: 2^30, limited for safe operation)
+#define MAX_VELOCITY            800             // rpm
 #define MAX_TORQUE              3000
 
 //New Pos Controller
