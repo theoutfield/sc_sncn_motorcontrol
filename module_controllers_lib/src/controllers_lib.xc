@@ -57,6 +57,21 @@ void pid_reset(PIDparam &param)
 
 
 
+float new_pos_controller_updat(float desired_value, float actual_value, int feedforward_ctrl_effort, int T_s, PIDparam &param)
+{
+    float cmd, temp;
+
+    temp = param.integral;
+    param.integral += ((desired_value * param.Ki) - (actual_value * (param.Ki + param.Kp)) + (param.actual_value_1n * param.Kp));
+    if((param.integral > param.integral_limit) || (param.integral < -param.integral_limit))
+        param.integral = temp;
+    cmd = param.integral - (actual_value * param.Kd) + (param.actual_value_1n * param.Kd);
+    cmd += ((float) feedforward_ctrl_effort);
+    param.actual_value_1n = actual_value;
+    return cmd;
+}
+
+
 
 
 

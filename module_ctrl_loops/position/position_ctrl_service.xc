@@ -82,7 +82,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     float velocity_k = 0;
     float velocity_k_1n = 0;
     float velocity_k_2n = 0;
-    float velocity_sens_d_k = 0;
     float velocity_cmd_k = 0;
 
     // torque
@@ -185,10 +184,20 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         else if (position_ref_k < pos_velocity_ctrl_config.int21_min_position)
                             position_ref_k = pos_velocity_ctrl_config.int21_min_position;
 
-                        // PID parameters should be int9 -> -255 to 255
-                        position_cmd_k = pid_update(position_ref_k, position_k, 0, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+//new pos controller
+///*
+                        position_cmd_k = new_pos_controller_updat(position_ref_k, position_k, 0, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                        torque_ref_k = (position_cmd_k / 512);
+//*/
+//new pos controller
 
+
+//PID pos controller
+/*
+                        position_cmd_k = pid_update(position_ref_k, position_k, 0, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                         velocity_ref_k = (position_cmd_k / 512);
+*/
+//PID pos controller
 
                         second_order_LP_filter_shift_buffers(&position_k,
                                                              &position_k_1n,
@@ -198,6 +207,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                                              &position_ref_k_2n);
                     }
 
+//PID pos controller
+/*
                     // velocity control
                     if (int1_velocity_enable_flag == 1 || int1_position_enable_flag == 1) {
 
@@ -230,6 +241,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                                              &velocity_k_1n,
                                                              &velocity_k_2n);
                     }
+//PID pos controller
+*/
 
                     if(torque_ref_k > pos_velocity_ctrl_config.int21_max_torque)
                         torque_ref_k = pos_velocity_ctrl_config.int21_max_torque;
