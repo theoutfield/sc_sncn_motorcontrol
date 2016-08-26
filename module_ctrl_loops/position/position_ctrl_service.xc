@@ -265,10 +265,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(POSITION_REF, (int) (position_ref_k*512));
                 xscope_int(POSITION, (int) (position_k*512));
                 xscope_int(POSITION_CMD, (int) position_cmd_k);
-                xscope_int(POSITION_TEMP1, (int) velocity_control_pid_param.Kp);
-                xscope_int(VELOCITY_REF, (int) velocity_ref_k);
-                xscope_int(VELOCITY, (int) velocity_k);
-                xscope_int(VELOCITY_CMD, (int) velocity_cmd_k);
+                xscope_int(POSITION_TEMP1, 0);//(int) velocity_control_pid_param.Kp);
+                xscope_int(VELOCITY_REF, 0);//(int) velocity_ref_k);
+                xscope_int(VELOCITY, 0);//(int) velocity_k);
+                xscope_int(VELOCITY_CMD, 0);//(int) velocity_cmd_k);
                 xscope_int(VELOCITY_TEMP1, (int) (torque_ref_k / 1));
 #endif
 #ifdef XSCOPE_POSITION_CTRL_2

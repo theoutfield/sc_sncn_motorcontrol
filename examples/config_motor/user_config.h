@@ -79,7 +79,7 @@
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
 
-#define I_MAX           50//100      //maximum tolerable value of phase current (under abnormal conditions)
+#define I_MAX           80//100      //maximum tolerable value of phase current (under abnormal conditions)
 #define V_DC_MAX        60      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define V_DC_MIN        15      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
@@ -104,7 +104,7 @@
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
 
-#define VDC             48
+#define VDC             24
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     66
@@ -340,16 +340,16 @@
 
 // AMK or qmot
 //**motor offset: AMK 2470, qmot 3450
-#define MIN_POSITION_LIMIT     -110000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      110000         // ticks (max range: 2^30, limited for safe operation)
+#define MIN_POSITION_LIMIT     -200000         // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT      200000         // ticks (max range: 2^30, limited for safe operation)
 #define MAX_VELOCITY            800             // rpm
-#define MAX_TORQUE              1500
+#define MAX_TORQUE              3500
 
 //New Pos Controller
-#define POSITION_Kp             150000//20000//30000
-#define POSITION_Ki             140//80//180
-#define POSITION_Kd             1200000//80000//500000
-#define POSITION_INTEGRAL_LIMIT 600000//1500000
+#define POSITION_Kp             400000//20000//30000
+#define POSITION_Ki             700//80//180
+#define POSITION_Kd             2000000//80000//500000
+#define POSITION_INTEGRAL_LIMIT 3000000//1500000
 
 //PID Pos controller
 //#define POSITION_Kp             8000
@@ -366,7 +366,7 @@
 #define VELOCITY_P_ERROR_lIMIT  0 //not used anymore
 #define VELOCITY_I_ERROR_lIMIT  0 //not used anymore
 #define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         20
+#define POSITION_REF_FC         1
 #define POSITION_FC             100
 #define VELOCITY_REF_FC         50
 #define VELOCITY_FC             90
