@@ -16,6 +16,7 @@
 #include <mc_internal_constants.h>
 #include <filters_lib.h>
 #include <stdio.h>
+#include <math.h>
 
 
 
@@ -89,6 +90,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int int23_torque_ref_in = 0;
     float torque_ref_k = 0;
 
+    // Pointman
+    float POS_OFFSET = 0;
+    float MAX_POS = 95000;
+    float MAX_POS_TORQUE = 850 * (-512);
+    float position_sens_k_original = 0;
+
     timer t;
     unsigned int ts;
 
@@ -148,13 +155,14 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
                 position_sens_k = ((float) upstream_control_data.position);
+                position_sens_k_original = position_sens_k;
                 position_sens_k /= 512;// 2^(24-15);
                 position_sens_k *= 1; // 2^(15-bits);
                 position_ref_in_k = ((float) position_ref_input_k);
                 position_ref_in_k /= 512; // 2^(24-15);
                 position_ref_in_k *= 1; // 2^(15-bits);
 
-                int23_feedforward_effort = int23_feedforward_effort_in;
+                int23_feedforward_effort = MAX_POS_TORQUE * sin(1.57*((position_sens_k_original-POS_OFFSET)/MAX_POS));//(float) int23_feedforward_effort_in;
 
                 velocity_sens_k = (float) upstream_control_data.velocity;
                 velocity_sens_k /= 1; // 2^(bits-16);
@@ -186,7 +194,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 //new pos controller
 ///*
-                        position_cmd_k = new_pos_controller_updat(position_ref_k, position_k, 0, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                        position_cmd_k = new_pos_controller_updat(position_ref_k, position_k, int23_feedforward_effort, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                         torque_ref_k = (position_cmd_k / 512);
 //*/
 //new pos controller

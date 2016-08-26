@@ -79,7 +79,7 @@
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
 
-#define I_MAX           100      //maximum tolerable value of phase current (under abnormal conditions)
+#define I_MAX           50//100      //maximum tolerable value of phase current (under abnormal conditions)
 #define V_DC_MAX        60      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define V_DC_MIN        15      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
@@ -110,7 +110,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      150//3390//1660
+#define COMMUTATION_OFFSET_CLK      2735//150//3390//1660
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
@@ -142,7 +142,7 @@
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 100
+#define PERCENT_OFFSET_TORQUE 20
 
 
 /////////////////////////////////////////////////
@@ -340,16 +340,16 @@
 
 // AMK or qmot
 //**motor offset: AMK 2470, qmot 3450
-#define MIN_POSITION_LIMIT     -400000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      400000         // ticks (max range: 2^30, limited for safe operation)
+#define MIN_POSITION_LIMIT     -110000         // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT      110000         // ticks (max range: 2^30, limited for safe operation)
 #define MAX_VELOCITY            800             // rpm
-#define MAX_TORQUE              3000
+#define MAX_TORQUE              1500
 
 //New Pos Controller
-#define POSITION_Kp             30000
-#define POSITION_Ki             180
-#define POSITION_Kd             500000
-#define POSITION_INTEGRAL_LIMIT 1500000
+#define POSITION_Kp             150000//20000//30000
+#define POSITION_Ki             140//80//180
+#define POSITION_Kd             1200000//80000//500000
+#define POSITION_INTEGRAL_LIMIT 600000//1500000
 
 //PID Pos controller
 //#define POSITION_Kp             8000

@@ -54,7 +54,7 @@
 // motor model: DT4
 
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
-#define POLE_PAIRS              5       //number of motor pole-pairs
+#define POLE_PAIRS              7//5       //number of motor pole-pairs
 #define PERCENT_TORQUE_CONSTANT 15      //motor torque constant multiplied by 100
 #define RATED_CURRENT           8000    //rated phase current [milli-Amp-RMS]
 #define MAXIMUM_TORQUE          2500    //maximum value of torque which can be produced by motor [milli-Nm]

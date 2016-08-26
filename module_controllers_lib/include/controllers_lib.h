@@ -49,7 +49,7 @@ float pid_update(float desired_value, float actual_value, int feedforward_ctrl_e
 void pid_reset(PIDparam &param);
 
 
-float new_pos_controller_updat(float desired_value, float actual_value, int feedforward_ctrl_effort, int T_s, PIDparam &param);
+float new_pos_controller_updat(float desired_value, float actual_value, float feedforward_ctrl_effort, int T_s, PIDparam &param);
 
 
 
