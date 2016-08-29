@@ -9,7 +9,6 @@
 /**
 * @brief Definition for referring to the Encoder sensor.
 */
-#define QEI_SENSOR               2
 
 #define QEI_CHANGES_PER_TICK     4 //Quadrature encoder
 

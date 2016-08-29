@@ -5,11 +5,6 @@
 
 #pragma once
 
-/**
-* @brief Definition for referring to the Hall sensor.
-*/
-#define HALL_SENSOR             1
-
 #define ERROR                   0
 #define SUCCESS                 1
 

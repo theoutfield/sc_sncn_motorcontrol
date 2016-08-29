@@ -9,8 +9,6 @@
 
 #include <refclk.h>
 
-#define CONTELEC_SENSOR                6
-
 #define CONTELEC_USEC            USEC_FAST
 
 #define SPI_MASTER_MODE 1 //clock active high
