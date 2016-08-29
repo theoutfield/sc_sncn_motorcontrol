@@ -50,6 +50,9 @@
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1
 
+// POLARITY OF YOUR HALL SENSOR (if applicable) [1,-1]
+#define HALL_POLARITY              -1
+
 
 //////////////////////////////////////////////
 //////  RECUPERATION MODE PARAMETERS
@@ -137,8 +140,8 @@
 //#define VELOCITY_Kd       0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
-#define TORQUE_Kp         40 //7
-#define TORQUE_Ki         160  //3
+#define TORQUE_Kp         10 //7
+#define TORQUE_Ki         10  //3
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
