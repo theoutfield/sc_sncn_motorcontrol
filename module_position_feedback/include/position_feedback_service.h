@@ -10,7 +10,6 @@
 #include <biss_config.h>
 #include <contelec_config.h>
 #include <ams_config.h>
-#include <hall_config.h>
 
 #include <biss_struct.h>
 #include <contelec_struct.h>

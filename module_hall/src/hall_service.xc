@@ -149,7 +149,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     int hall_sector_and_state;
     hall_sector_and_state=0;
 
-    int angle_out=0;
+    int angle_out=0, speed_out=0;
 
     int hall_sector_and_state_temp;
 
@@ -509,14 +509,18 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
 
 
                 angle_out = hv.hall_interpolated_angle;
+                speed_out = hv.hall_filtered_speed;
 
-                if (hv.sensor_polarity==1)//inverted polarity
+                if (hv.sensor_polarity==-1)//inverted polarity
+                {
                     angle_out = 4095 - hv.hall_interpolated_angle;
+                    speed_out = -hv.hall_filtered_speed;
+                }
 
                 if(angle_out>4095) angle_out-=4096;
                 if(angle_out<0)    angle_out+=4096;
 
-                i_shared_memory.write_angle_velocity_position(angle_out, hv.hall_filtered_speed, 0);
+                i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, 0, hall_state_new);
 
 
 
