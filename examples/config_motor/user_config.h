@@ -113,7 +113,16 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1300
+#define COMMUTATION_OFFSET_CLK      1370
+
+// MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
+#define HALL_STATE_1_ANGLE     2720
+#define HALL_STATE_2_ANGLE     17
+#define HALL_STATE_3_ANGLE     3358
+#define HALL_STATE_4_ANGLE     1333
+#define HALL_STATE_5_ANGLE     2071
+#define HALL_STATE_6_ANGLE     702
+
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0

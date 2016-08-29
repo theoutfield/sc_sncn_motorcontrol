@@ -315,8 +315,16 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
                 printf("set offset to %d\n", offset);
                 i_motorcontrol.set_offset_value(offset);
-                delay_milliseconds(2000);
 
+                motorcontrol_config = i_motorcontrol.get_config();
+                printf("hall_state_1_angle %d\n", motorcontrol_config.hall_state_1);
+                printf("hall_state_2_angle %d\n", motorcontrol_config.hall_state_2);
+                printf("hall_state_3_angle %d\n", motorcontrol_config.hall_state_3);
+                printf("hall_state_4_angle %d\n", motorcontrol_config.hall_state_4);
+                printf("hall_state_5_angle %d\n", motorcontrol_config.hall_state_5);
+                printf("hall_state_6_angle %d\n", motorcontrol_config.hall_state_6);
+
+                delay_milliseconds(2000);
                 i_motorcontrol.set_torque_control_enabled();
             }
             else

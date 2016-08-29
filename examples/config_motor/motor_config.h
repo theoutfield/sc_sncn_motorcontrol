@@ -10,16 +10,6 @@
  *********      USER CONFIGURATION       **********
  **************************************************/
 
-/*
- * Should be set in case HALL sensor is used.
- */
-#define HALL_STATE_1_ANGLE     0
-#define HALL_STATE_2_ANGLE     0
-#define HALL_STATE_3_ANGLE     0
-#define HALL_STATE_4_ANGLE     0
-#define HALL_STATE_5_ANGLE     0
-#define HALL_STATE_6_ANGLE     0
-
 #define POWER_FACTOR           0
 
 /////////////////////////////////////////////
@@ -59,7 +49,7 @@
 
 // OTHER PARAMETERS (do not change if not having access to the following parameter values)
 #define RATED_POWER             4000    // rated power [W]
-#define RATED_TORQUE            12000   // rated motor torque [milli-Nm]
+#define RATED_TORQUE            5000   // rated motor torque [milli-Nm]
 #define PEAK_SPEED              5000    // maximum motor speed [rpm]
 #define PHASE_RESISTANCE        6200    // motor phase resistance [micro-ohm]
 #define PHASE_INDUCTANCE          68    // motor phase inductance [micro-Hunnry]
