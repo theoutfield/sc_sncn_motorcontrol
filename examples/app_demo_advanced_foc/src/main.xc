@@ -131,7 +131,7 @@ int main(void) {
 
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = HALL_SENSOR;
-                    position_feedback_config.hall_config.pole_pairs = 4;
+                    position_feedback_config.hall_config.pole_pairs = POLE_PAIRS;
                     position_feedback_config.hall_config.polarity = HALL_POLARITY;
                     position_feedback_config.hall_config.enable_push_service = PushAll;
 
