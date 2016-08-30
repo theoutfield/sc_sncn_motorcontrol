@@ -84,7 +84,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
         case 'a':
             auto_offset(i_motorcontrol);
             break;
-        //set brake
+            //set brake
         case 'b':
             if (brake_flag) {
                 brake_flag = 0;
@@ -96,30 +96,30 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             i_motorcontrol.set_brake_status(brake_flag);
             break;
 
-        //position limit
+            //position limit
         case 'l':
             if (!isnull(i_tuning))
                 i_tuning.set_limit(value * sign);
             break;
 
-        //set offset
+            //set offset
         case 'o':
             printf("set offset to %d\n", value);
             i_motorcontrol.set_offset_value(value);
             break;
 
-        //print offset
+            //print offset
         case 'p':
             printf("offset %d\n", i_motorcontrol.set_calib(0));
             break;
-        //reverse voltage
+            //reverse voltage
         case 'r':
             torque_ref = -torque_ref;
             i_motorcontrol.set_torque(torque_ref);
             printf("torque %d [milli-Nm]\n", torque_ref);
             break;
 
-        //enable and disable torque controller
+            //enable and disable torque controller
         case 't':
             if (torque_control_flag == 0) {
                 torque_control_flag = 1;
@@ -133,23 +133,23 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             break;
 
             //play sound!
-            case 's':
-                for(period_us=400;period_us<=(1*1000);(period_us+=400))
+        case 's':
+            for(period_us=400;period_us<=(1*1000);(period_us+=400))
+            {
+                if(period_us<3000) period_us-=300;
+
+                for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
                 {
-                    if(period_us<3000) period_us-=300;
-
-                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
-                    {
-                        i_motorcontrol.set_torque(80);
-                        delay_microseconds(period_us);
-                        i_motorcontrol.set_torque(-80);
-                        delay_microseconds(period_us);
-                    }
+                    i_motorcontrol.set_torque(80);
+                    delay_microseconds(period_us);
+                    i_motorcontrol.set_torque(-80);
+                    delay_microseconds(period_us);
                 }
-                i_motorcontrol.set_torque(0);
-                break;
+            }
+            i_motorcontrol.set_torque(0);
+            break;
 
-        //set torque
+            //set torque
         default:
             torque_ref = value * sign;
             i_motorcontrol.set_torque(torque_ref);
@@ -317,12 +317,15 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
                 i_motorcontrol.set_offset_value(offset);
 
                 motorcontrol_config = i_motorcontrol.get_config();
-                printf("hall_state_1_angle %d\n", motorcontrol_config.hall_state_1);
-                printf("hall_state_2_angle %d\n", motorcontrol_config.hall_state_2);
-                printf("hall_state_3_angle %d\n", motorcontrol_config.hall_state_3);
-                printf("hall_state_4_angle %d\n", motorcontrol_config.hall_state_4);
-                printf("hall_state_5_angle %d\n", motorcontrol_config.hall_state_5);
-                printf("hall_state_6_angle %d\n", motorcontrol_config.hall_state_6);
+                if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                {
+                    printf("hall_state_1_angle %d\n", motorcontrol_config.hall_state_1);
+                    printf("hall_state_2_angle %d\n", motorcontrol_config.hall_state_2);
+                    printf("hall_state_3_angle %d\n", motorcontrol_config.hall_state_3);
+                    printf("hall_state_4_angle %d\n", motorcontrol_config.hall_state_4);
+                    printf("hall_state_5_angle %d\n", motorcontrol_config.hall_state_5);
+                    printf("hall_state_6_angle %d\n", motorcontrol_config.hall_state_6);
+                }
 
                 delay_milliseconds(2000);
                 i_motorcontrol.set_torque_control_enabled();
@@ -515,8 +518,8 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             motorcontrol_config = i_motorcontrol.get_config();
             if(torque_ref>motorcontrol_config.max_torque || torque_ref<-motorcontrol_config.max_torque)
             {
-                    upstream_control_data = i_motorcontrol.update_upstream_control_data();
-                    printf("above limits! torque %d [milli-Nm]\n", upstream_control_data.torque_set);
+                upstream_control_data = i_motorcontrol.update_upstream_control_data();
+                printf("above limits! torque %d [milli-Nm]\n", upstream_control_data.torque_set);
             }
             else
                 printf("torque %d [milli-Nm]\n", torque_ref);
