@@ -13,10 +13,10 @@
 #define PERCENT_TORQUE_CONSTANT (MAXIMUM_TORQUE/10)      //motor torque constant multiplied by 100
 #define RATED_CURRENT           6250    //rated phase current (RMS)
 #define MAXIMUM_TORQUE          2128    //maximum value of torque which can be produced by motor [milli-Nm]
+#define RATED_TORQUE            700     // rated motor torque [milli-Nm]
 
 // OTHER PARAMETERS (do not change if not having access to the following parameter values)
 #define RATED_POWER             220     // rated power [W]
-#define RATED_TORQUE            700     // rated motor torque [milli-Nm]
 #define PEAK_SPEED              4500    // maximum motor speed [rpm]
 #define PHASE_RESISTANCE        180000  // motor phase resistance [micro-ohm]
 #define PHASE_INDUCTANCE        350     // motor phase inductance [micro-Hunnry]
