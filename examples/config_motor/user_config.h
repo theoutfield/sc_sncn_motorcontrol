@@ -33,7 +33,7 @@
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
 #define MOTOR_FEEDBACK_SENSOR      MOTOR_COMMUTATION_SENSOR
@@ -49,6 +49,9 @@
 
 // POLARITY OF YOUR INCREMENTAL ENCODER (if applicable) [1, -1]
 #define QEI_SENSOR_POLARITY         1
+
+// POLARITY OF YOUR HALL SENSOR (if applicable) [1,-1]
+#define HALL_POLARITY              1
 
 
 //////////////////////////////////////////////
@@ -81,7 +84,7 @@
 
 #define I_MAX           100      //maximum tolerable value of phase current (under abnormal conditions)
 #define V_DC_MAX        60      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
-#define V_DC_MIN        15      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+#define V_DC_MIN        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
 
 
@@ -110,7 +113,16 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1660
+#define COMMUTATION_OFFSET_CLK      1300
+
+// MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
+#define HALL_STATE_1_ANGLE     4029
+#define HALL_STATE_2_ANGLE     2601
+#define HALL_STATE_3_ANGLE     3323
+#define HALL_STATE_4_ANGLE     1292
+#define HALL_STATE_5_ANGLE     592
+#define HALL_STATE_6_ANGLE     1986
+
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
@@ -137,12 +149,12 @@
 //#define VELOCITY_Kd       0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
-#define TORQUE_Kp         40 //7
-#define TORQUE_Ki         160  //3
+#define TORQUE_Kp         10 //7
+#define TORQUE_Ki         10  //3
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 50
+#define PERCENT_OFFSET_TORQUE 20
 
 
 /////////////////////////////////////////////////

@@ -7,8 +7,6 @@
 
 #include <refclk.h>
 
-#define BISS_SENSOR                4
-
 #define ERROR                      0
 #define SUCCESS                    1
 
