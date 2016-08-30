@@ -11,6 +11,17 @@
 
 
 /**
+ * @brief Type for position sensors.
+ */
+typedef enum {
+    HALL_SENSOR= 1,
+    QEI_SENSOR = 2,
+    BISS_SENSOR= 4,
+    CONTELEC_SENSOR=6
+} SensorType;
+
+
+/**
  * @brief Type for motors.
  */
 typedef enum {
@@ -72,6 +83,13 @@ typedef struct {
     int hall_state_4;                       /**< Hall port state while being in sector 4*/
     int hall_state_5;                       /**< Hall port state while being in sector 5*/
     int hall_state_6;                       /**< Hall port state while being in sector 6*/
+
+    int hall_state_1_angle;                 /**< estimated angle while being in sector 1*/
+    int hall_state_2_angle;                 /**< estimated angle while being in sector 2*/
+    int hall_state_3_angle;                 /**< estimated angle while being in sector 3*/
+    int hall_state_4_angle;                 /**< estimated angle while being in sector 4*/
+    int hall_state_5_angle;                 /**< estimated angle while being in sector 5*/
+    int hall_state_6_angle;                 /**< estimated angle while being in sector 6*/
 
     int commutation_loop_period;            /**< Period for the commutation loop [microseconds]. */
 

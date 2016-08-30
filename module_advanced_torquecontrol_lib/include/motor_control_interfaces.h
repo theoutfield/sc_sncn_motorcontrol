@@ -290,6 +290,18 @@ interface shared_memory_interface {
     */
     {unsigned int, int, int} get_angle_velocity_position();
 
+
+    /**
+    * @brief Getter for electrical angle and current velocity and position.
+    *
+    * @return  Electrical angle.
+    * @return  Current velocity.
+    * @return  Current multiturn count.
+    * @return  Hall_state (in case HALL sensor is used)
+    */
+    {unsigned int, int, int, int} get_angle_velocity_position_hall();
+
+
     /**
     * @brief Getter for electrical angle and current velocity.
     *
@@ -350,7 +362,16 @@ interface shared_memory_interface {
     */
     void write_angle_velocity_position(unsigned int in_angle, int in_velocity, int in_count);
 
-    /**
+     /**
+    * @brief Write multi-turn electrical angle and current velocity and position to shared memory.
+    *
+    * @param  Electrical angle.
+    * @param  Current velocity.
+    * @param  Multi-turn count.
+    * @param  Hall state (in case HALL sensor is used)
+    */
+    void write_angle_velocity_position_hall(unsigned int in_angle, int in_velocity, int in_count, int in_hall_state);
+   /**
     * @brief Write multi-turn electrical angle and current velocity and position to shared memory.
     *
     * @param  Current velocity.
