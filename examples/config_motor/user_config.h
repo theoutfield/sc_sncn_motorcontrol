@@ -51,7 +51,7 @@
 #define QEI_SENSOR_POLARITY         1
 
 // POLARITY OF YOUR HALL SENSOR (if applicable) [1,-1]
-#define HALL_POLARITY              -1
+#define HALL_POLARITY              1
 
 
 //////////////////////////////////////////////
@@ -113,15 +113,15 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1370
+#define COMMUTATION_OFFSET_CLK      1300
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
-#define HALL_STATE_1_ANGLE     2739
-#define HALL_STATE_2_ANGLE     62
-#define HALL_STATE_3_ANGLE     3354
-#define HALL_STATE_4_ANGLE     1340
-#define HALL_STATE_5_ANGLE     2100
-#define HALL_STATE_6_ANGLE     718
+#define HALL_STATE_1_ANGLE     4029
+#define HALL_STATE_2_ANGLE     2601
+#define HALL_STATE_3_ANGLE     3323
+#define HALL_STATE_4_ANGLE     1292
+#define HALL_STATE_5_ANGLE     592
+#define HALL_STATE_6_ANGLE     1986
 
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]

@@ -44,9 +44,5 @@
     <Probe name="TEMPERATURE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="FAULT_CODE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
-    <Probe name="ANGLE_ACTUAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="ANGLE_TEST" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    
-    
 
 </xSCOPEconfig>
