@@ -134,8 +134,8 @@
 //////  MOTOR CONTROL CONFIGURATION
 ///////////////////////////////////////////////
 
-// CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     1000
+// POSITION CONTROL LOOP PERIOD [us]
+#define CONTROL_LOOP_PERIOD     500
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
 //#define POSITION_Kp       100
@@ -377,7 +377,7 @@
 #define VELOCITY_P_ERROR_lIMIT  0 //not used anymore
 #define VELOCITY_I_ERROR_lIMIT  0 //not used anymore
 #define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         20
+#define POSITION_REF_FC         1
 #define POSITION_FC             100
 #define VELOCITY_REF_FC         50
 #define VELOCITY_FC             90

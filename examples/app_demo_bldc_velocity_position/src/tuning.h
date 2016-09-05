@@ -26,6 +26,4 @@ interface PositionLimiterInterface {
     int get_limit();
 };
 
-void run_offset_tuning(int input_voltage, interface MotorcontrolInterface client i_commutation, interface PositionVelocityCtrlInterface client ?i_position_control);
-
-void position_limiter(int position_limit, interface PositionLimiterInterface server i_position_limiter, client interface MotorcontrolInterface i_motorcontrol);
+void run_offset_tuning(interface MotorcontrolInterface client i_commutation, interface PositionVelocityCtrlInterface client ?i_position_control);

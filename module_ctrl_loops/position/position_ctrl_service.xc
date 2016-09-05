@@ -392,9 +392,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
             case i_position_control[int i].get_position_velocity_control_config() ->  PosVelocityControlConfig out_config:
                     out_config = pos_velocity_ctrl_config;
-                    out_config.int21_max_speed /= 1;
-                    out_config.int21_min_position *= 1;
-                    out_config.int21_max_position *= 1;
                 break;
 
             case i_position_control[int i].get_position() -> int out_position:
