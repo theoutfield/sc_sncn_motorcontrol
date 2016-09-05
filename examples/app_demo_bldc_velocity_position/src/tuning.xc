@@ -73,7 +73,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     delay_milliseconds(2000);
 //    i_commutation.set_brake_status(1);
 
-    i_commutation.set_offset_value(1250);
+    i_commutation.set_offset_value(150);//1250);
     delay_milliseconds(1000);
 
     i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
@@ -264,10 +264,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = value*sign;
                         i_position_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(5000);
+                        delay_milliseconds(2000);
                         downstream_control_data.position_cmd = -value*sign;
                         i_position_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(5000);
+                        delay_milliseconds(2000);
                         downstream_control_data.position_cmd = 0;
                         i_position_control.update_control_data(downstream_control_data);
                     }
@@ -277,10 +277,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                     downstream_control_data.offset_torque = 0;
                     downstream_control_data.velocity_cmd = value*sign;
                     i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(5000);
+                    delay_milliseconds(1500);
                     downstream_control_data.velocity_cmd = -value*sign;
                     i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(5000);
+                    delay_milliseconds(1500);
                     downstream_control_data.velocity_cmd = 0;//value*sign;
                     i_position_control.update_control_data(downstream_control_data);
                     break;
@@ -288,10 +288,10 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
                     printf("torque cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
                     downstream_control_data.torque_cmd = value*sign;
                     i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(2000);
+                    delay_milliseconds(1500);
                     downstream_control_data.torque_cmd = -value*sign;
                     i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(2000);
+                    delay_milliseconds(1500);
                     downstream_control_data.torque_cmd = 0;
                     i_position_control.update_control_data(downstream_control_data);
                     break;
@@ -340,9 +340,9 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 
         //set torque
         default:
-            torque = value*sign;
-            i_commutation.set_torque(torque);
-            printf("Torque %d [milli-Nm]\n", torque);
+            downstream_control_data.torque_cmd = value*sign;
+            i_position_control.update_control_data(downstream_control_data);
+            printf("Torque %d [milli-Nm]\n", downstream_control_data.torque_cmd);
             break;
         }
         delay_milliseconds(10);

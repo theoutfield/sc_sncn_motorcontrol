@@ -113,7 +113,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1343
+#define COMMUTATION_OFFSET_CLK      150
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     32
@@ -122,7 +122,6 @@
 #define HALL_STATE_4_ANGLE     1383
 #define HALL_STATE_5_ANGLE     601
 #define HALL_STATE_6_ANGLE     2087
-
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
@@ -149,8 +148,8 @@
 //#define VELOCITY_Kd       0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
-#define TORQUE_Kp         50 //7
-#define TORQUE_Ki         50  //3
+#define TORQUE_Kp         40 //7
+#define TORQUE_Ki         120  //3
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
@@ -352,29 +351,37 @@
 
 // AMK or qmot
 //**motor offset: AMK 2470, qmot 3450
-#define MIN_POSITION_LIMIT     -0x7fffffff         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      0x7fffffff         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            3000             // rpm
-#define MAX_TORQUE              1200000
+#define MIN_POSITION_LIMIT     -400000         // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT      400000         // ticks (max range: 2^30, limited for safe operation)
+#define MAX_VELOCITY            800             // rpm
+#define MAX_TORQUE              3000
 
-#define POSITION_Kp             100
-#define POSITION_Ki             80
-#define POSITION_Kd             0
-#define VELOCITY_Kp             90
-#define VELOCITY_Ki             100
-#define VELOCITY_Kd             0
+//New Pos Controller
+#define POSITION_Kp             30000
+#define POSITION_Ki             180
+#define POSITION_Kd             500000
+#define POSITION_INTEGRAL_LIMIT 1500000
 
-#define POSITION_P_ERROR_lIMIT  2000000000
-#define POSITION_I_ERROR_lIMIT  1
-#define POSITION_INTEGRAL_LIMIT 10000
-#define VELOCITY_P_ERROR_lIMIT  2000000000
-#define VELOCITY_I_ERROR_lIMIT  0
+//PID Pos controller
+//#define POSITION_Kp             8000
+//#define POSITION_Ki             15
+//#define POSITION_Kd             0
+//#define POSITION_INTEGRAL_LIMIT 5000000
+
+#define VELOCITY_Kp             1400
+#define VELOCITY_Ki             0
+#define VELOCITY_Kd             500
+
+#define POSITION_P_ERROR_lIMIT  0 //not used anymore
+#define POSITION_I_ERROR_lIMIT  0 //not used anymore
+#define VELOCITY_P_ERROR_lIMIT  0 //not used anymore
+#define VELOCITY_I_ERROR_lIMIT  0 //not used anymore
 #define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         1
+#define POSITION_REF_FC         20
 #define POSITION_FC             100
-#define VELOCITY_REF_FC         1
+#define VELOCITY_REF_FC         50
 #define VELOCITY_FC             90
-#define VELOCITY_D_FC           90
+#define VELOCITY_D_FC           90 //not used anymore
 
 
 // Foresight: Joint 1 Position Controller Config
