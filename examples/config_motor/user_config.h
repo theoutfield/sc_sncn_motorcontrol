@@ -351,8 +351,8 @@
 
 // AMK or qmot
 //**motor offset: AMK 2470, qmot 3450
-#define MIN_POSITION_LIMIT     -400000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      400000         // ticks (max range: 2^30, limited for safe operation)
+#define MIN_POSITION_LIMIT     -300000         // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT      300000         // ticks (max range: 2^30, limited for safe operation)
 #define MAX_VELOCITY            800             // rpm
 #define MAX_TORQUE              3000
 
@@ -371,12 +371,8 @@
 #define VELOCITY_Kp             1400
 #define VELOCITY_Ki             0
 #define VELOCITY_Kd             500
-
-#define POSITION_P_ERROR_lIMIT  0 //not used anymore
-#define POSITION_I_ERROR_lIMIT  0 //not used anymore
-#define VELOCITY_P_ERROR_lIMIT  0 //not used anymore
-#define VELOCITY_I_ERROR_lIMIT  0 //not used anymore
 #define VELOCITY_INTEGRAL_LIMIT 0
+
 #define POSITION_REF_FC         1
 #define POSITION_FC             100
 #define VELOCITY_REF_FC         50

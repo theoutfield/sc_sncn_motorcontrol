@@ -30,24 +30,20 @@ typedef struct {
 typedef struct {
     int control_loop_period; /**< Period for the control loop [microseconds]. */
 
-    int int21_min_position;
-    int int21_max_position;
-    int int10_P_position;
-    int int10_I_position;
-    int int10_D_position;
-    int int21_P_error_limit_position;
-    int int21_I_error_limit_position;
-    int int22_integral_limit_position;
+    int min_pos;
+    int max_pos;
+    int max_speed;
+    int max_torque;
 
-    int int21_max_speed;
-    int int10_P_velocity;
-    int int10_I_velocity;
-    int int10_D_velocity;
-    int int21_P_error_limit_velocity;
-    int int21_I_error_limit_velocity;
-    int int22_integral_limit_velocity;
+    int P_pos;
+    int I_pos;
+    int D_pos;
+    int integral_limit_pos;
 
-    int int21_max_torque;
+    int P_velocity;
+    int I_velocity;
+    int D_velocity;
+    int integral_limit_velocity;
 
     int position_ref_fc;
     int position_fc;

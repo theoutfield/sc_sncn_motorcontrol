@@ -56,25 +56,21 @@ int main(void) {
             /* Control Loop */
             pos_velocity_ctrl_config.control_loop_period = 500;//CONTROL_LOOP_PERIOD; //us
 
-            pos_velocity_ctrl_config.int21_min_position = MIN_POSITION_LIMIT;
-            pos_velocity_ctrl_config.int21_max_position = MAX_POSITION_LIMIT;
-            pos_velocity_ctrl_config.int21_max_speed = MAX_VELOCITY;
-            pos_velocity_ctrl_config.int21_max_torque = MAX_TORQUE;
+            pos_velocity_ctrl_config.min_pos = MIN_POSITION_LIMIT;
+            pos_velocity_ctrl_config.max_pos = MAX_POSITION_LIMIT;
+            pos_velocity_ctrl_config.max_speed = MAX_VELOCITY;
+            pos_velocity_ctrl_config.max_torque = MAX_TORQUE;
 
 
-            pos_velocity_ctrl_config.int10_P_position = POSITION_Kp;
-            pos_velocity_ctrl_config.int10_I_position = POSITION_Ki;
-            pos_velocity_ctrl_config.int10_D_position = POSITION_Kd;
-            pos_velocity_ctrl_config.int21_P_error_limit_position = POSITION_P_ERROR_lIMIT;
-            pos_velocity_ctrl_config.int21_I_error_limit_position = POSITION_I_ERROR_lIMIT;
-            pos_velocity_ctrl_config.int22_integral_limit_position = POSITION_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.P_pos = POSITION_Kp;
+            pos_velocity_ctrl_config.I_pos = POSITION_Ki;
+            pos_velocity_ctrl_config.D_pos = POSITION_Kd;
+            pos_velocity_ctrl_config.integral_limit_pos = POSITION_INTEGRAL_LIMIT;
 
-            pos_velocity_ctrl_config.int10_P_velocity = VELOCITY_Kp;
-            pos_velocity_ctrl_config.int10_I_velocity = VELOCITY_Ki;
-            pos_velocity_ctrl_config.int10_D_velocity = VELOCITY_Kd;
-            pos_velocity_ctrl_config.int21_P_error_limit_velocity = VELOCITY_P_ERROR_lIMIT;
-            pos_velocity_ctrl_config.int21_I_error_limit_velocity = VELOCITY_I_ERROR_lIMIT;
-            pos_velocity_ctrl_config.int22_integral_limit_velocity = VELOCITY_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.P_velocity = VELOCITY_Kp;
+            pos_velocity_ctrl_config.I_velocity = VELOCITY_Ki;
+            pos_velocity_ctrl_config.D_velocity = VELOCITY_Kd;
+            pos_velocity_ctrl_config.integral_limit_velocity = VELOCITY_INTEGRAL_LIMIT;
 
             pos_velocity_ctrl_config.position_ref_fc = POSITION_REF_FC;
             pos_velocity_ctrl_config.position_fc = POSITION_FC;
