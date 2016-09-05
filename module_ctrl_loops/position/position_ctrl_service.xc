@@ -138,6 +138,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
+#ifdef XSCOPE_POSITION_CTRL
                 if ((upstream_control_data.position > pos_velocity_ctrl_config.int21_max_position) || (upstream_control_data.position < pos_velocity_ctrl_config.int21_min_position))
                 {
                     int1_enable_flag = 0;
@@ -145,7 +146,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_safe_torque_off_enabled();
                     i_motorcontrol.set_brake_status(0);
                 }
-
+#endif
 
                 position_sens_k = ((float) upstream_control_data.position);
                 position_sens_k /= 512;// 2^(24-15);
