@@ -21,21 +21,6 @@ interface BrakeInterface {
  */
 interface MotorcontrolInterface{
 
-    /**
-     * @brief Notifies the interested parties that a new notification
-     * is available.
-     */
-    [[notification]]
-    slave void notification();
-
-    /**
-     * @brief Provides the type of notification currently available.
-     *
-     * @return type of the notification
-     */
-    [[clears_notification]]
-    int get_notification();
-
 
     /**
      * @brief Sets brake status to ON (no movement) or OFF (possible to move)
@@ -75,25 +60,12 @@ interface MotorcontrolInterface{
     void set_offset_value(int offset_value);
 
     /**
-     * @brief Sets an amplitude voltage on the sinusodial signals commutating the windings or Q value when FOC is used.
-     *
-     * @param voltage Voltage [-PWM_MAX_VALUE:PWM_MAX_VALUE]. By default PWM_MAX_VALUE = 13889. In case of FOC [-4096:4096]
-     */
-    void set_voltage(int voltage);
-
-    /**
      * @brief Sets torque target value when FOC is used.
      *
      * @param torque_sp Torque [-4096:4096].
      */
     void set_torque(int torque_sp);
 
-    /**
-     * @brief Sets maximum torque control value when FOC is used.
-     *
-     * @param torque_sp Torque [-4096:4096].
-     */
-    void set_torque_max(int torque_sp);
 
     /**
      * @brief Setter for the configuration used by the Service.
@@ -111,29 +83,6 @@ interface MotorcontrolInterface{
     MotorcontrolConfig get_config();
 
     /**
-     * @brief Setter for the status of the FETs
-     *
-     * @return 0 - FETs disabled.
-     *         1 - FETs enabled.
-     */
-    void set_fets_state(int state);
-
-    /**
-     * @brief Getter for the status of the FETs
-     *
-     * @return 0 - FETs disabled.
-     *         1 - FETs enabled.
-     */
-    int get_fets_state();
-
-    /**
-     * @brief Getter for actual torque.
-     *
-     * @return Torque actual.
-     */
-    int get_torque_actual();
-
-    /**
      * @brief Getter for actual velocity.
      *
      * @return Velocity actual.
@@ -148,20 +97,6 @@ interface MotorcontrolInterface{
     int get_position_actual();
 
     /**
-     * @brief Allows you to change the commutation sensor on runtime.
-     *
-     * @param sensor New sensor [HALL_SENSOR]. (So far, just Hall sensor is available for commutation)
-     */
-    void set_sensor(int sensor);
-
-    /**
-     * @brief Getter for the current state of the Service.
-     *
-     * @return 0 - not initialized, 1 - initialized.
-     */
-    int check_busy();
-
-    /**
      * @brief Set calib flag in the Motorcontrol service so it will alway set 0 as electrical angle
      *
      * @param flag 1 to activate, 0 to deactivate calibration
@@ -169,25 +104,10 @@ interface MotorcontrolInterface{
     int set_calib(int flag);
 
     /**
-     * @brief Set the sensor offset of the current position sensor
-     *
-     * @param Sensor offset
-     */
-    int set_sensor_offset(int in_offset);
-
-    void set_control(int flag);
-
-    {int, int, int} set_torque_pid(int Kp, int Ki, int Kd);
-
-    void restart_watchdog();
-
-    /**
      * @brief resets the state of motor controller from faulty to normal so that
      *        the application can again be restarted.
      */
     void reset_faults();
-
-    int get_field();
 
     UpstreamControlData update_upstream_control_data ();
 };
