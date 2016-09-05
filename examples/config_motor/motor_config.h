@@ -40,6 +40,7 @@
 #define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 */
 
+/*
 // chinese black motore
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
 #define POLE_PAIRS              4       //number of motor pole-pairs
@@ -57,6 +58,7 @@
 // GENERAL PARAMETERS
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 #define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+*/
 
 /*
 // FAULHABER motor (150W)
@@ -78,7 +80,7 @@
 #define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 */
 
-/*
+
 // motor model: DT4
 
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
@@ -96,7 +98,7 @@
 
 // GENERAL PARAMETERS
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-*/
+
 
 /*
 // motor model: MABI AXIS_1 and AXIS_2
