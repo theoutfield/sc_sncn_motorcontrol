@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 {
     printf("Sending offset_detection command ...\n");
@@ -34,6 +33,10 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
+
+    printf("sp1 -> POS_PID_CONTROLLER\n");
+    printf("sp2 -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
+    printf("sp3 -> POS_INTEGRAL_OPTIMUM_CONTROLLER\n");
 
     DownstreamControlData downstream_control_data;
     PosVelocityControlConfig pos_velocity_ctrl_config;
@@ -184,7 +187,15 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
             switch(mode_2) {
                 case 'p':
                     if (value == 1) {
-                        i_position_control.enable_position_ctrl();
+                        i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                        printf("position ctrl enabled\n");
+                    }
+                    else if (value == 2) {
+                        i_position_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                        printf("position ctrl enabled\n");
+                    }
+                    else if (value == 3) {
+                        i_position_control.enable_position_ctrl(POS_INTEGRAL_OPTIMUM_CONTROLLER);
                         printf("position ctrl enabled\n");
                     }
                     else {
@@ -194,7 +205,7 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                     break;
                 case 'v':
                     if (value == 1) {
-                        i_position_control.enable_velocity_ctrl();
+                        i_position_control.enable_velocity_ctrl(VELOCITY_PID_CONTROLLER);
                         printf("velocity ctrl enabled\n");
                     }
                     else {

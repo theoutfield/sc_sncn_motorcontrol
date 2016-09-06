@@ -19,13 +19,13 @@ interface PositionVelocityCtrlInterface{
     void disable();
 
 
-    void enable_position_ctrl();
+    void enable_position_ctrl(int pos_control_mode_);
     void set_position(int in_target_position);
     void set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
     void set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
     void set_position_limits(int position_min_limit, int position_max_limit);
 
-    void enable_velocity_ctrl();
+    void enable_velocity_ctrl(int velocity_control_mode_);
     void set_velocity(int in_target_velocity);
     void set_offset_torque(int offset_torque_);
     void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);

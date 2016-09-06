@@ -28,23 +28,16 @@ void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int 
 }
 
 
-float pid_update(float desired_value, float actual_value, int feedforward_ctrl_effort, int T_s, PIDparam &param)
+float pid_update(float desired_value, float actual_value, int T_s, PIDparam &param)
 {
     float error, cmd, integral_term;
-
     error = desired_value - actual_value;
-
     param.integral += error;
     integral_term = param.Ki * param.integral;
     if ((integral_term > param.integral_limit) || (integral_term < -param.integral_limit))
         param.integral -= error;
-
     cmd = ((param.Kp * error) + integral_term - (param.Kd * (actual_value - param.actual_value_1n)));
-    cmd /= param.scale_factor;
-    cmd += ((float) feedforward_ctrl_effort);
-
     param.actual_value_1n = actual_value;
-
     return cmd;
 }
 
@@ -57,16 +50,14 @@ void pid_reset(PIDparam &param)
 
 
 
-float new_pos_controller_updat(float desired_value, float actual_value, int feedforward_ctrl_effort, int T_s, PIDparam &param)
+float new_pos_controller_updat(float desired_value, float actual_value, int T_s, PIDparam &param)
 {
     float cmd, temp;
-
     temp = param.integral;
     param.integral += ((desired_value * param.Ki) - (actual_value * (param.Ki + param.Kp)) + (param.actual_value_1n * param.Kp));
     if((param.integral > param.integral_limit) || (param.integral < -param.integral_limit))
         param.integral = temp;
     cmd = param.integral - (actual_value * param.Kd) + (param.actual_value_1n * param.Kd);
-    cmd += ((float) feedforward_ctrl_effort);
     param.actual_value_1n = actual_value;
     return cmd;
 }

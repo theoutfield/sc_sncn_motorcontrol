@@ -23,6 +23,12 @@ typedef struct {
 } ControlConfig;
 
 
+#define POS_PID_CONTROLLER                      101
+#define POS_PID_VELOCITY_CASCADED_CONTROLLER    102
+#define POS_INTEGRAL_OPTIMUM_CONTROLLER         103
+#define VELOCITY_PID_CONTROLLER                 201
+
+
 
 /**
  * @brief Structure definition for a Control Loop Service configuration.
