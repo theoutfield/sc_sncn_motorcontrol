@@ -229,7 +229,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_torque((int) torque_ref_k);
                 }
 #ifdef XSCOPE_POSITION_CTRL
-                xscope_int(POSITION_REF, (int) (position_ref_in_k*512));
+                xscope_int(POSITION_REF, (int) (position_ref_k*512));
                 xscope_int(POSITION, (int) (position_sens_k*512));
                 xscope_int(POSITION_CMD, (int) position_cmd_k);
                 xscope_int(POSITION_TEMP1, (int) velocity_control_pid_param.Kp);

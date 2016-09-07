@@ -357,9 +357,9 @@
 #define MAX_TORQUE              3000
 
 //New Pos Controller
-#define POSITION_Kp             30000
-#define POSITION_Ki             180
-#define POSITION_Kd             500000
+#define POSITION_Kp             0//30000
+#define POSITION_Ki             0//180
+#define POSITION_Kd             0//500000
 #define POSITION_INTEGRAL_LIMIT 1500000
 
 //PID Pos controller

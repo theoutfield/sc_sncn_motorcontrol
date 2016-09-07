@@ -33,11 +33,29 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
-
     delay_milliseconds(1000);
     printf("\n");
+    printf("g->print guiding manual\n");
+    printf("------------------------------------------------------\n");
+    printf(".Direct Torque Controller\n");
+    printf("..b->brake                ..e->enable/disable\n");
+    printf("..#->command torque       ..r->reverse torque\n");
+    printf("..a->auto-tuning          ..m->sound\n");
+    printf("..os#->set offset         ..op#->print offset\n");
+    printf("------------------------------------------------------\n");
+    printf(".Torque Controller\n");
+    printf("..st1->set torque on      ..st0->set torque off\n");
+    printf("..ct#->command torque back and forth\n");
+    printf("------------------------------------------------------\n");
+    printf(".Velocity Controller\n");
+    printf("..kp#->Kp   ki#->Ki   kd#->Kd   kl#->integral_limit\n");
+    printf("..sv#->set velocity on/off while # is the mode:\n");
+    printf("...mode=1    -> VELOCITY_PID_CONTROLLER\n");
+    printf("...mode=else -> disable\n");
+    printf("..cv#->command velocity back and forth\n");
+    printf("------------------------------------------------------\n");
     printf(".Position Controller\n");
-    printf("..pp#->Kp pi#->Ki pd#->Kd pl#->integral_limit\n");
+    printf("..pp#->Kp   pi#->Ki   pd#->Kd   pl#->integral_limit\n");
     printf("..sp#->set pos on/off while # is the mode:\n");
     printf("...mode=1    -> POS_PID_CONTROLLER\n");
     printf("...mode=2    -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
@@ -45,11 +63,10 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
     printf("...mode=else -> disable\n");
     printf("..cp#->command position back and forth\n");
     printf("..cd#->command position\n");
-    printf("----------------------------------------------------\n");
+    printf("------------------------------------------------------\n");
     printf(".Limits\n");
-    printf("..lp#->pos_lim lv#->velocity_lim lt#->torque_lim\n");
-
-    printf("\n");
+    printf("..lp#->pos_lim   lv#->velocity_lim   lt#->torque_lim\n");
+    printf("------------------------------------------------------\n");
     printf("\n");
 
     DownstreamControlData downstream_control_data;
@@ -60,6 +77,18 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
     int period_us;     // torque generation period in micro-seconds
     int pulse_counter; // number of generated pulses
     int torque_control_flag = 0;
+
+    //profiler
+    float pos_k = 0, pos_k_1n = 0, pos_k_2n = 0;
+    float delta_T = 0.001;
+    float a_max = 10000;
+    float v_max = 5000;
+    float pos_target;
+    float pos_temp1, pos_temp2;
+    int target_reached_flag = 0;
+    float deceleration_distance = 0;
+    float pos_deceleration = 0;
+    int deceleration_flag = 0;
 
     fflush(stdout);
     //read and adjust the offset.
@@ -86,6 +115,42 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
         }
         switch(mode) {
 
+        case 'g':
+            printf("\n");
+            printf("g->print guiding manual\n");
+            printf("------------------------------------------------------\n");
+            printf(".Direct Torque Controller\n");
+            printf("..b->brake                ..e->enable/disable\n");
+            printf("..#->command torque       ..r->reverse torque\n");
+            printf("..a->auto-tuning          ..m->sound\n");
+            printf("..os#->set offset         ..op#->print offset\n");
+            printf("------------------------------------------------------\n");
+            printf(".Torque Controller\n");
+            printf("..st1->set torque on      ..st0->set torque off\n");
+            printf("..ct#->command torque back and forth\n");
+            printf("------------------------------------------------------\n");
+            printf(".Velocity Controller\n");
+            printf("..kp#->Kp   ki#->Ki   kd#->Kd   kl#->integral_limit\n");
+            printf("..sv#->set velocity on/off while # is the mode:\n");
+            printf("...mode=1    -> VELOCITY_PID_CONTROLLER\n");
+            printf("...mode=else -> disable\n");
+            printf("..cv#->command velocity back and forth\n");
+            printf("------------------------------------------------------\n");
+            printf(".Position Controller\n");
+            printf("..pp#->Kp   pi#->Ki   pd#->Kd   pl#->integral_limit\n");
+            printf("..sp#->set pos on/off while # is the mode:\n");
+            printf("...mode=1    -> POS_PID_CONTROLLER\n");
+            printf("...mode=2    -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
+            printf("...mode=3    -> POS_INTEGRAL_OPTIMUM_CONTROLLER\n");
+            printf("...mode=else -> disable\n");
+            printf("..cp#->command position back and forth\n");
+            printf("..cd#->command position\n");
+            printf("------------------------------------------------------\n");
+            printf(".Limits\n");
+            printf("..lp#->pos_lim   lv#->velocity_lim   lt#->torque_lim\n");
+            printf("------------------------------------------------------\n");
+            printf("\n");
+            break;
         //position pid coefficients
         case 'p':
             switch(mode_2) {
@@ -259,8 +324,42 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                 case 'd':
                     printf("position cmd: %d\n", value*sign);
                     downstream_control_data.offset_torque = 0;
-                    downstream_control_data.position_cmd = value*sign;
-                    i_position_control.update_control_data(downstream_control_data);
+                    pos_target = value*sign;
+                    //initial pos should be read from pos controller
+                    pos_k_1n = pos_k;
+                    pos_k_2n = pos_k;
+                    target_reached_flag = 0;
+//                    a_max = 10000;
+//                    v_max = 5000;
+                    deceleration_flag = 0;
+                    while(target_reached_flag == 0) {
+                        deceleration_distance = ((pos_k - pos_k_1n) / delta_T) * ((pos_k - pos_k_1n) / delta_T) / (2*a_max);// + a_max * delta_T * delta_T / 2;
+                        pos_deceleration = pos_target - deceleration_distance;
+                        if(pos_k >= pos_deceleration) {
+                            target_reached_flag = 1;
+                            printf("deceleration %d\n",(int)pos_k);
+                        }
+                        if(target_reached_flag == 0) {
+                            pos_temp1 = (delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
+                            pos_temp2 = (delta_T * v_max) + pos_k_1n; //sign of move should be added
+                            if (pos_temp1 < pos_temp2)
+                                pos_k = pos_temp1;
+                            else
+                                pos_k = pos_temp2;
+                        }
+                        else {
+                            pos_k = (-delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
+                            if (pos_k >= pos_target) {
+                                pos_k = pos_target;
+                                target_reached_flag = 1;
+                            }
+                        }
+                        downstream_control_data.position_cmd = pos_k;
+                        i_position_control.update_control_data(downstream_control_data);
+                        pos_k_2n = pos_k_1n;
+                        pos_k_1n = pos_k;
+                        delay_microseconds(900);
+                    }
                     break;
                 //command velocity forward and backward
                 case 'v':
@@ -302,6 +401,15 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                     i_position_control.update_control_data(downstream_control_data);
                     break;
                 }
+            break;
+
+        //profiler max acceleration
+        case 'j':
+            a_max = (float) value;
+            break;
+        //profiler max velocity
+        case 'x':
+            v_max = (float) value;
             break;
 
         //auto offset tuning
