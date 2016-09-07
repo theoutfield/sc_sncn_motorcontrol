@@ -34,9 +34,23 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
-    printf("sp1 -> POS_PID_CONTROLLER\n");
-    printf("sp2 -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
-    printf("sp3 -> POS_INTEGRAL_OPTIMUM_CONTROLLER\n");
+    delay_milliseconds(1000);
+    printf("\n");
+    printf(".Position Controller\n");
+    printf("..pp#->Kp pi#->Ki pd#->Kd pl#->integral_limit\n");
+    printf("..sp#->set pos on/off while # is the mode:\n");
+    printf("...mode=1    -> POS_PID_CONTROLLER\n");
+    printf("...mode=2    -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
+    printf("...mode=3    -> POS_INTEGRAL_OPTIMUM_CONTROLLER\n");
+    printf("...mode=else -> disable\n");
+    printf("..cp#->command position back and forth\n");
+    printf("..cd#->command position\n");
+    printf("----------------------------------------------------\n");
+    printf(".Limits\n");
+    printf("..lp#->pos_lim lv#->velocity_lim lt#->torque_lim\n");
+
+    printf("\n");
+    printf("\n");
 
     DownstreamControlData downstream_control_data;
     PosVelocityControlConfig pos_velocity_ctrl_config;
