@@ -113,15 +113,15 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      150
+#define COMMUTATION_OFFSET_CLK      292
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
-#define HALL_STATE_1_ANGLE     32
-#define HALL_STATE_2_ANGLE     2614
-#define HALL_STATE_3_ANGLE     3392
-#define HALL_STATE_4_ANGLE     1383
-#define HALL_STATE_5_ANGLE     601
-#define HALL_STATE_6_ANGLE     2087
+#define HALL_STATE_1_ANGLE     0
+#define HALL_STATE_2_ANGLE     0
+#define HALL_STATE_3_ANGLE     0
+#define HALL_STATE_4_ANGLE     0
+#define HALL_STATE_5_ANGLE     0
+#define HALL_STATE_6_ANGLE     0
 
 // COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CCLK     0
@@ -149,11 +149,11 @@
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
 #define TORQUE_Kp         40 //7
-#define TORQUE_Ki         120  //3
+#define TORQUE_Ki         40  //3
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 20
+#define PERCENT_OFFSET_TORQUE 80
 
 
 /////////////////////////////////////////////////
