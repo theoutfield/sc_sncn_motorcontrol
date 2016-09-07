@@ -13,8 +13,6 @@
 #include <position_feedback_service.h>
 #include <refclk.h>
 #include <motor_control_interfaces.h>
-#include <advanced_motor_control.h>
-#include <advanced_motorcontrol_licence.h>
 #include <pwm_server.h>
 #include <user_config.h>
 

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <mc_internal_constants.h>
+#include <motor_control_structures.h>
 #include <hall_struct.h>
 #include <qei_struct.h>
 #include <ams_struct.h>

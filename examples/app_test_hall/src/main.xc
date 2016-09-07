@@ -48,7 +48,7 @@ int main(void)
     par
     {
         /* Client side */
-        on tile[APP_TILE]: hall_test(i_position_feedback[0], null);
+        on tile[APP_TILE]: hall_test(i_position_feedback[0], i_shared_memory[1]);
 
         /***************************************************
          * IFM TILE
