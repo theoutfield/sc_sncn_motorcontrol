@@ -333,13 +333,11 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
 //                    v_max = 5000;
                     deceleration_flag = 0;
                     while(target_reached_flag == 0) {
-                        deceleration_distance = ((pos_k - pos_k_1n) / delta_T) * ((pos_k - pos_k_1n) / delta_T) / (2*a_max);// + a_max * delta_T * delta_T / 2;
+                        deceleration_distance = ((pos_k_1n - pos_k_2n) / delta_T) * ((pos_k_1n - pos_k_2n) / delta_T) / (2*a_max);// + a_max * delta_T * delta_T / 2;
                         pos_deceleration = pos_target - deceleration_distance;
-                        if(pos_k >= pos_deceleration) {
-                            target_reached_flag = 1;
-                            printf("deceleration %d\n",(int)pos_k);
-                        }
-                        if(target_reached_flag == 0) {
+                        if(pos_k >= pos_deceleration)
+                            deceleration_flag = 1;
+                        if(deceleration_flag == 0) {
                             pos_temp1 = (delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
                             pos_temp2 = (delta_T * v_max) + pos_k_1n; //sign of move should be added
                             if (pos_temp1 < pos_temp2)
