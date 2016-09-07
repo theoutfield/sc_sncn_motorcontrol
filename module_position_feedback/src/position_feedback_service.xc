@@ -90,7 +90,7 @@ void check_ports(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_po
         position_feedback_config.sensor_type = 0;
     }
     if (position_feedback_config.sensor_type == BISS_SENSOR) {
-        if (!isnull((*qei_ports).p_qei_config))
+        if (isnull((*qei_ports).p_qei_config))
                 position_feedback_config.sensor_type = 0;
         if (spi_ports == null)
             position_feedback_config.sensor_type = 0;
@@ -108,7 +108,8 @@ void reset_ports(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_po
     }
     if (qei_ports != null) {
         set_port_use_on((*qei_ports).p_qei);
-        set_port_use_on((*qei_ports).p_qei_config);
+        if (!isnull((*qei_ports).p_qei_config))
+            set_port_use_on((*qei_ports).p_qei_config);
     }
 }
 
