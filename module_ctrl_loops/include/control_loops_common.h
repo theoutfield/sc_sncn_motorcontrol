@@ -41,6 +41,9 @@ typedef struct {
     int max_speed;
     int max_torque;
 
+    int max_acceleration_profiler;
+    int max_speed_profiler;
+
     int P_pos;
     int I_pos;
     int D_pos;

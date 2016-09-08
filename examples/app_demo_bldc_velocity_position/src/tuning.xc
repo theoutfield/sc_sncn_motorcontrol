@@ -78,21 +78,6 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
     int pulse_counter; // number of generated pulses
     int torque_control_flag = 0;
 
-    //profiler
-    float pos_k = 0, pos_k_1n = 0, pos_k_2n = 0;
-    float delta_T = 0.001;
-    float a_max = 10000;
-    float v_max = 5000;
-    float pos_target;
-    float pos_temp1, pos_temp2;
-    int target_reached_flag = 0;
-    float deceleration_distance = 0;
-    float pos_deceleration = 0;
-    int deceleration_flag = 0;
-    int deceleration_flag_ready = 0;
-    int profiler_sign = 1;
-    float pos_k_initial = 0;
-
     fflush(stdout);
     //read and adjust the offset.
     while (1) {
@@ -327,53 +312,8 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                 case 'd':
                     printf("position cmd: %d\n", value*sign);
                     downstream_control_data.offset_torque = 0;
-                    pos_target = (float) (value*sign);
-                    //initial pos should be read from pos controller
-                    pos_k_1n = pos_k;
-                    pos_k_2n = pos_k;
-                    target_reached_flag = 0;
-//                    a_max = 10000;
-//                    v_max = 5000;
-                    deceleration_flag_ready = 0;
-                    deceleration_flag = 0;
-                    pos_k_initial = pos_k;
-                    while(target_reached_flag == 0) {
-                        if (pos_target >= pos_k)
-                            profiler_sign = 1;
-                        else
-                            profiler_sign = -1;
-                        if(deceleration_flag == 0) {
-                            pos_temp1 = (profiler_sign * delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
-                            pos_temp2 = (profiler_sign * delta_T * v_max) + pos_k_1n; //sign of move should be added
-                            if ((profiler_sign*pos_temp1) < (profiler_sign*pos_temp2))
-                                pos_k = pos_temp1;
-                            else
-                                pos_k = pos_temp2;
-                            deceleration_distance = ((pos_k - pos_k_1n) / delta_T) * ((pos_k - pos_k_1n) / delta_T) / (2*a_max);// + a_max * delta_T * delta_T / 2;
-                            pos_deceleration = pos_target - (profiler_sign * deceleration_distance);
-                            if (deceleration_flag_ready == 1)
-                                deceleration_flag = 1;
-                            if((profiler_sign * (pos_k-pos_deceleration)) >= 0)
-                                deceleration_flag_ready = 1;
-                        }
-                        else {
-                            pos_k = (-profiler_sign * delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
-                            if ((profiler_sign * (pos_k-(pos_target-(profiler_sign*3)))) >= 0) {
-                                pos_k = pos_target;
-                                target_reached_flag = 1;
-                            }
-                            if ((deceleration_flag == 1) && ((profiler_sign*(pos_k-pos_k_initial)) <= 0)) {
-                                pos_k = pos_k_initial;
-                                target_reached_flag = 1;
-                            }
-
-                        }
-                        downstream_control_data.position_cmd = pos_k;
-                        i_position_control.update_control_data(downstream_control_data);
-                        pos_k_2n = pos_k_1n;
-                        pos_k_1n = pos_k;
-                        delay_microseconds(900);
-                    }
+                    downstream_control_data.position_cmd = value*sign;
+                    i_position_control.update_control_data(downstream_control_data);
                     break;
                 //command velocity forward and backward
                 case 'v':
@@ -419,11 +359,15 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
 
         //profiler max acceleration
         case 'j':
-            a_max = (float) value;
+            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+            pos_velocity_ctrl_config.max_acceleration_profiler = value;
+            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
             break;
         //profiler max velocity
         case 'x':
-            v_max = (float) value;
+            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+            pos_velocity_ctrl_config.max_speed_profiler = value;
+            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
             break;
 
         //auto offset tuning

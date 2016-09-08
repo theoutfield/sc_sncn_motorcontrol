@@ -20,6 +20,11 @@ typedef struct {
 } PIDparam;
 
 
+typedef struct {
+    float delta_T;
+    float a_max;
+    float v_max;
+} posProfilerParam;
 
 
 /**
@@ -50,4 +55,5 @@ void pid_reset(PIDparam &param);
 float new_pos_controller_updat(float desired_value, float actual_value, int T_s, PIDparam &param);
 
 
+float pos_profiler(float pos_target, float pos_k_1n, float pos_k_2n, posProfilerParam pos_profiler_param);
 

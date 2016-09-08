@@ -356,6 +356,9 @@
 #define MAX_VELOCITY            800             // rpm
 #define MAX_TORQUE              3000
 
+#define MAX_ACCELERATION_PROFILER 10000
+#define MAX_SPEED_PROFILER      5000
+
 //New Pos Controller
 #define POSITION_Kp             30000
 #define POSITION_Ki             180

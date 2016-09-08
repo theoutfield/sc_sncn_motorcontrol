@@ -56,12 +56,14 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     float position_sens_k = 0;
     float position_k_1n = 0;
     float position_k_2n = 0;
-    float position_ref_in_k = 0;
     float position_ref_k = 0;
     float position_cmd_k = 0;
     float min_position = 0;
     float max_position = 0;
     int position_ref_input_k = 0;
+    float position_ref_in_k = 0;
+    float position_ref_in_k_1n = 0;
+    float position_ref_in_k_2n = 0;
 
     // velocity controller
     int velocity_enable_flag = 0;
@@ -82,6 +84,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int torque_enable_flag = 0;
     int torque_ref_input_k = 0;
     float torque_ref_k = 0;
+
+    //pos profiler
+    posProfilerParam pos_profiler_param;
+    pos_profiler_param.delta_T = ((float)pos_velocity_ctrl_config.control_loop_period)/1000000;
+    pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
+    pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
+    pos_profiler_param.delta_T = 0.001;
+    pos_profiler_param.a_max = 10000;
+    pos_profiler_param.v_max = 5000;
 
     timer t;
     unsigned int ts;
@@ -104,7 +115,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     downstream_control_data.torque_cmd = 0;
     downstream_control_data.offset_torque = 0;
 
+    delay_milliseconds(500);
+    upstream_control_data = i_motorcontrol.update_upstream_control_data();
     position_ref_input_k = upstream_control_data.position;
+    position_ref_in_k = (float) position_ref_input_k;
+    position_ref_in_k_1n = (float) position_ref_input_k;
+    position_ref_in_k_2n = (float) position_ref_input_k;
     position_sens_k = ((float) upstream_control_data.position);
     position_sens_k /= 512;// 2^(24-15);
     position_k = position_sens_k;
@@ -132,8 +148,16 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                  * AMS:         14bits single turn + 18bits multi turn
                  * Other sens:  13bits single turn + 12bits multi turn
                  */
-                position_ref_k = ((float) position_ref_input_k);
-                position_ref_k /= 512;
+
+
+                pos_profiler_param.delta_T = 0.001;
+                pos_profiler_param.a_max = 10000;
+                pos_profiler_param.v_max = 5000;
+                position_ref_in_k = pos_profiler(((float) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
+                position_ref_in_k_2n = position_ref_in_k_1n;
+                position_ref_in_k_1n = position_ref_in_k;
+
+                position_ref_k = position_ref_in_k / 512;
 
                 position_sens_k = ((float) upstream_control_data.position);
                 position_sens_k /= 512;
@@ -268,6 +292,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         velocity_enable_flag = 0;
                     upstream_control_data = i_motorcontrol.update_upstream_control_data();
                     position_ref_input_k = upstream_control_data.position;
+                    position_ref_in_k = (float) position_ref_input_k;
+                    position_ref_in_k_1n = (float) position_ref_input_k;
+                    position_ref_in_k_2n = (float) position_ref_input_k;
                     position_sens_k = ((float) upstream_control_data.position);
                     position_sens_k /= 512;// 2^(24-15);
                     position_k = position_sens_k;
@@ -280,6 +307,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
             case i_position_control[int i].set_position(int in_target_position):
                     position_ref_input_k = in_target_position;
+                    position_ref_in_k = (float) position_ref_input_k;
+                    position_ref_in_k_1n = (float) position_ref_input_k;
+                    position_ref_in_k_2n = (float) position_ref_input_k;
                 break;
             case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
                     pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_pos, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
@@ -359,6 +389,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                           pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                 second_order_LP_filter_init(/*f_c=*//*80*/pos_velocity_ctrl_config.position_fc, /*T_s=*/pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
                 second_order_LP_filter_init(/*f_c=*//*80*/pos_velocity_ctrl_config.velocity_fc, /*T_s=*/pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
+                pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
+                pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
                 break;
 
             case i_position_control[int i].get_position_velocity_control_config() ->  PosVelocityControlConfig out_config:
@@ -383,6 +415,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     upstream_control_data_ = upstream_control_data;
                     downstream_control_data = downstream_control_data_;
                     position_ref_input_k = downstream_control_data.position_cmd;
+                    position_ref_in_k = position_ref_input_k;
+                    position_ref_in_k_1n = position_ref_input_k;
+                    position_ref_in_k_2n = position_ref_input_k;
                     velocity_ref_input_k = downstream_control_data.velocity_cmd;
                     torque_ref_input_k = downstream_control_data.torque_cmd;
                     additive_torque_input_k = downstream_control_data.offset_torque;
