@@ -89,6 +89,9 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
     float deceleration_distance = 0;
     float pos_deceleration = 0;
     int deceleration_flag = 0;
+    int deceleration_flag_ready = 0;
+    int profiler_sign = 1;
+    float pos_k_initial = 0;
 
     fflush(stdout);
     //read and adjust the offset.
@@ -324,33 +327,46 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                 case 'd':
                     printf("position cmd: %d\n", value*sign);
                     downstream_control_data.offset_torque = 0;
-                    pos_target = value*sign;
+                    pos_target = (float) (value*sign);
                     //initial pos should be read from pos controller
                     pos_k_1n = pos_k;
                     pos_k_2n = pos_k;
                     target_reached_flag = 0;
 //                    a_max = 10000;
 //                    v_max = 5000;
+                    deceleration_flag_ready = 0;
                     deceleration_flag = 0;
+                    pos_k_initial = pos_k;
                     while(target_reached_flag == 0) {
-                        deceleration_distance = ((pos_k_1n - pos_k_2n) / delta_T) * ((pos_k_1n - pos_k_2n) / delta_T) / (2*a_max);// + a_max * delta_T * delta_T / 2;
-                        pos_deceleration = pos_target - deceleration_distance;
-                        if(pos_k >= pos_deceleration)
-                            deceleration_flag = 1;
+                        if (pos_target >= pos_k)
+                            profiler_sign = 1;
+                        else
+                            profiler_sign = -1;
                         if(deceleration_flag == 0) {
-                            pos_temp1 = (delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
-                            pos_temp2 = (delta_T * v_max) + pos_k_1n; //sign of move should be added
-                            if (pos_temp1 < pos_temp2)
+                            pos_temp1 = (profiler_sign * delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
+                            pos_temp2 = (profiler_sign * delta_T * v_max) + pos_k_1n; //sign of move should be added
+                            if ((profiler_sign*pos_temp1) < (profiler_sign*pos_temp2))
                                 pos_k = pos_temp1;
                             else
                                 pos_k = pos_temp2;
+                            deceleration_distance = ((pos_k - pos_k_1n) / delta_T) * ((pos_k - pos_k_1n) / delta_T) / (2*a_max);// + a_max * delta_T * delta_T / 2;
+                            pos_deceleration = pos_target - (profiler_sign * deceleration_distance);
+                            if (deceleration_flag_ready == 1)
+                                deceleration_flag = 1;
+                            if((profiler_sign * (pos_k-pos_deceleration)) >= 0)
+                                deceleration_flag_ready = 1;
                         }
                         else {
-                            pos_k = (-delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
-                            if (pos_k >= pos_target) {
+                            pos_k = (-profiler_sign * delta_T * delta_T * a_max) + (2 * pos_k_1n) - pos_k_2n; //sign of move should be added
+                            if ((profiler_sign * (pos_k-(pos_target-(profiler_sign*3)))) >= 0) {
                                 pos_k = pos_target;
                                 target_reached_flag = 1;
                             }
+                            if ((deceleration_flag == 1) && ((profiler_sign*(pos_k-pos_k_initial)) <= 0)) {
+                                pos_k = pos_k_initial;
+                                target_reached_flag = 1;
+                            }
+
                         }
                         downstream_control_data.position_cmd = pos_k;
                         i_position_control.update_control_data(downstream_control_data);
