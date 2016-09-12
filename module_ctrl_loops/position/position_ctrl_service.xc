@@ -90,9 +90,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     pos_profiler_param.delta_T = ((float)pos_velocity_ctrl_config.control_loop_period)/1000000;
     pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
     pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
-    pos_profiler_param.delta_T = 0.001;
-    pos_profiler_param.a_max = 10000;
-    pos_profiler_param.v_max = 5000;
+    float acceleration_monitor = 0;
 
     timer t;
     unsigned int ts;
@@ -151,6 +149,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
                 position_ref_in_k = pos_profiler(((float) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
+                acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(pos_velocity_ctrl_config.control_loop_period * pos_velocity_ctrl_config.control_loop_period);
                 position_ref_in_k_2n = position_ref_in_k_1n;
                 position_ref_in_k_1n = position_ref_in_k;
 
@@ -253,7 +252,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(POSITION_REF, (int) (position_ref_k*512));
                 xscope_int(POSITION, (int) (position_sens_k*512));
                 xscope_int(POSITION_CMD, (int) position_cmd_k);
-                xscope_int(POSITION_TEMP1, (int) velocity_control_pid_param.Kp);
+                xscope_int(POSITION_TEMP1, ((int) (acceleration_monitor*1000000000)));//velocity_control_pid_param.Kp);
                 xscope_int(VELOCITY_REF, (int) velocity_ref_in_k);
                 xscope_int(VELOCITY, (int) velocity_sens_k);
                 xscope_int(VELOCITY_CMD, (int) velocity_cmd_k);
