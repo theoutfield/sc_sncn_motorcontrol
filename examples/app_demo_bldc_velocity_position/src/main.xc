@@ -61,8 +61,8 @@ int main(void) {
             pos_velocity_ctrl_config.max_speed = MAX_VELOCITY;
             pos_velocity_ctrl_config.max_torque = MAX_TORQUE;
 
-//            pos_velocity_ctrl_config.max_acceleration_profiler = MAX_ACCELERATION_PROFILER;
-//            pos_velocity_ctrl_config.max_speed_profiler = MAX_SPEED_PROFILER;
+            pos_velocity_ctrl_config.max_acceleration_profiler = MAX_ACCELERATION_PROFILER;
+            pos_velocity_ctrl_config.max_speed_profiler = MAX_SPEED_PROFILER;
 
             pos_velocity_ctrl_config.P_pos = POSITION_Kp;
             pos_velocity_ctrl_config.I_pos = POSITION_Ki;

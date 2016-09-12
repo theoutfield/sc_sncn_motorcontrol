@@ -150,9 +150,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                  */
 
 
-                pos_profiler_param.delta_T = 0.001;
-                pos_profiler_param.a_max = 10000;
-                pos_profiler_param.v_max = 5000;
                 position_ref_in_k = pos_profiler(((float) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
                 position_ref_in_k_2n = position_ref_in_k_1n;
                 position_ref_in_k_1n = position_ref_in_k;
