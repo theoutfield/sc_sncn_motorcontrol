@@ -307,9 +307,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
             case i_position_control[int i].set_position(int in_target_position):
                     position_ref_input_k = in_target_position;
-                    position_ref_in_k = (float) position_ref_input_k;
-                    position_ref_in_k_1n = (float) position_ref_input_k;
-                    position_ref_in_k_2n = (float) position_ref_input_k;
                 break;
             case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
                     pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_pos, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
@@ -415,9 +412,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     upstream_control_data_ = upstream_control_data;
                     downstream_control_data = downstream_control_data_;
                     position_ref_input_k = downstream_control_data.position_cmd;
-                    position_ref_in_k = position_ref_input_k;
-                    position_ref_in_k_1n = position_ref_input_k;
-                    position_ref_in_k_2n = position_ref_input_k;
                     velocity_ref_input_k = downstream_control_data.velocity_cmd;
                     torque_ref_input_k = downstream_control_data.torque_cmd;
                     additive_torque_input_k = downstream_control_data.offset_torque;
