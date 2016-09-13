@@ -58,11 +58,8 @@ typedef struct {
     int D_velocity;
     int integral_limit_velocity;
 
-    int position_ref_fc;
     int position_fc;
-    int velocity_ref_fc;
     int velocity_fc;
-    int velocity_d_fc;
 
 } PosVelocityControlConfig;
 

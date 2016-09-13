@@ -342,8 +342,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 pid_set_parameters((float)pos_velocity_ctrl_config.P_pos, (float)pos_velocity_ctrl_config.I_pos,
                                    (float)pos_velocity_ctrl_config.D_pos, (float)pos_velocity_ctrl_config.integral_limit_pos,
                                           pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                second_order_LP_filter_init(/*f_c=*//*80*/pos_velocity_ctrl_config.position_fc, /*T_s=*/pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
-                second_order_LP_filter_init(/*f_c=*//*80*/pos_velocity_ctrl_config.velocity_fc, /*T_s=*/pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
+                second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
+                second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
                 pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
                 pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
                 enable_profiler = pos_velocity_ctrl_config.enable_profiler;

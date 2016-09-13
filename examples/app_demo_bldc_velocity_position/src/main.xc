@@ -74,11 +74,8 @@ int main(void) {
             pos_velocity_ctrl_config.D_velocity = VELOCITY_Kd;
             pos_velocity_ctrl_config.integral_limit_velocity = VELOCITY_INTEGRAL_LIMIT;
 
-            pos_velocity_ctrl_config.position_ref_fc = POSITION_REF_FC;
             pos_velocity_ctrl_config.position_fc = POSITION_FC;
-            pos_velocity_ctrl_config.velocity_ref_fc = VELOCITY_REF_FC;
             pos_velocity_ctrl_config.velocity_fc = VELOCITY_FC;
-            pos_velocity_ctrl_config.velocity_d_fc = VELOCITY_D_FC;
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
         }
