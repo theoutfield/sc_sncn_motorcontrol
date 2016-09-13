@@ -301,24 +301,24 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_torque_control_enabled();
                     i_motorcontrol.set_brake_status(1);
                 break;
-            case i_position_control[int i].set_position(int in_target_position):
-                    position_ref_input_k = in_target_position;
-                break;
-            case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
-                    pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_pos, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                break;
-            case i_position_control[int i].set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int21_target_max_velocity_):
-                pos_velocity_ctrl_config.max_speed = int21_target_max_velocity_;
-                pid_set_parameters((float)position_control_pid_param.Kp, (float)position_control_pid_param.Ki, (float)position_control_pid_param.Kd, (float)int16_itegral_limit, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                break;
-            case i_position_control[int i].set_position_limits(int position_min_limit, int position_max_limit):
-                pos_velocity_ctrl_config.min_pos = position_min_limit;
-                pos_velocity_ctrl_config.max_pos = position_max_limit;
-                max_position = ((float) pos_velocity_ctrl_config.max_pos);
-                max_position /= 512;
-                min_position = ((float) pos_velocity_ctrl_config.min_pos);
-                min_position /= 512;
-                break;
+//            case i_position_control[int i].set_position(int in_target_position):
+//                    position_ref_input_k = in_target_position;
+//                break;
+//            case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
+//                    pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_pos, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+//                break;
+//            case i_position_control[int i].set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int21_target_max_velocity_):
+//                pos_velocity_ctrl_config.max_speed = int21_target_max_velocity_;
+//                pid_set_parameters((float)position_control_pid_param.Kp, (float)position_control_pid_param.Ki, (float)position_control_pid_param.Kd, (float)int16_itegral_limit, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+//                break;
+//            case i_position_control[int i].set_position_limits(int position_min_limit, int position_max_limit):
+//                pos_velocity_ctrl_config.min_pos = position_min_limit;
+//                pos_velocity_ctrl_config.max_pos = position_max_limit;
+//                max_position = ((float) pos_velocity_ctrl_config.max_pos);
+//                max_position /= 512;
+//                min_position = ((float) pos_velocity_ctrl_config.min_pos);
+//                min_position /= 512;
+//                break;
 
 
 
@@ -334,22 +334,22 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_brake_status(1);
                 break;
 
-            case i_position_control[int i].set_velocity(int in_target_velocity):
-                    velocity_ref_input_k = in_target_velocity * 1;
-                break;
-            case i_position_control[int i].set_offset_torque(int offset_torque_):
-                    additive_torque_input_k = offset_torque_;
-                break;
-            case i_position_control[int i].set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
-                    pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_velocity, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-                break;
-            case i_position_control[int i].set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int21_target_max_torque_):
-                pos_velocity_ctrl_config.max_torque = int21_target_max_torque_;
-                pid_set_parameters((float)velocity_control_pid_param.Kp, (float)velocity_control_pid_param.Ki, (float)velocity_control_pid_param.Kd, (float)int16_itegral_limit, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-                break;
-            case i_position_control[int i].set_velocity_limits(int velocity_min_limit, int velocity_max_limit):
-                pos_velocity_ctrl_config.max_speed = velocity_max_limit;
-                break;
+//            case i_position_control[int i].set_velocity(int in_target_velocity):
+//                    velocity_ref_input_k = in_target_velocity * 1;
+//                break;
+//            case i_position_control[int i].set_offset_torque(int offset_torque_):
+//                    additive_torque_input_k = offset_torque_;
+//                break;
+//            case i_position_control[int i].set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
+//                    pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_velocity, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+//                break;
+//            case i_position_control[int i].set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int21_target_max_torque_):
+//                pos_velocity_ctrl_config.max_torque = int21_target_max_torque_;
+//                pid_set_parameters((float)velocity_control_pid_param.Kp, (float)velocity_control_pid_param.Ki, (float)velocity_control_pid_param.Kd, (float)int16_itegral_limit, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+//                break;
+//            case i_position_control[int i].set_velocity_limits(int velocity_min_limit, int velocity_max_limit):
+//                pos_velocity_ctrl_config.max_speed = velocity_max_limit;
+//                break;
 
             case i_position_control[int i].enable_torque_ctrl():
                     torque_enable_flag = 1;
@@ -359,12 +359,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_torque_control_enabled();
                     i_motorcontrol.set_brake_status(1);
                 break;
-            case i_position_control[int i].set_torque(int in_target_torque):
-                torque_ref_input_k = in_target_torque;
-                break;
-            case i_position_control[int i].set_torque_limits(int torque_min_limit, int torque_max_limit):
-                pos_velocity_ctrl_config.max_torque = torque_max_limit;
-                break;
+//            case i_position_control[int i].set_torque(int in_target_torque):
+//                torque_ref_input_k = in_target_torque;
+//                break;
+//            case i_position_control[int i].set_torque_limits(int torque_min_limit, int torque_max_limit):
+//                pos_velocity_ctrl_config.max_torque = torque_max_limit;
+//                break;
 
             case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
                 pos_velocity_ctrl_config = in_config;
@@ -390,18 +390,18 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     out_config = pos_velocity_ctrl_config;
                 break;
 
-            case i_position_control[int i].get_position() -> int out_position:
-                    out_position = upstream_control_data.position;
-                break;
-
-
-            case i_position_control[int i].get_velocity() -> int out_velocity:
-                    out_velocity = upstream_control_data.velocity;
-                break;
-
-            case i_position_control[int i].check_busy() -> int out_activate:
-//                out_activate = position_enable_flag;
-                break;
+//            case i_position_control[int i].get_position() -> int out_position:
+//                    out_position = upstream_control_data.position;
+//                break;
+//
+//
+//            case i_position_control[int i].get_velocity() -> int out_velocity:
+//                    out_velocity = upstream_control_data.velocity;
+//                break;
+//
+//            case i_position_control[int i].check_busy() -> int out_activate:
+////                out_activate = position_enable_flag;
+//                break;
 
 
             case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_) -> UpstreamControlData upstream_control_data_:
