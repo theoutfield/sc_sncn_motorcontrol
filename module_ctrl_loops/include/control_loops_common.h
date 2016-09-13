@@ -34,6 +34,9 @@ typedef struct {
  * @brief Structure definition for a Control Loop Service configuration.
  */
 typedef struct {
+
+    int control_mode;
+
     int control_loop_period; /**< Period for the control loop [microseconds]. */
 
     int min_pos;
@@ -41,6 +44,7 @@ typedef struct {
     int max_speed;
     int max_torque;
 
+    int enable_profiler;
     int max_acceleration_profiler;
     int max_speed_profiler;
 

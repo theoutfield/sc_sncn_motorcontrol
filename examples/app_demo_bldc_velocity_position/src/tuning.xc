@@ -357,6 +357,7 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                 }
             break;
 
+
         //profiler max acceleration
         case 'j':
             pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
@@ -369,6 +370,13 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
             pos_velocity_ctrl_config.max_speed_profiler = value;
             i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
             break;
+            //profiler max velocity
+        case 'h':
+            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+            pos_velocity_ctrl_config.enable_profiler = value;
+            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+            break;
+
 
         //auto offset tuning
         case 'a':
