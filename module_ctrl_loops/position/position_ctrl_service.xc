@@ -305,6 +305,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 pid_reset(position_control_pid_param);
                 i_motorcontrol.set_torque_control_enabled();
                 i_motorcontrol.set_brake_status(1);
+                enable_profiler = pos_velocity_ctrl_config.enable_profiler;
                 break;
 
             case i_position_control[int i].enable_velocity_ctrl(int velocity_control_mode_):

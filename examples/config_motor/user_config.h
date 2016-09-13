@@ -356,6 +356,7 @@
 #define MAX_VELOCITY            800             // rpm
 #define MAX_TORQUE              3000
 
+#define ENABLE_PROFILER         1
 #define MAX_ACCELERATION_PROFILER 1800000
 #define MAX_SPEED_PROFILER      1800000
 
@@ -376,11 +377,8 @@
 #define VELOCITY_Kd             500
 #define VELOCITY_INTEGRAL_LIMIT 0
 
-#define POSITION_REF_FC         1
 #define POSITION_FC             100
-#define VELOCITY_REF_FC         50
 #define VELOCITY_FC             90
-#define VELOCITY_D_FC           90 //not used anymore
 
 
 // Foresight: Joint 1 Position Controller Config
