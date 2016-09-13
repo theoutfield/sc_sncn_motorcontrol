@@ -6,6 +6,14 @@
 
 #include <controllers_lib.h>
 
+int sign_function(float a)
+{
+    if (a < 0)
+        return -1;
+    else
+        return 1;
+}
+
 
 void pid_init(PIDparam &param)
 {
@@ -68,30 +76,77 @@ float pos_profiler(float pos_target, float pos_k_1n, float pos_k_2n, posProfiler
     float velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2;
     int profiler_sign;
     int deceleration_flag = 0;
-    if ((pos_target-pos_k_1n)<10 && (pos_target-pos_k_1n)>-10)
+
+
+    if (pos_target == pos_k_1n)
         pos_k = pos_target;
-    else {
-        if (pos_target >= pos_k_1n)
-            profiler_sign = 1;
-        else
-            profiler_sign = -1;
-        velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
-        temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * pos_profiler_param.a_max;
-        deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * pos_profiler_param.a_max);
-        pos_deceleration = pos_target - (profiler_sign * deceleration_distance);
-        if((profiler_sign * (pos_k_1n-pos_deceleration)) >= 0)
-            deceleration_flag = 1;
-        if(deceleration_flag == 0) {
-            pos_temp1 = (profiler_sign * temp) + (2 * pos_k_1n) - pos_k_2n;
-            pos_temp2 = (profiler_sign * pos_profiler_param.delta_T * pos_profiler_param.v_max) + pos_k_1n;
-            if ((profiler_sign*pos_temp1) < (profiler_sign*pos_temp2))
-                pos_k = pos_temp1;
-            else
-                pos_k = pos_temp2;
+    else if (pos_target > pos_k_1n) {
+        //When the speed is zero, commands with a change less than N are ignored *** N should be calculated based on delta_T, a_max and v_max later
+        if (((pos_k_1n-pos_k_2n)==0) && (pos_target < (pos_k_1n+10)))
+            pos_k = pos_k_1n; //ignore the command
+        else {
+            velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
+            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * pos_profiler_param.a_max);
+            pos_deceleration = pos_target - deceleration_distance;
+            if ((pos_k_1n >= pos_deceleration) && (pos_k_1n > pos_k_2n))
+                deceleration_flag = 1;
+            temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * pos_profiler_param.a_max;
+            if (deceleration_flag == 0) {
+                pos_temp1 = temp + (2 * pos_k_1n) - pos_k_2n;
+                pos_temp2 = (pos_profiler_param.delta_T * pos_profiler_param.v_max) + pos_k_1n;
+                if (pos_temp1 < pos_temp2)
+                    pos_k = pos_temp1;
+                else
+                    pos_k = pos_temp2;
+            }
+            else {
+                //ehtemalan inja ham bayad az pos_temp1 va pos_temp2 estefade beshe
+                pos_k = -temp + (2 * pos_k_1n) - pos_k_2n;
+            }
+            if (pos_k > pos_target)
+                pos_k = pos_target;
+            if ((pos_k < pos_target) && (sign_function(pos_k_1n-pos_k_2n) > sign_function(pos_k-pos_k_1n)))
+                pos_k = pos_target;
         }
-        else
-            pos_k = (-profiler_sign * temp) + (2 * pos_k_1n) - pos_k_2n;
     }
+    else
+        pos_k = pos_target;
+
+
+//    if (pos_target == pos_k_1n)
+//        pos_k = pos_target;
+    //When the speed is zero, commands with a change less than N are ignored *** N should be calculated based on delta_T, a_max and v_max later
+//    else if (((pos_k_1n-pos_k_2n)==0) && ((pos_target-pos_k_1n)<10 && (pos_target-pos_k_1n)>-10))
+//        pos_k = pos_target;
+//    else {
+//        if (pos_target >= pos_k_1n)
+//            profiler_sign = 1;
+//        else
+//            profiler_sign = -1;
+//        velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
+//        temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * pos_profiler_param.a_max;
+//        deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * pos_profiler_param.a_max);
+//        pos_deceleration = pos_target - (profiler_sign * deceleration_distance);
+//        if((profiler_sign * (pos_k_1n-pos_deceleration)) >= 0)
+//            deceleration_flag = 1;
+//        if(deceleration_flag == 0) {
+//            pos_temp1 = (profiler_sign * temp) + (2 * pos_k_1n) - pos_k_2n;
+//            pos_temp2 = (profiler_sign * pos_profiler_param.delta_T * pos_profiler_param.v_max) + pos_k_1n;
+//            if ((profiler_sign*pos_temp1) < (profiler_sign*pos_temp2))
+//                pos_k = pos_temp1;
+//            else
+//                pos_k = pos_temp2;
+//        }
+//        else
+//        {
+//            //ehtemalan inja ham bayad az pos_temp1 va pos_temp2 estefade beshe
+//            pos_k = (-profiler_sign * temp) + (2 * pos_k_1n) - pos_k_2n;
+//        }
+//    }
+
+//    if ((pos_k < pos_target) && (sign_function(pos_k_1n-pos_k_2n) != sign_function(pos_k-pos_k_1n)))
+//            pos_k = pos_target;
+
     return pos_k;
 }
 

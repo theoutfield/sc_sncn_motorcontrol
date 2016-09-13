@@ -54,7 +54,7 @@ int main(void) {
         {
             PosVelocityControlConfig pos_velocity_ctrl_config;
             /* Control Loop */
-            pos_velocity_ctrl_config.control_loop_period = 500;//CONTROL_LOOP_PERIOD; //us
+            pos_velocity_ctrl_config.control_loop_period = 1000;//CONTROL_LOOP_PERIOD; //us
 
             pos_velocity_ctrl_config.min_pos = MIN_POSITION_LIMIT;
             pos_velocity_ctrl_config.max_pos = MAX_POSITION_LIMIT;
