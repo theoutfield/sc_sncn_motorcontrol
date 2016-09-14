@@ -6,6 +6,12 @@
 
 #include <controllers_lib.h>
 
+
+/**
+ * @brief sign function.
+ * @param output, sign of the number
+ * @param input, number
+ */
 int sign_function(float a)
 {
     if (a < 0)
@@ -15,6 +21,10 @@ int sign_function(float a)
 }
 
 
+/**
+ * @brief intializing the parameters of the PID controller.
+ * @param the parameters of the controller
+ */
 void pid_init(PIDparam &param)
 {
     param.Kp = 0;
@@ -26,6 +36,15 @@ void pid_init(PIDparam &param)
     param.T_s = 0;
 }
 
+/**
+ * @brief setting the parameters of the PID controller.
+ * @param input, P parameter
+ * @param input, I parameter
+ * @param input, D parameter
+ * @param input, Integral limit
+ * @param input, sample-time in us (microseconds).
+ * @param the parameters of the PID controller
+ */
 void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, PIDparam &param)
 {
     param.Kp = Kp;
@@ -35,7 +54,14 @@ void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int 
     param.T_s = T_s;
 }
 
-
+/**
+ * @brief updating the PID controller.
+ * @param output, control command
+ * @param input, setpoint
+ * @param input, feedback
+ * @param input, sample-time in us (microseconds).
+ * @param the parameters of the PID controller
+ */
 float pid_update(float desired_value, float actual_value, int T_s, PIDparam &param)
 {
     float error, cmd, integral_term;
@@ -50,6 +76,10 @@ float pid_update(float desired_value, float actual_value, int T_s, PIDparam &par
 }
 
 
+/**
+ * @brief resetting the parameters of the PID controller.
+ * @param the parameters of the controller
+ */
 void pid_reset(PIDparam &param)
 {
     param.actual_value_1n = 0;
@@ -57,6 +87,10 @@ void pid_reset(PIDparam &param)
 }
 
 
+/**
+ * @brief intializing the parameters of the integral optimum position controller.
+ * @param the parameters of the controller
+ */
 void integral_optimum_pos_controller_init(integralOptimumPosControllerParam &param)
 {
     param.Kp = 0;
@@ -68,7 +102,33 @@ void integral_optimum_pos_controller_init(integralOptimumPosControllerParam &par
     param.T_s = 0;
 }
 
+/**
+ * @brief setting the parameters of the integral optimum position controller.
+ * @param input, P parameter
+ * @param input, I parameter
+ * @param input, D parameter
+ * @param input, Integral limit
+ * @param input, sample-time in us (microseconds).
+ * @param the parameters of the integral optimum position controller
+ */
+void integral_optimum_pos_controller_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, integralOptimumPosControllerParam &param)
+{
+    param.Kp = Kp;
+    param.Ki = Ki;
+    param.Kd = Kd;
+    param.integral_limit = integral_limit;
+    param.T_s = T_s;
+}
 
+
+/**
+ * @brief updating the integral optimum position controller.
+ * @param output, control command
+ * @param input, setpoint
+ * @param input, feedback
+ * @param input, sample-time in us (microseconds).
+ * @param the parameters of the integral optimum position controller
+ */
 float integral_optimum_pos_controller_updat(float desired_value, float actual_value, int T_s, integralOptimumPosControllerParam &param)
 {
     float cmd, temp;
@@ -81,15 +141,11 @@ float integral_optimum_pos_controller_updat(float desired_value, float actual_va
     return cmd;
 }
 
-void integral_optimum_pos_controller_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, integralOptimumPosControllerParam &param)
-{
-    param.Kp = Kp;
-    param.Ki = Ki;
-    param.Kd = Kd;
-    param.integral_limit = integral_limit;
-    param.T_s = T_s;
-}
 
+/**
+ * @brief resetting the parameters of the integral optimum position controller.
+ * @param the parameters of the controller
+ */
 void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &param)
 {
     param.actual_value_1n = 0;
@@ -97,6 +153,15 @@ void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &pa
 }
 
 
+
+/**
+ * @brief updating the position reference profiler
+ * @param output, profiled position calculated for the next step
+ * @param input, target position
+ * @param input, profiled position calculated in one step ago
+ * @param input, profiled position calculated in two steps ago
+ * @param the parameters of the position reference profiler
+ */
 float pos_profiler(float pos_target, float pos_k_1n, float pos_k_2n, posProfilerParam pos_profiler_param)
 {
     float velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2;
@@ -163,5 +228,4 @@ float pos_profiler(float pos_target, float pos_k_1n, float pos_k_2n, posProfiler
 
     return pos_k;
 }
-
 
