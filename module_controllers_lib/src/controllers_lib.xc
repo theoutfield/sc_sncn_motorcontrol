@@ -57,8 +57,19 @@ void pid_reset(PIDparam &param)
 }
 
 
+void integral_optimum_pos_controller_init(integralOptimumPosControllerParam &param)
+{
+    param.Kp = 0;
+    param.Ki = 0;
+    param.Kd = 0;
+    param.integral_limit = 0;
+    param.integral = 0;
+    param.actual_value_1n = 0;
+    param.T_s = 0;
+}
 
-float new_pos_controller_updat(float desired_value, float actual_value, int T_s, PIDparam &param)
+
+float integral_optimum_pos_controller_updat(float desired_value, float actual_value, int T_s, integralOptimumPosControllerParam &param)
 {
     float cmd, temp;
     temp = param.integral;
@@ -68,6 +79,21 @@ float new_pos_controller_updat(float desired_value, float actual_value, int T_s,
     cmd = param.integral - (actual_value * param.Kd) + (param.actual_value_1n * param.Kd);
     param.actual_value_1n = actual_value;
     return cmd;
+}
+
+void integral_optimum_pos_controller_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, integralOptimumPosControllerParam &param)
+{
+    param.Kp = Kp;
+    param.Ki = Ki;
+    param.Kd = Kd;
+    param.integral_limit = integral_limit;
+    param.T_s = T_s;
+}
+
+void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &param)
+{
+    param.actual_value_1n = 0;
+    param.integral = 0;
 }
 
 

@@ -51,7 +51,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     // position controller
     int position_enable_flag = 0;
     PIDparam position_control_pid_param;
-    PIDparam integral_optimum_pos_ctrl_pid_param;
+    integralOptimumPosControllerParam integral_optimum_pos_ctrl_pid_param;
     SecondOrderLPfilterParam position_SO_LP_filter_param;
     float position_k = 0;
     float position_sens_k = 0;
@@ -97,17 +97,21 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     timer t;
     unsigned int ts;
 
-//    second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
-//    second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
+    second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
+    second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
 
-//    pid_init(velocity_control_pid_param);
-//    pid_set_parameters((float)pos_velocity_ctrl_config.P_velocity, (float)pos_velocity_ctrl_config.I_velocity,
-//                       (float)pos_velocity_ctrl_config.D_velocity, (float)pos_velocity_ctrl_config.integral_limit_velocity,
-//                              pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-//    pid_init(position_control_pid_param);
-//    pid_set_parameters((float)pos_velocity_ctrl_config.P_pos, (float)pos_velocity_ctrl_config.I_pos,
-//                       (float)pos_velocity_ctrl_config.D_pos, (float)pos_velocity_ctrl_config.integral_limit_pos,
-//                              pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+    pid_init(velocity_control_pid_param);
+    pid_set_parameters((float)pos_velocity_ctrl_config.P_velocity, (float)pos_velocity_ctrl_config.I_velocity,
+                       (float)pos_velocity_ctrl_config.D_velocity, (float)pos_velocity_ctrl_config.integral_limit_velocity,
+                              pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+    pid_init(position_control_pid_param);
+    pid_set_parameters((float)pos_velocity_ctrl_config.P_pos, (float)pos_velocity_ctrl_config.I_pos,
+                       (float)pos_velocity_ctrl_config.D_pos, (float)pos_velocity_ctrl_config.integral_limit_pos,
+                              pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+    integral_optimum_pos_controller_init(integral_optimum_pos_ctrl_pid_param);
+    integral_optimum_pos_controller_set_parameters((float)pos_velocity_ctrl_config.P_pos_Integral_optimum, (float)pos_velocity_ctrl_config.I_pos_Integral_optimum,
+                                                   (float)pos_velocity_ctrl_config.D_pos_Integral_optimum, (float)pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum,
+                                                    pos_velocity_ctrl_config.control_loop_period, integral_optimum_pos_ctrl_pid_param);
 
 
     downstream_control_data.position_cmd = 0;
@@ -115,17 +119,17 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     downstream_control_data.torque_cmd = 0;
     downstream_control_data.offset_torque = 0;
 
-//    delay_milliseconds(500);
-//    upstream_control_data = i_motorcontrol.update_upstream_control_data();
-//    position_ref_input_k = upstream_control_data.position;
-//    position_ref_in_k = (float) position_ref_input_k;
-//    position_ref_in_k_1n = (float) position_ref_input_k;
-//    position_ref_in_k_2n = (float) position_ref_input_k;
-//    position_sens_k = ((float) upstream_control_data.position);
-//    position_sens_k /= 512;// 2^(24-15);
-//    position_k = position_sens_k;
-//    position_k_1n = position_sens_k;
-//    position_k_2n = position_sens_k;
+    delay_milliseconds(500);
+    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    position_ref_input_k = upstream_control_data.position;
+    position_ref_in_k = (float) position_ref_input_k;
+    position_ref_in_k_1n = (float) position_ref_input_k;
+    position_ref_in_k_2n = (float) position_ref_input_k;
+    position_sens_k = ((float) upstream_control_data.position);
+    position_sens_k /= 512;// 2^(24-15);
+    position_k = position_sens_k;
+    position_k_1n = position_sens_k;
+    position_k_2n = position_sens_k;
 
     max_position = ((float) pos_velocity_ctrl_config.max_pos);
     max_position /= 512;
@@ -212,7 +216,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         }
                         else if (pos_control_mode == POS_INTEGRAL_OPTIMUM_CONTROLLER)
                         {
-                            position_cmd_k = new_pos_controller_updat(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, integral_optimum_pos_ctrl_pid_param);
+                            position_cmd_k = integral_optimum_pos_controller_updat(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, integral_optimum_pos_ctrl_pid_param);
                             torque_ref_k = (position_cmd_k / 512);
                         }
 
@@ -304,7 +308,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 position_k_2n = position_sens_k;
                 additive_torque_input_k = 0;
                 pid_reset(position_control_pid_param);
-                pid_reset(integral_optimum_pos_ctrl_pid_param);
+                integral_optimum_pos_controller_reset(integral_optimum_pos_ctrl_pid_param);
                 i_motorcontrol.set_torque_control_enabled();
                 i_motorcontrol.set_brake_status(1);
                 enable_profiler = pos_velocity_ctrl_config.enable_profiler;
@@ -345,10 +349,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 pid_set_parameters((float)pos_velocity_ctrl_config.P_pos, (float)pos_velocity_ctrl_config.I_pos,
                                    (float)pos_velocity_ctrl_config.D_pos, (float)pos_velocity_ctrl_config.integral_limit_pos,
                                           pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                pid_init(integral_optimum_pos_ctrl_pid_param);
-                pid_set_parameters((float)pos_velocity_ctrl_config.P_pos_Integral_optimum, (float)pos_velocity_ctrl_config.I_pos_Integral_optimum,
-                                   (float)pos_velocity_ctrl_config.D_pos_Integral_optimum, (float)pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum,
-                                          pos_velocity_ctrl_config.control_loop_period, integral_optimum_pos_ctrl_pid_param);
+                integral_optimum_pos_controller_init(integral_optimum_pos_ctrl_pid_param);
+                integral_optimum_pos_controller_set_parameters((float)pos_velocity_ctrl_config.P_pos_Integral_optimum, (float)pos_velocity_ctrl_config.I_pos_Integral_optimum,
+                                                               (float)pos_velocity_ctrl_config.D_pos_Integral_optimum, (float)pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum,
+                                                                pos_velocity_ctrl_config.control_loop_period, integral_optimum_pos_ctrl_pid_param);
                 second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
                 second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
                 pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);

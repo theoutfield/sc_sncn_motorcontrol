@@ -19,6 +19,16 @@ typedef struct {
     int T_s;    //Sampling-Time in microseconds
 } PIDparam;
 
+typedef struct {
+    float Kp;
+    float Ki;
+    float Kd;
+    float integral_limit;
+    float integral;
+    float actual_value_1n;
+    int T_s;    //Sampling-Time in microseconds
+} integralOptimumPosControllerParam;
+
 
 typedef struct {
     float delta_T;
@@ -52,8 +62,21 @@ float pid_update(float desired_value, float actual_value, int T_s, PIDparam &par
 void pid_reset(PIDparam &param);
 
 
-float new_pos_controller_updat(float desired_value, float actual_value, int T_s, PIDparam &param);
+
+void integral_optimum_pos_controller_init(integralOptimumPosControllerParam &param);
+
+float integral_optimum_pos_controller_updat(float desired_value, float actual_value, int T_s, integralOptimumPosControllerParam &param);
+
+void integral_optimum_pos_controller_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, integralOptimumPosControllerParam &param);
+
+void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &param);
 
 
 float pos_profiler(float pos_target, float pos_k_1n, float pos_k_2n, posProfilerParam pos_profiler_param);
+
+
+
+
+
+
 
