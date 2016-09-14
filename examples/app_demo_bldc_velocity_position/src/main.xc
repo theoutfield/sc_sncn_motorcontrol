@@ -54,29 +54,36 @@ int main(void) {
         {
             PosVelocityControlConfig pos_velocity_ctrl_config;
             /* Control Loop */
-            pos_velocity_ctrl_config.enable_profiler = ENABLE_PROFILER;
-            pos_velocity_ctrl_config.control_loop_period = 1000;//CONTROL_LOOP_PERIOD; //us
+            pos_velocity_ctrl_config.control_loop_period =                  CONTROL_LOOP_PERIOD; //us
 
-            pos_velocity_ctrl_config.min_pos = MIN_POSITION_LIMIT;
-            pos_velocity_ctrl_config.max_pos = MAX_POSITION_LIMIT;
-            pos_velocity_ctrl_config.max_speed = MAX_VELOCITY;
-            pos_velocity_ctrl_config.max_torque = MAX_TORQUE;
+            pos_velocity_ctrl_config.min_pos =                              MIN_POSITION_LIMIT;
+            pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
+            pos_velocity_ctrl_config.max_speed =                            MAX_VELOCITY;
+            pos_velocity_ctrl_config.max_torque =                           MAX_TORQUE;
 
-            pos_velocity_ctrl_config.max_acceleration_profiler = MAX_ACCELERATION_PROFILER;
-            pos_velocity_ctrl_config.max_speed_profiler = MAX_SPEED_PROFILER;
+            pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
+            pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
+            pos_velocity_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
 
-            pos_velocity_ctrl_config.P_pos = POSITION_Kp;
-            pos_velocity_ctrl_config.I_pos = POSITION_Ki;
-            pos_velocity_ctrl_config.D_pos = POSITION_Kd;
-            pos_velocity_ctrl_config.integral_limit_pos = POSITION_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.control_mode =                         POS_INTEGRAL_OPTIMUM_CONTROLLER;
 
-            pos_velocity_ctrl_config.P_velocity = VELOCITY_Kp;
-            pos_velocity_ctrl_config.I_velocity = VELOCITY_Ki;
-            pos_velocity_ctrl_config.D_velocity = VELOCITY_Kd;
-            pos_velocity_ctrl_config.integral_limit_velocity = VELOCITY_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.P_pos =                                Kp_POS_PID;
+            pos_velocity_ctrl_config.I_pos =                                Ki_POS_PID;
+            pos_velocity_ctrl_config.D_pos =                                Kd_POS_PID;
+            pos_velocity_ctrl_config.integral_limit_pos =                   INTEGRAL_LIMIT_POS_PID;
 
-            pos_velocity_ctrl_config.position_fc = POSITION_FC;
-            pos_velocity_ctrl_config.velocity_fc = VELOCITY_FC;
+            pos_velocity_ctrl_config.P_velocity =                           Kp_VELOCITY_PID;
+            pos_velocity_ctrl_config.I_velocity =                           Ki_VELOCITY_PID;
+            pos_velocity_ctrl_config.D_velocity =                           Kd_VELOCITY_PID;
+            pos_velocity_ctrl_config.integral_limit_velocity =              INTEGRAL_LIMIT_VELOCITY_PID;
+
+            pos_velocity_ctrl_config.P_pos_Integral_optimum =               Kp_POS_INTEGRAL_OPTIMUM;
+            pos_velocity_ctrl_config.I_pos_Integral_optimum =               Ki_POS_INTEGRAL_OPTIMUM;
+            pos_velocity_ctrl_config.D_pos_Integral_optimum =               Kd_POS_INTEGRAL_OPTIMUM;
+            pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum =  INTEGRAL_LIMIT_POS_INTEGRAL_OPTIMUM;
+
+            pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
+            pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
         }

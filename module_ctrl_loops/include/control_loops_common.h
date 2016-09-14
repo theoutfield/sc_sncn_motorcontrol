@@ -58,6 +58,11 @@ typedef struct {
     int D_velocity;
     int integral_limit_velocity;
 
+    int P_pos_Integral_optimum;
+    int I_pos_Integral_optimum;
+    int D_pos_Integral_optimum;
+    int integral_limit_pos_Integral_optimum;
+
     int position_fc;
     int velocity_fc;
 

@@ -351,31 +351,32 @@
 
 // AMK or qmot
 //**motor offset: AMK 2470, qmot 3450
-#define MIN_POSITION_LIMIT     -300000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      300000         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            800             // rpm
-#define MAX_TORQUE              3000
+#define MIN_POSITION_LIMIT                     -300000         // ticks (min range: -2^30, limited for safe operation)
+#define MAX_POSITION_LIMIT                      300000         // ticks (max range: 2^30, limited for safe operation)
+#define MAX_VELOCITY                            800             // rpm
+#define MAX_TORQUE                              3000
 
-#define ENABLE_PROFILER         1
-#define MAX_ACCELERATION_PROFILER 1800000
-#define MAX_SPEED_PROFILER      1800000
+#define ENABLE_PROFILER                         1
+#define MAX_ACCELERATION_PROFILER               1800000
+#define MAX_SPEED_PROFILER                      1800000
 
-//New Pos Controller
-#define POSITION_Kp             30000
-#define POSITION_Ki             180
-#define POSITION_Kd             500000
-#define POSITION_INTEGRAL_LIMIT 1500000
+//PID parameters of the position PID controller
+#define Kp_POS_PID                              8000
+#define Ki_POS_PID                              15
+#define Kd_POS_PID                              0
+#define INTEGRAL_LIMIT_POS_PID                  5000000
 
-//PID Pos controller
-//#define POSITION_Kp             8000
-//#define POSITION_Ki             15
-//#define POSITION_Kd             0
-//#define POSITION_INTEGRAL_LIMIT 5000000
+//PID parameters of the velocity PID controller
+#define Kp_VELOCITY_PID                         1400
+#define Ki_VELOCITY_PID                         0
+#define Kd_VELOCITY_PID                         500
+#define INTEGRAL_LIMIT_VELOCITY_PID             0
 
-#define VELOCITY_Kp             1400
-#define VELOCITY_Ki             0
-#define VELOCITY_Kd             500
-#define VELOCITY_INTEGRAL_LIMIT 0
+//PID parameters of the Integral Optimum position controller
+#define Kp_POS_INTEGRAL_OPTIMUM                 30000
+#define Ki_POS_INTEGRAL_OPTIMUM                 180
+#define Kd_POS_INTEGRAL_OPTIMUM                 500000
+#define INTEGRAL_LIMIT_POS_INTEGRAL_OPTIMUM     1500000
 
 #define POSITION_FC             100
 #define VELOCITY_FC             90
