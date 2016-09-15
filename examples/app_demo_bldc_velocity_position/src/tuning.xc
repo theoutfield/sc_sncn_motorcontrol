@@ -217,6 +217,46 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
             }
             break;
 
+
+            //position pid coefficients
+            case 'i':
+                switch(mode_2) {
+                case 'p':
+                    pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                    pos_velocity_ctrl_config.P_pos_Integral_optimum = value;
+                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                    printf("Pp:%d Pi:%d Pd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos_Integral_optimum, pos_velocity_ctrl_config.I_pos_Integral_optimum,
+                                                           pos_velocity_ctrl_config.D_pos_Integral_optimum, pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum);
+                    break;
+                case 'i':
+                    pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                    pos_velocity_ctrl_config.I_pos_Integral_optimum = value;
+                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                    printf("Pp:%d Pi:%d Pd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos_Integral_optimum, pos_velocity_ctrl_config.I_pos_Integral_optimum,
+                                                           pos_velocity_ctrl_config.D_pos_Integral_optimum, pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum);
+                    break;
+                case 'd':
+                    pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                    pos_velocity_ctrl_config.D_pos_Integral_optimum = value;
+                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                    printf("Pp:%d Pi:%d Pd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos_Integral_optimum, pos_velocity_ctrl_config.I_pos_Integral_optimum,
+                                                           pos_velocity_ctrl_config.D_pos_Integral_optimum, pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum);
+                    break;
+                case 'l':
+                    pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                    pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum = value;
+                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                    printf("Pp:%d Pi:%d Pd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos_Integral_optimum, pos_velocity_ctrl_config.I_pos_Integral_optimum,
+                                                           pos_velocity_ctrl_config.D_pos_Integral_optimum, pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum);
+                    break;
+                default:
+                    pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                    printf("Pp:%d Pi:%d Pd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos_Integral_optimum, pos_velocity_ctrl_config.I_pos_Integral_optimum,
+                                                           pos_velocity_ctrl_config.D_pos_Integral_optimum, pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum);
+                    break;
+                }
+                break;
+
         //limits
         case 'l':
             switch(mode_2) {

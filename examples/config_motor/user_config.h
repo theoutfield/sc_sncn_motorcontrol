@@ -353,7 +353,7 @@
 //**motor offset: AMK 2470, qmot 3450
 #define MIN_POSITION_LIMIT                     -300000         // ticks (min range: -2^30, limited for safe operation)
 #define MAX_POSITION_LIMIT                      300000         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY                            800             // rpm
+#define MAX_VELOCITY                            1500             // rpm
 #define MAX_TORQUE                              3000
 
 #define ENABLE_PROFILER                         1
@@ -361,15 +361,15 @@
 #define MAX_SPEED_PROFILER                      1800000
 
 //PID parameters of the position PID controller
-#define Kp_POS_PID                              8000
-#define Ki_POS_PID                              15
+#define Kp_POS_PID                              30000
+#define Ki_POS_PID                              10
 #define Kd_POS_PID                              0
-#define INTEGRAL_LIMIT_POS_PID                  5000000
+#define INTEGRAL_LIMIT_POS_PID                  400000
 
 //PID parameters of the velocity PID controller
-#define Kp_VELOCITY_PID                         1400
+#define Kp_VELOCITY_PID                         100
 #define Ki_VELOCITY_PID                         0
-#define Kd_VELOCITY_PID                         500
+#define Kd_VELOCITY_PID                         60
 #define INTEGRAL_LIMIT_VELOCITY_PID             0
 
 //PID parameters of the Integral Optimum position controller
