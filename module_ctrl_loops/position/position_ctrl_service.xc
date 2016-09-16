@@ -52,7 +52,55 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int pos_control_mode = 0;
     int velocity_control_mode = 0;
 
+    ///////////////////////////////////////////////
     // position controller
+
+    double j_   =100.00;//milli-kgm2
+    double k_fb_=0.00;
+    double k_m_ =0.00;
+    double ts_position_=0.00;
+
+    int position_enable_flag_ = 0;
+    int torque_enable_flag_ = 0;
+
+    int position_ref_input_k_ = 0;
+    int initial_position_=0;
+    double position_ref_k_ = 0.00;
+    double position_sens_k_ = 0.00, position_sens_k_1_=0.00;
+    double k_fb_by_err_=0.00;
+
+    double output_position_ctrl_    =0.00,
+           output_position_ctrl_0_  =0.00,
+           output_position_ctrl_1_  =0.00,
+           abs_output_position_ctrl_n_1_=0.00;
+
+    double output_torque_ctrl_=0.00;
+    double output_position_ctrl_limit_=0.00;
+    double torque_cmd_=0.00;
+    double additive_torque_k_ = 0.00;
+    double t_max_ = 500.00;//milli-Nm
+
+    double feedback_p_ =0.00, feedback_d=0.00;
+
+    double integral_input_0_=0.00, integral_input_1_=0.00;
+    double integral_output_=0.00;
+    double integral_input_00_=0.00, integral_input_11_=0.00;
+
+    double y_1_k_=0.00, y_1_k_1_=0.00, abs_y_1_k_=0.00, delta_y_1_k_=0.00;
+    double y_1_k_sign_ = 0.00;
+
+    double fp_=0.00;
+    double s1_=0.00, s2_=0.00, s3_=0.00;
+    double min_s_ =0.00;
+    int min_s_index_=0;
+
+    double w_max_ = 100000.00;
+
+    double x_=0.00, y_=0.00;
+
+    int USEC_TICKS_ = 250;
+    ///////////////////////////////////////////////
+
     int position_enable_flag = 0;
     PIDparam position_control_pid_param;
     integralOptimumPosControllerParam integral_optimum_pos_ctrl_pid_param;
