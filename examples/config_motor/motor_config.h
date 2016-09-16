@@ -80,7 +80,7 @@
 #define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 */
 
-
+/*
 // motor model: DT4
 
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
@@ -98,8 +98,8 @@
 
 // GENERAL PARAMETERS
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+*/
 
-/*
 // 411678 MAXON motor
 
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
@@ -118,7 +118,7 @@
 // GENERAL PARAMETERS
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 #define BLDC_WINDING_TYPE       STAR_WINDING    //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-*/
+
 
 /*
 // motor model: MABI AXIS_1 and AXIS_2

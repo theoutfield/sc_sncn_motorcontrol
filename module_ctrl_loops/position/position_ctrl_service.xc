@@ -287,8 +287,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             k_m_  = 0.001;
                             ts_position_ = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
-                            xscope_int(TS_POSITION, ((int)(ts_position_*1000*200)));
-
                             integral_optimum_pos_ctrl_pid_param.Kp = 9895.00;
                             integral_optimum_pos_ctrl_pid_param.Ki = 1001.00;
                             integral_optimum_pos_ctrl_pid_param.Kd = 41421.00;
@@ -302,10 +300,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             integral_optimum_pos_ctrl_pid_param.Kd *= ((double)(pos_velocity_ctrl_config.D_pos_Integral_optimum));
                             integral_optimum_pos_ctrl_pid_param.Kd /= 1000.00;
 
-                            xscope_int(P, ((int)(integral_optimum_pos_ctrl_pid_param.Kp)));
-                            xscope_int(I, ((int)(integral_optimum_pos_ctrl_pid_param.Ki)));
-                            xscope_int(D, ((int)(integral_optimum_pos_ctrl_pid_param.Kd)));
-
                             integral_optimum_pos_ctrl_pid_param.Kp *= j_;
                             integral_optimum_pos_ctrl_pid_param.Ki *= j_;
                             integral_optimum_pos_ctrl_pid_param.Kd *= j_;
@@ -315,10 +309,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             integral_optimum_pos_ctrl_pid_param.Kd /=1000000.00;
 
                             position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
+
                             position_ref_k_ = (double) (position_ref_input_k_);
 
                             position_sens_k_1_ = position_sens_k_;
                             position_sens_k_   = (double) (upstream_control_data.position);
+
 
                             k_fb_by_err_ = position_ref_k_ - position_sens_k_;
 
@@ -464,9 +460,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_torque((int) torque_ref_k);
                 }
 
-                xscope_int(LOOP_TIME, loop_time_);
-                xscope_int(IDLE_TIME, idle_time_);
-
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(POSITION_REF, (int) (position_ref_k*512));
                 xscope_int(POSITION, (int) (position_sens_k*512));
@@ -527,10 +520,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
                 //////nonlinear position control
-                initial_position_ = upstream_control_data.position;
                 downstream_control_data.position_cmd = 0;
                 output_torque_ctrl_=0;
                 additive_torque_k_ = 0;
+                initial_position_ = upstream_control_data.position;
                 ////////////////////////////////
 
 
