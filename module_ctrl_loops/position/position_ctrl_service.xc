@@ -200,6 +200,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
         select {
             case t when timerafter(ts + USEC_STD * pos_velocity_ctrl_config.control_loop_period) :> ts:
 
+                t_old_=t_new_;
+                t :> t_new_;
+                loop_time_=t_new_-t_old_;
+                idle_time_=t_new_-t_end_;
+
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
                 /*
@@ -272,10 +277,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         }
                         else if (pos_control_mode == POS_INTEGRAL_OPTIMUM_CONTROLLER)
                         {
-                            t_old_=t_new_;
-                            t :> t_new_;
-                            loop_time_=t_new_-t_old_;
-                            idle_time_=t_new_-t_end_;
+
 
                             // update feedback data
                             upstream_control_data = i_motorcontrol.update_upstream_control_data();
@@ -418,18 +420,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                 output_position_ctrl_ =-output_position_ctrl_limit_;
 
 
-                            if(position_enable_flag_ ==1)
-                            {
-                                i_motorcontrol.set_torque((int) output_position_ctrl_);
-                                //i_motorcontrol.set_torque(0);
-                            }
-                            else if(torque_enable_flag_ ==1)
-                            {
-                                output_torque_ctrl_ = downstream_control_data.torque_cmd;
-                                i_motorcontrol.set_torque((int) output_torque_ctrl_);
-                            }
+                            i_motorcontrol.set_torque((int) output_position_ctrl_);
 
-                            t :> t_end_;
+
                         }
 
                         second_order_LP_filter_shift_buffers(&position_k,
@@ -487,6 +480,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(POSITION_REF, position_ref_input_k * 1);
                 xscope_int(TORQUE_CMD, torque_ref_k / 1);
 #endif
+
+
+                t :> t_end_;
                 break;
 
 
