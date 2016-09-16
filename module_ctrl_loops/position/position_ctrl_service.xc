@@ -287,6 +287,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             k_m_  = 0.001;
                             ts_position_ = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
+                            xscope_int(TS_POSITION, ((int)(ts_position_*1000*200)));
+
                             position_control_pid_param.Kp = 9895.00;
                             position_control_pid_param.Ki = 1001.00;
                             position_control_pid_param.Kd = 41421.00;
@@ -300,6 +302,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_control_pid_param.Kd *= ((double)(pos_velocity_ctrl_config.D_pos));
                             position_control_pid_param.Kd /= 1000.00;
 
+                            xscope_int(P, ((int)(position_control_pid_param.Kp)));
+                            xscope_int(I, ((int)(position_control_pid_param.Ki)));
+                            xscope_int(D, ((int)(position_control_pid_param.Kd)));
+
                             position_control_pid_param.Kp *= j_;
                             position_control_pid_param.Ki *= j_;
                             position_control_pid_param.Kd *= j_;
@@ -308,7 +314,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_control_pid_param.Ki /=1000000.00;
                             position_control_pid_param.Kd /=1000000.00;
 
-                            position_ref_input_k_ = 150000;//initial_position_ + downstream_control_data.position_cmd;
+                            position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
                             position_ref_k_ = (double) (position_ref_input_k_);
 
                             position_sens_k_1_ = position_sens_k_;
@@ -413,7 +419,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             if(output_position_ctrl_ < -output_position_ctrl_limit_)
                                 output_position_ctrl_ =-output_position_ctrl_limit_;
 
-                            torque_ref_k = 0;//(int) output_position_ctrl_;
+                            torque_ref_k = ((int) (output_position_ctrl_));
                             //i_motorcontrol.set_torque((int) output_position_ctrl_);
 
 

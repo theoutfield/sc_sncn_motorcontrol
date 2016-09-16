@@ -36,5 +36,11 @@
 	<Probe name="LOOP_TIME" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="IDLE_TIME" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
+	<Probe name="TS_POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	
+	<Probe name="P" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="I" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="D" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	
 	
 </xSCOPEconfig>
