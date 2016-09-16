@@ -459,6 +459,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
 
                 xscope_int(LOOP_TIME, loop_time_);
+                xscope_int(IDLE_TIME, idle_time_);
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(POSITION_REF, (int) (position_ref_k*512));
@@ -505,7 +506,28 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     velocity_enable_flag = 0;
                     velocity_control_mode = VELOCITY_PID_CONTROLLER;
                 }
+
+                //////nonlinear position control
+                position_ref_input_k_ = 0;
+                position_ref_k_ = 0;
+                position_sens_k_ = 0;
+                position_sens_k_1_=0;
+                output_position_ctrl_ = 0;
+                additive_torque_k_ = 0;
+                feedback_p_ =0;
+                feedback_d_=0;
+                //////////////////////////////
+
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                //////nonlinear position control
+                initial_position_ = upstream_control_data.position;
+                downstream_control_data.position_cmd = 0;
+                output_torque_ctrl_=0;
+                additive_torque_k_ = 0;
+                ////////////////////////////////
+
+
                 position_ref_input_k = upstream_control_data.position;
                 position_ref_in_k = (float) position_ref_input_k;
                 position_ref_in_k_1n = (float) position_ref_input_k;

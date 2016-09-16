@@ -34,6 +34,7 @@
 	
 	
 	<Probe name="LOOP_TIME" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="IDLE_TIME" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
 	
 </xSCOPEconfig>
