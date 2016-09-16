@@ -8,6 +8,8 @@
 #include <print.h>
 #include <stdlib.h>
 
+#include <math.h>
+
 #include <controllers_lib.h>
 #include <filters_lib.h>
 
@@ -80,7 +82,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     double additive_torque_k_ = 0.00;
     double t_max_ = 500.00;//milli-Nm
 
-    double feedback_p_ =0.00, feedback_d=0.00;
+    double feedback_p_ =0.00, feedback_d_=0.00;
 
     double integral_input_0_=0.00, integral_input_1_=0.00;
     double integral_output_=0.00;
@@ -99,6 +101,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     double x_=0.00, y_=0.00;
 
     int USEC_TICKS_ = 250;
+
+    unsigned int ts_=0, t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
     ///////////////////////////////////////////////
 
     int position_enable_flag = 0;
@@ -268,8 +272,164 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         }
                         else if (pos_control_mode == POS_INTEGRAL_OPTIMUM_CONTROLLER)
                         {
-                            position_cmd_k = integral_optimum_pos_controller_updat(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, integral_optimum_pos_ctrl_pid_param);
-                            torque_ref_k = (position_cmd_k / 512);
+                            t_old_=t_new_;
+                            t :> t_new_;
+                            loop_time_=t_new_-t_old_;
+                            idle_time_=t_new_-t_end_;
+
+                            // update feedback data
+                            upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                            /*
+                             * CONTELEC:    16bits single turn + 12bits multi turn
+                             * BISS-MABI:   18bits signle turn + 10bits multi turn
+                             * AMS:         14bits single turn + 18bits multi turn
+                             * Other sens:  13bits single turn + 12bits multi turn
+                             */
+
+                            k_fb_ = 10429;
+                            k_m_  = 0.001;
+                            ts_position_ = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
+
+                            position_control_pid_param.Kp = 9895.00;
+                            position_control_pid_param.Ki = 1001.00;
+                            position_control_pid_param.Kd = 41421.00;
+
+                            position_control_pid_param.Kp *= ((double)(pos_velocity_ctrl_config.P_pos));
+                            position_control_pid_param.Kp /= 1000.00;
+
+                            position_control_pid_param.Ki *= ((double)(pos_velocity_ctrl_config.I_pos));
+                            position_control_pid_param.Ki /= 1000.00;
+
+                            position_control_pid_param.Kd *= ((double)(pos_velocity_ctrl_config.D_pos));
+                            position_control_pid_param.Kd /= 1000.00;
+
+                            position_control_pid_param.Kp *= j_;
+                            position_control_pid_param.Ki *= j_;
+                            position_control_pid_param.Kd *= j_;
+
+                            position_control_pid_param.Kp /=1000000.00;
+                            position_control_pid_param.Ki /=1000000.00;
+                            position_control_pid_param.Kd /=1000000.00;
+
+                            position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
+                            position_ref_k_ = (double) (position_ref_input_k_);
+
+                            position_sens_k_1_ = position_sens_k_;
+                            position_sens_k_   = (double) (upstream_control_data.position);
+
+                            k_fb_by_err_ = position_ref_k_ - position_sens_k_;
+
+                            feedback_p_  = position_control_pid_param.Kp * (position_sens_k_ - position_sens_k_1_);
+
+                            delta_y_1_k_ = k_fb_by_err_*position_control_pid_param.Ki - feedback_p_;
+
+                            y_1_k_ = delta_y_1_k_ + y_1_k_1_;
+
+                            if(y_1_k_>0)
+                            {
+                                abs_y_1_k_ = y_1_k_;
+                                y_1_k_sign_= 1;
+                            }
+                            else if (y_1_k_<0)
+                            {
+                                abs_y_1_k_ =-y_1_k_;
+                                y_1_k_sign_=-1;
+                            }
+                            else if (y_1_k_ == 0)
+                            {
+                                abs_y_1_k_  = 0;
+                                y_1_k_sign_ = 0;
+                            }
+
+                            s1_ = abs_y_1_k_;
+
+
+                            t_max_=((double)(pos_velocity_ctrl_config.max_torque));
+
+                            fp_  = (2.00*t_max_)/1000;
+
+                            if(k_fb_by_err_>0)       fp_ *=   k_fb_by_err_;
+                            else if(k_fb_by_err_<0)  fp_ *= (-k_fb_by_err_);
+                            else if(k_fb_by_err_==0) fp_  = 0;
+
+                            fp_ /= k_fb_;
+
+                            fp_ *= 1000.00;
+                            fp_ /= (j_/1000.00);
+
+                            fp_  = sqrt(fp_);
+
+                            s2_ = fp_;
+
+                            s2_*= position_control_pid_param.Kd;
+                            s2_*= ts_position_;
+                            s2_*= k_fb_;
+
+                            //if((abs_output_position_ctrl_n_1/1000.00)<s2)
+                            //    s2-=(abs_output_position_ctrl_n_1/1000);
+
+                            s2_*=0.9;
+
+
+
+                            s3_ = w_max_;
+                            s3_*= position_control_pid_param.Kd;
+                            s3_*= ts_position_;
+                            s3_*= k_fb_;
+
+
+                            if(s1_<s2_)
+                            {
+                                min_s_ = s1_;
+                                min_s_index_=1000;
+                            }
+                            else
+                            {
+                                min_s_ = s2_;
+                                min_s_index_=2000;
+                            }
+
+                            if(s3_<min_s_)
+                            {
+                                min_s_ = s3_;
+                                min_s_index_=3000;
+                            }
+
+                            if(s1_<0 || s2_<0 || s3_<0 || min_s_<0)
+                            {
+                                printstr(">>   ERROR, NEGATIVE VALUE OF Ss !!!! \n");
+                                while(1);
+                            }
+
+                            y_1_k_ = min_s_ * y_1_k_sign_;
+                            y_1_k_1_ = y_1_k_;
+
+                            feedback_d_ = position_control_pid_param.Kd * (position_sens_k_ - position_sens_k_1_);
+
+                            output_position_ctrl_ = y_1_k_ - feedback_d_;
+
+                            output_position_ctrl_limit_ =((double)(pos_velocity_ctrl_config.max_torque));
+
+                            if(output_position_ctrl_ >  output_position_ctrl_limit_)
+                                output_position_ctrl_ = output_position_ctrl_limit_;
+
+                            if(output_position_ctrl_ < -output_position_ctrl_limit_)
+                                output_position_ctrl_ =-output_position_ctrl_limit_;
+
+
+                            if(position_enable_flag_ ==1)
+                            {
+                                i_motorcontrol.set_torque((int) output_position_ctrl_);
+                                //i_motorcontrol.set_torque(0);
+                            }
+                            else if(torque_enable_flag_ ==1)
+                            {
+                                output_torque_ctrl_ = downstream_control_data.torque_cmd;
+                                i_motorcontrol.set_torque((int) output_torque_ctrl_);
+                            }
+
+                            t :> t_end_;
                         }
 
                         second_order_LP_filter_shift_buffers(&position_k,
