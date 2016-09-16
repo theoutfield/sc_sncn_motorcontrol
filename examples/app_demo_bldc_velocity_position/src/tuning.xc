@@ -77,6 +77,7 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
     int period_us;     // torque generation period in micro-seconds
     int pulse_counter; // number of generated pulses
     int torque_control_flag = 0;
+    int j=1;
 
     fflush(stdout);
     //read and adjust the offset.
@@ -393,6 +394,13 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                     delay_milliseconds(1000);
                     downstream_control_data.offset_torque = 0;
                     i_position_control.update_control_data(downstream_control_data);
+                    break;
+
+                //command additive torque forward and backward
+                case 'j':
+                    j = value;
+                    i_position_control.set_j(j);
+                    printf("moment of inertia :%d \n", j);
                     break;
                 }
             break;

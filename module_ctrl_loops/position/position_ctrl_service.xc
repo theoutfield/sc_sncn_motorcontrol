@@ -592,7 +592,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
 
 
-
+            case i_position_control[int i].set_j(int j):
+                    j_ = ((double)(j));
+                    break;
 
 
 
