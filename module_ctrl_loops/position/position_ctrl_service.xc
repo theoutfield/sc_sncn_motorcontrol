@@ -289,30 +289,30 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             xscope_int(TS_POSITION, ((int)(ts_position_*1000*200)));
 
-                            position_control_pid_param.Kp = 9895.00;
-                            position_control_pid_param.Ki = 1001.00;
-                            position_control_pid_param.Kd = 41421.00;
+                            integral_optimum_pos_ctrl_pid_param.Kp = 9895.00;
+                            integral_optimum_pos_ctrl_pid_param.Ki = 1001.00;
+                            integral_optimum_pos_ctrl_pid_param.Kd = 41421.00;
 
-                            position_control_pid_param.Kp *= ((double)(pos_velocity_ctrl_config.P_pos));
-                            position_control_pid_param.Kp /= 1000.00;
+                            integral_optimum_pos_ctrl_pid_param.Kp *= ((double)(pos_velocity_ctrl_config.P_pos));
+                            integral_optimum_pos_ctrl_pid_param.Kp /= 1000.00;
 
-                            position_control_pid_param.Ki *= ((double)(pos_velocity_ctrl_config.I_pos));
-                            position_control_pid_param.Ki /= 1000.00;
+                            integral_optimum_pos_ctrl_pid_param.Ki *= ((double)(pos_velocity_ctrl_config.I_pos));
+                            integral_optimum_pos_ctrl_pid_param.Ki /= 1000.00;
 
-                            position_control_pid_param.Kd *= ((double)(pos_velocity_ctrl_config.D_pos));
-                            position_control_pid_param.Kd /= 1000.00;
+                            integral_optimum_pos_ctrl_pid_param.Kd *= ((double)(pos_velocity_ctrl_config.D_pos));
+                            integral_optimum_pos_ctrl_pid_param.Kd /= 1000.00;
 
-                            xscope_int(P, ((int)(position_control_pid_param.Kp)));
-                            xscope_int(I, ((int)(position_control_pid_param.Ki)));
-                            xscope_int(D, ((int)(position_control_pid_param.Kd)));
+                            xscope_int(P, ((int)(integral_optimum_pos_ctrl_pid_param.Kp)));
+                            xscope_int(I, ((int)(integral_optimum_pos_ctrl_pid_param.Ki)));
+                            xscope_int(D, ((int)(integral_optimum_pos_ctrl_pid_param.Kd)));
 
-                            position_control_pid_param.Kp *= j_;
-                            position_control_pid_param.Ki *= j_;
-                            position_control_pid_param.Kd *= j_;
+                            integral_optimum_pos_ctrl_pid_param.Kp *= j_;
+                            integral_optimum_pos_ctrl_pid_param.Ki *= j_;
+                            integral_optimum_pos_ctrl_pid_param.Kd *= j_;
 
-                            position_control_pid_param.Kp /=1000000.00;
-                            position_control_pid_param.Ki /=1000000.00;
-                            position_control_pid_param.Kd /=1000000.00;
+                            integral_optimum_pos_ctrl_pid_param.Kp /=1000000.00;
+                            integral_optimum_pos_ctrl_pid_param.Ki /=1000000.00;
+                            integral_optimum_pos_ctrl_pid_param.Kd /=1000000.00;
 
                             position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
                             position_ref_k_ = (double) (position_ref_input_k_);
@@ -322,9 +322,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             k_fb_by_err_ = position_ref_k_ - position_sens_k_;
 
-                            feedback_p_  = position_control_pid_param.Kp * (position_sens_k_ - position_sens_k_1_);
+                            feedback_p_  = integral_optimum_pos_ctrl_pid_param.Kp * (position_sens_k_ - position_sens_k_1_);
 
-                            delta_y_1_k_ = k_fb_by_err_*position_control_pid_param.Ki - feedback_p_;
+                            delta_y_1_k_ = k_fb_by_err_*integral_optimum_pos_ctrl_pid_param.Ki - feedback_p_;
 
                             y_1_k_ = delta_y_1_k_ + y_1_k_1_;
 
@@ -364,7 +364,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             s2_ = fp_;
 
-                            s2_*= position_control_pid_param.Kd;
+                            s2_*= integral_optimum_pos_ctrl_pid_param.Kd;
                             s2_*= ts_position_;
                             s2_*= k_fb_;
 
@@ -376,7 +376,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
                             s3_ = w_max_;
-                            s3_*= position_control_pid_param.Kd;
+                            s3_*= integral_optimum_pos_ctrl_pid_param.Kd;
                             s3_*= ts_position_;
                             s3_*= k_fb_;
 
@@ -407,7 +407,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             y_1_k_ = min_s_ * y_1_k_sign_;
                             y_1_k_1_ = y_1_k_;
 
-                            feedback_d_ = position_control_pid_param.Kd * (position_sens_k_ - position_sens_k_1_);
+                            feedback_d_ = integral_optimum_pos_ctrl_pid_param.Kd * (position_sens_k_ - position_sens_k_1_);
 
                             output_position_ctrl_ = y_1_k_ - feedback_d_;
 

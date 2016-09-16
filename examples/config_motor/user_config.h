@@ -113,7 +113,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      2400//590
+#define COMMUTATION_OFFSET_CLK      590//2400
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     32
@@ -361,9 +361,9 @@
 #define MAX_SPEED_PROFILER                      1800000
 
 //PID parameters of the position PID controller
-#define Kp_POS_PID                              1000//30000
-#define Ki_POS_PID                              1000//10
-#define Kd_POS_PID                              1000//0
+#define Kp_POS_PID                              30000
+#define Ki_POS_PID                              10
+#define Kd_POS_PID                              0
 #define INTEGRAL_LIMIT_POS_PID                  400000
 
 //PID parameters of the velocity PID controller
@@ -373,9 +373,9 @@
 #define INTEGRAL_LIMIT_VELOCITY_PID             0
 
 //PID parameters of the Integral Optimum position controller
-#define Kp_POS_INTEGRAL_OPTIMUM                 30000
-#define Ki_POS_INTEGRAL_OPTIMUM                 180
-#define Kd_POS_INTEGRAL_OPTIMUM                 500000
+#define Kp_POS_INTEGRAL_OPTIMUM                 1000
+#define Ki_POS_INTEGRAL_OPTIMUM                 1000
+#define Kd_POS_INTEGRAL_OPTIMUM                 1000
 #define INTEGRAL_LIMIT_POS_INTEGRAL_OPTIMUM     1500000
 
 #define POSITION_FC             100
