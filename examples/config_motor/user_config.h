@@ -135,7 +135,7 @@
 ///////////////////////////////////////////////
 
 // POSITION CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     500
+#define CONTROL_LOOP_PERIOD     1000
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
 //#define POSITION_Kp       100
@@ -361,9 +361,9 @@
 #define MAX_SPEED_PROFILER                      1800000
 
 //PID parameters of the position PID controller
-#define Kp_POS_PID                              30000
-#define Ki_POS_PID                              10
-#define Kd_POS_PID                              0
+#define Kp_POS_PID                              1000//30000
+#define Ki_POS_PID                              1000//10
+#define Kd_POS_PID                              1000//0
 #define INTEGRAL_LIMIT_POS_PID                  400000
 
 //PID parameters of the velocity PID controller
