@@ -43,6 +43,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionVelocityCtrlInterface server i_position_control[3])
 {
+
+    //Set freq to 250MHz (always needed for proper timing)
+    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
     int pos_control_mode = 0;
