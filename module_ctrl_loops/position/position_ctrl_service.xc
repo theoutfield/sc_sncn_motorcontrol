@@ -46,9 +46,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                               interface PositionVelocityCtrlInterface server i_position_control[3])
 {
 
-    //Set freq to 250MHz (always needed for proper timing)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
     int pos_control_mode = 0;
@@ -99,8 +96,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     double w_max_ = 100000.00;
 
     double x_=0.00, y_=0.00;
-
-    int USEC_TICKS_ = 250;
 
     unsigned int ts_=0, t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
     ///////////////////////////////////////////////
@@ -278,7 +273,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         else if (pos_control_mode == POS_INTEGRAL_OPTIMUM_CONTROLLER)
                         {
 
-
                             // update feedback data
                             upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
@@ -314,7 +308,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_control_pid_param.Ki /=1000000.00;
                             position_control_pid_param.Kd /=1000000.00;
 
-                            position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
+                            position_ref_input_k_ = 150000;//initial_position_ + downstream_control_data.position_cmd;
                             position_ref_k_ = (double) (position_ref_input_k_);
 
                             position_sens_k_1_ = position_sens_k_;
@@ -419,8 +413,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             if(output_position_ctrl_ < -output_position_ctrl_limit_)
                                 output_position_ctrl_ =-output_position_ctrl_limit_;
 
-
-                            i_motorcontrol.set_torque((int) output_position_ctrl_);
+                            torque_ref_k = 0;//(int) output_position_ctrl_;
+                            //i_motorcontrol.set_torque((int) output_position_ctrl_);
 
 
                         }
@@ -463,6 +457,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                     i_motorcontrol.set_torque((int) torque_ref_k);
                 }
+
+                xscope_int(LOOP_TIME, loop_time_);
+
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(POSITION_REF, (int) (position_ref_k*512));
                 xscope_int(POSITION, (int) (position_sens_k*512));

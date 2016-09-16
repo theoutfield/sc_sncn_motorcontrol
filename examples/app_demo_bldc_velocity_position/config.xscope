@@ -33,4 +33,7 @@
 	<Probe name="VELOCITY FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
 	
+	<Probe name="LOOP_TIME" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	
+	
 </xSCOPEconfig>
