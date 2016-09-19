@@ -56,10 +56,37 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
     PositionControlWithSaturation pos_ctrl_with_saturation;
 
-    double j_   =100.00;//milli-kgm2
-    double k_fb_=0.00;
-    double k_m_ =0.00;
-    double ts_position_=0.00;
+    pos_ctrl_with_saturation.j = 100.00; // in micro-kgm2
+    pos_ctrl_with_saturation.k_fb = 0.00;
+    pos_ctrl_with_saturation.k_m = 0.00;
+    pos_ctrl_with_saturation.ts_position = 0.00;
+
+    pos_ctrl_with_saturation.kp =  0.00;
+    pos_ctrl_with_saturation.ki =  0.00;
+    pos_ctrl_with_saturation.kd =  0.00;
+
+    pos_ctrl_with_saturation.gain_p =  1000.00;
+    pos_ctrl_with_saturation.gain_i =  1000.00;
+    pos_ctrl_with_saturation.gain_d =  1000.00;
+
+    pos_ctrl_with_saturation.feedback_p_loop=0.00;
+    pos_ctrl_with_saturation.feedback_d_loop=0.00;
+    pos_ctrl_with_saturation.gained_error=0.00;
+    pos_ctrl_with_saturation.t_max=0.00;
+
+    pos_ctrl_with_saturation.y_k=0.00;
+    pos_ctrl_with_saturation.y_k_sign=0.00;
+    pos_ctrl_with_saturation.y_k_1=0.00;
+    pos_ctrl_with_saturation.delta_y_k=0.00;
+
+    pos_ctrl_with_saturation.dynamic_max_speed=0.00;
+    pos_ctrl_with_saturation.w_max = 100000.00;
+    pos_ctrl_with_saturation.state_1=0.00;
+    pos_ctrl_with_saturation.state_2=0.00;
+    pos_ctrl_with_saturation.state_3=0.00;
+    pos_ctrl_with_saturation.state_min=0.00;
+
+    pos_ctrl_with_saturation.torque_ref_k=0.00;
 
     int position_enable_flag_ = 0;
     int torque_enable_flag_ = 0;
@@ -68,36 +95,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int initial_position_=0;
     double position_ref_k_ = 0.00;
     double position_sens_k_ = 0.00, position_sens_k_1_=0.00;
-    double k_fb_by_err_=0.00;
 
-    double output_position_ctrl_    =0.00,
-           output_position_ctrl_0_  =0.00,
-           output_position_ctrl_1_  =0.00,
-           abs_output_position_ctrl_n_1_=0.00;
-
-    double output_torque_ctrl_=0.00;
-    double output_position_ctrl_limit_=0.00;
-    double torque_cmd_=0.00;
-    double additive_torque_k_ = 0.00;
-    double t_max_ = 500.00;//milli-Nm
-
-    double feedback_p_ =0.00, feedback_d_=0.00;
-
-    double integral_input_0_=0.00, integral_input_1_=0.00;
-    double integral_output_=0.00;
-    double integral_input_00_=0.00, integral_input_11_=0.00;
-
-    double y_1_k_=0.00, y_1_k_1_=0.00, abs_y_1_k_=0.00, delta_y_1_k_=0.00;
-    double y_1_k_sign_ = 0.00;
-
-    double fp_=0.00;
-    double s1_=0.00, s2_=0.00, s3_=0.00;
-    double min_s_ =0.00;
     int min_s_index_=0;
-
-    double w_max_ = 100000.00;
-
-    double x_=0.00, y_=0.00;
 
     unsigned int ts_=0, t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
     ///////////////////////////////////////////////
@@ -285,36 +284,36 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                              * Other sens:  13bits single turn + 12bits multi turn
                              */
 
-                            k_fb_ = 10429.00;
-                            k_m_  = 0.001;
-                            ts_position_ = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
+                            pos_ctrl_with_saturation.k_fb = 10429.00;
+                            pos_ctrl_with_saturation.k_m  = 0.001;
+                            pos_ctrl_with_saturation.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
                             ////500us
-                            //integral_optimum_pos_ctrl_pid_param.Kp = 39580.00 ; // 9895.00;
-                            //integral_optimum_pos_ctrl_pid_param.Ki = 4003.00  ; // 1001.00;
-                            //integral_optimum_pos_ctrl_pid_param.Kd = 165685.00; //41421.00;
+                            //pos_ctrl_with_saturation.kp = 39580.00 ; // 9895.00;
+                            //pos_ctrl_with_saturation.ki = 4003.00  ; // 1001.00;
+                            //pos_ctrl_with_saturation.kd = 165685.00; //41421.00;
 
                             //1ms
-                            integral_optimum_pos_ctrl_pid_param.Kp =  9895.00;
-                            integral_optimum_pos_ctrl_pid_param.Ki =  1001.00;
-                            integral_optimum_pos_ctrl_pid_param.Kd =  41421.00;
+                            pos_ctrl_with_saturation.kp =  9895.00;
+                            pos_ctrl_with_saturation.ki =  1001.00;
+                            pos_ctrl_with_saturation.kd =  41421.00;
 
-                            integral_optimum_pos_ctrl_pid_param.Kp *= ((double)(pos_velocity_ctrl_config.P_pos_Integral_optimum));
-                            integral_optimum_pos_ctrl_pid_param.Kp /= 1000.00;
+                            pos_ctrl_with_saturation.kp *= (pos_ctrl_with_saturation.gain_p);
+                            pos_ctrl_with_saturation.kp /= 1000.00;
 
-                            integral_optimum_pos_ctrl_pid_param.Ki *= ((double)(pos_velocity_ctrl_config.I_pos_Integral_optimum));
-                            integral_optimum_pos_ctrl_pid_param.Ki /= 1000.00;
+                            pos_ctrl_with_saturation.ki *= (pos_ctrl_with_saturation.gain_i);
+                            pos_ctrl_with_saturation.ki /= 1000.00;
 
-                            integral_optimum_pos_ctrl_pid_param.Kd *= ((double)(pos_velocity_ctrl_config.D_pos_Integral_optimum));
-                            integral_optimum_pos_ctrl_pid_param.Kd /= 1000.00;
+                            pos_ctrl_with_saturation.kd *= (pos_ctrl_with_saturation.gain_d);
+                            pos_ctrl_with_saturation.kd /= 1000.00;
 
-                            integral_optimum_pos_ctrl_pid_param.Kp *= j_;
-                            integral_optimum_pos_ctrl_pid_param.Ki *= j_;
-                            integral_optimum_pos_ctrl_pid_param.Kd *= j_;
+                            pos_ctrl_with_saturation.kp *= pos_ctrl_with_saturation.j;
+                            pos_ctrl_with_saturation.ki *= pos_ctrl_with_saturation.j;
+                            pos_ctrl_with_saturation.kd *= pos_ctrl_with_saturation.j;
 
-                            integral_optimum_pos_ctrl_pid_param.Kp /=1000000.00;
-                            integral_optimum_pos_ctrl_pid_param.Ki /=1000000.00;
-                            integral_optimum_pos_ctrl_pid_param.Kd /=1000000.00;
+                            pos_ctrl_with_saturation.kp /=1000000.00;
+                            pos_ctrl_with_saturation.ki /=1000000.00;
+                            pos_ctrl_with_saturation.kd /=1000000.00;
 
                             position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
 
@@ -324,107 +323,107 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_sens_k_   = (double) (upstream_control_data.position);
 
 
-                            k_fb_by_err_ = position_ref_k_ - position_sens_k_;
+                            pos_ctrl_with_saturation.gained_error = position_ref_k_ - position_sens_k_;
 
-                            feedback_p_  = integral_optimum_pos_ctrl_pid_param.Kp * (position_sens_k_ - position_sens_k_1_);
+                            pos_ctrl_with_saturation.feedback_p_loop  = pos_ctrl_with_saturation.kp * (position_sens_k_ - position_sens_k_1_);
 
-                            delta_y_1_k_ = k_fb_by_err_*integral_optimum_pos_ctrl_pid_param.Ki - feedback_p_;
+                            pos_ctrl_with_saturation.delta_y_k = pos_ctrl_with_saturation.gained_error*pos_ctrl_with_saturation.ki - pos_ctrl_with_saturation.feedback_p_loop;
 
-                            y_1_k_ = delta_y_1_k_ + y_1_k_1_;
+                            pos_ctrl_with_saturation.y_k = pos_ctrl_with_saturation.delta_y_k + pos_ctrl_with_saturation.y_k_1;
 
-                            if(y_1_k_>0)
+                            if(pos_ctrl_with_saturation.y_k>0)
                             {
-                                abs_y_1_k_ = y_1_k_;
-                                y_1_k_sign_= 1;
+                                pos_ctrl_with_saturation.abs_y_k = pos_ctrl_with_saturation.y_k;
+                                pos_ctrl_with_saturation.y_k_sign= 1;
                             }
-                            else if (y_1_k_<0)
+                            else if (pos_ctrl_with_saturation.y_k<0)
                             {
-                                abs_y_1_k_ =-y_1_k_;
-                                y_1_k_sign_=-1;
+                                pos_ctrl_with_saturation.abs_y_k =-pos_ctrl_with_saturation.y_k;
+                                pos_ctrl_with_saturation.y_k_sign=-1;
                             }
-                            else if (y_1_k_ == 0)
+                            else if (pos_ctrl_with_saturation.y_k == 0)
                             {
-                                abs_y_1_k_  = 0;
-                                y_1_k_sign_ = 0;
+                                pos_ctrl_with_saturation.abs_y_k  = 0;
+                                pos_ctrl_with_saturation.y_k_sign = 0;
                             }
 
-                            s1_ = abs_y_1_k_;
+                            pos_ctrl_with_saturation.state_1 = pos_ctrl_with_saturation.abs_y_k;
 
 
-                            t_max_=((double)(pos_velocity_ctrl_config.max_torque));
+                            pos_ctrl_with_saturation.t_max=((double)(pos_velocity_ctrl_config.max_torque));
 
-                            fp_  = (2.00*t_max_)/1000;
+                            pos_ctrl_with_saturation.dynamic_max_speed  = (2.00*pos_ctrl_with_saturation.t_max)/1000;
 
-                            if(k_fb_by_err_>0)       fp_ *=   k_fb_by_err_;
-                            else if(k_fb_by_err_<0)  fp_ *= (-k_fb_by_err_);
-                            else if(k_fb_by_err_==0) fp_  = 0;
+                            if(pos_ctrl_with_saturation.gained_error>0)       pos_ctrl_with_saturation.dynamic_max_speed *=   pos_ctrl_with_saturation.gained_error;
+                            else if(pos_ctrl_with_saturation.gained_error<0)  pos_ctrl_with_saturation.dynamic_max_speed *= (-pos_ctrl_with_saturation.gained_error);
+                            else if(pos_ctrl_with_saturation.gained_error==0) pos_ctrl_with_saturation.dynamic_max_speed  = 0;
 
-                            fp_ /= k_fb_;
+                            pos_ctrl_with_saturation.dynamic_max_speed /= pos_ctrl_with_saturation.k_fb;
 
-                            fp_ *= 1000.00;
-                            fp_ /= (j_/1000.00);
+                            pos_ctrl_with_saturation.dynamic_max_speed *= 1000.00;
+                            pos_ctrl_with_saturation.dynamic_max_speed /= (pos_ctrl_with_saturation.j/1000.00);
 
-                            fp_  = sqrt(fp_);
+                            pos_ctrl_with_saturation.dynamic_max_speed  = sqrt(pos_ctrl_with_saturation.dynamic_max_speed);
 
-                            s2_ = fp_;
+                            pos_ctrl_with_saturation.state_2 = pos_ctrl_with_saturation.dynamic_max_speed;
 
-                            s2_*= integral_optimum_pos_ctrl_pid_param.Kd;
-                            s2_*= ts_position_;
-                            s2_*= k_fb_;
+                            pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.kd;
+                            pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.ts_position;
+                            pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.k_fb;
 
                             //if((abs_output_position_ctrl_n_1/1000.00)<s2)
                             //    s2-=(abs_output_position_ctrl_n_1/1000);
 
-                            s2_*=0.9;
+                            pos_ctrl_with_saturation.state_2*=0.9;
 
 
 
-                            s3_ = w_max_;
-                            s3_*= integral_optimum_pos_ctrl_pid_param.Kd;
-                            s3_*= ts_position_;
-                            s3_*= k_fb_;
+                            pos_ctrl_with_saturation.state_3 = pos_ctrl_with_saturation.w_max;
+                            pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.kd;
+                            pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.ts_position;
+                            pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.k_fb;
 
 
-                            if(s1_<s2_)
+                            if(pos_ctrl_with_saturation.state_1<pos_ctrl_with_saturation.state_2)
                             {
-                                min_s_ = s1_;
+                                pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_1;
                                 min_s_index_=1000;
                             }
                             else
                             {
-                                min_s_ = s2_;
+                                pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_2;
                                 min_s_index_=2000;
                             }
 
-                            if(s3_<min_s_)
+                            if(pos_ctrl_with_saturation.state_3<pos_ctrl_with_saturation.state_min)
                             {
-                                min_s_ = s3_;
+                                pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_3;
                                 min_s_index_=3000;
                             }
 
-                            if(s1_<0 || s2_<0 || s3_<0 || min_s_<0)
+                            if(pos_ctrl_with_saturation.state_1<0 || pos_ctrl_with_saturation.state_2<0 || pos_ctrl_with_saturation.state_3<0 || pos_ctrl_with_saturation.state_min<0)
                             {
-                                printstr(">>   ERROR, NEGATIVE VALUE OF Ss !!!! \n");
+                                printstr(">>   ERROR, NEGATIVE VALUE OF States !!!! \n");
                                 while(1);
                             }
 
-                            y_1_k_ = min_s_ * y_1_k_sign_;
-                            y_1_k_1_ = y_1_k_;
+                            pos_ctrl_with_saturation.y_k = pos_ctrl_with_saturation.state_min * pos_ctrl_with_saturation.y_k_sign;
+                            pos_ctrl_with_saturation.y_k_1 = pos_ctrl_with_saturation.y_k;
 
-                            feedback_d_ = integral_optimum_pos_ctrl_pid_param.Kd * (position_sens_k_ - position_sens_k_1_);
+                            pos_ctrl_with_saturation.feedback_d_loop = pos_ctrl_with_saturation.kd * (position_sens_k_ - position_sens_k_1_);
 
-                            output_position_ctrl_ = y_1_k_ - feedback_d_;
+                            pos_ctrl_with_saturation.torque_ref_k = pos_ctrl_with_saturation.y_k - pos_ctrl_with_saturation.feedback_d_loop;
 
-                            output_position_ctrl_limit_ =((double)(pos_velocity_ctrl_config.max_torque));
+                            pos_ctrl_with_saturation.t_max =((double)(pos_velocity_ctrl_config.max_torque));
 
-                            if(output_position_ctrl_ >  output_position_ctrl_limit_)
-                                output_position_ctrl_ = output_position_ctrl_limit_;
+                            if(pos_ctrl_with_saturation.torque_ref_k >  pos_ctrl_with_saturation.t_max)
+                                pos_ctrl_with_saturation.torque_ref_k = pos_ctrl_with_saturation.t_max;
 
-                            if(output_position_ctrl_ < -output_position_ctrl_limit_)
-                                output_position_ctrl_ =-output_position_ctrl_limit_;
+                            if(pos_ctrl_with_saturation.torque_ref_k < -pos_ctrl_with_saturation.t_max)
+                                pos_ctrl_with_saturation.torque_ref_k =-pos_ctrl_with_saturation.t_max;
 
-                            torque_ref_k = ((int) (output_position_ctrl_));
-                            //i_motorcontrol.set_torque((int) output_position_ctrl_);
+                            torque_ref_k = ((int) (pos_ctrl_with_saturation.torque_ref_k));
+                            //i_motorcontrol.set_torque((int) pos_ctrl_with_saturation.torque_ref_k);
 
                             xscope_int(POSITION_REF_SP3 , ((int)(downstream_control_data.position_cmd)));
                             xscope_int(POSITION_REAL_SP3, ((int)(position_sens_k_ - initial_position_)));
@@ -523,18 +522,17 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 position_ref_k_ = 0;
                 position_sens_k_ = 0;
                 position_sens_k_1_=0;
-                output_position_ctrl_ = 0;
-                additive_torque_k_ = 0;
-                feedback_p_ =0;
-                feedback_d_=0;
+                pos_ctrl_with_saturation.torque_ref_k = 0.00;
+                pos_ctrl_with_saturation.t_additive = 0.00;
+                pos_ctrl_with_saturation.feedback_p_loop =0.00;
+                pos_ctrl_with_saturation.feedback_d_loop=0.00;
                 //////////////////////////////
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
                 //////nonlinear position control
                 downstream_control_data.position_cmd = 0;
-                output_torque_ctrl_=0;
-                additive_torque_k_ = 0;
+                pos_ctrl_with_saturation.t_additive = 0.00;
                 initial_position_ = upstream_control_data.position;
                 ////////////////////////////////
 
@@ -619,7 +617,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
             case i_position_control[int i].set_j(int j):
-                    j_ = ((double)(j));
+                    pos_ctrl_with_saturation.j = ((double)(j));
                     break;
 
 
