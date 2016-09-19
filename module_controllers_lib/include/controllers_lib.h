@@ -185,6 +185,20 @@ void position_control_with_saturation_set_parameters(
         PositionControlWithSaturation &pos_ctrl_with_saturation,
         PosVelocityControlConfig &pos_velocity_ctrl_config);
 
+
+/**
+ * @brief updating the output of position controller with update.
+ * @param output, torque reference in milli-Nm
+ * @param input, setpoint
+ * @param input, feedback
+ */
+int update_position_control_with_saturation(
+        PositionControlWithSaturation &pos_ctrl_with_saturation,
+        double position_ref_k_,
+        double position_sens_k_1_,
+        double position_sens_k_);
+
+
 /**
  * @brief updating the position reference profiler
  * @param output, profiled position calculated for the next step

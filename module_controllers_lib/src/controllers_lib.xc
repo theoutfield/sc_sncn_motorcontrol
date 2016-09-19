@@ -6,6 +6,8 @@
 
 #include <controllers_lib.h>
 #include <control_loops_common.h>
+#include <math.h>
+
 
 
 /**
@@ -227,6 +229,110 @@ void position_control_with_saturation_set_parameters(PositionControlWithSaturati
     pos_ctrl_with_saturation.kd /= 1000.00;
 
     pos_ctrl_with_saturation.t_max=((double)(pos_velocity_ctrl_config.max_torque));
+
+}
+
+
+/**
+ * @brief updating the output of position controller with update.
+ * @param output, torque reference in milli-Nm
+ * @param input, setpoint
+ * @param input, feedback
+ */
+int update_position_control_with_saturation(
+        PositionControlWithSaturation &pos_ctrl_with_saturation,
+        double position_ref_k_,
+        double position_sens_k_1_,
+        double position_sens_k_)
+{
+
+    pos_ctrl_with_saturation.gained_error = position_ref_k_ - position_sens_k_;
+
+    pos_ctrl_with_saturation.feedback_p_loop  = pos_ctrl_with_saturation.kp * (position_sens_k_ - position_sens_k_1_);
+
+    pos_ctrl_with_saturation.delta_y_k = pos_ctrl_with_saturation.gained_error*pos_ctrl_with_saturation.ki - pos_ctrl_with_saturation.feedback_p_loop;
+
+    pos_ctrl_with_saturation.y_k = pos_ctrl_with_saturation.delta_y_k + pos_ctrl_with_saturation.y_k_1;
+
+    if(pos_ctrl_with_saturation.y_k>0)
+    {
+        pos_ctrl_with_saturation.abs_y_k = pos_ctrl_with_saturation.y_k;
+        pos_ctrl_with_saturation.y_k_sign= 1;
+    }
+    else if (pos_ctrl_with_saturation.y_k<0)
+    {
+        pos_ctrl_with_saturation.abs_y_k =-pos_ctrl_with_saturation.y_k;
+        pos_ctrl_with_saturation.y_k_sign=-1;
+    }
+    else if (pos_ctrl_with_saturation.y_k == 0)
+    {
+        pos_ctrl_with_saturation.abs_y_k  = 0;
+        pos_ctrl_with_saturation.y_k_sign = 0;
+    }
+
+    pos_ctrl_with_saturation.state_1 = pos_ctrl_with_saturation.abs_y_k;
+
+    pos_ctrl_with_saturation.dynamic_max_speed  = (2.00*pos_ctrl_with_saturation.t_max)/1000;
+
+    if(pos_ctrl_with_saturation.gained_error>0)
+        pos_ctrl_with_saturation.dynamic_max_speed *=   pos_ctrl_with_saturation.gained_error;
+    else if(pos_ctrl_with_saturation.gained_error<0)
+        pos_ctrl_with_saturation.dynamic_max_speed *= (-pos_ctrl_with_saturation.gained_error);
+    else if(pos_ctrl_with_saturation.gained_error==0)
+        pos_ctrl_with_saturation.dynamic_max_speed  = 0;
+
+    pos_ctrl_with_saturation.dynamic_max_speed /= pos_ctrl_with_saturation.k_fb;
+    pos_ctrl_with_saturation.dynamic_max_speed *= 1000.00;
+    pos_ctrl_with_saturation.dynamic_max_speed /= (pos_ctrl_with_saturation.j/1000.00);
+    pos_ctrl_with_saturation.dynamic_max_speed  = sqrt(pos_ctrl_with_saturation.dynamic_max_speed);
+
+    pos_ctrl_with_saturation.state_2 = pos_ctrl_with_saturation.dynamic_max_speed;
+
+    pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.kd;
+    pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.ts_position;
+    pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.k_fb;
+
+    pos_ctrl_with_saturation.state_2*=0.9;
+
+    pos_ctrl_with_saturation.state_3 = pos_ctrl_with_saturation.w_max;
+    pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.kd;
+    pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.ts_position;
+    pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.k_fb;
+
+
+    if(pos_ctrl_with_saturation.state_1<pos_ctrl_with_saturation.state_2)
+    {
+        pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_1;
+        pos_ctrl_with_saturation.state_index=1000;
+    }
+    else
+    {
+        pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_2;
+        pos_ctrl_with_saturation.state_index=2000;
+    }
+
+    if(pos_ctrl_with_saturation.state_3<pos_ctrl_with_saturation.state_min)
+    {
+        pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_3;
+        pos_ctrl_with_saturation.state_index=3000;
+    }
+
+    pos_ctrl_with_saturation.y_k = pos_ctrl_with_saturation.state_min * pos_ctrl_with_saturation.y_k_sign;
+    pos_ctrl_with_saturation.y_k_1 = pos_ctrl_with_saturation.y_k;
+
+    pos_ctrl_with_saturation.feedback_d_loop = pos_ctrl_with_saturation.kd * (position_sens_k_ - position_sens_k_1_);
+
+    pos_ctrl_with_saturation.torque_ref_k = pos_ctrl_with_saturation.y_k - pos_ctrl_with_saturation.feedback_d_loop;
+
+
+    if(pos_ctrl_with_saturation.torque_ref_k >  pos_ctrl_with_saturation.t_max)
+        pos_ctrl_with_saturation.torque_ref_k = pos_ctrl_with_saturation.t_max;
+
+    if(pos_ctrl_with_saturation.torque_ref_k < -pos_ctrl_with_saturation.t_max)
+        pos_ctrl_with_saturation.torque_ref_k =-pos_ctrl_with_saturation.t_max;
+
+
+    return ((int) (pos_ctrl_with_saturation.torque_ref_k));
 
 }
 
