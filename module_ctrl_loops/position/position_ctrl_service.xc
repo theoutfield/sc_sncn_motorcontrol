@@ -75,13 +75,17 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     pos_ctrl_with_saturation.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
 
-    pos_ctrl_with_saturation.j   = 100.00; // in micro-kgm2
+    pos_ctrl_with_saturation.j   = ((double)(pos_velocity_ctrl_config.j)); //s
     pos_ctrl_with_saturation.kp *= pos_ctrl_with_saturation.j;
     pos_ctrl_with_saturation.ki *= pos_ctrl_with_saturation.j;
     pos_ctrl_with_saturation.kd *= pos_ctrl_with_saturation.j;
     pos_ctrl_with_saturation.kp /=1000000.00;
     pos_ctrl_with_saturation.ki /=1000000.00;
     pos_ctrl_with_saturation.kd /=1000000.00;
+
+    pos_ctrl_with_saturation.gain_p = ((double)(pos_velocity_ctrl_config.gain_p));
+    pos_ctrl_with_saturation.gain_i = ((double)(pos_velocity_ctrl_config.gain_i));
+    pos_ctrl_with_saturation.gain_d = ((double)(pos_velocity_ctrl_config.gain_d));
 
     pos_ctrl_with_saturation.kp *= (pos_ctrl_with_saturation.gain_p);
     pos_ctrl_with_saturation.kp /= 1000.00;

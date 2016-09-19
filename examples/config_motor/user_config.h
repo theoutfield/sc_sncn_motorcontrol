@@ -390,6 +390,12 @@
 #define K_FB                   10429000
 #define K_M                    1
 
+#define MOMENT_OF_INERTIA      100 //[micro-kgm2]
+
+#define GAIN_P      1000
+#define GAIN_I      1000
+#define GAIN_D      1000
+
 
 
 // Foresight: Joint 1 Position Controller Config

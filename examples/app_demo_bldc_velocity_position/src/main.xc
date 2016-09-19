@@ -89,8 +89,14 @@ int main(void) {
             pos_velocity_ctrl_config.I_saturated_position_controller =      Ki_SATURATED_POS_CONTROL;
             pos_velocity_ctrl_config.D_saturated_position_controller =      Kd_SATURATED_POS_CONTROL;
 
+            pos_velocity_ctrl_config.gain_p =                               GAIN_P;
+            pos_velocity_ctrl_config.gain_i =                               GAIN_I;
+            pos_velocity_ctrl_config.gain_d =                               GAIN_D;
+
             pos_velocity_ctrl_config.k_fb =                                 K_FB;
             pos_velocity_ctrl_config.k_m =                                  K_M;
+
+            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
         }
