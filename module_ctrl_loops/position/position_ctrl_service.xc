@@ -56,39 +56,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
     PositionControlWithSaturation pos_ctrl_with_saturation;
 
-    //************************************************
-    // reset position controller structure
-    pos_ctrl_with_saturation.j = 1.00; // in micro-kgm2
-    pos_ctrl_with_saturation.k_fb = 0.00;
-    pos_ctrl_with_saturation.k_m = 0.00;
-    pos_ctrl_with_saturation.ts_position = 0.00;
-
-    pos_ctrl_with_saturation.kp =  0.00;
-    pos_ctrl_with_saturation.ki =  0.00;
-    pos_ctrl_with_saturation.kd =  0.00;
-
-    pos_ctrl_with_saturation.gain_p =  1000.00;
-    pos_ctrl_with_saturation.gain_i =  1000.00;
-    pos_ctrl_with_saturation.gain_d =  1000.00;
-
-    pos_ctrl_with_saturation.feedback_p_loop=0.00;
-    pos_ctrl_with_saturation.feedback_d_loop=0.00;
-    pos_ctrl_with_saturation.gained_error=0.00;
-    pos_ctrl_with_saturation.t_max=0.00;
-
-    pos_ctrl_with_saturation.y_k=0.00;
-    pos_ctrl_with_saturation.y_k_sign=0.00;
-    pos_ctrl_with_saturation.y_k_1=0.00;
-    pos_ctrl_with_saturation.delta_y_k=0.00;
-
-    pos_ctrl_with_saturation.dynamic_max_speed=0.00;
-    pos_ctrl_with_saturation.w_max = 0.00;
-    pos_ctrl_with_saturation.state_1=0.00;
-    pos_ctrl_with_saturation.state_2=0.00;
-    pos_ctrl_with_saturation.state_3=0.00;
-    pos_ctrl_with_saturation.state_min=0.00;
-
-    pos_ctrl_with_saturation.torque_ref_k=0.00;
+    position_control_with_saturation_reset(pos_ctrl_with_saturation);
 
 
 

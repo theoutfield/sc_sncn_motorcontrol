@@ -168,6 +168,12 @@ float integral_optimum_pos_controller_updat(float desired_value, float actual_va
 void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &param);
 
 
+/**
+ * @brief resetting the parameters of the position controller with saturation.
+ * @param the parameters of the controller
+ */
+void position_control_with_saturation_reset(PositionControlWithSaturation &pos_ctrl_with_saturation);
+
 
 /**
  * @brief updating the position reference profiler
