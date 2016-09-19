@@ -101,11 +101,12 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
     unsigned int singleturn_raw;
     unsigned start_time, end_time;
     timer t;
-    int offset = -1;
+    int offset = 0;
 
     delay_milliseconds(500);
     PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
     printstr(">>   SOMANET CONTELEC SENSOR COMMANDS SERVICE STARTING...\n");
+    i_motorcontrol.set_torque_control_enabled();
 
     while(1) {
         char mode = 0;

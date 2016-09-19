@@ -39,13 +39,14 @@ void reset_spi_ports(SPIPorts &spi_ports)
     set_port_use_on(spi_ports.spi_interface.sclk);
 }
 
-int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw) {
-    int computed_checksum = 0x5a ^ (1 + (singleturn_raw & 0xff)) ^ (2 + (singleturn_raw >> 8)) ^ (3 + (singleturn_filtered & 0xff)) ^ (4 + (singleturn_filtered >> 8)) ^ (5 + (count & 0xff)) ^ (6 + (count >> 8));
-    return computed_checksum & 0xff;
+int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw, unsigned timestamp) {
+//    int computed_checksum = 0x5a ^ (1 + (singleturn_raw & 0xff)) ^ (2 + (singleturn_raw >> 8)) ^ (3 + (singleturn_filtered & 0xff)) ^ (4 + (singleturn_filtered >> 8)) ^ (5 + (count & 0xff)) ^ (6 + (count >> 8));
+    int computed_checksum = 0x5a ^ (1 + (timestamp & 0xff)) ^ (2 + (singleturn_raw & 0xff)) ^ (3 + (singleturn_raw >> 8)) ^ (4 + (singleturn_filtered & 0xff)) ^ (5 + (singleturn_filtered >> 8)) ^ (6 + (count & 0xff)) ^ (7 + (count >> 8));
+return computed_checksum & 0xff;
 }
 
-{unsigned, unsigned, unsigned} checksum_correct(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw, unsigned checksum) {
-    if (checksum_compute(count, singleturn_filtered, singleturn_raw) == checksum) {
+{unsigned, unsigned, unsigned} checksum_correct(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw, unsigned timestamp, unsigned checksum) {
+    if (checksum_compute(count, singleturn_filtered, singleturn_raw, timestamp) == checksum) {
         return {count, singleturn_filtered, singleturn_raw};
     }
 
@@ -56,7 +57,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 
     for (int i=0 ; i<16 ; i++) {
         count = orig_count ^ mask;
-        if (checksum_compute(count, singleturn_filtered, singleturn_raw) == checksum) {
+        if (checksum_compute(count, singleturn_filtered, singleturn_raw, timestamp) == checksum) {
             return {count, singleturn_filtered, singleturn_raw};
         }
         mask = mask << 1;
@@ -71,7 +72,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     singleturn_filtered = orig_singleturn_filtered;
     for (int i=0 ; i<16 ; i++) {
         singleturn_raw = orig_singleturn_raw ^ mask;
-        if (checksum_compute(count, singleturn_filtered, singleturn_raw) == checksum) {
+        if (checksum_compute(count, singleturn_filtered, singleturn_raw, timestamp) == checksum) {
             return {count, singleturn_filtered, singleturn_raw};
         }
         mask = mask << 1;
@@ -80,7 +81,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     return {orig_count, orig_singleturn_filtered, orig_singleturn_raw};
 }
 
-{ char, int, unsigned int, unsigned int } contelec_encoder_read(SPIPorts &spi_ports)
+{ char, int, unsigned int, unsigned int, unsigned int } contelec_encoder_read(SPIPorts &spi_ports)
 {
     char status;
     int count;
@@ -88,6 +89,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     unsigned int singleturn_raw;
     unsigned int checksum;
     unsigned int computed_checksum;
+    unsigned int timestamp;
     unsigned int try_count = 0;
     timer t;
     unsigned last_read;
@@ -102,10 +104,11 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
         count = spi_master_in_short(spi_ports.spi_interface);
         singleturn_filtered = spi_master_in_short(spi_ports.spi_interface);
         singleturn_raw = spi_master_in_short(spi_ports.spi_interface);
+        timestamp = spi_master_in_byte(spi_ports.spi_interface);
         checksum = spi_master_in_byte(spi_ports.spi_interface);
         slave_deselect(spi_ports.slave_select);
         t :> last_read;
-        computed_checksum = checksum_compute(count, singleturn_filtered, singleturn_raw);
+        computed_checksum = checksum_compute(count, singleturn_filtered, singleturn_raw, timestamp);
         try_count++;
     } while(computed_checksum != checksum && try_count <= 3);
 
@@ -116,7 +119,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     xscope_int(CHECKSUM_ERROR, (try_count-1)*1000);
 #endif
 
-    return { status, count, singleturn_filtered, singleturn_raw };
+    return { status, count, singleturn_filtered, singleturn_raw, timestamp };
 }
 
 
@@ -147,7 +150,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     //reset
     contelec_encoder_write(spi_ports, CONTELEC_CTRL_RESET, 0, 0);
     //read status
-    { status, void, void, void } = contelec_encoder_read(spi_ports);
+    { status, void, void, void, void } = contelec_encoder_read(spi_ports);
     delay_ticks(100*CONTELEC_USEC);
     if (status != 0)
         return status;
@@ -158,7 +161,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
         contelec_encoder_write(spi_ports, CONTELEC_CONF_DIR, 0, 8);
     //offset
     int position;
-    { void, void, position, void } = contelec_encoder_read(spi_ports); //read actual position
+    { void, void, position, void, void } = contelec_encoder_read(spi_ports); //read actual position
     delay_ticks(100*CONTELEC_USEC);
     contelec_encoder_write(spi_ports, CONTELEC_CONF_STPRESET, (position + contelec_config.offset) & 65535, 16); //write singleturn
     //filter
@@ -167,7 +170,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     }
     contelec_encoder_write(spi_ports, CONTELEC_CONF_FILTER, contelec_config.filter, 8);
     //read status
-    { status, void, void, void } = contelec_encoder_read(spi_ports);
+    { status, void, void, void, void } = contelec_encoder_read(spi_ports);
     delay_ticks(100*CONTELEC_USEC);
     return status;
 }
@@ -224,10 +227,14 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     //init variables
     //velocity
     int velocity = 0;
+    int velocity2 = 0;
     int velocity_buffer[32] = {0};
+    int velocity_buffer2[32] = {0};
     int index = 0;
+    int index2 = 0;
     int old_count = 0;
     int old_difference = 0;
+    unsigned int old_timestamp = 0;
     int ticks_per_turn = (1 << position_feedback_config.contelec_config.resolution_bits);
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC; //velocity loop time in clock ticks
@@ -254,7 +261,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
 
     //first read
     delay_ticks(100 * CONTELEC_USEC);
-    { void, count, last_position, void } = contelec_encoder_read(spi_ports);
+    { void, count, last_position, void, void } = contelec_encoder_read(spi_ports);
     t :> last_read;
 
     //main loop
@@ -268,7 +275,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
         //send electrical angle for commutation
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                { void, count, last_position, angle } = contelec_encoder_read(spi_ports);
+                { void, count, last_position, angle, void } = contelec_encoder_read(spi_ports);
                 t :> last_read;
                 if (position_feedback_config.contelec_config.resolution_bits > 12)
                     angle = (position_feedback_config.contelec_config.pole_pairs * (angle >> (position_feedback_config.contelec_config.resolution_bits-12)) ) & 4095;
@@ -279,7 +286,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
         //send multiturn count and position
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position }:
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                { void, count, position, void } = contelec_encoder_read(spi_ports);
+                { void, count, position, void, void } = contelec_encoder_read(spi_ports);
                 t :> last_read;
                 last_position = position;
                 out_count = count;
@@ -290,7 +297,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
                 unsigned start_time;
                 t :> start_time;
-                { status, out_count, position, void } = contelec_encoder_read(spi_ports);
+                { status, out_count, position, void, void } = contelec_encoder_read(spi_ports);
                 t :> last_read;
 //                status = (last_read-start_time)/CONTELEC_USEC;
 //                status = measurement_time;
@@ -370,10 +377,10 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
                 contelec_encoder_write(spi_ports, CONTELEC_CTRL_RESET, 0, 0);//reset
                 int real_position;
-                { void, void, real_position, void } = contelec_encoder_read(spi_ports);
+                { void, void, real_position, void, void } = contelec_encoder_read(spi_ports);
                 delay_ticks(position_feedback_config.contelec_config.timeout);
                 contelec_encoder_write(spi_ports, CONTELEC_CONF_STPRESET, new_angle / position_feedback_config.contelec_config.pole_pairs, 16);
-                { void, void, out_offset, void } = contelec_encoder_read(spi_ports);
+                { void, void, out_offset, void, void } = contelec_encoder_read(spi_ports);
                 t :> last_read;
                 out_offset = (out_offset - real_position) & (ticks_per_turn-1);
                 position_feedback_config.contelec_config.offset = out_offset;
@@ -383,7 +390,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
                 contelec_encoder_write(spi_ports, opcode, data, data_bits);
-                { status, void, void, void } = contelec_encoder_read(spi_ports);
+                { status, void, void, void, void } = contelec_encoder_read(spi_ports);
                 t :> last_read;
                 break;
 
@@ -396,9 +403,9 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
         case t when timerafter(next_velocity_read) :> start_time:
             next_velocity_read += velocity_loop;
             int position, difference;
-            unsigned int angle, status;
+            unsigned int angle, status, timestamp;
             t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-            { status, count, position, angle } = contelec_encoder_read(spi_ports);
+            { status, count, position, angle, timestamp } = contelec_encoder_read(spi_ports);
             t :> last_read;
             last_position = position;
 
@@ -406,25 +413,38 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
 //            if (velocity_count >= 1) {
                 difference = count - old_count;
                 old_count = count;
-                if(difference > crossover || difference < -crossover)
-                    difference = old_difference;
-                else if (difference == 0) //in case we read the same value two times
-                    difference = old_difference;
+//                if(difference > crossover || difference < -crossover)
+//                    difference = old_difference;
+//                else if (difference == 0) //in case we read the same value two times
+//                    difference = old_difference;
                 old_difference = difference;
                 // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
                 //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-                velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
+                if (difference != 0)
+                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
                 last_velocity_read = last_read;
+                unsigned int timedif = 0;
+                if (old_timestamp <= timestamp)
+                    timedif = timestamp-old_timestamp;
+                else
+                    timedif = 256+timestamp-old_timestamp;
+                old_timestamp = timestamp;
+                if (timedif != 0 && timedif > 58)
+                    velocity2 = (difference * (60000000/((int)timedif))) / ticks_per_turn;
+//                    velocity2 = difference;
                 /* filter */
-                velocity = filter(velocity_buffer, index, 32, velocity);
+//                velocity = filter(velocity_buffer2, index2, 32, velocity);
+//                velocity2 = filter(velocity_buffer, index, 32, velocity2);
 //                velocity_count = 0;
 //            }
 
 #ifdef XSCOPE_CONTELEC
             xscope_int(VELOCITY, velocity);
+            xscope_int(VELOCITY2, velocity2);
             xscope_int(POSITION, position);
             xscope_int(POSITION_RAW, angle);
             xscope_int(STATUS, status*1000);
+            xscope_int(TIMESTAMP, timedif);
             xscope_int(PERIOD, (int)(last_read-period_time)/CONTELEC_USEC);
             period_time = last_read;
 #endif
