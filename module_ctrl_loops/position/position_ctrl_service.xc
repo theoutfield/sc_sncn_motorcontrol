@@ -63,8 +63,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
     //************************************************
     // set parameters of position controller structure
-    pos_ctrl_with_saturation.w_max = 100000.00;
-    pos_ctrl_with_saturation.k_fb = 10429.00;
+    pos_ctrl_with_saturation.w_max = (((double)(pos_velocity_ctrl_config.max_speed))*2.00*3.1415)/60;
+    pos_ctrl_with_saturation.k_fb = pos_velocity_ctrl_config.k_fb;
     pos_ctrl_with_saturation.k_m  = 0.001;
 
     //1ms

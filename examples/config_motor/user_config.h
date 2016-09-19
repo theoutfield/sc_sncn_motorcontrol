@@ -381,6 +381,8 @@
 #define POSITION_FC             100
 #define VELOCITY_FC             90
 
+#define K_FB                    10429.00
+
 
 // Foresight: Joint 1 Position Controller Config
 //**motor offset: 2040
