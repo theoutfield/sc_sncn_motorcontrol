@@ -283,13 +283,19 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                              * Other sens:  13bits single turn + 12bits multi turn
                              */
 
-                            k_fb_ = 10429;
+                            k_fb_ = 10429.00;
                             k_m_  = 0.001;
                             ts_position_ = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
-                            integral_optimum_pos_ctrl_pid_param.Kp = 9895.00;
-                            integral_optimum_pos_ctrl_pid_param.Ki = 1001.00;
-                            integral_optimum_pos_ctrl_pid_param.Kd = 41421.00;
+                            ////500us
+                            //integral_optimum_pos_ctrl_pid_param.Kp = 39580.00 ; // 9895.00;
+                            //integral_optimum_pos_ctrl_pid_param.Ki = 4003.00  ; // 1001.00;
+                            //integral_optimum_pos_ctrl_pid_param.Kd = 165685.00; //41421.00;
+
+                            //1ms
+                            integral_optimum_pos_ctrl_pid_param.Kp =  9895.00;
+                            integral_optimum_pos_ctrl_pid_param.Ki =  1001.00;
+                            integral_optimum_pos_ctrl_pid_param.Kd =  41421.00;
 
                             integral_optimum_pos_ctrl_pid_param.Kp *= ((double)(pos_velocity_ctrl_config.P_pos_Integral_optimum));
                             integral_optimum_pos_ctrl_pid_param.Kp /= 1000.00;
@@ -417,6 +423,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             torque_ref_k = ((int) (output_position_ctrl_));
                             //i_motorcontrol.set_torque((int) output_position_ctrl_);
+
+                            xscope_int(POSITION_REF_SP3 , ((int)(downstream_control_data.position_cmd)));
+                            xscope_int(POSITION_REAL_SP3, ((int)(position_sens_k_ - initial_position_)));
+
 
 
                         }
