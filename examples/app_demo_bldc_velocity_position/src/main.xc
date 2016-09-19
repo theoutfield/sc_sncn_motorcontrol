@@ -86,6 +86,7 @@ int main(void) {
             pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
 
             pos_velocity_ctrl_config.k_fb =                                 K_FB;
+            pos_velocity_ctrl_config.k_m =                                  K_M;
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
         }

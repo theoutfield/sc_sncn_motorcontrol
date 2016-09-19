@@ -66,7 +66,8 @@ typedef struct {
     int position_fc;
     int velocity_fc;
 
-    double k_fb; //position feedback gain [tick/rad]
+    int k_fb; //position feedback gain [milli-ticks/rad]
+    int k_m;  //gain of torque actuator
 
 } PosVelocityControlConfig;
 

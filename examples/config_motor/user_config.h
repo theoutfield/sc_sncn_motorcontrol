@@ -381,7 +381,9 @@
 #define POSITION_FC             100
 #define VELOCITY_FC             90
 
-#define K_FB                    10429.00
+#define K_FB                   10429000
+#define K_M                    1
+
 
 
 // Foresight: Joint 1 Position Controller Config
