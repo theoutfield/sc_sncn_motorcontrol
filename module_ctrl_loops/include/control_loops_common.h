@@ -25,7 +25,7 @@ typedef struct {
 
 #define POS_PID_CONTROLLER                      101
 #define POS_PID_VELOCITY_CASCADED_CONTROLLER    102
-#define POS_INTEGRAL_OPTIMUM_CONTROLLER         103
+#define POS_WITH_SATURATION_CONTROLLER         103
 #define VELOCITY_PID_CONTROLLER                 201
 
 

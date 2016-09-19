@@ -271,7 +271,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_cmd_k = pid_update(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                             velocity_ref_k = (position_cmd_k / 512);
                         }
-                        else if (pos_control_mode == POS_INTEGRAL_OPTIMUM_CONTROLLER)
+                        else if (pos_control_mode == POS_WITH_SATURATION_CONTROLLER)
                         {
 
                             // update feedback data
