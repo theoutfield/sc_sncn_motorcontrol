@@ -85,6 +85,10 @@ int main(void) {
             pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
             pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
 
+            pos_velocity_ctrl_config.P_saturated_position_controller =      Kp_SATURATED_POS_CONTROL;
+            pos_velocity_ctrl_config.I_saturated_position_controller =      Ki_SATURATED_POS_CONTROL;
+            pos_velocity_ctrl_config.D_saturated_position_controller =      Kd_SATURATED_POS_CONTROL;
+
             pos_velocity_ctrl_config.k_fb =                                 K_FB;
             pos_velocity_ctrl_config.k_m =                                  K_M;
 

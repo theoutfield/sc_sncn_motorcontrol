@@ -68,14 +68,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     pos_ctrl_with_saturation.k_m  = ((double)(pos_velocity_ctrl_config.k_m))/1000.00;
 
     //1ms
-    pos_ctrl_with_saturation.kp =  9895.00;
-    pos_ctrl_with_saturation.ki =  1001.00;
-    pos_ctrl_with_saturation.kd =  41421.00;
-
-    ////500us
-    //pos_ctrl_with_saturation.kp = 39580.00 ;
-    //pos_ctrl_with_saturation.ki = 4003.00  ;
-    //pos_ctrl_with_saturation.kd = 165685.00;
+    pos_ctrl_with_saturation.kp =  ((double)(pos_velocity_ctrl_config.P_saturated_position_controller))/100.00;
+    pos_ctrl_with_saturation.ki =  ((double)(pos_velocity_ctrl_config.I_saturated_position_controller))/100.00;
+    pos_ctrl_with_saturation.kd =  ((double)(pos_velocity_ctrl_config.D_saturated_position_controller))/100.00;
 
     pos_ctrl_with_saturation.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 

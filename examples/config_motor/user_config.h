@@ -376,6 +376,12 @@
 #define Kp_POS_INTEGRAL_OPTIMUM                 1000
 #define Ki_POS_INTEGRAL_OPTIMUM                 1000
 #define Kd_POS_INTEGRAL_OPTIMUM                 1000
+
+//PID parameters of the Integral Optimum position controller
+#define Kp_SATURATED_POS_CONTROL                989500
+#define Ki_SATURATED_POS_CONTROL                100100
+#define Kd_SATURATED_POS_CONTROL                4142100
+
 #define INTEGRAL_LIMIT_POS_INTEGRAL_OPTIMUM     1500000
 
 #define POSITION_FC             100
