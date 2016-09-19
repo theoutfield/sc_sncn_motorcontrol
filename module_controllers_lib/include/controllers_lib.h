@@ -3,6 +3,8 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
+#include <control_loops_common.h>
+
 #pragma once
 
 
@@ -174,6 +176,14 @@ void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &pa
  */
 void position_control_with_saturation_reset(PositionControlWithSaturation &pos_ctrl_with_saturation);
 
+
+/**
+ * @brief resetting the parameters of the position controller with saturation.
+ * @param the parameters of the controller
+ */
+void position_control_with_saturation_set_parameters(
+        PositionControlWithSaturation &pos_ctrl_with_saturation,
+        PosVelocityControlConfig &pos_velocity_ctrl_config);
 
 /**
  * @brief updating the position reference profiler

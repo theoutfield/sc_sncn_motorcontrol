@@ -57,52 +57,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     PositionControlWithSaturation pos_ctrl_with_saturation;
 
     position_control_with_saturation_reset(pos_ctrl_with_saturation);
-
-
-
-
-    //************************************************
-    // set parameters of position controller structure
-    pos_ctrl_with_saturation.w_max = (((double)(pos_velocity_ctrl_config.max_speed))*2.00*3.1415)/60;
-    pos_ctrl_with_saturation.k_fb =((double)(pos_velocity_ctrl_config.k_fb))/1000.00;
-    pos_ctrl_with_saturation.k_m  = ((double)(pos_velocity_ctrl_config.k_m))/1000.00;
-
-    //1ms
-    pos_ctrl_with_saturation.kp =  ((double)(pos_velocity_ctrl_config.P_saturated_position_controller))/100.00;
-    pos_ctrl_with_saturation.ki =  ((double)(pos_velocity_ctrl_config.I_saturated_position_controller))/100.00;
-    pos_ctrl_with_saturation.kd =  ((double)(pos_velocity_ctrl_config.D_saturated_position_controller))/100.00;
-
-    pos_ctrl_with_saturation.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
-
-
-    pos_ctrl_with_saturation.j   = ((double)(pos_velocity_ctrl_config.j)); //s
-    pos_ctrl_with_saturation.kp *= pos_ctrl_with_saturation.j;
-    pos_ctrl_with_saturation.ki *= pos_ctrl_with_saturation.j;
-    pos_ctrl_with_saturation.kd *= pos_ctrl_with_saturation.j;
-    pos_ctrl_with_saturation.kp /=1000000.00;
-    pos_ctrl_with_saturation.ki /=1000000.00;
-    pos_ctrl_with_saturation.kd /=1000000.00;
-
-    pos_ctrl_with_saturation.gain_p = ((double)(pos_velocity_ctrl_config.gain_p));
-    pos_ctrl_with_saturation.gain_i = ((double)(pos_velocity_ctrl_config.gain_i));
-    pos_ctrl_with_saturation.gain_d = ((double)(pos_velocity_ctrl_config.gain_d));
-
-    pos_ctrl_with_saturation.kp *= (pos_ctrl_with_saturation.gain_p);
-    pos_ctrl_with_saturation.kp /= 1000.00;
-    pos_ctrl_with_saturation.ki *= (pos_ctrl_with_saturation.gain_i);
-    pos_ctrl_with_saturation.ki /= 1000.00;
-    pos_ctrl_with_saturation.kd *= (pos_ctrl_with_saturation.gain_d);
-    pos_ctrl_with_saturation.kd /= 1000.00;
-
-    pos_ctrl_with_saturation.t_max=((double)(pos_velocity_ctrl_config.max_torque));
-
-
-
-
-
-
-
-
+    position_control_with_saturation_set_parameters(pos_ctrl_with_saturation, pos_velocity_ctrl_config);
 
     int position_enable_flag_ = 0;
     int torque_enable_flag_ = 0;
