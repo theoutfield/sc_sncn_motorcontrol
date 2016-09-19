@@ -56,7 +56,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
     PositionControlWithSaturation pos_ctrl_with_saturation;
 
-    pos_ctrl_with_saturation.j = 100.00; // in micro-kgm2
+    //************************************************
+    // reset position controller structure
+    pos_ctrl_with_saturation.j = 1.00; // in micro-kgm2
     pos_ctrl_with_saturation.k_fb = 0.00;
     pos_ctrl_with_saturation.k_m = 0.00;
     pos_ctrl_with_saturation.ts_position = 0.00;
@@ -80,13 +82,60 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     pos_ctrl_with_saturation.delta_y_k=0.00;
 
     pos_ctrl_with_saturation.dynamic_max_speed=0.00;
-    pos_ctrl_with_saturation.w_max = 100000.00;
+    pos_ctrl_with_saturation.w_max = 0.00;
     pos_ctrl_with_saturation.state_1=0.00;
     pos_ctrl_with_saturation.state_2=0.00;
     pos_ctrl_with_saturation.state_3=0.00;
     pos_ctrl_with_saturation.state_min=0.00;
 
     pos_ctrl_with_saturation.torque_ref_k=0.00;
+
+
+
+
+    //************************************************
+    // set parameters of position controller structure
+    pos_ctrl_with_saturation.w_max = 100000.00;
+    pos_ctrl_with_saturation.k_fb = 10429.00;
+    pos_ctrl_with_saturation.k_m  = 0.001;
+
+    //1ms
+    pos_ctrl_with_saturation.kp =  9895.00;
+    pos_ctrl_with_saturation.ki =  1001.00;
+    pos_ctrl_with_saturation.kd =  41421.00;
+
+    ////500us
+    //pos_ctrl_with_saturation.kp = 39580.00 ;
+    //pos_ctrl_with_saturation.ki = 4003.00  ;
+    //pos_ctrl_with_saturation.kd = 165685.00;
+
+    pos_ctrl_with_saturation.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
+
+
+    pos_ctrl_with_saturation.j   = 100.00; // in micro-kgm2
+    pos_ctrl_with_saturation.kp *= pos_ctrl_with_saturation.j;
+    pos_ctrl_with_saturation.ki *= pos_ctrl_with_saturation.j;
+    pos_ctrl_with_saturation.kd *= pos_ctrl_with_saturation.j;
+    pos_ctrl_with_saturation.kp /=1000000.00;
+    pos_ctrl_with_saturation.ki /=1000000.00;
+    pos_ctrl_with_saturation.kd /=1000000.00;
+
+    pos_ctrl_with_saturation.kp *= (pos_ctrl_with_saturation.gain_p);
+    pos_ctrl_with_saturation.kp /= 1000.00;
+    pos_ctrl_with_saturation.ki *= (pos_ctrl_with_saturation.gain_i);
+    pos_ctrl_with_saturation.ki /= 1000.00;
+    pos_ctrl_with_saturation.kd *= (pos_ctrl_with_saturation.gain_d);
+    pos_ctrl_with_saturation.kd /= 1000.00;
+
+    pos_ctrl_with_saturation.t_max=((double)(pos_velocity_ctrl_config.max_torque));
+
+
+
+
+
+
+
+
 
     int position_enable_flag_ = 0;
     int torque_enable_flag_ = 0;
@@ -274,46 +323,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         else if (pos_control_mode == POS_WITH_SATURATION_CONTROLLER)
                         {
 
+                            //************************************************
                             // update feedback data
                             upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
-                            /*
-                             * CONTELEC:    16bits single turn + 12bits multi turn
-                             * BISS-MABI:   18bits signle turn + 10bits multi turn
-                             * AMS:         14bits single turn + 18bits multi turn
-                             * Other sens:  13bits single turn + 12bits multi turn
-                             */
-
-                            pos_ctrl_with_saturation.k_fb = 10429.00;
-                            pos_ctrl_with_saturation.k_m  = 0.001;
-                            pos_ctrl_with_saturation.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
-
-                            ////500us
-                            //pos_ctrl_with_saturation.kp = 39580.00 ; // 9895.00;
-                            //pos_ctrl_with_saturation.ki = 4003.00  ; // 1001.00;
-                            //pos_ctrl_with_saturation.kd = 165685.00; //41421.00;
-
-                            //1ms
-                            pos_ctrl_with_saturation.kp =  9895.00;
-                            pos_ctrl_with_saturation.ki =  1001.00;
-                            pos_ctrl_with_saturation.kd =  41421.00;
-
-                            pos_ctrl_with_saturation.kp *= (pos_ctrl_with_saturation.gain_p);
-                            pos_ctrl_with_saturation.kp /= 1000.00;
-
-                            pos_ctrl_with_saturation.ki *= (pos_ctrl_with_saturation.gain_i);
-                            pos_ctrl_with_saturation.ki /= 1000.00;
-
-                            pos_ctrl_with_saturation.kd *= (pos_ctrl_with_saturation.gain_d);
-                            pos_ctrl_with_saturation.kd /= 1000.00;
-
-                            pos_ctrl_with_saturation.kp *= pos_ctrl_with_saturation.j;
-                            pos_ctrl_with_saturation.ki *= pos_ctrl_with_saturation.j;
-                            pos_ctrl_with_saturation.kd *= pos_ctrl_with_saturation.j;
-
-                            pos_ctrl_with_saturation.kp /=1000000.00;
-                            pos_ctrl_with_saturation.ki /=1000000.00;
-                            pos_ctrl_with_saturation.kd /=1000000.00;
 
                             position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
 
@@ -322,6 +334,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_sens_k_1_ = position_sens_k_;
                             position_sens_k_   = (double) (upstream_control_data.position);
 
+
+                            // apply position control algorithm
 
                             pos_ctrl_with_saturation.gained_error = position_ref_k_ - position_sens_k_;
 
@@ -349,20 +363,18 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             pos_ctrl_with_saturation.state_1 = pos_ctrl_with_saturation.abs_y_k;
 
-
-                            pos_ctrl_with_saturation.t_max=((double)(pos_velocity_ctrl_config.max_torque));
-
                             pos_ctrl_with_saturation.dynamic_max_speed  = (2.00*pos_ctrl_with_saturation.t_max)/1000;
 
-                            if(pos_ctrl_with_saturation.gained_error>0)       pos_ctrl_with_saturation.dynamic_max_speed *=   pos_ctrl_with_saturation.gained_error;
-                            else if(pos_ctrl_with_saturation.gained_error<0)  pos_ctrl_with_saturation.dynamic_max_speed *= (-pos_ctrl_with_saturation.gained_error);
-                            else if(pos_ctrl_with_saturation.gained_error==0) pos_ctrl_with_saturation.dynamic_max_speed  = 0;
+                            if(pos_ctrl_with_saturation.gained_error>0)
+                                pos_ctrl_with_saturation.dynamic_max_speed *=   pos_ctrl_with_saturation.gained_error;
+                            else if(pos_ctrl_with_saturation.gained_error<0)
+                                pos_ctrl_with_saturation.dynamic_max_speed *= (-pos_ctrl_with_saturation.gained_error);
+                            else if(pos_ctrl_with_saturation.gained_error==0)
+                                pos_ctrl_with_saturation.dynamic_max_speed  = 0;
 
                             pos_ctrl_with_saturation.dynamic_max_speed /= pos_ctrl_with_saturation.k_fb;
-
                             pos_ctrl_with_saturation.dynamic_max_speed *= 1000.00;
                             pos_ctrl_with_saturation.dynamic_max_speed /= (pos_ctrl_with_saturation.j/1000.00);
-
                             pos_ctrl_with_saturation.dynamic_max_speed  = sqrt(pos_ctrl_with_saturation.dynamic_max_speed);
 
                             pos_ctrl_with_saturation.state_2 = pos_ctrl_with_saturation.dynamic_max_speed;
@@ -371,12 +383,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.ts_position;
                             pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.k_fb;
 
-                            //if((abs_output_position_ctrl_n_1/1000.00)<s2)
-                            //    s2-=(abs_output_position_ctrl_n_1/1000);
-
                             pos_ctrl_with_saturation.state_2*=0.9;
-
-
 
                             pos_ctrl_with_saturation.state_3 = pos_ctrl_with_saturation.w_max;
                             pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.kd;
@@ -387,21 +394,22 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             if(pos_ctrl_with_saturation.state_1<pos_ctrl_with_saturation.state_2)
                             {
                                 pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_1;
-                                min_s_index_=1000;
+                                pos_ctrl_with_saturation.state_index=1000;
                             }
                             else
                             {
                                 pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_2;
-                                min_s_index_=2000;
+                                pos_ctrl_with_saturation.state_index=2000;
                             }
 
                             if(pos_ctrl_with_saturation.state_3<pos_ctrl_with_saturation.state_min)
                             {
                                 pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_3;
-                                min_s_index_=3000;
+                                pos_ctrl_with_saturation.state_index=3000;
                             }
 
-                            if(pos_ctrl_with_saturation.state_1<0 || pos_ctrl_with_saturation.state_2<0 || pos_ctrl_with_saturation.state_3<0 || pos_ctrl_with_saturation.state_min<0)
+                            if(   pos_ctrl_with_saturation.state_1<0 || pos_ctrl_with_saturation.state_2<0
+                               || pos_ctrl_with_saturation.state_3<0 || pos_ctrl_with_saturation.state_min<0)
                             {
                                 printstr(">>   ERROR, NEGATIVE VALUE OF States !!!! \n");
                                 while(1);
@@ -414,7 +422,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             pos_ctrl_with_saturation.torque_ref_k = pos_ctrl_with_saturation.y_k - pos_ctrl_with_saturation.feedback_d_loop;
 
-                            pos_ctrl_with_saturation.t_max =((double)(pos_velocity_ctrl_config.max_torque));
 
                             if(pos_ctrl_with_saturation.torque_ref_k >  pos_ctrl_with_saturation.t_max)
                                 pos_ctrl_with_saturation.torque_ref_k = pos_ctrl_with_saturation.t_max;
@@ -423,12 +430,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                                 pos_ctrl_with_saturation.torque_ref_k =-pos_ctrl_with_saturation.t_max;
 
                             torque_ref_k = ((int) (pos_ctrl_with_saturation.torque_ref_k));
-                            //i_motorcontrol.set_torque((int) pos_ctrl_with_saturation.torque_ref_k);
 
                             xscope_int(POSITION_REF_SP3 , ((int)(downstream_control_data.position_cmd)));
                             xscope_int(POSITION_REAL_SP3, ((int)(position_sens_k_ - initial_position_)));
-
-
 
                         }
 

@@ -49,6 +49,7 @@ typedef struct {
     double state_2;
     double state_3;
     double state_min;
+    double state_index;
 
     double dynamic_max_speed; //the maximum speed which the system should have (in order to stop at target with no overshoot)
 
