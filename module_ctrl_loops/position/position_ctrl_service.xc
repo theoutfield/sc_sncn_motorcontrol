@@ -54,6 +54,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     ///////////////////////////////////////////////
     // position controller
 
+    PositionControlWithSaturation pos_ctrl_with_saturation;
+
     double j_   =100.00;//milli-kgm2
     double k_fb_=0.00;
     double k_m_ =0.00;
