@@ -5,6 +5,9 @@
  */
 
 #include <controllers_lib.h>
+#include <control_loops_common.h>
+#include <math.h>
+
 
 
 /**
@@ -152,7 +155,186 @@ void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &pa
     param.integral = 0;
 }
 
+void position_control_with_saturation_reset(PositionControlWithSaturation &pos_ctrl_with_saturation)
+{
+    //************************************************
+    // reset position controller structure
+    pos_ctrl_with_saturation.j = 0.00; // in micro-kgm2
+    pos_ctrl_with_saturation.k_fb = 0.00;
+    pos_ctrl_with_saturation.k_m = 0.00;
+    pos_ctrl_with_saturation.ts_position = 0.00;
 
+    pos_ctrl_with_saturation.kp =  0.00;
+    pos_ctrl_with_saturation.ki =  0.00;
+    pos_ctrl_with_saturation.kd =  0.00;
+
+    pos_ctrl_with_saturation.gain_p =  1000.00;
+    pos_ctrl_with_saturation.gain_i =  1000.00;
+    pos_ctrl_with_saturation.gain_d =  1000.00;
+
+    pos_ctrl_with_saturation.feedback_p_loop=0.00;
+    pos_ctrl_with_saturation.feedback_d_loop=0.00;
+    pos_ctrl_with_saturation.gained_error=0.00;
+    pos_ctrl_with_saturation.t_max=0.00;
+
+    pos_ctrl_with_saturation.y_k=0.00;
+    pos_ctrl_with_saturation.y_k_sign=0.00;
+    pos_ctrl_with_saturation.y_k_1=0.00;
+    pos_ctrl_with_saturation.delta_y_k=0.00;
+
+    pos_ctrl_with_saturation.dynamic_max_speed=0.00;
+    pos_ctrl_with_saturation.w_max = 0.00;
+    pos_ctrl_with_saturation.state_1=0.00;
+    pos_ctrl_with_saturation.state_2=0.00;
+    pos_ctrl_with_saturation.state_3=0.00;
+    pos_ctrl_with_saturation.state_min=0.00;
+
+    pos_ctrl_with_saturation.torque_ref_k=0.00;
+}
+
+
+void position_control_with_saturation_set_parameters(PositionControlWithSaturation &pos_ctrl_with_saturation, PosVelocityControlConfig &pos_velocity_ctrl_config)
+{
+    //************************************************
+    // set parameters of position controller structure
+    pos_ctrl_with_saturation.w_max = (((double)(pos_velocity_ctrl_config.max_speed))*2.00*3.1415)/60;
+    pos_ctrl_with_saturation.k_fb =((double)(pos_velocity_ctrl_config.k_fb))/1000.00;
+    pos_ctrl_with_saturation.k_m  = ((double)(pos_velocity_ctrl_config.k_m))/1000.00;
+
+    //1ms
+    pos_ctrl_with_saturation.kp =  ((double)(pos_velocity_ctrl_config.P_saturated_position_controller))/100.00;
+    pos_ctrl_with_saturation.ki =  ((double)(pos_velocity_ctrl_config.I_saturated_position_controller))/100.00;
+    pos_ctrl_with_saturation.kd =  ((double)(pos_velocity_ctrl_config.D_saturated_position_controller))/100.00;
+
+    pos_ctrl_with_saturation.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
+
+
+    pos_ctrl_with_saturation.j   = ((double)(pos_velocity_ctrl_config.j)); //s
+    pos_ctrl_with_saturation.kp *= pos_ctrl_with_saturation.j;
+    pos_ctrl_with_saturation.ki *= pos_ctrl_with_saturation.j;
+    pos_ctrl_with_saturation.kd *= pos_ctrl_with_saturation.j;
+    pos_ctrl_with_saturation.kp /=1000000.00;
+    pos_ctrl_with_saturation.ki /=1000000.00;
+    pos_ctrl_with_saturation.kd /=1000000.00;
+
+    pos_ctrl_with_saturation.gain_p = ((double)(pos_velocity_ctrl_config.gain_p));
+    pos_ctrl_with_saturation.gain_i = ((double)(pos_velocity_ctrl_config.gain_i));
+    pos_ctrl_with_saturation.gain_d = ((double)(pos_velocity_ctrl_config.gain_d));
+
+    pos_ctrl_with_saturation.kp *= (pos_ctrl_with_saturation.gain_p);
+    pos_ctrl_with_saturation.kp /= 1000.00;
+    pos_ctrl_with_saturation.ki *= (pos_ctrl_with_saturation.gain_i);
+    pos_ctrl_with_saturation.ki /= 1000.00;
+    pos_ctrl_with_saturation.kd *= (pos_ctrl_with_saturation.gain_d);
+    pos_ctrl_with_saturation.kd /= 1000.00;
+
+    pos_ctrl_with_saturation.t_max=((double)(pos_velocity_ctrl_config.max_torque));
+
+}
+
+
+/**
+ * @brief updating the output of position controller with update.
+ * @param output, torque reference in milli-Nm
+ * @param input, setpoint
+ * @param input, feedback
+ */
+int update_position_control_with_saturation(
+        PositionControlWithSaturation &pos_ctrl_with_saturation,
+        double position_ref_k_,
+        double position_sens_k_1_,
+        double position_sens_k_)
+{
+
+    pos_ctrl_with_saturation.gained_error = position_ref_k_ - position_sens_k_;
+
+    pos_ctrl_with_saturation.feedback_p_loop  = pos_ctrl_with_saturation.kp * (position_sens_k_ - position_sens_k_1_);
+
+    pos_ctrl_with_saturation.delta_y_k = pos_ctrl_with_saturation.gained_error*pos_ctrl_with_saturation.ki - pos_ctrl_with_saturation.feedback_p_loop;
+
+    pos_ctrl_with_saturation.y_k = pos_ctrl_with_saturation.delta_y_k + pos_ctrl_with_saturation.y_k_1;
+
+    if(pos_ctrl_with_saturation.y_k>0)
+    {
+        pos_ctrl_with_saturation.abs_y_k = pos_ctrl_with_saturation.y_k;
+        pos_ctrl_with_saturation.y_k_sign= 1;
+    }
+    else if (pos_ctrl_with_saturation.y_k<0)
+    {
+        pos_ctrl_with_saturation.abs_y_k =-pos_ctrl_with_saturation.y_k;
+        pos_ctrl_with_saturation.y_k_sign=-1;
+    }
+    else if (pos_ctrl_with_saturation.y_k == 0)
+    {
+        pos_ctrl_with_saturation.abs_y_k  = 0;
+        pos_ctrl_with_saturation.y_k_sign = 0;
+    }
+
+    pos_ctrl_with_saturation.state_1 = pos_ctrl_with_saturation.abs_y_k;
+
+    pos_ctrl_with_saturation.dynamic_max_speed  = (2.00*pos_ctrl_with_saturation.t_max)/1000;
+
+    if(pos_ctrl_with_saturation.gained_error>0)
+        pos_ctrl_with_saturation.dynamic_max_speed *=   pos_ctrl_with_saturation.gained_error;
+    else if(pos_ctrl_with_saturation.gained_error<0)
+        pos_ctrl_with_saturation.dynamic_max_speed *= (-pos_ctrl_with_saturation.gained_error);
+    else if(pos_ctrl_with_saturation.gained_error==0)
+        pos_ctrl_with_saturation.dynamic_max_speed  = 0;
+
+    pos_ctrl_with_saturation.dynamic_max_speed /= pos_ctrl_with_saturation.k_fb;
+    pos_ctrl_with_saturation.dynamic_max_speed *= 1000.00;
+    pos_ctrl_with_saturation.dynamic_max_speed /= (pos_ctrl_with_saturation.j/1000.00);
+    pos_ctrl_with_saturation.dynamic_max_speed  = sqrt(pos_ctrl_with_saturation.dynamic_max_speed);
+
+    pos_ctrl_with_saturation.state_2 = pos_ctrl_with_saturation.dynamic_max_speed;
+
+    pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.kd;
+    pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.ts_position;
+    pos_ctrl_with_saturation.state_2*= pos_ctrl_with_saturation.k_fb;
+
+    pos_ctrl_with_saturation.state_2*=0.9;
+
+    pos_ctrl_with_saturation.state_3 = pos_ctrl_with_saturation.w_max;
+    pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.kd;
+    pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.ts_position;
+    pos_ctrl_with_saturation.state_3*= pos_ctrl_with_saturation.k_fb;
+
+
+    if(pos_ctrl_with_saturation.state_1<pos_ctrl_with_saturation.state_2)
+    {
+        pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_1;
+        pos_ctrl_with_saturation.state_index=1000;
+    }
+    else
+    {
+        pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_2;
+        pos_ctrl_with_saturation.state_index=2000;
+    }
+
+    if(pos_ctrl_with_saturation.state_3<pos_ctrl_with_saturation.state_min)
+    {
+        pos_ctrl_with_saturation.state_min = pos_ctrl_with_saturation.state_3;
+        pos_ctrl_with_saturation.state_index=3000;
+    }
+
+    pos_ctrl_with_saturation.y_k = pos_ctrl_with_saturation.state_min * pos_ctrl_with_saturation.y_k_sign;
+    pos_ctrl_with_saturation.y_k_1 = pos_ctrl_with_saturation.y_k;
+
+    pos_ctrl_with_saturation.feedback_d_loop = pos_ctrl_with_saturation.kd * (position_sens_k_ - position_sens_k_1_);
+
+    pos_ctrl_with_saturation.torque_ref_k = pos_ctrl_with_saturation.y_k - pos_ctrl_with_saturation.feedback_d_loop;
+
+
+    if(pos_ctrl_with_saturation.torque_ref_k >  pos_ctrl_with_saturation.t_max)
+        pos_ctrl_with_saturation.torque_ref_k = pos_ctrl_with_saturation.t_max;
+
+    if(pos_ctrl_with_saturation.torque_ref_k < -pos_ctrl_with_saturation.t_max)
+        pos_ctrl_with_saturation.torque_ref_k =-pos_ctrl_with_saturation.t_max;
+
+
+    return ((int) (pos_ctrl_with_saturation.torque_ref_k));
+
+}
 
 /**
  * @brief updating the position reference profiler

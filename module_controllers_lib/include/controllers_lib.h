@@ -3,6 +3,8 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
+#include <control_loops_common.h>
+
 #pragma once
 
 
@@ -18,6 +20,53 @@ typedef struct {
     float actual_value_1n;
     int T_s;    //Sampling-Time in microseconds
 } PIDparam;
+
+
+/**
+ * @brief Structure type to set the parameters of (saturated) position controller.
+ */
+typedef struct {
+    double kp;
+    double ki;
+    double kd;
+
+    double gain_p;
+    double gain_i;
+    double gain_d;
+
+    double k_fb;         // position feedback gain
+    double gained_error; //position error which is directly measured
+    double k_m;          // actuator torque gain
+
+    double feedback_p_loop;
+    double feedback_d_loop;
+
+    double y_k;
+    double abs_y_k;
+    double y_k_sign;
+    double y_k_1;
+    double delta_y_k;
+
+    double state_1;
+    double state_2;
+    double state_3;
+    double state_min;
+    double state_index;
+
+    double dynamic_max_speed; //the maximum speed which the system should have (in order to stop at target with no overshoot)
+
+    double ts_position; // sampling time for position controller [sec]
+
+    double w_max; // maximum speed [rad/sec]
+    double t_max; // maximum motor torque [milli-Nm]
+    double t_additive; // additive torque [milli-Nm]
+
+    double j; // moment of inertia [micro-kgm2]
+
+    double torque_ref_k; // milli-Nm
+
+} PositionControlWithSaturation;
+
 
 
 /**
@@ -120,6 +169,34 @@ float integral_optimum_pos_controller_updat(float desired_value, float actual_va
  */
 void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &param);
 
+
+/**
+ * @brief resetting the parameters of the position controller with saturation.
+ * @param the parameters of the controller
+ */
+void position_control_with_saturation_reset(PositionControlWithSaturation &pos_ctrl_with_saturation);
+
+
+/**
+ * @brief resetting the parameters of the position controller with saturation.
+ * @param the parameters of the controller
+ */
+void position_control_with_saturation_set_parameters(
+        PositionControlWithSaturation &pos_ctrl_with_saturation,
+        PosVelocityControlConfig &pos_velocity_ctrl_config);
+
+
+/**
+ * @brief updating the output of position controller with update.
+ * @param output, torque reference in milli-Nm
+ * @param input, setpoint
+ * @param input, feedback
+ */
+int update_position_control_with_saturation(
+        PositionControlWithSaturation &pos_ctrl_with_saturation,
+        double position_ref_k_,
+        double position_sens_k_1_,
+        double position_sens_k_);
 
 
 /**

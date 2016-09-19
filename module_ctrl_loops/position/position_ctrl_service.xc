@@ -8,6 +8,8 @@
 #include <print.h>
 #include <stdlib.h>
 
+#include <math.h>
+
 #include <controllers_lib.h>
 #include <filters_lib.h>
 
@@ -43,12 +45,33 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                               interface MotorcontrolInterface client i_motorcontrol,
                               interface PositionVelocityCtrlInterface server i_position_control[3])
 {
+
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
     int pos_control_mode = 0;
     int velocity_control_mode = 0;
 
+    ///////////////////////////////////////////////
     // position controller
+
+    PositionControlWithSaturation pos_ctrl_with_saturation;
+
+    position_control_with_saturation_reset(pos_ctrl_with_saturation);
+    position_control_with_saturation_set_parameters(pos_ctrl_with_saturation, pos_velocity_ctrl_config);
+
+    int position_enable_flag_ = 0;
+    int torque_enable_flag_ = 0;
+
+    int position_ref_input_k_ = 0;
+    int initial_position_=0;
+    double position_ref_k_ = 0.00;
+    double position_sens_k_ = 0.00, position_sens_k_1_=0.00;
+
+    int min_s_index_=0;
+
+    unsigned int ts_=0, t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
+    ///////////////////////////////////////////////
+
     int position_enable_flag = 0;
     PIDparam position_control_pid_param;
     integralOptimumPosControllerParam integral_optimum_pos_ctrl_pid_param;
@@ -144,6 +167,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
         select {
             case t when timerafter(ts + USEC_STD * pos_velocity_ctrl_config.control_loop_period) :> ts:
 
+                t_old_=t_new_;
+                t :> t_new_;
+                loop_time_=t_new_-t_old_;
+                idle_time_=t_new_-t_end_;
+
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
                 /*
@@ -214,10 +242,27 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_cmd_k = pid_update(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                             velocity_ref_k = (position_cmd_k / 512);
                         }
-                        else if (pos_control_mode == POS_INTEGRAL_OPTIMUM_CONTROLLER)
+                        else if (pos_control_mode == POS_WITH_SATURATION_CONTROLLER)
                         {
-                            position_cmd_k = integral_optimum_pos_controller_updat(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, integral_optimum_pos_ctrl_pid_param);
-                            torque_ref_k = (position_cmd_k / 512);
+
+                            //************************************************
+                            // update feedback data
+                            upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                            position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
+
+                            position_ref_k_ = (double) (position_ref_input_k_);
+
+                            position_sens_k_1_ = position_sens_k_;
+                            position_sens_k_   = (double) (upstream_control_data.position);
+
+
+                            // apply position control algorithm
+                            torque_ref_k = update_position_control_with_saturation(pos_ctrl_with_saturation, position_ref_k_, position_sens_k_1_, position_sens_k_);
+
+                            xscope_int(POSITION_REF_SP3 , ((int)(downstream_control_data.position_cmd)));
+                            xscope_int(POSITION_REAL_SP3, ((int)(position_sens_k_ - initial_position_)));
+
                         }
 
                         second_order_LP_filter_shift_buffers(&position_k,
@@ -258,6 +303,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                     i_motorcontrol.set_torque((int) torque_ref_k);
                 }
+
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(POSITION_REF, (int) (position_ref_k*512));
                 xscope_int(POSITION, (int) (position_sens_k*512));
@@ -275,6 +321,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(POSITION_REF, position_ref_input_k * 1);
                 xscope_int(TORQUE_CMD, torque_ref_k / 1);
 #endif
+
+
+                t :> t_end_;
                 break;
 
 
@@ -300,7 +349,27 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     velocity_enable_flag = 0;
                     velocity_control_mode = VELOCITY_PID_CONTROLLER;
                 }
+
+                //////nonlinear position control
+                position_ref_input_k_ = 0;
+                position_ref_k_ = 0;
+                position_sens_k_ = 0;
+                position_sens_k_1_=0;
+                pos_ctrl_with_saturation.torque_ref_k = 0.00;
+                pos_ctrl_with_saturation.t_additive = 0.00;
+                pos_ctrl_with_saturation.feedback_p_loop =0.00;
+                pos_ctrl_with_saturation.feedback_d_loop=0.00;
+                //////////////////////////////
+
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                //////nonlinear position control
+                downstream_control_data.position_cmd = 0;
+                pos_ctrl_with_saturation.t_additive = 0.00;
+                initial_position_ = upstream_control_data.position;
+                ////////////////////////////////
+
+
                 position_ref_input_k = upstream_control_data.position;
                 position_ref_in_k = (float) position_ref_input_k;
                 position_ref_in_k_1n = (float) position_ref_input_k;
@@ -380,7 +449,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
 
 
-
+            case i_position_control[int i].set_j(int j):
+                    pos_ctrl_with_saturation.j = ((double)(j));
+                    break;
 
 
 

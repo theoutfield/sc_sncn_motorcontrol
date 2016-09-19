@@ -51,6 +51,12 @@ interface PositionVelocityCtrlInterface{
      */
     void set_position_velocity_control_config(PosVelocityControlConfig in_config);
 
+    /**
+     * @brief Setter for moment_of_inertia.
+     *
+     * @param j.
+     */
+    void set_j(int j);
 
 
 //    int get_position();
