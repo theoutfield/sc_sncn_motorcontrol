@@ -33,44 +33,47 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
-    delay_milliseconds(1000);
-    printf("\n");
-    printf("g->print guiding manual\n");
-    printf("------------------------------------------------------\n");
-    printf(".Direct Torque Controller\n");
-    printf("..b->brake                ..e->enable/disable\n");
-    printf("..#->command torque       ..r->reverse torque\n");
-    printf("..a->auto-tuning          ..m->sound\n");
-    printf("..os#->set offset         ..op#->print offset\n");
-    printf("------------------------------------------------------\n");
-    printf(".Torque Controller\n");
-    printf("..st1->set torque on      ..st0->set torque off\n");
-    printf("..ct#->command torque back and forth\n");
-    printf("------------------------------------------------------\n");
-    printf(".Velocity Controller\n");
-    printf("..kp#->Kp   ki#->Ki   kd#->Kd   kl#->integral_limit\n");
-    printf("..sv#->set velocity on/off while # is the mode:\n");
-    printf("...mode=1    -> VELOCITY_PID_CONTROLLER\n");
-    printf("...mode=else -> disable\n");
-    printf("..cv#->command velocity back and forth\n");
-    printf("------------------------------------------------------\n");
-    printf(".Position Controller\n");
-    printf("..pp#->Kp   pi#->Ki   pd#->Kd   pl#->integral_limit\n");
-    printf("..sp#->set pos on/off while # is the mode:\n");
-    printf("...mode=1    -> POS_PID_CONTROLLER\n");
-    printf("...mode=2    -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
-    printf("...mode=3    -> POS_INTEGRAL_OPTIMUM_CONTROLLER\n");
-    printf("...mode=else -> disable\n");
-    printf("..cp#->command position back and forth\n");
-    printf("..cd#->command position\n");
-    printf("------------------------------------------------------\n");
-    printf(".Limits\n");
-    printf("..lp#->pos_lim   lv#->velocity_lim   lt#->torque_lim\n");
-    printf("------------------------------------------------------\n");
-    printf("\n");
+//    delay_milliseconds(1000);
+//    printf("\n");
+//    printf("g->print guiding manual\n");
+//    printf("------------------------------------------------------\n");
+//    printf(".Direct Torque Controller\n");
+//    printf("..b->brake                ..e->enable/disable\n");
+//    printf("..#->command torque       ..r->reverse torque\n");
+//    printf("..a->auto-tuning          ..m->sound\n");
+//    printf("..os#->set offset         ..op#->print offset\n");
+//    printf("------------------------------------------------------\n");
+//    printf(".Torque Controller\n");
+//    printf("..st1->set torque on      ..st0->set torque off\n");
+//    printf("..ct#->command torque back and forth\n");
+//    printf("------------------------------------------------------\n");
+//    printf(".Velocity Controller\n");
+//    printf("..kp#->Kp   ki#->Ki   kd#->Kd   kl#->integral_limit\n");
+//    printf("..sv#->set velocity on/off while # is the mode:\n");
+//    printf("...mode=1    -> VELOCITY_PID_CONTROLLER\n");
+//    printf("...mode=else -> disable\n");
+//    printf("..cv#->command velocity back and forth\n");
+//    printf("------------------------------------------------------\n");
+//    printf(".Position Controller\n");
+//    printf("..pp#->Kp   pi#->Ki   pd#->Kd   pl#->integral_limit\n");
+//    printf("..sp#->set pos on/off while # is the mode:\n");
+//    printf("...mode=1    -> POS_PID_CONTROLLER\n");
+//    printf("...mode=2    -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
+//    printf("...mode=3    -> POS_INTEGRAL_OPTIMUM_CONTROLLER\n");
+//    printf("...mode=else -> disable\n");
+//    printf("..cp#->command position back and forth\n");
+//    printf("..cd#->command position\n");
+//    printf("------------------------------------------------------\n");
+//    printf(".Limits\n");
+//    printf("..lp#->pos_lim   lv#->velocity_lim   lt#->torque_lim\n");
+//    printf("------------------------------------------------------\n");
+//    printf("\n");
 
     DownstreamControlData downstream_control_data;
     PosVelocityControlConfig pos_velocity_ctrl_config;
+
+    int velocity_running = 0;
+    int velocity = 0;
 
     int torque = 0;
     int brake_flag = 0;
@@ -106,30 +109,83 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
         }
         value *= sign;
         switch(mode) {
-        //go to position directly
+        //position commands
         case 'p':
             downstream_control_data.offset_torque = 0;
             downstream_control_data.position_cmd = value;
             pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
             switch(mode_2) {
+            //direct command with profile
             case 'p':
+                //bug: the first time after one p# command p0 doesn't use the profile; only the way back to zero
                 pos_velocity_ctrl_config.enable_profiler = 1;
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
                 printf("Go to %d with profile\n", value);
                 i_position_control.update_control_data(downstream_control_data);
                 break;
+            //step command (forward and backward)
+            case 's':
+                switch(mode_3) {
+                //with profile
+                case 'p':
+                    pos_velocity_ctrl_config.enable_profiler = 1;
+                    printf("position cmd: %d to %d with profile\n", value, -value);
+                    break;
+                //without profile
+                default:
+                    pos_velocity_ctrl_config.enable_profiler = 0;
+                    printf("position cmd: %d to %d\n", value, -value);
+                    break;
+                }
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.position_cmd = value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1500);
+                downstream_control_data.position_cmd = -value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1500);
+                downstream_control_data.position_cmd = 0;
+                i_position_control.update_control_data(downstream_control_data);
+                break;
+            //direct command
             default:
                 pos_velocity_ctrl_config.enable_profiler = 0;
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
                 printf("Go to %d\n", value);
                 i_position_control.update_control_data(downstream_control_data);
                 break;
-        //set velocity
+            }
+            break;
+        //velocity commands
         case 'v':
-            downstream_control_data.offset_torque = 0;
-            downstream_control_data.velocity_cmd = value;
-            i_position_control.update_control_data(downstream_control_data);
-            printf("set velocity %d\n", downstream_control_data.velocity_cmd);
+            switch(mode_2) {
+            //step command (forward and backward)
+            case 's':
+                printf("velocity cmd: %d to %d\n", value, -value);
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.velocity_cmd = value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1000);
+                downstream_control_data.velocity_cmd = -value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1000);
+                downstream_control_data.velocity_cmd = 0;
+                i_position_control.update_control_data(downstream_control_data);
+                break;
+            //direct command
+            default:
+                if(value==0)
+                    velocity_running = 0;
+                else
+                    velocity_running = 1;
+                downstream_control_data.offset_torque = 0;
+                velocity = value;
+                downstream_control_data.velocity_cmd = velocity;
+                i_position_control.update_control_data(downstream_control_data);
+                printf("set velocity %d\n", downstream_control_data.velocity_cmd);
+                break;
+            }
             break;
         //pid coefficients
         case 'k':
@@ -198,87 +254,98 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
             }
             i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
             break;
-        //limits
-        case 'L':
-            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-            switch(mode_2) {
-            //max position limit
-            case 'p':
-                pos_velocity_ctrl_config.max_pos = value;
-                pos_velocity_ctrl_config.min_pos = -value;
+            //limits
+            case 'L':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                switch(mode_2) {
+                //max position limit
+                case 'p':
+                    pos_velocity_ctrl_config.max_pos = value;
+                    pos_velocity_ctrl_config.min_pos = -value;
+                    break;
+                //max velocity limit
+                case 'v':
+                    pos_velocity_ctrl_config.max_speed = value;
+                    break;
+                //max torque limit
+                case 't':
+                    pos_velocity_ctrl_config.max_torque = value;
+                    break;
+                default:
+                    break;
+                }
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("pos_max:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.max_speed,
+                                                            pos_velocity_ctrl_config.max_torque);
                 break;
-            //max velocity limit
-            case 'v':
-                pos_velocity_ctrl_config.max_speed = value;
-                break;
-            //max torque limit
-            case 't':
-                pos_velocity_ctrl_config.max_torque = value;
-                break;
-            default:
-                break;
-            }
-            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-            printf("max_pos:%d max_v:%d max_torq:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.max_speed,
-                                                        pos_velocity_ctrl_config.max_torque);
-            break;
-        //step command
-        case 'c':
-            switch(mode_2) {
+//        //step command
+//        case 'c':
+//            switch(mode_2) {
             //command position forward and backward
-            case 'p':
-                printf("position cmd: %d to %d\n", value*sign, -value*sign);
-                downstream_control_data.offset_torque = 0;
-                downstream_control_data.position_cmd = value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(1500);
-                downstream_control_data.position_cmd = -value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(1500);
-                downstream_control_data.position_cmd = 0;
-                i_position_control.update_control_data(downstream_control_data);
-                break;
+//            case 'p':
+//                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                switch(mode_2) {
+//                case 'p':
+//                    pos_velocity_ctrl_config.enable_profiler = 1;
+//                    printf("position cmd: %d to %d with profile\n", value, -value);
+//                    break;
+//                default:
+//                    pos_velocity_ctrl_config.enable_profiler = 0;
+//                    printf("position cmd: %d to %d\n", value, -value);
+//                    break;
+//                }
+//                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+//                downstream_control_data.offset_torque = 0;
+//                downstream_control_data.position_cmd = value;
+//                i_position_control.update_control_data(downstream_control_data);
+//                delay_milliseconds(1500);
+//                downstream_control_data.position_cmd = -value;
+//                i_position_control.update_control_data(downstream_control_data);
+//                delay_milliseconds(1500);
+//                downstream_control_data.position_cmd = 0;
+//                i_position_control.update_control_data(downstream_control_data);
+//                break;
             //command velocity forward and backward
-            case 'v':
-                printf("velocity cmd: %d to %d\n", value*sign, -value*sign);
-                downstream_control_data.offset_torque = 0;
-                downstream_control_data.velocity_cmd = value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(1000);
-                downstream_control_data.velocity_cmd = -value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(1000);
-                downstream_control_data.velocity_cmd = 0;//value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                break;
-            //command torque forward and backward
-            case 't':
-                printf("torque cmd: %d to %d\n", value*sign, -value*sign);
-                downstream_control_data.torque_cmd = value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(1000);
-                downstream_control_data.torque_cmd = -value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(1000);
-                downstream_control_data.torque_cmd = 0;
-                i_position_control.update_control_data(downstream_control_data);
-                break;
-            //command additive torque forward and backward
-            case 'o':
-                printf("offset-torque cmd: %d to %d\n", value*sign, -value*sign);
-                downstream_control_data.position_cmd = 0;
-                downstream_control_data.velocity_cmd = 0;
-                downstream_control_data.offset_torque = value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(1000);
-                downstream_control_data.offset_torque = -value*sign;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(1000);
-                downstream_control_data.offset_torque = 0;
-                i_position_control.update_control_data(downstream_control_data);
-                break;
-            }
-            break;
+//            case 'v':
+//                printf("velocity cmd: %d to %d\n", value, -value);
+//                downstream_control_data.offset_torque = 0;
+//                downstream_control_data.velocity_cmd = value;
+//                i_position_control.update_control_data(downstream_control_data);
+//                delay_milliseconds(1000);
+//                downstream_control_data.velocity_cmd = -value;
+//                i_position_control.update_control_data(downstream_control_data);
+//                delay_milliseconds(1000);
+//                downstream_control_data.velocity_cmd = 0;//value*sign;
+//                i_position_control.update_control_data(downstream_control_data);
+//                break;
+//            //command torque forward and backward
+//            case 't':
+//                printf("torque cmd: %d to %d\n", value, -value);
+//                downstream_control_data.torque_cmd = value;
+//                i_position_control.update_control_data(downstream_control_data);
+//                delay_milliseconds(1000);
+//                downstream_control_data.torque_cmd = -value;
+//                i_position_control.update_control_data(downstream_control_data);
+//                delay_milliseconds(1000);
+//                downstream_control_data.torque_cmd = 0;
+//                i_position_control.update_control_data(downstream_control_data);
+//                break;
+//            //command additive torque forward and backward
+//            case 'o':
+//                printf("offset-torque cmd: %d to %d\n", value, -value);
+//                downstream_control_data.position_cmd = 0;
+//                downstream_control_data.velocity_cmd = 0;
+//                downstream_control_data.offset_torque = value;
+//                i_position_control.update_control_data(downstream_control_data);
+//                delay_milliseconds(1000);
+//                downstream_control_data.offset_torque = -value;
+//                i_position_control.update_control_data(downstream_control_data);
+//                delay_milliseconds(1000);
+//                downstream_control_data.offset_torque = 0;
+//                i_position_control.update_control_data(downstream_control_data);
+//                break;
+//            }
+//            break;
         //enable
         case 'e':
             switch(mode_2) {
@@ -707,19 +774,35 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
 //            i_motorcontrol.set_torque(0);
 //            break;
 //
-//        //reverse torque
-//        case 'r':
-//            torque = -torque;
-//            i_motorcontrol.set_torque(torque);
-//            printf("Torque %d [milli-Nm]\n", torque);
-//            break;
-//
-//        //set torque
-//        default:
-//            torque = value * sign;
-//            i_motorcontrol.set_torque(torque);
-//            printf("torque %d [milli-Nm]\n", torque);
-//            break;
+        //reverse torque
+        case 'r':
+            torque = -torque;
+            if(velocity_running) {
+                velocity = -velocity;
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.velocity_cmd = velocity;
+                i_position_control.update_control_data(downstream_control_data);
+            }
+            i_motorcontrol.set_torque(torque);
+            printf("Torque %d [milli-Nm]\n", torque);
+            break;
+
+        //set torque
+        default:
+            if(velocity_running) {
+                velocity = 0;
+                velocity_running = 0;
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.velocity_cmd = velocity;
+                i_position_control.update_control_data(downstream_control_data);
+            }
+            else {
+                torque = value;
+                i_motorcontrol.set_torque(torque);
+                printf("torque %d [milli-Nm]\n", torque);
+            }
+            break;
+
         }
         delay_milliseconds(10);
     }
