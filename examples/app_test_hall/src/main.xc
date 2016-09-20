@@ -47,14 +47,15 @@ int main(void)
 
     par
     {
-        /* Client side */
-        on tile[APP_TILE]: hall_test(i_position_feedback[0], i_shared_memory[1]);
-
         /***************************************************
          * IFM TILE
          ***************************************************/
         on tile[IFM_TILE]: par {
-            memory_manager(i_shared_memory, 2);
+            /* Test Hall sensor Client */
+            hall_test(i_position_feedback[0], i_shared_memory[1]);
+
+            /* Shared memory Service */
+            [[distribute]] memory_manager(i_shared_memory, 2);
 
             /* Position feedback service */
             {

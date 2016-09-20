@@ -59,15 +59,16 @@ int main(void)
     interface PositionFeedbackInterface i_position_feedback[3];
     interface shared_memory_interface i_shared_memory[2];
 
-    par
-    {
-        on tile[APP_TILE]: ams_rotary_sensor_test(i_position_feedback[0], null);
-
+    par {
         /************************************************************
          * IFM_TILE
          ************************************************************/
         on tile[IFM_TILE]: par {
-            memory_manager(i_shared_memory, 2);
+            /* Test AMS Encoder Client */
+            ams_rotary_sensor_test(i_position_feedback[0], null);
+
+            /* Shared memory Service */
+            [[distribute]] memory_manager(i_shared_memory, 2);
 
             /* Position feedback service */
             {

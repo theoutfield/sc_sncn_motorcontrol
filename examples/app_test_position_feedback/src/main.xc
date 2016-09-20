@@ -128,7 +128,8 @@ int main(void)
         on tile[IFM_TILE]: par {
             position_feedback_test(i_position_feedback[0], i_position_feedback_2[0], null);
 
-            memory_manager(i_shared_memory, 3);
+            /* Shared memory Service */
+            [[distribute]] memory_manager(i_shared_memory, 3);
 
             /* Position feedback service */
             {

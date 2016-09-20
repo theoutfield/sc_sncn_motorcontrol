@@ -45,18 +45,15 @@ int main(void)
 
     par
     {
-        on tile[APP_TILE]:
-        {
-            /* Test QEI Sensor Client */
-            qei_test(i_position_feedback[0], null);
-        }
-
         /***************************************************
          * IFM TILE
          ***************************************************/
         on tile[IFM_TILE]: par {
-            memory_manager(i_shared_memory, 2);
+            /* Test QEI Sensor Client */
+            qei_test(i_position_feedback[0], null);
 
+            /* Shared memory Service */
+            [[distribute]] memory_manager(i_shared_memory, 2);
 
             /* Position feedback service */
             {
@@ -69,8 +66,8 @@ int main(void)
                 position_feedback_config.qei_config.enable_push_service = PushPosition;
 
                 position_feedback_service(null, qei_ports, null,
-                                         position_feedback_config, i_shared_memory[0], i_position_feedback,
-                                         null, null, null);
+                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                          null, null, null);
             }
         }
     }
