@@ -58,10 +58,10 @@ interface PositionVelocityCtrlInterface{
     void set_j(int j);
 
 
-//    int get_position();
+    int get_position();
 //
 //
-//    int get_velocity();
+    int get_velocity();
 //
 //    int check_busy();
 

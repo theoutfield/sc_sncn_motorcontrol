@@ -43,7 +43,7 @@ void set_profile_position(DownstreamControlData &downstream_control_data, int ve
 //    {
 //        init_position_velocity_control(i_position_control);
 //    }
-    i_position_control.enable_position_ctrl();
+    i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
 
     actual_position = i_position_control.get_position();
 
