@@ -18,22 +18,22 @@ interface PositionVelocityCtrlInterface{
     void disable();
 
 
-    void enable_position_ctrl();
-    void set_position(int in_target_position);
-    void set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
-    void set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
-    void set_position_limits(int position_min_limit, int position_max_limit);
+    void enable_position_ctrl(int pos_control_mode_);
+//    void set_position(int in_target_position);
+//    void set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
+//    void set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
+//    void set_position_limits(int position_min_limit, int position_max_limit);
 
-    void enable_velocity_ctrl();
-    void set_velocity(int in_target_velocity);
-    void set_offset_torque(int offset_torque_);
-    void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
-    void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
-    void set_velocity_limits(int velocity_min_limit, int velocity_max_limit);
+    void enable_velocity_ctrl(int velocity_control_mode_);
+//    void set_velocity(int in_target_velocity);
+//    void set_offset_torque(int offset_torque_);
+//    void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
+//    void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
+//    void set_velocity_limits(int velocity_min_limit, int velocity_max_limit);
 
     void enable_torque_ctrl();
-    void set_torque(int in_target_torque);
-    void set_torque_limits(int torque_min_limit, int torque_max_limit);
+//    void set_torque(int in_target_torque);
+//    void set_torque_limits(int torque_min_limit, int torque_max_limit);
 
 
     /**
@@ -50,14 +50,20 @@ interface PositionVelocityCtrlInterface{
      */
     void set_position_velocity_control_config(PosVelocityControlConfig in_config);
 
+    /**
+     * @brief Setter for moment_of_inertia.
+     *
+     * @param j.
+     */
+    void set_j(int j);
 
 
-    int get_position();
-
-
-    int get_velocity();
-
-    int check_busy();
+//    int get_position();
+//
+//
+//    int get_velocity();
+//
+//    int check_busy();
 
     UpstreamControlData update_control_data(DownstreamControlData downstream_control_data_);
 };
