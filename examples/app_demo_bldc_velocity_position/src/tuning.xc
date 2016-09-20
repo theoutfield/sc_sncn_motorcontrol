@@ -395,15 +395,51 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                     downstream_control_data.offset_torque = 0;
                     i_position_control.update_control_data(downstream_control_data);
                     break;
-
-                //command additive torque forward and backward
-                case 'j':
-                    j = value;
-                    i_position_control.set_j(j);
-                    printf("moment of inertia :%d \n", j);
-                    break;
                 }
             break;
+
+
+            case 'n':
+                switch(mode_2) {
+                    //command position forward and backward
+                    case 'p':
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        pos_velocity_ctrl_config.gain_p = value;
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
+                                                                  pos_velocity_ctrl_config.gain_i,
+                                                                  pos_velocity_ctrl_config.gain_d);
+                        break;
+                    //command position direct
+                    case 'i':
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        pos_velocity_ctrl_config.gain_i = value;
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
+                                                                  pos_velocity_ctrl_config.gain_i,
+                                                                  pos_velocity_ctrl_config.gain_d);
+                        break;
+                    //command velocity forward and backward
+                    case 'd':
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        pos_velocity_ctrl_config.gain_d = value;
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
+                                                                  pos_velocity_ctrl_config.gain_i,
+                                                                  pos_velocity_ctrl_config.gain_d);
+                        break;
+
+                    //command additive torque forward and backward
+                    case 'j':
+                        j = value;
+                        i_position_control.set_j(j);
+                        printf("moment of inertia :%d \n", j);
+                        break;
+                    }
+                break;
+
+
+
 
 
         //profiler max acceleration

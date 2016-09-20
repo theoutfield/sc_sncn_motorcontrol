@@ -341,7 +341,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     velocity_control_mode = VELOCITY_PID_CONTROLLER;
                 }
 
-                //////nonlinear position control
+                //nonlinear position control
                 position_ref_input_k_ = 0;
                 position_ref_k_ = 0;
                 position_sens_k_ = 0;
@@ -354,7 +354,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                //////nonlinear position control
+                //nonlinear position control
                 downstream_control_data.position_cmd = 0;
                 nl_pos_ctrl.t_additive = 0.00;
                 initial_position_ = upstream_control_data.position;
@@ -405,11 +405,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 max_position /= 512;
                 min_position = ((float) pos_velocity_ctrl_config.min_pos);
                 min_position /= 512;
-//                pid_init(velocity_control_pid_param);
+                //pid_init(velocity_control_pid_param);
                 pid_set_parameters((float)pos_velocity_ctrl_config.P_velocity, (float)pos_velocity_ctrl_config.I_velocity,
                                    (float)pos_velocity_ctrl_config.D_velocity, (float)pos_velocity_ctrl_config.integral_limit_velocity,
                                           pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-//                pid_init(position_control_pid_param);
+                //pid_init(position_control_pid_param);
                 pid_set_parameters((float)pos_velocity_ctrl_config.P_pos, (float)pos_velocity_ctrl_config.I_pos,
                                    (float)pos_velocity_ctrl_config.D_pos, (float)pos_velocity_ctrl_config.integral_limit_pos,
                                           pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
@@ -418,6 +418,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
                 pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
                 enable_profiler = pos_velocity_ctrl_config.enable_profiler;
+
+                nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
                 break;
 
             case i_position_control[int i].get_position_velocity_control_config() ->  PosVelocityControlConfig out_config:
@@ -436,7 +438,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
             case i_position_control[int i].set_j(int j):
-
                     pos_velocity_ctrl_config.j = j;
                     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
                     break;
