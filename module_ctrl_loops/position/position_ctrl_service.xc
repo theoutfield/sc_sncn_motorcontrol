@@ -242,7 +242,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
 
-                            position_ref_k_ = (double) (position_ref_input_k_);
+                            //position_ref_k_ = (double) (position_ref_input_k_);
+                            position_ref_k_ = (double) (position_ref_k*512);
 
                             position_sens_k_1_ = position_sens_k_;
                             position_sens_k_   = (double) (upstream_control_data.position);
