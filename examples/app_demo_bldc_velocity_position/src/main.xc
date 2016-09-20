@@ -65,7 +65,7 @@ int main(void) {
             pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
             pos_velocity_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
 
-            pos_velocity_ctrl_config.control_mode =                         POS_WITH_SATURATION_CONTROLLER;
+            pos_velocity_ctrl_config.control_mode =                         NL_POSITION_CONTROLLER;
 
             pos_velocity_ctrl_config.P_pos =                                Kp_POS_PID;
             pos_velocity_ctrl_config.I_pos =                                Ki_POS_PID;
@@ -85,9 +85,9 @@ int main(void) {
             pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
             pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
 
-            pos_velocity_ctrl_config.P_saturated_position_controller =      Kp_SATURATED_POS_CONTROL;
-            pos_velocity_ctrl_config.I_saturated_position_controller =      Ki_SATURATED_POS_CONTROL;
-            pos_velocity_ctrl_config.D_saturated_position_controller =      Kd_SATURATED_POS_CONTROL;
+            pos_velocity_ctrl_config.P_nl_position_controller =         Kp_NL_POS_CONTROL;
+            pos_velocity_ctrl_config.I_nl_position_controller =         Ki_NL_POS_CONTROL;
+            pos_velocity_ctrl_config.D_nl_position_controller =         Kd_NL_POS_CONTROL;
 
             pos_velocity_ctrl_config.gain_p =                               GAIN_P;
             pos_velocity_ctrl_config.gain_i =                               GAIN_I;

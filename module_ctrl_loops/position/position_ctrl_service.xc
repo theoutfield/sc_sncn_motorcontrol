@@ -54,10 +54,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     ///////////////////////////////////////////////
     // position controller
 
-    PositionControlWithSaturation pos_ctrl_with_saturation;
+    NonlinearPositionControl nl_pos_ctrl;
 
-    position_control_with_saturation_reset(pos_ctrl_with_saturation);
-    position_control_with_saturation_set_parameters(pos_ctrl_with_saturation, pos_velocity_ctrl_config);
+    nl_position_control_reset(nl_pos_ctrl);
+    nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
 
     int position_enable_flag_ = 0;
     int torque_enable_flag_ = 0;
@@ -237,7 +237,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_cmd_k = pid_update(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                             velocity_ref_k = (position_cmd_k / 512);
                         }
-                        else if (pos_control_mode == POS_WITH_SATURATION_CONTROLLER)
+                        else if (pos_control_mode == NL_POSITION_CONTROLLER)
                         {
 
                             //************************************************
@@ -253,7 +253,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
                             // apply position control algorithm
-                            torque_ref_k = update_position_control_with_saturation(pos_ctrl_with_saturation, position_ref_k_, position_sens_k_1_, position_sens_k_);
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_k_, position_sens_k_1_, position_sens_k_);
 
                             xscope_int(POSITION_REF_SP3 , ((int)(downstream_control_data.position_cmd)));
                             xscope_int(POSITION_REAL_SP3, ((int)(position_sens_k_ - initial_position_)));
@@ -350,17 +350,17 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 position_ref_k_ = 0;
                 position_sens_k_ = 0;
                 position_sens_k_1_=0;
-                pos_ctrl_with_saturation.torque_ref_k = 0.00;
-                pos_ctrl_with_saturation.t_additive = 0.00;
-                pos_ctrl_with_saturation.feedback_p_loop =0.00;
-                pos_ctrl_with_saturation.feedback_d_loop=0.00;
+                nl_pos_ctrl.torque_ref_k = 0.00;
+                nl_pos_ctrl.t_additive = 0.00;
+                nl_pos_ctrl.feedback_p_loop =0.00;
+                nl_pos_ctrl.feedback_d_loop=0.00;
                 //////////////////////////////
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
                 //////nonlinear position control
                 downstream_control_data.position_cmd = 0;
-                pos_ctrl_with_saturation.t_additive = 0.00;
+                nl_pos_ctrl.t_additive = 0.00;
                 initial_position_ = upstream_control_data.position;
                 ////////////////////////////////
 
@@ -440,7 +440,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
             case i_position_control[int i].set_j(int j):
-                    pos_ctrl_with_saturation.j = ((double)(j));
+                    nl_pos_ctrl.j = ((double)(j));
                     break;
 
 

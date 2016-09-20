@@ -59,7 +59,7 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
     printf("..sp#->set pos on/off while # is the mode:\n");
     printf("...mode=1    -> POS_PID_CONTROLLER\n");
     printf("...mode=2    -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
-    printf("...mode=3    -> POS_WITH_SATURATION_CONTROLLER\n");
+    printf("...mode=3    -> NL_POSITION_CONTROLLER\n");
     printf("...mode=else -> disable\n");
     printf("..cp#->command position back and forth\n");
     printf("..cd#->command position\n");
@@ -130,7 +130,7 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
             printf("..sp#->set pos on/off while # is the mode:\n");
             printf("...mode=1    -> POS_PID_CONTROLLER\n");
             printf("...mode=2    -> POS_PID_VELOCITY_CASCADED_CONTROLLER\n");
-            printf("...mode=3    -> POS_WITH_SATURATION_CONTROLLER\n");
+            printf("...mode=3    -> NL_POSITION_CONTROLLER\n");
             printf("...mode=else -> disable\n");
             printf("..cp#->command position back and forth\n");
             printf("..cd#->command position\n");
@@ -303,7 +303,7 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                         printf("position ctrl enabled\n");
                     }
                     else if (value == 3) {
-                        i_position_control.enable_position_ctrl(POS_WITH_SATURATION_CONTROLLER);
+                        i_position_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
                         printf("position ctrl enabled\n");
                     }
                     else {

@@ -23,7 +23,7 @@ typedef struct {
 
 
 /**
- * @brief Structure type to set the parameters of (saturated) position controller.
+ * @brief Structure type to set the parameters of nonlinear position controller with saturation.
  */
 typedef struct {
     double kp;
@@ -65,7 +65,7 @@ typedef struct {
 
     double torque_ref_k; // milli-Nm
 
-} PositionControlWithSaturation;
+} NonlinearPositionControl;
 
 
 
@@ -133,18 +133,18 @@ void pid_reset(PIDparam &param);
 
 
 /**
- * @brief resetting the parameters of the position controller with saturation.
+ * @brief resetting the parameters of the nonlinear position controller with saturation.
  * @param the parameters of the controller
  */
-void position_control_with_saturation_reset(PositionControlWithSaturation &pos_ctrl_with_saturation);
+void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl);
 
 
 /**
- * @brief resetting the parameters of the position controller with saturation.
+ * @brief resetting the parameters of nonlinear position controller with saturation.
  * @param the parameters of the controller
  */
-void position_control_with_saturation_set_parameters(
-        PositionControlWithSaturation &pos_ctrl_with_saturation,
+void nl_position_control_set_parameters(
+        NonlinearPositionControl &nl_pos_ctrl,
         PosVelocityControlConfig &pos_velocity_ctrl_config);
 
 
@@ -154,8 +154,8 @@ void position_control_with_saturation_set_parameters(
  * @param input, setpoint
  * @param input, feedback
  */
-int update_position_control_with_saturation(
-        PositionControlWithSaturation &pos_ctrl_with_saturation,
+int update_nl_position_control(
+        NonlinearPositionControl &nl_pos_ctrl,
         double position_ref_k_,
         double position_sens_k_1_,
         double position_sens_k_);
