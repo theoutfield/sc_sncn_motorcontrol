@@ -132,44 +132,6 @@ float pid_update(float desired_value, float actual_value, int T_s, PIDparam &par
 void pid_reset(PIDparam &param);
 
 
-
-/**
- * @brief intializing the parameters of the integral optimum position controller.
- * @param the parameters of the controller
- */
-void integral_optimum_pos_controller_init(integralOptimumPosControllerParam &param);
-
-
-/**
- * @brief setting the parameters of the integral optimum position controller.
- * @param input, P parameter
- * @param input, I parameter
- * @param input, D parameter
- * @param input, Integral limit
- * @param input, sample-time in us (microseconds).
- * @param the parameters of the integral optimum position controller
- */
-void integral_optimum_pos_controller_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, integralOptimumPosControllerParam &param);
-
-
-/**
- * @brief updating the integral optimum position controller.
- * @param output, control command
- * @param input, setpoint
- * @param input, feedback
- * @param input, sample-time in us (microseconds).
- * @param the parameters of the integral optimum position controller
- */
-float integral_optimum_pos_controller_updat(float desired_value, float actual_value, int T_s, integralOptimumPosControllerParam &param);
-
-
-/**
- * @brief resetting the parameters of the integral optimum position controller.
- * @param the parameters of the controller
- */
-void integral_optimum_pos_controller_reset(integralOptimumPosControllerParam &param);
-
-
 /**
  * @brief resetting the parameters of the position controller with saturation.
  * @param the parameters of the controller
