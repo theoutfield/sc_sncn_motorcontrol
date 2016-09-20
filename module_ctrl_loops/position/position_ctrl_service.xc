@@ -51,11 +51,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int pos_control_mode = 0;
     int velocity_control_mode = 0;
 
-    ///////////////////////////////////////////////
-    // position controller
-
     NonlinearPositionControl nl_pos_ctrl;
-
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
 
@@ -440,7 +436,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
             case i_position_control[int i].set_j(int j):
-                    nl_pos_ctrl.j = ((double)(j));
+
+                    pos_velocity_ctrl_config.j = j;
+                    nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
                     break;
 
 
