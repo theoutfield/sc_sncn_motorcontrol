@@ -435,6 +435,24 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                         i_position_control.set_j(j);
                         printf("moment of inertia :%d \n", j);
                         break;
+
+
+                    //command additive torque forward and backward
+                    case 't':
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        pos_velocity_ctrl_config.max_torque = value;
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        printf("max_torque: %d [milli-Nm]\n", pos_velocity_ctrl_config.max_torque);
+                        break;
+
+                    //command additive torque forward and backward
+                    case 'w':
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        pos_velocity_ctrl_config.max_speed = value;
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        printf("max speed: %d [rpm]\n", pos_velocity_ctrl_config.max_speed);
+                        break;
+
                     }
                 break;
 
