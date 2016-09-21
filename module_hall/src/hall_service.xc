@@ -29,6 +29,16 @@ void hall_calculate_speed(hall_variables& hv);
 void hall_calculate_angle(hall_variables& hv);
 void speed_LPF(hall_variables& hv);
 
+static inline void multiturn(int &count, int last_position, int position, int ticks_per_turn) {
+        int difference = position - last_position;
+        if (difference >= ticks_per_turn/2)
+            count = count + difference - ticks_per_turn;
+        else if (-difference >= ticks_per_turn/2)
+            count = count + difference + ticks_per_turn;
+        else
+            count += difference;
+}
+
 //[[combinable]]
 void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedback_config,
         client interface shared_memory_interface ?i_shared_memory,
@@ -149,7 +159,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     int hall_sector_and_state;
     hall_sector_and_state=0;
 
-    int angle_out=0, speed_out=0;
+    int angle_out=0, last_angle=0, speed_out=0, count = 0;
 
     int hall_sector_and_state_temp;
 
@@ -520,7 +530,10 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                 if(angle_out>4095) angle_out-=4096;
                 if(angle_out<0)    angle_out+=4096;
 
-                i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, 0, hall_state_new);
+                multiturn(count, last_angle, angle_out, 4096);
+                last_angle = angle_out;
+
+                i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, count, hall_state_new);
 
 
 

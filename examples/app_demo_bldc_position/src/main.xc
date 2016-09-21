@@ -147,33 +147,49 @@ int main(void)
         {
             PosVelocityControlConfig pos_velocity_ctrl_config;
             /* Control Loop */
-            pos_velocity_ctrl_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
+            pos_velocity_ctrl_config.control_loop_period =                  CONTROL_LOOP_PERIOD; //us
 
-            pos_velocity_ctrl_config.int21_min_position = MIN_POSITION_LIMIT;
-            pos_velocity_ctrl_config.int21_max_position = MAX_POSITION_LIMIT;
-            pos_velocity_ctrl_config.int21_max_speed = MAX_VELOCITY;
-            pos_velocity_ctrl_config.int21_max_torque = MAX_TORQUE;
+            pos_velocity_ctrl_config.min_pos =                              MIN_POSITION_LIMIT;
+            pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
+            pos_velocity_ctrl_config.max_speed =                            MAX_VELOCITY;
+            pos_velocity_ctrl_config.max_torque =                           MAX_TORQUE;
 
+            pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
+            pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
+            pos_velocity_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
 
-            pos_velocity_ctrl_config.int10_P_position = POSITION_Kp;
-            pos_velocity_ctrl_config.int10_I_position = POSITION_Ki;
-            pos_velocity_ctrl_config.int10_D_position = POSITION_Kd;
-            pos_velocity_ctrl_config.int21_P_error_limit_position = POSITION_P_ERROR_lIMIT;
-            pos_velocity_ctrl_config.int21_I_error_limit_position = POSITION_I_ERROR_lIMIT;
-            pos_velocity_ctrl_config.int22_integral_limit_position = POSITION_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.control_mode =                         NL_POSITION_CONTROLLER;
 
-            pos_velocity_ctrl_config.int10_P_velocity = VELOCITY_Kp;
-            pos_velocity_ctrl_config.int10_I_velocity = VELOCITY_Ki;
-            pos_velocity_ctrl_config.int10_D_velocity = VELOCITY_Kd;
-            pos_velocity_ctrl_config.int21_P_error_limit_velocity = VELOCITY_P_ERROR_lIMIT;
-            pos_velocity_ctrl_config.int21_I_error_limit_velocity = VELOCITY_I_ERROR_lIMIT;
-            pos_velocity_ctrl_config.int22_integral_limit_velocity = VELOCITY_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.P_pos =                                Kp_POS_PID;
+            pos_velocity_ctrl_config.I_pos =                                Ki_POS_PID;
+            pos_velocity_ctrl_config.D_pos =                                Kd_POS_PID;
+            pos_velocity_ctrl_config.integral_limit_pos =                   INTEGRAL_LIMIT_POS_PID;
 
-            pos_velocity_ctrl_config.position_ref_fc = POSITION_REF_FC;
-            pos_velocity_ctrl_config.position_fc = POSITION_FC;
-            pos_velocity_ctrl_config.velocity_ref_fc = VELOCITY_REF_FC;
-            pos_velocity_ctrl_config.velocity_fc = VELOCITY_FC;
-            pos_velocity_ctrl_config.velocity_d_fc = VELOCITY_D_FC;
+            pos_velocity_ctrl_config.P_velocity =                           Kp_VELOCITY_PID;
+            pos_velocity_ctrl_config.I_velocity =                           Ki_VELOCITY_PID;
+            pos_velocity_ctrl_config.D_velocity =                           Kd_VELOCITY_PID;
+            pos_velocity_ctrl_config.integral_limit_velocity =              INTEGRAL_LIMIT_VELOCITY_PID;
+
+            pos_velocity_ctrl_config.P_pos_Integral_optimum =               Kp_POS_INTEGRAL_OPTIMUM;
+            pos_velocity_ctrl_config.I_pos_Integral_optimum =               Ki_POS_INTEGRAL_OPTIMUM;
+            pos_velocity_ctrl_config.D_pos_Integral_optimum =               Kd_POS_INTEGRAL_OPTIMUM;
+            pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum =  INTEGRAL_LIMIT_POS_INTEGRAL_OPTIMUM;
+
+            pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
+            pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
+
+            pos_velocity_ctrl_config.P_nl_position_controller =         Kp_NL_POS_CONTROL;
+            pos_velocity_ctrl_config.I_nl_position_controller =         Ki_NL_POS_CONTROL;
+            pos_velocity_ctrl_config.D_nl_position_controller =         Kd_NL_POS_CONTROL;
+
+            pos_velocity_ctrl_config.gain_p =                               GAIN_P;
+            pos_velocity_ctrl_config.gain_i =                               GAIN_I;
+            pos_velocity_ctrl_config.gain_d =                               GAIN_D;
+
+            pos_velocity_ctrl_config.k_fb =                                 K_FB;
+            pos_velocity_ctrl_config.k_m =                                  K_M;
+
+            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
         }
@@ -249,9 +265,7 @@ int main(void)
                 }
 
                 /* Shared memory Service */
-                {
-                    memory_manager(i_shared_memory, 2);
-                }
+                [[distribute]] memory_manager(i_shared_memory, 2);
 
                 /* Position feedback service */
                 {

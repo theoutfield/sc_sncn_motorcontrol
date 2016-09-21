@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-
 int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 {
     printf("Sending offset_detection command ...\n");
@@ -29,8 +28,8 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 }
 
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_commutation,
-                       interface PositionVelocityCtrlInterface client ?i_position_control)
+void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
+        interface PositionVelocityCtrlInterface client ?i_position_control)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
@@ -38,51 +37,21 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
     DownstreamControlData downstream_control_data;
     PosVelocityControlConfig pos_velocity_ctrl_config;
 
+    int velocity_running = 0;
+    int velocity = 0;
+
     int torque = 0;
-
-
-    pos_velocity_ctrl_config.control_loop_period = CONTROL_LOOP_PERIOD; //us
-
-    pos_velocity_ctrl_config.int21_min_position = MIN_POSITION_LIMIT;
-    pos_velocity_ctrl_config.int21_max_position = MAX_POSITION_LIMIT;
-    pos_velocity_ctrl_config.int21_max_speed = MAX_VELOCITY;
-    pos_velocity_ctrl_config.int21_max_torque = MAX_TORQUE;
-
-
-    pos_velocity_ctrl_config.int10_P_position = POSITION_Kp;
-    pos_velocity_ctrl_config.int10_I_position = POSITION_Ki;
-    pos_velocity_ctrl_config.int10_D_position = POSITION_Kd;
-    pos_velocity_ctrl_config.int21_P_error_limit_position = POSITION_P_ERROR_lIMIT;
-    pos_velocity_ctrl_config.int21_I_error_limit_position = POSITION_I_ERROR_lIMIT;
-    pos_velocity_ctrl_config.int22_integral_limit_position = POSITION_INTEGRAL_LIMIT;
-
-    pos_velocity_ctrl_config.int10_P_velocity = VELOCITY_Kp;
-    pos_velocity_ctrl_config.int10_I_velocity = VELOCITY_Ki;
-    pos_velocity_ctrl_config.int10_D_velocity = VELOCITY_Kd;
-    pos_velocity_ctrl_config.int21_P_error_limit_velocity = VELOCITY_P_ERROR_lIMIT;
-    pos_velocity_ctrl_config.int21_I_error_limit_velocity = VELOCITY_I_ERROR_lIMIT;
-    pos_velocity_ctrl_config.int22_integral_limit_velocity = VELOCITY_INTEGRAL_LIMIT;
-
-    pos_velocity_ctrl_config.position_ref_fc = POSITION_REF_FC;
-    pos_velocity_ctrl_config.position_fc = POSITION_FC;
-    pos_velocity_ctrl_config.velocity_ref_fc = VELOCITY_REF_FC;
-    pos_velocity_ctrl_config.velocity_fc = VELOCITY_FC;
-    pos_velocity_ctrl_config.velocity_d_fc = VELOCITY_D_FC;
-
-
-    delay_milliseconds(2000);
-//    i_commutation.set_brake_status(1);
-
-    i_commutation.set_offset_value(150);//1250);
-    delay_milliseconds(1000);
-
-    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+    int brake_flag = 0;
+    int period_us;     // torque generation period in micro-seconds
+    int pulse_counter; // number of generated pulses
+    int torque_control_flag = 0;
 
     fflush(stdout);
     //read and adjust the offset.
     while (1) {
-        char mode = 0;
-        char mode_2 = 0;
+        char mode = '@';
+        char mode_2 = '@';
+        char mode_3 = '@';
         char c;
         int value = 0;
         int sign = 1;
@@ -94,315 +63,424 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
             } else if (c == '-') {
                 sign = -1;
             } else if (c != ' ') {
-                if (mode == 0) {
+                if (mode == '@') {
                     mode = c;
-                } else {
+                } else if (mode_2 == '@'){
                     mode_2 = c;
+                } else {
+                    mode_3 = c;
                 }
             }
         }
+        value *= sign;
         switch(mode) {
 
-        case 'u':
-            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-            printf("control config updated");
-            break;
-        //velocity pid coefficients
-        case 'k':
+        //position commands
+        case 'p':
+            downstream_control_data.offset_torque = 0;
+            downstream_control_data.position_cmd = value;
+            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
             switch(mode_2) {
+            //direct command with profile
             case 'p':
-                pos_velocity_ctrl_config.int10_P_velocity = value;
+                //bug: the first time after one p# command p0 doesn't use the profile; only the way back to zero
+                pos_velocity_ctrl_config.enable_profiler = 1;
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("Kp:%d Ki:%d Kd:%d\n", pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity);
+                printf("Go to %d with profile\n", value);
+                i_position_control.update_control_data(downstream_control_data);
                 break;
-            case 'i':
-                pos_velocity_ctrl_config.int10_I_velocity = value;
+            //step command (forward and backward)
+            case 's':
+                switch(mode_3) {
+                //with profile
+                case 'p':
+                    pos_velocity_ctrl_config.enable_profiler = 1;
+                    printf("position cmd: %d to %d with profile\n", value, -value);
+                    break;
+                //without profile
+                default:
+                    pos_velocity_ctrl_config.enable_profiler = 0;
+                    printf("position cmd: %d to %d\n", value, -value);
+                    break;
+                }
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("Kp:%d Ki:%d Kd:%d\n", pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity);
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.position_cmd = value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1500);
+                downstream_control_data.position_cmd = -value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1500);
+                downstream_control_data.position_cmd = 0;
+                i_position_control.update_control_data(downstream_control_data);
                 break;
-            case 'd':
-                pos_velocity_ctrl_config.int10_D_velocity = value;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("Kp:%d Ki:%d Kd:%d\n", pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity);
-                break;
+            //direct command
             default:
-                printf("Kp:%d Ki:%d Kd:%d\n", pos_velocity_ctrl_config.int10_P_velocity, pos_velocity_ctrl_config.int10_I_velocity, pos_velocity_ctrl_config.int10_D_velocity);
-                break;
-            }
-            break;
-        //velocity pid limits
-        case 'l':
-            switch(mode_2) {
-            case 'p':
-                pos_velocity_ctrl_config.int21_P_error_limit_velocity = value * sign;
+                pos_velocity_ctrl_config.enable_profiler = 0;
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity
-                                                                      , pos_velocity_ctrl_config.int22_integral_limit_velocity, pos_velocity_ctrl_config.int21_max_torque);
-                break;
-            case 'i':
-                pos_velocity_ctrl_config.int21_I_error_limit_velocity = value * sign;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity
-                                                                      , pos_velocity_ctrl_config.int22_integral_limit_velocity, pos_velocity_ctrl_config.int21_max_torque);
-                break;
-            case 'l':
-                pos_velocity_ctrl_config.int22_integral_limit_velocity = value * sign;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity
-                                                                      , pos_velocity_ctrl_config.int22_integral_limit_velocity, pos_velocity_ctrl_config.int21_max_torque);
-                break;
-            case 'c':
-                pos_velocity_ctrl_config.int21_max_torque = value * sign;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity
-                                                                      , pos_velocity_ctrl_config.int22_integral_limit_velocity, pos_velocity_ctrl_config.int21_max_torque);
-                break;
-            default:
-                printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_velocity, pos_velocity_ctrl_config.int21_I_error_limit_velocity
-                                                                      , pos_velocity_ctrl_config.int22_integral_limit_velocity, pos_velocity_ctrl_config.int21_max_torque);
+                printf("Go to %d\n", value);
+                i_position_control.update_control_data(downstream_control_data);
                 break;
             }
             break;
 
-            //position pid coefficients
-            case 'p':
-                switch(mode_2) {
+        //velocity commands
+        case 'v':
+            switch(mode_2) {
+            //step command (forward and backward)
+            case 's':
+                printf("velocity cmd: %d to %d\n", value, -value);
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.velocity_cmd = value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1000);
+                downstream_control_data.velocity_cmd = -value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1000);
+                downstream_control_data.velocity_cmd = 0;
+                i_position_control.update_control_data(downstream_control_data);
+                break;
+            //direct command
+            default:
+                if(value==0)
+                    velocity_running = 0;
+                else
+                    velocity_running = 1;
+                downstream_control_data.offset_torque = 0;
+                velocity = value;
+                downstream_control_data.velocity_cmd = velocity;
+                i_position_control.update_control_data(downstream_control_data);
+                printf("set velocity %d\n", downstream_control_data.velocity_cmd);
+                break;
+            }
+            break;
+
+        //pid coefficients
+        case 'k':
+            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+            switch(mode_2) {
+            case 'p': //position
+                switch(mode_3) {
                 case 'p':
-                    pos_velocity_ctrl_config.int10_P_position = value;
-                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                    printf("Pp:%d Pi:%d Pd:%d\n", pos_velocity_ctrl_config.int10_P_position, pos_velocity_ctrl_config.int10_I_position, pos_velocity_ctrl_config.int10_D_position);
+                    pos_velocity_ctrl_config.P_pos = value;
                     break;
                 case 'i':
-                    pos_velocity_ctrl_config.int10_I_position = value;
-                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                    printf("Pp:%d Pi:%d Pd:%d\n", pos_velocity_ctrl_config.int10_P_position, pos_velocity_ctrl_config.int10_I_position, pos_velocity_ctrl_config.int10_D_position);
+                    pos_velocity_ctrl_config.I_pos = value;
                     break;
                 case 'd':
-                    pos_velocity_ctrl_config.int10_D_position = value;
-                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                    printf("Pp:%d Pi:%d Pd:%d\n", pos_velocity_ctrl_config.int10_P_position, pos_velocity_ctrl_config.int10_I_position, pos_velocity_ctrl_config.int10_D_position);
-                    break;
-                default:
-                    printf("Pp:%d Pi:%d Pd:%d\n", pos_velocity_ctrl_config.int10_P_position, pos_velocity_ctrl_config.int10_I_position, pos_velocity_ctrl_config.int10_D_position);
-                    break;
-                }
-                break;
-            //position pid limits
-            case 'i':
-                switch(mode_2) {
-                case 'p':
-                    pos_velocity_ctrl_config.int21_P_error_limit_position = value * sign;
-                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                    printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_position, pos_velocity_ctrl_config.int21_I_error_limit_position
-                                                                          , pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.int21_max_speed);
-                    break;
-                case 'i':
-                    pos_velocity_ctrl_config.int21_I_error_limit_position = value * sign;
-                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                    printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_position, pos_velocity_ctrl_config.int21_I_error_limit_position
-                                                                          , pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.int21_max_speed);
+                    pos_velocity_ctrl_config.D_pos = value;
                     break;
                 case 'l':
-                    pos_velocity_ctrl_config.int22_integral_limit_position = value * sign;
-                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                    printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_position, pos_velocity_ctrl_config.int21_I_error_limit_position
-                                                                          , pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.int21_max_speed);
-                    break;
-                case 'c':
-                    pos_velocity_ctrl_config.int21_max_speed = value * sign;
-                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                    printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_position, pos_velocity_ctrl_config.int21_I_error_limit_position
-                                                                          , pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.int21_max_speed);
+                    pos_velocity_ctrl_config.integral_limit_pos = value;
                     break;
                 default:
-                    printf("P_e_lim:%d I_e_lim:%d int_lim:%d cmd_lim:%d\n", pos_velocity_ctrl_config.int21_P_error_limit_position, pos_velocity_ctrl_config.int21_I_error_limit_position
-                                                                          , pos_velocity_ctrl_config.int22_integral_limit_position, pos_velocity_ctrl_config.int21_max_speed);
                     break;
                 }
+                printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos, pos_velocity_ctrl_config.I_pos,
+                                                       pos_velocity_ctrl_config.D_pos, pos_velocity_ctrl_config.integral_limit_pos);
+                break;
+            case 'o': //integral optimum pos control
+                switch(mode_3) {
+                case 'p':
+                    pos_velocity_ctrl_config.P_pos_Integral_optimum = value;
+                    break;
+                case 'i':
+                    pos_velocity_ctrl_config.I_pos_Integral_optimum = value;
+                    break;
+                case 'd':
+                    pos_velocity_ctrl_config.D_pos_Integral_optimum = value;
+                    break;
+                case 'l':
+                    pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum = value;
+                    break;
+                default:
+                    break;
+                }
+                printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos_Integral_optimum, pos_velocity_ctrl_config.I_pos_Integral_optimum,
+                                                       pos_velocity_ctrl_config.D_pos_Integral_optimum, pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum);
+                break;
+            case 'v': //velocity
+                switch(mode_3) {
+                case 'p':
+                    pos_velocity_ctrl_config.P_velocity = value;
+                    break;
+                case 'i':
+                    pos_velocity_ctrl_config.I_velocity = value;
+                    break;
+                case 'd':
+                    pos_velocity_ctrl_config.D_velocity = value;
+                    break;
+                case 'l':
+                    pos_velocity_ctrl_config.integral_limit_velocity = value;
+                    break;
+                default:
+                    break;
+                }
+                printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_velocity, pos_velocity_ctrl_config.I_velocity,
+                                                       pos_velocity_ctrl_config.D_velocity, pos_velocity_ctrl_config.integral_limit_velocity);
+                break;
+            default:
+                printf("kp->pos_ctrl ko->optimum_ctrl kv->vel_ctrl\n");
+            }
+            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+            break;
+            //limits
+            case 'L':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                switch(mode_2) {
+                //max position limit
+                case 'p':
+                    pos_velocity_ctrl_config.max_pos = value;
+                    pos_velocity_ctrl_config.min_pos = -value;
+                    break;
+                //max velocity limit
+                case 'v':
+                    pos_velocity_ctrl_config.max_speed = value;
+                    break;
+                //max torque limit
+                case 't':
+                    pos_velocity_ctrl_config.max_torque = value;
+                    break;
+                default:
+                    break;
+                }
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("pos_max:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.max_speed,
+                                                            pos_velocity_ctrl_config.max_torque);
                 break;
 
-        case 's':
+        //enable
+        case 'e':
             switch(mode_2) {
-                case 'p':
-                    if (value == 1) {
-                        i_position_control.enable_position_ctrl();
-                        printf("position ctrl enabled\n");
-                    }
-                    else {
-                        i_position_control.disable();
-                        printf("position ctrl disabled\n");
-                    }
-                    break;
-                case 'v':
-                    if (value == 1) {
-                        i_position_control.enable_velocity_ctrl();
-                        printf("velocity ctrl enabled\n");
-                    }
-                    else {
-                        i_position_control.disable();
-                        printf("velocity ctrl disabled\n");
-                    }
-                    break;
-                case 't':
-                    if (value == 1) {
-                        i_position_control.enable_torque_ctrl();
-                        printf("torque ctrl enabled\n");
-                    }
-                    else {
-                        i_position_control.disable();
-                        printf("torque ctrl disabled\n");
-                    }
-                    break;
+            case 'p':
+                if (value == 1) {
+                    i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                    printf("simpe PID pos ctrl enabled\n");
+                }
+                else if (value == 2) {
+                    i_position_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                    printf("vel.-cascaded pos ctrl enabled\n");
+                }
+                else if (value == 3) {
+                    i_position_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
+                    printf("Nonlinear pos ctrl enabled\n");
+                }
+                else {
+                    i_position_control.disable();
+                    printf("position ctrl disabled\n");
+                }
+                break;
+            case 'v':
+                if (value == 1) {
+                    i_position_control.enable_velocity_ctrl(VELOCITY_PID_CONTROLLER);
+                    printf("velocity ctrl enabled\n");
+                }
+                else {
+                    i_position_control.disable();
+                    printf("velocity ctrl disabled\n");
+                }
+                break;
+            case 't':
+                if (value == 1) {
+                    i_position_control.enable_torque_ctrl();
+                    printf("torque ctrl enabled\n");
+                }
+                else {
+                    i_position_control.disable();
+                    printf("torque ctrl disabled\n");
+                }
+                break;
+            default:
+                printf("ep1->enable PID pos ctrl\n");
+                printf("ep2->enable cascaded pos ctrl\n");
+                printf("ep3->enable integral-optimum pos ctrl\n");
+                printf("ev1->enable PID velocity ctrl\n");
+                printf("et1->enable torque ctrl\n");
+                break;
+            }
+            break;
+
+
+
+
+
+        case 'n':
+            switch(mode_2) {
+            //command position forward and backward
+            case 'p':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                pos_velocity_ctrl_config.gain_p = value;
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
+                                                          pos_velocity_ctrl_config.gain_i,
+                                                          pos_velocity_ctrl_config.gain_d);
+                break;
+            //command position direct
+            case 'i':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                pos_velocity_ctrl_config.gain_i = value;
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
+                                                          pos_velocity_ctrl_config.gain_i,
+                                                          pos_velocity_ctrl_config.gain_d);
+                break;
+            //command velocity forward and backward
+            case 'd':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                pos_velocity_ctrl_config.gain_d = value;
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
+                                                          pos_velocity_ctrl_config.gain_i,
+                                                          pos_velocity_ctrl_config.gain_d);
+                break;
+
+            //command additive torque forward and backward
+            case 'j':
+                i_position_control.set_j(value);
+                printf("moment of inertia :%d \n", value);
+                break;
+
+            //command additive torque forward and backward
+            case 't':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                pos_velocity_ctrl_config.max_torque = value;
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("max_torque: %d [milli-Nm]\n", pos_velocity_ctrl_config.max_torque);
+                break;
+
+            //command additive torque forward and backward
+            case 'w':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                pos_velocity_ctrl_config.max_speed = value;
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("max speed: %d [rpm]\n", pos_velocity_ctrl_config.max_speed);
+                break;
                 }
             break;
 
-        case 'c':
+
+
+
+
+        //help
+        case 'h':
+            printf("p->set position\n");
+            printf("v->set veloctiy\n");
+            printf("k->set PIDs\n");
+            printf("L->set limits\n");
+            printf("e->enable controllers\n");
+            break;
+
+        //jerk limitation (profiler parameters)
+        case 'j':
+            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
             switch(mode_2) {
-                case 'p':
-                    printf("position cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    for (int ii=0; ii<1; ii++) {
-                        downstream_control_data.offset_torque = 0;
-                        downstream_control_data.position_cmd = value*sign;
-                        i_position_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(2000);
-                        downstream_control_data.position_cmd = -value*sign;
-                        i_position_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(2000);
-                        downstream_control_data.position_cmd = 0;
-                        i_position_control.update_control_data(downstream_control_data);
-                    }
-                    break;
-                case 'v':
-                    printf("velocity cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    downstream_control_data.offset_torque = 0;
-                    downstream_control_data.velocity_cmd = value*sign;
-                    i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(1500);
-                    downstream_control_data.velocity_cmd = -value*sign;
-                    i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(1500);
-                    downstream_control_data.velocity_cmd = 0;//value*sign;
-                    i_position_control.update_control_data(downstream_control_data);
-                    break;
-                case 't':
-                    printf("torque cmd: %d to %d (range:-32767 to 32767)\n", value*sign, -value*sign);
-                    downstream_control_data.torque_cmd = value*sign;
-                    i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(1500);
-                    downstream_control_data.torque_cmd = -value*sign;
-                    i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(1500);
-                    downstream_control_data.torque_cmd = 0;
-                    i_position_control.update_control_data(downstream_control_data);
-                    break;
-                case 'o':
-                    printf("offset-torque cmd: %d to %d\n", value*sign, -value*sign);
-                    downstream_control_data.position_cmd = 0;
-                    downstream_control_data.velocity_cmd = 0;
-                    downstream_control_data.offset_torque = value*sign;
-                    i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(200);
-                    downstream_control_data.offset_torque = -value*sign;
-                    i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(200);
-                    downstream_control_data.offset_torque = 0;
-                    i_position_control.update_control_data(downstream_control_data);
-                    break;
-                    }
+            case 'a':
+                pos_velocity_ctrl_config.max_acceleration_profiler = value;
+                break;
+            case 'v':
+                pos_velocity_ctrl_config.max_speed_profiler = value;
+                break;
+            default:
+                break;
+            }
+            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+            printf("acceleration_max:%d velocity_max:%d\n",pos_velocity_ctrl_config.max_acceleration_profiler, pos_velocity_ctrl_config.max_speed_profiler);
             break;
 
         //auto offset tuning
         case 'a':
-            auto_offset(i_commutation);
+            auto_offset(i_motorcontrol);
+            break;
+
+        //set brake
+        case 'b':
+            if (brake_flag) {
+                brake_flag = 0;
+                printf("Brake blocking\n");
+            } else {
+                brake_flag = 1;
+                printf("Brake released\n");
+            }
+            i_motorcontrol.set_brake_status(brake_flag);
             break;
 
         //set offset
         case 'o':
-            i_commutation.set_offset_value(value);
-            printf("set offset to %d\n", value);
+            switch(mode_2) {
+                //set offset
+                case 's':
+                    i_motorcontrol.set_offset_value(value);
+                    printf("set offset to %d\n", value);
+                    break;
+                //print offset
+                case 'p':
+                    printf("offset %d\n", i_motorcontrol.set_calib(0));
+                    break;
+            }
             break;
 
-        //reverse torque
+        //enable and disable torque controller
+        case 't':
+            if (torque_control_flag == 0) {
+                torque_control_flag = 1;
+                i_motorcontrol.set_brake_status(1);
+                i_motorcontrol.set_torque_control_enabled();
+                printf("Torque control activated\n");
+            } else {
+                torque_control_flag = 0;
+                i_motorcontrol.set_torque_control_disabled();
+                printf("Torque control deactivated\n");
+            }
+            break;
+
+        //play sound!
+        case 's':
+            for(period_us=400;period_us<=(1*1000);(period_us+=400))
+            {
+                if(period_us<3000) period_us-=300;
+
+                for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                {
+                    i_motorcontrol.set_torque(value);
+                    delay_microseconds(period_us);
+                    i_motorcontrol.set_torque(-value);
+                    delay_microseconds(period_us);
+                }
+            }
+            i_motorcontrol.set_torque(0);
+            break;
+
+        //reverse torque or velocity
         case 'r':
             torque = -torque;
-            i_commutation.set_torque(torque);
+            if(velocity_running) {
+                velocity = -velocity;
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.velocity_cmd = velocity;
+                i_position_control.update_control_data(downstream_control_data);
+            }
+            i_motorcontrol.set_torque(torque);
             printf("Torque %d [milli-Nm]\n", torque);
             break;
 
-        //reverse torque
-        case 'j':
-            i_commutation.set_brake_status(1);
-            break;
-
-        case 'z':
-            i_commutation.reset_faults();
-            break;
-
-        //set torque
+        //set torque / set velocity to zero
         default:
-            downstream_control_data.torque_cmd = value*sign;
-            i_position_control.update_control_data(downstream_control_data);
-            printf("Torque %d [milli-Nm]\n", downstream_control_data.torque_cmd);
+            if(velocity_running) {
+                velocity = 0;
+                velocity_running = 0;
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.velocity_cmd = velocity;
+                i_position_control.update_control_data(downstream_control_data);
+            }
+            else {
+                torque = value;
+                i_motorcontrol.set_torque(torque);
+                printf("torque %d [milli-Nm]\n", torque);
+            }
             break;
+
         }
         delay_milliseconds(10);
     }
 }
-
-void position_limiter(int position_limit, interface PositionLimiterInterface server i_position_limiter, client interface MotorcontrolInterface i_motorcontrol)
-{
-    timer t;
-    unsigned ts;
-    t :> ts;
-    int print_position_limit = 0;
-    int count = 0;
-    int velocity = 0;
-
-    while(1) {
-        select {
-        case t when timerafter(ts) :> void:
-
-            count = i_motorcontrol.get_position_actual();
-            velocity = i_motorcontrol.get_velocity_actual();
-
-            //postion limiter
-            if (position_limit > 0) {
-                if (count >= position_limit && velocity > 10) {
-                    i_motorcontrol.set_torque_control_disabled();
-                    i_motorcontrol.set_safe_torque_off_enabled();
-                    i_motorcontrol.set_brake_status(0);
-                    if (print_position_limit >= 0) {
-                        print_position_limit = -1;
-                        printf("up limit reached\n");
-                    }
-                } else if (count <= -position_limit && velocity < -10) {
-                    i_motorcontrol.set_torque_control_disabled();
-                    i_motorcontrol.set_safe_torque_off_enabled();
-                    i_motorcontrol.set_brake_status(0);
-                    if (print_position_limit <= 0) {
-                        print_position_limit = 1;
-                        printf("down limit reached\n");
-                    }
-                }
-            }
-            t :> ts;
-            ts += USEC_FAST * 1000;
-            break;
-
-        case i_position_limiter.set_limit(int in_limit):
-            if (in_limit < 0) {
-                position_limit = in_limit;
-                printf("Position limit disabled\n");
-            } else if (in_limit > 0) {
-                printf("Position limited to %d ticks\n", in_limit);
-                position_limit = in_limit;
-            }
-            break;
-
-        case i_position_limiter.get_limit() -> int out_limit:
-            out_limit =  position_limit;
-            break;
-
-        }//end select
-    }//end while
-}//end function

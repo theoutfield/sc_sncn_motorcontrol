@@ -73,14 +73,13 @@ int main() {
     interface update_pwm i_update_pwm;
 
     par {
-        /* Test BiSS Encoder Client */
-        on tile[APP_TILE]: biss_test(i_position_feedback[0], null);
-
-
         /************************************************************
          * IFM_TILE
          ************************************************************/
         on tile[IFM_TILE]: par {
+            /* Test BiSS Encoder Client */
+            biss_test(i_position_feedback[0], null);
+
             /* PWM Service */
             {
                 pwm_config(pwm_ports);
@@ -107,7 +106,7 @@ int main() {
             }
 
             /* Shared memory Service */
-            memory_manager(i_shared_memory, 2);
+            [[distribute]] memory_manager(i_shared_memory, 2);
 
             /* Position feedback service */
             {

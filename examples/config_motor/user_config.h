@@ -113,7 +113,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      292
+#define COMMUTATION_OFFSET_CLK      2400//590
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     0
@@ -134,8 +134,8 @@
 //////  MOTOR CONTROL CONFIGURATION
 ///////////////////////////////////////////////
 
-// CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     1000
+// POSITION CONTROL LOOP PERIOD [us]
+#define CONTROL_LOOP_PERIOD     1000 //500
 
 // PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
 //#define POSITION_Kp       100
@@ -180,369 +180,55 @@
 
 
 
+/////////////////////////////////////////////////
+//////  POSITION CONTROLLER
+/////////////////////////////////////////////////
+//**Foresight Joint 3
+#define MIN_POSITION_LIMIT                     -300000
+#define MAX_POSITION_LIMIT                      300000
+#define MAX_VELOCITY                            1500 //rpm
+#define MAX_TORQUE                              3000
 
-// A1 Position Controller Config
-// **motor offset: 2090
-/*#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            200             // rpm
-#define MAX_TORQUE              1200000
+#define ENABLE_PROFILER                         1
+#define MAX_ACCELERATION_PROFILER               1800000
+#define MAX_SPEED_PROFILER                      1800000
 
-#define POSITION_Kp             80
-#define POSITION_Ki             20
-#define POSITION_Kd             0
-#define VELOCITY_Kp             60
-#define VELOCITY_Ki             0
-#define VELOCITY_Kd             60
+//PID parameters of the position PID controller
+#define Kp_POS_PID                              30000
+#define Ki_POS_PID                              10
+#define Kd_POS_PID                              0
+#define INTEGRAL_LIMIT_POS_PID                  400000
 
-#define POSITION_P_ERROR_lIMIT  40000
-#define POSITION_I_ERROR_lIMIT  5
-#define POSITION_INTEGRAL_LIMIT 10000
-#define VELOCITY_P_ERROR_lIMIT  200000
-#define VELOCITY_I_ERROR_lIMIT  0
-#define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         8
-#define POSITION_FC             78
-#define VELOCITY_REF_FC         25
-#define VELOCITY_FC             80
-#define VELOCITY_D_FC           80*/
-//
+//PID parameters of the velocity PID controller
+#define Kp_VELOCITY_PID                         100
+#define Ki_VELOCITY_PID                         0
+#define Kd_VELOCITY_PID                         60
+#define INTEGRAL_LIMIT_VELOCITY_PID             0
 
+//PID parameters of the Integral Optimum position controller
+#define Kp_POS_INTEGRAL_OPTIMUM                 1000
+#define Ki_POS_INTEGRAL_OPTIMUM                 1000
+#define Kd_POS_INTEGRAL_OPTIMUM                 1000
 
-// A2 Position Controller Config
-// **motor offset: 1415
-/*#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            200             // rpm
-#define MAX_TORQUE              1200000
+//PID parameters of the Integral Optimum position controller
+#define Kp_NL_POS_CONTROL                   989500
+#define Ki_NL_POS_CONTROL                   100100
+#define Kd_NL_POS_CONTROL                   4142100
 
-#define POSITION_Kp             40
-#define POSITION_Ki             50
-#define POSITION_Kd             0
-#define VELOCITY_Kp             60
-#define VELOCITY_Ki             0
-#define VELOCITY_Kd             65
+#define INTEGRAL_LIMIT_POS_INTEGRAL_OPTIMUM     1500000
 
-#define POSITION_P_ERROR_lIMIT  40000
-#define POSITION_I_ERROR_lIMIT  5
-#define POSITION_INTEGRAL_LIMIT 10000
-#define VELOCITY_P_ERROR_lIMIT  200000
-#define VELOCITY_I_ERROR_lIMIT  0
-#define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         5
-#define POSITION_FC             80
-#define VELOCITY_REF_FC         35
-#define VELOCITY_FC             77
-#define VELOCITY_D_FC           75*/
-//
-
-
-
-// A3 Position Controller Config
-// **motor offset: 740
-/*#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            200             // rpm
-#define MAX_TORQUE              1200000
-
-#define POSITION_Kp             40
-#define POSITION_Ki             40
-#define POSITION_Kd             0
-#define VELOCITY_Kp             45
-#define VELOCITY_Ki             0
-#define VELOCITY_Kd             50
-
-#define POSITION_P_ERROR_lIMIT  40000
-#define POSITION_I_ERROR_lIMIT  5
-#define POSITION_INTEGRAL_LIMIT 10000
-#define VELOCITY_P_ERROR_lIMIT  200000
-#define VELOCITY_I_ERROR_lIMIT  0
-#define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         10
-#define POSITION_FC             82
-#define VELOCITY_REF_FC         28
-#define VELOCITY_FC             77
-#define VELOCITY_D_FC           75*/
-//
-
-
-// A4 Position Controller Config
-// **motor offset: 740
-/*#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            200             // rpm
-#define MAX_TORQUE              1200000
-
-#define POSITION_Kp             40
-#define POSITION_Ki             30
-#define POSITION_Kd             0
-#define VELOCITY_Kp             55
-#define VELOCITY_Ki             0
-#define VELOCITY_Kd             50
-
-#define POSITION_P_ERROR_lIMIT  40000
-#define POSITION_I_ERROR_lIMIT  5
-#define POSITION_INTEGRAL_LIMIT 10000
-#define VELOCITY_P_ERROR_lIMIT  200000
-#define VELOCITY_I_ERROR_lIMIT  0
-#define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         15
-#define POSITION_FC             80
-#define VELOCITY_REF_FC         45
-#define VELOCITY_FC             78
-#define VELOCITY_D_FC           75*/
-//
-
-
-// A5 Position Controller Config
-// **motor offset: 740
-/*#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            200             // rpm
-#define MAX_TORQUE              1000000
-
-#define POSITION_Kp             35
-#define POSITION_Ki             20
-#define POSITION_Kd             0
-#define VELOCITY_Kp             30
-#define VELOCITY_Ki             0
-#define VELOCITY_Kd             40
-
-#define POSITION_P_ERROR_lIMIT  40000
-#define POSITION_I_ERROR_lIMIT  5
-#define POSITION_INTEGRAL_LIMIT 10000
-#define VELOCITY_P_ERROR_lIMIT  200000
-#define VELOCITY_I_ERROR_lIMIT  0
-#define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         25
-#define POSITION_FC             82
-#define VELOCITY_REF_FC         28
-#define VELOCITY_FC             77
-#define VELOCITY_D_FC           75*/
-//
-
-
-// A6 Position Controller Config
-//**motor offset: 740
-//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-//#define MAX_VELOCITY            200             // rpm
-//#define MAX_TORQUE              1000000
-//
-//#define POSITION_Kp             35
-//#define POSITION_Ki             20
-//#define POSITION_Kd             0
-//#define VELOCITY_Kp             30
-//#define VELOCITY_Ki             0
-//#define VELOCITY_Kd             40
-//
-//#define POSITION_P_ERROR_lIMIT  40000
-//#define POSITION_I_ERROR_lIMIT  5
-//#define POSITION_INTEGRAL_LIMIT 10000
-//#define VELOCITY_P_ERROR_lIMIT  200000
-//#define VELOCITY_I_ERROR_lIMIT  0
-//#define VELOCITY_INTEGRAL_LIMIT 0
-//#define POSITION_REF_FC         25
-//#define POSITION_FC             82
-//#define VELOCITY_REF_FC         28
-//#define VELOCITY_FC             77
-//#define VELOCITY_D_FC           75
-
-
-// AMK or qmot
-//**motor offset: AMK 2470, qmot 3450
-#define MIN_POSITION_LIMIT     -400000         // ticks (min range: -2^30, limited for safe operation)
-#define MAX_POSITION_LIMIT      400000         // ticks (max range: 2^30, limited for safe operation)
-#define MAX_VELOCITY            800             // rpm
-#define MAX_TORQUE              3000
-
-//New Pos Controller
-#define POSITION_Kp             30000
-#define POSITION_Ki             180
-#define POSITION_Kd             500000
-#define POSITION_INTEGRAL_LIMIT 1500000
-
-//PID Pos controller
-//#define POSITION_Kp             8000
-//#define POSITION_Ki             15
-//#define POSITION_Kd             0
-//#define POSITION_INTEGRAL_LIMIT 5000000
-
-#define VELOCITY_Kp             1400
-#define VELOCITY_Ki             0
-#define VELOCITY_Kd             500
-
-#define POSITION_P_ERROR_lIMIT  0 //not used anymore
-#define POSITION_I_ERROR_lIMIT  0 //not used anymore
-#define VELOCITY_P_ERROR_lIMIT  0 //not used anymore
-#define VELOCITY_I_ERROR_lIMIT  0 //not used anymore
-#define VELOCITY_INTEGRAL_LIMIT 0
-#define POSITION_REF_FC         20
 #define POSITION_FC             100
-#define VELOCITY_REF_FC         50
 #define VELOCITY_FC             90
-#define VELOCITY_D_FC           90 //not used anymore
 
+#define K_FB                   10429000
+#define K_M                    1
 
-// Foresight: Joint 1 Position Controller Config
-//**motor offset: 2040
-//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-//#define MAX_VELOCITY            1200             // rpm
-//#define MAX_TORQUE              1200000
-//
-//#define POSITION_Kp             180
-//#define POSITION_Ki             30
-//#define POSITION_Kd             0
-//#define VELOCITY_Kp             30
-//#define VELOCITY_Ki             0
-//#define VELOCITY_Kd             40
-//
-//#define POSITION_P_ERROR_lIMIT  40000
-//#define POSITION_I_ERROR_lIMIT  5
-//#define POSITION_INTEGRAL_LIMIT 25000
-//#define VELOCITY_P_ERROR_lIMIT  150000
-//#define VELOCITY_I_ERROR_lIMIT  0
-//#define VELOCITY_INTEGRAL_LIMIT 0
-//#define POSITION_REF_FC         140
-//#define POSITION_FC             80
-//#define VELOCITY_REF_FC         100
-//#define VELOCITY_FC             80
-//#define VELOCITY_D_FC           60
+#define MOMENT_OF_INERTIA      100 //[micro-kgm2]
 
-
-// Foresight: Joint 2 Position Controller Config
-//**motor offset: 2000
-//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-//#define MAX_VELOCITY            10000             // rpm
-//#define MAX_TORQUE              1200000
-//
-//#define POSITION_Kp             300
-//#define POSITION_Ki             100
-//#define POSITION_Kd             0
-//#define VELOCITY_Kp             15
-//#define VELOCITY_Ki             0
-//#define VELOCITY_Kd             5
-//
-//#define POSITION_P_ERROR_lIMIT  50000
-//#define POSITION_I_ERROR_lIMIT  5
-//#define POSITION_INTEGRAL_LIMIT 25000
-//#define VELOCITY_P_ERROR_lIMIT  800000
-//#define VELOCITY_I_ERROR_lIMIT  0
-//#define VELOCITY_INTEGRAL_LIMIT 0
-//#define POSITION_REF_FC         140
-//#define POSITION_FC             80
-//#define VELOCITY_REF_FC         100
-//#define VELOCITY_FC             80
-//#define VELOCITY_D_FC           60
-
-
-// Foresight: Joint 3 Position Controller Config
-//**motor offset: 300
-//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-//#define MAX_VELOCITY            1200             // rpm
-//#define MAX_TORQUE              1200000
-//
-//#define POSITION_Kp             170
-//#define POSITION_Ki             35
-//#define POSITION_Kd             0
-//#define VELOCITY_Kp             38
-//#define VELOCITY_Ki             0
-//#define VELOCITY_Kd             35
-//
-//#define POSITION_P_ERROR_lIMIT  40000
-//#define POSITION_I_ERROR_lIMIT  5
-//#define POSITION_INTEGRAL_LIMIT 25000
-//#define VELOCITY_P_ERROR_lIMIT  150000
-//#define VELOCITY_I_ERROR_lIMIT  0
-//#define VELOCITY_INTEGRAL_LIMIT 0
-//#define POSITION_REF_FC         140
-//#define POSITION_FC             80
-//#define VELOCITY_REF_FC         100
-//#define VELOCITY_FC             80
-//#define VELOCITY_D_FC           60
-
-
-// Foresight: Joint 4 Position Controller Config
-//**motor offset: 330
-//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-//#define MAX_VELOCITY            1200             // rpm
-//#define MAX_TORQUE              1200000
-//
-//#define POSITION_Kp             150
-//#define POSITION_Ki             30
-//#define POSITION_Kd             0
-//#define VELOCITY_Kp             25
-//#define VELOCITY_Ki             0
-//#define VELOCITY_Kd             10
-//
-//#define POSITION_P_ERROR_lIMIT  40000
-//#define POSITION_I_ERROR_lIMIT  10
-//#define POSITION_INTEGRAL_LIMIT 25000
-//#define VELOCITY_P_ERROR_lIMIT  150000
-//#define VELOCITY_I_ERROR_lIMIT  0
-//#define VELOCITY_INTEGRAL_LIMIT 0
-//#define POSITION_REF_FC         140
-//#define POSITION_FC             80
-//#define VELOCITY_REF_FC         100
-//#define VELOCITY_FC             80
-//#define VELOCITY_D_FC           60
+#define GAIN_P      1000
+#define GAIN_I      1000
+#define GAIN_D      1000
 
 
 
-// Foresight: Joint 5 Position Controller Config
-//**motor offset: 1665
-//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-//#define MAX_VELOCITY            1200             // rpm
-//#define MAX_TORQUE              1200000
-//
-//#define POSITION_Kp             210
-//#define POSITION_Ki             40
-//#define POSITION_Kd             0
-//#define VELOCITY_Kp             25
-//#define VELOCITY_Ki             0
-//#define VELOCITY_Kd             15
-//
-//#define POSITION_P_ERROR_lIMIT  40000
-//#define POSITION_I_ERROR_lIMIT  4
-//#define POSITION_INTEGRAL_LIMIT 25000
-//#define VELOCITY_P_ERROR_lIMIT  150000
-//#define VELOCITY_I_ERROR_lIMIT  0
-//#define VELOCITY_INTEGRAL_LIMIT 0
-//#define POSITION_REF_FC         140
-//#define POSITION_FC             80
-//#define VELOCITY_REF_FC         100
-//#define VELOCITY_FC             80
-//#define VELOCITY_D_FC           60
 
-
-
-// Foresight: Joint 6 Position Controller Config
-//**motor offset: 2850
-//#define MIN_POSITION_LIMIT     -1500000         // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_POSITION_LIMIT      1500000         // ticks (max range: 2^30, limited for safe operation)
-//#define MAX_VELOCITY            2500             // rpm
-//#define MAX_TORQUE              1200000
-//
-//#define POSITION_Kp             250
-//#define POSITION_Ki             90
-//#define POSITION_Kd             0
-//#define VELOCITY_Kp             25
-//#define VELOCITY_Ki             0
-//#define VELOCITY_Kd             10
-//
-//#define POSITION_P_ERROR_lIMIT  40000
-//#define POSITION_I_ERROR_lIMIT  4
-//#define POSITION_INTEGRAL_LIMIT 25000
-//#define VELOCITY_P_ERROR_lIMIT  150000
-//#define VELOCITY_I_ERROR_lIMIT  0
-//#define VELOCITY_INTEGRAL_LIMIT 0
-//#define POSITION_REF_FC         140
-//#define POSITION_FC             80
-//#define VELOCITY_REF_FC         100
-//#define VELOCITY_FC             80
-//#define VELOCITY_D_FC           60
