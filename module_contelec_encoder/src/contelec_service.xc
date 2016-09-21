@@ -348,11 +348,6 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
         case i_position_feedback[int i].set_position(int new_count):
                 int multiturn = (new_count / ticks_per_turn) & 4095;
                 unsigned int singleturn = new_count % ticks_per_turn;
-                int test_count;
-                { void, test_count } = macs(ticks_per_turn, multiturn, 0, singleturn); //convert multiturn to absolute count: ticks per turn * number of turns + position
-                if (test_count != new_count) {
-                    printstrln("error new count computation");
-                }
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
                 contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + singleturn, 32);
                 last_position = singleturn;
