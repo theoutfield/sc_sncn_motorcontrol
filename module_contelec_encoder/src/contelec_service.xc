@@ -228,13 +228,24 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     //velocity
     int velocity = 0;
     int velocity2 = 0;
-    int velocity_buffer[32] = {0};
-    int velocity_buffer2[32] = {0};
-    int index = 0;
+    int velocity3 = 0;
+    int velocity4 = 0;
+    int filter_buffer1[32] = {0};
+    int filter_buffer2[8] = {0};
+    int filter_buffer3[8] = {0};
+    int filter_buffer4[32] = {0};
+    int filter_buffer5[8] = {0};
+    int index1 = 0;
     int index2 = 0;
+    int index3 = 0;
+    int index4 = 0;
+    int index5 = 0;
     int old_count = 0;
+    int old_count2 = 0;
     int old_difference = 0;
     unsigned int old_timestamp = 0;
+    int filter_timediff = 0;
+    int timediff2 = 0;
     int ticks_per_turn = (1 << position_feedback_config.contelec_config.resolution_bits);
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC; //velocity loop time in clock ticks
@@ -247,6 +258,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     unsigned int next_velocity_read = 0;
     unsigned int last_read = 0;
     unsigned int last_velocity_read = 0;
+    unsigned int last_velocity_read2 = 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
 
@@ -404,42 +416,67 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
             t :> last_read;
             last_position = position;
 
-//            velocity_count++;
-//            if (velocity_count >= 1) {
-                difference = count - old_count;
-                old_count = count;
-//                if(difference > crossover || difference < -crossover)
-//                    difference = old_difference;
-//                else if (difference == 0) //in case we read the same value two times
-//                    difference = old_difference;
-                old_difference = difference;
-                // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
-                //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-                if (difference != 0)
-                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
-                last_velocity_read = last_read;
-                unsigned int timedif = 0;
-                if (old_timestamp <= timestamp)
-                    timedif = timestamp-old_timestamp;
-                else
-                    timedif = 256+timestamp-old_timestamp;
-                old_timestamp = timestamp;
-                if (timedif != 0 && timedif > 58)
-                    velocity2 = (difference * (60000000/((int)timedif))) / ticks_per_turn;
-//                    velocity2 = difference;
-                /* filter */
-//                velocity = filter(velocity_buffer2, index2, 32, velocity);
-//                velocity2 = filter(velocity_buffer, index, 32, velocity2);
-//                velocity_count = 0;
-//            }
+            //ticks difference
+            difference = count - old_count;
+            old_count = count;
+            old_difference = difference;
+
+            /* velocity xmos time, average filter 32*/
+            if (difference != 0)
+                velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / ticks_per_turn;
+            last_velocity_read = last_read;
+            velocity = filter(filter_buffer1, index1, 32, velocity);
+
+            /* get timestamp difference*/
+            unsigned int timediff = 0;
+            if (old_timestamp <= timestamp) {
+                timediff = timestamp-old_timestamp;
+            } else {
+                timediff = 256+timestamp-old_timestamp;
+            }
+            old_timestamp = timestamp;
+
+            //filter timestamp difference
+            if ((timediff > 30) && (timediff < 90)) {// one sampling step
+                filter_timediff = filter(filter_buffer2, index2, 8, timediff);
+            } else if ((timediff > 90) && (timediff < 150)) {// two sampling steps
+                filter_timediff = filter(filter_buffer2, index2, 8, timediff/2);
+            }
+
+            //velocity timestamp
+//            if (timediff != 0 )
+//                velocity2 = (difference * (60000000/((int)timediff))) / ticks_per_turn;
+
+            //velocity filtered timestamp, filtered 32
+            if (difference != 0 && filter_timediff != 0)
+                velocity3 = (difference * (60000000/(filter_timediff))) / ticks_per_turn;
+            velocity3 = filter(filter_buffer4, index4, 32, velocity3);
+
+            //velocity 20 samples, average filter 8
+            velocity_count++;
+            timediff2 += timediff;
+            if (velocity_count >= 20) {
+                difference = count - old_count2;
+                old_count2 = count;
+                velocity4 = (difference * (60000000/((int)(timediff2)))) / ticks_per_turn;
+                velocity2 = (difference * (60000000/((int)(last_read-last_velocity_read2)/CONTELEC_USEC))) / ticks_per_turn;
+                timediff2 = 0;
+                last_velocity_read2 = last_read;
+                velocity_count = 0;
+            }
+//            velocity4 = filter(filter_buffer3, index3, 8, velocity4);
+//            velocity2 = filter(filter_buffer5, index5, 8, velocity2);
 
 #ifdef XSCOPE_CONTELEC
             xscope_int(VELOCITY, velocity);
             xscope_int(VELOCITY2, velocity2);
+            xscope_int(VELOCITY3, velocity3);
+            xscope_int(VELOCITY4, velocity4);
             xscope_int(POSITION, position);
             xscope_int(POSITION_RAW, angle);
             xscope_int(STATUS, status*1000);
-            xscope_int(TIMESTAMP, timedif);
+            xscope_int(TIMESTAMP, timediff);
+            xscope_int(TIMESTAMP_FILTERED, filter_timediff);
             xscope_int(PERIOD, (int)(last_read-period_time)/CONTELEC_USEC);
             period_time = last_read;
 #endif

@@ -107,6 +107,7 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
     PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
     printstr(">>   SOMANET CONTELEC SENSOR COMMANDS SERVICE STARTING...\n");
     i_motorcontrol.set_torque_control_enabled();
+    i_motorcontrol.set_brake_status(1);
 
     while(1) {
         char mode = 0;
@@ -201,6 +202,13 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
         case 'z':
             i_position_feedback.send_command(CONTELEC_CONF_NULL, 0, 0);
             printf("zero\n");
+            break;
+        //set velocity loop time
+        case 'l':
+            position_feedback_config = i_position_feedback.get_config();
+            position_feedback_config.contelec_config.velocity_loop = value;
+            i_position_feedback.set_config(position_feedback_config);
+            printf("velocity loop time %dus\n", position_feedback_config.contelec_config.velocity_loop);
             break;
         //print the count and the time to get it
         default:

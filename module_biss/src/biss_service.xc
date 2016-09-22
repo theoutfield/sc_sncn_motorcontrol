@@ -405,90 +405,90 @@ unsigned int read_biss_sensor_data(QEIPorts &biss_ports, BISSConfig & biss_confi
     unsigned int frame[frame_bytes];
     unsigned int crc  =  0;
     unsigned int status = 0;
-    unsigned int readbuf = 0;
-    unsigned int bitindex = 0;
-    unsigned int byteindex = 0;
-    unsigned int data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
-    const unsigned int timeout = 3+2; //3 bits to read before then the ack and start bits
-    unsigned int crc_length = 32 - clz(biss_config.crc_poly); //clz: number of leading 0
-    for (int i=0; i<(data_length-1)/32+1; i++) //init data with zeros
-        data[i] = 0;
-
-    //get the raw data
-//    start_clock(biss_ports.spi_interface.blk1);
-    for (int i=0; i<timeout+data_length+crc_length; i++) {
-        if (bitindex == 32) {
-            frame[byteindex] = readbuf;
-            readbuf = 0;
-            bitindex = 0;
-            byteindex++;
-        }
-        unsigned int bit;
-        biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
-        biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
-//        sync(biss_ports.p_qei_config);
-        biss_ports.p_qei :> bit;
-        readbuf = readbuf << 1;
-        readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
-        bitindex++;
-    }
-    biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
-//    configure_out_port(biss_ports.p_qei_config, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
-    readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
-    frame[byteindex] = readbuf;
-    byteindex = 0;
-    bitindex = 0;
-
-    //process the raw data
-    //search for ack and start bit
-    readbuf = frame[0];
-    while (status < 2 && bitindex <= timeout) {
-        unsigned int bit = (readbuf & 0x80000000);
-        readbuf = readbuf << 1;
-        bitindex++;
-        if (status) {
-            if (bit) //status = 2, ack and start bit found
-                status++;
-        } else if (bit == 0) //status = 1, ack bit found
-            status++;
-    }
-    //extract the data and crc
-    if (status == 2) {
-        for (int i=0; i<data_length; i++) {
-            if (bitindex == 32) {
-                bitindex = 0;
-                byteindex++;
-                readbuf = frame[byteindex];
-            }
-            data[i/32] = data[i/32] << 1;
-            data[i/32] |= (readbuf & 0x80000000) >> 31;
-            readbuf = readbuf << 1;
-            bitindex++;
-        }
-        for (int i=0; i<crc_length; i++) {
-            if (bitindex == 32) {
-                bitindex = 0;
-                byteindex++;
-                readbuf = frame[byteindex];
-            }
-            crc = crc << 1;
-            crc |= (readbuf & 0x80000000) >> 31;
-            readbuf = readbuf << 1;
-            bitindex++;
-        }
-        status = NoError;
-        //check crc
-        if (biss_config.crc_poly && crc != biss_crc(data, data_length, biss_config.crc_poly) ) {
-            biss_crc_correct(data, data_length, frame_bytes, crc,  biss_config.crc_poly); //try 1 bit error correction
-            if (crc == biss_crc(data, data_length, biss_config.crc_poly))
-                status = CRCCorrected;
-            else
-                status = CRCError;
-        }
-    } else if (status)
-        status = NoStartBit;
-    else
-        status = NoAck;
+//    unsigned int readbuf = 0;
+//    unsigned int bitindex = 0;
+//    unsigned int byteindex = 0;
+//    unsigned int data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
+//    const unsigned int timeout = 3+2; //3 bits to read before then the ack and start bits
+//    unsigned int crc_length = 32 - clz(biss_config.crc_poly); //clz: number of leading 0
+//    for (int i=0; i<(data_length-1)/32+1; i++) //init data with zeros
+//        data[i] = 0;
+//
+//    //get the raw data
+////    start_clock(biss_ports.spi_interface.blk1);
+//    for (int i=0; i<timeout+data_length+crc_length; i++) {
+//        if (bitindex == 32) {
+//            frame[byteindex] = readbuf;
+//            readbuf = 0;
+//            bitindex = 0;
+//            byteindex++;
+//        }
+//        unsigned int bit;
+//        biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
+//        biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+////        sync(biss_ports.p_qei_config);
+//        biss_ports.p_qei :> bit;
+//        readbuf = readbuf << 1;
+//        readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
+//        bitindex++;
+//    }
+//    biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+////    configure_out_port(biss_ports.p_qei_config, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
+//    readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
+//    frame[byteindex] = readbuf;
+//    byteindex = 0;
+//    bitindex = 0;
+//
+//    //process the raw data
+//    //search for ack and start bit
+//    readbuf = frame[0];
+//    while (status < 2 && bitindex <= timeout) {
+//        unsigned int bit = (readbuf & 0x80000000);
+//        readbuf = readbuf << 1;
+//        bitindex++;
+//        if (status) {
+//            if (bit) //status = 2, ack and start bit found
+//                status++;
+//        } else if (bit == 0) //status = 1, ack bit found
+//            status++;
+//    }
+//    //extract the data and crc
+//    if (status == 2) {
+//        for (int i=0; i<data_length; i++) {
+//            if (bitindex == 32) {
+//                bitindex = 0;
+//                byteindex++;
+//                readbuf = frame[byteindex];
+//            }
+//            data[i/32] = data[i/32] << 1;
+//            data[i/32] |= (readbuf & 0x80000000) >> 31;
+//            readbuf = readbuf << 1;
+//            bitindex++;
+//        }
+//        for (int i=0; i<crc_length; i++) {
+//            if (bitindex == 32) {
+//                bitindex = 0;
+//                byteindex++;
+//                readbuf = frame[byteindex];
+//            }
+//            crc = crc << 1;
+//            crc |= (readbuf & 0x80000000) >> 31;
+//            readbuf = readbuf << 1;
+//            bitindex++;
+//        }
+//        status = NoError;
+//        //check crc
+//        if (biss_config.crc_poly && crc != biss_crc(data, data_length, biss_config.crc_poly) ) {
+//            biss_crc_correct(data, data_length, frame_bytes, crc,  biss_config.crc_poly); //try 1 bit error correction
+//            if (crc == biss_crc(data, data_length, biss_config.crc_poly))
+//                status = CRCCorrected;
+//            else
+//                status = CRCError;
+//        }
+//    } else if (status)
+//        status = NoStartBit;
+//    else
+//        status = NoAck;
     return status;
 }
 
