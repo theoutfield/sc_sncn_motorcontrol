@@ -58,11 +58,11 @@ void contelec_encoder_test(client interface PositionFeedbackInterface i_position
         }
 
 
-        xscope_int(COUNT, count);
-        xscope_int(POSITION, position);
-        xscope_int(ANGLE, electrical_angle);
-        xscope_int(VELOCITY, velocity);
-        xscope_int(STATUS, status*1000);
+//        xscope_int(COUNT, count);
+//        xscope_int(POSITION, position);
+//        xscope_int(ANGLE, electrical_angle);
+//        xscope_int(VELOCITY, velocity);
+//        xscope_int(STATUS, status*1000);
 //        xscope_int(TIME, status);
 
         delay_microseconds(10);

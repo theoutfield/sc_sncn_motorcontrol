@@ -232,9 +232,9 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     int velocity4 = 0;
     int filter_buffer1[32] = {0};
     int filter_buffer2[8] = {0};
-    int filter_buffer3[8] = {0};
+    int filter_buffer3[16] = {0};
     int filter_buffer4[32] = {0};
-    int filter_buffer5[8] = {0};
+    int filter_buffer5[16] = {0};
     int index1 = 0;
     int index2 = 0;
     int index3 = 0;
@@ -245,7 +245,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     int old_difference = 0;
     unsigned int old_timestamp = 0;
     int filter_timediff = 0;
-    int timediff2 = 0;
+    int timediff_long = 0;
     int ticks_per_turn = (1 << position_feedback_config.contelec_config.resolution_bits);
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC; //velocity loop time in clock ticks
@@ -428,50 +428,46 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
             velocity = filter(filter_buffer1, index1, 32, velocity);
 
             /* get timestamp difference*/
-            unsigned int timediff = 0;
-            if (old_timestamp <= timestamp) {
-                timediff = timestamp-old_timestamp;
-            } else {
-                timediff = 256+timestamp-old_timestamp;
-            }
+            char timediff = 0;
+            timediff = (char)timestamp-(char)old_timestamp;
             old_timestamp = timestamp;
 
             //filter timestamp difference
+            //velocity filtered timestamp, average filter 32
             if ((timediff > 30) && (timediff < 90)) {// one sampling step
                 filter_timediff = filter(filter_buffer2, index2, 8, timediff);
+                velocity3 = (difference * (60000000/(filter_timediff))) / ticks_per_turn;
             } else if ((timediff > 90) && (timediff < 150)) {// two sampling steps
                 filter_timediff = filter(filter_buffer2, index2, 8, timediff/2);
+                velocity3 = (difference * (30000000/(filter_timediff))) / ticks_per_turn;
             }
+            velocity3 = filter(filter_buffer4, index4, 32, velocity3);
 
             //velocity timestamp
 //            if (timediff != 0 )
 //                velocity2 = (difference * (60000000/((int)timediff))) / ticks_per_turn;
 
-            //velocity filtered timestamp, filtered 32
-            if (difference != 0 && filter_timediff != 0)
-                velocity3 = (difference * (60000000/(filter_timediff))) / ticks_per_turn;
-            velocity3 = filter(filter_buffer4, index4, 32, velocity3);
 
-            //velocity 20 samples, average filter 8
+            //velocity 8 samples (424us), average filter 8
             velocity_count++;
-            timediff2 += timediff;
-            if (velocity_count >= 20) {
+            timediff_long += timediff;
+            if (velocity_count >= 8) {
                 difference = count - old_count2;
                 old_count2 = count;
-                velocity4 = (difference * (60000000/((int)(timediff2)))) / ticks_per_turn;
+                velocity4 = (difference * (60000000/timediff_long)) / ticks_per_turn;
                 velocity2 = (difference * (60000000/((int)(last_read-last_velocity_read2)/CONTELEC_USEC))) / ticks_per_turn;
-                timediff2 = 0;
+                timediff_long = 0;
                 last_velocity_read2 = last_read;
                 velocity_count = 0;
+                velocity4 = filter(filter_buffer3, index3, 16, velocity4);
+                velocity2 = filter(filter_buffer5, index5, 16, velocity2);
             }
-//            velocity4 = filter(filter_buffer3, index3, 8, velocity4);
-//            velocity2 = filter(filter_buffer5, index5, 8, velocity2);
 
 #ifdef XSCOPE_CONTELEC
-            xscope_int(VELOCITY, velocity);
-            xscope_int(VELOCITY2, velocity2);
-            xscope_int(VELOCITY3, velocity3);
-            xscope_int(VELOCITY4, velocity4);
+            xscope_int(VELOCITY_53US_AVERAGE_FILTER_32, velocity);
+            xscope_int(VELOCITY_53US_TIMESTAMP_AVERAGE_FILTER_32, velocity3);
+            xscope_int(VELOCITY_424US_AVERAGE_FILTER_16, velocity2);
+            xscope_int(VELOCITY_424US_TIMESTAMP_AVERAGE_FILTER_16, velocity4);
             xscope_int(POSITION, position);
             xscope_int(POSITION_RAW, angle);
             xscope_int(STATUS, status*1000);
