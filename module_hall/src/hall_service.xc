@@ -160,6 +160,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     hall_sector_and_state=0;
 
     int angle_out=0, last_angle=0, speed_out=0, count = 0;
+    int init_angle = 0;
 
     int hall_sector_and_state_temp;
 
@@ -530,7 +531,11 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                 if(angle_out>4095) angle_out-=4096;
                 if(angle_out<0)    angle_out+=4096;
 
-                multiturn(count, last_angle, angle_out, 4096);
+                if (init_angle) {
+                    multiturn(count, last_angle, angle_out, 4096);
+                } else {
+                    init_angle = 1;
+                }
                 last_angle = angle_out;
 
                 i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, count, hall_state_new);
