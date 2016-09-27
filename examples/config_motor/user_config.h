@@ -113,7 +113,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      2400//590
+#define COMMUTATION_OFFSET_CLK      3000//590
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     0
@@ -123,9 +123,6 @@
 #define HALL_STATE_5_ANGLE     0
 #define HALL_STATE_6_ANGLE     0
 
-// COMMUTATION CCW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CCLK     0
-
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
 #define MOTOR_POLARITY              NORMAL_POLARITY
 
@@ -134,26 +131,13 @@
 //////  MOTOR CONTROL CONFIGURATION
 ///////////////////////////////////////////////
 
-// POSITION CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     1000 //500
-
-// PID FOR POSITION CONTROL (if applicable) [will be divided by 10000]
-//#define POSITION_Kp       100
-//#define POSITION_Ki       1
-//#define POSITION_Kd       0
-
-// PID FOR VELOCITY CONTROL (if applicable) [will be divided by 10000]
-//#define VELOCITY_Kp       667
-//#define VELOCITY_Ki       200
-//#define VELOCITY_Kd       0
-
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
 #define TORQUE_Kp         40 //7
 #define TORQUE_Ki         40  //3
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 80
+#define PERCENT_OFFSET_TORQUE 20
 
 
 /////////////////////////////////////////////////
@@ -163,32 +147,24 @@
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [1,-1]
 #define POLARITY           1
 
-// DEFAULT PROFILER SETTINGS FOR PROFILE ETHERCAT DRIVE
-#define PROFILE_VELOCITY        1000        // rpm
-#define PROFILE_ACCELERATION    2000        // rpm/s
-#define PROFILE_DECELERATION    2000        // rpm/s
-#define PROFILE_TORQUE_SLOPE    400         // adc_ticks
-
-// PROFILER LIMITIS
-//#define MAX_POSITION_LIMIT      0x7fffffff        // ticks (max range: 2^30, limited for safe operation)
-//#define MIN_POSITION_LIMIT     -0x7fffffff        // ticks (min range: -2^30, limited for safe operation)
-//#define MAX_VELOCITY            7000              // rpm
+// PROFILER LIMITS
 #define MAX_ACCELERATION        7000            // rpm/s
 #define MAX_DECELERATION        7000            // rpm/s
-#define MAX_CURRENT_VARIATION   800             // adc_ticks/s
-#define MAX_CURRENT             800             // adc_ticks
-
 
 
 /////////////////////////////////////////////////
 //////  POSITION CONTROLLER
 /////////////////////////////////////////////////
-//**Foresight Joint 3
-#define MIN_POSITION_LIMIT                     -300000
-#define MAX_POSITION_LIMIT                      300000
+// POSITION CONTROL LOOP PERIOD [us]
+#define CONTROL_LOOP_PERIOD     1000 //500
+
+//Limits
+#define MIN_POSITION_LIMIT                     -0x7fffffff
+#define MAX_POSITION_LIMIT                      0x7fffffff
 #define MAX_VELOCITY                            1500 //rpm
 #define MAX_TORQUE                              3000
 
+//Integrated Profiler
 #define ENABLE_PROFILER                         1
 #define MAX_ACCELERATION_PROFILER               1800000
 #define MAX_SPEED_PROFILER                      1800000
@@ -210,15 +186,11 @@
 #define Ki_POS_INTEGRAL_OPTIMUM                 1000
 #define Kd_POS_INTEGRAL_OPTIMUM                 1000
 
-//PID parameters of the Integral Optimum position controller
 #define Kp_NL_POS_CONTROL                   989500
 #define Ki_NL_POS_CONTROL                   100100
 #define Kd_NL_POS_CONTROL                   4142100
 
 #define INTEGRAL_LIMIT_POS_INTEGRAL_OPTIMUM     1500000
-
-#define POSITION_FC             100
-#define VELOCITY_FC             90
 
 #define K_FB                   10429000
 #define K_M                    1
@@ -228,7 +200,8 @@
 #define GAIN_P      1000
 #define GAIN_I      1000
 #define GAIN_D      1000
+///////////////////////////////////////////////////////////
 
-
-
-
+//Filter parameters
+#define POSITION_FC             100
+#define VELOCITY_FC             90

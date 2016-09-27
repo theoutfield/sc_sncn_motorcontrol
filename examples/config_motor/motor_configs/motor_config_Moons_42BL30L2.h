@@ -19,7 +19,7 @@
 #define RATED_TORQUE            72      // rated motor torque [milli-Nm]
 #define PEAK_SPEED              5000    // maximum motor speed [rpm]
 #define PHASE_RESISTANCE        1340000 // motor phase resistance [micro-ohm]
-#define PHASE_INDUCTANCE        1150    // motor phase inductance [micro-Hunnry]
+#define PHASE_INDUCTANCE        1150    // motor phase inductance [micro-Henry]
 
 // GENERAL PARAMETERS
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]

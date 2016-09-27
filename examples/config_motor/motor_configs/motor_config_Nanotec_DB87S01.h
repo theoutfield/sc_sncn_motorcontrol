@@ -19,7 +19,7 @@
 #define RATED_POWER             220     // rated power [W]
 #define PEAK_SPEED              4500    // maximum motor speed [rpm]
 #define PHASE_RESISTANCE        180000  // motor phase resistance [micro-ohm]
-#define PHASE_INDUCTANCE        350     // motor phase inductance [micro-Hunnry]
+#define PHASE_INDUCTANCE        350     // motor phase inductance [micro-Henry]
 
 // GENERAL PARAMETERS
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
