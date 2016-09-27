@@ -43,3 +43,6 @@ run_xdoc.log
 /examples/app_demo_advanced_foc/swstup-n0v0-d5925dd2
 /examples/app_demo_advanced_foc/swstup-n0v0-e719c74e
 /examples/app_demo_advanced_foc/target-xn-v0-533d87f9
+
+#exclude motorcontrollicence file
+examples/config_motor/advanced_motorcontrol_licence.h
