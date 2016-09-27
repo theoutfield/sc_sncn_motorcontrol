@@ -236,7 +236,6 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     unsigned int next_velocity_read = 0;
     unsigned int last_read = 0;
     unsigned int last_velocity_read = 0;
-    unsigned int last_velocity_read2 = 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
 
