@@ -15,3 +15,5 @@
 #define CONTELEC_VELOCITY_LOOP   53
 #define CONTELEC_FILTER          0x02
 #define DEFAULT_SPI_CLOCK_DIV    32        // 250/32 / 2 = 4MHz
+
+//#define CONTELEC_USE_TIMESTAMP
