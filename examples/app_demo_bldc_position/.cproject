@@ -146,6 +146,49 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_SERIAL}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/biss_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
 								</option>
 								<option id="com.xmos.xc.compiler.option.defined.symbols.1773252399" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SHRT_MAX__=32767"/>
@@ -740,6 +783,49 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_SERIAL}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/biss_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.19038239" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1154,6 +1240,49 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ams_rotary_sensor/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_SERIAL}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/biss_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.75101409" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

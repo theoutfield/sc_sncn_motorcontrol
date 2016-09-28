@@ -8,293 +8,511 @@
 #include <print.h>
 #include <stdlib.h>
 
+#include <math.h>
+
+#include <controllers_lib.h>
+#include <filters_lib.h>
+
 #include <position_ctrl_service.h>
-#include <a4935.h>
+#include <refclk.h>
 #include <mc_internal_constants.h>
-#include <hall_service.h>
-#include <qei_service.h>
+#include <filters_lib.h>
+#include <stdio.h>
 
-void init_position_control(interface PositionControlInterface client i_position_control)
-{
-    int ctrl_state;
 
-    while (1) {
-        ctrl_state = i_position_control.check_busy();
-        if (ctrl_state == INIT_BUSY) {
-            i_position_control.enable_position_ctrl();
-        }
 
-        if (ctrl_state == INIT) {
-#ifdef debug_print
-            printstrln("position_ctrl_service: position control initialized");
-#endif
-            break;
-        }
-    }
-}
+//void init_position_velocity_control(interface PositionVelocityCtrlInterface client i_position_control)
+//{
+//    int ctrl_state;
+//
+//    while (1) {
+//        ctrl_state = i_position_control.check_busy();
+//        if (ctrl_state == INIT_BUSY) {
+//            i_position_control.enable_position_ctrl();
+//        }
+//
+//        if (ctrl_state == INIT) {
+//#ifdef debug_print
+//            printstrln("position_ctrl_service: position control initialized");
+//#endif
+//            break;
+//        }
+//    }
+//}
 
-int position_limit(int position, int max_position_limit, int min_position_limit)
-{
-    if (position > max_position_limit) {
-        position = max_position_limit;
-    } else if (position < min_position_limit) {
-        position = min_position_limit;
-    }
-    return position;
-}
 
-void position_control_service(ControlConfig &position_control_config,
-                              interface HallInterface client ?i_hall,
-                              interface QEIInterface client ?i_qei,
-                              interface BISSInterface client ?i_biss,
+void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ctrl_config,
                               interface MotorcontrolInterface client i_motorcontrol,
-                              interface PositionControlInterface server i_position_control[3])
+                              interface PositionVelocityCtrlInterface server i_position_control[3])
 {
-    int actual_position = 0;
-    int target_position = 0;
-    int error_position = 0;
-    int error_position_D = 0;
-    int error_position_I = 0;
-    int previous_error = 0;
-    int position_control_out = 0;
 
-    int position_control_out_limit = 0;
-    int error_position_I_limit = 0;
+    UpstreamControlData upstream_control_data;
+    DownstreamControlData downstream_control_data;
+    int pos_control_mode = 0;
+    int velocity_control_mode = 0;
+
+    NonlinearPositionControl nl_pos_ctrl;
+    nl_position_control_reset(nl_pos_ctrl);
+    nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
+
+    int position_enable_flag_ = 0;
+    int torque_enable_flag_ = 0;
+
+    int position_ref_input_k_ = 0;
+    int initial_position_=0;
+    double position_ref_k_ = 0.00;
+    double position_sens_k_ = 0.00, position_sens_k_1_=0.00;
+
+    int min_s_index_=0;
+
+    unsigned int ts_=0, t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
+    ///////////////////////////////////////////////
+
+    int position_enable_flag = 0;
+    PIDparam position_control_pid_param;
+    integralOptimumPosControllerParam integral_optimum_pos_ctrl_pid_param;
+    SecondOrderLPfilterParam position_SO_LP_filter_param;
+    float position_k = 0;
+    float position_sens_k = 0;
+    float position_k_1n = 0;
+    float position_k_2n = 0;
+    float position_ref_k = 0;
+    float position_cmd_k = 0;
+    float min_position = 0;
+    float max_position = 0;
+    int position_ref_input_k = 0;
+    float position_ref_in_k = 0;
+    float position_ref_in_k_1n = 0;
+    float position_ref_in_k_2n = 0;
+
+    // velocity controller
+    int velocity_enable_flag = 0;
+    PIDparam velocity_control_pid_param;
+    SecondOrderLPfilterParam velocity_SO_LP_filter_param;
+    int velocity_ref_input_k = 0;
+    float additive_torque_k = 0;
+    int additive_torque_input_k = 0;
+    float velocity_ref_in_k = 0;
+    float velocity_ref_k = 0;
+    float velocity_sens_k = 0;
+    float velocity_k = 0;
+    float velocity_k_1n = 0;
+    float velocity_k_2n = 0;
+    float velocity_cmd_k = 0;
+
+    // torque
+    int torque_enable_flag = 0;
+    int torque_ref_input_k = 0;
+    float torque_ref_k = 0;
+
+    //pos profiler
+    posProfilerParam pos_profiler_param;
+    pos_profiler_param.delta_T = ((float)pos_velocity_ctrl_config.control_loop_period)/1000000;
+    pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
+    pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
+    float acceleration_monitor = 0;
+    int enable_profiler = 1;
 
     timer t;
     unsigned int ts;
 
-    int activate = 0;
+    second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
+    second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
 
-    int config_update_flag = 1;
+    pid_init(velocity_control_pid_param);
+    pid_set_parameters((float)pos_velocity_ctrl_config.P_velocity, (float)pos_velocity_ctrl_config.I_velocity,
+                       (float)pos_velocity_ctrl_config.D_velocity, (float)pos_velocity_ctrl_config.integral_limit_velocity,
+                              pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+    pid_init(position_control_pid_param);
+    pid_set_parameters((float)pos_velocity_ctrl_config.P_pos, (float)pos_velocity_ctrl_config.I_pos,
+                       (float)pos_velocity_ctrl_config.D_pos, (float)pos_velocity_ctrl_config.integral_limit_pos,
+                              pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+
+    downstream_control_data.position_cmd = 0;
+    downstream_control_data.velocity_cmd = 0;
+    downstream_control_data.torque_cmd = 0;
+    downstream_control_data.offset_torque = 0;
+
+    delay_milliseconds(500);
+    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    position_ref_input_k = upstream_control_data.position;
+    position_ref_in_k = (float) position_ref_input_k;
+    position_ref_in_k_1n = (float) position_ref_input_k;
+    position_ref_in_k_2n = (float) position_ref_input_k;
+    position_sens_k = ((float) upstream_control_data.position);
+    position_sens_k /= 512;// 2^(24-15);
+    position_k = position_sens_k;
+    position_k_1n = position_sens_k;
+    position_k_2n = position_sens_k;
+
+    max_position = ((float) pos_velocity_ctrl_config.max_pos);
+    max_position /= 512;
+    min_position = ((float) pos_velocity_ctrl_config.min_pos);
+    min_position /= 512;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     t :> ts;
-
     while(1) {
 #pragma ordered
         select {
-            case t when timerafter(ts + USEC_STD * position_control_config.control_loop_period) :> ts:
-                if (config_update_flag) {
-                    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+            case t when timerafter(ts + USEC_STD * pos_velocity_ctrl_config.control_loop_period) :> ts:
 
-                    //Limits
-                    if (motorcontrol_config.motor_type == BLDC_MOTOR) {
-                        position_control_out_limit = BLDC_PWM_CONTROL_LIMIT;
-                    } else if(motorcontrol_config.motor_type == BDC_MOTOR) {
-                        position_control_out_limit = BDC_PWM_CONTROL_LIMIT;
-                    }
+                t_old_=t_new_;
+                t :> t_new_;
+                loop_time_=t_new_-t_old_;
+                idle_time_=t_new_-t_end_;
 
-                    if (position_control_config.feedback_sensor != HALL_SENSOR
-                           && position_control_config.feedback_sensor != QEI_SENSOR
-                           && position_control_config.feedback_sensor != BISS_SENSOR) {
-                        position_control_config.feedback_sensor = motorcontrol_config.commutation_sensor;
-                    }
+                upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                    if (position_control_config.Ki_n != 0) {
-                        error_position_I_limit = position_control_out_limit * PID_DENOMINATOR / position_control_config.Ki_n;
-                    }
+                /*
+                 * CONTELEC:    16bits single turn + 12bits multi turn
+                 * BISS-MABI:   18bits signle turn + 10bits multi turn
+                 * AMS:         14bits single turn + 18bits multi turn
+                 * Other sens:  13bits single turn + 12bits multi turn
+                 */
 
-                    if (position_control_config.feedback_sensor == HALL_SENSOR && !isnull(i_hall)) {
-                        actual_position = i_hall.get_hall_position_absolute();
-                    } else if (position_control_config.feedback_sensor == QEI_SENSOR && !isnull(i_qei)) {
-                        actual_position = i_qei.get_qei_position_absolute();
-                    } else if (position_control_config.feedback_sensor == BISS_SENSOR && !isnull(i_biss)) {
-                        { actual_position, void, void } = i_biss.get_biss_position();
-                    }
 
-                    config_update_flag = 0;
+                if (enable_profiler) {
+                    position_ref_in_k = pos_profiler(((float) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
+                    acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(pos_velocity_ctrl_config.control_loop_period * pos_velocity_ctrl_config.control_loop_period);
+                    position_ref_in_k_2n = position_ref_in_k_1n;
+                    position_ref_in_k_1n = position_ref_in_k;
                 }
+                else
+                    position_ref_in_k = (float) position_ref_input_k;
 
-                if (activate == 1) {
-                    /* acquire actual position hall/qei/sensor */
-                    switch (position_control_config.feedback_sensor) {
-                        case HALL_SENSOR:
-                            if(!isnull(i_hall)){
-                                actual_position = i_hall.get_hall_position_absolute();
-                            }
-                            else{
-                                printstrln("position_ctrl_service: ERROR: Hall interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
+                position_ref_k = position_ref_in_k / 512;
 
-                        case QEI_SENSOR:
-                            if(!isnull(i_qei)){
-                                actual_position =  i_qei.get_qei_position_absolute();
-                            }
-                            else{
-                                printstrln("position_ctrl_service: ERROR: Encoder interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
+                position_sens_k = ((float) upstream_control_data.position);
+                position_sens_k /= 512;
 
-                        case BISS_SENSOR:
-                            if(!isnull(i_biss)){
-                            {
-                                actual_position, void, void } = i_biss.get_biss_position();
-                            }
-                            else{
-                                printstrln("position_ctrl_service: ERROR: BiSS interface is not provided but requested");
-                                exit(-1);
-                            }
-                            break;
+                additive_torque_k = ((float) additive_torque_input_k);
 
-                    }
-                    /*
-                     * Or any other sensor interfaced to the IFM Module
-                     * place client functions here to acquire position
-                     */
+                velocity_ref_k = ((float) velocity_ref_input_k);
 
-                    /* PID Controller */
+                velocity_sens_k = (float) upstream_control_data.velocity;
 
-                    error_position = (target_position - actual_position);
-                    error_position_I = error_position_I + error_position;
-                    error_position_D = error_position - previous_error;
+                torque_ref_k = ((float) torque_ref_input_k);
 
-                    if (error_position_I > error_position_I_limit) {
-                        error_position_I = error_position_I_limit;
-                    } else if (error_position_I < -error_position_I_limit) {
-                        error_position_I = - error_position_I_limit;
-                    }
+                if(torque_enable_flag) {
 
-                    position_control_out = (position_control_config.Kp_n * error_position) +
-                                           (position_control_config.Ki_n * error_position_I) +
-                                           (position_control_config.Kd_n * error_position_D);
-
-                    position_control_out /= PID_DENOMINATOR;
-
-                    if (position_control_out > position_control_out_limit) {
-                        position_control_out = position_control_out_limit;
-                    } else if (position_control_out < -position_control_out_limit) {
-                        position_control_out =  -position_control_out_limit;
+                    if ((position_sens_k > max_position) || (position_sens_k < min_position))
+                    {
+                        torque_enable_flag = 0;
+                        position_enable_flag = 0;
+                        velocity_enable_flag = 0;
+                        i_motorcontrol.set_torque_control_disabled();
+                        i_motorcontrol.set_safe_torque_off_enabled();
+                        i_motorcontrol.set_brake_status(0);
+                        printstr("*** Position Limit Reached ***\n");
                     }
 
 
-                   // set_commutation_sinusoidal(c_commutation, position_control_out);
-                    i_motorcontrol.set_voltage(position_control_out);
+                    // position control
+                    if (position_enable_flag == 1)
+                    {
 
-#ifdef DEBUG
-                    xscope_int(ACTUAL_POSITION, actual_position);
-                    xscope_int(TARGET_POSITION, target_position);
-#endif
-                    //xscope_int(TARGET_POSITION, target_position);
-                    previous_error = error_position;
-                }
+                        if(position_ref_k > max_position)
+                            position_ref_k = max_position;
+                        else if (position_ref_k < min_position)
+                            position_ref_k = min_position;
 
-                break;
+                        second_order_LP_filter_update(&position_k,
+                                                      &position_k_1n,
+                                                      &position_k_2n,
+                                                      &position_sens_k, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
 
-            case !isnull(i_hall) => i_hall.notification():
+                        if (pos_control_mode == POS_PID_CONTROLLER)
+                        {
+                            position_cmd_k = pid_update(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                            torque_ref_k = (position_cmd_k / 512);
+                        }
+                        else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
+                        {
+                            position_cmd_k = pid_update(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                            velocity_ref_k = (position_cmd_k / 512);
+                        }
+                        else if (pos_control_mode == NL_POSITION_CONTROLLER)
+                        {
 
-                switch (i_hall.get_notification()) {
-                    case MOTCTRL_NTF_CONFIG_CHANGED:
-                        config_update_flag = 1;
-                        break;
-                    default:
-                        break;
-                }
-                break;
+                            //************************************************
+                            // update feedback data
+                            upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-            case !isnull(i_qei) => i_qei.notification():
+                            position_ref_input_k_ = initial_position_ + downstream_control_data.position_cmd;
 
-                switch (i_qei.get_notification()) {
-                    case MOTCTRL_NTF_CONFIG_CHANGED:
-                        config_update_flag = 1;
-                        break;
-                    default:
-                        break;
-                }
-                break;
+                            //position_ref_k_ = (double) (position_ref_input_k_);
+                            position_ref_k_ = (double) (position_ref_k*512);
 
-            case i_motorcontrol.notification():
+                            position_sens_k_1_ = position_sens_k_;
+                            position_sens_k_   = (double) (upstream_control_data.position);
 
-                switch (i_motorcontrol.get_notification()) {
-                    case MOTCTRL_NTF_CONFIG_CHANGED:
-                        config_update_flag = 1;
-                        break;
-                    default:
-                        break;
-                }
-                break;
 
-            case i_position_control[int i].set_position(int in_target_position):
-
-                target_position = in_target_position;
-
-                break;
-
-            case i_position_control[int i].get_position() -> int out_position:
-
-                out_position = actual_position;
-                break;
-
-            case i_position_control[int i].get_target_position() -> int out_target_position:
-
-                out_target_position = target_position;
-                break;
-
-            case i_position_control[int i].set_position_control_config(ControlConfig in_params):
-
-                position_control_config = in_params;
-                config_update_flag = 1;
-                break;
-
-            case i_position_control[int i].get_position_control_config() ->  ControlConfig out_config:
-
-                out_config = position_control_config;
-                break;
-
-            case i_position_control[int i].set_position_sensor(int in_sensor_used):
-
-                position_control_config.feedback_sensor = in_sensor_used;
-                target_position = actual_position;
-                config_update_flag = 1;
-
-                break;
-
-            case i_position_control[int i].check_busy() -> int out_activate:
-
-                out_activate = activate;
-                break;
-
-            case i_position_control[int i].enable_position_ctrl():
-
-                activate = 1;
-                while (1) {
-                    if (i_motorcontrol.check_busy() == INIT) { //__check_commutation_init(c_commutation);
-#ifdef debug_print
-                        printstrln("position_ctrl_service: commutation initialized");
-#endif
-                        if (i_motorcontrol.get_fets_state() == 0) { // check_fet_state(c_commutation);
-                            i_motorcontrol.set_fets_state(1);
-                            delay_milliseconds(2);
+                            // apply position control algorithm
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_k_, position_sens_k_1_, position_sens_k_);
                         }
 
-                        break;
+                        second_order_LP_filter_shift_buffers(&position_k,
+                                                             &position_k_1n,
+                                                             &position_k_2n);
                     }
+
+                    // velocity control
+                    if (velocity_enable_flag == 1)
+                    {
+                        if (velocity_ref_k > pos_velocity_ctrl_config.max_speed)
+                            velocity_ref_k = pos_velocity_ctrl_config.max_speed;
+                        else if (velocity_ref_k < -pos_velocity_ctrl_config.max_speed)
+                            velocity_ref_k = -pos_velocity_ctrl_config.max_speed;
+
+                        second_order_LP_filter_update(&velocity_k,
+                                                      &velocity_k_1n,
+                                                      &velocity_k_2n,
+                                                      &velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
+
+                        if (velocity_control_mode == VELOCITY_PID_CONTROLLER)
+                        {
+                            velocity_cmd_k = pid_update(velocity_ref_k, velocity_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+                            torque_ref_k = (velocity_cmd_k / 32);
+                        }
+
+                        second_order_LP_filter_shift_buffers(&velocity_k,
+                                                             &velocity_k_1n,
+                                                             &velocity_k_2n);
+                    }
+
+                    torque_ref_k += additive_torque_k;
+
+                    if(torque_ref_k > pos_velocity_ctrl_config.max_torque)
+                        torque_ref_k = pos_velocity_ctrl_config.max_torque;
+                    else if (torque_ref_k < (-pos_velocity_ctrl_config.max_torque))
+                        torque_ref_k = (-pos_velocity_ctrl_config.max_torque);
+
+                    i_motorcontrol.set_torque((int) torque_ref_k);
                 }
-#ifdef debug_print
-                printstrln("position_ctrl_service: position control activated");
+
+#ifdef XSCOPE_POSITION_CTRL
+                xscope_int(POSITION_REF, (int) (position_ref_k*512));
+                xscope_int(POSITION, (int) (position_sens_k*512));
+                xscope_int(POSITION_CMD, (int) position_cmd_k);
+                xscope_int(POSITION_TEMP1, ((int) (acceleration_monitor*1000000000)));//velocity_control_pid_param.Kp);
+                xscope_int(VELOCITY_REF, (int) velocity_ref_k);
+                xscope_int(VELOCITY, (int) velocity_sens_k);
+                xscope_int(VELOCITY_CMD, (int) velocity_cmd_k);
+                xscope_int(VELOCITY_TEMP1, (int) torque_ref_k);
 #endif
+#ifdef XSCOPE_POSITION_CTRL_2
+                xscope_int(VELOCITY, upstream_control_data.velocity);
+                xscope_int(POSITION, upstream_control_data.position);
+                xscope_int(TORQUE,   upstream_control_data.computed_torque);
+                xscope_int(POSITION_REF, position_ref_input_k * 1);
+                xscope_int(TORQUE_CMD, torque_ref_k / 1);
+#endif
+
+
+                t :> t_end_;
                 break;
 
-            case i_position_control[int i].disable_position_ctrl():
 
-                activate = 0;
-                i_motorcontrol.set_voltage(0); //set_commutation_sinusoidal(c_commutation, 0);
-                error_position = 0;
-                error_position_D = 0;
-                error_position_I = 0;
-                previous_error = 0;
-                position_control_out = 0;
-                i_motorcontrol.set_fets_state(0); // disable_motor(c_commutation);
-                delay_milliseconds(30); //wait_ms(30, 1, ts); //
-#ifdef debug_print
-                printstrln("position_ctrl_service: position control disabled");
-#endif
+
+            case i_position_control[int i].disable():
+                torque_enable_flag = 0;
+                position_enable_flag = 0;
+                velocity_enable_flag = 0;
+                i_motorcontrol.set_torque_control_disabled();
+                i_motorcontrol.set_safe_torque_off_enabled();
+                i_motorcontrol.set_brake_status(0);
                 break;
+
+            case i_position_control[int i].enable_position_ctrl(int pos_control_mode_):
+                pos_control_mode = pos_control_mode_;
+                torque_enable_flag = 1;
+                position_enable_flag = 1;
+                if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER) {
+                    velocity_enable_flag = 1;
+                    velocity_control_mode = VELOCITY_PID_CONTROLLER;
+                }
+                else {
+                    velocity_enable_flag = 0;
+                    velocity_control_mode = VELOCITY_PID_CONTROLLER;
+                }
+
+                //nonlinear position control
+                position_ref_input_k_ = 0;
+                position_ref_k_ = 0;
+                position_sens_k_ = 0;
+                position_sens_k_1_=0;
+                nl_pos_ctrl.torque_ref_k = 0.00;
+                nl_pos_ctrl.t_additive = 0.00;
+                nl_pos_ctrl.feedback_p_loop =0.00;
+                nl_pos_ctrl.feedback_d_loop=0.00;
+                //////////////////////////////
+
+                upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                //nonlinear position control
+                downstream_control_data.position_cmd = 0;
+                nl_pos_ctrl.t_additive = 0.00;
+                initial_position_ = upstream_control_data.position;
+                ////////////////////////////////
+
+
+                position_ref_input_k = upstream_control_data.position;
+                position_ref_in_k = (float) position_ref_input_k;
+                position_ref_in_k_1n = (float) position_ref_input_k;
+                position_ref_in_k_2n = (float) position_ref_input_k;
+                position_sens_k = ((float) upstream_control_data.position);
+                position_sens_k /= 512;// 2^(24-15);
+                position_k = position_sens_k;
+                position_k_1n = position_sens_k;
+                position_k_2n = position_sens_k;
+                additive_torque_input_k = 0;
+                pid_reset(position_control_pid_param);
+                pid_reset(velocity_control_pid_param);
+                i_motorcontrol.set_torque_control_enabled();
+                i_motorcontrol.set_brake_status(1);
+                enable_profiler = pos_velocity_ctrl_config.enable_profiler;
+                break;
+
+            case i_position_control[int i].enable_velocity_ctrl(int velocity_control_mode_):
+                velocity_control_mode = velocity_control_mode_;
+                torque_enable_flag = 1;
+                position_enable_flag = 0;
+                velocity_enable_flag = 1;
+                velocity_ref_input_k = 0;
+                additive_torque_input_k = 0;
+                pid_reset(velocity_control_pid_param);
+                i_motorcontrol.set_torque_control_enabled();
+                i_motorcontrol.set_brake_status(1);
+                break;
+
+            case i_position_control[int i].enable_torque_ctrl():
+                torque_enable_flag = 1;
+                position_enable_flag = 0;
+                velocity_enable_flag = 0;
+                torque_ref_input_k = 0;
+                i_motorcontrol.set_torque_control_enabled();
+                i_motorcontrol.set_brake_status(1);
+                break;
+
+            case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
+                pos_velocity_ctrl_config = in_config;
+                max_position = ((float) pos_velocity_ctrl_config.max_pos);
+                max_position /= 512;
+                min_position = ((float) pos_velocity_ctrl_config.min_pos);
+                min_position /= 512;
+                //pid_init(velocity_control_pid_param);
+                pid_set_parameters((float)pos_velocity_ctrl_config.P_velocity, (float)pos_velocity_ctrl_config.I_velocity,
+                                   (float)pos_velocity_ctrl_config.D_velocity, (float)pos_velocity_ctrl_config.integral_limit_velocity,
+                                          pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+                //pid_init(position_control_pid_param);
+                pid_set_parameters((float)pos_velocity_ctrl_config.P_pos, (float)pos_velocity_ctrl_config.I_pos,
+                                   (float)pos_velocity_ctrl_config.D_pos, (float)pos_velocity_ctrl_config.integral_limit_pos,
+                                          pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
+                second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
+                pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
+                pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
+                enable_profiler = pos_velocity_ctrl_config.enable_profiler;
+
+                nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
+                break;
+
+            case i_position_control[int i].get_position_velocity_control_config() ->  PosVelocityControlConfig out_config:
+                out_config = pos_velocity_ctrl_config;
+                break;
+
+
+            case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_) -> UpstreamControlData upstream_control_data_:
+                upstream_control_data_ = upstream_control_data;
+                downstream_control_data = downstream_control_data_;
+                position_ref_input_k = downstream_control_data.position_cmd;
+                velocity_ref_input_k = downstream_control_data.velocity_cmd;
+                torque_ref_input_k = downstream_control_data.torque_cmd;
+                additive_torque_input_k = downstream_control_data.offset_torque;
+                break;
+
+
+            case i_position_control[int i].set_j(int j):
+                    pos_velocity_ctrl_config.j = j;
+                    nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
+                    break;
+
+
+
+
+
+
+
+
+
+
+
+//            case i_position_control[int i].set_position(int in_target_position):
+//                    position_ref_input_k = in_target_position;
+//                break;
+//            case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
+//                    pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_pos, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+//                break;
+//            case i_position_control[int i].set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int21_target_max_velocity_):
+//                pos_velocity_ctrl_config.max_speed = int21_target_max_velocity_;
+//                pid_set_parameters((float)position_control_pid_param.Kp, (float)position_control_pid_param.Ki, (float)position_control_pid_param.Kd, (float)int16_itegral_limit, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+//                break;
+//            case i_position_control[int i].set_position_limits(int position_min_limit, int position_max_limit):
+//                pos_velocity_ctrl_config.min_pos = position_min_limit;
+//                pos_velocity_ctrl_config.max_pos = position_max_limit;
+//                max_position = ((float) pos_velocity_ctrl_config.max_pos);
+//                max_position /= 512;
+//                min_position = ((float) pos_velocity_ctrl_config.min_pos);
+//                min_position /= 512;
+//                break;
+
+
+
+//            case i_position_control[int i].set_velocity(int in_target_velocity):
+//                    velocity_ref_input_k = in_target_velocity * 1;
+//                break;
+//            case i_position_control[int i].set_offset_torque(int offset_torque_):
+//                    additive_torque_input_k = offset_torque_;
+//                break;
+//            case i_position_control[int i].set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
+//                    pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_velocity, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+//                break;
+//            case i_position_control[int i].set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int21_target_max_torque_):
+//                pos_velocity_ctrl_config.max_torque = int21_target_max_torque_;
+//                pid_set_parameters((float)velocity_control_pid_param.Kp, (float)velocity_control_pid_param.Ki, (float)velocity_control_pid_param.Kd, (float)int16_itegral_limit, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+//                break;
+//            case i_position_control[int i].set_velocity_limits(int velocity_min_limit, int velocity_max_limit):
+//                pos_velocity_ctrl_config.max_speed = velocity_max_limit;
+//                break;
+
+
+
+//            case i_position_control[int i].set_torque(int in_target_torque):
+//                torque_ref_input_k = in_target_torque;
+//                break;
+//            case i_position_control[int i].set_torque_limits(int torque_min_limit, int torque_max_limit):
+//                pos_velocity_ctrl_config.max_torque = torque_max_limit;
+//                break;
+
+
+
+
+            case i_position_control[int i].get_position() -> int out_position:
+                    out_position = upstream_control_data.position;
+                break;
+//
+//
+            case i_position_control[int i].get_velocity() -> int out_velocity:
+                    out_velocity = upstream_control_data.velocity;
+                break;
+//
+//            case i_position_control[int i].check_busy() -> int out_activate:
+////                out_activate = position_enable_flag;
+//                break;
+
+
         }
     }
 }
-

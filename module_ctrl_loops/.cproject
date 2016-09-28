@@ -53,7 +53,7 @@
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/xc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/clang&quot;"/>
 								</option>
-								<option id="com.xmos.xc.compiler.option.defined.symbols.1509016311" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
+								<option id="com.xmos.xc.compiler.option.defined.symbols.1509016311" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__SHRT_MAX__=32767"/>
 									<listOptionValue builtIn="false" value="__SCHAR_MAX__=127"/>
 									<listOptionValue builtIn="false" value="__SIZE_TYPE__=unsigned"/>

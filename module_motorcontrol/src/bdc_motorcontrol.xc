@@ -87,6 +87,45 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                 break;
 
+        case i_motorcontrol[int i].reset_faults():
+            break;
+
+        case i_motorcontrol[int i].set_brake_status(int brake_status):
+            break;
+
+        case i_motorcontrol[int i].set_torque_control_enabled():
+            break;
+
+        case i_motorcontrol[int i].set_torque_control_disabled():
+            break;
+
+        case i_motorcontrol[int i].set_offset_detection_enabled():
+            break;
+
+        case i_motorcontrol[int i].set_safe_torque_off_enabled():
+            break;
+
+        case i_motorcontrol[int i].update_upstream_control_data()-> UpstreamControlData control_data_low_level:
+                break;
+
+        case i_motorcontrol[int i].get_sensor_polarity_state() -> int proper_sensor_polarity:
+            break;
+
+        case i_motorcontrol[int i].set_offset_value(int offset_value):
+            break;
+
+        case i_motorcontrol[int i].get_torque_actual() -> int torque_actual:
+                //ToDo: implement!
+            break;
+
+        case i_motorcontrol[int i].get_velocity_actual() -> int velocity_actual:
+                //ToDo: implement!
+            break;
+
+        case i_motorcontrol[int i].get_position_actual() -> int position_actual:
+                //ToDo: implement!
+            break;
+
         case i_motorcontrol[int i].get_notification() -> int out_notification:
 
             out_notification = notification;
@@ -95,6 +134,18 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
         case i_motorcontrol[int i].set_voltage(int new_voltage):
 
             voltage = new_voltage;
+            break;
+
+        case i_motorcontrol[int i].set_torque(int torque_sp):
+                break;
+
+        case i_motorcontrol[int i].set_torque_max(int torque_max):
+                break;
+
+        case i_motorcontrol[int i].set_control(int in_flag):
+                break;
+
+        case i_motorcontrol[int i].set_torque_pid(int Kp, int Ki, int Kd) -> { int out_Kp, int out_Ki, int out_Kd }:
             break;
 
         case i_motorcontrol[int i].check_busy() -> int state_return:
@@ -126,7 +177,7 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
                 break;
         case i_motorcontrol[int i].set_sensor(int new_sensor):
                 break;
-        case i_motorcontrol[int i].set_sensor_offset(int in_offset):
+        case i_motorcontrol[int i].set_sensor_offset(int in_offset) -> int out_offset:
                 break;
         case i_motorcontrol[int i].set_config(MotorcontrolConfig new_config):
                 break;
@@ -134,10 +185,12 @@ static void bdc_internal_loop(FetDriverPorts &fet_driver_ports,
 
                   out_config = motorcontrol_config;
                   break;
-        case i_motorcontrol[int i].set_all_parameters(HallConfig in_hall_config,
-                                                            QEIConfig in_qei_config,
-                                                            MotorcontrolConfig in_commutation_config):
-               break;
+
+        case i_motorcontrol[int i].restart_watchdog():
+                break;
+
+        case i_motorcontrol[int i].get_field() -> int out_field:
+                break;
         }
     }
 }

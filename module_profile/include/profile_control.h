@@ -9,8 +9,6 @@
 #pragma once
 
 #include <position_ctrl_service.h>
-#include <velocity_ctrl_service.h>
-#include <torque_ctrl_service.h>
 
 /**
  * @brief Structure definition for Profiler configuration.
@@ -22,6 +20,7 @@ typedef struct{
     int velocity;   /**< Default velocity for Position Profile ramps generation [RPM]. */
     int max_position;    /**< Max. reachable position. */
     int min_position;    /**< Min. reachable position. */
+    int ticks_per_turn;  /**< Number of ticks per turn. */
 
     //Velocity
     int acceleration;    /**< Default acceleration for Velocity Profile ramps generation [RPM/s].  */
@@ -46,11 +45,8 @@ typedef struct{
  * @param i_qei Interface to Incremental Encoder Service (QEI)
  * @param i_biss Interface to BiSS Encoder Service (QEI)
  */
-void init_position_profiler(ProfilerConfig profile_position_config,
-                            interface PositionControlInterface client i_position_control,
-                            interface HallInterface client ?i_hall,
-                            interface QEIInterface client ?i_qei,
-                            interface BISSInterface client ?i_biss);
+//FIXME find a proper way to send the ticks per turn
+void init_position_profiler(ProfilerConfig profile_position_config);
 
 /**
  * @brief Velocity Profiler Initializer. It sets the profiler configuration.
@@ -59,8 +55,9 @@ void init_position_profiler(ProfilerConfig profile_position_config,
  * @param profile_velocity_config Configuration for the Velocity Profiler.
  * @param i_velocity_control Communication interface to the Velocity Control Service.
  */
-void init_velocity_profiler(ProfilerConfig profile_velocity_config,
-                                interface VelocityControlInterface client i_velocity_control);
+//FIXME: to be implemented for the new position/velocity controller
+//void init_velocity_profiler(ProfilerConfig profile_velocity_config,
+//                                interface VelocityControlInterface client i_velocity_control);
 
 /**
  * @brief Torque Profiler Initializer. It sets the profiler configuration.
@@ -69,8 +66,8 @@ void init_velocity_profiler(ProfilerConfig profile_velocity_config,
  * @param profile_torque_config Configuration for the Torque Profiler.
  * @param i_torque_control Communication interface to the Torque Control Service.
  */
-void init_torque_profiler(ProfilerConfig profile_torque_config,
-                                interface TorqueControlInterface client i_torque_control);
+//void init_torque_profiler(ProfilerConfig profile_torque_config,
+//                                interface TorqueControlInterface client i_torque_control);
 
 /**
  * @brief Generates a profile ramp from the current position to the defined target position
@@ -83,8 +80,8 @@ void init_torque_profiler(ProfilerConfig profile_torque_config,
  * @param deceleration [RPM/s].
  * @param i_position_control Communication interface to the Position Control Service.
  */
-void set_profile_position( int target_position, int velocity, int acceleration, int deceleration,
-                           interface PositionControlInterface client i_position_control );
+void set_profile_position( DownstreamControlData &downstream_control_data, int velocity, int acceleration, int deceleration,
+                           interface PositionVelocityCtrlInterface client i_position_control );
 
 /**
  * @brief Set profile velocity with Velocity Control loop
@@ -94,8 +91,11 @@ void set_profile_position( int target_position, int velocity, int acceleration, 
  * @param deceleration in (rpm/s)
  * @param i_velocity_control for communicating with the Velocity Control Server
  */
+//FIXME: to be implemented for the new position/velocity controller
+#if 0
 void set_profile_velocity( int target_velocity, int acceleration, int deceleration,
                            interface VelocityControlInterface client i_velocity_control );
+#endif
 
 /**
  * @brief Set profile torque with Torque Control loop
@@ -104,6 +104,8 @@ void set_profile_velocity( int target_velocity, int acceleration, int decelerati
  * @param torque_slope in (mNm/s * current resolution)
  * @param i_torque_control for communicating with the Torque Control Server
  */
+//FIXME
+#if 0
 void set_profile_torque( int target_torque, int torque_slope,
                          interface TorqueControlInterface client i_torque_control );
-
+#endif

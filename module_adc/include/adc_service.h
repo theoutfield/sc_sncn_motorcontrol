@@ -6,59 +6,19 @@
 #pragma once
 
 #include <xs1.h>
+#include <watchdog_service.h>
+#include <motor_control_interfaces.h>
 
 /**
  * Max value the ADC can provide.
  */
 #define MAX_ADC_VALUE 16383
-
 /**
- * @brief Interface type to communicate with the ADC Service.
+ * Max allowed value in ADC ticks till overcurrent protection is triggered.
  */
-interface ADCInterface{
-    // *Max adc ticks are 8192 and corresponds with the max current your DC can handle:
-    // DC100: 5A, DC300: 20A, DC1K 50A
-    /**
-     * @brief Get the ongoing current at B and C Phases.
-     *
-     * @return Current on B Phase [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
-     * @return Current on C Phase [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
-     */
-    {int, int} get_currents();
+#define OVERCURRENT_IN_ADC_TICKS 12800 //modify the value to match your motor operating conditions. Should be lower than MAX_ADC_VALUE!
 
-    /**
-     * @brief Get the value from the temperature sensor on your SOMANET device.
-     *        The translation of this value into degrees will depend on your SOMANET device.
-     *
-     * @return Temperature [0:16383].
-     */
-    int get_temperature();
 
-    /**
-     * @brief Get the voltage value present at the external analog inputs of your SOMANET device.
-     *
-     * @return Voltage at analog input 1 [0:16384].
-     * @return Voltage at analog input 2 [0:16384].
-     */
-    {int, int} get_external_inputs();
-
-    /**
-     * @brief Helper to convert Amps into a suitable ADC value for your SOMANET device.
-     *        The output of this helper would be suitable, for instance, as target torque
-     *        for a Torque Control Service.
-     *
-     * @return amps Ampers to convert [A]
-     */
-    int helper_amps_to_ticks(float amps);
-
-    /**
-     * @brief Helper to convert an ADC current value into Amps.
-     *
-     * @param ticks ADC current value [-8191:8192].
-     * @return Amps [A].
-     */
-    float helper_ticks_to_amps(int ticks);
-};
 
 /**
  * Structure type to define the ports to manage the AD7949 ADC chip.
@@ -108,4 +68,4 @@ typedef struct {
  * @param c_trigger [[Nullable]] Channel communication to trigger sampling. If not provided, sampling takes place on request.
  * @param i_adc Array of communication interfaces to handle up to 5 different clients.
  */
-void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2]);
+void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog);

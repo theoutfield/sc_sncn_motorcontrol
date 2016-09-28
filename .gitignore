@@ -8,6 +8,7 @@
 *.DS_Store
 *.swp
 *.out
+._*
 
 ## build files and bins
 .build_Debug/
@@ -27,3 +28,21 @@ bin/
 ## ignore xdoc outputs
 _build/
 run_xdoc.log
+/examples/app_demo_advanced_foc/decompressor-373412a9
+/examples/app_demo_advanced_foc/decompressor-9063d9a4
+/examples/app_demo_advanced_foc/spanning-xn-v0-b7665001
+/examples/app_demo_advanced_foc/target-xn-v0-64bbd1f6
+/examples/app_demo_advanced_foc/flash_bin_node0
+/examples/app_demo_advanced_foc/fp-91bc75fe
+/examples/app_demo_advanced_foc/fp-bac59237
+/examples/app_demo_advanced_foc/s2l-n0-0cf47b4c
+/examples/app_demo_advanced_foc/s2l-n0-3ffc241e
+/examples/app_demo_advanced_foc/spanning-xn-v0-f4e71812
+/examples/app_demo_advanced_foc/swstup-n0v0-93c86e9b
+/examples/app_demo_advanced_foc/swstup-n0v0-c872f161
+/examples/app_demo_advanced_foc/swstup-n0v0-d5925dd2
+/examples/app_demo_advanced_foc/swstup-n0v0-e719c74e
+/examples/app_demo_advanced_foc/target-xn-v0-533d87f9
+
+#exclude motorcontrollicence file
+examples/config_motor/advanced_motorcontrol_licence.h

@@ -12,6 +12,7 @@
 #define OUTPUT_PORT          2
 #define NUMBER_OF_IO_PORTS   4    /**< Defines number of Digital IOs available. */
 
+[[combinable]]
 void gpio_service(port gpio_ports[4], interface GPIOInterface server i_gpio[1])
 {
     //Set freq to 250MHz (always needed for proper timing)
