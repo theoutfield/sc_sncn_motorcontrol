@@ -124,7 +124,7 @@ void contelec_encoder_write(SPIPorts &spi_ports, int opcode, int data, int data_
 
 }
 
-int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
+int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
 {
     int status;
 
@@ -146,17 +146,30 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     else
         contelec_encoder_write(spi_ports, CONTELEC_CONF_DIR, 0, 8);
     //offset
-    int position;
+    int ticks_per_turn = (1 << contelec_config.resolution_bits);
+    contelec_config.offset &= (ticks_per_turn-1);
+    if (contelec_config.offset != 0) {
+        int position, count, multiturn;
 #ifdef CONTELEC_USE_TIMESTAMP
-    { void, void, position, void, void } = contelec_encoder_read(spi_ports); //read actual position
+        { void, count, position, void, void } = contelec_encoder_read(spi_ports); //read actual position
 #else
-    { void, void, position, void } = contelec_encoder_read(spi_ports); //read actual position
+        { void, count, position, void } = contelec_encoder_read(spi_ports); //read actual position
 #endif
-    delay_ticks(100*CONTELEC_USEC);
-    contelec_encoder_write(spi_ports, CONTELEC_CONF_STPRESET, (position + contelec_config.offset) & 65535, 16); //write singleturn
+        if (count < 0) {
+            multiturn = (count / ticks_per_turn) - 1;
+        } else {
+            multiturn = (count / ticks_per_turn);
+        }
+        delay_ticks(100*CONTELEC_USEC);
+        contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + ((position + contelec_config.offset) & 65535), 32); //write same multiturn and single + offset
+    }
     //filter
-    if (contelec_config.filter == 1 || contelec_config.filter < 0 || contelec_config.filter > 9) {
+    if (contelec_config.filter == 1) {
         contelec_config.filter = 0x02;
+    } else if (contelec_config.filter < 0) {
+        contelec_config.filter = 0x00;
+    } else if (contelec_config.filter > 9) {
+        contelec_config.filter = 0x09;
     }
     contelec_encoder_write(spi_ports, CONTELEC_CONF_FILTER, contelec_config.filter, 8);
     //read status
@@ -169,44 +182,12 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
     return status;
 }
 
-//int check_contelec_config(CONTELECConfig &contelec_config) {
-//    if(contelec_config.polarity < 0  || contelec_config.polarity > 1){
-//        printstrln("Wrong CONTELEC configuration: wrong direction");
-//        return ERROR;
-//    }
-//    if( CONTELEC_USEC <= 0 ){
-//        printstrln("Wrong CONTELEC configuration: wrong CONTELEC_USEC value");
-//        return ERROR;
-//    }
-//    if(contelec_config.timeout < 0){
-//        printstrln("Wrong CONTELEC configuration: wrong timeout");
-//        return ERROR;
-//    }
-//    if(contelec_config.pole_pairs < 1){
-//        printstrln("Wrong CONTELEC configuration: wrong pole-pairs");
-//        return ERROR;
-//    }
-//    if (contelec_config.filter == 1 || contelec_config.filter < 0 || contelec_config.filter > 9) {
-//        printstrln("Wrong filter configuration");
-//        contelec_config.filter = 0x02;
-//    }
-//    if (contelec_config.timeout < 10*CONTELEC_USEC) {
-//        printstrln("Timeout time too low");
-//        contelec_config.timeout = 10*CONTELEC_USEC;
-//    }
-//    return SUCCESS;
-//}
 
-//[[combinable]]
  void contelec_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
     //Set freq to 250MHz (always needed for velocity calculation)
     write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-//    if(check_contelec_config(position_feedback_config.contelec_config) == ERROR){
-//        printstrln("Error while checking the CONTELEC sensor configuration");
-//        return;
-//    }
     init_spi_ports(spi_ports);
     int init_status = contelec_encoder_init(spi_ports, position_feedback_config.contelec_config);
     if (init_status) {
@@ -323,24 +304,10 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
 
         //receive new contelec_config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
-                ticks_per_turn = (1 << in_config.contelec_config.resolution_bits);
-                in_config.contelec_config.offset &= (ticks_per_turn-1);
-                t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                //update variables which depend on contelec_config
-                if (position_feedback_config.contelec_config.offset != in_config.contelec_config.offset) {
-                    contelec_encoder_init(spi_ports, in_config.contelec_config);
-                } else {
-                    if (position_feedback_config.contelec_config.polarity != in_config.contelec_config.polarity) {
-                        contelec_encoder_write(spi_ports, CONTELEC_CONF_DIR, in_config.contelec_config.polarity, 8);
-                    }
-                    if (position_feedback_config.contelec_config.filter != in_config.contelec_config.filter) {
-                        if (in_config.contelec_config.filter == 1 || in_config.contelec_config.filter < 0 || in_config.contelec_config.filter > 9) {
-                            in_config.contelec_config.filter = 0x02;
-                        }
-                        contelec_encoder_write(spi_ports, CONTELEC_CONF_FILTER, in_config.contelec_config.filter, 8);
-                    }
-                }
                 position_feedback_config = in_config;
+                contelec_encoder_init(spi_ports, position_feedback_config.contelec_config); //init with new config
+                //update variables which depend on contelec_config
+                ticks_per_turn = (1 << position_feedback_config.contelec_config.resolution_bits);
                 crossover = ticks_per_turn - ticks_per_turn/10;
                 velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC;
 
@@ -360,7 +327,12 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
 
         //receive the new count to set and set the offset accordingly
         case i_position_feedback[int i].set_position(int new_count):
-                int multiturn = (new_count / ticks_per_turn) & 4095;
+                int multiturn;
+                if (new_count < 0) {
+                    multiturn = (new_count / ticks_per_turn) - 1;
+                } else {
+                    multiturn = (new_count / ticks_per_turn);
+                }
                 unsigned int singleturn = new_count % ticks_per_turn;
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
                 contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + singleturn, 32);
@@ -460,7 +432,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig contelec_config)
 
 #ifdef XSCOPE_CONTELEC
             xscope_int(VELOCITY, velocity);
-            xscope_int(POSITION, position);
+            xscope_int(POSITION, count);
             xscope_int(POSITION_RAW, angle);
             xscope_int(STATUS, status*1000);
 #ifdef CONTELEC_USE_TIMESTAMP

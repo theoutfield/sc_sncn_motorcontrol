@@ -11,7 +11,7 @@
 
 #include <position_feedback_service.h>
 
-int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig config);
+int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &config);
 void init_spi_ports(SPIPorts &spi_ports);
 
 
