@@ -39,6 +39,7 @@
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 */
 
+/*
 // 411678 MAXON motor
 
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
@@ -56,3 +57,4 @@
 
 // GENERAL PARAMETERS
 #define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
+*/

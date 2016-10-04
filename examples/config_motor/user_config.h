@@ -25,15 +25,16 @@
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
 //#include <motor_config_AMK_DT3.h>
+#include <motor_config_AMK_DD7_28_10_T00.h>
 
-#include <motor_config.h>
+//#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   AMS_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
 #define MOTOR_FEEDBACK_SENSOR      MOTOR_COMMUTATION_SENSOR
@@ -113,7 +114,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      3000//590
+#define COMMUTATION_OFFSET_CLK      450
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     0
@@ -137,7 +138,7 @@
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 20
+#define PERCENT_OFFSET_TORQUE 5
 
 
 /////////////////////////////////////////////////
