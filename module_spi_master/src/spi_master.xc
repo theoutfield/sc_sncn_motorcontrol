@@ -7,7 +7,6 @@
 
 #include <xs1.h>
 #include <xclib.h>
-#include <print.h> //TODO remove
 #include "spi_master.h"
 
 //static unsigned SCLK_VAL;
@@ -15,7 +14,6 @@
 void spi_master_init(spi_master_interface &spi_if, unsigned spi_clock_div)
 {
     // configure ports and clock blocks
-   // printuintln(spi_clock_div);
     configure_clock_rate(spi_if.blk1, 250, spi_clock_div);
 #if SPI_MASTER_MODE == 0
     set_port_no_inv(spi_if.sclk);

@@ -14,6 +14,8 @@
 
 #include <mc_internal_constants.h>
 
+extern char start_message[];
+
 int check_hall_config(HallConfig &hall_config){
 
     if (hall_config.pole_pairs < 1 || hall_config.pole_pairs > 11) {
@@ -52,7 +54,8 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
         return;
     }
 
-    printstr(">>   SOMANET HALL SENSOR SERVICE STARTING...\n");
+    printstr(start_message);
+    printstrln("HALL");
 
     timer tx;
     unsigned int time1=0;

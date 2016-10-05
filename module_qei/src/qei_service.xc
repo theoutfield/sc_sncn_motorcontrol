@@ -37,6 +37,8 @@ static const unsigned char lookup[16][4] = {
     { 0, 0, 0, 0 }  // 11 xx
 };
 
+extern char start_message[];
+
 int check_qei_config(QEIConfig &qei_config)
 {
     if (qei_config.index_type < 3  || qei_config.index_type > 4) {
@@ -71,7 +73,8 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
         return;
     }
 
-    printstr(">>   SOMANET ENCODER SENSOR SERVICE STARTING...\n");
+    printstr(start_message);
+    printstrln("QEI");
 
     //Check if we are using a dc board with configurable qei port
     if (!isnull(qei_ports.p_qei_config)) {

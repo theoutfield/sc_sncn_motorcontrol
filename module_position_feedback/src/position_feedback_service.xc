@@ -8,10 +8,12 @@
 #include <position_feedback_service.h>
 #include <print.h>
 
+char start_message[] = ">>   SOMANET SENSOR SERVICE STARTING: ";
 
 void fallback_service(PositionFeedbackConfig &position_feedback_config, server interface PositionFeedbackInterface i_position_feedback[3])
 {
-    printstrln(">>   SOMANET FALLBACK SENSOR SERVICE STARTING...");
+    printstr(start_message);
+    printstrln("FALLBACK");
 
     //main loop
     int loop_flag = 1;

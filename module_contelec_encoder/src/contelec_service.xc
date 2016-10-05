@@ -13,6 +13,7 @@
 #include <mc_internal_constants.h>
 #include <filter_blocks.h>
 
+extern char start_message[];
 
 static inline void slave_select(out port spi_ss)
 {
@@ -191,13 +192,14 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
     init_spi_ports(spi_ports);
     int init_status = contelec_encoder_init(spi_ports, position_feedback_config.contelec_config);
     if (init_status) {
-        printstr("Error with SPI CONTELEC sensor ");
+        printstr("Error with CONTELEC sensor initialization");
         printintln(init_status);
         position_feedback_config.sensor_type = 0;
         return;
     }
 
-    printstr(">>   SOMANET CONTELEC SENSOR SERVICE STARTING...\n");
+    printstr(start_message);
+    printstrln("CONTELEC");
 
     //init variables
     //velocity
