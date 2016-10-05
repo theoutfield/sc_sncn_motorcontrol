@@ -21,9 +21,10 @@ PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
-QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+//HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+//SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
+//QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+out port p_adc = SOMANET_IFM_GPIO_D0;
 
 #define POSITION_LIMIT 5000000 //+/- 4095
 
@@ -117,7 +118,7 @@ int main(void) {
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
                     Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm);
+                            i_watchdog[0], i_motorcontrol, i_update_pwm, p_adc);
                 }
 
                 /* Shared memory Service */
