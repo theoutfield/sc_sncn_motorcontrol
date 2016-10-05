@@ -25,23 +25,29 @@
 /** Define Motor Identifier (0 or 1) */
 #define _MOTOR_ID 0
 
+#ifdef CLK_FRQ_100_MHZ
 
-/** Define the resolution of PWM (WARNING: effects update rate as tied to ref clock) */
-//MB~ #define PWM_RES_BITS 12 // Number of bits used to define number of different PWM pulse-widths
-#define _PWM_RES_BITS 14 // Number of bits used to define number of different PWM pulse-widths
-#define _PWM_MAX_VALUE (1 << _PWM_RES_BITS) // No.of different PWM pulse-widths = 16384
+    /** Define the resolution of PWM (WARNING: effects update rate as tied to ref clock) */
+    #define _PWM_RES_BITS 14 // Number of bits used to define number of different PWM pulse-widths
+    #define _PWM_MAX_VALUE (1 << _PWM_RES_BITS) // No.of different PWM pulse-widths = 8192
 
-#define _PWM_MIN_LIMIT (_PWM_MAX_VALUE >> 4) // Min PWM value allowed (1/16th of max range) = 1024
-#define _PWM_MAX_LIMIT (_PWM_MAX_VALUE - _PWM_MIN_LIMIT) // Max. PWM value allowed = (16384-1024) = 15360
-
-
-#define _PWM_DEAD_TIME 1500 //((12 * MICRO_SEC + 5) / 10) // 1200ns PWM Dead-Time WARNING: Safety critical
-
-// Number of PWM time increments between ADC/PWM synchronisation points. NB Independent of Reference Frequency
-#define _INIT_SYNC_INCREMENT (_PWM_MAX_VALUE)
-#define _HALF_SYNC_INCREMENT (_INIT_SYNC_INCREMENT >> 1)
+    #define _PWM_MIN_LIMIT (_PWM_MAX_VALUE >> 4) // Min PWM value allowed (1/16th of max range) = 512
+    #define _PWM_MAX_LIMIT (_PWM_MAX_VALUE - _PWM_MIN_LIMIT) // Max. PWM value allowed = 7680
 
 
+    #define _PWM_DEAD_TIME 600 // 3 us PWM Dead-Time WARNING: Safety critical
+
+    // Number of PWM time increments between ADC/PWM synchronisation points. NB Independent of Reference Frequency
+    #define _INIT_SYNC_INCREMENT (_PWM_MAX_VALUE)
+    #define _HALF_SYNC_INCREMENT (_INIT_SYNC_INCREMENT >> 1)
+
+    #ifndef _PLATFORM_REFERENCE_MHZ
+        #define _PLATFORM_REFERENCE_MHZ 250//100
+        #define _PLATFORM_REFERENCE_KHZ (1000 * _PLATFORM_REFERENCE_MHZ)
+        #define _PLATFORM_REFERENCE_HZ  (1000 * _PLATFORM_REFERENCE_KHZ) // NB Uses 28-bits
+    #endif
+
+#endif
 
 
 // The time each motor starts the PWM is staggered by this amount
@@ -58,24 +64,11 @@
 /** Maximum Port timer value. See also PORT_TIME_TYP */
 #define _PORT_TIME_MASK 0xFFFF
 
-/* This is a bit of a cludge, we are using a non-standard configuration
- * where the timer on the tile for inner_loop() is running at 250 MHz,
- * but other timers are running at the default of 100 MHz.
- * Currently this flexibility to define timer frequencies for each tile does not exist.
- * Therefore, we set up the timer frequency here.
- */
-#ifndef _PLATFORM_REFERENCE_MHZ
-#define _PLATFORM_REFERENCE_MHZ 250//100
-#define _PLATFORM_REFERENCE_KHZ (1000 * _PLATFORM_REFERENCE_MHZ)
-#define _PLATFORM_REFERENCE_HZ  (1000 * _PLATFORM_REFERENCE_KHZ) // NB Uses 28-bits
-#endif
-
 #define SECOND PLATFORM_REFERENCE_HZ // One Second in Clock ticks
 #define MILLI_SEC (PLATFORM_REFERENCE_KHZ) // One milli-second in clock ticks
 #define MICRO_SEC (PLATFORM_REFERENCE_MHZ) // One micro-second in clock ticks
 
 #define QUART_PWM_MAX (PWM_MAX_VALUE >> 2)  // Quarter of maximum PWM width value
-
 
 /** Type for Port timer values. See also PORT_TIME_MASK */
 typedef unsigned short PORT_TIME_TYP;
