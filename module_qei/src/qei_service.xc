@@ -62,8 +62,8 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                  client interface shared_memory_interface ?i_shared_memory,
                  server interface PositionFeedbackInterface i_position_feedback[3])
 {
-    //Set freq to 250MHz (always needed for velocity calculation)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+//    //Set freq to 250MHz (always needed for velocity calculation)
+//    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
                // to compute velocity from qei
     if (check_qei_config(position_feedback_config.qei_config) == ERROR) {

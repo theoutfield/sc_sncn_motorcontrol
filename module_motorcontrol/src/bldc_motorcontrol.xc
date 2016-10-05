@@ -31,8 +31,8 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
                 interface WatchdogInterface client i_watchdog,
                 interface BrakeInterface client ?i_brake)
 {
-    //Set freq to 250MHz (always needed for proper timing)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+//    //Set freq to 250MHz (always needed for proper timing)
+//    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     t_pwm_control pwm_ctrl;
     const unsigned t_delay = 300*USEC_FAST;

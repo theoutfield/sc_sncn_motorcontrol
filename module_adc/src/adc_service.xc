@@ -5,8 +5,8 @@
 
 void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog){
 
-    //Set freq to 250MHz (always needed for proper timing)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+//    //Set freq to 250MHz (always needed for proper timing)
+//    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     printstr(">>   SOMANET ADC SERVICE STARTING...\n");
 
