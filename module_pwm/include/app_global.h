@@ -28,7 +28,7 @@
 #ifdef CLK_FRQ_100_MHZ
 
     /** Define the resolution of PWM (WARNING: effects update rate as tied to ref clock) */
-    #define _PWM_RES_BITS 14 // Number of bits used to define number of different PWM pulse-widths
+    #define _PWM_RES_BITS 13 // Number of bits used to define number of different PWM pulse-widths
     #define _PWM_MAX_VALUE (1 << _PWM_RES_BITS) // No.of different PWM pulse-widths = 8192
 
     #define _PWM_MIN_LIMIT (_PWM_MAX_VALUE >> 4) // Min PWM value allowed (1/16th of max range) = 512
@@ -42,7 +42,7 @@
     #define _HALF_SYNC_INCREMENT (_INIT_SYNC_INCREMENT >> 1)
 
     #ifndef _PLATFORM_REFERENCE_MHZ
-        #define _PLATFORM_REFERENCE_MHZ 250//100
+        #define _PLATFORM_REFERENCE_MHZ 100
         #define _PLATFORM_REFERENCE_KHZ (1000 * _PLATFORM_REFERENCE_MHZ)
         #define _PLATFORM_REFERENCE_HZ  (1000 * _PLATFORM_REFERENCE_KHZ) // NB Uses 28-bits
     #endif

@@ -194,9 +194,9 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
 
     //parameters for starting the brake
-    pwm_comms_s_start_brake.params.widths[0] = duty_start_brake;
-    pwm_comms_s_start_brake.params.widths[1] = duty_start_brake;
-    pwm_comms_s_start_brake.params.widths[2] = duty_start_brake;
+    pwm_comms_s_start_brake.params.widths[0] = 4000 /*duty_start_brake*/;
+    pwm_comms_s_start_brake.params.widths[1] = 4000 /*duty_start_brake*/;
+    pwm_comms_s_start_brake.params.widths[2] = 4000 /*duty_start_brake*/;
 
     pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s_start_brake.buf = 0;
@@ -209,9 +209,9 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     PWM_ARRAY_TYP pwm_ctrl_s_maintain_brake ; // Structure containing double-buffered PWM output data
     PWM_COMMS_TYP pwm_comms_s_maintain_brake; // Structure containing PWM communication data
 
-    pwm_comms_s_maintain_brake.params.widths[0] = duty_maintain_brake;
-    pwm_comms_s_maintain_brake.params.widths[1] = duty_maintain_brake;
-    pwm_comms_s_maintain_brake.params.widths[2] = duty_maintain_brake;
+    pwm_comms_s_maintain_brake.params.widths[0] = 4000 /*duty_maintain_brake*/;
+    pwm_comms_s_maintain_brake.params.widths[1] = 4000 /*duty_maintain_brake*/;
+    pwm_comms_s_maintain_brake.params.widths[2] = 4000 /*duty_maintain_brake*/;
 
     pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s_maintain_brake.buf = 0;
@@ -239,9 +239,9 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     pwm_comms_s.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s.buf = 0;
 
-    pwm_comms_s.params.widths[0] = 1500;
-    pwm_comms_s.params.widths[1] = 1500;
-    pwm_comms_s.params.widths[2] = 1500;
+    pwm_comms_s.params.widths[0] = 4000;
+    pwm_comms_s.params.widths[1] = 4000;
+    pwm_comms_s.params.widths[2] = 4000;
 
     convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf] ); // Max 178 Cycles
 
