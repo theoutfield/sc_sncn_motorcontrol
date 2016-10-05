@@ -24,7 +24,6 @@
 #include <assert.h>
 #include <xccompat.h>
 
-#include "app_global.h"
 #include "pwm_general.h"
 
 /******************************************************************************/

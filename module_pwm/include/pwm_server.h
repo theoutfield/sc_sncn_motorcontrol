@@ -24,12 +24,7 @@
 #include <assert.h>
 #include <print.h>
 
-#include "app_global.h"
-
-#include "pwm_general.h"
-#include "pwm_convert_width.h"
 #include <pwm_ports.h>
-
 #include <motor_control_interfaces.h>
 
 /**

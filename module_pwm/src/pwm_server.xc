@@ -14,6 +14,12 @@
  **/
 
 #include "pwm_server.h"
+#include <pwm_ports.h>
+#include "app_global.h"
+#include "pwm_convert_width.h"
+
+#include <motor_control_interfaces.h>
+
 #include <a4935.h>
 #include <mc_internal_constants.h>
 

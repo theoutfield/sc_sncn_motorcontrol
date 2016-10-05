@@ -132,6 +132,9 @@
 //////  MOTOR CONTROL CONFIGURATION
 ///////////////////////////////////////////////
 
+// motor id (in case more than 1 motor is controlled)
+#define MOTOR_ID 0
+
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
 #define TORQUE_Kp         40 //7
 #define TORQUE_Ki         40  //3
