@@ -3,15 +3,9 @@
  * @brief Hall Sensor Server Implementation
  * @author Synapticon GmbH <support@synapticon.com>
  */
-#include <xs1.h>
-#include <hall_service.h>
-#include <limits.h>
-#include <filter_blocks.h>
-#include <refclk.h>
-#include <stdlib.h>
-#include <print.h>
-#include <xscope.h>
 
+#include <hall_service.h>
+#include <print.h>
 #include <mc_internal_constants.h>
 
 int check_hall_config(HallConfig &hall_config){
@@ -43,8 +37,10 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                   client interface shared_memory_interface ?i_shared_memory,
                   server interface PositionFeedbackInterface i_position_feedback[3])
 {
-    //Set freq to 250MHz (always needed for velocity calculation)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+
+    if (HALL_USEC == USEC_FAST) { //Set freq to 250MHz
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
 
     if (check_hall_config(position_feedback_config.hall_config) == ERROR) {
         printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
@@ -139,7 +135,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
 
 
     // clock frequency of defined timers in hall section
-    hv.hall_f_clock = 250000000; //250 MHz of clock frequency
+    hv.hall_f_clock = (HALL_USEC*1000000); //1 second in ticks
     // motor pole pairs
     hv.hall_pole_pairs = position_feedback_config.hall_config.pole_pairs;
     hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
@@ -217,7 +213,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                 loop_flag = 0;
                 continue;
 
-        case tx when timerafter(time1+2500) :> void: //12 usec 3000
+        case tx when timerafter(time1+(HALL_USEC*10)) :> void: //10 usec
 
                 if(++hall_last_state_period  > HALL_TRANSITION_PERIOD_MAX)  hall_last_state_period=HALL_TRANSITION_PERIOD_MAX;
                 if(++hall_transition_timeout > HALL_PERIOD_MAX)             hall_transition_timeout=HALL_PERIOD_MAX;
