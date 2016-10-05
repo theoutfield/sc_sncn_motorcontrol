@@ -4,15 +4,11 @@
  * @author Synapticon GmbH <support@synapticon.com>
 */
 
-#include <xs1.h>
 #include <qei_service.h>
 #include <limits.h>
-#include <stdlib.h>
-#include <refclk.h>
 #include "print.h"
 #include <mc_internal_constants.h>
 
-#define MILLISECOND 250000 //ticks
 //#pragma xta command "analyze loop qei_loop"
 //#pragma xta command "set required - 1.0 us"
 // Order is 00 -> 10 -> 11 -> 01
@@ -64,8 +60,10 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                  client interface shared_memory_interface ?i_shared_memory,
                  server interface PositionFeedbackInterface i_position_feedback[3])
 {
-    //Set freq to 250MHz (always needed for velocity calculation)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+
+    if (QEI_USEC == USEC_FAST) { //Set freq to 250MHz
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
 
                // to compute velocity from qei
     if (check_qei_config(position_feedback_config.qei_config) == ERROR) {
@@ -318,7 +316,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                 loop_flag = 0;
                 continue;
 
-            case t_velocity when timerafter(ts_velocity + MILLISECOND) :> ts_velocity:
+            case t_velocity when timerafter(ts_velocity + (1000*QEI_USEC)) :> ts_velocity:
 
                 difference_velocity = count - vel_previous_position;
                 if (difference_velocity > qei_crossover_velocity) {

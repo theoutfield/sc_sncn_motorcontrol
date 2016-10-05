@@ -7,7 +7,9 @@
 
 #pragma once
 
-#include <refclk.h>
+#include <user_config.h>
+
+#define AMS_USEC            IFM_TILE_USEC
 
 #define AMS_SENSOR      5
 

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <refclk.h>
+#include <user_config.h>
 
 #define ERROR                      0
 #define SUCCESS                    1
@@ -21,7 +21,7 @@
 #define BISS_DATA_PORT_BIT         0            // bit number (0 = rightmost bit) when inputing from a multibit port
 #define BISS_CLK_PORT_HIGH         (0b1000 | SET_PORT1_AS_HALL_PORT2_AS_QEI)    // high clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
 #define BISS_CLK_PORT_LOW          SET_PORT1_AS_HALL_PORT2_AS_QEI               // low  clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
-#define BISS_USEC                  USEC_FAST    // number of ticks in a microsecond
+#define BISS_USEC                  IFM_TILE_USEC    // number of ticks in a microsecond
 
 /**
  * @brief Type for the return status when reading BiSS data

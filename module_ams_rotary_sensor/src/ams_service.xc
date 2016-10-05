@@ -487,8 +487,10 @@ static inline void multiturn(int &count, int last_position, int position, int ti
 
  void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
-    //Set freq to 250MHz (always needed for velocity calculation)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+
+     if (AMS_USEC == USEC_FAST) { //Set freq to 250MHz
+         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+     }
 
     if (initRotarySensor(spi_ports,  position_feedback_config.ams_config) != SUCCESS_WRITING) {
         printstrln("Error with SPI AMS sensor");
