@@ -111,7 +111,8 @@
 #define VDC             48
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     66
+#define COMMUTATION_LOOP_PERIOD     82 // set to 66 in case ref_clk_freq is 250 MHz.
+                                       // set to 82 in case ref_clk_freq is 100 MHz.
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CLK      450
