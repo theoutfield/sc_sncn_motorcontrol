@@ -13,7 +13,7 @@
 #define AMS_USEC            USEC_FAST
 #define AMS_CACHE_TIME      (60*AMS_USEC)
 #define AMS_RESOLUTION      14
-#define AMS_VELOCITY_LOOP   1000
+#define AMS_VELOCITY_LOOP   30
 #define DEFAULT_SPI_CLOCK_DIV 32        // 250/DIV MHz
 #define AMS_SENSOR_EXECUTING_TIME (AMS_USEC/2)       //0.5 us
 #define AMS_SENSOR_SAVING_TIME    (AMS_USEC/5)       //0.2 us
