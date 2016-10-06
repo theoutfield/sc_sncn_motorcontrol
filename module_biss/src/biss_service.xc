@@ -12,6 +12,8 @@
 
 #include <mc_internal_constants.h>
 
+extern char start_message[];
+
 static inline void update_turns(int &turns, int last_position, int position, int multiturn_resolution, int ticks_per_turn) {
     if (multiturn_resolution == 0) {
         int difference = position - last_position;
@@ -22,46 +24,16 @@ static inline void update_turns(int &turns, int last_position, int position, int
     }
 }
 
-//int check_biss_config(BISSConfig & biss_config)
-//{
-//    if(biss_config.polarity != BISS_POLARITY_NORMAL && biss_config.polarity != BISS_POLARITY_INVERTED){
-//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong polarity");
-//        return ERROR;
-//    }
-//
-//    if ( BISS_FRAME_BYTES < (( (3 + 2 + biss_config.multiturn_length + biss_config.singleturn_length + biss_config.status_length + 32 - clz(biss_config.crc_poly)) -1)/32 + 1) ){
-//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong frame bytes number");
-//        return ERROR;
-//    }
-//
-//    if( BISS_USEC <= 0 ){
-//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong BISS_USEC value");
-//        return ERROR;
-//    }
-//
-//    if(biss_config.timeout <= 0){
-//        printstrln("biss_service: ERROR: Wrong BISS configuration: wrong timeout");
-//        return ERROR;
-//    }
-//
-//    if(biss_config.pole_pairs < 1){
-//        printstrln("biss_service: ERROR: Wrong BiSS configuration: wrong pole-pairs");
-//        return ERROR;
-//    }
-//
-//    return SUCCESS;
-//}
 
 void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
-//    //Set freq to 250MHz (always needed for velocity calculation)
-//    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-//    if(check_biss_config(position_feedback_config.biss_config) == ERROR){
-//        return;
-//    }
+    if (BISS_USEC == USEC_FAST) { //Set freq to 250MHz
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
 
-    printstr(">>   SOMANET BISS SENSOR SERVICE STARTING...\n");
+    printstr(start_message);
+    printstrln("BISS");
 
     //init variables
     //velocity
@@ -72,7 +44,6 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
     int crossover = ticks_per_turn - ticks_per_turn/10;
     int velocity_loop = (position_feedback_config.biss_config.velocity_loop * BISS_USEC); //velocity loop time in clock ticks
     int velocity_factor = 60000000/position_feedback_config.biss_config.velocity_loop;
-    int velocity_count = 0;
     //position
     unsigned int data[BISS_FRAME_BYTES];
     unsigned int last_position = 0;
@@ -90,19 +61,10 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
     unsigned int last_count_read = 0;
     unsigned int last_biss_read = 0;
 
-    int actual_velocity = 0;
-    int actual_count = 0;
-    unsigned int actual_position = 0;
-    unsigned int actual_angle = 0;
     unsigned int measurement_time = 0;
     unsigned int start_time, end_time;
 
     int notification = MOTCTRL_NTF_EMPTY;
-
-    //clock and port configuration
-//    configure_clock_rate(biss_ports.spi_interface.blk1, position_feedback_config.biss_config.clock_dividend, position_feedback_config.biss_config.clock_divisor); // a/b MHz
-//    configure_out_port(biss_ports.p_qei_config, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
-//    configure_in_port(biss_ports.p_qei, biss_ports.spi_interface.blk1);
 
     //first read
     t :> time;
@@ -123,20 +85,12 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
     last_count_read = last_biss_read;
     next_velocity_read = last_biss_read;
     { last_count , last_position, void } = biss_encoder(data, position_feedback_config.biss_config);
-//    count_offset = -last_count;
 
     //main loop
     int loop_flag = 1;
     while (loop_flag) {
         select {
-//        case i_position_feedback[int i].get_all() -> { int out_count, int out_velocity, unsigned int out_position, unsigned int out_angle, unsigned int out_time }:
-//                out_count = actual_count;
-//                out_velocity = actual_velocity;
-//                out_position = actual_position;
-//                out_angle = actual_angle;
-//                out_time = measurement_time;
-//                break;
-
+        //notifications
         case i_position_feedback[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
@@ -158,19 +112,6 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                     angle = (4096 - angle) & 4095;
                 }
                 break;
-
-        //send singleturn position fast
-//        case i_position_feedback[int i].get_position_fast() -> unsigned int position:
-//                t :> time;
-//                if (timeafter(time, last_biss_read + position_feedback_config.biss_config.timeout)) {
-//                    position = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, position_feedback_config.biss_config.singleturn_resolution);
-//                    t :> last_biss_read;
-//                    last_position = position;
-//                } else
-//                    position = last_position;
-//                if (position_feedback_config.biss_config.polarity == BISS_POLARITY_INVERTED)
-//                    position = ticks_per_turn - position;
-//                break;
 
         //send count, position and status (error and warning bits), ajusted with count offset and polarity
         case i_position_feedback[int i].get_position() -> { int count, unsigned int position }:
@@ -368,18 +309,10 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
             if (!isnull(i_shared_memory)) {
                 if (position_feedback_config.biss_config.enable_push_service == PushAll) {
                     i_shared_memory.write_angle_velocity_position(angle, velocity, count);
-                    actual_count = count;
-                    actual_velocity = velocity;
-                    actual_angle = angle;
-                    actual_position = position;
                 } else if (position_feedback_config.biss_config.enable_push_service == PushAngle) {
                     i_shared_memory.write_angle_electrical(angle);
-                    actual_angle = angle;
                 } else if (position_feedback_config.biss_config.enable_push_service == PushPosition) {
                     i_shared_memory.write_velocity_position(velocity, count);
-                    actual_count = count;
-                    actual_velocity = velocity;
-                    actual_position = position;
                 }
             }
             t :> end_time;
@@ -405,90 +338,87 @@ unsigned int read_biss_sensor_data(QEIPorts &biss_ports, BISSConfig & biss_confi
     unsigned int frame[frame_bytes];
     unsigned int crc  =  0;
     unsigned int status = 0;
-//    unsigned int readbuf = 0;
-//    unsigned int bitindex = 0;
-//    unsigned int byteindex = 0;
-//    unsigned int data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
-//    const unsigned int timeout = 3+2; //3 bits to read before then the ack and start bits
-//    unsigned int crc_length = 32 - clz(biss_config.crc_poly); //clz: number of leading 0
-//    for (int i=0; i<(data_length-1)/32+1; i++) //init data with zeros
-//        data[i] = 0;
-//
-//    //get the raw data
-////    start_clock(biss_ports.spi_interface.blk1);
-//    for (int i=0; i<timeout+data_length+crc_length; i++) {
-//        if (bitindex == 32) {
-//            frame[byteindex] = readbuf;
-//            readbuf = 0;
-//            bitindex = 0;
-//            byteindex++;
-//        }
-//        unsigned int bit;
-//        biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
-//        biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
-////        sync(biss_ports.p_qei_config);
-//        biss_ports.p_qei :> bit;
-//        readbuf = readbuf << 1;
-//        readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
-//        bitindex++;
-//    }
-//    biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
-////    configure_out_port(biss_ports.p_qei_config, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
-//    readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
-//    frame[byteindex] = readbuf;
-//    byteindex = 0;
-//    bitindex = 0;
-//
-//    //process the raw data
-//    //search for ack and start bit
-//    readbuf = frame[0];
-//    while (status < 2 && bitindex <= timeout) {
-//        unsigned int bit = (readbuf & 0x80000000);
-//        readbuf = readbuf << 1;
-//        bitindex++;
-//        if (status) {
-//            if (bit) //status = 2, ack and start bit found
-//                status++;
-//        } else if (bit == 0) //status = 1, ack bit found
-//            status++;
-//    }
-//    //extract the data and crc
-//    if (status == 2) {
-//        for (int i=0; i<data_length; i++) {
-//            if (bitindex == 32) {
-//                bitindex = 0;
-//                byteindex++;
-//                readbuf = frame[byteindex];
-//            }
-//            data[i/32] = data[i/32] << 1;
-//            data[i/32] |= (readbuf & 0x80000000) >> 31;
-//            readbuf = readbuf << 1;
-//            bitindex++;
-//        }
-//        for (int i=0; i<crc_length; i++) {
-//            if (bitindex == 32) {
-//                bitindex = 0;
-//                byteindex++;
-//                readbuf = frame[byteindex];
-//            }
-//            crc = crc << 1;
-//            crc |= (readbuf & 0x80000000) >> 31;
-//            readbuf = readbuf << 1;
-//            bitindex++;
-//        }
-//        status = NoError;
-//        //check crc
-//        if (biss_config.crc_poly && crc != biss_crc(data, data_length, biss_config.crc_poly) ) {
-//            biss_crc_correct(data, data_length, frame_bytes, crc,  biss_config.crc_poly); //try 1 bit error correction
-//            if (crc == biss_crc(data, data_length, biss_config.crc_poly))
-//                status = CRCCorrected;
-//            else
-//                status = CRCError;
-//        }
-//    } else if (status)
-//        status = NoStartBit;
-//    else
-//        status = NoAck;
+    unsigned int readbuf = 0;
+    unsigned int bitindex = 0;
+    unsigned int byteindex = 0;
+    unsigned int data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
+    const unsigned int timeout = 3+2; //3 bits to read before then the ack and start bits
+    unsigned int crc_length = 32 - clz(biss_config.crc_poly); //clz: number of leading 0
+    for (int i=0; i<(data_length-1)/32+1; i++) //init data with zeros
+        data[i] = 0;
+
+    //get the raw data
+    for (int i=0; i<timeout+data_length+crc_length; i++) {
+        if (bitindex == 32) {
+            frame[byteindex] = readbuf;
+            readbuf = 0;
+            bitindex = 0;
+            byteindex++;
+        }
+        unsigned int bit;
+        biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
+        biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+        biss_ports.p_qei :> bit;
+        readbuf = readbuf << 1;
+        readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
+        bitindex++;
+    }
+    biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
+    readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
+    frame[byteindex] = readbuf;
+    byteindex = 0;
+    bitindex = 0;
+
+    //process the raw data
+    //search for ack and start bit
+    readbuf = frame[0];
+    while (status < 2 && bitindex <= timeout) {
+        unsigned int bit = (readbuf & 0x80000000);
+        readbuf = readbuf << 1;
+        bitindex++;
+        if (status) {
+            if (bit) //status = 2, ack and start bit found
+                status++;
+        } else if (bit == 0) //status = 1, ack bit found
+            status++;
+    }
+    //extract the data and crc
+    if (status == 2) {
+        for (int i=0; i<data_length; i++) {
+            if (bitindex == 32) {
+                bitindex = 0;
+                byteindex++;
+                readbuf = frame[byteindex];
+            }
+            data[i/32] = data[i/32] << 1;
+            data[i/32] |= (readbuf & 0x80000000) >> 31;
+            readbuf = readbuf << 1;
+            bitindex++;
+        }
+        for (int i=0; i<crc_length; i++) {
+            if (bitindex == 32) {
+                bitindex = 0;
+                byteindex++;
+                readbuf = frame[byteindex];
+            }
+            crc = crc << 1;
+            crc |= (readbuf & 0x80000000) >> 31;
+            readbuf = readbuf << 1;
+            bitindex++;
+        }
+        status = NoError;
+        //check crc
+        if (biss_config.crc_poly && crc != biss_crc(data, data_length, biss_config.crc_poly) ) {
+            biss_crc_correct(data, data_length, frame_bytes, crc,  biss_config.crc_poly); //try 1 bit error correction
+            if (crc == biss_crc(data, data_length, biss_config.crc_poly))
+                status = CRCCorrected;
+            else
+                status = CRCError;
+        }
+    } else if (status)
+        status = NoStartBit;
+    else
+        status = NoAck;
     return status;
 }
 
@@ -498,7 +428,6 @@ unsigned int read_biss_sensor_data_fast(QEIPorts &biss_ports, int before_length,
     int status = 0;
     int timeout = 5; //3 bits to read before then the ack and start bits
 
-//    start_clock(biss_ports.spi_interface.blk1);
     while(status < 2 && timeout > 0) {
         timeout--;
         unsigned int bit;
@@ -528,8 +457,6 @@ unsigned int read_biss_sensor_data_fast(QEIPorts &biss_ports, int before_length,
         }
     }
     biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
-//    stop_clock(biss_ports.spi_interface.blk1);
-//    configure_out_port(biss_ports.p_qei_config, biss_ports.spi_interface.blk1, BISS_CLK_PORT_HIGH);
 
     return data;
 }

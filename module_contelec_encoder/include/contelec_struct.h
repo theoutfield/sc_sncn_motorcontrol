@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <refclk.h>
+#include <user_config.h>
 
-#define CONTELEC_USEC            USEC_FAST
+#define CONTELEC_USEC            IFM_TILE_USEC
 
 #define SPI_MASTER_MODE 1 //clock active high
 #define SPI_MASTER_SD_CARD_COMPAT 1 //MOSI high during input

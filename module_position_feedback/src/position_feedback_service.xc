@@ -8,10 +8,12 @@
 #include <position_feedback_service.h>
 #include <print.h>
 
+char start_message[] = ">>   SOMANET SENSOR SERVICE STARTING: ";
 
 void fallback_service(PositionFeedbackConfig &position_feedback_config, server interface PositionFeedbackInterface i_position_feedback[3])
 {
-    printstrln(">>   SOMANET FALLBACK SENSOR SERVICE STARTING...");
+    printstr(start_message);
+    printstrln("FALLBACK");
 
     //main loop
     int loop_flag = 1;
@@ -172,8 +174,12 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
         if (!isnull(position_feedback_config_2) && !isnull(position_feedback_config_1)) {
             //set biss clock if needed
             if (position_feedback_config_2.sensor_type == BISS_SENSOR) {
-                configure_out_port((*qei_ports_1).p_qei_config, (*spi_ports_1).spi_interface.blk1, BISS_CLK_PORT_HIGH);
-                configure_in_port((*qei_ports_1).p_qei, (*spi_ports_1).spi_interface.blk1);
+                if (!isnull((*qei_ports_1).p_qei_config)) {
+                    configure_out_port((*qei_ports_1).p_qei_config, (*spi_ports_1).spi_interface.blk1, BISS_CLK_PORT_HIGH);
+                    configure_in_port((*qei_ports_1).p_qei, (*spi_ports_1).spi_interface.blk1);
+                } else {
+                    position_feedback_config_2.sensor_type = 0;
+                }
             }
 
             //move unused ports to sensor 2

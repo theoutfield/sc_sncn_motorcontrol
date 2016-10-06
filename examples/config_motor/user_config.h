@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <refclk.h>
+
 
 //#include <motor_configs/motor_config_Nanotec_DB42C01.h>
 //#include <motor_configs/motor_config_Nanotec_DB42C02.h>
@@ -210,3 +212,6 @@
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
+
+//Number of ticks in a microsecond/frequency for IFM Tile
+#define IFM_TILE_USEC   USEC_FAST

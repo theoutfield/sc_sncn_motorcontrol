@@ -14,6 +14,7 @@
 #include <print.h>
 #include <mc_internal_constants.h>
 
+extern char start_message[];
 
 static inline void slave_select(out port spi_ss)
 {
@@ -484,43 +485,21 @@ static inline void multiturn(int &count, int last_position, int position, int ti
             count += difference;
 }
 
-int check_ams_config(AMSConfig &ams_config) {
-    if(ams_config.polarity < 0  || ams_config.polarity > 1){
-        printstrln("Wrong AMS configuration: wrong direction");
-        return ERROR;
-    }
-    if( AMS_USEC <= 0 ){
-        printstrln("Wrong AMS configuration: wrong AMS_USEC value");
-        return ERROR;
-    }
-    if(ams_config.cache_time < 0){
-        printstrln("Wrong AMS configuration: wrong timeout");
-        return ERROR;
-    }
-    if(ams_config.pole_pairs < 1){
-        printstrln("Wrong AMS configuration: wrong pole-pairs");
-        return ERROR;
-    }
-    return SUCCESS;
-}
-
  void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
-//    //Set freq to 250MHz (always needed for velocity calculation)
-//    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-    if(check_ams_config(position_feedback_config.ams_config) == ERROR){
-        printstrln("Error while checking the AMS sensor configuration");
-        position_feedback_config.sensor_type = 0;
-        return;
-    }
+     if (AMS_USEC == USEC_FAST) { //Set freq to 250MHz
+         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+     }
+
     if (initRotarySensor(spi_ports,  position_feedback_config.ams_config) != SUCCESS_WRITING) {
         printstrln("Error with SPI AMS sensor");
         position_feedback_config.sensor_type = 0;
         return;
     }
 
-    printstr(">>   SOMANET AMS SENSOR SERVICE STARTING...\n");
+    printstr(start_message);
+    printstrln("AMS");
 
     //init variables
     //velocity

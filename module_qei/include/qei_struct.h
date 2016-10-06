@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <user_config.h>
+
 /**
 * @brief Definition for referring to the Encoder sensor.
 */
@@ -34,6 +36,8 @@
 
 #define QEI_PORT_AS_TTL           0b0000
 #define QEI_PORT_AS_RS422         0b0010
+
+#define QEI_USEC                 IFM_TILE_USEC
 
 
 /**
