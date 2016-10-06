@@ -115,7 +115,7 @@
                                        // set to 82 in case ref_clk_freq is 100 MHz.
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      450
+#define COMMUTATION_OFFSET_CLK      1700
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     0
