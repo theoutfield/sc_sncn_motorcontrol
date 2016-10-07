@@ -214,4 +214,4 @@
 #define VELOCITY_FC             90
 
 //Number of ticks in a microsecond/frequency for IFM Tile
-#define IFM_TILE_USEC   USEC_FAST
+#define IFM_TILE_USEC   USEC_STD//USEC_FAST
