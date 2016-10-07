@@ -26,8 +26,9 @@
 //#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
-//#include <motor_config_AMK_DT3.h>
-#include <motor_config_AMK_DD7_28_10_T00.h>
+//#include <motor_config_AMK_DT4.h>
+#include <motor_config_AMK_DT3.h>
+//#include <motor_config_AMK_DD7_28_10_T00.h>
 
 //#include <motor_config.h>
 
@@ -36,7 +37,7 @@
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   AMS_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
 #define MOTOR_FEEDBACK_SENSOR      MOTOR_COMMUTATION_SENSOR
@@ -101,8 +102,8 @@
 */
 
 //FORESIGHT PROJECT
-#define DUTY_START_BRAKE    10000   // duty cycles for brake release (should be a number between 1500 and 13000)
-#define DUTY_MAINTAIN_BRAKE 1500    // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
+#define DUTY_START_BRAKE    7000   // duty cycles for brake release (should be a number between 600 and 7000)
+#define DUTY_MAINTAIN_BRAKE 800    // duty cycles for keeping the brake released (should be a number between 700 and 7000)
 
 #define PERIOD_START_BRAKE  1000    // period in which high voltage is applied for realising the brake [milli-seconds]
 
@@ -144,7 +145,7 @@
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 5
+#define PERCENT_OFFSET_TORQUE 80
 
 
 /////////////////////////////////////////////////
