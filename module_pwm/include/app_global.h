@@ -25,7 +25,7 @@
 /** Define Motor Identifier (0 or 1) */
 #define _MOTOR_ID 0
 
-#ifdef CLK_FRQ_100_MHZ
+//#ifdef CLK_FRQ_100_MHZ
 
     /** Define the resolution of PWM (WARNING: effects update rate as tied to ref clock) */
     #define _PWM_RES_BITS 13 // Number of bits used to define number of different PWM pulse-widths
@@ -47,7 +47,7 @@
         #define _PLATFORM_REFERENCE_HZ  (1000 * _PLATFORM_REFERENCE_KHZ) // NB Uses 28-bits
     #endif
 
-#endif
+//#endif
 
 
 // The time each motor starts the PWM is staggered by this amount

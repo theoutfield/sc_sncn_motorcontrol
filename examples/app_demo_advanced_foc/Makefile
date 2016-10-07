@@ -21,7 +21,7 @@ USED_MODULES = config_motor module_adc module_advanced_foc module_ams_rotary_sen
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O1 -report -DCLK_FRQ_100_MHZ  #-DUSE_XSCOPE
+XCC_FLAGS_Debug = -g -O1 -report #-DUSE_XSCOPE
 XCC_FLAGS_Release = -g -O1
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
