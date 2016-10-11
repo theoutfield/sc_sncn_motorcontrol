@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 
 /**
@@ -116,6 +116,7 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_current =  I_MAX;
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
+                    motorcontrol_config.ref_clk_frq = REF_CLK_FRQ_250_MHZ;
 
                     Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                             i_watchdog[0], i_motorcontrol, i_update_pwm);
