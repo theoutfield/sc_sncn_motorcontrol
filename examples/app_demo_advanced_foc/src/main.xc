@@ -190,7 +190,7 @@ int main(void) {
                     position_feedback_config.ams_config.resolution_bits = AMS_RESOLUTION;
                     position_feedback_config.ams_config.offset = AMS_OFFSET;
                     position_feedback_config.ams_config.max_ticks = 0x7fffffff;
-                    position_feedback_config.ams_config.pole_pairs = 5;
+                    position_feedback_config.ams_config.pole_pairs = POLE_PAIRS;
                     position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
                     position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
                     position_feedback_config.ams_config.enable_push_service = PushAll;
