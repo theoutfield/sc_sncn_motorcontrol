@@ -27,7 +27,8 @@
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
 //#include <motor_config_AMK_DT4.h>
-#include <motor_config_AMK_DT3.h>
+//#include <motor_config_AMK_DT3.h>
+#include <motor_config_AMK_DT2.h>
 //#include <motor_config_AMK_DD7_28_10_T00.h>
 
 //#include <motor_config.h>
@@ -102,8 +103,8 @@
 */
 
 //FORESIGHT PROJECT
-#define DUTY_START_BRAKE    7000   // duty cycles for brake release (should be a number between 600 and 7000)
-#define DUTY_MAINTAIN_BRAKE 800    // duty cycles for keeping the brake released (should be a number between 700 and 7000)
+#define DUTY_START_BRAKE    10000   // duty cycles for brake release (should be a number between 600 and 7000)
+#define DUTY_MAINTAIN_BRAKE  1500   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
 
 #define PERIOD_START_BRAKE  1000    // period in which high voltage is applied for realising the brake [milli-seconds]
 
@@ -114,11 +115,10 @@
 #define VDC             48
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     82 // set to 66 in case ref_clk_freq is 250 MHz.
-                                       // set to 82 in case ref_clk_freq is 100 MHz.
+#define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1700
+#define COMMUTATION_OFFSET_CLK      1900
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     0
@@ -215,4 +215,4 @@
 #define VELOCITY_FC             90
 
 //Number of ticks in a microsecond/frequency for IFM Tile
-#define IFM_TILE_USEC   USEC_STD//USEC_FAST
+#define IFM_TILE_USEC   USEC_FAST//USEC_STD//

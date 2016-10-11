@@ -180,8 +180,8 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 )
 {
 
-//    //Set freq to 250MHz (always needed for proper timing)
-//    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    //Set freq to 250MHz (always needed for proper timing)
+    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
     PWM_ARRAY_TYP pwm_ctrl_s ; // Structure containing double-buffered PWM output data
     PWM_SERV_TYP  pwm_serv_s ; // Structure containing PWM server control data
