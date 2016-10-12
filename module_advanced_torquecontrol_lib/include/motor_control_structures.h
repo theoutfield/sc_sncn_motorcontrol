@@ -63,7 +63,8 @@ typedef enum {
     OVER_CURRENT_PHASE_C = 3,
     UNDER_VOLTAGE = 4,
     OVER_VOLTAGE = 5,
-    WRONG_LICENCE=6
+    WRONG_LICENCE=6,
+    WRONG_REF_CLK_FRQ=7
 } FaultCode;
 
 /**
@@ -128,6 +129,7 @@ typedef struct {
     int protection_limit_over_current;  //maximum tolerable value of phase current (under abnormal conditions)
     int protection_limit_over_voltage;  //maximum tolerable value of dc-bus voltage (under abnormal conditions)
     int protection_limit_under_voltage; //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+
 } MotorcontrolConfig;
 
 
