@@ -187,9 +187,6 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     if(ref_clk_frq==250)
     {
         half_sync_inc = 8192;
-
-//     _PWM_MAX_VALUE (8000)
-//     _PWM_DEAD_TIME 1500
         pwm_max_value=16384;
         pwm_deadtime=1500;
 
@@ -198,9 +195,13 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     }
     else if(ref_clk_frq==100)
     {
+        half_sync_inc = 4096;
+        pwm_max_value=8192;
+        pwm_deadtime=600;
     }
     else if (ref_clk_frq!=100 && ref_clk_frq!=250)
     {
+        while(1);//error state!!!
     }
 
 

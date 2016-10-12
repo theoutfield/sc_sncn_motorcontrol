@@ -69,13 +69,13 @@ int main(void) {
                 /* ADC Service */
                 {
                     delay_milliseconds(10);
-                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1], REF_CLK_FRQ);
                 }
 
                 /* Watchdog Service */
                 {
                     delay_milliseconds(5);
-                    watchdog_service(wd_ports, i_watchdog);
+                    watchdog_service(wd_ports, i_watchdog, REF_CLK_FRQ);
                 }
 
                 /* Motor Control Service */

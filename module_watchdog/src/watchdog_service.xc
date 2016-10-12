@@ -8,12 +8,17 @@
 #include <watchdog_service.h>
 
 [[combinable]]
- void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2])
+ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ref_clk_frq)
 {
-
-    //Set freq to 250MHz (always needed for proper time calculation)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-
+    if(ref_clk_frq==250)
+    {
+        //Set freq to 250MHz (always needed for proper timing)
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
+    else if (ref_clk_frq!=100 && ref_clk_frq!=250)
+    {
+        while(1);//error state!!!
+    }
     unsigned char p_led_motoon_wdtick_wden_buffer = 0b1000;
     unsigned char reset_wd_en_mask = 0b1110;
     unsigned char   set_wd_en_mask = 0b0001;
