@@ -22,8 +22,6 @@
  */
 #define SEC_STD  100000000
 
-
-
 /**
  * Defines the amount of ticks of a 250MHz timer (Motorcontrol TILE reference frequency) for 1 us.
  */
@@ -39,3 +37,4 @@
  * Defines the amount of ticks of a 250MHz timer (Motorcontrol TILE reference frequency) for 1 s.
  */
 #define SEC_FAST  250000000
+

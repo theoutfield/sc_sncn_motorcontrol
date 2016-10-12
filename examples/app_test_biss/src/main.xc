@@ -90,13 +90,15 @@ int main() {
 
                 delay_milliseconds(5);
                 //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE);
+                pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
+                        DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
+                        IFM_TILE_USEC);
             }
 
             /* Watchdog Service */
             {
                 delay_milliseconds(5);
-                watchdog_service(wd_ports, i_watchdog);
+                watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
             }
 
             // enable watchdog

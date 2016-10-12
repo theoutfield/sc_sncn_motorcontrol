@@ -3,12 +3,15 @@
 #include <adc_7265.h>
 #include <adc_ad7949.h>
 
-void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog){
+void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog, int ifm_tile_usec){
 
-    //Set freq to 250MHz (always needed for proper timing)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    if(ifm_tile_usec==250)
+    {
+        //Set freq to 250MHz (always needed for proper timing)
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
 
-    printstr(">>   SOMANET ADC SERVICE STARTING...\n");
+//    printstr(">>   SOMANET ADC SERVICE STARTING...\n");
 
     if(isnull(c_trigger)){ // Check for triggered sampling channel
 

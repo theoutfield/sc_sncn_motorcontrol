@@ -102,9 +102,14 @@
 #define DUTY_MAINTAIN_BRAKE 2000    // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
 */
 
+////FORESIGHT PROJECT
+//#define DUTY_START_BRAKE    10000   // duty cycles for brake release (should be a number between 600 and 7000)
+//#define DUTY_MAINTAIN_BRAKE  1500   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
+
 //FORESIGHT PROJECT
-#define DUTY_START_BRAKE    10000   // duty cycles for brake release (should be a number between 600 and 7000)
-#define DUTY_MAINTAIN_BRAKE  1500   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
+#define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
+#define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
+
 
 #define PERIOD_START_BRAKE  1000    // period in which high voltage is applied for realising the brake [milli-seconds]
 
@@ -215,4 +220,4 @@
 #define VELOCITY_FC             90
 
 //Number of ticks in a microsecond/frequency for IFM Tile
-#define IFM_TILE_USEC   USEC_FAST//USEC_STD//
+#define IFM_TILE_USEC   USEC_STD//USEC_FAST//

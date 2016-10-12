@@ -38,11 +38,15 @@ unsigned long get_pwm_struct_address( // Converts PWM structure reference to add
 /*****************************************************************************/
 void convert_all_pulse_widths( // Convert all PWM pulse widths to pattern/time_offset port data
 	REFERENCE_PARAM( PWM_COMMS_TYP ,pwm_comms_ps), // Pointer to structure containing PWM communication data
-	REFERENCE_PARAM( PWM_BUFFER_TYP ,pwm_buf_ps) // Pointer to Structure containing buffered PWM output data
+	REFERENCE_PARAM( PWM_BUFFER_TYP ,pwm_buf_ps), // Pointer to Structure containing buffered PWM output data
+	unsigned int pwm_max_value,
+	unsigned int pwm_deadtime
 );
 /*****************************************************************************/
 void convert_widths_in_shared_mem( // Converts PWM Pulse-width to port data in shared memory
-	REFERENCE_PARAM( PWM_COMMS_TYP ,pwm_comms_ps) // Pointer to structure containing PWM communication data
+	REFERENCE_PARAM( PWM_COMMS_TYP ,pwm_comms_ps), // Pointer to structure containing PWM communication data
+	unsigned int pwm_max_value,
+	unsigned int pwm_deadtime
 );
 /*****************************************************************************/
 

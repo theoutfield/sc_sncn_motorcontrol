@@ -418,22 +418,11 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
         // Get data from port a
         endin( adc_ports.p32_data[0] );   // End the previous input on this buffered port
         adc_ports.p32_data[0] :> inp_val; // Get new input
-        tmp_val = bitrev( inp_val );      // Reverse bit order. WARNING. Machine dependent
-        tmp_val = tmp_val >> (SHIFTING_BITS+1);
-        tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-        out_a = (int)tmp_val;
 
         // Get data from port b
         endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
         adc_ports.p32_data[1] :> inp_val; // Get new input
-        tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
-        tmp_val = tmp_val >> (SHIFTING_BITS+1);
-        tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-        out_b = (int)tmp_val;
 
-        I_b = out_a - 2048;
-        I_c = out_b - 2048;
-        I_a = -I_b-I_c;
     }
 
     while(1)
