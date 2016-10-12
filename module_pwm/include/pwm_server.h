@@ -55,7 +55,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         int duty_start_brake,
         int duty_maintain_brake,
         int time_start_brake,
-        int ref_clk_frq
+        int ifm_tile_usec
 );
 
 

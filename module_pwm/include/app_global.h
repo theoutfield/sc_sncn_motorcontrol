@@ -51,7 +51,7 @@
 
 
 // The time each motor starts the PWM is staggered by this amount
-#define _PWM_STAGGER ((_INIT_SYNC_INCREMENT + (_NUMBER_OF_MOTORS >> 1)) / _NUMBER_OF_MOTORS)
+//#define _PWM_STAGGER ((_INIT_SYNC_INCREMENT + (_NUMBER_OF_MOTORS >> 1)) / _NUMBER_OF_MOTORS)
 
 // If locked, the ADC sampling will occur in the middle of the  switching sequence.
 // It is triggered over a channel. Set this define to 0 to disable this feature

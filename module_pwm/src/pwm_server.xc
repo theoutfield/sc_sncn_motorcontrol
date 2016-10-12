@@ -177,14 +177,14 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         int duty_start_brake,
         int duty_maintain_brake,
         int time_start_brake,
-        int ref_clk_frq
+        int ifm_tile_usec
 )
 {
     unsigned int half_sync_inc=0;
     unsigned int pwm_max_value=0;
     unsigned int pwm_deadtime =0;
 
-    if(ref_clk_frq==250)
+    if(ifm_tile_usec==250)
     {
         half_sync_inc = 8192;
         pwm_max_value=16384;
@@ -193,13 +193,13 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         //Set freq to 250MHz (always needed for proper timing)
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
-    else if(ref_clk_frq==100)
+    else if(ifm_tile_usec==100)
     {
         half_sync_inc = 4096;
         pwm_max_value=8192;
         pwm_deadtime=600;
     }
-    else if (ref_clk_frq!=100 && ref_clk_frq!=250)
+    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
     {
         while(1);//error state!!!
     }
