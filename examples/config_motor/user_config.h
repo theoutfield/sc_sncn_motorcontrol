@@ -215,6 +215,5 @@
 #define VELOCITY_FC             90
 
 //Number of ticks in a microsecond/frequency for IFM Tile
-#define REF_CLK_FRQ_100_MHZ  100
-#define REF_CLK_FRQ_250_MHZ  250
+#define REF_CLK_FRQ     REF_CLK_FRQ_250_MHZ
 #define IFM_TILE_USEC   USEC_FAST//USEC_STD//

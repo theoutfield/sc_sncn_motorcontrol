@@ -116,10 +116,9 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_current =  I_MAX;
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
-                    motorcontrol_config.ref_clk_frq = REF_CLK_FRQ_250_MHZ;
 
                     Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm);
+                            i_watchdog[0], i_motorcontrol, i_update_pwm, REF_CLK_FRQ);
                 }
 
                 /* Shared memory Service */
