@@ -27,25 +27,25 @@
 
 //#ifdef CLK_FRQ_250_MHZ
 
-    /** Define the resolution of PWM (WARNING: effects update rate as tied to ref clock) */
-    #define _PWM_RES_BITS 14 // Number of bits used to define number of different PWM pulse-widths
-    #define _PWM_MAX_VALUE (1 << _PWM_RES_BITS) // No.of different PWM pulse-widths = 8192
-
-    #define _PWM_MIN_LIMIT (_PWM_MAX_VALUE >> 4) // Min PWM value allowed (1/16th of max range) = 512
-    #define _PWM_MAX_LIMIT (_PWM_MAX_VALUE - _PWM_MIN_LIMIT) // Max. PWM value allowed = 7680
-
-
-    #define _PWM_DEAD_TIME 1500 // 3 us PWM Dead-Time WARNING: Safety critical
-
-    // Number of PWM time increments between ADC/PWM synchronisation points. NB Independent of Reference Frequency
-    #define _INIT_SYNC_INCREMENT (_PWM_MAX_VALUE)
-    #define _HALF_SYNC_INCREMENT (_INIT_SYNC_INCREMENT >> 1)
-
-    #ifndef _PLATFORM_REFERENCE_MHZ
-        #define _PLATFORM_REFERENCE_MHZ 250
-        #define _PLATFORM_REFERENCE_KHZ (1000 * _PLATFORM_REFERENCE_MHZ)
-        #define _PLATFORM_REFERENCE_HZ  (1000 * _PLATFORM_REFERENCE_KHZ) // NB Uses 28-bits
-    #endif
+//    /** Define the resolution of PWM (WARNING: effects update rate as tied to ref clock) */
+//    #define _PWM_RES_BITS 14 // Number of bits used to define number of different PWM pulse-widths
+//    #define _PWM_MAX_VALUE (1 << _PWM_RES_BITS) // No.of different PWM pulse-widths = 8192
+//
+//    #define _PWM_MIN_LIMIT (_PWM_MAX_VALUE >> 4) // Min PWM value allowed (1/16th of max range) = 512
+//    #define _PWM_MAX_LIMIT (_PWM_MAX_VALUE - _PWM_MIN_LIMIT) // Max. PWM value allowed = 7680
+//
+//
+//    #define _PWM_DEAD_TIME 1500 // 3 us PWM Dead-Time WARNING: Safety critical
+//
+//    // Number of PWM time increments between ADC/PWM synchronisation points. NB Independent of Reference Frequency
+//    #define _INIT_SYNC_INCREMENT (_PWM_MAX_VALUE)
+//    #define _HALF_SYNC_INCREMENT (_INIT_SYNC_INCREMENT >> 1)
+//
+//    #ifndef _PLATFORM_REFERENCE_MHZ
+//        #define _PLATFORM_REFERENCE_MHZ 250
+//        #define _PLATFORM_REFERENCE_KHZ (1000 * _PLATFORM_REFERENCE_MHZ)
+//        #define _PLATFORM_REFERENCE_HZ  (1000 * _PLATFORM_REFERENCE_KHZ) // NB Uses 28-bits
+//    #endif
 
 //#endif
 

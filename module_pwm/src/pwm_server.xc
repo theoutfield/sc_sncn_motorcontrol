@@ -181,10 +181,17 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 )
 {
     unsigned int half_sync_inc=0;
+    unsigned int pwm_max_value=0;
+    unsigned int pwm_deadtime =0;
 
     if(ref_clk_frq==250)
     {
         half_sync_inc = 8192;
+
+//     _PWM_MAX_VALUE (8000)
+//     _PWM_DEAD_TIME 1500
+        pwm_max_value=16384;
+        pwm_deadtime=1500;
 
         //Set freq to 250MHz (always needed for proper timing)
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -215,7 +222,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s_start_brake.buf = 0;
 
-    convert_all_pulse_widths( pwm_comms_s_start_brake ,pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf] ); // Max 178 Cycles
+    convert_all_pulse_widths( pwm_comms_s_start_brake ,pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
 
 
     //parameters for maintaining the brake
@@ -230,7 +237,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
     pwm_comms_s_maintain_brake.buf = 0;
 
-    convert_all_pulse_widths( pwm_comms_s_maintain_brake ,pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf] ); // Max 178 Cycles
+    convert_all_pulse_widths( pwm_comms_s_maintain_brake ,pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
 
 
 
@@ -257,7 +264,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     pwm_comms_s.params.widths[1] = 4000;
     pwm_comms_s.params.widths[2] = 4000;
 
-    convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf] ); // Max 178 Cycles
+    convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
 
     // Find out value of time clock on an output port, WITHOUT changing port value
     pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
@@ -278,7 +285,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
                 pwm_comms_s.params.widths[0] =  pwm_a;
                 pwm_comms_s.params.widths[1] =  pwm_b;
                 pwm_comms_s.params.widths[2] =  pwm_c;
-                convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf] ); // Max 178 Cycles
+                convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
 
                 if(recieved_safe_torque_off_mode ==0)
                     pwm_on     = received_pwm_on;
