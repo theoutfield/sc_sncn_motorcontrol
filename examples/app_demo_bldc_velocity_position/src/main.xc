@@ -106,7 +106,6 @@ int main(void) {
         {
             par
             {
-                /* PWM Service */
                 {
                     pwm_config(pwm_ports);
 
@@ -116,19 +115,21 @@ int main(void) {
 
                     delay_milliseconds(5);
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                    pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE);
+                    pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
+                            DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
+                            IFM_TILE_USEC);
                 }
 
                 /* ADC Service */
                 {
                     delay_milliseconds(10);
-                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC);
                 }
 
                 /* Watchdog Service */
                 {
                     delay_milliseconds(5);
-                    watchdog_service(wd_ports, i_watchdog);
+                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
                 }
 
                 /* Motor Control Service */
@@ -173,7 +174,7 @@ int main(void) {
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
                     Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm);
+                            i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
                 }
 
                 /* Shared memory Service */
@@ -219,8 +220,8 @@ int main(void) {
                     position_feedback_config.qei_config.enable_push_service = PushPosition;
 
                     position_feedback_service(hall_ports, qei_ports, spi_ports,
-                                              position_feedback_config, i_shared_memory[0], i_position_feedback,
-                                              null, null, null);
+                            position_feedback_config, i_shared_memory[0], i_position_feedback,
+                            null, null, null);
                 }
             }
         }

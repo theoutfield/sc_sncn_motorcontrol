@@ -201,7 +201,6 @@ int main(void)
         {
             par
             {
-                /* PWM Service */
                 {
                     pwm_config(pwm_ports);
 
@@ -211,19 +210,21 @@ int main(void)
 
                     delay_milliseconds(5);
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                    pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm, DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE);
+                    pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
+                            DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
+                            IFM_TILE_USEC);
                 }
 
                 /* ADC Service */
                 {
                     delay_milliseconds(10);
-                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1]);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC);
                 }
 
                 /* Watchdog Service */
                 {
                     delay_milliseconds(5);
-                    watchdog_service(wd_ports, i_watchdog);
+                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
                 }
 
                 /* Motor Control Service */
@@ -235,12 +236,19 @@ int main(void)
                     motorcontrol_config.licence =  ADVANCED_MOTOR_CONTROL_LICENCE;
                     motorcontrol_config.v_dc =  VDC;
                     motorcontrol_config.commutation_loop_period =  COMMUTATION_LOOP_PERIOD;
-                    motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.polarity_type=MOTOR_POLARITY;
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
                     motorcontrol_config.current_I_gain =  TORQUE_Ki;
                     motorcontrol_config.current_D_gain =  TORQUE_Kd;
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
+                    motorcontrol_config.commutation_sensor=MOTOR_COMMUTATION_SENSOR;
+                    motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
+                    motorcontrol_config.hall_state_1_angle=HALL_STATE_1_ANGLE;
+                    motorcontrol_config.hall_state_2_angle=HALL_STATE_2_ANGLE;
+                    motorcontrol_config.hall_state_3_angle=HALL_STATE_3_ANGLE;
+                    motorcontrol_config.hall_state_4_angle=HALL_STATE_4_ANGLE;
+                    motorcontrol_config.hall_state_5_angle=HALL_STATE_5_ANGLE;
+                    motorcontrol_config.hall_state_6_angle=HALL_STATE_6_ANGLE;
                     motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
@@ -261,7 +269,7 @@ int main(void)
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
                     Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm);
+                            i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
                 }
 
                 /* Shared memory Service */
