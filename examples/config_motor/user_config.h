@@ -26,9 +26,9 @@
 //#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
-//#include <motor_config_AMK_DT4.h>
+#include <motor_config_AMK_DT4.h>
 //#include <motor_config_AMK_DT3.h>
-#include <motor_config_AMK_DT2.h>
+//#include <motor_config_AMK_DT2.h>
 //#include <motor_config_AMK_DD7_28_10_T00.h>
 
 //#include <motor_config.h>
