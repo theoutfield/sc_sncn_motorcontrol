@@ -176,12 +176,26 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         server interface update_pwm i_update_pwm,
         int duty_start_brake,
         int duty_maintain_brake,
-        int time_start_brake
+        int time_start_brake,
+        int ref_clk_frq
 )
 {
+    unsigned int half_sync_inc=0;
 
-    //Set freq to 250MHz (always needed for proper timing)
-    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    if(ref_clk_frq==250)
+    {
+        half_sync_inc = 8192;
+
+        //Set freq to 250MHz (always needed for proper timing)
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
+    else if(ref_clk_frq==100)
+    {
+    }
+    else if (ref_clk_frq!=100 && ref_clk_frq!=250)
+    {
+    }
+
 
     PWM_ARRAY_TYP pwm_ctrl_s ; // Structure containing double-buffered PWM output data
     PWM_SERV_TYP  pwm_serv_s ; // Structure containing PWM server control data
@@ -283,7 +297,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
                 pattern = peek( ports.p_pwm[_PWM_PHASE_A] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
                 pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[_PWM_PHASE_A] ,1 ,pattern ); // Re-load output port with same bit-value
-                pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
+                pwm_serv_s.ref_time += half_sync_inc;
 
                 break;
 
@@ -293,7 +307,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
                 pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
                 pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
-                pwm_serv_s.ref_time += _HALF_SYNC_INCREMENT;
+                pwm_serv_s.ref_time += half_sync_inc;
 
 
                 // Rising edges - these have negative time offsets - 44 Cycles
