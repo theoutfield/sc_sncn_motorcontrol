@@ -33,7 +33,7 @@ int main(void) {
     // Motor control interfaces
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
-    interface MotorcontrolInterface i_motorcontrol[4];
+    interface MotorcontrolInterface i_motorcontrol[1];
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
     interface update_pwm i_update_pwm;
