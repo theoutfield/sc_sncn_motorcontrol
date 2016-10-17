@@ -27,7 +27,7 @@
     unsigned char reset_led_mask = 0b0111;
     unsigned char   set_led_mask = 0b1000;
 
-    unsigned char reset_motoon_mask = 0b1011;
+//    unsigned char reset_motoon_mask = 0b1011;
     unsigned char   set_motoon_mask = 0b0100;
 
     unsigned char   fault_mask = 0b1000;

@@ -102,7 +102,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
     int direction = 0;
     int config_qei_changes_per_turn = position_feedback_config.qei_config.ticks_resolution * QEI_CHANGES_PER_TICK; //Quadrature encoder. 4x resolution
     int qei_type = position_feedback_config.qei_config.index_type;            // TODO use to disable sync for no-index
-    int init_state = INIT;
+//    int init_state = INIT;
 
     int qei_crossover = (config_qei_changes_per_turn * 19) / 100;
     int qei_count_per_hall = config_qei_changes_per_turn;   // / position_feedback_config.qei_config.poles;

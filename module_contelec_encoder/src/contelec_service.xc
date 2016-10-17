@@ -230,7 +230,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
     unsigned int actual_angle = 0;
     unsigned int measurement_time = 0;
     unsigned int start_time, end_time;
-    unsigned int period_time = 0;
+//    unsigned int period_time = 0;
 
     //first read
     delay_ticks(100 * CONTELEC_USEC);

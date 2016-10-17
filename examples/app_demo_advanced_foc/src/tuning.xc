@@ -230,7 +230,7 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
     int pulse_counter; // number of generated pulses
 
 
-    int loop_counter=0;
+//    int loop_counter=0;
     int proper_sensor_polarity=0;
 
     int torque_ref = 0;
@@ -243,14 +243,14 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
     MotorcontrolConfig motorcontrol_config;
 
-    printf("\n===================================================================\n");
-    printf(">>  ADVANCED FOC DEMO STARTING ...\n");
-    printf(">>   applicable commands:\n");
-    printf(" a => auto offset detection,           |    b  => enable/disable the brake\n");
-    printf(" t => enable/disable torque controller,|    ox => set offset to x \n");
-    printf(" p => print the actual offset,         |    r  => reverse the torque\n");
-    printf(" x => show on xscope for 20 seconds,   | Enter => set torque to 0\n");
-    printf("===================================================================\n");
+//    printf("\n===================================================================\n");
+//    printf(">>  ADVANCED FOC DEMO STARTING ...\n");
+//    printf(">>   applicable commands:\n");
+//    printf(" a => auto offset detection,           |    b  => enable/disable the brake\n");
+//    printf(" t => enable/disable torque controller,|    ox => set offset to x \n");
+//    printf(" p => print the actual offset,         |    r  => reverse the torque\n");
+//    printf(" x => show on xscope for 20 seconds,   | Enter => set torque to 0\n");
+//    printf("===================================================================\n");
 
 
     i_motorcontrol.set_brake_status(1);

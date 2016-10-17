@@ -138,7 +138,7 @@ static int adc_ad7265_singleshot(AD7265Ports &adc_ports, int adc_data[2][6],
         #endif
 
         if(port_id == 0)
-               return;
+               return 0;
 
 
 /////////////Then we sample the requested index///////////////////////
@@ -258,7 +258,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
     int overcurrent_protection_is_active = 0;
 
     //Calibration variables
-    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+    int i_calib_a = 0, i_calib_b = 0/*, i = 0*/, Icalibrated_a = 0, Icalibrated_b = 0;
 
     configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
@@ -375,7 +375,7 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog)
 {
 
-    timer t;
+//    timer t;
     unsigned time_stamp; // Time stamp
 
     int i_max=100;
@@ -742,7 +742,7 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
     int overcurrent_protection_is_active = 0;
 
     //Calibration variables
-    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+    int i_calib_a = 0, i_calib_b = 0/*, i = 0*/, Icalibrated_a = 0, Icalibrated_b = 0;
 
     configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
