@@ -53,7 +53,7 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
     } else {
         profiler_config.ticks_per_turn = QEI_SENSOR_RESOLUTION;
     }
-    profiler_config.max_velocity = MAX_VELOCITY;
+    profiler_config.max_velocity = MAX_SPEED;
     profiler_config.max_acceleration = MAX_ACCELERATION;
     profiler_config.max_deceleration = MAX_DECELERATION;
 
@@ -151,8 +151,8 @@ int main(void)
 
             pos_velocity_ctrl_config.min_pos =                              MIN_POSITION_LIMIT;
             pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
-            pos_velocity_ctrl_config.max_speed =                            MAX_VELOCITY;
-            pos_velocity_ctrl_config.max_torque =                           MAX_TORQUE;
+            pos_velocity_ctrl_config.max_speed =                            MAX_SPEED;
+            pos_velocity_ctrl_config.max_torque =                           TORQUE_CONTROL_LIMIT;
 
             pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
             pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
@@ -160,15 +160,15 @@ int main(void)
 
             pos_velocity_ctrl_config.control_mode =                         NL_POSITION_CONTROLLER;
 
-            pos_velocity_ctrl_config.P_pos =                                Kp_POS_PID;
-            pos_velocity_ctrl_config.I_pos =                                Ki_POS_PID;
-            pos_velocity_ctrl_config.D_pos =                                Kd_POS_PID;
-            pos_velocity_ctrl_config.integral_limit_pos =                   INTEGRAL_LIMIT_POS_PID;
+            pos_velocity_ctrl_config.P_pos =                                POSITION_Kp;
+            pos_velocity_ctrl_config.I_pos =                                POSITION_Ki;
+            pos_velocity_ctrl_config.D_pos =                                POSITION_Kd;
+            pos_velocity_ctrl_config.integral_limit_pos =                   POSITION_INTEGRAL_LIMIT;
 
-            pos_velocity_ctrl_config.P_velocity =                           Kp_VELOCITY_PID;
-            pos_velocity_ctrl_config.I_velocity =                           Ki_VELOCITY_PID;
-            pos_velocity_ctrl_config.D_velocity =                           Kd_VELOCITY_PID;
-            pos_velocity_ctrl_config.integral_limit_velocity =              INTEGRAL_LIMIT_VELOCITY_PID;
+            pos_velocity_ctrl_config.P_velocity =                           VELOCITY_Kp;
+            pos_velocity_ctrl_config.I_velocity =                           VELOCITY_Ki;
+            pos_velocity_ctrl_config.D_velocity =                           VELOCITY_Kd;
+            pos_velocity_ctrl_config.integral_limit_velocity =              VELOCITY_INTEGRAL_LIMIT;
 
             pos_velocity_ctrl_config.P_pos_Integral_optimum =               Kp_POS_INTEGRAL_OPTIMUM;
             pos_velocity_ctrl_config.I_pos_Integral_optimum =               Ki_POS_INTEGRAL_OPTIMUM;

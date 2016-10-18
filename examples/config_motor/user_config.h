@@ -26,12 +26,12 @@
 //#include <motor_config_MABI_Hohlwellenservomotor_A5.h>
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
-#include <motor_config_AMK_DT4.h>
+//#include <motor_config_AMK_DT4.h>
 //#include <motor_config_AMK_DT3.h>
 //#include <motor_config_AMK_DT2.h>
 //#include <motor_config_AMK_DD7_28_10_T00.h>
 
-//#include <motor_config.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -174,8 +174,8 @@
 //Limits
 #define MIN_POSITION_LIMIT                     -0x7fffffff
 #define MAX_POSITION_LIMIT                      0x7fffffff
-#define MAX_VELOCITY                            1500 //rpm
-#define MAX_TORQUE                              3000
+#define MAX_SPEED                               1500 //rpm
+#define TORQUE_CONTROL_LIMIT                    3000
 
 //Integrated Profiler
 #define ENABLE_PROFILER                         1
@@ -183,16 +183,16 @@
 #define MAX_SPEED_PROFILER                      1800000
 
 //PID parameters of the position PID controller
-#define Kp_POS_PID                              30000
-#define Ki_POS_PID                              10
-#define Kd_POS_PID                              0
-#define INTEGRAL_LIMIT_POS_PID                  400000
+#define POSITION_Kp                             30000
+#define POSITION_Ki                             10
+#define POSITION_Kd                             0
+#define POSITION_INTEGRAL_LIMIT                 400000
 
 //PID parameters of the velocity PID controller
-#define Kp_VELOCITY_PID                         100
-#define Ki_VELOCITY_PID                         0
-#define Kd_VELOCITY_PID                         60
-#define INTEGRAL_LIMIT_VELOCITY_PID             0
+#define VELOCITY_Kp                             100
+#define VELOCITY_Ki                             0
+#define VELOCITY_Kd                             60
+#define VELOCITY_INTEGRAL_LIMIT                 0
 
 //PID parameters of the Integral Optimum position controller
 #define Kp_POS_INTEGRAL_OPTIMUM                 1000
