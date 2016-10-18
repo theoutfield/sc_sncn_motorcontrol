@@ -20,7 +20,6 @@ typedef enum {
     CONTELEC_SENSOR=6
 } SensorType;
 
-
 /**
  * @brief Type for motors.
  */

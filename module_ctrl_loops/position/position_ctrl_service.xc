@@ -55,22 +55,22 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
 
-    int position_enable_flag_ = 0;
-    int torque_enable_flag_ = 0;
+//    int position_enable_flag_ = 0;
+//    int torque_enable_flag_ = 0;
 
     int position_ref_input_k_ = 0;
     int initial_position_=0;
     double position_ref_k_ = 0.00;
     double position_sens_k_ = 0.00, position_sens_k_1_=0.00;
 
-    int min_s_index_=0;
+//    int min_s_index_=0;
 
-    unsigned int ts_=0, t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
+    unsigned int /*ts_=0, */t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
     ///////////////////////////////////////////////
 
     int position_enable_flag = 0;
     PIDparam position_control_pid_param;
-    integralOptimumPosControllerParam integral_optimum_pos_ctrl_pid_param;
+//    integralOptimumPosControllerParam integral_optimum_pos_ctrl_pid_param;
     SecondOrderLPfilterParam position_SO_LP_filter_param;
     float position_k = 0;
     float position_sens_k = 0;
@@ -92,7 +92,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int velocity_ref_input_k = 0;
     float additive_torque_k = 0;
     int additive_torque_input_k = 0;
-    float velocity_ref_in_k = 0;
+//    float velocity_ref_in_k = 0;
     float velocity_ref_k = 0;
     float velocity_sens_k = 0;
     float velocity_k = 0;

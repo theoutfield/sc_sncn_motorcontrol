@@ -59,7 +59,7 @@ static void do_pwm_port_config(PwmPorts &ports)
 /*****************************************************************************/
 void pwm_config(PwmPorts &ports)
 {
-    int motor_cnt; // motor counter
+//    int motor_cnt; // motor counter
 
     // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz) -> in our application it is 250 MHz
     //configure_clock_rate( ports.clk ,PLATFORM_REFERENCE_MHZ ,1 );
@@ -244,14 +244,14 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
     unsigned pattern=0; // Bit-pattern on port
 
-    int pwm_test=0;
+//    int pwm_test=0;
     int pwm_on  =0;
 
     int brake_active  = 0;
     int brake_counter = 0;
     int brake_start   = (time_start_brake*15000)/1000;
 
-    int pwm_flag=0;
+//    int pwm_flag=0;
 
     unsigned char brake_defined = 0b0000;
     brake_defined = !isnull(ports.p_pwm_phase_d);

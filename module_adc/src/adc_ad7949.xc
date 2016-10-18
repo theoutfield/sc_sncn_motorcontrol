@@ -227,7 +227,7 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
     timer t;
     unsigned int ts;
 
-    unsigned char ct;
+//    unsigned char ct;
 
     /********************************************************************************************************************************
      *  13  CFG     Configuration udpate
@@ -254,18 +254,18 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
     const unsigned int adc_config_mot     =   0b11110001001001;
 
 
-    const unsigned int adc_config_other[] = { 0b10110001001001,   // Temperature
-                                              0b11110101001001,   // ADC Channel 2, unipolar, referenced to GND  voltage and current
-                                              0b11111001001001,   // ADC Channel 4, unipolar, referenced to GND  external A0/1_n
-                                              0b11111011001001 }; // ADC Channel 5, unipolar, referenced to GND  external A0/1_p
+//    const unsigned int adc_config_other[] = { 0b10110001001001,   // Temperature
+//                                              0b11110101001001,   // ADC Channel 2, unipolar, referenced to GND  voltage and current
+//                                              0b11111001001001,   // ADC Channel 4, unipolar, referenced to GND  external A0/1_n
+//                                              0b11111011001001 }; // ADC Channel 5, unipolar, referenced to GND  external A0/1_p
 
-    const unsigned int delay = (11*USEC_FAST) / 3; // 3.7 us
+//    const unsigned int delay = (11*USEC_FAST) / 3; // 3.7 us
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
-    unsigned short adc_index = 0;
-    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
-    int overcurrent_protection_was_triggered = 0;
-    int overcurrent_protection_is_active = 0;
+//    unsigned short adc_index = 0;
+    int i_calib_a = 0, i_calib_b = 0/*, i = 0*//*, Icalibrated_a = 0, Icalibrated_b = 0*/;
+//    int overcurrent_protection_was_triggered = 0;
+//    int overcurrent_protection_is_active = 0;
 
     int i_max=100;
     int v_dc_max=100;
@@ -450,7 +450,7 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
     unsigned short adc_index = 0;
-    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+    int i_calib_a = 0, i_calib_b = 0/*, i = 0*/, Icalibrated_a = 0, Icalibrated_b = 0;
     int overcurrent_protection_was_triggered = 0;
     int overcurrent_protection_is_active = 0;
 
@@ -581,7 +581,7 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
     unsigned short adc_index = 0;
-    int i_calib_a = 0, i_calib_b = 0, i = 0, Icalibrated_a = 0, Icalibrated_b = 0;
+    int i_calib_a = 0, i_calib_b = 0/*, i = 0*/, Icalibrated_a = 0, Icalibrated_b = 0;
     int overcurrent_protection_was_triggered = 0;
     int overcurrent_protection_is_active = 0;
 

@@ -19,9 +19,8 @@ interface BrakeInterface {
 /**
  * @brief Interface type to communicate with the Motor Control Service.
  */
-interface MotorcontrolInterface{
-
-
+interface MotorcontrolInterface
+{
     /**
      * @brief Sets brake status to ON (no movement) or OFF (possible to move)
      */
@@ -65,7 +64,6 @@ interface MotorcontrolInterface{
      * @param torque_sp Torque [-4096:4096].
      */
     void set_torque(int torque_sp);
-
 
     /**
      * @brief Setter for the configuration used by the Service.
@@ -116,8 +114,8 @@ interface MotorcontrolInterface{
 /**
  * @brief Interface type to communicate with the ADC Service.
  */
-interface ADCInterface{
-
+interface ADCInterface
+{
     /**
      * @brief Get all measured parameters at once
      * The parameters include:
@@ -200,7 +198,8 @@ interface ADCInterface{
     void reset_faults();
 };
 
-interface shared_memory_interface {
+interface shared_memory_interface
+{
     /**
     * @brief Getter for electrical angle and current velocity and position.
     *
@@ -209,7 +208,6 @@ interface shared_memory_interface {
     * @return  Current multiturn count.
     */
     {unsigned int, int, int} get_angle_velocity_position();
-
 
     /**
     * @brief Getter for electrical angle and current velocity and position.
@@ -220,7 +218,6 @@ interface shared_memory_interface {
     * @return  Hall_state (in case HALL sensor is used)
     */
     {unsigned int, int, int, int} get_angle_velocity_position_hall();
-
 
     /**
     * @brief Getter for electrical angle and current velocity.
@@ -311,8 +308,8 @@ interface update_pwm
 /**
  * @brief Interface type to communicate with the Watchdog Service.
  */
-interface WatchdogInterface{
-
+interface WatchdogInterface
+{
     /**
      * @brief Initialize and starts ticking the watchdog.
      */

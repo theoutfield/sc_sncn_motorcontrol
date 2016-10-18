@@ -11,7 +11,6 @@
 
 extern const short sine_table_control[];
 extern const unsigned short arctg_table_control[];
-extern const short sine_table_control[];
 extern const unsigned short vectortab_control[];
 
 #endif /* LOOKUP_TABLES_H_ */
