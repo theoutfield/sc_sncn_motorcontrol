@@ -15,11 +15,14 @@ void memory_manager(server interface shared_memory_interface i_shared_memory[n],
     int hall_state=0;
     while (1) {
         select {
-            case i_shared_memory[int j].get_angle_velocity_position() -> {unsigned int out_angle, int out_velocity, int out_count}:
-                out_angle = angle_electrical;
-                out_velocity = current_velocity;
-                out_count = multiturn_count;
-                break;
+        case i_shared_memory[int j].status() -> {int status}:
+            status = ACTIVE;
+            break;
+        case i_shared_memory[int j].get_angle_velocity_position() -> {unsigned int out_angle, int out_velocity, int out_count}:
+            out_angle = angle_electrical;
+            out_velocity = current_velocity;
+            out_count = multiturn_count;
+            break;
             case i_shared_memory[int j].get_angle_velocity_position_hall() -> {unsigned int out_angle, int out_velocity, int out_count, int out_hall}:
                 out_angle = angle_electrical;
                 out_velocity = current_velocity;
