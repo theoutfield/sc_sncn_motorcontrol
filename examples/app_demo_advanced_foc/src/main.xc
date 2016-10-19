@@ -56,11 +56,9 @@ int main(void) {
                 {
                     pwm_config(pwm_ports);
 
-                    delay_milliseconds(10);
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    delay_milliseconds(5);
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                     pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
                             DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
@@ -69,19 +67,16 @@ int main(void) {
 
                 /* ADC Service */
                 {
-                    delay_milliseconds(10);
                     adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC);
                 }
 
                 /* Watchdog Service */
                 {
-                    delay_milliseconds(5);
                     watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
                 }
 
                 /* Motor Control Service */
                 {
-                    delay_milliseconds(20);
 
                     MotorcontrolConfig motorcontrol_config;
 
@@ -129,7 +124,6 @@ int main(void) {
 
                 /* Position feedback service */
                 {
-                    delay_milliseconds(10);
                     /*
 
                     PositionFeedbackConfig position_feedback_config;

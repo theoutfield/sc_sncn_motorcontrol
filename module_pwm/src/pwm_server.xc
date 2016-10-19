@@ -184,6 +184,15 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     unsigned int pwm_max_value=0;
     unsigned int pwm_deadtime =0;
 
+
+    timer t;
+    unsigned ts;
+
+    //proper task startup
+    t :> ts;
+    t when timerafter (ts + (4*20*250)) :> void;
+
+
     if(ifm_tile_usec==250)
     {
         half_sync_inc = 8192;
