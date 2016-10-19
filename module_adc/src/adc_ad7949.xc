@@ -308,6 +308,11 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
         #pragma ordered
         select
         {
+
+        case i_adc[int i].status() -> {int status}:
+                status = ACTIVE;
+                break;
+
         case i_adc[int i].set_protection_limits(int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
@@ -500,6 +505,11 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
             }
 
             break;
+
+        case i_adc[int i].status() -> {int status}:
+                status = ACTIVE;
+                break;
+
         case i_adc[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
         case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
@@ -617,6 +627,11 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
 #pragma ordered
         select
         {
+
+        case i_adc[int i].status() -> {int status}:
+                status = ACTIVE;
+                break;
+
         case i_adc[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
 

@@ -290,6 +290,11 @@ void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports, C
 
     #pragma ordered
         select {
+
+        case iADC[int i].status() -> {int status}:
+                status = ACTIVE;
+                break;
+
         case iADC[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
 
@@ -437,6 +442,10 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
 #pragma ordered
         select
         {
+
+        case iADC[int i].status() -> {int status}:
+                status = ACTIVE;
+                break;
 
         case iADC[int i].set_protection_limits(int i_max_in, int i_ratio, int v_dc_max_in, int v_dc_min_in):
                 i_max=i_max_in;
@@ -796,6 +805,10 @@ void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &ad
                     overcurrent_protection_was_triggered = adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
                 }
 
+                break;
+
+        case iADC[int i].status() -> {int status}:
+                status = ACTIVE;
                 break;
 
         case iADC[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):

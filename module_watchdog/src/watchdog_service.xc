@@ -27,7 +27,7 @@
     unsigned char reset_led_mask = 0b0111;
     unsigned char   set_led_mask = 0b1000;
 
-//    unsigned char reset_motoon_mask = 0b1011;
+    //    unsigned char reset_motoon_mask = 0b1011;
     unsigned char   set_motoon_mask = 0b0100;
 
     unsigned char   fault_mask = 0b1000;
@@ -76,7 +76,11 @@
     // Loop forever processing commands
     while (1) {
         select {
-            // Get a command from the out loop
+        case i_watchdog[int i].status() -> {int status}:
+                status = ACTIVE;
+                break;
+
+                // Get a command from the out loop
         case i_watchdog[int i].start(): // produce a rising edge on the WD_EN
                 wd_enabled = 1;
                 break;
