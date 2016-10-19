@@ -335,6 +335,7 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
                 configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
+                fault_code_out = 0;
 
                 #pragma unsafe arrays
                 int bits[4];
