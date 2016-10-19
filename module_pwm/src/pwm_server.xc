@@ -190,7 +190,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
     //proper task startup
     t :> ts;
-    t when timerafter (ts + (4*20*250)) :> void;
+    t when timerafter (ts + (4000*20*250)) :> void;
 
 
     if(ifm_tile_usec==250)
@@ -291,6 +291,10 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
     {
         select
         {
+        case i_update_pwm.status() -> {int status}:
+                status = ACTIVE;
+                break;
+
         case i_update_pwm.update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode):
                 pwm_comms_s.params.widths[0] =  pwm_a;
                 pwm_comms_s.params.widths[1] =  pwm_b;

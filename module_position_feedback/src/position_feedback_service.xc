@@ -20,7 +20,7 @@ void fallback_service(PositionFeedbackConfig &position_feedback_config, server i
 
     //proper task startup
     t :> ts;
-    t when timerafter (ts + (2*20*250)) :> void;
+    t when timerafter (ts + (2000*20*250)) :> void;
 
     //main loop
     int loop_flag = 1;

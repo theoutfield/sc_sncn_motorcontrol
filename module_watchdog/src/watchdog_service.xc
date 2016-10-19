@@ -44,7 +44,7 @@
 
     //proper task startup
     t :> ts;
-    t when timerafter (ts + (1*20*250)) :> void;
+    t when timerafter (ts + (1000*20*250)) :> void;
 
 
     if (initialization == 0)
