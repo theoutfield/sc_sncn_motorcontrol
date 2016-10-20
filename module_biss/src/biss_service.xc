@@ -99,11 +99,17 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 t :> time;
                 if (timeafter(time, last_biss_read + position_feedback_config.biss_config.timeout)) {
-                    angle = read_biss_sensor_data_fast(biss_ports, biss_before_singleturn_length, position_feedback_config.biss_config.singleturn_resolution);
+                    int count_internal;
+                    int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
                     t :> last_biss_read;
+                    last_count_read = last_biss_read;
+                    { count_internal, angle, void } = biss_encoder(data, position_feedback_config.biss_config);
+                    update_turns(turns, last_count, count_internal, position_feedback_config.biss_config.multiturn_resolution, ticks_per_turn);
+                    last_count = count_internal;
                     last_position = angle;
-                } else
+                } else {
                     angle = last_position;
+                }
                 if (position_feedback_config.biss_config.singleturn_resolution > 12)
                     angle = (position_feedback_config.biss_config.pole_pairs * (angle >> (position_feedback_config.biss_config.singleturn_resolution-12)) + position_feedback_config.biss_config.offset_electrical ) & 4095;
                 else
