@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 
 
@@ -34,7 +34,7 @@ int main(void) {
     // Motor control interfaces
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
-    interface MotorcontrolInterface i_motorcontrol[1];
+    interface MotorcontrolInterface i_motorcontrol[2];
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
     interface update_pwm i_update_pwm;
@@ -56,11 +56,9 @@ int main(void) {
                 {
                     pwm_config(pwm_ports);
 
-                    delay_milliseconds(10);
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    delay_milliseconds(5);
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                     pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
                             DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
@@ -69,19 +67,16 @@ int main(void) {
 
                 /* ADC Service */
                 {
-                    delay_milliseconds(10);
                     adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC);
                 }
 
                 /* Watchdog Service */
                 {
-                    delay_milliseconds(5);
                     watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
                 }
 
                 /* Motor Control Service */
                 {
-                    delay_milliseconds(20);
 
                     MotorcontrolConfig motorcontrol_config;
 
@@ -120,7 +115,7 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
-                    Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
+                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                             i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
                 }
 
@@ -129,7 +124,6 @@ int main(void) {
 
                 /* Position feedback service */
                 {
-                    delay_milliseconds(10);
                     /*
 
                     PositionFeedbackConfig position_feedback_config;

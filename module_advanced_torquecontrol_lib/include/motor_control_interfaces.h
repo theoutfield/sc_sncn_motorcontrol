@@ -117,6 +117,11 @@ interface MotorcontrolInterface
 interface ADCInterface
 {
     /**
+     * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
+     */
+    int status(void);
+
+    /**
      * @brief Get all measured parameters at once
      * The parameters include:
      *  - Current on Phase B
@@ -200,6 +205,12 @@ interface ADCInterface
 
 interface shared_memory_interface
 {
+
+    /**
+     * @brief send the status of memory manager task (ACTIVE or INACTIVE) to client side
+     */
+    int status(void);
+
     /**
     * @brief Getter for electrical angle and current velocity and position.
     *
@@ -300,6 +311,11 @@ interface shared_memory_interface
 
 interface update_pwm
 {
+    /**
+     * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
+     */
+    int status(void);
+
     void update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int pwm_on, int brake_active, int recieved_safe_torque_off_mode);
     void safe_torque_off_enabled();
 };
@@ -310,6 +326,11 @@ interface update_pwm
  */
 interface WatchdogInterface
 {
+    /**
+     * @brief send the status of WD service to the client (ACTIVE/INACTIVE)
+     */
+    int status(void);
+
     /**
      * @brief Initialize and starts ticking the watchdog.
      */

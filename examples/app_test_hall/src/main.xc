@@ -2,6 +2,7 @@
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
+
 /**
  * @file test_hall.xc
  * @brief Test illustrates usage of hall sensor to get position and velocity information

@@ -27,7 +27,7 @@
     unsigned char reset_led_mask = 0b0111;
     unsigned char   set_led_mask = 0b1000;
 
-//    unsigned char reset_motoon_mask = 0b1011;
+    //    unsigned char reset_motoon_mask = 0b1011;
     unsigned char   set_motoon_mask = 0b0100;
 
     unsigned char   fault_mask = 0b1000;
@@ -41,6 +41,11 @@
     unsigned int LED_counter = 0;
     int fault=0;//FIXME: this variable should be initialized to 0. here it is 3 to check the LED flashing of WD task
     int fault_counter=0;
+
+    //proper task startup
+    t :> ts;
+    t when timerafter (ts + (1000*20*250)) :> void;
+
 
     if (initialization == 0)
     {
@@ -71,7 +76,11 @@
     // Loop forever processing commands
     while (1) {
         select {
-            // Get a command from the out loop
+        case i_watchdog[int i].status() -> {int status}:
+                status = ACTIVE;
+                break;
+
+                // Get a command from the out loop
         case i_watchdog[int i].start(): // produce a rising edge on the WD_EN
                 wd_enabled = 1;
                 break;

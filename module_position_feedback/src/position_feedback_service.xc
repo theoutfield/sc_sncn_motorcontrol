@@ -15,6 +15,13 @@ void fallback_service(PositionFeedbackConfig &position_feedback_config, server i
     printstr(start_message);
     printstrln("FALLBACK");
 
+    timer t;
+    unsigned ts;
+
+    //proper task startup
+    t :> ts;
+    t when timerafter (ts + (2000*20*250)) :> void;
+
     //main loop
     int loop_flag = 1;
     while (loop_flag) {

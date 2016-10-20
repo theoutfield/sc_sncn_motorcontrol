@@ -9,6 +9,16 @@
 #ifndef MOTOR_CONTROL_STRUCTURES_H_
 #define MOTOR_CONTROL_STRUCTURES_H_
 
+/**
+ * @brief Status of motor control related task
+ * ACTIVE   -> the task is started and can be used as a server
+ * INACTIVE -> the task is not started yet
+ */
+typedef enum {
+    INACTIVE= 1,
+    ACTIVE = 2
+} TaskStatus;
+
 
 /**
  * @brief Type for position sensors.

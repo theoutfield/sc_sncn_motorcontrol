@@ -3,6 +3,7 @@
 #include <IFM_BOARD_REQUIRED>
 
 
+
 /**
  * @file test_biss.xc
  * @brief Test illustrates usage of biss encoder to get position and velocity information
@@ -84,11 +85,9 @@ int main() {
             {
                 pwm_config(pwm_ports);
 
-                delay_milliseconds(10);
                 if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                     predriver(fet_driver_ports);
 
-                delay_milliseconds(5);
                 //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                 pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
                         DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
@@ -97,14 +96,7 @@ int main() {
 
             /* Watchdog Service */
             {
-                delay_milliseconds(5);
                 watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
-            }
-
-            // enable watchdog
-            {
-                delay_milliseconds(1);
-                i_watchdog[0].start();
             }
 
             /* Shared memory Service */
@@ -112,8 +104,21 @@ int main() {
 
             /* Position feedback service */
             {
+                /*
+
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = BISS_SENSOR;
+                position_feedback_config.sensor_type = HALL_SENSOR;
+                position_feedback_config.hall_config.pole_pairs = POLE_PAIRS;
+                position_feedback_config.hall_config.polarity = HALL_POLARITY;
+                position_feedback_config.hall_config.enable_push_service = PushAll;
+
+                position_feedback_service(hall_ports, null, null,
+                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                          null, null, null);
+                 */
+
+                PositionFeedbackConfig position_feedback_config;
+                position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
 
                 position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
@@ -121,7 +126,7 @@ int main() {
                 position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
                 position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
                 position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-                position_feedback_config.biss_config.pole_pairs = 2;
+                position_feedback_config.biss_config.pole_pairs = POLE_PAIRS;
                 position_feedback_config.biss_config.polarity = BISS_POLARITY;
                 position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
                 position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
@@ -131,7 +136,43 @@ int main() {
                 position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
                 position_feedback_config.biss_config.enable_push_service = PushAll;
 
-                position_feedback_service(null, qei_ports, spi_ports,
+                position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
+                position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
+                position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
+                position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
+                position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
+                position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
+                position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                position_feedback_config.contelec_config.enable_push_service = PushAll;
+
+                position_feedback_config.hall_config.pole_pairs = POLE_PAIRS;
+                position_feedback_config.hall_config.enable_push_service = PushAll;
+
+                position_feedback_config.qei_config.ticks_resolution = QEI_SENSOR_RESOLUTION;
+                position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
+                position_feedback_config.qei_config.sensor_polarity = QEI_SENSOR_POLARITY;
+                position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
+                position_feedback_config.qei_config.enable_push_service = PushPosition;
+
+
+                position_feedback_config.ams_config.factory_settings = 1;
+                position_feedback_config.ams_config.polarity = AMS_POLARITY;
+                position_feedback_config.ams_config.hysteresis = 1;
+                position_feedback_config.ams_config.noise_setting = AMS_NOISE_NORMAL;
+                position_feedback_config.ams_config.uvw_abi = 0;
+                position_feedback_config.ams_config.dyn_angle_comp = 0;
+                position_feedback_config.ams_config.data_select = 0;
+                position_feedback_config.ams_config.pwm_on = AMS_PWM_OFF;
+                position_feedback_config.ams_config.abi_resolution = 0;
+                position_feedback_config.ams_config.resolution_bits = AMS_RESOLUTION;
+                position_feedback_config.ams_config.offset = AMS_OFFSET;
+                position_feedback_config.ams_config.max_ticks = 0x7fffffff;
+                position_feedback_config.ams_config.pole_pairs = POLE_PAIRS;
+                position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
+                position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
+                position_feedback_config.ams_config.enable_push_service = PushAll;
+
+                position_feedback_service(null, null, spi_ports,
                                           position_feedback_config, i_shared_memory[0], i_position_feedback,
                                           null, null, null);
             }
