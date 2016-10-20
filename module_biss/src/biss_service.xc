@@ -415,11 +415,13 @@ unsigned int read_biss_sensor_data(QEIPorts &biss_ports, BISSConfig & biss_confi
         status = NoError;
         //check crc
         if (biss_config.crc_poly && crc != biss_crc(data, data_length, biss_config.crc_poly) ) {
+            status = CRCError;
+#ifdef BISS_CRC_CORRECT
             biss_crc_correct(data, data_length, frame_bytes, crc,  biss_config.crc_poly); //try 1 bit error correction
-            if (crc == biss_crc(data, data_length, biss_config.crc_poly))
+            if (crc == biss_crc(data, data_length, biss_config.crc_poly)) {
                 status = CRCCorrected;
-            else
-                status = CRCError;
+            }
+#endif
         }
     } else if (status)
         status = NoStartBit;
