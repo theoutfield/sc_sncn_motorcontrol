@@ -217,37 +217,39 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                     break;
                 }
                 printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_velocity, pos_velocity_ctrl_config.I_velocity,
-                                                       pos_velocity_ctrl_config.D_velocity, pos_velocity_ctrl_config.integral_limit_velocity);
+                        pos_velocity_ctrl_config.D_velocity, pos_velocity_ctrl_config.integral_limit_velocity);
                 break;
-            default:
-                printf("kp->pos_ctrl ko->optimum_ctrl kv->vel_ctrl\n");
+                default:
+                    printf("kp->pos_ctrl ko->optimum_ctrl kv->vel_ctrl\n");
+                    break;
             }
             i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
             break;
-            //limits
-            case 'L':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                switch(mode_2) {
-                //max position limit
-                case 'p':
-                    pos_velocity_ctrl_config.max_pos = value;
-                    pos_velocity_ctrl_config.min_pos = -value;
-                    break;
-                //max velocity limit
-                case 'v':
-                    pos_velocity_ctrl_config.max_speed = value;
-                    break;
-                //max torque limit
-                case 't':
-                    pos_velocity_ctrl_config.max_torque = value;
-                    break;
-                default:
-                    break;
-                }
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("pos_max:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.max_speed,
-                                                            pos_velocity_ctrl_config.max_torque);
+
+        //limits
+        case 'L':
+            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+            switch(mode_2) {
+            //max position limit
+            case 'p':
+                pos_velocity_ctrl_config.max_pos = value;
+                pos_velocity_ctrl_config.min_pos = -value;
                 break;
+            //max velocity limit
+            case 'v':
+                pos_velocity_ctrl_config.max_speed = value;
+                break;
+            //max torque limit
+            case 't':
+                pos_velocity_ctrl_config.max_torque = value;
+                break;
+            default:
+                break;
+            }
+            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+            printf("pos_max:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.max_speed,
+                                                        pos_velocity_ctrl_config.max_torque);
+            break;
 
         //enable
         case 'e':
@@ -299,9 +301,6 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                 break;
             }
             break;
-
-
-
 
 
         case 'n':
@@ -357,10 +356,6 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                 break;
                 }
             break;
-
-
-
-
 
         //help
         case 'h':
@@ -424,7 +419,6 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
         case 't':
             if (torque_control_flag == 0) {
                 torque_control_flag = 1;
-                i_motorcontrol.set_brake_status(1);
                 i_motorcontrol.set_torque_control_enabled();
                 printf("Torque control activated\n");
             } else {
