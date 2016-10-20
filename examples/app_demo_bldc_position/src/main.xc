@@ -36,7 +36,7 @@ QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 void position_profile_test(interface PositionVelocityCtrlInterface client i_position_control, client interface PositionFeedbackInterface ?i_position_feedback)
 {
     const int target = 16000;
-//    const int target = 2620000;
+    //    const int target = 2620000;
     int target_position = target;        // HALL: 1 rotation = 4096 x nr. pole pairs; QEI: your encoder documented resolution x 4 = one rotation
     int velocity        = 500;         // rpm
     int acceleration    = 500;         // rpm/s
@@ -85,7 +85,7 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
         xscope_core_int(0, actual_position);
         xscope_core_int(1, target_position);
         xscope_core_int(2, follow_error);
-        */
+         */
         // Keep motor turning when reaching target position
         if (follow_error < 200 && follow_error > -200){
             if (target_position == (start_position + target)){
@@ -107,7 +107,7 @@ int main(void)
 
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
-    interface MotorcontrolInterface i_motorcontrol[4];
+    interface MotorcontrolInterface i_motorcontrol[2];
     interface update_pwm i_update_pwm;
     interface shared_memory_interface i_shared_memory[2];
     interface PositionVelocityCtrlInterface i_position_control[3];
@@ -191,7 +191,7 @@ int main(void)
 
             pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
 
-            position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[3], i_position_control);
+            position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[1], i_position_control);
         }
 
         /************************************************************
@@ -201,14 +201,13 @@ int main(void)
         {
             par
             {
+                /* PWM Service */
                 {
                     pwm_config(pwm_ports);
 
-                    delay_milliseconds(10);
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    delay_milliseconds(5);
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                     pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
                             DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
@@ -217,19 +216,16 @@ int main(void)
 
                 /* ADC Service */
                 {
-                    delay_milliseconds(10);
                     adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC);
                 }
 
                 /* Watchdog Service */
                 {
-                    delay_milliseconds(5);
                     watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
                 }
 
                 /* Motor Control Service */
                 {
-                    delay_milliseconds(20);
 
                     MotorcontrolConfig motorcontrol_config;
 
@@ -268,7 +264,7 @@ int main(void)
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
-                    Motor_Control_Service(motorcontrol_config, i_adc[0], i_shared_memory[1],
+                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                             i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
                 }
 
@@ -277,6 +273,19 @@ int main(void)
 
                 /* Position feedback service */
                 {
+                    /*
+
+                    PositionFeedbackConfig position_feedback_config;
+                    position_feedback_config.sensor_type = HALL_SENSOR;
+                    position_feedback_config.hall_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.hall_config.polarity = HALL_POLARITY;
+                    position_feedback_config.hall_config.enable_push_service = PushAll;
+
+                    position_feedback_service(hall_ports, null, null,
+                                              position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                              null, null, null);
+                     */
+
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
 
@@ -314,9 +323,27 @@ int main(void)
                     position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
                     position_feedback_config.qei_config.enable_push_service = PushPosition;
 
-                    position_feedback_service(hall_ports, qei_ports, spi_ports,
-                                              position_feedback_config, i_shared_memory[0], i_position_feedback,
-                                              null, null, null);
+
+                    position_feedback_config.ams_config.factory_settings = 1;
+                    position_feedback_config.ams_config.polarity = AMS_POLARITY;
+                    position_feedback_config.ams_config.hysteresis = 1;
+                    position_feedback_config.ams_config.noise_setting = AMS_NOISE_NORMAL;
+                    position_feedback_config.ams_config.uvw_abi = 0;
+                    position_feedback_config.ams_config.dyn_angle_comp = 0;
+                    position_feedback_config.ams_config.data_select = 0;
+                    position_feedback_config.ams_config.pwm_on = AMS_PWM_OFF;
+                    position_feedback_config.ams_config.abi_resolution = 0;
+                    position_feedback_config.ams_config.resolution_bits = AMS_RESOLUTION;
+                    position_feedback_config.ams_config.offset = AMS_OFFSET;
+                    position_feedback_config.ams_config.max_ticks = 0x7fffffff;
+                    position_feedback_config.ams_config.pole_pairs = POLE_PAIRS;
+                    position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
+                    position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
+                    position_feedback_config.ams_config.enable_push_service = PushAll;
+
+                    position_feedback_service(null, null, spi_ports,
+                            position_feedback_config, i_shared_memory[0], i_position_feedback,
+                            null, null, null);
                 }
             }
         }

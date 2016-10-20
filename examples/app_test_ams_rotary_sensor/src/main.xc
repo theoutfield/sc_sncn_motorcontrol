@@ -2,6 +2,7 @@
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
+
 /**
  * @file app_test_ams_rotary_sensor.xc
  * @brief Test illustrates usage of the AMS rotary sensor to get position, velocity, and electrical angle information

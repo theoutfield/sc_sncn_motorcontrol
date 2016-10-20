@@ -441,8 +441,8 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
 #ifdef CONTELEC_USE_TIMESTAMP
             xscope_int(TIMESTAMP, timediff);
 #endif
-            xscope_int(PERIOD, (int)(last_read-period_time)/CONTELEC_USEC);
-            period_time = last_read;
+//            xscope_int(PERIOD, (int)(last_read-period_time)/CONTELEC_USEC);
+//            period_time = last_read;
 #endif
 
 
