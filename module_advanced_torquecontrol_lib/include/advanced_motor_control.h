@@ -10,7 +10,7 @@
 #define ADVANCED_MOTOR_CONTROL_H_
 
 /*****************************************************************************/
-void Motor_Control_Service( MotorcontrolConfig &motorcontrol_config,
+void motor_control_service( MotorcontrolConfig &motorcontrol_config,
                             interface ADCInterface client ?i_adc,
                             client interface shared_memory_interface ?i_shared_memory,
                             interface WatchdogInterface client i_watchdog,
