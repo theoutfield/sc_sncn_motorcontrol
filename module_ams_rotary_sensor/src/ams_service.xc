@@ -42,7 +42,9 @@ void initspi_ports(SPIPorts &spi_ports)
     settings1 = (config.factory_settings << 0);
     #endif
     settings1 |= (config.noise_setting << 1);
-    settings1 |= (config.polarity << 2);
+    if (config.polarity == AMS_POLARITY_INVERTED) {
+        settings1 |= (1 << 2);
+    }
     settings1 |= (config.uvw_abi << 3);
     settings1 |= (config.dyn_angle_comp << 4);
     settings1 |= (config.data_select << 6);

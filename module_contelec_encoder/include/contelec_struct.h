@@ -17,8 +17,8 @@
 #define ERROR       0
 #define SUCCESS     1
 
-#define CONTELEC_POLARITY_NORMAL      0
-#define CONTELEC_POLARITY_INVERTED    1
+#define CONTELEC_POLARITY_NORMAL      1
+#define CONTELEC_POLARITY_INVERTED    -1
 
 #define CONTELEC_CTRL_RESET         0x00
 #define CONTELEC_CONF_DIR           0x55

@@ -23,8 +23,8 @@
 
 #define SPI_MASTER_MODE 1
 
-#define AMS_POLARITY_NORMAL      0
-#define AMS_POLARITY_INVERTED    1
+#define AMS_POLARITY_NORMAL      1
+#define AMS_POLARITY_INVERTED    -1
 
 #define AMS_PWM_OFF     0
 #define AMS_PWM_ON      1
