@@ -104,21 +104,8 @@ int main() {
 
             /* Position feedback service */
             {
-                /*
-
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = HALL_SENSOR;
-                position_feedback_config.hall_config.pole_pairs = POLE_PAIRS;
-                position_feedback_config.hall_config.polarity = HALL_POLARITY;
-                position_feedback_config.hall_config.enable_push_service = PushAll;
-
-                position_feedback_service(hall_ports, null, null,
-                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
-                                          null, null, null);
-                 */
-
-                PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
+                position_feedback_config.sensor_type = BISS_SENSOR;
 
                 position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
@@ -154,7 +141,6 @@ int main() {
                 position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
                 position_feedback_config.qei_config.enable_push_service = PushPosition;
 
-
                 position_feedback_config.ams_config.factory_settings = 1;
                 position_feedback_config.ams_config.polarity = AMS_POLARITY;
                 position_feedback_config.ams_config.hysteresis = 1;
@@ -172,7 +158,7 @@ int main() {
                 position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
                 position_feedback_config.ams_config.enable_push_service = PushAll;
 
-                position_feedback_service(null, null, spi_ports,
+                position_feedback_service(null, qei_ports, spi_ports,
                                           position_feedback_config, i_shared_memory[0], i_position_feedback,
                                           null, null, null);
             }

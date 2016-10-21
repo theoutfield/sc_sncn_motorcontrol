@@ -23,9 +23,9 @@ PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-//HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
-//QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
 #define POSITION_LIMIT 5000000 //+/- 4095
 
@@ -192,7 +192,7 @@ int main(void) {
                     position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
                     position_feedback_config.ams_config.enable_push_service = PushAll;
 
-                    position_feedback_service(null, null, spi_ports,
+                    position_feedback_service(hall_ports, qei_ports, spi_ports,
                                               position_feedback_config, i_shared_memory[0], i_position_feedback,
                                               null, null, null);
                 }

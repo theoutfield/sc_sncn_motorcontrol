@@ -341,7 +341,7 @@ int main(void)
                     position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
                     position_feedback_config.ams_config.enable_push_service = PushAll;
 
-                    position_feedback_service(null, null, spi_ports,
+                    position_feedback_service(hall_ports, qei_ports, spi_ports,
                             position_feedback_config, i_shared_memory[0], i_position_feedback,
                             null, null, null);
                 }
