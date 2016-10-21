@@ -134,7 +134,7 @@
 #define HALL_STATE_6_ANGLE     0
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              NORMAL_POLARITY
+#define MOTOR_POLARITY              INVERTED_POLARITY
 
 
 ///////////////////////////////////////////////
