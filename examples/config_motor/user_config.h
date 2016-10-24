@@ -123,7 +123,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1900
+#define COMMUTATION_OFFSET_CLK      650
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     0
@@ -172,8 +172,8 @@
 #define CONTROL_LOOP_PERIOD     1000 //500
 
 //Limits
-#define MIN_POSITION_LIMIT                     -0x7fffffff
-#define MAX_POSITION_LIMIT                      0x7fffffff
+#define MIN_POSITION_LIMIT                     -3000000
+#define MAX_POSITION_LIMIT                      3000000
 #define MAX_SPEED                               1500 //rpm
 #define TORQUE_CONTROL_LIMIT                    3000
 
@@ -195,7 +195,7 @@
 #define POSITION_Kd                             4142100
 
 #define POSITION_INTEGRAL_LIMIT                 400000
-#define MOMENT_OF_INERTIA                       75      // [micro-kgm2]
+#define MOMENT_OF_INERTIA                       20      // [micro-kgm2]
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100

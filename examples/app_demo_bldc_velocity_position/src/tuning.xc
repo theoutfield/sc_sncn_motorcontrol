@@ -173,32 +173,17 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
                 case 'l':
                     pos_velocity_ctrl_config.integral_limit_pos = value;
                     break;
-                default:
-                    break;
-                }
-                printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos, pos_velocity_ctrl_config.I_pos,
-                                                       pos_velocity_ctrl_config.D_pos, pos_velocity_ctrl_config.integral_limit_pos);
-                break;
-            case 'o': //integral optimum pos control
-                switch(mode_3) {
-                case 'p':
-                    pos_velocity_ctrl_config.P_pos_Integral_optimum = value;
-                    break;
-                case 'i':
-                    pos_velocity_ctrl_config.I_pos_Integral_optimum = value;
-                    break;
-                case 'd':
-                    pos_velocity_ctrl_config.D_pos_Integral_optimum = value;
-                    break;
-                case 'l':
-                    pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum = value;
+                case 'j':
+                    pos_velocity_ctrl_config.j = value;
                     break;
                 default:
                     break;
                 }
-                printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_pos_Integral_optimum, pos_velocity_ctrl_config.I_pos_Integral_optimum,
-                                                       pos_velocity_ctrl_config.D_pos_Integral_optimum, pos_velocity_ctrl_config.integral_limit_pos_Integral_optimum);
+                printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
+                        pos_velocity_ctrl_config.P_pos, pos_velocity_ctrl_config.I_pos, pos_velocity_ctrl_config.D_pos,
+                        pos_velocity_ctrl_config.j, pos_velocity_ctrl_config.integral_limit_pos);
                 break;
+
             case 'v': //velocity
                 switch(mode_3) {
                 case 'p':
@@ -302,60 +287,6 @@ void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
             }
             break;
 
-
-        case 'n':
-            switch(mode_2) {
-            //command position forward and backward
-            case 'p':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                pos_velocity_ctrl_config.gain_p = value;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
-                                                          pos_velocity_ctrl_config.gain_i,
-                                                          pos_velocity_ctrl_config.gain_d);
-                break;
-            //command position direct
-            case 'i':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                pos_velocity_ctrl_config.gain_i = value;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
-                                                          pos_velocity_ctrl_config.gain_i,
-                                                          pos_velocity_ctrl_config.gain_d);
-                break;
-            //command velocity forward and backward
-            case 'd':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                pos_velocity_ctrl_config.gain_d = value;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("gain_p:%d gain_i:%d gain_d:%d\n", pos_velocity_ctrl_config.gain_p,
-                                                          pos_velocity_ctrl_config.gain_i,
-                                                          pos_velocity_ctrl_config.gain_d);
-                break;
-
-            //command additive torque forward and backward
-            case 'j':
-                i_position_control.set_j(value);
-                printf("moment of inertia :%d \n", value);
-                break;
-
-            //command additive torque forward and backward
-            case 't':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                pos_velocity_ctrl_config.max_torque = value;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("max_torque: %d [milli-Nm]\n", pos_velocity_ctrl_config.max_torque);
-                break;
-
-            //command additive torque forward and backward
-            case 'w':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                pos_velocity_ctrl_config.max_speed = value;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("max speed: %d [rpm]\n", pos_velocity_ctrl_config.max_speed);
-                break;
-                }
-            break;
 
         //help
         case 'h':
