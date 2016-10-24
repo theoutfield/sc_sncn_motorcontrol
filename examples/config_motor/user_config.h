@@ -27,8 +27,8 @@
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
 //#include <motor_config_AMK_DT4.h>
-//#include <motor_config_AMK_DT3.h>
-#include <motor_config_AMK_DT2.h>
+#include <motor_config_AMK_DT3.h>
+//#include <motor_config_AMK_DT2.h>
 //#include <motor_config_AMK_DD7_28_10_T00.h>
 
 //#include <motor_config.h>
@@ -134,7 +134,7 @@
 #define HALL_STATE_6_ANGLE     0
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              INVERTED_POLARITY
+#define MOTOR_POLARITY              NORMAL_POLARITY
 
 
 ///////////////////////////////////////////////
@@ -187,15 +187,15 @@
 #define POSITION_Kp                             30000
 #define POSITION_Ki                             10
 #define POSITION_Kd                             0
-#define POSITION_INTEGRAL_LIMIT                 400000
 */
 
-
-//PID parameters of the position PID controller
+//PID parameters of non-linear position controller
 #define POSITION_Kp                             989500
 #define POSITION_Ki                             100100
 #define POSITION_Kd                             4142100
-#define POSITION_INTEGRAL_LIMIT                 20
+
+#define POSITION_INTEGRAL_LIMIT                 400000
+#define MOMENT_OF_INERTIA                       75      // [micro-kgm2]
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
