@@ -182,11 +182,20 @@
 #define MAX_ACCELERATION_PROFILER               1800000
 #define MAX_SPEED_PROFILER                      1800000
 
+/*
 //PID parameters of the position PID controller
 #define POSITION_Kp                             30000
 #define POSITION_Ki                             10
 #define POSITION_Kd                             0
 #define POSITION_INTEGRAL_LIMIT                 400000
+*/
+
+
+//PID parameters of the position PID controller
+#define POSITION_Kp                             989500
+#define POSITION_Ki                             100100
+#define POSITION_Kd                             4142100
+#define POSITION_INTEGRAL_LIMIT                 20
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
@@ -194,26 +203,6 @@
 #define VELOCITY_Kd                             60
 #define VELOCITY_INTEGRAL_LIMIT                 0
 
-//PID parameters of the Integral Optimum position controller
-#define Kp_POS_INTEGRAL_OPTIMUM                 1000
-#define Ki_POS_INTEGRAL_OPTIMUM                 1000
-#define Kd_POS_INTEGRAL_OPTIMUM                 1000
-
-#define Kp_NL_POS_CONTROL                   989500
-#define Ki_NL_POS_CONTROL                   100100
-#define Kd_NL_POS_CONTROL                   4142100
-
-#define INTEGRAL_LIMIT_POS_INTEGRAL_OPTIMUM     1500000
-
-#define K_FB                   10429000
-#define K_M                    1
-
-#define MOMENT_OF_INERTIA      100 //[micro-kgm2]
-
-#define GAIN_P      1000
-#define GAIN_I      1000
-#define GAIN_D      1000
-///////////////////////////////////////////////////////////
 
 //Filter parameters
 #define POSITION_FC             100

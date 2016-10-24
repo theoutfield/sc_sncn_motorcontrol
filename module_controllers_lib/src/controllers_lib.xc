@@ -89,11 +89,9 @@ void pid_reset(PIDparam &param)
     param.integral = 0;
 }
 
-
-
 void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
 {
-    //************************************************
+    //************************************
     // reset position controller structure
     nl_pos_ctrl.j = 0.00; // in micro-kgm2
     nl_pos_ctrl.k_fb = 0.00;
@@ -133,19 +131,19 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
 {
     //************************************************
     // set parameters of position controller structure
-    nl_pos_ctrl.w_max = (((double)(pos_velocity_ctrl_config.max_speed))*2.00*3.1415)/60;
-    nl_pos_ctrl.k_fb =((double)(pos_velocity_ctrl_config.k_fb))/1000.00;
-    nl_pos_ctrl.k_m  = ((double)(pos_velocity_ctrl_config.k_m))/1000.00;
+    nl_pos_ctrl.w_max= (((double)(pos_velocity_ctrl_config.max_speed))*2.00*3.1415)/60;
+    nl_pos_ctrl.k_fb = ( (double)(10429000))/1000.00;
+    nl_pos_ctrl.k_m  = ( (double)(1) )/1000.00;
 
-    //1ms
-    nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_nl_position_controller))/100.00;
-    nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_nl_position_controller))/100.00;
-    nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_nl_position_controller))/100.00;
+    //calculated non-liniear values (VER_1 SIMULATIONS)
+    nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos))/100.00;
+    nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos))/100.00;
+    nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos))/100.00;
 
     nl_pos_ctrl.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
+    nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.integral_limit_pos)); //s
 
-    nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.j)); //s
     nl_pos_ctrl.kp *= nl_pos_ctrl.j;
     nl_pos_ctrl.ki *= nl_pos_ctrl.j;
     nl_pos_ctrl.kd *= nl_pos_ctrl.j;
@@ -153,9 +151,9 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
     nl_pos_ctrl.ki /=1000000.00;
     nl_pos_ctrl.kd /=1000000.00;
 
-    nl_pos_ctrl.gain_p = ((double)(pos_velocity_ctrl_config.gain_p));
-    nl_pos_ctrl.gain_i = ((double)(pos_velocity_ctrl_config.gain_i));
-    nl_pos_ctrl.gain_d = ((double)(pos_velocity_ctrl_config.gain_d));
+    nl_pos_ctrl.gain_p = ((double)(1000));
+    nl_pos_ctrl.gain_i = ((double)(1000));
+    nl_pos_ctrl.gain_d = ((double)(1000));
 
     nl_pos_ctrl.kp *= (nl_pos_ctrl.gain_p);
     nl_pos_ctrl.kp /= 1000.00;

@@ -248,7 +248,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             position_sens_k_1_ = position_sens_k_;
                             position_sens_k_   = (double) (upstream_control_data.position);
 
-
                             // apply position control algorithm
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_k_, position_sens_k_1_, position_sens_k_);
                         }
