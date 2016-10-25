@@ -240,7 +240,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             // update feedback data
                             upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                            position_ref_input_k_ = /*initial_position_ +*/ downstream_control_data.position_cmd;
+                            position_ref_input_k_ =  position_ref_in_k;//downstream_control_data.position_cmd;
 
                             position_ref_k_ = (double) (position_ref_input_k_);
                             //position_ref_k_ = (double) (position_ref_k*512);
