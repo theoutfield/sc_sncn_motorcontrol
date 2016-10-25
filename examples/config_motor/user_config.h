@@ -190,12 +190,12 @@
 */
 
 //PID parameters of non-linear position controller
-#define POSITION_Kp                             989500
-#define POSITION_Ki                             100100
-#define POSITION_Kd                             4142100
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 
 #define POSITION_INTEGRAL_LIMIT                 400000
-#define MOMENT_OF_INERTIA                       20      // [micro-kgm2]
+#define MOMENT_OF_INERTIA                       1000000      // [micro-kgm2]
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100

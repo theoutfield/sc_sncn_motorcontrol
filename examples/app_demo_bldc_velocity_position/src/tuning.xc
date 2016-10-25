@@ -232,199 +232,221 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
                 break;
 
-                    //limits
-                    case 'L':
-                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                        switch(mode_2) {
-                        //max position limit
-                        case 'p':
-                            pos_velocity_ctrl_config.max_pos = value;
-                            pos_velocity_ctrl_config.min_pos = -value;
-                            break;
-                            //max velocity limit
-                        case 'v':
-                            pos_velocity_ctrl_config.max_speed = value;
-                            break;
-                            //max torque limit
-                        case 't':
-                            pos_velocity_ctrl_config.max_torque = value;
-                            break;
-                        default:
-                            break;
-                        }
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                        printf("pos_max:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.max_speed,
-                                pos_velocity_ctrl_config.max_torque);
+        //limits
+        case 'L':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                switch(mode_2)
+                {
+                //max position limit
+                case 'p':
+                        pos_velocity_ctrl_config.max_pos = value;
+                        pos_velocity_ctrl_config.min_pos = -value;
                         break;
 
-                        //enable
-                        case 'e':
-                            switch(mode_2) {
-                            case 'p':
-                                if (value == 1) {
-                                    i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
-                                    printf("simpe PID pos ctrl enabled\n");
-                                }
-                                else if (value == 2) {
-                                    i_position_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
-                                    printf("vel.-cascaded pos ctrl enabled\n");
-                                }
-                                else if (value == 3) {
-                                    i_position_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
-                                    printf("Nonlinear pos ctrl enabled\n");
-                                }
-                                else {
-                                    i_position_control.disable();
-                                    printf("position ctrl disabled\n");
-                                }
-                                break;
-                            case 'v':
-                                if (value == 1) {
-                                    i_position_control.enable_velocity_ctrl(VELOCITY_PID_CONTROLLER);
-                                    printf("velocity ctrl enabled\n");
-                                }
-                                else {
-                                    i_position_control.disable();
-                                    printf("velocity ctrl disabled\n");
-                                }
-                                break;
-                            case 't':
-                                if (value == 1) {
-                                    i_position_control.enable_torque_ctrl();
-                                    printf("torque ctrl enabled\n");
-                                }
-                                else {
-                                    i_position_control.disable();
-                                    printf("torque ctrl disabled\n");
-                                }
-                                break;
-                            default:
-                                printf("ep1->enable PID pos ctrl\n");
-                                printf("ep2->enable cascaded pos ctrl\n");
-                                printf("ep3->enable integral-optimum pos ctrl\n");
-                                printf("ev1->enable PID velocity ctrl\n");
-                                printf("et1->enable torque ctrl\n");
-                                break;
-                            }
-                            break;
+                //max velocity limit
+                case 'v':
+                        pos_velocity_ctrl_config.max_speed = value;
+                        break;
 
+                //max torque limit
+                case 't':
+                        pos_velocity_ctrl_config.max_torque = value;
+                        break;
 
-                            //help
-                            case 'h':
-                                printf("p->set position\n");
-                                printf("v->set veloctiy\n");
-                                printf("k->set PIDs\n");
-                                printf("L->set limits\n");
-                                printf("e->enable controllers\n");
-                                break;
+                default:
+                        break;
+                }
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("pos_max:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.max_speed,
+                        pos_velocity_ctrl_config.max_torque);
+                break;
 
-                                //jerk limitation (profiler parameters)
-                            case 'j':
-                                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                                switch(mode_2) {
-                                case 'a':
-                                    pos_velocity_ctrl_config.max_acceleration_profiler = value;
-                                    break;
-                                case 'v':
-                                    pos_velocity_ctrl_config.max_speed_profiler = value;
-                                    break;
-                                default:
-                                    break;
-                                }
-                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                                printf("acceleration_max:%d velocity_max:%d\n",pos_velocity_ctrl_config.max_acceleration_profiler, pos_velocity_ctrl_config.max_speed_profiler);
-                                break;
+        //enable
+        case 'e':
+                switch(mode_2)
+                {
+                case 'p':
+                        if (value == 1)
+                        {
+                            i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                            printf("simpe PID pos ctrl enabled\n");
+                        }
+                        else if (value == 2)
+                        {
+                            i_position_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                            printf("vel.-cascaded pos ctrl enabled\n");
+                        }
+                        else if (value == 3)
+                        {
+                            i_position_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
+                            printf("Nonlinear pos ctrl enabled\n");
+                        }
+                        else
+                        {
+                            i_position_control.disable();
+                            printf("position ctrl disabled\n");
+                        }
+                        break;
+                case 'v':
+                        if (value == 1)
+                        {
+                            i_position_control.enable_velocity_ctrl(VELOCITY_PID_CONTROLLER);
+                            printf("velocity ctrl enabled\n");
+                        }
+                        else
+                        {
+                            i_position_control.disable();
+                            printf("velocity ctrl disabled\n");
+                        }
+                        break;
+                case 't':
+                        if (value == 1)
+                        {
+                            i_position_control.enable_torque_ctrl();
+                            printf("torque ctrl enabled\n");
+                        }
+                        else
+                        {
+                            i_position_control.disable();
+                            printf("torque ctrl disabled\n");
+                        }
+                        break;
+                default:
+                        printf("ep1->enable PID pos ctrl\n");
+                        printf("ep2->enable cascaded pos ctrl\n");
+                        printf("ep3->enable integral-optimum pos ctrl\n");
+                        printf("ev1->enable PID velocity ctrl\n");
+                        printf("et1->enable torque ctrl\n");
+                        break;
+                }
+                break;
+        //help
+        case 'h':
+                printf("p->set position\n");
+                printf("v->set veloctiy\n");
+                printf("k->set PIDs\n");
+                printf("L->set limits\n");
+                printf("e->enable controllers\n");
+                break;
 
-                                //auto offset tuning
-                                case 'a':
-                                    auto_offset(i_motorcontrol);
-                                    break;
+        //jerk limitation (profiler parameters)
+        case 'j':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                switch(mode_2)
+                {
+                case 'a':
+                        pos_velocity_ctrl_config.max_acceleration_profiler = value;
+                        break;
+                case 'v':
+                        pos_velocity_ctrl_config.max_speed_profiler = value;
+                        break;
+                default:
+                        break;
+                }
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                printf("acceleration_max:%d velocity_max:%d\n",pos_velocity_ctrl_config.max_acceleration_profiler, pos_velocity_ctrl_config.max_speed_profiler);
+                break;
 
-                                    //set brake
-                                case 'b':
-                                    if (brake_flag) {
-                                        brake_flag = 0;
-                                        printf("Brake blocking\n");
-                                    } else {
-                                        brake_flag = 1;
-                                        printf("Brake released\n");
-                                    }
-                                    i_motorcontrol.set_brake_status(brake_flag);
-                                    break;
+        //auto offset tuning
+        case 'a':
+                auto_offset(i_motorcontrol);
+                break;
 
-                                    //set offset
-                                case 'o':
-                                    switch(mode_2) {
-                                    //set offset
-                                    case 's':
-                                        i_motorcontrol.set_offset_value(value);
-                                        printf("set offset to %d\n", value);
-                                        break;
-                                        //print offset
-                                    case 'p':
-                                        printf("offset %d\n", i_motorcontrol.set_calib(0));
-                                        break;
-                                    }
-                                    break;
+        //set brake
+        case 'b':
+                if (brake_flag)
+                {
+                    brake_flag = 0;
+                    printf("Brake blocking\n");
+                }
+                else
+                {
+                    brake_flag = 1;
+                    printf("Brake released\n");
+                }
+                i_motorcontrol.set_brake_status(brake_flag);
+                break;
 
-                                    //enable and disable torque controller
-                                    case 't':
-                                        if (torque_control_flag == 0) {
-                                            torque_control_flag = 1;
-                                            i_motorcontrol.set_torque_control_enabled();
-                                            printf("Torque control activated\n");
-                                        } else {
-                                            torque_control_flag = 0;
-                                            i_motorcontrol.set_torque_control_disabled();
-                                            printf("Torque control deactivated\n");
-                                        }
-                                        break;
+        //set offset
+        case 'o':
+                switch(mode_2)
+                {
+                //set offset
+                case 's':
+                    i_motorcontrol.set_offset_value(value);
+                    printf("set offset to %d\n", value);
+                    break;
+                    //print offset
+                case 'p':
+                    printf("offset %d\n", i_motorcontrol.set_calib(0));
+                    break;
+                }
+                break;
 
-                                        //play sound!
-                                    case 's':
-                                        for(period_us=400;period_us<=(1*1000);(period_us+=400))
-                                        {
-                                            if(period_us<3000) period_us-=300;
+        //enable and disable torque controller
+        case 't':
+                if (torque_control_flag == 0)
+                {
+                    torque_control_flag = 1;
+                    i_motorcontrol.set_torque_control_enabled();
+                    printf("Torque control activated\n");
+                }
+                else
+                {
+                    torque_control_flag = 0;
+                    i_motorcontrol.set_torque_control_disabled();
+                    printf("Torque control deactivated\n");
+                }
+                break;
 
-                                            for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
-                                            {
-                                                i_motorcontrol.set_torque(value);
-                                                delay_microseconds(period_us);
-                                                i_motorcontrol.set_torque(-value);
-                                                delay_microseconds(period_us);
-                                            }
-                                        }
-                                        i_motorcontrol.set_torque(0);
-                                        break;
+        //play sound!
+        case 's':
+                for(period_us=400;period_us<=(1*1000);(period_us+=400))
+                {
+                    if(period_us<3000) period_us-=300;
 
-                                        //reverse torque or velocity
-                                    case 'r':
-                                        torque = -torque;
-                                        if(velocity_running) {
-                                            velocity = -velocity;
-                                            downstream_control_data.offset_torque = 0;
-                                            downstream_control_data.velocity_cmd = velocity;
-                                            i_position_control.update_control_data(downstream_control_data);
-                                        }
-                                        i_motorcontrol.set_torque(torque);
-                                        printf("Torque %d [milli-Nm]\n", torque);
-                                        break;
+                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                    {
+                        i_motorcontrol.set_torque(value);
+                        delay_microseconds(period_us);
+                        i_motorcontrol.set_torque(-value);
+                        delay_microseconds(period_us);
+                    }
+                }
+                i_motorcontrol.set_torque(0);
+                break;
 
-                                        //set torque / set velocity to zero
-                                    default:
-                                        if(velocity_running) {
-                                            velocity = 0;
-                                            velocity_running = 0;
-                                            downstream_control_data.offset_torque = 0;
-                                            downstream_control_data.velocity_cmd = velocity;
-                                            i_position_control.update_control_data(downstream_control_data);
-                                        }
-                                        else {
-                                            torque = value;
-                                            i_motorcontrol.set_torque(torque);
-                                            printf("torque %d [milli-Nm]\n", torque);
-                                        }
-                                        break;
+        //reverse torque or velocity
+        case 'r':
+                torque = -torque;
+                if(velocity_running)
+                {
+                    velocity = -velocity;
+                    downstream_control_data.offset_torque = 0;
+                    downstream_control_data.velocity_cmd = velocity;
+                    i_position_control.update_control_data(downstream_control_data);
+                }
+                i_motorcontrol.set_torque(torque);
+                printf("Torque %d [milli-Nm]\n", torque);
+                break;
+
+        //set torque / set velocity to zero
+        default:
+                if(velocity_running)
+                {
+                    velocity = 0;
+                    velocity_running = 0;
+                    downstream_control_data.offset_torque = 0;
+                    downstream_control_data.velocity_cmd = velocity;
+                    i_position_control.update_control_data(downstream_control_data);
+                }
+                else
+                {
+                    torque = value;
+                    i_motorcontrol.set_torque(torque);
+                    printf("torque %d [milli-Nm]\n", torque);
+                }
+                break;
 
         }
         delay_milliseconds(10);
