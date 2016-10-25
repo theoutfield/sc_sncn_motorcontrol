@@ -101,6 +101,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     float velocity_cmd_k = 0;
 
     // torque
+    int motorctrl_enable_flag = 0;
+    int motorctrl_enable_timeout = 0;
     int torque_enable_flag = 0;
     int torque_ref_input_k = 0;
     float torque_ref_k = 0;
@@ -162,6 +164,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 t :> t_new_;
                 loop_time_=t_new_-t_old_;
                 idle_time_=t_new_-t_end_;
+                motorctrl_enable_timeout--;
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
@@ -196,18 +199,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 torque_ref_k = ((float) torque_ref_input_k);
 
                 if(torque_enable_flag) {
-
-                    if ((position_sens_k > max_position) || (position_sens_k < min_position))
-                    {
-                        torque_enable_flag = 0;
-                        position_enable_flag = 0;
-                        velocity_enable_flag = 0;
-                        i_motorcontrol.set_torque_control_disabled();
-                        i_motorcontrol.set_safe_torque_off_enabled();
-                        i_motorcontrol.set_brake_status(0);
-                        printstr("*** Position Limit Reached ***\n");
-                    }
-
 
                     // position control
                     if (position_enable_flag == 1)
@@ -283,10 +274,56 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                     torque_ref_k += additive_torque_k;
 
+                    //torque limit check
                     if(torque_ref_k > pos_velocity_ctrl_config.max_torque)
                         torque_ref_k = pos_velocity_ctrl_config.max_torque;
                     else if (torque_ref_k < (-pos_velocity_ctrl_config.max_torque))
                         torque_ref_k = (-pos_velocity_ctrl_config.max_torque);
+
+                    //position limit check
+                    if (upstream_control_data.position > pos_velocity_ctrl_config.max_pos) {
+                        if (((int)torque_ref_k) >= 0 && motorctrl_enable_flag == 1) {
+                            motorctrl_enable_flag = 0;
+                            position_enable_flag == 0;
+                            i_motorcontrol.set_torque_control_disabled();
+                            i_motorcontrol.set_safe_torque_off_enabled();
+                            i_motorcontrol.set_brake_status(0);
+                            motorctrl_enable_timeout = 1000;
+                            printstr("*** Position Limit Reached ***\n");
+                        } else if (((int)torque_ref_k) < 0 && motorctrl_enable_flag == 0 && motorctrl_enable_timeout < 0) {
+                            motorctrl_enable_flag = 1;
+                            i_motorcontrol.set_torque_control_enabled();
+                            i_motorcontrol.set_brake_status(1);
+                        }
+                    } else if (upstream_control_data.position < pos_velocity_ctrl_config.min_pos) {
+                        if (((int)torque_ref_k) <= 0 && motorctrl_enable_flag == 1) {
+                            motorctrl_enable_flag = 0;
+                            position_enable_flag == 0;
+                            i_motorcontrol.set_torque_control_disabled();
+                            i_motorcontrol.set_safe_torque_off_enabled();
+                            i_motorcontrol.set_brake_status(0);
+                            motorctrl_enable_timeout = 1000;
+                            printstr("*** Position Limit Reached ***\n");
+                        } else if (((int)torque_ref_k) > 0 && motorctrl_enable_flag == 0 && motorctrl_enable_timeout < 0) {
+                            motorctrl_enable_flag = 1;
+                            i_motorcontrol.set_torque_control_enabled();
+                            i_motorcontrol.set_brake_status(1);
+                        }
+                    } else if (motorctrl_enable_flag == 0 && motorctrl_enable_timeout < 0) {
+                        motorctrl_enable_flag = 1;
+                        i_motorcontrol.set_torque_control_enabled();
+                        i_motorcontrol.set_brake_status(1);
+                    }
+//                    if ((upstream_control_data.position > pos_velocity_ctrl_config.max_pos) || (upstream_control_data.position < pos_velocity_ctrl_config.min_pos))
+//                    {
+//                        torque_enable_flag = 0;
+//                        position_enable_flag = 0;
+//                        velocity_enable_flag = 0;
+//                        i_motorcontrol.set_torque_control_disabled();
+//                        i_motorcontrol.set_safe_torque_off_enabled();
+//                        i_motorcontrol.set_brake_status(0);
+//                        printstr("*** Position Limit Reached ***\n");
+//                    }
 
                     i_motorcontrol.set_torque((int) torque_ref_k);
                 }
@@ -316,6 +353,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
             case i_position_control[int i].disable():
+                motorctrl_enable_flag = 0;
                 torque_enable_flag = 0;
                 position_enable_flag = 0;
                 velocity_enable_flag = 0;
@@ -327,6 +365,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
             case i_position_control[int i].enable_position_ctrl(int pos_control_mode_):
                 pos_control_mode = pos_control_mode_;
                 torque_enable_flag = 1;
+                motorctrl_enable_flag = 1;
                 position_enable_flag = 1;
                 if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER) {
                     velocity_enable_flag = 1;
@@ -377,6 +416,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
             case i_position_control[int i].enable_velocity_ctrl(int velocity_control_mode_):
                 velocity_control_mode = velocity_control_mode_;
                 torque_enable_flag = 1;
+                motorctrl_enable_flag = 1;
                 position_enable_flag = 0;
                 velocity_enable_flag = 1;
                 velocity_ref_input_k = 0;
@@ -388,6 +428,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
             case i_position_control[int i].enable_torque_ctrl():
                 torque_enable_flag = 1;
+                motorctrl_enable_flag = 1;
                 position_enable_flag = 0;
                 velocity_enable_flag = 0;
                 torque_ref_input_k = 0;
