@@ -139,92 +139,98 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 }
                 break;
 
-            //velocity commands
-            case 'v':
-                switch(mode_2) {
+        //velocity commands
+        case 'v':
+                switch(mode_2)
+                {
                 //step command (forward and backward)
                 case 's':
-                    printf("velocity cmd: %d to %d\n", value, -value);
-                    downstream_control_data.offset_torque = 0;
-                    downstream_control_data.velocity_cmd = value;
-                    i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(1000);
-                    downstream_control_data.velocity_cmd = -value;
-                    i_position_control.update_control_data(downstream_control_data);
-                    delay_milliseconds(1000);
-                    downstream_control_data.velocity_cmd = 0;
-                    i_position_control.update_control_data(downstream_control_data);
-                    break;
-                    //direct command
+                        printf("velocity cmd: %d to %d\n", value, -value);
+                        downstream_control_data.offset_torque = 0;
+                        downstream_control_data.velocity_cmd = value;
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(1000);
+                        downstream_control_data.velocity_cmd = -value;
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(1000);
+                        downstream_control_data.velocity_cmd = 0;
+                        i_position_control.update_control_data(downstream_control_data);
+                        break;
+                //direct command
                 default:
-                    if(value==0)
-                        velocity_running = 0;
-                    else
-                        velocity_running = 1;
-                    downstream_control_data.offset_torque = 0;
-                    velocity = value;
-                    downstream_control_data.velocity_cmd = velocity;
-                    i_position_control.update_control_data(downstream_control_data);
-                    printf("set velocity %d\n", downstream_control_data.velocity_cmd);
-                    break;
+                        if(value==0)
+                            velocity_running = 0;
+                        else
+                            velocity_running = 1;
+                        downstream_control_data.offset_torque = 0;
+                        velocity = value;
+                        downstream_control_data.velocity_cmd = velocity;
+                        i_position_control.update_control_data(downstream_control_data);
+                        printf("set velocity %d\n", downstream_control_data.velocity_cmd);
+                        break;
                 }
                 break;
 
-                //pid coefficients
-                case 'k':
-                    pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                    switch(mode_2) {
-                    case 'p': //position
-                        switch(mode_3) {
+        //pid coefficients
+        case 'k':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                switch(mode_2)
+                {
+                case 'p': //position
+                        switch(mode_3)
+                        {
                         case 'p':
-                            pos_velocity_ctrl_config.P_pos = value;
-                            break;
+                                pos_velocity_ctrl_config.P_pos = value;
+                                break;
                         case 'i':
-                            pos_velocity_ctrl_config.I_pos = value;
-                            break;
+                                pos_velocity_ctrl_config.I_pos = value;
+                                break;
                         case 'd':
-                            pos_velocity_ctrl_config.D_pos = value;
-                            break;
+                                pos_velocity_ctrl_config.D_pos = value;
+                                break;
                         case 'l':
-                            pos_velocity_ctrl_config.integral_limit_pos = value;
-                            break;
+                                pos_velocity_ctrl_config.integral_limit_pos = value;
+                                break;
                         case 'j':
-                            pos_velocity_ctrl_config.j = value;
-                            break;
+                                pos_velocity_ctrl_config.j = value;
+                                break;
                         default:
-                            break;
+                                break;
                         }
                         printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
                                 pos_velocity_ctrl_config.P_pos, pos_velocity_ctrl_config.I_pos, pos_velocity_ctrl_config.D_pos,
                                 pos_velocity_ctrl_config.j, pos_velocity_ctrl_config.integral_limit_pos);
                         break;
 
-                        case 'v': //velocity
-                            switch(mode_3) {
-                            case 'p':
+                case 'v': //velocity
+                        switch(mode_3)
+                        {
+                        case 'p':
                                 pos_velocity_ctrl_config.P_velocity = value;
                                 break;
-                            case 'i':
+                        case 'i':
                                 pos_velocity_ctrl_config.I_velocity = value;
                                 break;
-                            case 'd':
+                        case 'd':
                                 pos_velocity_ctrl_config.D_velocity = value;
                                 break;
-                            case 'l':
+                        case 'l':
                                 pos_velocity_ctrl_config.integral_limit_velocity = value;
                                 break;
-                            default:
+                        default:
                                 break;
-                            }
-                            printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_velocity, pos_velocity_ctrl_config.I_velocity,
-                                    pos_velocity_ctrl_config.D_velocity, pos_velocity_ctrl_config.integral_limit_velocity);
-                            break;
-                            default:
-                                printf("kp->pos_ctrl ko->optimum_ctrl kv->vel_ctrl\n");
-                                break;
-                    }
-                    i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                    break;
+                        }
+                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_velocity, pos_velocity_ctrl_config.I_velocity,
+                                pos_velocity_ctrl_config.D_velocity, pos_velocity_ctrl_config.integral_limit_velocity);
+                        break;
+
+                default:
+                        printf("kp->pos_ctrl ko->optimum_ctrl kv->vel_ctrl\n");
+                        break;
+                }
+
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                break;
 
                     //limits
                     case 'L':
