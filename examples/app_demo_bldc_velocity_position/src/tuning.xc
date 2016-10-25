@@ -28,7 +28,7 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 }
 
 
-void run_offset_tuning(interface MotorcontrolInterface client i_motorcontrol,
+void demo_torque_position_velocity_control(interface MotorcontrolInterface client i_motorcontrol,
         interface PositionVelocityCtrlInterface client ?i_position_control)
 {
     delay_milliseconds(500);
