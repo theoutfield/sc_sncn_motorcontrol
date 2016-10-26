@@ -142,7 +142,7 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
 
     nl_pos_ctrl.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
-    nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.integral_limit_pos)); //s
+    nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.j)); //s
 
     nl_pos_ctrl.kp *= nl_pos_ctrl.j;
     nl_pos_ctrl.ki *= nl_pos_ctrl.j;

@@ -43,7 +43,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: run_offset_tuning(i_motorcontrol[1], i_position_control[0]);
+        on tile[APP_TILE]: demo_torque_position_velocity_control(i_motorcontrol[1], i_position_control[0]);
 
         on tile[APP_TILE_2]:
         /* Position Control Loop */
@@ -56,6 +56,7 @@ int main(void) {
             pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
             pos_velocity_ctrl_config.max_speed =                            MAX_SPEED;
             pos_velocity_ctrl_config.max_torque =                           TORQUE_CONTROL_LIMIT;
+            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
 
             pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
             pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;

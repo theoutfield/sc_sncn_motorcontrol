@@ -8,7 +8,7 @@
 #pragma once
 #include <contelec_struct.h>
 
-//#define CONTELEC_USE_TIMESTAMP
+#define CONTELEC_USE_TIMESTAMP
 
 #define CONTELEC_OFFSET          0
 #define CONTELEC_POLARITY        CONTELEC_POLARITY_NORMAL//CONTELEC_POLARITY_INVERTED

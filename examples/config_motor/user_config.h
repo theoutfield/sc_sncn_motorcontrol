@@ -27,8 +27,8 @@
 //#include <motor_config_MABI_A1.h>
 //#include <motor_config_qmot_qbl5704.h>
 //#include <motor_config_AMK_DT4.h>
-//#include <motor_config_AMK_DT3.h>
-#include <motor_config_AMK_DT2.h>
+#include <motor_config_AMK_DT3.h>
+//#include <motor_config_AMK_DT2.h>
 //#include <motor_config_AMK_DD7_28_10_T00.h>
 
 //#include <motor_config.h>
@@ -123,7 +123,7 @@
 #define COMMUTATION_LOOP_PERIOD     66
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1900
+#define COMMUTATION_OFFSET_CLK      650
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     0
@@ -134,7 +134,7 @@
 #define HALL_STATE_6_ANGLE     0
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              INVERTED_POLARITY
+#define MOTOR_POLARITY              NORMAL_POLARITY
 
 
 ///////////////////////////////////////////////
@@ -172,8 +172,8 @@
 #define CONTROL_LOOP_PERIOD     1000 //500
 
 //Limits
-#define MIN_POSITION_LIMIT                     -0x7fffffff
-#define MAX_POSITION_LIMIT                      0x7fffffff
+#define MIN_POSITION_LIMIT                     -3000000
+#define MAX_POSITION_LIMIT                      3000000
 #define MAX_SPEED                               1500 //rpm
 #define TORQUE_CONTROL_LIMIT                    3000
 
@@ -187,15 +187,15 @@
 #define POSITION_Kp                             30000
 #define POSITION_Ki                             10
 #define POSITION_Kd                             0
-#define POSITION_INTEGRAL_LIMIT                 400000
 */
 
+//PID parameters of non-linear position controller
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 
-//PID parameters of the position PID controller
-#define POSITION_Kp                             989500
-#define POSITION_Ki                             100100
-#define POSITION_Kd                             4142100
-#define POSITION_INTEGRAL_LIMIT                 20
+#define POSITION_INTEGRAL_LIMIT                 400000
+#define MOMENT_OF_INERTIA                       1000000      // [micro-kgm2]
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
