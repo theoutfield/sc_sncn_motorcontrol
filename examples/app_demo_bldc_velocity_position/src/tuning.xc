@@ -191,15 +191,15 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                         case 'l':
                                 pos_velocity_ctrl_config.integral_limit_pos = value;
                                 break;
-                        case 'j':
-                                pos_velocity_ctrl_config.j = value;
+                        case 'o':
+                                pos_velocity_ctrl_config.os_suppression = value;
                                 break;
                         default:
                                 break;
                         }
                         printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
                                 pos_velocity_ctrl_config.P_pos, pos_velocity_ctrl_config.I_pos, pos_velocity_ctrl_config.D_pos,
-                                pos_velocity_ctrl_config.j, pos_velocity_ctrl_config.integral_limit_pos);
+                                pos_velocity_ctrl_config.os_suppression, pos_velocity_ctrl_config.integral_limit_pos);
                         break;
 
                 case 'v': //velocity
@@ -302,11 +302,13 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 case 't':
                         if (value == 1)
                         {
+                            torque_control_flag = 1;
                             i_position_control.enable_torque_ctrl();
                             printf("torque ctrl enabled\n");
                         }
                         else
                         {
+                            torque_control_flag = 0;
                             i_position_control.disable();
                             printf("torque ctrl disabled\n");
                         }

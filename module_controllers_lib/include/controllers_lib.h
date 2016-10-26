@@ -30,12 +30,10 @@ typedef struct {
     double ki;
     double kd;
 
-    double gain_p;
-    double gain_i;
-    double gain_d;
-
     double k_fb;         // position feedback gain
+    double resolution;   // position sensor resolution
     double gained_error; //position error which is directly measured
+    double constant_gain;
     double k_m;          // actuator torque gain
 
     double feedback_p_loop;
@@ -60,8 +58,7 @@ typedef struct {
     double w_max; // maximum speed [rad/sec]
     double t_max; // maximum motor torque [milli-Nm]
     double t_additive; // additive torque [milli-Nm]
-
-    double j; // moment of inertia [micro-kgm2]
+    double os_suppression; //overshoot suppression factor
 
     double torque_ref_k; // milli-Nm
 

@@ -241,6 +241,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             // apply position control algorithm
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_k_, position_sens_k_1_, position_sens_k_);
+
+                            xscope_int(CONSTANT_GAIN, nl_pos_ctrl.constant_gain);
+
                         }
 
                         second_order_LP_filter_shift_buffers(&position_k,
@@ -475,8 +478,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
 
 
-            case i_position_control[int i].set_j(int j):
-                    pos_velocity_ctrl_config.j = j;
+            case i_position_control[int i].set_os(int os):
+                    pos_velocity_ctrl_config.os_suppression = os;
                     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
                     break;
 

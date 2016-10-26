@@ -67,17 +67,13 @@ typedef struct {
     int I_nl_position_controller;
     int D_nl_position_controller;
 
-    int gain_p;
-    int gain_i;
-    int gain_d;
-
     int position_fc;
     int velocity_fc;
 
     int k_fb; //position feedback gain [milli-ticks/rad]
+    int resolution;
     int k_m;  //gain of torque actuator
-
-    int j;    //moment of inertia [micro-kgm2]
+    int os_suppression;
 
 } PosVelocityControlConfig;
 

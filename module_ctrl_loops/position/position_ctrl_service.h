@@ -31,6 +31,12 @@ interface PositionVelocityCtrlInterface{
 //    void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
 //    void set_velocity_limits(int velocity_min_limit, int velocity_max_limit);
 
+    /**
+     * @brief (internal) Settings to suppress the overshoot
+     *
+     */
+    void set_os(int os);
+
     void enable_torque_ctrl();
 //    void set_torque(int in_target_torque);
 //    void set_torque_limits(int torque_min_limit, int torque_max_limit);
@@ -49,13 +55,6 @@ interface PositionVelocityCtrlInterface{
      * @param in_config New Service configuration.
      */
     void set_position_velocity_control_config(PosVelocityControlConfig in_config);
-
-    /**
-     * @brief Setter for moment_of_inertia.
-     *
-     * @param j.
-     */
-    void set_j(int j);
 
 
     int get_position();

@@ -35,5 +35,7 @@
 	<Probe name="POSITION_REF_SP3" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="POSITION_REAL_SP3" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
+	<Probe name="CONSTANT_GAIN" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	
 	
 </xSCOPEconfig>

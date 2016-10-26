@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 
 
@@ -56,7 +56,6 @@ int main(void) {
             pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
             pos_velocity_ctrl_config.max_speed =                            MAX_SPEED;
             pos_velocity_ctrl_config.max_torque =                           TORQUE_CONTROL_LIMIT;
-            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
 
             pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
             pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
@@ -68,6 +67,7 @@ int main(void) {
             pos_velocity_ctrl_config.I_pos =                                POSITION_Ki;
             pos_velocity_ctrl_config.D_pos =                                POSITION_Kd;
             pos_velocity_ctrl_config.integral_limit_pos =                   POSITION_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.os_suppression =                       OS_SUPPRESSION_FACTOR;
 
             pos_velocity_ctrl_config.P_velocity =                           VELOCITY_Kp;
             pos_velocity_ctrl_config.I_velocity =                           VELOCITY_Ki;
@@ -76,6 +76,7 @@ int main(void) {
 
             pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
             pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
+            pos_velocity_ctrl_config.resolution  =                          POSITION_SENSOR_RESOLUTION;
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
         }
