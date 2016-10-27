@@ -135,9 +135,9 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
     nl_pos_ctrl.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
     //PID parameters are pre-multiplied by 100 (by user)
-    nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos))/100.00;
-    nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos))/100.00;
-    nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos))/100.00;
+    nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos));
+    nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos));
+    nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos));
 
     nl_pos_ctrl.constant_gain = 2/nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/= nl_pos_ctrl.ts_position;

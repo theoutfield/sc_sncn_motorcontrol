@@ -248,6 +248,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             xscope_int(STATE_3, nl_pos_ctrl.state_3);
                             xscope_int(STATE_INDEX, nl_pos_ctrl.state_index);
                             xscope_int(CALCULATED_J, ((int)(1000*nl_pos_ctrl.calculated_j)));
+                            xscope_int(KP, ((int)(1000*nl_pos_ctrl.kp)));
+                            xscope_int(KI, ((int)(1000*nl_pos_ctrl.ki)));
+                            xscope_int(KD, ((int)(1000*nl_pos_ctrl.kd)));
+
 
 
                         }

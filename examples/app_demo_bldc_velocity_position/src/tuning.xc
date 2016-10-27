@@ -194,9 +194,6 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                         case 'j':
                                 pos_velocity_ctrl_config.j = value;
                                 break;
-                        case 'g':
-                                pos_velocity_ctrl_config.pid_gain = value;
-                                break;
                         default:
                                 break;
                         }
@@ -433,6 +430,22 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 }
                 i_motorcontrol.set_torque(torque);
                 printf("Torque %d [milli-Nm]\n", torque);
+                break;
+
+        //common_gain
+        case 'g':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                switch(mode_2)
+                {
+                    case 'g':
+                            pos_velocity_ctrl_config.pid_gain = value;
+                            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                            break;
+                    default:
+                            break;
+                }
+
+                printf("pid_gain:%d\n", pos_velocity_ctrl_config.pid_gain);
                 break;
 
         //set torque / set velocity to zero

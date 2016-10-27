@@ -191,10 +191,10 @@
 #define POSITION_Kd                             0
 */
 
-//PID parameters of non-linear position controller
-#define POSITION_Kp                             7916000
-#define POSITION_Ki                             800800
-#define POSITION_Kd                             33136800
+//PID parameters of non-linear position controller //between 0 and 2e9
+#define POSITION_Kp                             79160
+#define POSITION_Ki                             8008
+#define POSITION_Kd                             331368
 
 #define POSITION_INTEGRAL_LIMIT                 400000
 #define MOMENT_OF_INERTIA                       0           //set this variable only if it is known in [gram square centimiter]
