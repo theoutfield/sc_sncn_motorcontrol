@@ -192,13 +192,13 @@
 */
 
 //PID parameters of non-linear position controller
-#define POSITION_Kp                             989500
-#define POSITION_Ki                             100100
-#define POSITION_Kd                             4142100
+#define POSITION_Kp                             7916000
+#define POSITION_Ki                             800800
+#define POSITION_Kd                             33136800
 
 #define POSITION_INTEGRAL_LIMIT                 400000
-#define OS_SUPPRESSION_FACTOR                   200
-//#define MOMENT_OF_INERTIA                       200     // [micro-kgm2]
+#define MOMENT_OF_INERTIA                       0           //set this variable only if it is known in [gram square centimiter]
+                                                            //otherwise set as 0
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
@@ -210,6 +210,9 @@
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
+
+#define PID_GAIN                1000     //common gain multiplied in 3 pid constants at the same time.
+                                         //default value is 1000 (which makes it ineffective)
 
 //Number of ticks in a microsecond/frequency for IFM Tile
 #define IFM_TILE_USEC   USEC_STD//USEC_FAST//

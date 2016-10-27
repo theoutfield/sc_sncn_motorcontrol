@@ -243,6 +243,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_k_, position_sens_k_1_, position_sens_k_);
 
                             xscope_int(CONSTANT_GAIN, nl_pos_ctrl.constant_gain);
+                            xscope_int(STATE_1, nl_pos_ctrl.state_1);
+                            xscope_int(STATE_2, nl_pos_ctrl.state_2);
+                            xscope_int(STATE_3, nl_pos_ctrl.state_3);
+                            xscope_int(STATE_INDEX, nl_pos_ctrl.state_index);
+                            xscope_int(CALCULATED_J, ((int)(1000*nl_pos_ctrl.calculated_j)));
+
 
                         }
 
@@ -478,8 +484,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
 
 
-            case i_position_control[int i].set_os(int os):
-                    pos_velocity_ctrl_config.os_suppression = os;
+            case i_position_control[int i].set_j(int j):
+                    pos_velocity_ctrl_config.j = j;
                     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
                     break;
 

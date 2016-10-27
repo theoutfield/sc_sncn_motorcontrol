@@ -29,6 +29,7 @@ typedef struct {
     double kp;
     double ki;
     double kd;
+    double pid_gain;
 
     double k_fb;         // position feedback gain
     double resolution;   // position sensor resolution
@@ -58,7 +59,8 @@ typedef struct {
     double w_max; // maximum speed [rad/sec]
     double t_max; // maximum motor torque [milli-Nm]
     double t_additive; // additive torque [milli-Nm]
-    double os_suppression; //overshoot suppression factor
+    double j; //moment of inertia
+    double calculated_j;
 
     double torque_ref_k; // milli-Nm
 

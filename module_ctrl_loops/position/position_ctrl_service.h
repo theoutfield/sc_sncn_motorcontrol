@@ -17,7 +17,6 @@ interface PositionVelocityCtrlInterface{
 
     void disable();
 
-
     void enable_position_ctrl(int pos_control_mode_);
 //    void set_position(int in_target_position);
 //    void set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
@@ -35,7 +34,7 @@ interface PositionVelocityCtrlInterface{
      * @brief (internal) Settings to suppress the overshoot
      *
      */
-    void set_os(int os);
+    void set_j(int j);
 
     void enable_torque_ctrl();
 //    void set_torque(int in_target_torque);
@@ -56,13 +55,9 @@ interface PositionVelocityCtrlInterface{
      */
     void set_position_velocity_control_config(PosVelocityControlConfig in_config);
 
-
     int get_position();
-//
-//
+
     int get_velocity();
-//
-//    int check_busy();
 
     UpstreamControlData update_control_data(DownstreamControlData downstream_control_data_);
 };

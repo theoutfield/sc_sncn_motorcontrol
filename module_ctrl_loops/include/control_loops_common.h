@@ -52,20 +52,12 @@ typedef struct {
     int I_pos;
     int D_pos;
     int integral_limit_pos;
+    int pid_gain;
 
     int P_velocity;
     int I_velocity;
     int D_velocity;
     int integral_limit_velocity;
-
-    int P_pos_Integral_optimum;
-    int I_pos_Integral_optimum;
-    int D_pos_Integral_optimum;
-    int integral_limit_pos_Integral_optimum;
-
-    int P_nl_position_controller;
-    int I_nl_position_controller;
-    int D_nl_position_controller;
 
     int position_fc;
     int velocity_fc;
@@ -73,7 +65,7 @@ typedef struct {
     int k_fb; //position feedback gain [milli-ticks/rad]
     int resolution;
     int k_m;  //gain of torque actuator
-    int os_suppression;
+    int j;
 
 } PosVelocityControlConfig;
 
