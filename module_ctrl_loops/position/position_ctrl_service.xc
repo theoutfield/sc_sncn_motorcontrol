@@ -241,19 +241,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                             // apply position control algorithm
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_k_, position_sens_k_1_, position_sens_k_);
-
-                            xscope_int(CONSTANT_GAIN, nl_pos_ctrl.constant_gain);
-                            xscope_int(STATE_1, nl_pos_ctrl.state_1);
-                            xscope_int(STATE_2, nl_pos_ctrl.state_2);
-                            xscope_int(STATE_3, nl_pos_ctrl.state_3);
-                            xscope_int(STATE_INDEX, nl_pos_ctrl.state_index);
-                            xscope_int(CALCULATED_J, ((int)(1000*nl_pos_ctrl.calculated_j)));
-                            xscope_int(KP, ((int)(1000*nl_pos_ctrl.kp)));
-                            xscope_int(KI, ((int)(1000*nl_pos_ctrl.ki)));
-                            xscope_int(KD, ((int)(1000*nl_pos_ctrl.kd)));
-
-
-
                         }
 
                         second_order_LP_filter_shift_buffers(&position_k,
