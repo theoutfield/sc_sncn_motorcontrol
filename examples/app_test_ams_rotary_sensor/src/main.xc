@@ -76,7 +76,7 @@ int main(void)
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = AMS_SENSOR;
                 position_feedback_config.ams_config.factory_settings = 1;
-                position_feedback_config.ams_config.polarity = AMS_POLARITY;
+                position_feedback_config.ams_config.polarity = SENSOR_POLARITY;
                 position_feedback_config.ams_config.hysteresis = 1;
                 position_feedback_config.ams_config.noise_setting = AMS_NOISE_NORMAL;
                 position_feedback_config.ams_config.uvw_abi = 0;

@@ -90,7 +90,7 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
         i_motorcontrol.set_torque_control_enabled();
     } else {
         printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-        printf(">>  Please either change CONTELEC_POLARITY parameter [0 - normal, 1 - inverted] or flip any two motor phases\n");
+        printf(">>  Please either change SENSOR_POLARITY parameter [0 - normal, 1 - inverted] or flip any two motor phases\n");
     }
     return offset;
 }
@@ -318,7 +318,7 @@ int main(void)
                 position_feedback_config.sensor_type = CONTELEC_SENSOR;
 
                 position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
-                position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
+                position_feedback_config.contelec_config.polarity = SENSOR_POLARITY;
                 position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
                 position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
                 position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;

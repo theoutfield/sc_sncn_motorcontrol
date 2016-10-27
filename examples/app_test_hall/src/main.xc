@@ -63,6 +63,7 @@ int main(void)
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = HALL_SENSOR;
                 position_feedback_config.hall_config.pole_pairs = 5;
+                position_feedback_config.contelec_config.polarity = 1;
                 position_feedback_config.hall_config.enable_push_service = PushAll;
 
                 position_feedback_service(hall_ports, null, null,
