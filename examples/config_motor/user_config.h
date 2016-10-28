@@ -122,7 +122,7 @@
 #define VDC             48
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     66
+#define COMMUTATION_LOOP_PERIOD     82
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CLK      650
