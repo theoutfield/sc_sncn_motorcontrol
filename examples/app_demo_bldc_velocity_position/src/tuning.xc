@@ -171,6 +171,28 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 }
                 break;
 
+        //enable and disable torque controller
+        case 't':
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.torque_cmd = value;
+                i_position_control.update_control_data(downstream_control_data);
+                printf("torque command %d milli-Nm\n", downstream_control_data.torque_cmd);
+                break;
+
+        //reverse torque
+        case 'r':
+                downstream_control_data.torque_cmd = -downstream_control_data.torque_cmd;
+//                if(velocity_running)
+//                {
+//                    velocity = -velocity;
+//                    downstream_control_data.offset_torque = 0;
+//                    downstream_control_data.velocity_cmd = velocity;
+//                    i_position_control.update_control_data(downstream_control_data);
+//                }
+                i_position_control.update_control_data(downstream_control_data);
+                printf("torque command %d milli-Nm\n", downstream_control_data.torque_cmd);
+                break;
+
         //pid coefficients
         case 'k':
                 pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
@@ -385,53 +407,6 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 }
                 break;
 
-        //enable and disable torque controller
-        case 't':
-                if (torque_control_flag == 0)
-                {
-                    torque_control_flag = 1;
-                    i_motorcontrol.set_torque_control_enabled();
-                    printf("Torque control activated\n");
-                }
-                else
-                {
-                    torque_control_flag = 0;
-                    i_motorcontrol.set_torque_control_disabled();
-                    printf("Torque control deactivated\n");
-                }
-                break;
-
-        //play sound!
-        case 's':
-                for(period_us=400;period_us<=(1*1000);(period_us+=400))
-                {
-                    if(period_us<3000) period_us-=300;
-
-                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
-                    {
-                        i_motorcontrol.set_torque(value);
-                        delay_microseconds(period_us);
-                        i_motorcontrol.set_torque(-value);
-                        delay_microseconds(period_us);
-                    }
-                }
-                i_motorcontrol.set_torque(0);
-                break;
-
-        //reverse torque or velocity
-        case 'r':
-                torque = -torque;
-                if(velocity_running)
-                {
-                    velocity = -velocity;
-                    downstream_control_data.offset_torque = 0;
-                    downstream_control_data.velocity_cmd = velocity;
-                    i_position_control.update_control_data(downstream_control_data);
-                }
-                i_motorcontrol.set_torque(torque);
-                printf("Torque %d [milli-Nm]\n", torque);
-                break;
-
         //common_gain
         case 'g':
                 pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
@@ -448,22 +423,10 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 printf("pid_gain:%d\n", pos_velocity_ctrl_config.pid_gain);
                 break;
 
-        //set torque / set velocity to zero
+        //disable controllers
         default:
-                if(velocity_running)
-                {
-                    velocity = 0;
-                    velocity_running = 0;
-                    downstream_control_data.offset_torque = 0;
-                    downstream_control_data.velocity_cmd = velocity;
-                    i_position_control.update_control_data(downstream_control_data);
-                }
-                else
-                {
-                    torque = value;
-                    i_motorcontrol.set_torque(torque);
-                    printf("torque %d [milli-Nm]\n", torque);
-                }
+                i_position_control.disable();
+                printf("controller disabled\n");
                 break;
 
         }

@@ -37,7 +37,7 @@ interface PositionVelocityCtrlInterface{
     void set_j(int j);
 
     void enable_torque_ctrl();
-//    void set_torque(int in_target_torque);
+    void set_torque(int in_target_torque);
 //    void set_torque_limits(int torque_min_limit, int torque_max_limit);
 
 
