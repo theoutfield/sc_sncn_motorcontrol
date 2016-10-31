@@ -3,7 +3,6 @@
 #include <IFM_BOARD_REQUIRED>
 
 
-
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
@@ -56,7 +55,6 @@ int main(void) {
             pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
             pos_velocity_ctrl_config.max_speed =                            MAX_SPEED;
             pos_velocity_ctrl_config.max_torque =                           TORQUE_CONTROL_LIMIT;
-            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
 
             pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
             pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
@@ -68,6 +66,7 @@ int main(void) {
             pos_velocity_ctrl_config.I_pos =                                POSITION_Ki;
             pos_velocity_ctrl_config.D_pos =                                POSITION_Kd;
             pos_velocity_ctrl_config.integral_limit_pos =                   POSITION_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
 
             pos_velocity_ctrl_config.P_velocity =                           VELOCITY_Kp;
             pos_velocity_ctrl_config.I_velocity =                           VELOCITY_Ki;
@@ -76,6 +75,9 @@ int main(void) {
 
             pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
             pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
+            pos_velocity_ctrl_config.resolution  =                          POSITION_SENSOR_RESOLUTION;
+            pos_velocity_ctrl_config.pid_gain =                             PID_GAIN;
+
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
         }

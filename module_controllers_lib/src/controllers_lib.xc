@@ -93,18 +93,14 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
 {
     //************************************
     // reset position controller structure
-    nl_pos_ctrl.j = 0.00; // in micro-kgm2
     nl_pos_ctrl.k_fb = 0.00;
     nl_pos_ctrl.k_m = 0.00;
+    nl_pos_ctrl.j = 0.00;
     nl_pos_ctrl.ts_position = 0.00;
 
     nl_pos_ctrl.kp =  0.00;
     nl_pos_ctrl.ki =  0.00;
     nl_pos_ctrl.kd =  0.00;
-
-    nl_pos_ctrl.gain_p =  1000.00;
-    nl_pos_ctrl.gain_i =  1000.00;
-    nl_pos_ctrl.gain_d =  1000.00;
 
     nl_pos_ctrl.feedback_p_loop=0.00;
     nl_pos_ctrl.feedback_d_loop=0.00;
@@ -132,38 +128,32 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
     //************************************************
     // set parameters of position controller structure
     nl_pos_ctrl.w_max= (((double)(pos_velocity_ctrl_config.max_speed))*2.00*3.1415)/60;
-    nl_pos_ctrl.k_fb = ( (double)(10429000))/1000.00;
+    nl_pos_ctrl.resolution = ((double)(pos_velocity_ctrl_config.resolution));
+    nl_pos_ctrl.k_fb = (nl_pos_ctrl.resolution)/(2.00*3.1416);
     nl_pos_ctrl.k_m  = ( (double)(1) )/1000.00;
-
-    //calculated non-liniear values (VER_1 SIMULATIONS)
-    nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos))/100.00;
-    nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos))/100.00;
-    nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos))/100.00;
-
+    nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.j));
     nl_pos_ctrl.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
-    nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.j)); //s
+    //PID parameters are pre-multiplied by 100 (by user)
+    nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos));
+    nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos));
+    nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos));
 
-    nl_pos_ctrl.kp *= nl_pos_ctrl.j;
-    nl_pos_ctrl.ki *= nl_pos_ctrl.j;
-    nl_pos_ctrl.kd *= nl_pos_ctrl.j;
-    nl_pos_ctrl.kp /=1000000.00;
-    nl_pos_ctrl.ki /=1000000.00;
-    nl_pos_ctrl.kd /=1000000.00;
+    nl_pos_ctrl.constant_gain = 2/nl_pos_ctrl.ts_position;
+    nl_pos_ctrl.constant_gain/= nl_pos_ctrl.ts_position;
+    nl_pos_ctrl.constant_gain/=(nl_pos_ctrl.k_fb * nl_pos_ctrl.k_m);
 
-    nl_pos_ctrl.gain_p = ((double)(1000));
-    nl_pos_ctrl.gain_i = ((double)(1000));
-    nl_pos_ctrl.gain_d = ((double)(1000));
+    nl_pos_ctrl.pid_gain = ((double)(pos_velocity_ctrl_config.pid_gain))/1000.00;
+    nl_pos_ctrl.kp *= nl_pos_ctrl.pid_gain;
+    nl_pos_ctrl.ki *= nl_pos_ctrl.pid_gain;
+    nl_pos_ctrl.kd *= nl_pos_ctrl.pid_gain;
+    nl_pos_ctrl.kp /=100000.00;
+    nl_pos_ctrl.ki /=100000.00;
+    nl_pos_ctrl.kd /=100000.00;
 
-    nl_pos_ctrl.kp *= (nl_pos_ctrl.gain_p);
-    nl_pos_ctrl.kp /= 1000.00;
-    nl_pos_ctrl.ki *= (nl_pos_ctrl.gain_i);
-    nl_pos_ctrl.ki /= 1000.00;
-    nl_pos_ctrl.kd *= (nl_pos_ctrl.gain_d);
-    nl_pos_ctrl.kd /= 1000.00;
+    nl_pos_ctrl.calculated_j = (nl_pos_ctrl.kd*10000000)/(nl_pos_ctrl.constant_gain*0.216);
 
     nl_pos_ctrl.t_max=((double)(pos_velocity_ctrl_config.max_torque));
-
 }
 
 
@@ -179,7 +169,6 @@ int update_nl_position_control(
         double position_sens_k_1_,
         double position_sens_k_)
 {
-
     nl_pos_ctrl.gained_error = position_ref_k_ - position_sens_k_;
 
     nl_pos_ctrl.feedback_p_loop  = nl_pos_ctrl.kp * (position_sens_k_ - position_sens_k_1_);
@@ -206,7 +195,7 @@ int update_nl_position_control(
 
     nl_pos_ctrl.state_1 = nl_pos_ctrl.abs_y_k;
 
-    nl_pos_ctrl.dynamic_max_speed  = (2.00*nl_pos_ctrl.t_max)/1000;
+    nl_pos_ctrl.dynamic_max_speed  = (2.00*nl_pos_ctrl.t_max)/1000;//t_max is considered as milli-Nm
 
     if(nl_pos_ctrl.gained_error>0)
         nl_pos_ctrl.dynamic_max_speed *=   nl_pos_ctrl.gained_error;
@@ -216,8 +205,14 @@ int update_nl_position_control(
         nl_pos_ctrl.dynamic_max_speed  = 0;
 
     nl_pos_ctrl.dynamic_max_speed /= nl_pos_ctrl.k_fb;
-    nl_pos_ctrl.dynamic_max_speed *= 1000.00;
-    nl_pos_ctrl.dynamic_max_speed /= (nl_pos_ctrl.j/1000.00);
+
+    if(nl_pos_ctrl.j>=1)
+    {
+        //moment of inertia in gram square centimeter
+        nl_pos_ctrl.dynamic_max_speed *= 10000.00;
+        nl_pos_ctrl.dynamic_max_speed /= (nl_pos_ctrl.j/1000.00);
+    }
+
     nl_pos_ctrl.dynamic_max_speed  = sqrt(nl_pos_ctrl.dynamic_max_speed);
 
     nl_pos_ctrl.state_2 = nl_pos_ctrl.dynamic_max_speed;
@@ -225,7 +220,7 @@ int update_nl_position_control(
     nl_pos_ctrl.state_2*= nl_pos_ctrl.kd;
     nl_pos_ctrl.state_2*= nl_pos_ctrl.ts_position;
     nl_pos_ctrl.state_2*= nl_pos_ctrl.k_fb;
-
+    //FIXME: the effect of transient ref_torque is not considered in state_2
     nl_pos_ctrl.state_2*=0.9;
 
     nl_pos_ctrl.state_3 = nl_pos_ctrl.w_max;
@@ -234,21 +229,23 @@ int update_nl_position_control(
     nl_pos_ctrl.state_3*= nl_pos_ctrl.k_fb;
 
 
-    if(nl_pos_ctrl.state_1<nl_pos_ctrl.state_2)
+    //consider state_2 only if it is possible to measure moment of inertia.
+    //otherwise, only consider state_1 and state_3
+    if(nl_pos_ctrl.state_1<nl_pos_ctrl.state_3)
     {
         nl_pos_ctrl.state_min = nl_pos_ctrl.state_1;
         nl_pos_ctrl.state_index=1000;
     }
     else
     {
-        nl_pos_ctrl.state_min = nl_pos_ctrl.state_2;
-        nl_pos_ctrl.state_index=2000;
-    }
-
-    if(nl_pos_ctrl.state_3<nl_pos_ctrl.state_min)
-    {
         nl_pos_ctrl.state_min = nl_pos_ctrl.state_3;
         nl_pos_ctrl.state_index=3000;
+    }
+
+    if((nl_pos_ctrl.state_2<nl_pos_ctrl.state_min)&&(nl_pos_ctrl.j>=1))
+    {
+        nl_pos_ctrl.state_min = nl_pos_ctrl.state_2;
+        nl_pos_ctrl.state_index=2000;
     }
 
     nl_pos_ctrl.y_k = nl_pos_ctrl.state_min * nl_pos_ctrl.y_k_sign;
@@ -264,7 +261,6 @@ int update_nl_position_control(
 
     if(nl_pos_ctrl.torque_ref_k < -nl_pos_ctrl.t_max)
         nl_pos_ctrl.torque_ref_k =-nl_pos_ctrl.t_max;
-
 
     return ((int) (nl_pos_ctrl.torque_ref_k));
 

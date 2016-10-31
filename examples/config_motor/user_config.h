@@ -8,16 +8,19 @@
 
 #include <refclk.h>
 
-#include <motor_config.h>
+#include <motor_config_AMK_DT3.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   BISS_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
 
-// SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR, AMS_SENSOR, CONTELEC_SENSOR]
+// POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
+#define POSITION_SENSOR_RESOLUTION 65530
+
+// SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
 #define MOTOR_FEEDBACK_SENSOR      MOTOR_COMMUTATION_SENSOR
 
 // TYPE OF INCREMENTAL ENCODER (if applicable) [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
@@ -82,10 +85,10 @@
 #define VDC             48
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     66
+#define COMMUTATION_LOOP_PERIOD     82
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1120
+#define COMMUTATION_OFFSET_CLK      650
 
 // MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
 #define HALL_STATE_1_ANGLE     0
@@ -151,13 +154,17 @@
 #define POSITION_Kd                             0
 */
 
-//PID parameters of non-linear position controller
-#define POSITION_Kp                             989500
-#define POSITION_Ki                             100100
-#define POSITION_Kd                             4142100
+
+//PID parameters of non-linear position controller. In case non-linear position controller is selected, these three
+//constants "POSITION_Kp", "POSITION_Ki" and "POSITION_Kd" should be between 0 and 10^8. Inside the controller, these
+//constants will be divided by 10^6. In other words, the precision in this mode will be 6 floating point digits.
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 
 #define POSITION_INTEGRAL_LIMIT                 400000
-#define MOMENT_OF_INERTIA                       10      // [micro-kgm2]
+#define MOMENT_OF_INERTIA                       0           //set this variable only if it is known in [gram square centimiter]
+                                                            //otherwise set as 0
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
@@ -169,6 +176,9 @@
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
+
+#define PID_GAIN                1000     //common gain multiplied in 3 pid constants at the same time.
+                                         //default value is 1000 (which makes it ineffective)
 
 //Number of ticks in a microsecond/frequency for IFM Tile
 #define IFM_TILE_USEC   USEC_STD//USEC_FAST//

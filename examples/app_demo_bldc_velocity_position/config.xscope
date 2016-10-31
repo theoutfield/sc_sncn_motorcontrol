@@ -20,20 +20,16 @@
 
 	<Probe name="POSITION REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="POSITION CMD" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="POSITION TEMP1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="POSITION CMD" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="POSITION TEMP1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="POSITION TEMP2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="VELOCITY REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="VELOCITY REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="VELOCITY CMD" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="VELOCITY TEMP1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="VELOCITY CMD" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="VELOCITY TEMP1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="VELOCITY TEMP2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="VELOCITY FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
-	<Probe name="POSITION_REF_SP3" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="POSITION_REAL_SP3" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	
-	
 </xSCOPEconfig>
