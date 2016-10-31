@@ -8,14 +8,14 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT3.h>
+#include <motor_config_unknown_black_motor.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
 #define POSITION_SENSOR_RESOLUTION 65530
@@ -88,9 +88,10 @@
 #define COMMUTATION_LOOP_PERIOD     82
 
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      650
+#define COMMUTATION_OFFSET_CLK      2621
 
-// MOTOR ANGLE IN EACH HALL STATE (should be configured in case HALL sensor is used)
+// (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
+// FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
 #define HALL_STATE_1_ANGLE     0
 #define HALL_STATE_2_ANGLE     0
 #define HALL_STATE_3_ANGLE     0
@@ -115,7 +116,7 @@
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 80
+#define PERCENT_OFFSET_TORQUE 40
 
 
 /////////////////////////////////////////////////

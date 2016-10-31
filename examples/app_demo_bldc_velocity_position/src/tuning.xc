@@ -37,6 +37,10 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
     DownstreamControlData downstream_control_data;
     PosVelocityControlConfig pos_velocity_ctrl_config;
 
+    MotorcontrolConfig motorcontrol_config;
+    int proper_sensor_polarity=0;
+    int offset=0;
+
     int velocity_running = 0;
     int velocity = 0;
 
@@ -373,7 +377,43 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
 
         //auto offset tuning
         case 'a':
-                auto_offset(i_motorcontrol);
+                printf("Sending offset_detection command ...\n");
+                i_motorcontrol.set_offset_detection_enabled();
+
+                while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
+
+
+                proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+
+                if(proper_sensor_polarity == 1)
+                {
+                    printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+
+                    offset=i_motorcontrol.set_calib(0);
+                    printf("Detected offset is: %i\n", offset);
+
+                    printf("set offset to %d\n", offset);
+                    i_motorcontrol.set_offset_value(offset);
+
+                    motorcontrol_config = i_motorcontrol.get_config();
+                    if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                    {
+                        printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
+                        printf("      hall_state_1_angle: %d\n", motorcontrol_config.hall_state_1);
+                        printf("      hall_state_2_angle: %d\n", motorcontrol_config.hall_state_2);
+                        printf("      hall_state_3_angle: %d\n", motorcontrol_config.hall_state_3);
+                        printf("      hall_state_4_angle: %d\n", motorcontrol_config.hall_state_4);
+                        printf("      hall_state_5_angle: %d\n", motorcontrol_config.hall_state_5);
+                        printf("      hall_state_6_angle: %d\n", motorcontrol_config.hall_state_6);
+                    }
+
+                    delay_milliseconds(2000);
+                    i_motorcontrol.set_torque_control_enabled();
+                }
+                else
+                {
+                    printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                }
                 break;
 
         //set brake
