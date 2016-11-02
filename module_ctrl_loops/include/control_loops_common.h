@@ -66,6 +66,7 @@ typedef struct {
     int resolution;
     int k_m;  //gain of torque actuator
     int j;
+    int polarity; //polarity of the movement [-1/1]
 
 } PosVelocityControlConfig;
 

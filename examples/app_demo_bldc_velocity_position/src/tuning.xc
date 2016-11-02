@@ -265,9 +265,20 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 {
                 //max position limit
                 case 'p':
+                    switch(mode_3)
+                    {
+                    case 'u':
+                        pos_velocity_ctrl_config.max_pos = value;
+                        break;
+                    case 'l':
+                        pos_velocity_ctrl_config.min_pos = value;
+                        break;
+                    default:
                         pos_velocity_ctrl_config.max_pos = value;
                         pos_velocity_ctrl_config.min_pos = -value;
                         break;
+                    }
+                    break;
 
                 //max velocity limit
                 case 'v':
@@ -283,9 +294,25 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                         break;
                 }
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("pos_max:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.max_speed,
+                printf("pos_max:%d pos_min:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.min_pos, pos_velocity_ctrl_config.max_speed,
                         pos_velocity_ctrl_config.max_torque);
                 break;
+
+        //change direction/polarity of the movement in position/velocity control
+        case 'd':
+            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+            if (pos_velocity_ctrl_config.polarity == -1)
+            {
+                pos_velocity_ctrl_config.polarity = 1;
+                printf("normal movement polarity\n");
+            }
+            else
+            {
+                pos_velocity_ctrl_config.polarity = -1;
+                printf("inverted movement polarity\n");
+            }
+            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+            break;
 
         //enable
         case 'e':
