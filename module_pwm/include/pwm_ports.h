@@ -26,3 +26,26 @@ typedef struct{
     in port ?dummy_port; /**< Any unused port. Used internally for accurate timming */
 } PwmPorts;
 
+/**
+ * @brief Structure type for PWM ports.
+ */
+typedef struct{
+    buffered out port:32 ?p_pwm_a;
+    buffered out port:32 ?p_pwm_inv_a;
+    buffered out port:32 ?p_pwm_b;
+    buffered out port:32 ?p_pwm_inv_b;
+    buffered out port:32 ?p_pwm_c;
+    buffered out port:32 ?p_pwm_inv_c;
+
+    buffered out port:32 ?p_pwm_u;
+    buffered out port:32 ?p_pwm_inv_u;
+    buffered out port:32 ?p_pwm_v;
+    buffered out port:32 ?p_pwm_inv_v;
+    buffered out port:32 ?p_pwm_w;
+    buffered out port:32 ?p_pwm_inv_w;
+
+    clock clk; /**< Hardware clock used as time reference */
+
+    in port ?dummy_port; /**< Any unused port. Used internally for accurate timming */
+} PwmPortsGeneral;
+

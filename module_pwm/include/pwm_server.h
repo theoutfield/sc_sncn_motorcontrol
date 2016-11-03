@@ -46,8 +46,13 @@ typedef struct PWM_SERV_TAG
 } PWM_SERV_TYP;
 
 void predriver(FetDriverPorts &fet_driver_ports);
+
 void pwm_config(PwmPorts &ports);
+void pwm_config_general(PwmPortsGeneral &ports);
+
 void pwm_check(PwmPorts &ports);
+void pwm_check_general(PwmPortsGeneral &ports);
+
 void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, PWM server, with ADC synchronization
         unsigned motor_id, // Motor identifier
         PwmPorts &ports,
@@ -56,6 +61,15 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         int duty_maintain_brake,
         int time_start_brake,
         int ifm_tile_usec
+);
+void pwm_service_general(
+        PwmPortsGeneral &ports,
+        server interface update_pwm_general i_update_pwm,
+        int duty_start_brake,
+        int duty_maintain_brake,
+        int time_start_brake,
+        int ifm_tile_usec,
+        int commutation_frq
 );
 
 
