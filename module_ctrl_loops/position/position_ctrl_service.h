@@ -55,6 +55,30 @@ interface PositionVelocityCtrlInterface{
      */
     void set_position_velocity_control_config(PosVelocityControlConfig in_config);
 
+    /**
+     * @brief Setter for new configuration in the Motorcontrol Service.
+     *
+     * @param in_config New Service configuration.
+     */
+    void set_motorcontrol_config(MotorcontrolConfig in_config);
+
+    /**
+     * @brief Getter for current configuration used by the Motorcontrol Service.
+     *
+     * @return Current Service configuration.
+     */
+    MotorcontrolConfig get_motorcontrol_config();
+
+    /**
+     * @brief Sets brake status to ON (no movement) or OFF (possible to move)
+     */
+    void set_brake_status(int brake_status);
+
+    /**
+     * @brief Enables the offset detection process
+     */
+    MotorcontrolConfig set_offset_detection_enabled();
+
     int get_position();
 
     int get_velocity();

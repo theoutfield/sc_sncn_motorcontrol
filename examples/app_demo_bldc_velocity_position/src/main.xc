@@ -42,7 +42,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: demo_torque_position_velocity_control(i_motorcontrol[1], i_position_control[0]);
+        on tile[APP_TILE]: demo_torque_position_velocity_control(i_position_control[0]);
 
         on tile[APP_TILE_2]:
         /* Position Control Loop */

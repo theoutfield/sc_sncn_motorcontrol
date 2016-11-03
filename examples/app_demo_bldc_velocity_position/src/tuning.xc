@@ -28,8 +28,7 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
 }
 
 
-void demo_torque_position_velocity_control(interface MotorcontrolInterface client i_motorcontrol,
-        interface PositionVelocityCtrlInterface client ?i_position_control)
+void demo_torque_position_velocity_control(client interface PositionVelocityCtrlInterface i_position_control)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
@@ -405,24 +404,19 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
         //auto offset tuning
         case 'a':
                 printf("Sending offset_detection command ...\n");
-                i_motorcontrol.set_offset_detection_enabled();
 
-                while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
+                motorcontrol_config = i_position_control.set_offset_detection_enabled();
 
-
-                proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
-
-                if(proper_sensor_polarity == 1)
+                if(motorcontrol_config.commutation_angle_offset == -1)
+                {
+                    printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                }
+                else
                 {
                     printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
 
-                    offset=i_motorcontrol.set_calib(0);
-                    printf("Detected offset is: %i\n", offset);
+                    printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
 
-                    printf("set offset to %d\n", offset);
-                    i_motorcontrol.set_offset_value(offset);
-
-                    motorcontrol_config = i_motorcontrol.get_config();
                     if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
                     {
                         printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
@@ -433,13 +427,6 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                         printf("      hall_state_5_angle: %d\n", motorcontrol_config.hall_state_5);
                         printf("      hall_state_6_angle: %d\n", motorcontrol_config.hall_state_6);
                     }
-
-                    delay_milliseconds(2000);
-                    i_motorcontrol.set_torque_control_enabled();
-                }
-                else
-                {
-                    printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
                 }
                 break;
 
@@ -470,23 +457,25 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                     brake_flag = 1;
                     printf("Brake released\n");
                 }
-                i_motorcontrol.set_brake_status(brake_flag);
+                i_position_control.set_brake_status(brake_flag);
                 break;
             }
             break;
 
         //set offset
         case 'o':
+                motorcontrol_config = i_position_control.get_motorcontrol_config();
                 switch(mode_2)
                 {
                 //set offset
                 case 's':
-                    i_motorcontrol.set_offset_value(value);
-                    printf("set offset to %d\n", value);
+                    motorcontrol_config.commutation_angle_offset = value;
+                    i_position_control.set_motorcontrol_config(motorcontrol_config);
+                    printf("set offset to %d\n", motorcontrol_config.commutation_angle_offset);
                     break;
-                    //print offset
+                //print offset
                 case 'p':
-                    printf("offset %d\n", i_motorcontrol.set_calib(0));
+                    printf("offset %d\n", motorcontrol_config.commutation_angle_offset);
                     break;
                 }
                 break;

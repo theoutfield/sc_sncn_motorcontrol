@@ -637,6 +637,38 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 ////                out_activate = position_enable_flag;
 //                break;
 
+            case i_position_control[int i].get_motorcontrol_config() -> MotorcontrolConfig out_motorcontrol_config:
+                out_motorcontrol_config = i_motorcontrol.get_config();
+                break;
+
+            case i_position_control[int i].set_motorcontrol_config(MotorcontrolConfig in_motorcontrol_config):
+                i_motorcontrol.set_config(in_motorcontrol_config);
+                break;
+
+            case i_position_control[int i].set_brake_status(int in_brake_status):
+                i_motorcontrol.set_brake_status(in_brake_status);
+                break;
+
+            case i_position_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
+                //offset detection
+                out_motorcontrol_config = i_motorcontrol.get_config();
+                out_motorcontrol_config.commutation_angle_offset = -1;
+                i_motorcontrol.set_offset_detection_enabled();
+                while(out_motorcontrol_config.commutation_angle_offset == -1)
+                {
+                    out_motorcontrol_config.commutation_angle_offset = i_motorcontrol.set_calib(0);
+                    delay_milliseconds(50);//wait until offset is detected
+                }
+
+                //check polarity state
+                if(i_motorcontrol.get_sensor_polarity_state() != 1)
+                {
+                    out_motorcontrol_config.commutation_angle_offset = -1;
+                }
+                //write offset in config
+                i_motorcontrol.set_config(out_motorcontrol_config);
+                break;
+
 
         }
     }
