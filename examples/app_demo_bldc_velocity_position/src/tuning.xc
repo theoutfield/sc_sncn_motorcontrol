@@ -445,6 +445,21 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
 
         //set brake
         case 'b':
+            switch(mode_2)
+            {
+            case 's':
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                if (pos_velocity_ctrl_config.special_brake_release == 1)
+                {
+                    pos_velocity_ctrl_config.special_brake_release = 0;
+                }
+                else
+                {
+                    pos_velocity_ctrl_config.special_brake_release = 1;
+                }
+                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                break;
+            default:
                 if (brake_flag)
                 {
                     brake_flag = 0;
@@ -457,6 +472,8 @@ void demo_torque_position_velocity_control(interface MotorcontrolInterface clien
                 }
                 i_motorcontrol.set_brake_status(brake_flag);
                 break;
+            }
+            break;
 
         //set offset
         case 'o':

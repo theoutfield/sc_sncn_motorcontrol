@@ -40,6 +40,34 @@
 //    }
 //}
 
+int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration)
+{
+    int target_position;
+    if (counter < (duration/2)) //first half we try to move to one direction
+    {
+        target_position = start_position+range;
+    }
+    else if (counter == (duration/2)) //at half we check if we moved
+    {
+        if ( (actual_position-start_position) > (range/2)) //we moved more than half the range so the brake should be released
+        {
+            target_position = start_position; //restore start positon
+            counter = duration+1; //stop counter
+        }
+    }
+    else if (counter < duration) //second half we try to move to the other direction
+    {
+        target_position = start_position-range;
+    }
+    else if (counter == duration) //end: restore start positon
+    {
+        target_position = start_position; //restore start positon
+    }
+    counter++;
+
+    return target_position;
+}
+
 
 void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ctrl_config,
                               interface MotorcontrolInterface client i_motorcontrol,
@@ -115,6 +143,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     float acceleration_monitor = 0;
     int enable_profiler = 1;
 
+    //special_brake_release
+    const int special_brake_release_range = 1500;
+    const int special_brake_release_duration = 1000;
+    int special_brake_release_counter = special_brake_release_duration+1;
+
     timer t;
     unsigned int ts;
 
@@ -182,7 +215,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                  */
 
 
-                if (enable_profiler)
+                if (special_brake_release_counter <= special_brake_release_duration) //change target position if we are in special brake release
+                {
+                    position_ref_input_k = special_brake_release(special_brake_release_counter, initial_position_, upstream_control_data.position, special_brake_release_range, special_brake_release_duration);
+                    position_ref_in_k = (float) position_ref_input_k;
+                }
+                else if (enable_profiler)
                 {
                     position_ref_in_k = pos_profiler(((float) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
                     acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(pos_velocity_ctrl_config.control_loop_period * pos_velocity_ctrl_config.control_loop_period);
@@ -190,7 +228,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     position_ref_in_k_1n = position_ref_in_k;
                 }
                 else
+                {
                     position_ref_in_k = (float) position_ref_input_k;
+                }
 
                 position_ref_k = position_ref_in_k / 512;
 
@@ -400,6 +440,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 initial_position_ = upstream_control_data.position;
                 ////////////////////////////////
 
+                //special brake release
+                if (pos_velocity_ctrl_config.special_brake_release == 1)
+                {
+                    special_brake_release_counter = 0;
+                }
 
                 position_ref_input_k = upstream_control_data.position;
                 position_ref_in_k = (float) position_ref_input_k;

@@ -67,6 +67,7 @@ typedef struct {
     int k_m;  //gain of torque actuator
     int j;
     int polarity; //polarity of the movement [-1/1]
+    int special_brake_release;
 
 } PosVelocityControlConfig;
 
