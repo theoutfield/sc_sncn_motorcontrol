@@ -154,6 +154,8 @@
 #define POSITION_Kp                             30000
 #define POSITION_Ki                             10
 #define POSITION_Kd                             0
+#define POSITION_INTEGRAL_LIMIT                 400000 //in case of using non-linear position control,
+                                                       //set "POSITION_INTEGRAL_LIMIT" to 1000
 */
 
 
@@ -163,8 +165,9 @@
 #define POSITION_Kp                             0
 #define POSITION_Ki                             0
 #define POSITION_Kd                             0
+#define POSITION_INTEGRAL_LIMIT                 1000 //in case of using non-linear position control,
+                                                     //set "POSITION_INTEGRAL_LIMIT" to 1000
 
-#define POSITION_INTEGRAL_LIMIT                 400000
 #define MOMENT_OF_INERTIA                       0           //set this variable only if it is known in [gram square centimiter]
                                                             //otherwise set as 0
 
