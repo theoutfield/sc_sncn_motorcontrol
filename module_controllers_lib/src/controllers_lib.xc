@@ -143,10 +143,10 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
     nl_pos_ctrl.constant_gain/= nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/=(nl_pos_ctrl.k_fb * nl_pos_ctrl.k_m);
 
-    nl_pos_ctrl.pid_gain = ((double)(pos_velocity_ctrl_config.pid_gain))/1000.00;
-    nl_pos_ctrl.kp *= nl_pos_ctrl.pid_gain;
-    nl_pos_ctrl.ki *= nl_pos_ctrl.pid_gain;
-    nl_pos_ctrl.kd *= nl_pos_ctrl.pid_gain;
+    nl_pos_ctrl.integral_limit_pos = ((double)(pos_velocity_ctrl_config.integral_limit_pos))/1000.00;
+    nl_pos_ctrl.kp *= nl_pos_ctrl.integral_limit_pos;
+    nl_pos_ctrl.ki *= nl_pos_ctrl.integral_limit_pos;
+    nl_pos_ctrl.kd *= nl_pos_ctrl.integral_limit_pos;
     nl_pos_ctrl.kp /=100000.00;
     nl_pos_ctrl.ki /=100000.00;
     nl_pos_ctrl.kd /=100000.00;

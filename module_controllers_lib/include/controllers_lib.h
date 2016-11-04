@@ -29,6 +29,7 @@ typedef struct {
     double kp;
     double ki;
     double kd;
+    double integral_limit_pos;
     double pid_gain;
 
     double k_fb;         // position feedback gain

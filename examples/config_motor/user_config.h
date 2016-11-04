@@ -88,8 +88,8 @@
 #define COMMUTATION_LOOP_PERIOD     82
 #define COMMUTATION_FRQ             24
 
-// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      598
+//// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
+//#define COMMUTATION_OFFSET_CLK      0
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -141,7 +141,6 @@
 //Limits
 #define MIN_POSITION_LIMIT                     -0x7fffffff
 #define MAX_POSITION_LIMIT                      0x7fffffff
-#define MAX_SPEED                               3000 //rpm
 #define TORQUE_CONTROL_LIMIT                    MAXIMUM_TORQUE
 
 //Integrated Profiler
@@ -162,14 +161,38 @@
 //PID parameters of non-linear position controller. In case non-linear position controller is selected, these three
 //constants "POSITION_Kp", "POSITION_Ki" and "POSITION_Kd" should be between 0 and 10^8. Inside the controller, these
 //constants will be divided by 10^6. In other words, the precision in this mode will be 6 floating point digits.
+
+/*
+//-----  default values  -----
 #define POSITION_Kp                             0
 #define POSITION_Ki                             0
 #define POSITION_Kd                             0
+
+#define MAX_SPEED                               0    // prefered value 3000, maximum value 5000 [rpm]
+
 #define POSITION_INTEGRAL_LIMIT                 1000 //in case of using non-linear position control,
                                                      //set "POSITION_INTEGRAL_LIMIT" to 1000
 
-#define MOMENT_OF_INERTIA                       0           //set this variable only if it is known in [gram square centimiter]
-                                                            //otherwise set as 0
+#define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
+                                                     //otherwise set as 0
+*/
+
+//-----  axis 4 of the robot (project FS)
+#define POSITION_Kp                             76000
+#define POSITION_Ki                             7700
+#define POSITION_Kd                             320000
+
+#define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
+
+#define POSITION_INTEGRAL_LIMIT                 1000 //in case of using non-linear position control,
+                                                     //set "POSITION_INTEGRAL_LIMIT" to 1000
+
+#define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
+                                                     //otherwise set as 0
+// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
+#define COMMUTATION_OFFSET_CLK      600
+
+
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
