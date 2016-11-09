@@ -145,7 +145,6 @@ int main(void)
         on tile[APP_TILE]:
         /* Position Control Loop */
         {
-
             PosVelocityControlConfig pos_velocity_ctrl_config;
             /* Control Loop */
             pos_velocity_ctrl_config.control_loop_period =                  CONTROL_LOOP_PERIOD; //us
@@ -166,6 +165,7 @@ int main(void)
             pos_velocity_ctrl_config.I_pos =                                POSITION_Ki;
             pos_velocity_ctrl_config.D_pos =                                POSITION_Kd;
             pos_velocity_ctrl_config.integral_limit_pos =                   POSITION_INTEGRAL_LIMIT;
+            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
 
             pos_velocity_ctrl_config.P_velocity =                           VELOCITY_Kp;
             pos_velocity_ctrl_config.I_velocity =                           VELOCITY_Ki;
@@ -174,8 +174,12 @@ int main(void)
 
             pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
             pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
+            pos_velocity_ctrl_config.resolution  =                          POSITION_SENSOR_RESOLUTION;
+            pos_velocity_ctrl_config.pid_gain =                             PID_GAIN;
+            pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
 
-            position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[1], i_position_control);
+
+            position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
         }
 
         /************************************************************

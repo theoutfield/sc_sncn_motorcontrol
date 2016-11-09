@@ -77,6 +77,7 @@
 #define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
 #define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
 #define PERIOD_START_BRAKE  1000   // period in which high voltage is applied for realising the brake [milli-seconds]
+#define ENABLE_SHAKE_BRAKE     0
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
