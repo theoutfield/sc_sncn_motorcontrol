@@ -40,32 +40,29 @@
 //    }
 //}
 
-int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration)
+int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque)
 {
-    int target_position;
-    if (counter < (duration/2)) //first half we try to move to one direction
+    int target;
+    if ( (actual_position-start_position) > range || (actual_position-start_position) < (-range)) //we moved more than half the range so the brake should be released
     {
-        target_position = start_position+range;
+        target = 0;
+        counter = duration+1; //stop counter
     }
-    else if (counter == (duration/2)) //at half we check if we moved
+    else if (counter < (duration/2)) //first half we try to move to one direction
     {
-        if ( (actual_position-start_position) > (range/2)) //we moved more than half the range so the brake should be released
-        {
-            target_position = start_position; //restore start positon
-            counter = duration+1; //stop counter
-        }
+        target = max_torque/2;
     }
     else if (counter < duration) //second half we try to move to the other direction
     {
-        target_position = start_position-range;
+        target = -max_torque/2;
     }
-    else if (counter == duration) //end: restore start positon
+    else if (counter == duration) //end:
     {
-        target_position = start_position; //restore start positon
+        target = 0; //stop
     }
     counter++;
 
-    return target_position;
+    return target;
 }
 
 
@@ -144,8 +141,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int enable_profiler = 1;
 
     //special_brake_release
-    const int special_brake_release_range = 1600;
-    const int special_brake_release_duration = 1000;
+    const int special_brake_release_range = 1000;
+    const int special_brake_release_duration = 200;
     int special_brake_release_counter = special_brake_release_duration+1;
 
     timer t;
@@ -215,12 +212,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                  */
 
 
-                if (special_brake_release_counter <= special_brake_release_duration) //change target position if we are in special brake release
-                {
-                    position_ref_input_k = special_brake_release(special_brake_release_counter, initial_position_, upstream_control_data.position, special_brake_release_range, special_brake_release_duration);
-                    position_ref_in_k = (float) position_ref_input_k;
-                }
-                else if (enable_profiler)
+
+                if (enable_profiler)
                 {
                     position_ref_in_k = pos_profiler(((float) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
                     acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(pos_velocity_ctrl_config.control_loop_period * pos_velocity_ctrl_config.control_loop_period);
@@ -315,6 +308,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     }
 
                     torque_ref_k += additive_torque_k;
+
+                    //brake release
+                    if (special_brake_release_counter <= special_brake_release_duration) //change target torque if we are in special brake release
+                    {
+                        torque_ref_k = special_brake_release(special_brake_release_counter, initial_position_, upstream_control_data.position, special_brake_release_range, special_brake_release_duration, pos_velocity_ctrl_config.max_torque);
+                    }
 
                     //torque limit check
                     if(torque_ref_k > pos_velocity_ctrl_config.max_torque)
