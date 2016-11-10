@@ -204,9 +204,9 @@
 
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             100
+#define VELOCITY_Kp                             0
 #define VELOCITY_Ki                             0
-#define VELOCITY_Kd                             60
+#define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 0
 
 

@@ -7,6 +7,7 @@
 #include <controllers_lib.h>
 #include <control_loops_common.h>
 #include <math.h>
+#include <xscope.h>
 
 
 
@@ -48,7 +49,7 @@ void pid_init(PIDparam &param)
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, PIDparam &param)
+void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDparam &param)
 {
     param.Kp = Kp;
     param.Ki = Ki;
@@ -65,15 +66,32 @@ void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int 
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-float pid_update(float desired_value, float actual_value, int T_s, PIDparam &param)
+double pid_update(double desired_value, double actual_value, int T_s, PIDparam &param)
 {
-    float error, cmd, integral_term;
+    double error, cmd, integral_term;
     error = desired_value - actual_value;
-    param.integral += error;
-    integral_term = param.Ki * param.integral;
-    if ((integral_term > param.integral_limit) || (integral_term < -param.integral_limit))
-        param.integral -= error;
-    cmd = ((param.Kp * error) + integral_term - (param.Kd * (actual_value - param.actual_value_1n)));
+
+    xscope_int(DESIRED_VALUE, (int)(desired_value));
+    xscope_int(ACTUAL_VALUE, (int)(actual_value));
+
+    param.integral += param.Ki * error;
+
+    xscope_int(PARAM_KI, ((int)(param.Ki)));
+    xscope_int(ERROR, ((int)(error)));
+    xscope_int(PARAM_INTEGRAL_1, (int)(param.integral));
+
+    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
+        param.integral -= (param.Ki * error);
+
+    xscope_int(PARAM_INTEGRAL_2, (int)(param.integral));
+
+    xscope_int(P_PART, (int)(param.Kp * error));
+    xscope_int(D_PART, (int)((param.Kd * (actual_value - param.actual_value_1n))));
+
+    cmd = ((param.Kp * error) + param.integral - (param.Kd * (actual_value - param.actual_value_1n)));
+
+    xscope_int(CMD, (int)(cmd));
+
     param.actual_value_1n = actual_value;
     return cmd;
 }
