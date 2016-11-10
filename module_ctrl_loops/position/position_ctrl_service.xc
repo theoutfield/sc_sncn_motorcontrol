@@ -127,6 +127,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     double velocity_k_2n = 0;
     double velocity_cmd_k = 0;
     int velocity_counter=0, velocity_integral=0, velocity_filtered=0;
+    int velocity_controller_counter=0;
 
 
     // torque
@@ -309,9 +310,18 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 //                            velocity_counter=0;
 //                            velocity_integral=0;
 //                        }
-                        velocity_cmd_k = pid_update(velocity_ref_k, velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-                        torque_ref_k = velocity_cmd_k;
 
+//                        velocity_controller_counter++;
+//                        velocity_integral+=velocity_sens_k;
+//                        if(velocity_controller_counter==50)
+//                        {
+//                            velocity_filtered=velocity_integral/velocity_controller_counter;
+//                            velocity_integral=0;
+//                            velocity_controller_counter=0;
+
+                            velocity_cmd_k = pid_update(velocity_ref_k, velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+//                        }
+                        torque_ref_k = velocity_cmd_k;
 
 //                        }
 
