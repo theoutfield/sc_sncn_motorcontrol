@@ -8,14 +8,14 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT3.h>
+#include <motor_config_Maxon_251601.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
 #define POSITION_SENSOR_RESOLUTION 65530
@@ -94,12 +94,12 @@
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
-#define HALL_STATE_1_ANGLE     0
-#define HALL_STATE_2_ANGLE     0
-#define HALL_STATE_3_ANGLE     0
-#define HALL_STATE_4_ANGLE     0
-#define HALL_STATE_5_ANGLE     0
-#define HALL_STATE_6_ANGLE     0
+#define HALL_STATE_1_ANGLE     1754
+#define HALL_STATE_2_ANGLE     420
+#define HALL_STATE_3_ANGLE     1111
+#define HALL_STATE_4_ANGLE     3122
+#define HALL_STATE_5_ANGLE     2458
+#define HALL_STATE_6_ANGLE     3825
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
 #define MOTOR_POLARITY              NORMAL_POLARITY
@@ -191,7 +191,7 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      600
+#define COMMUTATION_OFFSET_CLK      3178
 
 
 
@@ -210,4 +210,4 @@
                                          //default value is 1000 (which makes it ineffective)
 
 //Number of ticks in a microsecond/frequency for IFM Tile
-#define IFM_TILE_USEC   USEC_STD//USEC_FAST//
+#define IFM_TILE_USEC   USEC_FAST//USEC_STD
