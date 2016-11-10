@@ -641,6 +641,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
 
             case i_position_control[int i].set_motorcontrol_config(MotorcontrolConfig in_motorcontrol_config):
+                motorctrl_enable_flag = 0;
+                torque_enable_flag = 0;
+                position_enable_flag = 0;
+                velocity_enable_flag = 0;
                 i_motorcontrol.set_config(in_motorcontrol_config);
                 break;
 
@@ -666,6 +670,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
                 //write offset in config
                 i_motorcontrol.set_config(out_motorcontrol_config);
+                motorctrl_enable_flag = 0;
+                torque_enable_flag = 0;
+                position_enable_flag = 0;
+                velocity_enable_flag = 0;
                 break;
 
 
