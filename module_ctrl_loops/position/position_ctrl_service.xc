@@ -20,26 +20,6 @@
 #include <stdio.h>
 
 
-
-//void init_position_velocity_control(interface PositionVelocityCtrlInterface client i_position_control)
-//{
-//    int ctrl_state;
-//
-//    while (1) {
-//        ctrl_state = i_position_control.check_busy();
-//        if (ctrl_state == INIT_BUSY) {
-//            i_position_control.enable_position_ctrl();
-//        }
-//
-//        if (ctrl_state == INIT) {
-//#ifdef debug_print
-//            printstrln("position_ctrl_service: position control initialized");
-//#endif
-//            break;
-//        }
-//    }
-//}
-
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque)
 {
     int target;
@@ -88,14 +68,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
 
-//    int position_enable_flag_ = 0;
-//    int torque_enable_flag_ = 0;
-
     int position_ref_input_k_ = 0;
     double position_ref_k_ = 0.00;
     double position_sens_k_ = 0.00, position_sens_k_1_=0.00;
-
-//    int min_s_index_=0;
 
     unsigned int /*ts_=0, */t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
     ///////////////////////////////////////////////
@@ -106,7 +81,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int position_limit_reached = 0;
     int max_position, min_position;
     PIDparam position_control_pid_param;
-//    integralOptimumPosControllerParam integral_optimum_pos_ctrl_pid_param;
     SecondOrderLPfilterParam position_SO_LP_filter_param;
     float position_k = 0;
     float position_sens_k = 0;
@@ -126,7 +100,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int velocity_ref_input_k = 0;
     float additive_torque_k = 0;
     int additive_torque_input_k = 0;
-//    float velocity_ref_in_k = 0;
     float velocity_ref_k = 0;
     float velocity_sens_k = 0;
     float velocity_k = 0;
@@ -272,13 +245,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         {
 
                             //************************************************
-                            // update feedback data
-                            upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
                             position_ref_input_k_ =  position_ref_in_k;//downstream_control_data.position_cmd;
 
                             position_ref_k_ = (double) (position_ref_input_k_);
-                            //position_ref_k_ = (double) (position_ref_k*512);
 
                             position_sens_k_1_ = position_sens_k_;
                             position_sens_k_   = (double) (upstream_control_data.position);
@@ -424,21 +394,13 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 //nonlinear position control
                 position_ref_input_k_ = 0;
                 position_ref_k_ = 0;
-                position_sens_k_ = 0;
-                position_sens_k_1_=0;
                 position_sens_k_ = (double) (upstream_control_data.position);
                 nl_pos_ctrl.torque_ref_k = 0.00;
                 nl_pos_ctrl.t_additive = 0.00;
                 nl_pos_ctrl.feedback_p_loop =0.00;
                 nl_pos_ctrl.feedback_d_loop=0.00;
-                //////////////////////////////
-
-                upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
-                //nonlinear position control
-                downstream_control_data.position_cmd = 0;
                 nl_pos_ctrl.t_additive = 0.00;
-                ////////////////////////////////
+                //////////////////////////////
 
                 position_ref_input_k = upstream_control_data.position;
                 downstream_control_data.position_cmd = upstream_control_data.position;
@@ -573,64 +535,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
                     break;
 
-
-
-
-
-
-
-
-
-
-
-//            case i_position_control[int i].set_position(int in_target_position):
-//                    position_ref_input_k = in_target_position;
-//                break;
-//            case i_position_control[int i].set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
-//                    pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_pos, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-//                break;
-//            case i_position_control[int i].set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int21_target_max_velocity_):
-//                pos_velocity_ctrl_config.max_speed = int21_target_max_velocity_;
-//                pid_set_parameters((float)position_control_pid_param.Kp, (float)position_control_pid_param.Ki, (float)position_control_pid_param.Kd, (float)int16_itegral_limit, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-//                break;
-//            case i_position_control[int i].set_position_limits(int position_min_limit, int position_max_limit):
-//                pos_velocity_ctrl_config.min_pos = position_min_limit;
-//                pos_velocity_ctrl_config.max_pos = position_max_limit;
-//                max_position = ((float) pos_velocity_ctrl_config.max_pos);
-//                max_position /= 512;
-//                min_position = ((float) pos_velocity_ctrl_config.min_pos);
-//                min_position /= 512;
-//                break;
-
-
-
-//            case i_position_control[int i].set_velocity(int in_target_velocity):
-//                    velocity_ref_input_k = in_target_velocity * 1;
-//                break;
-//            case i_position_control[int i].set_offset_torque(int offset_torque_):
-//                    additive_torque_input_k = offset_torque_;
-//                break;
-//            case i_position_control[int i].set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd):
-//                    pid_set_parameters((float)int8_Kp, (float)int8_Ki, (float)int8_Kd, (float)pos_velocity_ctrl_config.integral_limit_velocity, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-//                break;
-//            case i_position_control[int i].set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int21_target_max_torque_):
-//                pos_velocity_ctrl_config.max_torque = int21_target_max_torque_;
-//                pid_set_parameters((float)velocity_control_pid_param.Kp, (float)velocity_control_pid_param.Ki, (float)velocity_control_pid_param.Kd, (float)int16_itegral_limit, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-//                break;
-//            case i_position_control[int i].set_velocity_limits(int velocity_min_limit, int velocity_max_limit):
-//                pos_velocity_ctrl_config.max_speed = velocity_max_limit;
-//                break;
-
-
-
             case i_position_control[int i].set_torque(int in_target_torque):
                 torque_ref_input_k = in_target_torque;
                 break;
-//            case i_position_control[int i].set_torque_limits(int torque_min_limit, int torque_max_limit):
-//                pos_velocity_ctrl_config.max_torque = torque_max_limit;
-//                break;
-
-
 
 
             case i_position_control[int i].get_position() -> int out_position:
@@ -639,18 +546,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     else
                         out_position = upstream_control_data.position;
                 break;
-//
-//
+
+
             case i_position_control[int i].get_velocity() -> int out_velocity:
                     if (pos_velocity_ctrl_config.polarity == -1)
                         out_velocity = -upstream_control_data.velocity;
                     else
                         out_velocity = upstream_control_data.velocity;
                 break;
-//
-//            case i_position_control[int i].check_busy() -> int out_activate:
-////                out_activate = position_enable_flag;
-//                break;
+
 
             case i_position_control[int i].get_motorcontrol_config() -> MotorcontrolConfig out_motorcontrol_config:
                 out_motorcontrol_config = i_motorcontrol.get_config();
@@ -691,8 +595,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 position_enable_flag = 0;
                 velocity_enable_flag = 0;
                 break;
-
-
         }
     }
 }
