@@ -426,6 +426,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 position_ref_k_ = 0;
                 position_sens_k_ = 0;
                 position_sens_k_1_=0;
+                position_sens_k_ = (double) (upstream_control_data.position);
                 nl_pos_ctrl.torque_ref_k = 0.00;
                 nl_pos_ctrl.t_additive = 0.00;
                 nl_pos_ctrl.feedback_p_loop =0.00;
