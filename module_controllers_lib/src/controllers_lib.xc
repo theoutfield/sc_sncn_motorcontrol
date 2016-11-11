@@ -88,6 +88,10 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
     xscope_int(P_PART, (int)(param.Kp * error));
     xscope_int(D_PART, (int)((param.Kd * (actual_value - param.actual_value_1n))));
 
+    if(-150<desired_value && desired_value<150)
+    {
+        param.integral=0;
+    }
     cmd = ((param.Kp * error) + param.integral - (param.Kd * (actual_value - param.actual_value_1n)));
 
     xscope_int(CMD, (int)(cmd));
