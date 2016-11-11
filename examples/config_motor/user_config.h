@@ -187,9 +187,9 @@
 */
 
 //-----  axis 4 of the robot (project FS)
-#define POSITION_Kp                             76000
-#define POSITION_Ki                             7700
-#define POSITION_Kd                             320000
+#define POSITION_Kp                             3190
+#define POSITION_Ki                             20
+#define POSITION_Kd                             13400
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 
@@ -199,7 +199,7 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      3178
+#define COMMUTATION_OFFSET_CLK      530
 
 
 

@@ -11,10 +11,10 @@
 
 extern char start_message[];
 
-int check_hall_config(HallConfig &hall_config){
-
+int check_hall_config(HallConfig &hall_config)
+{
     if (hall_config.pole_pairs < 1 || hall_config.pole_pairs > 11) {
-        printstrln("hall_service: ERROR: Wrong Hall configuration: wrong pole-pairs");
+        //printstrln("hall_service: ERROR: Wrong Hall configuration: wrong pole-pairs");
         return ERROR;
     }
 
@@ -47,13 +47,13 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     }
 
     if (check_hall_config(position_feedback_config.hall_config) == ERROR) {
-        printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
+        //printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
         position_feedback_config.sensor_type = 0;
         return;
     }
 
     printstr(start_message);
-    printstrln("HALL");
+    //printstrln("HALL");
 
     timer tx;
     unsigned int time1=0;
