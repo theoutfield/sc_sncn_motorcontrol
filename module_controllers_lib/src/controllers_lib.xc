@@ -70,32 +70,15 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
 {
     double error, cmd, integral_term;
     error = desired_value - actual_value;
-
-    xscope_int(DESIRED_VALUE, (int)(desired_value));
-    xscope_int(ACTUAL_VALUE, (int)(actual_value));
-
     param.integral += param.Ki * error;
-
-    xscope_int(PARAM_KI, ((int)(param.Ki)));
-    xscope_int(ERROR, ((int)(error)));
-    xscope_int(PARAM_INTEGRAL_1, (int)(param.integral));
-
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
         param.integral -= (param.Ki * error);
-
-    xscope_int(PARAM_INTEGRAL_2, (int)(param.integral));
-
-    xscope_int(P_PART, (int)(param.Kp * error));
-    xscope_int(D_PART, (int)((param.Kd * (actual_value - param.actual_value_1n))));
 
     if(-150<desired_value && desired_value<150)
     {
         param.integral=0;
     }
     cmd = ((param.Kp * error) + param.integral - (param.Kd * (actual_value - param.actual_value_1n)));
-
-    xscope_int(CMD, (int)(cmd));
-
     param.actual_value_1n = actual_value;
     return cmd;
 }
