@@ -48,13 +48,21 @@ int special_brake_release(int &counter, int start_position, int actual_position,
         target = 0;
         counter = duration+1; //stop counter
     }
-    else if (counter < (duration/2)) //first half we try to move to one direction
+    else if (counter < (duration/4)) //first quart ramp to max_torque
     {
-        target = (counter*max_torque)/(duration/2); //ramp to max_torque
+        target = (counter*max_torque)/(duration/4); //ramp to max_torque
     }
-    else if (counter < duration) //second half we try to move to the other direction
+    else if (counter < (duration/2)) //second quart we maintain max torque
     {
-        target = -((counter-(duration/2))*max_torque)/(duration/2); //ramp to -max torque
+        target = max_torque;
+    }
+    else if (counter < (duration*3)/4) //third quart we ramp to -max torque
+    {
+        target = -((counter-(duration/2))*max_torque)/(duration/4); //ramp to -max torque
+    }
+    else if (counter < duration) // last quart we maintain -max torque
+    {
+        target = -max_torque;
     }
     else if (counter == duration) //end:
     {
@@ -140,8 +148,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int enable_profiler = 1;
 
     //special_brake_release
-    const int special_brake_release_range = 500;
-    const int special_brake_release_duration = 500;
+    const int special_brake_release_range = 800;
+    const int special_brake_release_duration = 800;
     int special_brake_release_counter = special_brake_release_duration+1;
     int special_brake_release_initial_position = 0;
     int special_brake_release_torque = 0;
