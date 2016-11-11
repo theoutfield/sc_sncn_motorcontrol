@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config_Maxon_251601.h>
+#include <motor_config_FAULHABER.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
