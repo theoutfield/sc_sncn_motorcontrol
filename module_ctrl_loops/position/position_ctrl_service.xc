@@ -48,21 +48,13 @@ int special_brake_release(int &counter, int start_position, int actual_position,
         target = 0;
         counter = duration+1; //stop counter
     }
-    else if (counter < (duration/4)) //first quart ramp to max_torque
+    else if (counter < (duration/2)) //first half we try to move to one direction
     {
-        target = (counter*max_torque)/(duration/4); //ramp to max_torque
+        target = max_torque/2;
     }
-    else if (counter < (duration/2)) //second quart we maintain max torque
+    else if (counter < duration) //second half we try to move to the other direction
     {
-        target = max_torque;
-    }
-    else if (counter < (duration*3)/4) //third quart we ramp to -max torque
-    {
-        target = -((counter-(duration/2))*max_torque)/(duration/4); //ramp to -max torque
-    }
-    else if (counter < duration) // last quart we maintain -max torque
-    {
-        target = -max_torque;
+        target = -max_torque/2;
     }
     else if (counter == duration) //end:
     {
@@ -92,6 +84,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 //    int torque_enable_flag_ = 0;
 
     int position_ref_input_k_ = 0;
+    int initial_position_=0;
     double position_ref_k_ = 0.00;
     double position_sens_k_ = 0.00, position_sens_k_1_=0.00;
 
@@ -151,11 +144,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int enable_profiler = 1;
 
     //special_brake_release
-    const int special_brake_release_range = 800;
-    const int special_brake_release_duration = 800;
+    const int special_brake_release_range = 1000;
+    const int special_brake_release_duration = 200;
     int special_brake_release_counter = special_brake_release_duration+1;
-    int special_brake_release_initial_position = 0;
-    int special_brake_release_torque = 0;
 
     timer t;
     unsigned int ts;
@@ -344,8 +335,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     //brake release
                     if (special_brake_release_counter <= special_brake_release_duration) //change target torque if we are in special brake release
                     {
-                        torque_ref_k = special_brake_release(special_brake_release_counter, special_brake_release_initial_position, upstream_control_data.position,\
-                                special_brake_release_range, special_brake_release_duration, special_brake_release_torque);
+                        torque_ref_k = special_brake_release(special_brake_release_counter, initial_position_, upstream_control_data.position, special_brake_release_range, special_brake_release_duration, pos_velocity_ctrl_config.max_torque);
                     }
 
                     //torque limit check
@@ -460,6 +450,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 //nonlinear position control
                 downstream_control_data.position_cmd = 0;
                 nl_pos_ctrl.t_additive = 0.00;
+                initial_position_ = upstream_control_data.position;
                 ////////////////////////////////
 
                 position_ref_input_k = upstream_control_data.position;
@@ -478,11 +469,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 i_motorcontrol.set_torque_control_enabled();
                 i_motorcontrol.set_brake_status(1);
                 //special brake release
-                if (pos_velocity_ctrl_config.special_brake_release != 0)
+                if (pos_velocity_ctrl_config.special_brake_release == 1)
                 {
                     special_brake_release_counter = 0;
-                    special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
                 }
                 enable_profiler = pos_velocity_ctrl_config.enable_profiler;
                 break;
@@ -499,11 +488,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 i_motorcontrol.set_torque_control_enabled();
                 i_motorcontrol.set_brake_status(1);
                 //special brake release
-                if (pos_velocity_ctrl_config.special_brake_release != 0)
+                if (pos_velocity_ctrl_config.special_brake_release == 1)
                 {
                     special_brake_release_counter = 0;
-                    special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
                 }
                 break;
 
@@ -516,11 +503,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 i_motorcontrol.set_torque_control_enabled();
                 i_motorcontrol.set_brake_status(1);
                 //special brake release
-                if (pos_velocity_ctrl_config.special_brake_release != 0)
+                if (pos_velocity_ctrl_config.special_brake_release == 1)
                 {
                     special_brake_release_counter = 0;
-                    special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
                 }
                 break;
 
@@ -679,10 +664,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
 
             case i_position_control[int i].set_motorcontrol_config(MotorcontrolConfig in_motorcontrol_config):
-                motorctrl_enable_flag = 0;
-                torque_enable_flag = 0;
-                position_enable_flag = 0;
-                velocity_enable_flag = 0;
                 i_motorcontrol.set_config(in_motorcontrol_config);
                 break;
 
@@ -709,10 +690,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
                 //write offset in config
                 i_motorcontrol.set_config(out_motorcontrol_config);
-                motorctrl_enable_flag = 0;
-                torque_enable_flag = 0;
-                position_enable_flag = 0;
-                velocity_enable_flag = 0;
                 break;
 
 

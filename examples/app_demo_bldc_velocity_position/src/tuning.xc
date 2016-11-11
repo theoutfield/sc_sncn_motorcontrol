@@ -436,7 +436,14 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
             {
             case 's':
                 pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                pos_velocity_ctrl_config.special_brake_release = value;
+                if (pos_velocity_ctrl_config.special_brake_release == 1)
+                {
+                    pos_velocity_ctrl_config.special_brake_release = 0;
+                }
+                else
+                {
+                    pos_velocity_ctrl_config.special_brake_release = 1;
+                }
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
                 break;
             default:

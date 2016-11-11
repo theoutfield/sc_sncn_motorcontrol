@@ -101,6 +101,14 @@
 #define HALL_STATE_5_ANGLE     0
 #define HALL_STATE_6_ANGLE     0
 
+//#define HALL_STATE_1_ANGLE     1754
+//#define HALL_STATE_2_ANGLE     420
+//#define HALL_STATE_3_ANGLE     1111
+//#define HALL_STATE_4_ANGLE     3122
+//#define HALL_STATE_5_ANGLE     2458
+//#define HALL_STATE_6_ANGLE     3825
+
+
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
 #define MOTOR_POLARITY              NORMAL_POLARITY
 
@@ -179,9 +187,9 @@
 */
 
 //-----  axis 4 of the robot (project FS)
-#define POSITION_Kp                             0
-#define POSITION_Ki                             0
-#define POSITION_Kd                             0
+#define POSITION_Kp                             3190
+#define POSITION_Ki                             20
+#define POSITION_Kd                             13400
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 

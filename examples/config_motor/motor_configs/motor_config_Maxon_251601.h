@@ -1,8 +1,7 @@
 /**
- * @file motor_config.h
+ * @file motor_config_AMK_DD-28-10-T00
  * @brief Motor Control config file (define your motor specifications here)
  * @author Synapticon GmbH <support@synapticon.com>
- *
  */
 
 /**************************************************
