@@ -7,13 +7,14 @@
 #include <hall_service.h>
 #include <print.h>
 #include <mc_internal_constants.h>
+#include <xscope.h>
 
 extern char start_message[];
 
-int check_hall_config(HallConfig &hall_config){
-
+int check_hall_config(HallConfig &hall_config)
+{
     if (hall_config.pole_pairs < 1 || hall_config.pole_pairs > 11) {
-        printstrln("hall_service: ERROR: Wrong Hall configuration: wrong pole-pairs");
+        //printstrln("hall_service: ERROR: Wrong Hall configuration: wrong pole-pairs");
         return ERROR;
     }
 
@@ -46,13 +47,13 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     }
 
     if (check_hall_config(position_feedback_config.hall_config) == ERROR) {
-        printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
+        //printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
         position_feedback_config.sensor_type = 0;
         return;
     }
 
     printstr(start_message);
-    printstrln("HALL");
+    //printstrln("HALL");
 
     timer tx;
     unsigned int time1=0;
@@ -70,7 +71,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     int hall_sector_and_state;
     hall_sector_and_state=0;
 
-    int angle_out=0, last_angle=0, speed_out=0, count = 0;
+    int angle_out=0, last_angle=0, speed_out=0, count = 0, hall_angle_low_speed=0;
     int init_angle = 0;
 
     int hall_sector_and_state_temp;
@@ -409,16 +410,21 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                 hall_calculate_angle(hv);
 
                 angle_out = hv.hall_interpolated_angle;
+                hall_angle_low_speed = hv.hall_angle_middle;
                 speed_out = hv.hall_filtered_speed;
 
                 if (hv.sensor_polarity==-1)//inverted polarity
                 {
                     angle_out = 4095 - hv.hall_interpolated_angle;
+                    hall_angle_low_speed = 4095 - hv.hall_angle_middle;
                     speed_out = -hv.hall_filtered_speed;
                 }
 
                 if(angle_out>4095) angle_out-=4096;
                 if(angle_out<0)    angle_out+=4096;
+
+                if(hall_angle_low_speed>4095) hall_angle_low_speed-=4096;
+                if(hall_angle_low_speed<0)    hall_angle_low_speed+=4096;
 
                 if (init_angle) {
                     multiturn(count, last_angle, angle_out, HALL_TICKS_PER_ELECTRICAL_ROTATION);
@@ -427,12 +433,20 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                 }
                 last_angle = angle_out;
 
-                if (!isnull(i_shared_memory)) {
-                    if (position_feedback_config.contelec_config.enable_push_service == PushAll) {
-                        i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, count, hall_state_new);
-                    } else if (position_feedback_config.contelec_config.enable_push_service == PushAngle) {
+
+
+                if (!isnull(i_shared_memory))
+                {
+                    if (position_feedback_config.contelec_config.enable_push_service == PushAll)
+                    {
+                        i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, count, hall_state_new, hall_angle_low_speed);
+                    }
+                    else if (position_feedback_config.contelec_config.enable_push_service == PushAngle)
+                    {
                         i_shared_memory.write_angle_electrical(angle_out);
-                    } else if (position_feedback_config.contelec_config.enable_push_service == PushPosition) {
+                    }
+                    else if (position_feedback_config.contelec_config.enable_push_service == PushPosition)
+                    {
                         i_shared_memory.write_velocity_position(speed_out, count);
                     }
                 }
@@ -474,6 +488,7 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
             hv.hall_angle = HALL_ANGLE_0;
         else
             hv.hall_angle = HALL_ANGLE_1;
+        hv.hall_angle_middle = 1;
         hv.hall_next_state = HALL_STATE_1;
         hv.hall_previous_state = HALL_STATE_5;
         break;
@@ -483,6 +498,7 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
             hv.hall_angle = HALL_ANGLE_1;
         else
             hv.hall_angle = HALL_ANGLE_2;
+        hv.hall_angle_middle = (HALL_ANGLE_1+HALL_ANGLE_2)/2;
         hv.hall_next_state = HALL_STATE_2;
         hv.hall_previous_state = HALL_STATE_0;
         break;
@@ -492,6 +508,7 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
             hv.hall_angle = HALL_ANGLE_2;
         else
             hv.hall_angle = HALL_ANGLE_3;
+        hv.hall_angle_middle = (HALL_ANGLE_2+HALL_ANGLE_3)/2;
         hv.hall_next_state = HALL_STATE_3;
         hv.hall_previous_state = HALL_STATE_1;
         break;
@@ -501,6 +518,7 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
             hv.hall_angle = HALL_ANGLE_3;
         else
             hv.hall_angle = HALL_ANGLE_4;
+        hv.hall_angle_middle = (HALL_ANGLE_3+HALL_ANGLE_4)/2;
         hv.hall_next_state = HALL_STATE_4;
         hv.hall_previous_state = HALL_STATE_2;
         break;
@@ -510,6 +528,7 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
             hv.hall_angle = HALL_ANGLE_4;
         else
             hv.hall_angle = HALL_ANGLE_5;
+        hv.hall_angle_middle = (HALL_ANGLE_4+HALL_ANGLE_5)/2;
         hv.hall_next_state = HALL_STATE_5;
         hv.hall_previous_state = HALL_STATE_3;
         break;
@@ -519,6 +538,7 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
             hv.hall_angle = HALL_ANGLE_5;
         else
             hv.hall_angle = HALL_ANGLE_0;
+        hv.hall_angle_middle = (HALL_ANGLE_5+HALL_ANGLE_0)/2;
         hv.hall_next_state = HALL_STATE_0;
         hv.hall_previous_state = HALL_STATE_4;
         break;

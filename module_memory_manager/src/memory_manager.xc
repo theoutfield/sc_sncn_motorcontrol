@@ -8,7 +8,7 @@
 
 [[distributable]]
 void memory_manager(server interface shared_memory_interface i_shared_memory[n], unsigned n){
-    unsigned int angle_electrical = 0;
+    unsigned int angle_electrical = 0, angle_hall_low_speed=0;
     int current_velocity = 0;
     unsigned position_singleturn = 0;
     int multiturn_count = 0;
@@ -23,8 +23,9 @@ void memory_manager(server interface shared_memory_interface i_shared_memory[n],
             out_velocity = current_velocity;
             out_count = multiturn_count;
             break;
-            case i_shared_memory[int j].get_angle_velocity_position_hall() -> {unsigned int out_angle, int out_velocity, int out_count, int out_hall}:
+            case i_shared_memory[int j].get_angle_velocity_position_hall() -> {unsigned int out_angle, int out_velocity, int out_count, int out_hall, int out_hall_low_speed}:
                 out_angle = angle_electrical;
+                out_hall_low_speed = angle_hall_low_speed;
                 out_velocity = current_velocity;
                 out_count = multiturn_count;
                 out_hall = hall_state;
@@ -57,11 +58,13 @@ void memory_manager(server interface shared_memory_interface i_shared_memory[n],
                     current_velocity = in_velocity;
                     multiturn_count = in_count;
                     break;
-            case i_shared_memory[int j].write_angle_velocity_position_hall(unsigned int in_angle, int in_velocity, int in_count, int in_hall):
+            case i_shared_memory[int j].write_angle_velocity_position_hall(unsigned int in_angle, int in_velocity, int in_count, int in_hall, int in_hall_low_speed):
                     angle_electrical = in_angle;
+                    angle_hall_low_speed = in_hall_low_speed;
                     current_velocity = in_velocity;
                     multiturn_count = in_count;
                     hall_state = in_hall;
+
                     break;
             case i_shared_memory[int j].write_velocity_position(int in_velocity, int in_count):
                     current_velocity = in_velocity;
