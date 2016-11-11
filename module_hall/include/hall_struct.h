@@ -67,7 +67,6 @@ typedef struct
     int hall_position;
 
     int hall_angle;
-    int hall_angle_middle;
     int hall_increment;
     int hall_interpolated_angle;
 

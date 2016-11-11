@@ -7,7 +7,6 @@
 #include <controllers_lib.h>
 #include <control_loops_common.h>
 #include <math.h>
-#include <xscope.h>
 
 
 
@@ -49,7 +48,7 @@ void pid_init(PIDparam &param)
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDparam &param)
+void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, PIDparam &param)
 {
     param.Kp = Kp;
     param.Ki = Ki;
@@ -66,19 +65,15 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-double pid_update(double desired_value, double actual_value, int T_s, PIDparam &param)
+float pid_update(float desired_value, float actual_value, int T_s, PIDparam &param)
 {
-    double error, cmd, integral_term;
+    float error, cmd, integral_term;
     error = desired_value - actual_value;
-    param.integral += param.Ki * error;
-    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
-        param.integral -= (param.Ki * error);
-
-    if(-150<desired_value && desired_value<150)
-    {
-        param.integral=0;
-    }
-    cmd = ((param.Kp * error) + param.integral - (param.Kd * (actual_value - param.actual_value_1n)));
+    param.integral += error;
+    integral_term = param.Ki * param.integral;
+    if ((integral_term > param.integral_limit) || (integral_term < -param.integral_limit))
+        param.integral -= error;
+    cmd = ((param.Kp * error) + integral_term - (param.Kd * (actual_value - param.actual_value_1n)));
     param.actual_value_1n = actual_value;
     return cmd;
 }

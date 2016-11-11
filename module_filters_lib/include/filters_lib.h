@@ -89,10 +89,10 @@ void second_order_LP_filter_init(int f_c, int T_s_considered, SecondOrderLPfilte
  * @param sample-time in us (microseconds).
  * @param filter parameters.
  */
-void second_order_LP_filter_update(double *y_k, double *y_k_1n, double *y_k_2n, double *x_k, int T_s, SecondOrderLPfilterParam &param);
+void second_order_LP_filter_update(float *y_k, float *y_k_1n, float *y_k_2n, float *x_k, int T_s, SecondOrderLPfilterParam &param);
 
 
-void second_order_LP_filter_shift_buffers(double *y_k, double *y_k_1n, double *y_k_2n);
+void second_order_LP_filter_shift_buffers(float *y_k, float *y_k_1n, float *y_k_2n);
 
 
 /**

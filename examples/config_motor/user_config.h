@@ -8,14 +8,14 @@
 
 #include <refclk.h>
 
-#include <motor_config_FAULHABER.h>
+#include <motor_config_AMK_DT3.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
 #define POSITION_SENSOR_RESOLUTION 65530
@@ -101,14 +101,6 @@
 #define HALL_STATE_5_ANGLE     0
 #define HALL_STATE_6_ANGLE     0
 
-//#define HALL_STATE_1_ANGLE     1754
-//#define HALL_STATE_2_ANGLE     420
-//#define HALL_STATE_3_ANGLE     1111
-//#define HALL_STATE_4_ANGLE     3122
-//#define HALL_STATE_5_ANGLE     2458
-//#define HALL_STATE_6_ANGLE     3825
-
-
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
 #define MOTOR_POLARITY              NORMAL_POLARITY
 
@@ -187,9 +179,9 @@
 */
 
 //-----  axis 4 of the robot (project FS)
-#define POSITION_Kp                             3190
-#define POSITION_Ki                             20
-#define POSITION_Kd                             13400
+#define POSITION_Kp                             76000
+#define POSITION_Ki                             7700
+#define POSITION_Kd                             320000
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 
@@ -199,14 +191,14 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      530
+#define COMMUTATION_OFFSET_CLK      600
 
 
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             0
+#define VELOCITY_Kp                             100
 #define VELOCITY_Ki                             0
-#define VELOCITY_Kd                             0
+#define VELOCITY_Kd                             60
 #define VELOCITY_INTEGRAL_LIMIT                 0
 
 
@@ -218,4 +210,4 @@
                                          //default value is 1000 (which makes it ineffective)
 
 //Number of ticks in a microsecond/frequency for IFM Tile
-#define IFM_TILE_USEC   USEC_FAST//USEC_STD
+#define IFM_TILE_USEC   USEC_STD//USEC_FAST//
