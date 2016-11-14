@@ -320,16 +320,6 @@ interface update_pwm
     void safe_torque_off_enabled();
 };
 
-interface update_pwm_general
-{
-    /**
-     * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
-     */
-    int status(void);
-
-    unsigned int update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int pwm_u, int pwm_v, int pwm_w, int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode);
-    void safe_torque_off_enabled();
-};
 
 /**
  * @brief Interface type to communicate with the Watchdog Service.
