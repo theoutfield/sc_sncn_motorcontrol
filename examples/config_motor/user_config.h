@@ -8,14 +8,14 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT3.h>
+#include <motor_config_FAULHABER.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
 #define POSITION_SENSOR_RESOLUTION 65530
@@ -191,7 +191,7 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      600
+#define COMMUTATION_OFFSET_CLK      530
 
 
 
