@@ -26,20 +26,19 @@ void hall_calculate_angle(hall_variables& hv);
 void speed_LPF(hall_variables& hv);
 
 static inline void multiturn(int &count, int last_position, int position, int ticks_per_turn) {
-        int difference = position - last_position;
-        if (difference >= ticks_per_turn/2)
-            count = count + difference - ticks_per_turn;
-        else if (-difference >= ticks_per_turn/2)
-            count = count + difference + ticks_per_turn;
-        else
-            count += difference;
+    int difference = position - last_position;
+    if (difference >= ticks_per_turn/2)
+        count = count + difference - ticks_per_turn;
+    else if (-difference >= ticks_per_turn/2)
+        count = count + difference + ticks_per_turn;
+    else
+        count += difference;
 }
 
 void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedback_config,
-                  client interface shared_memory_interface ?i_shared_memory,
-                  server interface PositionFeedbackInterface i_position_feedback[3])
+        client interface shared_memory_interface ?i_shared_memory,
+                server interface PositionFeedbackInterface i_position_feedback[3])
 {
-
 
     if (HALL_USEC == USEC_FAST) { //Set freq to 250MHz
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -122,10 +121,8 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
 
     int notification = MOTCTRL_NTF_EMPTY;
 
-
     // filter initialization:
     hv.hall_filter_order = 3;
-
     hv.h[0] = 300;
     hv.h[1] = 380;
     hv.h[2] = 320;
@@ -137,7 +134,6 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
 
     hv.hall_filter_index_newest=0;
 
-
     // clock frequency of defined timers in hall section
     hv.hall_f_clock = (HALL_USEC*1000000); //1 second in ticks
     // motor pole pairs
@@ -145,7 +141,6 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
 
     hv.sensor_polarity=position_feedback_config.hall_config.polarity;
-
 
     do
     {
@@ -159,8 +154,10 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     tx :> time1;
 
     int loop_flag = 1;
-    while (loop_flag) {
-        select {
+    while (loop_flag)
+    {
+        select
+        {
         case i_position_feedback[int i].get_notification() -> int out_notification:
                 out_notification = notification;
                 break;
@@ -379,13 +376,41 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                     }
                     else
                     {
-                        if(hv.hall_last_transition_period >= HALL_TRANSITION_PERIOD_MAX)         hv.hall_speed = 0;
-                    }
+                        if(hv.hall_last_transition_period >= HALL_TRANSITION_PERIOD_MAX)
+                        {
+                            hv.hall_speed = 0;
 
+                            switch(hv.hall_pin_state)
+                            {
+                            case HALL_STATE_0:
+                                    hv.hall_angle = 1;
+                                break;
+
+                            case HALL_STATE_1:
+                                hv.hall_angle = (HALL_ANGLE_1+HALL_ANGLE_2)/2;
+                                break;
+
+                            case HALL_STATE_2:
+                                hv.hall_angle = (HALL_ANGLE_2+HALL_ANGLE_3)/2;
+                                break;
+
+                            case HALL_STATE_3:
+                                hv.hall_angle = (HALL_ANGLE_3+HALL_ANGLE_4)/2;
+                                break;
+
+                            case HALL_STATE_4:
+                                hv.hall_angle = (HALL_ANGLE_4+HALL_ANGLE_5)/2;
+                                break;
+
+                            case HALL_STATE_5:
+                                hv.hall_angle = (HALL_ANGLE_5+HALL_ANGLE_0)/2;
+                                break;
+                            }
+                        }
+                    }
 
                     hall_calculate_speed(hv);
                     speed_LPF(hv);
-
 
                     hv.hall_last_transition_period=hall_last_state_period;
                     hall_calculate_angle(hv);
@@ -444,11 +469,6 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
         }
     }
 }
-
-
-
-
-
 
 void sector_transition(hall_variables & hv, int hall_sector_and_state)
 {
