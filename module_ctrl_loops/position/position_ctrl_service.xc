@@ -348,6 +348,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);
+                xscope_int(ANGEL, upstream_control_data.angle);
                 xscope_int(POSITION_CMD, downstream_control_data.position_cmd);
                 xscope_int(VELOCITY_CMD, downstream_control_data.velocity_cmd);
                 xscope_int(TORQUE_CMD, (int)torque_ref_k);

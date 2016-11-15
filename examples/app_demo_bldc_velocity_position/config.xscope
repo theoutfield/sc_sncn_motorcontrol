@@ -24,5 +24,7 @@
     <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    
+    <Probe name="ANGEL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 
 </xSCOPEconfig>
