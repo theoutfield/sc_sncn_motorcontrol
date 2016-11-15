@@ -190,11 +190,16 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
+    //init sensor
     init_spi_ports(spi_ports);
     int init_status = contelec_encoder_init(spi_ports, position_feedback_config.contelec_config);
     if (init_status) {
-        printstr("Error with CONTELEC sensor initialization");
-        printintln(init_status);
+        delay_ticks(200000*CONTELEC_USEC);
+        init_status = contelec_encoder_init(spi_ports, position_feedback_config.contelec_config);
+        if (init_status) {
+            printstr("Error with CONTELEC sensor initialization");
+            printintln(init_status);
+        }
     }
 
     printstr(start_message);
