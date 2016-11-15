@@ -22,7 +22,7 @@
         usec = 100;
     }
 
-    unsigned int wd_half_period = 20 * usec;
+    unsigned int wd_half_period = 40 * usec;
 
     unsigned char p_led_motoon_wdtick_wden_buffer = 0b1000;
     unsigned char reset_wd_en_mask = 0b1110;
@@ -74,9 +74,12 @@
         initialization = 1;
         wd_enabled = 1;
 
-        t :> ts;
-        t when timerafter (ts + 25000  ) :> void;
     }
+
+
+
+    t :> ts;
+    t when timerafter (ts + 100*usec) :> void;//100 us
 
 
     t :> ts;
@@ -320,7 +323,7 @@
                 initialization = 1;
                 wd_enabled = 1;
                 t :> ts;
-                t when timerafter (ts + 25000  ) :> void;
+                t when timerafter (ts + 100*usec  ) :> void;//100 us
                 t :> ts;
                 break;
         }
