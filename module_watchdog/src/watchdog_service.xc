@@ -10,11 +10,19 @@
 [[combinable]]
  void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec)
 {
+    unsigned int usec;
     if(ifm_tile_usec==250)
     {
         //Set freq to 250MHz (always needed for proper timing)
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        usec = 250;
     }
+    else
+    {
+        usec = 100;
+    }
+
+    unsigned int wd_half_period = 20 * usec;
 
     unsigned char p_led_motoon_wdtick_wden_buffer = 0b1000;
     unsigned char reset_wd_en_mask = 0b1110;
@@ -104,7 +112,7 @@
                 wd_enabled = 0;
                 break;
 
-        case t when timerafter(ts + 5000) :> void: // 5000 is equal to 20 us when reference frequency is 250 MHz
+        case t when timerafter(ts + wd_half_period) :> void:
 
                 t :> ts;
                 if (initialization == 1)
