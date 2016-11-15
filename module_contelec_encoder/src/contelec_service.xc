@@ -195,8 +195,6 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
     if (init_status) {
         printstr("Error with CONTELEC sensor initialization");
         printintln(init_status);
-        position_feedback_config.sensor_type = 0;
-        return;
     }
 
     printstr(start_message);
