@@ -413,6 +413,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 }
                 else
                 {
+                    motorcontrol_config = i_position_control.get_motorcontrol_config();
                     printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
 
                     printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
