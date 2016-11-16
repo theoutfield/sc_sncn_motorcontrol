@@ -8,14 +8,14 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT3.h>
+#include <motor_config_FAULHABER.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
 #define POSITION_SENSOR_RESOLUTION 65530
@@ -177,9 +177,9 @@
                                                      //otherwise set as 0
 */
 
-#define POSITION_Kp                             158000
-#define POSITION_Ki                             6400
-#define POSITION_Kd                             663000
+#define POSITION_Kp                             4000
+#define POSITION_Ki                             120
+#define POSITION_Kd                             16500
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 
@@ -189,7 +189,7 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      700
+#define COMMUTATION_OFFSET_CLK      1460
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
@@ -201,9 +201,6 @@
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
-
-#define PID_GAIN                1000     //common gain multiplied in 3 pid constants at the same time.
-                                         //default value is 1000 (which makes it ineffective)
 
 //Number of ticks in a microsecond/frequency for IFM Tile
 #define IFM_TILE_USEC   USEC_STD//USEC_FAST//
