@@ -127,6 +127,30 @@ extern int init_quick_stop_position_profile(int actual_velocity, int actual_posi
  */
 extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
 
+/*
+ * Quick Stop Torque prototypes
+ */
+
+/**
+ * @brief Initialize Quick Stop Torque Profile
+ *
+ * @param actual_velocity
+ * @param deceleration_ramp defines the deceleration for quick stop profile
+ *
+ * @return no. of steps for quick stop profile : range [1 - steps]
+ */
+extern int init_quick_stop_torque_profile(int actual_velocity, int deceleration_ramp) ;
+
+/**
+ * @brief Generate Quick Stop Torque Profile
+ *
+ * @param steps current step of the profile
+ *
+ * @return corresponding target torque at the step input
+ */
+extern int quick_stop_torque_profile_generate(int steps);
+
+
 extern void init_linear_profile_limits(int max_value, int polarity);
 extern int get_linear_profile_polarity();
 /**
