@@ -12,7 +12,7 @@
 #include <position_feedback_service.h>
 
 void initRotarySensorInterface(SPIPorts &spi_ports);
-int initRotarySensor(SPIPorts &spi_ports, AMSConfig config);
+int initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config);
 
 //reading fx
 //non-volatile regs

@@ -45,7 +45,6 @@ typedef struct {
     int status_length;          /**< Rumber of bits used for status data */
     int crc_poly;               /**< CRC polynom in reverse representation:  x^0 + x^1 + x^4 is 0b1100 */
     int pole_pairs;             /**< Number of poles pairs to compute the electrical angle from the mechanical angle*/
-    int polarity;               /**< Polarity, invert the direction */
     int clock_dividend;         /**< BiSS output clock frequency dividend */
     int clock_divisor;          /**< BiSS output clock frequency divisor */
     int timeout;                /**< Timeout after a BiSS read in clock ticks */

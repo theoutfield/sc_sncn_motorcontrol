@@ -19,6 +19,7 @@
 
 typedef struct {
     int sensor_type;
+    int polarity;
     BISSConfig biss_config;
     CONTELECConfig contelec_config;
     AMSConfig ams_config;

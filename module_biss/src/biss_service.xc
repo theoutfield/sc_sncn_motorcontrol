@@ -114,7 +114,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                     angle = (position_feedback_config.biss_config.pole_pairs * (angle >> (position_feedback_config.biss_config.singleturn_resolution-12)) + position_feedback_config.biss_config.offset_electrical ) & 4095;
                 else
                     angle = (position_feedback_config.biss_config.pole_pairs * (angle << (12-position_feedback_config.biss_config.singleturn_resolution)) + position_feedback_config.biss_config.offset_electrical ) & 4095;
-                if (position_feedback_config.biss_config.polarity == BISS_POLARITY_INVERTED) {
+                if (position_feedback_config.polarity == BISS_POLARITY_INVERTED) {
                     angle = (4096 - angle) & 4095;
                 }
                 break;
@@ -146,7 +146,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                 } else //singleturn encoder
                     count = turns*ticks_per_turn + count_internal  + count_offset;
                 //polarity
-                if (position_feedback_config.biss_config.polarity == BISS_POLARITY_INVERTED) {
+                if (position_feedback_config.polarity == BISS_POLARITY_INVERTED) {
                     count = -count;
                     position = ticks_per_turn - position;
                 }
@@ -218,7 +218,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                 update_turns(turns, last_count, count, position_feedback_config.biss_config.multiturn_resolution, ticks_per_turn);
                 last_count = count;
                 last_position = position;
-                if (position_feedback_config.biss_config.polarity == BISS_POLARITY_INVERTED)
+                if (position_feedback_config.polarity == BISS_POLARITY_INVERTED)
                     new_count = -new_count;
                 if (position_feedback_config.biss_config.multiturn_resolution == 0) {
                     turns = new_count/ticks_per_turn;
@@ -238,7 +238,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                 update_turns(turns, last_count, count, position_feedback_config.biss_config.multiturn_resolution, ticks_per_turn);
                 last_count = count;
                 last_position = angle;
-                if (position_feedback_config.biss_config.polarity == BISS_POLARITY_INVERTED)
+                if (position_feedback_config.polarity == BISS_POLARITY_INVERTED)
                     new_angle = (4096 - new_angle) & 4095;
                 if (position_feedback_config.biss_config.singleturn_resolution > 12)
                     position_feedback_config.biss_config.offset_electrical = (new_angle - position_feedback_config.biss_config.pole_pairs * (angle >> (position_feedback_config.biss_config.singleturn_resolution-12)) ) & 4095;
@@ -302,7 +302,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
 //            }
 
             //polarity
-            if (position_feedback_config.biss_config.polarity == BISS_POLARITY_INVERTED) {
+            if (position_feedback_config.polarity == BISS_POLARITY_INVERTED) {
                 count = -count;
                 position = (ticks_per_turn - position) & (ticks_per_turn-1);
                 velocity = -velocity;

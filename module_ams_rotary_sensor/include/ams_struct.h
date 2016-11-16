@@ -72,7 +72,6 @@ typedef struct {
                                      reduced maximum temperature (125°C) by clearing NOISESET
                                      to 0. When NOISESET is set to 1, the full temperature range is
                                      available with reduced noise performance (ONH). */
-    int polarity;               /**< Encoder polarity. */
     int uvw_abi;                /**< Defines the PWM Output (0 = ABI is operating, W is used as PWM;
                                      1 = UVW is operating, I is used as PWM) */
     int dyn_angle_comp;         /**< Disable Dynamic Angle Error Compensation

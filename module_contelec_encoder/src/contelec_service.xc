@@ -125,7 +125,7 @@ void contelec_encoder_write(SPIPorts &spi_ports, int opcode, int data, int data_
 
 }
 
-int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
+int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 {
     int status;
 
@@ -142,14 +142,14 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
     if (status != 0)
         return status;
     //direction
-    if (contelec_config.polarity == CONTELEC_POLARITY_INVERTED)
+    if (config.polarity == CONTELEC_POLARITY_INVERTED)
         contelec_encoder_write(spi_ports, CONTELEC_CONF_DIR, 1, 8);
     else
         contelec_encoder_write(spi_ports, CONTELEC_CONF_DIR, 0, 8);
     //offset
-    int ticks_per_turn = (1 << contelec_config.resolution_bits);
-    contelec_config.offset &= (ticks_per_turn-1);
-    if (contelec_config.offset != 0) {
+    int ticks_per_turn = (1 << config.contelec_config.resolution_bits);
+    config.contelec_config.offset &= (ticks_per_turn-1);
+    if (config.contelec_config.offset != 0) {
         int position, count, multiturn;
 #ifdef CONTELEC_USE_TIMESTAMP
         { void, count, position, void, void } = contelec_encoder_read(spi_ports); //read actual position
@@ -162,17 +162,17 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
             multiturn = (count / ticks_per_turn);
         }
         delay_ticks(100*CONTELEC_USEC);
-        contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + ((position + contelec_config.offset) & 65535), 32); //write same multiturn and single + offset
+        contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + ((position + config.contelec_config.offset) & 65535), 32); //write same multiturn and single + offset
     }
     //filter
-    if (contelec_config.filter == 1) {
-        contelec_config.filter = 0x02;
-    } else if (contelec_config.filter < 0) {
-        contelec_config.filter = 0x00;
-    } else if (contelec_config.filter > 9) {
-        contelec_config.filter = 0x09;
+    if (config.contelec_config.filter == 1) {
+        config.contelec_config.filter = 0x02;
+    } else if (config.contelec_config.filter < 0) {
+        config.contelec_config.filter = 0x00;
+    } else if (config.contelec_config.filter > 9) {
+        config.contelec_config.filter = 0x09;
     }
-    contelec_encoder_write(spi_ports, CONTELEC_CONF_FILTER, contelec_config.filter, 8);
+    contelec_encoder_write(spi_ports, CONTELEC_CONF_FILTER, config.contelec_config.filter, 8);
     //read status
 #ifdef CONTELEC_USE_TIMESTAMP
     { status, void, void, void, void } = contelec_encoder_read(spi_ports);
@@ -192,10 +192,10 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
 
     //init sensor
     init_spi_ports(spi_ports);
-    int init_status = contelec_encoder_init(spi_ports, position_feedback_config.contelec_config);
+    int init_status = contelec_encoder_init(spi_ports, position_feedback_config);
     if (init_status) {
         delay_ticks(200000*CONTELEC_USEC);
-        init_status = contelec_encoder_init(spi_ports, position_feedback_config.contelec_config);
+        init_status = contelec_encoder_init(spi_ports, position_feedback_config);
         if (init_status) {
             printstr("Error with CONTELEC sensor initialization");
             printintln(init_status);
@@ -311,7 +311,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, CONTELECConfig &contelec_config)
         //receive new contelec_config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 position_feedback_config = in_config;
-                contelec_encoder_init(spi_ports, position_feedback_config.contelec_config); //init with new config
+                contelec_encoder_init(spi_ports, position_feedback_config); //init with new config
                 //update variables which depend on contelec_config
                 ticks_per_turn = (1 << position_feedback_config.contelec_config.resolution_bits);
                 crossover = ticks_per_turn - ticks_per_turn/10;

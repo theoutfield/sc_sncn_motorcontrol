@@ -32,32 +32,32 @@ void initspi_ports(SPIPorts &spi_ports)
     slave_deselect(spi_ports.slave_select); // Ensure slave select is in correct start state
 }
 
-{unsigned short, unsigned short} transform_settings(AMSConfig config)
+{unsigned short, unsigned short} transform_settings(PositionFeedbackConfig &config)
 {
     unsigned short settings1 = 0, settings2 = 0;
 
     #if AMS_SENSOR_TYPE == AS5147
-    settings1 = (config.width_index_pulse << 0);
+    settings1 = (config.ams_config.width_index_pulse << 0);
     #else
-    settings1 = (config.factory_settings << 0);
+    settings1 = (config.ams_config.factory_settings << 0);
     #endif
-    settings1 |= (config.noise_setting << 1);
+    settings1 |= (config.ams_config.noise_setting << 1);
     if (config.polarity == AMS_POLARITY_INVERTED) {
         settings1 |= (1 << 2);
     }
-    settings1 |= (config.uvw_abi << 3);
-    settings1 |= (config.dyn_angle_comp << 4);
-    settings1 |= (config.data_select << 6);
-    settings1 |= (config.pwm_on << 7);
+    settings1 |= (config.ams_config.uvw_abi << 3);
+    settings1 |= (config.ams_config.dyn_angle_comp << 4);
+    settings1 |= (config.ams_config.data_select << 6);
+    settings1 |= (config.ams_config.pwm_on << 7);
 
-    settings2 = (config.pole_pairs-1) << 0;
-    settings2 |= (config.hysteresis << 3);
-    settings2 |= (config.abi_resolution << 5);
+    settings2 = (config.ams_config.pole_pairs-1) << 0;
+    settings2 |= (config.ams_config.hysteresis << 3);
+    settings2 |= (config.ams_config.abi_resolution << 5);
 
     return {settings1, settings2};
 }
 
-int initRotarySensor(SPIPorts &spi_ports, AMSConfig config)
+int initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 {
     int data_in;
 
@@ -85,7 +85,7 @@ int initRotarySensor(SPIPorts &spi_ports, AMSConfig config)
 
     delay_milliseconds(1);
 
-    data_in = writeZeroPosition(spi_ports, config.offset);
+    data_in = writeZeroPosition(spi_ports, config.ams_config.offset);
 
     if(data_in < 0){
 
@@ -494,7 +494,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
          write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
      }
 
-    if (initRotarySensor(spi_ports,  position_feedback_config.ams_config) != SUCCESS_WRITING) {
+    if (initRotarySensor(spi_ports,  position_feedback_config) != SUCCESS_WRITING) {
         printstrln("Error with SPI AMS sensor");
         position_feedback_config.sensor_type = 0;
         return;
@@ -595,8 +595,8 @@ static inline void multiturn(int &count, int last_position, int position, int ti
                 ticks_per_turn = (1 << in_config.ams_config.resolution_bits);
                 in_config.ams_config.offset &= (ticks_per_turn-1);
                 //update variables which depend on ams_config
-                if (position_feedback_config.ams_config.polarity != in_config.ams_config.polarity)
-                    initRotarySensor(spi_ports,  in_config.ams_config);
+                if (position_feedback_config.polarity != in_config.polarity)
+                    initRotarySensor(spi_ports,  in_config);
                 else if (position_feedback_config.ams_config.offset != in_config.ams_config.offset)
                     writeZeroPosition(spi_ports, in_config.ams_config.offset);
                 position_feedback_config = in_config;
