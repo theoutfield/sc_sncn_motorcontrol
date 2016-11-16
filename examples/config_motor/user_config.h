@@ -8,14 +8,14 @@
 
 #include <refclk.h>
 
-#include <motor_config_FAULHABER.h>
+#include <motor_config_AMK_DT3.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
 #define POSITION_SENSOR_RESOLUTION 65530
@@ -41,12 +41,11 @@
 //////////////////////////////////////////////
 
 /*
- * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.
+ * By default, RECUPERATION MODE is activated. Setting the maximum power of recuperation to a high
+ * value (such as 10 times the nominal power) results in having no limit while working under recuperation mode.
+ * In high-power applications (such as electric vehicles), this mode shoule
+ * be activated only if dc-power supply is capable of accepting energy.
  * */
-
-// For not affecting higher controlling levels (such as position control),
-// RECUPERATION should be set to 1, and REGEN_P_MAX should be set to a much higher value than the rated power
-// (such as 50 kW),
 
 #define RECUPERATION        1          // when RECUPERATION is 0, there will be no recuperation
 
@@ -178,10 +177,9 @@
                                                      //otherwise set as 0
 */
 
-//-----  axis 4 of the robot (project FS)
-#define POSITION_Kp                             76000
-#define POSITION_Ki                             7700
-#define POSITION_Kd                             320000
+#define POSITION_Kp                             158000
+#define POSITION_Ki                             6400
+#define POSITION_Kd                             663000
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 
@@ -191,9 +189,7 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      530
-
-
+#define COMMUTATION_OFFSET_CLK      700
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
