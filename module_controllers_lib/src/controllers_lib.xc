@@ -134,21 +134,21 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
     nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.j));
     nl_pos_ctrl.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
-    //PID parameters are pre-multiplied by 100 (by user)
-    nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos));
-    nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos));
-    nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos));
+    //check if the PID parameters are in range
+    if(0<=pos_velocity_ctrl_config.P_pos && pos_velocity_ctrl_config.P_pos<=100000000)
+        nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos));
+    if(0<=pos_velocity_ctrl_config.I_pos && pos_velocity_ctrl_config.I_pos<=100000000)
+        nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos));
+    if(0<=pos_velocity_ctrl_config.D_pos && pos_velocity_ctrl_config.D_pos<=100000000)
+        nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos));
 
     nl_pos_ctrl.constant_gain = 2/nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/= nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/=(nl_pos_ctrl.k_fb * nl_pos_ctrl.k_m);
 
     nl_pos_ctrl.integral_limit_pos = ((double)(pos_velocity_ctrl_config.integral_limit_pos))/1000.00;
-    nl_pos_ctrl.kp *= nl_pos_ctrl.integral_limit_pos;
-    nl_pos_ctrl.ki *= nl_pos_ctrl.integral_limit_pos;
+
     nl_pos_ctrl.kd *= nl_pos_ctrl.integral_limit_pos;
-    nl_pos_ctrl.kp /=100000.00;
-    nl_pos_ctrl.ki /=100000.00;
     nl_pos_ctrl.kd /=100000.00;
 
     nl_pos_ctrl.calculated_j = (nl_pos_ctrl.kd*10000000)/(nl_pos_ctrl.constant_gain*0.216);
@@ -171,11 +171,15 @@ int update_nl_position_control(
 {
     nl_pos_ctrl.gained_error = position_ref_k_ - position_sens_k_;
 
-    nl_pos_ctrl.feedback_p_loop  = nl_pos_ctrl.kp * (position_sens_k_ - position_sens_k_1_);
+    nl_pos_ctrl.feedback_p_loop  = position_sens_k_ - position_sens_k_1_;
+    nl_pos_ctrl.feedback_p_loop *= nl_pos_ctrl.kp;
 
-    nl_pos_ctrl.delta_y_k = nl_pos_ctrl.gained_error*nl_pos_ctrl.ki - nl_pos_ctrl.feedback_p_loop;
+    nl_pos_ctrl.delta_y_k = position_ref_k_ - position_sens_k_;
+    nl_pos_ctrl.delta_y_k*= nl_pos_ctrl.ki;
+    nl_pos_ctrl.delta_y_k-= nl_pos_ctrl.feedback_p_loop;
+    nl_pos_ctrl.delta_y_k*= nl_pos_ctrl.integral_limit_pos;
 
-    nl_pos_ctrl.y_k = nl_pos_ctrl.delta_y_k + nl_pos_ctrl.y_k_1;
+    nl_pos_ctrl.y_k = (nl_pos_ctrl.delta_y_k/100000.00) + nl_pos_ctrl.y_k_1;
 
     if(nl_pos_ctrl.y_k>0)
     {
