@@ -20,28 +20,76 @@
 #include <stdio.h>
 
 
-int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque)
+int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque,\
+        interface MotorcontrolInterface client i_motorcontrol)
 {
-    const int steps = 8;
+    int steps = 8;
+    const int brake_pull_period = 800;
+    int phase_1 = (duration/3); //1000
+    int phase_2 = duration;
+
+    // re pull the brake
+    if ((counter) % brake_pull_period == 0)
+    {
+        i_motorcontrol.set_brake_status(1);
+    }
+
     int target;
     if ( (actual_position-start_position) > range || (actual_position-start_position) < (-range)) //we moved more than half the range so the brake should be released
     {
         target = 0;
         counter = duration; //stop counter
     }
-    else if (counter < duration)
+    else if (counter < phase_1)
     {
-        int step = counter/(duration/steps);
+        int step = counter/(phase_1/steps);
         int sign = 1;
         if (step%2) {
             sign = -1;
         }
-        target = ((counter-(duration/steps)*step)*max_torque*(step+1)*sign)/(duration); //ramp to max torque of step
+        target = ((counter-(phase_1/steps)*step)*max_torque*(step+1+(step+1)%2)*sign)/phase_1; //ramp to max torque of step
+    }
+//    else if (counter < phase_2) //ramp to max torque
+//    {
+//        target = ((counter-phase_1)*max_torque)/(phase_2-phase_1);
+//    }
+//    else if (counter < phase_3) //hold max torque
+//    {
+//        target = max_torque;
+//    }
+//    else if (counter < phase_4) //ramp to -max torque
+//    {
+//        target = -((counter-phase_3)*max_torque)/(phase_4-phase_3);
+//    }
+//    else if (counter < duration) //hold -max torque
+//    {
+//        target = -max_torque;
+//    }
+    else if (counter < duration) //end:
+    {
+        steps = 2;
+        int step = (counter-phase_1)/((phase_2-phase_1)/steps);
+        int sign = 1;
+        if (step%2) {
+            sign = -1;
+        }
+        target = (((counter-phase_1)-((phase_2-phase_1)/steps)*step)*max_torque*(step+1+(step+1)%2)*sign)/(((phase_2-phase_1)*6)/10); //ramp to max torque of step
+        if (target > (max_torque*(step+1+(step+1)%2))/steps)
+            target = (max_torque*(step+1+(step+1)%2))/steps;
+        else if (target < -(max_torque*(step+1+(step+1)%2))/steps)
+            target = -(max_torque*(step+1+(step+1)%2))/steps;
     }
     else if (counter == duration) //end:
     {
         target = 0; //stop
     }
+
+    //re pull the brake
+    if ((counter+1) % brake_pull_period == 0 && counter < (duration-1))
+    {
+        i_motorcontrol.set_brake_status(0);
+    }
+
     counter++;
 
     return target;
@@ -116,7 +164,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
     //special_brake_release
     const int special_brake_release_range = 1000;
-    const int special_brake_release_duration = 2000;
+    const int special_brake_release_duration = 3000;
     int special_brake_release_counter = special_brake_release_duration+1;
     int special_brake_release_initial_position = 0;
     int special_brake_release_torque = 0;
@@ -286,7 +334,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     if (special_brake_release_counter <= special_brake_release_duration) //change target torque if we are in special brake release
                     {
                         torque_ref_k = special_brake_release(special_brake_release_counter, special_brake_release_initial_position, upstream_control_data.position,\
-                                special_brake_release_range, special_brake_release_duration, special_brake_release_torque);
+                                special_brake_release_range, special_brake_release_duration, special_brake_release_torque, i_motorcontrol);
                     }
 
                     //torque limit check
