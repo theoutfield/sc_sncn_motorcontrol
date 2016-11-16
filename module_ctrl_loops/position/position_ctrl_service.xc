@@ -352,7 +352,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(POSITION_CMD, downstream_control_data.position_cmd);
                 xscope_int(VELOCITY_CMD, downstream_control_data.velocity_cmd);
                 xscope_int(TORQUE_CMD, (int)torque_ref_k);
-                xscope_int(IDLE_TIME, idle_time_);
 #endif
 
 
