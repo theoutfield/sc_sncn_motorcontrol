@@ -115,8 +115,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int enable_profiler = 1;
 
     //special_brake_release
-    const int special_brake_release_range = 800;
-    const int special_brake_release_duration = 1000;
+    const int special_brake_release_range = 1000;
+    const int special_brake_release_duration = 2000;
     int special_brake_release_counter = special_brake_release_duration+1;
     int special_brake_release_initial_position = 0;
     int special_brake_release_torque = 0;
