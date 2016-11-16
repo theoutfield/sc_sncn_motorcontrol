@@ -177,9 +177,9 @@
                                                      //otherwise set as 0
 */
 
-#define POSITION_Kp                             0
-#define POSITION_Ki                             0
-#define POSITION_Kd                             0
+#define POSITION_Kp                             158000
+#define POSITION_Ki                             6400
+#define POSITION_Kd                             663000
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 
@@ -189,9 +189,7 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1340
-
-
+#define COMMUTATION_OFFSET_CLK      700
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             100
