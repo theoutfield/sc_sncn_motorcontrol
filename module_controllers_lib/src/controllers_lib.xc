@@ -48,7 +48,7 @@ void pid_init(PIDparam &param)
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, PIDparam &param)
+void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDparam &param)
 {
     param.Kp = Kp;
     param.Ki = Ki;
@@ -65,18 +65,19 @@ void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int 
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-float pid_update(float desired_value, float actual_value, int T_s, PIDparam &param)
+double pid_update(double desired_value, double actual_value, int T_s, PIDparam &param)
 {
-    float error, cmd, integral_term;
+    double error, cmd, integral_term;
     error = desired_value - actual_value;
-    param.integral += error;
-    integral_term = param.Ki * param.integral;
-    if ((integral_term > param.integral_limit) || (integral_term < -param.integral_limit))
-        param.integral -= error;
-    cmd = ((param.Kp * error) + integral_term - (param.Kd * (actual_value - param.actual_value_1n)));
+    param.integral += (param.Ki/1000000.00) * error;
+    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
+        param.integral -= (param.Ki/1000000.00) * error;
+
+    cmd = (((param.Kp/1000000.00) * (- actual_value)) + param.integral - ((param.Kd/1000000.00) * (actual_value - param.actual_value_1n)));
     param.actual_value_1n = actual_value;
     return cmd;
 }
+
 
 
 /**

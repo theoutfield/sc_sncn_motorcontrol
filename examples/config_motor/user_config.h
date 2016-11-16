@@ -192,10 +192,10 @@
 #define COMMUTATION_OFFSET_CLK      1460
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             100
-#define VELOCITY_Ki                             0
-#define VELOCITY_Kd                             60
-#define VELOCITY_INTEGRAL_LIMIT                 0
+#define VELOCITY_Kp                             1500000
+#define VELOCITY_Ki                             50000
+#define VELOCITY_Kd                             0
+#define VELOCITY_INTEGRAL_LIMIT                 1000000000
 
 
 //Filter parameters

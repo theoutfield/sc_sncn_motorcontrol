@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 
 /**
@@ -24,7 +24,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
-QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+//QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
 int main(void) {
 
@@ -77,7 +77,6 @@ int main(void) {
             pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
             pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
             pos_velocity_ctrl_config.resolution  =                          POSITION_SENSOR_RESOLUTION;
-            pos_velocity_ctrl_config.pid_gain =                             PID_GAIN;
             pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
 
 
@@ -215,7 +214,7 @@ int main(void) {
                     position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
                     position_feedback_config.ams_config.enable_push_service = PushAll;
 
-                    position_feedback_service(hall_ports, qei_ports, spi_ports,
+                    position_feedback_service(hall_ports, null, spi_ports,
                             position_feedback_config, i_shared_memory[0], i_position_feedback,
                             null, null, null);
                 }
