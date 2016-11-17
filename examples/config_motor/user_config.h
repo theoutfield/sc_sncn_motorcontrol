@@ -177,9 +177,9 @@
                                                      //otherwise set as 0
 */
 
-#define POSITION_Kp                             4000
-#define POSITION_Ki                             120
-#define POSITION_Kd                             16500
+#define POSITION_Kp                             50000//0//4000
+#define POSITION_Ki                             200//0//120
+#define POSITION_Kd                             0//0//16500
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 

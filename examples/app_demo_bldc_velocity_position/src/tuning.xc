@@ -323,7 +323,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         if (value == 1)
                         {
                             i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
-                            printf("simpe PID pos ctrl enabled\n");
+                            printf("simple PID pos ctrl enabled\n");
                         }
                         else if (value == 2)
                         {
