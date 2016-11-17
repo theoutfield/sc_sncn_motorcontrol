@@ -242,8 +242,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         }
                         else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                         {
-                            position_cmd_k = pid_update(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-//                            velocity_ref_k = (position_cmd_k / 512);
+                            position_cmd_k = pos_cascade_controller(
+                                    position_ref_k_, position_sens_k_,
+                                    pos_velocity_ctrl_config.control_loop_period, position_control_pid_param,
+                                    velocity_sens_k);
+                            torque_ref_k = position_cmd_k ;
                         }
                         else if (pos_control_mode == NL_POSITION_CONTROLLER)
                         {
@@ -349,18 +352,16 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 #ifdef XSCOPE_POSITION_CTRL
 //                xscope_int(VELOCITY, velocity_sens_k);
-                xscope_int(POSITION, upstream_control_data.position);
+//                xscope_int(POSITION, position_sens_k_);
 //                xscope_int(TORQUE,   upstream_control_data.computed_torque);
 //                xscope_int(ANGEL, upstream_control_data.angle);
-                xscope_int(POSITION_CMD, downstream_control_data.position_cmd);
+//                xscope_int(POSITION_CMD, position_ref_k_);
 //                xscope_int(VELOCITY_CMD, velocity_ref_k);
 //                xscope_int(TORQUE_CMD, (int)torque_ref_k);
 #endif
 
                 t :> t_end_;
                 break;
-
-
 
             case i_position_control[int i].disable():
                 motorctrl_enable_flag = 0;
@@ -377,16 +378,16 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 torque_enable_flag = 1;
                 motorctrl_enable_flag = 1;
                 position_enable_flag = 1;
-                if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
-                {
-                    velocity_enable_flag = 1;
-                    velocity_control_mode = VELOCITY_PID_CONTROLLER;
-                }
-                else
-                {
-                    velocity_enable_flag = 0;
-                    velocity_control_mode = VELOCITY_PID_CONTROLLER;
-                }
+//                if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
+//                {
+//                    velocity_enable_flag = 1;
+//                    velocity_control_mode = VELOCITY_PID_CONTROLLER;
+//                }
+//                else
+//                {
+//                    velocity_enable_flag = 0;
+//                    velocity_control_mode = VELOCITY_PID_CONTROLLER;
+//                }
 
                 //nonlinear position control
                 position_ref_input_k_ = 0;

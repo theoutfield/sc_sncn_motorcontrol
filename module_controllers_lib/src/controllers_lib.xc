@@ -96,6 +96,47 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
 
 
 /**
+ * @brief updating the PID controller.
+ * @param output, control command
+ * @param input, setpoint
+ * @param input, feedback
+ * @param input, sample-time in us (microseconds).
+ * @param the parameters of the PID controller
+ */
+double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed)
+{
+    double error=0.00, error_temp_cmd=0.00, temp_cmd=0.00, cmd=0.00, proportional_term=0.00, integral_term=0.00, derivative_term=0.00;
+
+    error = desired_value - actual_value;
+    xscope_int(DESIRED_VALUE, ((int)(desired_value)));
+    xscope_int(ACTUAL_VALUE, ((int)(actual_value)));
+    xscope_int(ERROR, ((int)(error)));
+
+    param.integral += (param.Ki/1000000.00) * error;
+
+    xscope_int(I_PART_1, ((int)(param.integral)));
+    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
+        param.integral -= ((param.Ki/1000000.00) * error);
+    xscope_int(I_PART_2, ((int)(param.integral)));
+
+    proportional_term = (param.Kp/1000000.00) * (desired_value- actual_value);
+    xscope_int(P_PART, ((int)(proportional_term)));
+
+    temp_cmd = proportional_term + param.integral;
+
+    error_temp_cmd = temp_cmd - speed;
+    xscope_int(ERROR_TEMP_CMD, ((int)(error_temp_cmd)));
+
+    cmd = (param.Kd/1000000.00) * error_temp_cmd;
+    xscope_int(CMD, ((int)(cmd)));
+
+    param.actual_value_1n = actual_value;
+    return cmd;
+}
+
+
+
+/**
  * @brief velocity controller
  * @param output, torque command in milli-Nm
  * @param input, velocity reference in rpm
