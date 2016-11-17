@@ -71,7 +71,7 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
     error = desired_value - actual_value;
     param.integral += (param.Ki/1000000.00) * error;
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
-        param.integral -= (param.Ki/1000000.00) * error;
+        param.integral -= ((param.Ki/1000000.00) * error);
 
     cmd = (((param.Kp/1000000.00) * (- actual_value)) + param.integral - ((param.Kd/1000000.00) * (actual_value - param.actual_value_1n)));
     param.actual_value_1n = actual_value;

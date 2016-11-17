@@ -201,10 +201,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     position_ref_in_k = (float) position_ref_input_k;
                 }
 
-                position_ref_k = position_ref_in_k / 512;
+//                position_ref_k = position_ref_in_k / 512;
 
-                position_sens_k = ((float) upstream_control_data.position);
-                position_sens_k /= 512;
+//                position_sens_k = ((float) upstream_control_data.position);
+//                position_sens_k /= 512;
 
                 additive_torque_k = ((double) additive_torque_input_k);
 
@@ -220,20 +220,20 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     if (position_enable_flag == 1)
                     {
 
-                        second_order_LP_filter_update(&position_k,
-                                                      &position_k_1n,
-                                                      &position_k_2n,
-                                                      &position_sens_k, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
+//                        second_order_LP_filter_update(&position_k,
+//                                                      &position_k_1n,
+//                                                      &position_k_2n,
+//                                                      &position_sens_k, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
 
                         if (pos_control_mode == POS_PID_CONTROLLER)
                         {
                             position_cmd_k = pid_update(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                            torque_ref_k = (position_cmd_k / 512);
+//                            torque_ref_k = (position_cmd_k / 512);
                         }
                         else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                         {
                             position_cmd_k = pid_update(position_ref_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                            velocity_ref_k = (position_cmd_k / 512);
+//                            velocity_ref_k = (position_cmd_k / 512);
                         }
                         else if (pos_control_mode == NL_POSITION_CONTROLLER)
                         {
@@ -251,9 +251,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_k_, position_sens_k_1_, position_sens_k_);
                         }
 
-                        second_order_LP_filter_shift_buffers(&position_k,
-                                                             &position_k_1n,
-                                                             &position_k_2n);
+//                        second_order_LP_filter_shift_buffers(&position_k,
+//                                                             &position_k_1n,
+//                                                             &position_k_2n);
                     }
 
                     // velocity control
@@ -264,20 +264,20 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         else if (velocity_ref_k < -pos_velocity_ctrl_config.max_speed)
                             velocity_ref_k = -pos_velocity_ctrl_config.max_speed;
 
-                        second_order_LP_filter_update(&velocity_k,
-                                                      &velocity_k_1n,
-                                                      &velocity_k_2n,
-                                                      &velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
+//                        second_order_LP_filter_update(&velocity_k,
+//                                                      &velocity_k_1n,
+//                                                      &velocity_k_2n,
+//                                                      &velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
 
                         if (velocity_control_mode == VELOCITY_PID_CONTROLLER)
                         {
-                            velocity_cmd_k = pid_update(velocity_ref_k, velocity_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-                            torque_ref_k = (velocity_cmd_k / 32);
+                            velocity_cmd_k = pid_update(velocity_ref_k, velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+                            torque_ref_k = velocity_cmd_k;
                         }
 
-                        second_order_LP_filter_shift_buffers(&velocity_k,
-                                                             &velocity_k_1n,
-                                                             &velocity_k_2n);
+//                        second_order_LP_filter_shift_buffers(&velocity_k,
+//                                                             &velocity_k_1n,
+//                                                             &velocity_k_2n);
                     }
 
                     torque_ref_k += additive_torque_k;
@@ -345,15 +345,14 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
 
 #ifdef XSCOPE_POSITION_CTRL
-                xscope_int(VELOCITY, upstream_control_data.velocity);
+                xscope_int(VELOCITY, velocity_sens_k);
                 xscope_int(POSITION, upstream_control_data.position);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);
                 xscope_int(ANGEL, upstream_control_data.angle);
                 xscope_int(POSITION_CMD, downstream_control_data.position_cmd);
-                xscope_int(VELOCITY_CMD, downstream_control_data.velocity_cmd);
+                xscope_int(VELOCITY_CMD, velocity_ref_k);
                 xscope_int(TORQUE_CMD, (int)torque_ref_k);
 #endif
-
 
                 t :> t_end_;
                 break;
