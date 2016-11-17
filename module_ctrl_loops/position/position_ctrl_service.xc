@@ -271,7 +271,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                         if (velocity_control_mode == VELOCITY_PID_CONTROLLER)
                         {
-                            velocity_cmd_k = pid_update(velocity_ref_k, velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+                            velocity_cmd_k = velocity_controller(velocity_ref_k, velocity_sens_k, velocity_control_pid_param);
                             torque_ref_k = velocity_cmd_k;
                         }
 

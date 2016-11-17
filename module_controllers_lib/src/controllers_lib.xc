@@ -79,6 +79,29 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
 }
 
 
+/**
+ * @brief velocity controller
+ * @param output, torque command in milli-Nm
+ * @param input, velocity reference in rpm
+ * @param input, measured velocity in rpm
+ * @param the parameters of the PID controller
+ */
+double velocity_controller(double desired_value, double actual_value, PIDparam &param)
+{
+    double error=0.00, cmd=0.00, integral_term=0.00;
+
+    error = desired_value - actual_value;
+
+    param.integral += (param.Ki/1000000.00) * error;
+    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
+        param.integral -= ((param.Ki/1000000.00) * error);
+
+    cmd = param.integral + ((param.Kd/1000000.00)*(param.actual_value_1n-actual_value)) - ((param.Kp/1000000.00)*actual_value);
+
+    param.actual_value_1n = actual_value;
+    return cmd;
+}
+
 
 /**
  * @brief resetting the parameters of the PID controller.
