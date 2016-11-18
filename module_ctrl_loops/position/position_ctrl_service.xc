@@ -49,35 +49,22 @@ int special_brake_release(int &counter, int start_position, int actual_position,
         }
         target = ((counter-(phase_1/steps)*step)*max_torque*(step+1+(step+1)%2)*sign)/phase_1; //ramp to max torque of step
     }
-//    else if (counter < phase_2) //ramp to max torque
-//    {
-//        target = ((counter-phase_1)*max_torque)/(phase_2-phase_1);
-//    }
-//    else if (counter < phase_3) //hold max torque
-//    {
-//        target = max_torque;
-//    }
-//    else if (counter < phase_4) //ramp to -max torque
-//    {
-//        target = -((counter-phase_3)*max_torque)/(phase_4-phase_3);
-//    }
-//    else if (counter < duration) //hold -max torque
-//    {
-//        target = -max_torque;
-//    }
     else if (counter < duration) //end:
     {
-        steps = 2;
+        steps = 4;
         int step = (counter-phase_1)/((phase_2-phase_1)/steps);
+        int max_torque_step = max_torque*(step+1+(step+1)%2);
         int sign = 1;
         if (step%2) {
             sign = -1;
         }
-        target = (((counter-phase_1)-((phase_2-phase_1)/steps)*step)*max_torque*(step+1+(step+1)%2)*sign)/(((phase_2-phase_1)*6)/10); //ramp to max torque of step
-        if (target > (max_torque*(step+1+(step+1)%2))/steps)
-            target = (max_torque*(step+1+(step+1)%2))/steps;
-        else if (target < -(max_torque*(step+1+(step+1)%2))/steps)
-            target = -(max_torque*(step+1+(step+1)%2))/steps;
+        // ramp to max torque of step, we ramp faster and then limit the torque,
+        // so we have some time when the maximum torque is applied
+        target = (((counter-phase_1)-((phase_2-phase_1)/steps)*step)*max_torque_step*sign)/(((phase_2-phase_1)*6)/10);
+        if (target > max_torque_step/steps)
+            target = max_torque_step/steps;
+        else if (target < -max_torque_step/steps)
+            target = -max_torque_step/steps;
     }
     else if (counter == duration) //end:
     {
@@ -87,6 +74,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
     //re pull the brake
     if ((counter+1) % brake_pull_period == 0 && counter < (duration-1))
     {
+        // stop brake for 1ms to reset the brake pull counter
         i_motorcontrol.set_brake_status(0);
     }
 
