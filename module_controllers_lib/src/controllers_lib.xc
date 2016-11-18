@@ -74,7 +74,7 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
         param.integral -= (param.Ki * error);
 
-    if(-150<desired_value && desired_value<150)
+    if(-50<desired_value && desired_value<50)
     {
         param.integral=0;
     }

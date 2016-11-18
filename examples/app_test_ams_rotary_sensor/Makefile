@@ -3,7 +3,7 @@
 # or a valid argument for the --target option when compiling
 #TARGET = SOMANET-C21-DX
 #TARGET = SOMANET-C22
-TARGET = 
+TARGET = SOMANET-C22
 
 
 # The APP_NAME variable determines the name of the final .xe file. It should
