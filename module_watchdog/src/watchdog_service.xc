@@ -194,10 +194,10 @@
                     fault_counter++;
                     if(fault==0)
                     {
-                        if ((led_motor_on_wdtick_wden_buffer & set_led_mask) == 0)
-                            led_motor_on_wdtick_wden_buffer |= set_led_mask;
-                        else
-                            led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+//FixMe: check the behavoiur on other DC boards
+#if 0
+                        led_motor_on_wdtick_wden_buffer ^= (1 << 3);//toggling LED
+#endif
                         LED_counter=14000;
                     }
                     //showing the fault type by LED flashing (once, twice, ..., five times)
