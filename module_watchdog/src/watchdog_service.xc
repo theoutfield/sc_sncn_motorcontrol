@@ -56,19 +56,30 @@
 
     /* WD Initialization routine */
     if(!isnull(watchdog_ports.p_shared_enable_tick_led)){
-        //motor on
-        led_motor_on_wdtick_wden_buffer |= set_motor_on_mask;
-        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
 
-        //reset WD_EN and LED
-        led_motor_on_wdtick_wden_buffer &= reset_led_mask;
-        led_motor_on_wdtick_wden_buffer &= reset_wd_en_mask;
+        if(!isnull(watchdog_ports.p_tick)){//DC100 & DC300
+            //Enable WD
+            led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
 
-        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+            led_motor_on_wdtick_wden_buffer |= 0b1010;//set green LED on
+            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+        }
+        else//DC1K & DC5K
+        {
+            //motor on
+            led_motor_on_wdtick_wden_buffer |= set_motor_on_mask;
+            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
 
-        //Enable WD
-        led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
-        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+            //reset WD_EN and LED
+            led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+            led_motor_on_wdtick_wden_buffer &= reset_wd_en_mask;
+
+            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+
+            //Enable WD
+            led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
+            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+        }
 
         //enable tick
         wd_enabled = 1;
