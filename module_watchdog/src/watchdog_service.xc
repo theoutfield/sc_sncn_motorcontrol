@@ -6,6 +6,7 @@
 
 #include <xs1.h>
 #include <watchdog_service.h>
+#include <print.h>
 
 [[combinable]]
  void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec)
@@ -33,8 +34,6 @@
     unsigned char   set_wd_en_mask = 0b0001;
 
     unsigned char p_ifm_wdtick = 0b0000;
-    unsigned char reset_wd_tick_mask = 0b0000;
-    unsigned char   set_wd_tick_mask = 0b0001;
 
     unsigned char reset_led_mask = 0b0111;
     unsigned char   set_led_mask = 0b1000;
@@ -53,6 +52,7 @@
     unsigned int LED_counter = 0;
     int fault=0;//FIXME: this variable should be initialized to 0. here it is 3 to check the LED flashing of WD task
     int fault_counter=0;
+    unsigned int times = 0;
 
     //proper task startup
     t :> ts;
@@ -187,7 +187,12 @@
                     }
                 }
 
+                //showing the fault type by LED flashing (once, twice, ..., five times)
+                blink_red(IFM_module_type, led_motor_on_wdtick_wden_buffer, wd_half_period/2, times, LED_counter, fault);
+
+
                 LED_counter++;
+#if 0
                 if (LED_counter >= 15000)
                 {
                     LED_counter=0;
@@ -200,9 +205,11 @@
 #endif
                         LED_counter=14000;
                     }
-                    //showing the fault type by LED flashing (once, twice, ..., five times)
+
+
                     if(fault==1)
                     {
+
                         if(!isnull(watchdog_ports.p_tick))
                         {
                             if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
@@ -320,13 +327,11 @@
                     if(!isnull(watchdog_ports.p_shared_enable_tick_led)) watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                     if(fault_counter==20) fault_counter=0;
                 }
-
+#endif
                 break;
 
         case i_watchdog[int i].reset_faults():
 
-                led_motor_on_wdtick_wden_buffer = 0b1000;
-                p_ifm_wdtick = 0b0000;
                 WD_En_sent_flag =0;
                 LED_counter = 0;
                 fault=0;
@@ -360,5 +365,20 @@
                 t :> ts;
                 break;
         }
+    }
+}
+
+void blink_red(int &IFM_module_type, unsigned char &output, int period, unsigned int &times, unsigned int &delay_counter, int &fault){
+    enum {DC100_DC300, DC500, DC1K_DC5K};
+    switch(IFM_module_type){
+    case DC1K_DC5K:
+        if ((delay_counter % period == 0) && times != (fault*2)){
+            output ^= (1 << 3);
+            times++;
+        }
+        else if ((delay_counter % (period*10) == 0) && times == (fault*2)){
+            times = 0;
+        }
+        break;
     }
 }

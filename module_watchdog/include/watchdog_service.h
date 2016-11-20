@@ -26,3 +26,5 @@ typedef struct {
  */
 [[combinable]]
 void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec);
+
+void blink_red(int &IFM_module_type, unsigned char &output, int period, unsigned int &times, unsigned int &delay_counter, int &fault);
