@@ -104,48 +104,6 @@
             wd_enabled = 1;
             break;
     }
-#if 0
-    /* WD Initialization routine */
-    if(!isnull(watchdog_ports.p_shared_enable_tick_led)){
-
-        if(!isnull(watchdog_ports.p_tick)){//DC100 & DC300
-            //Enable WD
-            led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
-            //set green LED on
-            led_motor_on_wdtick_wden_buffer |= 0b1010;
-            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-        }
-        else//DC1K & DC5K
-        {
-            //motor on
-            led_motor_on_wdtick_wden_buffer |= set_motor_on_mask;
-            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
-            //reset WD_EN and LED
-            led_motor_on_wdtick_wden_buffer &= reset_led_mask;
-            led_motor_on_wdtick_wden_buffer &= reset_wd_en_mask;
-
-            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
-            //Enable WD
-            led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
-            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-        }
-
-        //enable tick
-        wd_enabled = 1;
-    }
-    else if(!isnull(watchdog_ports.p_cpld_shared)){//[B3, B2, B1, B0] -> [green_LED, CPLD_Enable (active high), WD_Tick (rising_edge), fault_reset (ative high)]
-
-        cpld_out_state &= 0b0111;//turn green LED on
-        cpld_out_state |= 0b0101;//enable CPLD, reset errors
-        watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-        cycles_counter = 40;
-
-        //enable tick
-        wd_enabled = 1;
-    }
-#endif
 
     t :> ts;
     t when timerafter (ts + 100*usec) :> void;//100 us
@@ -188,23 +146,6 @@
                         break;
                 }
 
-#if 0
-                if(!isnull(watchdog_ports.p_shared_enable_tick_led)){//All IFM except for DC500
-                    led_motor_on_wdtick_wden_buffer &= fault_mask;
-                    watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
-                    if (!isnull(watchdog_ports.p_tick))//DC100 & DC300
-                    {
-                        //Disable WD and set red LED on
-                        led_motor_on_wdtick_wden_buffer &= 0b1100;
-                        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-                    }
-                }
-                else if(!isnull(watchdog_ports.p_cpld_shared)){ //DC500
-                    cpld_out_state |= 0b1000;//set green LED off
-                    watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-                }
-#endif
                 fault=fault_id;
                 wd_enabled = 0;
                 break;
@@ -242,23 +183,6 @@
                             break;
                     }
 
-#if 0
-                    if (!isnull(watchdog_ports.p_tick))
-                    {
-                        p_ifm_wdtick ^= 1;
-                        watchdog_ports.p_tick <: p_ifm_wdtick;
-                    }
-                    else
-                    {
-                        if ((led_motor_on_wdtick_wden_buffer & 0b0010) == 0)
-                            led_motor_on_wdtick_wden_buffer |= 0b0010;
-                        else
-                            led_motor_on_wdtick_wden_buffer &= 0b1101;
-
-                        if(!isnull(watchdog_ports.p_shared_enable_tick_led))
-                            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-                    }
-#endif
                     //FixMe: what is that for? Toggling flip-flop?
                     if (WD_En_sent_flag<2)
                     {
@@ -271,24 +195,6 @@
 
                         WD_En_sent_flag++;
                     }
-#if 0
-                    //CPLD wd tick
-                    if(!isnull(watchdog_ports.p_cpld_shared)){
-
-                        cpld_out_state ^= (1 << 1); //togle wd tick
-
-                        watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-
-                        //keep fault reset pin high for some number of cycles to charge the cap
-                        if(cycles_counter > 0){
-                            cycles_counter--;
-                            if(!cycles_counter){//drive reset pin down
-                                cpld_out_state &= 0b1110;
-                                watchdog_ports.p_cpld_shared <: cpld_out_state;
-                            }
-                        }
-                    }
-#endif
                 }
 
                 LED_counter++;
@@ -463,29 +369,7 @@
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                         break;
                 }
-#if 0
-                //motor on
-                led_motor_on_wdtick_wden_buffer |= set_motor_on_mask;
-                if(!isnull(watchdog_ports.p_shared_enable_tick_led)) watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
 
-                //reset WD_EN and LED
-                led_motor_on_wdtick_wden_buffer &= reset_led_mask;
-                led_motor_on_wdtick_wden_buffer &= reset_wd_en_mask;
-
-                if(!isnull(watchdog_ports.p_shared_enable_tick_led)) watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
-                //Enable WD
-                led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
-                if(!isnull(watchdog_ports.p_shared_enable_tick_led)) watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
-                //CPLD
-                if(!isnull(watchdog_ports.p_cpld_shared)){
-                    cpld_out_state &= 0b0111;//turn green LED on
-                    cpld_out_state |= 0b0101;//enable CPLD, reset errors
-                    watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-                    cycles_counter = 40;
-                }
-#endif
                 wd_enabled = 1;
                 t :> ts;
                 t when timerafter (ts + 100*usec  ) :> void;//100 us
