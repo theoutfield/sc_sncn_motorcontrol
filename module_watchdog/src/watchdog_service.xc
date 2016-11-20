@@ -81,6 +81,13 @@
             wd_enabled = 1;
             break;
         case DC500:
+            cpld_out_state &= 0b0111;//turn green LED on
+            cpld_out_state |= 0b0101;//enable CPLD, reset errors
+            watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
+            cycles_counter = 40;
+            wd_enabled = 1;
+            break;
+        case DC1K_DC5K:
             //motor on
             led_motor_on_wdtick_wden_buffer |= set_motor_on_mask;
             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
@@ -94,13 +101,6 @@
             //Enable WD
             led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-            wd_enabled = 1;
-            break;
-        case DC1K_DC5K:
-            cpld_out_state &= 0b0111;//turn green LED on
-            cpld_out_state |= 0b0101;//enable CPLD, reset errors
-            watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-            cycles_counter = 40;
             wd_enabled = 1;
             break;
     }
