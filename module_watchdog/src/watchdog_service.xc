@@ -157,11 +157,11 @@
                 {
                     switch(IFM_module_type){
                         case DC100_DC300:
-                            p_ifm_wdtick ^= 1;
+                            p_ifm_wdtick ^= 1;//toggle wd tick
                             watchdog_ports.p_tick <: p_ifm_wdtick;
                             break;
                         case DC500:
-                            cpld_out_state ^= (1 << 1); //togle wd tick
+                            cpld_out_state ^= (1 << 1); //toggle wd tick
                             watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
 
                             //keep fault reset pin high for some number of cycles to charge the cap
@@ -174,14 +174,13 @@
                             }
                             break;
                         case DC1K_DC5K:
-                            led_motor_on_wdtick_wden_buffer ^= (1 << 1); //togle wd tick
+                            led_motor_on_wdtick_wden_buffer ^= (1 << 1); //toggle wd tick
                             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-                            //togle WD Enable pin
+                            //Reset WD after fault
                             if (WD_En_sent_flag<2)
                             {
-                                led_motor_on_wdtick_wden_buffer ^= 1;
+                                led_motor_on_wdtick_wden_buffer ^= 1;//toggle WD Enable pin
                                 watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
                                 WD_En_sent_flag++;
                             }
                             break;
@@ -348,16 +347,10 @@
                         cycles_counter = 40;
                         break;
                     case DC1K_DC5K://FixMe: optimize the code. Why do we write 3 times?
-                        //motor on
-                        led_motor_on_wdtick_wden_buffer |= set_motor_on_mask;
-                        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-                        //reset WD_EN and LED
-                        led_motor_on_wdtick_wden_buffer &= reset_led_mask;
-                        led_motor_on_wdtick_wden_buffer &= reset_wd_en_mask;
-                        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-                        //Enable WD
-                        led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
-                        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        //Reset all pins to zero, do not touch WD tick
+                        led_motor_on_wdtick_wden_buffer &= 0b0010;
+                        //Set green LED on, enable WD
+                        led_motor_on_wdtick_wden_buffer |= 0b0101;
                         break;
                 }
 
