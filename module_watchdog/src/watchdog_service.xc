@@ -87,7 +87,7 @@
             cycles_counter = 40;
             wd_enabled = 1;
             break;
-        case DC1K_DC5K:
+        case DC1K_DC5K://FixMe: optimize it further
             //motor on
             led_motor_on_wdtick_wden_buffer |= set_motor_on_mask;
             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
@@ -173,27 +173,18 @@
                                 }
                             }
                             break;
-                        case DC1K_DC5K://FixMe: reduce conditionals
-                            if ((led_motor_on_wdtick_wden_buffer & 0b0010) == 0)
-                                led_motor_on_wdtick_wden_buffer |= 0b0010;
-                            else
-                                led_motor_on_wdtick_wden_buffer &= 0b1101;
-
+                        case DC1K_DC5K:
+                            led_motor_on_wdtick_wden_buffer ^= (1 << 1); //togle wd tick
                             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                            //togle WD Enable pin
+                            if (WD_En_sent_flag<2)
+                            {
+                                led_motor_on_wdtick_wden_buffer ^= 1;
+                                watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+
+                                WD_En_sent_flag++;
+                            }
                             break;
-                    }
-
-                    //FixMe: what is that for? Toggling flip-flop?
-                    if (WD_En_sent_flag<2)
-                    {
-                        if ((led_motor_on_wdtick_wden_buffer & set_wd_en_mask) == 0)
-                            led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
-                        else
-                            led_motor_on_wdtick_wden_buffer &= reset_wd_en_mask;
-
-                        if(!isnull(watchdog_ports.p_shared_enable_tick_led)) watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
-                        WD_En_sent_flag++;
                     }
                 }
 
