@@ -330,7 +330,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     //                              &velocity_k_1n,
                     //                              &velocity_k_2n,
                     //                              &velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
-                    torque_ref_k = velocity_controller(velocity_ref_k, velocity_sens_k, velocity_control_pid_param);
+                    torque_ref_k = velocity_controller(velocity_ref_k, velocity_k, velocity_control_pid_param);
                     //second_order_LP_filter_shift_buffers(&velocity_k,
                     //                                     &velocity_k_1n,
                     //                                     &velocity_k_2n);
@@ -421,7 +421,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 i_motorcontrol.set_torque((int) torque_ref_k);
 
 #ifdef XSCOPE_POSITION_CTRL
-                xscope_int(VELOCITY, ((int)velocity_sens_k));
+                xscope_int(VELOCITY, ((int)velocity_k));
                 xscope_int(POSITION, ((int)position_sens_k_));
                 xscope_int(TORQUE,   ((int)upstream_control_data.computed_torque));
                 xscope_int(POSITION_CMD, ((int)position_ref_k_));
