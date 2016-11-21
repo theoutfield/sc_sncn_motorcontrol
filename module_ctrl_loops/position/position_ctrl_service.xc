@@ -505,14 +505,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 break;
 
         case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
-                //send the actual position/velocity/torque upstream
                 upstream_control_data_out = upstream_control_data;
-
-                //receive position/velocity/torque commands
                 downstream_control_data = downstream_control_data_in;
 
                 //reverse position/velocity feedback/commands when polarity is inverted
-                if (pos_velocity_ctrl_config.polarity == -1) {
+                if (pos_velocity_ctrl_config.polarity == -1)
+                {
                     upstream_control_data_out.position = -upstream_control_data_out.position;
                     upstream_control_data_out.velocity = -upstream_control_data_out.velocity;
                     downstream_control_data.position_cmd = -downstream_control_data.position_cmd;
@@ -520,19 +518,21 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
 
                 //apply limits
-                if (downstream_control_data.position_cmd > max_position) {
+                if (downstream_control_data.position_cmd > max_position)
+                {
                     downstream_control_data.position_cmd = max_position;
-                } else if (downstream_control_data.position_cmd < min_position) {
+                }
+                else if (downstream_control_data.position_cmd < min_position)
+                {
                     downstream_control_data.position_cmd = min_position;
                 }
 
                 //set targets
                 position_ref_input_k = downstream_control_data.position_cmd;
                 velocity_ref_input_k = downstream_control_data.velocity_cmd;
-                torque_ref_input_k = downstream_control_data.torque_cmd;
+                torque_ref_input_k   = downstream_control_data.torque_cmd;
                 additive_torque_input_k = downstream_control_data.offset_torque;
                 break;
-
 
         case i_position_control[int i].set_j(int j):
                 pos_velocity_ctrl_config.j = j;
@@ -543,7 +543,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 torque_ref_input_k = in_target_torque;
                 break;
 
-
         case i_position_control[int i].get_position() -> int out_position:
                 if (pos_velocity_ctrl_config.polarity == -1)
                     out_position = -upstream_control_data.position;
@@ -551,14 +550,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     out_position = upstream_control_data.position;
                 break;
 
-
         case i_position_control[int i].get_velocity() -> int out_velocity:
                 if (pos_velocity_ctrl_config.polarity == -1)
                     out_velocity = -upstream_control_data.velocity;
                 else
                     out_velocity = upstream_control_data.velocity;
                 break;
-
 
         case i_position_control[int i].get_motorcontrol_config() -> MotorcontrolConfig out_motorcontrol_config:
                 out_motorcontrol_config = i_motorcontrol.get_config();
