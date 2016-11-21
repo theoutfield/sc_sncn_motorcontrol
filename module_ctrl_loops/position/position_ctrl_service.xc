@@ -120,6 +120,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
     int velocity_ref_input_k = 0;
+    double velocity_ref_k = 0;
     double velocity_k = 0.00;
 
 
@@ -131,7 +132,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
 
-    double position_sens_k   = 0.00, position_sens_k_1=0.00;
+    double position_k   = 0.00, position_k_1=0.00;
 
 
     //pos profiler
@@ -213,8 +214,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
     position_ref_input_k = upstream_control_data.position;
-    position_sens_k = ((double) upstream_control_data.position);
-    position_sens_k_1 = position_sens_k ;
+    position_k  = ((double) upstream_control_data.position);
+    position_k_1= position_k;
 
 
     t :> ts;
@@ -241,20 +242,19 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     double position_sens_k_   = 0.00, position_sens_k_1_=0.00;
     double position_k_1n = 0;
     double position_k_2n = 0;
-    double position_k = 0;
     double position_cmd_k = 0;
 
 
 
 
 
+    double position_sens_k   = 0.00, position_sens_k_1=0.00;
 
 
 
     // velocity controller
 
 
-    double velocity_ref_k = 0;
     double velocity_sens_k = 0;
     double velocity_k_1n = 0;
     double velocity_k_2n = 0;
@@ -295,6 +295,9 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
+                velocity_ref_k    = ((double) velocity_ref_input_k);
+                velocity_k        = ((double) upstream_control_data.velocity);
+
                 if (enable_profiler)
                 {
                     position_ref_in_k = pos_profiler(((double) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
@@ -306,36 +309,42 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 {
                     position_ref_in_k = (double) position_ref_input_k;
                 }
-
-
+                position_k  = ((double) upstream_control_data.position);
+                position_k_1= position_k;
 
                 additive_torque_k = ((double) additive_torque_input_k);
-                velocity_ref_k    = ((double) velocity_ref_input_k);
-                velocity_sens_k   = (double) upstream_control_data.velocity;
 
                 // torque control
-                if(torque_enable_flag)
+                if(torque_enable_flag == 1)
                 {
                     torque_ref_k = ((double) torque_ref_input_k);
-                    torque_ref_k += additive_torque_k;
+                }
+                else if (velocity_enable_flag == 1)// velocity control
+                {
+                    if (velocity_ref_k > pos_velocity_ctrl_config.max_speed)
+                        velocity_ref_k = pos_velocity_ctrl_config.max_speed;
+                    else if (velocity_ref_k < -pos_velocity_ctrl_config.max_speed)
+                        velocity_ref_k = -pos_velocity_ctrl_config.max_speed;
+
+                    //second_order_LP_filter_update(&velocity_k,
+                    //                              &velocity_k_1n,
+                    //                              &velocity_k_2n,
+                    //                              &velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
+                    torque_ref_k = velocity_controller(velocity_ref_k, velocity_sens_k, velocity_control_pid_param);
+                    //second_order_LP_filter_shift_buffers(&velocity_k,
+                    //                                     &velocity_k_1n,
+                    //                                     &velocity_k_2n);
                 }
                 else if (position_enable_flag == 1)// position control
                 {
-
                     //second_order_LP_filter_update(&position_k,
                     //                              &position_k_1n,
                     //                              &position_k_2n,
                     //                              &position_sens_k, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
 
-                    position_ref_input_k_ =  position_ref_in_k;
-                    position_ref_k_ = (double) (position_ref_input_k_);
-                    position_sens_k_1_ = position_sens_k_;
-                    position_sens_k_   = (double) (upstream_control_data.position);
-
-
                     if (pos_control_mode == POS_PID_CONTROLLER)
                     {
-                        torque_ref_k = pid_update(position_ref_k_, position_sens_k_, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                        torque_ref_k = pid_update(position_ref_in_k, position_sens_k_, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                     }
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
@@ -355,23 +364,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     //                                     &position_k_2n);
 
                 }
-                else if (velocity_enable_flag == 1)// velocity control
-                {
-                    if (velocity_ref_k > pos_velocity_ctrl_config.max_speed)
-                        velocity_ref_k = pos_velocity_ctrl_config.max_speed;
-                    else if (velocity_ref_k < -pos_velocity_ctrl_config.max_speed)
-                        velocity_ref_k = -pos_velocity_ctrl_config.max_speed;
-
-                    //second_order_LP_filter_update(&velocity_k,
-                    //                              &velocity_k_1n,
-                    //                              &velocity_k_2n,
-                    //                              &velocity_sens_k, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
-                    torque_ref_k = velocity_controller(velocity_ref_k, velocity_sens_k, velocity_control_pid_param);
-                    //second_order_LP_filter_shift_buffers(&velocity_k,
-                    //                                     &velocity_k_1n,
-                    //                                     &velocity_k_2n);
-                }
-
 
                 //brake release
                 if (special_brake_release_counter <= special_brake_release_duration) //change target torque if we are in special brake release
