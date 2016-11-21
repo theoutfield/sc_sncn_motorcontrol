@@ -309,8 +309,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 {
                     position_ref_in_k = (double) position_ref_input_k;
                 }
-                position_k  = ((double) upstream_control_data.position);
                 position_k_1= position_k;
+                position_k  = ((double) upstream_control_data.position);
 
                 additive_torque_k = ((double) additive_torque_input_k);
 
@@ -356,7 +356,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
                     {
                         // apply position control algorithm
-                        torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_k_, position_sens_k_1_, position_sens_k_);
+                        torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                     }
 
                     //second_order_LP_filter_shift_buffers(&position_k,
@@ -422,11 +422,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, ((int)velocity_k));
-                xscope_int(POSITION, ((int)position_sens_k_));
+                xscope_int(POSITION, ((int)position_k));
                 xscope_int(TORQUE,   ((int)upstream_control_data.computed_torque));
-                xscope_int(POSITION_CMD, ((int)position_ref_k_));
+                xscope_int(POSITION_CMD, ((int)position_ref_in_k));
                 xscope_int(VELOCITY_CMD, ((int)velocity_ref_k));
-                xscope_int(TORQUE_CMD, ((int)torque_ref_k));
+                xscope_int(TORQUE_CMD, ((int)torque_ref_input_k));
 #endif
 
                 break;
