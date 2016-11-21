@@ -344,7 +344,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                     if (pos_control_mode == POS_PID_CONTROLLER)
                     {
-                        torque_ref_k = pid_update(position_ref_in_k, position_sens_k_, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                        torque_ref_k = pid_update(position_ref_in_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                     }
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
