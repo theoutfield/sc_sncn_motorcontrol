@@ -181,7 +181,7 @@ int update_nl_position_control(
  * @param input, profiled position calculated in two steps ago
  * @param the parameters of the position reference profiler
  */
-float pos_profiler(float pos_target, float pos_k_1n, float pos_k_2n, posProfilerParam pos_profiler_param);
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfilerParam pos_profiler_param);
 
 
 

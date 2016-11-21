@@ -125,7 +125,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
     int position_ref_input_k = 0;
-    double position_ref_k = 0.00;
+    double position_ref_k    = 0.00;
+
+    double position_ref_in_k = 0.00;
+    double position_ref_in_k_1n = 0.00;
+    double position_ref_in_k_2n = 0.00;
 
     double position_sens_k   = 0.00, position_sens_k_1=0.00;
 
@@ -154,8 +158,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
     timer t;
     unsigned int ts;
-
-    unsigned int t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
 
     // initialization
     nl_position_control_reset(nl_pos_ctrl);
@@ -241,9 +243,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     double position_k_2n = 0;
     double position_k = 0;
     double position_cmd_k = 0;
-    double position_ref_in_k = 0;
-    double position_ref_in_k_1n = 0;
-    double position_ref_in_k_2n = 0;
+
 
 
 
@@ -293,31 +293,21 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
         {
         case t when timerafter(ts + USEC_STD * pos_velocity_ctrl_config.control_loop_period) :> ts:
 
-                t_old_=t_new_;
-                t :> t_new_;
-                loop_time_=t_new_-t_old_;
-                idle_time_=t_new_-t_end_;
-
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
-                /*
-                 * CONTELEC:    16bits single turn + 12bits multi turn
-                 * BISS-MABI:   18bits signle turn + 10bits multi turn
-                 * AMS:         14bits single turn + 18bits multi turn
-                 * Other sens:  13bits single turn + 12bits multi turn
-                 */
 
                 if (enable_profiler)
                 {
-                    position_ref_in_k = pos_profiler(((float) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
+                    position_ref_in_k = pos_profiler(((double) position_ref_input_k), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
                     acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(pos_velocity_ctrl_config.control_loop_period * pos_velocity_ctrl_config.control_loop_period);
                     position_ref_in_k_2n = position_ref_in_k_1n;
                     position_ref_in_k_1n = position_ref_in_k;
                 }
                 else
                 {
-                    position_ref_in_k = (float) position_ref_input_k;
+                    position_ref_in_k = (double) position_ref_input_k;
                 }
+
+
 
                 additive_torque_k = ((double) additive_torque_input_k);
                 velocity_ref_k    = ((double) velocity_ref_input_k);
@@ -447,7 +437,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(TORQUE_CMD, ((int)torque_ref_k));
 #endif
 
-                t :> t_end_;
                 break;
 
         case i_position_control[int i].disable():
