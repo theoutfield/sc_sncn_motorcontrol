@@ -201,6 +201,7 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
     nl_pos_ctrl.state_min=0.00;
 
     nl_pos_ctrl.torque_ref_k=0.00;
+    nl_pos_ctrl.t_additive = 0.00;
 }
 
 

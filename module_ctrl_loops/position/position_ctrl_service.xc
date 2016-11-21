@@ -221,68 +221,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     t :> ts;
     t when timerafter (ts + 200*1000*USEC_FAST) :> void;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    int position_ref_input_k_ = 0;
-    double position_ref_k_    = 0.00;
-
-    double position_sens_k_   = 0.00, position_sens_k_1_=0.00;
-    double position_k_1n = 0;
-    double position_k_2n = 0;
-    double position_cmd_k = 0;
-
-
-
-
-
-    double position_sens_k   = 0.00, position_sens_k_1=0.00;
-
-
-
-    // velocity controller
-
-
-    double velocity_sens_k = 0;
-    double velocity_k_1n = 0;
-    double velocity_k_2n = 0;
-    double velocity_cmd_k = 0;
-
-    // torque
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    position_ref_in_k = (double) position_ref_input_k;
-    position_ref_in_k_1n = (double) position_ref_input_k;
-    position_ref_in_k_2n = (double) position_ref_input_k;
-    position_sens_k = ((double) upstream_control_data.position);
-    position_k = position_sens_k;
-    position_k_1n = position_sens_k;
-    position_k_2n = position_sens_k;
-
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     t :> ts;
@@ -355,14 +293,11 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     }
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
                     {
-                        // apply position control algorithm
                         torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                     }
-
                     //second_order_LP_filter_shift_buffers(&position_k,
                     //                                     &position_k_1n,
                     //                                     &position_k_2n);
-
                 }
 
                 //brake release
@@ -372,7 +307,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                             special_brake_release_range, special_brake_release_duration, special_brake_release_torque, i_motorcontrol);
                 }
 
-                /*
                 //position limit check
                 if (upstream_control_data.position > max_position || upstream_control_data.position < min_position)
                 {
@@ -409,7 +343,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     }
                     position_limit_reached = 0;
                 }
-                 */
+
                 torque_ref_k += additive_torque_k;
 
                 //torque limit check
@@ -454,31 +388,18 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 pos_control_mode = pos_control_mode_;
 
-                //nonlinear position control
-                position_ref_input_k_ = 0;
-                position_ref_k_ = 0;
-                position_sens_k_ = (double) (upstream_control_data.position);
-                nl_pos_ctrl.torque_ref_k = 0.00;
-                nl_pos_ctrl.t_additive = 0.00;
-                nl_pos_ctrl.feedback_p_loop =0.00;
-                nl_pos_ctrl.feedback_d_loop=0.00;
-                nl_pos_ctrl.t_additive = 0.00;
-
-                position_ref_input_k = upstream_control_data.position;
                 downstream_control_data.position_cmd = upstream_control_data.position;
-                position_ref_in_k = (float) position_ref_input_k;
-                position_ref_in_k_1n = (float) position_ref_input_k;
-                position_ref_in_k_2n = (float) position_ref_input_k;
-                position_sens_k = ((float) upstream_control_data.position);
-                position_sens_k /= 512;// 2^(24-15);
-                position_k = position_sens_k;
-                position_k_1n = position_sens_k;
-                position_k_2n = position_sens_k;
+                position_ref_in_k = ((double) upstream_control_data.position);
+                position_k        = ((double) upstream_control_data.position);
+                position_k_1      = ((double) upstream_control_data.position);
+                position_ref_in_k_1n = ((double) upstream_control_data.position);
+                position_ref_in_k_2n = ((double) upstream_control_data.position);
+
+                nl_position_control_reset(nl_pos_ctrl);
+
                 additive_torque_input_k = 0;
                 pid_reset(position_control_pid_param);
-                pid_reset(velocity_control_pid_param);
-                i_motorcontrol.set_torque_control_enabled();
-                i_motorcontrol.set_brake_status(1);
+
                 //special brake release
                 if (pos_velocity_ctrl_config.special_brake_release != 0)
                 {
