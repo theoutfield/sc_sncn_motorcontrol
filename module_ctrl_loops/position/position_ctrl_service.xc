@@ -38,7 +38,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
     if ( (actual_position-start_position) > range || (actual_position-start_position) < (-range)) //we moved more than half the range so the brake should be released
     {
         target = 0;
-        counter = duration; //stop counter
+        counter= duration; //stop counter
     }
     else if (counter < phase_1)
     {
@@ -89,61 +89,46 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
         interface PositionVelocityCtrlInterface server i_position_control[3])
 {
 
+    // structure definition
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
 
-    int pos_control_mode = 0;
-    int velocity_control_mode = 0;
-
-    NonlinearPositionControl nl_pos_ctrl;
-    nl_position_control_reset(nl_pos_ctrl);
-    nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
-
-    int position_ref_input_k_ = 0;
-    double position_ref_k_    = 0.00;
-    double position_sens_k_   = 0.00, position_sens_k_1_=0.00;
-
-    unsigned int t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
-
-    int position_enable_flag = 0;
-
-    //    int motorctrl_enable_timeout = 0;
-    //    int position_limit_reached = 0;
-    //    int max_position, min_position;
+    PIDparam velocity_control_pid_param;
+    SecondOrderLPfilterParam velocity_SO_LP_filter_param;
 
     PIDparam position_control_pid_param;
     SecondOrderLPfilterParam position_SO_LP_filter_param;
 
-    double position_k = 0;
-    double position_sens_k = 0;
-    double position_k_1n = 0;
-    double position_k_2n = 0;
-    double position_ref_k = 0;
-    double position_cmd_k = 0;
-    int position_ref_input_k = 0;
-    double position_ref_in_k = 0;
-    double position_ref_in_k_1n = 0;
-    double position_ref_in_k_2n = 0;
+    NonlinearPositionControl nl_pos_ctrl;
 
-    // velocity controller
+
+    // variable definition
+    int brake_enable_flag=0;
+    int torque_enable_flag = 0;
     int velocity_enable_flag = 0;
-    PIDparam velocity_control_pid_param;
-    SecondOrderLPfilterParam velocity_SO_LP_filter_param;
+    int position_enable_flag = 0;
+
+
+    int velocity_control_mode = 0;
+    int pos_control_mode = 0;
+
+
+    int additive_torque_input_k = 0;
+    double additive_torque_k = 0.00;
+    int torque_ref_input_k = 0;
+    double torque_ref_k = 0.00;
+
 
     int velocity_ref_input_k = 0;
-    double additive_torque_k = 0;
-    int additive_torque_input_k = 0;
-    double velocity_ref_k = 0;
-    double velocity_sens_k = 0;
-    double velocity_k = 0;
-    double velocity_k_1n = 0;
-    double velocity_k_2n = 0;
-    double velocity_cmd_k = 0;
+    double velocity_k = 0.00;
 
-    // torque
-    int torque_enable_flag = 0;
-    int torque_ref_input_k = 0;
-    double torque_ref_k = 0;
+
+
+    int position_ref_input_k = 0;
+    double position_ref_k = 0.00;
+
+    double position_sens_k   = 0.00, position_sens_k_1=0.00;
+
 
     //pos profiler
     posProfilerParam pos_profiler_param;
@@ -157,14 +142,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int position_limit_reached = 0;
     int max_position_orig, min_position_orig;
     int max_position, min_position;
-    //reverse position limits when polarity is inverted
-    if (pos_velocity_ctrl_config.polarity == -1) {
-        min_position = -pos_velocity_ctrl_config.max_pos;
-        max_position = -pos_velocity_ctrl_config.min_pos;
-    } else {
-        min_position = pos_velocity_ctrl_config.min_pos;
-        max_position = pos_velocity_ctrl_config.max_pos;
-    }
+
 
     //special_brake_release
     const int special_brake_release_range = 1000;
@@ -173,50 +151,134 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int special_brake_release_initial_position = 0;
     int special_brake_release_torque = 0;
 
-    int brake_enable_flag=0;
 
     timer t;
     unsigned int ts;
+
+    unsigned int t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
+
+    // initialization
+    nl_position_control_reset(nl_pos_ctrl);
+    nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
+
+    //reverse position limits when polarity is inverted
+    if (pos_velocity_ctrl_config.polarity == -1)
+    {
+        min_position = -pos_velocity_ctrl_config.max_pos;
+        max_position = -pos_velocity_ctrl_config.min_pos;
+    }
+    else
+    {
+        min_position = pos_velocity_ctrl_config.min_pos;
+        max_position = pos_velocity_ctrl_config.max_pos;
+    }
+
+
 
     second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
     second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
 
     pid_init(velocity_control_pid_param);
+    if(pos_velocity_ctrl_config.P_velocity<0)            pos_velocity_ctrl_config.P_velocity=0;
+    if(pos_velocity_ctrl_config.P_velocity>100000000)    pos_velocity_ctrl_config.P_velocity=100000000;
+    if(pos_velocity_ctrl_config.I_velocity<0)            pos_velocity_ctrl_config.I_velocity=0;
+    if(pos_velocity_ctrl_config.I_velocity>100000000)    pos_velocity_ctrl_config.I_velocity=100000000;
+    if(pos_velocity_ctrl_config.D_velocity<0)            pos_velocity_ctrl_config.D_velocity=0;
+    if(pos_velocity_ctrl_config.D_velocity>100000000)    pos_velocity_ctrl_config.D_velocity=100000000;
     pid_set_parameters(
             (double)pos_velocity_ctrl_config.P_velocity, (double)pos_velocity_ctrl_config.I_velocity,
             (double)pos_velocity_ctrl_config.D_velocity, (double)pos_velocity_ctrl_config.integral_limit_velocity,
             pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
 
+
     pid_init(position_control_pid_param);
+    if(pos_velocity_ctrl_config.P_pos<0)            pos_velocity_ctrl_config.P_pos=0;
+    if(pos_velocity_ctrl_config.P_pos>100000000)    pos_velocity_ctrl_config.P_pos=100000000;
+    if(pos_velocity_ctrl_config.I_pos<0)            pos_velocity_ctrl_config.I_pos=0;
+    if(pos_velocity_ctrl_config.I_pos>100000000)    pos_velocity_ctrl_config.I_pos=100000000;
+    if(pos_velocity_ctrl_config.D_pos<0)            pos_velocity_ctrl_config.D_pos=0;
+    if(pos_velocity_ctrl_config.D_pos>100000000)    pos_velocity_ctrl_config.D_pos=100000000;
     pid_set_parameters((double)pos_velocity_ctrl_config.P_pos, (double)pos_velocity_ctrl_config.I_pos,
             (double)pos_velocity_ctrl_config.D_pos, (double)pos_velocity_ctrl_config.integral_limit_pos,
             pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
 
-    //    //reverse position limits when polarity is inverted
-    //    if (pos_velocity_ctrl_config.polarity == -1)
-    //    {
-    //        min_position = -pos_velocity_ctrl_config.max_pos;
-    //        max_position = -pos_velocity_ctrl_config.min_pos;
-    //    }
-    //    else
-    //    {
-    //        min_position = pos_velocity_ctrl_config.min_pos;
-    //        max_position = pos_velocity_ctrl_config.max_pos;
-    //    }
 
     downstream_control_data.position_cmd = 0;
     downstream_control_data.velocity_cmd = 0;
     downstream_control_data.torque_cmd   = 0;
     downstream_control_data.offset_torque = 0;
 
-    delay_milliseconds(500);
-
     upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
     position_ref_input_k = upstream_control_data.position;
-    position_ref_in_k = (float) position_ref_input_k;
-    position_ref_in_k_1n = (float) position_ref_input_k;
-    position_ref_in_k_2n = (float) position_ref_input_k;
-    position_sens_k = ((float) upstream_control_data.position);
+    position_sens_k = ((double) upstream_control_data.position);
+    position_sens_k_1 = position_sens_k ;
+
+
+    t :> ts;
+    t when timerafter (ts + 200*1000*USEC_FAST) :> void;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    int position_ref_input_k_ = 0;
+    double position_ref_k_    = 0.00;
+
+    double position_sens_k_   = 0.00, position_sens_k_1_=0.00;
+    double position_k_1n = 0;
+    double position_k_2n = 0;
+    double position_k = 0;
+    double position_cmd_k = 0;
+    double position_ref_in_k = 0;
+    double position_ref_in_k_1n = 0;
+    double position_ref_in_k_2n = 0;
+
+
+
+
+
+
+
+    // velocity controller
+
+
+    double velocity_ref_k = 0;
+    double velocity_sens_k = 0;
+    double velocity_k_1n = 0;
+    double velocity_k_2n = 0;
+    double velocity_cmd_k = 0;
+
+    // torque
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    position_ref_in_k = (double) position_ref_input_k;
+    position_ref_in_k_1n = (double) position_ref_input_k;
+    position_ref_in_k_2n = (double) position_ref_input_k;
+    position_sens_k = ((double) upstream_control_data.position);
     position_k = position_sens_k;
     position_k_1n = position_sens_k;
     position_k_2n = position_sens_k;
@@ -377,12 +439,12 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 i_motorcontrol.set_torque((int) torque_ref_k);
 
 #ifdef XSCOPE_POSITION_CTRL
-                xscope_int(VELOCITY, velocity_sens_k);
-                xscope_int(POSITION, position_sens_k_);
-                xscope_int(TORQUE,   upstream_control_data.computed_torque);
-                xscope_int(POSITION_CMD, position_ref_k_);
-                xscope_int(VELOCITY_CMD, velocity_ref_k);
-                xscope_int(TORQUE_CMD, (int)torque_ref_k);
+                xscope_int(VELOCITY, ((int)velocity_sens_k));
+                xscope_int(POSITION, ((int)position_sens_k_));
+                xscope_int(TORQUE,   ((int)upstream_control_data.computed_torque));
+                xscope_int(POSITION_CMD, ((int)position_ref_k_));
+                xscope_int(VELOCITY_CMD, ((int)velocity_ref_k));
+                xscope_int(TORQUE_CMD, ((int)torque_ref_k));
 #endif
 
                 t :> t_end_;
