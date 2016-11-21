@@ -125,8 +125,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
 
     int position_ref_input_k = 0;
-    double position_ref_k    = 0.00;
-
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
@@ -587,7 +585,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 out_motorcontrol_config.commutation_angle_offset = -1;
                 i_motorcontrol.set_offset_detection_enabled();
                 while(out_motorcontrol_config.commutation_angle_offset == -1)
-                {
+                 {
                     out_motorcontrol_config = i_motorcontrol.get_config();
                     out_motorcontrol_config.commutation_angle_offset = i_motorcontrol.set_calib(0);
                     delay_milliseconds(50);//wait until offset is detected
