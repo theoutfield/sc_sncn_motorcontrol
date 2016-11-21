@@ -20,28 +20,64 @@
 #include <stdio.h>
 
 
-int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque)
+int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque,\
+        interface MotorcontrolInterface client i_motorcontrol)
 {
-    const int steps = 8;
+    int steps = 8;
+    const int brake_pull_period = 800;
+    int phase_1 = (duration/3); //1000
+    int phase_2 = duration;
+
+    // re pull the brake
+    if ((counter) % brake_pull_period == 0)
+    {
+        i_motorcontrol.set_brake_status(1);
+    }
+
     int target;
     if ( (actual_position-start_position) > range || (actual_position-start_position) < (-range)) //we moved more than half the range so the brake should be released
     {
         target = 0;
         counter = duration; //stop counter
     }
-    else if (counter < duration)
+    else if (counter < phase_1)
     {
-        int step = counter/(duration/steps);
+        int step = counter/(phase_1/steps);
         int sign = 1;
         if (step%2) {
             sign = -1;
         }
-        target = ((counter-(duration/steps)*step)*max_torque*(step+1)*sign)/(duration); //ramp to max torque of step
+        target = ((counter-(phase_1/steps)*step)*max_torque*(step+1+(step+1)%2)*sign)/phase_1; //ramp to max torque of step
+    }
+    else if (counter < duration) //end:
+    {
+        steps = 4;
+        int step = (counter-phase_1)/((phase_2-phase_1)/steps);
+        int max_torque_step = max_torque*(step+1+(step+1)%2);
+        int sign = 1;
+        if (step%2) {
+            sign = -1;
+        }
+        // ramp to max torque of step, we ramp faster and then limit the torque,
+        // so we have some time when the maximum torque is applied
+        target = (((counter-phase_1)-((phase_2-phase_1)/steps)*step)*max_torque_step*sign)/(((phase_2-phase_1)*6)/10);
+        if (target > max_torque_step/steps)
+            target = max_torque_step/steps;
+        else if (target < -max_torque_step/steps)
+            target = -max_torque_step/steps;
     }
     else if (counter == duration) //end:
     {
         target = 0; //stop
     }
+
+    //re pull the brake
+    if ((counter+1) % brake_pull_period == 0 && counter < (duration-1))
+    {
+        // stop brake for 1ms to reset the brake pull counter
+        i_motorcontrol.set_brake_status(0);
+    }
+
     counter++;
 
     return target;
@@ -70,9 +106,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     unsigned int t_old_=0, t_new_=0, t_end_=0, idle_time_=0, loop_time_=0;
 
     int position_enable_flag = 0;
-    int motorctrl_enable_timeout = 0;
-    int position_limit_reached = 0;
-    int max_position, min_position;
+
+    //    int motorctrl_enable_timeout = 0;
+    //    int position_limit_reached = 0;
+    //    int max_position, min_position;
 
     PIDparam position_control_pid_param;
     SecondOrderLPfilterParam position_SO_LP_filter_param;
@@ -116,9 +153,22 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     float acceleration_monitor = 0;
     int enable_profiler = 1;
 
+    //position limiter
+    int position_limit_reached = 0;
+    int max_position_orig, min_position_orig;
+    int max_position, min_position;
+    //reverse position limits when polarity is inverted
+    if (pos_velocity_ctrl_config.polarity == -1) {
+        min_position = -pos_velocity_ctrl_config.max_pos;
+        max_position = -pos_velocity_ctrl_config.min_pos;
+    } else {
+        min_position = pos_velocity_ctrl_config.min_pos;
+        max_position = pos_velocity_ctrl_config.max_pos;
+    }
+
     //special_brake_release
     const int special_brake_release_range = 1000;
-    const int special_brake_release_duration = 2000;
+    const int special_brake_release_duration = 3000;
     int special_brake_release_counter = special_brake_release_duration+1;
     int special_brake_release_initial_position = 0;
     int special_brake_release_torque = 0;
@@ -142,17 +192,17 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
             (double)pos_velocity_ctrl_config.D_pos, (double)pos_velocity_ctrl_config.integral_limit_pos,
             pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
 
-    //reverse position limits when polarity is inverted
-    if (pos_velocity_ctrl_config.polarity == -1)
-    {
-        min_position = -pos_velocity_ctrl_config.max_pos;
-        max_position = -pos_velocity_ctrl_config.min_pos;
-    }
-    else
-    {
-        min_position = pos_velocity_ctrl_config.min_pos;
-        max_position = pos_velocity_ctrl_config.max_pos;
-    }
+    //    //reverse position limits when polarity is inverted
+    //    if (pos_velocity_ctrl_config.polarity == -1)
+    //    {
+    //        min_position = -pos_velocity_ctrl_config.max_pos;
+    //        max_position = -pos_velocity_ctrl_config.min_pos;
+    //    }
+    //    else
+    //    {
+    //        min_position = pos_velocity_ctrl_config.min_pos;
+    //        max_position = pos_velocity_ctrl_config.max_pos;
+    //    }
 
     downstream_control_data.position_cmd = 0;
     downstream_control_data.velocity_cmd = 0;
@@ -185,7 +235,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 t :> t_new_;
                 loop_time_=t_new_-t_old_;
                 idle_time_=t_new_-t_end_;
-                motorctrl_enable_timeout--;
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
@@ -276,58 +325,47 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 if (special_brake_release_counter <= special_brake_release_duration) //change target torque if we are in special brake release
                 {
                     torque_ref_k = special_brake_release(special_brake_release_counter, special_brake_release_initial_position, upstream_control_data.position,\
-                            special_brake_release_range, special_brake_release_duration, special_brake_release_torque);
+                            special_brake_release_range, special_brake_release_duration, special_brake_release_torque, i_motorcontrol);
                 }
 
-
-/*
+                /*
                 //position limit check
-                if (upstream_control_data.position > max_position)
+                if (upstream_control_data.position > max_position || upstream_control_data.position < min_position)
                 {
-                    if (((int)torque_ref_k) >= 0 && motorctrl_enable_flag == 1)
+                    //disable everything
+                    torque_enable_flag = 0;
+                    position_enable_flag = 0;
+                    velocity_enable_flag = 0;
+                    i_motorcontrol.set_brake_status(0);
+                    i_motorcontrol.set_torque_control_disabled();
+                    i_motorcontrol.set_safe_torque_off_enabled();
+                    printstr("*** Position Limit Reached ***\n");
+                    //store original limits
+                    if (position_limit_reached == 0)
                     {
-                        motorctrl_enable_flag = 0;
-                        motorctrl_enable_timeout = 3000000/pos_velocity_ctrl_config.control_loop_period; //wait 3 seconds before enabling the motor again
                         position_limit_reached = 1;
-                        i_motorcontrol.set_brake_status(0);
-                        i_motorcontrol.set_torque_control_disabled();
-                        i_motorcontrol.set_safe_torque_off_enabled();
-                        printstr("*** Maximum Position Limit Reached ***\n");
+                        max_position_orig = max_position;
+                        min_position_orig = min_position;
                     }
-                    else if (((int)torque_ref_k) < 0 && motorctrl_enable_flag == 0 && motorctrl_enable_timeout < 0 && position_limit_reached == 0)
-                    {
-                        motorctrl_enable_flag = 1;
-                        i_motorcontrol.set_torque_control_enabled();
-                        i_motorcontrol.set_brake_status(1);
-                    }
+                    //increase limit by threashold
+                    max_position += pos_velocity_ctrl_config.pos_limit_threshold;
+                    min_position -= pos_velocity_ctrl_config.pos_limit_threshold;
+                    printintln(max_position);
                 }
-                else if (upstream_control_data.position < min_position)
+                else if (position_limit_reached == 1 && upstream_control_data.position < max_position_orig && upstream_control_data.position > min_position_orig)
                 {
-                    if (((int)torque_ref_k) <= 0 && motorctrl_enable_flag == 1)
-                    {
-                        motorctrl_enable_flag = 0;
-                        motorctrl_enable_timeout = 3000000/pos_velocity_ctrl_config.control_loop_period; //wait 3 seconds before enabling the motor again
-                        position_limit_reached = 1;
-                        i_motorcontrol.set_brake_status(0);
-                        i_motorcontrol.set_torque_control_disabled();
-                        i_motorcontrol.set_safe_torque_off_enabled();
-                        printstr("*** Minimum Position Limit Reached ***\n");
+                    printstr("*** Position Limit Restore ***\n");
+                    //we moved back inside the original limits, restore the position limits
+                    if (pos_velocity_ctrl_config.polarity == -1) {
+                        min_position = -pos_velocity_ctrl_config.max_pos;
+                        max_position = -pos_velocity_ctrl_config.min_pos;
+                    } else {
+                        min_position = pos_velocity_ctrl_config.min_pos;
+                        max_position = pos_velocity_ctrl_config.max_pos;
                     }
-                    else if (((int)torque_ref_k) > 0 && motorctrl_enable_flag == 0 && motorctrl_enable_timeout < 0 && position_limit_reached == 0)
-                    {
-                        motorctrl_enable_flag = 1;
-                        i_motorcontrol.set_torque_control_enabled();
-                        i_motorcontrol.set_brake_status(1);
-                    }
+                    position_limit_reached = 0;
                 }
-                else if (motorctrl_enable_flag == 0 && motorctrl_enable_timeout < 0 && position_limit_reached == 0)
-                {
-                    motorctrl_enable_flag = 1;
-                    i_motorcontrol.set_torque_control_enabled();
-                    i_motorcontrol.set_brake_status(1);
-                }
-*/
-
+                 */
                 torque_ref_k += additive_torque_k;
 
                 //torque limit check
@@ -356,7 +394,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 torque_enable_flag   =0;
                 velocity_enable_flag =0;
                 position_enable_flag =0;
-
                 i_motorcontrol.set_torque_control_disabled();
                 i_motorcontrol.set_safe_torque_off_enabled();
                 i_motorcontrol.set_brake_status(0);
@@ -411,7 +448,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
         case i_position_control[int i].enable_velocity_ctrl(int velocity_control_mode_):
                 velocity_control_mode = velocity_control_mode_;
-
                 torque_enable_flag   =0;
                 velocity_enable_flag =1;
                 position_enable_flag =0;
@@ -493,20 +529,13 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 out_config = pos_velocity_ctrl_config;
                 break;
 
-
         case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
-                //reset position limiter if a new position target is received
-                if (position_limit_reached == 1) {
-                    if (downstream_control_data_in.position_cmd != downstream_control_data.position_cmd ||
-                            downstream_control_data_in.velocity_cmd != downstream_control_data.velocity_cmd ||
-                            downstream_control_data_in.torque_cmd != downstream_control_data.torque_cmd  ) {
-                        position_limit_reached = 0;
-                    }
-                }
                 //send the actual position/velocity/torque upstream
                 upstream_control_data_out = upstream_control_data;
+
                 //receive position/velocity/torque commands
                 downstream_control_data = downstream_control_data_in;
+
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (pos_velocity_ctrl_config.polarity == -1) {
                     upstream_control_data_out.position = -upstream_control_data_out.position;
@@ -514,12 +543,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     downstream_control_data.position_cmd = -downstream_control_data.position_cmd;
                     downstream_control_data.velocity_cmd = -downstream_control_data.velocity_cmd;
                 }
+
                 //apply limits
                 if (downstream_control_data.position_cmd > max_position) {
                     downstream_control_data.position_cmd = max_position;
                 } else if (downstream_control_data.position_cmd < min_position) {
                     downstream_control_data.position_cmd = min_position;
                 }
+
+                //set targets
                 position_ref_input_k = downstream_control_data.position_cmd;
                 velocity_ref_input_k = downstream_control_data.velocity_cmd;
                 torque_ref_input_k = downstream_control_data.torque_cmd;
@@ -597,7 +629,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 //write offset in config
                 i_motorcontrol.set_config(out_motorcontrol_config);
 
-                brake_enable_flag    = 0;
                 torque_enable_flag   = 0;
                 position_enable_flag = 0;
                 velocity_enable_flag = 0;

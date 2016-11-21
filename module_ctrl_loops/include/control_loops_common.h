@@ -41,6 +41,7 @@ typedef struct {
 
     int min_pos;
     int max_pos;
+    int pos_limit_threshold;
     int max_speed;
     int max_torque;
 
