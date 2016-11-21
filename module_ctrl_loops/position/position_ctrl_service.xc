@@ -109,7 +109,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     int position_enable_flag = 0;
 
 
-    int velocity_control_mode = 0;
     int pos_control_mode = 0;
 
 
@@ -410,21 +409,20 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 enable_profiler = pos_velocity_ctrl_config.enable_profiler;
                 break;
 
-        case i_position_control[int i].enable_velocity_ctrl(int velocity_control_mode_):
-                velocity_control_mode = velocity_control_mode_;
+        case i_position_control[int i].enable_velocity_ctrl(void):
+
                 torque_enable_flag   =0;
                 velocity_enable_flag =1;
                 position_enable_flag =0;
 
                 brake_enable_flag    =1;
                 i_motorcontrol.set_brake_status(1);
-                i_motorcontrol.set_torque_control_disabled();
+                i_motorcontrol.set_torque_control_enabled();
 
                 velocity_ref_input_k = 0;
                 additive_torque_input_k = 0;
                 pid_reset(velocity_control_pid_param);
-                i_motorcontrol.set_torque_control_enabled();
-                i_motorcontrol.set_brake_status(1);
+
                 //special brake release
                 if (pos_velocity_ctrl_config.special_brake_release != 0)
                 {
@@ -443,7 +441,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 i_motorcontrol.set_brake_status(1);
                 i_motorcontrol.set_torque_control_enabled();
 
-
                 //special brake release
                 if (pos_velocity_ctrl_config.special_brake_release != 0)
                 {
@@ -455,32 +452,46 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
         case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
                 pos_velocity_ctrl_config = in_config;
+
                 //reverse position limits when polarity is inverted
-                if (pos_velocity_ctrl_config.polarity == -1) {
+                if (pos_velocity_ctrl_config.polarity == -1)
+                {
                     min_position = -pos_velocity_ctrl_config.max_pos;
                     max_position = -pos_velocity_ctrl_config.min_pos;
-                } else {
+                }
+                else
+                {
                     min_position = pos_velocity_ctrl_config.min_pos;
                     max_position = pos_velocity_ctrl_config.max_pos;
                 }
-                //pid_init(velocity_control_pid_param);
-                pid_set_parameters((double)pos_velocity_ctrl_config.P_velocity, (double)pos_velocity_ctrl_config.I_velocity,
+
+                pid_init(velocity_control_pid_param);
+                if(pos_velocity_ctrl_config.P_velocity<0)            pos_velocity_ctrl_config.P_velocity=0;
+                if(pos_velocity_ctrl_config.P_velocity>100000000)    pos_velocity_ctrl_config.P_velocity=100000000;
+                if(pos_velocity_ctrl_config.I_velocity<0)            pos_velocity_ctrl_config.I_velocity=0;
+                if(pos_velocity_ctrl_config.I_velocity>100000000)    pos_velocity_ctrl_config.I_velocity=100000000;
+                if(pos_velocity_ctrl_config.D_velocity<0)            pos_velocity_ctrl_config.D_velocity=0;
+                if(pos_velocity_ctrl_config.D_velocity>100000000)    pos_velocity_ctrl_config.D_velocity=100000000;
+                pid_set_parameters(
+                        (double)pos_velocity_ctrl_config.P_velocity, (double)pos_velocity_ctrl_config.I_velocity,
                         (double)pos_velocity_ctrl_config.D_velocity, (double)pos_velocity_ctrl_config.integral_limit_velocity,
                         pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-                //pid_init(position_control_pid_param);
+
+
+                pid_init(position_control_pid_param);
                 if(pos_velocity_ctrl_config.P_pos<0)            pos_velocity_ctrl_config.P_pos=0;
                 if(pos_velocity_ctrl_config.P_pos>100000000)    pos_velocity_ctrl_config.P_pos=100000000;
                 if(pos_velocity_ctrl_config.I_pos<0)            pos_velocity_ctrl_config.I_pos=0;
                 if(pos_velocity_ctrl_config.I_pos>100000000)    pos_velocity_ctrl_config.I_pos=100000000;
                 if(pos_velocity_ctrl_config.D_pos<0)            pos_velocity_ctrl_config.D_pos=0;
                 if(pos_velocity_ctrl_config.D_pos>100000000)    pos_velocity_ctrl_config.D_pos=100000000;
-
                 pid_set_parameters((double)pos_velocity_ctrl_config.P_pos, (double)pos_velocity_ctrl_config.I_pos,
                         (double)pos_velocity_ctrl_config.D_pos, (double)pos_velocity_ctrl_config.integral_limit_pos,
                         pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
 
                 second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, pos_velocity_ctrl_config.control_loop_period, position_SO_LP_filter_param);
                 second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, pos_velocity_ctrl_config.control_loop_period, velocity_SO_LP_filter_param);
+
                 pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
                 pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
                 enable_profiler = pos_velocity_ctrl_config.enable_profiler;

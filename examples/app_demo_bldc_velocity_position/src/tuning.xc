@@ -344,7 +344,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 case 'v':
                         if (value == 1)
                         {
-                            i_position_control.enable_velocity_ctrl(VELOCITY_PID_CONTROLLER);
+                            i_position_control.enable_velocity_ctrl();
                             printf("velocity ctrl enabled\n");
                         }
                         else
