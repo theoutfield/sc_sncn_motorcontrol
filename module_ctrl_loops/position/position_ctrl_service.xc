@@ -428,7 +428,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
         case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
                 //check if we need to update max/min pos limits
-                if (in_config.max_pos != pos_velocity_ctrl_config.max_pos || in_config.min_pos != pos_velocity_ctrl_config.min_pos)
+                if (in_config.max_pos != pos_velocity_ctrl_config.max_pos || in_config.min_pos != pos_velocity_ctrl_config.min_pos || in_config.polarity != pos_velocity_ctrl_config.polarity)
                 {
                     //reverse position limits when polarity is inverted
                     if (in_config.polarity == -1)
