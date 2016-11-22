@@ -197,7 +197,7 @@
 #define POSITION_Kd                             16500
 
 
-#define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
+#define MAX_SPEED                               30000    // prefered value 3000, maximum value 5000 [rpm]
 
 #define POSITION_INTEGRAL_LIMIT                 1000 //in case of using non-linear position control,
                                                      //set "POSITION_INTEGRAL_LIMIT" to 1000
@@ -208,10 +208,10 @@
 #define COMMUTATION_OFFSET_CLK      1460
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             30000
-#define VELOCITY_Ki                             1300
+#define VELOCITY_Kp                             0
+#define VELOCITY_Ki                             0
 #define VELOCITY_Kd                             0
-#define VELOCITY_INTEGRAL_LIMIT                 1000000000
+#define VELOCITY_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
 
 
 //Filter parameters
