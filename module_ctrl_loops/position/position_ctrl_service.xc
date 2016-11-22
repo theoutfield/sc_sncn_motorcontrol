@@ -393,6 +393,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 position_ref_in_k_2n = ((double) upstream_control_data.position);
 
                 nl_position_control_reset(nl_pos_ctrl);
+                nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
 
                 additive_torque_input_k = 0;
                 pid_reset(position_control_pid_param);
