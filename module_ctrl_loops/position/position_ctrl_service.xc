@@ -288,22 +288,28 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     i_motorcontrol.set_torque_control_disabled();
                     i_motorcontrol.set_safe_torque_off_enabled();
                     printstr("*** Position Limit Reached ***\n");
-                    //store original limits
+                    //store original limits, with threshold if possible
                     if (position_limit_reached == 0)
                     {
                         position_limit_reached = 1;
-                        max_position_orig = max_position;
-                        min_position_orig = min_position;
+                        if (max_position-min_position > 2*pos_velocity_ctrl_config.pos_limit_threshold)
+                        {
+                            max_position_orig = max_position-pos_velocity_ctrl_config.pos_limit_threshold;
+                            min_position_orig = min_position+pos_velocity_ctrl_config.pos_limit_threshold;
+                        }
+                        else
+                        {
+                            max_position_orig = max_position;
+                            min_position_orig = min_position;
+                        }
                     }
                     //increase limit by threashold
                     max_position += pos_velocity_ctrl_config.pos_limit_threshold;
                     min_position -= pos_velocity_ctrl_config.pos_limit_threshold;
-                    printintln(max_position);
                 }
+                //test if we moved back inside the original limits, then restore the position limits
                 else if (position_limit_reached == 1 && upstream_control_data.position < max_position_orig && upstream_control_data.position > min_position_orig)
                 {
-                    printstr("*** Position Limit Restore ***\n");
-                    //we moved back inside the original limits, restore the position limits
                     if (pos_velocity_ctrl_config.polarity == -1) {
                         min_position = -pos_velocity_ctrl_config.max_pos;
                         max_position = -pos_velocity_ctrl_config.min_pos;
@@ -365,6 +371,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                 //reset pid
                 nl_position_control_reset(nl_pos_ctrl);
+                nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config);
                 pid_reset(position_control_pid_param);
 
                 //special brake release
