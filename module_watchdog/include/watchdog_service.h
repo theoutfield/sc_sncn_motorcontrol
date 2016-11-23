@@ -19,6 +19,11 @@ typedef struct {
 } WatchdogPorts;
 
 /**
+ * @brief Enumeration of existing IFM modules.
+ */
+enum {DC100_DC300, DC500, DC1K_DC5K};
+
+/**
  * @brief Service to manage the watchdog chip within your IFM SOMANET device.
  *
  * @param watchdog_ports Ports structure defining where to access the watchdog chip.
@@ -27,4 +32,4 @@ typedef struct {
 [[combinable]]
 void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec);
 
-void blink_red(int &IFM_module_type, unsigned char &output, int period, unsigned int &times, unsigned int &delay_counter, int &fault);
+void blink_red(int &fault, int period, WatchdogPorts &watchdog_ports, int &IFM_module_type, unsigned char &output, unsigned int &times, unsigned int &delay_counter);

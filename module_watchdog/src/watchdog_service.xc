@@ -6,7 +6,6 @@
 
 #include <xs1.h>
 #include <watchdog_service.h>
-#include <print.h>
 
 [[combinable]]
  void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec)
@@ -22,8 +21,6 @@
     {
         usec = 100;
     }
-
-    enum {DC100_DC300, DC500, DC1K_DC5K};
 
     int IFM_module_type = -1;
 
@@ -188,8 +185,7 @@
                 }
 
                 //showing the fault type by LED flashing (once, twice, ..., five times)
-                blink_red(IFM_module_type, led_motor_on_wdtick_wden_buffer, wd_half_period/2, times, LED_counter, fault);
-
+                blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, times, LED_counter);
 
                 LED_counter++;
 #if 0
@@ -368,17 +364,26 @@
     }
 }
 
-void blink_red(int &IFM_module_type, unsigned char &output, int period, unsigned int &times, unsigned int &delay_counter, int &fault){
-    enum {DC100_DC300, DC500, DC1K_DC5K};
-    switch(IFM_module_type){
-    case DC1K_DC5K:
-        if ((delay_counter % period == 0) && times != (fault*2)){
-            output ^= (1 << 3);
-            times++;
-        }
-        else if ((delay_counter % (period*10) == 0) && times == (fault*2)){
-            times = 0;
-        }
-        break;
+void blink_red(int &fault, int period, WatchdogPorts &watchdog_ports, int &IFM_module_type, unsigned char &output, unsigned int &times, unsigned int &delay_counter){
+    if ((delay_counter % period == 0) && times != (fault*2)){//blinking
+        switch(IFM_module_type){
+            case DC100_DC300://ToDo: to be tested
+                output |= 0b1100;
+                output ^= (1 << 1);
+                watchdog_ports.p_shared_enable_tick_led <: output;
+                break;
+            case DC500://ToDo: to be tested
+                output ^= (1 << 3);
+                watchdog_ports.p_cpld_shared <: output;
+                break;
+            case DC1K_DC5K:
+                output ^= (1 << 3);
+                watchdog_ports.p_shared_enable_tick_led <: output;
+                break;
+            }
+        times++;
+    }
+    else if ((delay_counter % (period*20) == 0) && times == (fault*2)){//idling
+        times = 0;
     }
 }
