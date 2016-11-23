@@ -192,15 +192,15 @@
 */
 
 //cascade pos controller
-#define POSITION_Kp                             4000
-#define POSITION_Ki                             120
-#define POSITION_Kd                             16500
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 
 
 #define MAX_SPEED                               30000    // prefered value 3000, maximum value 5000 [rpm]
 
-#define POSITION_INTEGRAL_LIMIT                 1000 //in case of using non-linear position control,
-                                                     //set "POSITION_INTEGRAL_LIMIT" to 1000
+#define POSITION_INTEGRAL_LIMIT                 MAXIMUM_TORQUE   //in case of using non-linear position control,
+                                                                 //set "POSITION_INTEGRAL_LIMIT" to 1000
 
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
