@@ -8,14 +8,14 @@
 
 #include <refclk.h>
 
-#include <motor_config_FAULHABER.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   HALL_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR//HALL_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
 #define POSITION_SENSOR_RESOLUTION 65530
@@ -101,7 +101,7 @@
 #define HALL_STATE_6_ANGLE     0
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              NORMAL_POLARITY
+#define MOTOR_POLARITY              INVERTED_POLARITY
 
 
 ///////////////////////////////////////////////
@@ -192,20 +192,20 @@
 */
 
 //cascade pos controller
-#define POSITION_Kp                             0
-#define POSITION_Ki                             0
-#define POSITION_Kd                             0
+#define POSITION_Kp                             0//30000
+#define POSITION_Ki                             0//1500
+#define POSITION_Kd                             0//124000
 
 
 #define MAX_SPEED                               30000    // prefered value 3000, maximum value 5000 [rpm]
 
-#define POSITION_INTEGRAL_LIMIT                 MAXIMUM_TORQUE   //in case of using non-linear position control,
-                                                                 //set "POSITION_INTEGRAL_LIMIT" to 1000
+//in case of using non-linear position control set "POSITION_INTEGRAL_LIMIT" to 1000
+#define POSITION_INTEGRAL_LIMIT                 1000
 
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      1460
+#define COMMUTATION_OFFSET_CLK      2000
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             0
