@@ -26,7 +26,7 @@
 
     unsigned int wd_half_period = 40 * usec;
 
-    unsigned char led_motor_on_wdtick_wden_buffer = 0b1000;
+    unsigned char led_motor_on_wdtick_wden_buffer = 0;
     unsigned char reset_wd_en_mask = 0b1110;
     unsigned char   set_wd_en_mask = 0b0001;
 
@@ -85,19 +85,8 @@
             wd_enabled = 1;
             break;
         case DC1K_DC5K://FixMe: optimize it further
-            //motor on
-            led_motor_on_wdtick_wden_buffer |= set_motor_on_mask;
-            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
-            //reset WD_EN and LED
-            led_motor_on_wdtick_wden_buffer &= reset_led_mask;
-            led_motor_on_wdtick_wden_buffer &= reset_wd_en_mask;
-
-            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-
-            //Enable WD
-            led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
-            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+            //motor on and WD on
+            led_motor_on_wdtick_wden_buffer |= 0b0101;
             wd_enabled = 1;
             break;
     }
@@ -185,7 +174,7 @@
                 }
 
                 //showing the fault type by LED flashing (once, twice, ..., five times)
-                blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, times, LED_counter);
+                if(fault) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, times, LED_counter);
 
                 LED_counter++;
 #if 0
@@ -364,7 +353,7 @@
     }
 }
 
-void blink_red(int &fault, int period, WatchdogPorts &watchdog_ports, int &IFM_module_type, unsigned char &output, unsigned int &times, unsigned int &delay_counter){
+void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_module_type, unsigned char &output, unsigned int &times, unsigned int &delay_counter){
     if ((delay_counter % period == 0) && times != (fault*2)){//blinking
         switch(IFM_module_type){
             case DC100_DC300://ToDo: to be tested
