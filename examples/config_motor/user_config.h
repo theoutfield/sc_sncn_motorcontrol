@@ -192,8 +192,8 @@
 */
 
 //cascade pos controller
-#define POSITION_Kp                             250000
-#define POSITION_Ki                             10000
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
 #define POSITION_Kd                             0
 
 
@@ -209,7 +209,7 @@
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             1000000
-#define VELOCITY_Ki                             10000
+#define VELOCITY_Ki                             30000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
 
