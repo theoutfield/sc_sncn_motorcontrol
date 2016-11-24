@@ -7,7 +7,7 @@
 #include <controllers_lib.h>
 #include <control_loops_common.h>
 #include <math.h>
-
+#include <xscope.h>
 
 
 /**
@@ -48,7 +48,7 @@ void pid_init(PIDparam &param)
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, PIDparam &param)
+void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDparam &param)
 {
     param.Kp = Kp;
     param.Ki = Ki;
@@ -65,15 +65,79 @@ void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int 
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-float pid_update(float desired_value, float actual_value, int T_s, PIDparam &param)
+double pid_update(double desired_value, double actual_value, int T_s, PIDparam &param)
 {
-    float error, cmd, integral_term;
+    double error=0.00, cmd=0.00;
+
     error = desired_value - actual_value;
-    param.integral += error;
-    integral_term = param.Ki * param.integral;
-    if ((integral_term > param.integral_limit) || (integral_term < -param.integral_limit))
-        param.integral -= error;
-    cmd = ((param.Kp * error) + integral_term - (param.Kd * (actual_value - param.actual_value_1n)));
+
+    param.integral += (param.Ki/1000000.00) * error;
+    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
+        param.integral -= ((param.Ki/1000000.00) * error);
+
+    cmd = ((param.Kp/1000000.00) * (desired_value- actual_value)) + param.integral - ((param.Kd/1000000.00) * (actual_value - param.actual_value_1n));
+
+    param.actual_value_1n = actual_value;
+
+    return cmd;
+}
+
+
+/**
+ * @brief updating the PID controller.
+ * @param output, control command
+ * @param input, setpoint
+ * @param input, feedback
+ * @param input, sample-time in us (microseconds).
+ * @param the parameters of the PID controller
+ */
+double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed, int speed_max)
+{
+    double error=0.00, error_temp_cmd=0.00, temp_cmd=0.00, cmd=0.00, proportional_term=0.00, integral_term=0.00, derivative_term=0.00;
+
+    error = desired_value - actual_value;
+
+    param.integral += (param.Ki/1000000.00) * error;
+
+    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
+        param.integral -= ((param.Ki/1000000.00) * error);
+
+    proportional_term = (param.Kp/1000000.00) * (desired_value- actual_value);
+
+    temp_cmd = proportional_term + param.integral;
+
+    if(temp_cmd> speed_max) temp_cmd= speed_max;
+    if(temp_cmd<-speed_max) temp_cmd=-speed_max;
+
+    error_temp_cmd = temp_cmd - speed;
+
+    cmd = (param.Kd/1000000.00) * error_temp_cmd;
+
+    param.actual_value_1n = actual_value;
+    return cmd;
+}
+
+
+
+/**
+ * @brief velocity controller
+ * @param output, torque command in milli-Nm
+ * @param input, velocity reference in rpm
+ * @param input, measured velocity in rpm
+ * @param the parameters of the PID controller
+ */
+double velocity_controller(double desired_value, double actual_value, PIDparam &param)
+{
+    double error=0.00, cmd=0.00, integral_term=0.00;
+
+    error = desired_value - actual_value;
+
+    param.integral += (param.Ki/1000000.00) * error;
+    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
+        param.integral -= ((param.Ki/1000000.00) * error);
+
+    cmd = param.integral + ((param.Kd/1000000.00)*(param.actual_value_1n-actual_value)) + ((param.Kp/1000000.00)*error);
+
     param.actual_value_1n = actual_value;
     return cmd;
 }
@@ -120,6 +184,7 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
     nl_pos_ctrl.state_min=0.00;
 
     nl_pos_ctrl.torque_ref_k=0.00;
+    nl_pos_ctrl.t_additive = 0.00;
 }
 
 
@@ -134,21 +199,21 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
     nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.j));
     nl_pos_ctrl.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
 
-    //PID parameters are pre-multiplied by 100 (by user)
-    nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos));
-    nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos));
-    nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos));
+    //check if the PID parameters are in range
+    if(0<=pos_velocity_ctrl_config.P_pos && pos_velocity_ctrl_config.P_pos<=100000000)
+        nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.P_pos));
+    if(0<=pos_velocity_ctrl_config.I_pos && pos_velocity_ctrl_config.I_pos<=100000000)
+        nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.I_pos));
+    if(0<=pos_velocity_ctrl_config.D_pos && pos_velocity_ctrl_config.D_pos<=100000000)
+        nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.D_pos));
 
     nl_pos_ctrl.constant_gain = 2/nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/= nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/=(nl_pos_ctrl.k_fb * nl_pos_ctrl.k_m);
 
     nl_pos_ctrl.integral_limit_pos = ((double)(pos_velocity_ctrl_config.integral_limit_pos))/1000.00;
-    nl_pos_ctrl.kp *= nl_pos_ctrl.integral_limit_pos;
-    nl_pos_ctrl.ki *= nl_pos_ctrl.integral_limit_pos;
+
     nl_pos_ctrl.kd *= nl_pos_ctrl.integral_limit_pos;
-    nl_pos_ctrl.kp /=100000.00;
-    nl_pos_ctrl.ki /=100000.00;
     nl_pos_ctrl.kd /=100000.00;
 
     nl_pos_ctrl.calculated_j = (nl_pos_ctrl.kd*10000000)/(nl_pos_ctrl.constant_gain*0.216);
@@ -171,11 +236,15 @@ int update_nl_position_control(
 {
     nl_pos_ctrl.gained_error = position_ref_k_ - position_sens_k_;
 
-    nl_pos_ctrl.feedback_p_loop  = nl_pos_ctrl.kp * (position_sens_k_ - position_sens_k_1_);
+    nl_pos_ctrl.feedback_p_loop  = position_sens_k_ - position_sens_k_1_;
+    nl_pos_ctrl.feedback_p_loop *= nl_pos_ctrl.kp;
 
-    nl_pos_ctrl.delta_y_k = nl_pos_ctrl.gained_error*nl_pos_ctrl.ki - nl_pos_ctrl.feedback_p_loop;
+    nl_pos_ctrl.delta_y_k = position_ref_k_ - position_sens_k_;
+    nl_pos_ctrl.delta_y_k*= nl_pos_ctrl.ki;
+    nl_pos_ctrl.delta_y_k-= nl_pos_ctrl.feedback_p_loop;
+    nl_pos_ctrl.delta_y_k*= nl_pos_ctrl.integral_limit_pos;
 
-    nl_pos_ctrl.y_k = nl_pos_ctrl.delta_y_k + nl_pos_ctrl.y_k_1;
+    nl_pos_ctrl.y_k = (nl_pos_ctrl.delta_y_k/100000.00) + nl_pos_ctrl.y_k_1;
 
     if(nl_pos_ctrl.y_k>0)
     {
@@ -274,9 +343,9 @@ int update_nl_position_control(
  * @param input, profiled position calculated in two steps ago
  * @param the parameters of the position reference profiler
  */
-float pos_profiler(float pos_target, float pos_k_1n, float pos_k_2n, posProfilerParam pos_profiler_param)
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfilerParam pos_profiler_param)
 {
-    float velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2;
+    double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2;
     int deceleration_flag = 0;
 
 

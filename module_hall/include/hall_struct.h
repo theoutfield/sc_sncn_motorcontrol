@@ -17,16 +17,6 @@
 
 #define HALL_USEC           IFM_TILE_USEC
 
-/**
- * Structure type for Hall Service configuration
- */
-typedef struct {
-    int pole_pairs; /**< Number of pole pairs in your motor. */
-    int enable_push_service;
-    int polarity;
-} HallConfig;
-
-
 // Hall_states
 #define HALL_STATE_0  4
 #define HALL_STATE_1  6

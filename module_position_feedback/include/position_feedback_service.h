@@ -17,12 +17,18 @@
 #include <hall_struct.h>
 #include <qei_struct.h>
 
+#include <stdint.h>
+
 typedef struct {
     int sensor_type;
+    int polarity;   /**< Encoder polarity. >*/
+    int pole_pairs; /**< Number of pole pairs (1-7) >*/
+    int resolution; /**< number of ticks per turn >*/
+    int offset;     /**< position offset in ticks, can be singleturn or multiturn depending on the sensor >*/
+    int enable_push_service; /**< Select which data to push to shared memory >*/
     BISSConfig biss_config;
     CONTELECConfig contelec_config;
     AMSConfig ams_config;
-    HallConfig hall_config;
     QEIConfig qei_config;
 } PositionFeedbackConfig;
 
@@ -101,5 +107,7 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?biss_ports, SP
                                PositionFeedbackConfig &?position_feedback_config_2,
                                client interface shared_memory_interface ?i_shared_memory_2,
                                server interface PositionFeedbackInterface ?i_position_feedback_2[3]);
+
+int tickstobits(uint32_t ticks);
 
 #endif

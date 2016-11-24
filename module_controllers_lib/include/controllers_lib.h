@@ -12,12 +12,12 @@
  * @brief Structure type to set the parameters of the PID controller.
  */
 typedef struct {
-    float Kp;
-    float Ki;
-    float Kd;
-    float integral_limit;
-    float integral;
-    float actual_value_1n;
+    double Kp;
+    double Ki;
+    double Kd;
+    double integral_limit;
+    double integral;
+    double actual_value_1n;
     int T_s;    //Sampling-Time in microseconds
 } PIDparam;
 
@@ -73,12 +73,12 @@ typedef struct {
  * @brief Structure type to set the parameters of the integral optimum position controller.
  */
 typedef struct {
-    float Kp;
-    float Ki;
-    float Kd;
-    float integral_limit;
-    float integral;
-    float actual_value_1n;
+    double Kp;
+    double Ki;
+    double Kd;
+    double integral_limit;
+    double integral;
+    double actual_value_1n;
     int T_s;    //Sampling-Time in microseconds
 } integralOptimumPosControllerParam;
 
@@ -111,7 +111,7 @@ void pid_init(PIDparam &param);
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int T_s, PIDparam &param);
+void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDparam &param);
 
 
 /**
@@ -122,7 +122,7 @@ void pid_set_parameters(float Kp, float Ki, float Kd, float integral_limit, int 
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-float pid_update(float desired_value, float actual_value, int T_s, PIDparam &param);
+double pid_update(double desired_value, double actual_value, int T_s, PIDparam &param);
 
 
 /**
@@ -132,6 +132,17 @@ float pid_update(float desired_value, float actual_value, int T_s, PIDparam &par
 void pid_reset(PIDparam &param);
 
 
+/**
+ * @brief velocity controller
+ * @param output, torque command in milli-Nm
+ * @param input, velocity reference in rpm
+ * @param input, measured velocity in rpm
+ * @param the parameters of the PID controller
+ */
+double velocity_controller(double desired_value, double actual_value, PIDparam &param);
+
+
+double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed, int speed_max);
 /**
  * @brief resetting the parameters of the nonlinear position controller with saturation.
  * @param the parameters of the controller
@@ -169,7 +180,7 @@ int update_nl_position_control(
  * @param input, profiled position calculated in two steps ago
  * @param the parameters of the position reference profiler
  */
-float pos_profiler(float pos_target, float pos_k_1n, float pos_k_2n, posProfilerParam pos_profiler_param);
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfilerParam pos_profiler_param);
 
 
 

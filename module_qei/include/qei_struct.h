@@ -60,9 +60,6 @@ typedef enum {
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    int ticks_resolution;       /**< Encoder resolution [pulses/revolution]. */
     QEI_IndexType index_type;   /**< Encoder index type. */
-    int sensor_polarity;        /**< Encoder direction. */
     QEI_SignalType signal_type; /**< Encoder output signal type (if applicable in your SOMANET device). */
-    int enable_push_service;
 } QEIConfig;

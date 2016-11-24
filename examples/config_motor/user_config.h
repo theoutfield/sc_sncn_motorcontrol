@@ -8,14 +8,14 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT3.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
 // SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
-#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR
+#define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR//HALL_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
 #define POSITION_SENSOR_RESOLUTION 65530
@@ -41,12 +41,11 @@
 //////////////////////////////////////////////
 
 /*
- * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.
+ * By default, RECUPERATION MODE is activated. Setting the maximum power of recuperation to a high
+ * value (such as 10 times the nominal power) results in having no limit while working under recuperation mode.
+ * In high-power applications (such as electric vehicles), this mode shoule
+ * be activated only if dc-power supply is capable of accepting energy.
  * */
-
-// For not affecting higher controlling levels (such as position control),
-// RECUPERATION should be set to 1, and REGEN_P_MAX should be set to a much higher value than the rated power
-// (such as 50 kW),
 
 #define RECUPERATION        1          // when RECUPERATION is 0, there will be no recuperation
 
@@ -102,7 +101,7 @@
 #define HALL_STATE_6_ANGLE     0
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              NORMAL_POLARITY
+#define MOTOR_POLARITY              INVERTED_POLARITY
 
 
 ///////////////////////////////////////////////
@@ -142,6 +141,7 @@
 //Limits
 #define MIN_POSITION_LIMIT                     -0x7fffffff
 #define MAX_POSITION_LIMIT                      0x7fffffff
+#define POSITION_LIMIT_THRESHOLD                20000
 #define TORQUE_CONTROL_LIMIT                    MAXIMUM_TORQUE
 
 //Integrated Profiler
@@ -177,37 +177,46 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 */
+/*
+//nonlinear mode
+#define POSITION_Kp                             4000
+#define POSITION_Ki                             120
+#define POSITION_Kd                             16500
+*/
 
-//-----  axis 4 of the robot (project FS)
-#define POSITION_Kp                             76000
-#define POSITION_Ki                             7700
-#define POSITION_Kd                             320000
+/*
+//simple pid pos controller
+#define POSITION_Kp                             50000
+#define POSITION_Ki                             200
+#define POSITION_Kd                             0
+*/
 
-#define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
+//cascade pos controller
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 
-#define POSITION_INTEGRAL_LIMIT                 1000 //in case of using non-linear position control,
-                                                     //set "POSITION_INTEGRAL_LIMIT" to 1000
+
+#define MAX_SPEED                               30000    // prefered value 3000, maximum value 5000 [rpm]
+
+//in case of using non-linear position control set "POSITION_INTEGRAL_LIMIT" to 1000
+#define POSITION_INTEGRAL_LIMIT                 1000
 
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      600
-
-
+#define COMMUTATION_OFFSET_CLK      2000
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             100
-#define VELOCITY_Ki                             0
-#define VELOCITY_Kd                             60
-#define VELOCITY_INTEGRAL_LIMIT                 0
+#define VELOCITY_Kp                             1000000
+#define VELOCITY_Ki                             30000
+#define VELOCITY_Kd                             0
+#define VELOCITY_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
 
 
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
-
-#define PID_GAIN                1000     //common gain multiplied in 3 pid constants at the same time.
-                                         //default value is 1000 (which makes it ineffective)
 
 //Number of ticks in a microsecond/frequency for IFM Tile
 #define IFM_TILE_USEC   USEC_STD//USEC_FAST//

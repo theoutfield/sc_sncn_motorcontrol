@@ -32,32 +32,32 @@ void initspi_ports(SPIPorts &spi_ports)
     slave_deselect(spi_ports.slave_select); // Ensure slave select is in correct start state
 }
 
-{unsigned short, unsigned short} transform_settings(AMSConfig config)
+{unsigned short, unsigned short} transform_settings(PositionFeedbackConfig &config)
 {
     unsigned short settings1 = 0, settings2 = 0;
 
     #if AMS_SENSOR_TYPE == AS5147
-    settings1 = (config.width_index_pulse << 0);
+    settings1 = (config.ams_config.width_index_pulse << 0);
     #else
-    settings1 = (config.factory_settings << 0);
+    settings1 = (config.ams_config.factory_settings << 0);
     #endif
-    settings1 |= (config.noise_setting << 1);
+    settings1 |= (config.ams_config.noise_setting << 1);
     if (config.polarity == AMS_POLARITY_INVERTED) {
         settings1 |= (1 << 2);
     }
-    settings1 |= (config.uvw_abi << 3);
-    settings1 |= (config.dyn_angle_comp << 4);
-    settings1 |= (config.data_select << 6);
-    settings1 |= (config.pwm_on << 7);
+    settings1 |= (config.ams_config.uvw_abi << 3);
+    settings1 |= (config.ams_config.dyn_angle_comp << 4);
+    settings1 |= (config.ams_config.data_select << 6);
+    settings1 |= (config.ams_config.pwm_on << 7);
 
     settings2 = (config.pole_pairs-1) << 0;
-    settings2 |= (config.hysteresis << 3);
-    settings2 |= (config.abi_resolution << 5);
+    settings2 |= (config.ams_config.hysteresis << 3);
+    settings2 |= (config.ams_config.abi_resolution << 5);
 
     return {settings1, settings2};
 }
 
-int initRotarySensor(SPIPorts &spi_ports, AMSConfig config)
+int initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 {
     int data_in;
 
@@ -487,14 +487,15 @@ static inline void multiturn(int &count, int last_position, int position, int ti
             count += difference;
 }
 
- void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
+void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
 
-     if (AMS_USEC == USEC_FAST) { //Set freq to 250MHz
-         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-     }
+    if (AMS_USEC == USEC_FAST) { //Set freq to 250MHz
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
 
-    if (initRotarySensor(spi_ports,  position_feedback_config.ams_config) != SUCCESS_WRITING) {
+    position_feedback_config.offset &= (position_feedback_config.resolution-1);
+    if (initRotarySensor(spi_ports,  position_feedback_config) != SUCCESS_WRITING) {
         printstrln("Error with SPI AMS sensor");
         position_feedback_config.sensor_type = 0;
         return;
@@ -508,8 +509,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
     int velocity = 0;
     int old_count = 0;
     int old_difference = 0;
-    int ticks_per_turn = (1 << position_feedback_config.ams_config.resolution_bits);
-    int crossover = ticks_per_turn - ticks_per_turn/10;
+    int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
     int velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
     int velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
     //position
@@ -549,14 +549,11 @@ static inline void multiturn(int &count, int last_position, int position, int ti
                 if (timeafter(time, last_ams_read + position_feedback_config.ams_config.cache_time)) {
                     angle = readRotarySensorAngleWithCompensation(spi_ports);
                     t :> last_ams_read;
-                    multiturn(count, last_position, angle, ticks_per_turn);
+                    multiturn(count, last_position, angle, position_feedback_config.resolution);
                     last_position = angle;
                 } else
                     angle = last_position;
-                if (position_feedback_config.ams_config.resolution_bits > 12)
-                    angle = (position_feedback_config.ams_config.pole_pairs * (angle >> (position_feedback_config.ams_config.resolution_bits-12)) ) & 4095;
-                else
-                    angle = (position_feedback_config.ams_config.pole_pairs * (angle << (12-position_feedback_config.ams_config.resolution_bits)) ) & 4095;
+                angle = (position_feedback_config.pole_pairs * (angle >> 2) ) & 4095;
                 break;
 
         //send multiturn count and position
@@ -565,7 +562,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
                 if (timeafter(time, last_ams_read + position_feedback_config.ams_config.cache_time)) {
                     position = readRotarySensorAngleWithCompensation(spi_ports);
                     t :> last_ams_read;
-                    multiturn(count, last_position, position, ticks_per_turn);
+                    multiturn(count, last_position, position, position_feedback_config.resolution);
                     last_position = position;
                 } else
                     position = last_position;
@@ -587,20 +584,19 @@ static inline void multiturn(int &count, int last_position, int position, int ti
 
         //send ticks per turn
         case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
-                out_ticks_per_turn = ticks_per_turn;
+                out_ticks_per_turn = position_feedback_config.resolution;
                 break;
 
         //receive new ams_config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
-                ticks_per_turn = (1 << in_config.ams_config.resolution_bits);
-                in_config.ams_config.offset &= (ticks_per_turn-1);
+                in_config.offset &= (in_config.resolution-1);
                 //update variables which depend on ams_config
-                if (position_feedback_config.ams_config.polarity != in_config.ams_config.polarity)
-                    initRotarySensor(spi_ports,  in_config.ams_config);
-                else if (position_feedback_config.ams_config.offset != in_config.ams_config.offset)
-                    writeZeroPosition(spi_ports, in_config.ams_config.offset);
+                if (position_feedback_config.polarity != in_config.polarity)
+                    initRotarySensor(spi_ports,  in_config);
+                else if (position_feedback_config.offset != in_config.offset)
+                    writeZeroPosition(spi_ports, in_config.offset);
                 position_feedback_config = in_config;
-                crossover = ticks_per_turn - ticks_per_turn/10;
+                crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
                 velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC;
                 velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
 
@@ -628,12 +624,9 @@ static inline void multiturn(int &count, int last_position, int position, int ti
         case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
                 writeZeroPosition(spi_ports, 0);
                 int position = readRotarySensorAngleWithoutCompensation(spi_ports);
-                if (position_feedback_config.ams_config.resolution_bits > 12)
-                    out_offset = (ticks_per_turn - ((new_angle << (position_feedback_config.ams_config.resolution_bits-12)) / position_feedback_config.ams_config.pole_pairs) + position) & (ticks_per_turn-1);
-                else
-                    out_offset = (ticks_per_turn - ((new_angle >> (12-position_feedback_config.ams_config.resolution_bits)) / position_feedback_config.ams_config.pole_pairs) + position) & (ticks_per_turn-1);
+                out_offset = (position_feedback_config.resolution - ((new_angle << 2) / position_feedback_config.pole_pairs) + position) & (position_feedback_config.resolution-1);
                 writeZeroPosition(spi_ports, out_offset);
-                position_feedback_config.ams_config.offset = out_offset;
+                position_feedback_config.offset = out_offset;
                 break;
 
         //execute command
@@ -651,13 +644,10 @@ static inline void multiturn(int &count, int last_position, int position, int ti
             t :> time;
             position = readRotarySensorAngleWithCompensation(spi_ports);
             t :> last_ams_read;
-            multiturn(count, last_position, position, ticks_per_turn);
+            multiturn(count, last_position, position, position_feedback_config.resolution);
             last_position = position;
 
-            if (position_feedback_config.ams_config.resolution_bits > 12)
-                angle = (position_feedback_config.ams_config.pole_pairs * (position >> (position_feedback_config.ams_config.resolution_bits-12)) ) & 4095;
-            else
-                angle = (position_feedback_config.ams_config.pole_pairs * (position << (12-position_feedback_config.ams_config.resolution_bits)) ) & 4095;
+            angle = (position_feedback_config.pole_pairs * (position >> 2) ) & 4095;
 
             int difference = count - old_count;
             if(difference > crossover || difference < -crossover)
@@ -667,20 +657,20 @@ static inline void multiturn(int &count, int last_position, int position, int ti
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
 //            velocity = (difference * velocity_factor) / ticks_per_turn;
-            velocity = (difference * (60000000/((int)(last_ams_read-last_velocity_read)/AMS_USEC))) / ticks_per_turn;
+            velocity = (difference * (60000000/((int)(last_ams_read-last_velocity_read)/AMS_USEC))) / position_feedback_config.resolution;
             last_velocity_read = last_ams_read;
 
             if (!isnull(i_shared_memory)) {
-                if (position_feedback_config.ams_config.enable_push_service == PushAll) {
+                if (position_feedback_config.enable_push_service == PushAll) {
                     i_shared_memory.write_angle_velocity_position(angle, velocity, count);
                     actual_count = count;
                     actual_velocity = velocity;
                     actual_angle = angle;
                     actual_position = position;
-                } else if (position_feedback_config.ams_config.enable_push_service == PushAngle) {
+                } else if (position_feedback_config.enable_push_service == PushAngle) {
                     i_shared_memory.write_angle_electrical(angle);
                     actual_angle = angle;
-                } else if (position_feedback_config.ams_config.enable_push_service == PushPosition) {
+                } else if (position_feedback_config.enable_push_service == PushPosition) {
                     i_shared_memory.write_velocity_position(velocity, count);
                     actual_count = count;
                     actual_velocity = velocity;

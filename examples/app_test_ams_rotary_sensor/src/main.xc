@@ -75,8 +75,13 @@ int main(void)
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = AMS_SENSOR;
+                position_feedback_config.polarity    = 1;
+                position_feedback_config.pole_pairs  = 2;
+                position_feedback_config.resolution  = 16384;
+                position_feedback_config.offset      = 0;
+                position_feedback_config.enable_push_service = PushAll;
+
                 position_feedback_config.ams_config.factory_settings = 1;
-                position_feedback_config.ams_config.polarity = SENSOR_POLARITY;
                 position_feedback_config.ams_config.hysteresis = 1;
                 position_feedback_config.ams_config.noise_setting = AMS_NOISE_NORMAL;
                 position_feedback_config.ams_config.uvw_abi = 0;
@@ -84,17 +89,13 @@ int main(void)
                 position_feedback_config.ams_config.data_select = 0;
                 position_feedback_config.ams_config.pwm_on = AMS_PWM_OFF;
                 position_feedback_config.ams_config.abi_resolution = 0;
-                position_feedback_config.ams_config.resolution_bits = AMS_RESOLUTION;
-                position_feedback_config.ams_config.offset = AMS_OFFSET;
                 position_feedback_config.ams_config.max_ticks = 0x7fffffff;
-                position_feedback_config.ams_config.pole_pairs = 5;
                 position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
                 position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
-                position_feedback_config.ams_config.enable_push_service = PushAll;
 
                 position_feedback_service(null, null, spi_ports,
-                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
-                                          null, null, null);
+                        position_feedback_config, i_shared_memory[0], i_position_feedback,
+                        null, null, null);
             }
         }
     }

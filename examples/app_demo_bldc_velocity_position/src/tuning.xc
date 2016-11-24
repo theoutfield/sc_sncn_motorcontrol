@@ -222,6 +222,8 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         default:
                                 break;
                         }
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
                         printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
                                 pos_velocity_ctrl_config.P_pos, pos_velocity_ctrl_config.I_pos, pos_velocity_ctrl_config.D_pos,
                                 pos_velocity_ctrl_config.j, pos_velocity_ctrl_config.integral_limit_pos);
@@ -245,6 +247,8 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         default:
                                 break;
                         }
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
                         printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_velocity, pos_velocity_ctrl_config.I_velocity,
                                 pos_velocity_ctrl_config.D_velocity, pos_velocity_ctrl_config.integral_limit_velocity);
                         break;
@@ -321,7 +325,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         if (value == 1)
                         {
                             i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
-                            printf("simpe PID pos ctrl enabled\n");
+                            printf("simple PID pos ctrl enabled\n");
                         }
                         else if (value == 2)
                         {
@@ -342,7 +346,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 case 'v':
                         if (value == 1)
                         {
-                            i_position_control.enable_velocity_ctrl(VELOCITY_PID_CONTROLLER);
+                            i_position_control.enable_velocity_ctrl();
                             printf("velocity ctrl enabled\n");
                         }
                         else
@@ -413,6 +417,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 }
                 else
                 {
+                    motorcontrol_config = i_position_control.get_motorcontrol_config();
                     printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
 
                     printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
