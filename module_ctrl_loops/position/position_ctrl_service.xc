@@ -220,7 +220,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    torque_ref_k = (int)velocity_controller(velocity_ref_k, velocity_k, velocity_control_pid_param);
+                    torque_ref_k = (int)pid_update(velocity_ref_k   , velocity_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+                                    //(int)velocity_controller(velocity_ref_k, velocity_k, velocity_control_pid_param);
                 }
                 else if (position_enable_flag == 1)// position control
                 {
@@ -244,10 +245,13 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     }
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
-                        torque_ref_k = (int)pos_cascade_controller(
-                                position_ref_in_k, position_k,
-                                pos_velocity_ctrl_config.control_loop_period, position_control_pid_param,
-                                velocity_k, pos_velocity_ctrl_config.max_speed);
+
+                        velocity_ref_k =(int)pid_update(position_ref_in_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                        torque_ref_k   =(int)pid_update(velocity_ref_k   , velocity_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
+                        //torque_ref_k = (int)pos_cascade_controller(
+                        //        position_ref_in_k, position_k,
+                        //        pos_velocity_ctrl_config.control_loop_period, position_control_pid_param,
+                        //        velocity_k, pos_velocity_ctrl_config.max_speed);
                     }
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
                     {
