@@ -22,7 +22,7 @@
     <Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="position raw" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Timestamp" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Timestamp" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="period" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Status" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="checksum error" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
