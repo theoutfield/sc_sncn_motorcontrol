@@ -106,26 +106,26 @@ int main() {
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = BISS_SENSOR;
+                position_feedback_config.polarity    = SENSOR_POLARITY;
+                position_feedback_config.pole_pairs  = POLE_PAIRS;
+                position_feedback_config.resolution  = POSITION_SENSOR_RESOLUTION;
+                position_feedback_config.offset      = 0;
+                position_feedback_config.enable_push_service = PushAll;
 
                 position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                 position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
                 position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
                 position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-                position_feedback_config.biss_config.pole_pairs = POLE_PAIRS;
-                position_feedback_config.biss_config.polarity = SENSOR_POLARITY;
                 position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
                 position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
                 position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
                 position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
                 position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-                position_feedback_config.biss_config.enable_push_service = PushAll;
 
                 position_feedback_service(null, qei_ports, spi_ports,
-                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
-                                          null, null, null);
+                        position_feedback_config, i_shared_memory[0], i_position_feedback,
+                        null, null, null);
             }
         }
     }

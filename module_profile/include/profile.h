@@ -13,9 +13,7 @@
 #include <math.h>
 #include <mc_internal_constants.h>
 #include <motor_control_structures.h>
-#include <hall_struct.h>
-#include <qei_struct.h>
-#include <ams_struct.h>
+#include <position_feedback_service.h>
 #include <xccompat.h>
 
 /*Profile Velocity Quick Stop*/
@@ -202,9 +200,7 @@ typedef struct
 
     float q;                    // position profile
 
-    QEIConfig qei_params;
-    HallConfig hall_params;
-    AMSConfig ams_params;
+    PositionFeedbackConfig position_feedback_params;
     int sensor_used;
     float max_position;
     float min_position;

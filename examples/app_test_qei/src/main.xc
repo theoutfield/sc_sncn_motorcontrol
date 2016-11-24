@@ -9,6 +9,7 @@
  */
 
 #include <position_feedback_service.h>
+#include <user_config.h>
 
 /* Test QEI Sensor Client */
 void qei_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
@@ -59,15 +60,16 @@ int main(void)
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = QEI_SENSOR;
-                position_feedback_config.qei_config.ticks_resolution = 1000;
-                position_feedback_config.qei_config.index_type = QEI_WITH_INDEX;
-                position_feedback_config.qei_config.sensor_polarity = 1;
-                position_feedback_config.qei_config.signal_type = QEI_RS422_SIGNAL;
-                position_feedback_config.qei_config.enable_push_service = PushPosition;
+                position_feedback_config.polarity    = SENSOR_POLARITY;
+                position_feedback_config.resolution  = POSITION_SENSOR_RESOLUTION;
+                position_feedback_config.enable_push_service = PushAll;
+
+                position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
+                position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
 
                 position_feedback_service(null, qei_ports, null,
-                                          position_feedback_config, i_shared_memory[0], i_position_feedback,
-                                          null, null, null);
+                        position_feedback_config, i_shared_memory[0], i_position_feedback,
+                        null, null, null);
             }
         }
     }

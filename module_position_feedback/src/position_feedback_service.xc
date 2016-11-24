@@ -7,6 +7,7 @@
 
 #include <position_feedback_service.h>
 #include <print.h>
+#include <xclib.h>
 
 char start_message[] = ">>   SOMANET SENSOR SERVICE STARTING: ";
 
@@ -130,6 +131,10 @@ void set_clock_biss(QEIPorts * qei_ports, SPIPorts * spi_ports, PositionFeedback
     }
 }
 
+int tickstobits(uint32_t ticks)
+{
+    return (31-clz(ticks));
+}
 
 void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPIPorts &?spi_ports,
                                PositionFeedbackConfig &?position_feedback_config_1,

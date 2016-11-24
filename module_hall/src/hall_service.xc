@@ -10,9 +10,9 @@
 
 extern char start_message[];
 
-int check_hall_config(HallConfig &hall_config){
+int check_hall_config(PositionFeedbackConfig &position_feedback_config){
 
-    if (hall_config.pole_pairs < 1 || hall_config.pole_pairs > 11) {
+    if (position_feedback_config.pole_pairs < 1) {
         printstrln("hall_service: ERROR: Wrong Hall configuration: wrong pole-pairs");
         return ERROR;
     }
@@ -44,7 +44,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
-    if (check_hall_config(position_feedback_config.hall_config) == ERROR) {
+    if (check_hall_config(position_feedback_config) == ERROR) {
         printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
         position_feedback_config.sensor_type = 0;
         return;
@@ -137,10 +137,10 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
     // clock frequency of defined timers in hall section
     hv.hall_f_clock = (HALL_USEC*1000000); //1 second in ticks
     // motor pole pairs
-    hv.hall_pole_pairs = position_feedback_config.hall_config.pole_pairs;
+    hv.hall_pole_pairs = position_feedback_config.pole_pairs;
     hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
 
-    hv.sensor_polarity=position_feedback_config.hall_config.polarity;
+    hv.sensor_polarity=position_feedback_config.polarity;
 
     do
     {
@@ -186,9 +186,9 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
 
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 position_feedback_config = in_config;
-                hv.hall_pole_pairs = position_feedback_config.hall_config.pole_pairs;
+                hv.hall_pole_pairs = position_feedback_config.pole_pairs;
                 hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
-                hv.sensor_polarity=position_feedback_config.hall_config.polarity;
+                hv.sensor_polarity=position_feedback_config.polarity;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
@@ -453,11 +453,11 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                 last_angle = angle_out;
 
                 if (!isnull(i_shared_memory)) {
-                    if (position_feedback_config.contelec_config.enable_push_service == PushAll) {
+                    if (position_feedback_config.enable_push_service == PushAll) {
                         i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, count, hall_state_new);
-                    } else if (position_feedback_config.contelec_config.enable_push_service == PushAngle) {
+                    } else if (position_feedback_config.enable_push_service == PushAngle) {
                         i_shared_memory.write_angle_electrical(angle_out);
-                    } else if (position_feedback_config.contelec_config.enable_push_service == PushPosition) {
+                    } else if (position_feedback_config.enable_push_service == PushPosition) {
                         i_shared_memory.write_velocity_position(speed_out, count);
                     }
                 }
