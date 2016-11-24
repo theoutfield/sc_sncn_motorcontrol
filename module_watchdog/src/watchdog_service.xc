@@ -27,15 +27,8 @@
     unsigned int wd_half_period = 40 * usec;
 
     unsigned char led_motor_on_wdtick_wden_buffer = 0;
-    unsigned char reset_wd_en_mask = 0b1110;
     unsigned char   set_wd_en_mask = 0b0001;
-
     unsigned char p_ifm_wdtick = 0b0000;
-
-    unsigned char reset_led_mask = 0b0111;
-    unsigned char   set_led_mask = 0b1000;
-
-    unsigned char   set_motor_on_mask = 0b0100;
     unsigned char   fault_mask = 0b1000;
     //CPLD
     unsigned cpld_out_state = 0x8;//set green LED off
