@@ -154,7 +154,7 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
             //set offset
         case 'o':
             position_feedback_config = i_position_feedback.get_config();
-            position_feedback_config.contelec_config.offset = value * sign;
+            position_feedback_config.offset = value * sign;
             i_position_feedback.set_config(position_feedback_config);
             printf("offset %d\n", value * sign);
             break;
