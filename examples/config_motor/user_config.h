@@ -41,12 +41,11 @@
 //////////////////////////////////////////////
 
 /*
- * WARNING: explosion danger. This mode shoule not be activated before evaluating battery behaviour.
+ * By default, RECUPERATION MODE is activated. Setting the maximum power of recuperation to a high
+ * value (such as 10 times the nominal power) results in having no limit while working under recuperation mode.
+ * In high-power applications (such as electric vehicles), this mode shoule
+ * be activated only if dc-power supply is capable of accepting energy.
  * */
-
-// For not affecting higher controlling levels (such as position control),
-// RECUPERATION should be set to 1, and REGEN_P_MAX should be set to a much higher value than the rated power
-// (such as 50 kW),
 
 #define RECUPERATION        1          // when RECUPERATION is 0, there will be no recuperation
 
@@ -142,6 +141,7 @@
 //Limits
 #define MIN_POSITION_LIMIT                     -0x7fffffff
 #define MAX_POSITION_LIMIT                      0x7fffffff
+#define POSITION_LIMIT_THRESHOLD                20000
 #define TORQUE_CONTROL_LIMIT                    MAXIMUM_TORQUE
 
 //Integrated Profiler
@@ -177,11 +177,25 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 */
+/*
+//nonlinear mode
+#define POSITION_Kp                             4000
+#define POSITION_Ki                             120
+#define POSITION_Kd                             16500
+*/
 
-//-----  axis 4 of the robot (project FS)
-#define POSITION_Kp                             76000
-#define POSITION_Ki                             7700
-#define POSITION_Kd                             320000
+/*
+//simple pid pos controller
+#define POSITION_Kp                             50000
+#define POSITION_Ki                             200
+#define POSITION_Kd                             0
+*/
+
+//cascade pos controller
+#define POSITION_Kp                             4000
+#define POSITION_Ki                             120
+#define POSITION_Kd                             16500
+
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 
@@ -191,23 +205,18 @@
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 // COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      530
-
-
+#define COMMUTATION_OFFSET_CLK      1460
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             100
-#define VELOCITY_Ki                             0
-#define VELOCITY_Kd                             60
-#define VELOCITY_INTEGRAL_LIMIT                 0
+#define VELOCITY_Kp                             30000
+#define VELOCITY_Ki                             1300
+#define VELOCITY_Kd                             0
+#define VELOCITY_INTEGRAL_LIMIT                 1000000000
 
 
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
-
-#define PID_GAIN                1000     //common gain multiplied in 3 pid constants at the same time.
-                                         //default value is 1000 (which makes it ineffective)
 
 //Number of ticks in a microsecond/frequency for IFM Tile
 #define IFM_TILE_USEC   USEC_STD//USEC_FAST//
