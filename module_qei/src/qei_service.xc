@@ -100,22 +100,20 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
     int const config_min_ticks = INT_MIN;
     int difference = 0;
     int direction = 0;
-    int config_qei_changes_per_turn = position_feedback_config.resolution * QEI_CHANGES_PER_TICK; //Quadrature encoder. 4x resolution
     int qei_type = position_feedback_config.qei_config.index_type;            // TODO use to disable sync for no-index
 //    int init_state = INIT;
 
-    int qei_crossover = (config_qei_changes_per_turn * 19) / 100;
-    int qei_count_per_hall = config_qei_changes_per_turn;   // / position_feedback_config.qei_config.poles;
+    int qei_crossover = (position_feedback_config.resolution * 19) / 100;
+    int qei_count_per_hall = position_feedback_config.resolution;   // / position_feedback_config.qei_config.poles;
     int offset_fw = 0;
     int offset_bw = 0;
     int calib_fw_flag = 0;
     int calib_bw_flag = 0;
     int sync_out = 0;
-    int status = 0;
     int flag_index = 0;
     unsigned int new_pins_1;
 
-    int qei_crossover_velocity = config_qei_changes_per_turn - config_qei_changes_per_turn / 10;
+    int qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
     int vel_previous_position = 0, vel_old_difference = 0;
     int difference_velocity;
     int velocity = 0;
@@ -144,9 +142,9 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
 
                         if (qei_type == QEI_WITH_NO_INDEX) {
                             { v, position } = lmul(1, position, v, -5);
-                            if (position >= config_qei_changes_per_turn) {
+                            if (position >= position_feedback_config.resolution) {
                                 position = 0;
-                            } else if (position <= -config_qei_changes_per_turn) {
+                            } else if (position <= -position_feedback_config.resolution) {
                                 position = 0;
                             }
                         } else {
@@ -247,7 +245,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
             case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position }:
 
                 out_count = count;
-                out_position = count & (config_qei_changes_per_turn - 1);
+                out_position = count & (position_feedback_config.resolution - 1);
                 break;
 
 //            case i_position_feedback[int i].get_qei_sync_position() -> {int out_position, int out_calib_fw, int out_calib_bw}:
@@ -283,7 +281,11 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
             case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
 
                 position_feedback_config = in_config;
-                status = 1;
+                qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
+                // max_count_actual = position_feedback_config.qei_config.max_ticks;
+                qei_type = position_feedback_config.qei_config.index_type;
+                qei_crossover = (position_feedback_config.resolution * 19) / 100;
+                qei_count_per_hall = position_feedback_config.resolution;// / position_feedback_config.qei_config.poles;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
@@ -298,7 +300,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
 //                break;
 
             case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
-                out_ticks_per_turn = config_qei_changes_per_turn;
+                out_ticks_per_turn = position_feedback_config.resolution;
                 break;
 
             case i_position_feedback[int i].get_angle() -> unsigned int out_angle:
@@ -329,19 +331,10 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                 vel_previous_position = count;
                 vel_old_difference = difference_velocity;
 
-                velocity = (difference_velocity * 60000) / config_qei_changes_per_turn;
+                velocity = (difference_velocity * 60000) / position_feedback_config.resolution;
 
                 break;
 
-        }
-
-        if (status == 1) {
-            status = 0;
-           // max_count_actual = position_feedback_config.qei_config.max_ticks;
-            config_qei_changes_per_turn = position_feedback_config.resolution * QEI_CHANGES_PER_TICK;
-            qei_type = position_feedback_config.qei_config.index_type;
-            qei_crossover = (config_qei_changes_per_turn * 19) / 100;
-            qei_count_per_hall = config_qei_changes_per_turn;// / position_feedback_config.qei_config.poles;
         }
 #pragma xta endpoint "qei_loop_end_point"
     }
