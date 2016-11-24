@@ -482,8 +482,8 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
                 out_b = (int)tmp_val;
 
-                phaseB_out = -(out_a - 2048);
-                phaseC_out = +(out_b - 2048);
+                phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
+                phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
 
 
                 I_b = phaseB_out;
@@ -543,8 +543,8 @@ void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports
                 tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
                 out_b = (int)tmp_val;
 
-                phaseB = -(out_a - 2048);
-                phaseC = +(out_b - 2048);
+                phaseB = current_sensor_config.sign_phase_b * (out_a - 2048);
+                phaseC = current_sensor_config.sign_phase_c * (out_b - 2048);
 
 
                 I_b = phaseB;

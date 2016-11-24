@@ -32,7 +32,7 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
         } else {
 
-            printstr("adc_service: ERROR No ADC configured");
+   //         printstr("adc_service: ERROR No ADC configured");
 
         }
     } else{
@@ -46,7 +46,7 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
         } else {
 
-            printstr("adc_service: ERROR No ADC configured");
+ //           printstr("adc_service: ERROR No ADC configured");
 
         }
     }

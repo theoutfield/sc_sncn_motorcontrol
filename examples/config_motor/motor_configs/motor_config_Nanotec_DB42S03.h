@@ -8,15 +8,18 @@
  *********      USER CONFIGURATION       **********
  **************************************************/
 
-/////////////////////////////////////////////
-//////  GENERAL MOTOR CONFIGURATION
-////////////////////////////////////////////
+// IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
+#define POLE_PAIRS              3       //number of motor pole-pairs
+#define PERCENT_TORQUE_CONSTANT 4      //motor torque constant multiplied by 100
+#define RATED_CURRENT           1790    //rated phase current [milli-Amp-RMS]
+#define MAXIMUM_TORQUE          190    //maximum value of torque which can be produced by motor [milli-Nm]
+#define RATED_TORQUE            63     // rated motor torque [milli-Nm]
 
-// MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
-#define MOTOR_TYPE  BLDC_MOTOR
+// OTHER PARAMETERS (do not change if not having access to the following parameter values)
+#define RATED_POWER             26     // rated power [W]
+#define PEAK_SPEED              6200    // maximum motor speed [rpm]
+#define PHASE_RESISTANCE        750000  // motor phase resistance [micro-ohm]
+#define PHASE_INDUCTANCE        1050     // motor phase inductance [micro-Henry]
 
-// NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  4
-
-// WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
-#define BLDC_WINDING_TYPE   DELTA_WINDING
+// GENERAL PARAMETERS
+#define MOTOR_TYPE              BLDC_MOTOR      //MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]

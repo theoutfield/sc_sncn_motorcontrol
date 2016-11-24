@@ -10,29 +10,30 @@
 [[combinable]]
  void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec)
 {
+    unsigned int usec;
     if(ifm_tile_usec==250)
     {
         //Set freq to 250MHz (always needed for proper timing)
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        usec = 250;
+    }
+    else
+    {
+        usec = 100;
     }
 
-    unsigned char p_led_motoon_wdtick_wden_buffer = 0b1000;
-    unsigned char reset_wd_en_mask = 0b1110;
+    int IFM_module_type = -1;
+
+    unsigned int wd_half_period = 40 * usec;
+
+    unsigned char led_motor_on_wdtick_wden_buffer = 0;
     unsigned char   set_wd_en_mask = 0b0001;
-
     unsigned char p_ifm_wdtick = 0b0000;
-    unsigned char reset_wd_tick_mask = 0b0000;
-    unsigned char   set_wd_tick_mask = 0b0001;
-
-    unsigned char reset_led_mask = 0b0111;
-    unsigned char   set_led_mask = 0b1000;
-
-    //    unsigned char reset_motoon_mask = 0b1011;
-    unsigned char   set_motoon_mask = 0b0100;
-
     unsigned char   fault_mask = 0b1000;
+    //CPLD
+    unsigned cpld_out_state = 0x8;//set green LED off
+    unsigned int cycles_counter = 0;
 
-    int initialization  =0;
     int WD_En_sent_flag =0;
     unsigned int wd_enabled = 0;
     unsigned int ts;
@@ -41,34 +42,50 @@
     unsigned int LED_counter = 0;
     int fault=0;//FIXME: this variable should be initialized to 0. here it is 3 to check the LED flashing of WD task
     int fault_counter=0;
+    unsigned int times = 0;
 
     //proper task startup
     t :> ts;
-    t when timerafter (ts + (1000*20*250)) :> void;
+    t when timerafter (ts + (1000*20*250)) :> void;//FixMe: how is it proper?
 
-
-    if (initialization == 0)
-    {
-        //motor on
-        p_led_motoon_wdtick_wden_buffer |= set_motoon_mask;
-        watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-
-        //reset WD_EN and LED
-        p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-        p_led_motoon_wdtick_wden_buffer &= reset_wd_en_mask;
-
-        watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-
-        //Enable WD
-        p_led_motoon_wdtick_wden_buffer |= set_wd_en_mask;
-        watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-
-        initialization = 1;
-        wd_enabled = 1;
-
-        t :> ts;
-        t when timerafter (ts + 25000  ) :> void;
+    //Do the IFM type identification only once
+    if(!isnull(watchdog_ports.p_shared_enable_tick_led)){//DC100, DC300, or DC1K
+        if(!isnull(watchdog_ports.p_tick)){
+            IFM_module_type = DC100_DC300;
+        } else {
+            IFM_module_type = DC1K_DC5K;
+        }
     }
+    else if(!isnull(watchdog_ports.p_cpld_shared)){//DC500
+        IFM_module_type = DC500;
+    }
+
+    /* WD Initialization routine */
+    switch(IFM_module_type){
+        case DC100_DC300:
+            //Enable WD
+            led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
+            //set green LED on
+            led_motor_on_wdtick_wden_buffer |= 0b1010;
+            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+            wd_enabled = 1;
+            break;
+        case DC500:
+            cpld_out_state &= 0b0111;//turn green LED on
+            cpld_out_state |= 0b0101;//enable CPLD, reset errors
+            watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
+            cycles_counter = 40;
+            wd_enabled = 1;
+            break;
+        case DC1K_DC5K://FixMe: optimize it further
+            //motor on and WD on
+            led_motor_on_wdtick_wden_buffer |= 0b0101;
+            wd_enabled = 1;
+            break;
+    }
+
+    t :> ts;
+    t when timerafter (ts + 100*usec) :> void;//100 us
 
 
     t :> ts;
@@ -80,241 +97,275 @@
                 status = ACTIVE;
                 break;
 
-                // Get a command from the out loop
+                //FixMe: this call is absolete, should be removed
         case i_watchdog[int i].start(): // produce a rising edge on the WD_EN
                 wd_enabled = 1;
                 break;
 
+                //FixMe: this call is absolete, should be removed
         case i_watchdog[int i].stop():
                 // Disable the kicking
                 wd_enabled = 0;
                 break;
 
         case i_watchdog[int i].protect(int fault_id):
-                p_led_motoon_wdtick_wden_buffer &= fault_mask;
-                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-
-                if (!isnull(watchdog_ports.p_tick))
-                {
-                    p_ifm_wdtick &= reset_wd_tick_mask;
-                    watchdog_ports.p_tick <: p_ifm_wdtick;
+                switch(IFM_module_type){
+                    case DC100_DC300:
+                        //Disable WD and set red LED on
+                        led_motor_on_wdtick_wden_buffer &= 0b1100;
+                        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        break;
+                    case DC500:
+                        cpld_out_state |= 0b1000;//set green LED off
+                        watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
+                        break;
+                    case DC1K_DC5K:
+                        led_motor_on_wdtick_wden_buffer &= fault_mask;
+                        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        break;
                 }
 
                 fault=fault_id;
                 wd_enabled = 0;
                 break;
 
-        case t when timerafter(ts + 5000) :> void: // 5000 is equal to 20 us when reference frequency is 250 MHz
+        case t when timerafter(ts + wd_half_period) :> void://clocking
 
                 t :> ts;
-                if (initialization == 1)
+                if (wd_enabled == 1)
                 {
-                    if (wd_enabled == 1)
-                    {
-
-                        if (!isnull(watchdog_ports.p_tick))
-                        {
-                            if ((p_ifm_wdtick & set_wd_tick_mask) == 0)
-                                p_ifm_wdtick |= set_wd_tick_mask;
-                            else
-                                p_ifm_wdtick &= reset_wd_tick_mask;
-
+                    switch(IFM_module_type){
+                        case DC100_DC300:
+                            p_ifm_wdtick ^= 1;//toggle wd tick
                             watchdog_ports.p_tick <: p_ifm_wdtick;
-                        }
-                        else
-                        {
-                            if ((p_led_motoon_wdtick_wden_buffer & 0b0010) == 0)
-                                p_led_motoon_wdtick_wden_buffer |= 0b0010;
-                            else
-                                p_led_motoon_wdtick_wden_buffer &= 0b1101;
+                            break;
+                        case DC500:
+                            cpld_out_state ^= (1 << 1); //toggle wd tick
+                            watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
 
-                            watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-                        }
-
-
-                        if (WD_En_sent_flag<2)
-                        {
-                            if ((p_led_motoon_wdtick_wden_buffer & set_wd_en_mask) == 0)
-                                p_led_motoon_wdtick_wden_buffer |= set_wd_en_mask;
-                            else
-                                p_led_motoon_wdtick_wden_buffer &= reset_wd_en_mask;
-
-                            watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-
-                            WD_En_sent_flag++;
-                        }
-                    }
-
-                    LED_counter++;
-                    if (LED_counter >= 15000)
-                    {
-                        LED_counter=0;
-                        fault_counter++;
-                        if(fault==0)
-                        {
-                            if ((p_led_motoon_wdtick_wden_buffer & set_led_mask) == 0)
-                                p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                            else
-                                p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                            LED_counter=14000;
-                        }
-                        //showing the fault type by LED flashing (once, twice, ..., five times)
-                        if(fault==1)
-                        {
-                            if(!isnull(watchdog_ports.p_tick))
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
+                            //keep fault reset pin high for some number of cycles to charge the cap
+                            if(cycles_counter > 0){
+                                cycles_counter--;
+                                if(!cycles_counter){//drive reset pin down
+                                    cpld_out_state &= 0b1110;
+                                    watchdog_ports.p_cpld_shared <: cpld_out_state;
+                                }
                             }
-                            else
+                            break;
+                        case DC1K_DC5K:
+                            led_motor_on_wdtick_wden_buffer ^= (1 << 1); //toggle wd tick
+                            watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                            //Reset WD after fault
+                            if (WD_En_sent_flag<2)
                             {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
+                                led_motor_on_wdtick_wden_buffer ^= 1;//toggle WD Enable pin
+                                watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                                WD_En_sent_flag++;
                             }
-                        }
-                        if(fault==2)
-                        {
-                            if(!isnull(watchdog_ports.p_tick))
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 8)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 9)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                            }
-                            else
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 8)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 9)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                            }
-
-                        }
-                        if(fault==3)
-                        {
-                            if(!isnull(watchdog_ports.p_tick))
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 8)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 9)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==10)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==11)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                            }
-                            else
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 8)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 9)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==10)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==11)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                            }
-                        }
-                        if(fault==4)
-                        {
-                            if(!isnull(watchdog_ports.p_tick))
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 8)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 9)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==10)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==11)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==12)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==13)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                            }
-                            else
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 8)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 9)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==10)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==11)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==12)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==13)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                            }
-                        }
-                        if(fault==5)
-                        {
-                            if(!isnull(watchdog_ports.p_tick))
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 8)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 9)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==10)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==11)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==12)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==13)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==14)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==15)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                            }
-                            else
-                            {
-                                if(fault_counter== 5)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 6)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 7)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter== 8)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter== 9)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==10)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==11)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==12)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==13)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                                if(fault_counter==14)   p_led_motoon_wdtick_wden_buffer |= set_led_mask;
-                                if(fault_counter==15)   p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                            }
-                        }
-                        watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-                        if(fault_counter==20) fault_counter=0;
+                            break;
                     }
                 }
 
+                //showing the fault type by LED flashing (once, twice, ..., five times)
+                if(fault) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, times, LED_counter);
+
+                LED_counter++;
+#if 0
+                if (LED_counter >= 15000)
+                {
+                    LED_counter=0;
+                    fault_counter++;
+                    if(fault==0)
+                    {
+//FixMe: check the behavoiur on other DC boards
+#if 0
+                        led_motor_on_wdtick_wden_buffer ^= (1 << 3);//toggling LED
+#endif
+                        LED_counter=14000;
+                    }
 
 
+                    if(fault==1)
+                    {
+
+                        if(!isnull(watchdog_ports.p_tick))
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                        }
+                        else
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                        }
+                    }
+                    if(fault==2)
+                    {
+                        if(!isnull(watchdog_ports.p_tick))
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 8)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 9)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                        }
+                        else
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 8)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 9)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                        }
+
+                    }
+                    if(fault==3)
+                    {
+                        if(!isnull(watchdog_ports.p_tick))
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 8)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 9)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==10)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==11)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                        }
+                        else
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 8)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 9)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==10)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==11)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                        }
+                    }
+                    if(fault==4)
+                    {
+                        if(!isnull(watchdog_ports.p_tick))
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 8)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 9)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==10)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==11)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==12)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==13)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                        }
+                        else
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 8)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 9)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==10)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==11)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==12)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==13)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                        }
+                    }
+                    if(fault==5)
+                    {
+                        if(!isnull(watchdog_ports.p_tick))
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 8)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 9)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==10)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==11)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==12)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==13)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==14)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==15)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                        }
+                        else
+                        {
+                            if(fault_counter== 5)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 6)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 7)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter== 8)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter== 9)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==10)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==11)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==12)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==13)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                            if(fault_counter==14)   led_motor_on_wdtick_wden_buffer |= set_led_mask;
+                            if(fault_counter==15)   led_motor_on_wdtick_wden_buffer &= reset_led_mask;
+                        }
+                    }
+                    if(!isnull(watchdog_ports.p_shared_enable_tick_led)) watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                    if(fault_counter==20) fault_counter=0;
+                }
+#endif
                 break;
 
         case i_watchdog[int i].reset_faults():
 
-                p_led_motoon_wdtick_wden_buffer = 0b1000;
-                p_ifm_wdtick = 0b0000;
-                initialization  =0;
                 WD_En_sent_flag =0;
-                wd_enabled = 0;
                 LED_counter = 0;
                 fault=0;
                 fault_counter=0;
 
-                //motor on
-                p_led_motoon_wdtick_wden_buffer |= set_motoon_mask;
-                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
+                switch(IFM_module_type){
+                    case DC100_DC300://ToDo: this needs to be tested!
+                        //reset WD_EN and LED
+                        led_motor_on_wdtick_wden_buffer &= 0b0000;
+                        //Turn green LED on and enable WD
+                        led_motor_on_wdtick_wden_buffer |= 0b1011;
+                        watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        break;
+                    case DC500:
+                        cpld_out_state &= 0b0111;//turn green LED on
+                        cpld_out_state |= 0b0101;//enable CPLD, reset errors
+                        watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
+                        cycles_counter = 40;
+                        break;
+                    case DC1K_DC5K://FixMe: optimize the code. Why do we write 3 times?
+                        //Reset all pins to zero, do not touch WD tick
+                        led_motor_on_wdtick_wden_buffer &= 0b0010;
+                        //Set green LED on, enable WD
+                        led_motor_on_wdtick_wden_buffer |= 0b0101;
+                        break;
+                }
 
-                //reset WD_EN and LED
-                p_led_motoon_wdtick_wden_buffer &= reset_led_mask;
-                p_led_motoon_wdtick_wden_buffer &= reset_wd_en_mask;
-
-                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-
-                //Enable WD
-                p_led_motoon_wdtick_wden_buffer |= set_wd_en_mask;
-                watchdog_ports.p_enable <: p_led_motoon_wdtick_wden_buffer;
-
-                initialization = 1;
                 wd_enabled = 1;
                 t :> ts;
-                t when timerafter (ts + 25000  ) :> void;
+                t when timerafter (ts + 100*usec  ) :> void;//100 us
                 t :> ts;
                 break;
         }
+    }
+}
+
+void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_module_type, unsigned char &output, unsigned int &times, unsigned int &delay_counter){
+    if ((delay_counter % period == 0) && times != (fault*2)){//blinking
+        switch(IFM_module_type){
+            case DC100_DC300://ToDo: to be tested
+                output |= 0b1100;
+                output ^= (1 << 1);
+                watchdog_ports.p_shared_enable_tick_led <: output;
+                break;
+            case DC500://ToDo: to be tested
+                output ^= (1 << 3);
+                watchdog_ports.p_cpld_shared <: output;
+                break;
+            case DC1K_DC5K:
+                output ^= (1 << 3);
+                watchdog_ports.p_shared_enable_tick_led <: output;
+                break;
+            }
+        times++;
+    }
+    else if ((delay_counter % (period*20) == 0) && times == (fault*2)){//idling
+        times = 0;
     }
 }
