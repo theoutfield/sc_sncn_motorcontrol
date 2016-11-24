@@ -44,12 +44,9 @@ typedef struct {
     int singleturn_resolution;  /**< Number of bits of singleturn resolution */
     int status_length;          /**< Rumber of bits used for status data */
     int crc_poly;               /**< CRC polynom in reverse representation:  x^0 + x^1 + x^4 is 0b1100 */
-    int pole_pairs;             /**< Number of poles pairs to compute the electrical angle from the mechanical angle*/
     int clock_dividend;         /**< BiSS output clock frequency dividend */
     int clock_divisor;          /**< BiSS output clock frequency divisor */
     int timeout;                /**< Timeout after a BiSS read in clock ticks */
     int velocity_loop;          /**< Velocity loop time in microseconds */
     int max_ticks;              /**< The count is reset to 0 if greater than this */
-    int offset_electrical;      /**< Offset for the electrical angle */
-    int enable_push_service;
 } BISSConfig;

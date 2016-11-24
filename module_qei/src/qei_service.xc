@@ -35,19 +35,19 @@ static const unsigned char lookup[16][4] = {
 
 extern char start_message[];
 
-int check_qei_config(QEIConfig &qei_config)
+int check_qei_config(PositionFeedbackConfig &position_feedback_config)
 {
-    if (qei_config.index_type < 3  || qei_config.index_type > 4) {
+    if (position_feedback_config.qei_config.index_type < 3  || position_feedback_config.qei_config.index_type > 4) {
         printstrln("qei_service: ERROR: Wrong QEI configuration: wrong type");
         return ERROR;
     }
 
-    if (qei_config.sensor_polarity != -1 && qei_config.sensor_polarity != 1) {
+    if (position_feedback_config.polarity != -1 && position_feedback_config.polarity != 1) {
         printstrln("qei_service: ERROR: Wrong QEI configuration: wrong polarity");
         return ERROR;
     }
 
-    if (qei_config.ticks_resolution < 0) {
+    if (position_feedback_config.resolution < 0) {
         printstrln("qei_service: ERROR: Wrong QEI configuration: wrong resolution");
         return ERROR;
     }
@@ -67,7 +67,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
     }
 
                // to compute velocity from qei
-    if (check_qei_config(position_feedback_config.qei_config) == ERROR) {
+    if (check_qei_config(position_feedback_config) == ERROR) {
         position_feedback_config.sensor_type = 0;
         return;
     }
@@ -100,7 +100,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
     int const config_min_ticks = INT_MIN;
     int difference = 0;
     int direction = 0;
-    int config_qei_changes_per_turn = position_feedback_config.qei_config.ticks_resolution * QEI_CHANGES_PER_TICK; //Quadrature encoder. 4x resolution
+    int config_qei_changes_per_turn = position_feedback_config.resolution * QEI_CHANGES_PER_TICK; //Quadrature encoder. 4x resolution
     int qei_type = position_feedback_config.qei_config.index_type;            // TODO use to disable sync for no-index
 //    int init_state = INIT;
 
@@ -171,7 +171,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                             difference = position - previous_position;
                             //xscope_int(1, difference);
                             if (difference >= qei_crossover) {
-                                if (position_feedback_config.qei_config.sensor_polarity == QEI_POLARITY_NORMAL) {
+                                if (position_feedback_config.polarity == QEI_POLARITY_NORMAL) {
                                     count = count - 1;
                                 } else {
                                     count = count + 1;
@@ -180,7 +180,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                                 calib_fw_flag = 1;
                                 direction = -1;
                             } else if (difference <= -qei_crossover) {
-                                if (position_feedback_config.qei_config.sensor_polarity == QEI_POLARITY_NORMAL) {
+                                if (position_feedback_config.polarity == QEI_POLARITY_NORMAL) {
                                     count = count + 1;
                                 } else {
                                     count = count - 1;
@@ -189,7 +189,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                                 calib_bw_flag = 1;
                                 direction = +1;
                             } else if (difference <= 2 && difference > 0) {
-                                if (position_feedback_config.qei_config.sensor_polarity == QEI_POLARITY_NORMAL) {
+                                if (position_feedback_config.polarity == QEI_POLARITY_NORMAL) {
                                     count = count + difference;
                                     sync_out = sync_out + difference;
                                 } else {
@@ -198,7 +198,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                                 }
                                 direction = -1;
                             } else if (difference < 0 && difference >= -2) {
-                                if (position_feedback_config.qei_config.sensor_polarity == QEI_POLARITY_NORMAL) {
+                                if (position_feedback_config.polarity == QEI_POLARITY_NORMAL) {
                                     count = count + difference;
                                     sync_out = sync_out + difference;
                                 } else {
@@ -224,7 +224,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                     }
 
                     if (!isnull(i_shared_memory)) {
-                        if (position_feedback_config.qei_config.enable_push_service == PushPosition) {
+                        if (position_feedback_config.enable_push_service == PushPosition || position_feedback_config.enable_push_service == PushAll) {
                             i_shared_memory.write_velocity_position(velocity, count);
                         }
                     }
@@ -338,7 +338,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
         if (status == 1) {
             status = 0;
            // max_count_actual = position_feedback_config.qei_config.max_ticks;
-            config_qei_changes_per_turn = position_feedback_config.qei_config.ticks_resolution * QEI_CHANGES_PER_TICK;
+            config_qei_changes_per_turn = position_feedback_config.resolution * QEI_CHANGES_PER_TICK;
             qei_type = position_feedback_config.qei_config.index_type;
             qei_crossover = (config_qei_changes_per_turn * 19) / 100;
             qei_count_per_hall = config_qei_changes_per_turn;// / position_feedback_config.qei_config.poles;

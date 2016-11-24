@@ -37,12 +37,6 @@
  */
 typedef struct {
     int multiturn_resolution;   /**< Multiturn resolution in bits. */
-    int resolution_bits;        /**< Encoder resolution in bits. */
-    int polarity;               /**< Encoder polarity. */
-
-    int pole_pairs;             /**< Number of pole pairs (1-7) */
-
-    int offset;                 /**< Rotary sensor offset (Zero) */
 
     int timeout;                /**< timeout after a read (in clock ticks) */
 
@@ -51,5 +45,4 @@ typedef struct {
     int max_ticks;              /**< The count is reset to 0 if greater than this */
 
     int filter;                 /**< filter parameter for contelect encoder */
-    int enable_push_service;
 } CONTELECConfig;

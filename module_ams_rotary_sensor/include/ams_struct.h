@@ -61,7 +61,6 @@ typedef enum {
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    int resolution_bits;        /**< Encoder resolution in bits. */
 #if AMS_SENSOR_TYPE == AS5147
     int width_index_pulse;      /**< Width of the index pulse I (0 = 3LSB, 1 = 1LSB). */
 #else
@@ -79,7 +78,6 @@ typedef struct {
     int data_select;            /**< This bit defines which data can be read form address
                                      16383dec (3FFFhex). 0->DAECANG 1->CORDICANG */
     int pwm_on;                 /**< Enables PWM (setting of UVW_ABI Bit necessary) */
-    int pole_pairs;             /**< Number of pole pairs (1-7) */
     AMS_Hysteresis hysteresis;  /**< Hysteresis for 11 Bit ABI Resolution:
                                      0 = 3 LSB
                                      1 = 2 LSB
@@ -93,15 +91,11 @@ typedef struct {
                                      3 = 3 LSB) */
     int abi_resolution;         /**< Resolution of ABI (0 = 11 bits, 1 = 10 bits) */
 
-    int offset;                 /**< Rotary sensor offset (Zero) */
-
     int cache_time;             /**< How long to cache the position (in clock ticks) */
 
     int velocity_loop;          /**< Velcity loop time in microseconds */
 
     int max_ticks;              /**< The count is reset to 0 if greater than this */
-
-    int enable_push_service;
 } AMSConfig;
 
 

@@ -316,15 +316,15 @@ int main(void)
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = CONTELEC_SENSOR;
+                position_feedback_config.polarity    = SENSOR_POLARITY;
+                position_feedback_config.pole_pairs  = POLE_PAIRS;
+                position_feedback_config.resolution  = 65536;
+                position_feedback_config.offset      = 0;
+                position_feedback_config.enable_push_service = PushAll;
 
                 position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
-                position_feedback_config.contelec_config.polarity = SENSOR_POLARITY;
-                position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
-                position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
-                position_feedback_config.contelec_config.pole_pairs = POLE_PAIRS;
                 position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
                 position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
-                position_feedback_config.contelec_config.enable_push_service = PushAll;
 
                 position_feedback_service(null, null, spi_ports,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
