@@ -18,7 +18,7 @@
 #define MOTOR_COMMUTATION_SENSOR   CONTELEC_SENSOR//HALL_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
-#define POSITION_SENSOR_RESOLUTION 65530
+#define POSITION_SENSOR_RESOLUTION 65536
 
 // SENSOR USED FOR CONTROL FEEDBACK [HALL_SENSOR, QEI_SENSOR, BISS_SENSOR]
 #define MOTOR_FEEDBACK_SENSOR      MOTOR_COMMUTATION_SENSOR
@@ -28,9 +28,6 @@
 
 // TYPE OF SIGNAL FOR INCREMENTAL ENCODER (if applicable) [QEI_RS422_SIGNAL, QEI_TTL_SIGNAL]
 #define QEI_SENSOR_SIGNAL_TYPE     QEI_RS422_SIGNAL
-
-// RESOLUTION OF YOUR INCREMENTAL ENCODER (if applicable)
-#define QEI_SENSOR_RESOLUTION      4000
 
 // POLARITY OF YOUR HALL SENSOR (if applicable) [1,-1]
 #define SENSOR_POLARITY            1
@@ -70,11 +67,23 @@
 
 
 //////////////////////////////////////////////
+//////  IFM TILE FREQ CONFIGURATION
+//////////////////////////////////////////////
+
+#define IFM_TILE_USEC   USEC_STD // Number of ticks in a microsecond for IFM Tile
+
+
+//////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
 
+#if (IFM_TILE_USEC == USEC_STD)
 #define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
 #define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
+#else
+#define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
+#define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
+#endif
 #define PERIOD_START_BRAKE  1000   // period in which high voltage is applied for realising the brake [milli-seconds]
 #define ENABLE_SHAKE_BRAKE     0
 
@@ -89,7 +98,7 @@
 #define COMMUTATION_FRQ             24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-//#define COMMUTATION_OFFSET_CLK      0
+#define COMMUTATION_OFFSET_CLK      0
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -101,7 +110,7 @@
 #define HALL_STATE_6_ANGLE     0
 
 // MOTOR POLARITY [NORMAL_POLARITY, INVERTED_POLARITY]
-#define MOTOR_POLARITY              INVERTED_POLARITY
+#define MOTOR_POLARITY              NORMAL_POLARITY
 
 
 ///////////////////////////////////////////////
@@ -141,7 +150,7 @@
 //Limits
 #define MIN_POSITION_LIMIT                     -0x7fffffff
 #define MAX_POSITION_LIMIT                      0x7fffffff
-#define POSITION_LIMIT_THRESHOLD                20000
+#define POSITION_LIMIT_THRESHOLD                20000  //threshold in ticks to re-enable the position controler if the limit reached
 #define TORQUE_CONTROL_LIMIT                    MAXIMUM_TORQUE
 
 //Integrated Profiler
@@ -165,10 +174,6 @@
 
 /*
 //-----  default values  -----
-#define POSITION_Kp                             0
-#define POSITION_Ki                             0
-#define POSITION_Kd                             0
-
 #define MAX_SPEED                               0    // prefered value 3000, maximum value 5000 [rpm]
 
 #define POSITION_INTEGRAL_LIMIT                 1000 //in case of using non-linear position control,
@@ -176,12 +181,6 @@
 
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
-*/
-/*
-//nonlinear mode
-#define POSITION_Kp                             4000
-#define POSITION_Ki                             120
-#define POSITION_Kd                             16500
 */
 
 /*
@@ -191,21 +190,27 @@
 #define POSITION_Kd                             0
 */
 
+/*
 //cascade pos controller
 #define POSITION_Kp                             0
 #define POSITION_Ki                             0
 #define POSITION_Kd                             0
+*/
 
 
-#define MAX_SPEED                               30000    // prefered value 3000, maximum value 5000 [rpm]
+//nonlinear mode
+#define POSITION_Kp                             4000
+#define POSITION_Ki                             120
+#define POSITION_Kd                             16500
+
+
+#define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 
 //in case of using non-linear position control set "POSITION_INTEGRAL_LIMIT" to 1000
 #define POSITION_INTEGRAL_LIMIT                 1000
 
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
-// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      2000
 
 //PID parameters of the velocity PID controller
 #define VELOCITY_Kp                             1000000
@@ -217,6 +222,3 @@
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
-
-//Number of ticks in a microsecond/frequency for IFM Tile
-#define IFM_TILE_USEC   USEC_STD//USEC_FAST//
