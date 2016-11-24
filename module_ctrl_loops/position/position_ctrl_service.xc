@@ -220,8 +220,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    torque_ref_k = (int)pid_update(velocity_ref_k   , velocity_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-                                    //(int)velocity_controller(velocity_ref_k, velocity_k, velocity_control_pid_param);
+                    torque_ref_k = pid_update(velocity_ref_k   , velocity_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
                 }
                 else if (position_enable_flag == 1)// position control
                 {
@@ -241,21 +240,16 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
                     if (pos_control_mode == POS_PID_CONTROLLER)
                     {
-                        torque_ref_k = (int)pid_update(position_ref_in_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                        torque_ref_k = pid_update(position_ref_in_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
                     }
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
-
-                        velocity_ref_k =(int)pid_update(position_ref_in_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
-                        torque_ref_k   =(int)pid_update(velocity_ref_k   , velocity_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
-                        //torque_ref_k = (int)pos_cascade_controller(
-                        //        position_ref_in_k, position_k,
-                        //        pos_velocity_ctrl_config.control_loop_period, position_control_pid_param,
-                        //        velocity_k, pos_velocity_ctrl_config.max_speed);
+                        velocity_ref_k =pid_update(position_ref_in_k, position_k, pos_velocity_ctrl_config.control_loop_period, position_control_pid_param);
+                        torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, pos_velocity_ctrl_config.control_loop_period, velocity_control_pid_param);
                     }
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
                     {
-                        torque_ref_k = (int)update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+                        torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                     }
                 }
 
@@ -309,7 +303,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     position_limit_reached = 0;
                 }
 
-                torque_ref_k += downstream_control_data.offset_torque;
+                torque_ref_k += (double)(downstream_control_data.offset_torque);
 
                 //torque limit check
                 if(torque_ref_k > pos_velocity_ctrl_config.max_torque)
@@ -317,7 +311,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 else if (torque_ref_k < (-pos_velocity_ctrl_config.max_torque))
                     torque_ref_k = (-pos_velocity_ctrl_config.max_torque);
 
-                i_motorcontrol.set_torque(torque_ref_k);
+                i_motorcontrol.set_torque(((int)(torque_ref_k)));
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
