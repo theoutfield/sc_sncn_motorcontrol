@@ -142,8 +142,7 @@ void pid_reset(PIDparam &param);
 double velocity_controller(double desired_value, double actual_value, PIDparam &param);
 
 
-double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed);
-
+double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed, int speed_max);
 /**
  * @brief resetting the parameters of the nonlinear position controller with saturation.
  * @param the parameters of the controller

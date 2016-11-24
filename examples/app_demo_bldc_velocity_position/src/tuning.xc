@@ -247,6 +247,8 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         default:
                                 break;
                         }
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
                         printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.P_velocity, pos_velocity_ctrl_config.I_velocity,
                                 pos_velocity_ctrl_config.D_velocity, pos_velocity_ctrl_config.integral_limit_velocity);
                         break;

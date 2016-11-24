@@ -67,30 +67,18 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
  */
 double pid_update(double desired_value, double actual_value, int T_s, PIDparam &param)
 {
-    double error=0.00, cmd=0.00, proportional_term=0.00, integral_term=0.00, derivative_term=0.00;
+    double error=0.00, cmd=0.00;
 
     error = desired_value - actual_value;
-    //xscope_int(ERROR, ((int)(error)));
 
     param.integral += (param.Ki/1000000.00) * error;
-
-    //xscope_int(I_PART_1, ((int)(param.integral)));
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
         param.integral -= ((param.Ki/1000000.00) * error);
-    //xscope_int(I_PART_2, ((int)(param.integral)));
 
-    proportional_term = (param.Kp/1000000.00) * (desired_value- actual_value);
-    //xscope_int(P_PART, ((int)(proportional_term)));
-
-
-    derivative_term = - ((param.Kd/1000000.00) * (actual_value - param.actual_value_1n));
-    //xscope_int(D_PART, ((int)(derivative_term)));
-
-
-    cmd = proportional_term + param.integral + derivative_term;
-    //xscope_int(CMD, ((int)(cmd)));
+    cmd = ((param.Kp/1000000.00) * (desired_value- actual_value)) + param.integral - ((param.Kd/1000000.00) * (actual_value - param.actual_value_1n));
 
     param.actual_value_1n = actual_value;
+
     return cmd;
 }
 
@@ -103,32 +91,27 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
  * @param input, sample-time in us (microseconds).
  * @param the parameters of the PID controller
  */
-double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed)
+double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed, int speed_max)
 {
     double error=0.00, error_temp_cmd=0.00, temp_cmd=0.00, cmd=0.00, proportional_term=0.00, integral_term=0.00, derivative_term=0.00;
 
     error = desired_value - actual_value;
-    //xscope_int(DESIRED_VALUE, ((int)(desired_value)));
-    //xscope_int(ACTUAL_VALUE, ((int)(actual_value)));
-    //xscope_int(ERROR, ((int)(error)));
 
     param.integral += (param.Ki/1000000.00) * error;
 
-    //xscope_int(I_PART_1, ((int)(param.integral)));
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
         param.integral -= ((param.Ki/1000000.00) * error);
-    //xscope_int(I_PART_2, ((int)(param.integral)));
 
     proportional_term = (param.Kp/1000000.00) * (desired_value- actual_value);
-    //xscope_int(P_PART, ((int)(proportional_term)));
 
     temp_cmd = proportional_term + param.integral;
 
+    if(temp_cmd> speed_max) temp_cmd= speed_max;
+    if(temp_cmd<-speed_max) temp_cmd=-speed_max;
+
     error_temp_cmd = temp_cmd - speed;
-    //xscope_int(ERROR_TEMP_CMD, ((int)(error_temp_cmd)));
 
     cmd = (param.Kd/1000000.00) * error_temp_cmd;
-    //xscope_int(CMD, ((int)(cmd)));
 
     param.actual_value_1n = actual_value;
     return cmd;
@@ -153,7 +136,7 @@ double velocity_controller(double desired_value, double actual_value, PIDparam &
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
         param.integral -= ((param.Ki/1000000.00) * error);
 
-    cmd = param.integral + ((param.Kd/1000000.00)*(param.actual_value_1n-actual_value)) - ((param.Kp/1000000.00)*actual_value);
+    cmd = param.integral + ((param.Kd/1000000.00)*(param.actual_value_1n-actual_value)) + ((param.Kp/1000000.00)*error);
 
     param.actual_value_1n = actual_value;
     return cmd;
