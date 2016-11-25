@@ -139,10 +139,10 @@ int tickstobits(uint32_t ticks)
 void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPIPorts &?spi_ports,
                                PositionFeedbackConfig &?position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
-                               server interface PositionFeedbackInterface ?i_position_feedback_1[3],
+                               server interface PositionFeedbackInterface (&?i_position_feedback_1)[3],
                                PositionFeedbackConfig &?position_feedback_config_2,
                                client interface shared_memory_interface ?i_shared_memory_2,
-                               server interface PositionFeedbackInterface ?i_position_feedback_2[3])
+                               server interface PositionFeedbackInterface (&?i_position_feedback_2)[3])
 {
     //pointers to ports 1
     HallPorts * movable hall_ports_1 = &hall_ports;

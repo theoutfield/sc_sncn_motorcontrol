@@ -220,7 +220,9 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
     timer t;
     unsigned int next_velocity_read = 0;
     unsigned int last_read = 0;
+#ifndef CONTELEC_USE_TIMESTAMP
     unsigned int last_velocity_read = 0;
+#endif
 
     int notification = MOTCTRL_NTF_EMPTY;
 
