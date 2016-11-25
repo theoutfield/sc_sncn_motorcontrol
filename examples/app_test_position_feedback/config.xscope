@@ -24,6 +24,12 @@
     <Probe name="Count 2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Angle 2" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
     <Probe name="Velocity 2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Count 3" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Angle 3" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
+    <Probe name="Velocity 3" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Count 4" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Angle 4" type="CONTINUOUS" datatype="UINT" units="Value" enabled="false"/>
+    <Probe name="Velocity 4" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
 
 </xSCOPEconfig>

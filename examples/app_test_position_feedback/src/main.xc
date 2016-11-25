@@ -16,6 +16,8 @@
 /* Test Sensor Client */
 void position_feedback_test(client interface PositionFeedbackInterface i_position_feedback_1,
                             client interface PositionFeedbackInterface ?i_position_feedback_2,
+                            client interface PositionFeedbackInterface ?i_position_feedback_3,
+                            client interface PositionFeedbackInterface ?i_position_feedback_4,
                             client interface shared_memory_interface ?i_shared_memory)
 {
     int angle = 0;
@@ -24,6 +26,8 @@ void position_feedback_test(client interface PositionFeedbackInterface i_positio
     int angle_2 = 0;
     int velocity_2 = 0;
     int count_2 = 0;
+    int count_3, angle_3, velocity_3;
+    int count_4, angle_4, velocity_4;
 
     while(1)
     {
@@ -39,6 +43,16 @@ void position_feedback_test(client interface PositionFeedbackInterface i_positio
             angle_2 = i_position_feedback_2.get_angle();
             velocity_2 = i_position_feedback_2.get_velocity();
         }
+        if (!isnull(i_position_feedback_3)) {
+            { count_3, void } = i_position_feedback_3.get_position();
+            angle_3 = i_position_feedback_3.get_angle();
+            velocity_3 = i_position_feedback_3.get_velocity();
+        }
+        if (!isnull(i_position_feedback_4)) {
+            { count_4, void } = i_position_feedback_4.get_position();
+            angle_4 = i_position_feedback_4.get_angle();
+            velocity_4 = i_position_feedback_4.get_velocity();
+        }
 
         if (!isnull(i_shared_memory)) {
             { angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
@@ -52,8 +66,10 @@ void position_feedback_test(client interface PositionFeedbackInterface i_positio
         xscope_int(COUNT_2, count_2);
         xscope_int(VELOCITY_2, velocity_2);
         xscope_int(ANGLE_2, angle_2);
+        xscope_int(ANGLE_3, angle_3);
+        xscope_int(COUNT_4, count_4);
 
-        delay_milliseconds(1);
+        delay_milliseconds(10);
     }
 }
 
@@ -109,13 +125,17 @@ void commands_test(client interface PositionFeedbackInterface i_position_feedbac
 }
 
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
+//SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+HallPorts hall_2_ports = SOMANET_IFM_HALL_2_PORTS;
+QEIPorts qei_2_ports = SOMANET_IFM_QEI_2_PORTS;
 
 int main(void)
 {
     interface PositionFeedbackInterface i_position_feedback[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
+    interface PositionFeedbackInterface i_position_feedback_3[3];
+    interface PositionFeedbackInterface i_position_feedback_4[3];
     interface shared_memory_interface i_shared_memory[3];
 
     par
@@ -127,7 +147,7 @@ int main(void)
          * IFM TILE
          ***************************************************/
         on tile[IFM_TILE]: par {
-            position_feedback_test(i_position_feedback[0], i_position_feedback_2[0], null);
+            position_feedback_test(i_position_feedback[0], i_position_feedback_2[0], i_position_feedback_3[0], i_position_feedback_4[0], null);
 
             /* Shared memory Service */
             [[distribute]] memory_manager(i_shared_memory, 3);
@@ -138,7 +158,7 @@ int main(void)
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.polarity    = 1;
                 position_feedback_config.pole_pairs  = 2;
-                position_feedback_config.resolution  = 8192;
+                position_feedback_config.resolution  = 4000;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
@@ -175,14 +195,24 @@ int main(void)
                 //set sensor 2 parameters
                 PositionFeedbackConfig position_feedback_config_2;
                 position_feedback_config_2 = position_feedback_config;
+                //set sensor 3 parameters
+                PositionFeedbackConfig position_feedback_config_3;
+                position_feedback_config_3 = position_feedback_config;
+                //set sensor 4 parameters
+                PositionFeedbackConfig position_feedback_config_4;
+                position_feedback_config_4 = position_feedback_config;
 
-                //set sensor types for 1 and 2
+                //set sensor types
                 position_feedback_config.sensor_type = HALL_SENSOR;
-                position_feedback_config_2.sensor_type = BISS_SENSOR;
+                position_feedback_config_2.sensor_type = QEI_SENSOR;
+                position_feedback_config_3.sensor_type = HALL_SENSOR;
+                position_feedback_config_4.sensor_type = QEI_SENSOR;
 
-                position_feedback_service(hall_ports, qei_ports, spi_ports,
+                position_feedback_service(hall_ports, qei_ports, null, hall_2_ports, qei_2_ports,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
-                        position_feedback_config_2, null, i_position_feedback_2);
+                        position_feedback_config_2, null, i_position_feedback_2,
+                        position_feedback_config_3, null, i_position_feedback_3,
+                        position_feedback_config_4, null, i_position_feedback_4);
             }
         }
     }

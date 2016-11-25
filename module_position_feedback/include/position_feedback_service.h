@@ -101,12 +101,19 @@ typedef struct {
 
 
 void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPIPorts &?spi_ports,
+                               HallPorts &?hall_2_ports, QEIPorts &?qei_2_ports,
                                PositionFeedbackConfig &?position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
                                server interface PositionFeedbackInterface (&?i_position_feedback_1)[3],
                                PositionFeedbackConfig &?position_feedback_config_2,
                                client interface shared_memory_interface ?i_shared_memory_2,
-                               server interface PositionFeedbackInterface (&?i_position_feedback_2)[3]);
+                               server interface PositionFeedbackInterface (&?i_position_feedback_2)[3],
+                               PositionFeedbackConfig &?position_feedback_config_3,
+                               client interface shared_memory_interface ?i_shared_memory_3,
+                               server interface PositionFeedbackInterface (&?i_position_feedback_3)[3],
+                               PositionFeedbackConfig &?position_feedback_config_4,
+                               client interface shared_memory_interface ?i_shared_memory_4,
+                               server interface PositionFeedbackInterface (&?i_position_feedback_4)[3]);
 
 int tickstobits(uint32_t ticks);
 

@@ -198,9 +198,11 @@ int main(void) {
                     position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
                     position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
 
-                    position_feedback_service(hall_ports, qei_ports, spi_ports,
-                            position_feedback_config, i_shared_memory[0], i_position_feedback,
-                            null, null, null);
+                    position_feedback_service(null, qei_ports, null, null, null,
+                                            position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                            null, null, null,
+                                            null, null, null,
+                                            null, null, null);
                 }
             }
         }

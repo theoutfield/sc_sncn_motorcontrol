@@ -138,6 +138,9 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                 if (new_pins_1 == new_pins) {
                     qei_ports.p_qei :> new_pins;
                     if (new_pins_1 == new_pins) {
+                        char pi = (new_pins & 0b0001) << 2;
+                        char pa = (new_pins & 0b0100) >> 2;
+                        new_pins = (new_pins & 0b1010) + pi + pa;
                         v = lookup[new_pins][old_pins];
 
                         if (qei_type == QEI_WITH_NO_INDEX) {

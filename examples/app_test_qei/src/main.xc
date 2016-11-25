@@ -37,7 +37,8 @@ void qei_test(client interface PositionFeedbackInterface i_position_feedback, cl
     }
 }
 
-QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+//QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+QEIPorts qei_ports = SOMANET_IFM_QEI_2_PORTS;
 
 int main(void)
 {
@@ -67,8 +68,10 @@ int main(void)
                 position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
                 position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
 
-                position_feedback_service(null, qei_ports, null,
+                position_feedback_service(null, qei_ports, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
+                        null, null, null,
+                        null, null, null,
                         null, null, null);
             }
         }
