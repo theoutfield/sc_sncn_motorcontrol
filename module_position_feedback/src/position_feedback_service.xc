@@ -6,6 +6,7 @@
  */
 
 #include <position_feedback_service.h>
+#include <serial_encoder_service.h>
 #include <print.h>
 #include <xclib.h>
 
@@ -74,10 +75,10 @@ void start_service(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_
         biss_service(*qei_ports , position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     case CONTELEC_SENSOR:
-        contelec_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        serial_encoder_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     case AMS_SENSOR:
-        ams_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        serial_encoder_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     case HALL_SENSOR:
         hall_service(*hall_ports, position_feedback_config, i_shared_memory, i_position_feedback);
