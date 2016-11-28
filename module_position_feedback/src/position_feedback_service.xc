@@ -72,13 +72,13 @@ void start_service(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_
 {
     switch(position_feedback_config.sensor_type) {
     case BISS_SENSOR:
-        biss_service(*qei_ports , position_feedback_config, i_shared_memory, i_position_feedback);
+        serial_encoder_service(*spi_ports, *qei_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     case CONTELEC_SENSOR:
-        serial_encoder_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        serial_encoder_service(*spi_ports, *qei_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     case AMS_SENSOR:
-        serial_encoder_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        serial_encoder_service(*spi_ports, *qei_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     case HALL_SENSOR:
         hall_service(*hall_ports, position_feedback_config, i_shared_memory, i_position_feedback);
