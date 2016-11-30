@@ -345,17 +345,17 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
         case i_position_control[int i].disable():
 
                 i_motorcontrol.set_brake_status(0);
-                if (pos_velocity_ctrl_config.brake_shutdown_delay == 0)
+                if (pos_velocity_ctrl_config.brake_shutdown_delay != 0 && position_enable_flag == 1)
+                {
+                    brake_shutdown_counter = pos_velocity_ctrl_config.brake_shutdown_delay;
+                }
+                else
                 {
                     torque_enable_flag   =0;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
                     i_motorcontrol.set_torque_control_disabled();
                     i_motorcontrol.set_safe_torque_off_enabled();
-                }
-                else
-                {
-                    brake_shutdown_counter = pos_velocity_ctrl_config.brake_shutdown_delay;
                 }
 
                 break;
