@@ -57,27 +57,29 @@ double first_order_LP_filter_update(double *x_k, FirstOrderLPfilterParam &param)
  */
 void second_order_LP_filter_init(int f_c, int T_s, SecondOrderLPfilterParam &param )
 {
-    double f_c_max=0.00, omega_T=0.00;
+
+    double fs=0.00, w=0.00, z=0.00, d=0.00;
 
     param.y_k  =0.00;
     param.y_k_1=0.00;
     param.y_k_2=0.00;
 
+    fs= 1000000.00/((double)(T_s));
+    w = 6.28318530718 * ((double)f_c);
+    z = 0.60;
+
+    d = (fs*fs) + (2*z*w*fs) + (w*w);
+
     param.T_s = T_s;
-    f_c_max = US_DENOMINATOR/(6.28318530718 * ((double)T_s));
-    if (f_c < 0)
-    {
-        f_c = 0;
-    }
-    else if (f_c > ((int)f_c_max))
-    {
-        f_c = (int)f_c_max;
-        printf("\nERROR: The cutt-off frequency of the second_order_LP_filter is higher than the limit.\nMax f_c = %.2f\n",f_c_max);
-    }
-    omega_T = (6.28318530718 * ((double)f_c) * ((double)T_s)) / US_DENOMINATOR;
-    param.a1 = 2 * (1 - omega_T);
-    param.a2 = -(1 - omega_T) * (1 - omega_T);
-    param.b0 = omega_T * omega_T;
+
+    param.a1 = (2*fs*fs) + (2*z*w*fs);
+    param.a1/= d;
+
+    param.a2 = -(fs*fs);
+    param.a2/= d;
+
+    param.b0 = w*w;
+    param.b0/= d;
 }
 
 /**
