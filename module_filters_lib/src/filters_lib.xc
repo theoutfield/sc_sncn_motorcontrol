@@ -23,19 +23,9 @@ void first_order_LP_filter_init(int f_c, int T_s, FirstOrderLPfilterParam &param
     param.y_k_1=0.00;
 
     param.T_s = T_s;
-    f_c_max = US_DENOMINATOR/(6.28318530718 * ((double)T_s));
-    if (f_c < 0)
-    {
-        f_c = 0;
-    }
-    else if (f_c > ((int)f_c_max))
-    {
-        f_c = (int)f_c_max;
-        printf("\nERROR: The cutt-off frequency of the first_order_LP_filter is higher than the limit.\nMax f_c = %.2f\n",f_c_max);
-    }
-    omega_T = (6.28318530718 * ((double)f_c) * ((double)T_s)) / US_DENOMINATOR;
-    param.a1 = (1 - omega_T);
-    param.b0 = omega_T;
+    omega_T = (6.28318530718 * ((double)f_c) * ((double)T_s))/1000000.00;
+    param.a1 = 1.00/(1.00+omega_T);
+    param.b0 = omega_T/(1.00+omega_T);
 }
 
 
