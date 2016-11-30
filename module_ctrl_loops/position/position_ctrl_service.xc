@@ -225,13 +225,28 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 }
                 else if (position_enable_flag == 1)// position control
                 {
-                    if (pos_velocity_ctrl_config.enable_profiler)
+                    //brake shutdown delay, don't update target position
+                    if (brake_shutdown_counter > 0)
+                    {
+                        brake_shutdown_counter--;
+                        if (brake_shutdown_counter == 0)
+                        {
+                            torque_enable_flag   =0;
+                            velocity_enable_flag =0;
+                            position_enable_flag =0;
+                            i_motorcontrol.set_torque_control_disabled();
+                            i_motorcontrol.set_safe_torque_off_enabled();
+                        }
+                    }
+                    //profiler enabled, set target position
+                    else if (pos_velocity_ctrl_config.enable_profiler)
                     {
                         position_ref_in_k = pos_profiler(((double) downstream_control_data.position_cmd), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
                         acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(pos_velocity_ctrl_config.control_loop_period * pos_velocity_ctrl_config.control_loop_period);
                         position_ref_in_k_2n = position_ref_in_k_1n;
                         position_ref_in_k_1n = position_ref_in_k;
                     }
+                    //use direct target position
                     else
                     {
                         position_ref_in_k = (double) downstream_control_data.position_cmd;
@@ -253,20 +268,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
                     {
                         torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
-                    }
-                }
-
-                //brake shutdown delay
-                if (brake_shutdown_counter > 0)
-                {
-                    brake_shutdown_counter--;
-                    if (brake_shutdown_counter == 0)
-                    {
-                        torque_enable_flag   =0;
-                        velocity_enable_flag =0;
-                        position_enable_flag =0;
-                        i_motorcontrol.set_torque_control_disabled();
-                        i_motorcontrol.set_safe_torque_off_enabled();
                     }
                 }
 
