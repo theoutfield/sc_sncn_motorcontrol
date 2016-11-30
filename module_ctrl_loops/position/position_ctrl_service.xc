@@ -143,12 +143,13 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
         max_position = pos_velocity_ctrl_config.max_pos;
     }
 
-    //special_brake_release
+    //brake
     const int special_brake_release_range = 1000;
     const int special_brake_release_duration = 3000;
     int special_brake_release_counter = special_brake_release_duration+1;
     int special_brake_release_initial_position = 0;
     int special_brake_release_torque = 0;
+    int brake_shutdown_counter = 0;
 
     timer t;
     unsigned int ts;
@@ -255,6 +256,20 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     }
                 }
 
+                //brake shutdown delay
+                if (brake_shutdown_counter > 0)
+                {
+                    brake_shutdown_counter--;
+                    if (brake_shutdown_counter == 0)
+                    {
+                        torque_enable_flag   =0;
+                        velocity_enable_flag =0;
+                        position_enable_flag =0;
+                        i_motorcontrol.set_torque_control_disabled();
+                        i_motorcontrol.set_safe_torque_off_enabled();
+                    }
+                }
+
                 //brake release, override target torque if we are in brake release
                 if (special_brake_release_counter <= special_brake_release_duration)
                 {
@@ -328,12 +343,20 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 
         case i_position_control[int i].disable():
 
-                torque_enable_flag   =0;
-                velocity_enable_flag =0;
-                position_enable_flag =0;
-                i_motorcontrol.set_torque_control_disabled();
-                i_motorcontrol.set_safe_torque_off_enabled();
                 i_motorcontrol.set_brake_status(0);
+                if (pos_velocity_ctrl_config.brake_shutdown_delay == 0)
+                {
+                    torque_enable_flag   =0;
+                    velocity_enable_flag =0;
+                    position_enable_flag =0;
+                    i_motorcontrol.set_torque_control_disabled();
+                    i_motorcontrol.set_safe_torque_off_enabled();
+                }
+                else
+                {
+                    brake_shutdown_counter = pos_velocity_ctrl_config.brake_shutdown_delay;
+                }
+
                 break;
 
         case i_position_control[int i].enable_position_ctrl(int in_pos_control_mode):
@@ -341,9 +364,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 torque_enable_flag   =0;
                 velocity_enable_flag =0;
                 position_enable_flag =1;
-
-                i_motorcontrol.set_brake_status(1);
-                i_motorcontrol.set_torque_control_enabled();
 
                 pos_control_mode = in_pos_control_mode;
 
@@ -366,6 +386,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     special_brake_release_initial_position = upstream_control_data.position;
                     special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
                 }
+
+                //enable motorcontrol and release brake
+                i_motorcontrol.set_torque_control_enabled();
+                i_motorcontrol.set_brake_status(1);
+
+                //start control loop just after
+                t :> ts;
+                ts = ts - USEC_STD * pos_velocity_ctrl_config.control_loop_period;
+
                 break;
 
         case i_position_control[int i].enable_velocity_ctrl(void):
@@ -373,9 +402,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 torque_enable_flag   =0;
                 velocity_enable_flag =1;
                 position_enable_flag =0;
-
-                i_motorcontrol.set_brake_status(1);
-                i_motorcontrol.set_torque_control_enabled();
 
                 downstream_control_data.velocity_cmd = 0;
                 downstream_control_data.offset_torque = 0;
@@ -389,15 +415,21 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     special_brake_release_initial_position = upstream_control_data.position;
                     special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
                 }
+
+                //enable motorcontrol and release brake
+                i_motorcontrol.set_torque_control_enabled();
+                i_motorcontrol.set_brake_status(1);
+
+                //start control loop just after
+                t :> ts;
+                ts = ts - USEC_STD * pos_velocity_ctrl_config.control_loop_period;
+
                 break;
 
         case i_position_control[int i].enable_torque_ctrl():
                 torque_enable_flag   =1;
                 velocity_enable_flag =0;
                 position_enable_flag =0;
-
-                i_motorcontrol.set_brake_status(1);
-                i_motorcontrol.set_torque_control_enabled();
 
                 downstream_control_data.torque_cmd = 0;
                 downstream_control_data.offset_torque = 0;
@@ -409,6 +441,15 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     special_brake_release_initial_position = upstream_control_data.position;
                     special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
                 }
+
+                //enable motorcontrol and release brake
+                i_motorcontrol.set_torque_control_enabled();
+                i_motorcontrol.set_brake_status(1);
+
+                //start control loop just after
+                t :> ts;
+                ts = ts - USEC_STD * pos_velocity_ctrl_config.control_loop_period;
+
                 break;
 
         case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
