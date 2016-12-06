@@ -113,12 +113,12 @@ static void do_pwm_port_config_general(PwmPortsGeneral &ports)
 
 
 /*****************************************************************************/
-void pwm_config(PwmPorts &ports)
+void pwm_config(PwmPorts &ports, int ifm_tile_usec)
 {
     //    int motor_cnt; // motor counter
 
-    // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz) -> in our application it is 250 MHz
-    //configure_clock_rate( ports.clk ,PLATFORM_REFERENCE_MHZ ,1 );
+    // Configure clock rate to ifm_tile_usec/1
+    configure_clock_rate( ports.clk, ifm_tile_usec, 1);
 
     do_pwm_port_config(ports);
 
@@ -143,10 +143,10 @@ void pwm_config(PwmPorts &ports)
 } // foc_pwm_config
 
 /*****************************************************************************/
-void pwm_config_general(PwmPortsGeneral &ports)
+void pwm_config_general(PwmPortsGeneral &ports, int ifm_tile_usec)
 {
-    // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz) -> in our application it is 250 MHz
-    //configure_clock_rate( ports.clk ,PLATFORM_REFERENCE_MHZ ,1 );
+    // Configure clock rate to ifm_tile_usec
+    configure_clock_rate( ports.clk, ifm_tile_usec, 1);
 
     do_pwm_port_config_general(ports);
 
@@ -381,7 +381,7 @@ void pwm_check_general(PwmPortsGeneral &ports)
 }
 
 
-void pwm_checkl(PwmPorts &ports)
+void pwm_check(PwmPorts &ports)
 {
 
     while(1)

@@ -47,8 +47,8 @@ typedef struct PWM_SERV_TAG
 
 void predriver(FetDriverPorts &fet_driver_ports);
 
-void pwm_config(PwmPorts &ports);
-void pwm_config_general(PwmPortsGeneral &ports);
+void pwm_config(PwmPorts &ports, int ifm_tile_usec);
+void pwm_config_general(PwmPortsGeneral &ports, int ifm_tile_usec);
 
 void pwm_check(PwmPorts &ports);
 void pwm_check_general(PwmPortsGeneral &ports);

@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 
 /**
@@ -68,7 +68,7 @@ int main(void) {
                 }
                 /* PWM Service */
                 {
-                    pwm_config_general(pwm_ports);
+                    pwm_config_general(pwm_ports, IFM_TILE_USEC);
 
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
