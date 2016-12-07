@@ -186,7 +186,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
  void contelec_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
     if (CONTELEC_USEC == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        //write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
     //init sensor

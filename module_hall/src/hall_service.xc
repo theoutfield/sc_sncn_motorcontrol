@@ -41,7 +41,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
 {
 
     if (HALL_USEC == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        //write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
     if (check_hall_config(position_feedback_config) == ERROR) {

@@ -14,7 +14,7 @@
     if(ifm_tile_usec==250)
     {
         //Set freq to 250MHz (always needed for proper timing)
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        //write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
         usec = 250;
     }
     else
@@ -156,7 +156,7 @@
                             led_motor_on_wdtick_wden_buffer ^= (1 << 1); //toggle wd tick
                             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                             //Reset WD after fault
-                            if (WD_En_sent_flag<2)
+                            if (WD_En_sent_flag<20)
                             {
                                 led_motor_on_wdtick_wden_buffer ^= 1;//toggle WD Enable pin
                                 watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;

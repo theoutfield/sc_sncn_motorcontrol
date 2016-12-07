@@ -491,7 +491,7 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
 {
 
     if (AMS_USEC == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        //write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
     position_feedback_config.offset &= (position_feedback_config.resolution-1);

@@ -40,10 +40,10 @@ int main(void) {
     interface update_pwm_general i_update_pwm;
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[2];
-//    interface PositionVelocityCtrlInterface i_position_control[3];
-//    interface PositionFeedbackInterface i_position_feedback[3];
+    //interface PositionVelocityCtrlInterface i_position_control[3];
+    //interface PositionFeedbackInterface i_position_feedback[3];
     interface shared_memory_interface i_shared_memory[2];
-//    interface PositionLimiterInterface i_position_limiter;
+    //interface PositionLimiterInterface i_position_limiter;
 
     par
     {
@@ -99,7 +99,7 @@ int main(void) {
             {
                 /* PWM Service */
                 {
-                    pwm_config_general(pwm_ports, IFM_TILE_USEC);
+                    pwm_config_general(pwm_ports, 250);
 
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
@@ -107,7 +107,7 @@ int main(void) {
                     pwm_service_general(//80ms
                             pwm_ports, i_update_pwm,
                             DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
-                            IFM_TILE_USEC, COMMUTATION_FRQ);
+                            250, 15);
 
                 }
 
@@ -162,7 +162,7 @@ int main(void) {
 
                     //100ms
                     motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC, COMMUTATION_FRQ);
+                            i_watchdog[0], i_motorcontrol, i_update_pwm, 250, 15);
                 }
 
 //                /* Shared memory Service */

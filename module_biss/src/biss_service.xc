@@ -29,7 +29,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
 {
 
     if (BISS_USEC == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        //write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
     printstr(start_message);

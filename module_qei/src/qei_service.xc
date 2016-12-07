@@ -63,7 +63,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
 
 
     if (QEI_USEC == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+        //write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
                // to compute velocity from qei
