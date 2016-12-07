@@ -104,7 +104,7 @@ int main(void) {
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    pwm_service_general(
+                    pwm_service_general(//80ms
                             pwm_ports, i_update_pwm,
                             DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
                             IFM_TILE_USEC, COMMUTATION_FRQ);
@@ -118,7 +118,7 @@ int main(void) {
 
                 /* Watchdog Service */
                 {
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
+                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);//20ms
                 }
 
                 /* Motor Control Service */
@@ -160,6 +160,7 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
+                    //100ms
                     motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                             i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC, COMMUTATION_FRQ);
                 }

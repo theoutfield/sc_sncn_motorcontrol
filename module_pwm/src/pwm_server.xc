@@ -63,43 +63,61 @@ static void do_pwm_port_config_general(PwmPortsGeneral &ports)
     if (!isnull(ports.p_pwm_a))
     {
         configure_out_port( ports.p_pwm_a    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_a, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-        set_port_inv( ports.p_pwm_inv_a);
+        if(!isnull(ports.p_pwm_inv_a))
+        {
+            configure_out_port( ports.p_pwm_inv_a, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+            set_port_inv( ports.p_pwm_inv_a);
+        }
     }
 
     if (!isnull(ports.p_pwm_b))
     {
         configure_out_port( ports.p_pwm_b    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_b, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-        set_port_inv( ports.p_pwm_inv_b);
+        if(!isnull(ports.p_pwm_inv_b))
+        {
+            configure_out_port( ports.p_pwm_inv_b, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+            set_port_inv( ports.p_pwm_inv_b);
+        }
     }
 
     if (!isnull(ports.p_pwm_c))
     {
         configure_out_port( ports.p_pwm_c    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_c, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-        set_port_inv( ports.p_pwm_inv_c);
+        if(!isnull(ports.p_pwm_inv_c))
+        {
+            configure_out_port( ports.p_pwm_inv_c, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+            set_port_inv( ports.p_pwm_inv_c);
+        }
     }
 
     if (!isnull(ports.p_pwm_u))
     {
         configure_out_port( ports.p_pwm_u    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_u, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-        set_port_inv( ports.p_pwm_inv_u);
+        if(!isnull(ports.p_pwm_inv_u))
+        {
+            configure_out_port( ports.p_pwm_inv_u, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+            set_port_inv( ports.p_pwm_inv_u);
+        }
     }
 
     if (!isnull(ports.p_pwm_v))
     {
         configure_out_port( ports.p_pwm_v    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_v, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-        set_port_inv( ports.p_pwm_inv_v);
+        if(!isnull(ports.p_pwm_inv_v))
+        {
+            configure_out_port( ports.p_pwm_inv_v, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+            set_port_inv( ports.p_pwm_inv_v);
+        }
     }
 
     if (!isnull(ports.p_pwm_w))
     {
         configure_out_port( ports.p_pwm_w    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_w, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-        set_port_inv( ports.p_pwm_inv_w);
+        if(!isnull(ports.p_pwm_inv_w))
+        {
+            configure_out_port( ports.p_pwm_inv_w, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+            set_port_inv( ports.p_pwm_inv_w);
+        }
     }
 
     // Check of ADC synchronisation is being used
@@ -143,10 +161,10 @@ void pwm_config(PwmPorts &ports, int ifm_tile_usec)
 } // foc_pwm_config
 
 /*****************************************************************************/
-void pwm_config_general(PwmPortsGeneral &ports, int ifm_tile_usec)
+void pwm_config_general(PwmPortsGeneral &ports, int pwm_tile_usec)
 {
     // Configure clock rate to ifm_tile_usec
-    configure_clock_rate( ports.clk, ifm_tile_usec, 1);
+    configure_clock_rate( ports.clk, pwm_tile_usec, 1);
 
     do_pwm_port_config_general(ports);
 
@@ -155,37 +173,37 @@ void pwm_config_general(PwmPortsGeneral &ports, int ifm_tile_usec)
     if (!isnull(ports.p_pwm_a))
     {
         ports.p_pwm_a     <: 0x00000000;
-        ports.p_pwm_inv_a <: 0xFFFFFFFF;
+        if(!isnull(ports.p_pwm_inv_a)) ports.p_pwm_inv_a <: 0xFFFFFFFF;
     }
 
     if (!isnull(ports.p_pwm_b))
     {
         ports.p_pwm_b     <: 0x00000000;
-        ports.p_pwm_inv_b <: 0xFFFFFFFF;
+        if(!isnull(ports.p_pwm_inv_b)) ports.p_pwm_inv_b <: 0xFFFFFFFF;
     }
 
     if (!isnull(ports.p_pwm_c))
     {
         ports.p_pwm_c     <: 0x00000000;
-        ports.p_pwm_inv_c <: 0xFFFFFFFF;
+        if(!isnull(ports.p_pwm_inv_c)) ports.p_pwm_inv_c <: 0xFFFFFFFF;
     }
 
     if (!isnull(ports.p_pwm_u))
     {
         ports.p_pwm_u     <: 0x00000000;
-        ports.p_pwm_inv_u <: 0xFFFFFFFF;
+        if(!isnull(ports.p_pwm_inv_u)) ports.p_pwm_inv_u <: 0xFFFFFFFF;
     }
 
     if (!isnull(ports.p_pwm_v))
     {
         ports.p_pwm_v     <: 0x00000000;
-        ports.p_pwm_inv_v <: 0xFFFFFFFF;
+        if(!isnull(ports.p_pwm_inv_v)) ports.p_pwm_inv_v <: 0xFFFFFFFF;
     }
 
     if (!isnull(ports.p_pwm_w))
     {
         ports.p_pwm_w     <: 0x00000000;
-        ports.p_pwm_inv_w <: 0xFFFFFFFF;
+        if(!isnull(ports.p_pwm_inv_w)) ports.p_pwm_inv_w <: 0xFFFFFFFF;
     }
 
 } // foc_pwm_config
@@ -686,7 +704,7 @@ void pwm_service_general(
         int duty_start_brake,
         int duty_maintain_brake,
         int time_start_brake,
-        int ifm_tile_usec,
+        int pwm_tile_usec,
         int commutation_frq
 )
 {
@@ -702,7 +720,7 @@ void pwm_service_general(
     t when timerafter (ts + (4000*20*250)) :> void;
 
 
-    if(ifm_tile_usec==250)
+    if(pwm_tile_usec==250)
     {
         if(commutation_frq==15)
         {
@@ -710,10 +728,8 @@ void pwm_service_general(
             pwm_max_value=16384;
             pwm_deadtime=1500;
         }
-        //Set freq to 250MHz (always needed for proper timing)
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
-    else if(ifm_tile_usec==100)
+    else if(pwm_tile_usec==100)
     {
         if(commutation_frq==12)
         {
@@ -730,7 +746,7 @@ void pwm_service_general(
         }
 
     }
-    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+    else if (pwm_tile_usec!=100 && pwm_tile_usec!=250)
     {
         while(1);//error state!!!
     }
@@ -784,7 +800,6 @@ void pwm_service_general(
 
     convert_all_pulse_widths( pwm_comms_s1 ,pwm_ctrl_s1.buf_data[pwm_comms_s1.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
     convert_all_pulse_widths( pwm_comms_s2 ,pwm_ctrl_s2.buf_data[pwm_comms_s2.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
-
 
     pwm_serv_s1.data_ready = 1; // Signal new data ready. NB this happened in init_pwm_data()
     pwm_serv_s2.data_ready = 1; // Signal new data ready. NB this happened in init_pwm_data()
