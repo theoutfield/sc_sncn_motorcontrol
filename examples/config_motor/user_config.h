@@ -70,8 +70,11 @@
 //////  IFM TILE FREQ CONFIGURATION
 //////////////////////////////////////////////
 
-#define IFM_TILE_USEC   USEC_STD // Number of ticks in a microsecond for IFM Tile
+#define IFM_TILE_USEC               USEC_STD // Number of ticks in a microsecond
 
+#define REF_CLK_FRQ_MHZ_             250
+#define PWM_CLK_FRQ_MHZ_             REF_CLK_FRQ_MHZ_
+#define COMMUTATION_FRQ_KHZ_         15
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
@@ -94,12 +97,10 @@
 
 #define VDC             48
 
-// COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     82
-#define COMMUTATION_FRQ             24
-
-//// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
+// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_OFFSET_CLK      0
+#define COMMUTATION_LOOP_PERIOD     82
+
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -128,7 +129,6 @@
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
 #define PERCENT_OFFSET_TORQUE 80
-
 
 /////////////////////////////////////////////////
 //////  PROFILES AND LIMITS CONFIGURATION

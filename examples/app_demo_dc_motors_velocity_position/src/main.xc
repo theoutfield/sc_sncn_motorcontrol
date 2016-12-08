@@ -99,15 +99,14 @@ int main(void) {
             {
                 /* PWM Service */
                 {
-                    pwm_config_general(pwm_ports, 250);
+                    pwm_config_general(pwm_ports, REF_CLK_FRQ_MHZ_, PWM_CLK_FRQ_MHZ_);
 
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    pwm_service_general(//80ms
+                    pwm_service_general(
                             pwm_ports, i_update_pwm,
-                            DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
-                            250, 15);
+                            REF_CLK_FRQ_MHZ_, PWM_CLK_FRQ_MHZ_, COMMUTATION_FRQ_KHZ_);
 
                 }
 
@@ -118,7 +117,7 @@ int main(void) {
 
                 /* Watchdog Service */
                 {
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);//20ms
+                    watchdog_service(wd_ports, i_watchdog, REF_CLK_FRQ_MHZ_);//20ms
                 }
 
                 /* Motor Control Service */
@@ -162,7 +161,8 @@ int main(void) {
 
                     //100ms
                     motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm, 250, 15);
+                            i_watchdog[0], i_motorcontrol, i_update_pwm,
+                            REF_CLK_FRQ_MHZ_, PWM_CLK_FRQ_MHZ_, COMMUTATION_FRQ_KHZ_);
                 }
 
 //                /* Shared memory Service */

@@ -160,11 +160,16 @@ void pwm_config(PwmPorts &ports, int ifm_tile_usec)
 
 } // foc_pwm_config
 
-/*****************************************************************************/
-void pwm_config_general(PwmPortsGeneral &ports, int pwm_tile_usec)
+
+/*
+ * The important inputs of this function are:
+ *  - pwm clock frequency       (MHz)
+ *  - reference clock frequency (MHz)
+ * */
+void pwm_config_general(PwmPortsGeneral &ports, int ref_clk_frq, int pwm_clk_frq)
 {
     // Configure clock rate to ifm_tile_usec
-    configure_clock_rate( ports.clk, pwm_tile_usec, 1);
+    configure_clock_rate( ports.clk, pwm_clk_frq, 1);
 
     do_pwm_port_config_general(ports);
 
@@ -696,15 +701,16 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 /*****************************************************************************/
 
 /*
- *
+ * The important inputs of this function are:
+ *  - commutation frequency     (kHz)
+ *  - pwm clock frequency       (MHz)
+ *  - reference clock frequency (MHz)
  * */
 void pwm_service_general(
         PwmPortsGeneral &ports,
         server interface update_pwm_general i_update_pwm,
-        int duty_start_brake,
-        int duty_maintain_brake,
-        int time_start_brake,
-        int pwm_tile_usec,
+        int ref_clk_frq,
+        int pwm_clk_frq,
         int commutation_frq
 )
 {
@@ -720,39 +726,67 @@ void pwm_service_general(
     t :> ts;
     t when timerafter (ts + (4000*20*250)) :> void;
 
-
-    if(pwm_tile_usec==250)
+    if(ref_clk_frq==100)
     {
-        if(commutation_frq==15)
+        if(pwm_clk_frq==100)
         {
-            half_sync_inc = 8192;
-            pwm_max_value=16384;
-            pwm_max_value_loop=6554;
-            pwm_deadtime=1500;
+            if(commutation_frq==12)
+            {
+                half_sync_inc = 4096;
+                pwm_max_value=8192;
+                pwm_max_value_loop=pwm_max_value;
+                pwm_deadtime=600;
+            }
+            else if (commutation_frq==24)
+            {
+                half_sync_inc = 2048;
+                pwm_max_value=4096;
+                pwm_max_value_loop=pwm_max_value;
+                pwm_deadtime=600;
+            }
+            else
+            {
+                printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+                while(1);
+            }
+
+        }
+        else
+        {
+            printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+            while(1);
         }
     }
-    else if(pwm_tile_usec==100)
+    else if(ref_clk_frq==250)
     {
-        if(commutation_frq==12)
-        {
-            half_sync_inc = 4096;
-            pwm_max_value=8192;
-            pwm_max_value_loop=pwm_max_value;
-            pwm_deadtime=600;
-        }
+        //Set freq to 250MHz (always needed for proper timing)
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
 
-        if(commutation_frq==24)
+        if(pwm_clk_frq==250)
         {
-            half_sync_inc = 2048;
-            pwm_max_value=4096;
-            pwm_max_value_loop=pwm_max_value;
-            pwm_deadtime=600;
+            if(commutation_frq==15)
+            {
+                half_sync_inc = 8192;
+                pwm_max_value=16384;
+                pwm_max_value_loop=pwm_max_value;
+                pwm_deadtime=1500;
+            }
+            else
+            {
+                printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+                while(1);
+            }
         }
-
+        else
+        {
+            printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+            while(1);
+        }
     }
-    else if (pwm_tile_usec!=100 && pwm_tile_usec!=250)
+    else
     {
-        while(1);//error state!!!
+        printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+        while(1);
     }
 
     PWM_ARRAY_TYP pwm_ctrl_s1, pwm_ctrl_s2 ;  // Structure containing double-buffered PWM output data
@@ -762,10 +796,6 @@ void pwm_service_general(
     unsigned pattern=0; // Bit-pattern on port
 
     int pwm_on  =0;
-
-    int brake_active  = 0;
-    int brake_counter = 0;
-    int brake_start   = (time_start_brake*15000)/1000;
 
     unsigned char phase_a_defined=0b0000, phase_b_defined=0b0000, phase_c_defined=0b0000,
                   phase_u_defined=0b0000, phase_v_defined=0b0000, phase_w_defined=0b0000;
@@ -828,8 +858,7 @@ void pwm_service_general(
         case i_update_pwm.update_server_control_data(
                 int pwm_a, int pwm_b, int pwm_c,
                 int pwm_u, int pwm_v, int pwm_w,
-                int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode) -> unsigned int t_calculation:
-                        t :> t_start;
+                int received_pwm_on, int recieved_safe_torque_off_mode):
                         pwm_comms_s1.params.widths[0] =  pwm_a;
                         pwm_comms_s1.params.widths[1] =  pwm_b;
                         pwm_comms_s1.params.widths[2] =  pwm_c;
@@ -846,16 +875,6 @@ void pwm_service_general(
                 else if(recieved_safe_torque_off_mode ==1)
                     pwm_on     = 0;
 
-                if(received_brake_active==0)  brake_active = 0;
-
-                if((brake_active == 0)&&(received_brake_active==1))
-                {
-                    brake_counter=0;
-                    brake_active = 1;
-                }
-                t :> t_end;
-
-                t_calculation = t_end - t_start;
                 break;
 
         case i_update_pwm.safe_torque_off_enabled():
@@ -896,7 +915,7 @@ void pwm_service_general(
 
                 pwm_serv_s1.ref_time += half_sync_inc;
                 pwm_serv_s2.ref_time += half_sync_inc;
-                time += pwm_max_value_loop;// (16384*100)/250
+                time += pwm_max_value_loop;
             break;
         }
 
