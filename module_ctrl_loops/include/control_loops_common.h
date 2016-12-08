@@ -69,6 +69,7 @@ typedef struct {
     int j;
     int polarity; //polarity of the movement [-1/1]
     int special_brake_release;
+    int brake_shutdown_delay;
 
 } PosVelocityControlConfig;
 
