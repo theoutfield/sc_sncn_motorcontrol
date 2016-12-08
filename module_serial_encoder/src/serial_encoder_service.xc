@@ -1,15 +1,14 @@
 /*
- * rotary_sensor_new.xc
+ * serial_encoder_service.xc
  *
- *  Created on: 26.01.2016
- *      Author: hstroetgen
+ *  Created on: 26.11.2016
+ *      Author: synapticon
  */
 
 #include <xs1.h>
-//#include <contelec_service.h>
-//#include <serial_encoder_struct.h>
 #include <contelec_service.h>
 #include <ams_service.h>
+#include <biss_service.h>
 #include <timer.h>
 #include <print.h>
 #include <xscope.h>
@@ -37,7 +36,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
             count += difference;
 }
 
-void read_position(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionFeedbackConfig &position_feedback_config, PositionState &state)
+void read_position(SPIPorts * spi_ports, QEIPorts * biss_ports, PositionFeedbackConfig &position_feedback_config, PositionState &state)
 {
     state.status = 0;
 
@@ -46,20 +45,20 @@ void read_position(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionFeedbackCo
     case CONTELEC_SENSOR:
 #ifdef CONTELEC_USE_TIMESTAMP
         char timestamp;
-        { state.status, state.count, state.position, state.angle, state.timestamp } = contelec_encoder_read(spi_ports);
+        { state.status, state.count, state.position, state.angle, state.timestamp } = contelec_encoder_read(*spi_ports);
 #else
-        { state.status, state.count, state.position, state.angle } = contelec_encoder_read(spi_ports);
+        { state.status, state.count, state.position, state.angle } = contelec_encoder_read(*spi_ports);
 #endif
         state.angle = (position_feedback_config.pole_pairs * (state.angle >> 4) ) & 4095;
         break;
     case AMS_SENSOR:
-        state.position = readRotarySensorAngleWithoutCompensation(spi_ports);
+        state.position = readRotarySensorAngleWithoutCompensation(*spi_ports);
         multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
         state.angle = (position_feedback_config.pole_pairs * (state.position >> 2) ) & 4095;
         break;
     case BISS_SENSOR:
         unsigned int data[BISS_FRAME_BYTES];
-        int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+        int error = read_biss_sensor_data(*biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
         { state.count, state.position, state.status } = biss_encoder(data, position_feedback_config.biss_config);
         state.status = state.status + (error << 2);
         if (position_feedback_config.biss_config.multiturn_resolution == 0)
@@ -83,7 +82,7 @@ void read_position(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionFeedbackCo
 }
 
 
-void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
+void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
     if (CONTELEC_USEC == USEC_FAST) { //Set freq to 250MHz
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -111,24 +110,21 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
     unsigned int next_velocity_read = 0;
     unsigned int last_read = 0;
     unsigned int last_velocity_read = 0;
+    unsigned int end_time = 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
 
-    //debug
-    unsigned int measurement_time = 0;
-    unsigned int start_time, end_time;
-//    unsigned int period_time = 0;
-
+    //init sensor
     switch(position_feedback_config.sensor_type)
     {
     case CONTELEC_SENSOR:
         velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC; //velocity loop time in clock ticks
         //init sensor
-        init_spi_ports(spi_ports);
-        int init_status = contelec_encoder_init(spi_ports, position_feedback_config);
+        init_spi_ports(*spi_ports);
+        int init_status = contelec_encoder_init(*spi_ports, position_feedback_config);
         if (init_status) {
             delay_ticks(200000*CONTELEC_USEC);
-            init_status = contelec_encoder_init(spi_ports, position_feedback_config);
+            init_status = contelec_encoder_init(*spi_ports, position_feedback_config);
             if (init_status) {
                 printstr("Error with CONTELEC sensor initialization");
                 printintln(init_status);
@@ -139,23 +135,23 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
         //first read
         delay_ticks(100 * CONTELEC_USEC);
     #ifdef CONTELEC_USE_TIMESTAMP
-        { void, pos_state.count, pos_state.last_position, void, void } = contelec_encoder_read(spi_ports);
+        { void, pos_state.count, pos_state.last_position, void, void } = contelec_encoder_read(*spi_ports);
     #else
-        { void, pos_state.count, pos_state.last_position, void } = contelec_encoder_read(spi_ports);
+        { void, pos_state.count, pos_state.last_position, void } = contelec_encoder_read(*spi_ports);
     #endif
         t :> last_read;
         break;
     case AMS_SENSOR:
         velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
         position_feedback_config.offset &= (position_feedback_config.resolution-1);
-        if (initRotarySensor(spi_ports,  position_feedback_config) != SUCCESS_WRITING) {
+        if (initRotarySensor(*spi_ports,  position_feedback_config) != SUCCESS_WRITING) {
             printstrln("Error with SPI AMS sensor");
             position_feedback_config.sensor_type = 0;
             return;
         }
         printstr(start_message);
         printstrln("AMS");
-        pos_state.last_position = readRotarySensorAngleWithoutCompensation(spi_ports);
+        pos_state.last_position = readRotarySensorAngleWithoutCompensation(*spi_ports);
         t :> last_read;
         break;
     case BISS_SENSOR:
@@ -177,7 +173,7 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
         int init_status;
         do {
             t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
-            init_status = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+            init_status = read_biss_sensor_data(*biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
             t :> last_read;
         } while (init_status != NoError && !timeafter(last_read, time + 1000000*BISS_USEC));
         if (init_status == CRCError)
@@ -205,7 +201,7 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
 
         //send electrical angle for commutation
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
-                switch(position_feedback_config.sensor_type == CONTELEC_SENSOR)
+                switch(position_feedback_config.sensor_type)
                 {
                 case CONTELEC_SENSOR:
                     t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
@@ -221,7 +217,7 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
 
         //send multiturn count and position
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position }:
-                switch(position_feedback_config.sensor_type == CONTELEC_SENSOR)
+                switch(position_feedback_config.sensor_type)
                 {
                 case CONTELEC_SENSOR:
                     t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
@@ -238,7 +234,7 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
 
         //send position
         case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
-                switch(position_feedback_config.sensor_type == CONTELEC_SENSOR)
+                switch(position_feedback_config.sensor_type)
                 {
                 case CONTELEC_SENSOR:
                     t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
@@ -271,7 +267,7 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
                 {
                 case CONTELEC_SENSOR:
                     position_feedback_config = in_config;
-                    contelec_encoder_init(spi_ports, position_feedback_config); //init with new config
+                    contelec_encoder_init(*spi_ports, position_feedback_config); //init with new config
                     t :> last_read;
                     //update variables which depend on contelec_config
                     velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC;
@@ -280,9 +276,9 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
                     in_config.offset &= (in_config.resolution-1);
                     //update variables which depend on ams_config
                     if (position_feedback_config.polarity != in_config.polarity)
-                        initRotarySensor(spi_ports,  in_config);
+                        initRotarySensor(*spi_ports,  in_config);
                     else if (position_feedback_config.offset != in_config.offset)
-                        writeZeroPosition(spi_ports, in_config.offset);
+                        writeZeroPosition(*spi_ports, in_config.offset);
                     position_feedback_config = in_config;
                     velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC;
                     velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
@@ -318,18 +314,20 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
                 {
                 case CONTELEC_SENSOR:
                     int multiturn;
+                    unsigned int singleturn;
                     if (new_count < 0) {
                         multiturn = (new_count / position_feedback_config.resolution) - 1;
+                        singleturn = position_feedback_config.resolution + new_count % position_feedback_config.resolution;
                     } else {
                         multiturn = (new_count / position_feedback_config.resolution);
+                        singleturn = new_count % position_feedback_config.resolution;
                     }
-                    unsigned int singleturn = new_count % position_feedback_config.resolution;
                     t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                    contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + singleturn, 32);
+                    contelec_encoder_write(*spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + singleturn, 32);
                     pos_state.last_position = singleturn;
                     break;
                 case AMS_SENSOR:
-                    pos_state.last_position = readRotarySensorAngleWithoutCompensation(spi_ports);
+                    pos_state.last_position = readRotarySensorAngleWithoutCompensation(*spi_ports);
                     break;
                 case BISS_SENSOR:
                     t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
@@ -347,26 +345,26 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
                 case CONTELEC_SENSOR:
                     new_angle = (new_angle << 4);
                     t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                    contelec_encoder_write(spi_ports, CONTELEC_CTRL_RESET, 0, 0);//reset
+                    contelec_encoder_write(*spi_ports, CONTELEC_CTRL_RESET, 0, 0);//reset
                     int real_position;
 #ifdef CONTELEC_USE_TIMESTAMP
-                    { void, void, real_position, void, void } = contelec_encoder_read(spi_ports);
+                    { void, void, real_position, void, void } = contelec_encoder_read(*spi_ports);
                     delay_ticks(position_feedback_config.contelec_config.timeout);
-                    contelec_encoder_write(spi_ports, CONTELEC_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
-                    { void, void, out_offset, void, void } = contelec_encoder_read(spi_ports);
+                    contelec_encoder_write(*spi_ports, CONTELEC_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
+                    { void, void, out_offset, void, void } = contelec_encoder_read(*spi_ports);
 #else
-                    { void, void, real_position, void } = contelec_encoder_read(spi_ports);
+                    { void, void, real_position, void } = contelec_encoder_read(*spi_ports);
                     delay_ticks(position_feedback_config.contelec_config.timeout);
-                    contelec_encoder_write(spi_ports, CONTELEC_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
-                    { void, void, out_offset, void } = contelec_encoder_read(spi_ports);
+                    contelec_encoder_write(*spi_ports, CONTELEC_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
+                    { void, void, out_offset, void } = contelec_encoder_read(*spi_ports);
 #endif
                     out_offset = (out_offset - real_position) & (position_feedback_config.resolution-1);
                     break;
                 case AMS_SENSOR:
-                    writeZeroPosition(spi_ports, 0);
-                    int position = readRotarySensorAngleWithoutCompensation(spi_ports);
+                    writeZeroPosition(*spi_ports, 0);
+                    int position = readRotarySensorAngleWithoutCompensation(*spi_ports);
                     out_offset = (position_feedback_config.resolution - ((new_angle << 2) / position_feedback_config.pole_pairs) + position) & (position_feedback_config.resolution-1);
-                    writeZeroPosition(spi_ports, out_offset);
+                    writeZeroPosition(*spi_ports, out_offset);
                     break;
                 }
                 t :> last_read;
@@ -378,11 +376,11 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
                 if (position_feedback_config.sensor_type == CONTELEC_SENSOR)
                 {
                     t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                    contelec_encoder_write(spi_ports, opcode, data, data_bits);
+                    contelec_encoder_write(*spi_ports, opcode, data, data_bits);
 #ifdef CONTELEC_USE_TIMESTAMP
-                    { status, void, void, void, void } = contelec_encoder_read(spi_ports);
+                    { status, void, void, void, void } = contelec_encoder_read(*spi_ports);
 #else
-                    { status, void, void, void } = contelec_encoder_read(spi_ports);
+                    { status, void, void, void } = contelec_encoder_read(*spi_ports);
 #endif
                     t :> last_read;
                 }
@@ -393,10 +391,10 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
                 continue;
 
         //compute velocity
-        case t when timerafter(next_velocity_read) :> start_time:
+        case t when timerafter(next_velocity_read) :> next_velocity_read:
             next_velocity_read += velocity_loop;
             int difference;
-            switch(position_feedback_config.sensor_type == CONTELEC_SENSOR)
+            switch(position_feedback_config.sensor_type)
             {
             case CONTELEC_SENSOR:
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
@@ -448,7 +446,6 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
                 old_count = pos_state.count;
                 // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
                 //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-                // velocity = (difference * velocity_factor) / ticks_per_turn;
                 if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
                     velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/AMS_USEC))) / position_feedback_config.resolution;
                 }
@@ -465,11 +462,9 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
 #ifdef CONTELEC_USE_TIMESTAMP
             xscope_int(TIMESTAMP, timediff);
 #endif
-//            xscope_int(PERIOD, (int)(last_read-period_time)/CONTELEC_USEC);
-//            period_time = last_read;
 #endif
 
-
+            //send data to shared memory
             if (!isnull(i_shared_memory)) {
                 if (position_feedback_config.enable_push_service == PushAll) {
                     i_shared_memory.write_angle_velocity_position(pos_state.angle, velocity, pos_state.count);
@@ -479,13 +474,12 @@ void serial_encoder_service(SPIPorts &spi_ports, QEIPorts &biss_ports, PositionF
                     i_shared_memory.write_velocity_position(velocity, pos_state.count);
                 }
             }
-            t :> end_time;
-
-            measurement_time = (end_time-start_time)/CONTELEC_USEC;
 
             //to prevent blocking
-            if (timeafter(end_time, next_velocity_read))
+            t :> end_time;
+            if (timeafter(end_time, next_velocity_read)) {
                 next_velocity_read = end_time + CONTELEC_USEC;
+            }
             break;
         }
     }

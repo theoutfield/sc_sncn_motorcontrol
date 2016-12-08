@@ -330,12 +330,14 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
         //receive the new count to set
         case i_position_feedback[int i].set_position(int new_count):
                 int multiturn;
+                unsigned int singleturn;
                 if (new_count < 0) {
                     multiturn = (new_count / position_feedback_config.resolution) - 1;
+                    singleturn = position_feedback_config.resolution + new_count % position_feedback_config.resolution;
                 } else {
                     multiturn = (new_count / position_feedback_config.resolution);
+                    singleturn = new_count % position_feedback_config.resolution;
                 }
-                unsigned int singleturn = new_count % position_feedback_config.resolution;
                 t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
                 contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + singleturn, 32);
                 last_position = singleturn;
