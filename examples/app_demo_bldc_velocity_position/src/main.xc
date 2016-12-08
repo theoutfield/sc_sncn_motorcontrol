@@ -23,8 +23,11 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+//SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+//HallPorts hall_2_ports = SOMANET_IFM_HALL_2_PORTS;
+//QEIPorts qei_2_ports = SOMANET_IFM_QEI_2_PORTS;
 
 int main(void) {
 
@@ -198,7 +201,8 @@ int main(void) {
                     position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
                     position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
 
-                    position_feedback_service(null, qei_ports, null, null, null,
+//                    position_feedback_service(null, qei_ports, null, null, qei_2_ports,
+                    position_feedback_service(hall_ports, qei_ports, spi_ports, null, null,
                                             position_feedback_config, i_shared_memory[0], i_position_feedback,
                                             null, null, null,
                                             null, null, null,

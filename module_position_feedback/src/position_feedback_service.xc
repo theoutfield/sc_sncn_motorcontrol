@@ -64,14 +64,43 @@ void fallback_service(PositionFeedbackConfig &position_feedback_config, server i
     }
 }
 
-void start_service(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_ports,
+static void start_service(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_ports,
                    PositionFeedbackConfig &position_feedback_config,
                    client interface shared_memory_interface ?i_shared_memory,
-                   server interface PositionFeedbackInterface i_position_feedback[3])
+                   server interface PositionFeedbackInterface i_position_feedback[3], static const int sensor_types)
+{
+    switch(position_feedback_config.sensor_type) {
+//    case BISS_SENSOR:
+//        if (sensor_types != 0)
+//            biss_service(*qei_ports , position_feedback_config, i_shared_memory, i_position_feedback);
+//        break;
+    case CONTELEC_SENSOR:
+        contelec_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        break;
+    case AMS_SENSOR:
+        ams_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        break;
+    case HALL_SENSOR:
+        hall_service(*hall_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        break;
+    case QEI_SENSOR:
+        qei_service(*qei_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        break;
+    default:
+        fallback_service(position_feedback_config, i_position_feedback);
+        break;
+    }
+}
+
+static void start_service2(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_ports,
+                   PositionFeedbackConfig &position_feedback_config,
+                   client interface shared_memory_interface ?i_shared_memory,
+                   server interface PositionFeedbackInterface i_position_feedback[3], static const int sensor_types)
 {
     switch(position_feedback_config.sensor_type) {
     case BISS_SENSOR:
-        biss_service(*qei_ports , position_feedback_config, i_shared_memory, i_position_feedback);
+        if (sensor_types & 0b00100)
+            biss_service(*qei_ports , position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     case CONTELEC_SENSOR:
         contelec_service(*spi_ports, position_feedback_config, i_shared_memory, i_position_feedback);
@@ -155,11 +184,20 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
     HallPorts * movable hall_ports_1 = &hall_ports;
     QEIPorts * movable qei_ports_1 = &qei_ports;
     SPIPorts * movable spi_ports_1 = &spi_ports;
+    HallPorts * movable hall_2_ports_1 = &hall_2_ports;
+    QEIPorts * movable qei_2_ports_1 = &qei_2_ports;
 
     //pointers to ports 2
     HallPorts * movable hall_ports_2;
     QEIPorts * movable qei_ports_2;
     SPIPorts * movable spi_ports_2;
+    HallPorts * movable hall_2_ports_2;
+    QEIPorts * movable qei_2_ports_2;
+
+    int num_sensors = 2;
+    if (hall_2_ports_1 != null) {
+        num_sensors = 4;
+    }
 
 
     while(1) {
@@ -217,28 +255,43 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
             }
         }
 
-
-        //start services
-        par {
-            {//sensor 1
-                if (!isnull(i_position_feedback_1) && !isnull(position_feedback_config_1)) {
-                    start_service(hall_ports_1, qei_ports_1, spi_ports_1, position_feedback_config_1, i_shared_memory_1, i_position_feedback_1);
+        if (hall_2_ports_1 != null) {
+            //start services
+            par {
+                {//sensor 1
+                    if (!isnull(i_position_feedback_1) && !isnull(position_feedback_config_1)) {
+                        start_service(hall_ports_1, qei_ports_1, spi_ports_1, position_feedback_config_1, i_shared_memory_1, i_position_feedback_1, 0b00011);
+                    }
+                }
+                {//sensor 2
+                    if (!isnull(i_position_feedback_2) && !isnull(position_feedback_config_2)) {
+                        start_service(hall_ports_2, qei_ports_2, spi_ports_2, position_feedback_config_2, i_shared_memory_2, i_position_feedback_2, 0b00011);
+                    }
+                }
+                {//sensor 3
+                    if (!isnull(i_position_feedback_3) && !isnull(position_feedback_config_3)) {
+                        start_service(hall_2_ports_1, null, null, position_feedback_config_3, i_shared_memory_3, i_position_feedback_3, 0b00011);
+                    }
+                }
+                {//sensor 4
+                    //                QEIPorts * movable qei_2_ports = &qei_2_ports;
+                    if (!isnull(i_position_feedback_4) && !isnull(position_feedback_config_4)) {
+                        start_service(null, qei_2_ports_1, null, position_feedback_config_4, i_shared_memory_4, i_position_feedback_4, 0b00011);
+                    }
                 }
             }
-            {//sensor 2
-                if (!isnull(i_position_feedback_2) && !isnull(position_feedback_config_2)) {
-                    start_service(hall_ports_2, qei_ports_2, spi_ports_2, position_feedback_config_2, i_shared_memory_2, i_position_feedback_2);
+        }
+        else {
+            par {
+                {//sensor 1
+                    if (!isnull(i_position_feedback_1) && !isnull(position_feedback_config_1)) {
+                        start_service2(hall_ports_1, qei_ports_1, spi_ports_1, position_feedback_config_1, i_shared_memory_1, i_position_feedback_1, 0b11111);
+                    }
                 }
-            }
-            {//sensor 3
-                if (!isnull(i_position_feedback_3) && !isnull(position_feedback_config_3)) {
-                    start_service(&hall_2_ports, null, null, position_feedback_config_3, i_shared_memory_3, i_position_feedback_3);
-                }
-            }
-            {//sensor 4
-//                QEIPorts * movable qei_2_ports = &qei_2_ports;
-                if (!isnull(i_position_feedback_4) && !isnull(position_feedback_config_4)) {
-                    start_service(null, &qei_2_ports, null, position_feedback_config_4, i_shared_memory_4, i_position_feedback_4);
+                {//sensor 2
+                    if (!isnull(i_position_feedback_2) && !isnull(position_feedback_config_2)) {
+                        start_service2(hall_ports_2, qei_ports_2, spi_ports_2, position_feedback_config_2, i_shared_memory_2, i_position_feedback_2, 0b11111);
+                    }
                 }
             }
         }
