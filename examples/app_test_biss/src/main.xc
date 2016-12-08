@@ -62,7 +62,7 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
+SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 

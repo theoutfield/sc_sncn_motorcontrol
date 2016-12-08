@@ -13,7 +13,7 @@
 #include <ctype.h>
 
 
-SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
+SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 
 /* Test AMS Sensor Client */
 void ams_rotary_sensor_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)

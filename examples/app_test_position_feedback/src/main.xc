@@ -109,7 +109,7 @@ void commands_test(client interface PositionFeedbackInterface i_position_feedbac
 }
 
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
+SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 
 int main(void)

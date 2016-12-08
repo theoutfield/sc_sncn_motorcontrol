@@ -22,7 +22,7 @@
 #include <advanced_motor_control.h>
 #include <advanced_motorcontrol_licence.h>
 /*********** Sensor Test ***********/
-SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
+SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 
 /*********** Motor Test ***********/
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
