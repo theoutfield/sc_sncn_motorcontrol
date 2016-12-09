@@ -8,11 +8,11 @@
 #pragma once
 
 #include <biss_config.h>
-#include <contelec_config.h>
+#include <rem_16mt_config.h>
 #include <rem_14_config.h>
 
 #include <biss_struct.h>
-#include <contelec_struct.h>
+#include <rem_16mt_struct.h>
 #include <rem_14_struct.h>
 #include <hall_struct.h>
 #include <qei_struct.h>
@@ -27,7 +27,7 @@ typedef struct {
     int offset;     /**< position offset in ticks, can be singleturn or multiturn depending on the sensor >*/
     int enable_push_service; /**< Select which data to push to shared memory >*/
     BISSConfig biss_config;
-    CONTELECConfig contelec_config;
+    REM_16MTConfig rem_16mt_config;
     REM_14Config rem_14_config;
     QEIConfig qei_config;
 } PositionFeedbackConfig;
@@ -94,7 +94,7 @@ typedef struct {
 
 #include <memory_manager.h>
 #include <biss_service.h>
-#include <contelec_service.h>
+#include <rem_16mt_service.h>
 #include <rem_14_service.h>
 #include <hall_service.h>
 #include <qei_service.h>

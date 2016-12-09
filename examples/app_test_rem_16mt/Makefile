@@ -11,10 +11,10 @@ TARGET =
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_test_contelec_encoder
+APP_NAME = app_test_rem_16mt
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_biss module_board-support module_rem_14 module_contelec_encoder module_serial_encoder module_memory_manager module_misc module_position_feedback module_spi_master module_qei
+USED_MODULES = module_biss module_board-support module_rem_14 module_rem_16mt module_serial_encoder module_memory_manager module_misc module_position_feedback module_spi_master module_qei
 #For Motor Test
 USED_MODULES += config_motor module_adc module_advanced_torquecontrol_lib module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_pwm module_watchdog
 
@@ -23,7 +23,7 @@ USED_MODULES += config_motor module_adc module_advanced_torquecontrol_lib module
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O1 -report -DXSCOPE_CONTELEC
+XCC_FLAGS_Debug = -g -O1 -report -DXSCOPE_REM_16MT
 XCC_FLAGS_Release = -g -O3
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.

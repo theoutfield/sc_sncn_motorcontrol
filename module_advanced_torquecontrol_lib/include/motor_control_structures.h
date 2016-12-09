@@ -27,7 +27,7 @@ typedef enum {
     HALL_SENSOR= 1,
     QEI_SENSOR = 2,
     BISS_SENSOR= 4,
-    CONTELEC_SENSOR=6
+    REM_16MT_SENSOR=6
 } SensorType;
 
 /**

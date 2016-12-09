@@ -6,7 +6,7 @@
  */
 
 #include <xs1.h>
-#include <contelec_service.h>
+#include <rem_16mt_service.h>
 #include <timer.h>
 #include <print.h>
 #include <xscope.h>
@@ -40,7 +40,7 @@ void reset_spi_ports(SPIPorts &spi_ports)
     set_port_use_on(spi_ports.spi_interface.sclk);
 }
 
-#ifdef CONTELEC_USE_TIMESTAMP
+#ifdef REM_16MT_USE_TIMESTAMP
 int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw, unsigned timestamp) {
     int computed_checksum = 0x5a ^ (1 + (timestamp & 0xff)) ^ (2 + (singleturn_raw & 0xff)) ^ (3 + (singleturn_raw >> 8)) ^ (4 + (singleturn_filtered & 0xff)) ^ (5 + (singleturn_filtered >> 8)) ^ (6 + (count & 0xff)) ^ (7 + (count >> 8));
 #else
@@ -50,11 +50,11 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     return computed_checksum & 0xff;
 }
 
-#ifdef CONTELEC_USE_TIMESTAMP
-{ char, int, unsigned int, unsigned int, unsigned int } contelec_encoder_read(SPIPorts &spi_ports) {
+#ifdef REM_16MT_USE_TIMESTAMP
+{ char, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports) {
     unsigned int timestamp;
 #else
-{ char, int, unsigned int, unsigned int } contelec_encoder_read(SPIPorts &spi_ports) {
+{ char, int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports) {
 #endif
     char status;
     int count;
@@ -66,17 +66,17 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     timer t;
     unsigned last_read;
     t :> last_read;
-    last_read = last_read - 40*CONTELEC_USEC - 1;
+    last_read = last_read - 40*REM_16MT_USEC - 1;
 
     do {
-        t when timerafter(last_read + 40*CONTELEC_USEC) :> void;
+        t when timerafter(last_read + 40*REM_16MT_USEC) :> void;
         configure_out_port(spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1); //set mosi to 1
         slave_select(spi_ports.slave_select);
-        delay_ticks(10*CONTELEC_USEC); //wait for the data buffer to fill
+        delay_ticks(10*REM_16MT_USEC); //wait for the data buffer to fill
         count = spi_master_in_short(spi_ports.spi_interface);
         singleturn_filtered = spi_master_in_short(spi_ports.spi_interface);
         singleturn_raw = spi_master_in_short(spi_ports.spi_interface);
-#ifdef CONTELEC_USE_TIMESTAMP
+#ifdef REM_16MT_USE_TIMESTAMP
         timestamp = spi_master_in_byte(spi_ports.spi_interface);
         checksum = spi_master_in_byte(spi_ports.spi_interface);
         slave_deselect(spi_ports.slave_select);
@@ -94,11 +94,11 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     status = (count >> 12) + ((try_count-1) << 4);
     count = (sext(count & 0xfff, 12) * (1 << 16)) + singleturn_filtered; //convert multiturn to signed absolute count
 
-#ifdef XSCOPE_CONTELEC
+#ifdef XSCOPE_REM_16MT
     xscope_int(CHECKSUM_ERROR, (try_count-1)*1000);
 #endif
 
-#ifdef CONTELEC_USE_TIMESTAMP
+#ifdef REM_16MT_USE_TIMESTAMP
     return { status, count, singleturn_filtered, singleturn_raw, timestamp };
 #else
     return { status, count, singleturn_filtered, singleturn_raw };
@@ -106,11 +106,11 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 }
 
 
-void contelec_encoder_write(SPIPorts &spi_ports, int opcode, int data, int data_bits)
+void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits)
 {
     configure_out_port(spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
     slave_select(spi_ports.slave_select);
-    delay_ticks(100*CONTELEC_USEC);
+    delay_ticks(100*REM_16MT_USEC);
     spi_master_out_byte(spi_ports.spi_interface, opcode);
     if (data_bits == 8) {
         spi_master_out_byte(spi_ports.spi_interface, data);
@@ -121,88 +121,88 @@ void contelec_encoder_write(SPIPorts &spi_ports, int opcode, int data, int data_
     }
     configure_out_port(spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
     slave_deselect(spi_ports.slave_select);
-    delay_ticks(200020*CONTELEC_USEC);
+    delay_ticks(200020*REM_16MT_USEC);
 
 }
 
-int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
+int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 {
     int status;
 
-    delay_ticks(100*CONTELEC_USEC);
+    delay_ticks(100*REM_16MT_USEC);
     //reset
-    contelec_encoder_write(spi_ports, CONTELEC_CTRL_RESET, 0, 0);
+    rem_16mt_write(spi_ports, REM_16MT_CTRL_RESET, 0, 0);
     //read status
-#ifdef CONTELEC_USE_TIMESTAMP
-    { status, void, void, void, void } = contelec_encoder_read(spi_ports);
+#ifdef REM_16MT_USE_TIMESTAMP
+    { status, void, void, void, void } = rem_16mt_read(spi_ports);
 #else
-    { status, void, void, void } = contelec_encoder_read(spi_ports);
+    { status, void, void, void } = rem_16mt_read(spi_ports);
 #endif
-    delay_ticks(100*CONTELEC_USEC);
+    delay_ticks(100*REM_16MT_USEC);
     if (status != 0)
         return status;
     //direction
-    if (config.polarity == CONTELEC_POLARITY_INVERTED)
-        contelec_encoder_write(spi_ports, CONTELEC_CONF_DIR, 1, 8);
+    if (config.polarity == REM_16MT_POLARITY_INVERTED)
+        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 1, 8);
     else
-        contelec_encoder_write(spi_ports, CONTELEC_CONF_DIR, 0, 8);
+        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 0, 8);
     //offset
     config.offset &= (config.resolution-1);
     if (config.offset != 0) {
         int position, count, multiturn;
-#ifdef CONTELEC_USE_TIMESTAMP
-        { void, count, position, void, void } = contelec_encoder_read(spi_ports); //read actual position
+#ifdef REM_16MT_USE_TIMESTAMP
+        { void, count, position, void, void } = rem_16mt_read(spi_ports); //read actual position
 #else
-        { void, count, position, void } = contelec_encoder_read(spi_ports); //read actual position
+        { void, count, position, void } = rem_16mt_read(spi_ports); //read actual position
 #endif
         if (count < 0) {
             multiturn = (count / config.resolution) - 1;
         } else {
             multiturn = (count / config.resolution);
         }
-        delay_ticks(100*CONTELEC_USEC);
-        contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + ((position + config.offset) & 65535), 32); //write same multiturn and single + offset
+        delay_ticks(100*REM_16MT_USEC);
+        rem_16mt_write(spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + ((position + config.offset) & 65535), 32); //write same multiturn and single + offset
     }
     //filter
-    if (config.contelec_config.filter == 1) {
-        config.contelec_config.filter = 0x02;
-    } else if (config.contelec_config.filter < 0) {
-        config.contelec_config.filter = 0x00;
-    } else if (config.contelec_config.filter > 9) {
-        config.contelec_config.filter = 0x09;
+    if (config.rem_16mt_config.filter == 1) {
+        config.rem_16mt_config.filter = 0x02;
+    } else if (config.rem_16mt_config.filter < 0) {
+        config.rem_16mt_config.filter = 0x00;
+    } else if (config.rem_16mt_config.filter > 9) {
+        config.rem_16mt_config.filter = 0x09;
     }
-    contelec_encoder_write(spi_ports, CONTELEC_CONF_FILTER, config.contelec_config.filter, 8);
+    rem_16mt_write(spi_ports, REM_16MT_CONF_FILTER, config.rem_16mt_config.filter, 8);
     //read status
-#ifdef CONTELEC_USE_TIMESTAMP
-    { status, void, void, void, void } = contelec_encoder_read(spi_ports);
+#ifdef REM_16MT_USE_TIMESTAMP
+    { status, void, void, void, void } = rem_16mt_read(spi_ports);
 #else
-    { status, void, void, void } = contelec_encoder_read(spi_ports);
+    { status, void, void, void } = rem_16mt_read(spi_ports);
 #endif
-    delay_ticks(100*CONTELEC_USEC);
+    delay_ticks(100*REM_16MT_USEC);
     return status;
 }
 
 
- void contelec_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
+ void rem_16mt_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
-    if (CONTELEC_USEC == USEC_FAST) { //Set freq to 250MHz
+    if (REM_16MT_USEC == USEC_FAST) { //Set freq to 250MHz
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
     //init sensor
     init_spi_ports(spi_ports);
-    int init_status = contelec_encoder_init(spi_ports, position_feedback_config);
+    int init_status = rem_16mt_init(spi_ports, position_feedback_config);
     if (init_status) {
-        delay_ticks(200000*CONTELEC_USEC);
-        init_status = contelec_encoder_init(spi_ports, position_feedback_config);
+        delay_ticks(200000*REM_16MT_USEC);
+        init_status = rem_16mt_init(spi_ports, position_feedback_config);
         if (init_status) {
-            printstr("Error with CONTELEC sensor initialization");
+            printstr("Error with REM_16MT sensor initialization");
             printintln(init_status);
         }
     }
 
     printstr(start_message);
-    printstrln("CONTELEC");
+    printstrln("REM_16MT");
 
     //init variables
     //velocity
@@ -211,7 +211,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
     int index = 0;
     int old_count = 0;
     int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-    int velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC; //velocity loop time in clock ticks
+    int velocity_loop = position_feedback_config.rem_16mt_config.velocity_loop * REM_16MT_USEC; //velocity loop time in clock ticks
     int velocity_count = 0;
     //position
     unsigned int last_position = 0;
@@ -220,7 +220,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
     timer t;
     unsigned int next_velocity_read = 0;
     unsigned int last_read = 0;
-#ifndef CONTELEC_USE_TIMESTAMP
+#ifndef REM_16MT_USE_TIMESTAMP
     unsigned int last_velocity_read = 0;
 #endif
 
@@ -236,13 +236,13 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 //    unsigned int period_time = 0;
 
     //first read
-    delay_ticks(100 * CONTELEC_USEC);
-#ifdef CONTELEC_USE_TIMESTAMP
+    delay_ticks(100 * REM_16MT_USEC);
+#ifdef REM_16MT_USE_TIMESTAMP
     unsigned int old_timestamp = 0;
     int timediff_long = 0;
-    { void, count, last_position, void, void } = contelec_encoder_read(spi_ports);
+    { void, count, last_position, void, void } = rem_16mt_read(spi_ports);
 #else
-    { void, count, last_position, void } = contelec_encoder_read(spi_ports);
+    { void, count, last_position, void } = rem_16mt_read(spi_ports);
 #endif
     t :> last_read;
 
@@ -256,11 +256,11 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 
         //send electrical angle for commutation
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
-                t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-#ifdef CONTELEC_USE_TIMESTAMP
-                { void, count, last_position, angle, void } = contelec_encoder_read(spi_ports);
+                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
+#ifdef REM_16MT_USE_TIMESTAMP
+                { void, count, last_position, angle, void } = rem_16mt_read(spi_ports);
 #else
-                { void, count, last_position, angle } = contelec_encoder_read(spi_ports);
+                { void, count, last_position, angle } = rem_16mt_read(spi_ports);
 #endif
                 t :> last_read;
                 angle = (position_feedback_config.pole_pairs * (angle >> 4) ) & 4095;
@@ -268,11 +268,11 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 
         //send multiturn count and position
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position }:
-                t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-#ifdef CONTELEC_USE_TIMESTAMP
-                { void, count, position, void, void } = contelec_encoder_read(spi_ports);
+                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
+#ifdef REM_16MT_USE_TIMESTAMP
+                { void, count, position, void, void } = rem_16mt_read(spi_ports);
 #else
-                { void, count, position, void } = contelec_encoder_read(spi_ports);
+                { void, count, position, void } = rem_16mt_read(spi_ports);
 #endif
                 t :> last_read;
                 last_position = position;
@@ -281,16 +281,16 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 
         //send position
         case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
-                t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
+                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
                 unsigned start_time;
                 t :> start_time;
-#ifdef CONTELEC_USE_TIMESTAMP
-                { status, out_count, position, void, void } = contelec_encoder_read(spi_ports);
+#ifdef REM_16MT_USE_TIMESTAMP
+                { status, out_count, position, void, void } = rem_16mt_read(spi_ports);
 #else
-                { status, out_count, position, void } = contelec_encoder_read(spi_ports);
+                { status, out_count, position, void } = rem_16mt_read(spi_ports);
 #endif
                 t :> last_read;
-//                status = (last_read-start_time)/CONTELEC_USEC;
+//                status = (last_read-start_time)/REM_16MT_USEC;
 //                status = measurement_time;
                 last_position = position;
                 break;
@@ -305,13 +305,13 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
                 out_ticks_per_turn = position_feedback_config.resolution;
                 break;
 
-        //receive new contelec_config
+        //receive new rem_16mt_config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 position_feedback_config = in_config;
-                contelec_encoder_init(spi_ports, position_feedback_config); //init with new config
-                //update variables which depend on contelec_config
+                rem_16mt_init(spi_ports, position_feedback_config); //init with new config
+                //update variables which depend on rem_16mt_config
                 crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-                velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC;
+                velocity_loop = position_feedback_config.rem_16mt_config.velocity_loop * REM_16MT_USEC;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
@@ -322,7 +322,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
                 t :> last_read;
                 break;
 
-        //send contelec_config
+        //send rem_16mt_config
         case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
                 out_config = position_feedback_config;
                 break;
@@ -338,8 +338,8 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
                     multiturn = (new_count / position_feedback_config.resolution);
                     singleturn = new_count % position_feedback_config.resolution;
                 }
-                t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                contelec_encoder_write(spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + singleturn, 32);
+                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
+                rem_16mt_write(spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + singleturn, 32);
                 last_position = singleturn;
                 t :> last_read;
                 count = new_count;
@@ -348,19 +348,19 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
         //receive the new electrical angle to set the offset accordingly
         case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
                 new_angle = (new_angle << 4);
-                t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                contelec_encoder_write(spi_ports, CONTELEC_CTRL_RESET, 0, 0);//reset
+                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
+                rem_16mt_write(spi_ports, REM_16MT_CTRL_RESET, 0, 0);//reset
                 int real_position;
-#ifdef CONTELEC_USE_TIMESTAMP
-                { void, void, real_position, void, void } = contelec_encoder_read(spi_ports);
-                delay_ticks(position_feedback_config.contelec_config.timeout);
-                contelec_encoder_write(spi_ports, CONTELEC_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
-                { void, void, out_offset, void, void } = contelec_encoder_read(spi_ports);
+#ifdef REM_16MT_USE_TIMESTAMP
+                { void, void, real_position, void, void } = rem_16mt_read(spi_ports);
+                delay_ticks(position_feedback_config.rem_16mt_config.timeout);
+                rem_16mt_write(spi_ports, REM_16MT_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
+                { void, void, out_offset, void, void } = rem_16mt_read(spi_ports);
 #else
-                { void, void, real_position, void } = contelec_encoder_read(spi_ports);
-                delay_ticks(position_feedback_config.contelec_config.timeout);
-                contelec_encoder_write(spi_ports, CONTELEC_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
-                { void, void, out_offset, void } = contelec_encoder_read(spi_ports);
+                { void, void, real_position, void } = rem_16mt_read(spi_ports);
+                delay_ticks(position_feedback_config.rem_16mt_config.timeout);
+                rem_16mt_write(spi_ports, REM_16MT_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
+                { void, void, out_offset, void } = rem_16mt_read(spi_ports);
 #endif
                 t :> last_read;
                 out_offset = (out_offset - real_position) & (position_feedback_config.resolution-1);
@@ -369,12 +369,12 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 
         //execute command
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
-                t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-                contelec_encoder_write(spi_ports, opcode, data, data_bits);
-#ifdef CONTELEC_USE_TIMESTAMP
-                { status, void, void, void, void } = contelec_encoder_read(spi_ports);
+                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
+                rem_16mt_write(spi_ports, opcode, data, data_bits);
+#ifdef REM_16MT_USE_TIMESTAMP
+                { status, void, void, void, void } = rem_16mt_read(spi_ports);
 #else
-                { status, void, void, void } = contelec_encoder_read(spi_ports);
+                { status, void, void, void } = rem_16mt_read(spi_ports);
 #endif
                 t :> last_read;
                 break;
@@ -389,18 +389,18 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
             next_velocity_read += velocity_loop;
             int position, difference;
             unsigned int angle, status;
-            t when timerafter(last_read + position_feedback_config.contelec_config.timeout) :> void;
-#ifdef CONTELEC_USE_TIMESTAMP
+            t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
+#ifdef REM_16MT_USE_TIMESTAMP
             unsigned int timestamp;
-            { status, count, position, angle, timestamp } = contelec_encoder_read(spi_ports);
+            { status, count, position, angle, timestamp } = rem_16mt_read(spi_ports);
 #else
-            { status, count, position, angle } = contelec_encoder_read(spi_ports);
+            { status, count, position, angle } = rem_16mt_read(spi_ports);
 #endif
             t :> last_read;
             last_position = position;
 
             velocity_count++;
-#ifdef CONTELEC_USE_TIMESTAMP
+#ifdef REM_16MT_USE_TIMESTAMP
             //timestamp difference
             char timediff = (char)timestamp-(char)old_timestamp;
             old_timestamp = timestamp;
@@ -422,7 +422,7 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
                 difference = count - old_count;
                 old_count = count;
                 if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
-                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/CONTELEC_USEC))) / position_feedback_config.resolution;
+                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/REM_16MT_USEC))) / position_feedback_config.resolution;
                     velocity = filter(velocity_buffer, index, 8, velocity);
                 }
                 last_velocity_read = last_read;
@@ -430,15 +430,15 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
             }
 #endif
 
-#ifdef XSCOPE_CONTELEC
+#ifdef XSCOPE_REM_16MT
             xscope_int(VELOCITY, velocity);
             xscope_int(POSITION, count);
             xscope_int(POSITION_RAW, angle);
             xscope_int(STATUS, status*1000);
-#ifdef CONTELEC_USE_TIMESTAMP
+#ifdef REM_16MT_USE_TIMESTAMP
             xscope_int(TIMESTAMP, timediff);
 #endif
-//            xscope_int(PERIOD, (int)(last_read-period_time)/CONTELEC_USEC);
+//            xscope_int(PERIOD, (int)(last_read-period_time)/REM_16MT_USEC);
 //            period_time = last_read;
 #endif
 
@@ -464,11 +464,11 @@ int contelec_encoder_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
             }
             t :> end_time;
 
-            measurement_time = (end_time-start_time)/CONTELEC_USEC;
+            measurement_time = (end_time-start_time)/REM_16MT_USEC;
 
             //to prevent blocking
             if (timeafter(end_time, next_velocity_read))
-                next_velocity_read = end_time + CONTELEC_USEC;
+                next_velocity_read = end_time + REM_16MT_USEC;
             break;
         }
     }

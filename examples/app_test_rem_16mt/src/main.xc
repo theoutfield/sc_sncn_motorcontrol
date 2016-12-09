@@ -4,8 +4,8 @@
 
 
 /**
- * @file app_test_contelec_rotary_sensor.xc
- * @brief Test illustrates usage of the CONTELEC rotary sensor to get position, velocity, and electrical angle information
+ * @file app_test_rem_16mt_rotary_sensor.xc
+ * @brief Test illustrates usage of the REM_16MT rotary sensor to get position, velocity, and electrical angle information
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
@@ -31,8 +31,8 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
 
-/* Test CONTELEC Sensor Client */
-void contelec_encoder_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
+/* Test REM_16MT Sensor Client */
+void rem_16mt_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
 {
     int count = 0;
     int velocity = 0;
@@ -43,13 +43,13 @@ void contelec_encoder_test(client interface PositionFeedbackInterface i_position
     unsigned start_time, end_time;
 
     while(1) {
-        /* get position from CONTELEC Sensor */
+        /* get position from REM_16MT Sensor */
         t :> start_time;
         {void, void, status} = i_position_feedback.get_real_position();
         t :> end_time;
         {count, position} = i_position_feedback.get_position();
 
-        /* get angle and velocity from CONTELEC Sensor */
+        /* get angle and velocity from REM_16MT Sensor */
         //        velocity = i_position_feedback.get_velocity();
 
         //electrical_angle = i_position_feedback.get_angle();
@@ -95,7 +95,7 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
     return offset;
 }
 
-void contelec_encoder_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorcontrolInterface client i_motorcontrol) {
+void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorcontrolInterface client i_motorcontrol) {
     char status;
     int multiturn;
     //    unsigned int singleturn_filtered;
@@ -106,7 +106,7 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
 
     delay_milliseconds(500);
     PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
-    printstr(">>   SOMANET CONTELEC SENSOR COMMANDS SERVICE STARTING...\n");
+    printstr(">>   SOMANET REM_16MT SENSOR COMMANDS SERVICE STARTING...\n");
     i_motorcontrol.set_torque_control_enabled();
     i_motorcontrol.set_brake_status(1);
 
@@ -138,17 +138,17 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
             break;
             //set calibration point
         case 'c':
-            i_position_feedback.send_command(CONTELEC_CALIB_TBL_POINT, value, 16);
+            i_position_feedback.send_command(REM_16MT_CALIB_TBL_POINT, value, 16);
             printf("set calibration point %d\n", value);
             break;
             //change direction
         case 'd':
-            i_position_feedback.send_command(CONTELEC_CONF_DIR, value, 8);
+            i_position_feedback.send_command(REM_16MT_CONF_DIR, value, 8);
             printf("direction %d\n", value);
             break;
             //filter
         case 'f':
-            i_position_feedback.send_command(CONTELEC_CONF_FILTER, value, 8);
+            i_position_feedback.send_command(REM_16MT_CONF_FILTER, value, 8);
             printf("filter %d\n", value);
             break;
             //set offset
@@ -164,7 +164,7 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
             break;
             //set multiturn
         case 'm':
-            i_position_feedback.send_command(CONTELEC_CONF_MTPRESET, value*sign, 16);
+            i_position_feedback.send_command(REM_16MT_CONF_MTPRESET, value*sign, 16);
             printf("multiturn\n");
             break;
             //set toruqe
@@ -180,36 +180,36 @@ void contelec_encoder_commands_test(client interface PositionFeedbackInterface i
             break;
             //reset sensor
         case 'r':
-            i_position_feedback.send_command(CONTELEC_CTRL_RESET, 0, 0);
+            i_position_feedback.send_command(REM_16MT_CTRL_RESET, 0, 0);
             printf("reset\n");
             break;
             //set singleturn
         case 's':
-            i_position_feedback.send_command(CONTELEC_CONF_STPRESET, value, 16);
+            i_position_feedback.send_command(REM_16MT_CONF_STPRESET, value, 16);
             printf("singleturn\n");
             break;
             //calibration table size
         case 't':
-            i_position_feedback.send_command(CONTELEC_CALIB_TBL_SIZE, value, 16);
+            i_position_feedback.send_command(REM_16MT_CALIB_TBL_SIZE, value, 16);
             printf("calibration table size %d\n", value);
             break;
             //save
         case 'v':
-            i_position_feedback.send_command(CONTELEC_CTRL_SAVE, 0, 0);
-            i_position_feedback.send_command(CONTELEC_CTRL_RESET, 0, 0);
+            i_position_feedback.send_command(REM_16MT_CTRL_SAVE, 0, 0);
+            i_position_feedback.send_command(REM_16MT_CTRL_RESET, 0, 0);
             printf("save\n");
             break;
             //set zero position
         case 'z':
-            i_position_feedback.send_command(CONTELEC_CONF_NULL, 0, 0);
+            i_position_feedback.send_command(REM_16MT_CONF_NULL, 0, 0);
             printf("zero\n");
             break;
             //set velocity loop time
         case 'l':
             position_feedback_config = i_position_feedback.get_config();
-            position_feedback_config.contelec_config.velocity_loop = value;
+            position_feedback_config.rem_16mt_config.velocity_loop = value;
             i_position_feedback.set_config(position_feedback_config);
-            printf("velocity loop time %dus\n", position_feedback_config.contelec_config.velocity_loop);
+            printf("velocity loop time %dus\n", position_feedback_config.rem_16mt_config.velocity_loop);
             break;
             //print the count and the time to get it
         default:
@@ -238,7 +238,7 @@ int main(void)
 
     par
     {
-        on tile[APP_TILE]: contelec_encoder_commands_test(i_position_feedback[1], i_motorcontrol[1]);
+        on tile[APP_TILE]: rem_16mt_commands_test(i_position_feedback[1], i_motorcontrol[1]);
 
         on tile[IFM_TILE]: par
         {
@@ -315,16 +315,16 @@ int main(void)
             /* Position feedback service */
             {
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = CONTELEC_SENSOR;
+                position_feedback_config.sensor_type = REM_16MT_SENSOR;
                 position_feedback_config.polarity    = SENSOR_POLARITY;
                 position_feedback_config.pole_pairs  = POLE_PAIRS;
                 position_feedback_config.resolution  = 65536;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
-                position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
-                position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
-                position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
+                position_feedback_config.rem_16mt_config.timeout = REM_16MT_TIMEOUT;
+                position_feedback_config.rem_16mt_config.velocity_loop = REM_16MT_VELOCITY_LOOP;
 
                 position_feedback_service(null, null, spi_ports,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

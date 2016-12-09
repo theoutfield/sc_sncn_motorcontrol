@@ -348,7 +348,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
@@ -357,8 +357,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
@@ -852,7 +852,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
@@ -861,8 +861,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
@@ -1363,7 +1363,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
@@ -1372,8 +1372,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_contelec_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>

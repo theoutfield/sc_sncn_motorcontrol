@@ -72,7 +72,7 @@ void start_service(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_
 {
     switch(position_feedback_config.sensor_type) {
     case BISS_SENSOR:
-    case CONTELEC_SENSOR:
+    case REM_16MT_SENSOR:
     case REM_14_SENSOR:
         serial_encoder_service(spi_ports, qei_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
@@ -93,7 +93,7 @@ void check_ports(HallPorts * hall_ports, QEIPorts * qei_ports, SPIPorts * spi_po
     //if ports are missing use fallback service
     if ( (position_feedback_config.sensor_type == HALL_SENSOR && hall_ports == null) ||
          ((position_feedback_config.sensor_type == BISS_SENSOR || position_feedback_config.sensor_type == QEI_SENSOR) && qei_ports == null) ||
-         ((position_feedback_config.sensor_type == CONTELEC_SENSOR || position_feedback_config.sensor_type == REM_14_SENSOR) && spi_ports == null) ) {
+         ((position_feedback_config.sensor_type == REM_16MT_SENSOR || position_feedback_config.sensor_type == REM_14_SENSOR) && spi_ports == null) ) {
         position_feedback_config.sensor_type = 0;
     }
     if (position_feedback_config.sensor_type == BISS_SENSOR) {
@@ -173,7 +173,7 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
                 if (isnull(position_feedback_config_2)) {
                     set_clock_biss(qei_ports_1, spi_ports_1, position_feedback_config_1);
                 } else {
-                    if (position_feedback_config_2.sensor_type != CONTELEC_SENSOR && position_feedback_config_2.sensor_type != REM_14_SENSOR) {
+                    if (position_feedback_config_2.sensor_type != REM_16MT_SENSOR && position_feedback_config_2.sensor_type != REM_14_SENSOR) {
                         set_clock_biss(qei_ports_1, spi_ports_1, position_feedback_config_1);
                     }
                 }
@@ -196,7 +196,7 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
                 hall_ports_2 = move(hall_ports_1);
             if (qei_ports_1 != null && position_feedback_config_1.sensor_type != BISS_SENSOR && position_feedback_config_1.sensor_type != QEI_SENSOR)
                 qei_ports_2 = move(qei_ports_1);
-            if (spi_ports_1 != null && position_feedback_config_1.sensor_type != CONTELEC_SENSOR &&  position_feedback_config_1.sensor_type != REM_14_SENSOR)
+            if (spi_ports_1 != null && position_feedback_config_1.sensor_type != REM_16MT_SENSOR &&  position_feedback_config_1.sensor_type != REM_14_SENSOR)
                 spi_ports_2 = move(spi_ports_1);
             //check ports
             check_ports(hall_ports_2, qei_ports_2, spi_ports_2, position_feedback_config_2);
