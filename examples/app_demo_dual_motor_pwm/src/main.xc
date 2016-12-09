@@ -33,34 +33,139 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 
 
-void send_pwm_values(client interface update_pwm_general i_update_pwm)
+void send_pwm_values(
+        client interface update_pwm_general i_update_pwm,
+        interface WatchdogInterface client i_watchdog,
+        int ref_clk_frq,
+        int pwm_clk_frq,
+        int commutation_frq)
 {
     timer t;
-    unsigned start_time=0, end_time=0, total_period=0;
-    unsigned int t_claculation=0;
+    unsigned time=0, ts=0;
+    int safe_torque_off_mode=0;
+    int pwm_on=1;
+
+    int pwm_max=0, pwm_min=0, pwm_dif=0, pwm_av=0;
+
+    int pwm_counter=0;
     int pwm_value=2000;
+    int pwm_values[6];
 
-    while(1)
+    unsigned int sync_inc=0;
+
+
+    //proper task startup
+    t :> ts;
+    t when timerafter (ts + (5000*20*250)) :> void;
+
+//    while(i_shared_memory.status()!=ACTIVE);
+    while(i_watchdog.status()!=ACTIVE);
+//    while(i_adc.status()!=ACTIVE);
+    while(i_update_pwm.status()!=ACTIVE);
+
+
+
+     pwm_dif =  pwm_max -  pwm_min;
+     pwm_av  =( pwm_max +  pwm_min)/2;
+
+     pwm_values[0] =  pwm_av;
+     pwm_values[1] =  pwm_av;
+     pwm_values[2] =  pwm_av;
+
+     pwm_on  =0;
+
+
+
+    if(ref_clk_frq==100)
     {
-        pwm_value=2000;
-        t :> start_time;
-//        t_claculation = i_update_pwm.update_server_control_data(
-//                        /*int pwm_a*/pwm_value, /*int pwm_b*/pwm_value, /*int pwm_c*/pwm_value,
-//                        /*int pwm_u*/pwm_value, /*int pwm_v*/pwm_value, /*int pwm_w*/pwm_value,
-//                        /*int received_pwm_on*/0, /*int received_brake_active*/0, /*int recieved_safe_torque_off_mode*/0);
-        t :> end_time;
-        delay_milliseconds(500);
+        if(pwm_clk_frq==100)
+        {
+            if(commutation_frq==12)
+            {
+                sync_inc= 8192;
+                pwm_max = 7000;
+                pwm_min = 600;
+            }
+            else if (commutation_frq==24)
+            {
+                sync_inc= 8192;
+                pwm_max = 3200;
+                pwm_min =  600;
+            }
+            else
+            {
+                printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+                while(1);
+            }
+        }
+        else
+        {
+            printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+            while(1);
+        }
+    }
+    else if(ref_clk_frq==250)
+    {
+        if(pwm_clk_frq==250)
+        {
+            if(commutation_frq==15)
+            {
+                sync_inc= 16384;
+                pwm_max = 13000;
+                pwm_min = 1500;
+            }
+            else
+            {
+                printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+                while(1);
+            }
+        }
+        else
+        {
+            printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+            while(1);
+        }
+    }
+    else
+    {
+        printstr("ERROR: PWM SETTINGS NOT SUPPORTED \n");
+        while(1);
+    }
+    t :> time;
+    while (1)
+    {
+        select
+        {
+        case t when timerafter(time) :> void:
 
+            pwm_counter++;
+            if(pwm_counter>10)
+            {
+                pwm_counter=0;
 
+                pwm_value++;
+                if(pwm_value>pwm_max) pwm_value= pwm_min;
 
-        pwm_value=3000;
-        t :> start_time;
-//        t_claculation = i_update_pwm.update_server_control_data(
-//                        /*int pwm_a*/pwm_value, /*int pwm_b*/pwm_value, /*int pwm_c*/pwm_value,
-//                        /*int pwm_u*/pwm_value, /*int pwm_v*/pwm_value, /*int pwm_w*/pwm_value,
-//                        /*int received_pwm_on*/0, /*int received_brake_active*/0, /*int recieved_safe_torque_off_mode*/0);
-        t :> end_time;
-        delay_milliseconds(500);
+                if(pwm_value<pwm_min) pwm_value= pwm_min;
+                if(pwm_value>pwm_max) pwm_value= pwm_max;
+
+                pwm_values[0]=pwm_value;
+                pwm_values[1]=pwm_value;
+                pwm_values[2]=pwm_value;
+
+                pwm_values[3]=pwm_value;
+                pwm_values[4]=pwm_value;
+                pwm_values[5]=pwm_value;
+
+                i_update_pwm.update_server_control_data(
+                        pwm_values[0],  pwm_values[1],  pwm_values[2],
+                        pwm_values[3],  pwm_values[4],  pwm_values[5],
+                        pwm_on,  safe_torque_off_mode);
+            }
+
+            time +=sync_inc;
+            break;
+        }
     }
 }
 
@@ -81,48 +186,48 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-//        on tile[APP_TILE]: demo_torque_position_velocity_control(i_position_control[0]);
+        //        on tile[APP_TILE]: demo_torque_position_velocity_control(i_position_control[0]);
 
-//        on tile[APP_TILE_2]:
-//        /* Position Control Loop */
-//        {
-//            PosVelocityControlConfig pos_velocity_ctrl_config;
-//            /* Control Loop */
-//            pos_velocity_ctrl_config.control_loop_period =                  CONTROL_LOOP_PERIOD; //us
-//
-//            pos_velocity_ctrl_config.min_pos =                              MIN_POSITION_LIMIT;
-//            pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
-//            pos_velocity_ctrl_config.pos_limit_threshold =                  POSITION_LIMIT_THRESHOLD;
-//            pos_velocity_ctrl_config.max_speed =                            MAX_SPEED;
-//            pos_velocity_ctrl_config.max_torque =                           TORQUE_CONTROL_LIMIT;
-//            pos_velocity_ctrl_config.polarity =                             POLARITY;
-//
-//            pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
-//            pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
-//            pos_velocity_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
-//
-//            pos_velocity_ctrl_config.control_mode =                         NL_POSITION_CONTROLLER;
-//
-//            pos_velocity_ctrl_config.P_pos =                                POSITION_Kp;
-//            pos_velocity_ctrl_config.I_pos =                                POSITION_Ki;
-//            pos_velocity_ctrl_config.D_pos =                                POSITION_Kd;
-//            pos_velocity_ctrl_config.integral_limit_pos =                   POSITION_INTEGRAL_LIMIT;
-//            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
-//
-//            pos_velocity_ctrl_config.P_velocity =                           VELOCITY_Kp;
-//            pos_velocity_ctrl_config.I_velocity =                           VELOCITY_Ki;
-//            pos_velocity_ctrl_config.D_velocity =                           VELOCITY_Kd;
-//            pos_velocity_ctrl_config.integral_limit_velocity =              VELOCITY_INTEGRAL_LIMIT;
-//
-//            pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
-//            pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
-//            pos_velocity_ctrl_config.resolution  =                          POSITION_SENSOR_RESOLUTION;
-//            pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
-//            pos_velocity_ctrl_config.brake_shutdown_delay =                 BRAKE_SHUTDOWN_DELAY;
-//
-//
-//            position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
-//        }
+        //        on tile[APP_TILE_2]:
+        //        /* Position Control Loop */
+        //        {
+        //            PosVelocityControlConfig pos_velocity_ctrl_config;
+        //            /* Control Loop */
+        //            pos_velocity_ctrl_config.control_loop_period =                  CONTROL_LOOP_PERIOD; //us
+        //
+        //            pos_velocity_ctrl_config.min_pos =                              MIN_POSITION_LIMIT;
+        //            pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
+        //            pos_velocity_ctrl_config.pos_limit_threshold =                  POSITION_LIMIT_THRESHOLD;
+        //            pos_velocity_ctrl_config.max_speed =                            MAX_SPEED;
+        //            pos_velocity_ctrl_config.max_torque =                           TORQUE_CONTROL_LIMIT;
+        //            pos_velocity_ctrl_config.polarity =                             POLARITY;
+        //
+        //            pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
+        //            pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
+        //            pos_velocity_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
+        //
+        //            pos_velocity_ctrl_config.control_mode =                         NL_POSITION_CONTROLLER;
+        //
+        //            pos_velocity_ctrl_config.P_pos =                                POSITION_Kp;
+        //            pos_velocity_ctrl_config.I_pos =                                POSITION_Ki;
+        //            pos_velocity_ctrl_config.D_pos =                                POSITION_Kd;
+        //            pos_velocity_ctrl_config.integral_limit_pos =                   POSITION_INTEGRAL_LIMIT;
+        //            pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
+        //
+        //            pos_velocity_ctrl_config.P_velocity =                           VELOCITY_Kp;
+        //            pos_velocity_ctrl_config.I_velocity =                           VELOCITY_Ki;
+        //            pos_velocity_ctrl_config.D_velocity =                           VELOCITY_Kd;
+        //            pos_velocity_ctrl_config.integral_limit_velocity =              VELOCITY_INTEGRAL_LIMIT;
+        //
+        //            pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
+        //            pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
+        //            pos_velocity_ctrl_config.resolution  =                          POSITION_SENSOR_RESOLUTION;
+        //            pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
+        //            pos_velocity_ctrl_config.brake_shutdown_delay =                 BRAKE_SHUTDOWN_DELAY;
+        //
+        //
+        //            position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
+        //        }
 
 
         on tile[IFM_TILE]:
@@ -143,9 +248,9 @@ int main(void) {
                 }
 
                 /* ADC Service */
-//                {
-//                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC);
-//                }
+                //                {
+                //                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC);
+                //                }
 
                 /* Watchdog Service */
                 {
@@ -195,55 +300,62 @@ int main(void) {
                     motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                             i_watchdog[0], i_motorcontrol, i_update_pwm,
                             REF_CLK_FRQ_MHZ_, PWM_CLK_FRQ_MHZ_, COMMUTATION_FRQ_KHZ_);
+                    send_pwm_values(
+                            i_update_pwm,
+                            i_watchdog[0],
+                             REF_CLK_FRQ_MHZ_,
+                             PWM_CLK_FRQ_MHZ_,
+                             COMMUTATION_FRQ_KHZ_);
+
                 }
 
-//                /* Shared memory Service */
-//                [[distribute]] memory_manager(i_shared_memory, 2);
+                //                /* Shared memory Service */
+                //                [[distribute]] memory_manager(i_shared_memory, 2);
 
-//                /* Position feedback service */
-//                {
-//                    PositionFeedbackConfig position_feedback_config;
-//                    position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
-//                    position_feedback_config.polarity    = SENSOR_POLARITY;
-//                    position_feedback_config.pole_pairs  = POLE_PAIRS;
-//                    position_feedback_config.resolution  = POSITION_SENSOR_RESOLUTION;
-//                    position_feedback_config.offset      = 0;
-//                    position_feedback_config.enable_push_service = PushAll;
-//
-//                    position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-//                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-//                    position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-//                    position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
-//                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-//                    position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-//                    position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-//                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-//                    position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
-//                    position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-//
-//                    position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
-//                    position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
-//                    position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
-//
-//                    position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
-//                    position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
-//
-//                    position_feedback_config.ams_config.factory_settings = 1;
-//                    position_feedback_config.ams_config.hysteresis = 1;
-//                    position_feedback_config.ams_config.noise_setting = AMS_NOISE_NORMAL;
-//                    position_feedback_config.ams_config.uvw_abi = 0;
-//                    position_feedback_config.ams_config.dyn_angle_comp = 0;
-//                    position_feedback_config.ams_config.data_select = 0;
-//                    position_feedback_config.ams_config.pwm_on = AMS_PWM_OFF;
-//                    position_feedback_config.ams_config.abi_resolution = 0;
-//                    position_feedback_config.ams_config.max_ticks = 0x7fffffff;
-//                    position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
-//                    position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
-//
-//                    position_feedback_service(hall_ports, qei_ports, spi_ports,
-//                            position_feedback_config, i_shared_memory[0], i_position_feedback,
-//                            null, null, null);
-//                }
+                //                /* Position feedback service */
+                //                {
+                //                    PositionFeedbackConfig position_feedback_config;
+                //                    position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
+                //                    position_feedback_config.polarity    = SENSOR_POLARITY;
+                //                    position_feedback_config.pole_pairs  = POLE_PAIRS;
+                //                    position_feedback_config.resolution  = POSITION_SENSOR_RESOLUTION;
+                //                    position_feedback_config.offset      = 0;
+                //                    position_feedback_config.enable_push_service = PushAll;
+                //
+                //                    position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
+                //                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                //                    position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
+                //                    position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
+                //                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
+                //                    position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
+                //                    position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+                //                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
+                //                    position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
+                //                    position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                //
+                //                    position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
+                //                    position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
+                //                    position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
+                //
+                //                    position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
+                //                    position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
+                //
+                //                    position_feedback_config.ams_config.factory_settings = 1;
+                //                    position_feedback_config.ams_config.hysteresis = 1;
+                //                    position_feedback_config.ams_config.noise_setting = AMS_NOISE_NORMAL;
+                //                    position_feedback_config.ams_config.uvw_abi = 0;
+                //                    position_feedback_config.ams_config.dyn_angle_comp = 0;
+                //                    position_feedback_config.ams_config.data_select = 0;
+                //                    position_feedback_config.ams_config.pwm_on = AMS_PWM_OFF;
+                //                    position_feedback_config.ams_config.abi_resolution = 0;
+                //                    position_feedback_config.ams_config.max_ticks = 0x7fffffff;
+                //                    position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
+                //                    position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
+                //
+                //                    position_feedback_service(hall_ports, qei_ports, spi_ports,
+                //                            position_feedback_config, i_shared_memory[0], i_position_feedback,
+                //                            null, null, null);
+                //                }
             }
         }
     }

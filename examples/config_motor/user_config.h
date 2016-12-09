@@ -74,7 +74,7 @@
 
 #define REF_CLK_FRQ_MHZ_             100
 #define PWM_CLK_FRQ_MHZ_             REF_CLK_FRQ_MHZ_
-#define COMMUTATION_FRQ_KHZ_         24
+#define COMMUTATION_FRQ_KHZ_         12
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
