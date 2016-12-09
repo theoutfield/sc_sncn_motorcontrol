@@ -9,9 +9,9 @@
 
 #include <user_config.h>
 
-#define AMS_USEC            IFM_TILE_USEC
+#define REM_14_USEC            IFM_TILE_USEC
 
-#define AMS_SENSOR      5
+#define REM_14_SENSOR      5
 
 #define ERROR       0
 #define SUCCESS     1
@@ -19,49 +19,49 @@
 #define AS5147      0
 #define AS5047      1
 
-#define AMS_SENSOR_TYPE AS5047
+#define REM_14_SENSOR_TYPE AS5047
 
 #define SPI_MASTER_MODE 1
 
-#define AMS_POLARITY_NORMAL      1
-#define AMS_POLARITY_INVERTED    -1
+#define REM_14_POLARITY_NORMAL      1
+#define REM_14_POLARITY_INVERTED    -1
 
-#define AMS_PWM_OFF     0
-#define AMS_PWM_ON      1
+#define REM_14_PWM_OFF     0
+#define REM_14_PWM_ON      1
 
-#define AMS_ABI_RES_11BIT   0
-#define AMS_ABI_RES_10BIT   1
+#define REM_14_ABI_RES_11BIT   0
+#define REM_14_ABI_RES_10BIT   1
 
-#define AMS_ABI_ON_PWM_W    0
-#define AMS_UVW_ON_PWM_I    1
+#define REM_14_ABI_ON_PWM_W    0
+#define REM_14_UVW_ON_PWM_I    1
 
-#define AMS_DAE_ON          0
-#define AMS_DAE_OFF         1
+#define REM_14_DAE_ON          0
+#define REM_14_DAE_OFF         1
 
-#define AMS_DATA_DAECANG    0
-#define AMS_DATA_CORDICANG       1
+#define REM_14_DATA_DAECANG    0
+#define REM_14_DATA_CORDICANG       1
 
-#define AMS_NOISE_NORMAL    0
-#define AMS_NOISE_REDUCED   1
+#define REM_14_NOISE_NORMAL    0
+#define REM_14_NOISE_REDUCED   1
 
 typedef enum {
-    AMS_HYS_11BIT_3LSB = 0,
-    AMS_HYS_11BIT_2LSB = 1,
-    AMS_HYS_11BIT_1LSB = 2,
-    AMS_HYS_11BIT_OFF = 3,
+    REM_14_HYS_11BIT_3LSB = 0,
+    REM_14_HYS_11BIT_2LSB = 1,
+    REM_14_HYS_11BIT_1LSB = 2,
+    REM_14_HYS_11BIT_OFF = 3,
 
-    AMS_HYS_10BIT_3LSB = 3,
-    AMS_HYS_10BIT_2LSB = 0,
-    AMS_HYS_10BIT_1LSB = 1,
-    AMS_HYS_10BIT_OFF = 2
-} AMS_Hysteresis;
+    REM_14_HYS_10BIT_3LSB = 3,
+    REM_14_HYS_10BIT_2LSB = 0,
+    REM_14_HYS_10BIT_1LSB = 1,
+    REM_14_HYS_10BIT_OFF = 2
+} REM_14_Hysteresis;
 
 
 /**
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-#if AMS_SENSOR_TYPE == AS5147
+#if REM_14_SENSOR_TYPE == AS5147
     int width_index_pulse;      /**< Width of the index pulse I (0 = 3LSB, 1 = 1LSB). */
 #else
     int factory_settings;       /**< Factory Settings, just reading, no  writing. */
@@ -78,7 +78,7 @@ typedef struct {
     int data_select;            /**< This bit defines which data can be read form address
                                      16383dec (3FFFhex). 0->DAECANG 1->CORDICANG */
     int pwm_on;                 /**< Enables PWM (setting of UVW_ABI Bit necessary) */
-    AMS_Hysteresis hysteresis;  /**< Hysteresis for 11 Bit ABI Resolution:
+    REM_14_Hysteresis hysteresis;  /**< Hysteresis for 11 Bit ABI Resolution:
                                      0 = 3 LSB
                                      1 = 2 LSB
                                      2 = 1 LSB
@@ -96,10 +96,10 @@ typedef struct {
     int velocity_loop;          /**< Velcity loop time in microseconds */
 
     int max_ticks;              /**< The count is reset to 0 if greater than this */
-} AMSConfig;
+} REM_14Config;
 
 
-#define AMS_MAX_RESOLUTION   16384
+#define REM_14_MAX_RESOLUTION   16384
 
 //volatile registers
 #define ADDR_ERRFL      0x0001

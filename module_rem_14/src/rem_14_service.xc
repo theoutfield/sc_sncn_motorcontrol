@@ -36,13 +36,13 @@ void initspi_ports(SPIPorts &spi_ports)
 {
     unsigned short settings1 = 0, settings2 = 0;
 
-    #if AMS_SENSOR_TYPE == AS5147
+    #if REM_14_SENSOR_TYPE == AS5147
     settings1 = (config.rem_14_config.width_index_pulse << 0);
     #else
     settings1 = (config.rem_14_config.factory_settings << 0);
     #endif
     settings1 |= (config.rem_14_config.noise_setting << 1);
-    if (config.polarity == AMS_POLARITY_INVERTED) {
+    if (config.polarity == REM_14_POLARITY_INVERTED) {
         settings1 |= (1 << 2);
     }
     settings1 |= (config.rem_14_config.uvw_abi << 3);
@@ -138,7 +138,7 @@ short SPIReadTransaction(SPIPorts &spi_ports, unsigned short reg) {
     spi_ports.spi_interface.mosi <: 0;
 
     slave_deselect(spi_ports.slave_select);                 //pause for
-    delay_ticks(AMS_SENSOR_EXECUTING_TIME);                 //executing the command
+    delay_ticks(REM_14_SENSOR_EXECUTING_TIME);                 //executing the command
     slave_select(spi_ports.slave_select);                   //on the sensor
 
     data_in = spi_master_in_short(spi_ports.spi_interface); //handle response
@@ -162,14 +162,14 @@ short SPIWriteTransaction(SPIPorts &spi_ports, unsigned short reg, unsigned shor
     spi_master_out_short(spi_ports.spi_interface, reg);     //send command
 
     slave_deselect(spi_ports.slave_select);                 //pause for
-    delay_ticks(AMS_SENSOR_EXECUTING_TIME);                 //executing the command
+    delay_ticks(REM_14_SENSOR_EXECUTING_TIME);                 //executing the command
     slave_select(spi_ports.slave_select);                   //on the sensor
 
     spi_master_out_short(spi_ports.spi_interface, data);
     spi_ports.spi_interface.mosi <: 0;
 
     slave_deselect(spi_ports.slave_select);                 //pause for
-    delay_ticks(AMS_SENSOR_SAVING_TIME);                    //saving the data
+    delay_ticks(REM_14_SENSOR_SAVING_TIME);                    //saving the data
     slave_select(spi_ports.slave_select);                   //on the reg
 
     data_in = spi_master_in_short(spi_ports.spi_interface); //handle response
@@ -370,7 +370,7 @@ int readNumberPolePairs(SPIPorts &spi_ports){
     }
 
     data_in &= POLE_PAIRS_SET_MASK;                             //clean pole pairs bits
-    data_in += 1;                                             //add 1 because of AMS sensor convention
+    data_in += 1;                                             //add 1 because of REM_14 sensor convention
 
     return data_in;
 }
@@ -461,7 +461,7 @@ int writeNumberPolePairs(SPIPorts &spi_ports, unsigned short data){
 
     int data_in = 0;
 
-    data -= 1;                                              //substract 1 because of AMS sensor convention
+    data -= 1;                                              //substract 1 because of REM_14 sensor convention
     data &= POLE_PAIRS_SET_MASK;                            //mask pole pairs bits
 
     data_in = readSettings2(spi_ports);                     //read current settings
@@ -490,19 +490,19 @@ static inline void multiturn(int &count, int last_position, int position, int ti
 void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
 
-    if (AMS_USEC == USEC_FAST) { //Set freq to 250MHz
+    if (REM_14_USEC == USEC_FAST) { //Set freq to 250MHz
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
     position_feedback_config.offset &= (position_feedback_config.resolution-1);
     if (initRotarySensor(spi_ports,  position_feedback_config) != SUCCESS_WRITING) {
-        printstrln("Error with SPI AMS sensor");
+        printstrln("Error with SPI REM_14 sensor");
         position_feedback_config.sensor_type = 0;
         return;
     }
 
     printstr(start_message);
-    printstrln("AMS");
+    printstrln("REM_14");
 
     //init variables
     //velocity
@@ -510,7 +510,7 @@ void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedba
     int old_count = 0;
     int old_difference = 0;
     int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-    int velocity_loop = position_feedback_config.rem_14_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
+    int velocity_loop = position_feedback_config.rem_14_config.velocity_loop * REM_14_USEC; //velocity loop time in clock ticks
     int velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
     //position
     unsigned int last_position = 0;
@@ -597,7 +597,7 @@ void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedba
                     writeZeroPosition(spi_ports, in_config.offset);
                 position_feedback_config = in_config;
                 crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-                velocity_loop = position_feedback_config.rem_14_config.velocity_loop * AMS_USEC;
+                velocity_loop = position_feedback_config.rem_14_config.velocity_loop * REM_14_USEC;
                 velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
@@ -657,7 +657,7 @@ void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedba
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
 //            velocity = (difference * velocity_factor) / ticks_per_turn;
-            velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/AMS_USEC))) / position_feedback_config.resolution;
+            velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/REM_14_USEC))) / position_feedback_config.resolution;
             last_velocity_read = last_read;
 
             if (!isnull(i_shared_memory)) {
@@ -683,7 +683,7 @@ void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedba
 
             //to prevent blocking
             if (timeafter(end_time, next_velocity_read))
-                next_velocity_read = end_time + AMS_USEC;
+                next_velocity_read = end_time + REM_14_USEC;
             break;
         }
     }

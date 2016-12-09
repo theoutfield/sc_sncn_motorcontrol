@@ -5,7 +5,7 @@
 
 /**
  * @file app_test_rem_14.xc
- * @brief Test illustrates usage of the AMS rotary sensor to get position, velocity, and electrical angle information
+ * @brief Test illustrates usage of the REM_14 rotary sensor to get position, velocity, and electrical angle information
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
@@ -15,7 +15,7 @@
 
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 
-/* Test AMS Sensor Client */
+/* Test REM_14 Sensor Client */
 void rem_14_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
 {
     int count = 0;
@@ -27,13 +27,13 @@ void rem_14_test(client interface PositionFeedbackInterface i_position_feedback,
 
 
     while(1) {
-        /* get position from AMS Sensor */
+        /* get position from REM_14 Sensor */
         {count, position} = i_position_feedback.get_position();
 
-        /* get angle from AMS Sensor */
+        /* get angle from REM_14 Sensor */
         electrical_angle = i_position_feedback.get_angle();
 
-        /* get velocity from AMS Sensor */
+        /* get velocity from REM_14 Sensor */
         velocity = i_position_feedback.get_velocity();
 
         t :> start_time;
@@ -64,7 +64,7 @@ int main(void)
          * IFM_TILE
          ************************************************************/
         on tile[IFM_TILE]: par {
-            /* Test AMS Encoder Client */
+            /* Test REM_14 Encoder Client */
             rem_14_test(i_position_feedback[0], null);
 
             /* Shared memory Service */
@@ -73,7 +73,7 @@ int main(void)
             /* Position feedback service */
             {
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = AMS_SENSOR;
+                position_feedback_config.sensor_type = REM_14_SENSOR;
                 position_feedback_config.polarity    = 1;
                 position_feedback_config.pole_pairs  = 2;
                 position_feedback_config.resolution  = 16384;
@@ -82,15 +82,15 @@ int main(void)
 
                 position_feedback_config.rem_14_config.factory_settings = 1;
                 position_feedback_config.rem_14_config.hysteresis = 1;
-                position_feedback_config.rem_14_config.noise_setting = AMS_NOISE_NORMAL;
+                position_feedback_config.rem_14_config.noise_setting = REM_14_NOISE_NORMAL;
                 position_feedback_config.rem_14_config.uvw_abi = 0;
                 position_feedback_config.rem_14_config.dyn_angle_comp = 0;
                 position_feedback_config.rem_14_config.data_select = 0;
-                position_feedback_config.rem_14_config.pwm_on = AMS_PWM_OFF;
+                position_feedback_config.rem_14_config.pwm_on = REM_14_PWM_OFF;
                 position_feedback_config.rem_14_config.abi_resolution = 0;
                 position_feedback_config.rem_14_config.max_ticks = 0x7fffffff;
-                position_feedback_config.rem_14_config.cache_time = AMS_CACHE_TIME;
-                position_feedback_config.rem_14_config.velocity_loop = AMS_VELOCITY_LOOP;
+                position_feedback_config.rem_14_config.cache_time = REM_14_CACHE_TIME;
+                position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
                 position_feedback_service(null, null, spi_ports,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

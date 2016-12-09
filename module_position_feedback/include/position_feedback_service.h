@@ -28,7 +28,7 @@ typedef struct {
     int enable_push_service; /**< Select which data to push to shared memory >*/
     BISSConfig biss_config;
     CONTELECConfig contelec_config;
-    AMSConfig rem_14_config;
+    REM_14Config rem_14_config;
     QEIConfig qei_config;
 } PositionFeedbackConfig;
 

@@ -162,15 +162,15 @@ int main(void)
 
                 position_feedback_config.rem_14_config.factory_settings = 1;
                 position_feedback_config.rem_14_config.hysteresis = 1;
-                position_feedback_config.rem_14_config.noise_setting = AMS_NOISE_NORMAL;
+                position_feedback_config.rem_14_config.noise_setting = REM_14_NOISE_NORMAL;
                 position_feedback_config.rem_14_config.uvw_abi = 0;
                 position_feedback_config.rem_14_config.dyn_angle_comp = 0;
                 position_feedback_config.rem_14_config.data_select = 0;
-                position_feedback_config.rem_14_config.pwm_on = AMS_PWM_OFF;
+                position_feedback_config.rem_14_config.pwm_on = REM_14_PWM_OFF;
                 position_feedback_config.rem_14_config.abi_resolution = 0;
                 position_feedback_config.rem_14_config.max_ticks = 0x7fffffff;
-                position_feedback_config.rem_14_config.cache_time = AMS_CACHE_TIME;
-                position_feedback_config.rem_14_config.velocity_loop = AMS_VELOCITY_LOOP;
+                position_feedback_config.rem_14_config.cache_time = REM_14_CACHE_TIME;
+                position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
                 //set sensor 2 parameters
                 PositionFeedbackConfig position_feedback_config_2;

@@ -51,7 +51,7 @@ void read_position(SPIPorts * spi_ports, QEIPorts * biss_ports, PositionFeedback
 #endif
         state.angle = (position_feedback_config.pole_pairs * (state.angle >> 4) ) & 4095;
         break;
-    case AMS_SENSOR:
+    case REM_14_SENSOR:
         state.position = readRotarySensorAngleWithoutCompensation(*spi_ports);
         multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
         state.angle = (position_feedback_config.pole_pairs * (state.position >> 2) ) & 4095;
@@ -141,16 +141,16 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
     #endif
         t :> last_read;
         break;
-    case AMS_SENSOR:
-        velocity_loop = position_feedback_config.rem_14_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
+    case REM_14_SENSOR:
+        velocity_loop = position_feedback_config.rem_14_config.velocity_loop * REM_14_USEC; //velocity loop time in clock ticks
         position_feedback_config.offset &= (position_feedback_config.resolution-1);
         if (initRotarySensor(*spi_ports,  position_feedback_config) != SUCCESS_WRITING) {
-            printstrln("Error with SPI AMS sensor");
+            printstrln("Error with SPI REM_14 sensor");
             position_feedback_config.sensor_type = 0;
             return;
         }
         printstr(start_message);
-        printstrln("AMS");
+        printstrln("REM_14");
         pos_state.last_position = readRotarySensorAngleWithoutCompensation(*spi_ports);
         t :> last_read;
         break;
@@ -272,7 +272,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
                     //update variables which depend on contelec_config
                     velocity_loop = position_feedback_config.contelec_config.velocity_loop * CONTELEC_USEC;
                     break;
-                case AMS_SENSOR:
+                case REM_14_SENSOR:
                     in_config.offset &= (in_config.resolution-1);
                     //update variables which depend on rem_14_config
                     if (position_feedback_config.polarity != in_config.polarity)
@@ -280,7 +280,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
                     else if (position_feedback_config.offset != in_config.offset)
                         writeZeroPosition(*spi_ports, in_config.offset);
                     position_feedback_config = in_config;
-                    velocity_loop = position_feedback_config.rem_14_config.velocity_loop * AMS_USEC;
+                    velocity_loop = position_feedback_config.rem_14_config.velocity_loop * REM_14_USEC;
                     velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
                     break;
                 case BISS_SENSOR:
@@ -326,7 +326,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
                     contelec_encoder_write(*spi_ports, CONTELEC_CONF_PRESET, (multiturn << 16) + singleturn, 32);
                     pos_state.last_position = singleturn;
                     break;
-                case AMS_SENSOR:
+                case REM_14_SENSOR:
                     pos_state.last_position = readRotarySensorAngleWithoutCompensation(*spi_ports);
                     break;
                 case BISS_SENSOR:
@@ -360,7 +360,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
 #endif
                     out_offset = (out_offset - real_position) & (position_feedback_config.resolution-1);
                     break;
-                case AMS_SENSOR:
+                case REM_14_SENSOR:
                     writeZeroPosition(*spi_ports, 0);
                     int position = readRotarySensorAngleWithoutCompensation(*spi_ports);
                     out_offset = (position_feedback_config.resolution - ((new_angle << 2) / position_feedback_config.pole_pairs) + position) & (position_feedback_config.resolution-1);
@@ -440,14 +440,14 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
                 }
 #endif
                 break;
-            case AMS_SENSOR:
+            case REM_14_SENSOR:
             case BISS_SENSOR:
                 difference = pos_state.count - old_count;
                 old_count = pos_state.count;
                 // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
                 //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
                 if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
-                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/AMS_USEC))) / position_feedback_config.resolution;
+                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/REM_14_USEC))) / position_feedback_config.resolution;
                 }
                 last_velocity_read = last_read;
                 break;
