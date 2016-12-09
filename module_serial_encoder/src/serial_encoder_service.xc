@@ -7,7 +7,7 @@
 
 #include <xs1.h>
 #include <contelec_service.h>
-#include <ams_service.h>
+#include <rem_14_service.h>
 #include <biss_service.h>
 #include <timer.h>
 #include <print.h>
@@ -97,7 +97,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
     int old_count = 0;
     int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
     int velocity_count = 0;
-    int velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
+    int velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
     int velocity_loop;
 #ifdef CONTELEC_USE_TIMESTAMP
     char old_timestamp = 0, timediff;
@@ -142,7 +142,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
         t :> last_read;
         break;
     case AMS_SENSOR:
-        velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
+        velocity_loop = position_feedback_config.rem_14_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
         position_feedback_config.offset &= (position_feedback_config.resolution-1);
         if (initRotarySensor(*spi_ports,  position_feedback_config) != SUCCESS_WRITING) {
             printstrln("Error with SPI AMS sensor");
@@ -274,14 +274,14 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
                     break;
                 case AMS_SENSOR:
                     in_config.offset &= (in_config.resolution-1);
-                    //update variables which depend on ams_config
+                    //update variables which depend on rem_14_config
                     if (position_feedback_config.polarity != in_config.polarity)
                         initRotarySensor(*spi_ports,  in_config);
                     else if (position_feedback_config.offset != in_config.offset)
                         writeZeroPosition(*spi_ports, in_config.offset);
                     position_feedback_config = in_config;
-                    velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC;
-                    velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
+                    velocity_loop = position_feedback_config.rem_14_config.velocity_loop * AMS_USEC;
+                    velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
                     break;
                 case BISS_SENSOR:
                     //update variables which depend on biss_config

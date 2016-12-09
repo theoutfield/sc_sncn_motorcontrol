@@ -36,6 +36,6 @@ int writeSettings2(SPIPorts &spi_ports, unsigned short data);
 int writeZeroPosition(SPIPorts &spi_ports, unsigned short data);
 int writeNumberPolePairs(SPIPorts &spi_ports, unsigned short data);
 
-void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3]);
+void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3]);
 
 #endif

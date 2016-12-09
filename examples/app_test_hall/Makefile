@@ -13,7 +13,7 @@ TARGET =
 APP_NAME = app_test_hall
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_advanced_torquecontrol_lib module_ams_rotary_sensor module_biss module_board-support module_contelec_encoder module_hall module_memory_manager module_misc module_position_feedback module_qei module_serial_encoder module_spi_master
+USED_MODULES = config_motor module_advanced_torquecontrol_lib module_rem_14 module_biss module_board-support module_contelec_encoder module_hall module_memory_manager module_misc module_position_feedback module_qei module_serial_encoder module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

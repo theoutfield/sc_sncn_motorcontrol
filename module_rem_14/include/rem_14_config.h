@@ -6,7 +6,7 @@
  */
 
 #pragma once
-#include <ams_struct.h>
+#include <rem_14_struct.h>
 
 #define AMS_OFFSET          0
 #define AMS_POLARITY        AMS_POLARITY_NORMAL//AMS_POLARITY_NORMAL

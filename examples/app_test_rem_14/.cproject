@@ -34,7 +34,7 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="app_test_ams_rotary_sensor.null.932817749" name="app_test_ams_rotary_sensor"/>
+		<project id="app_test_rem_14.null.932817749" name="app_test_rem_14"/>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
@@ -42,7 +42,7 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="/app_test_ams_rotary_sensor"/>
+			<resource resourceType="PROJECT" workspacePath="/app_test_rem_14"/>
 		</configuration>
 	</storageModule>
 </cproject>

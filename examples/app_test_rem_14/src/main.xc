@@ -4,7 +4,7 @@
 
 
 /**
- * @file app_test_ams_rotary_sensor.xc
+ * @file app_test_rem_14.xc
  * @brief Test illustrates usage of the AMS rotary sensor to get position, velocity, and electrical angle information
  * @author Synapticon GmbH <support@synapticon.com>
  */
@@ -16,7 +16,7 @@
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 
 /* Test AMS Sensor Client */
-void ams_rotary_sensor_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
+void rem_14_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
 {
     int count = 0;
     int velocity = 0;
@@ -37,7 +37,6 @@ void ams_rotary_sensor_test(client interface PositionFeedbackInterface i_positio
         velocity = i_position_feedback.get_velocity();
 
         t :> start_time;
-//        { count, velocity, position, electrical_angle, time } = i_position_feedback.get_ams_all();
         if (!isnull(i_shared_memory)) {
             { electrical_angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
         }
@@ -66,7 +65,7 @@ int main(void)
          ************************************************************/
         on tile[IFM_TILE]: par {
             /* Test AMS Encoder Client */
-            ams_rotary_sensor_test(i_position_feedback[0], null);
+            rem_14_test(i_position_feedback[0], null);
 
             /* Shared memory Service */
             [[distribute]] memory_manager(i_shared_memory, 2);
@@ -81,17 +80,17 @@ int main(void)
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
-                position_feedback_config.ams_config.factory_settings = 1;
-                position_feedback_config.ams_config.hysteresis = 1;
-                position_feedback_config.ams_config.noise_setting = AMS_NOISE_NORMAL;
-                position_feedback_config.ams_config.uvw_abi = 0;
-                position_feedback_config.ams_config.dyn_angle_comp = 0;
-                position_feedback_config.ams_config.data_select = 0;
-                position_feedback_config.ams_config.pwm_on = AMS_PWM_OFF;
-                position_feedback_config.ams_config.abi_resolution = 0;
-                position_feedback_config.ams_config.max_ticks = 0x7fffffff;
-                position_feedback_config.ams_config.cache_time = AMS_CACHE_TIME;
-                position_feedback_config.ams_config.velocity_loop = AMS_VELOCITY_LOOP;
+                position_feedback_config.rem_14_config.factory_settings = 1;
+                position_feedback_config.rem_14_config.hysteresis = 1;
+                position_feedback_config.rem_14_config.noise_setting = AMS_NOISE_NORMAL;
+                position_feedback_config.rem_14_config.uvw_abi = 0;
+                position_feedback_config.rem_14_config.dyn_angle_comp = 0;
+                position_feedback_config.rem_14_config.data_select = 0;
+                position_feedback_config.rem_14_config.pwm_on = AMS_PWM_OFF;
+                position_feedback_config.rem_14_config.abi_resolution = 0;
+                position_feedback_config.rem_14_config.max_ticks = 0x7fffffff;
+                position_feedback_config.rem_14_config.cache_time = AMS_CACHE_TIME;
+                position_feedback_config.rem_14_config.velocity_loop = AMS_VELOCITY_LOOP;
 
                 position_feedback_service(null, null, spi_ports,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

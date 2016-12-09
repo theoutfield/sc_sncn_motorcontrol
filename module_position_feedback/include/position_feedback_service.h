@@ -9,11 +9,11 @@
 
 #include <biss_config.h>
 #include <contelec_config.h>
-#include <ams_config.h>
+#include <rem_14_config.h>
 
 #include <biss_struct.h>
 #include <contelec_struct.h>
-#include <ams_struct.h>
+#include <rem_14_struct.h>
 #include <hall_struct.h>
 #include <qei_struct.h>
 
@@ -28,7 +28,7 @@ typedef struct {
     int enable_push_service; /**< Select which data to push to shared memory >*/
     BISSConfig biss_config;
     CONTELECConfig contelec_config;
-    AMSConfig ams_config;
+    AMSConfig rem_14_config;
     QEIConfig qei_config;
 } PositionFeedbackConfig;
 
@@ -95,7 +95,7 @@ typedef struct {
 #include <memory_manager.h>
 #include <biss_service.h>
 #include <contelec_service.h>
-#include <ams_service.h>
+#include <rem_14_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 

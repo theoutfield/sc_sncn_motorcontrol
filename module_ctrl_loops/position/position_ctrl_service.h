@@ -104,10 +104,6 @@ void init_position_velocity_control(interface PositionVelocityCtrlInterface clie
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
  * @param position_ctrl_config Configuration for the Position Control Service.
- * @param i_hall [[Nullable]] Communication interface to the Hall Sensor Service (if applicable).
- * @param i_qei [[Nullable]] Communication interface to the Incremental Encoder Service (if applicable).
- * @param i_biss [[Nullable]] Communication interface to the BiSSEncoder Service (if applicable).
- * @param i_ams [[Nullable]] Communication interface to the AMSEncoder Service (if applicable).
  * @param i_motorcontrol Communication interface to the Motor Control Service.
  * @param i_position_control Array of communication interfaces to handle up to 3 different clients.
  */

@@ -6,7 +6,7 @@
  */
 
 #include <xs1.h>
-#include <ams_service.h>
+#include <rem_14_service.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -37,22 +37,22 @@ void initspi_ports(SPIPorts &spi_ports)
     unsigned short settings1 = 0, settings2 = 0;
 
     #if AMS_SENSOR_TYPE == AS5147
-    settings1 = (config.ams_config.width_index_pulse << 0);
+    settings1 = (config.rem_14_config.width_index_pulse << 0);
     #else
-    settings1 = (config.ams_config.factory_settings << 0);
+    settings1 = (config.rem_14_config.factory_settings << 0);
     #endif
-    settings1 |= (config.ams_config.noise_setting << 1);
+    settings1 |= (config.rem_14_config.noise_setting << 1);
     if (config.polarity == AMS_POLARITY_INVERTED) {
         settings1 |= (1 << 2);
     }
-    settings1 |= (config.ams_config.uvw_abi << 3);
-    settings1 |= (config.ams_config.dyn_angle_comp << 4);
-    settings1 |= (config.ams_config.data_select << 6);
-    settings1 |= (config.ams_config.pwm_on << 7);
+    settings1 |= (config.rem_14_config.uvw_abi << 3);
+    settings1 |= (config.rem_14_config.dyn_angle_comp << 4);
+    settings1 |= (config.rem_14_config.data_select << 6);
+    settings1 |= (config.rem_14_config.pwm_on << 7);
 
     settings2 = (config.pole_pairs-1) << 0;
-    settings2 |= (config.ams_config.hysteresis << 3);
-    settings2 |= (config.ams_config.abi_resolution << 5);
+    settings2 |= (config.rem_14_config.hysteresis << 3);
+    settings2 |= (config.rem_14_config.abi_resolution << 5);
 
     return {settings1, settings2};
 }
@@ -487,7 +487,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
             count += difference;
 }
 
-void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
+void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
 
     if (AMS_USEC == USEC_FAST) { //Set freq to 250MHz
@@ -510,8 +510,8 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
     int old_count = 0;
     int old_difference = 0;
     int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-    int velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
-    int velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
+    int velocity_loop = position_feedback_config.rem_14_config.velocity_loop * AMS_USEC; //velocity loop time in clock ticks
+    int velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
     //position
     unsigned int last_position = 0;
     int count = 0;
@@ -519,7 +519,7 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
     timer t;
     unsigned int time;
     unsigned int next_velocity_read = 0;
-    unsigned int last_ams_read = 0;
+    unsigned int last_read = 0;
     unsigned int last_velocity_read= 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
@@ -533,7 +533,7 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
 
     //first read
     last_position = readRotarySensorAngleWithoutCompensation(spi_ports);
-    t :> last_ams_read;
+    t :> last_read;
 
     //main loop
     int loop_flag = 1;
@@ -546,9 +546,9 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
         //send electrical angle for commutation
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 t :> time;
-                if (timeafter(time, last_ams_read + position_feedback_config.ams_config.cache_time)) {
+                if (timeafter(time, last_read + position_feedback_config.rem_14_config.cache_time)) {
                     angle = readRotarySensorAngleWithCompensation(spi_ports);
-                    t :> last_ams_read;
+                    t :> last_read;
                     multiturn(count, last_position, angle, position_feedback_config.resolution);
                     last_position = angle;
                 } else
@@ -559,15 +559,15 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
         //send multiturn count and position
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position }:
                 t :> time;
-                if (timeafter(time, last_ams_read + position_feedback_config.ams_config.cache_time)) {
+                if (timeafter(time, last_read + position_feedback_config.rem_14_config.cache_time)) {
                     position = readRotarySensorAngleWithCompensation(spi_ports);
-                    t :> last_ams_read;
+                    t :> last_read;
                     multiturn(count, last_position, position, position_feedback_config.resolution);
                     last_position = position;
                 } else
                     position = last_position;
                 //count reset
-                if (count >= position_feedback_config.ams_config.max_ticks || count < -position_feedback_config.ams_config.max_ticks)
+                if (count >= position_feedback_config.rem_14_config.max_ticks || count < -position_feedback_config.rem_14_config.max_ticks)
                     count = 0;
                 out_count = count;
                 break;
@@ -587,18 +587,18 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
                 out_ticks_per_turn = position_feedback_config.resolution;
                 break;
 
-        //receive new ams_config
+        //receive new rem_14_config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 in_config.offset &= (in_config.resolution-1);
-                //update variables which depend on ams_config
+                //update variables which depend on rem_14_config
                 if (position_feedback_config.polarity != in_config.polarity)
                     initRotarySensor(spi_ports,  in_config);
                 else if (position_feedback_config.offset != in_config.offset)
                     writeZeroPosition(spi_ports, in_config.offset);
                 position_feedback_config = in_config;
                 crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-                velocity_loop = position_feedback_config.ams_config.velocity_loop * AMS_USEC;
-                velocity_factor = 60000000/position_feedback_config.ams_config.velocity_loop;
+                velocity_loop = position_feedback_config.rem_14_config.velocity_loop * AMS_USEC;
+                velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
@@ -608,7 +608,7 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
 
                 break;
 
-        //send ams_config
+        //send rem_14_config
         case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
                 out_config = position_feedback_config;
                 break;
@@ -616,7 +616,7 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
         //receive the new count to set and set the offset accordingly
         case i_position_feedback[int i].set_position(int new_count):
                 last_position = readRotarySensorAngleWithoutCompensation(spi_ports);
-                t :> last_ams_read;
+                t :> last_read;
                 count = new_count;
                 break;
 
@@ -643,7 +643,7 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
             int position, angle;
             t :> time;
             position = readRotarySensorAngleWithCompensation(spi_ports);
-            t :> last_ams_read;
+            t :> last_read;
             multiturn(count, last_position, position, position_feedback_config.resolution);
             last_position = position;
 
@@ -657,8 +657,8 @@ void ams_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_
             // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
             //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
 //            velocity = (difference * velocity_factor) / ticks_per_turn;
-            velocity = (difference * (60000000/((int)(last_ams_read-last_velocity_read)/AMS_USEC))) / position_feedback_config.resolution;
-            last_velocity_read = last_ams_read;
+            velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/AMS_USEC))) / position_feedback_config.resolution;
+            last_velocity_read = last_read;
 
             if (!isnull(i_shared_memory)) {
                 if (position_feedback_config.enable_push_service == PushAll) {
