@@ -72,9 +72,9 @@
 
 #define IFM_TILE_USEC               USEC_STD // Number of ticks in a microsecond
 
-#define REF_CLK_FRQ_MHZ_             250
+#define REF_CLK_FRQ_MHZ_             100
 #define PWM_CLK_FRQ_MHZ_             REF_CLK_FRQ_MHZ_
-#define COMMUTATION_FRQ_KHZ_         15
+#define COMMUTATION_FRQ_KHZ_         24
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
