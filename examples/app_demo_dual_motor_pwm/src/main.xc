@@ -8,15 +8,14 @@
  * @date 17/06/2014
  */
 
-//#include <pwm_service.h>
 #include <pwm_server.h>
-#include <adc_service.h>
-#include <user_config.h>
+#include <watchdog_service.h>
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
-#include <advanced_motorcontrol_licence.h>
-#include <position_feedback_service.h>
 
+#define REF_CLK_FRQ_MHZ_             100
+#define PWM_CLK_FRQ_MHZ_             REF_CLK_FRQ_MHZ_
+#define COMMUTATION_FRQ_KHZ_         12
 
 PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -112,6 +111,9 @@ void send_pwm_values(
     pwm_values[0] =  pwm_av;
     pwm_values[1] =  pwm_av;
     pwm_values[2] =  pwm_av;
+    pwm_values[3] =  pwm_av;
+    pwm_values[4] =  pwm_av;
+    pwm_values[5] =  pwm_av;
 
     t :> time;
     while (1)

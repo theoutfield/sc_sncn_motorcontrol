@@ -136,7 +136,7 @@ void pwm_config(PwmPorts &ports, int ifm_tile_usec)
     //    int motor_cnt; // motor counter
 
     // Configure clock rate to ifm_tile_usec/1
-    configure_clock_rate( ports.clk, ifm_tile_usec, 1);
+    //configure_clock_rate( ports.clk, ifm_tile_usec, 1);
 
     do_pwm_port_config(ports);
 
@@ -169,7 +169,7 @@ void pwm_config(PwmPorts &ports, int ifm_tile_usec)
 void pwm_config_general(PwmPortsGeneral &ports, int ref_clk_frq, int pwm_clk_frq)
 {
     // Configure clock rate to ifm_tile_usec
-    configure_clock_rate( ports.clk, pwm_clk_frq, 1);
+    //configure_clock_rate( ports.clk, pwm_clk_frq, 1);
 
     do_pwm_port_config_general(ports);
 
