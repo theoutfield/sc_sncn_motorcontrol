@@ -56,7 +56,7 @@ int check_qei_config(PositionFeedbackConfig &position_feedback_config)
 }
 
 #pragma unsafe arrays
-void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_config,
+void qei_service(QEIPorts &qei_ports, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
                  client interface shared_memory_interface ?i_shared_memory,
                  server interface PositionFeedbackInterface i_position_feedback[3])
 {
@@ -66,7 +66,8 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
-               // to compute velocity from qei
+
+#ifdef DEBUG_POSITION_FEEDBACK
     if (check_qei_config(position_feedback_config) == ERROR) {
         position_feedback_config.sensor_type = 0;
         return;
@@ -74,6 +75,7 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
 
     printstr(start_message);
     printstrln("QEI");
+#endif
 
     //Check if we are using a dc board with configurable qei port
     if (!isnull(qei_ports.p_qei_config)) {
@@ -319,6 +321,16 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                 loop_flag = 0;
                 continue;
 
+            //gpio read
+            case i_position_feedback[int i].gpio_read(int gpio_number) -> int out_value:
+                    out_value = gpio_read(gpio_ports, position_feedback_config, gpio_number);
+                    break;
+
+            //gpio_write
+            case i_position_feedback[int i].gpio_write(int gpio_number, int in_value):
+                    gpio_write(gpio_ports, position_feedback_config, gpio_number, in_value);
+                    break;
+
             case t_velocity when timerafter(ts_velocity + (1000*QEI_USEC)) :> ts_velocity:
 
                 difference_velocity = count - vel_previous_position;
@@ -332,6 +344,9 @@ void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_
                 vel_old_difference = difference_velocity;
 
                 velocity = (difference_velocity * 60000) / position_feedback_config.resolution;
+
+                //gpio
+                gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
 
                 break;
 

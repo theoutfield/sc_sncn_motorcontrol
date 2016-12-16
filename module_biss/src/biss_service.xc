@@ -32,8 +32,10 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
+#ifdef DEBUG_POSITION_FEEDBACK
     printstr(start_message);
     printstrln("BISS");
+#endif
 
     //init variables
     //velocity
@@ -255,6 +257,12 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                 break;
 
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
+                break;
+        //gpio read
+        case i_position_feedback[int i].gpio_read(int gpio_number) -> int out_value:
+                break;
+        //gpio_write
+        case i_position_feedback[int i].gpio_write(int gpio_number, int in_value):
                 break;
 
         case i_position_feedback[int i].exit():

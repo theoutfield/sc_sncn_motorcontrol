@@ -41,8 +41,6 @@
 
 #define CONFIG_DIO_INPUT                    10
 #define CONFIG_DIO_DONE                     15
-#define GPIO_INPUT                          20
-#define GPIO_OUTPUT                         22
 
 /* Digital Input types */
 #define GP_INPUT_TYPE                       40

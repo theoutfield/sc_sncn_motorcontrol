@@ -82,7 +82,7 @@ void read_position(SPIPorts * spi_ports, QEIPorts * biss_ports, PositionFeedback
 }
 
 
-void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
+void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
     if (REM_16MT_USEC == USEC_FAST) { //Set freq to 250MHz
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -122,6 +122,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
         //init sensor
         init_spi_ports(*spi_ports);
         int init_status = rem_16mt_init(*spi_ports, position_feedback_config);
+#ifdef DEBUG_POSITION_FEEDBACK
         if (init_status) {
             delay_ticks(200000*REM_16MT_USEC);
             init_status = rem_16mt_init(*spi_ports, position_feedback_config);
@@ -132,6 +133,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
         }
         printstr(start_message);
         printstrln("REM_16MT");
+#endif
         //first read
         delay_ticks(100 * REM_16MT_USEC);
     #ifdef REM_16MT_USE_TIMESTAMP
@@ -144,13 +146,13 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
     case REM_14_SENSOR:
         velocity_loop = position_feedback_config.rem_14_config.velocity_loop * REM_14_USEC; //velocity loop time in clock ticks
         position_feedback_config.offset &= (position_feedback_config.resolution-1);
+#ifdef DEBUG_POSITION_FEEDBACK
         if (initRotarySensor(*spi_ports,  position_feedback_config) != SUCCESS_WRITING) {
             printstrln("Error with SPI REM_14 sensor");
-            position_feedback_config.sensor_type = 0;
-            return;
         }
         printstr(start_message);
         printstrln("REM_14");
+#endif
         pos_state.last_position = readRotarySensorAngleWithoutCompensation(*spi_ports);
         t :> last_read;
         break;
@@ -158,7 +160,9 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
         //check if resolution is a power of 2
         if ( position_feedback_config.resolution & (position_feedback_config.resolution -1) )
         {
+#ifdef DEBUG_POSITION_FEEDBACK
             printstrln("BISS service: Wrong resolution");
+#endif
             position_feedback_config.sensor_type = 0;
             return;
         }
@@ -176,6 +180,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
             init_status = read_biss_sensor_data(*biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
             t :> last_read;
         } while (init_status != NoError && !timeafter(last_read, time + 1000000*BISS_USEC));
+#ifdef DEBUG_POSITION_FEEDBACK
         if (init_status == CRCError)
             printstrln("biss_service: ERROR: CRC");
         else if (init_status == NoStartBit)
@@ -184,10 +189,10 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
             printstrln("biss_service: ERROR: No Ack bit");
         else if (init_status != NoError)
             printstrln("biss_service: ERROR: initialization");
-        { void , pos_state.last_position, void } = biss_encoder(data, position_feedback_config.biss_config);
-
         printstr(start_message);
         printstrln("BISS");
+#endif
+        { void , pos_state.last_position, void } = biss_encoder(data, position_feedback_config.biss_config);
         break;
     }
 
@@ -213,6 +218,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
                 read_position(spi_ports, biss_ports, position_feedback_config, pos_state);
                 t :> last_read;
                 angle = pos_state.angle;
+                *gpio_ports[0] :> angle;
                 break;
 
         //send multiturn count and position
@@ -390,6 +396,16 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
                 loop_flag = 0;
                 continue;
 
+        //gpio read
+        case i_position_feedback[int i].gpio_read(int gpio_number) -> int out_value:
+                out_value = gpio_read(gpio_ports, position_feedback_config, gpio_number);
+                break;
+
+        //gpio_write
+        case i_position_feedback[int i].gpio_write(int gpio_number, int in_value):
+                gpio_write(gpio_ports, position_feedback_config, gpio_number, in_value);
+                break;
+
         //compute velocity
         case t when timerafter(next_velocity_read) :> next_velocity_read:
             next_velocity_read += velocity_loop;
@@ -474,6 +490,9 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, Positio
                     i_shared_memory.write_velocity_position(velocity, pos_state.count);
                 }
             }
+
+            //gpio
+            gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
 
             //to prevent blocking
             t :> end_time;

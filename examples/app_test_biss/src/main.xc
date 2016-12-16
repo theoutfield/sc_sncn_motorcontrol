@@ -123,7 +123,7 @@ int main() {
                 position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
                 position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
 
-                position_feedback_service(null, qei_ports, spi_ports,
+                position_feedback_service(null, qei_ports, spi_ports, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

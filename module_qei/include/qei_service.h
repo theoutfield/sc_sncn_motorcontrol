@@ -18,7 +18,7 @@
  * @param qei_config Configuration for the service.
  * @param i_qei Array of communication interfaces to handle up to 5 different clients.
  */
-void qei_service(QEIPorts &qei_ports, PositionFeedbackConfig &position_feedback_config,
+void qei_service(QEIPorts &qei_ports, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
                  client interface shared_memory_interface ?i_shared_memory,
                  server interface PositionFeedbackInterface i_position_feedback[3]);
 

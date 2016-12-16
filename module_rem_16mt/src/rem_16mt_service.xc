@@ -28,16 +28,16 @@ static inline void slave_deselect(out port spi_ss)
 void init_spi_ports(SPIPorts &spi_ports)
 {
     spi_master_init(spi_ports.spi_interface, DEFAULT_SPI_CLOCK_DIV);
-    slave_deselect(spi_ports.slave_select); // Ensure slave select is in correct start state
+    slave_deselect(*spi_ports.slave_select); // Ensure slave select is in correct start state
 }
 
 void reset_spi_ports(SPIPorts &spi_ports)
 {
     set_clock_on(spi_ports.spi_interface.blk2);
     set_clock_on(spi_ports.spi_interface.blk1);
-    set_port_use_on(spi_ports.spi_interface.mosi);
-    set_port_use_on(spi_ports.spi_interface.miso);
-    set_port_use_on(spi_ports.spi_interface.sclk);
+    set_port_use_on(*spi_ports.spi_interface.mosi);
+    set_port_use_on(*spi_ports.spi_interface.miso);
+    set_port_use_on(*spi_ports.spi_interface.sclk);
 }
 
 #ifdef REM_16MT_USE_TIMESTAMP
@@ -70,8 +70,8 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 
     do {
         t when timerafter(last_read + 40*REM_16MT_USEC) :> void;
-        configure_out_port(spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1); //set mosi to 1
-        slave_select(spi_ports.slave_select);
+        configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1); //set mosi to 1
+        slave_select(*spi_ports.slave_select);
         delay_ticks(10*REM_16MT_USEC); //wait for the data buffer to fill
         count = spi_master_in_short(spi_ports.spi_interface);
         singleturn_filtered = spi_master_in_short(spi_ports.spi_interface);
@@ -79,7 +79,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 #ifdef REM_16MT_USE_TIMESTAMP
         timestamp = spi_master_in_byte(spi_ports.spi_interface);
         checksum = spi_master_in_byte(spi_ports.spi_interface);
-        slave_deselect(spi_ports.slave_select);
+        slave_deselect(*spi_ports.slave_select);
         t :> last_read;
         computed_checksum = checksum_compute(count, singleturn_filtered, singleturn_raw, timestamp);
 #else
@@ -108,8 +108,8 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 
 void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits)
 {
-    configure_out_port(spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
-    slave_select(spi_ports.slave_select);
+    configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
+    slave_select(*spi_ports.slave_select);
     delay_ticks(100*REM_16MT_USEC);
     spi_master_out_byte(spi_ports.spi_interface, opcode);
     if (data_bits == 8) {
@@ -119,8 +119,8 @@ void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits)
     } else if (data_bits == 32) {
         spi_master_out_word(spi_ports.spi_interface, data);
     }
-    configure_out_port(spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
-    slave_deselect(spi_ports.slave_select);
+    configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
+    slave_deselect(*spi_ports.slave_select);
     delay_ticks(200020*REM_16MT_USEC);
 
 }
@@ -201,8 +201,10 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
         }
     }
 
+#ifdef DEBUG_POSITION_FEEDBACK
     printstr(start_message);
     printstrln("REM_16MT");
+#endif
 
     //init variables
     //velocity
@@ -383,6 +385,13 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
                 reset_spi_ports(spi_ports);
                 loop_flag = 0;
                 continue;
+
+        //gpio read
+        case i_position_feedback[int i].gpio_read(int gpio_number) -> int out_value:
+                break;
+        //gpio_write
+        case i_position_feedback[int i].gpio_write(int gpio_number, int in_value):
+                break;
 
         //compute velocity
         case t when timerafter(next_velocity_read) :> start_time:

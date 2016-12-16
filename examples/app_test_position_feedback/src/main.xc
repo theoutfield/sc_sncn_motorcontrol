@@ -109,8 +109,12 @@ void commands_test(client interface PositionFeedbackInterface i_position_feedbac
 }
 
 HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
+port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
+port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
+port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 int main(void)
 {
@@ -180,7 +184,7 @@ int main(void)
                 position_feedback_config.sensor_type = HALL_SENSOR;
                 position_feedback_config_2.sensor_type = BISS_SENSOR;
 
-                position_feedback_service(hall_ports, qei_ports, spi_ports,
+                position_feedback_service(hall_ports, qei_ports, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         position_feedback_config_2, null, i_position_feedback_2);
             }

@@ -66,7 +66,7 @@ int main(void)
                 position_feedback_config.pole_pairs  = 2;
                 position_feedback_config.enable_push_service = PushAll;
 
-                position_feedback_service(hall_ports, null, null,
+                position_feedback_service(hall_ports, null, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

@@ -29,7 +29,7 @@ static inline void slave_deselect(out port spi_ss)
 void initspi_ports(SPIPorts &spi_ports)
 {
     spi_master_init(spi_ports.spi_interface, DEFAULT_SPI_CLOCK_DIV);
-    slave_deselect(spi_ports.slave_select); // Ensure slave select is in correct start state
+    slave_deselect(*spi_ports.slave_select); // Ensure slave select is in correct start state
 }
 
 {unsigned short, unsigned short} transform_settings(PositionFeedbackConfig &config)
@@ -132,18 +132,18 @@ short SPIReadTransaction(SPIPorts &spi_ports, unsigned short reg) {
     reg |= READ_MASK;                           //read command
     reg = addEvenParity(reg);                   //parity
 
-    slave_select(spi_ports.slave_select);                   //start transaction
+    slave_select(*spi_ports.slave_select);                   //start transaction
 
     spi_master_out_short(spi_ports.spi_interface, reg);     //send command
-    spi_ports.spi_interface.mosi <: 0;
+    *spi_ports.spi_interface.mosi <: 0;
 
-    slave_deselect(spi_ports.slave_select);                 //pause for
+    slave_deselect(*spi_ports.slave_select);                 //pause for
     delay_ticks(REM_14_SENSOR_EXECUTING_TIME);                 //executing the command
-    slave_select(spi_ports.slave_select);                   //on the sensor
+    slave_select(*spi_ports.slave_select);                   //on the sensor
 
     data_in = spi_master_in_short(spi_ports.spi_interface); //handle response
 
-    slave_deselect(spi_ports.slave_select);                 //end transaction
+    slave_deselect(*spi_ports.slave_select);                 //end transaction
 
     return data_in;
 }
@@ -157,26 +157,26 @@ short SPIWriteTransaction(SPIPorts &spi_ports, unsigned short reg, unsigned shor
     data &= WRITE_MASK;                         //action
     data = addEvenParity(data);                 //parity
 
-    slave_select(spi_ports.slave_select);                   //start transaction
+    slave_select(*spi_ports.slave_select);                   //start transaction
 
     spi_master_out_short(spi_ports.spi_interface, reg);     //send command
 
-    slave_deselect(spi_ports.slave_select);                 //pause for
+    slave_deselect(*spi_ports.slave_select);                 //pause for
     delay_ticks(REM_14_SENSOR_EXECUTING_TIME);                 //executing the command
-    slave_select(spi_ports.slave_select);                   //on the sensor
+    slave_select(*spi_ports.slave_select);                   //on the sensor
 
     spi_master_out_short(spi_ports.spi_interface, data);
-    spi_ports.spi_interface.mosi <: 0;
+    *spi_ports.spi_interface.mosi <: 0;
 
-    slave_deselect(spi_ports.slave_select);                 //pause for
+    slave_deselect(*spi_ports.slave_select);                 //pause for
     delay_ticks(REM_14_SENSOR_SAVING_TIME);                    //saving the data
-    slave_select(spi_ports.slave_select);                   //on the reg
+    slave_select(*spi_ports.slave_select);                   //on the reg
 
     data_in = spi_master_in_short(spi_ports.spi_interface); //handle response
    // printhex(data_in);
    // printstrln("");
 
-    slave_deselect(spi_ports.slave_select);                 //end transaction
+    slave_deselect(*spi_ports.slave_select);                 //end transaction
 
     return data_in;
 }
@@ -501,8 +501,10 @@ void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedba
         return;
     }
 
+#ifdef DEBUG_POSITION_FEEDBACK
     printstr(start_message);
     printstrln("REM_14");
+#endif
 
     //init variables
     //velocity
@@ -631,6 +633,12 @@ void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedba
 
         //execute command
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
+                break;
+        //gpio read
+        case i_position_feedback[int i].gpio_read(int gpio_number) -> int out_value:
+                break;
+        //gpio_write
+        case i_position_feedback[int i].gpio_write(int gpio_number, int in_value):
                 break;
 
         case i_position_feedback[int i].exit():

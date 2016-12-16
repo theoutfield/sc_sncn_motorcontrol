@@ -14,6 +14,10 @@
 
 
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
+port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
+port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
+port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 /* Test REM_14 Sensor Client */
 void rem_14_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
@@ -92,7 +96,7 @@ int main(void)
                 position_feedback_config.rem_14_config.cache_time = REM_14_CACHE_TIME;
                 position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
-                position_feedback_service(null, null, spi_ports,
+                position_feedback_service(null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

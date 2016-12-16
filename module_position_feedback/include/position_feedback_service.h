@@ -19,6 +19,21 @@
 
 #include <stdint.h>
 
+#define NUMBER_OF_GPIO_PORTS   4    /**< Defines number of Digital IOs available. */
+
+typedef enum {
+    GPIO_INPUT=0,
+    GPIO_INPUT_PULLDOWN=1,
+    GPIO_OUTPUT=2
+} GPIOType;
+
+typedef struct {
+    GPIOType port_0;
+    GPIOType port_1;
+    GPIOType port_2;
+    GPIOType port_3;
+} GPIOConfig;
+
 typedef struct {
     int sensor_type;
     int polarity;   /**< Encoder polarity. >*/
@@ -30,6 +45,7 @@ typedef struct {
     REM_16MTConfig rem_16mt_config;
     REM_14Config rem_14_config;
     QEIConfig qei_config;
+    GPIOType gpio_config[4];
 } PositionFeedbackConfig;
 
 
@@ -74,12 +90,16 @@ interface PositionFeedbackInterface
 
     unsigned int send_command(int opcode, int data, int data_bits);
 
+    int gpio_read(int gpio_num);
+
+    void gpio_write(int gpio_num, int in_value);
+
     void exit();
 };
 
 typedef struct {
     spi_master_interface spi_interface;
-    port ?slave_select;
+    port * movable slave_select;
 } SPIPorts;
 
 typedef struct {
@@ -91,7 +111,6 @@ typedef struct {
     port ?p_hall;        /**< Port for Hall signals. */
 } HallPorts;
 
-
 #include <memory_manager.h>
 #include <biss_service.h>
 #include <rem_16mt_service.h>
@@ -100,14 +119,21 @@ typedef struct {
 #include <qei_service.h>
 
 
-void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPIPorts &?spi_ports,
-                               PositionFeedbackConfig &?position_feedback_config_1,
+void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
+                               PositionFeedbackConfig &position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
-                               server interface PositionFeedbackInterface (&?i_position_feedback_1)[3],
+                               server interface PositionFeedbackInterface i_position_feedback_1[3],
                                PositionFeedbackConfig &?position_feedback_config_2,
                                client interface shared_memory_interface ?i_shared_memory_2,
                                server interface PositionFeedbackInterface (&?i_position_feedback_2)[3]);
 
 int tickstobits(uint32_t ticks);
+
+int gpio_read(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number);
+
+void gpio_write(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number, int value);
+
+void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory);
+
 
 #endif

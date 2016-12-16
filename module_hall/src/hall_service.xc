@@ -35,7 +35,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
         count += difference;
 }
 
-void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedback_config,
+void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
         client interface shared_memory_interface ?i_shared_memory,
                 server interface PositionFeedbackInterface i_position_feedback[3])
 {
@@ -44,6 +44,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 
+#ifdef DEBUG_POSITION_FEEDBACK
     if (check_hall_config(position_feedback_config) == ERROR) {
         printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
         position_feedback_config.sensor_type = 0;
@@ -52,6 +53,7 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
 
     printstr(start_message);
     printstrln("HALL");
+#endif
 
     timer tx;
     unsigned int time1=0;
@@ -213,6 +215,16 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
         case i_position_feedback[int i].exit():
                 loop_flag = 0;
                 continue;
+
+        //gpio read
+        case i_position_feedback[int i].gpio_read(int gpio_number) -> int out_value:
+                out_value = gpio_read(gpio_ports, position_feedback_config, gpio_number);
+                break;
+
+        //gpio_write
+        case i_position_feedback[int i].gpio_write(int gpio_number, int in_value):
+                gpio_write(gpio_ports, position_feedback_config, gpio_number, in_value);
+                break;
 
         case tx when timerafter(time1+(HALL_USEC*10)) :> void: //10 usec
 
@@ -461,6 +473,9 @@ void hall_service(HallPorts &hall_ports, PositionFeedbackConfig &position_feedba
                         i_shared_memory.write_velocity_position(speed_out, count);
                     }
                 }
+
+                //gpio
+                gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
 
 
                 tx :> time1;
