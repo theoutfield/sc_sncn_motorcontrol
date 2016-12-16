@@ -141,6 +141,18 @@ typedef struct {
 
 } MotorcontrolConfig;
 
+/**
+ * @brief Structure type for the shared memory data
+ */
+typedef struct {
+    unsigned int angle;
+    int position;
+    unsigned position_singleturn;
+    int velocity;
+    int hall_state;
+    unsigned int gpio[4];
+} SharedMemoryData;
+
 
 /**
  * @brief Structure type to send the data from lower controlling levels

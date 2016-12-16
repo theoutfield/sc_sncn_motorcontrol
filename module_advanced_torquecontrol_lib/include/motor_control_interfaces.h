@@ -307,6 +307,29 @@ interface shared_memory_interface
     */
     void write_velocity_position(int in_velocity, int in_count);
 
+    /**
+    * @brief Getter for shared memory data.
+    *
+    * @return  shared memory data.
+    */
+    SharedMemoryData read();
+
+    /**
+     * @brief Write write gpio input data to shared memory, return the gpio output data.
+     *
+     * @param  gpio input data.
+     *
+     * @return  gpio output data.
+     */
+    unsigned int gpio_write_input_read_output(unsigned int in_gpio);
+
+    /**
+     * @brief Write write gpio output data to shared memory.
+     *
+     * @param  gpio output data.
+     */
+    void write_gpio_output(unsigned int out_gpio);
+
 };
 
 interface update_pwm
