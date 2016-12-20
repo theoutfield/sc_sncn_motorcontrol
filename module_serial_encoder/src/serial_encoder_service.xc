@@ -218,7 +218,6 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * 
                 read_position(spi_ports, biss_ports, position_feedback_config, pos_state);
                 t :> last_read;
                 angle = pos_state.angle;
-                *gpio_ports[0] :> angle;
                 break;
 
         //send multiturn count and position

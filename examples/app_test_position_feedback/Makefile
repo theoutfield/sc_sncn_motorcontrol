@@ -13,14 +13,14 @@ TARGET =
 APP_NAME = app_test_position_feedback
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_advanced_torquecontrol_lib module_rem_14 module_biss module_board-support module_rem_16mt module_serial_encoder module_hall module_memory_manager module_misc module_position_feedback module_qei module_spi_master
+USED_MODULES = config_motor module_advanced_torquecontrol_lib module_biss module_board-support module_hall module_memory_manager module_misc module_position_feedback module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O3 -report
+XCC_FLAGS_Debug = -g -O3 -report -DDEBUG_POSITION_FEEDBACK
 XCC_FLAGS_Release = -g -O3
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.

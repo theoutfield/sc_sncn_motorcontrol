@@ -29,7 +29,7 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
 
     //proper task startup
     t :> ts;
-    t when timerafter (ts + (2000*20*250)) :> void;
+    t when timerafter (ts + (2000*20*250)) :> ts;
 
     //main loop
     int loop_flag = 1;

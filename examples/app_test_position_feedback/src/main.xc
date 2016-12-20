@@ -42,13 +42,15 @@ void position_feedback_test(client interface PositionFeedbackInterface i_positio
 
         if (!isnull(i_shared_memory)) {
             { angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
+            SharedMemoryData data = i_shared_memory.read();
+            unsigned int gpio_out = 0b1010;
+            i_shared_memory.write_gpio_output(gpio_out);
+            xscope_int(GPIO_0, 1000 * data.gpio[0]);
         }
 
-//        printintln(position);
-
-        xscope_int(COUNT, count);
-        xscope_int(VELOCITY, velocity);
-        xscope_int(ANGLE, angle);
+        xscope_int(COUNT_1, count);
+        xscope_int(VELOCITY_1, velocity);
+        xscope_int(ANGLE_1, angle);
         xscope_int(COUNT_2, count_2);
         xscope_int(VELOCITY_2, velocity_2);
         xscope_int(ANGLE_2, angle_2);
@@ -131,7 +133,7 @@ int main(void)
          * IFM TILE
          ***************************************************/
         on tile[IFM_TILE]: par {
-            position_feedback_test(i_position_feedback[0], i_position_feedback_2[0], null);
+            position_feedback_test(i_position_feedback[0], i_position_feedback_2[0], i_shared_memory[1]);
 
             /* Shared memory Service */
             [[distribute]] memory_manager(i_shared_memory, 3);
@@ -142,7 +144,6 @@ int main(void)
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.polarity    = 1;
                 position_feedback_config.pole_pairs  = 2;
-                position_feedback_config.resolution  = 8192;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
@@ -176,13 +177,20 @@ int main(void)
                 position_feedback_config.rem_14_config.cache_time = REM_14_CACHE_TIME;
                 position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
+                position_feedback_config.gpio_config[0] = GPIO_INPUT_PULLDOWN;
+                position_feedback_config.gpio_config[1] = GPIO_OUTPUT;
+                position_feedback_config.gpio_config[2] = GPIO_OUTPUT;
+                position_feedback_config.gpio_config[3] = GPIO_OUTPUT;
+
                 //set sensor 2 parameters
                 PositionFeedbackConfig position_feedback_config_2;
                 position_feedback_config_2 = position_feedback_config;
 
                 //set sensor types for 1 and 2
+                position_feedback_config.resolution  = 4096;
                 position_feedback_config.sensor_type = HALL_SENSOR;
-                position_feedback_config_2.sensor_type = BISS_SENSOR;
+                position_feedback_config_2.resolution  = 4000;
+                position_feedback_config_2.sensor_type = QEI_SENSOR;
 
                 position_feedback_service(hall_ports, qei_ports, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
