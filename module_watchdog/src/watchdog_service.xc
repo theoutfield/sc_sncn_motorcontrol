@@ -137,6 +137,14 @@
                         case DC100_DC300:
                             p_ifm_wdtick ^= 1;//toggle wd tick
                             watchdog_ports.p_tick <: p_ifm_wdtick;
+
+                            //Reset WD after fault
+                            if (WD_En_sent_flag<20)
+                            {
+                                led_motor_on_wdtick_wden_buffer ^= 1;//toggle WD Enable pin
+                                watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                                WD_En_sent_flag++;
+                            }
                             break;
                         case DC500:
                             cpld_out_state ^= (1 << 1); //toggle wd tick
