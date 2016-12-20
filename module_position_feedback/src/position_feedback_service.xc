@@ -285,6 +285,7 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
                 }
             }
         }
+        int move_gpio_check = 1;
         //check sensor 2
         if (!isnull(position_feedback_config_2)) {
             //set biss clock if needed
@@ -302,7 +303,7 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
                 hall_ports_2 = move(hall_ports_1);
             if (qei_ports_1 != null && position_feedback_config_1.sensor_type != BISS_SENSOR && position_feedback_config_1.sensor_type != QEI_SENSOR)
                 qei_ports_2 = move(qei_ports_1);
-            if (spi_ports_1 != null && position_feedback_config_1.sensor_type != REM_16MT_SENSOR &&  position_feedback_config_1.sensor_type != REM_14_SENSOR)
+            if (spi_ports_1 != null && position_feedback_config_1.sensor_type != REM_16MT_SENSOR && position_feedback_config_1.sensor_type != REM_14_SENSOR)
                 spi_ports_2 = move(spi_ports_1);
             //check ports
             check_ports(hall_ports_2, qei_ports_2, spi_ports_2, position_feedback_config_2);
@@ -311,12 +312,14 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
             if (position_feedback_config_2.sensor_type == BISS_SENSOR) {
                 set_clock_biss(qei_ports_2, spi_ports_2, position_feedback_config_2);
             }
+
+            if (position_feedback_config_2.sensor_type == REM_16MT_SENSOR || position_feedback_config_2.sensor_type == REM_14_SENSOR) {
+                move_gpio_check = 0;
+            }
         }
 
         //move gpio ports if no sensor is using spi
-        if (position_feedback_config_1.sensor_type != REM_16MT_SENSOR && position_feedback_config_1.sensor_type != REM_14_SENSOR &&
-                position_feedback_config_2.sensor_type != REM_16MT_SENSOR && position_feedback_config_2.sensor_type != REM_14_SENSOR &&
-                gpio_ports_check)
+        if (position_feedback_config_1.sensor_type != REM_16MT_SENSOR && position_feedback_config_1.sensor_type != REM_14_SENSOR && gpio_ports_check && move_gpio_check)
         {
             if (spi_ports_2 != null) {
                 gpio_ports[0] = reconfigure_port(move((*spi_ports_2).slave_select), port);
