@@ -149,6 +149,8 @@ int readAngleValue(SPIPorts &spi_ports){
 
     unsigned short data_in = 0;
 
+    delay_microseconds(20);
+
     if (checkWOWBit(spi_ports) == 0x0)
     {
 
@@ -215,7 +217,6 @@ int porCellDeactivate(SPIPorts &spi_ports){
 int initas5050a(SPIPorts &spi_ports){
 
     initspiPorts(spi_ports);
-   // delay_milliseconds(2);
 
     delay_microseconds(600);
     return 0;
