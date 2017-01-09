@@ -10,6 +10,7 @@
 #include <biss_config.h>
 #include <rem_16mt_config.h>
 #include <rem_14_config.h>
+#include <rem_10_struct.h>
 
 #include <biss_struct.h>
 #include <rem_16mt_struct.h>
@@ -30,6 +31,7 @@ typedef struct {
     REM_16MTConfig rem_16mt_config;
     REM_14Config rem_14_config;
     QEIConfig qei_config;
+    AS5050A_Config as5050a_config;
 } PositionFeedbackConfig;
 
 
@@ -96,6 +98,7 @@ typedef struct {
 #include <biss_service.h>
 #include <rem_16mt_service.h>
 #include <rem_14_service.h>
+#include <rem_10_service.h>
 #include <hall_service.h>
 #include <qei_service.h>
 

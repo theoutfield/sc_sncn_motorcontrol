@@ -6,7 +6,7 @@
  */
 
 #include <xs1.h>
-#include <as5050a.h>
+#include <rem_10_service.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -19,7 +19,7 @@ extern char start_message[];
 //int check_pin;
 
 //FixMe extend config structure
-//#define CONFIG_EXTENDED
+#define CONFIG_EXTENDED
 
 static inline void slave_select(out port spi_ss)
 {
@@ -71,7 +71,7 @@ unsigned char check_EvenParity(unsigned short bitStream){
 short ReadTransactionSPI(SPIPorts &spi_ports, unsigned short reg) {
     unsigned short data_in = 0;
 
-    reg |= READ_MASK;                           //read command
+    reg |= READ_MASK_rem_10;                           //read command
     reg = reg <<1;
     reg = add_EvenParity(reg);                   //parity
 
@@ -95,11 +95,11 @@ short ReadTransactionSPI(SPIPorts &spi_ports, unsigned short reg) {
 short WriteTransactionSPI(SPIPorts &spi_ports, unsigned short reg, unsigned short data) {
     unsigned short data_in = 0;
 
-    reg &= WRITE_MASK;                          //action
+    reg &= WRITE_MASK_rem_10;                          //action
     reg = reg << 1;
     reg = add_EvenParity(reg);                   //parity
 
-  //  data &= WRITE_MASK;                         //action
+  //  data &= WRITE_MASK_rem_10;                         //action
     data = data << 1;
     data = add_EvenParity(data);                 //parity
 
@@ -137,7 +137,7 @@ int checkWOWBit(SPIPorts &spi_ports){
 
     if(check_EvenParity(data_in)){            //check right parity
 
-        return ((data_in & BITS_1_MASK) >> 6);         //get WOW bit
+        return ((data_in & BITS_1_MASK_rem_10) >> 6);         //get WOW bit
 
     }else{
 
@@ -163,7 +163,7 @@ int readAngleValue(SPIPorts &spi_ports){
     }
     if(check_EvenParity(data_in)){                     //check right parity
 
-        return ((data_in & BITS_10_MASK ) >> 2);        //remove unused bits
+        return ((data_in & BITS_10_MASK_rem_10 ) >> 2);        //remove unused bits
       //  return (data_in & BITS_10_MASK);            //remove unused bits
 
     }else{
@@ -183,7 +183,7 @@ int readAutomaticGainControl(SPIPorts &spi_ports){
     if(check_EvenParity(data_in)){                     //check right parity
 
      //   printstrln("correct parity");
-        return ((data_in & BITS_6_MASK ) >> 2);        //remove unused bits
+        return ((data_in & BITS_6_MASK_rem_10 ) >> 2);        //remove unused bits
 
     }else{
 
@@ -197,12 +197,12 @@ int porCellDeactivate(SPIPorts &spi_ports){
     unsigned short data_in = 0;
 
     unsigned short data = 0x5A;
-    data &= BITS_8_MASK;
+    data &= BITS_8_MASK_rem_10;
     data_in = WriteTransactionSPI(spi_ports, ADDR_PorOFF, data);
 
     if(check_EvenParity(data_in)){            //check right parity
 
-        if((data_in & BITS_8_MASK) == data){
+        if((data_in & BITS_8_MASK_rem_10) == data){
 
             return SUCCESS_WRITING;
         }else{
@@ -258,11 +258,13 @@ void as5050a_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedb
     int old_difference = 0;
     int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
 
-    int velocity_loop = 0;
+
 #ifdef CONFIG_EXTENDED
     int velocity_loop = position_feedback_config.as5050a_config.velocity_loop * as5050a_USEC; //velocity loop time in clock ticks
 
-    int velocity_factor = 60000000/position_feedback_config.as5050a_Config.velocity_loop;
+    int velocity_factor = 60000000/position_feedback_config.as5050a_config.velocity_loop;
+#else
+    int velocity_loop = 0;
 #endif
     //position
     unsigned int last_position = 0;
