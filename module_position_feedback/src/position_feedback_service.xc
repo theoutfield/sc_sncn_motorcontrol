@@ -297,14 +297,18 @@ void position_feedback_service(HallPorts &?hall_ports, QEIPorts &?qei_ports, SPI
                     position_feedback_config_2.sensor_type = 0;
                 }
             }
+        }
 
-            //move unused ports to sensor 2
-            if (hall_ports_1 != null && position_feedback_config_1.sensor_type != HALL_SENSOR)
-                hall_ports_2 = move(hall_ports_1);
-            if (qei_ports_1 != null && position_feedback_config_1.sensor_type != BISS_SENSOR && position_feedback_config_1.sensor_type != QEI_SENSOR)
-                qei_ports_2 = move(qei_ports_1);
-            if (spi_ports_1 != null && position_feedback_config_1.sensor_type != REM_16MT_SENSOR && position_feedback_config_1.sensor_type != REM_14_SENSOR)
-                spi_ports_2 = move(spi_ports_1);
+        //move unused ports to sensor 2
+        if (hall_ports_1 != null && position_feedback_config_1.sensor_type != HALL_SENSOR)
+            hall_ports_2 = move(hall_ports_1);
+        if (qei_ports_1 != null && position_feedback_config_1.sensor_type != BISS_SENSOR && position_feedback_config_1.sensor_type != QEI_SENSOR)
+            qei_ports_2 = move(qei_ports_1);
+        if (spi_ports_1 != null && position_feedback_config_1.sensor_type != REM_16MT_SENSOR && position_feedback_config_1.sensor_type != REM_14_SENSOR)
+            spi_ports_2 = move(spi_ports_1);
+
+        //check sensor 2
+        if (!isnull(position_feedback_config_2)) {
             //check ports
             check_ports(hall_ports_2, qei_ports_2, spi_ports_2, position_feedback_config_2);
 
