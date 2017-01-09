@@ -6,7 +6,7 @@
 
 in port P8C = on tile[IFM_TILE]: XS1_PORT_8C;
 
-int a = 0,b = 0,c = 0,d = 0,e = 0,f = 0,g = 0,h = 0;
+//int a = 0,b = 0,c = 0,d = 0,e = 0,f = 0,g = 0,h = 0;
 int data = 0;
 inline static void delay_ten_nanosecond(timer t, int delay)
 {
