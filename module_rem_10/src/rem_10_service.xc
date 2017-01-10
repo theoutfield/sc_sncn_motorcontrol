@@ -310,7 +310,7 @@ void as5050a_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedb
                     last_position = angle;
                // } else
               //  angle = last_position;
-               // angle = (position_feedback_config.pole_pairs * (angle << 2) ) & 4095;
+                angle = (position_feedback_config.pole_pairs * (angle << 2) ) & 4095;
                 break;
 
         //send multiturn count and position

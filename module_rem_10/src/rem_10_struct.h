@@ -9,11 +9,13 @@
 #ifndef REM_10_STRUCT_H_
 #define REM_10_STRUCT_H_
 
+#define REM_10_VELOCITY_LOOP   30
+
 #define IFM_TILE_USEC   USEC_STD // Number of ticks in a microsecond for IFM Tile
 
 #define as5050a_USEC            IFM_TILE_USEC
 
-#define REM_14_SENSOR      5
+#define REM_10_SENSOR      7
 
 #define ERROR       0
 #define SUCCESS     1
