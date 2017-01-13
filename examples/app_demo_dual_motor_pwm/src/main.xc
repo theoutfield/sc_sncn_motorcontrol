@@ -54,7 +54,13 @@ void send_pwm_values(client interface update_pwm_general i_update_pwm)
         {
         case t when timerafter(time) :> void:
 
-             i_update_pwm.update_server_control_data(
+            pwm_value_a &= 0x0000FFFF;
+            pwm_value_b &= 0x0000FFFF;
+            pwm_value_c &= 0x0000FFFF;
+            pwm_value_u &= 0x0000FFFF;
+            pwm_value_v &= 0x0000FFFF;
+            pwm_value_w &= 0x0000FFFF;
+            i_update_pwm.update_server_control_data(
                     /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
                     /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
                     /*received_pwm_on (not activated)*/0, /*recieved_safe_torque_off_mode  (not activated)*/0);
@@ -72,12 +78,12 @@ void send_pwm_values(client interface update_pwm_general i_update_pwm)
                  pwm_delta = 1;
              }
 
-             pwm_value_a = pwm_value & 0x0000FFFF;
-             pwm_value_b = pwm_value & 0x0000FFFF;
-             pwm_value_c = pwm_value & 0x0000FFFF;
-             pwm_value_u = pwm_value & 0x0000FFFF;
-             pwm_value_v = pwm_value & 0x0000FFFF;
-             pwm_value_w = pwm_value & 0x0000FFFF;
+             pwm_value_a = pwm_value;
+             pwm_value_b = pwm_value;
+             pwm_value_c = pwm_value;
+             pwm_value_u = pwm_value;
+             pwm_value_v = pwm_value;
+             pwm_value_w = pwm_value;
 
              time     += period;
             break;
