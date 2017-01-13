@@ -350,7 +350,7 @@ interface update_pwm_general
      */
     int status(void);
 
-    unsigned int update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int pwm_u, int pwm_v, int pwm_w, int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode);
+    void update_server_control_data(unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c, unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w, int received_pwm_on, int recieved_safe_torque_off_mode);
     void safe_torque_off_enabled();
 };
 
