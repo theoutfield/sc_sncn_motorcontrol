@@ -146,7 +146,7 @@ void pwm_config(PwmPorts &ports)
 void pwm_config_general(PwmPortsGeneral &ports)
 {
     // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz) -> in our application it is 250 MHz
-    //configure_clock_rate( ports.clk ,PLATFORM_REFERENCE_MHZ ,1 );
+    configure_clock_rate( ports.clk ,100 ,1 );
 
     do_pwm_port_config_general(ports);
 
@@ -154,38 +154,38 @@ void pwm_config_general(PwmPortsGeneral &ports)
 
     if (!isnull(ports.p_pwm_a))
     {
-        ports.p_pwm_a     <: 0x00000000;
-        ports.p_pwm_inv_a <: 0xFFFFFFFF;
+        ports.p_pwm_a     <: 0;
+        if (!isnull(ports.p_pwm_inv_a))  ports.p_pwm_inv_a <: 1;
     }
 
     if (!isnull(ports.p_pwm_b))
     {
-        ports.p_pwm_b     <: 0x00000000;
-        ports.p_pwm_inv_b <: 0xFFFFFFFF;
+        ports.p_pwm_b     <: 0;
+        if (!isnull(ports.p_pwm_inv_b))  ports.p_pwm_inv_b <: 1;
     }
 
     if (!isnull(ports.p_pwm_c))
     {
-        ports.p_pwm_c     <: 0x00000000;
-        ports.p_pwm_inv_c <: 0xFFFFFFFF;
+        ports.p_pwm_c     <: 0;
+        if (!isnull(ports.p_pwm_inv_c))  ports.p_pwm_inv_c <: 1;
     }
 
     if (!isnull(ports.p_pwm_u))
     {
-        ports.p_pwm_u     <: 0x00000000;
-        ports.p_pwm_inv_u <: 0xFFFFFFFF;
+        ports.p_pwm_u     <: 0;
+        if (!isnull(ports.p_pwm_inv_u))  ports.p_pwm_inv_u <: 1;
     }
 
     if (!isnull(ports.p_pwm_v))
     {
-        ports.p_pwm_v     <: 0x00000000;
-        ports.p_pwm_inv_v <: 0xFFFFFFFF;
+        ports.p_pwm_v     <: 0;
+        if (!isnull(ports.p_pwm_inv_v))  ports.p_pwm_inv_v <: 1;
     }
 
     if (!isnull(ports.p_pwm_w))
     {
-        ports.p_pwm_w     <: 0x00000000;
-        ports.p_pwm_inv_w <: 0xFFFFFFFF;
+        ports.p_pwm_w     <: 0;
+        if (!isnull(ports.p_pwm_inv_w))  ports.p_pwm_inv_w <: 1;
     }
 
 } // foc_pwm_config
