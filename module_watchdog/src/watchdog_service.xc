@@ -163,7 +163,7 @@
                             led_motor_on_wdtick_wden_buffer ^= (1 << 1); //toggle wd tick
                             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                             //Reset WD after fault
-                            if (WD_En_sent_flag<4)
+                            if (WD_En_sent_flag<40)
                             {
                                 if(WD_En_sent_flag % 2 == 0){
                                     led_motor_on_wdtick_wden_buffer ^= 1;//toggle WD Enable pin
