@@ -36,7 +36,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
             count += difference;
 }
 
-void read_position(SPIPorts * spi_ports, QEIPorts * biss_ports, PositionFeedbackConfig &position_feedback_config, PositionState &state)
+void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * biss_clock_port, int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config, PositionState &state)
 {
     state.status = 0;
 
@@ -58,7 +58,7 @@ void read_position(SPIPorts * spi_ports, QEIPorts * biss_ports, PositionFeedback
         break;
     case BISS_SENSOR:
         unsigned int data[BISS_FRAME_BYTES];
-        int error = read_biss_sensor_data(*biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+        int error = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, biss_clock_port, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
         { state.count, state.position, state.status } = biss_encoder(data, position_feedback_config.biss_config);
         state.status = state.status + (error << 2);
         if (position_feedback_config.biss_config.multiturn_resolution == 0)
@@ -82,7 +82,7 @@ void read_position(SPIPorts * spi_ports, QEIPorts * biss_ports, PositionFeedback
 }
 
 
-void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
+void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * (&?gpio_ports)[4], int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
     if (REM_16MT_USEC == USEC_FAST) { //Set freq to 250MHz
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -177,7 +177,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * 
         int init_status;
         do {
             t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
-            init_status = read_biss_sensor_data(*biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+            init_status = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
             t :> last_read;
         } while (init_status != NoError && !timeafter(last_read, time + 1000000*BISS_USEC));
 #ifdef DEBUG_POSITION_FEEDBACK
@@ -215,7 +215,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * 
                     t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
                     break;
                 }
-                read_position(spi_ports, biss_ports, position_feedback_config, pos_state);
+                read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, pos_state);
                 t :> last_read;
                 angle = pos_state.angle;
                 break;
@@ -231,7 +231,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * 
                     t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
                     break;
                 }
-                read_position(spi_ports, biss_ports, position_feedback_config, pos_state);
+                read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, pos_state);
                 t :> last_read;
                 out_count = pos_state.count;
                 position = pos_state.position;
@@ -248,7 +248,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * 
                     t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
                     break;
                 }
-                read_position(spi_ports, biss_ports, position_feedback_config, pos_state);
+                read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, pos_state);
                 t :> last_read;
                 out_count = pos_state.count;
                 position = pos_state.position;
@@ -336,7 +336,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * 
                     break;
                 case BISS_SENSOR:
                     t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
-                    read_position(spi_ports, biss_ports, position_feedback_config, pos_state);
+                    read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, pos_state);
                     break;
                 }
                 t :> last_read;
@@ -418,7 +418,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * 
                 t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
                 break;
             }
-            read_position(spi_ports, biss_ports, position_feedback_config, pos_state);
+            read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, pos_state);
             t :> last_read;
 
             switch(position_feedback_config.sensor_type)

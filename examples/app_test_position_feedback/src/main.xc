@@ -110,8 +110,11 @@ void commands_test(client interface PositionFeedbackInterface i_position_feedbac
     }
 }
 
-HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+//HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+//QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
+QEIHallPort qei_hall_port_2 = {QEI_PORT};
+HallEncSelectPort hall_enc_select_port = {QEI_PORT_INPUT_MODE_SELECTION};
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
@@ -187,12 +190,20 @@ int main(void)
                 position_feedback_config_2 = position_feedback_config;
 
                 //set sensor types for 1 and 2
-                position_feedback_config.resolution  = 4096;
-                position_feedback_config.sensor_type = HALL_SENSOR;
-                position_feedback_config_2.resolution  = 4000;
-                position_feedback_config_2.sensor_type = QEI_SENSOR;
+//                position_feedback_config.resolution  = 4096;
+                position_feedback_config.resolution  = 262144;
+                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D5;
+                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT_2;
+                position_feedback_config.sensor_type = BISS_SENSOR;
+                position_feedback_config_2.resolution  = 8192;
+                position_feedback_config_2.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D2;
+                position_feedback_config_2.biss_config.data_port_config = BISS_DATA_PORT_1;
+                position_feedback_config_2.biss_config.multiturn_resolution = 12;
+                position_feedback_config_2.biss_config.multiturn_length = position_feedback_config_2.biss_config.multiturn_resolution + 1;
+                position_feedback_config_2.biss_config.singleturn_length = 13;
+                position_feedback_config_2.sensor_type = BISS_SENSOR;
 
-                position_feedback_service(hall_ports, qei_ports, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         position_feedback_config_2, null, i_position_feedback_2);
             }

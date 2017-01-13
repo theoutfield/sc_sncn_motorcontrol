@@ -54,7 +54,7 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
         xscope_int(ERROR_BIT, (status&0b10) * 500);         //error bit, should be 0
         xscope_int(WARNING_BIT, (status&0b01) * 1000);      //warning bit, should be 0
         xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
-        xscope_int(TIME_INTERNAL, status);   //time to get the data in microseconds
+        xscope_int(CRC_ERRORS, (status>>2)*1000);   //time to get the data in microseconds
 
         delay_milliseconds(1);
     }
@@ -63,7 +63,9 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+//QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+QEIHallPort qei_hall_port_2 = {QEI_PORT};
+HallEncSelectPort hall_enc_select_port = {QEI_PORT_INPUT_MODE_SELECTION};
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 int main() {
@@ -112,6 +114,8 @@ int main() {
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
+                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D5;
+                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT_2;
                 position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                 position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
@@ -123,7 +127,7 @@ int main() {
                 position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
                 position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
 
-                position_feedback_service(null, qei_ports, spi_ports, null, null, null, null,
+                position_feedback_service(null, qei_hall_port_2, hall_enc_select_port, spi_ports, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

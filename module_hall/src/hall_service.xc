@@ -35,7 +35,7 @@ static inline void multiturn(int &count, int last_position, int position, int ti
         count += difference;
 }
 
-void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
+void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
         client interface shared_memory_interface ?i_shared_memory,
                 server interface PositionFeedbackInterface i_position_feedback[3])
 {
@@ -146,8 +146,8 @@ void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedb
 
     do
     {
-        hall_ports.p_hall :> hall_state_1;
-        hall_ports.p_hall :> hall_state_2;
+        qei_hall_port.p_qei_hall :> hall_state_1;
+        qei_hall_port.p_qei_hall :> hall_state_2;
     } while(hall_state_1 != hall_state_2);
 
     hall_state_new = hall_state_1;
@@ -239,12 +239,13 @@ void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedb
                 if(++hall_period5>HALL_PERIOD_MAX)  hall_period5=HALL_PERIOD_MAX;
 
 
+#if 0
                 switch(hall_stable_states)
                 {
                 case 0:
-                    hall_ports.p_hall :> hall_state_1;
+                    qei_hall_port.p_qei_hall :> hall_state_1;
                     hall_state_1 &= 0x07;
-                    hall_ports.p_hall :> hall_state_2;
+                    qei_hall_port.p_qei_hall :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_1 == hall_state_2)
                         hall_stable_states++;
@@ -252,7 +253,7 @@ void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedb
 
 
                 case 1:
-                    hall_ports.p_hall :> hall_state_2;
+                    qei_hall_port.p_qei_hall :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_2 == hall_state_1)
                         hall_stable_states++;
@@ -262,7 +263,7 @@ void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedb
 
 
                 case 2:
-                    hall_ports.p_hall :> hall_state_2;
+                    qei_hall_port.p_qei_hall :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_2 == hall_state_1)
                         hall_state_new = hall_state_2;
@@ -273,6 +274,7 @@ void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedb
                 default:
                     break;
                 }
+#endif
 
 
                 if(hall_state_new != hall_state_old)

@@ -34,6 +34,18 @@ typedef enum {
     NoStartBit       /**< Start bit not found */
 } BISS_ErrorType;
 
+typedef enum {
+    BISS_CLOCK_PORT_EXT_D2=2,
+    BISS_CLOCK_PORT_EXT_D3=3,
+    BISS_CLOCK_PORT_EXT_D4=0b0100,
+    BISS_CLOCK_PORT_EXT_D5=0b1000
+} BISSClockPortConfig;
+
+typedef enum {
+    BISS_DATA_PORT_1=0,
+    BISS_DATA_PORT_2
+} BISSDataPortConfig;
+
 /**
  * @brief Structure type to define the BiSS Service configuration.
  */
@@ -49,4 +61,6 @@ typedef struct {
     int timeout;                /**< Timeout after a BiSS read in clock ticks */
     int velocity_loop;          /**< Velocity loop time in microseconds */
     int max_ticks;              /**< The count is reset to 0 if greater than this */
+    BISSClockPortConfig clock_port_config; /**< Config of the biss clock port (4 or 1 bit) */
+    BISSDataPortConfig  data_port_config;  /**< Config of the biss data port (4 or 1 bit) */
 } BISSConfig;

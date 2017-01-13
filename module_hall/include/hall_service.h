@@ -19,7 +19,7 @@
  * @param i_shared_memory Client interface to write to the shared memory.
  * @param i_hall Array of communication interfaces to handle up to 3 different clients.
  */
-void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
+void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
                   client interface shared_memory_interface ?i_shared_memory,
                   server interface PositionFeedbackInterface i_position_feedback[3]);
 

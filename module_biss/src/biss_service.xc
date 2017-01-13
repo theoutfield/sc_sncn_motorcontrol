@@ -24,7 +24,7 @@ static inline void update_turns(int &turns, int last_position, int position, int
     }
 }
 
-
+#if 0
 void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
 
@@ -80,7 +80,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
     last_biss_read = time;
     do {
         t when timerafter(last_biss_read + position_feedback_config.biss_config.timeout) :> void;
-        last_count = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+//        last_count = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
         t :> last_biss_read;
     } while (last_count != NoError && !timeafter(last_biss_read, time + 1000000*BISS_USEC));
     if (last_count == CRCError)
@@ -109,7 +109,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                 t :> time;
                 if (timeafter(time, last_biss_read + position_feedback_config.biss_config.timeout)) {
                     int count_internal;
-                    int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+//                    int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
                     t :> last_biss_read;
                     last_count_read = last_biss_read;
                     { count_internal, angle, void } = biss_encoder(data, position_feedback_config.biss_config);
@@ -134,7 +134,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                 t :> time;
                 if (timeafter(time, last_count_read + position_feedback_config.biss_config.timeout)) {
                     t when timerafter(last_biss_read + position_feedback_config.biss_config.timeout) :> void;
-                    int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+//                    int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
                     t :> last_biss_read;
                     last_count_read = last_biss_read;
                     { count_internal, position, void } = biss_encoder(data, position_feedback_config.biss_config);
@@ -170,7 +170,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
         //send count, position and status (error and warning bits) as returned by the encoder (not ajusted)
         case i_position_feedback[int i].get_real_position() -> { int count, unsigned int position, unsigned int status }:
                 t when timerafter(last_biss_read + position_feedback_config.biss_config.timeout) :> void;
-                int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+                int error;// = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 { count, position, status } = biss_encoder(data, position_feedback_config.biss_config);
@@ -219,7 +219,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
         //receive the new count to set and set the offset accordingly
         case i_position_feedback[int i].set_position(int new_count):
                 t when timerafter(last_biss_read + position_feedback_config.biss_config.timeout) :> void;
-                read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+//                read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 int count, position;
@@ -239,7 +239,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
         //receive the new elecrical angle to set and set the offset accordingly
         case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int offset:
                 t when timerafter(last_biss_read + position_feedback_config.biss_config.timeout) :> void;
-                read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+//                read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
                 t :> last_biss_read;
                 last_count_read = last_biss_read;
                 int count, angle;
@@ -274,7 +274,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
             next_velocity_read += velocity_loop;
             int count, position, angle, count_internal, difference;
             t when timerafter(last_biss_read + position_feedback_config.biss_config.timeout) :> void;
-            int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+//            int error = read_biss_sensor_data(biss_ports, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
             t :> last_biss_read;
 //            if (error == 1) {
             last_count_read = last_biss_read;
@@ -353,9 +353,11 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
         }
     }
 }
+#endif
 
 
-unsigned int read_biss_sensor_data(QEIPorts &biss_ports, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes) {
+unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes)
+{
     unsigned int frame[frame_bytes];
     unsigned int crc  =  0;
     unsigned int status = 0;
@@ -369,6 +371,10 @@ unsigned int read_biss_sensor_data(QEIPorts &biss_ports, BISSConfig & biss_confi
         data[i] = 0;
 
     //get the raw data
+    int clock_config = 0;
+    if (biss_config.clock_port_config <= BISS_CLOCK_PORT_EXT_D3) { //clock is output on a gpio port
+        clock_config = 1;
+    }
     for (int i=0; i<timeout+data_length+crc_length; i++) {
         if (bitindex == 32) {
             frame[byteindex] = readbuf;
@@ -377,14 +383,24 @@ unsigned int read_biss_sensor_data(QEIPorts &biss_ports, BISSConfig & biss_confi
             byteindex++;
         }
         unsigned int bit;
-        biss_ports.p_qei_config <: BISS_CLK_PORT_LOW;
-        biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
-        biss_ports.p_qei :> bit;
+        if (clock_config) { //clock is output on a gpio port
+            *biss_clock_port <:0;
+            *biss_clock_port <:1;
+        } else { //clock is output on the hall_enc_select port leftmost 2 bits
+            hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
+            hall_enc_select_port->p_hall_enc_select <: biss_config.clock_port_config | hall_enc_select_config;
+//            hall_enc_select_port->p_hall_enc_select <: 0b0010;
+//            hall_enc_select_port->p_hall_enc_select <: 0b1010;
+        }
+        if (biss_config.data_port_config == BISS_DATA_PORT_2) {
+            qei_hall_port_2->p_qei_hall :> bit;
+        } else {
+            qei_hall_port_1->p_qei_hall :> bit;
+        }
         readbuf = readbuf << 1;
         readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
         bitindex++;
     }
-    biss_ports.p_qei_config <: BISS_CLK_PORT_HIGH;
     readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
     frame[byteindex] = readbuf;
     byteindex = 0;
@@ -445,7 +461,7 @@ unsigned int read_biss_sensor_data(QEIPorts &biss_ports, BISSConfig & biss_confi
     return status;
 }
 
-
+#if 0
 unsigned int read_biss_sensor_data_fast(QEIPorts &biss_ports, int before_length, int data_length) {
     unsigned int data = 0;
     int status = 0;
@@ -483,6 +499,7 @@ unsigned int read_biss_sensor_data_fast(QEIPorts &biss_ports, int before_length,
 
     return data;
 }
+#endif
 
 
 { int, unsigned int, unsigned int } biss_encoder(unsigned int data[], BISSConfig biss_config) {
