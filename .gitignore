@@ -46,3 +46,4 @@ run_xdoc.log
 
 #exclude motorcontrollicence file
 examples/config_motor/advanced_motorcontrol_licence.h
+/target.sh
