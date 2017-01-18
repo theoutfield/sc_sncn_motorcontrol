@@ -239,7 +239,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 if(++hall_period5>HALL_PERIOD_MAX)  hall_period5=HALL_PERIOD_MAX;
 
 
-#if 0
                 switch(hall_stable_states)
                 {
                 case 0:
@@ -274,7 +273,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 default:
                     break;
                 }
-#endif
 
 
                 if(hall_state_new != hall_state_old)
