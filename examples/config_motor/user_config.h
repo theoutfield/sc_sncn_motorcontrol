@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config.h>
+#include <motor_config_AMK_DT3.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -99,7 +99,7 @@
 #define COMMUTATION_FRQ             24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      0
+#define COMMUTATION_OFFSET_CLK      300
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -200,9 +200,9 @@
 
 
 //nonlinear mode
-#define POSITION_Kp                             4000
-#define POSITION_Ki                             120
-#define POSITION_Kd                             16500
+#define POSITION_Kp                             59000
+#define POSITION_Ki                             4800
+#define POSITION_Kd                             248500
 
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
@@ -214,8 +214,8 @@
                                                      //otherwise set as 0
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             1000000
-#define VELOCITY_Ki                             30000
+#define VELOCITY_Kp                             700000
+#define VELOCITY_Ki                             20000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
 
