@@ -20,13 +20,19 @@
  */
 #define _NUMBER_OF_MOTORS 1
 
-/** Define Motor Identifier (0 or 1) */
+/**
+ * Define Motor Identifier (0 or 1)
+ */
 #define _MOTOR_ID 0
 
-/** Define sync. mode for ADC sampling. Default 1 is 'ADC synchronised to PWM' */
+/**
+ * Define sync. mode for ADC sampling. Default 1 is 'ADC synchronised to PWM'
+ */
 #define _LOCK_ADC_TO_PWM 1
 
-/** Type for Port timer values. See also PORT_TIME_MASK */
+/**
+ * Define type for Port timer values. See also PORT_TIME_MASK
+ */
 typedef unsigned short PORT_TIME_TYP;
 
 #endif /* _APP_GLOBAL_H_ */
