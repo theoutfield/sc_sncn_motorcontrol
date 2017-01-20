@@ -49,28 +49,10 @@ void send_pwm_values(client interface update_pwm_general i_update_pwm)
         {
         case t when timerafter(time) :> void:
 
-            pwm_value_a &= 0x0000FFFF;
-            pwm_value_b &= 0x0000FFFF;
-            pwm_value_c &= 0x0000FFFF;
-            pwm_value_u &= 0x0000FFFF;
-            pwm_value_v &= 0x0000FFFF;
-            pwm_value_w &= 0x0000FFFF;
-            i_update_pwm.update_server_control_data(
-                    /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
-                    /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
-                    /*received_pwm_on (not activated)*/0, /*recieved_safe_torque_off_mode  (not activated)*/0);
-
-             pwm_value += pwm_delta;
+             pwm_value ++;
              if(pwm_value>pwm_limit_high)
              {
-                 pwm_value=pwm_limit_high;
-                 pwm_delta = -1;
-             }
-
-             if(pwm_value<pwm_limit_low)
-             {
                  pwm_value=pwm_limit_low;
-                 pwm_delta = 1;
              }
 
              pwm_value_a = pwm_value;
@@ -79,6 +61,18 @@ void send_pwm_values(client interface update_pwm_general i_update_pwm)
              pwm_value_u = pwm_value;
              pwm_value_v = pwm_value;
              pwm_value_w = pwm_value;
+
+
+             pwm_value_a &= 0x0000FFFF;
+             pwm_value_b &= 0x0000FFFF;
+             pwm_value_c &= 0x0000FFFF;
+             pwm_value_u &= 0x0000FFFF;
+             pwm_value_v &= 0x0000FFFF;
+             pwm_value_w &= 0x0000FFFF;
+             i_update_pwm.update_server_control_data(
+                     /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
+                     /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
+                     /*received_pwm_on (not activated)*/0, /*recieved_safe_torque_off_mode  (not activated)*/0);
 
              time     += period;
             break;
