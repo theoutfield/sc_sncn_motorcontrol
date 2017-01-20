@@ -18,7 +18,7 @@ If PWM signals are used to drive an IFM module, the watchdog service should also
 
   `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_pwm>`_
 
-.. image:: images/pwm-concept.png
+.. image:: images/pwm_concept.png
    :width: 80%
 
 
