@@ -25,8 +25,8 @@
     <Probe name="Real Count" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Error bit" type="DISCRETE" datatype="UINT" units="Value" enabled="true"/>
     <Probe name="Warning bit" type="DISCRETE" datatype="UINT" units="Value" enabled="true"/>
+    <Probe name="CRC error" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
     <Probe name="Time" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
-    <Probe name="Time Internal" type="CONTINUOUS" datatype="UINT" units="Value" enabled="false"/>
     <Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
 </xSCOPEconfig>

@@ -38,7 +38,6 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
         /* get angle and velocity from BiSS Encoder */
         angle = i_position_feedback.get_angle();
         velocity = i_position_feedback.get_velocity();
-//        { count, velocity, position, angle, status } = i_position_feedback.get_all();
         t :> end_time;
 
 
@@ -49,12 +48,12 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
         xscope_int(COUNT, count);                           //absolute count
         xscope_int(REAL_COUNT, real_count);                 //real internal absolute count
         xscope_int(POSITION, position);                     //singleturn position
-        xscope_int(ANGLE, angle);                     //singleturn position
+        xscope_int(ANGLE, angle);                           //electrical angle
         xscope_int(VELOCITY, velocity);                     //velocity in rpm
         xscope_int(ERROR_BIT, (status&0b10) * 500);         //error bit, should be 0
         xscope_int(WARNING_BIT, (status&0b01) * 1000);      //warning bit, should be 0
         xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
-        xscope_int(TIME_INTERNAL, status);   //time to get the data in microseconds
+        xscope_int(CRC_ERROR, (status>>2)*1000);            //number of CRC errors, should be 0
 
         delay_milliseconds(1);
     }
