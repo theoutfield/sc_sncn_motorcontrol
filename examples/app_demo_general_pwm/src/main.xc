@@ -1,14 +1,12 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
-
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
  */
 
-//#include <pwm_service.h>
 #include <pwm_server.h>
 #include <user_config.h>
 #include <watchdog_service.h>
@@ -24,9 +22,6 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 void send_pwm_values(client interface update_pwm_general i_update_pwm)
 {
-    #define PWM_MAX_VALUE   5650
-    #define PWM_MIN_VALUE   0
-
     timer t;
     unsigned int time=0x00000000;
     unsigned int period = 10000;
@@ -40,11 +35,11 @@ void send_pwm_values(client interface update_pwm_general i_update_pwm)
     unsigned short pwm_limit_low  = 0x0000;
     unsigned short pwm_limit_high = 0x0000;
 
-    pwm_limit_high= PWM_MAX_VALUE;
-    pwm_limit_low = PWM_MIN_VALUE;
+    pwm_limit_high= GENERAL_PWM_MAX_VALUE;
+    pwm_limit_low = GENERAL_PWM_MIN_VALUE;
 
     pwm_delta = 1;
-    pwm_value = PWM_MIN_VALUE;
+    pwm_value = pwm_limit_low;
 
     time    =0x00000000;
     t :> time;
@@ -112,11 +107,7 @@ int main(void) {
                     pwm_config_general(pwm_ports);
 
                     delay_milliseconds(500);
-                    pwm_service_general(
-                            pwm_ports, i_update_pwm,
-                            DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
-                            IFM_TILE_USEC, COMMUTATION_FRQ);
-
+                    pwm_service_general(pwm_ports, i_update_pwm);
                 }
 
                 /* Watchdog Service */
