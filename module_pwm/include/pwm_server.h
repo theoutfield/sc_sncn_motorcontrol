@@ -39,7 +39,6 @@
  */
 #define GENERAL_PWM_MIN_VALUE   0x0000
 
-
 /**
  * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
  */
@@ -72,6 +71,29 @@ void predriver(FetDriverPorts &fet_driver_ports);
 /**
  * @brief Configure the pwm ports before starting pwm service.
  *
+ * @param ports  Structure type for PWM ports.
+ *
+ * @return void
+ */
+void pwm_config_general(PwmPortsGeneral &ports);
+
+/**
+ * @brief Service to generate center-alligned PWM signals for 6 inverter outputs (2 power switch for each leg).
+ * It recieves 6 pwm values through i_update_pwm interface. The commutation frequency is 16 kHz, and the deadtime is 3 us.
+ *
+ * @param ports                 Structure type for PWM ports
+ * @param i_update_pwm          Interface to communicate with client and update the PWM values
+ *
+ * @return void
+ */
+void pwm_service_general(
+        PwmPortsGeneral &ports,
+        server interface update_pwm_general i_update_pwm
+);
+
+/**
+ * @brief Configure the pwm ports before starting pwm service.
+ *
  * @param ports  Structure type for PWM ports
  *
  * @return void
@@ -100,30 +122,6 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         int duty_maintain_brake,
         int time_start_brake,
         int ifm_tile_usec
-);
-
-
-/**
- * @brief Configure the pwm ports before starting pwm service.
- *
- * @param ports  Structure type for PWM ports.
- *
- * @return void
- */
-void pwm_config_general(PwmPortsGeneral &ports);
-
-/**
- * @brief Service to generate center-alligned PWM signals for 6 inverter outputs (2 power switch for each leg).
- * It recieves 6 pwm values through i_update_pwm interface. The commutation frequency is 16 kHz, and the deadtime is 3 us.
- *
- * @param ports                 Structure type for PWM ports
- * @param i_update_pwm          Interface to communicate with client and update the PWM values
- *
- * @return void
- */
-void pwm_service_general(
-        PwmPortsGeneral &ports,
-        server interface update_pwm_general i_update_pwm
 );
 
 #endif // _PWM_SERVER_H_
