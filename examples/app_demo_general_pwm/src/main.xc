@@ -20,6 +20,13 @@ PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
+/**
+ * @brief Send pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
+ *
+ * @param i_update_pwm  Interface to communicate with client and update the PWM values.
+ *
+ * @return void
+ */
 void send_pwm_values(client interface update_pwm_general i_update_pwm)
 {
     timer t;
