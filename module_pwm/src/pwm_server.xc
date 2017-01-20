@@ -17,14 +17,11 @@
 #include <pwm_ports.h>
 #include "app_global.h"
 #include "pwm_convert_width.h"
-
 #include <motor_control_interfaces.h>
-
 #include <a4935.h>
 #include <mc_internal_constants.h>
 
 
-/*****************************************************************************/
 static void do_pwm_port_config(PwmPorts &ports)
 {
     unsigned i;
@@ -220,219 +217,6 @@ void predriver(FetDriverPorts &fet_driver_ports)
 } // foc_pwm_config
 
 
-void pwm_check_general(PwmPortsGeneral &ports)
-{
-
-    while(1)
-    {
-        if (!isnull(ports.p_pwm_a))
-        {
-            ports.p_pwm_a     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_a <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_b))
-        {
-            ports.p_pwm_b     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_b <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_c))
-        {
-
-            ports.p_pwm_c     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_c <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_u))
-        {
-            ports.p_pwm_u     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_u <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_v))
-        {
-            ports.p_pwm_v     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_v <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_w))
-        {
-            ports.p_pwm_w     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_w <: 0xFFFFFFFF;
-        }
-        delay_microseconds(100);
-
-
-        if (!isnull(ports.p_pwm_a))
-        {
-            ports.p_pwm_a     <: 0x00000000;
-            ports.p_pwm_inv_a <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_b))
-        {
-            ports.p_pwm_b     <: 0x00000000;
-            ports.p_pwm_inv_b <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_c))
-        {
-            ports.p_pwm_c     <: 0x00000000;
-            ports.p_pwm_inv_c <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_u))
-        {
-            ports.p_pwm_u     <: 0x00000000;
-            ports.p_pwm_inv_u <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_v))
-        {
-            ports.p_pwm_v     <: 0x00000000;
-            ports.p_pwm_inv_v <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_w))
-        {
-            ports.p_pwm_w     <: 0x00000000;
-            ports.p_pwm_inv_w <: 0xFFFFFFFF;
-        }
-        delay_microseconds(3);
-
-
-        if (!isnull(ports.p_pwm_a))
-        {
-            ports.p_pwm_a     <: 0x00000000;
-            ports.p_pwm_inv_a <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_b))
-        {
-            ports.p_pwm_b     <: 0x00000000;
-            ports.p_pwm_inv_b <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_c))
-        {
-            ports.p_pwm_c     <: 0x00000000;
-            ports.p_pwm_inv_c <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_u))
-        {
-            ports.p_pwm_u     <: 0x00000000;
-            ports.p_pwm_inv_u <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_v))
-        {
-            ports.p_pwm_v     <: 0x00000000;
-            ports.p_pwm_inv_v <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_w))
-        {
-            ports.p_pwm_w     <: 0x00000000;
-            ports.p_pwm_inv_w <: 0x00000000;
-        }
-        delay_microseconds(100);
-
-        if (!isnull(ports.p_pwm_a))
-        {
-            ports.p_pwm_a     <: 0x00000000;
-            ports.p_pwm_inv_a <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_b))
-        {
-            ports.p_pwm_b     <: 0x00000000;
-            ports.p_pwm_inv_b <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_c))
-        {
-            ports.p_pwm_c     <: 0x00000000;
-            ports.p_pwm_inv_c <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_u))
-        {
-            ports.p_pwm_u     <: 0x00000000;
-            ports.p_pwm_inv_u <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_v))
-        {
-            ports.p_pwm_v     <: 0x00000000;
-            ports.p_pwm_inv_v <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_w))
-        {
-            ports.p_pwm_w     <: 0x00000000;
-            ports.p_pwm_inv_w <: 0xFFFFFFFF;
-        }
-        delay_microseconds(3);
-
-    }
-
-}
-
-
-void pwm_checkl(PwmPorts &ports)
-{
-
-    while(1)
-    {
-
-        ports.p_pwm[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-        delay_microseconds(100);
-
-
-        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-        delay_microseconds(3);
-
-
-        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0x00000000;
-
-        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0x00000000;
-
-        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0x00000000;
-        delay_microseconds(100);
-
-
-        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-        delay_microseconds(3);
-
-    }
-
-}
 void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, PWM server, with ADC sync
         unsigned motor_id, // Motor identifier
         PwmPorts &ports,
@@ -679,12 +463,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
 
 void pwm_service_general(
         PwmPortsGeneral &ports,
-        server interface update_pwm_general i_update_pwm,
-        int duty_start_brake,
-        int duty_maintain_brake,
-        int time_start_brake,
-        int ifm_tile_usec,
-        int commutation_frq
+        server interface update_pwm_general i_update_pwm
 )
 {
     unsigned short phase_a_defined=0x0000, phase_b_defined=0x0000, phase_c_defined=0x0000;

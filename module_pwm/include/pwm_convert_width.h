@@ -27,7 +27,7 @@
 #include "pwm_general.h"
 
 /**
- * Converts PWM structure reference to address.
+ * @brief Converts PWM structure reference to address.
  *
  * @param pwm_ps Pointer to PWM control structure
  * @return Address
@@ -37,12 +37,13 @@ unsigned long get_pwm_struct_address( // Converts PWM structure reference to add
 ); // Return address
 
 /**
- * Convert all PWM pulse widths to pattern/time_offset port data
+ * @brief Convert all PWM pulse widths to pattern/time_offset port data
  *
  * @param pwm_comms_ps      Pointer to structure containing PWM communication data
  * @param pwm_buf_ps        Pointer to Structure containing buffered PWM output data
  * @param pwm_max_value     Maximum pwm value which can be sent to pwm server (number of clock ticks)
  * @param pwm_deadtime      Number of clock ticks in over deadtime period
+ *
  * @return void
  */
 void convert_all_pulse_widths(
@@ -53,11 +54,12 @@ void convert_all_pulse_widths(
 );
 
 /**
- * Converts PWM Pulse-width to port data in shared memory
+ * @brief Converts PWM Pulse-width to port data in shared memory
  *
  * @param pwm_comms_ps      Pointer to structure containing PWM communication data
  * @param pwm_max_value     Maximum pwm value which can be sent to pwm server (number of clock ticks)
  * @param pwm_deadtime      Number of clock ticks in over deadtime period
+ *
  * @return void
  */
 void convert_widths_in_shared_mem(

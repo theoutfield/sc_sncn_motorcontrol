@@ -16,23 +16,23 @@
 #define _PWM_GENERAL_H_
 
 /**
- * Define Number of buffers in storage ring
+ * @brief Define Number of buffers in storage ring
  */
 #define _NUM_PWM_BUFS 2  // Double-buffered
 
 /**
- * Define PWM port width resolution
+ * @brief Define PWM port width resolution
  */
 #define _PORT_RES_BITS 5 // PWM port width resoltion (e.g. 5 for 32-bits)
 
 /**
- * Define PWM port width in bits
+ * @brief Define PWM port width in bits
  */
 #define _PWM_PORT_WID (1 << _PORT_RES_BITS) // PWM port width in bits
 #define _HALF_PORT_WID (_PWM_PORT_WID >> 1) // Half of PWM port width in bits
 
 /**
- * Different PWM Control Commands (Client --> Server)
+ * @brief Different PWM Control Commands (Client --> Server)
  */
 typedef enum CMD_PWM_ETAG
 {
@@ -42,7 +42,7 @@ typedef enum CMD_PWM_ETAG
 } CMD_PWM_ENUM;
 
 /**
- * Different PWM Phases
+ * @brief Different PWM Phases
  */
 typedef enum PWM_PHASE_ETAG
 {
@@ -53,7 +53,7 @@ typedef enum PWM_PHASE_ETAG
 } PWM_PHASE_ENUM;
 
 /**
- * Structure containing PWM parameters for one motor
+ * @brief Structure containing PWM parameters for one motor
  */
 typedef struct PWM_PARAM_TAG
 {
@@ -62,7 +62,7 @@ typedef struct PWM_PARAM_TAG
 } PWM_PARAM_TYP;
 
 /**
- * Structure containing pwm communication control data
+ * @brief Structure containing pwm communication control data
  */
 typedef struct PWM_COMMS_TAG
 {
@@ -72,7 +72,7 @@ typedef struct PWM_COMMS_TAG
 } PWM_COMMS_TYP;
 
 /**
- * Structure containing data for doing timed load of buffered output port
+ * @brief Structure containing data for doing timed load of buffered output port
  */
 typedef struct PWM_PORT_TAG
 {
@@ -81,7 +81,7 @@ typedef struct PWM_PORT_TAG
 } PWM_PORT_TYP;
 
 /**
- * Structure containing pwm output data for one phase (& one edge)
+ * @brief Structure containing pwm output data for one phase (& one edge)
  */
 typedef struct PWM_PHASE_TAG // Structure containing string
 {
@@ -90,7 +90,7 @@ typedef struct PWM_PHASE_TAG // Structure containing string
 } PWM_PHASE_TYP;
 
 /**
- * Structure containing data for one pulse edge for all phases
+ * @brief Structure containing data for one pulse edge for all phases
  */
 typedef struct PWM_EDGE_TAG
 {
@@ -98,7 +98,7 @@ typedef struct PWM_EDGE_TAG
 } PWM_EDGE_TYP;
 
 /**
- * Structure containing pwm output data for one buffer
+ * @brief Structure containing pwm output data for one buffer
  */
 typedef struct PWM_BUFFER_TAG
 {
@@ -107,7 +107,7 @@ typedef struct PWM_BUFFER_TAG
 } PWM_BUFFER_TYP;
 
 /**
- * Structure containing pwm output data for all buffers
+ * @brief Structure containing pwm output data for all buffers
  */
 typedef struct PWM_ARRAY_TAG
 {
