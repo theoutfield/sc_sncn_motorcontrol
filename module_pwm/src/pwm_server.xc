@@ -362,6 +362,70 @@ void pwm_service_general(
 
 } // pwm_service_general
 
+
+void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
+        int v_dc, int voltage_pull_brake, int time_pull_brake, int voltage_hold_brake)
+{
+
+    int error=0;
+    int duty_min=0, duty_max=0;
+    int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
+
+    //#if (IFM_TILE_USEC == USEC_STD)
+    //    #define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
+    //    #define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
+    //#else
+    //    #define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
+    //    #define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
+    //#endif
+
+    //DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
+
+
+    if(v_dc <= 0)                   error=1;
+
+    if(voltage_pull_brake > v_dc)   error=1;
+    if(voltage_pull_brake < 0)      error=1;
+
+    if(voltage_hold_brake > v_dc)   error=1;
+    if(voltage_hold_brake < 0)      error=1;
+
+    if(period_start_brake < 0)      error=1;
+
+
+
+    if(ifm_tile_usec==250)
+    {
+        duty_min = 1500;
+        duty_max = 13000;
+    }
+    else if(ifm_tile_usec==100)
+    {
+        duty_min = 600;
+        duty_max = 7000;
+    }
+    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+    {
+        error = 1;
+    }
+
+    duty_start_brake    = duty_min + ((duty_max - duty_min) * voltage_pull_brake)/v_dc;
+
+    duty_maintain_brake = duty_min + ((duty_max - duty_min) * voltage_hold_brake)/v_dc;
+
+    period_start_brake  = (time_pull_brake * 1000)/ifm_tile_usec;
+
+    if(error==1)
+    {
+        printf("ERROR IN ELECTRIC BRAKE PARAMETERS ...\n");
+        printf("PLEASE CHECK V_DC AND BRAKE CONFIGURATIONS");
+        while(1);
+    }
+
+    i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
+}
+
+
 /**
  * @brief Configure the clock value and initial value of pwm ports.
  *
@@ -447,12 +511,26 @@ void pwm_service_task(
         unsigned motor_id,
         PwmPorts &ports,
         server interface update_pwm i_update_pwm,
-        int duty_start_brake,
-        int duty_maintain_brake,
-        int time_start_brake,
+        server interface update_brake i_update_brake,
         int ifm_tile_usec
 )
 {
+
+    int duty_start_brake=0;
+    int duty_maintain_brake=0;
+    int time_start_brake=0;
+
+    select
+    {
+    case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
+            duty_start_brake    = _duty_start_brake;
+            duty_maintain_brake = _duty_maintain_brake;
+            time_start_brake    = _period_start_brake;
+            break;
+    }
+
+
+
     unsigned int half_sync_inc=0;
     unsigned int pwm_max_value=0;
     unsigned int pwm_deadtime =0;
