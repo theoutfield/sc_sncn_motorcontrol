@@ -407,16 +407,21 @@ void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
         error = 1;
     }
 
-    duty_start_brake    = duty_min + ((duty_max - duty_min) * voltage_pull_brake)/v_dc;
+    duty_start_brake    = (duty_max * voltage_pull_brake)/v_dc;
+    if(duty_start_brake < duty_min) duty_start_brake = duty_min;
+    if(duty_start_brake > duty_max) duty_start_brake = duty_max;
 
-    duty_maintain_brake = duty_min + ((duty_max - duty_min) * voltage_hold_brake)/v_dc;
+    duty_maintain_brake = (duty_max * voltage_hold_brake)/v_dc;
+    if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
+    if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
+
 
     period_start_brake  = (time_pull_brake * 1000)/ifm_tile_usec;
 
     if(error==1)
     {
         printf("ERROR IN ELECTRIC BRAKE PARAMETERS ...\n");
-        printf("PLEASE CHECK V_DC AND BRAKE CONFIGURATIONS");
+        printf("PLEASE CHECK V_DC AND BRAKE CONFIGURATIONS...");
         while(1);
     }
 
