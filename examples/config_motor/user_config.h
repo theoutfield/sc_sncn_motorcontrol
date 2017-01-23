@@ -211,21 +211,21 @@
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
 
-#if (IFM_TILE_USEC == USEC_STD)
-    #define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
-    #define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
-#else
-    #define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
-    #define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
-#endif
-
-#define PERIOD_START_BRAKE  1000   // period in which high voltage is applied for realising the brake [milli-seconds]
+//#if (IFM_TILE_USEC == USEC_STD)
+//    #define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
+//    #define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
+//#else
+//    #define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
+//    #define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
+//#endif
+//
+//#define PERIOD_START_BRAKE  1000   // period in which high voltage is applied for realising the brake [milli-seconds]
 #define ENABLE_SHAKE_BRAKE     0
 #define BRAKE_SHUTDOWN_DELAY   0   //delay in milliseconds between the brake blocking and the stop of the control
 
 
-#define VOLTAGE_PULL_BRAKE     0        //Voltage which will be applied to electric brake to release (pull) the brake at startup [Volts]
-#define TIME_PULL_BRAKE        0     //Time period in which it is tried to release (pull) the brake [milli seconds]
-#define VOLTAGE_HOLD_BRAKE     0    //Voltage which will be applied to electric brake after it is successfully released (pulled) to maintain the brake
+#define VOLTAGE_PULL_BRAKE     48      //Voltage which will be applied to electric brake to release (pull) the brake at startup [Volts]
+#define TIME_PULL_BRAKE        1000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define VOLTAGE_HOLD_BRAKE     0      //Voltage which will be applied to electric brake after it is successfully released (pulled) to maintain the brake
 
 

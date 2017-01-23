@@ -49,8 +49,6 @@ int main(void) {
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         on tile[APP_TILE]:
         {
-            init_brake(i_update_brake, IFM_TILE_USEC,
-                    VDC, VOLTAGE_PULL_BRAKE, TIME_PULL_BRAKE, VOLTAGE_HOLD_BRAKE);
 
             demo_torque_position_velocity_control(i_position_control[0]);
         }
@@ -92,6 +90,14 @@ int main(void) {
             pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
             pos_velocity_ctrl_config.brake_shutdown_delay =                 BRAKE_SHUTDOWN_DELAY;
 
+            pos_velocity_ctrl_config.voltage_pull_brake=                    VOLTAGE_PULL_BRAKE;
+            pos_velocity_ctrl_config.time_pull_brake =                      TIME_PULL_BRAKE;
+            pos_velocity_ctrl_config.voltage_hold_brake =                   VOLTAGE_HOLD_BRAKE;
+
+            init_brake(i_update_brake, IFM_TILE_USEC, VDC,
+                    pos_velocity_ctrl_config.voltage_pull_brake,
+                    pos_velocity_ctrl_config.time_pull_brake,
+                    pos_velocity_ctrl_config.voltage_hold_brake);
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
         }

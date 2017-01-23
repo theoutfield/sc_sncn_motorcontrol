@@ -392,8 +392,6 @@ void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
 
     if(period_start_brake < 0)      error=1;
 
-
-
     if(ifm_tile_usec==250)
     {
         duty_min = 1500;
@@ -421,6 +419,24 @@ void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
         printf("PLEASE CHECK V_DC AND BRAKE CONFIGURATIONS");
         while(1);
     }
+
+    //#if (IFM_TILE_USEC == USEC_STD)
+    //    #define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
+    //    #define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
+    //#else
+    //    #define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
+    //    #define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
+    //#endif
+    //
+    //#define PERIOD_START_BRAKE  1000   // period in which high voltage is applied for realising the brake [milli-seconds]
+    //#define ENABLE_SHAKE_BRAKE     0
+    //#define BRAKE_SHUTDOWN_DELAY   0   //delay in milliseconds between the brake blocking and the stop of the control
+    //
+
+
+//    duty_start_brake = 6000;
+//    duty_maintain_brake = 1000;
+//    period_start_brake=10000;
 
     i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 }
@@ -516,20 +532,18 @@ void pwm_service_task(
 )
 {
 
-    int duty_start_brake=0;
-    int duty_maintain_brake=0;
-    int time_start_brake=0;
+    int duty_start_brake    = 0;
+    int duty_maintain_brake = 0;
+    int brake_start         = 0;
 
     select
     {
     case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
             duty_start_brake    = _duty_start_brake;
             duty_maintain_brake = _duty_maintain_brake;
-            time_start_brake    = _period_start_brake;
+            brake_start         = _period_start_brake;
             break;
     }
-
-
 
     unsigned int half_sync_inc=0;
     unsigned int pwm_max_value=0;
@@ -595,7 +609,6 @@ void pwm_service_task(
     int pwm_on  =0;
     int brake_active  = 0;
     int brake_counter = 0;
-    int brake_start   = (time_start_brake*15000)/1000;
 
     unsigned char brake_defined = 0b0000;
     brake_defined = !isnull(ports.p_pwm_phase_d);
