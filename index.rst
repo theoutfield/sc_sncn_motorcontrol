@@ -56,7 +56,7 @@ Modules
 	:maxdepth: 1
 	:hidden:
 
-	Symmetrical PWM Module <module_pwm_symmetrical/doc/index>
+	PWM Module <module_pwm/doc/index>
 	Hall Sensor Feedback Module <module_hall/doc/index>
 	Incremental Encoder Feedback Module <module_qei/doc/index>
 	BiSS Encoder Feedback Module <module_biss/doc/index>
@@ -71,7 +71,6 @@ Modules
 
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
 
-* `Symmetrical PWM Module <module_pwm_symmetrical/doc/index.html>`_: Service for PWM generation. 
 * `Hall Sensor Feedback Module <module_hall/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
 * `Incremental Encoder Feedback Module <module_qei/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
 * `BiSS Encoder Feedback Module <module_biss/doc/index.html>`_: Driver to read data from BiSS Encoder.
@@ -94,7 +93,8 @@ Examples
 	Hall Sensor Feedback Test <examples/app_test_hall/doc/index>
 	BiSS Encoder Feedback Test <examples/app_test_biss/doc/index>
 	Watchdog Demo <examples/app_demo_watchdog/doc/index>
-	PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index>
+	
+	PWM Demo <examples/app_demo_general_pwm/doc/index>
 	
 	BLDC Motor Control Demo <examples/app_demo_bldc_motorcontrol/doc/index>	
 	BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index>	
@@ -111,7 +111,8 @@ Examples
 
 * **Low level functionality tests:**
 
-	* `PWM Symmetrical Demo <examples/app_pwm_symmetrical_demo/doc/index.html>`_: Simple example on PWM signal output.
+	* `
+	PWM Demo <examples/app_demo_general_pwm/doc/index.html>`_: Simple example on PWM signal output.
 	* `Incremental Encoder Interface Test <examples/app_test_qei/doc/index.html>`_: Shows data acquired from incremental Encoder.
 	* `Hall Sensor Feedback Test <examples/app_test_hall/doc/index.html>`_: Shows data acquired from Hall sensor.
 	* `BiSS Encoder Feedback Test <examples/app_test_biss/doc/index.html>`_: Shows data acquired from BiSS Encoder 
