@@ -75,7 +75,7 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
-#define VDC             48
+#define VDC             20
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     82
@@ -219,9 +219,9 @@
                                      //note: the real generated voltage on the brake does not proportionally (linearly) this input
 
 #define VOLTAGE_HOLD_BRAKE     0     //Voltage which will be applied to electric brake after it is successfully
-                                     //released (pulled) to maintain the brake [Volts]. (note: precision 1.5 V)
+                                     //released (pulled) to maintain the brake [Volts].
                                      //note: the real generated voltage on the brake does not proportionally (linearly) this input
 
-#define TIME_PULL_BRAKE        1000  //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define TIME_PULL_BRAKE        10000 //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 
