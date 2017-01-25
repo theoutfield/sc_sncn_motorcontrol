@@ -214,14 +214,18 @@
 
 #define BRAKE_SHUTDOWN_DELAY   0     //delay in milliseconds between the brake blocking and the stop of the control
 
-#define VOLTAGE_PULL_BRAKE     15    //Voltage which will be applied to electric brake to release (pull)
-                                     //the brake at startup [Volts].
-                                     //note: the real generated voltage on the brake does not proportionally (linearly) this input
+/*
+ * Define: Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
+ * Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
+ */
+#define VOLTAGE_PULL_BRAKE     13000    // [milli-Volts]
 
-#define VOLTAGE_HOLD_BRAKE     0     //Voltage which will be applied to electric brake after it is successfully
-                                     //released (pulled) to maintain the brake [Volts].
-                                     //note: the real generated voltage on the brake does not proportionally (linearly) this input
+/*
+ * Define: Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
+ * Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
+ */
+#define VOLTAGE_HOLD_BRAKE     7000     // [milli-Volts]
 
-#define TIME_PULL_BRAKE        10000 //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define TIME_PULL_BRAKE        10000    //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 

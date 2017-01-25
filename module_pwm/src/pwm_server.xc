@@ -368,80 +368,72 @@ void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
 {
 
     int error=0;
-    int duty_min=0, duty_max=0;
+    int duty_min=0, duty_max=0, duty_divider=0;
     int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
 
-    //#if (IFM_TILE_USEC == USEC_STD)
-    //    #define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
-    //    #define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
-    //#else
-    //    #define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
-    //    #define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
-    //#endif
 
-    //DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
+    if(v_dc <= 0)
+    {
+        printf("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
+        while(1);
+    }
 
+    if(voltage_pull_brake > (v_dc*1000))
+    {
+        printf("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
+        while(1);
+    }
 
-    if(v_dc <= 0)                   error=1;
+    if(voltage_pull_brake < 0)
+    {
+        printf("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
+        while(1);
+    }
 
-    if(voltage_pull_brake > v_dc)   error=1;
-    if(voltage_pull_brake < 0)      error=1;
+    if(voltage_hold_brake > (v_dc*1000))
+    {
+        printf("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
+        while(1);
+    }
 
-    if(voltage_hold_brake > v_dc)   error=1;
-    if(voltage_hold_brake < 0)      error=1;
+    if(voltage_hold_brake < 0)
+    {
+        printf("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
+        while(1);
+    }
 
-    if(period_start_brake < 0)      error=1;
+    if(period_start_brake < 0)
+    {
+        printf("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
+        while(1);
+    }
 
     if(ifm_tile_usec==250)
     {
         duty_min = 1500;
         duty_max = 13000;
+        duty_divider = 16384;
     }
     else if(ifm_tile_usec==100)
     {
         duty_min = 600;
         duty_max = 7000;
+        duty_divider = 8192;
     }
     else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
     {
         error = 1;
     }
 
-    duty_start_brake    = (duty_max * voltage_pull_brake)/v_dc;
+    duty_start_brake    = (duty_divider * voltage_pull_brake)/(1000*v_dc);
     if(duty_start_brake < duty_min) duty_start_brake = duty_min;
     if(duty_start_brake > duty_max) duty_start_brake = duty_max;
 
-    duty_maintain_brake = (duty_max * voltage_hold_brake)/v_dc;
+    duty_maintain_brake = (duty_divider * voltage_hold_brake)/(1000*v_dc);
     if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
     if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
 
-
     period_start_brake  = (time_pull_brake * 1000)/ifm_tile_usec;
-
-    if(error==1)
-    {
-        printf("ERROR IN ELECTRIC BRAKE PARAMETERS ...\n");
-        printf("PLEASE CHECK V_DC AND BRAKE CONFIGURATIONS...");
-        while(1);
-    }
-
-    //#if (IFM_TILE_USEC == USEC_STD)
-    //    #define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
-    //    #define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
-    //#else
-    //    #define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
-    //    #define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
-    //#endif
-    //
-    //#define PERIOD_START_BRAKE  1000   // period in which high voltage is applied for realising the brake [milli-seconds]
-    //#define ENABLE_SHAKE_BRAKE     0
-    //#define BRAKE_SHUTDOWN_DELAY   0   //delay in milliseconds between the brake blocking and the stop of the control
-    //
-
-
-//    duty_start_brake = 6000;
-//    duty_maintain_brake = 1000;
-//    period_start_brake=10000;
 
     i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 }
