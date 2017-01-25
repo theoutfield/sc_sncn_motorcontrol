@@ -17,7 +17,7 @@ void spi_master_init(spi_master_interface &spi_if, unsigned spi_clock_div)
     configure_clock_rate(spi_if.blk1, 250, spi_clock_div);
 #if SPI_MASTER_MODE == 0
     set_port_no_inv(*spi_if.sclk);
-    configure_out_port(*spi_if.sclk, *spi_if.blk1, 0);
+    configure_out_port(*spi_if.sclk, spi_if.blk1, 0);
     #define SCLK_VAL 0x55
 #elif SPI_MASTER_MODE == 1
     set_port_inv(*spi_if.sclk); // invert port and values used
@@ -25,11 +25,11 @@ void spi_master_init(spi_master_interface &spi_if, unsigned spi_clock_div)
     #define SCLK_VAL 0xAA
 #elif SPI_MASTER_MODE == 2
     set_port_inv(*spi_if.sclk); // invert port and values used
-    configure_out_port(*spi_if.sclk, *spi_if.blk1, 0);
+    configure_out_port(*spi_if.sclk, spi_if.blk1, 0);
     #define SCLK_VAL 0x55
 #elif SPI_MASTER_MODE == 3
     set_port_no_inv(*spi_if.sclk);
-    configure_out_port(*spi_if.sclk, *spi_if.blk1, 1);
+    configure_out_port(*spi_if.sclk, spi_if.blk1, 1);
     #define SCLK_VAL 0xAA
 #else
     #error "Unrecognised SPI mode."
@@ -116,10 +116,10 @@ static inline void spi_master_out_byte_internal(spi_master_interface &spi_if, un
     asm("setc res[%0], 8" :: "r"(*spi_if.mosi)); // reset port
     asm("setc res[%0], 0x200f" :: "r"(*spi_if.mosi)); // set to buffering
     asm("settw res[%0], %1" :: "r"(*spi_if.mosi), "r"(32)); // set transfer width to 32
-    stop_clock(*spi_if.blk2);
-    configure_clock_src(*spi_if.blk2, *spi_if.sclk);
-    configure_out_port(*spi_if.mosi, *spi_if.blk2, x);
-    start_clock(*spi_if.blk2);
+    stop_clock(spi_if.blk2);
+    configure_clock_src(spi_if.blk2, *spi_if.sclk);
+    configure_out_port(*spi_if.mosi, spi_if.blk2, x);
+    start_clock(spi_if.blk2);
 
     // output remaining data
     *spi_if.mosi <: (x >> 1);
