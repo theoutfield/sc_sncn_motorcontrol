@@ -528,19 +528,10 @@ void pwm_service_task(
         int ifm_tile_usec
 )
 {
-
-    int duty_start_brake    = 0;
-    int duty_maintain_brake = 0;
+    int duty_start_brake    = 3000;
+    int duty_maintain_brake = 3000;
     int brake_start         = 0;
-
-    select
-    {
-    case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
-            duty_start_brake    = _duty_start_brake;
-            duty_maintain_brake = _duty_maintain_brake;
-            brake_start         = _period_start_brake;
-            break;
-    }
+    unsigned char  brake_defined_II    = 0b0000;
 
     unsigned int half_sync_inc=0;
     unsigned int pwm_max_value=0;
@@ -551,6 +542,19 @@ void pwm_service_task(
 
     t :> ts;
     t when timerafter (ts + (4000*20*250)) :> void;    //proper task startup
+
+    select
+    {
+    case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
+            duty_start_brake    = _duty_start_brake;
+            duty_maintain_brake = _duty_maintain_brake;
+            brake_start         = _period_start_brake;
+            brake_defined_II    = 0b1111;
+            break;
+
+    default:
+        break;
+    }
 
     if(ifm_tile_usec==250)
     {
@@ -608,7 +612,7 @@ void pwm_service_task(
     int brake_counter = 0;
 
     unsigned char brake_defined = 0b0000;
-    brake_defined = !isnull(ports.p_pwm_phase_d);
+    brake_defined = ((!isnull(ports.p_pwm_phase_d))&brake_defined_II);
 
     // initialize PWM
     pwm_serv_s.id = motor_id;  // Assign motor identifier
