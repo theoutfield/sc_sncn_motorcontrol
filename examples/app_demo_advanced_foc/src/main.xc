@@ -37,6 +37,7 @@ int main(void) {
 
     // Motor control interfaces
     interface WatchdogInterface i_watchdog[2];
+    interface update_brake i_update_brake;
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[2];
     interface shared_memory_interface i_shared_memory[2];
@@ -65,8 +66,8 @@ int main(void) {
 
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                     pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                            DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
-                            IFM_TILE_USEC);
+                            i_update_brake, IFM_TILE_USEC);
+
                 }
 
                 /* ADC Service */

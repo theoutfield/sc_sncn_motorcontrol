@@ -71,6 +71,7 @@ int main() {
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
     interface update_pwm i_update_pwm;
+    interface update_brake i_update_brake;
 
     par {
         /************************************************************
@@ -89,8 +90,8 @@ int main() {
 
                 //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                 pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                        DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
-                        IFM_TILE_USEC);
+                        i_update_brake, IFM_TILE_USEC);
+
             }
 
             /* Watchdog Service */
