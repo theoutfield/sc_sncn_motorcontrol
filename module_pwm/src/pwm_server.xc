@@ -362,6 +362,83 @@ void pwm_service_general(
 
 } // pwm_service_general
 
+
+void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
+        int v_dc, int voltage_pull_brake, int time_pull_brake, int voltage_hold_brake)
+{
+
+    int error=0;
+    int duty_min=0, duty_max=0, duty_divider=0;
+    int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
+
+
+    if(v_dc <= 0)
+    {
+        printf("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
+        while(1);
+    }
+
+    if(voltage_pull_brake > (v_dc*1000))
+    {
+        printf("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
+        while(1);
+    }
+
+    if(voltage_pull_brake < 0)
+    {
+        printf("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
+        while(1);
+    }
+
+    if(voltage_hold_brake > (v_dc*1000))
+    {
+        printf("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
+        while(1);
+    }
+
+    if(voltage_hold_brake < 0)
+    {
+        printf("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
+        while(1);
+    }
+
+    if(period_start_brake < 0)
+    {
+        printf("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
+        while(1);
+    }
+
+    if(ifm_tile_usec==250)
+    {
+        duty_min = 1500;
+        duty_max = 13000;
+        duty_divider = 16384;
+    }
+    else if(ifm_tile_usec==100)
+    {
+        duty_min = 600;
+        duty_max = 7000;
+        duty_divider = 8192;
+    }
+    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+    {
+        error = 1;
+    }
+
+    duty_start_brake    = (duty_divider * voltage_pull_brake)/(1000*v_dc);
+    if(duty_start_brake < duty_min) duty_start_brake = duty_min;
+    if(duty_start_brake > duty_max) duty_start_brake = duty_max;
+
+    duty_maintain_brake = (duty_divider * voltage_hold_brake)/(1000*v_dc);
+    if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
+    if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
+
+    period_start_brake  = (time_pull_brake * 1000)/ifm_tile_usec;
+
+    i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
+}
+
+
 /**
  * @brief Configure the clock value and initial value of pwm ports.
  *
@@ -447,12 +524,15 @@ void pwm_service_task(
         unsigned motor_id,
         PwmPorts &ports,
         server interface update_pwm i_update_pwm,
-        int duty_start_brake,
-        int duty_maintain_brake,
-        int time_start_brake,
+        server interface update_brake i_update_brake,
         int ifm_tile_usec
 )
 {
+    int duty_start_brake    = 3000;
+    int duty_maintain_brake = 3000;
+    int brake_start         = 0;
+    unsigned char  brake_defined_II    = 0b0000;
+
     unsigned int half_sync_inc=0;
     unsigned int pwm_max_value=0;
     unsigned int pwm_deadtime =0;
@@ -462,6 +542,19 @@ void pwm_service_task(
 
     t :> ts;
     t when timerafter (ts + (4000*20*250)) :> void;    //proper task startup
+
+    select
+    {
+    case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
+            duty_start_brake    = _duty_start_brake;
+            duty_maintain_brake = _duty_maintain_brake;
+            brake_start         = _period_start_brake;
+            brake_defined_II    = 0b1111;
+            break;
+
+    default:
+        break;
+    }
 
     if(ifm_tile_usec==250)
     {
@@ -517,10 +610,9 @@ void pwm_service_task(
     int pwm_on  =0;
     int brake_active  = 0;
     int brake_counter = 0;
-    int brake_start   = (time_start_brake*15000)/1000;
 
     unsigned char brake_defined = 0b0000;
-    brake_defined = !isnull(ports.p_pwm_phase_d);
+    brake_defined = ((!isnull(ports.p_pwm_phase_d))&brake_defined_II);
 
     // initialize PWM
     pwm_serv_s.id = motor_id;  // Assign motor identifier

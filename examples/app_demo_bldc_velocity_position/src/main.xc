@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 
 /**
@@ -35,6 +35,7 @@ int main(void) {
     // Motor control interfaces
     interface WatchdogInterface i_watchdog[2];
     interface update_pwm i_update_pwm;
+    interface update_brake i_update_brake;
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[2];
     interface PositionVelocityCtrlInterface i_position_control[3];
@@ -46,7 +47,11 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: demo_torque_position_velocity_control(i_position_control[0]);
+        on tile[APP_TILE]:
+        {
+
+            demo_torque_position_velocity_control(i_position_control[0]);
+        }
 
         on tile[APP_TILE_2]:
         /* Position Control Loop */
@@ -85,6 +90,14 @@ int main(void) {
             pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
             pos_velocity_ctrl_config.brake_shutdown_delay =                 BRAKE_SHUTDOWN_DELAY;
 
+            pos_velocity_ctrl_config.voltage_pull_brake=                    VOLTAGE_PULL_BRAKE;
+            pos_velocity_ctrl_config.time_pull_brake =                      TIME_PULL_BRAKE;
+            pos_velocity_ctrl_config.voltage_hold_brake =                   VOLTAGE_HOLD_BRAKE;
+
+            init_brake(i_update_brake, IFM_TILE_USEC, VDC,
+                    pos_velocity_ctrl_config.voltage_pull_brake,
+                    pos_velocity_ctrl_config.time_pull_brake,
+                    pos_velocity_ctrl_config.voltage_hold_brake);
 
             position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
         }
@@ -103,8 +116,8 @@ int main(void) {
 
                     //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                     pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                            DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
-                            IFM_TILE_USEC);
+                            i_update_brake, IFM_TILE_USEC);
+
                 }
 
                 /* ADC Service */

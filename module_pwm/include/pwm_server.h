@@ -59,6 +59,27 @@ typedef struct PWM_SERV_TAG
 	int data_ready;
 } PWM_SERV_TYP;
 
+
+interface update_brake
+{
+    /**
+     * @brief send the brake settings to pwm server
+     */
+    void update_brake_control_data(int duty_start_brake, int duty_maintain_brake, int period_start_brake);
+};
+
+
+/**
+ * @brief Initialize the settings of electric brake
+ *
+ * @param ...
+ *
+ * @return void
+ */
+void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
+        int v_dc, int voltage_pull_brake, int time_pull_brake, int voltage_hold_brake);
+
+
 /**
  * @brief Initialize the predriver circuit in your IFM SOMANET device (if applicable)
  *
@@ -118,10 +139,10 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         unsigned motor_id, // Motor identifier
         PwmPorts &ports,
         server interface update_pwm i_update_pwm,
-        int duty_start_brake,
-        int duty_maintain_brake,
-        int time_start_brake,
+        server interface update_brake i_update_brake,
         int ifm_tile_usec
 );
+
+
 
 #endif // _PWM_SERVER_H_

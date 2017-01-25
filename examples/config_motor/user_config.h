@@ -72,27 +72,10 @@
 
 #define IFM_TILE_USEC   USEC_STD // Number of ticks in a microsecond for IFM Tile
 
-
-//////////////////////////////////////////////
-//////  BRAKE CONFIGURATION
-//////////////////////////////////////////////
-
-#if (IFM_TILE_USEC == USEC_STD)
-#define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
-#define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
-#else
-#define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
-#define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
-#endif
-#define PERIOD_START_BRAKE  1000   // period in which high voltage is applied for realising the brake [milli-seconds]
-#define ENABLE_SHAKE_BRAKE     0
-#define BRAKE_SHUTDOWN_DELAY   0   //delay in milliseconds between the brake blocking and the stop of the control
-
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
-
-#define VDC             48
+#define VDC             20
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     82
@@ -223,3 +206,26 @@
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
+
+//////////////////////////////////////////////
+//////  BRAKE CONFIGURATION
+//////////////////////////////////////////////
+#define ENABLE_SHAKE_BRAKE     0
+
+#define BRAKE_SHUTDOWN_DELAY   0     //delay in milliseconds between the brake blocking and the stop of the control
+
+/*
+ * Define: Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
+ * Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
+ */
+#define VOLTAGE_PULL_BRAKE     13000    // [milli-Volts]
+
+/*
+ * Define: Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
+ * Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
+ */
+#define VOLTAGE_HOLD_BRAKE     7000     // [milli-Volts]
+
+#define TIME_PULL_BRAKE        10000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+
+
