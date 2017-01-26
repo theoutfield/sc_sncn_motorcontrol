@@ -234,7 +234,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 //                out_valid = ok;
 //                break;
 
-            case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position }:
+            case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position, unsigned int status }:
 
                 out_count = count;
                 out_position = count & (position_feedback_config.resolution - 1);
@@ -291,18 +291,18 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 //                out_status = init_state;
 //                break;
 
-            case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
-                out_ticks_per_turn = position_feedback_config.resolution;
-                break;
+//            case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
+//                out_ticks_per_turn = position_feedback_config.resolution;
+//                break;
 
             case i_position_feedback[int i].get_angle() -> unsigned int out_angle:
                 break;
 
-            case i_position_feedback[int i].set_angle(unsigned int in_angle) -> unsigned int out_offset:
-                break;
+//            case i_position_feedback[int i].set_angle(unsigned int in_angle) -> unsigned int out_offset:
+//                break;
 
-            case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int out_position,  unsigned int out_status}:
-                break;
+//            case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int out_position,  unsigned int out_status}:
+//                break;
 
             case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
                 break;

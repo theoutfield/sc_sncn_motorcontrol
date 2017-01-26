@@ -182,7 +182,7 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
     return status;
 }
 
-
+#if 0
  void rem_16mt_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
     if (REM_16MT_USEC == USEC_FAST) { //Set freq to 250MHz
@@ -482,4 +482,5 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
         }
     }
 }
+#endif
 

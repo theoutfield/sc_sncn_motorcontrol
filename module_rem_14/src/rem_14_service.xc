@@ -65,8 +65,6 @@ int initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 
     {settings1, settings2} = transform_settings(config);
 
-    initspi_ports(spi_ports);
-
     data_in = writeSettings1(spi_ports, settings1);
 
     if(data_in < 0){
@@ -477,16 +475,7 @@ int writeNumberPolePairs(SPIPorts &spi_ports, unsigned short data){
     return data_in;
 }
 
-static inline void multiturn(int &count, int last_position, int position, int ticks_per_turn) {
-        int difference = position - last_position;
-        if (difference >= ticks_per_turn/2)
-            count = count + difference - ticks_per_turn;
-        else if (-difference >= ticks_per_turn/2)
-            count = count + difference + ticks_per_turn;
-        else
-            count += difference;
-}
-
+#if 0
 void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, server interface PositionFeedbackInterface i_position_feedback[3])
 {
 
@@ -696,4 +685,5 @@ void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedba
         }
     }
 }
+#endif
 

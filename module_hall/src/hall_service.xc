@@ -25,16 +25,6 @@ void hall_calculate_speed(hall_variables& hv);
 void hall_calculate_angle(hall_variables& hv);
 void speed_LPF(hall_variables& hv);
 
-static inline void multiturn(int &count, int last_position, int position, int ticks_per_turn) {
-    int difference = position - last_position;
-    if (difference >= ticks_per_turn/2)
-        count = count + difference - ticks_per_turn;
-    else if (-difference >= ticks_per_turn/2)
-        count = count + difference + ticks_per_turn;
-    else
-        count += difference;
-}
-
 void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
         client interface shared_memory_interface ?i_shared_memory,
                 server interface PositionFeedbackInterface i_position_feedback[3])
@@ -168,7 +158,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 out_angle = angle_out;
                 break;
 
-        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position }:
+        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position, unsigned int status }:
                 out_count = count;
                 out_position = angle_out;
                 break;
@@ -199,15 +189,15 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 }
                 break;
 
-        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
-                out_ticks_per_turn = HALL_TICKS_PER_ELECTRICAL_ROTATION;
-                break;
+//        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
+//                out_ticks_per_turn = HALL_TICKS_PER_ELECTRICAL_ROTATION;
+//                break;
 
-        case i_position_feedback[int i].set_angle(unsigned int in_angle) -> unsigned int out_offset:
-                break;
+//        case i_position_feedback[int i].set_angle(unsigned int in_angle) -> unsigned int out_offset:
+//                break;
 
-        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int out_position,  unsigned int out_status}:
-                break;
+//        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int out_position,  unsigned int out_status}:
+//                break;
 
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
                 break;

@@ -72,13 +72,13 @@ interface PositionFeedbackInterface
 
     unsigned int get_angle(void);
 
-    { int, unsigned int } get_position(void);
+    { int, unsigned int, unsigned int } get_position(void);
 
-    { int, unsigned int, unsigned int } get_real_position(void);
+//    { int, unsigned int, unsigned int } get_real_position(void);
 
     int get_velocity(void);
 
-    unsigned int get_ticks_per_turn();
+//    unsigned int get_ticks_per_turn();
 
     PositionFeedbackConfig get_config(void);
 
@@ -86,7 +86,7 @@ interface PositionFeedbackInterface
 
     void set_position(int in_count);
 
-    unsigned int set_angle(unsigned int in_angle);
+//    unsigned int set_angle(unsigned int in_angle);
 
     unsigned int send_command(int opcode, int data, int data_bits);
 
@@ -132,6 +132,8 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                                server interface PositionFeedbackInterface (&?i_position_feedback_2)[3]);
 
 int tickstobits(uint32_t ticks);
+
+void multiturn(int &count, int last_position, int position, int ticks_per_turn);
 
 int gpio_read(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number);
 

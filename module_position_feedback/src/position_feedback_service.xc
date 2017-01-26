@@ -62,22 +62,22 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
 
         case i_position_feedback[int i].set_position(int new_count):
                 break;
-        case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
-                break;
+//        case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
+//                break;
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
                 break;
         case i_position_feedback[int i].get_notification() -> int out_notification:
                 break;
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 break;
-        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position }:
+        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position, unsigned int status }:
                 break;
-        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
-                break;
+//        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
+//                break;
         case i_position_feedback[int i].get_velocity() -> int out_velocity:
                 break;
-        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
-                break;
+//        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
+//                break;
 
         //gpio
         case t when timerafter(ts + (1000*IFM_TILE_USEC)) :> ts:
@@ -103,7 +103,7 @@ void start_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         hall_service(*qei_hall_port_1, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     case QEI_SENSOR:
-//        qei_service(*qei_hall_port_2, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        qei_service(*qei_hall_port_2, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
         break;
     default:
         fallback_service(gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
@@ -234,6 +234,16 @@ void set_clock_biss(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2
 int tickstobits(uint32_t ticks)
 {
     return (31-clz(ticks));
+}
+
+void multiturn(int &count, int last_position, int position, int ticks_per_turn) {
+        int difference = position - last_position;
+        if (difference >= ticks_per_turn/2)
+            count = count + difference - ticks_per_turn;
+        else if (-difference >= ticks_per_turn/2)
+            count = count + difference + ticks_per_turn;
+        else
+            count += difference;
 }
 
 int gpio_read(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number)
