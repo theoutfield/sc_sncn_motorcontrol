@@ -111,7 +111,9 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
         break;
     }
     //read
-    read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, biss_clock_port, hall_enc_select_config, position_feedback_config, pos_state, t, last_read);
+    for (int i=0;i<2;i++) { //read 2 times
+        read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, biss_clock_port, hall_enc_select_config, position_feedback_config, pos_state, t, last_read);
+    }
 
 
 #ifdef DEBUG_POSITION_FEEDBACK
@@ -154,7 +156,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     int old_count = 0;
     int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
     int velocity_count = 0;
-    int velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
+//    int velocity_factor = 60000000/position_feedback_config.rem_14_config.velocity_loop;
     int velocity_loop;
 #ifdef REM_16MT_USE_TIMESTAMP
     char old_timestamp = 0, timediff;

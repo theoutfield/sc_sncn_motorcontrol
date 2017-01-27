@@ -31,8 +31,8 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
     while(1) {
 
         /* get position from BiSS Encoder */
-        { count, position } = i_position_feedback.get_position();
-        { real_count, void, status } = i_position_feedback.get_real_position();
+        { count, position, status } = i_position_feedback.get_position();
+//        { real_count, void, status } = i_position_feedback.get_real_position();
 
         t :> start_time;
         /* get angle and velocity from BiSS Encoder */
