@@ -18,11 +18,18 @@
 
 	<!-- Velocity Position Control -->
 
-	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="I_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="I_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="V_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="TORQUE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="FAULT_CODE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	
+	
+	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
 </xSCOPEconfig>
