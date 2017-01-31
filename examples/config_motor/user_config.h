@@ -14,7 +14,7 @@
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
-// SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
+// SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
 #define MOTOR_COMMUTATION_SENSOR   REM_16MT_SENSOR//HALL_SENSOR
 
 // POSITION SENSOR RESOLUTION [ticks/mechanical_rotation]
@@ -72,34 +72,17 @@
 
 #define IFM_TILE_USEC   USEC_STD // Number of ticks in a microsecond for IFM Tile
 
-
-//////////////////////////////////////////////
-//////  BRAKE CONFIGURATION
-//////////////////////////////////////////////
-
-#if (IFM_TILE_USEC == USEC_STD)
-#define DUTY_START_BRAKE    6000   // duty cycles for brake release (should be a number between 600 and 7000)
-#define DUTY_MAINTAIN_BRAKE 1000   // duty cycles for keeping the brake released (should be a number between 700 and 7000)
-#else
-#define DUTY_START_BRAKE    10000  // duty cycles for brake release (should be a number between 1500 and 13000)
-#define DUTY_MAINTAIN_BRAKE 1500   // duty cycles for keeping the brake released (should be a number between 1500 and 13000)
-#endif
-#define PERIOD_START_BRAKE  1000   // period in which high voltage is applied for realising the brake [milli-seconds]
-#define ENABLE_SHAKE_BRAKE     0
-#define BRAKE_SHUTDOWN_DELAY   0   //delay in milliseconds between the brake blocking and the stop of the control
-
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
-
-#define VDC             48
+#define VDC             20
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     82
 #define COMMUTATION_FRQ             24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      0
+#define COMMUTATION_OFFSET_CLK      300
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -200,9 +183,9 @@
 
 
 //nonlinear mode
-#define POSITION_Kp                             4000
-#define POSITION_Ki                             120
-#define POSITION_Kd                             16500
+#define POSITION_Kp                             59000
+#define POSITION_Ki                             4800
+#define POSITION_Kd                             248500
 
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
@@ -214,8 +197,8 @@
                                                      //otherwise set as 0
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             1000000
-#define VELOCITY_Ki                             30000
+#define VELOCITY_Kp                             700000
+#define VELOCITY_Ki                             20000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
 
@@ -223,3 +206,26 @@
 //Filter parameters
 #define POSITION_FC             100
 #define VELOCITY_FC             90
+
+//////////////////////////////////////////////
+//////  BRAKE CONFIGURATION
+//////////////////////////////////////////////
+#define ENABLE_SHAKE_BRAKE     0
+
+#define BRAKE_SHUTDOWN_DELAY   0     //delay in milliseconds between the brake blocking and the stop of the control
+
+/*
+ * Define: Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
+ * Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
+ */
+#define VOLTAGE_PULL_BRAKE     13000    // [milli-Volts]
+
+/*
+ * Define: Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
+ * Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
+ */
+#define VOLTAGE_HOLD_BRAKE     7000     // [milli-Volts]
+
+#define TIME_PULL_BRAKE        10000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+
+

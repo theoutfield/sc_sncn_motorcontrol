@@ -1,32 +1,50 @@
-///*
-// * The copyrights, all other intellectual and industrial
-// * property rights are retained by XMOS and/or its licensors.
-// * Terms and conditions covering the use of this code can
-// * be found in the Xmos End User License Agreement.
-// *
-// * Copyright XMOS Ltd 2013
-// *
-// * In the case where this code is a modification of existing code
-// * under a separate license, the separate license terms are shown
-// * below. The modifications to the code are still covered by the
-// * copyright notice above.
-// **/
-//
+/*
+ * The copyrights, all other intellectual and industrial
+ * property rights are retained by XMOS and/or its licensors.
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2013
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the
+ * copyright notice above.
+ **/
+
 #include "pwm_convert_width.h"
-//#include <app_global.h>
-//
-/******************************************************************************/
+
+/**
+ * @brief Converts PWM structure reference to address.
+ *
+ * @param pwm_ps Pointer to PWM control structure
+ * @return Address
+ */
 unsigned long get_pwm_struct_address( // Converts PWM structure reference to address
 	PWM_ARRAY_TYP * pwm_ps // Pointer to PWM control structure
 ) // Return wrapped offset
 {
 	return (unsigned long)pwm_ps; // Return Address
 } // get_pwm_struct_address
-/*****************************************************************************/
-static void convert_pulse_width( // convert pulse width to a 32-bit pattern and a time-offset
-	PWM_COMMS_TYP * pwm_comms_ps, // Pointer to structure containing PWM communication data
-	PWM_PORT_TYP  * rise_port_data_ps, // Pointer to port data structure (for one leg of balanced line for rising edge )
-	PWM_PORT_TYP  * fall_port_data_ps, // Pointer to port data structure (for one leg of balanced line for falling edge)
+
+
+/**
+ * @brief Convert pulse width to a 32-bit pattern and a time-offset
+ *
+ * @param pwm_comms_ps          Pointer to structure containing PWM communication data
+ * @param rise_port_data_ps     Pointer to port data structure (for one leg of balanced line for rising edge )
+ * @param fall_port_data_ps     Pointer to port data structure (for one leg of balanced line for falling edge)
+ * @param inp_wid
+ * @param pwm_deadtime
+ * @param pwm_max_value
+ * @param pwm_deadtime
+ *
+ * @return void
+ */
+static void convert_pulse_width(
+	PWM_COMMS_TYP * pwm_comms_ps,
+	PWM_PORT_TYP  * rise_port_data_ps,
+	PWM_PORT_TYP  * fall_port_data_ps,
 	unsigned inp_wid,
 	unsigned pwm_max_value,
 	unsigned pwm_deadtime
@@ -85,18 +103,30 @@ static void convert_pulse_width( // convert pulse width to a 32-bit pattern and 
 
 	return;
 } // convert_pulse_width
-/*****************************************************************************/
-static void convert_phase_pulse_widths(  // Convert PWM pulse widths for current phase to pattern/time_offset port data
-	PWM_COMMS_TYP * pwm_comms_ps, // Pointer to structure containing PWM communication data
-	PWM_PHASE_TYP * rise_phase_data_ps, // Pointer to PWM output data structure for rising edge of current phase
-	PWM_PHASE_TYP * fall_phase_data_ps, // Pointer to PWM output data structure for falling edge of current phase
-	unsigned hi_wid, // PWM pulse-width value for Hi-leg
+
+
+/**
+ * @brief Convert PWM pulse widths for current phase to pattern/time_offset port data.
+ * WARNING: Both legs of the balanced line must NOT be switched at the same time. Safety Critical.
+ * Calculate PWM Pulse data for low leg (V+) of balanced line
+ *
+ * @param pwm_comms_ps          Pointer to structure containing PWM communication data
+ * @param rise_port_data_ps     Pointer to PWM output data structure for rising edge of current phase
+ * @param fall_port_data_ps     Pointer to PWM output data structure for falling edge of current phase
+ * @param inp_wid               PWM pulse-width value for Hi-leg
+ * @param pwm_max_value         PWM maximum value
+ * @param pwm_deadtime          deadtime value (in clock ticks)
+ *
+ * @return void
+ */
+static void convert_phase_pulse_widths(
+	PWM_COMMS_TYP * pwm_comms_ps,
+	PWM_PHASE_TYP * rise_phase_data_ps,
+	PWM_PHASE_TYP * fall_phase_data_ps,
+	unsigned hi_wid,
 	unsigned int pwm_max_value,
 	unsigned int pwm_deadtime
 )
-	/* WARNING: Both legs of the balanced line must NOT be switched at the same time. Safety Critical.
-	 * Calculate PWM Pulse data for low leg (V+) of balanced line
-	 */
 
 {
 	unsigned lo_wid = (hi_wid + pwm_deadtime);
@@ -110,7 +140,18 @@ static void convert_phase_pulse_widths(  // Convert PWM pulse widths for current
 
 	convert_pulse_width( pwm_comms_ps ,&(rise_phase_data_ps->lo) ,&(fall_phase_data_ps->lo) ,lo_wid, pwm_max_value, pwm_deadtime );
 } // convert_phase_pulse_widths
-/*****************************************************************************/
+
+
+/**
+ * @brief Convert all PWM pulse widths to pattern/time_offset port data
+ *
+ * @param pwm_comms_ps      Pointer to structure containing PWM communication data
+ * @param pwm_buf_ps        Pointer to Structure containing buffered PWM output data
+ * @param pwm_max_value     Maximum pwm value which can be sent to pwm server (number of clock ticks)
+ * @param pwm_deadtime      Number of clock ticks in over deadtime period
+ *
+ * @return void
+ */
 void convert_all_pulse_widths( // Convert all PWM pulse widths to pattern/time_offset port data
 	PWM_COMMS_TYP * pwm_comms_ps, // Pointer to structure containing PWM communication data
 	PWM_BUFFER_TYP * pwm_buf_ps,   // Pointer to Structure containing buffered PWM output data
@@ -125,7 +166,17 @@ void convert_all_pulse_widths( // Convert all PWM pulse widths to pattern/time_o
 			,&(pwm_buf_ps->fall_edg.phase_data[phase_cnt]) ,pwm_comms_ps->params.widths[phase_cnt], pwm_max_value, pwm_deadtime );
 	} // for phase_cnt
 } // convert_all_pulse_widths
-/*****************************************************************************/
+
+
+/**
+ * @brief Converts PWM Pulse-width to port data in shared memory
+ *
+ * @param pwm_comms_ps      Pointer to structure containing PWM communication data
+ * @param pwm_max_value     Maximum pwm value which can be sent to pwm server (number of clock ticks)
+ * @param pwm_deadtime      Number of clock ticks in over deadtime period
+ *
+ * @return void
+ */
 void convert_widths_in_shared_mem( // Converts PWM Pulse-width to port data in shared memory area
 	PWM_COMMS_TYP * pwm_comms_ps, // Pointer to structure containing PWM communication data
     unsigned int pwm_max_value,
@@ -137,4 +188,3 @@ void convert_widths_in_shared_mem( // Converts PWM Pulse-width to port data in s
 	convert_all_pulse_widths( pwm_comms_ps ,&(pwm_ctrl_ps->buf_data[pwm_comms_ps->buf]), pwm_max_value, pwm_deadtime );
 
 } // convert_widths_in_shared_mem
-/*****************************************************************************/

@@ -236,6 +236,7 @@ int main(void)
     /*********** Motor Test ***********/
     interface WatchdogInterface i_watchdog[2];
     interface update_pwm i_update_pwm;
+    interface update_brake i_update_brake;
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[2];
 
@@ -255,8 +256,8 @@ int main(void)
 
                 //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                 pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                        DUTY_START_BRAKE, DUTY_MAINTAIN_BRAKE, PERIOD_START_BRAKE,
-                        IFM_TILE_USEC);
+                        i_update_brake, IFM_TILE_USEC);
+
             }
 
             /* ADC Service */
@@ -284,12 +285,12 @@ int main(void)
                 motorcontrol_config.pole_pair =  POLE_PAIRS;
                 motorcontrol_config.commutation_sensor=MOTOR_COMMUTATION_SENSOR;
                 motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
-                motorcontrol_config.hall_state_1_angle=HALL_STATE_1_ANGLE;
-                motorcontrol_config.hall_state_2_angle=HALL_STATE_2_ANGLE;
-                motorcontrol_config.hall_state_3_angle=HALL_STATE_3_ANGLE;
-                motorcontrol_config.hall_state_4_angle=HALL_STATE_4_ANGLE;
-                motorcontrol_config.hall_state_5_angle=HALL_STATE_5_ANGLE;
-                motorcontrol_config.hall_state_6_angle=HALL_STATE_6_ANGLE;
+                motorcontrol_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
+                motorcontrol_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
+                motorcontrol_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
+                motorcontrol_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
+                motorcontrol_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
+                motorcontrol_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
                 motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                 motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                 motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;

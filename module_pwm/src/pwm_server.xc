@@ -17,88 +17,91 @@
 #include <pwm_ports.h>
 #include "app_global.h"
 #include "pwm_convert_width.h"
-
 #include <motor_control_interfaces.h>
-
 #include <a4935.h>
 #include <mc_internal_constants.h>
 
-
-/*****************************************************************************/
-static void do_pwm_port_config(PwmPorts &ports)
+/**
+ * @brief Initialize the predriver circuit in your IFM SOMANET device (if applicable)
+ *
+ * @param fet_driver_ports  Structure of ports to manage the FET-driver in your IFM SOMANET device (if applicable).
+ *
+ * @return void
+ */
+void predriver(FetDriverPorts &fet_driver_ports)
 {
-    unsigned i;
+    const unsigned t_delay = 300*100;//300 us
+    unsigned int ts;
+    int check_fet;
+    int init_state = INIT_BUSY;
+    timer t;
 
-    // Loop through PWM phases
-    for (i = 0; i < _NUM_PWM_PHASES; i++)
-    {   // Configure ports for this phase
-
-        configure_out_port( ports.p_pwm[i] , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv[i] , ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-        set_port_inv( ports.p_pwm_inv[i] );
-    }
-
-    if (!isnull(ports.p_pwm_phase_d))
+    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
     {
-        configure_out_port( ports.p_pwm_phase_d , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_phase_d_inv , ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
-        set_port_inv( ports.p_pwm_phase_d_inv );
+        a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
+        t when timerafter (ts + t_delay) :> ts;
     }
 
-    // Check of ADC synchronisation is being used
-    if (1 == _LOCK_ADC_TO_PWM)
-    {   // ADC synchronisation activated
+    if(!isnull(fet_driver_ports.p_coast))
+    {
+        fet_driver_ports.p_coast :> check_fet;
+        init_state = check_fet;
+    }
+    else
+    {
+        init_state = 1;
+    }
+} // predriver
 
-        // Configure dummy input port used to send ADC synchronisation pulse
-        configure_in_port( ports.dummy_port, ports.clk );
-    } // if (1 == LOCK_ADC_TO_PWM)
-
-
-} // do_pwm_port_config
-
-/*****************************************************************************/
+/**
+ * @brief Configure the clock value and initial value of general pwm ports (with up to 6 inverter outputs).
+ *
+ * @param ports  Structure type for PWM ports
+ *
+ * @return void
+ */
 static void do_pwm_port_config_general(PwmPortsGeneral &ports)
 {
 
     if (!isnull(ports.p_pwm_a))
     {
         configure_out_port( ports.p_pwm_a    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_a, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_inv_a, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_a);
     }
 
     if (!isnull(ports.p_pwm_b))
     {
         configure_out_port( ports.p_pwm_b    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_b, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_inv_b, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_b);
     }
 
     if (!isnull(ports.p_pwm_c))
     {
         configure_out_port( ports.p_pwm_c    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_c, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_inv_c, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_c);
     }
 
     if (!isnull(ports.p_pwm_u))
     {
         configure_out_port( ports.p_pwm_u    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_u, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_inv_u, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_u);
     }
 
     if (!isnull(ports.p_pwm_v))
     {
         configure_out_port( ports.p_pwm_v    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_v, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_inv_v, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_v);
     }
 
     if (!isnull(ports.p_pwm_w))
     {
         configure_out_port( ports.p_pwm_w    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_w, ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_inv_w, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_w);
     }
 
@@ -109,40 +112,15 @@ static void do_pwm_port_config_general(PwmPortsGeneral &ports)
         configure_in_port( ports.dummy_port, ports.clk );
     }
 
-} // do_pwm_port_config
+} // do_pwm_port_config_general
 
-
-/*****************************************************************************/
-void pwm_config(PwmPorts &ports)
-{
-    //    int motor_cnt; // motor counter
-
-    // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz) -> in our application it is 250 MHz
-    //configure_clock_rate( ports.clk ,PLATFORM_REFERENCE_MHZ ,1 );
-
-    do_pwm_port_config(ports);
-
-    start_clock( ports.clk ); // Start common PWM clock, once all ports configured
-
-    ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
-    ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-
-    ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
-    ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-
-    ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
-    ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-
-    if (!isnull(ports.p_pwm_phase_d))
-    {
-        ports.p_pwm_phase_d  <: 0x00000000;
-        ports.p_pwm_phase_d_inv  <: 0xFFFFFFFF;
-    }
-
-
-} // foc_pwm_config
-
-/*****************************************************************************/
+/**
+ * @brief Configure the pwm ports (all FETs open) before starting pwm service.
+ *
+ * @param ports  Structure type for general PWM ports (up to 6 inverter outputs)
+ *
+ * @return void
+ */
 void pwm_config_general(PwmPortsGeneral &ports)
 {
     // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz) -> in our application it is 250 MHz
@@ -188,503 +166,20 @@ void pwm_config_general(PwmPortsGeneral &ports)
         if (!isnull(ports.p_pwm_inv_w))  ports.p_pwm_inv_w <: 1;
     }
 
-} // foc_pwm_config
-
-
-/*****************************************************************************/
-void predriver(FetDriverPorts &fet_driver_ports)
-{
-    const unsigned t_delay = 300*100;//300 us
-    unsigned int ts;
-    int check_fet;
-    int init_state = INIT_BUSY;
-    timer t;
-
-    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
-    {
-        a4935_initialize(fet_driver_ports.p_esf_rst_pwml_pwmh, fet_driver_ports.p_coast, A4935_BIT_PWML | A4935_BIT_PWMH);
-        t when timerafter (ts + t_delay) :> ts;
-    }
-
-    if(!isnull(fet_driver_ports.p_coast))
-    {
-        fet_driver_ports.p_coast :> check_fet;
-        init_state = check_fet;
-    }
-    else
-    {
-        init_state = 1;
-    }
-
-
-} // foc_pwm_config
-
-
-void pwm_check_general(PwmPortsGeneral &ports)
-{
-
-    while(1)
-    {
-        if (!isnull(ports.p_pwm_a))
-        {
-            ports.p_pwm_a     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_a <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_b))
-        {
-            ports.p_pwm_b     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_b <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_c))
-        {
-
-            ports.p_pwm_c     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_c <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_u))
-        {
-            ports.p_pwm_u     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_u <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_v))
-        {
-            ports.p_pwm_v     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_v <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_w))
-        {
-            ports.p_pwm_w     <: 0xFFFFFFFF;
-            ports.p_pwm_inv_w <: 0xFFFFFFFF;
-        }
-        delay_microseconds(100);
-
-
-        if (!isnull(ports.p_pwm_a))
-        {
-            ports.p_pwm_a     <: 0x00000000;
-            ports.p_pwm_inv_a <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_b))
-        {
-            ports.p_pwm_b     <: 0x00000000;
-            ports.p_pwm_inv_b <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_c))
-        {
-            ports.p_pwm_c     <: 0x00000000;
-            ports.p_pwm_inv_c <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_u))
-        {
-            ports.p_pwm_u     <: 0x00000000;
-            ports.p_pwm_inv_u <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_v))
-        {
-            ports.p_pwm_v     <: 0x00000000;
-            ports.p_pwm_inv_v <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_w))
-        {
-            ports.p_pwm_w     <: 0x00000000;
-            ports.p_pwm_inv_w <: 0xFFFFFFFF;
-        }
-        delay_microseconds(3);
-
-
-        if (!isnull(ports.p_pwm_a))
-        {
-            ports.p_pwm_a     <: 0x00000000;
-            ports.p_pwm_inv_a <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_b))
-        {
-            ports.p_pwm_b     <: 0x00000000;
-            ports.p_pwm_inv_b <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_c))
-        {
-            ports.p_pwm_c     <: 0x00000000;
-            ports.p_pwm_inv_c <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_u))
-        {
-            ports.p_pwm_u     <: 0x00000000;
-            ports.p_pwm_inv_u <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_v))
-        {
-            ports.p_pwm_v     <: 0x00000000;
-            ports.p_pwm_inv_v <: 0x00000000;
-        }
-
-        if (!isnull(ports.p_pwm_w))
-        {
-            ports.p_pwm_w     <: 0x00000000;
-            ports.p_pwm_inv_w <: 0x00000000;
-        }
-        delay_microseconds(100);
-
-        if (!isnull(ports.p_pwm_a))
-        {
-            ports.p_pwm_a     <: 0x00000000;
-            ports.p_pwm_inv_a <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_b))
-        {
-            ports.p_pwm_b     <: 0x00000000;
-            ports.p_pwm_inv_b <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_c))
-        {
-            ports.p_pwm_c     <: 0x00000000;
-            ports.p_pwm_inv_c <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_u))
-        {
-            ports.p_pwm_u     <: 0x00000000;
-            ports.p_pwm_inv_u <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_v))
-        {
-            ports.p_pwm_v     <: 0x00000000;
-            ports.p_pwm_inv_v <: 0xFFFFFFFF;
-        }
-
-        if (!isnull(ports.p_pwm_w))
-        {
-            ports.p_pwm_w     <: 0x00000000;
-            ports.p_pwm_inv_w <: 0xFFFFFFFF;
-        }
-        delay_microseconds(3);
-
-    }
-
-}
-
-
-void pwm_checkl(PwmPorts &ports)
-{
-
-    while(1)
-    {
-
-        ports.p_pwm[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-        delay_microseconds(100);
-
-
-        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-        delay_microseconds(3);
-
-
-        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0x00000000;
-
-        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0x00000000;
-
-        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0x00000000;
-        delay_microseconds(100);
-
-
-        ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
-
-        ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
-        ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
-        delay_microseconds(3);
-
-    }
-
-}
-void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, PWM server, with ADC sync
-        unsigned motor_id, // Motor identifier
-        PwmPorts &ports,
-        server interface update_pwm i_update_pwm,
-        int duty_start_brake,
-        int duty_maintain_brake,
-        int time_start_brake,
-        int ifm_tile_usec
-)
-{
-    unsigned int half_sync_inc=0;
-    unsigned int pwm_max_value=0;
-    unsigned int pwm_deadtime =0;
-
-
-    timer t;
-    unsigned ts;
-
-    //proper task startup
-    t :> ts;
-    t when timerafter (ts + (4000*20*250)) :> void;
-
-
-    if(ifm_tile_usec==250)
-    {
-        half_sync_inc = 8192;
-        pwm_max_value=16384;
-        pwm_deadtime=1500;
-
-        //Set freq to 250MHz (always needed for proper timing)
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-    }
-    else if(ifm_tile_usec==100)
-    {
-        half_sync_inc = 4096;
-        pwm_max_value=8192;
-        pwm_deadtime=600;
-    }
-    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
-    {
-        while(1);//error state!!!
-    }
-
-
-    PWM_ARRAY_TYP pwm_ctrl_s ; // Structure containing double-buffered PWM output data
-    PWM_SERV_TYP  pwm_serv_s ; // Structure containing PWM server control data
-    PWM_COMMS_TYP pwm_comms_s; // Structure containing PWM communication data
-
-
-    PWM_ARRAY_TYP pwm_ctrl_s_start_brake ; // Structure containing double-buffered PWM output data
-    PWM_COMMS_TYP pwm_comms_s_start_brake; // Structure containing PWM communication data
-
-
-
-    //parameters for starting the brake
-    pwm_comms_s_start_brake.params.widths[0] = duty_start_brake;
-    pwm_comms_s_start_brake.params.widths[1] =  duty_start_brake;
-    pwm_comms_s_start_brake.params.widths[2] =  duty_start_brake;
-
-    pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
-    pwm_comms_s_start_brake.buf = 0;
-
-    convert_all_pulse_widths( pwm_comms_s_start_brake ,pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
-
-
-    //parameters for maintaining the brake
-
-    PWM_ARRAY_TYP pwm_ctrl_s_maintain_brake ; // Structure containing double-buffered PWM output data
-    PWM_COMMS_TYP pwm_comms_s_maintain_brake; // Structure containing PWM communication data
-
-    pwm_comms_s_maintain_brake.params.widths[0] = duty_maintain_brake;
-    pwm_comms_s_maintain_brake.params.widths[1] = duty_maintain_brake;
-    pwm_comms_s_maintain_brake.params.widths[2] = duty_maintain_brake;
-
-    pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
-    pwm_comms_s_maintain_brake.buf = 0;
-
-    convert_all_pulse_widths( pwm_comms_s_maintain_brake ,pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
-
-
-
-    unsigned pattern=0; // Bit-pattern on port
-
-    //    int pwm_test=0;
-    int pwm_on  =0;
-
-    int brake_active  = 0;
-    int brake_counter = 0;
-    int brake_start   = (time_start_brake*15000)/1000;
-
-    //    int pwm_flag=0;
-
-    unsigned char brake_defined = 0b0000;
-    brake_defined = !isnull(ports.p_pwm_phase_d);
-
-    // initialize PWM
-    pwm_serv_s.id = motor_id; // Assign motor identifier
-    pwm_comms_s.params.id = 0; // Unique Motor identifier e.g. 0 or 1
-    pwm_comms_s.buf = 0;
-
-    pwm_comms_s.params.widths[0] = 4000;
-    pwm_comms_s.params.widths[1] = 4000;
-    pwm_comms_s.params.widths[2] = 4000;
-
-    convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
-
-    // Find out value of time clock on an output port, WITHOUT changing port value
-    pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
-    pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
-
-    pwm_serv_s.data_ready = 1; // Signal new data ready. NB this happened in init_pwm_data()
-
-
-
-    /* This loop requires at least ~280 cycles, which means the PWM period must be at least 512 cycles.
-     * If convert_all_pulse_widths was optimised for speed, maybe a PWM period of 256 cycles would be possible
-     */
-    while (1)
-    {
-        select
-        {
-        case i_update_pwm.status() -> {int status}:
-                status = ACTIVE;
-                break;
-
-        case i_update_pwm.update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode):
-                pwm_comms_s.params.widths[0] =  pwm_a;
-                pwm_comms_s.params.widths[1] =  pwm_b;
-                pwm_comms_s.params.widths[2] =  pwm_c;
-                convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
-
-                if(recieved_safe_torque_off_mode ==0)
-                    pwm_on     = received_pwm_on;
-                else if(recieved_safe_torque_off_mode ==1)
-                    pwm_on     = 0;
-
-                if(received_brake_active==0)  brake_active = 0;
-
-                if((brake_active == 0)&&(received_brake_active==1))
-                {
-                    brake_counter=0;
-                    brake_active = 1;
-                }
-
-
-
-                pattern = peek( ports.p_pwm[_PWM_PHASE_A] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
-                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[_PWM_PHASE_A] ,1 ,pattern ); // Re-load output port with same bit-value
-                pwm_serv_s.ref_time += half_sync_inc;
-
-                break;
-
-        case i_update_pwm.safe_torque_off_enabled():
-
-            pwm_on     = 0;
-
-            pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
-            pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
-            pwm_serv_s.ref_time += half_sync_inc;
-
-
-            // Rising edges - these have negative time offsets - 44 Cycles
-            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
-            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
-            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
-
-            // Falling edges - these have positive time offsets - 44 Cycles
-            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
-            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
-            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
-            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
-
-
-
-            break;
-        }
-
-        if (pwm_on)
-        {
-            // Rising edges - these have negative time offsets - 44 Cycles
-            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.pattern;
-            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.pattern;
-
-            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.pattern;
-            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.pattern;
-
-            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-        }
-
-        if(brake_active && brake_defined)
-        {
-            if(brake_counter < brake_start)
-            {
-                brake_counter++;
-
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-            }
-            else
-            {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-            }
-        }
-
-        if (pwm_on)
-        {
-            // Falling edges - these have positive time offsets - 44 Cycles
-            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.pattern;
-            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.pattern;
-
-            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.pattern;
-            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.pattern;
-
-            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-        }
-
-        if(brake_active && brake_defined)
-        {
-            if(brake_counter < brake_start)
-            {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-            }
-            else
-            {
-                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
-                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
-            }
-        }
-
-    } // while(1)
-
-
-} // pwm_service_task
-/*****************************************************************************/
-
+} // pwm_config_general
+
+/**
+ * @brief Service to generate center-alligned PWM signals for 6 inverter outputs (2 power switch for each leg).
+ * It recieves 6 pwm values through i_update_pwm interface. The commutation frequency is 16 kHz, and the deadtime is 3 us.
+ *
+ * @param ports                 Structure type for PWM ports
+ * @param i_update_pwm          Interface to communicate with client and update the PWM values
+ *
+ * @return void
+ */
 void pwm_service_general(
         PwmPortsGeneral &ports,
-        server interface update_pwm_general i_update_pwm,
-        int duty_start_brake,
-        int duty_maintain_brake,
-        int time_start_brake,
-        int ifm_tile_usec,
-        int commutation_frq
+        server interface update_pwm_general i_update_pwm
 )
 {
     unsigned short phase_a_defined=0x0000, phase_b_defined=0x0000, phase_c_defined=0x0000;
@@ -722,7 +217,6 @@ void pwm_service_general(
     t :> ts;
     t when timerafter (ts + (4000*20*250)) :> void;
 
-
     phase_a_defined     = !isnull(ports.p_pwm_a);
     phase_a_inv_defined = !isnull(ports.p_pwm_inv_a);
     phase_b_defined     = !isnull(ports.p_pwm_b);
@@ -737,18 +231,10 @@ void pwm_service_general(
     phase_w_inv_defined = !isnull(ports.p_pwm_inv_w);
 
     //constants optimized for the closest case to 16kHz commutation frequency frq at 100 MHz ref_clk_frq
-/*
     period           = 0x186A;
     port_clock_shift = 0x0C35;
-    inactive_period  = 0x012C;
-    range_limit      = 0x15EA;
-*/
-
-    period           = 6250;
-    port_clock_shift = 3125;
-    inactive_period  = 250;
-    range_limit      = 5650;
-
+    inactive_period  = 0x0FA;
+    range_limit      = 0x1612;
 
     pwm_value_a=pwm_init;
     pwm_value_b=pwm_init;
@@ -874,7 +360,392 @@ void pwm_service_general(
 
     } // while(1)
 
+} // pwm_service_general
+
+
+void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
+        int v_dc, int voltage_pull_brake, int time_pull_brake, int voltage_hold_brake)
+{
+
+    int error=0;
+    int duty_min=0, duty_max=0, duty_divider=0;
+    int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
+
+
+    if(v_dc <= 0)
+    {
+        printf("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
+        while(1);
+    }
+
+    if(voltage_pull_brake > (v_dc*1000))
+    {
+        printf("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
+        while(1);
+    }
+
+    if(voltage_pull_brake < 0)
+    {
+        printf("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
+        while(1);
+    }
+
+    if(voltage_hold_brake > (v_dc*1000))
+    {
+        printf("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
+        while(1);
+    }
+
+    if(voltage_hold_brake < 0)
+    {
+        printf("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
+        while(1);
+    }
+
+    if(period_start_brake < 0)
+    {
+        printf("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
+        while(1);
+    }
+
+    if(ifm_tile_usec==250)
+    {
+        duty_min = 1500;
+        duty_max = 13000;
+        duty_divider = 16384;
+    }
+    else if(ifm_tile_usec==100)
+    {
+        duty_min = 600;
+        duty_max = 7000;
+        duty_divider = 8192;
+    }
+    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+    {
+        error = 1;
+    }
+
+    duty_start_brake    = (duty_divider * voltage_pull_brake)/(1000*v_dc);
+    if(duty_start_brake < duty_min) duty_start_brake = duty_min;
+    if(duty_start_brake > duty_max) duty_start_brake = duty_max;
+
+    duty_maintain_brake = (duty_divider * voltage_hold_brake)/(1000*v_dc);
+    if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
+    if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
+
+    period_start_brake  = (time_pull_brake * 1000)/ifm_tile_usec;
+
+    i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
+}
+
+
+/**
+ * @brief Configure the clock value and initial value of pwm ports.
+ *
+ * @param ports  Structure type for PWM ports
+ *
+ * @return void
+ */
+static void do_pwm_port_config(PwmPorts &ports)
+{
+    unsigned i;
+
+    // Loop through PWM phases
+    for (i = 0; i < _NUM_PWM_PHASES; i++)
+    {   // Configure ports for this phase
+
+        configure_out_port( ports.p_pwm[i] , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_inv[i] , ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        set_port_inv( ports.p_pwm_inv[i] );
+    }
+
+    if (!isnull(ports.p_pwm_phase_d))
+    {
+        configure_out_port( ports.p_pwm_phase_d , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        configure_out_port( ports.p_pwm_phase_d_inv , ports.clk ,0 ); // Set initial value of port to 0 (Switched Off)
+        set_port_inv( ports.p_pwm_phase_d_inv );
+    }
+
+    // Check of ADC synchronisation is being used
+    if (1 == _LOCK_ADC_TO_PWM)
+    {   // ADC synchronisation activated
+
+        // Configure dummy input port used to send ADC synchronisation pulse
+        configure_in_port( ports.dummy_port, ports.clk );
+    } // if (1 == LOCK_ADC_TO_PWM)
+
+} // do_pwm_port_config
+
+/**
+ * @brief Configure the pwm ports before starting pwm service.
+ *
+ * @param ports  Structure type for PWM ports
+ *
+ * @return void
+ */
+void pwm_config(PwmPorts &ports)
+{
+
+    do_pwm_port_config(ports);
+
+    start_clock( ports.clk ); // Start common PWM clock, once all ports configured
+
+    ports.p_pwm[_PWM_PHASE_A]  <: 0x00000000;
+    ports.p_pwm_inv[_PWM_PHASE_A]  <: 0xFFFFFFFF;
+
+    ports.p_pwm[_PWM_PHASE_B]  <: 0x00000000;
+    ports.p_pwm_inv[_PWM_PHASE_B]  <: 0xFFFFFFFF;
+
+    ports.p_pwm[_PWM_PHASE_C]  <: 0x00000000;
+    ports.p_pwm_inv[_PWM_PHASE_C]  <: 0xFFFFFFFF;
+
+    if (!isnull(ports.p_pwm_phase_d))
+    {
+        ports.p_pwm_phase_d  <: 0x00000000;
+        ports.p_pwm_phase_d_inv  <: 0xFFFFFFFF;
+    }
+} // pwm_config
+
+/**
+ * @brief Service to generate center-alligned PWM signals for 3 inverter outputs.
+ * it also provides PWM signals to turn on/off an electric brake.
+ *
+ * @param motor_id              Motor ID (the default value is 0)
+ * @param ports                 Structure type for PWM ports
+ * @param i_update_pwm          Interface to communicate with client and update the PWM values
+ * @param duty_start_brake      PWM value which is used to start the electric brake
+ * @param duty_maintain_brake   PWM value which is used to maintain the electric brake
+ * @param time_start_brake      Required time to start the brake (in milliseconds)
+ * @param ifm_tile_usec         Reference clock frequency of IFM tile (in MHz)
+ *
+ * @return void
+ */
+void pwm_service_task(
+        unsigned motor_id,
+        PwmPorts &ports,
+        server interface update_pwm i_update_pwm,
+        server interface update_brake i_update_brake,
+        int ifm_tile_usec
+)
+{
+    int duty_start_brake    = 3000;
+    int duty_maintain_brake = 3000;
+    int brake_start         = 0;
+    unsigned char  brake_defined_II    = 0b0000;
+
+    unsigned int half_sync_inc=0;
+    unsigned int pwm_max_value=0;
+    unsigned int pwm_deadtime =0;
+
+    timer t;
+    unsigned ts;
+
+    t :> ts;
+    t when timerafter (ts + (4000*20*250)) :> void;    //proper task startup
+
+    select
+    {
+    case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
+            duty_start_brake    = _duty_start_brake;
+            duty_maintain_brake = _duty_maintain_brake;
+            brake_start         = _period_start_brake;
+            brake_defined_II    = 0b1111;
+            break;
+
+    default:
+        break;
+    }
+
+    if(ifm_tile_usec==250)
+    {
+        half_sync_inc = 8192;
+        pwm_max_value=16384;
+        pwm_deadtime=1500;
+
+        //Set freq to 250MHz (always needed for proper timing)
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
+    else if(ifm_tile_usec==100)
+    {
+        half_sync_inc = 4096;
+        pwm_max_value=8192;
+        pwm_deadtime=600;
+    }
+    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+    {
+        while(1);//error state!!!
+    }
+
+    PWM_ARRAY_TYP pwm_ctrl_s ; // Structure containing double-buffered PWM output data
+    PWM_SERV_TYP  pwm_serv_s ; // Structure containing PWM server control data
+    PWM_COMMS_TYP pwm_comms_s; // Structure containing PWM communication data
+
+    PWM_ARRAY_TYP pwm_ctrl_s_start_brake ; // Structure containing double-buffered PWM output data
+    PWM_COMMS_TYP pwm_comms_s_start_brake; // Structure containing PWM communication data
+
+    //parameters for starting the brake
+    pwm_comms_s_start_brake.params.widths[0] =  duty_start_brake;
+    pwm_comms_s_start_brake.params.widths[1] =  duty_start_brake;
+    pwm_comms_s_start_brake.params.widths[2] =  duty_start_brake;
+
+    pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+    pwm_comms_s_start_brake.buf = 0;
+
+    convert_all_pulse_widths( pwm_comms_s_start_brake ,pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
+
+    //parameters for maintaining the brake
+    PWM_ARRAY_TYP pwm_ctrl_s_maintain_brake ; // Structure containing double-buffered PWM output data
+    PWM_COMMS_TYP pwm_comms_s_maintain_brake; // Structure containing PWM communication data
+
+    pwm_comms_s_maintain_brake.params.widths[0] = duty_maintain_brake;
+    pwm_comms_s_maintain_brake.params.widths[1] = duty_maintain_brake;
+    pwm_comms_s_maintain_brake.params.widths[2] = duty_maintain_brake;
+
+    pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+    pwm_comms_s_maintain_brake.buf = 0;
+
+    convert_all_pulse_widths( pwm_comms_s_maintain_brake ,pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
+
+    unsigned pattern=0; // Bit-pattern on port
+    int pwm_on  =0;
+    int brake_active  = 0;
+    int brake_counter = 0;
+
+    unsigned char brake_defined = 0b0000;
+    brake_defined = ((!isnull(ports.p_pwm_phase_d))&brake_defined_II);
+
+    // initialize PWM
+    pwm_serv_s.id = motor_id;  // Assign motor identifier
+    pwm_comms_s.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+    pwm_comms_s.buf = 0;
+
+    pwm_comms_s.params.widths[0] = 4000;
+    pwm_comms_s.params.widths[1] = 4000;
+    pwm_comms_s.params.widths[2] = 4000;
+
+    convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
+
+    // Find out value of time clock on an output port, WITHOUT changing port value
+    pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
+    pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
+
+    pwm_serv_s.data_ready = 1; // Signal new data ready. NB this happened in init_pwm_data()
+
+    while (1)
+    {
+        select
+        {
+        case i_update_pwm.status() -> {int status}:
+                status = ACTIVE;
+                break;
+
+        case i_update_pwm.update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int received_pwm_on, int received_brake_active, int recieved_safe_torque_off_mode):
+                pwm_comms_s.params.widths[0] =  pwm_a;
+                pwm_comms_s.params.widths[1] =  pwm_b;
+                pwm_comms_s.params.widths[2] =  pwm_c;
+                convert_all_pulse_widths( pwm_comms_s ,pwm_ctrl_s.buf_data[pwm_comms_s.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
+
+                if(recieved_safe_torque_off_mode ==0)
+                    pwm_on     = received_pwm_on;
+                else if(recieved_safe_torque_off_mode ==1)
+                    pwm_on     = 0;
+
+                if(received_brake_active==0)  brake_active = 0;
+
+                if((brake_active == 0)&&(received_brake_active==1))
+                {
+                    brake_counter=0;
+                    brake_active = 1;
+                }
+
+                pattern = peek( ports.p_pwm[_PWM_PHASE_A] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
+                pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[_PWM_PHASE_A] ,1 ,pattern ); // Re-load output port with same bit-value
+                pwm_serv_s.ref_time += half_sync_inc;
+
+                break;
+
+        case i_update_pwm.safe_torque_off_enabled():
+
+            pwm_on     = 0;
+
+            pattern = peek( ports.p_pwm[0] ); // Find out value on 1-bit port. NB Only LS-bit is relevant
+            pwm_serv_s.ref_time = partout_timestamped( ports.p_pwm[0] ,1 ,pattern ); // Re-load output port with same bit-value
+            pwm_serv_s.ref_time += half_sync_inc;
+
+            // Rising edges - these have negative time offsets - 44 Cycles
+            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
+
+            // Falling edges - these have positive time offsets - 44 Cycles
+            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: 0xFFFFFFFF;
+            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: 0x00000000;
+            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: 0xFFFFFFFF;
+
+            break;
+        }
+
+        if (pwm_on)
+        {
+            // Rising edges - these have negative time offsets - 44 Cycles
+            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_A].lo.pattern;
+
+            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_B].lo.pattern;
+
+            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+        }
+
+        if(brake_active && brake_defined)
+        {
+            if(brake_counter < brake_start)
+            {
+                brake_counter++;
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+            }
+            else
+            {
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].rise_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+            }
+        }
+
+        if (pwm_on)
+        {
+            // Falling edges - these have positive time offsets - 44 Cycles
+            ports.p_pwm[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_A] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_A].lo.pattern;
+
+            ports.p_pwm[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_B] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_B].lo.pattern;
+
+            ports.p_pwm[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+            ports.p_pwm_inv[_PWM_PHASE_C] @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s.buf_data[pwm_comms_s.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+        }
+
+        if(brake_active && brake_defined)
+        {
+            if(brake_counter < brake_start)
+            {
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+            }
+            else
+            {
+                ports.p_pwm_phase_d @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].hi.pattern;
+                ports.p_pwm_phase_d_inv @ (PORT_TIME_TYP)(pwm_serv_s.ref_time + pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.time_off) <: pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf].fall_edg.phase_data[_PWM_PHASE_C].lo.pattern;
+            }
+        }
+
+    } // while(1)
 
 } // pwm_service_task
-
-/*****************************************************************************/

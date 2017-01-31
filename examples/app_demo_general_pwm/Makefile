@@ -11,11 +11,10 @@ TARGET =
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_demo_dual_motor_pwm
+APP_NAME = app_demo_general_pwm
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = config_motor module_advanced_torquecontrol_lib module_board-support module_misc module_pwm module_watchdog
-
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

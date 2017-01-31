@@ -87,19 +87,8 @@ typedef struct {
     int licence;                            /**< Licence number for using the library of module_advanced_foc  */
     int commutation_sensor;                 /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
     int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
-    int hall_state_1;                       /**< Hall port state while being in sector 1*/
-    int hall_state_2;                       /**< Hall port state while being in sector 2*/
-    int hall_state_3;                       /**< Hall port state while being in sector 3*/
-    int hall_state_4;                       /**< Hall port state while being in sector 4*/
-    int hall_state_5;                       /**< Hall port state while being in sector 5*/
-    int hall_state_6;                       /**< Hall port state while being in sector 6*/
-
-    int hall_state_1_angle;                 /**< estimated angle while being in sector 1*/
-    int hall_state_2_angle;                 /**< estimated angle while being in sector 2*/
-    int hall_state_3_angle;                 /**< estimated angle while being in sector 3*/
-    int hall_state_4_angle;                 /**< estimated angle while being in sector 4*/
-    int hall_state_5_angle;                 /**< estimated angle while being in sector 5*/
-    int hall_state_6_angle;                 /**< estimated angle while being in sector 6*/
+    int hall_state[6];                       /**< Hall port state while being in sector [1-6] */
+    int hall_state_angle[7];                 /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
 
     int commutation_loop_period;            /**< Period for the commutation loop [microseconds]. */
 
