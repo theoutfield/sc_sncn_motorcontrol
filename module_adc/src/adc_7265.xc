@@ -90,50 +90,15 @@ void adc_ad7256(
         CurrentSensorsConfig &current_sensor_config,
         interface WatchdogInterface client ?i_watchdog)
 {
-//    int adc_data[2][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0}};
-//    unsigned char sampling_port = 0;
-
     timer t;
     unsigned time=0, time_stamp=0;
 
     unsigned inp_val = 0, tmp_val = 0;
 
-
-//    int overcurrent_protection_was_triggered = 0;
-//    int overcurrent_protection_is_active = 0;
-
-//    //Calibration variables
-//    int i_calib_a = 0, i_calib_b = 0, Icalibrated_a = 0, Icalibrated_b = 0;
-
     configure_adc_ports_7265( adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
-
-//    //Calibration
-//#ifdef AUTOCALIBRATION
-//    while (i < ADC_CALIB_POINTS) {
-//        // get ADC reading
-//
-//        adc_ad7265_singleshot(adc_ports, adc_data, 1, sampling_port, 200, overcurrent_protection_is_active, i_watchdog);
-//
-//        if (adc_data[0][0]>0 && adc_data[0][0]<16382  &&  adc_data[1][0]>0 && adc_data[1][0]<16382) {
-//            i_calib_a += adc_data[0][0];
-//            i_calib_b += adc_data[1][0];
-//            i++;
-//            if (i == ADC_CALIB_POINTS) {
-//                break;
-//            }
-//        }
-//    }
-//
-//    i_calib_a = (i_calib_a >> Factor);
-//    i_calib_b = (i_calib_b >> Factor);
-//#else
-//    i_calib_a = MAX_ADC_VALUE/2;
-//    i_calib_b = MAX_ADC_VALUE/2;
-//#endif
 
     while(1)
     {
-
         #pragma ordered
         select
         {
