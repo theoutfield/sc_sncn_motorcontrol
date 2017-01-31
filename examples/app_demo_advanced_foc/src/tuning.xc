@@ -319,12 +319,9 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
                 motorcontrol_config = i_motorcontrol.get_config();
                 if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
                 {
-                    printf("hall_state_1_angle %d\n", motorcontrol_config.hall_state_1);
-                    printf("hall_state_2_angle %d\n", motorcontrol_config.hall_state_2);
-                    printf("hall_state_3_angle %d\n", motorcontrol_config.hall_state_3);
-                    printf("hall_state_4_angle %d\n", motorcontrol_config.hall_state_4);
-                    printf("hall_state_5_angle %d\n", motorcontrol_config.hall_state_5);
-                    printf("hall_state_6_angle %d\n", motorcontrol_config.hall_state_6);
+                    for (int i=0;i<6;i++) {
+                        printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                    }
                 }
 
                 delay_milliseconds(2000);
