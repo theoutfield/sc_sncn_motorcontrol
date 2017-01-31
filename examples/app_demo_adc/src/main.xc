@@ -131,7 +131,7 @@ int main(void)
 
                 /* ADC Service */
                 {
-                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, null/*i_watchdog[1]*/, IFM_TILE_USEC);
+                    adc_service(adc_ports, null/*c_trigger*/, i_adc /*ADCInterface*/, null/*i_watchdog[1]*/, IFM_TILE_USEC, NORMAL_MODE);
                 }
 
 //                /* Watchdog Service */

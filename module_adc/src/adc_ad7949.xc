@@ -313,6 +313,12 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
                 status = ACTIVE;
                 break;
 
+        case i_adc[int i].set_channel(unsigned short channel_config):
+                break;
+
+        case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
+                break;
+
         case i_adc[int i].set_protection_limits(int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
@@ -411,26 +417,26 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
                 break;
 
-        case i_adc[int i].get_currents() -> {int Ia, int Ib}:
-                break;
-
-        case i_adc[int i].get_temperature() -> {int out_temp}:
-                break;
-
-        case i_adc[int i].get_external_inputs() -> {int ext_a, int ext_b}:
-                break;
-
-        case i_adc[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
-                break;
-
-        case i_adc[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
-                break;
-
-        case i_adc[int i].enable_overcurrent_protection():
-                break;
-
-        case i_adc[int i].get_overcurrent_protection_status() -> int status:
-                break;
+//        case i_adc[int i].get_currents() -> {int Ia, int Ib}:
+//                break;
+//
+//        case i_adc[int i].get_temperature() -> {int out_temp}:
+//                break;
+//
+//        case i_adc[int i].get_external_inputs() -> {int ext_a, int ext_b}:
+//                break;
+//
+//        case i_adc[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+//                break;
+//
+//        case i_adc[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+//                break;
+//
+//        case i_adc[int i].enable_overcurrent_protection():
+//                break;
+//
+//        case i_adc[int i].get_overcurrent_protection_status() -> int status:
+//                break;
 
         case i_adc[int i].reset_faults():
                 break;
@@ -511,62 +517,68 @@ void adc_ad7949_triggered(interface ADCInterface server i_adc[2], AD7949Ports &a
                 status = ACTIVE;
                 break;
 
+        case i_adc[int i].set_channel(unsigned short channel_config):
+                break;
+
+        case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
+                break;
+
         case i_adc[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
         case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
 
-        case i_adc[int i].get_currents() -> {int Ia, int Ib}:
-
-                Ia = current_sensor_config.sign_phase_b * Icalibrated_a;
-                Ib = current_sensor_config.sign_phase_c * Icalibrated_b;
-
-                break;
-
-        case i_adc[int i].get_temperature() -> {int out_temp}:
-
-                out_temp = adc_data_a[1];
-
-                break;
-
-        case i_adc[int i].get_external_inputs() -> {int ext_a, int ext_b}:
-
-                ext_a = adc_data_a[3];
-                ext_b = adc_data_b[3];
-
-                break;
-
-        case i_adc[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
-
-
-                if(amps >= current_sensor_config.current_sensor_amplitude)
-                     out_ticks = MAX_ADC_VALUE/2; break;
-                if(amps <= -current_sensor_config.current_sensor_amplitude)
-                    out_ticks = -MAX_ADC_VALUE/2; break;
-
-                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
-
-                break;
-
-        case i_adc[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
-
-                if(ticks >= MAX_ADC_VALUE/2)
-                    out_amps = current_sensor_config.current_sensor_amplitude; break;
-                if(ticks <= -MAX_ADC_VALUE/2)
-                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
-
-                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
-
-                break;
-
-        case i_adc[int i].enable_overcurrent_protection():
-              //  printstr("\n> Overcurrent protection enabled");
-                overcurrent_protection_is_active = 1;
-                break;
-
-        case i_adc[int i].get_overcurrent_protection_status() -> int status:
-                status = overcurrent_protection_was_triggered;
-                break;
+//        case i_adc[int i].get_currents() -> {int Ia, int Ib}:
+//
+//                Ia = current_sensor_config.sign_phase_b * Icalibrated_a;
+//                Ib = current_sensor_config.sign_phase_c * Icalibrated_b;
+//
+//                break;
+//
+//        case i_adc[int i].get_temperature() -> {int out_temp}:
+//
+//                out_temp = adc_data_a[1];
+//
+//                break;
+//
+//        case i_adc[int i].get_external_inputs() -> {int ext_a, int ext_b}:
+//
+//                ext_a = adc_data_a[3];
+//                ext_b = adc_data_b[3];
+//
+//                break;
+//
+//        case i_adc[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+//
+//
+//                if(amps >= current_sensor_config.current_sensor_amplitude)
+//                     out_ticks = MAX_ADC_VALUE/2; break;
+//                if(amps <= -current_sensor_config.current_sensor_amplitude)
+//                    out_ticks = -MAX_ADC_VALUE/2; break;
+//
+//                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
+//
+//                break;
+//
+//        case i_adc[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+//
+//                if(ticks >= MAX_ADC_VALUE/2)
+//                    out_amps = current_sensor_config.current_sensor_amplitude; break;
+//                if(ticks <= -MAX_ADC_VALUE/2)
+//                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
+//
+//                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
+//
+//                break;
+//
+//        case i_adc[int i].enable_overcurrent_protection():
+//              //  printstr("\n> Overcurrent protection enabled");
+//                overcurrent_protection_is_active = 1;
+//                break;
+//
+//        case i_adc[int i].get_overcurrent_protection_status() -> int status:
+//                status = overcurrent_protection_was_triggered;
+//                break;
 
         case i_adc[int i].reset_faults():
                 break;
@@ -633,84 +645,90 @@ void adc_ad7949(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
                 status = ACTIVE;
                 break;
 
+        case i_adc[int i].set_channel(unsigned short channel_config):
+                break;
+
+        case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
+                break;
+
         case i_adc[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
                 break;
 
         case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
 
-        case i_adc[int i].get_currents() -> {int Ia, int Ib}:
-
-
-                //If no trigger exists on the system, we sample on request
-                overcurrent_protection_was_triggered =  adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
-                                                                               adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                                                               adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
-
-                Icalibrated_a = ((int) adc_data_a[4]) - i_calib_a;
-                Icalibrated_b = ((int) adc_data_b[4]) - i_calib_b;
-
-                Ia = current_sensor_config.sign_phase_b * Icalibrated_a;
-                Ib = current_sensor_config.sign_phase_c *Icalibrated_b;
-
-                break;
-
-        case i_adc[int i].get_temperature() -> {int out_temp}:
-
-                //If no trigger exists on the system, we sample on request
-                adc_index = 1;
-                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
-                                        adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
-
-                out_temp = adc_data_a[1];
-
-                break;
-
-        case i_adc[int i].get_external_inputs() -> {int ext_a, int ext_b}:
-
-                //If no trigger exists on the system, we sample on request
-                adc_index = 3;
-                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
-                                        adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
-                                        adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
-
-                ext_a = adc_data_a[3];
-                ext_b = adc_data_b[3];
-
-                break;
-
-        case i_adc[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
-
-
-                if(amps >= current_sensor_config.current_sensor_amplitude)
-                     out_ticks = MAX_ADC_VALUE/2; break;
-                if(amps <= -current_sensor_config.current_sensor_amplitude)
-                    out_ticks = -MAX_ADC_VALUE/2; break;
-
-                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
-
-                break;
-
-        case i_adc[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
-
-                if(ticks >= MAX_ADC_VALUE/2)
-                    out_amps = current_sensor_config.current_sensor_amplitude; break;
-                if(ticks <= -MAX_ADC_VALUE/2)
-                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
-
-                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
-
-                break;
-
-        case i_adc[int i].enable_overcurrent_protection():
-          //      printstr("\n> Overcurrent protection enabled");
-                overcurrent_protection_is_active = 1;
-                break;
-
-        case i_adc[int i].get_overcurrent_protection_status() -> int status:
-                status = overcurrent_protection_was_triggered;
-                break;
+//        case i_adc[int i].get_currents() -> {int Ia, int Ib}:
+//
+//
+//                //If no trigger exists on the system, we sample on request
+//                overcurrent_protection_was_triggered =  adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+//                                                                               adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
+//                                                                               adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
+//
+//                Icalibrated_a = ((int) adc_data_a[4]) - i_calib_a;
+//                Icalibrated_b = ((int) adc_data_b[4]) - i_calib_b;
+//
+//                Ia = current_sensor_config.sign_phase_b * Icalibrated_a;
+//                Ib = current_sensor_config.sign_phase_c *Icalibrated_b;
+//
+//                break;
+//
+//        case i_adc[int i].get_temperature() -> {int out_temp}:
+//
+//                //If no trigger exists on the system, we sample on request
+//                adc_index = 1;
+//                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+//                                        adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
+//                                        adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
+//
+//                out_temp = adc_data_a[1];
+//
+//                break;
+//
+//        case i_adc[int i].get_external_inputs() -> {int ext_a, int ext_b}:
+//
+//                //If no trigger exists on the system, we sample on request
+//                adc_index = 3;
+//                adc_ad7949_singleshot( adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b,
+//                                        adc_ports.clk, adc_config_mot,  adc_config_other, delay, t, adc_data_a,
+//                                        adc_data_b, adc_index, overcurrent_protection_is_active, i_watchdog);
+//
+//                ext_a = adc_data_a[3];
+//                ext_b = adc_data_b[3];
+//
+//                break;
+//
+//        case i_adc[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
+//
+//
+//                if(amps >= current_sensor_config.current_sensor_amplitude)
+//                     out_ticks = MAX_ADC_VALUE/2; break;
+//                if(amps <= -current_sensor_config.current_sensor_amplitude)
+//                    out_ticks = -MAX_ADC_VALUE/2; break;
+//
+//                out_ticks = (int) amps * (MAX_ADC_VALUE/(2*current_sensor_config.current_sensor_amplitude));
+//
+//                break;
+//
+//        case i_adc[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
+//
+//                if(ticks >= MAX_ADC_VALUE/2)
+//                    out_amps = current_sensor_config.current_sensor_amplitude; break;
+//                if(ticks <= -MAX_ADC_VALUE/2)
+//                    out_amps = -current_sensor_config.current_sensor_amplitude; break;
+//
+//                out_amps = ticks/(MAX_ADC_VALUE/2.0) * current_sensor_config.current_sensor_amplitude;
+//
+//                break;
+//
+//        case i_adc[int i].enable_overcurrent_protection():
+//          //      printstr("\n> Overcurrent protection enabled");
+//                overcurrent_protection_is_active = 1;
+//                break;
+//
+//        case i_adc[int i].get_overcurrent_protection_status() -> int status:
+//                status = overcurrent_protection_was_triggered;
+//                break;
 
         case i_adc[int i].reset_faults():
                 break;

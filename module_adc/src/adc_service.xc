@@ -3,7 +3,7 @@
 #include <adc_7265.h>
 #include <adc_ad7949.h>
 
-void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog, int ifm_tile_usec)
+void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog, int ifm_tile_usec, int operational_mode)
 {
 
     if(ifm_tile_usec==250)
@@ -17,22 +17,21 @@ void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface
 
         if(!isnull(adc_ports.ad7949_ports.clk))
         { // Check which ADC is configured
-
-            if (ADC_FIXED_CHANNEL_OPERATION)
-                adc_ad7949_fixed_channel(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
-            else
+            if (operational_mode==NORMAL_MODE)
                 adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
-
-
+//            else if (operational_mode==SINGLE_SHOT)
+//                adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
+            else if (operational_mode==FIXED_CHANNEL)
+                adc_ad7949_fixed_channel(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
         }
         else if(!isnull(adc_ports.ad7265_ports.xclk))
         {
-
-            if(ADC_FIXED_CHANNEL_OPERATION)
-                adc_ad7256_fixed_channel(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
-            else
+            if (operational_mode==NORMAL_MODE)
                 adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
-
+//            else if (operational_mode==SINGLE_SHOT)
+//                adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
+            else if(operational_mode==FIXED_CHANNEL)
+                adc_ad7256_fixed_channel(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
         }
     }
     else

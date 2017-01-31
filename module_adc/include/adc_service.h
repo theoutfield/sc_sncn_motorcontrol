@@ -18,6 +18,28 @@
  */
 #define OVERCURRENT_IN_ADC_TICKS 12800 //modify the value to match your motor operating conditions. Should be lower than MAX_ADC_VALUE!
 
+#define SGL_A1_B1 0b1000
+#define SGL_A2_B2 0b1001
+#define SGL_A3_B3 0b1010
+#define SGL_A4_B4 0b1011
+#define SGL_A5_B5 0b1100
+#define SGL_A6_B6 0b1101
+
+#define DIFF_A1A2_B1B2  0b0000
+#define DIFF_A3A4_B3B4  0b0010
+#define DIFF_A5A6_B5B6  0b0101
+
+
+/**
+ * @brief Operational mode of ADC
+ *
+ */
+typedef enum
+{
+    NORMAL_MODE = 1,
+    SINGLE_SHOT = 2,
+    FIXED_CHANNEL = 3
+} AdcOperationalMode;
 
 
 /**
@@ -68,4 +90,4 @@ typedef struct {
  * @param c_trigger [[Nullable]] Channel communication to trigger sampling. If not provided, sampling takes place on request.
  * @param i_adc Array of communication interfaces to handle up to 5 different clients.
  */
-void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog, int ifm_tile_usec);
+void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog, int ifm_tile_usec, int operational_mode);
