@@ -28,14 +28,14 @@ void position_feedback_test(client interface PositionFeedbackInterface i_positio
     while(1)
     {
         /* get position from Hall Sensor */
-        { count, void } = i_position_feedback_1.get_position();
+        { count, void, void } = i_position_feedback_1.get_position();
         angle = i_position_feedback_1.get_angle();
 
         /* get velocity from Hall Sensor */
         velocity = i_position_feedback_1.get_velocity();
 
         if (!isnull(i_position_feedback_2)) {
-            { count_2, void } = i_position_feedback_2.get_position();
+            { count_2, void, void } = i_position_feedback_2.get_position();
             angle_2 = i_position_feedback_2.get_angle();
             velocity_2 = i_position_feedback_2.get_velocity();
         }
@@ -191,7 +191,8 @@ int main(void)
 
                 //set sensor types for 1 and 2
 //                position_feedback_config.resolution  = 4096;
-                position_feedback_config.resolution  = 262144;
+//                position_feedback_config.resolution  = 262144;
+                position_feedback_config.resolution  = 8192;
                 position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D5;
                 position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT_2;
                 position_feedback_config.sensor_type = BISS_SENSOR;
@@ -201,7 +202,7 @@ int main(void)
                 position_feedback_config_2.biss_config.multiturn_resolution = 12;
                 position_feedback_config_2.biss_config.multiturn_length = position_feedback_config_2.biss_config.multiturn_resolution + 1;
                 position_feedback_config_2.biss_config.singleturn_length = 13;
-                position_feedback_config_2.sensor_type = BISS_SENSOR;
+                position_feedback_config_2.sensor_type = HALL_SENSOR;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
