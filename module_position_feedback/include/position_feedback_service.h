@@ -27,6 +27,18 @@ typedef enum {
     GPIO_OUTPUT=2
 } GPIOType;
 
+/**
+ * @brief These are the values expected from the object dictionary object 0x21xx:2 "Sensor Type"
+ */
+typedef enum {
+    FEEDBACK_SENSOR_UNDEFINED   = 0   /**< Sensor undefined handle somehow */
+    ,FEEDBACK_SENSOR_HALL       = 1
+    ,FEEDBACK_SENSOR_QEI        = 2
+    ,FEEDBACK_SENSOR_BISS       = 4
+    ,FEEDBACK_SENSOR_REM14      = 5
+    ,FEEDBACK_SENSOR_REM16MT    = 6
+} FeedbackSensorType;
+
 typedef struct {
     GPIOType port_0;
     GPIOType port_1;
@@ -35,7 +47,7 @@ typedef struct {
 } GPIOConfig;
 
 typedef struct {
-    int sensor_type;
+    FeedbackSensorType sensor_type; /**< type of the sensor @see FeedbackSensorType */
     int polarity;   /**< Encoder polarity. >*/
     int pole_pairs; /**< Number of pole pairs (1-7) >*/
     int resolution; /**< number of ticks per turn >*/
