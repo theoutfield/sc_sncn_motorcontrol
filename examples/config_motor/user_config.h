@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT3.h>
+#include <motor_config_Maxon_411678.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
