@@ -68,7 +68,6 @@ HallEncSelectPort hall_enc_select_port = {QEI_PORT_INPUT_MODE_SELECTION};
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 int main() {
-    chan c_pwm_ctrl; // pwm channels
     interface WatchdogInterface i_watchdog[2];
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
@@ -108,9 +107,9 @@ int main() {
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = BISS_SENSOR;
-                position_feedback_config.polarity    = SENSOR_POLARITY;
+                position_feedback_config.polarity    = FEEDBACK_SENSOR_POLARITY;
                 position_feedback_config.pole_pairs  = POLE_PAIRS;
-                position_feedback_config.resolution  = POSITION_SENSOR_RESOLUTION;
+                position_feedback_config.resolution  = FEEDBACK_SENSOR_RESOLUTION;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 

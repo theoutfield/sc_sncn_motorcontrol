@@ -40,8 +40,9 @@ int main(void) {
     interface update_brake i_update_brake;
     interface ADCInterface i_adc[2];
     interface MotorcontrolInterface i_motorcontrol[2];
-    interface shared_memory_interface i_shared_memory[2];
-    interface PositionFeedbackInterface i_position_feedback[3];
+    interface shared_memory_interface i_shared_memory[3];
+    interface PositionFeedbackInterface i_position_feedback_1[3];
+    interface PositionFeedbackInterface i_position_feedback_2[3];
     interface update_pwm i_update_pwm;
     // interface TuningInterface i_tuning;
 
@@ -120,20 +121,20 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
                     motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
 
-                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
+                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
                             i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
                 }
 
                 /* Shared memory Service */
-                [[distribute]] memory_manager(i_shared_memory, 2);
+                [[distribute]] memory_manager(i_shared_memory, 3);
 
                 /* Position feedback service */
                 {
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
-                    position_feedback_config.polarity    = SENSOR_POLARITY;
+                    position_feedback_config.polarity    = COMMUTATION_SENSOR_POLARITY;
                     position_feedback_config.pole_pairs  = POLE_PAIRS;
-                    position_feedback_config.resolution  = POSITION_SENSOR_RESOLUTION;
+                    position_feedback_config.resolution  = COMMUTATION_SENSOR_RESOLUTION;
                     position_feedback_config.offset      = 0;
                     position_feedback_config.enable_push_service = PushAll;
 
@@ -167,9 +168,21 @@ int main(void) {
                     position_feedback_config.rem_14_config.cache_time = REM_14_CACHE_TIME;
                     position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
+                    //setting second sensor
+                    PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
+                    position_feedback_config_2.sensor_type = 0;
+                    if (MOTOR_COMMUTATION_SENSOR != MOTOR_FEEDBACK_SENSOR) //enable second sensor when different from the first one
+                            {
+                        position_feedback_config_2.sensor_type = MOTOR_FEEDBACK_SENSOR;
+                        position_feedback_config_2.polarity    = FEEDBACK_SENSOR_POLARITY;
+                        position_feedback_config_2.resolution  = FEEDBACK_SENSOR_RESOLUTION;
+                        position_feedback_config_2.enable_push_service = PushPosition;
+                        position_feedback_config.enable_push_service = PushAngle;
+                            }
+
                     position_feedback_service(hall_ports, qei_ports, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
-                            position_feedback_config, i_shared_memory[0], i_position_feedback,
-                            null, null, null);
+                            position_feedback_config, i_shared_memory[0], i_position_feedback_1,
+                            position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
                 }
             }
         }

@@ -39,8 +39,9 @@ void memory_manager(server interface shared_memory_interface i_shared_memory[n],
                 count_ = data.position;
                 position_singleturn_ = data.position_singleturn;
                 break;
-        case i_shared_memory[int j].write_angle_electrical(int in_angle):
+        case i_shared_memory[int j].write_angle_and_hall(int in_angle, int in_hall):
                 data.angle = in_angle;
+                data.hall_state = in_hall;
                 break;
         case i_shared_memory[int j].write_current_velocity(int current_velocity_):
                 data.velocity = current_velocity_;

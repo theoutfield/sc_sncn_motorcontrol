@@ -665,7 +665,7 @@ void rem_14_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedba
                     actual_angle = angle;
                     actual_position = position;
                 } else if (position_feedback_config.enable_push_service == PushAngle) {
-                    i_shared_memory.write_angle_electrical(angle);
+                    i_shared_memory.write_angle_and_hall(angle, 0);
                     actual_angle = angle;
                 } else if (position_feedback_config.enable_push_service == PushPosition) {
                     i_shared_memory.write_velocity_position(velocity, count);
