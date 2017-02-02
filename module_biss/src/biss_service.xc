@@ -331,7 +331,7 @@ void biss_service(QEIPorts &biss_ports, PositionFeedbackConfig &position_feedbac
                 if (position_feedback_config.enable_push_service == PushAll) {
                     i_shared_memory.write_angle_velocity_position(angle, velocity, count);
                 } else if (position_feedback_config.enable_push_service == PushAngle) {
-                    i_shared_memory.write_angle_electrical(angle);
+                    i_shared_memory.write_angle_and_hall(angle, 0);
                 } else if (position_feedback_config.enable_push_service == PushPosition) {
                     i_shared_memory.write_velocity_position(velocity, count);
                 }

@@ -468,7 +468,7 @@ void hall_service(HallPorts &hall_ports, port * (&?gpio_ports)[4], PositionFeedb
                     if (position_feedback_config.enable_push_service == PushAll) {
                         i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, count, hall_state_new);
                     } else if (position_feedback_config.enable_push_service == PushAngle) {
-                        i_shared_memory.write_angle_electrical(angle_out);
+                        i_shared_memory.write_angle_and_hall(angle_out, hall_state_new);
                     } else if (position_feedback_config.enable_push_service == PushPosition) {
                         i_shared_memory.write_velocity_position(speed_out, count);
                     }

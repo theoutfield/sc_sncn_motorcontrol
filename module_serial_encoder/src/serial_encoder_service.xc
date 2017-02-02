@@ -484,7 +484,7 @@ void serial_encoder_service(SPIPorts * spi_ports, QEIPorts * biss_ports, port * 
                 if (position_feedback_config.enable_push_service == PushAll) {
                     i_shared_memory.write_angle_velocity_position(pos_state.angle, velocity, pos_state.count);
                 } else if (position_feedback_config.enable_push_service == PushAngle) {
-                    i_shared_memory.write_angle_electrical(pos_state.angle);
+                    i_shared_memory.write_angle_and_hall(pos_state.angle, 0);
                 } else if (position_feedback_config.enable_push_service == PushPosition) {
                     i_shared_memory.write_velocity_position(velocity, pos_state.count);
                 }

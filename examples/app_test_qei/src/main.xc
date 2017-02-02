@@ -60,8 +60,8 @@ int main(void)
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = QEI_SENSOR;
-                position_feedback_config.polarity    = SENSOR_POLARITY;
-                position_feedback_config.resolution  = POSITION_SENSOR_RESOLUTION;
+                position_feedback_config.polarity    = FEEDBACK_SENSOR_POLARITY;
+                position_feedback_config.resolution  = FEEDBACK_SENSOR_RESOLUTION;
                 position_feedback_config.enable_push_service = PushAll;
 
                 position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;

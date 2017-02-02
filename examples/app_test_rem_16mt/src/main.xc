@@ -321,7 +321,7 @@ int main(void)
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = REM_16MT_SENSOR;
-                position_feedback_config.polarity    = SENSOR_POLARITY;
+                position_feedback_config.polarity    = COMMUTATION_SENSOR_POLARITY;
                 position_feedback_config.pole_pairs  = POLE_PAIRS;
                 position_feedback_config.resolution  = 65536;
                 position_feedback_config.offset      = 0;
