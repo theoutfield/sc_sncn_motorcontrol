@@ -20,15 +20,6 @@
 
 #define SHIFTING_BITS   1
 
-////Takes 8ms for the filter to react to a current spike
-//#define OVERCURRENT_SAMPLES 20
-
-//#ifdef DISPLAY_MAX_CURRENTS
-//#include <xscope.h>
-//#endif
-
-
-
 
 
 /*****************************************************************************/
