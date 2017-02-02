@@ -73,6 +73,8 @@ void demo_adc(interface ADCInterface client i_adc)
         xscope_int(A5A6, a5a6);
         xscope_int(B5B6, b5b6);
 
+        delay_milliseconds(2);
+
     } // while(1)
 
 }

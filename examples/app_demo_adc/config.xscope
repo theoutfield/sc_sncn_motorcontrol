@@ -24,17 +24,17 @@
 	<Probe name="A2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="B2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="A3" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="B3" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="A3" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="B3" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
-	<Probe name="A4" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="B4" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="A4" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="B4" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
-	<Probe name="A5" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="B5" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="A5" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="B5" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
-	<Probe name="A6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="B6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="A6" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="B6" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
 	<Probe name="A1A2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="B1B2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
@@ -44,5 +44,13 @@
 	
 	<Probe name="A5A6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="B5B6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	
+	
+	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
 </xSCOPEconfig>

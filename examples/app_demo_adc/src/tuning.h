@@ -1,7 +1,7 @@
 /*
- * demo_adc.h
+ * tuning.h
  *
- *  Created on: Jul 13, 20117
+ *  Created on: Jul 13, 2015
  *      Author: Synapticon GmbH
  */
 
@@ -21,4 +21,9 @@
 #include <mc_internal_constants.h>
 #include <user_config.h>
 
-void demo_adc(interface ADCInterface client i_adc);
+interface PositionLimiterInterface {
+    void set_limit(int limit);
+    int get_limit();
+};
+
+void demo_torque_position_velocity_control(client interface PositionVelocityCtrlInterface i_position_control);
