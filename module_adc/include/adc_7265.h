@@ -20,14 +20,6 @@
 #include <print.h>
 #include <adc_service.h>
 
-#define ADC_CALIB_POINTS 64
-#define Factor 6
-
-#define AD7265_MUX_DEFAULT_CONFIG 0b1000 // nDIFF|A2|A1|A0
-
-#define ADC_FIXED_CHANNEL_OPERATION 1 // the channels will be set directly inside adc server
-                                      // adc channels can not be modified by server inputs
-
 interface ADC{
     {int, int} get_adc_measurements(unsigned char port_id, unsigned char config);
 };

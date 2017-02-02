@@ -37,8 +37,7 @@
 typedef enum
 {
     NORMAL_MODE = 1,
-    SINGLE_SHOT = 2,
-    FIXED_CHANNEL = 3
+    STD_MOTOR_CTRL_MODE = 2
 } AdcOperationalMode;
 
 

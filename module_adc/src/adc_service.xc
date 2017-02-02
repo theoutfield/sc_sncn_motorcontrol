@@ -16,14 +16,14 @@ void adc_service(ADCPorts &adc_ports, interface ADCInterface server i_adc[2], in
     { // Check which ADC is configured
         if (operational_mode==NORMAL_MODE)
             adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
-        else if (operational_mode==FIXED_CHANNEL)
+        else if (operational_mode==STD_MOTOR_CTRL_MODE)
             adc_ad7949_fixed_channel(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog);
     }
     else if(!isnull(adc_ports.ad7265_ports.xclk))
     {
         if (operational_mode==NORMAL_MODE)
             adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
-        else if(operational_mode==FIXED_CHANNEL)
+        else if(operational_mode==STD_MOTOR_CTRL_MODE)
             adc_ad7256_fixed_channel(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
     }
 }
