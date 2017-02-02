@@ -256,8 +256,9 @@ interface shared_memory_interface
     * @brief Write electrical angle to shared memory.
     *
     * @param Electrical angle.
+    * @param  Hall state (in case HALL sensor is used)
     */
-    void write_angle_electrical(int);
+    void write_angle_and_hall(int, int);
 
     /**
     * @brief Write current velocity to shared memory.
