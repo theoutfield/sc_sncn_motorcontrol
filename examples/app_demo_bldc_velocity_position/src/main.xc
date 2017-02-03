@@ -45,7 +45,6 @@ int main(void) {
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
     interface shared_memory_interface i_shared_memory[3];
-    interface PositionLimiterInterface i_position_limiter;
 
     par
     {
@@ -223,7 +222,7 @@ int main(void) {
                     position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
                     //setting second sensor
-#if 0
+#if 1
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
                     position_feedback_config_2.sensor_type = 0;
                     if (MOTOR_COMMUTATION_SENSOR != MOTOR_FEEDBACK_SENSOR) //enable second sensor when different from the first one
@@ -238,8 +237,8 @@ int main(void) {
 
 //                    position_feedback_service(hall_ports, qei_ports, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                     position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
-                            position_feedback_config, i_shared_memory[0], i_position_feedback,
-                            null, null, null);
+                            position_feedback_config, i_shared_memory[0], i_position_feedback_1,
+                            position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
                 }
             }
         }

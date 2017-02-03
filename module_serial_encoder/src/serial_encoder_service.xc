@@ -140,6 +140,11 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
     return velocity_loop;
 }
 
+int velocity_compute(int difference, int timediff, int resolution)
+{
+    return (difference * (60000000/timediff)) / resolution;
+}
+
 
 void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * (&?gpio_ports)[4], int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
@@ -476,7 +481,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     difference = pos_state.count - old_count;
                     old_count = pos_state.count;
                     if (timediff_long != 0 && difference < crossover && difference > -crossover) {
-                        velocity = (difference * (60000000/timediff_long)) / position_feedback_config.resolution;
+//                        velocity = (difference * (60000000/timediff_long)) / position_feedback_config.resolution;
+                        velocity = velocity_compute(difference, timediff_long, position_feedback_config.resolution);
                         velocity = filter(velocity_buffer, index, 8, velocity);
                     }
                     timediff_long = 0;
@@ -487,7 +493,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     difference = count - old_count;
                     old_count = count;
                     if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
-                        velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/REM_16MT_USEC))) / position_feedback_config.resolution;
+//                        velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/REM_16MT_USEC))) / position_feedback_config.resolution;
+                        velocity = velocity_compute(difference, (last_read-last_velocity_read)/REM_16MT_USEC, position_feedback_config.resolution);
                         velocity = filter(velocity_buffer, index, 8, velocity);
                     }
                     last_velocity_read = last_read;
@@ -502,7 +509,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
                 //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
                 if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
-                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/REM_14_USEC))) / position_feedback_config.resolution;
+//                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/REM_14_USEC))) / position_feedback_config.resolution;
+                    velocity = velocity_compute(difference, (last_read-last_velocity_read)/REM_14_USEC, position_feedback_config.resolution);
                 }
                 last_velocity_read = last_read;
                 break;
