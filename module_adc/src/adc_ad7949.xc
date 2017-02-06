@@ -12,7 +12,8 @@
 #include <adc_ad7949.h>
 #include <xscope.h>
 
-#define BIT13 0x00002000    //
+
+#define BIT13 0x00002000
 #define BIT12 0x00001000
 #define BIT11 0x00000800
 #define BIT10 0x00000400
@@ -172,6 +173,9 @@ void adc_ad7949(
                 status = ACTIVE;
                 break;
 
+        case i_adc[int i].set_protection_limits(int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
+                break;
+
         case i_adc[int i].set_channel(unsigned short channel_config):
                 if     (channel_config==0)   adc_config_mot = AD7949_CHANNEL_0;
                 else if(channel_config==1)   adc_config_mot = AD7949_CHANNEL_1;
@@ -291,9 +295,6 @@ void adc_ad7949(
 
                 break;
 
-        case i_adc[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
-                break;
-
         case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
                 break;
 
@@ -304,15 +305,11 @@ void adc_ad7949(
 }
 
 
-
-
-
-
 void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog)
 {
     timer t;
-    unsigned int ts;
+    unsigned int time;
 
     /*
      * Configuration Register Description
@@ -350,10 +347,20 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
     unsigned int adc_data_b[5];
 
     int i_calib_a = 0, i_calib_b = 0;
+
+    int V_dc=0;
+
+    int flag=0;
+
+    int I_a=0;
+    int I_b=0;
+    int I_c=0;
+
     int i_max=100;
     int v_dc_max=100;
     int v_dc_min=0;
     int current_limit = i_max * 20;
+    int fault_code=NO_FAULT;
 
     configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
@@ -368,12 +375,6 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
         case i_adc[int i].status() -> {int status}:
                 status = ACTIVE;
-                break;
-
-        case i_adc[int i].set_channel(unsigned short channel_config):
-                break;
-
-        case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
                 break;
 
         case i_adc[int i].set_protection_limits(int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
@@ -467,6 +468,37 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
                 phaseB_out = (current_sensor_config.sign_phase_b * (((int) adc_data_a[4]) - i_calib_a))/20;
                 phaseC_out = (current_sensor_config.sign_phase_c * (((int) adc_data_b[4]) - i_calib_b))/20;
 
+                I_b = phaseB_out;
+                I_c = phaseC_out;
+                I_a = -I_b-I_c;
+
+                if( I_a<(-current_limit) || current_limit<I_a)
+                {
+                    i_watchdog.protect(OVER_CURRENT_PHASE_A);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_A;
+                }
+
+                if( I_b<(-current_limit) || current_limit<I_b)
+                {
+                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
+                }
+
+                if( I_c<(-current_limit) || current_limit<I_c)
+                {
+                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
+                }
+
+                fault_code_out=fault_code;
+
+                flag=1;
+                break;
+
+        case i_adc[int i].set_channel(unsigned short channel_config):
+                break;
+
+        case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
                 break;
 
         case i_adc[int i].reset_faults():
