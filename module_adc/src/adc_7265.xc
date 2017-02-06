@@ -181,7 +181,11 @@ void adc_ad7265_fixed_channel(
 
     int j=0;
     int selected_channel=0;
-    unsigned short channel_config[10] = {SGL_A1_B1, SGL_A2_B2, SGL_A3_B3, SGL_A4_B4, SGL_A5_B5, SGL_A6_B6, DIFF_A1A2_B1B2, DIFF_A3A4_B3B4, DIFF_A5A6_B5B6};
+    unsigned short channel_config[10] = {
+            AD7265_SGL_A1_B1, AD7265_SGL_A2_B2, AD7265_SGL_A3_B3,
+            AD7265_SGL_A4_B4, AD7265_SGL_A5_B5, AD7265_SGL_A6_B6,
+            AD7265_DIFF_A1A2_B1B2, AD7265_DIFF_A3A4_B3B4, AD7265_DIFF_A5A6_B5B6
+    };
     int OUT_A[10], OUT_B[10];
 
     //proper task startup
@@ -196,7 +200,7 @@ void adc_ad7265_fixed_channel(
      */
     for (i=0;i<150;i++)
     {
-        adc_ports.p4_mux <: SGL_A1_B1;      //mux_config;
+        adc_ports.p4_mux <: AD7265_SGL_A1_B1;      //mux_config;
         clearbuf( adc_ports.p32_data[0] );  // Clear the buffers used by the input ports.
         clearbuf( adc_ports.p32_data[1] );
         adc_ports.p1_ready <: 1 @ time_stamp;   // Switch ON input reads (and ADC conversion)
@@ -233,7 +237,7 @@ void adc_ad7265_fixed_channel(
 
         case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
 
-                adc_ports.p4_mux <: SGL_A1_B1;      //mux_config;
+                adc_ports.p4_mux <: AD7265_SGL_A1_B1;      //mux_config;
                 clearbuf( adc_ports.p32_data[0] );  //Clear the buffers used by the input ports.
                 clearbuf( adc_ports.p32_data[1] );
                 adc_ports.p1_ready <: 1 @ time_stamp;   // Switch ON input reads (and ADC conversion)
@@ -373,7 +377,7 @@ void adc_ad7265_fixed_channel(
             torque = OUT_A[2]-OUT_B[2];
 
 
-            adc_ports.p4_mux <: SGL_A1_B1;
+            adc_ports.p4_mux <: AD7265_SGL_A1_B1;
             t :> time;
             t when timerafter (time + 500) :> void;//5 us of wait
 

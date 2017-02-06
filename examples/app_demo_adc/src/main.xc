@@ -51,7 +51,7 @@ int main(void)
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         on tile[APP_TILE]:
         {
-            demo_torque_position_velocity_control(i_position_control[0]);
+//            demo_torque_position_velocity_control(i_position_control[0]);
         }
 
         on tile[APP_TILE_2]:
@@ -60,54 +60,54 @@ int main(void)
             par
             {
                 {
-                    demo_adc(i_adc[1]);
+                    demo_ad7949(i_adc[1]);
                 }
 
                 {
-                    PosVelocityControlConfig pos_velocity_ctrl_config;
-                    /* Control Loop */
-                    pos_velocity_ctrl_config.control_loop_period =                  CONTROL_LOOP_PERIOD; //us
-
-                    pos_velocity_ctrl_config.min_pos =                              MIN_POSITION_LIMIT;
-                    pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
-                    pos_velocity_ctrl_config.pos_limit_threshold =                  POSITION_LIMIT_THRESHOLD;
-                    pos_velocity_ctrl_config.max_speed =                            MAX_SPEED;
-                    pos_velocity_ctrl_config.max_torque =                           TORQUE_CONTROL_LIMIT;
-                    pos_velocity_ctrl_config.polarity =                             POLARITY;
-
-                    pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
-                    pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
-                    pos_velocity_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
-
-                    pos_velocity_ctrl_config.control_mode =                         NL_POSITION_CONTROLLER;
-
-                    pos_velocity_ctrl_config.P_pos =                                POSITION_Kp;
-                    pos_velocity_ctrl_config.I_pos =                                POSITION_Ki;
-                    pos_velocity_ctrl_config.D_pos =                                POSITION_Kd;
-                    pos_velocity_ctrl_config.integral_limit_pos =                   POSITION_INTEGRAL_LIMIT;
-                    pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
-
-                    pos_velocity_ctrl_config.P_velocity =                           VELOCITY_Kp;
-                    pos_velocity_ctrl_config.I_velocity =                           VELOCITY_Ki;
-                    pos_velocity_ctrl_config.D_velocity =                           VELOCITY_Kd;
-                    pos_velocity_ctrl_config.integral_limit_velocity =              VELOCITY_INTEGRAL_LIMIT;
-
-                    pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
-                    pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
-                    pos_velocity_ctrl_config.resolution  =                          POSITION_SENSOR_RESOLUTION;
-                    pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
-                    pos_velocity_ctrl_config.brake_shutdown_delay =                 BRAKE_SHUTDOWN_DELAY;
-
-                    pos_velocity_ctrl_config.voltage_pull_brake=                    VOLTAGE_PULL_BRAKE;
-                    pos_velocity_ctrl_config.time_pull_brake =                      TIME_PULL_BRAKE;
-                    pos_velocity_ctrl_config.voltage_hold_brake =                   VOLTAGE_HOLD_BRAKE;
-
-                    init_brake(i_update_brake, IFM_TILE_USEC, VDC,
-                            pos_velocity_ctrl_config.voltage_pull_brake,
-                            pos_velocity_ctrl_config.time_pull_brake,
-                            pos_velocity_ctrl_config.voltage_hold_brake);
-
-                    position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
+//                    PosVelocityControlConfig pos_velocity_ctrl_config;
+//                    /* Control Loop */
+//                    pos_velocity_ctrl_config.control_loop_period =                  CONTROL_LOOP_PERIOD; //us
+//
+//                    pos_velocity_ctrl_config.min_pos =                              MIN_POSITION_LIMIT;
+//                    pos_velocity_ctrl_config.max_pos =                              MAX_POSITION_LIMIT;
+//                    pos_velocity_ctrl_config.pos_limit_threshold =                  POSITION_LIMIT_THRESHOLD;
+//                    pos_velocity_ctrl_config.max_speed =                            MAX_SPEED;
+//                    pos_velocity_ctrl_config.max_torque =                           TORQUE_CONTROL_LIMIT;
+//                    pos_velocity_ctrl_config.polarity =                             POLARITY;
+//
+//                    pos_velocity_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
+//                    pos_velocity_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
+//                    pos_velocity_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
+//
+//                    pos_velocity_ctrl_config.control_mode =                         NL_POSITION_CONTROLLER;
+//
+//                    pos_velocity_ctrl_config.P_pos =                                POSITION_Kp;
+//                    pos_velocity_ctrl_config.I_pos =                                POSITION_Ki;
+//                    pos_velocity_ctrl_config.D_pos =                                POSITION_Kd;
+//                    pos_velocity_ctrl_config.integral_limit_pos =                   POSITION_INTEGRAL_LIMIT;
+//                    pos_velocity_ctrl_config.j =                                    MOMENT_OF_INERTIA;
+//
+//                    pos_velocity_ctrl_config.P_velocity =                           VELOCITY_Kp;
+//                    pos_velocity_ctrl_config.I_velocity =                           VELOCITY_Ki;
+//                    pos_velocity_ctrl_config.D_velocity =                           VELOCITY_Kd;
+//                    pos_velocity_ctrl_config.integral_limit_velocity =              VELOCITY_INTEGRAL_LIMIT;
+//
+//                    pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
+//                    pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
+//                    pos_velocity_ctrl_config.resolution  =                          POSITION_SENSOR_RESOLUTION;
+//                    pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
+//                    pos_velocity_ctrl_config.brake_shutdown_delay =                 BRAKE_SHUTDOWN_DELAY;
+//
+//                    pos_velocity_ctrl_config.voltage_pull_brake=                    VOLTAGE_PULL_BRAKE;
+//                    pos_velocity_ctrl_config.time_pull_brake =                      TIME_PULL_BRAKE;
+//                    pos_velocity_ctrl_config.voltage_hold_brake =                   VOLTAGE_HOLD_BRAKE;
+//
+//                    init_brake(i_update_brake, IFM_TILE_USEC, VDC,
+//                            pos_velocity_ctrl_config.voltage_pull_brake,
+//                            pos_velocity_ctrl_config.time_pull_brake,
+//                            pos_velocity_ctrl_config.voltage_hold_brake);
+//
+//                    position_velocity_control_service(pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control);
                 }
 
             }
@@ -133,7 +133,7 @@ int main(void)
 
                 /* ADC Service */
                 {
-                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, STD_MOTOR_CTRL_MODE);
+                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, NORMAL_MODE);
                 }
 
                 /* Watchdog Service */

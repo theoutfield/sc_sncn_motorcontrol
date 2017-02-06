@@ -18,16 +18,16 @@
  */
 #define OVERCURRENT_IN_ADC_TICKS 12800 //modify the value to match your motor operating conditions. Should be lower than MAX_ADC_VALUE!
 
-#define SGL_A1_B1 0b1000
-#define SGL_A2_B2 0b1001
-#define SGL_A3_B3 0b1010
-#define SGL_A4_B4 0b1011
-#define SGL_A5_B5 0b1100
-#define SGL_A6_B6 0b1101
+#define AD7265_SGL_A1_B1 0b1000
+#define AD7265_SGL_A2_B2 0b1001
+#define AD7265_SGL_A3_B3 0b1010
+#define AD7265_SGL_A4_B4 0b1011
+#define AD7265_SGL_A5_B5 0b1100
+#define AD7265_SGL_A6_B6 0b1101
 
-#define DIFF_A1A2_B1B2  0b0000
-#define DIFF_A3A4_B3B4  0b0010
-#define DIFF_A5A6_B5B6  0b0101
+#define AD7265_DIFF_A1A2_B1B2  0b0000
+#define AD7265_DIFF_A3A4_B3B4  0b0010
+#define AD7265_DIFF_A5A6_B5B6  0b0101
 
 
 /**
