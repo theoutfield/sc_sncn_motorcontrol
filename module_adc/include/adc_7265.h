@@ -91,9 +91,9 @@ interface ADC{
 #define ADC_TRIGGER_CORR 128 // Timing correction
 #define ADC_TRIGGER_DELAY (QUART_PWM_MAX - ADC_TRIGGER_CORR) // MB~ Re-tune
 
-void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
+void adc_ad7265(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
                     CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog);
-void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
+void adc_ad7265_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
                     CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog);
 
 /*****************************************************************************/

@@ -22,8 +22,8 @@ void adc_service(ADCPorts &adc_ports, interface ADCInterface server i_adc[2], in
     else if(!isnull(adc_ports.ad7265_ports.xclk))
     {
         if (operational_mode==NORMAL_MODE)
-            adc_ad7256(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
+            adc_ad7265(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
         else if(operational_mode==STD_MOTOR_CTRL_MODE)
-            adc_ad7256_fixed_channel(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
+            adc_ad7265_fixed_channel(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog);
     }
 }

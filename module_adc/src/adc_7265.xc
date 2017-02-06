@@ -75,7 +75,7 @@ void configure_adc_ports_7265( // Configure all ADC data ports
 
 
 
-void adc_ad7256(
+void adc_ad7265(
         interface ADCInterface server iADC[2],
         AD7265Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
@@ -146,7 +146,7 @@ void adc_ad7256(
     }//eof while
 }
 
-void adc_ad7256_fixed_channel(
+void adc_ad7265_fixed_channel(
         interface ADCInterface server iADC[2],
         AD7265Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
