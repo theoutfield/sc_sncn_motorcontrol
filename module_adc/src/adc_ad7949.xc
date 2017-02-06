@@ -27,8 +27,17 @@
 #define BIT01 0x00000002
 #define BIT0  0x00000001
 
-#define ADC_CALIB_POINTS 64
-#define Factor 6
+
+#define AD7949_TEMPERATURE          0b10110001001001
+
+#define AD7949_CHANNEL_0            0b11110001001001
+#define AD7949_CHANNEL_1            0b11110011001001
+#define AD7949_CHANNEL_2            0b11110101001001
+#define AD7949_CHANNEL_3            0b11110111001001
+#define AD7949_CHANNEL_4            0b11111001001001
+#define AD7949_CHANNEL_5            0b11111011001001
+#define AD7949_CHANNEL_6            0b11111101001001
+#define AD7949_CHANNEL_7            0b11111111001001
 
 
 static void configure_adc_ports(clock clk,
@@ -137,7 +146,7 @@ void adc_ad7949(
         interface WatchdogInterface client ?i_watchdog)
 {
     timer t;
-    const unsigned int adc_config_mot     =   0b11110001001001;   /* Motor current (ADC Channel 0), unipolar, referenced to GND */
+    unsigned int adc_config_mot     =   0b11110001001001;   /* Motor current (ADC Channel 0), unipolar, referenced to GND */
     const unsigned int adc_config_other[] = {
             0b10110001001001,   // Temperature
             0b11110101001001,   // ADC Channel 2, unipolar, referenced to GND  voltage and current
@@ -164,9 +173,122 @@ void adc_ad7949(
                 break;
 
         case i_adc[int i].set_channel(unsigned short channel_config):
+                if     (channel_config==0)   adc_config_mot = AD7949_CHANNEL_0;
+                else if(channel_config==1)   adc_config_mot = AD7949_CHANNEL_1;
+                else if(channel_config==2)   adc_config_mot = AD7949_CHANNEL_2;
+                else if(channel_config==3)   adc_config_mot = AD7949_CHANNEL_3;
+                else if(channel_config==4)   adc_config_mot = AD7949_CHANNEL_4;
+                else if(channel_config==5)   adc_config_mot = AD7949_CHANNEL_5;
+                else if(channel_config==6)   adc_config_mot = AD7949_CHANNEL_6;
+                else if(channel_config==7)   adc_config_mot = AD7949_CHANNEL_7;
                 break;
 
         case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
+
+                unsigned int data_raw_a;
+                unsigned int data_raw_b;
+
+
+                /* Reading/Writing after conversion (RAC)
+                                   Read previous conversion result
+                                   Write CFG for next conversion */
+
+                // CONGIG__other_n1     CFG_Imotx_x1       |CONGIG__other_n2     CFG_Imotx_x2     |CONGIG__other_n3     CFG_Imotx_x3       |
+                // CONVERT_null         CONVERT_other_n1   |CONVERT_Imot_x1      CONVERT_other_n2 |CONVERT_Imot_x2      CONVERT_other_n3   |
+                // READOUT_null         READOUT_other_null |READOUT_other_n1     READOUT_Imot_x1  |READOUT_other_n2     READOUT_Imot_x2    |
+                // -----------
+                // iIndexADC        0           1                  2                  3
+                // readout       extern     temperature     current-voltage         extern
+
+                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+
+#pragma unsafe arrays
+                int bits[4];
+
+                /*
+                 * Configuration Register Description
+                 *
+                 * bit(s)   name    Description
+                 *
+                 *  13      CFG     Configuration udpate
+                 *  12      INCC    Input channel configuration
+                 *  11      INCC    Input channel configuration
+                 *  10      INCC    Input channel configuration
+                 *  09      INx     Input channel selection bit 2 0..7
+                 *  08      INx     Input channel selection bit 1
+                 *  07      INx     Input channel selection bit 0
+                 *  06      BW      Select bandwidth for low-pass filter
+                 *  05      REF     Reference/buffer selection
+                 *  04      REF     Reference/buffer selection
+                 *  03      REF     Reference/buffer selection
+                 *  02      SEQ     Channel sequencer. Allows for scanning channels in an IN0 to IN[7:0] fashion.
+                 *  01      SEQ     Channel sequencer
+                 *  00      RB      Read back the CFG register.
+                 */
+
+                bits[0]=0x80808000;
+                if(adc_config_mot & BIT13)
+                    bits[0] |= 0x0000B300;
+                if(adc_config_mot & BIT12)
+                    bits[0] |= 0x00B30000;
+                if(adc_config_mot & BIT11)
+                    bits[0] |= 0xB3000000;
+
+                bits[1]=0x80808080;
+                if(adc_config_mot & BIT10)
+                    bits[1] |= 0x000000B3;
+                if(adc_config_mot & BIT09)
+                    bits[1] |= 0x0000B300;
+                if(adc_config_mot & BIT08)
+                    bits[1] |= 0x00B30000;
+                if(adc_config_mot & BIT07)
+                    bits[1] |= 0xB3000000;
+
+                bits[2]=0x80808080;
+                if(adc_config_mot & BIT06)
+                    bits[2] |= 0x000000B3;
+                if(adc_config_mot & BIT05)
+                    bits[2] |= 0x0000B300;
+                if(adc_config_mot & BIT04)
+                    bits[2] |= 0x00B30000;
+                if(adc_config_mot & BIT03)
+                    bits[2] |= 0xB3000000;
+
+                bits[3]=0x00808080;
+                if(adc_config_mot & BIT02)
+                    bits[3] |= 0x000000B3;
+                if(adc_config_mot & BIT01)
+                    bits[3] |= 0x0000B300;
+                if(adc_config_mot & BIT0)
+                    bits[3] |= 0x00B30000;
+
+                stop_clock(adc_ports.clk);
+                clearbuf(adc_ports.data_a);
+                clearbuf(adc_ports.data_b);
+                clearbuf(adc_ports.sclk_conv_mosib_mosia);
+                adc_ports.sclk_conv_mosib_mosia <: bits[0];
+                start_clock(adc_ports.clk);
+
+                adc_ports.sclk_conv_mosib_mosia <: bits[1];
+                adc_ports.sclk_conv_mosib_mosia <: bits[2];
+                adc_ports.sclk_conv_mosib_mosia <: bits[3];
+
+                sync(adc_ports.sclk_conv_mosib_mosia);
+                stop_clock(adc_ports.clk);
+
+                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+
+                adc_ports.data_a :> data_raw_a;
+                adc_data_a[4] = convert(data_raw_a);
+                adc_ports.data_b :> data_raw_b;
+                adc_data_b[4] = convert(data_raw_b);
+
+                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+
+                out_a = ((int) adc_data_a[4]);
+                out_b = ((int) adc_data_b[4]);
+
+
                 break;
 
         case i_adc[int i].set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min):
