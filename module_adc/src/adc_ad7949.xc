@@ -388,27 +388,6 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
                 break;
 
-                //        case i_adc[int i].get_currents() -> {int Ia, int Ib}:
-                //                break;
-                //
-                //        case i_adc[int i].get_temperature() -> {int out_temp}:
-                //                break;
-                //
-                //        case i_adc[int i].get_external_inputs() -> {int ext_a, int ext_b}:
-                //                break;
-                //
-                //        case i_adc[int i].helper_amps_to_ticks(float amps) -> int out_ticks:
-                //                break;
-                //
-                //        case i_adc[int i].helper_ticks_to_amps(int ticks) -> float out_amps:
-                //                break;
-                //
-                //        case i_adc[int i].enable_overcurrent_protection():
-                //                break;
-                //
-                //        case i_adc[int i].get_overcurrent_protection_status() -> int status:
-                //                break;
-
         case i_adc[int i].reset_faults():
                 break;
         }
