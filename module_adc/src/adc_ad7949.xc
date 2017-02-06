@@ -147,7 +147,7 @@ void adc_ad7949(
         interface WatchdogInterface client ?i_watchdog)
 {
     timer t;
-    unsigned int adc_config_mot     =   0b11110001001001;   /* Motor current (ADC Channel 0), unipolar, referenced to GND */
+    unsigned int ad7949_config     =   0b11110001001001;   /* Motor current (ADC Channel 0), unipolar, referenced to GND */
     const unsigned int adc_config_other[] = {
             0b10110001001001,   // Temperature
             0b11110101001001,   // ADC Channel 2, unipolar, referenced to GND  voltage and current
@@ -177,14 +177,14 @@ void adc_ad7949(
                 break;
 
         case i_adc[int i].set_channel(unsigned short channel_config):
-                if     (channel_config==0)   adc_config_mot = AD7949_CHANNEL_0;
-                else if(channel_config==1)   adc_config_mot = AD7949_CHANNEL_1;
-                else if(channel_config==2)   adc_config_mot = AD7949_CHANNEL_2;
-                else if(channel_config==3)   adc_config_mot = AD7949_CHANNEL_3;
-                else if(channel_config==4)   adc_config_mot = AD7949_CHANNEL_4;
-                else if(channel_config==5)   adc_config_mot = AD7949_CHANNEL_5;
-                else if(channel_config==6)   adc_config_mot = AD7949_CHANNEL_6;
-                else if(channel_config==7)   adc_config_mot = AD7949_CHANNEL_7;
+                if     (channel_config==0)   ad7949_config = AD7949_CHANNEL_0;
+                else if(channel_config==1)   ad7949_config = AD7949_CHANNEL_1;
+                else if(channel_config==2)   ad7949_config = AD7949_CHANNEL_2;
+                else if(channel_config==3)   ad7949_config = AD7949_CHANNEL_3;
+                else if(channel_config==4)   ad7949_config = AD7949_CHANNEL_4;
+                else if(channel_config==5)   ad7949_config = AD7949_CHANNEL_5;
+                else if(channel_config==6)   ad7949_config = AD7949_CHANNEL_6;
+                else if(channel_config==7)   ad7949_config = AD7949_CHANNEL_7;
                 break;
 
         case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
@@ -231,39 +231,39 @@ void adc_ad7949(
                  */
 
                 bits[0]=0x80808000;
-                if(adc_config_mot & BIT13)
+                if(ad7949_config & BIT13)
                     bits[0] |= 0x0000B300;
-                if(adc_config_mot & BIT12)
+                if(ad7949_config & BIT12)
                     bits[0] |= 0x00B30000;
-                if(adc_config_mot & BIT11)
+                if(ad7949_config & BIT11)
                     bits[0] |= 0xB3000000;
 
                 bits[1]=0x80808080;
-                if(adc_config_mot & BIT10)
+                if(ad7949_config & BIT10)
                     bits[1] |= 0x000000B3;
-                if(adc_config_mot & BIT09)
+                if(ad7949_config & BIT09)
                     bits[1] |= 0x0000B300;
-                if(adc_config_mot & BIT08)
+                if(ad7949_config & BIT08)
                     bits[1] |= 0x00B30000;
-                if(adc_config_mot & BIT07)
+                if(ad7949_config & BIT07)
                     bits[1] |= 0xB3000000;
 
                 bits[2]=0x80808080;
-                if(adc_config_mot & BIT06)
+                if(ad7949_config & BIT06)
                     bits[2] |= 0x000000B3;
-                if(adc_config_mot & BIT05)
+                if(ad7949_config & BIT05)
                     bits[2] |= 0x0000B300;
-                if(adc_config_mot & BIT04)
+                if(ad7949_config & BIT04)
                     bits[2] |= 0x00B30000;
-                if(adc_config_mot & BIT03)
+                if(ad7949_config & BIT03)
                     bits[2] |= 0xB3000000;
 
                 bits[3]=0x00808080;
-                if(adc_config_mot & BIT02)
+                if(ad7949_config & BIT02)
                     bits[3] |= 0x000000B3;
-                if(adc_config_mot & BIT01)
+                if(ad7949_config & BIT01)
                     bits[3] |= 0x0000B300;
-                if(adc_config_mot & BIT0)
+                if(ad7949_config & BIT0)
                     bits[3] |= 0x00B30000;
 
                 stop_clock(adc_ports.clk);
@@ -343,8 +343,21 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
      */
     const unsigned int adc_config_mot     =   0b11110001001001;
 
+    unsigned int ad7949_config     =   0b11110001001001;
+
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
+
+    int OUT_A[10], OUT_B[10];
+    int j=0;
+    int selected_channel=0;
+
+    unsigned short channel_config[10] = {
+            AD7949_CHANNEL_0, AD7949_CHANNEL_1, AD7949_CHANNEL_2,
+            AD7949_CHANNEL_3, AD7949_CHANNEL_4, AD7949_CHANNEL_5,
+            AD7949_CHANNEL_6, AD7949_CHANNEL_7, 0,
+            0 };
+
 
     int i_calib_a = 0, i_calib_b = 0;
 
@@ -361,6 +374,10 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
     int v_dc_min=0;
     int current_limit = i_max * 20;
     int fault_code=NO_FAULT;
+
+    //proper task startup
+    t :> time;
+    t when timerafter (time + (3000*20*250)) :> void;
 
     configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
 
@@ -496,13 +513,148 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
                 break;
 
         case i_adc[int i].set_channel(unsigned short channel_config):
+                if     (channel_config==0)   ad7949_config = AD7949_CHANNEL_0;
+                else if(channel_config==1)   ad7949_config = AD7949_CHANNEL_1;
+                else if(channel_config==2)   ad7949_config = AD7949_CHANNEL_2;
+                else if(channel_config==3)   ad7949_config = AD7949_CHANNEL_3;
+                else if(channel_config==4)   ad7949_config = AD7949_CHANNEL_4;
+                else if(channel_config==5)   ad7949_config = AD7949_CHANNEL_5;
+                else if(channel_config==6)   ad7949_config = AD7949_CHANNEL_6;
+                else if(channel_config==7)   ad7949_config = AD7949_CHANNEL_7;
                 break;
 
         case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
+                for(int k=0;k<10;k++)
+                {
+                    if(selected_channel == channel_config[k])
+                    {
+                        out_a = OUT_A[k];
+                        out_b = OUT_B[k];
+                    }
+                }
                 break;
 
         case i_adc[int i].reset_faults():
+                I_a=0;
+                I_b=0;
+                I_c=0;
+
+                fault_code=NO_FAULT;
+                flag=0;
+
+                i_watchdog.reset_faults();
                 break;
+        default:
+            break;
+        }
+
+
+        if(flag==1)
+        {
+            j++;
+            if(j==7) j=0;
+//
+//            adc_ports.p4_mux <: channel_config[j];
+//            t :> time;
+//            t when timerafter (time + 500) :> void;//5 us of wait
+//
+//            clearbuf( adc_ports.p32_data[0] );  //Clear the buffers used by the input ports.
+//            clearbuf( adc_ports.p32_data[1] );
+//            adc_ports.p1_ready <: 1 @ time_stamp;   // Switch ON input reads (and ADC conversion)
+//            time_stamp += (ADC_TOTAL_BITS+2);       // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
+//            adc_ports.p1_ready @ time_stamp <: 0;   // Switch OFF input reads, (and ADC conversion)
+//
+//            sync( adc_ports.p1_ready );             // Wait until port has completed any pending outputs
+//
+//            // Get data from port a
+//            endin( adc_ports.p32_data[0] );         // End the previous input on this buffered port
+//            adc_ports.p32_data[0] :> inp_val;       // Get new input
+//            tmp_val = bitrev( inp_val );            // Reverse bit order. WARNING. Machine dependent
+//            tmp_val = tmp_val >> (SHIFTING_BITS+1);
+//            tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+//            OUT_A[j] = (int)tmp_val;
+//
+//            // Get data from port b
+//            endin( adc_ports.p32_data[1] );         // End the previous input on this buffered port
+//            adc_ports.p32_data[1] :> inp_val;       // Get new input
+//            tmp_val = bitrev( inp_val );            // Reverse bit order. WARNING. Machine dependent
+//            tmp_val = tmp_val >> (SHIFTING_BITS+1);
+//            tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+//            OUT_B[j] = (int)tmp_val;
+//
+//
+//            V_dc = OUT_A[1]/56;
+//
+//            if (V_dc<v_dc_min)
+//            {
+//                i_watchdog.protect(UNDER_VOLTAGE);
+//                if(fault_code==0) fault_code=UNDER_VOLTAGE;
+//            }
+//
+//            if (v_dc_max<V_dc)
+//            {
+//                i_watchdog.protect(OVER_VOLTAGE);
+//                if(fault_code==0) fault_code=OVER_VOLTAGE;
+//            }
+//
+//            torque = OUT_A[2]-OUT_B[2];
+//
+//
+//            adc_ports.p4_mux <: AD7265_SGL_A1_B1;
+//            t :> time;
+//            t when timerafter (time + 500) :> void;//5 us of wait
+//
+//            for (i=0;i<=5;i++)
+//            {
+//                clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
+//                clearbuf( adc_ports.p32_data[1] );
+//                adc_ports.p1_ready <: 1 @ time_stamp; // Switch ON input reads (and ADC conversion)
+//                time_stamp += (ADC_TOTAL_BITS+2); // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
+//                adc_ports.p1_ready @ time_stamp <: 0; // Switch OFF input reads, (and ADC conversion)
+//
+//                sync( adc_ports.p1_ready ); // Wait until port has completed any pending outputs
+//
+//                // Get data from port a
+//                endin( adc_ports.p32_data[0] );   // End the previous input on this buffered port
+//                adc_ports.p32_data[0] :> inp_val; // Get new input
+//                tmp_val = bitrev( inp_val );      // Reverse bit order. WARNING. Machine dependent
+//                tmp_val = tmp_val >> (SHIFTING_BITS+1);
+//                tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+//                out_a = (int)tmp_val;
+//
+//                // Get data from port b
+//                endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
+//                adc_ports.p32_data[1] :> inp_val; // Get new input
+//                tmp_val = bitrev( inp_val );    // Reverse bit order. WARNING. Machine dependent
+//                tmp_val = tmp_val >> (SHIFTING_BITS+1);
+//                tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+//                out_b = (int)tmp_val;
+//
+//                I_b = out_a - 2048;
+//                I_c = out_b - 2048;
+//                I_a = -I_b-I_c;
+//
+//                if( I_a<(-current_limit) || current_limit<I_a)
+//                {
+//                    i_watchdog.protect(OVER_CURRENT_PHASE_A);
+//                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_A;
+//                }
+//
+//                if( I_b<(-current_limit) || current_limit<I_b)
+//                {
+//                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
+//                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
+//                }
+//
+//                if( I_c<(-current_limit) || current_limit<I_c)
+//                {
+//                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
+//                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
+//                }
+//            }
+
+            flag=0;
+
         }
     }
 }
