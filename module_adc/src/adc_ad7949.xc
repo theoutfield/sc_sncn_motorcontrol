@@ -168,14 +168,7 @@ void adc_ad7949(
                 break;
 
         case i_adc[int i].set_channel(unsigned short channel_config):
-                if     (channel_config==0)   ad7949_config = AD7949_CHANNEL_0;
-                else if(channel_config==1)   ad7949_config = AD7949_CHANNEL_1;
-                else if(channel_config==2)   ad7949_config = AD7949_CHANNEL_2;
-                else if(channel_config==3)   ad7949_config = AD7949_CHANNEL_3;
-                else if(channel_config==4)   ad7949_config = AD7949_CHANNEL_4;
-                else if(channel_config==5)   ad7949_config = AD7949_CHANNEL_5;
-                else if(channel_config==6)   ad7949_config = AD7949_CHANNEL_6;
-                else if(channel_config==7)   ad7949_config = AD7949_CHANNEL_7;
+                ad7949_config = channel_config;
                 break;
 
         case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
