@@ -30,6 +30,18 @@
 #define AD7265_DIFF_A5A6_B5B6  0b0101
 
 
+#define AD7949_TEMPERATURE          0b10110001001001
+
+#define AD7949_CHANNEL_0            0b11110001001001
+#define AD7949_CHANNEL_1            0b11110011001001
+#define AD7949_CHANNEL_2            0b11110101001001
+#define AD7949_CHANNEL_3            0b11110111001001
+#define AD7949_CHANNEL_4            0b11111001001001
+#define AD7949_CHANNEL_5            0b11111011001001
+#define AD7949_CHANNEL_6            0b11111101001001
+#define AD7949_CHANNEL_7            0b11111111001001
+
+
 /**
  * @brief Operational mode of ADC
  *
