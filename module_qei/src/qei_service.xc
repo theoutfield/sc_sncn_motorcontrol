@@ -106,8 +106,9 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
     unsigned int new_pins_1;
 
     int qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
-    int vel_previous_position = 0, vel_old_difference = 0;
-    int difference_velocity;
+//    int vel_previous_position = 0, vel_old_difference = 0;
+    int vel_previous_position = 0;
+//    int difference_velocity;
     int velocity = 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
@@ -323,17 +324,19 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
             case t_velocity when timerafter(ts_velocity + (1000*QEI_USEC)) :> ts_velocity:
 
-                difference_velocity = count - vel_previous_position;
-                if (difference_velocity > qei_crossover_velocity) {
-                    difference_velocity = vel_old_difference;
-                } else if(difference_velocity < -qei_crossover_velocity) {
-                    difference_velocity = vel_old_difference;
-                }
+                int difference_velocity = count - vel_previous_position;
+//                if (difference_velocity > qei_crossover_velocity) {
+//                    difference_velocity = vel_old_difference;
+//                } else if(difference_velocity < -qei_crossover_velocity) {
+//                    difference_velocity = vel_old_difference;
+//                }
+                if (difference_velocity < qei_crossover_velocity && difference_velocity > -qei_crossover_velocity)
+                    velocity = velocity_compute(difference_velocity, 1000, position_feedback_config.resolution);
 
                 vel_previous_position = count;
-                vel_old_difference = difference_velocity;
+//                vel_old_difference = difference_velocity;
 
-                velocity = (difference_velocity * 60000) / position_feedback_config.resolution;
+//                velocity = (difference_velocity * 60000) / position_feedback_config.resolution;
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);

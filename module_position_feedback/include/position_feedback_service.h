@@ -135,6 +135,8 @@ int tickstobits(uint32_t ticks);
 
 void multiturn(int &count, int last_position, int position, int ticks_per_turn);
 
+int velocity_compute(int difference, int timediff, int resolution);
+
 int gpio_read(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number);
 
 void gpio_write(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number, int value);

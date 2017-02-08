@@ -21,7 +21,7 @@ void hall_test(client interface PositionFeedbackInterface i_position_feedback, c
     while(1)
     {
         /* get position from Hall Sensor */
-        { count, void } = i_position_feedback.get_position();
+        { count, void, void } = i_position_feedback.get_position();
         angle = i_position_feedback.get_angle();
 
         /* get velocity from Hall Sensor */
@@ -39,7 +39,8 @@ void hall_test(client interface PositionFeedbackInterface i_position_feedback, c
     }
 }
 
-HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+//HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
+QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
 
 int main(void)
 {
@@ -66,7 +67,7 @@ int main(void)
                 position_feedback_config.pole_pairs  = 2;
                 position_feedback_config.enable_push_service = PushAll;
 
-                position_feedback_service(hall_ports, null, null, null, null, null, null,
+                position_feedback_service(qei_hall_port_1, null, null, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

@@ -246,6 +246,12 @@ void multiturn(int &count, int last_position, int position, int ticks_per_turn) 
             count += difference;
 }
 
+
+int velocity_compute(int difference, int timediff, int resolution)
+{
+    return (difference * (60000000/timediff)) / resolution;
+}
+
 int gpio_read(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number)
 {
     int out_value = -1;

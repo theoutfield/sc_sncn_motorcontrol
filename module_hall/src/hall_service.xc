@@ -25,6 +25,72 @@ void hall_calculate_speed(hall_variables& hv);
 void hall_calculate_angle(hall_variables& hv);
 void speed_LPF(hall_variables& hv);
 
+
+//unsigned int hall_state[6] = {
+//        HALL_STATE_0,
+//        HALL_STATE_1,
+//        HALL_STATE_2,
+//        HALL_STATE_3,
+//        HALL_STATE_4,
+//        HALL_STATE_5
+//};
+//unsigned int hall_angle[6] = {
+//        HALL_ANGLE_0,
+//        HALL_ANGLE_1,
+//        HALL_ANGLE_2,
+//        HALL_ANGLE_3,
+//        HALL_ANGLE_4,
+//        HALL_ANGLE_5
+//};
+unsigned int hall_state_reverse[6] = {
+        4,
+        2,
+        3,
+        0,
+        5,
+        1
+};
+unsigned int hall_state_next[6] = {
+        HALL_STATE_5,
+        HALL_STATE_3,
+        HALL_STATE_4,
+        HALL_STATE_1,
+        HALL_STATE_0,
+        HALL_STATE_2
+};
+unsigned int hall_state_prev[6] = {
+        HALL_STATE_3,
+        HALL_STATE_1,
+        HALL_STATE_2,
+        HALL_STATE_5,
+        HALL_STATE_4,
+        HALL_STATE_0
+};
+unsigned int hall_angle_next[6] = {
+        HALL_ANGLE_5,
+        HALL_ANGLE_3,
+        HALL_ANGLE_4,
+        HALL_ANGLE_1,
+        HALL_ANGLE_0,
+        HALL_ANGLE_2
+};
+unsigned int hall_angle[6] = {
+        HALL_ANGLE_4,
+        HALL_ANGLE_2,
+        HALL_ANGLE_3,
+        HALL_ANGLE_0,
+        HALL_ANGLE_5,
+        HALL_ANGLE_1
+};
+unsigned int hall_half_angle[6] = {
+        2730,
+        1365,
+        2048,
+        1,
+        3413,
+        682
+};
+
 void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
         client interface shared_memory_interface ?i_shared_memory,
                 server interface PositionFeedbackInterface i_position_feedback[3])
@@ -84,7 +150,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
     unsigned int hall_state_1  ;
     unsigned int hall_state_2  ;
 
-    unsigned int hall_state_next;
+    unsigned int hall_state_next_local;
     unsigned int hall_state_previous;
 
     unsigned int hall_transition_timeout;
@@ -92,12 +158,13 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
     unsigned int hall_last_period;
 
-    unsigned int hall_period0;
-    unsigned int hall_period1;
-    unsigned int hall_period2;
-    unsigned int hall_period3;
-    unsigned int hall_period4;
-    unsigned int hall_period5;
+//    unsigned int hall_period0;
+//    unsigned int hall_period1;
+//    unsigned int hall_period2;
+//    unsigned int hall_period3;
+//    unsigned int hall_period4;
+//    unsigned int hall_period5;
+    unsigned int hall_period[6];
 
     int hall_error;
     hall_error=0;
@@ -221,12 +288,15 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 if(++hall_last_state_period  > HALL_TRANSITION_PERIOD_MAX)  hall_last_state_period=HALL_TRANSITION_PERIOD_MAX;
                 if(++hall_transition_timeout > HALL_PERIOD_MAX)             hall_transition_timeout=HALL_PERIOD_MAX;
 
-                if(++hall_period0>HALL_PERIOD_MAX)  hall_period0=HALL_PERIOD_MAX;
-                if(++hall_period1>HALL_PERIOD_MAX)  hall_period1=HALL_PERIOD_MAX;
-                if(++hall_period2>HALL_PERIOD_MAX)  hall_period2=HALL_PERIOD_MAX;
-                if(++hall_period3>HALL_PERIOD_MAX)  hall_period3=HALL_PERIOD_MAX;
-                if(++hall_period4>HALL_PERIOD_MAX)  hall_period4=HALL_PERIOD_MAX;
-                if(++hall_period5>HALL_PERIOD_MAX)  hall_period5=HALL_PERIOD_MAX;
+//                if(++hall_period0>HALL_PERIOD_MAX)  hall_period0=HALL_PERIOD_MAX;
+//                if(++hall_period1>HALL_PERIOD_MAX)  hall_period1=HALL_PERIOD_MAX;
+//                if(++hall_period2>HALL_PERIOD_MAX)  hall_period2=HALL_PERIOD_MAX;
+//                if(++hall_period3>HALL_PERIOD_MAX)  hall_period3=HALL_PERIOD_MAX;
+//                if(++hall_period4>HALL_PERIOD_MAX)  hall_period4=HALL_PERIOD_MAX;
+//                if(++hall_period5>HALL_PERIOD_MAX)  hall_period5=HALL_PERIOD_MAX;
+                for (int i=0; i<6; i++) {
+                    if(++hall_period[i]>HALL_PERIOD_MAX)  hall_period[i]=HALL_PERIOD_MAX;
+                }
 
 
                 switch(hall_stable_states)
@@ -273,7 +343,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
                     hall_transition_timeout = 0;
 
-                    if(hall_state_new == hall_state_next)
+                    if(hall_state_new == hall_state_next_local)
                     {
                         hv.hall_position++;
                         if(hall_direction < 1)  hall_direction++;
@@ -286,60 +356,98 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                         if(hall_direction > -1) hall_direction--;
                     }
 
-                    switch(hall_state_new)
+
+                    //saves 4 bytes
+//                    if (hall_state_new >= 1 && hall_state_new <= 6)
+//                    {
+//                        hall_state_next = hall_state[(hall_state_reverse[hall_state_new-1]+1)%6];
+//                        if (hall_state_new == HALL_STATE_0) {
+//                            hall_sector_and_state = 0x80 + HALL_STATE_0;
+//                            hall_state_previous = HALL_STATE_5;
+//                        } else {
+//                            hall_sector_and_state = hall_state_reverse[hall_state_new-1]*0x10 + hall_state_new;
+//                            hall_state_previous = hall_state[(hall_state_reverse[hall_state_new-1]-1)%6];
+//                        }
+//                        hall_last_period = hall_period[hall_state_reverse[hall_state_new-1]];
+//                        hall_period[hall_state_reverse[hall_state_new-1]] = 0;
+//                    }
+//                    else
+//                    {
+//                        hall_error++;
+//                    }
+
+
+                    if (hall_state_new >= 1 && hall_state_new <= 6)
                     {
-                    case HALL_STATE_0:
-                        hall_state_next     = HALL_STATE_1;
-                        hall_state_previous = HALL_STATE_5;
-                        hall_sector_and_state = 0x80 + hall_state_new;
-                        hall_last_period = hall_period0;
-                        hall_period0 = 0;
-                        break;
-
-                    case HALL_STATE_1:
-                        hall_state_next     = HALL_STATE_2;
-                        hall_state_previous = HALL_STATE_0;
-                        hall_sector_and_state = 0x10 + hall_state_new;
-                        hall_last_period = hall_period1;
-                        hall_period1 = 0;
-                        break;
-
-                    case HALL_STATE_2:
-                        hall_state_next     = HALL_STATE_3;
-                        hall_state_previous = HALL_STATE_1;
-                        hall_sector_and_state = 0x20 + hall_state_new;
-                        hall_last_period = hall_period2;
-                        hall_period2 = 0;
-                        break;
-
-                    case HALL_STATE_3:
-                        hall_state_next     = HALL_STATE_4;
-                        hall_state_previous = HALL_STATE_2;
-                        hall_sector_and_state = 0x30 + hall_state_new;
-                        hall_last_period = hall_period3;
-                        hall_period3 = 0;
-                        break;
-
-                    case HALL_STATE_4:
-                        hall_state_next     = HALL_STATE_5;
-                        hall_state_previous = HALL_STATE_3;
-                        hall_sector_and_state = 0x40 + hall_state_new;
-                        hall_last_period = hall_period4;
-                        hall_period4 = 0;
-                        break;
-
-                    case HALL_STATE_5:
-                        hall_state_next     = HALL_STATE_0;
-                        hall_state_previous = HALL_STATE_4;
-                        hall_sector_and_state = 0x50 + hall_state_new;
-                        hall_last_period = hall_period5;
-                        hall_period5 = 0;
-                        break;
-
-                    default:
-                        hall_error++;
-                        break;
+                        hall_state_next_local = hall_state_next[hall_state_new-1];
+                        hall_state_previous = hall_state_prev[hall_state_new-1];
+                        if (hall_state_new == HALL_STATE_0) {
+                            hall_sector_and_state = 0x80 + HALL_STATE_0;
+                        } else {
+                            hall_sector_and_state = hall_state_reverse[hall_state_new-1]*0x10 + hall_state_new;
+                        }
+                        hall_last_period = hall_period[hall_state_new-1];
+                        hall_period[hall_state_new-1] = 0;
                     }
+                    else
+                    {
+                        hall_error++;
+                    }
+
+//                    switch(hall_state_new)
+//                    {
+//                    case HALL_STATE_0:
+//                        hall_state_next     = HALL_STATE_1;
+//                        hall_state_previous = HALL_STATE_5;
+//                        hall_sector_and_state = 0x80 + hall_state_new;
+//                        hall_last_period = hall_period[0];
+//                        hall_period[0] = 0;
+//                        break;
+//
+//                    case HALL_STATE_1:
+//                        hall_state_next     = HALL_STATE_2;
+//                        hall_state_previous = HALL_STATE_0;
+//                        hall_sector_and_state = 0x10 + hall_state_new;
+//                        hall_last_period = hall_period[1];
+//                        hall_period[1] = 0;
+//                        break;
+//
+//                    case HALL_STATE_2:
+//                        hall_state_next     = HALL_STATE_3;
+//                        hall_state_previous = HALL_STATE_1;
+//                        hall_sector_and_state = 0x20 + hall_state_new;
+//                        hall_last_period = hall_period[2];
+//                        hall_period[2] = 0;
+//                        break;
+//
+//                    case HALL_STATE_3:
+//                        hall_state_next     = HALL_STATE_4;
+//                        hall_state_previous = HALL_STATE_2;
+//                        hall_sector_and_state = 0x30 + hall_state_new;
+//                        hall_last_period = hall_period[3];
+//                        hall_period[3] = 0;
+//                        break;
+//
+//                    case HALL_STATE_4:
+//                        hall_state_next     = HALL_STATE_5;
+//                        hall_state_previous = HALL_STATE_3;
+//                        hall_sector_and_state = 0x40 + hall_state_new;
+//                        hall_last_period = hall_period[4];
+//                        hall_period[4] = 0;
+//                        break;
+//
+//                    case HALL_STATE_5:
+//                        hall_state_next     = HALL_STATE_0;
+//                        hall_state_previous = HALL_STATE_4;
+//                        hall_sector_and_state = 0x50 + hall_state_new;
+//                        hall_last_period = hall_period[5];
+//                        hall_period[5] = 0;
+//                        break;
+//
+//                    default:
+//                        hall_error++;
+//                        break;
+//                    }
 
                     hall_last_state_period = 0;
 
@@ -382,32 +490,36 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                         {
                             hv.hall_speed = 0;
 
-                            switch(hv.hall_pin_state)
-                            {
-                            case HALL_STATE_0:
-                                    hv.hall_angle = 1;
-                                break;
-
-                            case HALL_STATE_1:
-                                hv.hall_angle = (HALL_ANGLE_1+HALL_ANGLE_2)/2;
-                                break;
-
-                            case HALL_STATE_2:
-                                hv.hall_angle = (HALL_ANGLE_2+HALL_ANGLE_3)/2;
-                                break;
-
-                            case HALL_STATE_3:
-                                hv.hall_angle = (HALL_ANGLE_3+HALL_ANGLE_4)/2;
-                                break;
-
-                            case HALL_STATE_4:
-                                hv.hall_angle = (HALL_ANGLE_4+HALL_ANGLE_5)/2;
-                                break;
-
-                            case HALL_STATE_5:
-                                hv.hall_angle = (HALL_ANGLE_5+HALL_ANGLE_0)/2;
-                                break;
+                            if (hv.hall_pin_state >=1 && hv.hall_pin_state <= 6) {
+                                hv.hall_angle = hall_half_angle[hv.hall_pin_state-1];
                             }
+
+//                            switch(hv.hall_pin_state)
+//                            {
+//                            case HALL_STATE_0:
+//                                    hv.hall_angle = 1;
+//                                break;
+//
+//                            case HALL_STATE_1:
+//                                hv.hall_angle = (HALL_ANGLE_1+HALL_ANGLE_2)/2;
+//                                break;
+//
+//                            case HALL_STATE_2:
+//                                hv.hall_angle = (HALL_ANGLE_2+HALL_ANGLE_3)/2;
+//                                break;
+//
+//                            case HALL_STATE_3:
+//                                hv.hall_angle = (HALL_ANGLE_3+HALL_ANGLE_4)/2;
+//                                break;
+//
+//                            case HALL_STATE_4:
+//                                hv.hall_angle = (HALL_ANGLE_4+HALL_ANGLE_5)/2;
+//                                break;
+//
+//                            case HALL_STATE_5:
+//                                hv.hall_angle = (HALL_ANGLE_5+HALL_ANGLE_0)/2;
+//                                break;
+//                            }
                         }
                     }
 
@@ -491,63 +603,82 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
     if(hv.hall_pin_state == hv.hall_next_state)     hv.hall_direction_of_rotation =  1;
     if(hv.hall_pin_state == hv.hall_previous_state) hv.hall_direction_of_rotation = -1;
 
-    switch(hv.hall_pin_state)
-    {
 
-    case HALL_STATE_0:
-        if(hv.hall_next_state == HALL_STATE_0)
-            hv.hall_angle = HALL_ANGLE_0;
-        else
-            hv.hall_angle = HALL_ANGLE_1;
-        hv.hall_next_state = HALL_STATE_1;
-        hv.hall_previous_state = HALL_STATE_5;
-        break;
+//    if (hv.hall_pin_state >= 1 && hv.hall_pin_state <= 6) {
+//        if(hv.hall_next_state == hv.hall_pin_state)
+//            hv.hall_angle = hall_angle[hall_state_reverse[hv.hall_pin_state-1]];
+//        else
+//            hv.hall_angle = hall_angle[hall_state_reverse[hv.hall_pin_state%6]];
+//        hv.hall_next_state = hall_state[hall_state_reverse[hv.hall_pin_state%6]];
+//        hv.hall_previous_state = hall_state[hall_state_reverse[hv.hall_pin_state%6]];
+//    }
 
-    case HALL_STATE_1:
-        if(hv.hall_next_state == HALL_STATE_1)
-            hv.hall_angle = HALL_ANGLE_1;
+    if (hv.hall_pin_state >= 1 && hv.hall_pin_state <= 6) {
+        if(hv.hall_next_state == hv.hall_pin_state)
+            hv.hall_angle = hall_angle[hv.hall_pin_state-1];
         else
-            hv.hall_angle = HALL_ANGLE_2;
-        hv.hall_next_state = HALL_STATE_2;
-        hv.hall_previous_state = HALL_STATE_0;
-        break;
-
-    case HALL_STATE_2:
-        if(hv.hall_next_state == HALL_STATE_2)
-            hv.hall_angle = HALL_ANGLE_2;
-        else
-            hv.hall_angle = HALL_ANGLE_3;
-        hv.hall_next_state = HALL_STATE_3;
-        hv.hall_previous_state = HALL_STATE_1;
-        break;
-
-    case HALL_STATE_3:
-        if(hv.hall_next_state == HALL_STATE_3)
-            hv.hall_angle = HALL_ANGLE_3;
-        else
-            hv.hall_angle = HALL_ANGLE_4;
-        hv.hall_next_state = HALL_STATE_4;
-        hv.hall_previous_state = HALL_STATE_2;
-        break;
-
-    case HALL_STATE_4:
-        if(hv.hall_next_state == HALL_STATE_4)
-            hv.hall_angle = HALL_ANGLE_4;
-        else
-            hv.hall_angle = HALL_ANGLE_5;
-        hv.hall_next_state = HALL_STATE_5;
-        hv.hall_previous_state = HALL_STATE_3;
-        break;
-
-    case HALL_STATE_5:
-        if(hv.hall_next_state == HALL_STATE_5)
-            hv.hall_angle = HALL_ANGLE_5;
-        else
-            hv.hall_angle = HALL_ANGLE_0;
-        hv.hall_next_state = HALL_STATE_0;
-        hv.hall_previous_state = HALL_STATE_4;
-        break;
+            hv.hall_angle = hall_angle_next[hv.hall_pin_state-1];
+        hv.hall_next_state = hall_state_next[hv.hall_pin_state-1];
+        hv.hall_previous_state = hall_state_prev[hv.hall_pin_state-1];
     }
+
+//    switch(hv.hall_pin_state)
+//    {
+//
+//    case HALL_STATE_0:
+//        if(hv.hall_next_state == HALL_STATE_0)
+//            hv.hall_angle = HALL_ANGLE_0;
+//        else
+//            hv.hall_angle = HALL_ANGLE_1;
+//        hv.hall_next_state = HALL_STATE_1;
+//        hv.hall_previous_state = HALL_STATE_5;
+//        break;
+//
+//    case HALL_STATE_1:
+//        if(hv.hall_next_state == HALL_STATE_1)
+//            hv.hall_angle = HALL_ANGLE_1;
+//        else
+//            hv.hall_angle = HALL_ANGLE_2;
+//        hv.hall_next_state = HALL_STATE_2;
+//        hv.hall_previous_state = HALL_STATE_0;
+//        break;
+//
+//    case HALL_STATE_2:
+//        if(hv.hall_next_state == HALL_STATE_2)
+//            hv.hall_angle = HALL_ANGLE_2;
+//        else
+//            hv.hall_angle = HALL_ANGLE_3;
+//        hv.hall_next_state = HALL_STATE_3;
+//        hv.hall_previous_state = HALL_STATE_1;
+//        break;
+//
+//    case HALL_STATE_3:
+//        if(hv.hall_next_state == HALL_STATE_3)
+//            hv.hall_angle = HALL_ANGLE_3;
+//        else
+//            hv.hall_angle = HALL_ANGLE_4;
+//        hv.hall_next_state = HALL_STATE_4;
+//        hv.hall_previous_state = HALL_STATE_2;
+//        break;
+//
+//    case HALL_STATE_4:
+//        if(hv.hall_next_state == HALL_STATE_4)
+//            hv.hall_angle = HALL_ANGLE_4;
+//        else
+//            hv.hall_angle = HALL_ANGLE_5;
+//        hv.hall_next_state = HALL_STATE_5;
+//        hv.hall_previous_state = HALL_STATE_3;
+//        break;
+//
+//    case HALL_STATE_5:
+//        if(hv.hall_next_state == HALL_STATE_5)
+//            hv.hall_angle = HALL_ANGLE_5;
+//        else
+//            hv.hall_angle = HALL_ANGLE_0;
+//        hv.hall_next_state = HALL_STATE_0;
+//        hv.hall_previous_state = HALL_STATE_4;
+//        break;
+//    }
 }
 
 
