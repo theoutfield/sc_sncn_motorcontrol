@@ -60,7 +60,7 @@ int main(void)
             par
             {
                 {
-                    demo_ad7949(i_adc[1]);
+//                    demo_ad7949(i_adc[1]);
                 }
 
                 {
@@ -133,8 +133,7 @@ int main(void)
 
                 /* ADC Service */
                 {
-                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC,
-                            /*STD_MOTOR_CTRL_MODE*/NORMAL_MODE);
+                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, /*NORMAL_MODE*/STD_MOTOR_CTRL_MODE);
                 }
 
                 /* Watchdog Service */

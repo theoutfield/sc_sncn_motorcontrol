@@ -27,32 +27,16 @@ void demo_ad7265(interface ADCInterface client i_adc)
     t :> time;
     while (1)
     {
-        i_adc.set_channel(AD7265_SGL_A1_B1);
-        {a1, b1} = i_adc.sample_and_send();
+        {a1, b1} = i_adc.get_channel(AD7265_SGL_A1_B1);
+        {a2, b2} = i_adc.get_channel(AD7265_SGL_A2_B2);
+        {a3, b3} = i_adc.get_channel(AD7265_SGL_A3_B3);
+        {a4, b4} = i_adc.get_channel(AD7265_SGL_A4_B4);
+        {a5, b5} =  i_adc.get_channel(AD7265_SGL_A5_B5);
+        {a6, b6} = i_adc.get_channel(AD7265_SGL_A6_B6);
+        {a1a2, b1b2} = i_adc.get_channel(AD7265_DIFF_A1A2_B1B2);
+        {a3a4, b3b4} = i_adc.get_channel(AD7265_DIFF_A3A4_B3B4);
+        {a5a6, b5b6} = i_adc.get_channel(AD7265_DIFF_A5A6_B5B6);
 
-        i_adc.set_channel(AD7265_SGL_A2_B2);
-        {a2, b2} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7265_SGL_A3_B3);
-        {a3, b3} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7265_SGL_A4_B4);
-        {a4, b4} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7265_SGL_A5_B5);
-        {a5, b5} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7265_SGL_A6_B6);
-        {a6, b6} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7265_DIFF_A1A2_B1B2);
-        {a1a2, b1b2} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7265_DIFF_A3A4_B3B4);
-        {a3a4, b3b4} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7265_DIFF_A5A6_B5B6);
-        {a5a6, b5b6} = i_adc.sample_and_send();
 
         xscope_int(A1, a1);
         xscope_int(B1, b1);
@@ -92,29 +76,14 @@ void demo_ad7949(interface ADCInterface client i_adc)
     t :> time;
     while (1)
     {
-        i_adc.set_channel(AD7949_CHANNEL_0);
-        {a0, b0} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7949_CHANNEL_1);
-        {a1, b1} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7949_CHANNEL_2);
-        {a2, b2} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7949_CHANNEL_3);
-        {a3, b3} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7949_CHANNEL_4);
-        {a4, b4} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7949_CHANNEL_5);
-        {a5, b5} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7949_CHANNEL_6);
-        {a6, b6} = i_adc.sample_and_send();
-
-        i_adc.set_channel(AD7949_CHANNEL_7);
-        {a7, b7} = i_adc.sample_and_send();
+        {a0, b0} = i_adc.get_channel(AD7949_CHANNEL_0);
+        {a1, b1} = i_adc.get_channel(AD7949_CHANNEL_1);
+        {a2, b2} = i_adc.get_channel(AD7949_CHANNEL_2);
+        {a3, b3} = i_adc.get_channel(AD7949_CHANNEL_3);
+        {a4, b4} = i_adc.get_channel(AD7949_CHANNEL_4);
+        {a5, b5} = i_adc.get_channel(AD7949_CHANNEL_5);
+        {a6, b6} = i_adc.get_channel(AD7949_CHANNEL_6);
+        {a7, b7} = i_adc.get_channel(AD7949_CHANNEL_7);
 
         xscope_int(A0, a0);
         xscope_int(B0, b0);
@@ -133,7 +102,7 @@ void demo_ad7949(interface ADCInterface client i_adc)
         xscope_int(A7, a7);
         xscope_int(B7, b7);
 
-//        delay_milliseconds(2);
+        delay_milliseconds(2);
 
     } // while(1)
 

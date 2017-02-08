@@ -23,8 +23,14 @@
  * @param current_sensor_config Structure containing configurations for this service
  *
  */
-void adc_ad7949(  interface ADCInterface server i_adc[2],
-                 AD7949Ports &adc_ports, CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog);
+void adc_ad7949(
+        interface ADCInterface server i_adc[2],
+        AD7949Ports &adc_ports,
+        CurrentSensorsConfig &current_sensor_config,
+        interface WatchdogInterface client ?i_watchdog, int operational_mode);
 
-void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Ports &adc_ports,
-                CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog);
+void adc_ad7949_fixed_channel(
+        interface ADCInterface server i_adc[2],
+        AD7949Ports &adc_ports,
+        CurrentSensorsConfig &current_sensor_config,
+        interface WatchdogInterface client ?i_watchdog, int operational_mode);
