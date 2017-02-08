@@ -133,7 +133,8 @@ int main(void)
 
                 /* ADC Service */
                 {
-                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, STD_MOTOR_CTRL_MODE);
+                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC,
+                            /*STD_MOTOR_CTRL_MODE*/NORMAL_MODE);
                 }
 
                 /* Watchdog Service */

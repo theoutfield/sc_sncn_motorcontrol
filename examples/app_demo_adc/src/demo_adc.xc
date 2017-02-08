@@ -92,16 +92,6 @@ void demo_ad7949(interface ADCInterface client i_adc)
     t :> time;
     while (1)
     {
-        //#define AD7949_TEMPERATURE          0b10110001001001
-        //
-        //#define AD7949_CHANNEL_0            0b11110001001001
-        //#define AD7949_CHANNEL_1            0b11110011001001
-        //#define AD7949_CHANNEL_2            0b11110101001001
-        //#define AD7949_CHANNEL_3            0b11110111001001
-        //#define AD7949_CHANNEL_4            0b11111001001001
-        //#define AD7949_CHANNEL_5            0b11111011001001
-        //#define AD7949_CHANNEL_6            0b11111101001001
-        //#define AD7949_CHANNEL_7            0b11111111001001
         i_adc.set_channel(AD7949_CHANNEL_0);
         {a0, b0} = i_adc.sample_and_send();
 
@@ -140,10 +130,10 @@ void demo_ad7949(interface ADCInterface client i_adc)
         xscope_int(B5, b5);
         xscope_int(A6, a6);
         xscope_int(B6, b6);
-        xscope_int(A7, a6);
-        xscope_int(B7, b6);
+        xscope_int(A7, a7);
+        xscope_int(B7, b7);
 
-        delay_milliseconds(2);
+//        delay_milliseconds(2);
 
     } // while(1)
 

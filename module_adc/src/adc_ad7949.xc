@@ -138,12 +138,9 @@ void adc_ad7949(
         interface WatchdogInterface client ?i_watchdog)
 {
     timer t;
+    unsigned int time_end=0, time_start=0, period=0;
     unsigned int ad7949_config     =   0b11110001001001;   /* Motor current (ADC Channel 0), unipolar, referenced to GND */
-    const unsigned int adc_config_other[] = {
-            0b10110001001001,   // Temperature
-            0b11110101001001,   // ADC Channel 2, unipolar, referenced to GND  voltage and current
-            0b11111001001001,   // ADC Channel 4, unipolar, referenced to GND
-            0b11111011001001 }; // ADC Channel 5, unipolar, referenced to GND
+
 
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
@@ -172,6 +169,7 @@ void adc_ad7949(
                 break;
 
         case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
+                t :> time_start;
 
                 unsigned int data_raw_a;
                 unsigned int data_raw_b;
@@ -250,32 +248,38 @@ void adc_ad7949(
                 if(ad7949_config & BIT0)
                     bits[3] |= 0x00B30000;
 
-                stop_clock(adc_ports.clk);
-                clearbuf(adc_ports.data_a);
-                clearbuf(adc_ports.data_b);
-                clearbuf(adc_ports.sclk_conv_mosib_mosia);
-                adc_ports.sclk_conv_mosib_mosia <: bits[0];
-                start_clock(adc_ports.clk);
+                for(int i=0;i<=3;i++)
+                {
+                    stop_clock(adc_ports.clk);
+                    clearbuf(adc_ports.data_a);
+                    clearbuf(adc_ports.data_b);
+                    clearbuf(adc_ports.sclk_conv_mosib_mosia);
+                    adc_ports.sclk_conv_mosib_mosia <: bits[0];
+                    start_clock(adc_ports.clk);
 
-                adc_ports.sclk_conv_mosib_mosia <: bits[1];
-                adc_ports.sclk_conv_mosib_mosia <: bits[2];
-                adc_ports.sclk_conv_mosib_mosia <: bits[3];
+                    adc_ports.sclk_conv_mosib_mosia <: bits[1];
+                    adc_ports.sclk_conv_mosib_mosia <: bits[2];
+                    adc_ports.sclk_conv_mosib_mosia <: bits[3];
 
-                sync(adc_ports.sclk_conv_mosib_mosia);
-                stop_clock(adc_ports.clk);
+                    sync(adc_ports.sclk_conv_mosib_mosia);
+                    stop_clock(adc_ports.clk);
 
-                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+                    configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-                adc_ports.data_a :> data_raw_a;
-                adc_data_a[4] = convert(data_raw_a);
-                adc_ports.data_b :> data_raw_b;
-                adc_data_b[4] = convert(data_raw_b);
+                    adc_ports.data_a :> data_raw_a;
+                    adc_data_a[4] = convert(data_raw_a);
+                    adc_ports.data_b :> data_raw_b;
+                    adc_data_b[4] = convert(data_raw_b);
 
-                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-
+                    configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+                }
                 out_a = ((int) adc_data_a[4]);
                 out_b = ((int) adc_data_b[4]);
 
+                xscope_int (PERIOD, period);
+
+                t :> time_end;
+                period = time_end-time_start;
 
                 break;
 
@@ -326,15 +330,17 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
      *
      */
     const unsigned int adc_config_mot     =   0b11110001001001;
-
     unsigned int ad7949_config     =   0b11110001001001;
 
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
 
+    unsigned int data_raw_a;
+    unsigned int data_raw_b;
+
     int OUT_A[10], OUT_B[10];
     int j=0;
-    int selected_channel=0;
+    int selected_channel=adc_config_mot;
 
     unsigned short channel_config[10] = {
             AD7949_CHANNEL_0, AD7949_CHANNEL_1, AD7949_CHANNEL_2,
@@ -386,8 +392,6 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
                 break;
 
         case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
-                unsigned int data_raw_a;
-                unsigned int data_raw_b;
 
                 /* Reading/Writing after conversion (RAC)
                    Read previous conversion result
@@ -498,19 +502,10 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
 
         case i_adc[int i].set_channel(unsigned short channel_config_in):
                 selected_channel = channel_config_in;
-//
-//                if     (channel_config==0)   ad7949_config = AD7949_CHANNEL_0;
-//                else if(channel_config==1)   ad7949_config = AD7949_CHANNEL_1;
-//                else if(channel_config==2)   ad7949_config = AD7949_CHANNEL_2;
-//                else if(channel_config==3)   ad7949_config = AD7949_CHANNEL_3;
-//                else if(channel_config==4)   ad7949_config = AD7949_CHANNEL_4;
-//                else if(channel_config==5)   ad7949_config = AD7949_CHANNEL_5;
-//                else if(channel_config==6)   ad7949_config = AD7949_CHANNEL_6;
-//                else if(channel_config==7)   ad7949_config = AD7949_CHANNEL_7;
                 break;
 
         case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
-                for(int k=0;k<10;k++)
+                for(int k=0;k<8;k++)
                 {
                     if(selected_channel == channel_config[k])
                     {
@@ -541,10 +536,6 @@ void adc_ad7949_fixed_channel(interface ADCInterface server i_adc[2], AD7949Port
             if(j==7) j=0;
 
             ad7949_config = channel_config[j];
-
-            unsigned int data_raw_a;
-            unsigned int data_raw_b;
-
 
             /* Reading/Writing after conversion (RAC)
                                         Read previous conversion result
