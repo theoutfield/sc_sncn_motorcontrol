@@ -228,18 +228,22 @@ void adc_ad7265_fixed_channel(
                 status = ACTIVE;
                 break;
 
-        case iADC[int i].config_adc_inputs(unsigned int config_ai_1, unsigned int config_ai_2):
-                break;
+//        case iADC[int i].config_adc_inputs(unsigned int config_ai_1, unsigned int config_ai_2):
+//                break;
 
-        case iADC[int i].set_protection_limits(int i_max_in, int i_ratio, int v_dc_max_in, int v_dc_min_in):
+        case iADC[int i].set_protection_limits_and_analogue_input_configs(
+                int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in,
+                unsigned int config_ai_1, unsigned int config_ai_2):
+
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
-                current_limit = i_max * i_ratio;
+                current_limit = i_max * i_ratio_in;
                 break;
 
         case iADC[int i].get_all_measurements() -> {
-            int phaseB_out, int phaseC_out, int V_dc_out,
+            int phaseB_out, int phaseC_out,
+            int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
             int analogue_input_b_1, int analogue_input_b_2,
             int fault_code_out}:
