@@ -228,6 +228,9 @@ void adc_ad7265_fixed_channel(
                 status = ACTIVE;
                 break;
 
+        case iADC[int i].config_adc_inputs(unsigned int config_ai_1, unsigned int config_ai_2):
+                break;
+
         case iADC[int i].set_protection_limits(int i_max_in, int i_ratio, int v_dc_max_in, int v_dc_min_in):
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
@@ -235,7 +238,11 @@ void adc_ad7265_fixed_channel(
                 current_limit = i_max * i_ratio;
                 break;
 
-        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int analogue_input_1, int analogue_input_2, int fault_code_out}:
+        case iADC[int i].get_all_measurements() -> {
+            int phaseB_out, int phaseC_out, int V_dc_out,
+            int analogue_input_a_1, int analogue_input_a_2,
+            int analogue_input_b_1, int analogue_input_b_2,
+            int fault_code_out}:
 
                 adc_ports.p4_mux <: AD7265_SGL_A1_B1;      //mux_config;
                 clearbuf( adc_ports.p32_data[0] );  //Clear the buffers used by the input ports.
@@ -288,7 +295,11 @@ void adc_ad7265_fixed_channel(
                 }
 
                 V_dc_out = V_dc;
-                analogue_input_1 = torque;
+                analogue_input_a_1 = torque;
+                analogue_input_a_2=0;
+                analogue_input_b_1=0;
+                analogue_input_b_2=0;
+
                 fault_code_out=fault_code;
 
                 flag=1;

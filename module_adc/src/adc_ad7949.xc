@@ -353,6 +353,8 @@ void adc_ad7949_fixed_channel(
             AD7949_CHANNEL_4, // ADC Channel 4, unipolar, referenced to GND
             AD7949_CHANNEL_5};  // ADC Channel 5, unipolar, referenced to GND
 
+    int analogue_index_1=0, analogue_index_2=0;
+
     int i_calib_a = 0, i_calib_b = 0;
 
     int flag=0;
@@ -387,6 +389,19 @@ void adc_ad7949_fixed_channel(
                 status = ACTIVE;
                 break;
 
+        case i_adc[int i].config_adc_inputs(unsigned int config_ai_1, unsigned int config_ai_2):
+                for(int i=0; i<=3; i++)
+                {
+                    if(config_ai_1 == channel_config[i])    analogue_index_1=i;
+                    if(config_ai_2 == channel_config[i])    analogue_index_2=i;
+                }
+//                const unsigned int channel_config[4] = {
+//                        AD7949_TEMPERATURE, // Temperature
+//                        AD7949_CHANNEL_2, // ADC Channel 2, unipolar, referenced to GND voltage and current
+//                        AD7949_CHANNEL_4, // ADC Channel 4, unipolar, referenced to GND
+//                        AD7949_CHANNEL_5};  // ADC Channel 5, unipolar, referenced to GND
+                break;
+
         case i_adc[int i].set_protection_limits(int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
@@ -394,7 +409,11 @@ void adc_ad7949_fixed_channel(
                 current_limit = i_max * i_ratio_in;
                 break;
 
-        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int analogue_input_1, int analogue_input_2, int fault_code_out}:
+        case i_adc[int i].get_all_measurements() -> {
+            int phaseB_out, int phaseC_out, int V_dc_out,
+            int analogue_input_a_1, int analogue_input_a_2,
+            int analogue_input_b_1, int analogue_input_b_2,
+            int fault_code_out}:
 
                 t:> time_start;
                 time_idle = time_start-time_end_II;
@@ -503,8 +522,10 @@ void adc_ad7949_fixed_channel(
 
                 fault_code_out=fault_code;
 
-                analogue_input_1=0;
-                analogue_input_2=0;
+                analogue_input_a_1=OUT_A[analogue_index_1];
+                analogue_input_a_2=OUT_A[analogue_index_2];
+                analogue_input_b_1=OUT_B[analogue_index_1];
+                analogue_input_b_2=OUT_B[analogue_index_2];
 
                 flag=1;
 
