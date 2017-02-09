@@ -511,16 +511,83 @@ void adc_ad7949_fixed_channel(
                 break;
 
         case i_adc[int i].get_channel(unsigned short channel_config_in)-> {int out_a, int out_b}:
-                selected_channel = channel_config_in;
 
-                for(int k=0;k<8;k++)
+                if (operational_mode==NORMAL_MODE)
                 {
-                    if(selected_channel == channel_config[k])
+
+                    ad7949_config = channel_config_in;
+
+                    configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+
+#pragma unsafe arrays
+                    int bits[4];
+
+                    bits[0]=0x80808000;
+                    if(ad7949_config & BIT13)
+                        bits[0] |= 0x0000B300;
+                    if(ad7949_config & BIT12)
+                        bits[0] |= 0x00B30000;
+                    if(ad7949_config & BIT11)
+                        bits[0] |= 0xB3000000;
+
+                    bits[1]=0x80808080;
+                    if(ad7949_config & BIT10)
+                        bits[1] |= 0x000000B3;
+                    if(ad7949_config & BIT09)
+                        bits[1] |= 0x0000B300;
+                    if(ad7949_config & BIT08)
+                        bits[1] |= 0x00B30000;
+                    if(ad7949_config & BIT07)
+                        bits[1] |= 0xB3000000;
+
+                    bits[2]=0x80808080;
+                    if(ad7949_config & BIT06)
+                        bits[2] |= 0x000000B3;
+                    if(ad7949_config & BIT05)
+                        bits[2] |= 0x0000B300;
+                    if(ad7949_config & BIT04)
+                        bits[2] |= 0x00B30000;
+                    if(ad7949_config & BIT03)
+                        bits[2] |= 0xB3000000;
+
+                    bits[3]=0x00808080;
+                    if(ad7949_config & BIT02)
+                        bits[3] |= 0x000000B3;
+                    if(ad7949_config & BIT01)
+                        bits[3] |= 0x0000B300;
+                    if(ad7949_config & BIT0)
+                        bits[3] |= 0x00B30000;
+
+                    for(int i=0;i<=3;i++)
                     {
-                        out_a = OUT_A[k];
-                        out_b = OUT_B[k];
+                        stop_clock(adc_ports.clk);
+                        clearbuf(adc_ports.data_a);
+                        clearbuf(adc_ports.data_b);
+                        clearbuf(adc_ports.sclk_conv_mosib_mosia);
+                        adc_ports.sclk_conv_mosib_mosia <: bits[0];
+                        start_clock(adc_ports.clk);
+
+                        adc_ports.sclk_conv_mosib_mosia <: bits[1];
+                        adc_ports.sclk_conv_mosib_mosia <: bits[2];
+                        adc_ports.sclk_conv_mosib_mosia <: bits[3];
+
+                        sync(adc_ports.sclk_conv_mosib_mosia);
+                        stop_clock(adc_ports.clk);
+
+                        configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+
+                        adc_ports.data_a :> data_raw_a;
+                        adc_data_a[4] = convert(data_raw_a);
+                        adc_ports.data_b :> data_raw_b;
+                        adc_data_b[4] = convert(data_raw_b);
+
+                        configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
                     }
+
+                    out_a = ((int) adc_data_a[4]);
+                    out_b = ((int) adc_data_b[4]);
                 }
+
                 break;
 
         case i_adc[int i].reset_faults():
@@ -540,48 +607,14 @@ void adc_ad7949_fixed_channel(
 
         if(operational_mode==STD_MOTOR_CTRL_MODE && flag==1)
         {
-//            j++;
-//            if(j==7) j=0;
             for(j=0;j<=4;j++)
             {
                 ad7949_config = channel_config[j];
 
-                /* Reading/Writing after conversion (RAC)
-                                                    Read previous conversion result
-                                                    Write CFG for next conversion */
-
-                // CONGIG__other_n1     CFG_Imotx_x1       |CONGIG__other_n2     CFG_Imotx_x2     |CONGIG__other_n3     CFG_Imotx_x3       |
-                // CONVERT_null         CONVERT_other_n1   |CONVERT_Imot_x1      CONVERT_other_n2 |CONVERT_Imot_x2      CONVERT_other_n3   |
-                // READOUT_null         READOUT_other_null |READOUT_other_n1     READOUT_Imot_x1  |READOUT_other_n2     READOUT_Imot_x2    |
-                // -----------
-                // iIndexADC        0           1                  2                  3
-                // readout       extern     temperature     current-voltage         extern
-
                 configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-#pragma unsafe arrays
+                #pragma unsafe arrays
                 int bits[4];
-
-                /*
-                 * Configuration Register Description
-                 *
-                 * bit(s)   name    Description
-                 *
-                 *  13      CFG     Configuration udpate
-                 *  12      INCC    Input channel configuration
-                 *  11      INCC    Input channel configuration
-                 *  10      INCC    Input channel configuration
-                 *  09      INx     Input channel selection bit 2 0..7
-                 *  08      INx     Input channel selection bit 1
-                 *  07      INx     Input channel selection bit 0
-                 *  06      BW      Select bandwidth for low-pass filter
-                 *  05      REF     Reference/buffer selection
-                 *  04      REF     Reference/buffer selection
-                 *  03      REF     Reference/buffer selection
-                 *  02      SEQ     Channel sequencer. Allows for scanning channels in an IN0 to IN[7:0] fashion.
-                 *  01      SEQ     Channel sequencer
-                 *  00      RB      Read back the CFG register.
-                 */
 
                 bits[0]=0x80808000;
                 if(ad7949_config & BIT13)
@@ -664,7 +697,7 @@ void adc_ad7949_fixed_channel(
              */
             t when timerafter (time_start + (7000)) :> void;
 
-#pragma unsafe arrays
+            #pragma unsafe arrays
                 int bits[4];
             bits[0]=0x80808000;
             if(adc_config_mot & BIT13)
@@ -732,115 +765,6 @@ void adc_ad7949_fixed_channel(
             t :> time_end_II;
             period_II = time_end_II - time_start;
 
-        }
-        else if (operational_mode==NORMAL_MODE)
-        {
-            j++;
-            if(j==7) j=0;
-
-            ad7949_config = channel_config[j];
-
-            /* Reading/Writing after conversion (RAC)
-                                        Read previous conversion result
-                                        Write CFG for next conversion */
-
-            // CONGIG__other_n1     CFG_Imotx_x1       |CONGIG__other_n2     CFG_Imotx_x2     |CONGIG__other_n3     CFG_Imotx_x3       |
-            // CONVERT_null         CONVERT_other_n1   |CONVERT_Imot_x1      CONVERT_other_n2 |CONVERT_Imot_x2      CONVERT_other_n3   |
-            // READOUT_null         READOUT_other_null |READOUT_other_n1     READOUT_Imot_x1  |READOUT_other_n2     READOUT_Imot_x2    |
-            // -----------
-            // iIndexADC        0           1                  2                  3
-            // readout       extern     temperature     current-voltage         extern
-
-            configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-
-#pragma unsafe arrays
-            int bits[4];
-
-            /*
-             * Configuration Register Description
-             *
-             * bit(s)   name    Description
-             *
-             *  13      CFG     Configuration udpate
-             *  12      INCC    Input channel configuration
-             *  11      INCC    Input channel configuration
-             *  10      INCC    Input channel configuration
-             *  09      INx     Input channel selection bit 2 0..7
-             *  08      INx     Input channel selection bit 1
-             *  07      INx     Input channel selection bit 0
-             *  06      BW      Select bandwidth for low-pass filter
-             *  05      REF     Reference/buffer selection
-             *  04      REF     Reference/buffer selection
-             *  03      REF     Reference/buffer selection
-             *  02      SEQ     Channel sequencer. Allows for scanning channels in an IN0 to IN[7:0] fashion.
-             *  01      SEQ     Channel sequencer
-             *  00      RB      Read back the CFG register.
-             */
-
-            bits[0]=0x80808000;
-            if(ad7949_config & BIT13)
-                bits[0] |= 0x0000B300;
-            if(ad7949_config & BIT12)
-                bits[0] |= 0x00B30000;
-            if(ad7949_config & BIT11)
-                bits[0] |= 0xB3000000;
-
-            bits[1]=0x80808080;
-            if(ad7949_config & BIT10)
-                bits[1] |= 0x000000B3;
-            if(ad7949_config & BIT09)
-                bits[1] |= 0x0000B300;
-            if(ad7949_config & BIT08)
-                bits[1] |= 0x00B30000;
-            if(ad7949_config & BIT07)
-                bits[1] |= 0xB3000000;
-
-            bits[2]=0x80808080;
-            if(ad7949_config & BIT06)
-                bits[2] |= 0x000000B3;
-            if(ad7949_config & BIT05)
-                bits[2] |= 0x0000B300;
-            if(ad7949_config & BIT04)
-                bits[2] |= 0x00B30000;
-            if(ad7949_config & BIT03)
-                bits[2] |= 0xB3000000;
-
-            bits[3]=0x00808080;
-            if(ad7949_config & BIT02)
-                bits[3] |= 0x000000B3;
-            if(ad7949_config & BIT01)
-                bits[3] |= 0x0000B300;
-            if(ad7949_config & BIT0)
-                bits[3] |= 0x00B30000;
-
-            for(int i=0;i<=3;i++)
-            {
-                stop_clock(adc_ports.clk);
-                clearbuf(adc_ports.data_a);
-                clearbuf(adc_ports.data_b);
-                clearbuf(adc_ports.sclk_conv_mosib_mosia);
-                adc_ports.sclk_conv_mosib_mosia <: bits[0];
-                start_clock(adc_ports.clk);
-
-                adc_ports.sclk_conv_mosib_mosia <: bits[1];
-                adc_ports.sclk_conv_mosib_mosia <: bits[2];
-                adc_ports.sclk_conv_mosib_mosia <: bits[3];
-
-                sync(adc_ports.sclk_conv_mosib_mosia);
-                stop_clock(adc_ports.clk);
-
-                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-
-                adc_ports.data_a :> data_raw_a;
-                adc_data_a[4] = convert(data_raw_a);
-                adc_ports.data_b :> data_raw_b;
-                adc_data_b[4] = convert(data_raw_b);
-
-                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-            }
-
-            OUT_A[j] = ((int) adc_data_a[4]);
-            OUT_B[j] = ((int) adc_data_b[4]);
         }
     }
 }
