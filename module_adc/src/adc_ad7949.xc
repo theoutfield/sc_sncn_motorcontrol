@@ -394,7 +394,7 @@ void adc_ad7949_fixed_channel(
                 current_limit = i_max * i_ratio_in;
                 break;
 
-        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
+        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int analogue_input_1, int analogue_input_2, int fault_code_out}:
 
                 t:> time_start;
                 time_idle = time_start-time_end_II;
@@ -503,6 +503,9 @@ void adc_ad7949_fixed_channel(
 
                 fault_code_out=fault_code;
 
+                analogue_input_1=0;
+                analogue_input_2=0;
+
                 flag=1;
 
                 t :> time_end;
@@ -519,7 +522,7 @@ void adc_ad7949_fixed_channel(
 
                     configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-#pragma unsafe arrays
+                    #pragma unsafe arrays
                     int bits[4];
 
                     bits[0]=0x80808000;

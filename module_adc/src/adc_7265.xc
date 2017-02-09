@@ -235,7 +235,7 @@ void adc_ad7265_fixed_channel(
                 current_limit = i_max * i_ratio;
                 break;
 
-        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
+        case iADC[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int analogue_input_1, int analogue_input_2, int fault_code_out}:
 
                 adc_ports.p4_mux <: AD7265_SGL_A1_B1;      //mux_config;
                 clearbuf( adc_ports.p32_data[0] );  //Clear the buffers used by the input ports.
@@ -288,7 +288,7 @@ void adc_ad7265_fixed_channel(
                 }
 
                 V_dc_out = V_dc;
-                torque_out = torque;
+                analogue_input_1 = torque;
                 fault_code_out=fault_code;
 
                 flag=1;
