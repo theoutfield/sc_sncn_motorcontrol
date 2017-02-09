@@ -18,40 +18,42 @@
 
 	<!-- Velocity Position Control -->
 
-	<Probe name="A0" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B0" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A0" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B0" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
-	<Probe name="A1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 		
-	<Probe name="A2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="A3" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B3" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A3" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B3" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="A4" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B4" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A4" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B4" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="A5" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B5" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A5" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B5" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="A6" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B6" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="A7" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B7" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A7" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B7" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 		
-	<Probe name="A1A2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B1B2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A1A2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B1B2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="A3A4" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B3B4" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A3A4" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B3B4" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="A5A6" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="B5B6" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="A5A6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="B5B6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
-	<Probe name="PERIOD" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="PERIOD" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="PERIOD_II" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="TIME_IDLE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
 	
 	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>

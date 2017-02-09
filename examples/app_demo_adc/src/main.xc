@@ -60,7 +60,7 @@ int main(void)
             par
             {
                 {
-//                    demo_ad7949(i_adc[1]);
+                    demo_ad7949(i_adc[1]);
                 }
 
                 {
