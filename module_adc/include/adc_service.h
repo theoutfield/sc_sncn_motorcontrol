@@ -52,6 +52,13 @@ typedef enum
     STD_MOTOR_CTRL_MODE = 2
 } AdcOperationalMode;
 
+typedef enum
+{
+    AD_7949_TEMPERATURE = 0,
+    AD_7949_VMOT_DIV_I_MOT = 1,
+    AD_7949_EXT_A0_N_EXT_A1_N=2,
+    AD_7949_EXT_A0_P_EXT_A1_P=3
+} AdcChannelInputs;
 
 /**
  * Structure type to define the ports to manage the AD7949 ADC chip.

@@ -347,6 +347,7 @@ void adc_ad7949_fixed_channel(
     int j=0;
     int selected_channel=adc_config_mot;
 
+
     const unsigned int channel_config[4] = {
             AD7949_TEMPERATURE, // Temperature
             AD7949_CHANNEL_2,   // ADC Channel 2, unipolar, referenced to GND voltage and current
@@ -406,16 +407,17 @@ void adc_ad7949_fixed_channel(
         case i_adc[int i].set_protection_limits_and_analogue_input_configs(
                 int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in,
                 unsigned int config_ai_1, unsigned int config_ai_2):
+
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
                 current_limit = i_max * i_ratio_in;
 
-                for(int i=0; i<=3; i++)
-                {
-                    if(config_ai_1 == channel_config[i])    analogue_index_1=i;
-                    if(config_ai_2 == channel_config[i])    analogue_index_2=i;
-                }
+//                for(int i=0; i<=3; i++)
+//                {
+//                    if(config_ai_1 == channel_config[i])    analogue_index_1=i;
+//                    if(config_ai_2 == channel_config[i])    analogue_index_2=i;
+//                }
 //                const unsigned int channel_config[4] = {
 //                        AD7949_TEMPERATURE, // Temperature
 //                        AD7949_CHANNEL_2, // ADC Channel 2, unipolar, referenced to GND voltage and current
@@ -535,14 +537,18 @@ void adc_ad7949_fixed_channel(
                     if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
                 }
 
+                V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT];
+                I_dc_out=OUT_B[AD_7949_VMOT_DIV_I_MOT];
+
+                Temperature_out=0;
+
+                analogue_input_a_1 = OUT_A[AD_7949_EXT_A0_N_EXT_A1_N];
+                analogue_input_b_1 = OUT_B[AD_7949_EXT_A0_N_EXT_A1_N];
+
+                analogue_input_a_2 = OUT_A[AD_7949_EXT_A0_P_EXT_A1_P];
+                analogue_input_b_2 = OUT_B[AD_7949_EXT_A0_P_EXT_A1_P];
 
                 fault_code_out=fault_code;
-
-
-                analogue_input_a_1=OUT_A[analogue_index_1];
-                analogue_input_a_2=OUT_A[analogue_index_2];
-                analogue_input_b_1=OUT_B[analogue_index_1];
-                analogue_input_b_2=OUT_B[analogue_index_2];
 
                 flag=1;
 
