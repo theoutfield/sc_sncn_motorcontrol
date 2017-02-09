@@ -334,8 +334,8 @@ void adc_ad7949_fixed_channel(
      *  bits[2:1] 00        bit[0] 1
      *
      */
-    const unsigned int adc_config_mot     =   0b11110001001001;
-    unsigned int ad7949_config     =   0b11110001001001;
+    const unsigned int adc_config_mot=   0b11110001001001;
+    unsigned int ad7949_config       =   0b11110001001001;
 
     unsigned int adc_data_a[5];
     unsigned int adc_data_b[5];
@@ -347,11 +347,11 @@ void adc_ad7949_fixed_channel(
     int j=0;
     int selected_channel=adc_config_mot;
 
-    unsigned short channel_config[10] = {
-            AD7949_CHANNEL_0, AD7949_CHANNEL_1, AD7949_CHANNEL_2,
-            AD7949_CHANNEL_3, AD7949_CHANNEL_4, AD7949_CHANNEL_5,
-            AD7949_CHANNEL_6, AD7949_CHANNEL_7, 0,
-            0 };
+    const unsigned int channel_config[4] = {
+            AD7949_TEMPERATURE, // Temperature
+            AD7949_CHANNEL_2, // ADC Channel 2, unipolar, referenced to GND voltage and current
+            AD7949_CHANNEL_4, // ADC Channel 4, unipolar, referenced to GND
+            AD7949_CHANNEL_5};  // ADC Channel 5, unipolar, referenced to GND
 
     int i_calib_a = 0, i_calib_b = 0;
 
@@ -605,9 +605,9 @@ void adc_ad7949_fixed_channel(
         }
 
 
-        if(operational_mode==STD_MOTOR_CTRL_MODE && flag==1)
+        if(flag==1)
         {
-            for(j=0;j<=4;j++)
+            for(j=0;j<=3;j++)
             {
                 ad7949_config = channel_config[j];
 
