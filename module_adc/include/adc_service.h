@@ -62,11 +62,12 @@ typedef enum
 
 typedef enum
 {
-    AD_7265_CURRENT_B_C     =0,
-    AD_7265_VDC_IDC         =1,
-    AD_7265_AI_SIGNAL_1_3   =2,
-    AD_7265_AI_SIGNAL_2_4   =3,
-    AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B  =4
+    AD_7265_CURRENT_B_C     =0,                     //corresponding to VA1 & VB1 in AD7265 (dc1k board)
+    AD_7265_VDC_IDC         =1,                     //corresponding to VA2 & VB2 in AD7265 (dc1k board)
+    AD_7265_AI_SIGNAL_1_3   =2,                     //corresponding to VA3 & VB3 in AD7265 (dc1k board)
+    AD_7265_AI_SIGNAL_2_4   =3,                     //corresponding to VA4 & VB4 in AD7265 (dc1k board)
+    AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B  =4,         //corresponding to VA5 & VB5 in AD7265 (dc1k board)
+    AD_7265_PHASE_VOLTAGE_C_PHASE_VOLTAGE_B  =5     //corresponding to VA6 & VB6 in AD7265 (dc1k board)
 } Ad7265ChannelInputs;
 
 

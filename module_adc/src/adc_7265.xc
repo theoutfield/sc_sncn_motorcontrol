@@ -312,26 +312,27 @@ void adc_ad7265_fixed_channel(
                 break;
 
         case iADC[int i].get_channel(unsigned short channel_in)-> {int out_a, int out_b}:
-                selected_channel = channel_in;
-
-                for(int k=0;k<10;k++)
-                {
-                    if(selected_channel == channel_config[k])
-                    {
-                        out_a = OUT_A[k];
-                        out_b = OUT_B[k];
-                    }
-                }
+                //selected_channel = channel_in;
+                //
+                //for(int k=0;k<10;k++)
+                //{
+                //    if(selected_channel == channel_config[k])
+                //    {
+                //        out_a = OUT_A[k];
+                //        out_b = OUT_B[k];
+                //    }
+                //}
                 break;
 
         case iADC[int i].reset_faults():
                 I_a=0;
                 I_b=0;
                 I_c=0;
-                torque=0;
+
                 V_dc=(v_dc_min+v_dc_max)/2;
 
                 fault_code=NO_FAULT;
+
                 flag=0;
 
                 i_watchdog.reset_faults();
@@ -343,9 +344,8 @@ void adc_ad7265_fixed_channel(
 
         if(flag==1)
         {
-            j++;
-            if(j==9) j=0;
-
+            for(j=AD_7265_VDC_IDC;j<=AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B;j++)
+            {
             adc_ports.p4_mux <: channel_config[j];
             t :> time;
             t when timerafter (time + 500) :> void;//5 us of wait
@@ -373,9 +373,9 @@ void adc_ad7265_fixed_channel(
             tmp_val = tmp_val >> (SHIFTING_BITS+1);
             tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
             OUT_B[j] = (int)tmp_val;
+            }
 
-
-            V_dc = OUT_A[1]/56;
+            V_dc = OUT_A[AD_7265_VDC_IDC]/56;
 
             if (V_dc<v_dc_min)
             {
@@ -389,14 +389,12 @@ void adc_ad7265_fixed_channel(
                 if(fault_code==0) fault_code=OVER_VOLTAGE;
             }
 
-            torque = OUT_A[2]-OUT_B[2];
 
-
-            adc_ports.p4_mux <: AD7265_SGL_A1_B1;
+            adc_ports.p4_mux <: channel_config[AD_7265_CURRENT_B_C];
             t :> time;
             t when timerafter (time + 500) :> void;//5 us of wait
 
-            for (i=0;i<=5;i++)
+            for (i=0;i<=3;i++)
             {
                 clearbuf( adc_ports.p32_data[0] ); // Clear the buffers used by the input ports.
                 clearbuf( adc_ports.p32_data[1] );
