@@ -138,168 +138,6 @@ void adc_ad7949(
         CurrentSensorsConfig &current_sensor_config,
         interface WatchdogInterface client ?i_watchdog, int operational_mode)
 {
-    //    timer t;
-    //    unsigned int time_end=0, time_start=0, period=0;
-    //    unsigned int ad7949_config     =   0b11110001001001;   /* Motor current (ADC Channel 0), unipolar, referenced to GND */
-    //
-    //
-    //    unsigned int adc_data_a[5];
-    //    unsigned int adc_data_b[5];
-    //    int i_calib_a = 0, i_calib_b = 0;
-    //
-    //    configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
-    //
-    //    i_calib_a = 10002;
-    //    i_calib_b = 10002;
-    //
-    //    while (1)
-    //    {
-    //#pragma ordered
-    //        select
-    //        {
-    //
-    //        case i_adc[int i].status() -> {int status}:
-    //                status = ACTIVE;
-    //                break;
-    //
-    //        case i_adc[int i].set_protection_limits(int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
-    //                break;
-    //
-    //        case i_adc[int i].set_channel(unsigned short channel_config):
-    //                ad7949_config = channel_config;
-    //                break;
-    //
-    //        case i_adc[int i].sample_and_send()-> {int out_a, int out_b}:
-    //                t :> time_start;
-    //
-    //                unsigned int data_raw_a;
-    //                unsigned int data_raw_b;
-    //
-    //
-    //                /* Reading/Writing after conversion (RAC)
-    //                                   Read previous conversion result
-    //                                   Write CFG for next conversion */
-    //
-    //                // CONGIG__other_n1     CFG_Imotx_x1       |CONGIG__other_n2     CFG_Imotx_x2     |CONGIG__other_n3     CFG_Imotx_x3       |
-    //                // CONVERT_null         CONVERT_other_n1   |CONVERT_Imot_x1      CONVERT_other_n2 |CONVERT_Imot_x2      CONVERT_other_n3   |
-    //                // READOUT_null         READOUT_other_null |READOUT_other_n1     READOUT_Imot_x1  |READOUT_other_n2     READOUT_Imot_x2    |
-    //                // -----------
-    //                // iIndexADC        0           1                  2                  3
-    //                // readout       extern     temperature     current-voltage         extern
-    //
-    //                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-    //
-    //#pragma unsafe arrays
-    //                int bits[4];
-    //
-    //                /*
-    //                 * Configuration Register Description
-    //                 *
-    //                 * bit(s)   name    Description
-    //                 *
-    //                 *  13      CFG     Configuration udpate
-    //                 *  12      INCC    Input channel configuration
-    //                 *  11      INCC    Input channel configuration
-    //                 *  10      INCC    Input channel configuration
-    //                 *  09      INx     Input channel selection bit 2 0..7
-    //                 *  08      INx     Input channel selection bit 1
-    //                 *  07      INx     Input channel selection bit 0
-    //                 *  06      BW      Select bandwidth for low-pass filter
-    //                 *  05      REF     Reference/buffer selection
-    //                 *  04      REF     Reference/buffer selection
-    //                 *  03      REF     Reference/buffer selection
-    //                 *  02      SEQ     Channel sequencer. Allows for scanning channels in an IN0 to IN[7:0] fashion.
-    //                 *  01      SEQ     Channel sequencer
-    //                 *  00      RB      Read back the CFG register.
-    //                 */
-    //
-    //                bits[0]=0x80808000;
-    //                if(ad7949_config & BIT13)
-    //                    bits[0] |= 0x0000B300;
-    //                if(ad7949_config & BIT12)
-    //                    bits[0] |= 0x00B30000;
-    //                if(ad7949_config & BIT11)
-    //                    bits[0] |= 0xB3000000;
-    //
-    //                bits[1]=0x80808080;
-    //                if(ad7949_config & BIT10)
-    //                    bits[1] |= 0x000000B3;
-    //                if(ad7949_config & BIT09)
-    //                    bits[1] |= 0x0000B300;
-    //                if(ad7949_config & BIT08)
-    //                    bits[1] |= 0x00B30000;
-    //                if(ad7949_config & BIT07)
-    //                    bits[1] |= 0xB3000000;
-    //
-    //                bits[2]=0x80808080;
-    //                if(ad7949_config & BIT06)
-    //                    bits[2] |= 0x000000B3;
-    //                if(ad7949_config & BIT05)
-    //                    bits[2] |= 0x0000B300;
-    //                if(ad7949_config & BIT04)
-    //                    bits[2] |= 0x00B30000;
-    //                if(ad7949_config & BIT03)
-    //                    bits[2] |= 0xB3000000;
-    //
-    //                bits[3]=0x00808080;
-    //                if(ad7949_config & BIT02)
-    //                    bits[3] |= 0x000000B3;
-    //                if(ad7949_config & BIT01)
-    //                    bits[3] |= 0x0000B300;
-    //                if(ad7949_config & BIT0)
-    //                    bits[3] |= 0x00B30000;
-    //
-    //                for(int i=0;i<=3;i++)
-    //                {
-    //                    stop_clock(adc_ports.clk);
-    //                    clearbuf(adc_ports.data_a);
-    //                    clearbuf(adc_ports.data_b);
-    //                    clearbuf(adc_ports.sclk_conv_mosib_mosia);
-    //                    adc_ports.sclk_conv_mosib_mosia <: bits[0];
-    //                    start_clock(adc_ports.clk);
-    //
-    //                    adc_ports.sclk_conv_mosib_mosia <: bits[1];
-    //                    adc_ports.sclk_conv_mosib_mosia <: bits[2];
-    //                    adc_ports.sclk_conv_mosib_mosia <: bits[3];
-    //
-    //                    sync(adc_ports.sclk_conv_mosib_mosia);
-    //                    stop_clock(adc_ports.clk);
-    //
-    //                    configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-    //
-    //                    adc_ports.data_a :> data_raw_a;
-    //                    adc_data_a[4] = convert(data_raw_a);
-    //                    adc_ports.data_b :> data_raw_b;
-    //                    adc_data_b[4] = convert(data_raw_b);
-    //
-    //                    configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-    //                }
-    //                out_a = ((int) adc_data_a[4]);
-    //                out_b = ((int) adc_data_b[4]);
-    //
-    //                xscope_int (PERIOD, period);
-    //
-    //                t :> time_end;
-    //                period = time_end-time_start;
-    //
-    //                break;
-    //
-    //        case i_adc[int i].get_all_measurements() -> {int phaseB_out, int phaseC_out, int V_dc_out, int torque_out, int fault_code_out}:
-    //                break;
-    //
-    //        case i_adc[int i].reset_faults():
-    //                break;
-    //        }
-    //    }
-}
-
-
-void adc_ad7949_fixed_channel(
-        interface ADCInterface server i_adc[2],
-        AD7949Ports &adc_ports,
-        CurrentSensorsConfig &current_sensor_config,
-        interface WatchdogInterface client ?i_watchdog, int operational_mode)
-{
     timer t;
     unsigned int time, time_start=0, time_end=0, time_end_II=0, time_idle=0, period=0, period_II=0,
             time_end_mid=0, time_idle_mid=0;
@@ -391,19 +229,6 @@ void adc_ad7949_fixed_channel(
                 status = ACTIVE;
                 break;
 
-//        case i_adc[int i].config_adc_inputs(unsigned int config_ai_1, unsigned int config_ai_2):
-//                for(int i=0; i<=3; i++)
-//                {
-//                    if(config_ai_1 == channel_config[i])    analogue_index_1=i;
-//                    if(config_ai_2 == channel_config[i])    analogue_index_2=i;
-//                }
-////                const unsigned int channel_config[4] = {
-////                        AD7949_TEMPERATURE, // Temperature
-////                        AD7949_CHANNEL_2, // ADC Channel 2, unipolar, referenced to GND voltage and current
-////                        AD7949_CHANNEL_4, // ADC Channel 4, unipolar, referenced to GND
-////                        AD7949_CHANNEL_5};  // ADC Channel 5, unipolar, referenced to GND
-//                break;
-
         case i_adc[int i].set_protection_limits_and_analogue_input_configs(
                 int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in,
                 unsigned int config_ad7265_analogue_inputs_a3a4_b3b4):
@@ -412,17 +237,6 @@ void adc_ad7949_fixed_channel(
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
                 current_limit = i_max * i_ratio_in;
-
-//                for(int i=0; i<=3; i++)
-//                {
-//                    if(config_ai_1 == channel_config[i])    analogue_index_1=i;
-//                    if(config_ai_2 == channel_config[i])    analogue_index_2=i;
-//                }
-//                const unsigned int channel_config[4] = {
-//                        AD7949_TEMPERATURE, // Temperature
-//                        AD7949_CHANNEL_2, // ADC Channel 2, unipolar, referenced to GND voltage and current
-//                        AD7949_CHANNEL_4, // ADC Channel 4, unipolar, referenced to GND
-//                        AD7949_CHANNEL_5};  // ADC Channel 5, unipolar, referenced to GND
                 break;
 
         case i_adc[int i].get_all_measurements() -> {
@@ -736,12 +550,6 @@ void adc_ad7949_fixed_channel(
             t :> time_end_mid;
             time_idle_mid = time_start+7000 - time_end_mid;
 
-            /*
-             * the entire loop will be 83.3 us.
-             * we need to start the sampling, 10 us before the adc is triggered.
-             * so, it will be around 70 us after its previous triggered moment.
-             * So, we wait until the moment t_start + 70us which is t_start+7000
-             */
             t when timerafter (time_start + (7000)) :> void;
 
             #pragma unsafe arrays
