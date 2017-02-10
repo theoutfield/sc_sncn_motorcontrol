@@ -74,19 +74,13 @@ interface PositionFeedbackInterface
 
     { int, unsigned int, unsigned int } get_position(void);
 
-//    { int, unsigned int, unsigned int } get_real_position(void);
-
     int get_velocity(void);
-
-//    unsigned int get_ticks_per_turn();
 
     PositionFeedbackConfig get_config(void);
 
     void set_config(PositionFeedbackConfig in_config);
 
     void set_position(int in_count);
-
-//    unsigned int set_angle(unsigned int in_angle);
 
     unsigned int send_command(int opcode, int data, int data_bits);
 
@@ -105,11 +99,6 @@ typedef struct {
 typedef struct {
     in port p_qei_hall; /**< 4-bit Port for Encoder, BiSS or Hall signals input. */
 } QEIHallPort;
-
-typedef struct {
-    port ?p_hall;        /**< Port for Hall signals. */
-} HallPort;
-
 
 typedef struct {
     out port ?p_hall_enc_select; /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). Also used for the BiSS clock output */
@@ -134,6 +123,8 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
 int tickstobits(uint32_t ticks);
 
 void multiturn(int &count, int last_position, int position, int ticks_per_turn);
+
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int enable_push_service, int count, int velocity, int angle, int hall_state);
 
 int velocity_compute(int difference, int timediff, int resolution);
 

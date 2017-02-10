@@ -36,8 +36,6 @@
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    int multiturn_resolution;   /**< Multiturn resolution in bits. */
-
     int timeout;                /**< timeout after a read (in clock ticks) */
 
     int velocity_loop;          /**< Velcity loop time in microseconds */

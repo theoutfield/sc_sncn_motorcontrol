@@ -37,8 +37,8 @@ typedef enum {
 typedef enum {
     BISS_CLOCK_PORT_EXT_D2=2,
     BISS_CLOCK_PORT_EXT_D3=3,
-    BISS_CLOCK_PORT_EXT_D4=0b0100,
-    BISS_CLOCK_PORT_EXT_D5=0b1000
+    BISS_CLOCK_PORT_EXT_D4=0b0100, //4
+    BISS_CLOCK_PORT_EXT_D5=0b1000  //8
 } BISSClockPortConfig;
 
 typedef enum {
@@ -54,7 +54,7 @@ typedef struct {
     int multiturn_resolution;   /**< Number of bits of multiturn resolution */
     int singleturn_length;      /**< Number of bits used for singleturn data */
     int singleturn_resolution;  /**< Number of bits of singleturn resolution */
-    int status_length;          /**< Rumber of bits used for status data */
+    int status_length;          /**< Number of bits used for status data */
     int crc_poly;               /**< CRC polynom in reverse representation:  x^0 + x^1 + x^4 is 0b1100 */
     int clock_dividend;         /**< BiSS output clock frequency dividend */
     int clock_divisor;          /**< BiSS output clock frequency divisor */

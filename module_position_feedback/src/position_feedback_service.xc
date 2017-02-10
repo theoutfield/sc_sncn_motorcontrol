@@ -62,8 +62,6 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
 
         case i_position_feedback[int i].set_position(int new_count):
                 break;
-//        case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
-//                break;
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
                 break;
         case i_position_feedback[int i].get_notification() -> int out_notification:
@@ -72,12 +70,8 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
                 break;
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position, unsigned int status }:
                 break;
-//        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
-//                break;
         case i_position_feedback[int i].get_velocity() -> int out_velocity:
                 break;
-//        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
-//                break;
 
         //gpio
         case t when timerafter(ts + (1000*IFM_TILE_USEC)) :> ts:
@@ -252,6 +246,19 @@ int velocity_compute(int difference, int timediff, int resolution)
     return (difference * (60000000/timediff)) / resolution;
 }
 
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int enable_push_service, int count, int velocity, int angle, int hall_state)
+{
+    if (!isnull(i_shared_memory)) {
+        if (enable_push_service == PushAll) {
+            i_shared_memory.write_angle_velocity_position_hall(angle, velocity, count, hall_state);
+        } else if (enable_push_service == PushAngle) {
+            i_shared_memory.write_angle_and_hall(angle, hall_state);
+        } else if (enable_push_service == PushPosition) {
+            i_shared_memory.write_velocity_position(velocity, count);
+        }
+    }
+}
+
 int gpio_read(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number)
 {
     int out_value = -1;
@@ -298,14 +305,6 @@ void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &positi
     }
 }
 
-typedef struct {
-    port a;
-} PORTS;
-
-typedef struct {
-    port * movable a;
-} PORTS2;
-
 void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_hall_port_2, HallEncSelectPort &?hall_enc_select_port, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
                                PositionFeedbackConfig &position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
@@ -330,17 +329,10 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
     port? * movable gpio_3 = &gpio_port_3;
     port * movable gpio_ports[4];
     if (gpio_ports_check) {
-//        if (spi_ports_1 != null) {
-//            (*spi_ports_1).slave_select = reconfigure_port(move(gpio_0), port);
-//            (*spi_ports_1).spi_interface.sclk = reconfigure_port(move(gpio_1), out buffered port:8);
-//            (*spi_ports_1).spi_interface.miso = reconfigure_port(move(gpio_2), in buffered port:8);
-//            (*spi_ports_1).spi_interface.mosi = reconfigure_port(move(gpio_3), out buffered port:8);
-//        } else {
             gpio_ports[0] = reconfigure_port(move(gpio_0), port);
             gpio_ports[1] = reconfigure_port(move(gpio_1), port);
             gpio_ports[2] = reconfigure_port(move(gpio_2), port);
             gpio_ports[3] = reconfigure_port(move(gpio_3), port);
-//        }
     }
 
     //pointers to ports 2
@@ -349,9 +341,6 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
     HallEncSelectPort * movable hall_enc_select_port_2;
     SPIPorts * movable spi_ports_2;
     port * movable gpio_ports_2[4];
-
-//    printintln((int)qei_hall_port_1_2);
-//    printintln((int)qei_hall_port_1_1);
 
     int spi_on = 0;
     int hall_enc_select_config = 0b0011;
@@ -428,104 +417,12 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
             }
         }
 
-
-
-
-#if 0
-        //FIXME qei/hall mode port configuration
-        if (hall_enc_select_port_1 != null) {
-            if (!isnull(hall_enc_select_port_1->p_hall_enc_select))
-                hall_enc_select_port_1->p_hall_enc_select <: SET_PORT1_AS_HALL_PORT2_AS_QEI;
-        }
-
-        //check sensor 1
-        check_ports(qei_hall_port_1_1, qei_hall_port_2_1, hall_enc_select_port_1, spi_ports_1, hall_enc_select_config, position_feedback_config_1);
-
-        //set biss clock if needed
-        if (position_feedback_config_1.sensor_type == BISS_SENSOR) {
-            configure_out_port(hall_enc_select_port_1->p_hall_enc_select, (*spi_ports_1).spi_interface.blk1, BISS_CLK_PORT_HIGH);
-            configure_in_port(qei_hall_port_2_1->p_qei_hall, (*spi_ports_1).spi_interface.blk1);
-            if (isnull(position_feedback_config_2)) {
-                set_clock_biss(null, qei_hall_port_2_1, spi_ports_1, position_feedback_config_1);
-            } else {
-                if (position_feedback_config_2.sensor_type != REM_16MT_SENSOR && position_feedback_config_2.sensor_type != REM_14_SENSOR) {
-                    set_clock_biss(null, qei_hall_port_2_1, spi_ports_1, position_feedback_config_1);
-                }
-            }
-        }
-        int move_gpio_check = 1;
-        //check sensor 2
-        if (!isnull(position_feedback_config_2)) {
-            //set biss clock if needed
-            if (position_feedback_config_2.sensor_type == BISS_SENSOR) {
-                if (!isnull(hall_enc_select_port_1->p_hall_enc_select)) {
-                    configure_out_port(hall_enc_select_port_1->p_hall_enc_select, (*spi_ports_1).spi_interface.blk1, BISS_CLK_PORT_HIGH);
-                    configure_in_port(qei_hall_port_2_1->p_qei_hall, (*spi_ports_1).spi_interface.blk1);
-                } else {
-                    position_feedback_config_2.sensor_type = 0;
-                }
-            }
-        }
-
-        //move unused ports to sensor 2
-        if (qei_hall_port_1_1 != null && position_feedback_config_1.sensor_type != HALL_SENSOR)
-            qei_hall_port_1_2 = move(qei_hall_port_1_1);
-        if (qei_hall_port_2_1 != null && position_feedback_config_1.sensor_type != BISS_SENSOR && position_feedback_config_1.sensor_type != QEI_SENSOR)
-            qei_hall_port_2_2 = move(qei_hall_port_2_1);
-        if (spi_ports_1 != null && position_feedback_config_1.sensor_type != REM_16MT_SENSOR && position_feedback_config_1.sensor_type != REM_14_SENSOR)
-            spi_ports_2 = move(spi_ports_1);
-
-        //check sensor 2
-        if (!isnull(position_feedback_config_2)) {
-            //check ports
-            check_ports(qei_hall_port_1_2, qei_hall_port_2_2, hall_enc_select_port_2, spi_ports_2, hall_enc_select_config, position_feedback_config_2);
-
-            //set biss clock if needed
-            if (position_feedback_config_2.sensor_type == BISS_SENSOR) {
-                set_clock_biss(null, qei_hall_port_2_2, spi_ports_2, position_feedback_config_2);
-            }
-
-            if (position_feedback_config_2.sensor_type == REM_16MT_SENSOR || position_feedback_config_2.sensor_type == REM_14_SENSOR) {
-                move_gpio_check = 0;
-            }
-        }
-
-        //move gpio ports if no sensor is using spi
-        if (position_feedback_config_1.sensor_type != REM_16MT_SENSOR && position_feedback_config_1.sensor_type != REM_14_SENSOR && gpio_ports_check && move_gpio_check)
-        {
-            if (spi_ports_2 != null) {
-                gpio_ports[0] = reconfigure_port(move((*spi_ports_2).slave_select), port);
-                gpio_ports[1] = reconfigure_port(move((*spi_ports_2).spi_interface.sclk), port);
-                gpio_ports[2] = reconfigure_port(move((*spi_ports_2).spi_interface.miso), port);
-                gpio_ports[3] = reconfigure_port(move((*spi_ports_2).spi_interface.mosi), port);
-            }
-            for (int i=0 ; i<4 ; i++) {
-                if (position_feedback_config_1.gpio_config[i] == GPIO_INPUT_PULLDOWN) {
-                    set_port_pull_down(*gpio_ports[i]);
-                } else {
-                    set_port_pull_none(*gpio_ports[i]);
-                }
-            }
-        }
-
-        printintln((int)qei_hall_port_1_2);
-        printintln((int)gpio_ports[2]);
-        if (!isnull(position_feedback_config_2)) {
-            if (position_feedback_config_2.sensor_type == BISS_SENSOR) {
-                gpio_ports_2[2] = move(gpio_ports[2]);
-                configure_out_port(*gpio_ports_2[2], (*spi_ports_2).spi_interface.blk1, 1);
-                configure_in_port(qei_hall_port_1_2->p_qei_hall, (*spi_ports_2).spi_interface.blk1);
-            }
-        }
-#endif
-
         //start services
         par {
             {//sensor 1
                 start_service(qei_hall_port_1_1, qei_hall_port_2_1, hall_enc_select_port_1, spi_ports_1, gpio_ports, hall_enc_select_config, position_feedback_config_1, i_shared_memory_1, i_position_feedback_1);
             }
             {//sensor 2
-                delay_milliseconds(500);
                 if (!isnull(i_position_feedback_2) && !isnull(position_feedback_config_2)) {
                     start_service(qei_hall_port_1_2, qei_hall_port_2_2, hall_enc_select_port_2, spi_ports_2, gpio_ports_2, hall_enc_select_config, position_feedback_config_2, i_shared_memory_2, i_position_feedback_2);
                 }

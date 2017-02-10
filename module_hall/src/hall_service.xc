@@ -26,23 +26,9 @@ void hall_calculate_angle(hall_variables& hv);
 void speed_LPF(hall_variables& hv);
 
 
-//unsigned int hall_state[6] = {
-//        HALL_STATE_0,
-//        HALL_STATE_1,
-//        HALL_STATE_2,
-//        HALL_STATE_3,
-//        HALL_STATE_4,
-//        HALL_STATE_5
-//};
-//unsigned int hall_angle[6] = {
-//        HALL_ANGLE_0,
-//        HALL_ANGLE_1,
-//        HALL_ANGLE_2,
-//        HALL_ANGLE_3,
-//        HALL_ANGLE_4,
-//        HALL_ANGLE_5
-//};
-unsigned int hall_state_reverse[6] = {
+//lookup tables for hall states and angle transitions
+//hall state value to hall state number
+static const unsigned int hall_state_reverse[6] = {
         4,
         2,
         3,
@@ -50,7 +36,8 @@ unsigned int hall_state_reverse[6] = {
         5,
         1
 };
-unsigned int hall_state_next[6] = {
+//hall state to hall state next
+static const unsigned int hall_state_next[6] = {
         HALL_STATE_5,
         HALL_STATE_3,
         HALL_STATE_4,
@@ -58,7 +45,8 @@ unsigned int hall_state_next[6] = {
         HALL_STATE_0,
         HALL_STATE_2
 };
-unsigned int hall_state_prev[6] = {
+//hall state to hall state pious
+static const unsigned int hall_state_prev[6] = {
         HALL_STATE_3,
         HALL_STATE_1,
         HALL_STATE_2,
@@ -66,15 +54,8 @@ unsigned int hall_state_prev[6] = {
         HALL_STATE_4,
         HALL_STATE_0
 };
-unsigned int hall_angle_next[6] = {
-        HALL_ANGLE_5,
-        HALL_ANGLE_3,
-        HALL_ANGLE_4,
-        HALL_ANGLE_1,
-        HALL_ANGLE_0,
-        HALL_ANGLE_2
-};
-unsigned int hall_angle[6] = {
+//hall state to to hall angle with same number
+static const unsigned int hall_angle[6] = {
         HALL_ANGLE_4,
         HALL_ANGLE_2,
         HALL_ANGLE_3,
@@ -82,13 +63,23 @@ unsigned int hall_angle[6] = {
         HALL_ANGLE_5,
         HALL_ANGLE_1
 };
-unsigned int hall_half_angle[6] = {
-        2730,
-        1365,
-        2048,
+//hall state to hall angle next number
+static const unsigned int hall_angle_next[6] = {
+        HALL_ANGLE_5,
+        HALL_ANGLE_3,
+        HALL_ANGLE_4,
+        HALL_ANGLE_1,
+        HALL_ANGLE_0,
+        HALL_ANGLE_2
+};
+//hall state value to hall half angle
+static const unsigned int hall_half_angle[6] = {
+        (HALL_ANGLE_4+HALL_ANGLE_5)/2,
+        (HALL_ANGLE_2+HALL_ANGLE_3)/2,
+        (HALL_ANGLE_3+HALL_ANGLE_4)/2,
         1,
-        3413,
-        682
+        (HALL_ANGLE_5+HALL_ANGLE_0)/2,
+        (HALL_ANGLE_1+HALL_ANGLE_2)/2
 };
 
 void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
@@ -157,13 +148,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
     hall_transition_timeout=HALL_PERIOD_MAX;
 
     unsigned int hall_last_period;
-
-//    unsigned int hall_period0;
-//    unsigned int hall_period1;
-//    unsigned int hall_period2;
-//    unsigned int hall_period3;
-//    unsigned int hall_period4;
-//    unsigned int hall_period5;
     unsigned int hall_period[6];
 
     int hall_error;
@@ -256,16 +240,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 }
                 break;
 
-//        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
-//                out_ticks_per_turn = HALL_TICKS_PER_ELECTRICAL_ROTATION;
-//                break;
-
-//        case i_position_feedback[int i].set_angle(unsigned int in_angle) -> unsigned int out_offset:
-//                break;
-
-//        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int out_position,  unsigned int out_status}:
-//                break;
-
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
                 break;
 
@@ -288,12 +262,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 if(++hall_last_state_period  > HALL_TRANSITION_PERIOD_MAX)  hall_last_state_period=HALL_TRANSITION_PERIOD_MAX;
                 if(++hall_transition_timeout > HALL_PERIOD_MAX)             hall_transition_timeout=HALL_PERIOD_MAX;
 
-//                if(++hall_period0>HALL_PERIOD_MAX)  hall_period0=HALL_PERIOD_MAX;
-//                if(++hall_period1>HALL_PERIOD_MAX)  hall_period1=HALL_PERIOD_MAX;
-//                if(++hall_period2>HALL_PERIOD_MAX)  hall_period2=HALL_PERIOD_MAX;
-//                if(++hall_period3>HALL_PERIOD_MAX)  hall_period3=HALL_PERIOD_MAX;
-//                if(++hall_period4>HALL_PERIOD_MAX)  hall_period4=HALL_PERIOD_MAX;
-//                if(++hall_period5>HALL_PERIOD_MAX)  hall_period5=HALL_PERIOD_MAX;
                 for (int i=0; i<6; i++) {
                     if(++hall_period[i]>HALL_PERIOD_MAX)  hall_period[i]=HALL_PERIOD_MAX;
                 }
@@ -329,9 +297,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                     else
                         hall_stable_states=0;
                     break;
-
-                default:
-                    break;
                 }
 
 
@@ -357,26 +322,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                     }
 
 
-                    //saves 4 bytes
-//                    if (hall_state_new >= 1 && hall_state_new <= 6)
-//                    {
-//                        hall_state_next = hall_state[(hall_state_reverse[hall_state_new-1]+1)%6];
-//                        if (hall_state_new == HALL_STATE_0) {
-//                            hall_sector_and_state = 0x80 + HALL_STATE_0;
-//                            hall_state_previous = HALL_STATE_5;
-//                        } else {
-//                            hall_sector_and_state = hall_state_reverse[hall_state_new-1]*0x10 + hall_state_new;
-//                            hall_state_previous = hall_state[(hall_state_reverse[hall_state_new-1]-1)%6];
-//                        }
-//                        hall_last_period = hall_period[hall_state_reverse[hall_state_new-1]];
-//                        hall_period[hall_state_reverse[hall_state_new-1]] = 0;
-//                    }
-//                    else
-//                    {
-//                        hall_error++;
-//                    }
-
-
                     if (hall_state_new >= 1 && hall_state_new <= 6)
                     {
                         hall_state_next_local = hall_state_next[hall_state_new-1];
@@ -393,61 +338,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                     {
                         hall_error++;
                     }
-
-//                    switch(hall_state_new)
-//                    {
-//                    case HALL_STATE_0:
-//                        hall_state_next     = HALL_STATE_1;
-//                        hall_state_previous = HALL_STATE_5;
-//                        hall_sector_and_state = 0x80 + hall_state_new;
-//                        hall_last_period = hall_period[0];
-//                        hall_period[0] = 0;
-//                        break;
-//
-//                    case HALL_STATE_1:
-//                        hall_state_next     = HALL_STATE_2;
-//                        hall_state_previous = HALL_STATE_0;
-//                        hall_sector_and_state = 0x10 + hall_state_new;
-//                        hall_last_period = hall_period[1];
-//                        hall_period[1] = 0;
-//                        break;
-//
-//                    case HALL_STATE_2:
-//                        hall_state_next     = HALL_STATE_3;
-//                        hall_state_previous = HALL_STATE_1;
-//                        hall_sector_and_state = 0x20 + hall_state_new;
-//                        hall_last_period = hall_period[2];
-//                        hall_period[2] = 0;
-//                        break;
-//
-//                    case HALL_STATE_3:
-//                        hall_state_next     = HALL_STATE_4;
-//                        hall_state_previous = HALL_STATE_2;
-//                        hall_sector_and_state = 0x30 + hall_state_new;
-//                        hall_last_period = hall_period[3];
-//                        hall_period[3] = 0;
-//                        break;
-//
-//                    case HALL_STATE_4:
-//                        hall_state_next     = HALL_STATE_5;
-//                        hall_state_previous = HALL_STATE_3;
-//                        hall_sector_and_state = 0x40 + hall_state_new;
-//                        hall_last_period = hall_period[4];
-//                        hall_period[4] = 0;
-//                        break;
-//
-//                    case HALL_STATE_5:
-//                        hall_state_next     = HALL_STATE_0;
-//                        hall_state_previous = HALL_STATE_4;
-//                        hall_sector_and_state = 0x50 + hall_state_new;
-//                        hall_last_period = hall_period[5];
-//                        hall_period[5] = 0;
-//                        break;
-//
-//                    default:
-//                        hall_error++;
-//                        break;
-//                    }
 
                     hall_last_state_period = 0;
 
@@ -493,33 +383,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                             if (hv.hall_pin_state >=1 && hv.hall_pin_state <= 6) {
                                 hv.hall_angle = hall_half_angle[hv.hall_pin_state-1];
                             }
-
-//                            switch(hv.hall_pin_state)
-//                            {
-//                            case HALL_STATE_0:
-//                                    hv.hall_angle = 1;
-//                                break;
-//
-//                            case HALL_STATE_1:
-//                                hv.hall_angle = (HALL_ANGLE_1+HALL_ANGLE_2)/2;
-//                                break;
-//
-//                            case HALL_STATE_2:
-//                                hv.hall_angle = (HALL_ANGLE_2+HALL_ANGLE_3)/2;
-//                                break;
-//
-//                            case HALL_STATE_3:
-//                                hv.hall_angle = (HALL_ANGLE_3+HALL_ANGLE_4)/2;
-//                                break;
-//
-//                            case HALL_STATE_4:
-//                                hv.hall_angle = (HALL_ANGLE_4+HALL_ANGLE_5)/2;
-//                                break;
-//
-//                            case HALL_STATE_5:
-//                                hv.hall_angle = (HALL_ANGLE_5+HALL_ANGLE_0)/2;
-//                                break;
-//                            }
                         }
                     }
 
@@ -552,12 +415,9 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
                 if (hv.sensor_polarity==-1)//inverted polarity
                 {
-                    angle_out = 4095 - hv.hall_interpolated_angle;
-                    speed_out = -hv.hall_filtered_speed;
+                    angle_out = 4095 - angle_out;
+                    speed_out = -speed_out;
                 }
-
-                if(angle_out>4095) angle_out-=4096;
-                if(angle_out<0)    angle_out+=4096;
 
                 if (init_angle) {
                     multiturn(count, last_angle, angle_out, HALL_TICKS_PER_ELECTRICAL_ROTATION);
@@ -566,15 +426,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 }
                 last_angle = angle_out;
 
-                if (!isnull(i_shared_memory)) {
-                    if (position_feedback_config.enable_push_service == PushAll) {
-                        i_shared_memory.write_angle_velocity_position_hall(angle_out, speed_out, count, hall_state_new);
-                    } else if (position_feedback_config.enable_push_service == PushAngle) {
-                        i_shared_memory.write_angle_and_hall(angle_out, hall_state_new);
-                    } else if (position_feedback_config.enable_push_service == PushPosition) {
-                        i_shared_memory.write_velocity_position(speed_out, count);
-                    }
-                }
+                write_shared_memory(i_shared_memory, position_feedback_config.enable_push_service, count, speed_out, angle_out, hall_state_new);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
@@ -604,15 +456,6 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
     if(hv.hall_pin_state == hv.hall_previous_state) hv.hall_direction_of_rotation = -1;
 
 
-//    if (hv.hall_pin_state >= 1 && hv.hall_pin_state <= 6) {
-//        if(hv.hall_next_state == hv.hall_pin_state)
-//            hv.hall_angle = hall_angle[hall_state_reverse[hv.hall_pin_state-1]];
-//        else
-//            hv.hall_angle = hall_angle[hall_state_reverse[hv.hall_pin_state%6]];
-//        hv.hall_next_state = hall_state[hall_state_reverse[hv.hall_pin_state%6]];
-//        hv.hall_previous_state = hall_state[hall_state_reverse[hv.hall_pin_state%6]];
-//    }
-
     if (hv.hall_pin_state >= 1 && hv.hall_pin_state <= 6) {
         if(hv.hall_next_state == hv.hall_pin_state)
             hv.hall_angle = hall_angle[hv.hall_pin_state-1];
@@ -621,64 +464,6 @@ void sector_transition(hall_variables & hv, int hall_sector_and_state)
         hv.hall_next_state = hall_state_next[hv.hall_pin_state-1];
         hv.hall_previous_state = hall_state_prev[hv.hall_pin_state-1];
     }
-
-//    switch(hv.hall_pin_state)
-//    {
-//
-//    case HALL_STATE_0:
-//        if(hv.hall_next_state == HALL_STATE_0)
-//            hv.hall_angle = HALL_ANGLE_0;
-//        else
-//            hv.hall_angle = HALL_ANGLE_1;
-//        hv.hall_next_state = HALL_STATE_1;
-//        hv.hall_previous_state = HALL_STATE_5;
-//        break;
-//
-//    case HALL_STATE_1:
-//        if(hv.hall_next_state == HALL_STATE_1)
-//            hv.hall_angle = HALL_ANGLE_1;
-//        else
-//            hv.hall_angle = HALL_ANGLE_2;
-//        hv.hall_next_state = HALL_STATE_2;
-//        hv.hall_previous_state = HALL_STATE_0;
-//        break;
-//
-//    case HALL_STATE_2:
-//        if(hv.hall_next_state == HALL_STATE_2)
-//            hv.hall_angle = HALL_ANGLE_2;
-//        else
-//            hv.hall_angle = HALL_ANGLE_3;
-//        hv.hall_next_state = HALL_STATE_3;
-//        hv.hall_previous_state = HALL_STATE_1;
-//        break;
-//
-//    case HALL_STATE_3:
-//        if(hv.hall_next_state == HALL_STATE_3)
-//            hv.hall_angle = HALL_ANGLE_3;
-//        else
-//            hv.hall_angle = HALL_ANGLE_4;
-//        hv.hall_next_state = HALL_STATE_4;
-//        hv.hall_previous_state = HALL_STATE_2;
-//        break;
-//
-//    case HALL_STATE_4:
-//        if(hv.hall_next_state == HALL_STATE_4)
-//            hv.hall_angle = HALL_ANGLE_4;
-//        else
-//            hv.hall_angle = HALL_ANGLE_5;
-//        hv.hall_next_state = HALL_STATE_5;
-//        hv.hall_previous_state = HALL_STATE_3;
-//        break;
-//
-//    case HALL_STATE_5:
-//        if(hv.hall_next_state == HALL_STATE_5)
-//            hv.hall_angle = HALL_ANGLE_5;
-//        else
-//            hv.hall_angle = HALL_ANGLE_0;
-//        hv.hall_next_state = HALL_STATE_0;
-//        hv.hall_previous_state = HALL_STATE_4;
-//        break;
-//    }
 }
 
 
@@ -726,19 +511,13 @@ void hall_calculate_angle(hall_variables & hv)
 
 void speed_LPF(hall_variables& hv)
 {
-    int k;
-    int y;
-    int speed_index=0;
-
-    ++hv.hall_filter_index_newest;
-
-    if(hv.hall_filter_index_newest == hv.hall_filter_order) hv.hall_filter_index_newest = 0;
+    hv.hall_filter_index_newest = (hv.hall_filter_index_newest+1) % hv.hall_filter_order;
 
     hv.hall_filter_buffer[hv.hall_filter_index_newest] = hv.hall_speed;
-    y = 0;
 
-    speed_index = hv.hall_filter_index_newest;
-    for(k=0;k<hv.hall_filter_order;k++)
+    int y = 0;
+    int speed_index = hv.hall_filter_index_newest;
+    for(int k=0;k<hv.hall_filter_order;k++)
     {
         y += hv.h[k] * hv.hall_filter_buffer[speed_index];
         --speed_index;
