@@ -54,11 +54,22 @@ typedef enum
 
 typedef enum
 {
-    AD_7949_TEMPERATURE = 0,
-    AD_7949_VMOT_DIV_I_MOT = 1,
+    AD_7949_TEMPERATURE      =0,
+    AD_7949_VMOT_DIV_I_MOT   =1,
     AD_7949_EXT_A0_N_EXT_A1_N=2,
     AD_7949_EXT_A0_P_EXT_A1_P=3
-} AdcChannelInputs;
+} Ad7949ChannelInputs;
+
+typedef enum
+{
+    AD_7265_CURRENT_B_C     =0,
+    AD_7265_VDC_IDC         =1,
+    AD_7265_AI_SIGNAL_1_3   =2,
+    AD_7265_AI_SIGNAL_2_4   =3,
+    AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B  =4
+} Ad7265ChannelInputs;
+
+
 
 /**
  * Structure type to define the ports to manage the AD7949 ADC chip.
