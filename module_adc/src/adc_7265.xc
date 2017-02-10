@@ -230,7 +230,7 @@ void adc_ad7265_fixed_channel(
 
         case iADC[int i].set_protection_limits_and_analogue_input_configs(
                 int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in,
-                unsigned int config_ai_1, unsigned int config_ai_2):
+                unsigned int config_ad7265_analogue_inputs_a3a4_b3b4):
 
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
@@ -305,23 +305,6 @@ void adc_ad7265_fixed_channel(
 
                 analogue_input_a_2 = OUT_A[AD_7265_AI_SIGNAL_2_4];
                 analogue_input_b_2 = OUT_B[AD_7265_AI_SIGNAL_2_4];
-
-//                typedef enum
-//                {
-//                    AD_7265_CURRENT_B_C     =0,
-//                    AD_7265_VDC_IDC         =1,
-//                    AD_7265_AI_SIGNAL_1_3   =2,
-//                    AD_7265_AI_SIGNAL_2_4   =3,
-//                    AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B  =4
-//                } Ad7265ChannelInputs;
-//
-//
-//
-                V_dc_out = V_dc;
-                analogue_input_a_1=0;
-                analogue_input_a_2=0;
-                analogue_input_b_1=0;
-                analogue_input_b_2=0;
 
                 fault_code_out=fault_code;
 

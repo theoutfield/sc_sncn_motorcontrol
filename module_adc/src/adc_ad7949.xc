@@ -406,7 +406,7 @@ void adc_ad7949_fixed_channel(
 
         case i_adc[int i].set_protection_limits_and_analogue_input_configs(
                 int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in,
-                unsigned int config_ai_1, unsigned int config_ai_2):
+                unsigned int config_ad7265_analogue_inputs_a3a4_b3b4):
 
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
