@@ -77,7 +77,7 @@
 //////  IFM TILE FREQ CONFIGURATION
 //////////////////////////////////////////////
 
-#define IFM_TILE_USEC   USEC_STD // Number of ticks in a microsecond for IFM Tile
+#define IFM_TILE_USEC   USEC_FAST // Number of ticks in a microsecond for IFM Tile
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
