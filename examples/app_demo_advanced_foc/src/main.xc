@@ -23,8 +23,9 @@ PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
+QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
@@ -148,6 +149,8 @@ int main(void) {
                     position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
                     position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
                     position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                    position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D5;
+                    position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT_2;
 
                     position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
                     position_feedback_config.rem_16mt_config.timeout = REM_16MT_TIMEOUT;
@@ -172,15 +175,15 @@ int main(void) {
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
                     position_feedback_config_2.sensor_type = 0;
                     if (MOTOR_COMMUTATION_SENSOR != MOTOR_FEEDBACK_SENSOR) //enable second sensor when different from the first one
-                            {
+                    {
                         position_feedback_config_2.sensor_type = MOTOR_FEEDBACK_SENSOR;
                         position_feedback_config_2.polarity    = FEEDBACK_SENSOR_POLARITY;
                         position_feedback_config_2.resolution  = FEEDBACK_SENSOR_RESOLUTION;
                         position_feedback_config_2.enable_push_service = PushPosition;
                         position_feedback_config.enable_push_service = PushAngle;
-                            }
+                    }
 
-                    position_feedback_service(hall_ports, qei_ports, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                    position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                             position_feedback_config, i_shared_memory[0], i_position_feedback_1,
                             position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
                 }

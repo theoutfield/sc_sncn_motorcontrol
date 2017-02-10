@@ -49,9 +49,8 @@ void rem_16mt_test(client interface PositionFeedbackInterface i_position_feedbac
     while(1) {
         /* get position from REM_16MT Sensor */
         t :> start_time;
-        {void, void, status} = i_position_feedback.get_real_position();
+        {count, position, status } = i_position_feedback.get_position();
         t :> end_time;
-        {count, position} = i_position_feedback.get_position();
 
         /* get angle and velocity from REM_16MT Sensor */
         //        velocity = i_position_feedback.get_velocity();
@@ -131,10 +130,6 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
         }
 
         switch(mode) {
-        //set angle
-        case 'a':
-            printf("Set angle to %d\nnew offset %d\n", value, i_position_feedback.set_angle(value));
-            break;
             //auto offset tuning
         case 'b':
             offset = auto_offset(i_motorcontrol);
@@ -218,7 +213,7 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
             //print the count and the time to get it
         default:
             t :> start_time;
-            {multiturn, singleturn_raw, status} = i_position_feedback.get_real_position();
+            {multiturn, singleturn_raw, status} = i_position_feedback.get_position();
             t :> end_time;
             printf("time %d, count %d\n", (end_time-start_time)/USEC_STD, multiturn);
             break;
@@ -331,7 +326,7 @@ int main(void)
                 position_feedback_config.rem_16mt_config.timeout = REM_16MT_TIMEOUT;
                 position_feedback_config.rem_16mt_config.velocity_loop = REM_16MT_VELOCITY_LOOP;
 
-                position_feedback_service(null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                position_feedback_service(null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

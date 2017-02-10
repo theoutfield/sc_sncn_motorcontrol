@@ -14,12 +14,12 @@
 /* Test QEI Sensor Client */
 void qei_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
 {
-    int position, velocity, count, valid;
+    int position, velocity, count;
 
     while(1)
     {
         /* get position and velocity from QEI Sensor */
-        { count, position } = i_position_feedback.get_position();
+        { count, position, void } = i_position_feedback.get_position();
 
         velocity = i_position_feedback.get_velocity();
 
@@ -31,13 +31,12 @@ void qei_test(client interface PositionFeedbackInterface i_position_feedback, cl
         xscope_int(POSITION, position);
         xscope_int(VELOCITY, velocity);
 
-        //printf("Position: %d Velocity: %d\n", position, velocity);
-
         delay_milliseconds(1);
     }
 }
 
-QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 
 int main(void)
 {
@@ -67,7 +66,7 @@ int main(void)
                 position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
                 position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
 
-                position_feedback_service(null, qei_ports, null, null, null, null, null,
+                position_feedback_service(null, qei_hall_port_2, hall_enc_select_port, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

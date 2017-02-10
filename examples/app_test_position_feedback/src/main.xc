@@ -110,11 +110,9 @@ void commands_test(client interface PositionFeedbackInterface i_position_feedbac
     }
 }
 
-//HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-//QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = {QEI_PORT};
-HallEncSelectPort hall_enc_select_port = {QEI_PORT_INPUT_MODE_SELECTION};
+QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
@@ -143,7 +141,7 @@ int main(void)
 
             /* Position feedback service */
             {
-                //set sensor 1 parameters
+                //set default parameters
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.polarity    = 1;
                 position_feedback_config.pole_pairs  = 2;
@@ -160,6 +158,8 @@ int main(void)
                 position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
                 position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
                 position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D5;
+                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT_2;
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
                 position_feedback_config.rem_16mt_config.timeout = REM_16MT_TIMEOUT;
@@ -185,24 +185,16 @@ int main(void)
                 position_feedback_config.gpio_config[2] = GPIO_OUTPUT;
                 position_feedback_config.gpio_config[3] = GPIO_OUTPUT;
 
-                //set sensor 2 parameters
                 PositionFeedbackConfig position_feedback_config_2;
                 position_feedback_config_2 = position_feedback_config;
 
-                //set sensor types for 1 and 2
-//                position_feedback_config.resolution  = 4096;
-//                position_feedback_config.resolution  = 262144;
+                //set sensor 1 parameters
+                position_feedback_config.sensor_type = HALL_SENSOR;
                 position_feedback_config.resolution  = 8192;
-                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D5;
-                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT_2;
-                position_feedback_config.sensor_type = BISS_SENSOR;
+
+                //set sensor 1 parameters
+                position_feedback_config_2.sensor_type = BISS_SENSOR;
                 position_feedback_config_2.resolution  = 8192;
-                position_feedback_config_2.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D2;
-                position_feedback_config_2.biss_config.data_port_config = BISS_DATA_PORT_1;
-                position_feedback_config_2.biss_config.multiturn_resolution = 12;
-                position_feedback_config_2.biss_config.multiturn_length = position_feedback_config_2.biss_config.multiturn_resolution + 1;
-                position_feedback_config_2.biss_config.singleturn_length = 13;
-                position_feedback_config_2.sensor_type = HALL_SENSOR;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

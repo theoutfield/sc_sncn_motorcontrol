@@ -39,7 +39,6 @@ void hall_test(client interface PositionFeedbackInterface i_position_feedback, c
     }
 }
 
-//HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
 QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
 
 int main(void)

@@ -32,7 +32,7 @@ void rem_14_test(client interface PositionFeedbackInterface i_position_feedback,
 
     while(1) {
         /* get position from REM_14 Sensor */
-        {count, position} = i_position_feedback.get_position();
+        {count, position, void } = i_position_feedback.get_position();
 
         /* get angle from REM_14 Sensor */
         electrical_angle = i_position_feedback.get_angle();
@@ -96,7 +96,7 @@ int main(void)
                 position_feedback_config.rem_14_config.cache_time = REM_14_CACHE_TIME;
                 position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
-                position_feedback_service(null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                position_feedback_service(null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

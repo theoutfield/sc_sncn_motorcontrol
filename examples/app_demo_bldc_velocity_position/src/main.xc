@@ -22,11 +22,9 @@ PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-//HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-//QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
 QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = {QEI_PORT};
-HallEncSelectPort hall_enc_select_port = {QEI_PORT_INPUT_MODE_SELECTION};
+QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
@@ -222,7 +220,6 @@ int main(void) {
                     position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
                     //setting second sensor
-#if 1
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
                     position_feedback_config_2.sensor_type = 0;
                     if (MOTOR_COMMUTATION_SENSOR != MOTOR_FEEDBACK_SENSOR) //enable second sensor when different from the first one
@@ -233,9 +230,7 @@ int main(void) {
                         position_feedback_config_2.enable_push_service = PushPosition;
                         position_feedback_config.enable_push_service = PushAngle;
                     }
-#endif
 
-//                    position_feedback_service(hall_ports, qei_ports, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                     position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                             position_feedback_config, i_shared_memory[0], i_position_feedback_1,
                             position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
