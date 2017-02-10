@@ -51,10 +51,10 @@
 	<Probe name="A5A6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="B5B6" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
-	<Probe name="PERIOD" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="PERIOD_II" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="TIME_IDLE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="TIME_IDLE_MID" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="PERIOD" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="PERIOD_II" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="TIME_IDLE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="TIME_IDLE_MID" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
 	<Probe name="V_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="I_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>

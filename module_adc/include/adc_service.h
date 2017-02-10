@@ -41,6 +41,8 @@
 #define AD7949_CHANNEL_6            0b11111101001001
 #define AD7949_CHANNEL_7            0b11111111001001
 
+#define SINGLE_ENDED                0
+#define DIFFERENTIAL                1
 
 /**
  * @brief Operational mode of ADC

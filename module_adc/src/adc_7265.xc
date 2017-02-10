@@ -230,12 +230,19 @@ void adc_ad7265_fixed_channel(
 
         case iADC[int i].set_protection_limits_and_analogue_input_configs(
                 int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in,
-                unsigned int config_ad7265_analogue_inputs_a3a4_b3b4):
+                unsigned int measurement_mode_in):
 
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
                 current_limit = i_max * i_ratio_in;
+
+                if(measurement_mode_in==DIFFERENTIAL)
+                {
+                    channel_config[AD_7265_AI_SIGNAL_1_3] = AD7265_DIFF_A3A4_B3B4;
+                    channel_config[AD_7265_AI_SIGNAL_2_4] = AD7265_DIFF_A3A4_B3B4;
+                }
+
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -312,16 +319,6 @@ void adc_ad7265_fixed_channel(
                 break;
 
         case iADC[int i].get_channel(unsigned short channel_in)-> {int out_a, int out_b}:
-                //selected_channel = channel_in;
-                //
-                //for(int k=0;k<10;k++)
-                //{
-                //    if(selected_channel == channel_config[k])
-                //    {
-                //        out_a = OUT_A[k];
-                //        out_b = OUT_B[k];
-                //    }
-                //}
                 break;
 
         case iADC[int i].reset_faults():
