@@ -121,6 +121,10 @@ interface ADCInterface
      */
     int status(void);
 
+////    void config_adc_inputs(unsigned int, unsigned int);
+//
+//    {int, int} get_channel(unsigned short channel_config);
+
     /**
      * @brief Get all measured parameters at once
      * The parameters include:
@@ -130,64 +134,64 @@ interface ADCInterface
      *  - Torque
      *  - fault code
      */
-    {int, int, int, int, int} get_all_measurements();
+    {int, int, int, int, int, int, int, int, int, int} get_all_measurements();
 
 
-    // *Max adc ticks are 8192 and corresponds with the max current your DC can handle:
-    // DC100: 5A, DC300: 20A, DC1K 50A
-    /**
-     * @brief Get the ongoing current at B and C Phases.
-     *
-     * @return Current on B Phase [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
-     * @return Current on C Phase [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
-     */
-    {int, int} get_currents();
+//    // *Max adc ticks are 8192 and corresponds with the max current your DC can handle:
+//    // DC100: 5A, DC300: 20A, DC1K 50A
+//    /**
+//     * @brief Get the ongoing current at B and C Phases.
+//     *
+//     * @return Current on B Phase [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
+//     * @return Current on C Phase [-8191:8192]. (8192 is equivalent to the max current your SOMANET IFM DC device can handle: DC100: 5A, DC300: 20A, DC1K 50A).
+//     */
+//    {int, int} get_currents();
 
-    /**
-     * @brief Get the value from the temperature sensor on your SOMANET device.
-     *        The translation of this value into degrees will depend on your SOMANET device.
-     *
-     * @return Temperature [0:16383].
-     */
-    int get_temperature();
+//    /**
+//     * @brief Get the value from the temperature sensor on your SOMANET device.
+//     *        The translation of this value into degrees will depend on your SOMANET device.
+//     *
+//     * @return Temperature [0:16383].
+//     */
+//    int get_temperature();
 
-    /**
-     * @brief Get the voltage value present at the external analog inputs of your SOMANET device.
-     *
-     * @return Voltage at analog input 1 [0:16384].
-     * @return Voltage at analog input 2 [0:16384].
-     */
-    {int, int} get_external_inputs();
+//    /**
+//     * @brief Get the voltage value present at the external analog inputs of your SOMANET device.
+//     *
+//     * @return Voltage at analog input 1 [0:16384].
+//     * @return Voltage at analog input 2 [0:16384].
+//     */
+//    {int, int} get_external_inputs();
 
-    /**
-     * @brief Helper to convert Amps into a suitable ADC value for your SOMANET device.
-     *        The output of this helper would be suitable, for instance, as target torque
-     *        for a Torque Control Service.
-     *
-     * @return amps Ampers to convert [A]
-     */
-    int helper_amps_to_ticks(float amps);
+//    /**
+//     * @brief Helper to convert Amps into a suitable ADC value for your SOMANET device.
+//     *        The output of this helper would be suitable, for instance, as target torque
+//     *        for a Torque Control Service.
+//     *
+//     * @return amps Ampers to convert [A]
+//     */
+//    int helper_amps_to_ticks(float amps);
 
-    /**
-     * @brief Helper to convert an ADC current value into Amps.
-     *
-     * @param ticks ADC current value [-8191:8192].
-     * @return Amps [A].
-     */
-    float helper_ticks_to_amps(int ticks);
+//    /**
+//     * @brief Helper to convert an ADC current value into Amps.
+//     *
+//     * @param ticks ADC current value [-8191:8192].
+//     * @return Amps [A].
+//     */
+//    float helper_ticks_to_amps(int ticks);
 
-    /**
-     * @brief Enable overcurrent protection.
-     *
-     */
-    void enable_overcurrent_protection();
+//    /**
+//     * @brief Enable overcurrent protection.
+//     *
+//     */
+//    void enable_overcurrent_protection();
 
-    /**
-     * @brief Get status if overcurrent protection was triggered.
-     *
-     * @return status [0/1]
-     */
-    int get_overcurrent_protection_status();
+//    /**
+//     * @brief Get status if overcurrent protection was triggered.
+//     *
+//     * @return status [0/1]
+//     */
+//    int get_overcurrent_protection_status();
 
     /**
      * @brief Sets the protection limits including:
@@ -195,7 +199,7 @@ interface ADCInterface
      *      - V_dc_max
      *      - V_dc_min
      */
-    void set_protection_limits(int i_max, int i_ratio, int v_dc_max, int v_dc_min);
+    void set_protection_limits_and_analogue_input_configs(int, int, int, int, unsigned int);
 
     /**
      * @brief Resets the fault state in adc service

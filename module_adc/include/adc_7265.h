@@ -20,14 +20,6 @@
 #include <print.h>
 #include <adc_service.h>
 
-#define ADC_CALIB_POINTS 64
-#define Factor 6
-
-#define AD7265_MUX_DEFAULT_CONFIG 0b1000 // nDIFF|A2|A1|A0
-
-#define ADC_FIXED_CHANNEL_OPERATION 1 // the channels will be set directly inside adc server
-                                      // adc channels can not be modified by server inputs
-
 interface ADC{
     {int, int} get_adc_measurements(unsigned char port_id, unsigned char config);
 };
@@ -99,13 +91,11 @@ interface ADC{
 #define ADC_TRIGGER_CORR 128 // Timing correction
 #define ADC_TRIGGER_DELAY (QUART_PWM_MAX - ADC_TRIGGER_CORR) // MB~ Re-tune
 
-void adc_ad7256(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
-                    CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog);
-void adc_ad7256_fixed_channel(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
-                    CurrentSensorsConfig &current_sensor_config, interface WatchdogInterface client ?i_watchdog);
-void adc_ad7256_triggered(interface ADCInterface server iADC[2], AD7265Ports &adc_ports,
-                    CurrentSensorsConfig &current_sensor_config, chanend c_trig, interface WatchdogInterface client ?i_watchdog);
 
-int statusTemperature_adc2degrees(int adcValue);
+void adc_ad7265(
+        interface ADCInterface server iADC[2],
+        AD7265Ports &adc_ports,
+        CurrentSensorsConfig &current_sensor_config,
+        interface WatchdogInterface client ?i_watchdog, int operational_mode);
 
 /*****************************************************************************/

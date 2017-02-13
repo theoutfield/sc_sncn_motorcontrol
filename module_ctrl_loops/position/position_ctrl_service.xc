@@ -340,7 +340,18 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(TORQUE_CMD, torque_ref_k);
 #endif
 
-                break;
+#ifdef XSCOPE_ANALOGUE_MEASUREMENT
+                xscope_int(V_DC, upstream_control_data.V_dc);
+                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
+                xscope_int(TEMPERATURE, upstream_control_data.analogue_input_b_2);
+                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
+                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
+                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
+                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+#endif
+
+
+break;
 
         case i_position_control[int i].disable():
 
@@ -590,7 +601,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 out_motorcontrol_config.commutation_angle_offset = -1;
                 i_motorcontrol.set_offset_detection_enabled();
                 while(out_motorcontrol_config.commutation_angle_offset == -1)
-                 {
+                {
                     out_motorcontrol_config = i_motorcontrol.get_config();
                     out_motorcontrol_config.commutation_angle_offset = i_motorcontrol.set_calib(0);
                     delay_milliseconds(50);//wait until offset is detected

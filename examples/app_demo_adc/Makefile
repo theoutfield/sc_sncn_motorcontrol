@@ -11,10 +11,10 @@ TARGET = SOMANET-C22
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_demo_bldc_velocity_position
+APP_NAME = app_demo_adc
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_advanced_torquecontrol_lib module_biss module_board-support module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_memory_manager module_misc module_position_feedback module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master module_watchdog
+USED_MODULES = config_motor module_adc module_advanced_foc module_biss module_board-support module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_memory_manager module_misc module_position_feedback module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master module_watchdog
 
 
 # The flags passed to xcc when building the application
@@ -22,7 +22,7 @@ USED_MODULES = config_motor module_adc module_advanced_torquecontrol_lib module_
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O3 -report -DXSCOPE_POSITION_CTRL -DXSCOPE_ANALOGUE_MEASUREMENT
+XCC_FLAGS_Debug = -g -O3 -report
 XCC_FLAGS_Release = -g -O3
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this

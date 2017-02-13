@@ -10,6 +10,7 @@
 
 #include <motor_config_AMK_DT4.h>
 
+
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
@@ -79,7 +80,8 @@
 #define COMMUTATION_FRQ             24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      300
+#define COMMUTATION_OFFSET_CLK      300//DT4 MOTOR
+//#define COMMUTATION_OFFSET_CLK      980//MAXON MOTOR OF HENRIK
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -180,9 +182,9 @@
 
 
 //nonlinear mode
-#define POSITION_Kp                             59000
-#define POSITION_Ki                             4800
-#define POSITION_Kd                             248500
+#define POSITION_Kp                             20000
+#define POSITION_Ki                             2000
+#define POSITION_Kd                             80000
 
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
@@ -190,7 +192,7 @@
 //in case of using non-linear position control set "POSITION_INTEGRAL_LIMIT" to 1000
 #define POSITION_INTEGRAL_LIMIT                 1000
 
-#define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
+#define MOMENT_OF_INERTIA                       2000 //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 
 //PID parameters of the velocity PID controller

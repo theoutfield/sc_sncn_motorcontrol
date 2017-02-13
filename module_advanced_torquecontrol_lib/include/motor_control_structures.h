@@ -164,6 +164,11 @@ typedef struct
 
     int temperature;
 
+    int analogue_input_a_1;
+    int analogue_input_a_2;
+    int analogue_input_b_1;
+    int analogue_input_b_2;
+
 }UpstreamControlData;
 
 /**
