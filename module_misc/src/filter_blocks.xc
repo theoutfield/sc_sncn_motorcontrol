@@ -25,8 +25,8 @@ int filter(int filter_buffer[], int &index, int filter_length, int input)
 
     for (int i=0; i<filter_length; i++) {
         int mod = (index - 1 - i);
-        if (mod == -1) {
-            mod = filter_length - 1;
+        if (mod < 0) {
+            mod += filter_length;
         }
         filter_output += filter_buffer[mod];
     }
