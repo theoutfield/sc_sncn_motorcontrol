@@ -112,8 +112,8 @@ int main() {
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
-                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D5;
-                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT_2;
+                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
+                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT;
                 position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                 position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;

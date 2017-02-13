@@ -158,8 +158,8 @@ int main(void)
                 position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
                 position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
                 position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT_EXT_D5;
-                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT_2;
+                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
+                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT;
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
                 position_feedback_config.rem_16mt_config.timeout = REM_16MT_TIMEOUT;

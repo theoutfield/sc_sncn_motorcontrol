@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <biss_config.h>
 #include <rem_16mt_config.h>
 #include <rem_14_config.h>
 

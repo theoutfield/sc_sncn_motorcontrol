@@ -389,8 +389,6 @@ unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * 
         } else { //clock is output on the hall_enc_select port leftmost 2 bits
             hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
             hall_enc_select_port->p_hall_enc_select <: biss_config.clock_port_config | hall_enc_select_config;
-//            hall_enc_select_port->p_hall_enc_select <: 0b0010;
-//            hall_enc_select_port->p_hall_enc_select <: 0b1010;
         }
         if (biss_config.data_port_config == BISS_DATA_PORT_2) {
             qei_hall_port_2->p_qei_hall :> bit;
