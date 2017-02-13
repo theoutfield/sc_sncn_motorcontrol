@@ -235,38 +235,38 @@ void adc_ad7265(
             flag=1;
             break;
 
-        case iADC[int i].get_channel(unsigned short channel_in)-> {int output_a, int output_b}:
-//                if (operational_mode==NORMAL_MODE)
-//                {
-//                    adc_ports.p4_mux <: channel_in;
-//                    t :> time;
-//                    t when timerafter (time + 500) :> void;//5 us of wait
-//
-//                    clearbuf( adc_ports.p32_data[0] );  //Clear the buffers used by the input ports.
-//                    clearbuf( adc_ports.p32_data[1] );
-//                    adc_ports.p1_ready <: 1 @ time_stamp;   // Switch ON input reads (and ADC conversion)
-//                    time_stamp += (ADC_TOTAL_BITS+2);       // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
-//                    adc_ports.p1_ready @ time_stamp <: 0;   // Switch OFF input reads, (and ADC conversion)
-//
-//                    sync( adc_ports.p1_ready );             // Wait until port has completed any pending outputs
-//
-//                    // Get data from port a
-//                    endin( adc_ports.p32_data[0] );         // End the previous input on this buffered port
-//                    adc_ports.p32_data[0] :> inp_val;       // Get new input
-//                    tmp_val = bitrev( inp_val );            // Reverse bit order. WARNING. Machine dependent
-//                    tmp_val = tmp_val >> (SHIFTING_BITS+1);
-//                    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-//                    output_a = (int)tmp_val;
-//
-//                    // Get data from port b
-//                    endin( adc_ports.p32_data[1] );         // End the previous input on this buffered port
-//                    adc_ports.p32_data[1] :> inp_val;       // Get new input
-//                    tmp_val = bitrev( inp_val );            // Reverse bit order. WARNING. Machine dependent
-//                    tmp_val = tmp_val >> (SHIFTING_BITS+1);
-//                    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-//                    output_b = (int)tmp_val;
-//                }
-                break;
+//        case iADC[int i].get_channel(unsigned short channel_in)-> {int output_a, int output_b}:
+////                if (operational_mode==NORMAL_MODE)
+////                {
+////                    adc_ports.p4_mux <: channel_in;
+////                    t :> time;
+////                    t when timerafter (time + 500) :> void;//5 us of wait
+////
+////                    clearbuf( adc_ports.p32_data[0] );  //Clear the buffers used by the input ports.
+////                    clearbuf( adc_ports.p32_data[1] );
+////                    adc_ports.p1_ready <: 1 @ time_stamp;   // Switch ON input reads (and ADC conversion)
+////                    time_stamp += (ADC_TOTAL_BITS+2);       // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
+////                    adc_ports.p1_ready @ time_stamp <: 0;   // Switch OFF input reads, (and ADC conversion)
+////
+////                    sync( adc_ports.p1_ready );             // Wait until port has completed any pending outputs
+////
+////                    // Get data from port a
+////                    endin( adc_ports.p32_data[0] );         // End the previous input on this buffered port
+////                    adc_ports.p32_data[0] :> inp_val;       // Get new input
+////                    tmp_val = bitrev( inp_val );            // Reverse bit order. WARNING. Machine dependent
+////                    tmp_val = tmp_val >> (SHIFTING_BITS+1);
+////                    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+////                    output_a = (int)tmp_val;
+////
+////                    // Get data from port b
+////                    endin( adc_ports.p32_data[1] );         // End the previous input on this buffered port
+////                    adc_ports.p32_data[1] :> inp_val;       // Get new input
+////                    tmp_val = bitrev( inp_val );            // Reverse bit order. WARNING. Machine dependent
+////                    tmp_val = tmp_val >> (SHIFTING_BITS+1);
+////                    tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
+////                    output_b = (int)tmp_val;
+////                }
+//                break;
 
         case iADC[int i].reset_faults():
                 I_b=0;
