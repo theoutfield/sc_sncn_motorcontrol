@@ -340,6 +340,19 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(TORQUE_CMD, torque_ref_k);
 #endif
 
+#ifdef XSCOPE_ANALOGUE_MEASUREMENT
+                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
+                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
+                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
+                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+
+                xscope_int(V_DC, upstream_control_data.V_dc);
+                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+#endif
+
+
                 break;
 
         case i_position_control[int i].disable():
