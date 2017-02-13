@@ -373,6 +373,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1605921113" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -877,6 +885,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.277344476" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1388,6 +1404,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1122502185" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
-		<cconfiguration id="com.xmos.cdt.toolchain.324813606">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.324813606" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+		<cconfiguration id="com.xmos.cdt.toolchain.1882088494">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.1882088494" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
 					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -12,17 +12,17 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration buildProperties="" description="" id="com.xmos.cdt.toolchain.324813606" name="Debug" parent="org.eclipse.cdt.build.core.emptycfg">
-					<folderInfo id="com.xmos.cdt.toolchain.324813606.344532373" name="/" resourcePath="">
-						<toolChain id="com.xmos.cdt.toolchain.1360717576" name="com.xmos.cdt.toolchain" superClass="com.xmos.cdt.toolchain">
-							<targetPlatform archList="all" binaryParser="com.xmos.cdt.core.XEBinaryParser;org.eclipse.cdt.core.GNU_ELF" id="com.xmos.cdt.core.platform.357334041" isAbstract="false" osList="linux,win32,macosx" superClass="com.xmos.cdt.core.platform"/>
-							<builder arguments="CONFIG=Debug" id="com.xmos.cdt.builder.base.1980417158" keepEnvironmentInBuildfile="false" managedBuildOn="false" superClass="com.xmos.cdt.builder.base">
+				<configuration buildProperties="" description="" id="com.xmos.cdt.toolchain.1882088494" name="Debug" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="com.xmos.cdt.toolchain.1882088494.1959825779" name="/" resourcePath="">
+						<toolChain id="com.xmos.cdt.toolchain.215267786" name="com.xmos.cdt.toolchain" superClass="com.xmos.cdt.toolchain">
+							<targetPlatform archList="all" binaryParser="com.xmos.cdt.core.XEBinaryParser;org.eclipse.cdt.core.GNU_ELF" id="com.xmos.cdt.core.platform.1960322592" isAbstract="false" osList="linux,win32,macosx" superClass="com.xmos.cdt.core.platform"/>
+							<builder arguments="CONFIG=Debug" id="com.xmos.cdt.builder.base.1544568065" keepEnvironmentInBuildfile="false" managedBuildOn="false" superClass="com.xmos.cdt.builder.base">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH" kind="outputPath" name="bin/Debug"/>
 								</outputEntries>
 							</builder>
-							<tool id="com.xmos.cdt.xc.compiler.216964463" name="com.xmos.cdt.xc.compiler" superClass="com.xmos.cdt.xc.compiler">
-								<option id="com.xmos.xc.compiler.option.defined.symbols.1972574969" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
+							<tool id="com.xmos.cdt.xc.compiler.2145597796" name="com.xmos.cdt.xc.compiler" superClass="com.xmos.cdt.xc.compiler">
+								<option id="com.xmos.xc.compiler.option.defined.symbols.662637450" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__XC__=1"/>
 									<listOptionValue builtIn="false" value="__llvm__=1"/>
 									<listOptionValue builtIn="false" value="__ATOMIC_RELAXED=0"/>
@@ -169,9 +169,9 @@
 									<listOptionValue builtIn="false" value="XCC_VERSION_MAJOR=1402"/>
 									<listOptionValue builtIn="false" value="XCC_VERSION_MINOR=1"/>
 									<listOptionValue builtIn="false" value="__XCC_HAVE_FLOAT__=1"/>
-									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccmlBSHz.h&quot;"/>
+									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccwGfrby.h&quot;"/>
 								</option>
-								<option id="com.xmos.xc.compiler.option.include.paths.451801466" name="com.xmos.xc.compiler.option.include.paths" superClass="com.xmos.xc.compiler.option.include.paths" valueType="includePath">
+								<option id="com.xmos.xc.compiler.option.include.paths.662861958" name="com.xmos.xc.compiler.option.include.paths" superClass="com.xmos.xc.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/xc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/clang&quot;"/>
@@ -187,7 +187,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs2a}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC5K}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
@@ -198,8 +197,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC30}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/src}&quot;"/>
@@ -215,24 +216,25 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ETHERNET}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc/images}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ETHERNET}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/CORE_C21}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/CORE_C22}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
@@ -242,6 +244,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC300}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
@@ -249,12 +252,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ECAT}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs1b}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC100}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
@@ -268,19 +269,12 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 								</option>
-								<inputType id="com.xmos.cdt.xc.compiler.input.1592096092" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
+								<inputType id="com.xmos.cdt.xc.compiler.input.1574759938" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
-							<tool id="com.xmos.cdt.c.compiler.1577955086" name="com.xmos.cdt.c.compiler" superClass="com.xmos.cdt.c.compiler">
-								<option id="com.xmos.c.compiler.option.defined.symbols.1561149886" name="com.xmos.c.compiler.option.defined.symbols" superClass="com.xmos.c.compiler.option.defined.symbols" valueType="definedSymbols">
+							<tool id="com.xmos.cdt.c.compiler.539648870" name="com.xmos.cdt.c.compiler" superClass="com.xmos.cdt.c.compiler">
+								<option id="com.xmos.c.compiler.option.defined.symbols.277547437" name="com.xmos.c.compiler.option.defined.symbols" superClass="com.xmos.c.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__llvm__=1"/>
 									<listOptionValue builtIn="false" value="__clang__=1"/>
 									<listOptionValue builtIn="false" value="__clang_major__=3"/>
@@ -574,9 +568,9 @@
 									<listOptionValue builtIn="false" value="XCC_VERSION_MAJOR=1402"/>
 									<listOptionValue builtIn="false" value="XCC_VERSION_MINOR=1"/>
 									<listOptionValue builtIn="false" value="__XCC_HAVE_FLOAT__=1"/>
-									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccUZKIfL.h&quot;"/>
+									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccawtB7G.h&quot;"/>
 								</option>
-								<option id="com.xmos.c.compiler.option.include.paths.275904758" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
+								<option id="com.xmos.c.compiler.option.include.paths.985798093" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/clang&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/biss_configs}&quot;"/>
@@ -591,7 +585,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs2a}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC5K}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
@@ -602,8 +595,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC30}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/src}&quot;"/>
@@ -619,24 +614,25 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ETHERNET}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc/images}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ETHERNET}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/CORE_C21}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/CORE_C22}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
@@ -646,6 +642,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC300}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
@@ -653,12 +650,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ECAT}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs1b}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC100}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
@@ -672,19 +667,12 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 								</option>
-								<inputType id="com.xmos.cdt.c.compiler.input.c.897950974" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
+								<inputType id="com.xmos.cdt.c.compiler.input.c.532929918" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
-							<tool id="com.xmos.cdt.cxx.compiler.1097933744" name="com.xmos.cdt.cxx.compiler" superClass="com.xmos.cdt.cxx.compiler">
-								<option id="com.xmos.cxx.compiler.option.defined.symbols.1496910077" name="com.xmos.cxx.compiler.option.defined.symbols" superClass="com.xmos.cxx.compiler.option.defined.symbols" valueType="definedSymbols">
+							<tool id="com.xmos.cdt.cxx.compiler.481178490" name="com.xmos.cdt.cxx.compiler" superClass="com.xmos.cdt.cxx.compiler">
+								<option id="com.xmos.cxx.compiler.option.defined.symbols.1437189656" name="com.xmos.cxx.compiler.option.defined.symbols" superClass="com.xmos.cxx.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__llvm__=1"/>
 									<listOptionValue builtIn="false" value="__clang__=1"/>
 									<listOptionValue builtIn="false" value="__clang_major__=3"/>
@@ -982,9 +970,9 @@
 									<listOptionValue builtIn="false" value="XCC_VERSION_MAJOR=1402"/>
 									<listOptionValue builtIn="false" value="XCC_VERSION_MINOR=1"/>
 									<listOptionValue builtIn="false" value="__XCC_HAVE_FLOAT__=1"/>
-									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/cc9dKNV0.h&quot;"/>
+									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccbKSfeX.h&quot;"/>
 								</option>
-								<option id="com.xmos.cxx.compiler.option.include.paths.1315244988" name="com.xmos.cxx.compiler.option.include.paths" superClass="com.xmos.cxx.compiler.option.include.paths" valueType="includePath">
+								<option id="com.xmos.cxx.compiler.option.include.paths.198219201" name="com.xmos.cxx.compiler.option.include.paths" superClass="com.xmos.cxx.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/clang&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/c++/v1&quot;"/>
@@ -1000,7 +988,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs2a}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC5K}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/src}&quot;"/>
@@ -1011,8 +998,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC30}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/src}&quot;"/>
@@ -1028,24 +1017,25 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ETHERNET}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc/images}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ETHERNET}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_biss/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/CORE_C21}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/predriver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/CORE_C22}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/src}&quot;"/>
@@ -1055,6 +1045,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_misc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC300}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master}&quot;"/>
@@ -1062,12 +1053,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/COM_ECAT}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ctrl_loops}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs1b}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC100}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/motor_configs}&quot;"/>
@@ -1081,16 +1070,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc}&quot;"/>
 								</option>
-								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1253965045" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
+								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.139286420" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
@@ -1101,8 +1083,8 @@
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
-		<cconfiguration id="com.xmos.cdt.toolchain.1122294243">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.1122294243" moduleId="org.eclipse.cdt.core.settings" name="Release">
+		<cconfiguration id="com.xmos.cdt.toolchain.862866671">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.862866671" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
 					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -1112,17 +1094,17 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration buildProperties="" description="" id="com.xmos.cdt.toolchain.1122294243" name="Release" parent="org.eclipse.cdt.build.core.emptycfg">
-					<folderInfo id="com.xmos.cdt.toolchain.1122294243.139099436" name="/" resourcePath="">
-						<toolChain id="com.xmos.cdt.toolchain.1689855407" name="com.xmos.cdt.toolchain" superClass="com.xmos.cdt.toolchain">
-							<targetPlatform archList="all" binaryParser="com.xmos.cdt.core.XEBinaryParser;org.eclipse.cdt.core.GNU_ELF" id="com.xmos.cdt.core.platform.603634990" isAbstract="false" osList="linux,win32,macosx" superClass="com.xmos.cdt.core.platform"/>
-							<builder arguments="CONFIG=Release" id="com.xmos.cdt.builder.base.260228162" keepEnvironmentInBuildfile="false" managedBuildOn="false" superClass="com.xmos.cdt.builder.base">
+				<configuration buildProperties="" description="" id="com.xmos.cdt.toolchain.862866671" name="Release" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="com.xmos.cdt.toolchain.862866671.1091445649" name="/" resourcePath="">
+						<toolChain id="com.xmos.cdt.toolchain.2106061267" name="com.xmos.cdt.toolchain" superClass="com.xmos.cdt.toolchain">
+							<targetPlatform archList="all" binaryParser="com.xmos.cdt.core.XEBinaryParser;org.eclipse.cdt.core.GNU_ELF" id="com.xmos.cdt.core.platform.1447752235" isAbstract="false" osList="linux,win32,macosx" superClass="com.xmos.cdt.core.platform"/>
+							<builder arguments="CONFIG=Release" id="com.xmos.cdt.builder.base.821619794" keepEnvironmentInBuildfile="false" managedBuildOn="false" superClass="com.xmos.cdt.builder.base">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH" kind="outputPath" name="bin/Release"/>
 								</outputEntries>
 							</builder>
-							<tool id="com.xmos.cdt.xc.compiler.1940995193" name="com.xmos.cdt.xc.compiler" superClass="com.xmos.cdt.xc.compiler">
-								<option id="com.xmos.xc.compiler.option.defined.symbols.641724704" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
+							<tool id="com.xmos.cdt.xc.compiler.670572836" name="com.xmos.cdt.xc.compiler" superClass="com.xmos.cdt.xc.compiler">
+								<option id="com.xmos.xc.compiler.option.defined.symbols.1711304316" name="com.xmos.xc.compiler.option.defined.symbols" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__XC__=1"/>
 									<listOptionValue builtIn="false" value="__llvm__=1"/>
 									<listOptionValue builtIn="false" value="__ATOMIC_RELAXED=0"/>
@@ -1269,17 +1251,17 @@
 									<listOptionValue builtIn="false" value="XCC_VERSION_MAJOR=1402"/>
 									<listOptionValue builtIn="false" value="XCC_VERSION_MINOR=1"/>
 									<listOptionValue builtIn="false" value="__XCC_HAVE_FLOAT__=1"/>
-									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccmlBSHz.h&quot;"/>
+									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccwGfrby.h&quot;"/>
 								</option>
-								<option id="com.xmos.xc.compiler.option.include.paths.2103010641" name="com.xmos.xc.compiler.option.include.paths" superClass="com.xmos.xc.compiler.option.include.paths" valueType="includePath">
+								<option id="com.xmos.xc.compiler.option.include.paths.1060725189" name="com.xmos.xc.compiler.option.include.paths" superClass="com.xmos.xc.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/xc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/clang&quot;"/>
 								</option>
-								<inputType id="com.xmos.cdt.xc.compiler.input.967017088" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
+								<inputType id="com.xmos.cdt.xc.compiler.input.969904271" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
-							<tool id="com.xmos.cdt.c.compiler.269960752" name="com.xmos.cdt.c.compiler" superClass="com.xmos.cdt.c.compiler">
-								<option id="com.xmos.c.compiler.option.defined.symbols.1074616320" name="com.xmos.c.compiler.option.defined.symbols" superClass="com.xmos.c.compiler.option.defined.symbols" valueType="definedSymbols">
+							<tool id="com.xmos.cdt.c.compiler.146834858" name="com.xmos.cdt.c.compiler" superClass="com.xmos.cdt.c.compiler">
+								<option id="com.xmos.c.compiler.option.defined.symbols.1957578646" name="com.xmos.c.compiler.option.defined.symbols" superClass="com.xmos.c.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__llvm__=1"/>
 									<listOptionValue builtIn="false" value="__clang__=1"/>
 									<listOptionValue builtIn="false" value="__clang_major__=3"/>
@@ -1573,16 +1555,16 @@
 									<listOptionValue builtIn="false" value="XCC_VERSION_MAJOR=1402"/>
 									<listOptionValue builtIn="false" value="XCC_VERSION_MINOR=1"/>
 									<listOptionValue builtIn="false" value="__XCC_HAVE_FLOAT__=1"/>
-									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccUZKIfL.h&quot;"/>
+									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccawtB7G.h&quot;"/>
 								</option>
-								<option id="com.xmos.c.compiler.option.include.paths.1795332728" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
+								<option id="com.xmos.c.compiler.option.include.paths.1429021729" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/clang&quot;"/>
 								</option>
-								<inputType id="com.xmos.cdt.c.compiler.input.c.1514869852" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
+								<inputType id="com.xmos.cdt.c.compiler.input.c.857249824" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
-							<tool id="com.xmos.cdt.cxx.compiler.7521599" name="com.xmos.cdt.cxx.compiler" superClass="com.xmos.cdt.cxx.compiler">
-								<option id="com.xmos.cxx.compiler.option.defined.symbols.1477537318" name="com.xmos.cxx.compiler.option.defined.symbols" superClass="com.xmos.cxx.compiler.option.defined.symbols" valueType="definedSymbols">
+							<tool id="com.xmos.cdt.cxx.compiler.97422185" name="com.xmos.cdt.cxx.compiler" superClass="com.xmos.cdt.cxx.compiler">
+								<option id="com.xmos.cxx.compiler.option.defined.symbols.190855083" name="com.xmos.cxx.compiler.option.defined.symbols" superClass="com.xmos.cxx.compiler.option.defined.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__llvm__=1"/>
 									<listOptionValue builtIn="false" value="__clang__=1"/>
 									<listOptionValue builtIn="false" value="__clang_major__=3"/>
@@ -1880,14 +1862,14 @@
 									<listOptionValue builtIn="false" value="XCC_VERSION_MAJOR=1402"/>
 									<listOptionValue builtIn="false" value="XCC_VERSION_MINOR=1"/>
 									<listOptionValue builtIn="false" value="__XCC_HAVE_FLOAT__=1"/>
-									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/cc9dKNV0.h&quot;"/>
+									<listOptionValue builtIn="false" value="_XSCOPE_PROBES_INCLUDE_FILE=&quot;/tmp/ccbKSfeX.h&quot;"/>
 								</option>
-								<option id="com.xmos.cxx.compiler.option.include.paths.2102297737" name="com.xmos.cxx.compiler.option.include.paths" superClass="com.xmos.cxx.compiler.option.include.paths" valueType="includePath">
+								<option id="com.xmos.cxx.compiler.option.include.paths.385467641" name="com.xmos.cxx.compiler.option.include.paths" superClass="com.xmos.cxx.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/clang&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include/c++/v1&quot;"/>
 								</option>
-								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.471498549" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
+								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1606051116" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
@@ -1983,7 +1965,7 @@
 		</profile>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="app_demo_adc.null.265346818" name="app_demo_adc"/>
+		<project id="app_demo_adc.null.110532590" name="app_demo_adc"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope"/>
