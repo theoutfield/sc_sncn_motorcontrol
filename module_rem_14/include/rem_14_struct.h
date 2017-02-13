@@ -90,12 +90,6 @@ typedef struct {
                                      2 = no hysteresis LSB
                                      3 = 3 LSB) */
     int abi_resolution;         /**< Resolution of ABI (0 = 11 bits, 1 = 10 bits) */
-
-    int cache_time;             /**< How long to cache the position (in clock ticks) */
-
-    int velocity_loop;          /**< Velcity loop time in microseconds */
-
-    int max_ticks;              /**< The count is reset to 0 if greater than this */
 } REM_14Config;
 
 

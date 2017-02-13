@@ -37,7 +37,9 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
         select {
         //receive config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
+                int ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
+                position_feedback_config.ifm_usec = ifm_usec;
                 break;
 
         //send config
@@ -222,6 +224,15 @@ void set_clock_biss(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2
     if (qei_hall_port_2 != null && spi_ports != null) {
         configure_clock_rate((*spi_ports).spi_interface.blk1, position_feedback_config.biss_config.clock_dividend, position_feedback_config.biss_config.clock_divisor); // a/b MHz
         start_clock((*spi_ports).spi_interface.blk1);
+    }
+}
+
+void switch_ifm_freq(PositionFeedbackConfig &position_feedback_config)
+{
+    if (position_feedback_config.ifm_usec == USEC_FAST) { //Set freq to 250MHz
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    } else {
+        position_feedback_config.ifm_usec = USEC_STD;
     }
 }
 

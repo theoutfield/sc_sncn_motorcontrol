@@ -10,6 +10,7 @@
  */
 
 #include <position_feedback_service.h>
+#include <user_config.h>
 #include <ctype.h>
 
 
@@ -82,6 +83,9 @@ int main(void)
                 position_feedback_config.pole_pairs  = 2;
                 position_feedback_config.resolution  = 16384;
                 position_feedback_config.offset      = 0;
+                position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
+                position_feedback_config.velocity_compute_period   = REM_14_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.enable_push_service = PushAll;
 
                 position_feedback_config.rem_14_config.factory_settings = 1;
@@ -92,9 +96,6 @@ int main(void)
                 position_feedback_config.rem_14_config.data_select = 0;
                 position_feedback_config.rem_14_config.pwm_on = REM_14_PWM_OFF;
                 position_feedback_config.rem_14_config.abi_resolution = 0;
-                position_feedback_config.rem_14_config.max_ticks = 0x7fffffff;
-                position_feedback_config.rem_14_config.cache_time = REM_14_CACHE_TIME;
-                position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
 
                 position_feedback_service(null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

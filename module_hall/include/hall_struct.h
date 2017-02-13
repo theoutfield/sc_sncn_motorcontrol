@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <user_config.h>
-
 #define ERROR                   0
 #define SUCCESS                 1
 
@@ -14,8 +12,6 @@
 #define FILTER_LENGTH_HALL  16
 
 #define HALL_TICKS_PER_ELECTRICAL_ROTATION 4096
-
-#define HALL_USEC           IFM_TILE_USEC
 
 // Hall_states
 #define HALL_STATE_0  4

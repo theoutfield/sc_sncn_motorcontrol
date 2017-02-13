@@ -10,6 +10,7 @@
  */
 //Hall libs
 #include <position_feedback_service.h>
+#include <user_config.h>
 
 /* Test Hall Sensor Client */
 void hall_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
@@ -64,6 +65,9 @@ int main(void)
                 position_feedback_config.sensor_type = HALL_SENSOR;
                 position_feedback_config.polarity    = 1;
                 position_feedback_config.pole_pairs  = 2;
+                position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
+                position_feedback_config.velocity_compute_period   = 1000;
                 position_feedback_config.enable_push_service = PushAll;
 
                 position_feedback_service(qei_hall_port_1, null, null, null, null, null, null, null,

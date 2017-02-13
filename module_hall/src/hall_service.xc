@@ -87,9 +87,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 server interface PositionFeedbackInterface i_position_feedback[3])
 {
 
-    if (HALL_USEC == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-    }
+    switch_ifm_freq(position_feedback_config);
 
 #ifdef DEBUG_POSITION_FEEDBACK
     if (check_hall_config(position_feedback_config) == ERROR) {
@@ -178,7 +176,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
     hv.hall_filter_index_newest=0;
 
     // clock frequency of defined timers in hall section
-    hv.hall_f_clock = (HALL_USEC*1000000); //1 second in ticks
+    hv.hall_f_clock = (position_feedback_config.ifm_usec*1000000); //1 second in ticks
     // motor pole pairs
     hv.hall_pole_pairs = position_feedback_config.pole_pairs;
     hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
@@ -228,7 +226,9 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 break;
 
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
+                int ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
+                position_feedback_config.ifm_usec = ifm_usec;
                 hv.hall_pole_pairs = position_feedback_config.pole_pairs;
                 hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
                 hv.sensor_polarity=position_feedback_config.polarity;
@@ -257,7 +257,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 gpio_write(gpio_ports, position_feedback_config, gpio_number, in_value);
                 break;
 
-        case tx when timerafter(time1+(HALL_USEC*10)) :> void: //10 usec
+        case tx when timerafter(time1+(position_feedback_config.ifm_usec*10)) :> void: //10 usec
 
                 if(++hall_last_state_period  > HALL_TRANSITION_PERIOD_MAX)  hall_last_state_period=HALL_TRANSITION_PERIOD_MAX;
                 if(++hall_transition_timeout > HALL_PERIOD_MAX)             hall_transition_timeout=HALL_PERIOD_MAX;

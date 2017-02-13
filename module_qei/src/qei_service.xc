@@ -62,9 +62,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 {
 
 
-    if (QEI_USEC == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-    }
+    switch_ifm_freq(position_feedback_config);
 
 
 #ifdef DEBUG_POSITION_FEEDBACK
@@ -244,7 +242,9 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
             case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
 
+                int ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
+                position_feedback_config.ifm_usec = ifm_usec;
                 qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
                 // max_count_actual = position_feedback_config.qei_config.max_ticks;
                 qei_type = position_feedback_config.qei_config.index_type;
@@ -278,7 +278,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                     gpio_write(gpio_ports, position_feedback_config, gpio_number, in_value);
                     break;
 
-            case t_velocity when timerafter(ts_velocity + (1000*QEI_USEC)) :> ts_velocity:
+            case t_velocity when timerafter(ts_velocity + (1000*position_feedback_config.ifm_usec)) :> ts_velocity:
 
                 int difference_velocity = count - vel_previous_position;
                 if (difference_velocity < qei_crossover_velocity && difference_velocity > -qei_crossover_velocity)
