@@ -8,13 +8,13 @@
 
 #include <refclk.h>
 
-#include <motor_config.h>
+#include <motor_config_AMK_DT4.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
 
-// SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
+// SENSOR USED FOR COMMUTATION (if applicable) [HALL_SENSOR, AMS_SENSOR, CONTELEC_SENSOR, BISS_SENSOR]
 #define MOTOR_COMMUTATION_SENSOR   REM_16MT_SENSOR//HALL_SENSOR
 
 // FEEDBACK SENSOR RESOLUTION [ticks/mechanical_rotation]
@@ -117,7 +117,7 @@
 #define TORQUE_Kd         0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define PERCENT_OFFSET_TORQUE 80
+#define PERCENT_OFFSET_TORQUE 20
 
 
 /////////////////////////////////////////////////
@@ -190,9 +190,9 @@
 
 
 //nonlinear mode
-#define POSITION_Kp                             59000
-#define POSITION_Ki                             4800
-#define POSITION_Kd                             248500
+#define POSITION_Kp                             20000
+#define POSITION_Ki                             2000
+#define POSITION_Kd                             80000
 
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
@@ -200,7 +200,7 @@
 //in case of using non-linear position control set "POSITION_INTEGRAL_LIMIT" to 1000
 #define POSITION_INTEGRAL_LIMIT                 1000
 
-#define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
+#define MOMENT_OF_INERTIA                       2000 //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 
 //PID parameters of the velocity PID controller

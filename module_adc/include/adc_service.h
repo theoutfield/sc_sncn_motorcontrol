@@ -18,6 +18,60 @@
  */
 #define OVERCURRENT_IN_ADC_TICKS 12800 //modify the value to match your motor operating conditions. Should be lower than MAX_ADC_VALUE!
 
+#define AD7265_SGL_A1_B1 0b1000
+#define AD7265_SGL_A2_B2 0b1001
+#define AD7265_SGL_A3_B3 0b1010
+#define AD7265_SGL_A4_B4 0b1011
+#define AD7265_SGL_A5_B5 0b1100
+#define AD7265_SGL_A6_B6 0b1101
+
+#define AD7265_DIFF_A1A2_B1B2  0b0000
+#define AD7265_DIFF_A3A4_B3B4  0b0010
+#define AD7265_DIFF_A5A6_B5B6  0b0101
+
+
+#define AD7949_TEMPERATURE          0b10110001001001
+
+#define AD7949_CHANNEL_0            0b11110001001001
+#define AD7949_CHANNEL_1            0b11110011001001
+#define AD7949_CHANNEL_2            0b11110101001001
+#define AD7949_CHANNEL_3            0b11110111001001
+#define AD7949_CHANNEL_4            0b11111001001001
+#define AD7949_CHANNEL_5            0b11111011001001
+#define AD7949_CHANNEL_6            0b11111101001001
+#define AD7949_CHANNEL_7            0b11111111001001
+
+#define SINGLE_ENDED                0
+#define DIFFERENTIAL                1
+
+/**
+ * @brief Operational mode of ADC
+ *
+ */
+typedef enum
+{
+    NORMAL_MODE = 1,
+    STD_MOTOR_CTRL_MODE = 2
+} AdcOperationalMode;
+
+typedef enum
+{
+    AD_7949_IB_IC            =0,
+    AD_7949_VMOT_DIV_I_MOT   =1,
+    AD_7949_EXT_A0_N_EXT_A1_N=2,
+    AD_7949_EXT_A0_P_EXT_A1_P=3
+} Ad7949ChannelInputs;
+
+typedef enum
+{
+    AD_7265_CURRENT_B_C     =0,                     //corresponding to VA1 & VB1 in AD7265 (dc1k board)
+    AD_7265_VDC_IDC         =1,                     //corresponding to VA2 & VB2 in AD7265 (dc1k board)
+    AD_7265_AI_SIGNAL_1_3   =2,                     //corresponding to VA3 & VB3 in AD7265 (dc1k board)
+    AD_7265_AI_SIGNAL_2_4   =3,                     //corresponding to VA4 & VB4 in AD7265 (dc1k board)
+    AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B  =4,         //corresponding to VA5 & VB5 in AD7265 (dc1k board)
+    AD_7265_PHASE_VOLTAGE_C_PHASE_VOLTAGE_B  =5     //corresponding to VA6 & VB6 in AD7265 (dc1k board)
+} Ad7265ChannelInputs;
+
 
 
 /**
@@ -68,4 +122,4 @@ typedef struct {
  * @param c_trigger [[Nullable]] Channel communication to trigger sampling. If not provided, sampling takes place on request.
  * @param i_adc Array of communication interfaces to handle up to 5 different clients.
  */
-void adc_service(ADCPorts &adc_ports, chanend ?c_trigger, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog, int ifm_tile_usec);
+void adc_service(ADCPorts &adc_ports, interface ADCInterface server i_adc[2], interface WatchdogInterface client ?i_watchdog, int ifm_tile_usec, int operational_mode);
