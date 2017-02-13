@@ -8,8 +8,8 @@
 
 #include <refclk.h>
 
-//#include <motor_config_AMK_DT4.h>
-#include <motor_config_Maxon_411678.h>
+#include <motor_config_AMK_DT4.h>
+//#include <motor_config_Maxon_411678.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -90,8 +90,8 @@
 #define COMMUTATION_FRQ             24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-//#define COMMUTATION_OFFSET_CLK      300//DT4 MOTOR
-#define COMMUTATION_OFFSET_CLK      980//MAXON MOTOR OF HENRIK
+#define COMMUTATION_OFFSET_CLK      300//DT4 MOTOR
+//#define COMMUTATION_OFFSET_CLK      980//MAXON MOTOR OF HENRIK
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
