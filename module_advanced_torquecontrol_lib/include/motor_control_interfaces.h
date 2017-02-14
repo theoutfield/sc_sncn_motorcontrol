@@ -134,7 +134,7 @@ interface ADCInterface
      *  - Torque
      *  - fault code
      */
-    {int, int, int, int, int, int, int, int, int, int} get_all_measurements();
+    {int, int, int, int, int, int, int, int, int, int} get_all_measurements(unsigned int);
 
 
 //    // *Max adc ticks are 8192 and corresponds with the max current your DC can handle:
@@ -199,7 +199,7 @@ interface ADCInterface
      *      - V_dc_max
      *      - V_dc_min
      */
-    void set_protection_limits_and_analogue_input_configs(int, int, int, int, unsigned int);
+    void set_protection_limits_and_analogue_input_configs(int, int, int, int);
 
     /**
      * @brief Resets the fault state in adc service
