@@ -162,14 +162,13 @@ void adc_ad7949(
                 break;
 
         case i_adc[int i].set_protection_limits_and_analogue_input_configs(
-                int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in,
-                unsigned int config_ad7265_analogue_inputs_a3a4_b3b4):
+                int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
                 current_limit = i_max_in * i_ratio_in;
                 break;
 
-        case i_adc[int i].get_all_measurements() -> {
+        case i_adc[int i].get_all_measurements(unsigned int measurement_mode_in) -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
