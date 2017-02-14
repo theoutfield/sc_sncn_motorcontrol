@@ -168,7 +168,7 @@ void adc_ad7949(
                 current_limit = i_max_in * i_ratio_in;
                 break;
 
-        case i_adc[int i].get_all_measurements(unsigned int measurement_mode_in) -> {
+        case i_adc[int i].get_all_measurements() -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
@@ -285,86 +285,6 @@ void adc_ad7949(
 
                 break;
 
-//        case i_adc[int i].get_channel(unsigned short channel_config_in)-> {int out_a, int out_b}:
-////
-////                if (operational_mode==NORMAL_MODE)
-////                {
-////
-////                    ad7949_config = channel_config_in;
-////
-////                    configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-////
-////                    #pragma unsafe arrays
-////                    int bits[4];
-////
-////                    bits[0]=0x80808000;
-////                    if(ad7949_config & BIT13)
-////                        bits[0] |= 0x0000B300;
-////                    if(ad7949_config & BIT12)
-////                        bits[0] |= 0x00B30000;
-////                    if(ad7949_config & BIT11)
-////                        bits[0] |= 0xB3000000;
-////
-////                    bits[1]=0x80808080;
-////                    if(ad7949_config & BIT10)
-////                        bits[1] |= 0x000000B3;
-////                    if(ad7949_config & BIT09)
-////                        bits[1] |= 0x0000B300;
-////                    if(ad7949_config & BIT08)
-////                        bits[1] |= 0x00B30000;
-////                    if(ad7949_config & BIT07)
-////                        bits[1] |= 0xB3000000;
-////
-////                    bits[2]=0x80808080;
-////                    if(ad7949_config & BIT06)
-////                        bits[2] |= 0x000000B3;
-////                    if(ad7949_config & BIT05)
-////                        bits[2] |= 0x0000B300;
-////                    if(ad7949_config & BIT04)
-////                        bits[2] |= 0x00B30000;
-////                    if(ad7949_config & BIT03)
-////                        bits[2] |= 0xB3000000;
-////
-////                    bits[3]=0x00808080;
-////                    if(ad7949_config & BIT02)
-////                        bits[3] |= 0x000000B3;
-////                    if(ad7949_config & BIT01)
-////                        bits[3] |= 0x0000B300;
-////                    if(ad7949_config & BIT0)
-////                        bits[3] |= 0x00B30000;
-////
-////                    for(int i=0;i<=3;i++)
-////                    {
-////                        stop_clock(adc_ports.clk);
-////                        clearbuf(adc_ports.data_a);
-////                        clearbuf(adc_ports.data_b);
-////                        clearbuf(adc_ports.sclk_conv_mosib_mosia);
-////                        adc_ports.sclk_conv_mosib_mosia <: bits[0];
-////                        start_clock(adc_ports.clk);
-////
-////                        adc_ports.sclk_conv_mosib_mosia <: bits[1];
-////                        adc_ports.sclk_conv_mosib_mosia <: bits[2];
-////                        adc_ports.sclk_conv_mosib_mosia <: bits[3];
-////
-////                        sync(adc_ports.sclk_conv_mosib_mosia);
-////                        stop_clock(adc_ports.clk);
-////
-////                        configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-////
-////                        adc_ports.data_a :> data_raw_a;
-////                        adc_data_a[4] = convert(data_raw_a);
-////                        adc_ports.data_b :> data_raw_b;
-////                        adc_data_b[4] = convert(data_raw_b);
-////
-////                        configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-////                    }
-////
-////                    out_a = ((int) adc_data_a[4]);
-////                    out_b = ((int) adc_data_b[4]);
-////                }
-//
-//                break;
-
         case i_adc[int i].reset_faults():
                 I_b=0;
                 I_c=0;
@@ -455,72 +375,6 @@ void adc_ad7949(
                 OUT_A[j] = ((int) adc_data_a);
                 OUT_B[j] = ((int) adc_data_b);
             }
-
-//            t when timerafter (time_start + (7000)) :> void;
-//
-//            #pragma unsafe arrays
-//                int bits[4];
-//            bits[0]=0x80808000;
-//            if(adc_config_mot & BIT13)
-//                bits[0] |= 0x0000B300;
-//            if(adc_config_mot & BIT12)
-//                bits[0] |= 0x00B30000;
-//            if(adc_config_mot & BIT11)
-//                bits[0] |= 0xB3000000;
-//
-//            bits[1]=0x80808080;
-//            if(adc_config_mot & BIT10)
-//                bits[1] |= 0x000000B3;
-//            if(adc_config_mot & BIT09)
-//                bits[1] |= 0x0000B300;
-//            if(adc_config_mot & BIT08)
-//                bits[1] |= 0x00B30000;
-//            if(adc_config_mot & BIT07)
-//                bits[1] |= 0xB3000000;
-//
-//            bits[2]=0x80808080;
-//            if(adc_config_mot & BIT06)
-//                bits[2] |= 0x000000B3;
-//            if(adc_config_mot & BIT05)
-//                bits[2] |= 0x0000B300;
-//            if(adc_config_mot & BIT04)
-//                bits[2] |= 0x00B30000;
-//            if(adc_config_mot & BIT03)
-//                bits[2] |= 0xB3000000;
-//
-//            bits[3]=0x00808080;
-//            if(adc_config_mot & BIT02)
-//                bits[3] |= 0x000000B3;
-//            if(adc_config_mot & BIT01)
-//                bits[3] |= 0x0000B300;
-//            if(adc_config_mot & BIT0)
-//                bits[3] |= 0x00B30000;
-//
-//            for(int i=0;i<=3;i++)
-//            {
-//                stop_clock(adc_ports.clk);
-//                clearbuf(adc_ports.data_a);
-//                clearbuf(adc_ports.data_b);
-//                clearbuf(adc_ports.sclk_conv_mosib_mosia);
-//                adc_ports.sclk_conv_mosib_mosia <: bits[0];
-//                start_clock(adc_ports.clk);
-//
-//                adc_ports.sclk_conv_mosib_mosia <: bits[1];
-//                adc_ports.sclk_conv_mosib_mosia <: bits[2];
-//                adc_ports.sclk_conv_mosib_mosia <: bits[3];
-//
-//                sync(adc_ports.sclk_conv_mosib_mosia);
-//                stop_clock(adc_ports.clk);
-//
-//                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-//
-//                adc_ports.data_a :> data_raw_a;
-//                adc_data_a[4] = convert(data_raw_a);
-//                adc_ports.data_b :> data_raw_b;
-//                adc_data_b[4] = convert(data_raw_b);
-//
-//                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-//            }
 
             flag=0;
         }

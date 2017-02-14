@@ -144,6 +144,13 @@ void adc_ad7265(
         adc_ports.p32_data[1] :> inp_val;   // Get new input
     }
 
+
+    if(operational_mode)
+    {
+        channel_config[AD_7265_AI_SIGNAL_1_3] = AD7265_DIFF_A3A4_B3B4;
+        channel_config[AD_7265_AI_SIGNAL_2_4] = AD7265_DIFF_A3A4_B3B4;
+    }
+
     while(1)
     {
 #pragma ordered
@@ -164,18 +171,12 @@ void adc_ad7265(
 
                 break;
 
-        case iADC[int i].get_all_measurements(unsigned int measurement_mode_in) -> {
+        case iADC[int i].get_all_measurements() -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
             int analogue_input_b_1, int analogue_input_b_2,
             int fault_code_out}:
-
-            if(measurement_mode_in)
-            {
-                channel_config[AD_7265_AI_SIGNAL_1_3] = AD7265_DIFF_A3A4_B3B4;
-                channel_config[AD_7265_AI_SIGNAL_2_4] = AD7265_DIFF_A3A4_B3B4;
-            }
 
             adc_ports.p4_mux <: AD7265_SGL_A1_B1;       //mux_config;
             clearbuf( adc_ports.p32_data[0] );          //Clear the buffers used by the input ports.

@@ -27,7 +27,7 @@ void demo_adc(interface ADCInterface client i_adc)
     {
 
 
-        {ib, ic, vdc, idc, temperature, analogue_input_a1, analogue_input_a2,  analogue_input_b1, analogue_input_b2, fault_code} = i_adc.get_all_measurements(SINGLE_ENDED);
+        {ib, ic, vdc, idc, temperature, analogue_input_a1, analogue_input_a2,  analogue_input_b1, analogue_input_b2, fault_code} = i_adc.get_all_measurements();
 
         xscope_int(V_DC, vdc);
         xscope_int(I_DC, idc);
