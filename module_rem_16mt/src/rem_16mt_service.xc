@@ -51,10 +51,10 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 }
 
 #ifdef REM_16MT_USE_TIMESTAMP
-{ char, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports) {
+{ char, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, int ifm_usec) {
     unsigned int timestamp;
 #else
-{ char, int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports) {
+{ char, int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, int ifm_usec) {
 #endif
     char status;
     int count;
@@ -66,13 +66,13 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     timer t;
     unsigned last_read;
     t :> last_read;
-    last_read = last_read - 40*REM_16MT_USEC - 1;
+    last_read = last_read - 40*ifm_usec - 1;
 
     do {
-        t when timerafter(last_read + 40*REM_16MT_USEC) :> void;
+        t when timerafter(last_read + 40*ifm_usec) :> void;
         configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1); //set mosi to 1
         slave_select(*spi_ports.slave_select);
-        delay_ticks(10*REM_16MT_USEC); //wait for the data buffer to fill
+        delay_ticks(10*ifm_usec); //wait for the data buffer to fill
         count = spi_master_in_short(spi_ports.spi_interface);
         singleturn_filtered = spi_master_in_short(spi_ports.spi_interface);
         singleturn_raw = spi_master_in_short(spi_ports.spi_interface);
@@ -106,11 +106,11 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 }
 
 
-void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits)
+void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, int ifm_usec)
 {
     configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
     slave_select(*spi_ports.slave_select);
-    delay_ticks(100*REM_16MT_USEC);
+    delay_ticks(100*ifm_usec);
     spi_master_out_byte(spi_ports.spi_interface, opcode);
     if (data_bits == 8) {
         spi_master_out_byte(spi_ports.spi_interface, data);
@@ -121,7 +121,7 @@ void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits)
     }
     configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
     slave_deselect(*spi_ports.slave_select);
-    delay_ticks(200020*REM_16MT_USEC);
+    delay_ticks(200020*ifm_usec);
 
 }
 
@@ -129,39 +129,39 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 {
     int status;
 
-    delay_ticks(100*REM_16MT_USEC);
+    delay_ticks(100*config.ifm_usec);
     //reset
-    rem_16mt_write(spi_ports, REM_16MT_CTRL_RESET, 0, 0);
+    rem_16mt_write(spi_ports, REM_16MT_CTRL_RESET, 0, 0, config.ifm_usec);
     //read status
 #ifdef REM_16MT_USE_TIMESTAMP
-    { status, void, void, void, void } = rem_16mt_read(spi_ports);
+    { status, void, void, void, void } = rem_16mt_read(spi_ports, config.ifm_usec);
 #else
-    { status, void, void, void } = rem_16mt_read(spi_ports);
+    { status, void, void, void } = rem_16mt_read(spi_ports, config.ifm_usec);
 #endif
-    delay_ticks(100*REM_16MT_USEC);
+    delay_ticks(100*config.ifm_usec);
     if (status != 0)
         return status;
     //direction
-    if (config.polarity == REM_16MT_POLARITY_INVERTED)
-        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 1, 8);
+    if (config.polarity == INVERTED_POLARITY)
+        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 1, 8, config.ifm_usec);
     else
-        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 0, 8);
+        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 0, 8, config.ifm_usec);
     //offset
     config.offset &= (config.resolution-1);
     if (config.offset != 0) {
         int position, count, multiturn;
 #ifdef REM_16MT_USE_TIMESTAMP
-        { void, count, position, void, void } = rem_16mt_read(spi_ports); //read actual position
+        { void, count, position, void, void } = rem_16mt_read(spi_ports, config.ifm_usec); //read actual position
 #else
-        { void, count, position, void } = rem_16mt_read(spi_ports); //read actual position
+        { void, count, position, void } = rem_16mt_read(spi_ports, config.ifm_usec); //read actual position
 #endif
         if (count < 0) {
             multiturn = (count / config.resolution) - 1;
         } else {
             multiturn = (count / config.resolution);
         }
-        delay_ticks(100*REM_16MT_USEC);
-        rem_16mt_write(spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + ((position + config.offset) & 65535), 32); //write same multiturn and single + offset
+        delay_ticks(100*config.ifm_usec);
+        rem_16mt_write(spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + ((position + config.offset) & 65535), 32, config.ifm_usec); //write same multiturn and single + offset
     }
     //filter
     if (config.rem_16mt_config.filter == 1) {
@@ -171,316 +171,13 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
     } else if (config.rem_16mt_config.filter > 9) {
         config.rem_16mt_config.filter = 0x09;
     }
-    rem_16mt_write(spi_ports, REM_16MT_CONF_FILTER, config.rem_16mt_config.filter, 8);
+    rem_16mt_write(spi_ports, REM_16MT_CONF_FILTER, config.rem_16mt_config.filter, 8, config.ifm_usec);
     //read status
 #ifdef REM_16MT_USE_TIMESTAMP
-    { status, void, void, void, void } = rem_16mt_read(spi_ports);
+    { status, void, void, void, void } = rem_16mt_read(spi_ports, config.ifm_usec);
 #else
-    { status, void, void, void } = rem_16mt_read(spi_ports);
+    { status, void, void, void } = rem_16mt_read(spi_ports, config.ifm_usec);
 #endif
-    delay_ticks(100*REM_16MT_USEC);
+    delay_ticks(100*config.ifm_usec);
     return status;
 }
-
-#if 0
- void rem_16mt_service(SPIPorts &spi_ports, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
-{
-    if (REM_16MT_USEC == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-    }
-
-    //init sensor
-    init_spi_ports(spi_ports);
-    int init_status = rem_16mt_init(spi_ports, position_feedback_config);
-    if (init_status) {
-        delay_ticks(200000*REM_16MT_USEC);
-        init_status = rem_16mt_init(spi_ports, position_feedback_config);
-        if (init_status) {
-            printstr("Error with REM_16MT sensor initialization");
-            printintln(init_status);
-        }
-    }
-
-#ifdef DEBUG_POSITION_FEEDBACK
-    printstr(start_message);
-    printstrln("REM_16MT");
-#endif
-
-    //init variables
-    //velocity
-    int velocity = 0;
-    int velocity_buffer[8] = {0};
-    int index = 0;
-    int old_count = 0;
-    int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-    int velocity_loop = position_feedback_config.rem_16mt_config.velocity_loop * REM_16MT_USEC; //velocity loop time in clock ticks
-    int velocity_count = 0;
-    //position
-    unsigned int last_position = 0;
-    int count = 0;
-    //timing
-    timer t;
-    unsigned int next_velocity_read = 0;
-    unsigned int last_read = 0;
-#ifndef REM_16MT_USE_TIMESTAMP
-    unsigned int last_velocity_read = 0;
-#endif
-
-    int notification = MOTCTRL_NTF_EMPTY;
-
-    //debug
-    int actual_velocity = 0;
-    int actual_count = 0;
-    unsigned int actual_position = 0;
-    unsigned int actual_angle = 0;
-    unsigned int measurement_time = 0;
-    unsigned int start_time, end_time;
-//    unsigned int period_time = 0;
-
-    //first read
-    delay_ticks(100 * REM_16MT_USEC);
-#ifdef REM_16MT_USE_TIMESTAMP
-    unsigned int old_timestamp = 0;
-    int timediff_long = 0;
-    { void, count, last_position, void, void } = rem_16mt_read(spi_ports);
-#else
-    { void, count, last_position, void } = rem_16mt_read(spi_ports);
-#endif
-    t :> last_read;
-
-    //main loop
-    int loop_flag = 1;
-    while (loop_flag) {
-        select {
-        case i_position_feedback[int i].get_notification() -> int out_notification:
-                out_notification = notification;
-                break;
-
-        //send electrical angle for commutation
-        case i_position_feedback[int i].get_angle() -> unsigned int angle:
-                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
-#ifdef REM_16MT_USE_TIMESTAMP
-                { void, count, last_position, angle, void } = rem_16mt_read(spi_ports);
-#else
-                { void, count, last_position, angle } = rem_16mt_read(spi_ports);
-#endif
-                t :> last_read;
-                angle = (position_feedback_config.pole_pairs * (angle >> 4) ) & 4095;
-                break;
-
-        //send multiturn count and position
-        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position }:
-                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
-#ifdef REM_16MT_USE_TIMESTAMP
-                { void, count, position, void, void } = rem_16mt_read(spi_ports);
-#else
-                { void, count, position, void } = rem_16mt_read(spi_ports);
-#endif
-                t :> last_read;
-                last_position = position;
-                out_count = count;
-                break;
-
-        //send position
-        case i_position_feedback[int i].get_real_position() -> { int out_count, unsigned int position, unsigned int status }:
-                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
-                unsigned start_time;
-                t :> start_time;
-#ifdef REM_16MT_USE_TIMESTAMP
-                { status, out_count, position, void, void } = rem_16mt_read(spi_ports);
-#else
-                { status, out_count, position, void } = rem_16mt_read(spi_ports);
-#endif
-                t :> last_read;
-//                status = (last_read-start_time)/REM_16MT_USEC;
-//                status = measurement_time;
-                last_position = position;
-                break;
-
-        //send velocity
-        case i_position_feedback[int i].get_velocity() -> int out_velocity:
-                out_velocity = velocity;
-                break;
-
-        //send ticks per turn
-        case i_position_feedback[int i].get_ticks_per_turn() -> unsigned int out_ticks_per_turn:
-                out_ticks_per_turn = position_feedback_config.resolution;
-                break;
-
-        //receive new rem_16mt_config
-        case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
-                position_feedback_config = in_config;
-                rem_16mt_init(spi_ports, position_feedback_config); //init with new config
-                //update variables which depend on rem_16mt_config
-                crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-                velocity_loop = position_feedback_config.rem_16mt_config.velocity_loop * REM_16MT_USEC;
-
-                notification = MOTCTRL_NTF_CONFIG_CHANGED;
-                // TODO: Use a constant for the number of interfaces
-                for (int i = 0; i < 3; i++) {
-                    i_position_feedback[i].notification();
-                }
-
-                t :> last_read;
-                break;
-
-        //send rem_16mt_config
-        case i_position_feedback[int i].get_config() -> PositionFeedbackConfig out_config:
-                out_config = position_feedback_config;
-                break;
-
-        //receive the new count to set
-        case i_position_feedback[int i].set_position(int new_count):
-                int multiturn;
-                unsigned int singleturn;
-                if (new_count < 0) {
-                    multiturn = (new_count / position_feedback_config.resolution) - 1;
-                    singleturn = position_feedback_config.resolution + new_count % position_feedback_config.resolution;
-                } else {
-                    multiturn = (new_count / position_feedback_config.resolution);
-                    singleturn = new_count % position_feedback_config.resolution;
-                }
-                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
-                rem_16mt_write(spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + singleturn, 32);
-                last_position = singleturn;
-                t :> last_read;
-                count = new_count;
-                break;
-
-        //receive the new electrical angle to set the offset accordingly
-        case i_position_feedback[int i].set_angle(unsigned int new_angle) -> unsigned int out_offset:
-                new_angle = (new_angle << 4);
-                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
-                rem_16mt_write(spi_ports, REM_16MT_CTRL_RESET, 0, 0);//reset
-                int real_position;
-#ifdef REM_16MT_USE_TIMESTAMP
-                { void, void, real_position, void, void } = rem_16mt_read(spi_ports);
-                delay_ticks(position_feedback_config.rem_16mt_config.timeout);
-                rem_16mt_write(spi_ports, REM_16MT_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
-                { void, void, out_offset, void, void } = rem_16mt_read(spi_ports);
-#else
-                { void, void, real_position, void } = rem_16mt_read(spi_ports);
-                delay_ticks(position_feedback_config.rem_16mt_config.timeout);
-                rem_16mt_write(spi_ports, REM_16MT_CONF_STPRESET, new_angle / position_feedback_config.pole_pairs, 16);
-                { void, void, out_offset, void } = rem_16mt_read(spi_ports);
-#endif
-                t :> last_read;
-                out_offset = (out_offset - real_position) & (position_feedback_config.resolution-1);
-                position_feedback_config.offset = out_offset;
-                break;
-
-        //execute command
-        case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
-                t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
-                rem_16mt_write(spi_ports, opcode, data, data_bits);
-#ifdef REM_16MT_USE_TIMESTAMP
-                { status, void, void, void, void } = rem_16mt_read(spi_ports);
-#else
-                { status, void, void, void } = rem_16mt_read(spi_ports);
-#endif
-                t :> last_read;
-                break;
-
-        case i_position_feedback[int i].exit():
-                reset_spi_ports(spi_ports);
-                loop_flag = 0;
-                continue;
-
-        //gpio read
-        case i_position_feedback[int i].gpio_read(int gpio_number) -> int out_value:
-                break;
-        //gpio_write
-        case i_position_feedback[int i].gpio_write(int gpio_number, int in_value):
-                break;
-
-        //compute velocity
-        case t when timerafter(next_velocity_read) :> start_time:
-            next_velocity_read += velocity_loop;
-            int position, difference;
-            unsigned int angle, status;
-            t when timerafter(last_read + position_feedback_config.rem_16mt_config.timeout) :> void;
-#ifdef REM_16MT_USE_TIMESTAMP
-            unsigned int timestamp;
-            { status, count, position, angle, timestamp } = rem_16mt_read(spi_ports);
-#else
-            { status, count, position, angle } = rem_16mt_read(spi_ports);
-#endif
-            t :> last_read;
-            last_position = position;
-
-            velocity_count++;
-#ifdef REM_16MT_USE_TIMESTAMP
-            //timestamp difference
-            char timediff = (char)timestamp-(char)old_timestamp;
-            old_timestamp = timestamp;
-
-            //velocity 8 samples (424us), average filter 8
-            timediff_long += timediff;
-            if (velocity_count >= 8) {
-                difference = count - old_count;
-                old_count = count;
-                if (timediff_long != 0 && difference < crossover && difference > -crossover) {
-                    velocity = (difference * (60000000/timediff_long)) / position_feedback_config.resolution;
-                    velocity = filter(velocity_buffer, index, 8, velocity);
-                }
-                timediff_long = 0;
-                velocity_count = 0;
-            }
-#else
-            if (velocity_count >= 8) {
-                difference = count - old_count;
-                old_count = count;
-                if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
-                    velocity = (difference * (60000000/((int)(last_read-last_velocity_read)/REM_16MT_USEC))) / position_feedback_config.resolution;
-                    velocity = filter(velocity_buffer, index, 8, velocity);
-                }
-                last_velocity_read = last_read;
-                velocity_count = 0;
-            }
-#endif
-
-#ifdef XSCOPE_REM_16MT
-            xscope_int(VELOCITY, velocity);
-            xscope_int(POSITION, count);
-            xscope_int(POSITION_RAW, angle);
-            xscope_int(STATUS, status*1000);
-#ifdef REM_16MT_USE_TIMESTAMP
-            xscope_int(TIMESTAMP, timediff);
-#endif
-//            xscope_int(PERIOD, (int)(last_read-period_time)/REM_16MT_USEC);
-//            period_time = last_read;
-#endif
-
-
-            angle = (position_feedback_config.pole_pairs * (angle >> 4) ) & 4095;
-
-            if (!isnull(i_shared_memory)) {
-                if (position_feedback_config.enable_push_service == PushAll) {
-                    i_shared_memory.write_angle_velocity_position(angle, velocity, count);
-                    actual_count = count;
-                    actual_velocity = velocity;
-                    actual_angle = angle;
-                    actual_position = position;
-                } else if (position_feedback_config.enable_push_service == PushAngle) {
-                    i_shared_memory.write_angle_and_hall(angle, 0);
-                    actual_angle = angle;
-                } else if (position_feedback_config.enable_push_service == PushPosition) {
-                    i_shared_memory.write_velocity_position(velocity, count);
-                    actual_count = count;
-                    actual_velocity = velocity;
-                    actual_position = position;
-                }
-            }
-            t :> end_time;
-
-            measurement_time = (end_time-start_time)/REM_16MT_USEC;
-
-            //to prevent blocking
-            if (timeafter(end_time, next_velocity_read))
-                next_velocity_read = end_time + REM_16MT_USEC;
-            break;
-        }
-    }
-}
-#endif
-

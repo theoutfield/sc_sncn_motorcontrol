@@ -161,57 +161,6 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
 }
 
 
-void position_limiter(interface TuningInterface server i_tuning, client interface MotorcontrolInterface i_motorcontrol)
-{
-    timer t;
-    unsigned ts;
-    t :> ts;
-    int position_limit = 0;
-    int print_position_limit = 0;
-    int count = 0;
-    int velocity = 0;
-
-    while(1) {
-        select {
-        case t when timerafter(ts) :> void:
-
-            count = i_motorcontrol.get_position_actual();
-            velocity = i_motorcontrol.get_velocity_actual();
-
-            //postion limiter
-            if (position_limit > 0) {
-                if (count >= position_limit && velocity > 10) {
-                    i_motorcontrol.set_torque(0);
-                    if (print_position_limit >= 0) {
-                        print_position_limit = -1;
-                        printf("up limit reached\n");
-                    }
-                } else if (count <= -position_limit && velocity < -10) {
-                    i_motorcontrol.set_torque(0);
-                    if (print_position_limit <= 0) {
-                        print_position_limit = 1;
-                        printf("down limit reached\n");
-                    }
-                }
-            }
-            t :> ts;
-            ts += USEC_STD * 1000;
-            break;
-
-        case i_tuning.set_limit(int in_limit):
-            if (in_limit < 0) {
-                position_limit = in_limit;
-                printf("Position limit disabled\n");
-            } else if (in_limit > 0) {
-                printf("Position limited to %d ticks\n", in_limit);
-                position_limit = in_limit;
-            }
-            break;
-
-        }//end select
-    }//end while
-}//end function
-
 /*
  * The following function shows how to work with torque controller.
  * It is able to:

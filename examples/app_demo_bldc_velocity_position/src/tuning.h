@@ -17,9 +17,7 @@
 #include <position_ctrl_service.h>
 
 #include <xscope.h>
-//#include <bldc_motor_config.h>
 #include <mc_internal_constants.h>
-#include <user_config.h>
 
 interface PositionLimiterInterface {
     void set_limit(int limit);

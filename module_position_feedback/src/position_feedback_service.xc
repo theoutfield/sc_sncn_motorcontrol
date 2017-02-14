@@ -7,6 +7,7 @@
 
 #include <position_feedback_service.h>
 #include <serial_encoder_service.h>
+#include <refclk.h>
 #include <print.h>
 #include <xclib.h>
 #include <xs1.h>
@@ -76,7 +77,7 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
                 break;
 
         //gpio
-        case t when timerafter(ts + (1000*IFM_TILE_USEC)) :> ts:
+        case t when timerafter(ts + (1000*position_feedback_config.ifm_usec)) :> ts:
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
                 break;
         }

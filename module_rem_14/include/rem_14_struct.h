@@ -7,10 +7,6 @@
 
 #pragma once
 
-#include <user_config.h>
-
-#define REM_14_USEC            IFM_TILE_USEC
-
 #define REM_14_SENSOR      5
 
 #define ERROR       0
@@ -22,9 +18,6 @@
 #define REM_14_SENSOR_TYPE AS5047
 
 #define SPI_MASTER_MODE 1
-
-#define REM_14_POLARITY_NORMAL      1
-#define REM_14_POLARITY_INVERTED    -1
 
 #define REM_14_PWM_OFF     0
 #define REM_14_PWM_ON      1
@@ -43,6 +36,9 @@
 
 #define REM_14_NOISE_NORMAL    0
 #define REM_14_NOISE_REDUCED   1
+
+#define REM_14_SENSOR_EXECUTING_TIME 2       // 1us / 2 = 0.5 us
+#define REM_14_SENSOR_SAVING_TIME    5       // 1us / 5 = 0.2 us
 
 typedef enum {
     REM_14_HYS_11BIT_3LSB = 0,
