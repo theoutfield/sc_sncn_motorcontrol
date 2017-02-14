@@ -109,11 +109,12 @@ int main() {
                 position_feedback_config.polarity    = FEEDBACK_SENSOR_POLARITY;
                 position_feedback_config.pole_pairs  = POLE_PAIRS;
                 position_feedback_config.resolution  = FEEDBACK_SENSOR_RESOLUTION;
+                position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
+                position_feedback_config.velocity_compute_period   = FEEDBACK_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
-                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
-                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT;
                 position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                 position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
@@ -122,8 +123,8 @@ int main() {
                 position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
                 position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
                 position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-                position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
-                position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
+                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
+                position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT;
 
                 position_feedback_service(null, qei_hall_port_2, hall_enc_select_port, spi_ports, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

@@ -10,6 +10,7 @@
  */
 //libs
 #include <position_feedback_service.h>
+#include <user_config.h>
 #include <ctype.h>
 #include <stdio.h>
 
@@ -145,6 +146,8 @@ int main(void)
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.polarity    = 1;
                 position_feedback_config.pole_pairs  = 2;
+                position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
@@ -156,17 +159,10 @@ int main(void)
                 position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
                 position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
                 position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-                position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
-                position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
                 position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
                 position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT;
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
-                position_feedback_config.rem_16mt_config.timeout = REM_16MT_TIMEOUT;
-                position_feedback_config.rem_16mt_config.velocity_loop = REM_16MT_VELOCITY_LOOP;
-
-                position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
-                position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
 
                 position_feedback_config.rem_14_config.factory_settings = 1;
                 position_feedback_config.rem_14_config.hysteresis = 1;
@@ -176,9 +172,9 @@ int main(void)
                 position_feedback_config.rem_14_config.data_select = 0;
                 position_feedback_config.rem_14_config.pwm_on = REM_14_PWM_OFF;
                 position_feedback_config.rem_14_config.abi_resolution = 0;
-                position_feedback_config.rem_14_config.max_ticks = 0x7fffffff;
-                position_feedback_config.rem_14_config.cache_time = REM_14_CACHE_TIME;
-                position_feedback_config.rem_14_config.velocity_loop = REM_14_VELOCITY_LOOP;
+
+                position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
+                position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
 
                 position_feedback_config.gpio_config[0] = GPIO_INPUT_PULLDOWN;
                 position_feedback_config.gpio_config[1] = GPIO_OUTPUT;
@@ -191,10 +187,12 @@ int main(void)
                 //set sensor 1 parameters
                 position_feedback_config.sensor_type = HALL_SENSOR;
                 position_feedback_config.resolution  = 8192;
+                position_feedback_config.velocity_compute_period   = 1000;
 
                 //set sensor 1 parameters
                 position_feedback_config_2.sensor_type = BISS_SENSOR;
-                position_feedback_config_2.resolution  = 8192;
+                position_feedback_config_2.resolution  = (1<<BISS_SINGLETURN_RESOLUTION);
+                position_feedback_config.velocity_compute_period   = BISS_VELOCITY_COMPUTE_PERIOD;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

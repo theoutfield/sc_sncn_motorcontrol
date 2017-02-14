@@ -206,9 +206,9 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
             //set velocity loop time
         case 'l':
             position_feedback_config = i_position_feedback.get_config();
-            position_feedback_config.rem_16mt_config.velocity_loop = value;
+            position_feedback_config.velocity_compute_period = value;
             i_position_feedback.set_config(position_feedback_config);
-            printf("velocity loop time %dus\n", position_feedback_config.rem_16mt_config.velocity_loop);
+            printf("velocity loop time %dus\n", position_feedback_config.velocity_compute_period);
             break;
             //print the count and the time to get it
         default:
@@ -319,12 +319,13 @@ int main(void)
                 position_feedback_config.polarity    = COMMUTATION_SENSOR_POLARITY;
                 position_feedback_config.pole_pairs  = POLE_PAIRS;
                 position_feedback_config.resolution  = 65536;
+                position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
+                position_feedback_config.velocity_compute_period   = REM_16MT_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
-                position_feedback_config.rem_16mt_config.timeout = REM_16MT_TIMEOUT;
-                position_feedback_config.rem_16mt_config.velocity_loop = REM_16MT_VELOCITY_LOOP;
 
                 position_feedback_service(null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

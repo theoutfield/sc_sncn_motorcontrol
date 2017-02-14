@@ -40,6 +40,9 @@ typedef struct {
     int resolution; /**< number of ticks per turn >*/
     int offset;     /**< position offset in ticks, can be singleturn or multiturn depending on the sensor >*/
     int enable_push_service; /**< Select which data to push to shared memory >*/
+    int ifm_usec;   /**< number of clock ticks in a microsecond >*/
+    int velocity_compute_period; /**< velocity compute period in microsecond. Is also the polling period to write to the shared memory >*/
+    int max_ticks; /**< reset multiturn to 0 when reached >*/
     BISSConfig biss_config;
     REM_16MTConfig rem_16mt_config;
     REM_14Config rem_14_config;
@@ -122,6 +125,8 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
 int tickstobits(uint32_t ticks);
 
 void multiturn(int &count, int last_position, int position, int ticks_per_turn);
+
+void switch_ifm_freq(PositionFeedbackConfig &position_feedback_config);
 
 void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int enable_push_service, int count, int velocity, int angle, int hall_state);
 

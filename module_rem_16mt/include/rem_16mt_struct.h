@@ -36,11 +36,5 @@
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    int timeout;                /**< timeout after a read (in clock ticks) */
-
-    int velocity_loop;          /**< Velcity loop time in microseconds */
-
-    int max_ticks;              /**< The count is reset to 0 if greater than this */
-
     int filter;                 /**< filter parameter for rem_16mtt encoder */
 } REM_16MTConfig;
