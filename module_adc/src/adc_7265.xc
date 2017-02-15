@@ -13,7 +13,6 @@
  **/
 
 #include "adc_7265.h"
-#include <protection.h>
 //#include <xscope.h>
 #include <motor_control_interfaces.h>
 
