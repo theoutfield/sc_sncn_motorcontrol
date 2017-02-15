@@ -8,11 +8,11 @@
 #include <stdint.h>
 #include <xclib.h>
 #include <refclk.h>
-#include <print.h>
 #include <adc_ad7949.h>
-#include <xscope.h>
 
-
+/**
+ * @brief Define bit masks to distinguish if a single bit is 0/1 in a 14 bit binary variable.
+ */
 #define BIT13 0x00002000
 #define BIT12 0x00001000
 #define BIT11 0x00000800
@@ -28,6 +28,16 @@
 #define BIT01 0x00000002
 #define BIT0  0x00000001
 
+/**
+ * @brief Configure all ADC data ports
+ *
+ * @param clk                       XMOS internal clock
+ * @param p_sclk_conv_mosib_mosia   32-bit buffered port to commiunicate with AD7949 through SPI
+ * @param p_data_a                  32-bit buffered port to recieve the data from AD7949
+ * @param p_data_b                  32-bit buffered port to recieve the data from AD7949
+ *
+ * @return void
+ */
 static void configure_adc_ports(
         clock clk,
         buffered out port:32 p_sclk_conv_mosib_mosia,
@@ -45,7 +55,13 @@ static void configure_adc_ports(
     start_clock(clk);
 }
 
-
+/**
+ * @brief Convert the output (serial) data of the adc in to unsigned value
+ *
+ * @param raw       Type unsigned value which is sent from AD7949 through SPI communication
+ *
+ * @return unsigned Converted Digital value of AD7949
+ */
 static inline unsigned convert(unsigned raw)
 {
     unsigned int data;
@@ -71,7 +87,17 @@ static inline unsigned convert(unsigned raw)
     return data;
 }
 
-
+/**
+ * @brief Service to sample analogue inputs of ADC module
+ *
+ * @param iADC[2]               Interface to communicate with clients and send the measured values
+ * @param adc_ports             Structure type to manage the AD7949 ADC chip.
+ * @param current_sensor_config Structure type to calculate the proper sign (positive/negative) of sampled phase currents
+ * @param i_watchdog            Interface to communicate with watchdog service
+ * @param operational_mode      Reserved
+ *
+ * @return void
+ */
 void adc_ad7949(
         interface ADCInterface server i_adc[2],
         AD7949Ports &adc_ports,
@@ -79,7 +105,7 @@ void adc_ad7949(
         interface WatchdogInterface client ?i_watchdog, int operational_mode)
 {
     timer t;
-    unsigned int time, time_start=0;
+    unsigned int time;
 
     /*
      * Configuration Register Description
@@ -100,9 +126,7 @@ void adc_ad7949(
      *  02      SEQ     Channel sequencer. Allows for scanning channels in an IN0 to IN[7:0] fashion.
      *  01      SEQ     Channel sequencer
      *  00      RB      Read back the CFG register.
-     */
-
-    /*
+     *
      * Initialize the "Configuration Register":
      *
      * Overwrite configuration update | unipolar, referenced to GND | Motor current (ADC Channel IN0)| full Bandwidth | Internal reference, REF = 4,096V, temp enabled;
@@ -114,7 +138,6 @@ void adc_ad7949(
     const unsigned int adc_config_mot=   0b11110001001001;
     unsigned int ad7949_config       =   0b11110001001001;
 
-
     unsigned int adc_data_a=0;
     unsigned int adc_data_b=0;
 
@@ -123,7 +146,6 @@ void adc_ad7949(
 
     int OUT_A[4], OUT_B[4];
     int j=0;
-    int selected_channel=adc_config_mot;
 
     const unsigned int channel_config[4] = {
             AD7949_CHANNEL_0,   // ADC Channel 2, unipolar, referenced to GND voltage and current
@@ -133,7 +155,7 @@ void adc_ad7949(
 
     int i_calib_a = 10002, i_calib_b = 10002;
 
-    int flag=0;
+    int data_updated=0;
 
     int V_dc=0;
     int I_dc=0;
@@ -143,7 +165,7 @@ void adc_ad7949(
 
     int v_dc_max=100;
     int v_dc_min=0;
-    int current_limit = 2000;
+    int current_limit = 100;
     int fault_code=NO_FAULT;
 
     //proper task startup
@@ -175,131 +197,110 @@ void adc_ad7949(
             int analogue_input_b_1, int analogue_input_b_2,
             int fault_code_out}:
 
-                t:> time_start;
-
-                /* Reading/Writing after conversion (RAC)
-                   Read previous conversion result
-                   Write CFG for next conversion */
-
-                // CONGIG__other_n1     CFG_Imotx_x1       |CONGIG__other_n2     CFG_Imotx_x2     |CONGIG__other_n3     CFG_Imotx_x3       |
-                // CONVERT_null         CONVERT_other_n1   |CONVERT_Imot_x1      CONVERT_other_n2 |CONVERT_Imot_x2      CONVERT_other_n3   |
-                // READOUT_null         READOUT_other_null |READOUT_other_n1     READOUT_Imot_x1  |READOUT_other_n2     READOUT_Imot_x2    |
-                // -----------
-                // iIndexADC        0           1                  2                  3
-                // readout       extern     temperature     current-voltage         extern
-
-                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+            configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
 #pragma unsafe arrays
-                int bits[4];
+            int bits[4];
 
-                bits[0]=0x80808000;
-                if(adc_config_mot & BIT13)
-                    bits[0] |= 0x0000B300;
-                if(adc_config_mot & BIT12)
-                    bits[0] |= 0x00B30000;
-                if(adc_config_mot & BIT11)
-                    bits[0] |= 0xB3000000;
+            bits[0]=0x80808000;
+            if(adc_config_mot & BIT13)
+                bits[0] |= 0x0000B300;
+            if(adc_config_mot & BIT12)
+                bits[0] |= 0x00B30000;
+            if(adc_config_mot & BIT11)
+                bits[0] |= 0xB3000000;
 
-                bits[1]=0x80808080;
-                if(adc_config_mot & BIT10)
-                    bits[1] |= 0x000000B3;
-                if(adc_config_mot & BIT09)
-                    bits[1] |= 0x0000B300;
-                if(adc_config_mot & BIT08)
-                    bits[1] |= 0x00B30000;
-                if(adc_config_mot & BIT07)
-                    bits[1] |= 0xB3000000;
+            bits[1]=0x80808080;
+            if(adc_config_mot & BIT10)
+                bits[1] |= 0x000000B3;
+            if(adc_config_mot & BIT09)
+                bits[1] |= 0x0000B300;
+            if(adc_config_mot & BIT08)
+                bits[1] |= 0x00B30000;
+            if(adc_config_mot & BIT07)
+                bits[1] |= 0xB3000000;
 
-                bits[2]=0x80808080;
-                if(adc_config_mot & BIT06)
-                    bits[2] |= 0x000000B3;
-                if(adc_config_mot & BIT05)
-                    bits[2] |= 0x0000B300;
-                if(adc_config_mot & BIT04)
-                    bits[2] |= 0x00B30000;
-                if(adc_config_mot & BIT03)
-                    bits[2] |= 0xB3000000;
+            bits[2]=0x80808080;
+            if(adc_config_mot & BIT06)
+                bits[2] |= 0x000000B3;
+            if(adc_config_mot & BIT05)
+                bits[2] |= 0x0000B300;
+            if(adc_config_mot & BIT04)
+                bits[2] |= 0x00B30000;
+            if(adc_config_mot & BIT03)
+                bits[2] |= 0xB3000000;
 
-                bits[3]=0x00808080;
-                if(adc_config_mot & BIT02)
-                    bits[3] |= 0x000000B3;
-                if(adc_config_mot & BIT01)
-                    bits[3] |= 0x0000B300;
-                if(adc_config_mot & BIT0)
-                    bits[3] |= 0x00B30000;
+            bits[3]=0x00808080;
+            if(adc_config_mot & BIT02)
+                bits[3] |= 0x000000B3;
+            if(adc_config_mot & BIT01)
+                bits[3] |= 0x0000B300;
+            if(adc_config_mot & BIT0)
+                bits[3] |= 0x00B30000;
 
-                stop_clock(adc_ports.clk);
-                clearbuf(adc_ports.data_a);
-                clearbuf(adc_ports.data_b);
-                clearbuf(adc_ports.sclk_conv_mosib_mosia);
-                adc_ports.sclk_conv_mosib_mosia <: bits[0];
-                start_clock(adc_ports.clk);
+            stop_clock(adc_ports.clk);
+            clearbuf(adc_ports.data_a);
+            clearbuf(adc_ports.data_b);
+            clearbuf(adc_ports.sclk_conv_mosib_mosia);
+            adc_ports.sclk_conv_mosib_mosia <: bits[0];
+            start_clock(adc_ports.clk);
 
-                adc_ports.sclk_conv_mosib_mosia <: bits[1];
-                adc_ports.sclk_conv_mosib_mosia <: bits[2];
-                adc_ports.sclk_conv_mosib_mosia <: bits[3];
+            adc_ports.sclk_conv_mosib_mosia <: bits[1];
+            adc_ports.sclk_conv_mosib_mosia <: bits[2];
+            adc_ports.sclk_conv_mosib_mosia <: bits[3];
 
-                sync(adc_ports.sclk_conv_mosib_mosia);
-                stop_clock(adc_ports.clk);
+            sync(adc_ports.sclk_conv_mosib_mosia);
+            stop_clock(adc_ports.clk);
 
-                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+            configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-                adc_ports.data_a :> data_raw_a;
-                adc_data_a = convert(data_raw_a);
-                adc_ports.data_b :> data_raw_b;
-                adc_data_b = convert(data_raw_b);
+            adc_ports.data_a :> data_raw_a;
+            adc_data_a = convert(data_raw_a);
+            adc_ports.data_b :> data_raw_b;
+            adc_data_b = convert(data_raw_b);
 
-                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+            configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-                phaseB_out = (current_sensor_config.sign_phase_b * (((int) adc_data_a) - i_calib_a))/20;
-                phaseC_out = (current_sensor_config.sign_phase_c * (((int) adc_data_b) - i_calib_b))/20;
+            phaseB_out = (current_sensor_config.sign_phase_b * (((int) adc_data_a) - i_calib_a))/20;
+            phaseC_out = (current_sensor_config.sign_phase_c * (((int) adc_data_b) - i_calib_b))/20;
 
-                I_b = phaseB_out;
-                I_c = phaseC_out;
+            I_b = phaseB_out;
+            I_c = phaseC_out;
 
-                if( I_b<(-current_limit) || current_limit<I_b)
-                {
-                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
-                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
-                }
+            if( I_b<(-current_limit) || current_limit<I_b)
+            {
+                i_watchdog.protect(OVER_CURRENT_PHASE_B);
+                if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
+            }
 
-                if( I_c<(-current_limit) || current_limit<I_c)
-                {
-                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
-                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
-                }
+            if( I_c<(-current_limit) || current_limit<I_c)
+            {
+                i_watchdog.protect(OVER_CURRENT_PHASE_C);
+                if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
+            }
 
-                V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT];
-                I_dc_out=OUT_B[AD_7949_VMOT_DIV_I_MOT];
-
-                analogue_input_a_1 = OUT_A[AD_7949_EXT_A0_N_EXT_A1_N];
-                analogue_input_b_1 = OUT_B[AD_7949_EXT_A0_N_EXT_A1_N];
-
-                analogue_input_a_2 = OUT_A[AD_7949_EXT_A0_P_EXT_A1_P];
-                analogue_input_b_2 = OUT_B[AD_7949_EXT_A0_P_EXT_A1_P];
-
-                fault_code_out=fault_code;
-
-                flag=1;
-
-                break;
+            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT];
+            I_dc_out=OUT_B[AD_7949_VMOT_DIV_I_MOT];
+            analogue_input_a_1 = OUT_A[AD_7949_EXT_A0_N_EXT_A1_N];
+            analogue_input_b_1 = OUT_B[AD_7949_EXT_A0_N_EXT_A1_N];
+            analogue_input_a_2 = OUT_A[AD_7949_EXT_A0_P_EXT_A1_P];
+            analogue_input_b_2 = OUT_B[AD_7949_EXT_A0_P_EXT_A1_P];
+            fault_code_out=fault_code;
+            data_updated=1;
+            break;
 
         case i_adc[int i].reset_faults():
                 I_b=0;
                 I_c=0;
-
                 fault_code=NO_FAULT;
-                flag=0;
-
+                data_updated=0;
                 i_watchdog.reset_faults();
                 break;
         default:
             break;
         }
 
-
-        if(flag==1)
+        if(data_updated==1)
         {
             for(j=AD_7949_EXT_A0_P_EXT_A1_P;AD_7949_IB_IC<=j;j--)
             {
@@ -307,7 +308,7 @@ void adc_ad7949(
 
                 configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
-                #pragma unsafe arrays
+#pragma unsafe arrays
                 int bits[4];
 
                 bits[0]=0x80808000;
@@ -375,8 +376,7 @@ void adc_ad7949(
                 OUT_A[j] = ((int) adc_data_a);
                 OUT_B[j] = ((int) adc_data_b);
             }
-
-            flag=0;
+            data_updated=0;
         }
     }
 }
