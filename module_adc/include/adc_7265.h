@@ -15,28 +15,18 @@
 #pragma once
 
 #include <xs1.h>
-#include <xclib.h> // NB Contains bitrev()
+#include <xclib.h>
 #include <assert.h>
-#include <print.h>
 #include <adc_service.h>
 
-interface ADC{
-    {int, int} get_adc_measurements(unsigned char port_id, unsigned char config);
-};
-
 /*  The AD7265 data-sheet refers to the following signals:-
- *      SCLK:               Serial Clock frequency (can be configured to between  4..16 MHz.)
- *      CS#:                Chip Select. Ready signal (Falling edge starts sample conversion)
+ *      SCLK:           Serial Clock frequency (can be configured to between  4..16 MHz.)
+ *      CS#:            Chip Select. Ready signal (Falling edge starts sample conversion)
  *      A[0..2]:        Multiplexer Select. Selects inputs to be sampled.
  *      SGL/DIFF:       Selects between Single-ended/Differential mode.
  *      RANGE:          Selects between 0..Vref and 0..2xVref.
  *      Vdrive:         Max. analogue voltage corresponding to Max. 12-bit sample (Hardwired to 3.3V)
  *      REF_SELECT: Selects internal/external ref. (Hardwired to 2.5V internal)
- *
- *  The Motor-Control Board has been hardwired for differential mode.
- *  There are 2 jumper settings for controlling the following signals:-
- *      SGL/DIFF:       Should be set to 0 for Differential mode.
- *      RANGE:          Should be set to 0 for 0..Vref range.
  *
  *  The S/W application needs to set A[0..2].
  *  In differential mode (SGl/DIFF = 0):
@@ -57,45 +47,69 @@ interface ADC{
  *      16                 2               2
  */
 
-#define ADC_PRE_PAD_BITS 2 // 0..2 No. of pre-padding bits before Most-Significant active bit of sample
-#define ADC_ACTIVE_BITS 12 // No. of active bits in ADC Sample
-#define ADC_POST_PAD_BITS 0 // 0..2 No. of post-padding bits after Least-Significant active bit of sample
-#define ADC_MIN_BITS (ADC_ACTIVE_BITS + ADC_PRE_PAD_BITS) // Minimum No. of bits to transmit in ADC sample (including pre-padding bits)
-
-/* Temperature */
-#define ADC_VALUE_0_DEGREES 1640     //0.5V
-#define ADC_TEMP_ERROR      1120
-#define ADC_VALUE_PER_DEGREE 32    //10mV/deg
-
-/** Define Bits in Byte */
-#define BITS_IN_BYTE 8
-#define WORD16_BITS (sizeof(short) * BITS_IN_BYTE) // No. of bits in 16-bit word
-
-#define ADC_DIFF_BITS (WORD16_BITS - ADC_ACTIVE_BITS) //4 Difference between Word16 and active bits
-#define ADC_TOTAL_BITS (ADC_MIN_BITS + ADC_POST_PAD_BITS) //14..16 Total No. of bits to in ADC sample (including post-padding bits)
-
-#define ADC_SHIFT_BITS (ADC_DIFF_BITS - ADC_POST_PAD_BITS) //4..2 No. of bits to shift to get 16-bit word alignment
-#define ADC_MASK 0x0FFF // Mask for 12 active bits in MS bits of 16-bit word
-
-/*  The AD7265 clock frequency (SCLK) can be configured to between  4..16 MHz.
- *  The PWM requires a 16-bit sample every 61 KHz, this translates to a minimum ADC frequency of 977 KHz.
- *  In order to trigger capture from the ADC digital ouput on a rising edge,
- *  the SCLK frequency must be less than 13.7 MHz.
- *  Considering all above constraints. We set the ADC frequency to 8 MHz
+/**
+ * @brief Define Number of pre-padding bits before Most-Significant active bit of sample 0..2
  */
-#define ADC_SCLK_MHZ 8 // ADC Serial Clock frequency (in MHz)
+#define ADC_PRE_PAD_BITS 2
 
-/* ADC_TRIGGER_DELAY needs to be tuned to move the ADC trigger point into the centre of the PWM 'OFF' period.
- * This value is related to the PWM_MAX_VALUE (in module_pwm_foc) and is independent of the Reference Frequency
+/**
+ * @brief Define Number of active bits in ADC Sample
  */
-#define ADC_TRIGGER_CORR 128 // Timing correction
-#define ADC_TRIGGER_DELAY (QUART_PWM_MAX - ADC_TRIGGER_CORR) // MB~ Re-tune
+#define ADC_ACTIVE_BITS 12
 
+/**
+ * @brief Define Number of post-padding bits after Least-Significant active bit of sample 0..2
+ */
+#define ADC_POST_PAD_BITS 0
 
+/**
+ * @brief Define Minimum Number of bits to transmit in ADC sample (including pre-padding bits)
+ */
+#define ADC_MIN_BITS (ADC_ACTIVE_BITS + ADC_PRE_PAD_BITS)
+
+/**
+ * @brief Define Difference between Word16 and active bits
+ */
+#define ADC_DIFF_BITS (WORD16_BITS - ADC_ACTIVE_BITS)
+
+/**
+ * @brief Define 14..16 Total Number of bits to in ADC sample (including post-padding bits)
+ */
+#define ADC_TOTAL_BITS (ADC_MIN_BITS + ADC_POST_PAD_BITS)
+
+/**
+ * @brief Define 4..2 Number of bits to shift to get 16-bit word alignment
+ */
+#define ADC_SHIFT_BITS (ADC_DIFF_BITS - ADC_POST_PAD_BITS)
+
+/**
+ * @brief Define Mask for 12 active bits in MS bits of 16-bit word
+ */
+#define ADC_MASK 0x0FFF
+
+/**
+ * @brief Define ADC Serial Clock frequency (in MHz)
+ *
+ * The AD7265 clock frequency (SCLK) can be configured to between  4..16 MHz.
+ * In order to trigger capture from the ADC digital ouput on a rising edge,
+ * the SCLK frequency must be less than 13.7 MHz.
+ * Considering all above constraints. We set the ADC frequency to 8 MHz
+ */
+#define ADC_SCLK_MHZ 8
+
+/**
+ * @brief Service to sample analogue inputs of ADC module
+ *
+ * @param iADC[2]               Interface to communicate with clients and send the measured values
+ * @param adc_ports             Structure type to manage the AD7265 ADC chip.
+ * @param current_sensor_config Structure type to calculate the proper sign (positive/negative) of sampled phase currents
+ * @param i_watchdog            Interface to communicate with watchdog service
+ * @param operational_mode      Integer type to select between SINGLE_ENDED/FULLY_DIFFERENTIAL modes
+ *
+ * @return void
+ */
 void adc_ad7265(
         interface ADCInterface server iADC[2],
         AD7265Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
         interface WatchdogInterface client ?i_watchdog, int operational_mode);
-
-/*****************************************************************************/
