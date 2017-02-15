@@ -38,14 +38,14 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
 #ifdef REM_16MT_USE_TIMESTAMP
         char timestamp;
-        { state.status, state.count, state.position, state.angle, state.timestamp } = rem_16mt_read(*spi_ports);
+        { state.status, state.count, state.position, state.angle, state.timestamp } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
 #else
-        { state.status, state.count, state.position, state.angle } = rem_16mt_read(*spi_ports);
+        { state.status, state.count, state.position, state.angle } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
 #endif
         state.angle = (position_feedback_config.pole_pairs * (state.angle >> 4) ) & 4095;
         break;
     case REM_14_SENSOR:
-        state.position = readRotarySensorAngleWithoutCompensation(*spi_ports);
+        state.position = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.ifm_usec);
         state.status = 0;
         multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
         state.angle = (position_feedback_config.pole_pairs * (state.position >> 2) ) & 4095;
@@ -60,7 +60,7 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         {
             multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
         }
-        if (position_feedback_config.polarity == BISS_POLARITY_INVERTED) {
+        if (position_feedback_config.polarity == INVERTED_POLARITY) {
             state.count = -state.count;
             state.position = position_feedback_config.resolution - state.position - 1;
         }
@@ -251,11 +251,11 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                         singleturn = new_count % position_feedback_config.resolution;
                     }
                     t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
-                    rem_16mt_write(*spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + singleturn, 32);
+                    rem_16mt_write(*spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + singleturn, 32, position_feedback_config.ifm_usec);
                     pos_state.last_position = singleturn;
                     break;
                 case REM_14_SENSOR:
-                    pos_state.last_position = readRotarySensorAngleWithoutCompensation(*spi_ports);
+                    pos_state.last_position = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.ifm_usec);
                     break;
                 case BISS_SENSOR:
                     read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, pos_state, t, last_read);
@@ -270,11 +270,11 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 if (position_feedback_config.sensor_type == REM_16MT_SENSOR)
                 {
                     t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
-                    rem_16mt_write(*spi_ports, opcode, data, data_bits);
+                    rem_16mt_write(*spi_ports, opcode, data, data_bits, position_feedback_config.ifm_usec);
 #ifdef REM_16MT_USE_TIMESTAMP
-                    { status, void, void, void, void } = rem_16mt_read(*spi_ports);
+                    { status, void, void, void, void } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
 #else
-                    { status, void, void, void } = rem_16mt_read(*spi_ports);
+                    { status, void, void, void } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
 #endif
                     t :> last_read;
                 }

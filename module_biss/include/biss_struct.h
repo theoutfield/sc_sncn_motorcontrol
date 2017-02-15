@@ -12,13 +12,7 @@
 #define SET_PORT1_AS_HALL_PORT2_AS_QEI 0b0010
 #define SET_PORT1_AS_QEI_PORT2_AS_HALL 0b0001
 
-#define BISS_POLARITY_NORMAL       1
-#define BISS_POLARITY_INVERTED     -1
-
-#define BISS_FRAME_BYTES           (( (3 + 2 + BISS_MULTITURN_LENGTH + BISS_SINGLETURN_LENGTH + BISS_STATUS_LENGTH + 6) -1)/32 + 1) //at least 3 bits + ack and start bits + data + crc
 #define BISS_DATA_PORT_BIT         0            // bit number (0 = rightmost bit) when inputing from a multibit port
-#define BISS_CLK_PORT_HIGH         (0b1000 | SET_PORT1_AS_HALL_PORT2_AS_QEI)    // high clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
-#define BISS_CLK_PORT_LOW          SET_PORT1_AS_HALL_PORT2_AS_QEI               // low  clock value when outputing the clock to a multibit port, with mode selection of ifm qei encoder and hall ports
 
 /**
  * @brief Type for the return status when reading BiSS data
