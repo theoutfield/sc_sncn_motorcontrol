@@ -29,9 +29,6 @@ void adc_ad7949(
 
 
 
-void adc_ad7949_single_shot(
+void adc_ad7949_service_demo(
         AD7949Ports &adc_ports,
-        interface ADCInterface server iADC[2],
-        interface WatchdogInterface client ?i_watchdog,
-        int ifm_tile_usec,
-        int operational_mode);
+        interface ADCInterface server iADC[2]);

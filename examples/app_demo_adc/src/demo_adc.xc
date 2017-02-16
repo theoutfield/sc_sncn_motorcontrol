@@ -8,7 +8,7 @@
 #include <demo_adc.h>
 
 
-void demo_ad7265(interface ADCInterface client i_adc)
+void adc7265_client_demo(interface ADCInterface client i_adc)
 {
     timer t;
     unsigned time=0;
@@ -60,7 +60,7 @@ void demo_ad7265(interface ADCInterface client i_adc)
 
 }
 
-void demo_ad7949(interface ADCInterface client i_adc)
+void adc7949_client_demo(interface ADCInterface client i_adc)
 {
     timer t;
     unsigned time=0;

@@ -2,12 +2,10 @@
 #include <CORE_C22-rev-a.bsp>
 #include <IFM_DC100-rev-b.bsp>
 
-#include <adc_service.h>
+#include <demo_adc.h>
 #include <adc_7265.h>
 #include <adc_ad7949.h>
-
 #include <motor_control_interfaces.h>
-#include <demo_adc.h>
 
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
@@ -15,20 +13,19 @@ int main(void)
 {
     // ADC interface
     interface ADCInterface i_adc[2];
-    interface WatchdogInterface i_watchdog[2];
 
     par
     {
         on tile[APP_TILE]:
         {
-            //demo_ad7265(i_adc[1]);
-            demo_ad7949(i_adc[1]);
+            //adc7265_client_demo(i_adc[1]);
+            adc7949_client_demo(i_adc[1]);
         }
 
         on tile[IFM_TILE]:
         {
-            //adc_ad7265_single_shot(adc_ports.ad7265_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
-            adc_ad7949_single_shot(adc_ports.ad7949_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
+            if(!isnull(adc_ports.ad7949_ports.clk))         adc_ad7949_service_demo(adc_ports.ad7949_ports, i_adc);
+            else if(!isnull(adc_ports.ad7265_ports.xclk))   adc_ad7265_service_demo(adc_ports.ad7265_ports, i_adc);
         }
     }
 
