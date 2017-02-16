@@ -19,4 +19,5 @@
 #include <mc_internal_constants.h>
 #include <user_config.h>
 
-void demo_adc(interface ADCInterface client i_adc);
+void demo_ad7265(interface ADCInterface client i_adc);
+void demo_ad7949(interface ADCInterface client i_adc);
