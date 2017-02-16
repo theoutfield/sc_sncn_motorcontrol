@@ -50,6 +50,16 @@
  */
 typedef enum
 {
+    AD_7949 =0,
+    AD_7265 =1
+} AdcType;
+
+/**
+ * @brief Possible selection of analogue input pairs (to be sampled) in case of using AD7949 chip.
+ * used internally in AD7949 service.
+ */
+typedef enum
+{
     AD_7949_IB_IC            =0,
     AD_7949_VMOT_DIV_I_MOT   =1,
     AD_7949_EXT_A0_N_EXT_A1_N=2,

@@ -3,6 +3,7 @@
 #include <IFM_DC100-rev-b.bsp>
 
 #include <demo_adc.h>
+#include <adc_service.h>
 #include <adc_7265.h>
 #include <adc_ad7949.h>
 #include <motor_control_interfaces.h>
@@ -18,8 +19,7 @@ int main(void)
     {
         on tile[APP_TILE]:
         {
-            //adc7265_client_demo(i_adc[1]);
-            adc7949_client_demo(i_adc[1]);
+            adc_client_demo(i_adc[1], AD_7949);
         }
 
         on tile[IFM_TILE]:

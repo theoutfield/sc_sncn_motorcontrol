@@ -53,7 +53,7 @@ static void configure_adc_ports(
     configure_in_port(p_data_a, clk);
     configure_in_port(p_data_b, clk);
     start_clock(clk);
-}
+}// configure_adc_ports
 
 /**
  * @brief Convert the output (serial) data of the adc in to unsigned value
@@ -85,7 +85,7 @@ static inline unsigned convert(unsigned raw)
     data |= raw & 0x00000006;
     data >>= 1;
     return data;
-}
+}// convert
 
 /**
  * @brief Demo service to show how AD7949 can be used.
@@ -242,7 +242,7 @@ void adc_ad7949_service_demo(
             break;
         }
     }
-}
+}// adc_ad7949_service_demo
 
 /**
  * @brief Service to sample analogue inputs of ADC module
@@ -540,5 +540,5 @@ void adc_ad7949(
             data_updated=0;
         }
     }
-}
+}// adc_ad7949
 

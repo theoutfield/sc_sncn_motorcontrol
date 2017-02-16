@@ -156,7 +156,7 @@ void adc_ad7265_service_demo(
             break;
         }//eof select
     }//eof while(1)
-}
+}// adc_ad7265_service_demo
 
 /**
  * @brief Service to sample analogue inputs of ADC module
@@ -376,4 +376,4 @@ void adc_ad7265(
             data_updated=0;
         }
     }//eof while(1)
-}
+}// adc_ad7265
