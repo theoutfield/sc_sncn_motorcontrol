@@ -1,9 +1,11 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_C22-rev-a.bsp>
-#include <IFM_DC1K-rev-c3.bsp>
+#include <IFM_DC100-rev-b.bsp>
 
 #include <adc_service.h>
 #include <adc_7265.h>
+#include <adc_ad7949.h>
+
 #include <motor_control_interfaces.h>
 #include <demo_adc.h>
 
@@ -19,12 +21,14 @@ int main(void)
     {
         on tile[APP_TILE]:
         {
-            demo_ad7265(i_adc[1]);
+            //demo_ad7265(i_adc[1]);
+            demo_ad7949(i_adc[1]);
         }
 
         on tile[IFM_TILE]:
         {
-            adc_ad7265_single_shot(adc_ports.ad7265_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
+            //adc_ad7265_single_shot(adc_ports.ad7265_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
+            adc_ad7949_single_shot(adc_ports.ad7949_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
         }
     }
 
