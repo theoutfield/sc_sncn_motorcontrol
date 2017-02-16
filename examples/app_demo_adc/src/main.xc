@@ -9,14 +9,11 @@
 
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
-
-
 int main(void)
 {
     // ADC interface
     interface ADCInterface i_adc[2];
     interface WatchdogInterface i_watchdog[2];
-
 
     par
     {

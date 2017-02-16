@@ -22,8 +22,6 @@ void demo_ad7265(interface ADCInterface client i_adc)
 
     int period=10000;
 
-    while(i_adc.status()!=ACTIVE);
-
     t :> time;
     while (1)
     {
@@ -69,8 +67,6 @@ void demo_ad7949(interface ADCInterface client i_adc)
 
     int a0=0, a1=0, a2=0, a3=0, a4=0, a5=0, a6=0, a7=0;
     int b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0, b7=0;
-
-    while(i_adc.status()!=ACTIVE);
 
     t :> time;
     while (1)
