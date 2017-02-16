@@ -114,6 +114,14 @@ void adc_ad7265(
         CurrentSensorsConfig &current_sensor_config,
         interface WatchdogInterface client ?i_watchdog, int operational_mode);
 
+ /**
+  * @brief Demo service to show how AD7265 can be used.
+  *
+  * @param adc_ports             Structure type to manage the AD7265 ADC chip.
+  * @param iADC[2]               Interface to communicate with clients and send the measured values
+  *
+  * @return void
+  */
  void adc_ad7265_service_demo(
          AD7265Ports &adc_ports,
          interface ADCInterface server iADC[2]);

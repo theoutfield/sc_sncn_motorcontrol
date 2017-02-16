@@ -6,23 +6,17 @@
  */
 
 #include <demo_adc.h>
+#include <xscope.h>
 
 
 void adc7265_client_demo(interface ADCInterface client i_adc)
 {
-    timer t;
-    unsigned time=0;
-
-
     int a0=0, a1=0, a2=0, a3=0, a4=0, a5=0, a6=0;
     int b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
 
     int a1a2=0, a3a4=0, a5a6=0;
     int b1b2=0, b3b4=0, b5b6=0;
 
-    int period=10000;
-
-    t :> time;
     while (1)
     {
         {a0, b0} = i_adc.get_channel(AD7265_SGL_A1_B1);
@@ -54,7 +48,7 @@ void adc7265_client_demo(interface ADCInterface client i_adc)
         xscope_int(A5A6, a5a6);
         xscope_int(B5B6, b5b6);
 
-        delay_milliseconds(2);
+        delay_milliseconds(1);
 
     } // while(1)
 
@@ -62,13 +56,9 @@ void adc7265_client_demo(interface ADCInterface client i_adc)
 
 void adc7949_client_demo(interface ADCInterface client i_adc)
 {
-    timer t;
-    unsigned time=0;
-
     int a0=0, a1=0, a2=0, a3=0, a4=0, a5=0, a6=0, a7=0;
     int b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0, b7=0;
 
-    t :> time;
     while (1)
     {
         {a0, b0} = i_adc.get_channel(AD7949_CHANNEL_0);
@@ -97,7 +87,7 @@ void adc7949_client_demo(interface ADCInterface client i_adc)
         xscope_int(A7, a7);
         xscope_int(B7, b7);
 
-        delay_milliseconds(2);
+        delay_milliseconds(1);
 
     } // while(1)
 

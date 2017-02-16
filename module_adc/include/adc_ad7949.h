@@ -10,6 +10,21 @@
 #include <xclib.h>
 #include <adc_service.h>
 
+
+/**
+ * @brief Demo service to show how AD7949 can be used.
+ *
+ * @param adc_ports             Structure type to manage the AD7265 ADC chip.
+ * @param iADC[2]               Interface to communicate with clients and send the measured values
+ *
+ * @return void
+ */
+void adc_ad7949_service_demo(
+        AD7949Ports &adc_ports,
+        interface ADCInterface server iADC[2]);
+
+
+
 /**
  * @brief Service to sample analogue inputs of ADC module
  *
@@ -28,7 +43,3 @@ void adc_ad7949(
         interface WatchdogInterface client ?i_watchdog, int operational_mode);
 
 
-
-void adc_ad7949_service_demo(
-        AD7949Ports &adc_ports,
-        interface ADCInterface server iADC[2]);
