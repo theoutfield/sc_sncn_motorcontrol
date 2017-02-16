@@ -99,7 +99,7 @@ static inline unsigned convert(unsigned raw)
  * @return void
  */
 void adc_ad7949(
-        interface ADCInterface server i_adc[2],
+        interface ADCInterface server iADC[2],
         AD7949Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
         interface WatchdogInterface client ?i_watchdog, int operational_mode)
@@ -179,18 +179,50 @@ void adc_ad7949(
 #pragma ordered
         select
         {
-        case i_adc[int i].status() -> {int status}:
+        case iADC[int i].get_channel(unsigned short channel_in)-> {int output_a, int output_b}:
+       // if (operational_mode==NORMAL_MODE)
+       // {
+       // adc_ports.p4_mux <: channel_in;
+       // t :> time;
+       // t when timerafter (time + 500) :> void;//5 us of wait
+       //
+       // clearbuf( adc_ports.p32_data[0] ); //Clear the buffers used by the input ports.
+       // clearbuf( adc_ports.p32_data[1] );
+       // adc_ports.p1_ready <: 1 @ time_stamp; // Switch ON input reads (and ADC conversion)
+       // time_stamp += (ADC_TOTAL_BITS+2); // Allows sample-bits to be read on buffered input ports TODO: Check if +2 is cool enough and why
+       // adc_ports.p1_ready @ time_stamp <: 0; // Switch OFF input reads, (and ADC conversion)
+       //
+       // sync( adc_ports.p1_ready ); // Wait until port has completed any pending outputs
+       //
+       // // Get data from port a
+       // endin( adc_ports.p32_data[0] ); // End the previous input on this buffered port
+       // adc_ports.p32_data[0] :> inp_val; // Get new input
+       // tmp_val = bitrev( inp_val ); // Reverse bit order. WARNING. Machine dependent
+       // tmp_val = tmp_val >> (SHIFTING_BITS+1);
+       // tmp_val = (short)(tmp_val & ADC_MASK); // Mask out active bits and convert to signed word
+       // output_a = (int)tmp_val;
+       //
+       // // Get data from port b
+       // endin( adc_ports.p32_data[1] ); // End the previous input on this buffered port
+       // adc_ports.p32_data[1] :> inp_val; // Get new input
+       // tmp_val = bitrev( inp_val ); // Reverse bit order. WARNING. Machine dependent
+       // tmp_val = tmp_val >> (SHIFTING_BITS+1);
+       // tmp_val = (short)(tmp_val & ADC_MASK); // Mask out active bits and convert to signed word
+       // output_b = (int)tmp_val;
+       // }
+       break;
+        case iADC[int i].status() -> {int status}:
                 status = ACTIVE;
                 break;
 
-        case i_adc[int i].set_protection_limits_and_analogue_input_configs(
+        case iADC[int i].set_protection_limits_and_analogue_input_configs(
                 int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
                 current_limit = i_max_in * i_ratio_in;
                 break;
 
-        case i_adc[int i].get_all_measurements() -> {
+        case iADC[int i].get_all_measurements() -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
@@ -289,7 +321,7 @@ void adc_ad7949(
             data_updated=1;
             break;
 
-        case i_adc[int i].reset_faults():
+        case iADC[int i].reset_faults():
                 I_b=0;
                 I_c=0;
                 fault_code=NO_FAULT;

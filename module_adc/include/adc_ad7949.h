@@ -22,7 +22,7 @@
  * @return void
  */
 void adc_ad7949(
-        interface ADCInterface server i_adc[2],
+        interface ADCInterface server iADC[2],
         AD7949Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
         interface WatchdogInterface client ?i_watchdog, int operational_mode);
