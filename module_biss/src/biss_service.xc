@@ -7,10 +7,7 @@
 #include <biss_service.h>
 #include <xclib.h>
 #include <xs1.h>
-#include <print.h>
 #include <xscope.h>
-
-#include <mc_internal_constants.h>
 
 extern char start_message[];
 
@@ -22,8 +19,8 @@ unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * 
     unsigned int readbuf = 0;
     unsigned int bitindex = 0;
     unsigned int byteindex = 0;
-    unsigned int data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
-    unsigned int read_limit = BISS_BUSY; //maximum number of bits to read before the start bit
+    unsigned int data_length = BISS_CDS_BIT + biss_config.multiturn_resolution +  biss_config.singleturn_resolution + biss_config.filling_bits + BISS_STATUS_BITS;
+    unsigned int read_limit = biss_config.busy; //maximum number of bits to read before the start bit
     unsigned int crc_length = 32 - clz(biss_config.crc_poly); //clz: number of leading 0
     unsigned int frame_length = data_length+crc_length+1;
 
@@ -106,30 +103,32 @@ unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * 
 
 
 { int, unsigned int, unsigned int } biss_encoder(unsigned int data[], BISSConfig biss_config) {
-    int biss_data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
-    int count = 0;
+    unsigned int biss_data_length = biss_config.multiturn_resolution +  biss_config.singleturn_resolution + biss_config.filling_bits + BISS_STATUS_BITS; //length witout CDS bit
     unsigned int position = 0;
     unsigned int status = 0;
-    unsigned int readbuf;
-    int byteindex = -1;
+    unsigned int readbuf = data[0] << BISS_CDS_BIT; //discard CDS bit
+    unsigned int bitindex = BISS_CDS_BIT; //discard CDS bit
+    unsigned int byteindex = 0;
+    int count = 0;
+
+    //read data
     for (int i=0; i<biss_data_length; i++) {
-        if ((i%32) == 0) {
+        if (bitindex == 32) {
+            bitindex = 0;
             byteindex++;
             readbuf = data[byteindex];
         }
-        if (i < biss_config.multiturn_length) {
-            count = count << 1;
-            count |= (readbuf & 0x80000000) >> 31;
-        } else if (i < biss_config.multiturn_length + biss_config.singleturn_length) {
-            position = position << 1;
-            position|= (readbuf & 0x80000000) >> 31;
-        } else {
-            status = status << 1;
-            status|= (readbuf & 0x80000000) >> 31;
+        if (i < biss_config.multiturn_resolution) {
+            count = (count << 1) | ((readbuf & 0x80000000) >> 31);
+        } else if (i < biss_config.multiturn_resolution + biss_config.singleturn_resolution) {
+            position = (position << 1) | ((readbuf & 0x80000000) >> 31);
+        } else if (i >= biss_config.multiturn_resolution + biss_config.singleturn_resolution + biss_config.filling_bits) {
+            status = (status << 1) | ((readbuf & 0x80000000) >> 31);
         }
         readbuf = readbuf << 1;
+        bitindex++;
     }
-    status = (~status) & ((1 << biss_config.status_length)-1);
+    status = (~status) & ((1 << BISS_STATUS_BITS)-1);
     count &= ~(~0U <<  biss_config.multiturn_resolution);
     position &= ~(~0U <<  biss_config.singleturn_resolution);
     count = (sext(count, biss_config.multiturn_resolution) * (1 << biss_config.singleturn_resolution)) + position;  //convert multiturn to signed absolute count

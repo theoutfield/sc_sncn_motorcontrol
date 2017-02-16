@@ -8,7 +8,9 @@
 #include <biss_struct.h>
 
 // number of 32 bit bytes needed to save the biss frame before processing
-// it must be enough to hold: some bits at start (3), ack and start bits, multiturn and singleturn data, error and warning bits and the crc (6)
-// 2 bytes should be enough for a sensor up to 50 bits of position data (3 + 3 + 50 + 2 + 6 = 63)
+// it must be enough to hold: CDS bit + multiturn and singleturn data with filling bits + error and warning bits and the crc (6)
+// 2 bytes should be enough for a sensor up to 55 bits of position data (1 + 55 + 2 + 6 = 64)
 #define BISS_FRAME_BYTES    2
-#define BISS_BUSY           30
+
+#define BISS_DATA_PORT_BIT  0    /**< Bit number (0 = rightmost bit) when inputing from a multibit port */
+#define BISS_STATUS_BITS    2    /**< Number of bits used for status data */
