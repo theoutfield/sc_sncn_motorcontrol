@@ -14,43 +14,31 @@
 
 extern char start_message[];
 
-static inline void update_turns(int &turns, int last_position, int position, int multiturn_resolution, int ticks_per_turn) {
-    if (multiturn_resolution == 0) {
-        int difference = position - last_position;
-        if (difference >= ticks_per_turn/2)
-            turns--;
-        else if (-difference >= ticks_per_turn/2)
-            turns++;
-    }
-}
 
-
-unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[], static const unsigned int frame_bytes)
+unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[])
 {
-    unsigned int frame[frame_bytes];
     unsigned int crc  =  0;
     unsigned int status = 0;
     unsigned int readbuf = 0;
     unsigned int bitindex = 0;
     unsigned int byteindex = 0;
     unsigned int data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
-    const unsigned int timeout = 3+2; //3 bits to read before then the ack and start bits
+    unsigned int read_limit = BISS_BUSY; //maximum number of bits to read before the start bit
     unsigned int crc_length = 32 - clz(biss_config.crc_poly); //clz: number of leading 0
-    for (int i=0; i<(data_length-1)/32+1; i++) //init data with zeros
-        data[i] = 0;
+    unsigned int frame_length = data_length+crc_length+1;
 
-    //get the raw data
-    int clock_config = 0;
+    //set clock and data port config
+    unsigned int clock_config = 0;
     if (biss_config.clock_port_config <= BISS_CLOCK_PORT_EXT_D3) { //clock is output on a gpio port
         clock_config = 1;
     }
-    for (int i=0; i<timeout+data_length+crc_length; i++) {
-        if (bitindex == 32) {
-            frame[byteindex] = readbuf;
-            readbuf = 0;
-            bitindex = 0;
-            byteindex++;
-        }
+    unsigned int data_port_config = 0;
+    if (biss_config.data_port_config == BISS_DATA_PORT_2) {
+        data_port_config = 1;
+    }
+
+    //read the raw data
+    while (read_limit) {
         unsigned int bit;
         if (clock_config) { //clock is output on a gpio port
             *biss_clock_port <:0;
@@ -59,86 +47,71 @@ unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * 
             hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
             hall_enc_select_port->p_hall_enc_select <: biss_config.clock_port_config | hall_enc_select_config;
         }
-        if (biss_config.data_port_config == BISS_DATA_PORT_2) {
+        if (data_port_config) {
             qei_hall_port_2->p_qei_hall :> bit;
         } else {
             qei_hall_port_1->p_qei_hall :> bit;
         }
-        readbuf = readbuf << 1;
-        readbuf |= ((bit & (1 << BISS_DATA_PORT_BIT)) >> BISS_DATA_PORT_BIT);
-        bitindex++;
-    }
-    readbuf = readbuf << (31-(timeout+data_length+crc_length-1)%32); //left align the last frame byte
-    frame[byteindex] = readbuf;
-    byteindex = 0;
-    bitindex = 0;
+        bit = (bit >> BISS_DATA_PORT_BIT)&1;
 
-    //process the raw data
-    //search for ack and start bit
-    readbuf = frame[0];
-    while (status < 2 && bitindex <= timeout) {
-        unsigned int bit = (readbuf & 0x80000000);
-        readbuf = readbuf << 1;
-        bitindex++;
-        if (status) {
-            if (bit) //status = 2, ack and start bit found
+        //check ack and start bits and save the data
+        if (status == 2) { //ack and start bit received, save data
+            if (bitindex == 32) { //byte full
+                data[byteindex] = readbuf; //save byte
+                byteindex++;                //change to next byte
+                readbuf = 0;
+                bitindex = 0;
+            }
+            readbuf = (readbuf << 1) | bit;
+            bitindex++;
+        } else if (status) { //ack received, start not received
+            if (bit) {//start bit received, set status to 2
                 status++;
-        } else if (bit == 0) //status = 1, ack bit found
+                read_limit = frame_length; //now we read exactly data_length+crc_length bits
+            }
+        } else if (bit == 0)  {//ack bit received, set status to 1
             status++;
+        }
+        read_limit--;
     }
-    //extract the data and crc
+
+    //extract the crc from the data
     if (status == 2) {
-        for (int i=0; i<data_length; i++) {
-            if (bitindex == 32) {
-                bitindex = 0;
-                byteindex++;
-                readbuf = frame[byteindex];
-            }
-            data[i/32] = data[i/32] << 1;
-            data[i/32] |= (readbuf & 0x80000000) >> 31;
-            readbuf = readbuf << 1;
-            bitindex++;
-        }
+        //extract crc
+        //we read in reverse from last bit saved to extract the crc
         for (int i=0; i<crc_length; i++) {
-            if (bitindex == 32) {
-                bitindex = 0;
-                byteindex++;
-                readbuf = frame[byteindex];
+            if (bitindex == 0) { //byte fully read
+                byteindex--;
+                readbuf = data[byteindex]; //load previous byte
+                bitindex = 32;
             }
-            crc = crc << 1;
-            crc |= (readbuf & 0x80000000) >> 31;
-            readbuf = readbuf << 1;
-            bitindex++;
+            bitindex--;
+            crc |= (readbuf&1) << i;
+            readbuf = readbuf >> 1;
         }
-        status = NoError;
+        data[byteindex] = readbuf << (32-bitindex);//left align and save the last data byte
+
         //check crc
+        status = NoError;
         if (biss_config.crc_poly && crc != biss_crc(data, data_length, biss_config.crc_poly) ) {
             status = CRCError;
-#ifdef BISS_CRC_CORRECT
-            biss_crc_correct(data, data_length, frame_bytes, crc,  biss_config.crc_poly); //try 1 bit error correction
-            if (crc == biss_crc(data, data_length, biss_config.crc_poly)) {
-                status = CRCCorrected;
-            }
-#endif
         }
-    } else if (status)
+    } else if (status) {
         status = NoStartBit;
-    else
+    } else {
         status = NoAck;
+    }
     return status;
 }
 
 
 { int, unsigned int, unsigned int } biss_encoder(unsigned int data[], BISSConfig biss_config) {
     int biss_data_length = biss_config.multiturn_length +  biss_config.singleturn_length + biss_config.status_length;
-    unsigned int bytes = (biss_data_length-1)/32; //number of bytes used - 1
-    unsigned int rest = biss_data_length % 32; //rest of bits
     int count = 0;
     unsigned int position = 0;
     unsigned int status = 0;
     unsigned int readbuf;
     int byteindex = -1;
-    data[bytes] = data[bytes] << (32-rest); //left align last data byte
     for (int i=0; i<biss_data_length; i++) {
         if ((i%32) == 0) {
             byteindex++;
@@ -169,13 +142,15 @@ unsigned int biss_crc(unsigned int data[], unsigned int data_length, unsigned in
     //poly in reverse representation:  x^0 + x^1 + x^4 is 0b1100
     unsigned int bytes = data_length/32; //number of complete bytes
     unsigned int rest = data_length % 32; //rest of bits
-    unsigned int datarev; //to store reversed data byte
+    // crc for first byte
     unsigned int crc = bitrev(data[0]);
-    for (int i=1; i<bytes; i++) // compute crc for the first complete bytes
+    if (bytes == 0) {
+        crc = crc << (32-rest); // left align if first byte is incomplete
+    }
+    for (int i=1; i<bytes; i++) // crc for following the complete bytes if any
         crc32(crc, bitrev(data[i]), poly);
-    if (bytes && rest) { // prepare data for the last incomplete byte
-        datarev = bitrev(data[bytes]) >> (32 - rest);
-        crc32(crc, datarev, poly);
+    if (bytes && rest) { // crc for the last incomplete byte
+        crc32(crc, bitrev(data[bytes]), poly);
         crc = crc << (32 - rest);
     }
     crc32(crc, 0, poly); //final crc

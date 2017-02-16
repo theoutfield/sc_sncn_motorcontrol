@@ -53,7 +53,7 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
     case BISS_SENSOR:
         unsigned int data[BISS_FRAME_BYTES];
         t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
-        int error = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, biss_clock_port, position_feedback_config.biss_config, data, BISS_FRAME_BYTES);
+        int error = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, biss_clock_port, position_feedback_config.biss_config, data);
         { state.count, state.position, state.status } = biss_encoder(data, position_feedback_config.biss_config);
         state.status = state.status + (error << 2);
         if (position_feedback_config.biss_config.multiturn_resolution == 0)
