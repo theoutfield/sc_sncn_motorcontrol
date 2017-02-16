@@ -2,9 +2,11 @@
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
-#include <adc_service.h>
-#include <motor_control_interfaces.h>
 #include <demo_adc.h>
+#include <adc_service.h>
+#include <adc_7265.h>
+#include <adc_ad7949.h>
+#include <motor_control_interfaces.h>
 
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
@@ -17,12 +19,13 @@ int main(void)
     {
         on tile[APP_TILE]:
         {
-            demo_adc(i_adc[1]);
+            adc_client_demo(i_adc[1], AD_7949);
         }
 
         on tile[IFM_TILE]:
         {
-            adc_service(adc_ports, i_adc, null, IFM_TILE_USEC, SINGLE_ENDED);
+            if(!isnull(adc_ports.ad7949_ports.clk))         adc_ad7949_service_demo(adc_ports.ad7949_ports, i_adc);
+            else if(!isnull(adc_ports.ad7265_ports.xclk))   adc_ad7265_service_demo(adc_ports.ad7265_ports, i_adc);
         }
     }
 

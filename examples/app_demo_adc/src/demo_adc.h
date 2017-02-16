@@ -5,18 +5,20 @@
  *      Author: Synapticon GmbH
  */
 
-
 #pragma once
 
-#include <platform.h>
 #include <motor_control_interfaces.h>
-#include <advanced_motor_control.h>
-#include <advanced_motorcontrol_licence.h>
-#include <refclk.h>
 #include <adc_service.h>
 
-#include <xscope.h>
-#include <mc_internal_constants.h>
-#include <user_config.h>
+/**
+ * @brief Client demo to show how analogue to digital converter can be used.
+ * It sets the analogue input channel (to be sampled by ADC), and recieves the
+ * converted digital value from adc server.
+ *
+ * @param i_adc     Interface to communicate data with the server demo
+ * @param i_adc     ADC type (AD_7949 or AD_7265)
+ *
+ * @return void
+ */
+void adc_client_demo(interface ADCInterface client i_adc, int adc_type);
 
-void demo_adc(interface ADCInterface client i_adc);

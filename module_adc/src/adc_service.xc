@@ -24,4 +24,4 @@ void adc_service(
         adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog, operational_mode);
     else if(!isnull(adc_ports.ad7265_ports.xclk))
         adc_ad7265(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog, operational_mode);
-}
+}// adc_service

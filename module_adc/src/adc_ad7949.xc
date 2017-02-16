@@ -53,7 +53,7 @@ static void configure_adc_ports(
     configure_in_port(p_data_a, clk);
     configure_in_port(p_data_b, clk);
     start_clock(clk);
-}
+}// configure_adc_ports
 
 /**
  * @brief Convert the output (serial) data of the adc in to unsigned value
@@ -85,7 +85,164 @@ static inline unsigned convert(unsigned raw)
     data |= raw & 0x00000006;
     data >>= 1;
     return data;
-}
+}// convert
+
+/**
+ * @brief Demo service to show how AD7949 can be used.
+ *
+ * @param adc_ports             Structure type to manage the AD7265 ADC chip.
+ * @param iADC[2]               Interface to communicate with clients and send the measured values
+ *
+ * @return void
+ */
+void adc_ad7949_service_demo(
+        AD7949Ports &adc_ports,
+        interface ADCInterface server iADC[2])
+{
+    timer t;
+    unsigned int time;
+
+    /*
+     * Configuration Register Description
+     *
+     * bit(s)   name    Description
+     *
+     *  13      CFG     Configuration udpate
+     *  12      INCC    Input channel configuration
+     *  11      INCC    Input channel configuration
+     *  10      INCC    Input channel configuration
+     *  09      INx     Input channel selection bit 2 0..7
+     *  08      INx     Input channel selection bit 1
+     *  07      INx     Input channel selection bit 0
+     *  06      BW      Select bandwidth for low-pass filter
+     *  05      REF     Reference/buffer selection
+     *  04      REF     Reference/buffer selection
+     *  03      REF     Reference/buffer selection
+     *  02      SEQ     Channel sequencer. Allows for scanning channels in an IN0 to IN[7:0] fashion.
+     *  01      SEQ     Channel sequencer
+     *  00      RB      Read back the CFG register.
+     *
+     * Initialize the "Configuration Register":
+     *
+     * Overwrite configuration update | unipolar, referenced to GND | Motor current (ADC Channel IN0)| full Bandwidth | Internal reference, REF = 4,096V, temp enabled;
+     * bit[13] = 1                      bits[12:10]: 111              bits[9:7] 000                    bit[6] 1         bits[5:3] 001
+     *  Disable Sequencer | Do not read back contents of configuration
+     *  bits[2:1] 00        bit[0] 1
+     *
+     */
+    unsigned int ad7949_config       =   0b11110001001001;
+
+    unsigned int adc_data_a=0;
+    unsigned int adc_data_b=0;
+
+    unsigned int data_raw_a;
+    unsigned int data_raw_b;
+
+    configure_adc_ports(adc_ports.clk, adc_ports.sclk_conv_mosib_mosia, adc_ports.data_a, adc_ports.data_b);
+
+    while (1)
+    {
+#pragma ordered
+        select
+        {
+        case iADC[int i].get_channel(unsigned short channel_config_in)-> {int output_a, int output_b}:
+
+                ad7949_config = channel_config_in;
+
+                configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+
+#pragma unsafe arrays
+                int bits[4];
+
+                bits[0]=0x80808000;
+                if(ad7949_config & BIT13)
+                    bits[0] |= 0x0000B300;
+                if(ad7949_config & BIT12)
+                    bits[0] |= 0x00B30000;
+                if(ad7949_config & BIT11)
+                    bits[0] |= 0xB3000000;
+
+                bits[1]=0x80808080;
+                if(ad7949_config & BIT10)
+                    bits[1] |= 0x000000B3;
+                if(ad7949_config & BIT09)
+                    bits[1] |= 0x0000B300;
+                if(ad7949_config & BIT08)
+                    bits[1] |= 0x00B30000;
+                if(ad7949_config & BIT07)
+                    bits[1] |= 0xB3000000;
+
+                bits[2]=0x80808080;
+                if(ad7949_config & BIT06)
+                    bits[2] |= 0x000000B3;
+                if(ad7949_config & BIT05)
+                    bits[2] |= 0x0000B300;
+                if(ad7949_config & BIT04)
+                    bits[2] |= 0x00B30000;
+                if(ad7949_config & BIT03)
+                    bits[2] |= 0xB3000000;
+
+                bits[3]=0x00808080;
+                if(ad7949_config & BIT02)
+                    bits[3] |= 0x000000B3;
+                if(ad7949_config & BIT01)
+                    bits[3] |= 0x0000B300;
+                if(ad7949_config & BIT0)
+                    bits[3] |= 0x00B30000;
+
+                for(int i=0;i<=3;i++)
+                {
+                    stop_clock(adc_ports.clk);
+                    clearbuf(adc_ports.data_a);
+                    clearbuf(adc_ports.data_b);
+                    clearbuf(adc_ports.sclk_conv_mosib_mosia);
+                    adc_ports.sclk_conv_mosib_mosia <: bits[0];
+                    start_clock(adc_ports.clk);
+
+                    adc_ports.sclk_conv_mosib_mosia <: bits[1];
+                    adc_ports.sclk_conv_mosib_mosia <: bits[2];
+                    adc_ports.sclk_conv_mosib_mosia <: bits[3];
+
+                    sync(adc_ports.sclk_conv_mosib_mosia);
+                    stop_clock(adc_ports.clk);
+
+                    configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+
+                    adc_ports.data_a :> data_raw_a;
+                    adc_data_a = convert(data_raw_a);
+                    adc_ports.data_b :> data_raw_b;
+                    adc_data_b = convert(data_raw_b);
+
+                    configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
+
+                    output_a = ((int) adc_data_a);
+                    output_b = ((int) adc_data_b);
+                }
+                break;
+
+        case iADC[int i].status() -> {int status}:
+                break;
+
+        case iADC[int i].set_protection_limits_and_analogue_input_configs(
+                int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
+                break;
+
+        case iADC[int i].get_all_measurements() -> {
+            int phaseB_out, int phaseC_out,
+            int V_dc_out, int I_dc_out, int Temperature_out,
+            int analogue_input_a_1, int analogue_input_a_2,
+            int analogue_input_b_1, int analogue_input_b_2,
+            int fault_code_out}:
+            break;
+
+        case iADC[int i].reset_faults():
+                break;
+
+        default:
+            break;
+        }
+    }
+}// adc_ad7949_service_demo
 
 /**
  * @brief Service to sample analogue inputs of ADC module
@@ -99,7 +256,7 @@ static inline unsigned convert(unsigned raw)
  * @return void
  */
 void adc_ad7949(
-        interface ADCInterface server i_adc[2],
+        interface ADCInterface server iADC[2],
         AD7949Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
         interface WatchdogInterface client ?i_watchdog, int operational_mode)
@@ -179,18 +336,22 @@ void adc_ad7949(
 #pragma ordered
         select
         {
-        case i_adc[int i].status() -> {int status}:
+
+        case iADC[int i].get_channel(unsigned short channel_in)-> {int output_a, int output_b}:
+                break;
+
+        case iADC[int i].status() -> {int status}:
                 status = ACTIVE;
                 break;
 
-        case i_adc[int i].set_protection_limits_and_analogue_input_configs(
+        case iADC[int i].set_protection_limits_and_analogue_input_configs(
                 int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 v_dc_max=v_dc_max_in;
                 v_dc_min=v_dc_min_in;
                 current_limit = i_max_in * i_ratio_in;
                 break;
 
-        case i_adc[int i].get_all_measurements() -> {
+        case iADC[int i].get_all_measurements() -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
@@ -289,7 +450,7 @@ void adc_ad7949(
             data_updated=1;
             break;
 
-        case i_adc[int i].reset_faults():
+        case iADC[int i].reset_faults():
                 I_b=0;
                 I_c=0;
                 fault_code=NO_FAULT;
@@ -379,7 +540,5 @@ void adc_ad7949(
             data_updated=0;
         }
     }
-}
-
-
+}// adc_ad7949
 
