@@ -116,6 +116,8 @@ interface MotorcontrolInterface
  */
 interface ADCInterface
 {
+    {int, int}  get_channel(unsigned short);
+
     /**
      * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
      */
