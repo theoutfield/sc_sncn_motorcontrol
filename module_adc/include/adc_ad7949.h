@@ -23,8 +23,6 @@ void adc_ad7949_service_demo(
         AD7949Ports &adc_ports,
         interface ADCInterface server iADC[2]);
 
-
-
 /**
  * @brief Service to sample analogue inputs of ADC module
  *
@@ -41,5 +39,3 @@ void adc_ad7949(
         AD7949Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
         interface WatchdogInterface client ?i_watchdog, int operational_mode);
-
-

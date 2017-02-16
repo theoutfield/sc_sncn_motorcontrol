@@ -8,7 +8,15 @@
 #include <demo_adc.h>
 #include <xscope.h>
 
-
+/**
+ * @brief Client demo to show how AD7265 can be used.
+ * It sets the analogue input channel (to be sampled by ADC), and recieves the
+ * converted digital value from adc server. This client is recommended to be used with its corresponding service demo.
+ *
+ * @param i_adc     Interface to communicate data with the server demo
+ *
+ * @return void
+ */
 void adc7265_client_demo(interface ADCInterface client i_adc)
 {
     int a0=0, a1=0, a2=0, a3=0, a4=0, a5=0, a6=0;
@@ -54,6 +62,15 @@ void adc7265_client_demo(interface ADCInterface client i_adc)
 
 }
 
+/**
+ * @brief Client demo to show how AD7949 can be used.
+ * It sets the analogue input channel (to be sampled by ADC), and recieves the
+ * converted digital value from adc server. This client is recommended to be used with its corresponding service demo.
+ *
+ * @param i_adc     Interface to communicate data with the server demo
+ *
+ * @return void
+ */
 void adc7949_client_demo(interface ADCInterface client i_adc)
 {
     int a0=0, a1=0, a2=0, a3=0, a4=0, a5=0, a6=0, a7=0;
