@@ -77,6 +77,7 @@
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
 #define COMMUTATION_LOOP_PERIOD     82
+#define COMMUTATION_LOOP_PERIOD     83
 #define COMMUTATION_FRQ             24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
@@ -127,7 +128,7 @@
 //////  POSITION CONTROLLER
 /////////////////////////////////////////////////
 // POSITION CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     1000 //500
+#define CONTROL_LOOP_PERIOD     1000
 
 //Limits
 #define MIN_POSITION_LIMIT                     -0x7fffffff
@@ -191,7 +192,7 @@
 //in case of using non-linear position control set "POSITION_INTEGRAL_LIMIT" to 1000
 #define POSITION_INTEGRAL_LIMIT                 1000
 
-#define MOMENT_OF_INERTIA                       2000 //set this variable only if it is known in [gram square centimiter]
+#define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
 
 //PID parameters of the velocity PID controller
