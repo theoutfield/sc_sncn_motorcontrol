@@ -259,10 +259,11 @@ void adc_ad7949(
         interface ADCInterface server iADC[2],
         AD7949Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
-        interface WatchdogInterface client ?i_watchdog, int operational_mode)
+        interface WatchdogInterface client ?i_watchdog, int operational_mode, int ifm_tile_usec)
 {
     timer t;
     unsigned int time;
+    unsigned int t_start=0;
 
     /*
      * Configuration Register Description
@@ -297,6 +298,7 @@ void adc_ad7949(
 
     unsigned int adc_data_a=0;
     unsigned int adc_data_b=0;
+    unsigned int hdw_delay = 2440 + (18*ifm_tile_usec);
 
     unsigned int data_raw_a;
     unsigned int data_raw_b;
@@ -358,6 +360,7 @@ void adc_ad7949(
             int analogue_input_b_1, int analogue_input_b_2,
             int fault_code_out}:
 
+            t :> t_start;
             configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
 #pragma unsafe arrays
@@ -463,6 +466,7 @@ void adc_ad7949(
 
         if(data_updated==1)
         {
+            t when timerafter (t_start + hdw_delay) :> void;
             for(j=AD_7949_EXT_A0_P_EXT_A1_P;AD_7949_IB_IC<=j;j--)
             {
                 ad7949_config = channel_config[j];
