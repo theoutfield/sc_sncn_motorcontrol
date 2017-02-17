@@ -76,7 +76,6 @@
 #define VDC             20
 
 // COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     82
 #define COMMUTATION_LOOP_PERIOD     83
 #define COMMUTATION_FRQ             24
 
