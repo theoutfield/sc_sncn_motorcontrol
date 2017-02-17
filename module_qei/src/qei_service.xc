@@ -61,10 +61,6 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                  server interface PositionFeedbackInterface i_position_feedback[3])
 {
 
-
-    switch_ifm_freq(position_feedback_config);
-
-
 #ifdef DEBUG_POSITION_FEEDBACK
     if (check_qei_config(position_feedback_config) == ERROR) {
         position_feedback_config.sensor_type = 0;

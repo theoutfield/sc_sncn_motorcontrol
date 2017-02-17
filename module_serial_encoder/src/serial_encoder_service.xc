@@ -156,8 +156,6 @@ void init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
 
 void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * (&?gpio_ports)[4], int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
 {
-    switch_ifm_freq(position_feedback_config);
-
 
     //init variables
     //velocity

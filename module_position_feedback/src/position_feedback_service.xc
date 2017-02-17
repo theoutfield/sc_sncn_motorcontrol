@@ -175,7 +175,7 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
             }
             //configure clock rate
             set_clock_on((*spi_ports).spi_interface.blk1);
-            configure_clock_rate((*spi_ports).spi_interface.blk1, position_feedback_config.biss_config.clock_dividend, position_feedback_config.biss_config.clock_divisor); // a/b MHz
+            configure_clock_rate_at_most((*spi_ports).spi_interface.blk1, position_feedback_config.ifm_usec, ((position_feedback_config.ifm_usec*1000)/(position_feedback_config.biss_config.clock_frequency*2))+1);
             start_clock((*spi_ports).spi_interface.blk1);
         }
     }
@@ -217,14 +217,6 @@ void reset_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
     if (hall_enc_select_port != null) {
         if (!isnull((*hall_enc_select_port).p_hall_enc_select))
             set_port_use_on((*hall_enc_select_port).p_hall_enc_select);
-    }
-}
-
-void set_clock_biss(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, SPIPorts * spi_ports, PositionFeedbackConfig &position_feedback_config)
-{
-    if (qei_hall_port_2 != null && spi_ports != null) {
-        configure_clock_rate((*spi_ports).spi_interface.blk1, position_feedback_config.biss_config.clock_dividend, position_feedback_config.biss_config.clock_divisor); // a/b MHz
-        start_clock((*spi_ports).spi_interface.blk1);
     }
 }
 
@@ -325,6 +317,8 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                                client interface shared_memory_interface ?i_shared_memory_2,
                                server interface PositionFeedbackInterface (&?i_position_feedback_2)[3])
 {
+    switch_ifm_freq(position_feedback_config_1);
+
     //pointers to ports 1
     QEIHallPort * movable qei_hall_port_1_1 = &qei_hall_port_1;
     QEIHallPort * movable qei_hall_port_2_1 = &qei_hall_port_2;

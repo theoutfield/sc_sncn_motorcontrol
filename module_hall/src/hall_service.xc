@@ -87,8 +87,6 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 server interface PositionFeedbackInterface i_position_feedback[3])
 {
 
-    switch_ifm_freq(position_feedback_config);
-
 #ifdef DEBUG_POSITION_FEEDBACK
     if (check_hall_config(position_feedback_config) == ERROR) {
         printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
