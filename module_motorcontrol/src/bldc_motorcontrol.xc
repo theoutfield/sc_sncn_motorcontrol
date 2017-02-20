@@ -11,6 +11,7 @@
 #include <sine_table_foc.h>
 #include <foc_interface.h>
 #include <foc_utilities.h>
+#include <motor_control_structures.h>
 #include <print.h>
 #include <xscope.h>
 #include <stdlib.h>
@@ -63,7 +64,7 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     unsigned int pwm[3] = { 0, 0, 0 };
     int velocity = 0;
     int shutdown = 0; //Disable FETS
-    int sensor_select = motorcontrol_config.commutation_sensor;
+    SensorType sensor_select = motorcontrol_config.commutation_sensor;
     int calib_flag = 0;
     int voltage_q = 0;
     int voltage_q_limit = 4096;

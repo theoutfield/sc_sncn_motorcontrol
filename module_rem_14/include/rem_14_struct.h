@@ -7,8 +7,6 @@
 
 #pragma once
 
-#define REM_14_SENSOR      5
-
 #define ERROR       0
 #define SUCCESS     1
 

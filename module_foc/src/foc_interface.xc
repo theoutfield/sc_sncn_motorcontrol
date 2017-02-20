@@ -85,7 +85,7 @@ return{park_alpha, park_beta};
 }
 
 
-int      adjust_angle_reference_pwm(int angle_inv_park, int angle_offset, int measure_tick, int speed_actual, int q_value, int filter_sum[], int feedback_sensor)
+int      adjust_angle_reference_pwm(int angle_inv_park, int angle_offset, int measure_tick, int speed_actual, int q_value, int filter_sum[], SensorType feedback_sensor)
 {
 int iTemp1;
 int angle_new;
@@ -95,7 +95,7 @@ int angle_rpm_adjust = 0;
  //   angle_new  = angle_inv_park + angle_offset + 512;//why do we need 1024? For the hall sensor a correction of 1/4 of electrical rotation is required.
 
     if (q_value >= 0) angle_new  = angle_inv_park + angle_offset + 3072;
-    else if(feedback_sensor == 1) angle_new  = angle_inv_park + angle_offset + 512;//HALL_SENSOR FixMe: remove fixed number!
+    else if(feedback_sensor == HALL_SENSOR) angle_new  = angle_inv_park + angle_offset + 512;
     else angle_new  = angle_inv_park + angle_offset + 3072;
 
     if(measure_tick)

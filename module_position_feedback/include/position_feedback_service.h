@@ -16,6 +16,7 @@
 #include <rem_14_struct.h>
 #include <hall_struct.h>
 #include <qei_struct.h>
+#include <motor_control_structures.h>
 
 #include <stdint.h>
 
@@ -35,7 +36,7 @@ typedef struct {
 } GPIOConfig;
 
 typedef struct {
-    int sensor_type;
+    SensorType sensor_type;
     int polarity;   /**< Encoder polarity. >*/
     int pole_pairs; /**< Number of pole pairs (1-7) >*/
     int resolution; /**< number of ticks per turn >*/

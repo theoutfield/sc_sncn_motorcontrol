@@ -1,5 +1,6 @@
 #pragma once
 #include <foc_config.h>
+#include <motor_control_structures.h>
 
 //------------- ff ==>> filter enum index used with  filter_sum[8] --------------------------
 enum
@@ -48,7 +49,7 @@ int field_control(FieldControlParams &field_control_params, int field_new, int q
  * to
  *
  */
-int    adjust_angle_reference_pwm(int angle_inv_park, int angle_offset, int measure_tick, int speed_actual, int q_value, int filter_sum[], int feedback_sensor);
+int    adjust_angle_reference_pwm(int angle_inv_park, int angle_offset, int measure_tick, int speed_actual, int q_value, int filter_sum[], SensorType feedback_sensor);
 
 
 
