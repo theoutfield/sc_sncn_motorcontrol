@@ -10,6 +10,8 @@
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
 
+#define POSITION_LIMIT_THRESHOLD                20000  //threshold in ticks to re-enable the position controler if the limit reached
+
 /**
  * @brief Interface type to communicate with the Position Control Service.
  */

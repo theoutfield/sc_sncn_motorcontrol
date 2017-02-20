@@ -132,7 +132,6 @@
 //Limits
 #define MIN_POSITION_LIMIT                     -0x7fffffff
 #define MAX_POSITION_LIMIT                      0x7fffffff
-#define POSITION_LIMIT_THRESHOLD                20000  //threshold in ticks to re-enable the position controler if the limit reached
 #define TORQUE_CONTROL_LIMIT                    MAXIMUM_TORQUE
 
 //Integrated Profiler

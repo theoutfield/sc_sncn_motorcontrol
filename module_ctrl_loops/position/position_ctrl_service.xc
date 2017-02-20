@@ -293,10 +293,10 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                     if (position_limit_reached == 0)
                     {
                         position_limit_reached = 1;
-                        if (max_position-min_position > 2*pos_velocity_ctrl_config.pos_limit_threshold)
+                        if (max_position-min_position > 2*POSITION_LIMIT_THRESHOLD)
                         {
-                            max_position_orig = max_position-pos_velocity_ctrl_config.pos_limit_threshold;
-                            min_position_orig = min_position+pos_velocity_ctrl_config.pos_limit_threshold;
+                            max_position_orig = max_position-POSITION_LIMIT_THRESHOLD;
+                            min_position_orig = min_position+POSITION_LIMIT_THRESHOLD;
                         }
                         else
                         {
@@ -305,8 +305,8 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                         }
                     }
                     //increase limit by threashold
-                    max_position += pos_velocity_ctrl_config.pos_limit_threshold;
-                    min_position -= pos_velocity_ctrl_config.pos_limit_threshold;
+                    max_position += POSITION_LIMIT_THRESHOLD;
+                    min_position -= POSITION_LIMIT_THRESHOLD;
                 }
                 //test if we moved back inside the original limits, then restore the position limits
                 else if (position_limit_reached == 1 && upstream_control_data.position < max_position_orig && upstream_control_data.position > min_position_orig)
