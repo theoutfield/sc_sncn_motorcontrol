@@ -24,10 +24,11 @@ typedef enum {
  * @brief Type for position sensors.
  */
 typedef enum {
-    HALL_SENSOR= 1,
-    QEI_SENSOR = 2,
-    BISS_SENSOR= 4,
-    REM_16MT_SENSOR=6
+    HALL_SENSOR=1,
+    QEI_SENSOR,
+    BISS_SENSOR,
+    REM_14_SENSOR,
+    REM_16MT_SENSOR
 } SensorType;
 
 /**
@@ -85,7 +86,7 @@ typedef struct {
     BLDCWindingType bldc_winding_type;      /**< Type of winding of your motor (if using a BLDC motor). */
     PolarityType polarity_type;             /**< Type of polarity of your motor. */
     int licence;                            /**< Licence number for using the library of module_advanced_foc  */
-    int commutation_sensor;                 /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
+    SensorType commutation_sensor;          /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
     int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
     int hall_state[6];                       /**< Hall port state while being in sector [1-6] */
     int hall_state_angle[7];                 /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
