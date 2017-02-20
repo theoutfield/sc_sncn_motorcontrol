@@ -37,8 +37,6 @@ typedef struct {
 
     int control_mode;
 
-    int control_loop_period; /**< Period for the control loop [microseconds]. */
-
     int min_pos;
     int max_pos;
     int max_speed;

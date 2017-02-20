@@ -153,10 +153,12 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl);
 /**
  * @brief resetting the parameters of nonlinear position controller with saturation.
  * @param the parameters of the controller
+ * @param control_loop_period in us
  */
 void nl_position_control_set_parameters(
         NonlinearPositionControl &nl_pos_ctrl,
-        PosVelocityControlConfig &pos_velocity_ctrl_config);
+        PosVelocityControlConfig &pos_velocity_ctrl_config,
+        int control_loop_period);
 
 
 /**

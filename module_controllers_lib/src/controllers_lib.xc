@@ -188,7 +188,7 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
 }
 
 
-void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, PosVelocityControlConfig &pos_velocity_ctrl_config)
+void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, PosVelocityControlConfig &pos_velocity_ctrl_config, int control_loop_period)
 {
     //************************************************
     // set parameters of position controller structure
@@ -197,7 +197,7 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, P
     nl_pos_ctrl.k_fb = (nl_pos_ctrl.resolution)/(2.00*3.1416);
     nl_pos_ctrl.k_m  = ( (double)(1) )/1000.00;
     nl_pos_ctrl.j   = ((double)(pos_velocity_ctrl_config.j));
-    nl_pos_ctrl.ts_position = ((double)(pos_velocity_ctrl_config.control_loop_period))/1000000.00; //s
+    nl_pos_ctrl.ts_position = ((double)(control_loop_period))/1000000.00; //s
 
     //check if the PID parameters are in range
     if(0<=pos_velocity_ctrl_config.P_pos && pos_velocity_ctrl_config.P_pos<=100000000)

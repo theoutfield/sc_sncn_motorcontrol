@@ -126,8 +126,6 @@
 /////////////////////////////////////////////////
 //////  POSITION CONTROLLER
 /////////////////////////////////////////////////
-// POSITION CONTROL LOOP PERIOD [us]
-#define CONTROL_LOOP_PERIOD     1000
 
 //Limits
 #define MIN_POSITION_LIMIT                     -0x7fffffff
