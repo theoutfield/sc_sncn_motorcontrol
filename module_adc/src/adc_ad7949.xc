@@ -317,6 +317,7 @@ void adc_ad7949(
     int data_updated=0;
 
     int V_dc=0;
+    int dc_value=2617;
     int I_dc=0;
 
     int I_b=0;
@@ -353,6 +354,7 @@ void adc_ad7949(
                 v_dc_max=v_dc_max_in*v_ratio_in;
                 v_dc_min=v_dc_min_in*v_ratio_in;
                 current_limit = i_max_in * i_ratio_in;
+                if(v_ratio_in==100) dc_value=800;
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -445,7 +447,7 @@ void adc_ad7949(
                 if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
             }
 
-            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-2700;
+            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-dc_value;
 
             if (V_dc_out<v_dc_min && 5000<protection_counter)
             {

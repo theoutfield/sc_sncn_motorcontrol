@@ -25,7 +25,7 @@
 	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 
-    <Probe name="V_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="V_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="I_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="TEMPERATURE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="AI_A1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
