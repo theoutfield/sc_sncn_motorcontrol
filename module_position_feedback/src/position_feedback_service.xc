@@ -117,7 +117,7 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
         if (qei_hall_port_1 == null) {
             position_feedback_config.sensor_type = 0;
         } else {
-            hall_enc_select_config &= 0b1110; //set qei_hall_port_1 to hall mode
+            hall_enc_select_config &= 0b1110; //set qei_hall_port_1 to TTL mode
         }
     }
     else if (position_feedback_config.sensor_type == QEI_SENSOR)
@@ -125,7 +125,11 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
         if (qei_hall_port_2 == null) {
             position_feedback_config.sensor_type = 0;
         } else {
-            hall_enc_select_config |= 0b0010; //set qei_hall_port_2 to qei mode
+            if (position_feedback_config.qei_config.signal_type == QEI_TTL_SIGNAL) {
+                hall_enc_select_config &= 0b1101; //set qei_hall_port_2 to TTL mode
+            } else {
+                hall_enc_select_config |= 0b0010; //set qei_hall_port_2 to RS422 (differential) mode
+            }
         }
     }
     else if ((position_feedback_config.sensor_type == REM_16MT_SENSOR || position_feedback_config.sensor_type == REM_14_SENSOR)) {
@@ -349,7 +353,7 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
     port * movable gpio_ports_2[4];
 
     int spi_on = 0;
-    int hall_enc_select_config = 0b0011;
+    int hall_enc_select_config = 0b0011; // set qei_hall_port_1 and 2 to RS422 (differential) mode
 
     while(1) {
         //reset clocks and ports

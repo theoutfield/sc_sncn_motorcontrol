@@ -122,9 +122,9 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 if (new_pins_1 == new_pins) {
                     qei_hall_port.p_qei_hall :> new_pins;
                     if (new_pins_1 == new_pins) {
-                        v = lookup[new_pins][old_pins];
 
                         if (qei_type == QEI_WITH_NO_INDEX) {
+                            v = lookup[new_pins&0b11][old_pins];
                             { v, position } = lmul(1, position, v, -5);
                             if (position >= position_feedback_config.resolution) {
                                 position = 0;
@@ -132,6 +132,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                                 position = 0;
                             }
                         } else {
+                            v = lookup[new_pins][old_pins];
                             if (!v) {
                                 flag_index = 1;
                                 ok = 1;
@@ -218,7 +219,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
             case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position, unsigned int status }:
 
                 out_count = count;
-                out_position = count & (position_feedback_config.resolution - 1);
+                out_position = position;
                 break;
 
             case i_position_feedback[int i].get_velocity() -> int out_velocity:
