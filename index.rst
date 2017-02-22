@@ -71,6 +71,7 @@ Modules
 
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
 
+* `PWM Module <module_pwm/doc/index.html>`_: Service to generate center-aligned Pulse-Width modulation signals.
 * `Hall Sensor Feedback Module <module_hall/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
 * `Incremental Encoder Feedback Module <module_qei/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
 * `BiSS Encoder Feedback Module <module_biss/doc/index.html>`_: Driver to read data from BiSS Encoder.
