@@ -9,6 +9,8 @@
 #include <refclk.h>
 
 #include <motor_config.h>
+//#include <motor_config_AMK_DT4.h>
+#include <motor_config_Maxon_411678.h>
 
 
 /////////////////////////////////////////////

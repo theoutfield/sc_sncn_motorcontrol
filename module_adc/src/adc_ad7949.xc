@@ -445,7 +445,7 @@ void adc_ad7949(
                 if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
             }
 
-            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-2700;
+            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-2617;
 
             if (V_dc_out<v_dc_min && 5000<protection_counter)
             {
