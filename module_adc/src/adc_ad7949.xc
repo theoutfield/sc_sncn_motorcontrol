@@ -224,7 +224,7 @@ void adc_ad7949_service_demo(
                 break;
 
         case iADC[int i].set_protection_limits_and_analogue_input_configs(
-                int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
+                int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -325,6 +325,8 @@ void adc_ad7949(
     int v_dc_max=100;
     int v_dc_min=0;
     int current_limit = 100;
+    int protection_counter=0;
+
     int fault_code=NO_FAULT;
 
     //proper task startup
@@ -347,9 +349,9 @@ void adc_ad7949(
                 break;
 
         case iADC[int i].set_protection_limits_and_analogue_input_configs(
-                int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
-                v_dc_max=v_dc_max_in;
-                v_dc_min=v_dc_min_in;
+                int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
+                v_dc_max=v_dc_max_in*v_ratio_in;
+                v_dc_min=v_dc_min_in*v_ratio_in;
                 current_limit = i_max_in * i_ratio_in;
                 break;
 
@@ -431,19 +433,32 @@ void adc_ad7949(
             I_b = phaseB_out;
             I_c = phaseC_out;
 
-            if( I_b<(-current_limit) || current_limit<I_b)
+            if(( I_b<(-current_limit) || current_limit<I_b) && 5000<protection_counter)
             {
                 i_watchdog.protect(OVER_CURRENT_PHASE_B);
                 if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
             }
 
-            if( I_c<(-current_limit) || current_limit<I_c)
+            if(( I_c<(-current_limit) || current_limit<I_c) && 5000<protection_counter)
             {
                 i_watchdog.protect(OVER_CURRENT_PHASE_C);
                 if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
             }
 
-            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT];
+            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-2700;
+
+            if (V_dc_out<v_dc_min && 5000<protection_counter)
+            {
+                i_watchdog.protect(UNDER_VOLTAGE);
+                if(fault_code==0) fault_code=UNDER_VOLTAGE;
+            }
+
+            if (v_dc_max<V_dc_out && 5000<protection_counter)
+            {
+                i_watchdog.protect(OVER_VOLTAGE);
+                if(fault_code==0) fault_code=OVER_VOLTAGE;
+            }
+
             I_dc_out=OUT_B[AD_7949_VMOT_DIV_I_MOT];
             analogue_input_a_1 = OUT_A[AD_7949_EXT_A0_N_EXT_A1_N];
             analogue_input_b_1 = OUT_B[AD_7949_EXT_A0_N_EXT_A1_N];
@@ -466,6 +481,8 @@ void adc_ad7949(
 
         if(data_updated==1)
         {
+            if(protection_counter<10000) protection_counter++;
+
             t when timerafter (t_start + hdw_delay) :> void;
             for(j=AD_7949_EXT_A0_P_EXT_A1_P;AD_7949_IB_IC<=j;j--)
             {

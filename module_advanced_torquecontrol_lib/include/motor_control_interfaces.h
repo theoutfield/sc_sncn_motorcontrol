@@ -141,7 +141,7 @@ interface ADCInterface
      *      - V_dc_max
      *      - V_dc_min
      */
-    void set_protection_limits_and_analogue_input_configs(int, int, int, int);
+    void set_protection_limits_and_analogue_input_configs(int, int, int, int, int);
 
     /**
      * @brief Resets the fault state in adc service

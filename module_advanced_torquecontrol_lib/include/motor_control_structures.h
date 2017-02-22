@@ -104,7 +104,8 @@ typedef struct {
     int current_P_gain;                     /**< proportional constant in torque controller*/
     int current_I_gain;                     /**< integral constant in torque controller*/
     int current_D_gain;                     /**< derivative constant in torque controller*/
-    int current_ratio;                      //ratio between current recieved in control core, and real phase current
+    int current_ratio;                      // ratio between current recieved in control core, and real phase current
+    int voltage_ratio;                      // ratio between adc measured value and real dc-bus voltage
     int percent_offset_torque;              // (maximum) generated torque while finding offset value as a percentage of rated torque
 
     int phase_resistance;                   /**< uOhm*/

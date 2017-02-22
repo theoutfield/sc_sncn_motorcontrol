@@ -138,7 +138,7 @@ void adc_ad7265_service_demo(
                 break;
 
         case iADC[int i].set_protection_limits_and_analogue_input_configs(
-                int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
+                int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -184,6 +184,7 @@ void adc_ad7265(
     int v_dc_min=0   ;
     int i_max   =100 ;
     int current_limit = i_max * 20;
+    int protection_counter=0;
 
     int fault_code=NO_FAULT;
 
@@ -208,26 +209,6 @@ void adc_ad7265(
 
     configure_adc_ports_7265(adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
-    for (i=0;i<100;i++) //read ADC values several times to clear out noisy measurements at startup
-    {
-        adc_ports.p4_mux <: AD7265_SGL_A1_B1;   //mux_config;
-        clearbuf( adc_ports.p32_data[0] );      // Clear the buffers used by the input ports.
-        clearbuf( adc_ports.p32_data[1] );      // Clear the buffers used by the input ports.
-        adc_ports.p1_ready <: 1 @ time_stamp;   // Switch ON input reads (and ADC conversion)
-        time_stamp += (ADC_TOTAL_BITS+2);       // Allows sample-bits to be read on buffered input ports
-        adc_ports.p1_ready @ time_stamp <: 0;   // Switch OFF input reads, (and ADC conversion)
-
-        sync( adc_ports.p1_ready );             // Wait until port has completed any pending outputs
-
-        // Get data from port a
-        endin( adc_ports.p32_data[0] );         // End the previous input on this buffered port
-        adc_ports.p32_data[0] :> inp_val;       // Get new input
-
-        // Get data from port b
-        endin( adc_ports.p32_data[1] );         // End the previous input on this buffered port
-        adc_ports.p32_data[1] :> inp_val;       // Get new input
-    }
-
     if(operational_mode)
     {
         channel_config[AD_7265_AI_SIGNAL_1_3] = AD7265_DIFF_A3A4_B3B4;
@@ -247,10 +228,10 @@ void adc_ad7265(
                 break;
 
         case iADC[int i].set_protection_limits_and_analogue_input_configs(
-                int i_max_in, int i_ratio_in, int v_dc_max_in, int v_dc_min_in):
+                int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 i_max=i_max_in;
-                v_dc_max=v_dc_max_in;
-                v_dc_min=v_dc_min_in;
+                v_dc_max=v_dc_max_in*v_ratio_in;
+                v_dc_min=v_dc_min_in*v_ratio_in;
                 current_limit = i_max * i_ratio_in;
                 break;
 
@@ -292,13 +273,13 @@ void adc_ad7265(
             I_b = phaseB_out;
             I_c = phaseC_out;
 
-            if( I_b<(-current_limit) || current_limit<I_b)
+            if(( I_b<(-current_limit) || current_limit<I_b) && 5000<protection_counter)
             {
                 i_watchdog.protect(OVER_CURRENT_PHASE_B);
                 if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
             }
 
-            if( I_c<(-current_limit) || current_limit<I_c)
+            if(( I_c<(-current_limit) || current_limit<I_c) && 5000<protection_counter)
             {
                 i_watchdog.protect(OVER_CURRENT_PHASE_C);
                 if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
@@ -329,6 +310,8 @@ void adc_ad7265(
 
         if(data_updated==1)
         {
+            if(protection_counter<10000) protection_counter++;
+
             for(j=AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B;AD_7265_CURRENT_B_C<=j;j--)
             {
                 adc_ports.p4_mux <: channel_config[j];
@@ -360,15 +343,15 @@ void adc_ad7265(
                 OUT_B[j] = (int)tmp_val;
             }
 
-            V_dc = OUT_A[AD_7265_VDC_IDC]/56;
+            V_dc = OUT_A[AD_7265_VDC_IDC];
 
-            if (V_dc<v_dc_min)
+            if (V_dc<v_dc_min && 5000<protection_counter)
             {
                 i_watchdog.protect(UNDER_VOLTAGE);
                 if(fault_code==0) fault_code=UNDER_VOLTAGE;
             }
 
-            if (v_dc_max<V_dc)
+            if (v_dc_max<V_dc && 5000<protection_counter)
             {
                 i_watchdog.protect(OVER_VOLTAGE);
                 if(fault_code==0) fault_code=OVER_VOLTAGE;
