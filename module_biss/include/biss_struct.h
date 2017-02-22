@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <position_feedback_common.h>
+
 #define SET_ALL_AS_QEI                 0b0011
 #define SET_PORT1_AS_HALL_PORT2_AS_QEI 0b0010
 #define SET_PORT1_AS_QEI_PORT2_AS_HALL 0b0001
@@ -29,11 +31,6 @@ typedef enum {
     BISS_CLOCK_PORT_EXT_D5=0b1000  //8
 } BISSClockPortConfig;
 
-typedef enum {
-    BISS_DATA_PORT_1=0,
-    BISS_DATA_PORT_2
-} BISSDataPortConfig;
-
 /**
  * @brief Structure type to define the BiSS Service configuration.
  */
@@ -45,6 +42,6 @@ typedef struct {
     int clock_frequency;        /**< BiSS output clock frequency in kHz, supported frequencies depend on IFM Tile frequency */
     int timeout;                /**< Timeout after a BiSS read in clock ticks */
     int busy;                   /**< maximum number of bits to read before the start bit (= maximum duration of ack bit) */
-    BISSClockPortConfig clock_port_config; /**< Config of the biss clock port (4 or 1 bit) */
-    BISSDataPortConfig  data_port_config;  /**< Config of the biss data port (4 or 1 bit) */
+    BISSClockPortConfig clock_port_config;  /**< Config of the biss clock port (4 or 1 bit) */
+    EncoderPortType  data_port_config;      /**< Config with port is used for the biss data */
 } BISSConfig;

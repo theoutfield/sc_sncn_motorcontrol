@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <position_feedback_common.h>
+
 #define ERROR                   0
 #define SUCCESS                 1
 
@@ -32,6 +34,15 @@
 // longest (acceptable) electrical period
 #define HALL_PERIOD_MAX   1000000
 #define HALL_TRANSITION_PERIOD_MAX HALL_PERIOD_MAX/6
+
+
+/**
+ * @brief Structure type to define the Encoder Service configuration.
+ */
+typedef struct {
+    EncoderPortType port_config;    /**< Config which input port is used */
+} HallConfig;
+
 
 // variables related to hall measurement
 typedef struct

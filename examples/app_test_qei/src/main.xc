@@ -35,6 +35,7 @@ void qei_test(client interface PositionFeedbackInterface i_position_feedback, cl
     }
 }
 
+QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
 QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
 HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 
@@ -66,10 +67,11 @@ int main(void)
                 position_feedback_config.velocity_compute_period = SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.enable_push_service = PushAll;
 
-                position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
+                position_feedback_config.qei_config.index_type  = QEI_SENSOR_INDEX_TYPE;
                 position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
+                position_feedback_config.qei_config.port_config = QEI_SENSOR_PORT_CONFIG;
 
-                position_feedback_service(null, qei_hall_port_2, hall_enc_select_port, null, null, null, null, null,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

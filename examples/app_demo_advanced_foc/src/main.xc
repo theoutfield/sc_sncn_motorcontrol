@@ -165,6 +165,9 @@ int main(void) {
 
                     position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
                     position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
+                    position_feedback_config.qei_config.port_config = QEI_SENSOR_PORT_CONFIG;
+
+                    position_feedback_config.hall_config.port_config = HALL_SENSOR_PORT_CONFIG;
 
                     //setting second sensor
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;

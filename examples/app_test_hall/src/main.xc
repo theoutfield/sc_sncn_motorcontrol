@@ -41,6 +41,7 @@ void hall_test(client interface PositionFeedbackInterface i_position_feedback, c
 }
 
 QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
+QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
 
 int main(void)
 {
@@ -70,7 +71,9 @@ int main(void)
                 position_feedback_config.velocity_compute_period   = 1000;
                 position_feedback_config.enable_push_service = PushAll;
 
-                position_feedback_service(qei_hall_port_1, null, null, null, null, null, null, null,
+                position_feedback_config.hall_config.port_config = HALL_SENSOR_PORT_CONFIG;
+
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, null, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

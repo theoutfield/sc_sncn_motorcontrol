@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <position_feedback_common.h>
+
 /**
 * @brief Definition for referring to the Encoder sensor.
 */
@@ -52,10 +54,12 @@ typedef enum {
     QEI_WITH_INDEX  = 4     /**< Encoder with index signal.  */
 } QEI_IndexType;
 
+
 /**
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    QEI_IndexType index_type;   /**< Encoder index type. */
-    QEI_SignalType signal_type; /**< Encoder output signal type (if applicable in your SOMANET device). */
+    QEI_IndexType   index_type;     /**< Encoder index type. */
+    QEI_SignalType  signal_type;    /**< Encoder output signal type (if applicable in your SOMANET device). */
+    EncoderPortType port_config;    /**< Config which input port is used */
 } QEIConfig;

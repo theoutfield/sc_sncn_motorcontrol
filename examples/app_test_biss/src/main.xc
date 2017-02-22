@@ -32,7 +32,6 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 
         /* get position from BiSS Encoder */
         { count, position, status } = i_position_feedback.get_position();
-//        { real_count, void, status } = i_position_feedback.get_real_position();
 
         t :> start_time;
         /* get angle and velocity from BiSS Encoder */
@@ -62,6 +61,7 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
 QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
 HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
@@ -124,7 +124,7 @@ int main() {
                 position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
                 position_feedback_config.biss_config.data_port_config = BISS_DATA_PORT;
 
-                position_feedback_service(null, qei_hall_port_2, hall_enc_select_port, spi_ports, null, null, null, null,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

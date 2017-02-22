@@ -49,6 +49,7 @@ typedef struct {
     REM_16MTConfig rem_16mt_config;
     REM_14Config rem_14_config;
     QEIConfig qei_config;
+    HallConfig hall_config;
     GPIOType gpio_config[4];
 } PositionFeedbackConfig;
 
