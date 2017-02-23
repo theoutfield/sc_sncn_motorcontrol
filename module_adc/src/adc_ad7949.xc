@@ -320,9 +320,6 @@ void adc_ad7949(
     int dc_value=2617;
     int I_dc=0;
 
-    int I_b=0;
-    int I_c=0;
-
     int v_dc_max=100;
     int v_dc_min=0;
     int current_limit = 100;
@@ -432,35 +429,34 @@ void adc_ad7949(
             phaseB_out = (current_sensor_config.sign_phase_b * (((int) adc_data_a) - i_calib_a))/20;
             phaseC_out = (current_sensor_config.sign_phase_c * (((int) adc_data_b) - i_calib_b))/20;
 
-            I_b = phaseB_out;
-            I_c = phaseC_out;
-
-            if(( I_b<(-current_limit) || current_limit<I_b) && 5000<protection_counter)
-            {
-                i_watchdog.protect(OVER_CURRENT_PHASE_B);
-                if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
-            }
-
-            if(( I_c<(-current_limit) || current_limit<I_c) && 5000<protection_counter)
-            {
-                i_watchdog.protect(OVER_CURRENT_PHASE_C);
-                if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
-            }
-
             V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-dc_value;
 
-            if (V_dc_out<v_dc_min && 5000<protection_counter)
+            if(5000<protection_counter)
             {
-                i_watchdog.protect(UNDER_VOLTAGE);
-                if(fault_code==0) fault_code=UNDER_VOLTAGE;
-            }
+                if(( phaseB_out<(-current_limit) || current_limit<phaseB_out))
+                {
+                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
+                }
 
-            if (v_dc_max<V_dc_out && 5000<protection_counter)
-            {
-                i_watchdog.protect(OVER_VOLTAGE);
-                if(fault_code==0) fault_code=OVER_VOLTAGE;
-            }
+                if(( phaseC_out<(-current_limit) || current_limit<phaseC_out))
+                {
+                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
+                }
 
+                if (V_dc_out<v_dc_min)
+                {
+                    i_watchdog.protect(UNDER_VOLTAGE);
+                    if(fault_code==0) fault_code=UNDER_VOLTAGE;
+                }
+
+                if (v_dc_max<V_dc_out)
+                {
+                    i_watchdog.protect(OVER_VOLTAGE);
+                    if(fault_code==0) fault_code=OVER_VOLTAGE;
+                }
+            }
             I_dc_out=OUT_B[AD_7949_VMOT_DIV_I_MOT];
             analogue_input_a_1 = OUT_A[AD_7949_EXT_A0_N_EXT_A1_N];
             analogue_input_b_1 = OUT_B[AD_7949_EXT_A0_N_EXT_A1_N];
@@ -471,10 +467,9 @@ void adc_ad7949(
             break;
 
         case iADC[int i].reset_faults():
-                I_b=0;
-                I_c=0;
                 fault_code=NO_FAULT;
                 data_updated=0;
+                protection_counter=0;
                 i_watchdog.reset_faults();
                 break;
         default:
