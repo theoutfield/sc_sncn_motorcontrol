@@ -16,7 +16,7 @@
  * converted digital value from adc server.
  *
  * @param i_adc     Interface to communicate data with the server demo
- * @param i_adc     ADC type (AD_7949 or AD_7265)
+ * @param adc_type  ADC type (AD_7949 or AD_7265)
  *
  * @return void
  */
