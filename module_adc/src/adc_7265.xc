@@ -196,8 +196,6 @@ void adc_ad7265(
     int data_updated=0;
 
     int V_dc=0;
-    int I_b=0;
-    int I_c=0;
 
     int j=0;
     unsigned short channel_config[5] = {AD7265_SGL_A1_B1, AD7265_SGL_A2_B2, AD7265_SGL_A3_B3, AD7265_SGL_A4_B4, AD7265_SGL_A5_B5};
@@ -270,19 +268,31 @@ void adc_ad7265(
             phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
             phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
 
-            I_b = phaseB_out;
-            I_c = phaseC_out;
-
-            if(( I_b<(-current_limit) || current_limit<I_b) && 5000<protection_counter)
+            if(5000<protection_counter)
             {
-                i_watchdog.protect(OVER_CURRENT_PHASE_B);
-                if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
-            }
+                if(( phaseB_out<(-current_limit) || current_limit<phaseB_out))
+                {
+                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
+                }
 
-            if(( I_c<(-current_limit) || current_limit<I_c) && 5000<protection_counter)
-            {
-                i_watchdog.protect(OVER_CURRENT_PHASE_C);
-                if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
+                if(( phaseC_out<(-current_limit) || current_limit<phaseC_out))
+                {
+                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
+                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
+                }
+
+                if (V_dc<v_dc_min)
+                {
+                    i_watchdog.protect(UNDER_VOLTAGE);
+                    if(fault_code==0) fault_code=UNDER_VOLTAGE;
+                }
+
+                if (v_dc_max<V_dc)
+                {
+                    i_watchdog.protect(OVER_VOLTAGE);
+                    if(fault_code==0) fault_code=OVER_VOLTAGE;
+                }
             }
 
             V_dc_out           = OUT_A[AD_7265_VDC_IDC];
@@ -296,11 +306,10 @@ void adc_ad7265(
             break;
 
         case iADC[int i].reset_faults():
-                I_b=0;
-                I_c=0;
                 V_dc=(v_dc_min+v_dc_max)/2;
                 fault_code=NO_FAULT;
                 data_updated=0;
+                protection_counter=0;
                 i_watchdog.reset_faults();
                 break;
 
@@ -344,18 +353,6 @@ void adc_ad7265(
             }
 
             V_dc = OUT_A[AD_7265_VDC_IDC];
-
-            if (V_dc<v_dc_min && 5000<protection_counter)
-            {
-                i_watchdog.protect(UNDER_VOLTAGE);
-                if(fault_code==0) fault_code=UNDER_VOLTAGE;
-            }
-
-            if (v_dc_max<V_dc && 5000<protection_counter)
-            {
-                i_watchdog.protect(OVER_VOLTAGE);
-                if(fault_code==0) fault_code=OVER_VOLTAGE;
-            }
             data_updated=0;
         }
     }//eof while(1)
