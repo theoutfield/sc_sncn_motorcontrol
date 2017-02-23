@@ -64,11 +64,13 @@ int main(void)
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = HALL_SENSOR;
-                position_feedback_config.polarity    = 1;
-                position_feedback_config.pole_pairs  = 2;
+                position_feedback_config.resolution  = HALL_SENSOR_RESOLUTION;
+                position_feedback_config.polarity    = NORMAL_POLARITY;
+                position_feedback_config.velocity_compute_period = HALL_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                position_feedback_config.pole_pairs  = POLE_PAIRS;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                position_feedback_config.velocity_compute_period   = 1000;
+                position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 
                 position_feedback_config.hall_config.port_config = HALL_SENSOR_PORT_CONFIG;

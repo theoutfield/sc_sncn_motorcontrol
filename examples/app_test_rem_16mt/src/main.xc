@@ -317,12 +317,12 @@ int main(void)
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = REM_16MT_SENSOR;
-                position_feedback_config.polarity    = COMMUTATION_SENSOR_POLARITY;
+                position_feedback_config.resolution  = REM_16MT_SENSOR_RESOLUTION;
+                position_feedback_config.polarity    = NORMAL_POLARITY;
+                position_feedback_config.velocity_compute_period = REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.pole_pairs  = POLE_PAIRS;
-                position_feedback_config.resolution  = 65536;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                position_feedback_config.velocity_compute_period   = REM_16MT_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.enable_push_service = PushAll;
 

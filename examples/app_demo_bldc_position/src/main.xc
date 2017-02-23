@@ -271,12 +271,12 @@ int main(void)
                 {
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
-                    position_feedback_config.polarity    = COMMUTATION_SENSOR_POLARITY;
-                    position_feedback_config.pole_pairs  = POLE_PAIRS;
                     position_feedback_config.resolution  = COMMUTATION_SENSOR_RESOLUTION;
+                    position_feedback_config.polarity    = COMMUTATION_SENSOR_POLARITY;
+                    position_feedback_config.velocity_compute_period = COMMUTATION_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                    position_feedback_config.pole_pairs  = POLE_PAIRS;
                     position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                     position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                    position_feedback_config.velocity_compute_period   = COMMUTATION_VELOCITY_COMPUTE_PERIOD;
                     position_feedback_config.offset      = 0;
                     position_feedback_config.enable_push_service = PushAll;
 
@@ -291,16 +291,12 @@ int main(void)
 
                     position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
-                    position_feedback_config.rem_14_config.factory_settings = 1;
-                    position_feedback_config.rem_14_config.hysteresis = 1;
-                    position_feedback_config.rem_14_config.noise_setting = REM_14_NOISE_NORMAL;
-                    position_feedback_config.rem_14_config.uvw_abi = 0;
-                    position_feedback_config.rem_14_config.dyn_angle_comp = 0;
-                    position_feedback_config.rem_14_config.data_select = 0;
-                    position_feedback_config.rem_14_config.pwm_on = REM_14_PWM_OFF;
-                    position_feedback_config.rem_14_config.abi_resolution = 0;
+                    position_feedback_config.rem_14_config.hysteresis     = REM_14_SENSOR_HYSTERESIS ;
+                    position_feedback_config.rem_14_config.noise_setting  = REM_14_SENSOR_NOISE;
+                    position_feedback_config.rem_14_config.dyn_angle_comp = REM_14_SENSOR_DAE;
+                    position_feedback_config.rem_14_config.abi_resolution = REM_14_SENSOR_ABI_RES;
 
-                    position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
+                    position_feedback_config.qei_config.index_type  = QEI_SENSOR_INDEX_TYPE;
                     position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
                     position_feedback_config.qei_config.port_config = QEI_SENSOR_PORT_CONFIG;
 
@@ -314,7 +310,7 @@ int main(void)
                         position_feedback_config_2.sensor_type = MOTOR_FEEDBACK_SENSOR;
                         position_feedback_config_2.polarity    = FEEDBACK_SENSOR_POLARITY;
                         position_feedback_config_2.resolution  = FEEDBACK_SENSOR_RESOLUTION;
-                        position_feedback_config_2.velocity_compute_period = FEEDBACK_VELOCITY_COMPUTE_PERIOD;
+                        position_feedback_config_2.velocity_compute_period = FEEDBACK_SENSOR_VELOCITY_COMPUTE_PERIOD;
                         position_feedback_config_2.enable_push_service = PushPosition;
                         position_feedback_config.enable_push_service = PushAngle;
                     }

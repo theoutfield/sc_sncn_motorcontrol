@@ -140,7 +140,7 @@ void init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
         printstrln("REM_16MT");
         break;
     case REM_14_SENSOR:
-        if (init_status != SUCCESS_WRITING) {
+        if (init_status != REM_14_SUCCESS_WRITING) {
             printstrln("Error with SPI REM_14 sensor");
         }
         printstr(start_message);

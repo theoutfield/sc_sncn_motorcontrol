@@ -7,11 +7,7 @@
 
 #pragma once
 
-#define SPI_MASTER_MODE 1 //clock active high
-#define SPI_MASTER_SD_CARD_COMPAT 1 //MOSI high during input
-
-#define ERROR       0
-#define SUCCESS     1
+#define REM_16MT_SENSOR_RESOLUTION      (1<<16)
 
 #define REM_16MT_CTRL_RESET         0x00
 #define REM_16MT_CONF_DIR           0x55

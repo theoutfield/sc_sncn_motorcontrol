@@ -37,18 +37,18 @@ void initspi_ports(SPIPorts &spi_ports)
     unsigned short settings1 = 0, settings2 = 0;
 
     #if REM_14_SENSOR_TYPE == AS5147
-    settings1 = (config.rem_14_config.width_index_pulse << 0);
+    settings1 = (REM_14_WIDTH_INDEX_PULSE << 0);
     #else
-    settings1 = (config.rem_14_config.factory_settings << 0);
+    settings1 = (REM_14_FACTORY_SETTINGS << 0);
     #endif
     settings1 |= (config.rem_14_config.noise_setting << 1);
     if (config.polarity == INVERTED_POLARITY) {
         settings1 |= (1 << 2);
     }
-    settings1 |= (config.rem_14_config.uvw_abi << 3);
+    settings1 |= (REM_14_UVW_ABI << 3);
     settings1 |= (config.rem_14_config.dyn_angle_comp << 4);
-    settings1 |= (config.rem_14_config.data_select << 6);
-    settings1 |= (config.rem_14_config.pwm_on << 7);
+    settings1 |= (REM_14_DATA_SELECT << 6);
+    settings1 |= (REM_14_PWM_CONFIG << 7);
 
     settings2 = (config.pole_pairs-1) << 0;
     settings2 |= (config.rem_14_config.hysteresis << 3);
@@ -90,7 +90,7 @@ int initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config)
        return data_in;
     }
 
-    return SUCCESS_WRITING;
+    return REM_14_SUCCESS_WRITING;
 }
 
 /**
@@ -136,7 +136,7 @@ short SPIReadTransaction(SPIPorts &spi_ports, int ifm_usec, unsigned short reg) 
     *spi_ports.spi_interface.mosi <: 0;
 
     slave_deselect(*spi_ports.slave_select);                 //pause for
-    delay_ticks(ifm_usec/REM_14_SENSOR_EXECUTING_TIME);      //executing the command
+    delay_ticks(ifm_usec/REM_14_EXECUTING_TIME);      //executing the command
     slave_select(*spi_ports.slave_select);                   //on the sensor
 
     data_in = spi_master_in_short(spi_ports.spi_interface);  //handle response
@@ -160,14 +160,14 @@ short SPIWriteTransaction(SPIPorts &spi_ports, int ifm_usec, unsigned short reg,
     spi_master_out_short(spi_ports.spi_interface, reg);      //send command
 
     slave_deselect(*spi_ports.slave_select);                 //pause for
-    delay_ticks(ifm_usec/REM_14_SENSOR_EXECUTING_TIME);      //executing the command
+    delay_ticks(ifm_usec/REM_14_EXECUTING_TIME);      //executing the command
     slave_select(*spi_ports.slave_select);                   //on the sensor
 
     spi_master_out_short(spi_ports.spi_interface, data);
     *spi_ports.spi_interface.mosi <: 0;
 
     slave_deselect(*spi_ports.slave_select);                 //pause for
-    delay_ticks(ifm_usec/REM_14_SENSOR_SAVING_TIME);         //saving the data
+    delay_ticks(ifm_usec/REM_14_SAVING_TIME);         //saving the data
     slave_select(*spi_ports.slave_select);                   //on the reg
 
     data_in = spi_master_in_short(spi_ports.spi_interface);  //handle response
@@ -189,7 +189,7 @@ int readRedundancyReg(SPIPorts &spi_ports, int ifm_usec){
         return (data_in & BITS_5_MASK);
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -205,7 +205,7 @@ int readProgrammingReg(SPIPorts &spi_ports, int ifm_usec){
 
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -221,7 +221,7 @@ int readSettings1(SPIPorts &spi_ports, int ifm_usec){
 
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -237,7 +237,7 @@ int readSettings2(SPIPorts &spi_ports, int ifm_usec){
 
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -255,7 +255,7 @@ int readZeroPosition(SPIPorts &spi_ports, int ifm_usec){
 
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 
     data_in_tmp = SPIReadTransaction(spi_ports, ifm_usec, ADDR_ZPOSL);   //register address (LSB)
@@ -269,7 +269,7 @@ int readZeroPosition(SPIPorts &spi_ports, int ifm_usec){
 
         }else{
 
-            return PARITY_ERROR;
+            return REM_14_PARITY_ERROR;
         }
 }
 
@@ -285,7 +285,7 @@ int readCORDICMagnitude(SPIPorts &spi_ports, int ifm_usec){
 
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -302,7 +302,7 @@ int readRotaryDiagnosticAndAutoGainControl(SPIPorts &spi_ports, int ifm_usec){
 
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -318,7 +318,7 @@ int readRotarySensorError(SPIPorts &spi_ports, int ifm_usec){
 
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -335,7 +335,7 @@ int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, int ifm_usec){
 
    }else{
 
-       return PARITY_ERROR;
+       return REM_14_PARITY_ERROR;
    }
 }
 
@@ -352,7 +352,7 @@ int readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, int ifm_usec){
 
     } else {
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -384,14 +384,14 @@ int writeSettings(SPIPorts &spi_ports, int ifm_usec, unsigned short address, uns
 
         if((data_in & BITS_8_MASK) == data){
 
-            return SUCCESS_WRITING;
+            return REM_14_SUCCESS_WRITING;
         }else{
 
-            return ERROR_WRITING;
+            return REM_14_ERROR_WRITING;
         }
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 }
 
@@ -407,11 +407,11 @@ int writeZeroPosition(SPIPorts &spi_ports, int ifm_usec, unsigned short data){
 
         if((data_in & BITS_8_MASK) != msb_data){
 
-            return ERROR_WRITING;
+            return REM_14_ERROR_WRITING;
         }
     }else{
 
-        return PARITY_ERROR;
+        return REM_14_PARITY_ERROR;
     }
 
     lsb_data = data & BITS_6_MASK;
@@ -421,14 +421,14 @@ int writeZeroPosition(SPIPorts &spi_ports, int ifm_usec, unsigned short data){
 
         if((data_in & BITS_8_MASK) == lsb_data){
 
-            return SUCCESS_WRITING;
+            return REM_14_SUCCESS_WRITING;
         }else{
 
-            return ERROR_WRITING;
+            return REM_14_ERROR_WRITING;
         }
     }else{
 
-            return PARITY_ERROR;
+            return REM_14_PARITY_ERROR;
         }
 }
 

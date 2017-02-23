@@ -144,8 +144,8 @@ int main(void)
             {
                 //set default parameters
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.polarity    = 1;
-                position_feedback_config.pole_pairs  = 2;
+                position_feedback_config.polarity    = NORMAL_POLARITY;
+                position_feedback_config.pole_pairs  = POLE_PAIRS;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = 0;
@@ -162,16 +162,12 @@ int main(void)
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
-                position_feedback_config.rem_14_config.factory_settings = 1;
-                position_feedback_config.rem_14_config.hysteresis = 1;
-                position_feedback_config.rem_14_config.noise_setting = REM_14_NOISE_NORMAL;
-                position_feedback_config.rem_14_config.uvw_abi = 0;
-                position_feedback_config.rem_14_config.dyn_angle_comp = 0;
-                position_feedback_config.rem_14_config.data_select = 0;
-                position_feedback_config.rem_14_config.pwm_on = REM_14_PWM_OFF;
-                position_feedback_config.rem_14_config.abi_resolution = 0;
+                position_feedback_config.rem_14_config.hysteresis     = REM_14_SENSOR_HYSTERESIS ;
+                position_feedback_config.rem_14_config.noise_setting  = REM_14_SENSOR_NOISE;
+                position_feedback_config.rem_14_config.dyn_angle_comp = REM_14_SENSOR_DAE;
+                position_feedback_config.rem_14_config.abi_resolution = REM_14_SENSOR_ABI_RES;
 
-                position_feedback_config.qei_config.index_type = QEI_SENSOR_INDEX_TYPE;
+                position_feedback_config.qei_config.index_type  = QEI_SENSOR_INDEX_TYPE;
                 position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
                 position_feedback_config.qei_config.port_config = QEI_SENSOR_PORT_CONFIG;
 
@@ -187,13 +183,13 @@ int main(void)
 
                 //set sensor 1 parameters
                 position_feedback_config.sensor_type = HALL_SENSOR;
-                position_feedback_config.resolution  = 8192;
-                position_feedback_config.velocity_compute_period   = 1000;
+                position_feedback_config.resolution  = HALL_SENSOR_RESOLUTION;
+                position_feedback_config.velocity_compute_period = HALL_SENSOR_VELOCITY_COMPUTE_PERIOD;
 
                 //set sensor 1 parameters
                 position_feedback_config_2.sensor_type = BISS_SENSOR;
-                position_feedback_config_2.resolution  = (1<<BISS_SINGLETURN_RESOLUTION);
-                position_feedback_config.velocity_compute_period   = BISS_VELOCITY_COMPUTE_PERIOD;
+                position_feedback_config_2.resolution  = BISS_SENSOR_RESOLUTION;
+                position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
