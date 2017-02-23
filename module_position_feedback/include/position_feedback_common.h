@@ -14,4 +14,4 @@
 typedef enum {
     ENCODER_PORT_1 = 0,  /**< Encoder port 1 (value should be 0) */
     ENCODER_PORT_2 = 1   /**< Encoder port 0 (value should be 1) */
-} EncoderPortType;
+} EncoderPortNumber;

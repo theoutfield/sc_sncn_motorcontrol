@@ -61,5 +61,5 @@ typedef enum {
 typedef struct {
     QEI_IndexType   index_type;     /**< Encoder index type. */
     QEI_SignalType  signal_type;    /**< Encoder output signal type (if applicable in your SOMANET device). */
-    EncoderPortType port_config;    /**< Config which input port is used */
+    EncoderPortNumber port_number;  /**< Config which input port is used */
 } QEIConfig;

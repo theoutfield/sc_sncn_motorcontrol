@@ -30,7 +30,7 @@ unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * 
         clock_config = 1;
     }
     unsigned int data_port_config = 0;
-    if (biss_config.data_port_config == ENCODER_PORT_2) {
+    if (biss_config.data_port_number == ENCODER_PORT_2) {
         data_port_config = 1;
     }
 

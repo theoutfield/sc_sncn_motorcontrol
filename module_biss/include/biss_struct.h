@@ -43,5 +43,5 @@ typedef struct {
     int timeout;                /**< Timeout after a BiSS read in clock ticks */
     int busy;                   /**< maximum number of bits to read before the start bit (= maximum duration of ack bit) */
     BISSClockPortConfig clock_port_config;  /**< Config of the biss clock port (4 or 1 bit) */
-    EncoderPortType  data_port_config;      /**< Config with port is used for the biss data */
+    EncoderPortNumber  data_port_number;    /**< Config with port is used for the biss data */
 } BISSConfig;

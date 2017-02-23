@@ -14,4 +14,4 @@
 #define BISS_TIMEOUT               16*IFM_TILE_USEC // BiSS timeout in clock ticks
 #define BISS_BUSY                  30
 #define BISS_CLOCK_PORT            BISS_CLOCK_PORT_EXT_D5
-#define BISS_DATA_PORT             ENCODER_PORT_2
+#define BISS_DATA_PORT_NUMBER      ENCODER_PORT_2

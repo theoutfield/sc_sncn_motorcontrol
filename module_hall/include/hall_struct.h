@@ -40,7 +40,7 @@
  * @brief Structure type to define the Encoder Service configuration.
  */
 typedef struct {
-    EncoderPortType port_config;    /**< Config which input port is used */
+    EncoderPortNumber port_number;  /**< Config which input port is used */
 } HallConfig;
 
 
