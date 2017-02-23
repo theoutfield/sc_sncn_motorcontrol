@@ -316,7 +316,6 @@ void adc_ad7949(
 
     int data_updated=0;
 
-    int V_dc=0;
     int dc_value=2617;
     int I_dc=0;
 
