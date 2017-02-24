@@ -151,115 +151,53 @@ interface ADCInterface
 
 interface shared_memory_interface
 {
-
     /**
      * @brief send the status of memory manager task (ACTIVE or INACTIVE) to client side
      */
     int status(void);
 
     /**
-    * @brief Getter for electrical angle and current velocity and position.
+    * @brief Getter for UpstreamControlData in shared memory.
     *
-    * @return  Electrical angle.
-    * @return  Current velocity.
-    * @return  Current multiturn count.
+    * @return  UpstreamControlData in shared memory.
     */
-    {unsigned int, int, int} get_angle_velocity_position();
+    UpstreamControlData read();
 
     /**
-    * @brief Getter for electrical angle and current velocity and position.
-    *
-    * @return  Electrical angle.
-    * @return  Current velocity.
-    * @return  Current multiturn count.
-    * @return  Hall_state (in case HALL sensor is used)
-    */
-    {unsigned int, int, int, int} get_angle_velocity_position_hall();
-
-    /**
-    * @brief Getter for electrical angle and current velocity.
-    *
-    * @return  Electrical angle.
-    */
-    unsigned int get_angle();
-
-    /**
-    * @brief Getter for single-turn position.
-    *
-    * @return  Single-turn position in ticks.
-    */
-    unsigned get_position_singleturn();
-
-    /**
-    * @brief Getter for multi-turn position.
-    *
-    * @return  Multi-turn count.
-    * @return  Single-turn position in ticks.
-    */
-    {int, unsigned} get_position_multiturn();
-
-    /**
-    * @brief Write electrical angle to shared memory.
+    * @brief Write electrical angle and position data for motion control to shared memory.
     *
     * @param Electrical angle.
-    * @param  Hall state (in case HALL sensor is used)
+    * @param Hall state (in case HALL sensor is used).
+    * @param Position.
+    * @param Velocity.
     */
-    void write_angle_and_hall(int, int);
+    void write_commutation_and_motion_control(unsigned int angle, unsigned int hall_state, int position, int velocity);
 
     /**
-    * @brief Write current velocity to shared memory.
+    * @brief Write electrical angle and position data for feedback only to shared memory.
     *
-    * @param Current velocity.
+    * @param Electrical angle.
+    * @param Hall state (in case HALL sensor is used).
+    * @param Position.
+    * @param Velocity.
     */
-    void write_current_velocity(int);
+    void write_commutation_and_feedback_only(unsigned int angle, unsigned int hall_state, int position, int velocity);
 
     /**
-    * @brief Write single-turn position to shared memory.
+    * @brief Write position data for motion control only to shared memory.
     *
-    * @param  Single-turn position in ticks.
+    * @param Position.
+    * @param Velocity.
     */
-    void write_position_singleturn(unsigned);
+    void write_motion_control(int position, int velocity);
 
     /**
-    * @brief Write multi-turn position to shared memory.
+    * @brief Write position data for feedback only to shared memory.
     *
-    * @param  Multi-turn count.
-    * @param  Single-turn position in ticks.
+    * @param Position.
+    * @param Velocity.
     */
-    void write_position_multiturn(int, unsigned);
-
-    /**
-    * @brief Write multi-turn electrical angle and current velocity and position to shared memory.
-    *
-    * @param  Electrical angle.
-    * @param  Current velocity.
-    * @param  Multi-turn count.
-    */
-    void write_angle_velocity_position(unsigned int in_angle, int in_velocity, int in_count);
-
-     /**
-    * @brief Write multi-turn electrical angle and current velocity and position to shared memory.
-    *
-    * @param  Electrical angle.
-    * @param  Current velocity.
-    * @param  Multi-turn count.
-    * @param  Hall state (in case HALL sensor is used)
-    */
-    void write_angle_velocity_position_hall(unsigned int in_angle, int in_velocity, int in_count, int in_hall_state);
-   /**
-    * @brief Write multi-turn electrical angle and current velocity and position to shared memory.
-    *
-    * @param  Current velocity.
-    * @param  Multi-turn count.
-    */
-    void write_velocity_position(int in_velocity, int in_count);
-
-    /**
-    * @brief Getter for shared memory data.
-    *
-    * @return  shared memory data.
-    */
-    SharedMemoryData read();
+    void write_feedback_only(int position, int velocity);
 
     /**
      * @brief Write write gpio input data to shared memory, return the gpio output data.
@@ -276,7 +214,6 @@ interface shared_memory_interface
      * @param  gpio output data.
      */
     void write_gpio_output(unsigned int out_gpio);
-
 };
 
 interface update_pwm

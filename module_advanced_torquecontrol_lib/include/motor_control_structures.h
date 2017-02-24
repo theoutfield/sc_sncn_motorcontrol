@@ -132,18 +132,6 @@ typedef struct {
 
 } MotorcontrolConfig;
 
-/**
- * @brief Structure type for the shared memory data
- */
-typedef struct {
-    unsigned int angle;
-    int position;
-    unsigned position_singleturn;
-    int velocity;
-    int hall_state;
-    unsigned int gpio[4];
-} SharedMemoryData;
-
 
 /**
  * @brief Structure type to send the data from lower controlling levels
@@ -160,9 +148,15 @@ typedef struct
 
     int V_dc;
 
-    int angle;
+    unsigned int angle;
+    unsigned int hall_state;
+    int angle_velocity;
+
     int position;
     int velocity;
+
+    int position_additional;
+    int velocity_additional;
 
     int temperature;
 
@@ -170,6 +164,8 @@ typedef struct
     int analogue_input_a_2;
     int analogue_input_b_1;
     int analogue_input_b_2;
+
+    unsigned int gpio[4];
 
 }UpstreamControlData;
 
