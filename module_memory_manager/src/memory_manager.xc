@@ -31,7 +31,7 @@ void memory_manager(server interface shared_memory_interface i_shared_memory[n],
                 out_data = data;
                 break;
 
-        case i_shared_memory[int j].write_commutation_and_motion_control(unsigned int angle, unsigned int hall_state, int position, int velocity):
+        case i_shared_memory[int j].write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity):
                 data.angle = angle;
                 data.hall_state = hall_state;
                 data.angle_velocity = velocity;
@@ -39,7 +39,7 @@ void memory_manager(server interface shared_memory_interface i_shared_memory[n],
                 data.velocity = velocity;
                 break;
 
-        case i_shared_memory[int j].write_commutation_and_feedback_only(unsigned int angle, unsigned int hall_state, int position, int velocity):
+        case i_shared_memory[int j].write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity):
                 data.angle = angle;
                 data.hall_state = hall_state;
                 data.angle_velocity = velocity;
@@ -47,12 +47,12 @@ void memory_manager(server interface shared_memory_interface i_shared_memory[n],
                 data.velocity_additional = velocity;
                 break;
 
-        case i_shared_memory[int j].write_motion_control(int position, int velocity):
+        case i_shared_memory[int j].write_primary_feedback(int position, int velocity):
                 data.position = position;
                 data.velocity = velocity;
                 break;
 
-        case i_shared_memory[int j].write_feedback_only(int position, int velocity):
+        case i_shared_memory[int j].write_secondary_feedback(int position, int velocity):
                 data.position_additional = position;
                 data.velocity_additional = velocity;
                 break;
