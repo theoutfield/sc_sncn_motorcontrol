@@ -164,40 +164,40 @@ interface shared_memory_interface
     UpstreamControlData read();
 
     /**
-    * @brief Write electrical angle and position data for motion control to shared memory.
+    * @brief Write electrical angle and primary position feedback (used for motion control) to shared memory.
     *
     * @param Electrical angle.
     * @param Hall state (in case HALL sensor is used).
     * @param Position.
     * @param Velocity.
     */
-    void write_commutation_and_motion_control(unsigned int angle, unsigned int hall_state, int position, int velocity);
+    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity);
 
     /**
-    * @brief Write electrical angle and position data for feedback only to shared memory.
+    * @brief Write electrical angle and secondary position feedback (display only) to shared memory.
     *
     * @param Electrical angle.
     * @param Hall state (in case HALL sensor is used).
     * @param Position.
     * @param Velocity.
     */
-    void write_commutation_and_feedback_only(unsigned int angle, unsigned int hall_state, int position, int velocity);
+    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity);
 
     /**
-    * @brief Write position data for motion control only to shared memory.
+    * @brief Write primary position feedback (used for motion control) to shared memory.
     *
     * @param Position.
     * @param Velocity.
     */
-    void write_motion_control(int position, int velocity);
+    void write_primary_feedback(int position, int velocity);
 
     /**
-    * @brief Write position data for feedback only to shared memory.
+    * @brief Write secondary position feedback (display only) to shared memory.
     *
     * @param Position.
     * @param Velocity.
     */
-    void write_feedback_only(int position, int velocity);
+    void write_secondary_feedback(int position, int velocity);
 
     /**
      * @brief Write write gpio input data to shared memory, return the gpio output data.
