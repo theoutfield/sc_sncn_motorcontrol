@@ -35,13 +35,26 @@ typedef struct {
     GPIOType port_3;
 } GPIOConfig;
 
+
+/**
+ * @brief Sensor function type to select which data to write to the shared memory
+ */
+typedef enum {
+    SENSOR_FUNCTION_DISABLED=0,
+    SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
+    SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_ONLY,
+    SENSOR_FUNCTION_MOTION_CONTROL,
+    SENSOR_FUNCTION_FEEDBACK_ONLY
+} SensorFunction;
+
+
 typedef struct {
     SensorType sensor_type;
+    SensorFunction sensor_function; /**< Select which data to write to shared memory >*/
     int polarity;   /**< Encoder polarity. >*/
     int pole_pairs; /**< Number of pole pairs (1-7) >*/
     int resolution; /**< number of ticks per turn >*/
     int offset;     /**< position offset in ticks, can be singleturn or multiturn depending on the sensor >*/
-    int enable_push_service; /**< Select which data to push to shared memory >*/
     int ifm_usec;   /**< number of clock ticks in a microsecond >*/
     int velocity_compute_period; /**< velocity compute period in microsecond. Is also the polling period to write to the shared memory >*/
     int max_ticks; /**< reset multiturn to 0 when reached >*/
@@ -131,7 +144,7 @@ void multiturn(int &count, int last_position, int position, int ticks_per_turn);
 
 void switch_ifm_freq(PositionFeedbackConfig &position_feedback_config);
 
-void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int enable_push_service, int count, int velocity, int angle, int hall_state);
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int sensor_function, int count, int velocity, int angle, int hall_state);
 
 int velocity_compute(int difference, int timediff, int resolution);
 

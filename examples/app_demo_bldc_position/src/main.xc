@@ -51,7 +51,12 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
     profiler_config.polarity = POLARITY;
     profiler_config.max_position = MAX_POSITION_LIMIT;
     profiler_config.min_position = MIN_POSITION_LIMIT;
-    profiler_config.ticks_per_turn = FEEDBACK_SENSOR_RESOLUTION;
+    //select resolution of sensor used for motion control
+    if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
+        profiler_config.ticks_per_turn  =                          SENSOR_2_RESOLUTION;
+    } else {
+        profiler_config.ticks_per_turn  =                          SENSOR_1_RESOLUTION;
+    }
     profiler_config.max_velocity = MAX_SPEED;
     profiler_config.max_acceleration = MAX_ACCELERATION;
     profiler_config.max_deceleration = MAX_DECELERATION;
@@ -173,9 +178,15 @@ int main(void)
 
             pos_velocity_ctrl_config.position_fc =                          POSITION_FC;
             pos_velocity_ctrl_config.velocity_fc =                          VELOCITY_FC;
-            pos_velocity_ctrl_config.resolution  =                          FEEDBACK_SENSOR_RESOLUTION;
             pos_velocity_ctrl_config.special_brake_release =                ENABLE_SHAKE_BRAKE;
             pos_velocity_ctrl_config.brake_shutdown_delay =                 BRAKE_SHUTDOWN_DELAY;
+
+            //select resolution of sensor used for motion control
+            if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
+                pos_velocity_ctrl_config.resolution  =                          SENSOR_2_RESOLUTION;
+            } else {
+                pos_velocity_ctrl_config.resolution  =                          SENSOR_1_RESOLUTION;
+            }
 
             pos_velocity_ctrl_config.voltage_pull_brake=                    VOLTAGE_PULL_BRAKE;
             pos_velocity_ctrl_config.time_pull_brake =                      TIME_PULL_BRAKE;
@@ -232,7 +243,7 @@ int main(void)
                     motorcontrol_config.current_I_gain =  TORQUE_Ki;
                     motorcontrol_config.current_D_gain =  TORQUE_Kd;
                     motorcontrol_config.pole_pair =  POLE_PAIRS;
-                    motorcontrol_config.commutation_sensor=MOTOR_COMMUTATION_SENSOR;
+                    motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
                     motorcontrol_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
                     motorcontrol_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
@@ -270,15 +281,15 @@ int main(void)
                 /* Position feedback service */
                 {
                     PositionFeedbackConfig position_feedback_config;
-                    position_feedback_config.sensor_type = MOTOR_COMMUTATION_SENSOR;
-                    position_feedback_config.resolution  = COMMUTATION_SENSOR_RESOLUTION;
-                    position_feedback_config.polarity    = COMMUTATION_SENSOR_POLARITY;
-                    position_feedback_config.velocity_compute_period = COMMUTATION_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                    position_feedback_config.sensor_type = SENSOR_1_TYPE;
+                    position_feedback_config.resolution  = SENSOR_1_RESOLUTION;
+                    position_feedback_config.polarity    = SENSOR_1_POLARITY;
+                    position_feedback_config.velocity_compute_period = SENSOR_1_VELOCITY_COMPUTE_PERIOD;
                     position_feedback_config.pole_pairs  = POLE_PAIRS;
                     position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                     position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                     position_feedback_config.offset      = 0;
-                    position_feedback_config.enable_push_service = PushAll;
+                    position_feedback_config.sensor_function = SENSOR_1_FUNCTION;
 
                     position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                     position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;
@@ -305,14 +316,13 @@ int main(void)
                     //setting second sensor
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
                     position_feedback_config_2.sensor_type = 0;
-                    if (MOTOR_COMMUTATION_SENSOR != MOTOR_FEEDBACK_SENSOR) //enable second sensor when different from the first one
+                    if (SENSOR_2_FUNCTION != SENSOR_FUNCTION_DISABLED) //enable second sensor
                     {
-                        position_feedback_config_2.sensor_type = MOTOR_FEEDBACK_SENSOR;
-                        position_feedback_config_2.polarity    = FEEDBACK_SENSOR_POLARITY;
-                        position_feedback_config_2.resolution  = FEEDBACK_SENSOR_RESOLUTION;
-                        position_feedback_config_2.velocity_compute_period = FEEDBACK_SENSOR_VELOCITY_COMPUTE_PERIOD;
-                        position_feedback_config_2.enable_push_service = PushPosition;
-                        position_feedback_config.enable_push_service = PushAngle;
+                        position_feedback_config_2.sensor_type = SENSOR_2_TYPE;
+                        position_feedback_config_2.polarity    = SENSOR_2_POLARITY;
+                        position_feedback_config_2.resolution  = SENSOR_2_RESOLUTION;
+                        position_feedback_config_2.velocity_compute_period = SENSOR_2_VELOCITY_COMPUTE_PERIOD;
+                        position_feedback_config_2.sensor_function = SENSOR_2_FUNCTION;
                     }
 
                     position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,

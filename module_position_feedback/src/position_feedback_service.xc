@@ -264,15 +264,23 @@ int velocity_compute(int difference, int timediff, int resolution)
     return (difference * (60000000/timediff)) / resolution;
 }
 
-void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int enable_push_service, int count, int velocity, int angle, int hall_state)
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int sensor_function, int count, int velocity, int angle, int hall_state)
 {
     if (!isnull(i_shared_memory)) {
-        if (enable_push_service == PushAll) {
-            i_shared_memory.write_angle_velocity_position_hall(angle, velocity, count, hall_state);
-        } else if (enable_push_service == PushAngle) {
-            i_shared_memory.write_angle_and_hall(angle, hall_state);
-        } else if (enable_push_service == PushPosition) {
-            i_shared_memory.write_velocity_position(velocity, count);
+        switch(sensor_function)
+        {
+        case SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL:
+            i_shared_memory.write_commutation_and_motion_control(angle, hall_state, count, velocity);
+            break;
+        case SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_ONLY:
+            i_shared_memory.write_commutation_and_feedback_only(angle, hall_state, count, velocity);
+            break;
+        case SENSOR_FUNCTION_MOTION_CONTROL:
+            i_shared_memory.write_motion_control(count, velocity);
+            break;
+        case SENSOR_FUNCTION_FEEDBACK_ONLY:
+            i_shared_memory.write_feedback_only(count, velocity);
+            break;
         }
     }
 }

@@ -24,7 +24,9 @@ void qei_test(client interface PositionFeedbackInterface i_position_feedback, cl
         velocity = i_position_feedback.get_velocity();
 
         if (!isnull(i_shared_memory)) {
-            { void, velocity, count } = i_shared_memory.get_angle_velocity_position();
+            UpstreamControlData upstream_control_data = i_shared_memory.read();
+            count = upstream_control_data.position;
+            velocity = upstream_control_data.velocity;
         }
 
         xscope_int(COUNT, count);
@@ -60,12 +62,12 @@ int main(void)
             {
                 PositionFeedbackConfig position_feedback_config;
                 position_feedback_config.sensor_type = QEI_SENSOR;
-                position_feedback_config.polarity    = FEEDBACK_SENSOR_POLARITY;
+                position_feedback_config.polarity    = NORMAL_POLARITY;
                 position_feedback_config.resolution  = QEI_SENSOR_RESOLUTION;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                position_feedback_config.velocity_compute_period = SENSOR_VELOCITY_COMPUTE_PERIOD;
-                position_feedback_config.enable_push_service = PushAll;
+                position_feedback_config.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 position_feedback_config.qei_config.index_type  = QEI_SENSOR_INDEX_TYPE;
                 position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;

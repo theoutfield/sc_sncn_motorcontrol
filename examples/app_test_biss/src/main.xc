@@ -41,7 +41,10 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 
 
         if (!isnull(i_shared_memory)) {
-            { angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
+            UpstreamControlData upstream_control_data = i_shared_memory.read();
+            angle = upstream_control_data.angle;
+            count = upstream_control_data.position;
+            velocity = upstream_control_data.velocity;
         }
 
         xscope_int(COUNT, count);                           //absolute count
@@ -113,7 +116,7 @@ int main() {
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = 0;
-                position_feedback_config.enable_push_service = PushAll;
+                position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                 position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;

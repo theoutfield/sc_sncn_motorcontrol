@@ -42,11 +42,18 @@ void position_feedback_test(client interface PositionFeedbackInterface i_positio
         }
 
         if (!isnull(i_shared_memory)) {
-            { angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
-            SharedMemoryData data = i_shared_memory.read();
+            UpstreamControlData upstream_control_data = i_shared_memory.read();
+            //position data
+            angle = upstream_control_data.angle;
+            count = upstream_control_data.position;
+            velocity = upstream_control_data.velocity;
+
+            //write gpio
             unsigned int gpio_out = 0b1010;
             i_shared_memory.write_gpio_output(gpio_out);
-            xscope_int(GPIO_0, 1000 * data.gpio[0]);
+
+            //read gpio
+            xscope_int(GPIO_0, 1000 * upstream_control_data.gpio[0]);
         }
 
         xscope_int(COUNT_1, count);
@@ -149,7 +156,6 @@ int main(void)
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = 0;
-                position_feedback_config.enable_push_service = PushAll;
 
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                 position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;
@@ -185,11 +191,13 @@ int main(void)
                 position_feedback_config.sensor_type = HALL_SENSOR;
                 position_feedback_config.resolution  = HALL_SENSOR_RESOLUTION;
                 position_feedback_config.velocity_compute_period = HALL_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 //set sensor 1 parameters
                 position_feedback_config_2.sensor_type = BISS_SENSOR;
                 position_feedback_config_2.resolution  = BISS_SENSOR_RESOLUTION;
                 position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                position_feedback_config_2.sensor_function = SENSOR_FUNCTION_FEEDBACK_ONLY;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,

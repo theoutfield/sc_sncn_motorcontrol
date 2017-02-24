@@ -41,7 +41,7 @@ void rem_16mt_test(client interface PositionFeedbackInterface i_position_feedbac
     int count = 0;
     int velocity = 0;
     int position = 0;
-    int electrical_angle = 0;
+    int angle = 0;
     int status = 0;
     timer t;
     unsigned start_time, end_time;
@@ -58,13 +58,16 @@ void rem_16mt_test(client interface PositionFeedbackInterface i_position_feedbac
         //electrical_angle = i_position_feedback.get_angle();
 
         if (!isnull(i_shared_memory)) {
-            { electrical_angle, velocity, count } = i_shared_memory.get_angle_velocity_position();
+            UpstreamControlData upstream_control_data = i_shared_memory.read();
+            angle = upstream_control_data.angle;
+            count = upstream_control_data.position;
+            velocity = upstream_control_data.velocity;
         }
 
 
         //        xscope_int(COUNT, count);
         //        xscope_int(POSITION, position);
-        //        xscope_int(ANGLE, electrical_angle);
+        //        xscope_int(ANGLE, angle);
         //        xscope_int(VELOCITY, velocity);
         //        xscope_int(STATUS, status*1000);
         //        xscope_int(TIME, status);
@@ -278,7 +281,7 @@ int main(void)
                 motorcontrol_config.current_I_gain =  TORQUE_Ki;
                 motorcontrol_config.current_D_gain =  TORQUE_Kd;
                 motorcontrol_config.pole_pair =  POLE_PAIRS;
-                motorcontrol_config.commutation_sensor=MOTOR_COMMUTATION_SENSOR;
+                motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
                 motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
                 motorcontrol_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
                 motorcontrol_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
@@ -324,7 +327,7 @@ int main(void)
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = 0;
-                position_feedback_config.enable_push_service = PushAll;
+                position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 

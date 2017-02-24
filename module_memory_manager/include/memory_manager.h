@@ -9,18 +9,6 @@
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
 
-
-/**
- * @brief Type for wich data to push to the memory manager
- */
-typedef enum {
-    NoPush=0,
-    PushAngle,
-    PushPosition,
-    PushAll
-} PushType;
-
-
 /**
  * @brief Service to exchange data between tasks OF THE SAME TILE without blocking tasks execution.
  *

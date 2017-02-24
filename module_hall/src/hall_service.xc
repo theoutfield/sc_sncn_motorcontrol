@@ -45,7 +45,7 @@ static const unsigned int hall_state_next[6] = {
         HALL_STATE_0,
         HALL_STATE_2
 };
-//hall state to hall state pious
+//hall state to hall state previous
 static const unsigned int hall_state_prev[6] = {
         HALL_STATE_3,
         HALL_STATE_1,
@@ -424,7 +424,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 }
                 last_angle = angle_out;
 
-                write_shared_memory(i_shared_memory, position_feedback_config.enable_push_service, count, speed_out, angle_out, hall_state_new);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count, speed_out, angle_out, hall_state_new);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
