@@ -14,7 +14,7 @@ TARGET =
 APP_NAME = app_demo_adc
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_advanced_torquecontrol_lib module_biss module_board-support module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_memory_manager module_misc module_position_feedback module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master module_watchdog
+USED_MODULES = config_motor module_adc module_biss module_bldc_torque_control_lib module_board-support module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_memory_manager module_misc module_position_feedback module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master module_watchdog
 
 
 # The flags passed to xcc when building the application
