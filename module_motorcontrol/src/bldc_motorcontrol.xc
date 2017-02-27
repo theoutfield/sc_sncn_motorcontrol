@@ -58,9 +58,9 @@ static void commutation_init_to_zero(chanend c_pwm_ctrl, t_pwm_control & pwm_ctr
     int angle_pwm = 0;
     int count = 0;
     if (motorcontrol_config.bldc_winding_type == DELTA_WINDING)
-        motorcontrol_config.polarity_type = INVERTED_POLARITY;
+        motorcontrol_config.polarity_type = FLIPPED_CONNECTION;
     else
-        motorcontrol_config.polarity_type = NORMAL_POLARITY;
+        motorcontrol_config.polarity_type = NORMAL_CONNECTION;
     unsigned int pwm[3] = { 0, 0, 0 };
     int velocity = 0;
     int shutdown = 0; //Disable FETS
