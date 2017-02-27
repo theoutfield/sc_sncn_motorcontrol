@@ -56,7 +56,15 @@ typedef enum {
 } BLDCWindingType;
 
 /**
- * @brief Type for the polarity of a motor.
+ * @brief Fixes matching of reference torque sign to position and velocity signs.
+ */
+typedef enum {
+    NORMAL_CONNECTION  = 1,  /**< Normal connection  */
+    FLIPPED_CONNECTION =-1   /**< Flipped connection */
+} MotorPhasesConfiguration;
+
+/**
+ * @brief Type for the polarity of the position sensor
  */
 typedef enum {
     NORMAL_POLARITY  = 1, /**< Normal polarity. */
@@ -84,7 +92,7 @@ typedef struct {
     MotorType motor_type;                   /**< Type of motor to drive. */
     CommutationMethod commutation_method;   /**< Commutation method. */
     BLDCWindingType bldc_winding_type;      /**< Type of winding of your motor (if using a BLDC motor). */
-    PolarityType polarity_type;             /**< Type of polarity of your motor. */
+    MotorPhasesConfiguration terminal_connection;   /**< Type of polarity of your motor. */
     int licence;                            /**< Licence number for using the library of module_advanced_foc  */
     SensorType commutation_sensor;          /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
     int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
