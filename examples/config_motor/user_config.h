@@ -103,8 +103,7 @@
 //////////////////////////////////////////////
 #define VDC             20
 
-// COMMUTATION LOOP PERIOD (if applicable) [us]
-#define COMMUTATION_LOOP_PERIOD     83
+// COMMUTATION FREQUENCY [kHz]
 #define COMMUTATION_FRQ             24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]

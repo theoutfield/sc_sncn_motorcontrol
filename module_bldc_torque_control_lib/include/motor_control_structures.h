@@ -99,8 +99,6 @@ typedef struct {
     int hall_state[6];                       /**< Hall port state while being in sector [1-6] */
     int hall_state_angle[7];                 /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
 
-    int commutation_loop_period;            /**< Period for the commutation loop [microseconds]. */
-
     //variables added to be used in motor_control_service
     int pole_pair;                          /**< motor pole pair*/
     int max_torque;                         /**< maximum motor torque*/
