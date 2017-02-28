@@ -3,13 +3,13 @@
 SOMANET Motor Control Library
 ==============================
 
-The **SOMANET Motor Control Library** provides services and utilities to perform BLDC/BDC Motor Control using SOMANET devices.
-The library offer following functionalities:
+The **SOMANET Motor Control Library** provides services and utilities to perform BLDC Motor Control using SOMANET devices.
+The library offers following functionalities:
 
-* BLDC and Brushed DC motors control
-* Sinusoidal BLDC commutation
-* Position, Velocity and torque control loops (up to 18KHz)
-* Feedback sensor support (Hall Sensor, Incremental Encoder, BiSS, AMS Magnetic Rotary sensor via SPI)
+* BLDC motors control
+* Field Oriented Control
+* Position, Velocity, and Torque control loops
+* Feedback sensor support (Hall Sensor, Incremental Encoder, BiSS, Magnetic Rotary sensors via SPI)
 * Basic Motion Profile Generation
 * Fully featured ADC driver
 * Configurable software defined PWM module 
@@ -46,7 +46,7 @@ Hardware Compatibility
 +==========================================================================================================+
 | SOMANET Core: :ref:`C22 <core_c22>`, :ref:`C21 DX <core_c21_dx>`                                         |
 +----------------------------------------------------------------------------------------------------------+
-| SOMANET IFM: **DC30**, :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 1000**, **DC 5000**    |
+| SOMANET IFM:  :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 1000**, **DC 5000**             |
 +----------------------------------------------------------------------------------------------------------+
 
 Modules
@@ -63,10 +63,11 @@ Modules
 	ADC Module <module_adc/doc/index>
 	Watchdog Module <module_watchdog/doc/index>
 	GPIO Server Module <module_gpio/doc/index>
-	Motor Control Module <module_motorcontrol/doc/index>
+	BLDC Torque Control Module <module_bldc_torque_control_lib/doc/index>
 	Miscellaneous Module <module_misc/doc/index>
 	Control Loops Module <module_ctrl_loops/doc/index>
 	Profile Module <module_profile/doc/index>
+	Controllers Library <module_controllers_lib/doc/index>
 	
 
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
@@ -75,13 +76,14 @@ This is the complete list of modules currently included in the **SOMANET Motor C
 * `Hall Sensor Feedback Module <module_hall/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
 * `Incremental Encoder Feedback Module <module_qei/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
 * `BiSS Encoder Feedback Module <module_biss/doc/index.html>`_: Driver to read data from BiSS Encoder.
-* `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC on your IFM DC board.
+* `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC on your IFM Drive board.
 * `Watchdog Module <module_watchdog/doc/index.html>`_: Driver for the Watchdog on your IFM DC board.
 * `GPIO Server Module <module_gpio/doc/index.html>`_: Contains a service to handle the external digital input/outputs of your board.
-* `Motor Control Module <module_motorcontrol/doc/index.html>`_: Provide a service to commutate BLDC motors and drive Brushed DC motors.
+* `BLDC Torque Control Module <module_bldc_torque_control_lib/doc/index>`_: Provides a service to control torque of BLDC motors.
 * `Control Loops Module <module_ctrl_loops/doc/index.html>`_: Provide services for position, velocity and control loops. 
 * `Profile Module <module_profile/doc/index.html>`_: Contains software for profile ramps generation.
 * `Miscellaneous Module <module_misc/doc/index.html>`_: Contains constants and utilities used by the library.
+* `Controllers Library <module_controllers_lib/doc/index>`_: Contains PID and NL controllers implementations.
 
 Examples
 --------
