@@ -213,8 +213,13 @@
 
 #define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
 
-//in case of using non-linear position control set "POSITION_INTEGRAL_LIMIT" to 1000
-#define POSITION_INTEGRAL_LIMIT                 1000
+/*
+ * set "POSITION_INTEGRAL_LIMIT" equal to:
+ *      "MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
+ *      "PEAK_SPEED"     in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
+ *      "1000"           in case of using position controller in "NL_POSITION_CONTROLLER"               mode
+ */
+#define POSITION_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
 
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
