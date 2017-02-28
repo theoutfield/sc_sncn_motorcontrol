@@ -58,34 +58,9 @@
 // POLARITY OF SENSOR_2 SENSOR [1,-1]
 #define SENSOR_2_POLARITY                 NORMAL_POLARITY
 
-
-//////////////////////////////////////////////
-//////  RECUPERATION MODE PARAMETERS
-//////////////////////////////////////////////
-
-/*
- * By default, RECUPERATION MODE is activated. Setting the maximum power of recuperation to a high
- * value (such as 10 times the nominal power) results in having no limit while working under recuperation mode.
- * In high-power applications (such as electric vehicles), this mode shoule
- * be activated only if dc-power supply is capable of accepting energy.
- * */
-
-#define RECUPERATION        1          // when RECUPERATION is 0, there will be no recuperation
-
-#define BATTERY_E_MAX       80         // maximum energy status of battery
-#define BATTERY_E_MIN       10         // minimum energy status of battery
-
-#define REGEN_P_MAX         50000      // maximum regenerative power (in Watts)
-#define REGEN_P_MIN         0          // minimum regenerative power (in Watts)
-
-#define REGEN_SPEED_MAX     650
-#define REGEN_SPEED_MIN     50         // minimum value of the speed which is considered in regenerative calculations
-
-
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-
 #define I_MAX           100     //maximum tolerable value of phase current (under abnormal conditions)
 #define V_DC_MAX        60      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define V_DC_MIN        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
