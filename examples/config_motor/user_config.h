@@ -205,10 +205,6 @@
 #define VELOCITY_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
 
 
-//Filter parameters
-#define POSITION_FC             100
-#define VELOCITY_FC             90
-
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////

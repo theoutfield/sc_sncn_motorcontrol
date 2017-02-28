@@ -158,8 +158,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
 
-    second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, POSITION_CONTROL_LOOP_PERIOD, position_SO_LP_filter_param);
-    second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, POSITION_CONTROL_LOOP_PERIOD, velocity_SO_LP_filter_param);
 
     pid_init(velocity_control_pid_param);
     if(pos_velocity_ctrl_config.P_velocity<0)            pos_velocity_ctrl_config.P_velocity=0;
@@ -508,9 +506,6 @@ break;
                 pid_set_parameters((double)pos_velocity_ctrl_config.P_pos, (double)pos_velocity_ctrl_config.I_pos,
                         (double)pos_velocity_ctrl_config.D_pos, (double)pos_velocity_ctrl_config.integral_limit_pos,
                         POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-
-                second_order_LP_filter_init(pos_velocity_ctrl_config.position_fc, POSITION_CONTROL_LOOP_PERIOD, position_SO_LP_filter_param);
-                second_order_LP_filter_init(pos_velocity_ctrl_config.velocity_fc, POSITION_CONTROL_LOOP_PERIOD, velocity_SO_LP_filter_param);
 
                 pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
                 pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
