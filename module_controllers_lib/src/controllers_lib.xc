@@ -84,66 +84,6 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
 
 
 /**
- * @brief updating the PID controller.
- * @param output, control command
- * @param input, setpoint
- * @param input, feedback
- * @param input, sample-time in us (microseconds).
- * @param the parameters of the PID controller
- */
-double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed, int speed_max)
-{
-    double error=0.00, error_temp_cmd=0.00, temp_cmd=0.00, cmd=0.00, proportional_term=0.00, integral_term=0.00, derivative_term=0.00;
-
-    error = desired_value - actual_value;
-
-    param.integral += (param.Ki/1000000.00) * error;
-
-    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
-        param.integral -= ((param.Ki/1000000.00) * error);
-
-    proportional_term = (param.Kp/1000000.00) * (desired_value- actual_value);
-
-    temp_cmd = proportional_term + param.integral;
-
-    if(temp_cmd> speed_max) temp_cmd= speed_max;
-    if(temp_cmd<-speed_max) temp_cmd=-speed_max;
-
-    error_temp_cmd = temp_cmd - speed;
-
-    cmd = (param.Kd/1000000.00) * error_temp_cmd;
-
-    param.actual_value_1n = actual_value;
-    return cmd;
-}
-
-
-
-/**
- * @brief velocity controller
- * @param output, torque command in milli-Nm
- * @param input, velocity reference in rpm
- * @param input, measured velocity in rpm
- * @param the parameters of the PID controller
- */
-double velocity_controller(double desired_value, double actual_value, PIDparam &param)
-{
-    double error=0.00, cmd=0.00, integral_term=0.00;
-
-    error = desired_value - actual_value;
-
-    param.integral += (param.Ki/1000000.00) * error;
-    if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
-        param.integral -= ((param.Ki/1000000.00) * error);
-
-    cmd = param.integral + ((param.Kd/1000000.00)*(param.actual_value_1n-actual_value)) + ((param.Kp/1000000.00)*error);
-
-    param.actual_value_1n = actual_value;
-    return cmd;
-}
-
-
-/**
  * @brief resetting the parameters of the PID controller.
  * @param the parameters of the controller
  */

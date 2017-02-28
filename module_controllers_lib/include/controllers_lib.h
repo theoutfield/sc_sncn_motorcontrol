@@ -133,17 +133,6 @@ void pid_reset(PIDparam &param);
 
 
 /**
- * @brief velocity controller
- * @param output, torque command in milli-Nm
- * @param input, velocity reference in rpm
- * @param input, measured velocity in rpm
- * @param the parameters of the PID controller
- */
-double velocity_controller(double desired_value, double actual_value, PIDparam &param);
-
-
-double pos_cascade_controller(double desired_value, double actual_value, int T_s, PIDparam &param, int speed, int speed_max);
-/**
  * @brief resetting the parameters of the nonlinear position controller with saturation.
  * @param the parameters of the controller
  */
