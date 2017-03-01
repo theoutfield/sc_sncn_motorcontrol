@@ -145,7 +145,7 @@ int main(void)
             position_feedback_test(i_position_feedback[0], i_position_feedback_2[0], i_shared_memory[1]);
 
             /* Shared memory Service */
-            [[distribute]] memory_manager(i_shared_memory, 3);
+            [[distribute]] shared_memory_service(i_shared_memory, 3);
 
             /* Position feedback service */
             {

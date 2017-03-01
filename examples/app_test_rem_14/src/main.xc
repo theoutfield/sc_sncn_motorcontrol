@@ -76,7 +76,7 @@ int main(void)
             rem_14_test(i_position_feedback[0], null);
 
             /* Shared memory Service */
-            [[distribute]] memory_manager(i_shared_memory, 2);
+            [[distribute]] shared_memory_service(i_shared_memory, 2);
 
             /* Position feedback service */
             {

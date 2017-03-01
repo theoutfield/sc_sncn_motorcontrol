@@ -88,7 +88,7 @@ How to use
             {
 
                 on tile[IFM_TILE]: par {
-                    memory_manager(i_shared_memory, 3);
+                    shared_memory_service(i_shared_memory, 3);
 
                     /* Position feedback service */
                     {

@@ -8,7 +8,7 @@
 #include <string.h>
 
 [[distributable]]
-void memory_manager(server interface shared_memory_interface i_shared_memory[n], unsigned n){
+void shared_memory_service(server interface shared_memory_interface i_shared_memory[n], unsigned n){
 
     UpstreamControlData data = {0};
     unsigned int gpio_write_buffer = 0;
