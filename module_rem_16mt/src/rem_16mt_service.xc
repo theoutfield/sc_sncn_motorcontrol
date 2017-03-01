@@ -31,14 +31,6 @@ void init_spi_ports(SPIPorts &spi_ports)
     slave_deselect(*spi_ports.slave_select); // Ensure slave select is in correct start state
 }
 
-void reset_spi_ports(SPIPorts &spi_ports)
-{
-    set_clock_on(spi_ports.spi_interface.blk2);
-    set_clock_on(spi_ports.spi_interface.blk1);
-    set_port_use_on(*spi_ports.spi_interface.mosi);
-    set_port_use_on(*spi_ports.spi_interface.miso);
-    set_port_use_on(*spi_ports.spi_interface.sclk);
-}
 
 #ifdef REM_16MT_USE_TIMESTAMP
 int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned singleturn_raw, unsigned timestamp) {

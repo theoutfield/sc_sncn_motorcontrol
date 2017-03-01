@@ -482,10 +482,10 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
             spi_ports_1 = move(spi_ports_2);
         }
         if (spi_on) {
-            gpio_ports[0] = reconfigure_port(move((*spi_ports_2).slave_select), port);
-            gpio_ports[1] = reconfigure_port(move((*spi_ports_2).spi_interface.sclk), port);
-            gpio_ports[2] = reconfigure_port(move((*spi_ports_2).spi_interface.miso), port);
-            gpio_ports[3] = reconfigure_port(move((*spi_ports_2).spi_interface.mosi), port);
+            gpio_ports[0] = reconfigure_port(move((*spi_ports_1).slave_select), port);
+            gpio_ports[1] = reconfigure_port(move((*spi_ports_1).spi_interface.sclk), port);
+            gpio_ports[2] = reconfigure_port(move((*spi_ports_1).spi_interface.miso), port);
+            gpio_ports[3] = reconfigure_port(move((*spi_ports_1).spi_interface.mosi), port);
             spi_on = 0;
         }
     }

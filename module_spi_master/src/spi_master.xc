@@ -13,6 +13,13 @@
 
 void spi_master_init(spi_master_interface &spi_if, unsigned spi_clock_div)
 {
+    //reset ports and clock blocks
+    set_clock_on(spi_if.blk1);
+    set_clock_on(spi_if.blk2);
+    set_port_use_on(*spi_if.mosi);
+    set_port_use_on(*spi_if.miso);
+    set_port_use_on(*spi_if.sclk);
+
     // configure ports and clock blocks
     configure_clock_rate(spi_if.blk1, 250, spi_clock_div);
 #if SPI_MASTER_MODE == 0
