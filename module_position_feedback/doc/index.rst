@@ -1,14 +1,14 @@
 .. _module_position_feedback:
 
-=====================
+========================
 Position Feedback Module
-=====================
+========================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-This module provides a Service which starts one or two Position Sensor Services among BiSS, Contelec, AMS, Hall and QEI.
+This module provides a Service which starts one or two Position Sensor Services among BiSS, REM 16MT, REM 14, Hall and QEI. The service can also manage the GPIO ports.
 
 The service takes as parameters:
  - ports for the different sensors
@@ -16,11 +16,22 @@ The service takes as parameters:
  - client interfaces to the shared memory for each of the sensor services (2).
  - server interfaces for the sensor services (2).
 
-The service will initialize the ports and detect wrong configuration (for exemple starting two sensor services using the same ports). Then it will start one or two services. The second service is optional and will not be started if no config structure or server interface is provided it. The type sensor service started are set using the ``sensor_type`` parameter of the config structure.
+The service will initialize the ports and detect wrong configurations (for exemple starting two sensor services using the same ports). Then it will start one or two services. The second service is optional and will not be started if no config structure or server interface is provided it. The types of the sensor services started are set using the ``sensor_type`` parameter of the config structure.
 
-The services have an ``exit()`` interface call which will end their loop and the Position Feedback Service will restart and start a new service. Again according to the ``sensor_type`` parameter, so if it did not change the same services will restart.
+The service provides an interface which can be used to get or set the configuration or the position data. This interface should only be used for configuration and debug purposes. For periodic data reading the shared memory should be used.
 
-The BiSS Service should always run over an **IFM Tile** so it can access the ports to
+The shared memory is useful for other services to retrieve position and velocity data without blocking. There are 5 modes to configure which data is sent to the shared memory:
+  - send nothing
+  - send the electrical angle for commutation and the absolute position/velocity for motion control
+  - send the electrical angle for commutation and the absolute position/velocity for secondary feedback (for display only)
+  - send only the absolute position/velocity for motion control
+  - send only the absolute position/velocity for secondary feedback (for display only)
+
+The mode is set using the ``sensor_function`` parameter of the config structure.
+
+It is possible to switch the sensor service type at runtime. You need fist to update the config structure to set the ``sensor_type`` that you want. Then you call the ``exit()`` interface which will restart the Position Feedback Service with the new sensor service.
+
+This Service should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
 
 
@@ -31,11 +42,11 @@ How to use
 
 .. seealso:: You might find useful the :ref:`Position feedback Demo <app_test_position_feedback>`, which illustrates the use of this module.
 
-1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile. The Position Feedback Service needs all the sensor modules it supports (BiSS, Contelec, AMS, Hall and QEI).
+1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile. The Position Feedback Service needs all the sensor modules it supports (BiSS, REM 16MT, REM 14, Hall and QEI).
 
     ::
 
-        USED_MODULES = module_ams_rotary_sensor module_biss module_board-support module_contelec_encoder module_hall module_memory_manager module_misc module_position_feedback module_qei module_spi_master
+        USED_MODULES = config_motor module_biss module_bldc_torque_control_lib module_board-support module_hall module_memory_manager module_misc module_position_feedback module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules.
           This will help solving internal dependency issues.
@@ -58,9 +69,14 @@ How to use
 
         #include <position_feedback_service.h>
        
-        HallPorts hall_ports = SOMANET_IFM_HALL_PORTS;
-        SPIPorts spi_ports = SOMANET_IFM_AMS_PORTS;
-        QEIPorts qei_ports = SOMANET_IFM_QEI_PORTS;
+        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
+        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
+        HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
+        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+        port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
+        port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
+        port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
+        port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
         int main(void)
         {
@@ -76,50 +92,59 @@ How to use
 
                     /* Position feedback service */
                     {
+                        //set default parameters
                         PositionFeedbackConfig position_feedback_config;
-                        position_feedback_config.sensor_type = HALL_SENSOR;
+                        position_feedback_config.polarity    = NORMAL_POLARITY;
+                        position_feedback_config.pole_pairs  = POLE_PAIRS;
+                        position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                        position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
+                        position_feedback_config.offset      = 0;
 
-                        position_feedback_config.biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
                         position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                        position_feedback_config.biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                        position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-                        position_feedback_config.biss_config.status_length = BISS_STATUS_LENGTH;
+                        position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;
                         position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-                        position_feedback_config.biss_config.pole_pairs = 2;
-                        position_feedback_config.biss_config.polarity = BISS_POLARITY;
-                        position_feedback_config.biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-                        position_feedback_config.biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
+                        position_feedback_config.biss_config.clock_frequency = BISS_CLOCK_FREQUENCY;
                         position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-                        position_feedback_config.biss_config.max_ticks = BISS_MAX_TICKS;
-                        position_feedback_config.biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                        position_feedback_config.biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
-                        position_feedback_config.biss_config.enable_push_service = PushAll;
+                        position_feedback_config.biss_config.busy = BISS_BUSY;
+                        position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
+                        position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
 
-                        position_feedback_config.contelec_config.filter = CONTELEC_FILTER;
-                        position_feedback_config.contelec_config.polarity = CONTELEC_POLARITY;
-                        position_feedback_config.contelec_config.resolution_bits = CONTELEC_RESOLUTION;
-                        position_feedback_config.contelec_config.offset = CONTELEC_OFFSET;
-                        position_feedback_config.contelec_config.pole_pairs = 2;
-                        position_feedback_config.contelec_config.timeout = CONTELEC_TIMEOUT;
-                        position_feedback_config.contelec_config.velocity_loop = CONTELEC_VELOCITY_LOOP;
-                        position_feedback_config.contelec_config.enable_push_service = PushAll;
+                        position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
-                        position_feedback_config.hall_config.pole_pairs = 2;
-                        position_feedback_config.hall_config.enable_push_service = PushAll;
+                        position_feedback_config.rem_14_config.hysteresis     = REM_14_SENSOR_HYSTERESIS ;
+                        position_feedback_config.rem_14_config.noise_setting  = REM_14_SENSOR_NOISE;
+                        position_feedback_config.rem_14_config.dyn_angle_comp = REM_14_SENSOR_DAE;
+                        position_feedback_config.rem_14_config.abi_resolution = REM_14_SENSOR_ABI_RES;
 
-                        position_feedback_config.qei_config.ticks_resolution = 1000;
-                        position_feedback_config.qei_config.index_type = QEI_WITH_INDEX;
-                        position_feedback_config.qei_config.sensor_polarity = 1;
-                        position_feedback_config.qei_config.signal_type = QEI_RS422_SIGNAL;
-                        position_feedback_config.qei_config.enable_push_service = PushPosition;
+                        position_feedback_config.qei_config.index_type  = QEI_SENSOR_INDEX_TYPE;
+                        position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
+                        position_feedback_config.qei_config.port_number = QEI_SENSOR_PORT_NUMBER;
+
+                        position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+
+                        position_feedback_config.gpio_config[0] = GPIO_INPUT_PULLDOWN;
+                        position_feedback_config.gpio_config[1] = GPIO_OUTPUT;
+                        position_feedback_config.gpio_config[2] = GPIO_OUTPUT;
+                        position_feedback_config.gpio_config[3] = GPIO_OUTPUT;
 
                         PositionFeedbackConfig position_feedback_config_2;
                         position_feedback_config_2 = position_feedback_config;
-                        position_feedback_config_2.sensor_type = BISS_SENSOR;
 
-                        position_feedback_service(hall_ports, qei_ports, spi_ports,
-                                                  position_feedback_config, i_shared_memory[0], i_position_feedback_1,
-                                                  position_feedback_config_2, null, i_position_feedback_2);
+                        //set sensor 1 parameters
+                        position_feedback_config.sensor_type = HALL_SENSOR;
+                        position_feedback_config.resolution  = HALL_SENSOR_RESOLUTION;
+                        position_feedback_config.velocity_compute_period = HALL_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                        position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
+
+                        //set sensor 1 parameters
+                        position_feedback_config_2.sensor_type = BISS_SENSOR;
+                        position_feedback_config_2.resolution  = BISS_SENSOR_RESOLUTION;
+                        position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                        position_feedback_config_2.sensor_function = SENSOR_FUNCTION_FEEDBACK_ONLY;
+
+                        position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                                position_feedback_config, i_shared_memory[0], i_position_feedback,
+                                position_feedback_config_2, null, i_position_feedback_2);
                     }
                 }
             }
@@ -128,3 +153,25 @@ How to use
         }
 
 
+
+
+API
+===
+
+Types
+-----
+
+.. doxygenenum:: GPIOType
+.. doxygenenum:: SensorFunction
+.. doxygenstruct:: GPIOConfig
+.. doxygenstruct:: PositionFeedbackConfig
+
+Service
+--------
+
+.. doxygenfunction:: position_feedback_service
+
+Interface
+---------
+
+.. doxygeninterface:: PositionFeedbackInterface
