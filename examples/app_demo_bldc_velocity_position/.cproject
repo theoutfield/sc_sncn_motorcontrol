@@ -344,7 +344,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC500}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs2a}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
@@ -362,7 +362,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
@@ -371,7 +371,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_GPIO-A}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
@@ -856,7 +856,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC500}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs2a}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
@@ -874,7 +874,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
@@ -883,7 +883,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_GPIO-A}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>
@@ -1375,7 +1375,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC500}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib/xs2a}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
@@ -1393,7 +1393,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback}&quot;"/>
@@ -1402,7 +1402,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_GPIO-A}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_controllers_lib/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/libsrc/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc/predriver}&quot;"/>

@@ -13,7 +13,7 @@ TARGET =
 APP_NAME = app_demo_bldc_position
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_adc module_biss module_bldc_torque_control_lib module_board-support module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_memory_manager module_misc module_position_feedback module_profile module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master module_watchdog
+USED_MODULES = config_motor module_adc module_biss module_bldc_torque_control_lib module_board-support module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_shared_memory module_misc module_position_feedback module_profile module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master module_watchdog
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

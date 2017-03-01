@@ -14,7 +14,7 @@ TARGET =
 APP_NAME = app_test_rem_16mt
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_biss module_board-support module_rem_14 module_rem_16mt module_serial_encoder module_memory_manager module_misc module_position_feedback module_spi_master module_qei
+USED_MODULES = module_biss module_board-support module_rem_14 module_rem_16mt module_serial_encoder module_shared_memory module_misc module_position_feedback module_spi_master module_qei
 #For Motor Test
 USED_MODULES += config_motor module_adc module_bldc_torque_control_lib module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_pwm module_watchdog
 

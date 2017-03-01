@@ -204,7 +204,7 @@ typedef struct {
     out port ?p_hall_enc_select; /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). Also used for the BiSS clock output */
 } HallEncSelectPort;
 
-#include <memory_manager.h>
+#include <shared_memory.h>
 #include <biss_service.h>
 #include <rem_16mt_service.h>
 #include <rem_14_service.h>

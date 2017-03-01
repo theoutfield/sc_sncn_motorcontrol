@@ -336,14 +336,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_ctrl}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_linear_mode}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
@@ -828,14 +828,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_ctrl}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_linear_mode}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>
@@ -1327,14 +1327,14 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_ctrl}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profile/profile_linear_mode}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_memory_manager/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_filters_lib/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_foc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/include}&quot;"/>

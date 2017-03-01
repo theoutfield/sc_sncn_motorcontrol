@@ -29,7 +29,7 @@ How to use
 
     ::
 
-		USED_MODULES = config_motor module_adc module_advanced_torquecontrol_lib module_biss module_board-support module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_memory_manager module_misc module_position_feedback module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master module_watchdog
+		USED_MODULES = config_motor module_adc module_advanced_torquecontrol_lib module_biss module_board-support module_controllers_lib module_ctrl_loops module_filters_lib module_foc module_hall module_shared_memory module_misc module_position_feedback module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master module_watchdog
 
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 

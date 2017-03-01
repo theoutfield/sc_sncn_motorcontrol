@@ -1,5 +1,5 @@
 /**
- * @file memory_manager.h
+ * @file shared_memory.h
  * @brief Memory management task for asynchronous communication
  * @author Synapticon GmbH <support@synapticon.com>
  */

@@ -800,7 +800,7 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="module_memory_manager.null.852729435" name="module_memory_manager"/>
+		<project id="module_shared_memory.null.852729435" name="module_shared_memory"/>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>

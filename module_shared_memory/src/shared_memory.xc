@@ -1,10 +1,10 @@
 /**
- * @file memory_manager.h
+ * @file shared_memory.xc
  * @brief Memory management task for asynchronous communication
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <memory_manager.h>
+#include <shared_memory.h>
 #include <string.h>
 
 [[distributable]]
