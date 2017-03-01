@@ -1,8 +1,6 @@
-/*
- * position_feedback_service.h
- *
- *  Created on: May 27, 2016
- *      Author: romuald
+/**
+ * @file position_feedback_service.h
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #pragma once
@@ -58,7 +56,6 @@ typedef enum {
 
 /**
  * @brief Configuration structure of the position feedback service.
- *
  */
 typedef struct {
     SensorType sensor_type; /**< Select the sensor type */
