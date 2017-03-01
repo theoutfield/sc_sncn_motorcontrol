@@ -57,7 +57,7 @@ Modules
 	:hidden:
 
 	PWM Module <module_pwm/doc/index>
-	Position Feedback Module <module_position_feedback/doc/index.rst>
+	Position Feedback Module <module_position_feedback/doc/index>
 	Hall Sensor Feedback Module <module_hall/doc/index>
 	Incremental Encoder Feedback Module <module_qei/doc/index>
 	BiSS Encoder Feedback Module <module_biss/doc/index>
@@ -74,7 +74,7 @@ Modules
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
 
 * `PWM Module <module_pwm/doc/index.html>`_: Service to generate center-aligned Pulse-Width modulation signals.
-* `Position Feedback Module <module_position_feedback/doc/index.html>`_: Service to read and position, velocity and electrical angle from various position sensors (Hall, QEI, BiSS, REM 16MT, REM 14).
+* `Position Feedback Module <module_position_feedback/doc/index.html>`_: Service to read position data from various sensors.
 * `Hall Sensor Feedback Module <module_hall/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
 * `Incremental Encoder Feedback Module <module_qei/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
 * `BiSS Encoder Feedback Module <module_biss/doc/index.html>`_: Driver to read data from BiSS Encoder.
