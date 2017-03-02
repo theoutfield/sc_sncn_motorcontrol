@@ -475,6 +475,39 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 }
                 break;
 
+        //check status and reset faults if any
+        case 'z':
+            UpstreamControlData upstream_control_data = i_position_control.update_control_data(downstream_control_data);
+
+            if (upstream_control_data.error_status == NO_FAULT) {
+                printf("No fault\n");
+            } else {
+                //disable position and motorcontrol
+                i_position_control.disable();
+                brake_flag = 0;
+
+                //print fault
+                if(upstream_control_data.error_status == WRONG_LICENCE)
+                    printf(">>  WRONG LICENCE NUMBER ...\n");
+                else if(upstream_control_data.error_status != NO_FAULT)
+                    printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
+
+                //reset fault
+                printf("Reset fault...\n");
+                i_position_control.reset_motorcontrol_faults();
+
+                //check if reset worked
+                delay_milliseconds(500);
+                upstream_control_data = i_position_control.update_control_data(downstream_control_data);
+                if(upstream_control_data.error_status == NO_FAULT)
+                {
+                    printf(">>  FAULT REMOVED\n");
+                } else {
+                    printf(">>  FAULT ID %i NOT REMOVED!\n");
+                }
+            }
+            break;
+
         //disable controllers
         default:
                 i_position_control.disable();

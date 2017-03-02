@@ -82,6 +82,11 @@ interface PositionVelocityCtrlInterface{
      */
     MotorcontrolConfig set_offset_detection_enabled();
 
+    /**
+     * @brief Send a reset fault command to the motorcontrol
+     */
+    void reset_motorcontrol_faults();
+
     int get_position();
 
     int get_velocity();

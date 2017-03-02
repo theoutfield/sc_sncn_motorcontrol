@@ -617,6 +617,10 @@ break;
                 position_enable_flag = 0;
                 velocity_enable_flag = 0;
                 break;
+
+        case i_position_control[int i].reset_motorcontrol_faults():
+                i_motorcontrol.reset_faults();
+                break;
         }
     }
 }
