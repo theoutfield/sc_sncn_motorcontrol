@@ -18,30 +18,37 @@
  */
 typedef enum {
     NoError=0,       /**< no error */
-    CRCCorrected=1,  /**< CRC corrected  */
-    CRCError=2,      /**< CRC mismatch  */
+    CRCError=1,      /**< CRC mismatch  */
     NoAck,           /**< Ack bit not found. */
     NoStartBit       /**< Start bit not found */
 } BISS_ErrorType;
 
+/**
+ * @brief Type for the BiSS clock port config
+ *
+ * There are 4 possible BiSS clock port configurations.
+ * The first two use the GPIO ports 2 and 3. The value is used as the index of the gpio port array (for example gpio_ports[BISS_CLOCK_PORT_EXT_D2])
+ * The last two are the third and fourth bits of the hall_enc_select_port. The value is used as a mask for outputing to this port (for example hall_enc_select_port <: BISS_CLOCK_PORT_EXT_D4)
+ * So the values of the enum should not be changed.
+ */
 typedef enum {
-    BISS_CLOCK_PORT_EXT_D2=2,
-    BISS_CLOCK_PORT_EXT_D3=3,
-    BISS_CLOCK_PORT_EXT_D4=0b0100, //4
-    BISS_CLOCK_PORT_EXT_D5=0b1000  //8
+    BISS_CLOCK_PORT_EXT_D2=2,       /**< GPIO port number 2 */
+    BISS_CLOCK_PORT_EXT_D3=3,       /**< GPIO port number 1 */
+    BISS_CLOCK_PORT_EXT_D4=0b0100,  /**< hall_enc_select_port 3rd bit */
+    BISS_CLOCK_PORT_EXT_D5=0b1000   /**< hall_enc_select_port 4th bit */
 } BISSClockPortConfig;
 
 /**
- * @brief Structure type to define the BiSS Service configuration.
+ * @brief Structure type to define the BiSS sensor configuration.
  */
 typedef struct {
     int multiturn_resolution;   /**< Number of bits of multiturn resolution */
     int singleturn_resolution;  /**< Number of bits of singleturn resolution */
     int filling_bits;           /**< Number of filling bits between the singleturn data status data*/
-    int crc_poly;               /**< CRC polynom in reverse representation:  x^0 + x^1 + x^4 is 0b1100 */
+    int crc_poly;               /**< CRC polynom in reverse representation:  x^0 + x^1 + x^6 is 0b110000 */
     int clock_frequency;        /**< BiSS output clock frequency in kHz, supported frequencies depend on IFM Tile frequency */
-    int timeout;                /**< Timeout after a BiSS read in clock ticks */
-    int busy;                   /**< maximum number of bits to read before the start bit (= maximum duration of ack bit) */
-    BISSClockPortConfig clock_port_config;  /**< Config of the biss clock port (4 or 1 bit) */
-    EncoderPortNumber  data_port_number;    /**< Config with port is used for the biss data */
+    int timeout;                /**< Timeout after a BiSS read in microseconds */
+    int busy;                   /**< maximum number of bits to read before the start bit (= maximum duration of ACK bit) */
+    BISSClockPortConfig clock_port_config;  /**< Configure of the biss clock port (GPIO or hall_enc_select_port) */
+    EncoderPortNumber  data_port_number;    /**< Configure which port is used for the biss input data */
 } BISSConfig;

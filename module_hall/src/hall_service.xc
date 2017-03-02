@@ -14,10 +14,10 @@ int check_hall_config(PositionFeedbackConfig &position_feedback_config){
 
     if (position_feedback_config.pole_pairs < 1) {
         printstrln("hall_service: ERROR: Wrong Hall configuration: wrong pole-pairs");
-        return ERROR;
+        return HALL_ERROR;
     }
 
-    return SUCCESS;
+    return HALL_SUCCESS;
 }
 
 void sector_transition(hall_variables& hv, int pin_state);
@@ -88,10 +88,9 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 {
 
 #ifdef DEBUG_POSITION_FEEDBACK
-    if (check_hall_config(position_feedback_config) == ERROR) {
+    if (check_hall_config(position_feedback_config) != HALL_SUCCESS) {
         printstrln("hall_service: ERROR: Error while checking the Hall sensor configuration");
         position_feedback_config.sensor_type = 0;
-        return;
     }
 
     printstr(start_message);
@@ -224,7 +223,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 break;
 
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
-                int ifm_usec = position_feedback_config.ifm_usec;
+                UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
                 hv.hall_pole_pairs = position_feedback_config.pole_pairs;
@@ -411,7 +410,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 angle_out = hv.hall_interpolated_angle;
                 speed_out = hv.hall_filtered_speed;
 
-                if (hv.sensor_polarity==-1)//inverted polarity
+                if (position_feedback_config.polarity==SENSOR_POLARITY_INVERTED)//inverted polarity
                 {
                     angle_out = 4095 - angle_out;
                     speed_out = -speed_out;

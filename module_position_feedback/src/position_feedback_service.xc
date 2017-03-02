@@ -1,9 +1,8 @@
-/*
- * position_feedback_service.xc
- *
- *  Created on: May 27, 2016
- *      Author: romuald
+/**
+ * @file position_feedback_service.xc
+ * @author Synapticon GmbH <support@synapticon.com>
  */
+
 
 #include <position_feedback_service.h>
 #include <serial_encoder_service.h>
@@ -38,7 +37,7 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
         select {
         //receive config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
-                int ifm_usec = position_feedback_config.ifm_usec;
+                UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
                 break;
@@ -234,15 +233,6 @@ void reset_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
     }
 }
 
-void switch_ifm_freq(PositionFeedbackConfig &position_feedback_config)
-{
-    if (position_feedback_config.ifm_usec == USEC_FAST) { //Set freq to 250MHz
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-    } else {
-        position_feedback_config.ifm_usec = USEC_STD;
-    }
-}
-
 int tickstobits(uint32_t ticks)
 {
     return (31-clz(ticks));
@@ -264,7 +254,7 @@ int velocity_compute(int difference, int timediff, int resolution)
     return (difference * (60000000/timediff)) / resolution;
 }
 
-void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int sensor_function, int count, int velocity, int angle, int hall_state)
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int velocity, int angle, int hall_state)
 {
     if (!isnull(i_shared_memory)) {
         switch(sensor_function)
@@ -339,7 +329,9 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                                client interface shared_memory_interface ?i_shared_memory_2,
                                server interface PositionFeedbackInterface (&?i_position_feedback_2)[3])
 {
-    switch_ifm_freq(position_feedback_config_1);
+    if (position_feedback_config_1.ifm_usec == USEC_FAST) { //Set freq to 250MHz
+        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    }
 
     //pointers to ports 1
     QEIHallPort * movable qei_hall_port_1_1 = &qei_hall_port_1;

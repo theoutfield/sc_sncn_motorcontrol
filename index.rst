@@ -61,6 +61,10 @@ Modules
 	Hall Sensor Feedback Module <module_hall/doc/index>
 	Incremental Encoder Feedback Module <module_qei/doc/index>
 	BiSS Encoder Feedback Module <module_biss/doc/index>
+	REM 14 Module <module_rem_14/doc/index>
+	REM 16MT Module <module_rem_16mt/doc/index>
+	Serial Encoder Module <module_serial_encoder/doc/index>
+	SPI Master Module <module_spi_master/doc/index>
 	ADC Module <module_adc/doc/index>
 	Watchdog Module <module_watchdog/doc/index>
 	GPIO Server Module <module_gpio/doc/index>
@@ -78,6 +82,10 @@ This is the complete list of modules currently included in the **SOMANET Motor C
 * `Hall Sensor Feedback Module <module_hall/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
 * `Incremental Encoder Feedback Module <module_qei/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
 * `BiSS Encoder Feedback Module <module_biss/doc/index.html>`_: Driver to read data from BiSS Encoder.
+* `REM 14 Module <module_rem_14/doc/index.html>`_: Driver to read data from REM 14 Encoder.
+* `REM 16MT Module <module_rem_16mt/doc/index.html>`_: Driver to read data from REM 16MT Encoder.
+* `Serial Encoder Module <module_serial_encoder/doc/index.html>`_: Service to read position data from a Serial Encoder (SPI or BiSS)
+* `SPI Master Module <module_spi_master/doc/index.html>`_: Driver to read/write data from/to a SPI Slave.
 * `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC on your IFM Drive board.
 * `Watchdog Module <module_watchdog/doc/index.html>`_: Driver for the Watchdog on your IFM DC board.
 * `GPIO Server Module <module_gpio/doc/index.html>`_: Contains a service to handle the external digital input/outputs of your board.

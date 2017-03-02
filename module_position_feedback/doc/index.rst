@@ -163,8 +163,13 @@ Types
 
 .. doxygenenum:: GPIOType
 .. doxygenenum:: SensorFunction
-.. doxygenstruct:: GPIOConfig
+.. doxygenenum:: EncoderPortNumber
 .. doxygenstruct:: PositionFeedbackConfig
+
+
+.. doxygenstruct:: QEIHallPort
+.. doxygenstruct:: HallEncSelectPort
+.. doxygenstruct:: SPIPorts
 
 Service
 --------
@@ -175,3 +180,15 @@ Interface
 ---------
 
 .. doxygeninterface:: PositionFeedbackInterface
+
+
+Functions
+---------
+
+.. doxygenfunction:: tickstobits
+.. doxygenfunction:: multiturn
+.. doxygenfunction:: write_shared_memory
+.. doxygenfunction:: velocity_compute
+.. doxygenfunction:: gpio_read
+.. doxygenfunction:: gpio_write
+.. doxygenfunction:: gpio_shared_memory

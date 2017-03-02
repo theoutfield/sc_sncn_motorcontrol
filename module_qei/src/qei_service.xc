@@ -39,20 +39,20 @@ int check_qei_config(PositionFeedbackConfig &position_feedback_config)
 {
     if (position_feedback_config.qei_config.index_type < 3  || position_feedback_config.qei_config.index_type > 4) {
         printstrln("qei_service: ERROR: Wrong QEI configuration: wrong type");
-        return ERROR;
+        return QEI_ERROR;
     }
 
-    if (position_feedback_config.polarity != -1 && position_feedback_config.polarity != 1) {
+    if (position_feedback_config.polarity != SENSOR_POLARITY_INVERTED && position_feedback_config.polarity != SENSOR_POLARITY_NORMAL) {
         printstrln("qei_service: ERROR: Wrong QEI configuration: wrong polarity");
-        return ERROR;
+        return QEI_ERROR;
     }
 
     if (position_feedback_config.resolution < 0) {
         printstrln("qei_service: ERROR: Wrong QEI configuration: wrong resolution");
-        return ERROR;
+        return QEI_ERROR;
     }
 
-    return SUCCESS;
+    return QEI_SUCCESS;
 }
 
 #pragma unsafe arrays
@@ -62,7 +62,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 {
 
 #ifdef DEBUG_POSITION_FEEDBACK
-    if (check_qei_config(position_feedback_config) == ERROR) {
+    if (check_qei_config(position_feedback_config) != QEI_SUCCESS) {
         position_feedback_config.sensor_type = 0;
         return;
     }
@@ -154,7 +154,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                             difference = position - previous_position;
                             //xscope_int(1, difference);
                             if (difference >= qei_crossover) {
-                                if (position_feedback_config.polarity == QEI_POLARITY_NORMAL) {
+                                if (position_feedback_config.polarity == SENSOR_POLARITY_NORMAL) {
                                     count = count - 1;
                                 } else {
                                     count = count + 1;
@@ -163,7 +163,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                                 calib_fw_flag = 1;
                                 direction = -1;
                             } else if (difference <= -qei_crossover) {
-                                if (position_feedback_config.polarity == QEI_POLARITY_NORMAL) {
+                                if (position_feedback_config.polarity == SENSOR_POLARITY_NORMAL) {
                                     count = count + 1;
                                 } else {
                                     count = count - 1;
@@ -172,7 +172,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                                 calib_bw_flag = 1;
                                 direction = +1;
                             } else if (difference <= 2 && difference > 0) {
-                                if (position_feedback_config.polarity == QEI_POLARITY_NORMAL) {
+                                if (position_feedback_config.polarity == SENSOR_POLARITY_NORMAL) {
                                     count = count + difference;
                                     sync_out = sync_out + difference;
                                 } else {
@@ -181,7 +181,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                                 }
                                 direction = -1;
                             } else if (difference < 0 && difference >= -2) {
-                                if (position_feedback_config.polarity == QEI_POLARITY_NORMAL) {
+                                if (position_feedback_config.polarity == SENSOR_POLARITY_NORMAL) {
                                     count = count + difference;
                                     sync_out = sync_out + difference;
                                 } else {
@@ -239,7 +239,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
             case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
 
-                int ifm_usec = position_feedback_config.ifm_usec;
+                UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
                 qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;

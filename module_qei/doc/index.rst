@@ -88,24 +88,14 @@ How to use
 API
 ===
 
-Definitions
------------
-
-.. doxygendefine:: QEI_SENSOR
-
 Types
 -----
 .. doxygenenum:: QEI_SignalType
 .. doxygenenum:: QEI_IndexType
 .. doxygenstruct:: QEIConfig
-.. doxygenstruct:: QEIPorts
 
 Service
 --------
 
 .. doxygenfunction:: qei_service
 
-Interface
----------
-
-.. doxygeninterface:: QEIInterface

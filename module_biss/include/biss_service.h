@@ -13,10 +13,13 @@
 /**
  * @brief Read generic BiSS sensor data
  *
- * @param biss_ports Ports structure defining where to read the BiSS signal, outputting the clock and which clock block to use.
- * @param biss_config data lengths and crc polynomial.
- * @param[out] data array to store the received bits
- * @param frame_bytes number of 32 bit bytes to read from the encoder, should be able to contain 3 bits + ack and start bits + data + crc
+ * @param qei_hall_port_1 BiSS input port 1
+ * @param qei_hall_port_2 BiSS input port 2
+ * @param hall_enc_select_port port used to select the mode (differential or not) of Hall/qei ports and optionally output the BiSS clock
+ * @param hall_enc_select_config config to select the mode (differential or not) of Hall/qei ports
+ * @param biss_clock_port port used to optionally output the BiSS clock
+ * @param biss_config Configuration of the BiSS sensor (data lengths, crc polynomial, etc)
+ * @param[out] data Array to store the read bits, should be large enough to store all the data bits + crc bits
  *
  * @return error status (NoError, CRCError, NoAck, NoStartBit)
  */
@@ -24,9 +27,9 @@ unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * 
 
 
 /**
- * @brief Extract turn data from a BiSS encoder sensor data
+ * @brief Extract position data from a BiSS encoder raw sensor data
  *
- * @param data BiSS sensor data
+ * @param data BiSS raw sensor data
  * @param biss_config structure definition for the BiSS encoder data lengths
  *
  * @return absolute count

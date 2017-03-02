@@ -53,7 +53,7 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         break;
     case BISS_SENSOR:
         unsigned int data[BISS_FRAME_BYTES];
-        t when timerafter(last_read + position_feedback_config.biss_config.timeout) :> void;
+        t when timerafter(last_read + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec) :> void;
         int error = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, biss_clock_port, position_feedback_config.biss_config, data);
         { state.count, state.position, state.status } = biss_encoder(data, position_feedback_config.biss_config);
         state.status = state.status + (error << 2);
@@ -61,7 +61,7 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         {
             multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
         }
-        if (position_feedback_config.polarity == INVERTED_POLARITY) {
+        if (position_feedback_config.polarity == SENSOR_POLARITY_INVERTED) {
             state.count = -state.count;
             state.position = position_feedback_config.resolution - state.position - 1;
         }
@@ -216,7 +216,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
         //receive new config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
-                int ifm_usec = position_feedback_config.ifm_usec;
+                UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
                 init_sensor(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);

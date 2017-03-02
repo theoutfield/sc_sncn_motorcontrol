@@ -8,13 +8,13 @@
 #pragma once
 #include <rem_16mt_struct.h>
 
-#define DEFAULT_SPI_CLOCK_DIV    32        // 250/32 / 2 = 4MHz
-#define SPI_MASTER_MODE 1 //clock active high
-#define SPI_MASTER_SD_CARD_COMPAT 1 //MOSI high during input
+#define DEFAULT_SPI_CLOCK_DIV    32 /**< divisor for SPI clock frequency, (250/DIV)/2 MHz */
+#define SPI_MASTER_MODE 1           /**< clock active high */
+#define SPI_MASTER_SD_CARD_COMPAT 1 /**< MOSI high during input */
 
 #define REM_16MT_USE_TIMESTAMP
 #ifdef REM_16MT_USE_TIMESTAMP
-#define REM_16MT_TIMEOUT           10   //micro seconds
+#define REM_16MT_TIMEOUT           10   /**< Time to wait after read in micro seconds */
 #else
-#define REM_16MT_TIMEOUT           38
+#define REM_16MT_TIMEOUT           38   /**< Time to wait after read in micro seconds */
 #endif

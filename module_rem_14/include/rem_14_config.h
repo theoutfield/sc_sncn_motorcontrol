@@ -8,7 +8,7 @@
 #pragma once
 #include <rem_14_struct.h>
 
-#define DEFAULT_SPI_CLOCK_DIV     32                   /**<  250/DIV MHz */
+#define DEFAULT_SPI_CLOCK_DIV     32                   /**<  divisor for SPI clock frequency, (250/DIV)/2 MHz */
 
 #define REM_14_SENSOR_TYPE        AS5047
 #define SPI_MASTER_MODE           1

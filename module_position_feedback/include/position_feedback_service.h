@@ -15,6 +15,7 @@
 #include <hall_struct.h>
 #include <qei_struct.h>
 #include <motor_control_structures.h>
+#include <refclk.h>
 
 #include <stdint.h>
 
@@ -26,20 +27,9 @@
  */
 typedef enum {
     GPIO_INPUT=0,           /**< Input GPIO port */
-    GPIO_INPUT_PULLDOWN=1,  /**< Input GPIO port with pulldown */
-    GPIO_OUTPUT=2           /**< Output GPIO port */
+    GPIO_INPUT_PULLDOWN,    /**< Input GPIO port with pulldown */
+    GPIO_OUTPUT             /**< Output GPIO port */
 } GPIOType;
-
-
-/**
- * @brief Structure for configuration of GPIO ports
- */
-typedef struct {
-    GPIOType port_0;    /**< Type for GPIO port 0 */
-    GPIOType port_1;    /**< Type for GPIO port 1 */
-    GPIOType port_2;    /**< Type for GPIO port 2 */
-    GPIOType port_3;    /**< Type for GPIO port 3 */
-} GPIOConfig;
 
 
 /**
@@ -55,18 +45,33 @@ typedef enum {
 
 
 /**
+ * @brief Type for sensor polarity
+ *
+ *        When set to inverted it will reverse the position, velocity and electrical angle direction.
+ *        It the same effect as changing the sensor placement from back to front or the other way around.
+ *        Depending on the sensor the change is made in software (BiSS, Hall, QEI)
+ *        or by setting a register in the sensor (REM 16MT, REM 14)
+ */
+typedef enum {
+    SENSOR_POLARITY_NORMAL  = 1,    /**< Normal polarity. */
+    SENSOR_POLARITY_INVERTED=-1     /**< Inverted polarity. */
+} SensorPolarity;
+
+
+
+/**
  * @brief Configuration structure of the position feedback service.
  */
 typedef struct {
-    SensorType sensor_type; /**< Select the sensor type */
+    SensorType sensor_type;         /**< Select the sensor type */
     SensorFunction sensor_function; /**< Select which data to write to shared memory */
-    int polarity;   /**< Encoder polarity. */
-    int pole_pairs; /**< Number of pole pairs */
-    int resolution; /**< Number of ticks per turn */
-    int offset;     /**< Position offset in ticks, can be singleturn or multiturn depending on the sensor */
-    int ifm_usec;   /**< Number of clock ticks in a microsecond >*/
-    int velocity_compute_period; /**< Velocity compute period in microsecond. Is also the polling period to write to the shared memory */
-    int max_ticks; /**< The multiturn position is reset to 0 when reached */
+    SensorPolarity polarity;        /**< Encoder polarity. */
+    UsecType ifm_usec;              /**< Number of clock ticks in a microsecond >*/
+    int pole_pairs;                 /**< Number of pole pairs */
+    int resolution;                 /**< Number of ticks per turn */
+    int offset;                     /**< Position offset in ticks, can be singleturn or multiturn depending on the sensor */
+    int max_ticks;                  /**< The multiturn position is reset to 0 when reached */
+    int velocity_compute_period;    /**< Velocity compute period in microsecond. Is also the polling period to write to the shared memory */
     BISSConfig biss_config;         /**< BiSS sensor configuration */
     REM_16MTConfig rem_16mt_config; /**< REM 16MT sensor configuration */
     REM_14Config rem_14_config;     /**< REM 14  configuration */
@@ -220,7 +225,7 @@ typedef struct {
  * Is uses the shared memory to send position, velocity and electrical angle to the other services.
  *
  * @param qei_hall_port_1 Hall/QEI input port number 1
- * @param qei_hall_port_2 Hall/QEI input port number 1
+ * @param qei_hall_port_2 Hall/QEI input port number 2
  * @param hall_enc_select_port port used to select the mode (differential or not) of Hall/qei ports
  * @param spi_ports SPI ports and clock blocks
  * @param gpio_port_0 GPIO port number 0
@@ -243,20 +248,82 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                                client interface shared_memory_interface ?i_shared_memory_2,
                                server interface PositionFeedbackInterface (&?i_position_feedback_2)[3]);
 
+/**
+ * @brief Convert the number of tick per turn into the number of resolution bits
+ *
+ * @param ticks the number of ticks per turn
+ *
+ * @return the number of resolution bits
+ *
+ */
 int tickstobits(uint32_t ticks);
 
+/**
+ * @brief Compute the multiturn position using the last measured position and the current position
+ *
+ * @param count The multiturn position
+ * @param last_position The last measured position
+ * @param position The current position
+ * @param ticks_per_turn The number of ticks per turn
+ */
 void multiturn(int &count, int last_position, int position, int ticks_per_turn);
 
-void switch_ifm_freq(PositionFeedbackConfig &position_feedback_config);
 
-void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, int sensor_function, int count, int velocity, int angle, int hall_state);
+/**
+ * @brief Write position, velocity and electrical angle to the shared memory.
+ *
+ * @param i_shared_memory The client interface to the shared memory
+ * @param sensor_function The sensor function to select which data to write.
+ * @param count The absolute multiturn position
+ * @param velocity The velocity
+ * @param angle The electrical angle
+ * @param hall_state The Hall pin state if Hall sensor is used
+ */
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int velocity, int angle, int hall_state);
 
+/**
+ * @brief Compute the velocity in rpm
+ *
+ * @param difference The difference in ticks between the 2 last measurements
+ * @param timediff The time difference between the 2 last measurements
+ * @param resolution The number of ticks per turn (to convert ticks to rpm)
+ *
+ * @return velocity in rpm
+ */
 int velocity_compute(int difference, int timediff, int resolution);
 
+/**
+ * @brief Read a GPIO port
+ *
+ * @param gpio_ports The GPIO ports array
+ * @param position_feedback_config The position feedback service configuration
+ * @param gpio_number The GPIO port number
+ *
+ * @return The value of the GPIO port
+ */
 int gpio_read(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number);
 
+/**
+ * @brief Write to a GPIO port
+ *
+ * @param gpio_ports The GPIO ports array
+ * @param position_feedback_config The position feedback service configuration
+ * @param gpio_number The GPIO port number
+ * @param value The value to write
+ */
 void gpio_write(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, int gpio_number, int value);
 
+/**
+ * @brief Read/Write GPIO data from/to the shared memory.
+ *
+ *        The input data is read the GPIO ports and written to the shared memory.
+ *        The output data is read from the shared memory and written to the GPIO ports.
+ *
+ *
+ * @param gpio_ports The GPIO ports array
+ * @param position_feedback_config The position feedback service configuration
+ * @param i_shared_memory The client interface to the shared memory
+ */
 void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory);
 
 

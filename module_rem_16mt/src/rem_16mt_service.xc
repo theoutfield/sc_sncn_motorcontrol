@@ -43,10 +43,10 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 }
 
 #ifdef REM_16MT_USE_TIMESTAMP
-{ char, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, int ifm_usec) {
+{ char, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec) {
     unsigned int timestamp;
 #else
-{ char, int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, int ifm_usec) {
+{ char, int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec) {
 #endif
     char status;
     int count;
@@ -98,7 +98,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 }
 
 
-void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, int ifm_usec)
+void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, UsecType ifm_usec)
 {
     configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
     slave_select(*spi_ports.slave_select);
@@ -134,7 +134,7 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
     if (status != 0)
         return status;
     //direction
-    if (config.polarity == INVERTED_POLARITY)
+    if (config.polarity == SENSOR_POLARITY_INVERTED)
         rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 1, 8, config.ifm_usec);
     else
         rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 0, 8, config.ifm_usec);

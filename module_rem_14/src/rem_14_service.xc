@@ -42,7 +42,7 @@ void initspi_ports(SPIPorts &spi_ports)
     settings1 = (REM_14_FACTORY_SETTINGS << 0);
     #endif
     settings1 |= (config.rem_14_config.noise_setting << 1);
-    if (config.polarity == INVERTED_POLARITY) {
+    if (config.polarity == SENSOR_POLARITY_INVERTED) {
         settings1 |= (1 << 2);
     }
     settings1 |= (REM_14_UVW_ABI << 3);
@@ -124,7 +124,7 @@ unsigned char checkEvenParity(unsigned short bitStream){
      return (calc_parity(bitStream) == ((bitStream >> 15) & 1));    //comparison the parity bit the the real one
 }
 
-short SPIReadTransaction(SPIPorts &spi_ports, int ifm_usec, unsigned short reg) {
+short SPIReadTransaction(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short reg) {
     unsigned short data_in = 0;
 
     reg |= READ_MASK;                           //read command
@@ -146,7 +146,7 @@ short SPIReadTransaction(SPIPorts &spi_ports, int ifm_usec, unsigned short reg) 
     return data_in;
 }
 
-short SPIWriteTransaction(SPIPorts &spi_ports, int ifm_usec, unsigned short reg, unsigned short data) {
+short SPIWriteTransaction(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short reg, unsigned short data) {
     unsigned short data_in = 0;
 
     reg &= WRITE_MASK;                          //action
@@ -178,7 +178,7 @@ short SPIWriteTransaction(SPIPorts &spi_ports, int ifm_usec, unsigned short reg,
 }
 
 
-int readRedundancyReg(SPIPorts &spi_ports, int ifm_usec){
+int readRedundancyReg(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in;
 
@@ -193,7 +193,7 @@ int readRedundancyReg(SPIPorts &spi_ports, int ifm_usec){
     }
 }
 
-int readProgrammingReg(SPIPorts &spi_ports, int ifm_usec){
+int readProgrammingReg(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0;
 
@@ -209,7 +209,7 @@ int readProgrammingReg(SPIPorts &spi_ports, int ifm_usec){
     }
 }
 
-int readSettings1(SPIPorts &spi_ports, int ifm_usec){
+int readSettings1(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0;
 
@@ -225,7 +225,7 @@ int readSettings1(SPIPorts &spi_ports, int ifm_usec){
     }
 }
 
-int readSettings2(SPIPorts &spi_ports, int ifm_usec){
+int readSettings2(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0;
 
@@ -241,7 +241,7 @@ int readSettings2(SPIPorts &spi_ports, int ifm_usec){
     }
 }
 
-int readZeroPosition(SPIPorts &spi_ports, int ifm_usec){
+int readZeroPosition(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0, data_in_tmp = 0;
 
@@ -273,7 +273,7 @@ int readZeroPosition(SPIPorts &spi_ports, int ifm_usec){
         }
 }
 
-int readCORDICMagnitude(SPIPorts &spi_ports, int ifm_usec){
+int readCORDICMagnitude(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0;
 
@@ -290,7 +290,7 @@ int readCORDICMagnitude(SPIPorts &spi_ports, int ifm_usec){
 }
 
 
-int readRotaryDiagnosticAndAutoGainControl(SPIPorts &spi_ports, int ifm_usec){
+int readRotaryDiagnosticAndAutoGainControl(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0;
 
@@ -306,7 +306,7 @@ int readRotaryDiagnosticAndAutoGainControl(SPIPorts &spi_ports, int ifm_usec){
     }
 }
 
-int readRotarySensorError(SPIPorts &spi_ports, int ifm_usec){
+int readRotarySensorError(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0;
 
@@ -323,7 +323,7 @@ int readRotarySensorError(SPIPorts &spi_ports, int ifm_usec){
 }
 
 
-int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, int ifm_usec){
+int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType ifm_usec){
 
    unsigned short data_in = 0;
 
@@ -340,7 +340,7 @@ int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, int ifm_usec){
 }
 
 
-int readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, int ifm_usec){
+int readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0;
 
@@ -356,7 +356,7 @@ int readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, int ifm_usec){
     }
 }
 
-int readNumberPolePairs(SPIPorts &spi_ports, int ifm_usec){
+int readNumberPolePairs(SPIPorts &spi_ports, UsecType ifm_usec){
 
     int data_in = 0;
 
@@ -373,7 +373,7 @@ int readNumberPolePairs(SPIPorts &spi_ports, int ifm_usec){
 }
 
 
-int writeSettings(SPIPorts &spi_ports, int ifm_usec, unsigned short address, unsigned short data){
+int writeSettings(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short address, unsigned short data){
 
     unsigned short data_in = 0;
 
@@ -395,7 +395,7 @@ int writeSettings(SPIPorts &spi_ports, int ifm_usec, unsigned short address, uns
     }
 }
 
-int writeZeroPosition(SPIPorts &spi_ports, int ifm_usec, unsigned short data){
+int writeZeroPosition(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short data){
 
     unsigned short data_in = 0, msb_data = 0, lsb_data = 0;
 
@@ -432,7 +432,7 @@ int writeZeroPosition(SPIPorts &spi_ports, int ifm_usec, unsigned short data){
         }
 }
 
-int writeNumberPolePairs(SPIPorts &spi_ports, int ifm_usec, unsigned short data){
+int writeNumberPolePairs(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short data){
 
     int data_in = 0;
 

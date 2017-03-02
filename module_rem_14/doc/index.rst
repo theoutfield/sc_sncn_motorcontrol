@@ -1,4 +1,4 @@
-.. _module_biss:
+    .. _module_biss:
 
 =====================
 BiSS Encoder Module
@@ -103,22 +103,33 @@ API
 Definitions
 -----------
 
-.. doxygendefine:: BISS_FRAME_BYTES
-.. doxygendefine:: BISS_DATA_PORT_BIT
-.. doxygendefine:: BISS_STATUS_BITS
+.. doxygendefine:: DEFAULT_SPI_CLOCK_DIV
 
 Types
 -----
 
-.. doxygenenum:: BISS_ErrorType
-.. doxygenenun:: BISSClockPortConfig
-.. doxygenstruct:: BISSConfig
+.. doxygenenum:: REM_14_ABIResolution
+.. doxygenenum:: REM_14_DynAngleComp
+.. doxygenenum:: REM_14_Noise
+.. doxygenenum:: REM_14_Hysteresis
+.. doxygenestruct:: REM_14Config
 
 Functions
 --------
 
-.. doxygenfunction:: read_biss_sensor_data
-.. doxygenfunction:: biss_encoder
-.. doxygenfunction:: biss_crc
-.. doxygenfunction:: biss_crc_correct
+.. doxygenfunction:: initRotarySensorInterface
+.. doxygenfunction:: initRotarySensor
+.. doxygenfunction:: readZeroPosition
+.. doxygenfunction:: readNumberPolePairs
+.. doxygenfunction:: readSettings1
+.. doxygenfunction:: readSettings2
+.. doxygenfunction:: readRedundancyReg
+.. doxygenfunction:: readProgrammingReg
+.. doxygenfunction:: readCORDICMagnitude
+.. doxygenfunction:: readRotaryDiagnosticAndAutoGainControl
+.. doxygenfunction:: readRotarySensorError
+.. doxygenfunction:: readRotarySensorAngleWithoutCompensation
+.. doxygenfunction:: readRotarySensorAngleWithCompensation
+.. doxygenfunction:: writeZeroPosition
+.. doxygenfunction:: writeNumberPolePairs
 

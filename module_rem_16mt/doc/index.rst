@@ -1,4 +1,4 @@
-.. _module_biss:
+    .. _module_biss:
 
 =====================
 BiSS Encoder Module
@@ -100,25 +100,34 @@ How to use
 API
 ===
 
+Commands
+--------
+
+.. doxygendefine:: REM_16MT_CTRL_RESET
+.. doxygendefine:: REM_16MT_CONF_DIR
+.. doxygendefine:: REM_16MT_CONF_NULL
+.. doxygendefine:: REM_16MT_CONF_PRESET
+.. doxygendefine:: REM_16MT_CONF_STPRESET
+.. doxygendefine:: REM_16MT_CONF_MTPRESET
+.. doxygendefine:: REM_16MT_CONF_FILTER
+.. doxygendefine:: REM_16MT_CALIB_TBL_SIZE
+.. doxygendefine:: REM_16MT_CALIB_TBL_POINT
+.. doxygendefine:: REM_16MT_CTRL_SAVE
+
 Definitions
 -----------
 
-.. doxygendefine:: BISS_FRAME_BYTES
-.. doxygendefine:: BISS_DATA_PORT_BIT
-.. doxygendefine:: BISS_STATUS_BITS
+.. doxygendefine:: DEFAULT_SPI_CLOCK_DIV
 
 Types
 -----
-
-.. doxygenenum:: BISS_ErrorType
-.. doxygenenun:: BISSClockPortConfig
-.. doxygenstruct:: BISSConfig
+.. doxygenstruct:: REM_16MTConfig
 
 Functions
 --------
 
-.. doxygenfunction:: read_biss_sensor_data
-.. doxygenfunction:: biss_encoder
-.. doxygenfunction:: biss_crc
-.. doxygenfunction:: biss_crc_correct
+.. doxygenfunction:: init_spi_ports
+.. doxygenfunction:: rem_16mt_init
+.. doxygenfunction:: rem_16mt_read
+.. doxygenfunction:: rem_16mt_write
 

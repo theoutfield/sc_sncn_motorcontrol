@@ -84,13 +84,8 @@ How to use
 API
 ===
 
-Types
------
-
-.. doxygenstruct:: HallConfig
-
 Service
 -------
 
-.. doxygenfunction:: hall_service
+.. doxygenfunction:: serial_encoder_service
 

@@ -1,4 +1,4 @@
-.. _module_biss:
+    .. _module_biss:
 
 =====================
 BiSS Encoder Module
@@ -103,22 +103,18 @@ API
 Definitions
 -----------
 
-.. doxygendefine:: BISS_FRAME_BYTES
-.. doxygendefine:: BISS_DATA_PORT_BIT
-.. doxygendefine:: BISS_STATUS_BITS
+.. doxygendefine:: SPI_MASTER_SD_CARD_COMPAT
 
 Types
 -----
 
-.. doxygenenum:: BISS_ErrorType
-.. doxygenenun:: BISSClockPortConfig
-.. doxygenstruct:: BISSConfig
+.. doxygenestruct:: spi_master_interface
 
 Functions
 --------
 
-.. doxygenfunction:: read_biss_sensor_data
-.. doxygenfunction:: biss_encoder
-.. doxygenfunction:: biss_crc
-.. doxygenfunction:: biss_crc_correct
+.. doxygenfunction:: spi_master_in_byte
+.. doxygenfunction:: spi_master_in_short
+.. doxygenfunction:: spi_master_out_byte
+.. doxygenfunction:: spi_master_out_short
 

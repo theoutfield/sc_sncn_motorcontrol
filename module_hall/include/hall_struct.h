@@ -7,8 +7,8 @@
 
 #include <position_feedback_common.h>
 
-#define ERROR                   0
-#define SUCCESS                 1
+#define HALL_ERROR                   0
+#define HALL_SUCCESS                 1
 
 #define RPM_CONST           60000000 // 60s / 1us
 #define FILTER_LENGTH_HALL  16
@@ -37,10 +37,10 @@
 
 
 /**
- * @brief Structure type to define the Encoder Service configuration.
+ * @brief Structure for Hall sensor configuration
  */
 typedef struct {
-    EncoderPortNumber port_number;  /**< Config which input port is used */
+    EncoderPortNumber port_number;  /**< To select which input port is used */
 } HallConfig;
 
 
