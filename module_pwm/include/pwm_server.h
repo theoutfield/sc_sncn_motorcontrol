@@ -60,24 +60,15 @@ typedef struct PWM_SERV_TAG
 } PWM_SERV_TYP;
 
 
-interface update_brake
-{
-    /**
-     * @brief send the brake settings to pwm server
-     */
-    void update_brake_control_data(int duty_start_brake, int duty_maintain_brake, int period_start_brake);
-};
-
-
-/**
- * @brief Initialize the settings of electric brake
- *
- * @param ...
- *
- * @return void
- */
-void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
-        int v_dc, int voltage_pull_brake, int time_pull_brake, int voltage_hold_brake);
+///**
+// * @brief Initialize the settings of electric brake
+// *
+// * @param ...
+// *
+// * @return void
+// */
+//void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
+//        int v_dc, int voltage_pull_brake, int time_pull_brake, int voltage_hold_brake);
 
 
 /**

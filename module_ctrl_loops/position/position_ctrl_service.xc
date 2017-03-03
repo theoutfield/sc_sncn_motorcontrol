@@ -84,9 +84,9 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
-void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ctrl_config,
+void position_velocity_control_service(int ifm_tile_usec, PosVelocityControlConfig &pos_velocity_ctrl_config,
         interface MotorcontrolInterface client i_motorcontrol,
-        interface PositionVelocityCtrlInterface server i_position_control[3])
+        interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
 {
 
     // structure definition
@@ -205,7 +205,7 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
 #pragma ordered
         select
         {
-        case t when timerafter(ts + USEC_STD * POSITION_CONTROL_LOOP_PERIOD) :> ts:
+        case t when timerafter(ts + ifm_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
@@ -338,7 +338,6 @@ void position_velocity_control_service(PosVelocityControlConfig &pos_velocity_ct
                 xscope_int(POSITION_CMD, (int)position_ref_in_k);
                 xscope_int(VELOCITY_CMD, downstream_control_data.velocity_cmd);
                 xscope_int(TORQUE_CMD, torque_ref_k);
-                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
@@ -591,6 +590,100 @@ break;
                 {
                     i_motorcontrol.set_brake_status(in_brake_status);
                 }
+                break;
+
+
+        case i_position_control[int i].update_brake_configuration():
+
+                torque_enable_flag   =0;
+                velocity_enable_flag =0;
+                position_enable_flag =0;
+
+                torque_ref_k = 0;
+                i_motorcontrol.set_safe_torque_off_enabled();
+
+                t :> ts;
+                t when timerafter (ts + 200*1000*ifm_tile_usec) :> void;
+
+                i_motorcontrol.set_brake_status(0);
+
+                int error=0;
+                int duty_min=0, duty_max=0, duty_divider=0;
+                int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
+
+
+                //pos_velocity_ctrl_config.special_brake_release = value;
+                //pos_velocity_ctrl_config.nominal_v_dc=value;
+                //pos_velocity_ctrl_config.voltage_pull_brake=value;
+                //pos_velocity_ctrl_config.voltage_hold_brake=value;
+                //pos_velocity_ctrl_config.time_pull_brake=value;
+
+
+                if(pos_velocity_ctrl_config.nominal_v_dc <= 0)
+                {
+                    printstr("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
+                    while(1);
+                }
+
+                if(pos_velocity_ctrl_config.voltage_pull_brake > (pos_velocity_ctrl_config.nominal_v_dc*1000))
+                {
+                    printstr("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
+                    while(1);
+                }
+
+                if(pos_velocity_ctrl_config.voltage_pull_brake < 0)
+                {
+                    printstr("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
+                    while(1);
+                }
+
+                if(pos_velocity_ctrl_config.voltage_hold_brake > (pos_velocity_ctrl_config.nominal_v_dc*1000))
+                {
+                    printstr("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
+                    while(1);
+                }
+
+                if(pos_velocity_ctrl_config.voltage_hold_brake < 0)
+                {
+                    printstr("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
+                    while(1);
+                }
+
+                if(period_start_brake < 0)
+                {
+                    printstr("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
+                    while(1);
+                }
+
+                if(ifm_tile_usec==250)
+                {
+                    duty_min = 1500;
+                    duty_max = 13000;
+                    duty_divider = 16384;
+                }
+                else if(ifm_tile_usec==100)
+                {
+                    duty_min = 600;
+                    duty_max = 7000;
+                    duty_divider = 8192;
+                }
+                else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+                {
+                    error = 1;
+                }
+
+                duty_start_brake    = (duty_divider * pos_velocity_ctrl_config.voltage_pull_brake)/(1000*pos_velocity_ctrl_config.nominal_v_dc);
+                if(duty_start_brake < duty_min) duty_start_brake = duty_min;
+                if(duty_start_brake > duty_max) duty_start_brake = duty_max;
+
+                duty_maintain_brake = (duty_divider * pos_velocity_ctrl_config.voltage_hold_brake)/(1000*pos_velocity_ctrl_config.nominal_v_dc);
+                if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
+                if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
+
+                period_start_brake  = (pos_velocity_ctrl_config.time_pull_brake * 1000)/ifm_tile_usec;
+
+                i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
+
                 break;
 
         case i_position_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
