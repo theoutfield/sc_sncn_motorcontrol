@@ -8,7 +8,7 @@ BiSS Encoder Module
     :backlinks: none
     :depth: 3
 
-This module provides a functions to read data transmitted using the BiSS protocol and process the data coming from a BiSS Encoder into position data.
+This module provides functions to read data transmitted using the BiSS protocol and process the data coming from a BiSS Encoder into position data.
 
 BiSS is an open source digital interface for sensors and actuators. BiSS is hardware compatible to the industrial standard SSI (Serial Synchronous Interface). The standardization process is coordinated on biss-interface.com_.
 
@@ -44,9 +44,9 @@ How to use
 
 3. Instantiate the ports for the BiSS.
 
-     BiSS needs an clock output port, a data input port and a clock block. The ports structures are defined in ``position_feedback_service.h``.
+     BiSS needs a clock output port, a data input port and a clock block. The ports structures are defined in ``position_feedback_service.h``.
      The clock block is taken for the SPI ports sturcture. Depending on the BiSS configuration the output clock port is taken from ``hall_enc_select_port`` or from a GPIO port and the data input port is taken from ``qei_hall_port`` ``1`` or ``2``.
-     The functions take pointers for parameters, so you need to pass the addresses of the port structures. If qei_hall_ports are used the ``hall_enc_select_config`` parameter also needs to be set to configure them in differential mode.
+     The functions take pointers for parameters, so you need to pass the addresses of the port structures. If ``qei_hall_ports`` are used the ``hall_enc_select_config`` parameter also needs to be set to configure the ports in differential mode.
 
 4. Fill up the BiSS configuration structure.
 
@@ -75,18 +75,18 @@ How to use
                 {
                     // 4. Fill up the BiSS configuration structure.
                     BiSSConfig biss_config; 
-                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;
-                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-                    position_feedback_config.biss_config.clock_frequency = BISS_CLOCK_FREQUENCY;
-                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-                    position_feedback_config.biss_config.busy = BISS_BUSY;
-                    position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
-                    position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                    biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                    biss_config.filling_bits = BISS_FILLING_BITS;
+                    biss_config.crc_poly = BISS_CRC_POLY;
+                    biss_config.clock_frequency = BISS_CLOCK_FREQUENCY;
+                    biss_config.timeout = BISS_TIMEOUT;
+                    biss_config.busy = BISS_BUSY;
+                    biss_config.clock_port_config = BISS_CLOCK_PORT;
+                    biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
                     
                     // 5. Use the functions to read BiSS data and process it into position data.
                     // read BiSS data
-                    int data[BISS_FRAME_BYTES]; // 32 bit array to store the data. The size need to be enough to store all the data bits. 
+                    int data[BISS_FRAME_BYTES]; // array of 32 bit bytes to store the data. The size needs to be enough to store all the data bits. 
                     int hall_enc_select_config = 0b0011; //to configure qei_hall_ports in differential mode
                     int error = read_biss_sensor_data(&qei_hall_port_1, &qei_hall_port_2, &hall_enc_select_port, hall_enc_select_config, &gpio_port_2, biss_config, data);
                     // process data

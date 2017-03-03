@@ -8,18 +8,16 @@ Hall Sensor Module
     :depth: 3
 
 This module provides a Service that will read and process the data coming from your 
-Feedback Hall Sensor. Up to 5 clients could retrieve data from the Service
-through interfaces.
+Feedback Hall Sensor.
 
-When running the Hall Service, the **Reference Frequency** of the tile where the Service is
-allocated will be automatically changed to **250MHz**.
+This service can run independently but is meant to be used by the :ref:`Position Feedback Module <module_position_feedback>`.
 
 The Hall Service should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_hall>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_hall>`_
 
 .. image:: images/core-diagram-hall-interface.png
    :width: 50%
@@ -36,45 +34,96 @@ How to use
 
     ::
 
-        USED_MODULES = module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_profile module_gpio module_qei module_watchdog module_board-support
+        USED_MODULES = config_motor module_biss module_bldc_torque_control_lib module_board-support module_hall module_shared_memory module_misc module_position_feedback module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependency issues.
 
 2. Include the Hall Service header **hall_service.h** in your app. 
 
-3. Instantiate the ports where the Service will be reading the Hall Sensor feedback signals. 
+3. Instantiate the ports where the Service will be reading the Hall Sensor feedback signals.
+
+     The Hall service uses ``qei_hall_port`` ``1`` or ``2`` depending on the configuration.
+     The ports structures are defined in ``position_feedback_service.h``.
 
 4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+5. Optionally, instantiate the shared memory interface.
 
-6. At whichever other core, now you can perform calls to the Hall Service through the interfaces connected to it.
+6. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+
+     The Hall sensor has only one specific parameter ``hall_config.port_number`` the port number used.
+     You still need to fill up all the generic sensor parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
+
+7. At whichever other core, now you can perform calls to the Position Feedback Service through the interfaces connected to it. Or if it is enabled you can read the position using the shared memory.
 
     .. code-block:: c
 
-        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
-        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
+        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
+        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
                                         //(select your board support files according to your device)
-
-        #include <hall_service.h> // 2
-
-        HallPorts hall_ports = SOMANET_IFM_HALL_PORTS; // 3
+                                        
+        // 2. Include the Hall Service header
+        #include <hall_service.h>
+       
+        // 3. Instantiate the ports needed for the sensor.
+        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
+        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
 
         int main(void)
         {
-            interface HallInterface i_hall[5]; // 4
+            // 4. Instantiate the interfaces array for the Service-Clients communication.
+            interface PositionFeedbackInterface i_position_feedback_1[3];
+            
+            // 5. Instantiate the shared memory interface.
+            interface shared_memory_interface i_shared_memory[3];
 
             par
             {
-                on tile[APP_TILE]: int foo = i_hall[0].get_hall_position(); // 6
 
-                on tile[IFM_TILE]:
+                on tile[IFM_TILE]: par {
+                    // 5. Start the shared memory service
+                    shared_memory_service(i_shared_memory, 3);
+
+                    // 6. Fill up your Service configuration and instantiate the Service. 
+                    /* Position feedback service */
+                    {
+                        //set default parameters
+                        PositionFeedbackConfig position_feedback_config;
+                        position_feedback_config.polarity    = NORMAL_POLARITY;
+                        position_feedback_config.pole_pairs  = POLE_PAIRS;
+                        position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                        position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
+                        position_feedback_config.offset      = 0;
+                        position_feedback_config.sensor_type = HALL_SENSOR;
+                        position_feedback_config.resolution  = HALL_SENSOR_RESOLUTION;
+                        position_feedback_config.velocity_compute_period = HALL_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                        position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
+
+                        position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+
+                        position_feedback_service(qei_hall_port_1, qei_hall_port_2, null, null, null, null, null, null,
+                                position_feedback_config, i_shared_memory[0], i_position_feedback_1,
+                                null, null, null);
+                    }
+                }
+                
+                on tile[APP_TILE]:
                 {
-                    HallConfig hall_config; // 5
-                    hall_config.pole_pairs = 1;
-
-                    hall_service(hall_ports, hall_config, i_hall);
+                    int count_1, position_1, angle_1, velocity_1;
+                    int count_2, position_2, status_2, angle_2, velocity_2;
+                    
+                    // 7. Call to the Position Feddback Service through the interfaces connected to it.                
+                    /* get position from Sensor 1 */
+                    { count_1, position_1, void } = i_position_feedback_1[0].get_position();
+                    angle_1 = i_position_feedback_1[0].get_angle();
+                    velocity_1 = i_position_feedback_1[0].get_velocity();
+                    
+                    // 7. You can also read the position using the shared memory.
+                    UpstreamControlData upstream_control_data = i_shared_memory[2].read();
+                    angle_1 = upstream_control_data.angle;
+                    count_1 = upstream_control_data.position;
+                    velocity_1 = upstream_control_data.velocity;
                 }
             }
 
@@ -88,6 +137,7 @@ Types
 -----
 
 .. doxygenstruct:: HallConfig
+.. doxygenstruct:: QEIHallPort
 
 Service
 -------
