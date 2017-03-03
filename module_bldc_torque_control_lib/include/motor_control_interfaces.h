@@ -111,6 +111,15 @@ interface MotorcontrolInterface
 };
 
 
+interface update_brake
+{
+    /**
+     * @brief send the brake settings to pwm server
+     */
+    void update_brake_control_data(int duty_start_brake, int duty_maintain_brake, int period_start_brake);
+};
+
+
 /**
  * @brief Interface type to communicate with the ADC Service.
  */
