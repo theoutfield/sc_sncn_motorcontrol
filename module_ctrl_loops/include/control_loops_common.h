@@ -68,9 +68,10 @@ typedef struct {
     int special_brake_release;
     int brake_shutdown_delay;
 
-    int voltage_pull_brake;
-    int time_pull_brake;
-    int voltage_hold_brake;
+    int nominal_v_dc;       //in volts
+    int voltage_pull_brake; //in milli volts
+    int time_pull_brake;    //in milli seconds
+    int voltage_hold_brake; //in milli volts
 
 } PosVelocityControlConfig;
 

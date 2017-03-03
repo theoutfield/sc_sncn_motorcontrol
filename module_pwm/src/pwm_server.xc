@@ -363,80 +363,80 @@ void pwm_service_general(
 } // pwm_service_general
 
 
-void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
-        int v_dc, int voltage_pull_brake, int time_pull_brake, int voltage_hold_brake)
-{
-
-    int error=0;
-    int duty_min=0, duty_max=0, duty_divider=0;
-    int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
-
-
-    if(v_dc <= 0)
-    {
-        printf("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
-        while(1);
-    }
-
-    if(voltage_pull_brake > (v_dc*1000))
-    {
-        printf("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
-        while(1);
-    }
-
-    if(voltage_pull_brake < 0)
-    {
-        printf("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
-        while(1);
-    }
-
-    if(voltage_hold_brake > (v_dc*1000))
-    {
-        printf("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
-        while(1);
-    }
-
-    if(voltage_hold_brake < 0)
-    {
-        printf("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
-        while(1);
-    }
-
-    if(period_start_brake < 0)
-    {
-        printf("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
-        while(1);
-    }
-
-    if(ifm_tile_usec==250)
-    {
-        duty_min = 1500;
-        duty_max = 13000;
-        duty_divider = 16384;
-    }
-    else if(ifm_tile_usec==100)
-    {
-        duty_min = 600;
-        duty_max = 7000;
-        duty_divider = 8192;
-    }
-    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
-    {
-        error = 1;
-    }
-
-    duty_start_brake    = (duty_divider * voltage_pull_brake)/(1000*v_dc);
-    if(duty_start_brake < duty_min) duty_start_brake = duty_min;
-    if(duty_start_brake > duty_max) duty_start_brake = duty_max;
-
-    duty_maintain_brake = (duty_divider * voltage_hold_brake)/(1000*v_dc);
-    if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
-    if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
-
-    period_start_brake  = (time_pull_brake * 1000)/ifm_tile_usec;
-
-    i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
-}
+//void init_brake(client interface update_brake i_update_brake, int ifm_tile_usec,
+//        int v_dc, int voltage_pull_brake, int time_pull_brake, int voltage_hold_brake)
+//{
+//
+//    int error=0;
+//    int duty_min=0, duty_max=0, duty_divider=0;
+//    int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
+//
+//
+//    if(v_dc <= 0)
+//    {
+//        printf("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
+//        while(1);
+//    }
+//
+//    if(voltage_pull_brake > (v_dc*1000))
+//    {
+//        printf("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
+//        while(1);
+//    }
+//
+//    if(voltage_pull_brake < 0)
+//    {
+//        printf("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
+//        while(1);
+//    }
+//
+//    if(voltage_hold_brake > (v_dc*1000))
+//    {
+//        printf("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
+//        while(1);
+//    }
+//
+//    if(voltage_hold_brake < 0)
+//    {
+//        printf("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
+//        while(1);
+//    }
+//
+//    if(period_start_brake < 0)
+//    {
+//        printf("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
+//        while(1);
+//    }
+//
+//    if(ifm_tile_usec==250)
+//    {
+//        duty_min = 1500;
+//        duty_max = 13000;
+//        duty_divider = 16384;
+//    }
+//    else if(ifm_tile_usec==100)
+//    {
+//        duty_min = 600;
+//        duty_max = 7000;
+//        duty_divider = 8192;
+//    }
+//    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+//    {
+//        error = 1;
+//    }
+//
+//    duty_start_brake    = (duty_divider * voltage_pull_brake)/(1000*v_dc);
+//    if(duty_start_brake < duty_min) duty_start_brake = duty_min;
+//    if(duty_start_brake > duty_max) duty_start_brake = duty_max;
+//
+//    duty_maintain_brake = (duty_divider * voltage_hold_brake)/(1000*v_dc);
+//    if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
+//    if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
+//
+//    period_start_brake  = (time_pull_brake * 1000)/ifm_tile_usec;
+//
+//    i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
+//}
 
 
 /**
@@ -531,30 +531,25 @@ void pwm_service_task(
     int duty_start_brake    = 3000;
     int duty_maintain_brake = 3000;
     int brake_start         = 0;
-    unsigned char  brake_defined_II    = 0b0000;
+    unsigned char  brake_defined_II    = 0b1111;
 
     unsigned int half_sync_inc=0;
     unsigned int pwm_max_value=0;
     unsigned int pwm_deadtime =0;
 
+    PWM_ARRAY_TYP pwm_ctrl_s ; // Structure containing double-buffered PWM output data
+    PWM_SERV_TYP  pwm_serv_s ; // Structure containing PWM server control data
+    PWM_COMMS_TYP pwm_comms_s; // Structure containing PWM communication data
+
+    PWM_ARRAY_TYP pwm_ctrl_s_start_brake ; // Structure containing double-buffered PWM output data
+    PWM_COMMS_TYP pwm_comms_s_start_brake; // Structure containing PWM communication data
+
+    //parameters for maintaining the brake
+    PWM_ARRAY_TYP pwm_ctrl_s_maintain_brake ; // Structure containing double-buffered PWM output data
+    PWM_COMMS_TYP pwm_comms_s_maintain_brake; // Structure containing PWM communication data
+
     timer t;
     unsigned ts;
-
-    t :> ts;
-    t when timerafter (ts + (4000*20*250)) :> void;    //proper task startup
-
-    select
-    {
-    case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
-            duty_start_brake    = _duty_start_brake;
-            duty_maintain_brake = _duty_maintain_brake;
-            brake_start         = _period_start_brake;
-            brake_defined_II    = 0b1111;
-            break;
-
-    default:
-        break;
-    }
 
     if(ifm_tile_usec==250)
     {
@@ -576,12 +571,43 @@ void pwm_service_task(
         while(1);//error state!!!
     }
 
-    PWM_ARRAY_TYP pwm_ctrl_s ; // Structure containing double-buffered PWM output data
-    PWM_SERV_TYP  pwm_serv_s ; // Structure containing PWM server control data
-    PWM_COMMS_TYP pwm_comms_s; // Structure containing PWM communication data
 
-    PWM_ARRAY_TYP pwm_ctrl_s_start_brake ; // Structure containing double-buffered PWM output data
-    PWM_COMMS_TYP pwm_comms_s_start_brake; // Structure containing PWM communication data
+    t :> ts;
+    t when timerafter (ts + (4000*20*250)) :> void;    //proper task startup
+
+//    select
+//    {
+//    case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
+//            duty_start_brake    = _duty_start_brake;
+//            duty_maintain_brake = _duty_maintain_brake;
+//            brake_start         = _period_start_brake;
+//            brake_defined_II    = 0b1111;
+//
+//
+//            //parameters for starting the brake
+//            pwm_comms_s_start_brake.params.widths[0] =  duty_start_brake;
+//            pwm_comms_s_start_brake.params.widths[1] =  duty_start_brake;
+//            pwm_comms_s_start_brake.params.widths[2] =  duty_start_brake;
+//
+//            pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+//            pwm_comms_s_start_brake.buf = 0;
+//
+//            convert_all_pulse_widths( pwm_comms_s_start_brake ,pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
+//
+//            pwm_comms_s_maintain_brake.params.widths[0] = duty_maintain_brake;
+//            pwm_comms_s_maintain_brake.params.widths[1] = duty_maintain_brake;
+//            pwm_comms_s_maintain_brake.params.widths[2] = duty_maintain_brake;
+//
+//            pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+//            pwm_comms_s_maintain_brake.buf = 0;
+//
+//            convert_all_pulse_widths( pwm_comms_s_maintain_brake ,pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
+//
+//            break;
+//
+//    default:
+//        break;
+//    }
 
     //parameters for starting the brake
     pwm_comms_s_start_brake.params.widths[0] =  duty_start_brake;
@@ -592,10 +618,6 @@ void pwm_service_task(
     pwm_comms_s_start_brake.buf = 0;
 
     convert_all_pulse_widths( pwm_comms_s_start_brake ,pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
-
-    //parameters for maintaining the brake
-    PWM_ARRAY_TYP pwm_ctrl_s_maintain_brake ; // Structure containing double-buffered PWM output data
-    PWM_COMMS_TYP pwm_comms_s_maintain_brake; // Structure containing PWM communication data
 
     pwm_comms_s_maintain_brake.params.widths[0] = duty_maintain_brake;
     pwm_comms_s_maintain_brake.params.widths[1] = duty_maintain_brake;
@@ -635,6 +657,32 @@ void pwm_service_task(
     {
         select
         {
+        case i_update_brake.update_brake_control_data(int _duty_start_brake, int _duty_maintain_brake, int _period_start_brake):
+                duty_start_brake    = _duty_start_brake;
+                duty_maintain_brake = _duty_maintain_brake;
+                brake_start         = _period_start_brake;
+                brake_defined_II    = 0b1111;
+
+                //parameters for starting the brake
+                pwm_comms_s_start_brake.params.widths[0] =  duty_start_brake;
+                pwm_comms_s_start_brake.params.widths[1] =  duty_start_brake;
+                pwm_comms_s_start_brake.params.widths[2] =  duty_start_brake;
+
+                pwm_comms_s_start_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+                pwm_comms_s_start_brake.buf = 0;
+
+                convert_all_pulse_widths( pwm_comms_s_start_brake ,pwm_ctrl_s_start_brake.buf_data[pwm_comms_s_start_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
+
+                pwm_comms_s_maintain_brake.params.widths[0] = duty_maintain_brake;
+                pwm_comms_s_maintain_brake.params.widths[1] = duty_maintain_brake;
+                pwm_comms_s_maintain_brake.params.widths[2] = duty_maintain_brake;
+
+                pwm_comms_s_maintain_brake.params.id = 0; // Unique Motor identifier e.g. 0 or 1
+                pwm_comms_s_maintain_brake.buf = 0;
+
+                convert_all_pulse_widths( pwm_comms_s_maintain_brake ,pwm_ctrl_s_maintain_brake.buf_data[pwm_comms_s_maintain_brake.buf], pwm_max_value, pwm_deadtime); // Max 178 Cycles
+
+                break;
         case i_update_pwm.status() -> {int status}:
                 status = ACTIVE;
                 break;

@@ -434,28 +434,78 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
 
         //set brake
         case 'b':
-            switch(mode_2)
-            {
-            case 's':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                pos_velocity_ctrl_config.special_brake_release = value;
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                break;
-            default:
-                if (brake_flag)
+                switch(mode_2)
                 {
-                    brake_flag = 0;
-                    printf("Brake blocking\n");
+                case 's':
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        pos_velocity_ctrl_config.special_brake_release = value;
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        break;
+
+                case 'v'://brake voltage configure
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        switch(mode_3)
+                        {
+                        case 'n':// nominal voltage of dc-bus
+                                // set
+                                pos_velocity_ctrl_config.nominal_v_dc=value;
+                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                                // check
+                                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                i_position_control.update_brake_configuration();
+                                printf("nominal voltage of dc-bus is %d Volts \n", pos_velocity_ctrl_config.nominal_v_dc);
+                                break;
+
+                        case 'p':// pull voltage for releasing the brake at startup
+                                //set
+                                pos_velocity_ctrl_config.voltage_pull_brake=value;
+                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                                // check
+                                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                i_position_control.update_brake_configuration();
+                                printf("brake pull voltage is %d milli-Volts \n", pos_velocity_ctrl_config.voltage_pull_brake);
+                                break;
+
+                        case 'h':// hold voltage for holding the brake after it is pulled
+                                //set
+                                pos_velocity_ctrl_config.voltage_hold_brake=value;
+                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                                // check
+                                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                                i_position_control.update_brake_configuration();
+                                printf("brake hold voltage is %d milli-Volts\n", pos_velocity_ctrl_config.voltage_hold_brake);
+                                break;
+                        default:
+                                break;
+                        }
+                        break;
+
+                case 't'://set pull time
+                        //set
+                        pos_velocity_ctrl_config.time_pull_brake=value;
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        // check
+                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        i_position_control.update_brake_configuration();
+                        printf("brake pull time is %d milli-seconds \n", pos_velocity_ctrl_config.time_pull_brake);
+                        break;
+
+                default:
+                        if (brake_flag)
+                        {
+                            brake_flag = 0;
+                            printf("Brake blocking\n");
+                        }
+                        else
+                        {
+                            brake_flag = 1;
+                            printf("Brake released\n");
+                        }
+                        i_position_control.set_brake_status(brake_flag);
+                        break;
                 }
-                else
-                {
-                    brake_flag = 1;
-                    printf("Brake released\n");
-                }
-                i_position_control.set_brake_status(brake_flag);
                 break;
-            }
-            break;
 
         //set offset
         case 'o':
