@@ -316,7 +316,7 @@ void gpio_write(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedb
 /**
  * @brief Read/Write GPIO data from/to the shared memory.
  *
- *        The input data is read the GPIO ports and written to the shared memory.
+ *        The input data is read from the GPIO ports and written to the shared memory.
  *        The output data is read from the shared memory and written to the GPIO ports.
  *
  *

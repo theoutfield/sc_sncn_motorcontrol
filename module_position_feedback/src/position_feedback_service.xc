@@ -206,14 +206,6 @@ void reset_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
         set_clock_on((*spi_ports).spi_interface.blk2);
         set_clock_on((*spi_ports).spi_interface.blk1);
     }
-#if 0
-        if ((*spi_ports).spi_interface.sclk != null) {
-            set_port_use_on(*(*spi_ports).spi_interface.mosi);
-            set_port_use_on(*(*spi_ports).spi_interface.miso);
-            set_port_use_on(*(*spi_ports).spi_interface.sclk);
-        }
-    }
-#endif
 
     for (int i=0 ; i<4 ; i++) {
         if (gpio_ports[i] != null) {

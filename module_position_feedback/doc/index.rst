@@ -34,6 +34,14 @@ It is possible to switch the sensor service type at runtime. You need fist to up
 This Service should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
 
+.. cssclass:: github
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_position_feedback>`_
+
+
+.. image:: images/core-diagram-position-feedback-interface.png
+   :width: 50%
+
 
 How to use
 ==========
@@ -57,18 +65,27 @@ How to use
 
 4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+5. Optionally, instantiate the shared memory interface.
 
-6. At whichever other core, now you can perform calls to the Position Feddback Service through the interfaces connected to it. Or if it is enabled you can read the position using the shared memory.
+6. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+
+    The service configuration contains generic sensor parameters and also structures for sensor specific parameters.
+    You need to fill up all the parameters for the sensor you want to use.
+    You also need to fill up all the generic parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
+    As the service supports two sensors there is two configurations structures. The sensor type is selected with the ``sensor_type`` parameter.
+
+7. At whichever other core, now you can perform calls to the Position Feedback Service through the interfaces connected to it. Or if it is enabled you can read the position using the shared memory.
 
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
                                         //(select your board support files according to your device)
-
+                                        
+        // 2. Include the Position Feedback Service header
         #include <position_feedback_service.h>
        
+        // 3. Instantiate the ports needed for the sensors.
         QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
         QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
         HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
@@ -80,16 +97,21 @@ How to use
 
         int main(void)
         {
+            // 4. Instantiate the interfaces array for the Service-Clients communication.
             interface PositionFeedbackInterface i_position_feedback_1[3];
             interface PositionFeedbackInterface i_position_feedback_2[3];
+            
+            // 5. Instantiate the shared memory interface.
             interface shared_memory_interface i_shared_memory[3];
 
             par
             {
 
                 on tile[IFM_TILE]: par {
+                    // 5. Start the shared memory service
                     shared_memory_service(i_shared_memory, 3);
 
+                    // 6. Fill up your Service configuration and instantiate the Service. 
                     /* Position feedback service */
                     {
                         //set default parameters
@@ -143,9 +165,32 @@ How to use
                         position_feedback_config_2.sensor_function = SENSOR_FUNCTION_FEEDBACK_ONLY;
 
                         position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
-                                position_feedback_config, i_shared_memory[0], i_position_feedback,
-                                position_feedback_config_2, null, i_position_feedback_2);
+                                position_feedback_config, i_shared_memory[0], i_position_feedback_1,
+                                position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
                     }
+                }
+                
+                on tile[APP_TILE]:
+                {
+                    int count_1, position_1, status_1, angle_1, velocity_1;
+                    int count_2, position_2, status_2, angle_2, velocity_2;
+                    
+                    // 7. Call to the Position Feddback Service through the interfaces connected to it.                
+                    /* get position from Sensor 1 */
+                    { count_1, position_1, status_1 } = i_position_feedback_1[0].get_position();
+                    angle_1 = i_position_feedback_1[0].get_angle();
+                    velocity_1 = i_position_feedback_1[0].get_velocity();
+                    
+                    /* get position from Sensor 2 */
+                    { count_2, position_2, status_2 } = i_position_feedback_2[0].get_position();
+                    angle_2 = i_position_feedback_2[0].get_angle();
+                    velocity_2 = i_position_feedback_2[0].get_velocity();
+                    
+                    // 7. You can also read the position using the shared memory.
+                    UpstreamControlData upstream_control_data = i_shared_memory[2].read();
+                    angle_1 = upstream_control_data.angle;
+                    count_1 = upstream_control_data.position;
+                    velocity_1 = upstream_control_data.velocity;
                 }
             }
 

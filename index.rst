@@ -124,8 +124,7 @@ Examples
 
 * **Low level functionality tests:**
 
-	* `
-	PWM Demo <examples/app_demo_general_pwm/doc/index.html>`_: Simple example on PWM signal output.
+	* `PWM Demo <examples/app_demo_general_pwm/doc/index.html>`_: Simple example on PWM signal output.
 	* `Incremental Encoder Interface Test <examples/app_test_qei/doc/index.html>`_: Shows data acquired from incremental Encoder.
 	* `Hall Sensor Feedback Test <examples/app_test_hall/doc/index.html>`_: Shows data acquired from Hall sensor.
 	* `BiSS Encoder Feedback Test <examples/app_test_biss/doc/index.html>`_: Shows data acquired from BiSS Encoder 
