@@ -186,6 +186,7 @@ int main(void)
                 pos_velocity_ctrl_config.resolution  =                          SENSOR_1_RESOLUTION;
             }
 
+            pos_velocity_ctrl_config.nominal_v_dc=                          VDC;
             pos_velocity_ctrl_config.voltage_pull_brake=                    VOLTAGE_PULL_BRAKE;
             pos_velocity_ctrl_config.time_pull_brake =                      TIME_PULL_BRAKE;
             pos_velocity_ctrl_config.voltage_hold_brake =                   VOLTAGE_HOLD_BRAKE;
