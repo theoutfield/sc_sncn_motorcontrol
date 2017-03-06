@@ -25,7 +25,7 @@ How to use
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
 
-.. seealso:: You might find useful the :ref:`REM 14 Sensor Demo <rem_14_demo>`, which illustrates the use of this module.
+.. seealso:: You might find useful the :ref:`REM 14 Sensor Demo <app_test_rem_14`, which illustrates the use of this module.
 
 1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
@@ -48,7 +48,7 @@ How to use
      You need to fill up all the generic sensor parameters especially ``ifm_usec`.
      And fill up the REM 14 specific parameters.
 
-5. At your IFM tile, You can use the functions to read REM 14 data and process it into position data.
+5. At your IFM tile, You can use the functions to read REM 14 data.
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
@@ -79,7 +79,7 @@ How to use
                     position_feedback_config.rem_14_config.dyn_angle_comp = REM_14_SENSOR_DAE;
                     position_feedback_config.rem_14_config.abi_resolution = REM_14_SENSOR_ABI_RES;
                     
-                    // 5. Use the functions to read REM 14 data and process it into position data.
+                    // 5. Use the functions to read REM 14 data.
                     // initialize the sensor
                     initRotarySensor(spi_ports, position_feedback_config);
                     

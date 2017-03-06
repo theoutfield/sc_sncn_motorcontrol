@@ -25,7 +25,7 @@ How to use
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
 
-.. seealso:: You might find useful the :ref:`REM 16MT Sensor Demo <rem_16mt_demo>`, which illustrates the use of this module.
+.. seealso:: You might find useful the :ref:`REM 16MT Sensor Demo <app_test_rem_16mt>`, which illustrates the use of this module.
 
 1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
@@ -48,7 +48,7 @@ How to use
      You need to fill up all the generic sensor parameters especially ``ifm_usec`.
      And fill up the REM 16MT specific parameters.
 
-5. At your IFM tile, You can use the functions to read REM 16MT data and process it into position data.
+5. At your IFM tile, You can use the functions to read REM 16MT data.
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
@@ -76,7 +76,7 @@ How to use
 
                     position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
                     
-                    // 5. Use the functions to read REM 16MT data and process it into position data.
+                    // 5. Use the functions to read REM 16MT data.
                     // initialize the sensor
                     rem_16mt_init(spi_ports, position_feedback_config);
                     

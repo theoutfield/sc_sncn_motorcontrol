@@ -1,22 +1,25 @@
-.. _app_test_hall:
+.. _app_test_rem_16mt:
 
 =================================
-Hall Sensor Demo
+REM 16MT Sensor Demo
 =================================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-The purpose of this app is showing the use of the :ref:`Hall Sensor Module <module_hall>` with :ref:`Position Feedback Module <module_position_feedback>`.
-For that, it implements a simple app that reads the output of a Hall sensor and shows over **XScope** the read velocity and position.
+The purpose of this app is showing the use of the :ref:`REM 16MT Sensor Module <module_rem_16mt>` with :ref:`Position Feedback Module <module_position_feedback>`.
+For that, it implements a simple app that reads the output of a REM 16MT sensor and shows over **XScope** the read velocity and position.
+It also displays the status of the sensor for debugging.
+
+With this app you can also send direct command to the REM 16MT sensor (reset, change filter setting, etc...)
 
 * **Min. Nr. of cores**: 2
 * **Min. Nr. of tiles**: 1
 
 .. cssclass:: github
 
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_hall/>`_
+  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_test_rem_16mt/>`_
 
 Quick How-to
 ============
@@ -37,19 +40,19 @@ Quick How-to
             /* Position feedback service */
             {
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = HALL_SENSOR;
-                position_feedback_config.resolution  = HALL_SENSOR_RESOLUTION;
+                position_feedback_config.sensor_type = REM_16MT_SENSOR;
+                position_feedback_config.resolution  = REM_16MT_SENSOR_RESOLUTION;
                 position_feedback_config.polarity    = NORMAL_POLARITY;
-                position_feedback_config.velocity_compute_period = HALL_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                position_feedback_config.velocity_compute_period = REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.pole_pairs  = POLE_PAIRS;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = 0;
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
-                position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+                position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
-                position_feedback_service(qei_hall_port_1, qei_hall_port_2, null, null, null, null, null, null,
+                position_feedback_service(null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }
