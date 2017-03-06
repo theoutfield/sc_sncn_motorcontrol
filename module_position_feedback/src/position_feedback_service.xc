@@ -436,6 +436,15 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                 spi_on = 1;
             }
         }
+        if (!spi_on && gpio_ports_check) {
+            for (int i=0 ; i<NUMBER_OF_GPIO_PORTS ; i++) {
+                if (position_feedback_config_1.gpio_config[i] == GPIO_INPUT_PULLDOWN) {
+                    set_port_pull_down(*gpio_ports[i]);
+                } else {
+                    set_port_pull_none(*gpio_ports[i]);
+                }
+            }
+        }
 
         //start services
         par {
