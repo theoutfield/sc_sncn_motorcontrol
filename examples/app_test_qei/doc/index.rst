@@ -54,6 +54,36 @@ Quick How-to
                         null, null, null);
             }
 
-7. :ref:`Run the application enabling XScope <running_an_application>`.
+7. In parallel, the position/velocity and others status info are displayed with XScope.
+
+    .. code-block:: c
+        
+        on tile[APP_TILE]:
+        {
+            int position, velocity, count;
+
+            while(1)
+            {
+                /* get position and velocity from QEI Sensor */
+                { count, position, void } = i_position_feedback.get_position();
+
+                velocity = i_position_feedback.get_velocity();
+
+                if (!isnull(i_shared_memory)) {
+                    UpstreamControlData upstream_control_data = i_shared_memory.read();
+                    count = upstream_control_data.position;
+                    velocity = upstream_control_data.velocity;
+                }
+
+                xscope_int(COUNT, count);
+                xscope_int(POSITION, position);
+                xscope_int(VELOCITY, velocity);
+
+                delay_milliseconds(1);
+            }
+        }
+
+
+8. :ref:`Run the application enabling XScope <running_an_application>`.
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.

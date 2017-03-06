@@ -61,7 +61,56 @@ Quick How-to
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }
+            
+7. In parallel, the position/velocity and others status info are displayed with XScope.
 
-7. :ref:`Run the application enabling XScope <running_an_application>`.
+    .. code-block:: c
+        
+        on tile[APP_TILE]:
+        {
+            timer t;
+            unsigned int start_time, end_time;
+            int count = 0;
+            int real_count = 0;
+            unsigned int angle = 0;
+            int velocity = 0;
+            unsigned int position = 0;
+            unsigned int status = 0;
+
+            while(1) {
+
+                /* get position from BiSS Encoder */
+                { count, position, status } = i_position_feedback.get_position();
+
+                t :> start_time;
+                /* get angle and velocity from BiSS Encoder */
+                angle = i_position_feedback.get_angle();
+                velocity = i_position_feedback.get_velocity();
+                t :> end_time;
+
+
+                if (!isnull(i_shared_memory)) {
+                    UpstreamControlData upstream_control_data = i_shared_memory.read();
+                    angle = upstream_control_data.angle;
+                    count = upstream_control_data.position;
+                    velocity = upstream_control_data.velocity;
+                }
+
+                xscope_int(COUNT, count);                           //absolute count
+                xscope_int(REAL_COUNT, real_count);                 //real internal absolute count
+                xscope_int(POSITION, position);                     //singleturn position
+                xscope_int(ANGLE, angle);                           //electrical angle
+                xscope_int(VELOCITY, velocity);                     //velocity in rpm
+                xscope_int(ERROR_BIT, (status&0b10) * 500);         //error bit, should be 0
+                xscope_int(WARNING_BIT, (status&0b01) * 1000);      //warning bit, should be 0
+                xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
+                xscope_int(CRC_ERROR, (status>>2)*1000);            //number of CRC errors, should be 0
+
+                delay_milliseconds(1);
+            }
+        }
+
+
+8. :ref:`Run the application enabling XScope <running_an_application>`.
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.

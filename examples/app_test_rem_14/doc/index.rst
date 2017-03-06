@@ -58,6 +58,51 @@ Quick How-to
                         null, null, null);
             }
 
-7. :ref:`Run the application enabling XScope <running_an_application>`.
+7. In parallel, the position/velocity and others status info are displayed with XScope.
+
+    .. code-block:: c
+        
+        on tile[APP_TILE]:
+        {
+            int count = 0;
+            int velocity = 0;
+            int position = 0;
+            int angle = 0;
+            timer t;
+            unsigned int start_time, end_time, time;
+
+
+            while(1) {
+                /* get position from REM_14 Sensor */
+                {count, position, void } = i_position_feedback.get_position();
+
+                /* get angle from REM_14 Sensor */
+                angle = i_position_feedback.get_angle();
+
+                /* get velocity from REM_14 Sensor */
+                velocity = i_position_feedback.get_velocity();
+
+                t :> start_time;
+                if (!isnull(i_shared_memory)) {
+                    UpstreamControlData upstream_control_data = i_shared_memory.read();
+                    angle = upstream_control_data.angle;
+                    count = upstream_control_data.position;
+                    velocity = upstream_control_data.velocity;
+                }
+                t :> end_time;
+
+                xscope_int(COUNT, count);
+                xscope_int(POSITION, position);
+                xscope_int(ANGLE, angle);
+                xscope_int(VELOCITY, velocity);
+                xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
+                xscope_int(TIME_INTERNAL, time);   //time to get the data in microseconds
+
+                delay_milliseconds(1);
+            }
+        }
+
+
+8. :ref:`Run the application enabling XScope <running_an_application>`.
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.

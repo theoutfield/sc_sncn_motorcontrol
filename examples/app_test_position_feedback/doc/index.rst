@@ -92,6 +92,61 @@ Quick How-to
                         null, null, null);
             }
 
-7. :ref:`Run the application enabling XScope <running_an_application>`.
+7. In parallel, the position/velocity and others status info are displayed with XScope.
+
+    .. code-block:: c
+        
+        on tile[APP_TILE]:
+        {
+            int angle = 0;
+            int velocity = 0;
+            int count = 0;
+            int angle_2 = 0;
+            int velocity_2 = 0;
+            int count_2 = 0;
+
+            while(1)
+            {
+                /* get position from Hall Sensor */
+                { count, void, void } = i_position_feedback_1.get_position();
+                angle = i_position_feedback_1.get_angle();
+
+                /* get velocity from Hall Sensor */
+                velocity = i_position_feedback_1.get_velocity();
+
+                if (!isnull(i_position_feedback_2)) {
+                    { count_2, void, void } = i_position_feedback_2.get_position();
+                    angle_2 = i_position_feedback_2.get_angle();
+                    velocity_2 = i_position_feedback_2.get_velocity();
+                }
+
+                if (!isnull(i_shared_memory)) {
+                    UpstreamControlData upstream_control_data = i_shared_memory.read();
+                    //position data
+                    angle = upstream_control_data.angle;
+                    count = upstream_control_data.position;
+                    velocity = upstream_control_data.velocity;
+
+                    //write gpio
+                    unsigned int gpio_out = 0b1010;
+                    i_shared_memory.write_gpio_output(gpio_out);
+
+                    //read gpio
+                    xscope_int(GPIO_0, 1000 * upstream_control_data.gpio[0]);
+                }
+
+                xscope_int(COUNT_1, count);
+                xscope_int(VELOCITY_1, velocity);
+                xscope_int(ANGLE_1, angle);
+                xscope_int(COUNT_2, count_2);
+                xscope_int(VELOCITY_2, velocity_2);
+                xscope_int(ANGLE_2, angle_2);
+
+                delay_milliseconds(1);
+            }
+        }
+
+
+8. :ref:`Run the application enabling XScope <running_an_application>`.
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
