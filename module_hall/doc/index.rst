@@ -10,7 +10,7 @@ Hall Sensor Module
 This module provides a Service that will read and process the data coming from your 
 Feedback Hall Sensor.
 
-This service can run independently but is meant to be used by the :ref:`Position Feedback Module <module_position_feedback>`.
+This service can run independently but is meant to be used by the :ref:`Position Feedback Module <module_position_feedback>` that is why it uses the same communication interface.
 
 The Hall Service should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
@@ -137,6 +137,7 @@ Types
 -----
 
 .. doxygenstruct:: HallConfig
+.. doxygenstruct:: PositionFeedbackConfig
 .. doxygenstruct:: QEIHallPort
 
 Service

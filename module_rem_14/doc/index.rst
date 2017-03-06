@@ -1,31 +1,23 @@
-    .. _module_biss:
+.. _module_rem_14:
 
 =====================
-BiSS Encoder Module
+REM 14 Encoder Module
 =====================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-This module provides a Service which will read and process the data coming from your BiSS Encoder Feedback Sensor. Up to 5 clients could retrieve data from the Service through an interface.
+This module provides functions to read  data coming from a REM 14 Encoder.
 
-BiSS is an open source digital interface for sensors and actuators. BiSS is hardware compatible to the industrial standard SSI (Serial Synchronous Interface). The standardization process is coordinated on biss-interface.com_.
+Those functions are used in :ref:`Serial Encoder Module <module_serial_encoder>` itself used by :ref:`Position Feedback Module <module_position_feedback>` to create a service for reading a REM 14 encoder.
 
-When running the BiSS Service, the **Reference Frequency** of the tile where the Service is
-allocated will be automatically changed to **250MHz**.
-
-The BiSS Service should always run over an **IFM Tile** so it can access the ports to
+The functions should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_biss>`_
-
-.. image:: images/core-diagram-biss-interface.png
-   :width: 50%
-
-.. _biss-interface.com: http://www.biss-interface.com/
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_rem_14>`_
 
 
 How to use
@@ -33,64 +25,66 @@ How to use
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
 
-.. seealso:: You might find useful the :ref:`BiSS Sensor Demo <biss_demo>`, which illustrates the use of this module.
+.. seealso:: You might find useful the :ref:`REM 14 Sensor Demo <rem_14_demo>`, which illustrates the use of this module.
 
 1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
     ::
 
-        USED_MODULES = module_biss module_board-support module_misc
+        USED_MODULES = config_motor module_adc module_rem_14 module_bldc_torque_control_lib module_board-support module_hall module_misc module_position_feedback module_pwm module_qei module_biss module_rem_16mt module_serial_encoder module_shared_memory module_spi_master module_watchdog 
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules.
           This will help solving internal dependency issues.
 
-2. Include the BiSS Service header **biss_service.h** in your app.
+2. Include the REM 14 Service header **rem_14_service.h** in your app.
 
-3. Instantiate the ports where the Service will be sending the BiSS clock, reading the BiSS Sensor feedback signals and the clock block to use.
+3. Instantiate the ports for the REM 14.
 
-4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
+     REM 14 needs a ``SPIPorts`` structure containing two clock blocks and 4 1-bit ports for SPI.
 
-5. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+4. Fill up the REM 14 configuration structure.
 
-6. At whichever other core, now you can perform calls to the BiSS Service through the interfaces connected to it.
+     The functions use the same configuration structure as the :ref:`Position Feedback Module <module_position_feedback>`.
+     You need to fill up all the generic sensor parameters especially ``ifm_usec`.
+     And fill up the REM 14 specific parameters.
 
+5. At your IFM tile, You can use the functions to read REM 14 data and process it into position data.
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
         #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
                                         //(select your board support files according to your device)
 
-        #include <biss_service.h> // 2
-
-        BiSSPorts biss_ports = SOMANET_IFM_BISS_PORTS; // 3
+        // 2. Include the REM 14 Service header **rem_14_service.h** in your app.
+        #include <rem_14_service.h>
+        
+        // 3.Instantiate the ports for the REM 14.
+        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 
         int main(void)
         {
-            interface BiSSInterface i_biss[5]; // 4
-
             par
             {
-                on tile[APP_TILE]: int foo = i_biss[0].get_biss_position(); // 6
-
                 on tile[IFM_TILE]:
                 {
-                    BiSSConfig biss_config; // 5
-                    biss_config.multiturn_length = BISS_MULTITURN_LENGTH;
-                    biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    biss_config.singleturn_length = BISS_SINGLETURN_LENGTH;
-                    biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
-                    biss_config.status_length = BISS_STATUS_LENGTH;
-                    biss_config.crc_poly = BISS_CRC_POLY;
-                    biss_config.pole_pairs = 2;
-                    biss_config.polarity = BISS_POLARITY;
-                    biss_config.clock_dividend = BISS_CLOCK_DIVIDEND;
-                    biss_config.clock_divisor = BISS_CLOCK_DIVISOR;
-                    biss_config.timeout = BISS_TIMEOUT;
-                    biss_config.max_ticks = BISS_MAX_TICKS;
-                    biss_config.velocity_loop = BISS_VELOCITY_LOOP;
-                    biss_config.offset_electrical = BISS_OFFSET_ELECTRICAL;
+                    // 4. Fill up the REM 14 configuration structure.
+                    PositionFeedbackConfig position_feedback_config;
+                    position_feedback_config.polarity    = NORMAL_POLARITY;
+                    position_feedback_config.pole_pairs  = POLE_PAIRS;
+                    position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                    position_feedback_config.offset      = 0;
 
-                    biss_service(biss_ports, biss_config, i_biss);
+                    position_feedback_config.rem_14_config.hysteresis     = REM_14_SENSOR_HYSTERESIS ;
+                    position_feedback_config.rem_14_config.noise_setting  = REM_14_SENSOR_NOISE;
+                    position_feedback_config.rem_14_config.dyn_angle_comp = REM_14_SENSOR_DAE;
+                    position_feedback_config.rem_14_config.abi_resolution = REM_14_SENSOR_ABI_RES;
+                    
+                    // 5. Use the functions to read REM 14 data and process it into position data.
+                    // initialize the sensor
+                    initRotarySensor(spi_ports, position_feedback_config);
+                    
+                    // read REM 14 data
+                    position = readRotarySensorAngleWithCompensation(spi_ports, position_feedback_config.ifm_usec);
                 }
             }
 
@@ -104,15 +98,24 @@ Definitions
 -----------
 
 .. doxygendefine:: DEFAULT_SPI_CLOCK_DIV
+.. doxygendefine:: REM_14_EXECUTING_TIME
+.. doxygendefine:: REM_14_SAVING_TIME
+.. doxygendefine:: REM_14_WIDTH_INDEX_PULSE
+.. doxygendefine:: REM_14_FACTORY_SETTINGS
+.. doxygendefine:: REM_14_UVW_ABI
+.. doxygendefine:: REM_14_DATA_SELECT
+.. doxygendefine:: REM_14_PWM_CONFIG
 
 Types
 -----
 
 .. doxygenenum:: REM_14_ABIResolution
-.. doxygenenum:: REM_14_DynAngleComp
 .. doxygenenum:: REM_14_Noise
+.. doxygenenum:: REM_14_DynAngleComp
 .. doxygenenum:: REM_14_Hysteresis
-.. doxygenestruct:: REM_14Config
+.. doxygenstruct:: REM_14Config
+.. doxygenstruct:: PositionFeedbackConfig
+.. doxygenstruct:: SPIPorts
 
 Functions
 --------
@@ -121,8 +124,6 @@ Functions
 .. doxygenfunction:: initRotarySensor
 .. doxygenfunction:: readZeroPosition
 .. doxygenfunction:: readNumberPolePairs
-.. doxygenfunction:: readSettings1
-.. doxygenfunction:: readSettings2
 .. doxygenfunction:: readRedundancyReg
 .. doxygenfunction:: readProgrammingReg
 .. doxygenfunction:: readCORDICMagnitude
@@ -130,6 +131,7 @@ Functions
 .. doxygenfunction:: readRotarySensorError
 .. doxygenfunction:: readRotarySensorAngleWithoutCompensation
 .. doxygenfunction:: readRotarySensorAngleWithCompensation
+.. doxygenfunction:: writeSettings
 .. doxygenfunction:: writeZeroPosition
 .. doxygenfunction:: writeNumberPolePairs
 
