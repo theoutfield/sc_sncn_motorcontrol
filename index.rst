@@ -125,10 +125,16 @@ Examples
 * **Low level functionality tests:**
 
 	* `PWM Demo <examples/app_demo_general_pwm/doc/index.html>`_: Simple example on PWM signal output.
+	* `Watchdog Demo <examples/app_demo_watchdog/doc/index.html>`_: Simple example on how to use the Watchdog.
+
+* **Position Feedback Sensors tests:**
+
 	* `Incremental Encoder Interface Test <examples/app_test_qei/doc/index.html>`_: Shows data acquired from incremental Encoder.
 	* `Hall Sensor Feedback Test <examples/app_test_hall/doc/index.html>`_: Shows data acquired from Hall sensor.
-	* `BiSS Encoder Feedback Test <examples/app_test_biss/doc/index.html>`_: Shows data acquired from BiSS Encoder 
-	* `Watchdog Demo <examples/app_demo_watchdog/doc/index.html>`_: Simple example on how to use the Watchdog.
+	* `BiSS Encoder Feedback Test <examples/app_test_biss/doc/index.html>`_: Shows data acquired from BiSS Encoder.
+	* `REM 14 Feedback Test <examples/app_test_rem_14/doc/index.html>`_: Shows data acquired from a REM 14 Encoder.
+	* `REM 16MT Feedback Test <examples/app_test_rem_16mt/doc/index.html>`_: Shows data acquired from REM 16MT Encoder.
+	* `Position Feedback Service Test <examples/app_test_position_feedback/doc/index.html>`_: Simple example of the usage of Position Feedback Service to acquire position from multiple sensors.
 
 * **BLDC Motor Control demos:**
 
