@@ -12,9 +12,4 @@
 #define SPI_MASTER_MODE 1           /**< clock active high */
 #define SPI_MASTER_SD_CARD_COMPAT 1 /**< MOSI high during input */
 
-#define REM_16MT_USE_TIMESTAMP
-#ifdef REM_16MT_USE_TIMESTAMP
 #define REM_16MT_TIMEOUT           10   /**< Time to wait after read in micro seconds */
-#else
-#define REM_16MT_TIMEOUT           38   /**< Time to wait after read in micro seconds */
-#endif

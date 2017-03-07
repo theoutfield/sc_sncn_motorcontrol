@@ -30,7 +30,6 @@ void init_spi_ports(SPIPorts &spi_ports);
 int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config);
 
 
-#ifdef REM_16MT_USE_TIMESTAMP
 /**
  * @brief REM 16MT sensor position data
  *
@@ -44,9 +43,6 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config);
  * @return timestamp
  */
 { char, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec);
-#else
-{ char, int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec);
-#endif
 
 
 /**

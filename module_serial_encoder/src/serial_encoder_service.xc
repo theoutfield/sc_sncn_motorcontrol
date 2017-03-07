@@ -37,12 +37,7 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
     {
     case REM_16MT_SENSOR:
         t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
-#ifdef REM_16MT_USE_TIMESTAMP
-        char timestamp;
         { state.status, state.count, state.position, state.angle, state.timestamp } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
-#else
-        { state.status, state.count, state.position, state.angle } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
-#endif
 #ifdef XSCOPE_REM_16MT
             xscope_int(POSITION_RAW, state.angle);
 #endif
@@ -171,10 +166,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
     int velocity_count = 0;
     int velocity_loop = position_feedback_config.velocity_compute_period*position_feedback_config.ifm_usec;
-#ifdef REM_16MT_USE_TIMESTAMP
     char old_timestamp = 0, timediff;
     int timediff_long = 0;
-#endif
     //position
     PositionState pos_state = {0};
     //timing
@@ -273,11 +266,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 {
                     t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
                     rem_16mt_write(*spi_ports, opcode, data, data_bits, position_feedback_config.ifm_usec);
-#ifdef REM_16MT_USE_TIMESTAMP
                     { status, void, void, void, void } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
-#else
-                    { status, void, void, void } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
-#endif
                     t :> last_read;
                 }
                 break;
@@ -306,7 +295,6 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
             {
             case REM_16MT_SENSOR:
                 velocity_count++;
-#ifdef REM_16MT_USE_TIMESTAMP
                 //timestamp difference
                 timediff = (char)pos_state.timestamp-old_timestamp;
                 old_timestamp = pos_state.timestamp;
@@ -323,18 +311,6 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     timediff_long = 0;
                     velocity_count = 0;
                 }
-#else
-                if (velocity_count >= 8) {
-                    difference = count - old_count;
-                    old_count = count;
-                    if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
-                        velocity = velocity_compute(difference, (last_read-last_velocity_read)/position_feedback_config.ifm_usec, position_feedback_config.resolution);
-                        velocity = filter(velocity_buffer, index, 8, velocity);
-                    }
-                    last_velocity_read = last_read;
-                    velocity_count = 0;
-                }
-#endif
                 break;
             case REM_14_SENSOR:
             case BISS_SENSOR:
@@ -355,9 +331,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
             xscope_int(COUNT, pos_state.count);
             xscope_int(POSITION, pos_state.position);
             xscope_int(STATUS, pos_state.status*1000);
-#ifdef REM_16MT_USE_TIMESTAMP
             xscope_int(TIMESTAMP, timediff);
-#endif
 #endif
 
             //send data to shared memory
