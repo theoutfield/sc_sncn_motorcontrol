@@ -430,30 +430,30 @@ void adc_ad7949(
 
             V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-dc_value;
 
-            if(5000<protection_counter)
+            if((5000<protection_counter) && (fault_code==NO_FAULT))
             {
                 if(( phaseB_out<(-current_limit) || current_limit<phaseB_out))
                 {
                     i_watchdog.protect(OVER_CURRENT_PHASE_B);
-                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
+                    fault_code=OVER_CURRENT_PHASE_B;
                 }
 
                 if(( phaseC_out<(-current_limit) || current_limit<phaseC_out))
                 {
                     i_watchdog.protect(OVER_CURRENT_PHASE_C);
-                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
+                    fault_code=OVER_CURRENT_PHASE_C;
                 }
 
                 if (V_dc_out<v_dc_min)
                 {
                     i_watchdog.protect(UNDER_VOLTAGE);
-                    if(fault_code==0) fault_code=UNDER_VOLTAGE;
+                    fault_code=UNDER_VOLTAGE;
                 }
 
                 if (v_dc_max<V_dc_out)
                 {
                     i_watchdog.protect(OVER_VOLTAGE);
-                    if(fault_code==0) fault_code=OVER_VOLTAGE;
+                    fault_code=OVER_VOLTAGE;
                 }
             }
             I_dc_out=OUT_B[AD_7949_VMOT_DIV_I_MOT];

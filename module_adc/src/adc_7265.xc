@@ -266,30 +266,30 @@ void adc_ad7265(
             phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
             phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
 
-            if(5000<protection_counter)
+            if((5000<protection_counter) && (fault_code==NO_FAULT))
             {
                 if(( phaseB_out<(-current_limit) || current_limit<phaseB_out))
                 {
                     i_watchdog.protect(OVER_CURRENT_PHASE_B);
-                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_B;
+                    fault_code=OVER_CURRENT_PHASE_B;
                 }
 
                 if(( phaseC_out<(-current_limit) || current_limit<phaseC_out))
                 {
                     i_watchdog.protect(OVER_CURRENT_PHASE_C);
-                    if(fault_code==0) fault_code=OVER_CURRENT_PHASE_C;
+                    fault_code=OVER_CURRENT_PHASE_C;
                 }
 
                 if (OUT_A[AD_7265_VDC_IDC]<v_dc_min)
                 {
                     i_watchdog.protect(UNDER_VOLTAGE);
-                    if(fault_code==0) fault_code=UNDER_VOLTAGE;
+                    fault_code=UNDER_VOLTAGE;
                 }
 
                 if (v_dc_max<OUT_A[AD_7265_VDC_IDC])
                 {
                     i_watchdog.protect(OVER_VOLTAGE);
-                    if(fault_code==0) fault_code=OVER_VOLTAGE;
+                    fault_code=OVER_VOLTAGE;
                 }
             }
 

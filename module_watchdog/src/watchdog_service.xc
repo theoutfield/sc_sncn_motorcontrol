@@ -39,7 +39,7 @@
     timer t;
 
     unsigned int LED_counter = 0;
-    int fault=0;//FIXME: this variable should be initialized to 0. here it is 3 to check the LED flashing of WD task
+    int fault=NO_FAULT;
     int fault_counter=0;
     unsigned int times = 0;
 
@@ -124,7 +124,7 @@
                         break;
                 }
 
-                fault=fault_id;
+                fault=fault_id-NO_FAULT;
                 wd_enabled = 0;
                 break;
 
@@ -176,7 +176,7 @@
                 }
 
                 //showing the fault type by LED flashing (once, twice, ..., five times)
-                if(fault) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, times, LED_counter);
+                if(fault!=NO_FAULT) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, times, LED_counter);
 
                 LED_counter++;
 
@@ -186,7 +186,7 @@
 
                 WD_En_sent_flag =0;
                 LED_counter = 0;
-                fault=0;
+                fault=NO_FAULT;
                 fault_counter=0;
 
                 switch(IFM_module_type){
