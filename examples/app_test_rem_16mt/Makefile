@@ -23,7 +23,7 @@ USED_MODULES += config_motor module_adc module_bldc_torque_control_lib module_co
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O3 -report -DXSCOPE_REM_16MT -DDEBUG_POSITION_FEEDBACK
+XCC_FLAGS_Debug = -g -O3 -report -DXSCOPE_REM_16MT
 XCC_FLAGS_Release = -g -O3
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.

@@ -21,6 +21,7 @@
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
 #include <advanced_motorcontrol_licence.h>
+
 /*********** Sensor Test ***********/
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
@@ -34,78 +35,10 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
-
-/* Test REM_16MT Sensor Client */
-void rem_16mt_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory)
-{
-    int count = 0;
-    int velocity = 0;
-    int position = 0;
-    int angle = 0;
-    int status = 0;
-    timer t;
-    unsigned start_time, end_time;
-
-    while(1) {
-        /* get position from REM_16MT Sensor */
-        t :> start_time;
-        {count, position, status } = i_position_feedback.get_position();
-        t :> end_time;
-
-        /* get angle and velocity from REM_16MT Sensor */
-        //        velocity = i_position_feedback.get_velocity();
-
-        //electrical_angle = i_position_feedback.get_angle();
-
-        if (!isnull(i_shared_memory)) {
-            UpstreamControlData upstream_control_data = i_shared_memory.read();
-            angle = upstream_control_data.angle;
-            count = upstream_control_data.position;
-            velocity = upstream_control_data.velocity;
-        }
-
-
-        //        xscope_int(COUNT, count);
-        //        xscope_int(POSITION, position);
-        //        xscope_int(ANGLE, angle);
-        //        xscope_int(VELOCITY, velocity);
-        //        xscope_int(STATUS, status*1000);
-        //        xscope_int(TIME, status);
-
-        delay_microseconds(10);
-    }
-}
-
-//finding the offset function
-int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
-{
-    printf("Sending offset_detection command ...\n");
-    i_motorcontrol.set_offset_detection_enabled();
-
-    int offset = -1;
-    while (offset == -1) {
-        delay_milliseconds(50);//wait until offset is detected
-        offset = i_motorcontrol.set_calib(0);
-    }
-
-    printf("Detected offset is: %i\n", offset);
-    //    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
-    int proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
-    if(proper_sensor_polarity == 1) {
-        printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
-        i_motorcontrol.set_torque_control_enabled();
-    } else {
-        printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-        printf(">>  Please either change SENSOR_POLARITY parameter [0 - normal, 1 - inverted] or flip any two motor phases\n");
-    }
-    return offset;
-}
-
 void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorcontrolInterface client i_motorcontrol) {
     char status;
     int multiturn;
-    //    unsigned int singleturn_filtered;
-    unsigned int singleturn_raw;
+    unsigned int singleturn_filtered;
     unsigned start_time, end_time;
     timer t;
     int offset = 0;
@@ -133,90 +66,108 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
         }
 
         switch(mode) {
-            //auto offset tuning
-        case 'b':
-            offset = auto_offset(i_motorcontrol);
-            printf("using commutation offset to %d\n", offset);
+        //auto offset tuning
+        case 'a':
+            printf("Sending offset_detection command ...\n");
+            i_motorcontrol.set_offset_detection_enabled();
+            while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
+
+            if(i_motorcontrol.get_sensor_polarity_state() != 1) {
+                printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                offset = -1;
+            } else{
+                offset = i_motorcontrol.set_calib(0);
+                printf("Detected offset is: %i\n", offset);
+
+                //set offset to motorcontrol
+                MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+                motorcontrol_config.commutation_angle_offset = offset;
+                i_motorcontrol.set_config(motorcontrol_config);
+
+                //start motorcontrol
+                delay_milliseconds(500);
+                i_motorcontrol.set_torque_control_enabled();
+                i_motorcontrol.set_brake_status(1);
+            }
             break;
-            //set calibration point
-        case 'c':
-            i_position_feedback.send_command(REM_16MT_CALIB_TBL_POINT, value, 16);
-            printf("set calibration point %d\n", value);
-            break;
-            //change direction
+        //change direction
         case 'd':
             i_position_feedback.send_command(REM_16MT_CONF_DIR, value, 8);
             printf("direction %d\n", value);
             break;
-            //filter
+        //filter
         case 'f':
             i_position_feedback.send_command(REM_16MT_CONF_FILTER, value, 8);
             printf("filter %d\n", value);
             break;
-            //set offset
+        //set offset
         case 'o':
             position_feedback_config = i_position_feedback.get_config();
             position_feedback_config.offset = value * sign;
             i_position_feedback.set_config(position_feedback_config);
             printf("offset %d\n", value * sign);
             break;
-            //set position
+        //set position
         case 'p':
             i_position_feedback.set_position(value*sign);
             break;
-            //set multiturn
+        //set multiturn
         case 'm':
             i_position_feedback.send_command(REM_16MT_CONF_MTPRESET, value*sign, 16);
             printf("multiturn\n");
             break;
-            //set toruqe
+        //set torque
         case 'q':
             if(offset != -1){
                 int torque = value*sign;
                 i_motorcontrol.set_torque(torque);
                 printf("Torque %d\n", torque);
-            }
-            else {
-                printf("Ofset is not found or invalid, please type command 'b' first \n");
+            } else {
+                printf("Offset is not found or invalid, please type command 'a' first \n");
             }
             break;
-            //reset sensor
+        //reset sensor
         case 'r':
             i_position_feedback.send_command(REM_16MT_CTRL_RESET, 0, 0);
             printf("reset\n");
             break;
-            //set singleturn
+        //set singleturn
         case 's':
             i_position_feedback.send_command(REM_16MT_CONF_STPRESET, value, 16);
             printf("singleturn\n");
             break;
-            //calibration table size
+        //calibration table size
         case 't':
             i_position_feedback.send_command(REM_16MT_CALIB_TBL_SIZE, value, 16);
             printf("calibration table size %d\n", value);
             break;
-            //save
+        //set calibration point
+        case 'c':
+            i_position_feedback.send_command(REM_16MT_CALIB_TBL_POINT, value, 16);
+            printf("set calibration point %d\n", value);
+            break;
+        //save
         case 'v':
             i_position_feedback.send_command(REM_16MT_CTRL_SAVE, 0, 0);
             i_position_feedback.send_command(REM_16MT_CTRL_RESET, 0, 0);
             printf("save\n");
             break;
-            //set zero position
+        //set zero position
         case 'z':
             i_position_feedback.send_command(REM_16MT_CONF_NULL, 0, 0);
             printf("zero\n");
             break;
-            //set velocity loop time
+        //set velocity compute period
         case 'l':
             position_feedback_config = i_position_feedback.get_config();
             position_feedback_config.velocity_compute_period = value;
             i_position_feedback.set_config(position_feedback_config);
             printf("velocity loop time %dus\n", position_feedback_config.velocity_compute_period);
             break;
-            //print the count and the time to get it
+        //print the position and the time to get it
         default:
             t :> start_time;
-            {multiturn, singleturn_raw, status} = i_position_feedback.get_position();
+            {multiturn, singleturn_filtered, status} = i_position_feedback.get_position();
             t :> end_time;
             printf("time %d, count %d\n", (end_time-start_time)/USEC_STD, multiturn);
             break;
@@ -280,14 +231,14 @@ int main(void)
                 motorcontrol_config.current_I_gain =  TORQUE_Ki;
                 motorcontrol_config.current_D_gain =  TORQUE_Kd;
                 motorcontrol_config.pole_pair =  POLE_PAIRS;
-                motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
+                motorcontrol_config.commutation_sensor=REM_16MT_SENSOR;
                 motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
-                motorcontrol_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
-                motorcontrol_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
-                motorcontrol_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
-                motorcontrol_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
-                motorcontrol_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
-                motorcontrol_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
+                motorcontrol_config.hall_state_angle[0]=0;
+                motorcontrol_config.hall_state_angle[1]=0;
+                motorcontrol_config.hall_state_angle[2]=0;
+                motorcontrol_config.hall_state_angle[3]=0;
+                motorcontrol_config.hall_state_angle[4]=0;
+                motorcontrol_config.hall_state_angle[5]=0;
                 motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
                 motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
                 motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;

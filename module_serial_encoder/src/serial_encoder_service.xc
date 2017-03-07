@@ -43,6 +43,9 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
 #else
         { state.status, state.count, state.position, state.angle } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
 #endif
+#ifdef XSCOPE_REM_16MT
+            xscope_int(POSITION_RAW, state.angle);
+#endif
         state.angle = (position_feedback_config.pole_pairs * (state.angle >> 4) ) & 4095;
         break;
     case REM_14_SENSOR:
@@ -349,8 +352,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
 #ifdef XSCOPE_REM_16MT
             xscope_int(VELOCITY, velocity);
-            xscope_int(POSITION, pos_state.count);
-            xscope_int(POSITION_RAW, pos_state.angle);
+            xscope_int(COUNT, pos_state.count);
+            xscope_int(POSITION, pos_state.position);
             xscope_int(STATUS, pos_state.status*1000);
 #ifdef REM_16MT_USE_TIMESTAMP
             xscope_int(TIMESTAMP, timediff);

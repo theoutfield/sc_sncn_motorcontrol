@@ -12,7 +12,33 @@ The purpose of this app is showing the use of the :ref:`REM 16MT Sensor Module <
 For that, it implements a simple app that reads the output of a REM 16MT sensor and shows over **XScope** the read velocity and position.
 It also displays the status of the sensor for debugging.
 
-With this app you can also send direct command to the REM 16MT sensor (reset, change filter setting, etc...)
+The data displayed over XScope is:
+      - Position: the single turn position filtered
+      - Position Raw: the single turn position raw
+      - Count: the absolute multiturn position
+      - Velocity: the velocity
+      - Timestamp: the timestamp difference between two reads in microseconds
+      - Status: the sensor status
+      - checksum error: the number of read retry caused by checksum error
+      
+With this app you can also send direct commands to the REM 16MT sensor (reset, change filter setting, etc...) and control the motor.
+
+The commands are:
+ - a: start auto detection of commutation offset
+ - d [number]: change sensor polarity (direction), 0 is Clockwise and 1 is Counter Clockwise
+ - f [number]: change filter setting. 0 is disabled. 2 to 9 to enable (9 is the strongest)
+ - o [number]: set singleturn offset
+ - p [number]: set absolute multiturn position
+ - m [number]: set multiturn value (the number of turn)
+ - s [number]: set singleturn position
+ - q [number]: set torque
+ - r: reset the sensor
+ - t [number]: start a calibration with [number] points
+ - c [number]: set a calibration point
+ - v: save sensor configuration to flash
+ - z: reset position to zero
+ - l [number]: set velocity compute period
+ - [number]: print the position and the time to get it
 
 * **Min. Nr. of cores**: 2
 * **Min. Nr. of tiles**: 1
@@ -57,51 +83,7 @@ Quick How-to
                         null, null, null);
             }
 
-7. In parallel, the position/velocity and others status info are displayed with XScope.
-
-    .. code-block:: c
-        
-        on tile[APP_TILE]:
-        {
-            int count = 0;
-            int velocity = 0;
-            int position = 0;
-            int angle = 0;
-            int status = 0;
-            timer t;
-            unsigned start_time, end_time;
-
-            while(1) {
-                /* get position from REM_16MT Sensor */
-                t :> start_time;
-                {count, position, status } = i_position_feedback.get_position();
-                t :> end_time;
-
-                /* get angle and velocity from REM_16MT Sensor */
-                velocity = i_position_feedback.get_velocity();
-
-                angle = i_position_feedback.get_angle();
-
-                if (!isnull(i_shared_memory)) {
-                    UpstreamControlData upstream_control_data = i_shared_memory.read();
-                    angle = upstream_control_data.angle;
-                    count = upstream_control_data.position;
-                    velocity = upstream_control_data.velocity;
-                }
-
-
-                xscope_int(COUNT, count);
-                xscope_int(POSITION, position);
-                xscope_int(ANGLE, angle);
-                xscope_int(VELOCITY, velocity);
-                xscope_int(STATUS, status*1000);
-                xscope_int(TIME, status);
-
-                delay_microseconds(10);
-            }
-        }
-
-
-8. :ref:`Run the application enabling XScope <running_an_application>`.
+7. :ref:`Run the application enabling XScope <running_an_application>`.
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
+
