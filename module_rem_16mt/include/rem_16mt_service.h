@@ -27,7 +27,7 @@ void init_spi_ports(SPIPorts &spi_ports);
  *
  * @return status
  */
-int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config);
+SensorError rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config);
 
 
 /**
@@ -42,7 +42,7 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config);
  * @return singleturn position raw
  * @return timestamp
  */
-{ char, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec);
+{ SensorError, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec);
 
 
 /**

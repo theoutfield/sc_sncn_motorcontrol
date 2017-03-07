@@ -215,10 +215,11 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 out_notification = notification;
                 break;
 
-            case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position, unsigned int status }:
+            case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position, SensorError status }:
 
                 out_count = count;
                 out_position = position;
+                status = SENSOR_NO_ERROR;
                 break;
 
             case i_position_feedback[int i].get_velocity() -> int out_velocity:

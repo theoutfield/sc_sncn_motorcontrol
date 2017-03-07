@@ -120,7 +120,7 @@ interface PositionFeedbackInterface
      * @return Singleturn position in ticks
      * @return Sensor status
      */
-    { int, unsigned int, unsigned int } get_position(void);
+    { int, unsigned int, SensorError } get_position(void);
 
     /**
      * @brief Get the velocity in Round per minute (rpm)

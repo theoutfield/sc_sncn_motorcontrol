@@ -208,6 +208,7 @@ Types
 
 .. doxygenenum:: GPIOType
 .. doxygenenum:: SensorFunction
+.. doxygenenum:: SensorError
 .. doxygenenum:: EncoderPortNumber
 .. doxygenstruct:: PositionFeedbackConfig
 

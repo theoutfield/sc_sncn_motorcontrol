@@ -21,9 +21,9 @@
  * @param biss_config Configuration of the BiSS sensor (data lengths, crc polynomial, etc)
  * @param[out] data Array to store the read bits, should be large enough to store all the data bits + crc bits
  *
- * @return error status (NoError, CRCError, NoAck, NoStartBit)
+ * @return error status (No Error, CRC Error, No Ack, No Start Bit)
  */
-unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[]);
+SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[]);
 
 
 /**
@@ -34,9 +34,9 @@ unsigned int read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * 
  *
  * @return absolute count
  * @return position in the range [0 - (2^singleturn_resolution - 1)]
- * @return status bits (error and warning bits), 0 = ok
+ * @return status (error and warning bits)
  */
-{ int, unsigned int, unsigned int } biss_encoder(unsigned int data[], BISSConfig biss_config);
+{ int, unsigned int, SensorError } biss_encoder(unsigned int data[], BISSConfig biss_config);
 
 
 /**

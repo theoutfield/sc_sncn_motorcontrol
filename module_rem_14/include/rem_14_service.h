@@ -26,7 +26,7 @@ void initRotarySensorInterface(SPIPorts &spi_ports);
  *
  * @return status
  */
-int initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config);
+SensorError initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config);
 
 
 //reading fx
@@ -132,8 +132,9 @@ int readRotarySensorError(SPIPorts &spi_ports, UsecType ifm_usec);
  * @param ifm_usec number of ticks in a microseconds
  *
  * @return singleturn position without compensation
+ * @return status
  */
-int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType ifm_usec);
+{ unsigned int, unsigned int } readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType ifm_usec);
 
 /**
  * @brief Read the singleturn position with compensation
@@ -142,8 +143,9 @@ int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType ifm_u
  * @param ifm_usec number of ticks in a microseconds
  *
  * @return singleturn position with compensation
+ * @return status
  */
-int readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, UsecType ifm_usec);
+{ unsigned int, unsigned int } readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, UsecType ifm_usec);
 
 
 //writing fx

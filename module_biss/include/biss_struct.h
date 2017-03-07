@@ -13,15 +13,6 @@
 
 #define BISS_CDS_BIT        1    /**< CDS bit length */
 
-/**
- * @brief Type for the return status when reading BiSS data
- */
-typedef enum {
-    NoError=0,       /**< no error */
-    CRCError=1,      /**< CRC mismatch  */
-    NoAck,           /**< Ack bit not found. */
-    NoStartBit       /**< Start bit not found */
-} BISS_ErrorType;
 
 /**
  * @brief Type for the BiSS clock port config

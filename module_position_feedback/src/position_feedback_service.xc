@@ -70,7 +70,7 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
                 break;
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
                 break;
-        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position, unsigned int status }:
+        case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position, SensorError status }:
                 break;
         case i_position_feedback[int i].get_velocity() -> int out_velocity:
                 break;

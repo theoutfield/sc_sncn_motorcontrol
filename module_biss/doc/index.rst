@@ -111,9 +111,10 @@ Definitions
 Types
 -----
 
-.. doxygenenum:: BISS_ErrorType
-.. doxygenenun:: BISSClockPortConfig
 .. doxygenstruct:: BISSConfig
+.. doxygenenum:: SensorError
+.. doxygenstruct:: EncoderPortNumber
+.. doxygenenun:: BISSClockPortConfig
 .. doxygenstruct:: QEIHallPort
 .. doxygenstruct:: HallEncSelectPort
 .. doxygenstruct:: SPIPorts

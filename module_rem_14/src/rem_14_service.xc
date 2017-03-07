@@ -57,7 +57,7 @@ void initspi_ports(SPIPorts &spi_ports)
     return {settings1, settings2};
 }
 
-int initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config)
+SensorError initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 {
     int data_in;
 
@@ -90,7 +90,7 @@ int initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config)
        return data_in;
     }
 
-    return REM_14_SUCCESS_WRITING;
+    return SENSOR_NO_ERROR;
 }
 
 /**
@@ -323,7 +323,7 @@ int readRotarySensorError(SPIPorts &spi_ports, UsecType ifm_usec){
 }
 
 
-int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType ifm_usec){
+{ unsigned int, unsigned int } readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType ifm_usec){
 
    unsigned short data_in = 0;
 
@@ -331,16 +331,16 @@ int readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType ifm_u
 
    if(checkEvenParity(data_in)){             //check right parity
 
-       return (data_in & BITS_14_MASK);         //remove unused bits
+       return { (data_in & BITS_14_MASK), SENSOR_NO_ERROR };         //remove unused bits
 
    }else{
 
-       return REM_14_PARITY_ERROR;
+       return { (data_in & BITS_14_MASK), SENSOR_CHECKSUM_ERROR };
    }
 }
 
 
-int readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, UsecType ifm_usec){
+{ unsigned int, unsigned int } readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, UsecType ifm_usec){
 
     unsigned short data_in = 0;
 
@@ -348,11 +348,11 @@ int readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, UsecType ifm_usec
 
     if(checkEvenParity(data_in)){            //check right parity
 
-        return (data_in & BITS_14_MASK);        //remove unused bits
+        return { (data_in & BITS_14_MASK), SENSOR_NO_ERROR }; //remove unused bits
 
     } else {
 
-        return REM_14_PARITY_ERROR;
+        return { (data_in & BITS_14_MASK), SENSOR_CHECKSUM_ERROR };
     }
 }
 

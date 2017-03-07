@@ -37,9 +37,9 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     return computed_checksum & 0xff;
 }
 
-{ char, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec) {
+{ SensorError, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec) {
     unsigned int timestamp;
-    char status;
+    SensorError status;
     int count;
     unsigned int singleturn_filtered;
     unsigned int singleturn_raw;
@@ -65,14 +65,16 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
         t :> last_read;
         computed_checksum = checksum_compute(count, singleturn_filtered, singleturn_raw, timestamp);
         try_count++;
-    } while(computed_checksum != checksum && try_count <= 3);
+    } while(computed_checksum != checksum && try_count <= REM_16MT_MAX_RETRY);
 
-    status = (count >> 12) + ((try_count-1) << 4);
+    if (computed_checksum == checksum) {
+        status = (count >> 12) + ((try_count-1) << 4);
+    } else {
+        status = SENSOR_CHECKSUM_ERROR;
+    }
+    status = SENSOR_REM_16MT_FILTER_CONFIG_ERROR;
+
     count = (sext(count & 0xfff, 12) * (1 << 16)) + singleturn_filtered; //convert multiturn to signed absolute count
-
-#ifdef XSCOPE_REM_16MT
-    xscope_int(CHECKSUM_ERROR, (try_count-1)*1000);
-#endif
 
     return { status, count, singleturn_filtered, singleturn_raw, timestamp };
 }
@@ -94,12 +96,11 @@ void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, Us
     configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
     slave_deselect(*spi_ports.slave_select);
     delay_ticks(200020*ifm_usec);
-
 }
 
-int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
+SensorError rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 {
-    int status;
+    SensorError status;
 
     delay_ticks(100*config.ifm_usec);
     //reset
@@ -107,7 +108,7 @@ int rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
     //read status
     { status, void, void, void, void } = rem_16mt_read(spi_ports, config.ifm_usec);
     delay_ticks(100*config.ifm_usec);
-    if (status != 0)
+    if (status != SENSOR_NO_ERROR)
         return status;
     //direction
     if (config.polarity == SENSOR_POLARITY_INVERTED)
