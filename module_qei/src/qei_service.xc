@@ -37,8 +37,8 @@ extern char start_message[];
 
 int check_qei_config(PositionFeedbackConfig &position_feedback_config)
 {
-    if (position_feedback_config.qei_config.index_type < 3  || position_feedback_config.qei_config.index_type > 4) {
-        printstrln("qei_service: ERROR: Wrong QEI configuration: wrong type");
+    if (position_feedback_config.qei_config.index_type != QEI_WITH_INDEX && position_feedback_config.qei_config.index_type != QEI_WITH_NO_INDEX) {
+        printstrln("qei_service: ERROR: Wrong QEI configuration: wrong index type");
         return QEI_ERROR;
     }
 
@@ -47,7 +47,7 @@ int check_qei_config(PositionFeedbackConfig &position_feedback_config)
         return QEI_ERROR;
     }
 
-    if (position_feedback_config.resolution < 0) {
+    if (position_feedback_config.resolution <= 0) {
         printstrln("qei_service: ERROR: Wrong QEI configuration: wrong resolution");
         return QEI_ERROR;
     }
@@ -64,7 +64,6 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 #ifdef DEBUG_POSITION_FEEDBACK
     if (check_qei_config(position_feedback_config) != QEI_SUCCESS) {
         position_feedback_config.sensor_type = 0;
-        return;
     }
 
     printstr(start_message);

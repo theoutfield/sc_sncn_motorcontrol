@@ -35,8 +35,6 @@ void hall_test(client interface PositionFeedbackInterface i_position_feedback, c
             velocity = upstream_control_data.velocity;
         }
 
-//        printintln(position);
-
         xscope_int(COUNT, count);
         xscope_int(VELOCITY, velocity);
         xscope_int(ANGLE, angle);
