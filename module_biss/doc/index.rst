@@ -113,7 +113,7 @@ Types
 
 .. doxygenstruct:: BISSConfig
 .. doxygenenum:: SensorError
-.. doxygenstruct:: EncoderPortNumber
+.. doxygenenum:: EncoderPortNumber
 .. doxygenenun:: BISSClockPortConfig
 .. doxygenstruct:: QEIHallPort
 .. doxygenstruct:: HallEncSelectPort
