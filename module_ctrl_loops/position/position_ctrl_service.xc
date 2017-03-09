@@ -660,19 +660,20 @@ break;
                     while(1);
                 }
 
-                if(ifm_tile_usec==250)
+                MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+                if(motorcontrol_config.ifm_tile_usec==250)
                 {
                     duty_min = 1500;
                     duty_max = 13000;
                     duty_divider = 16384;
                 }
-                else if(ifm_tile_usec==100)
+                else if(motorcontrol_config.ifm_tile_usec==100)
                 {
                     duty_min = 600;
                     duty_max = 7000;
                     duty_divider = 8192;
                 }
-                else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+                else if (motorcontrol_config.ifm_tile_usec!=100 && motorcontrol_config.ifm_tile_usec!=250)
                 {
                     error = 1;
                 }
@@ -685,7 +686,7 @@ break;
                 if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
                 if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
 
-                period_start_brake  = (pos_velocity_ctrl_config.time_pull_brake * 1000)/ifm_tile_usec;
+                period_start_brake  = (pos_velocity_ctrl_config.time_pull_brake * 1000)/(motorcontrol_config.ifm_tile_usec);
 
                 i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 
