@@ -402,7 +402,8 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         break;
                 }
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("acceleration_max:%d velocity_max:%d\n",pos_velocity_ctrl_config.max_acceleration_profiler, pos_velocity_ctrl_config.max_speed_profiler);
+                printf("                 [rpm/s]                [rpm]\n");
+                printf("acceleration_max: %d     velocity_max: %d \n",pos_velocity_ctrl_config.max_acceleration_profiler, pos_velocity_ctrl_config.max_speed_profiler);
                 break;
 
         //auto offset tuning

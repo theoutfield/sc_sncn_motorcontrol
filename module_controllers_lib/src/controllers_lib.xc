@@ -291,17 +291,20 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
 
     if (pos_target == pos_k_1n)
         pos_k = pos_target;
-    else if (pos_target > pos_k_1n) {
+    else if (pos_target > pos_k_1n)
+    {
         if (((pos_k_1n-pos_k_2n)==0) && (pos_target < (pos_k_1n+10)))
             pos_k = pos_k_1n; //ignore the command
-        else {
+        else
+        {
             velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
             deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * pos_profiler_param.a_max);
             pos_deceleration = pos_target - deceleration_distance;
             if ((pos_k_1n >= pos_deceleration) && (pos_k_1n > pos_k_2n))
                 deceleration_flag = 1;
             temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * pos_profiler_param.a_max;
-            if (deceleration_flag == 0) {
+            if (deceleration_flag == 0)
+            {
                 pos_temp1 = temp + (2 * pos_k_1n) - pos_k_2n;
                 pos_temp2 = (pos_profiler_param.delta_T * pos_profiler_param.v_max) + pos_k_1n;
                 if (pos_temp1 < pos_temp2)
@@ -309,7 +312,8 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
                 else
                     pos_k = pos_temp2;
             }
-            else {
+            else
+            {
                 pos_k = -temp + (2 * pos_k_1n) - pos_k_2n;
             }
             if (pos_k > pos_target)
@@ -322,14 +326,16 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
     {
         if (((pos_k_1n-pos_k_2n)==0) && (pos_target > (pos_k_1n-10)))
             pos_k = pos_k_1n; //ignore the command
-        else {
+        else
+        {
             velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
             deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * pos_profiler_param.a_max);
             pos_deceleration = pos_target + deceleration_distance;
             if ((pos_k_1n <= pos_deceleration) && (pos_k_1n < pos_k_2n))
                 deceleration_flag = 1;
             temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * pos_profiler_param.a_max;
-            if (deceleration_flag == 0) {
+            if (deceleration_flag == 0)
+            {
                 pos_temp1 = -temp + (2 * pos_k_1n) - pos_k_2n;
                 pos_temp2 = -(pos_profiler_param.delta_T * pos_profiler_param.v_max) + pos_k_1n;
                 if (pos_temp1 > pos_temp2)
@@ -337,7 +343,8 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
                 else
                     pos_k = pos_temp2;
             }
-            else {
+            else
+            {
                 pos_k = temp + (2 * pos_k_1n) - pos_k_2n;
             }
             if (pos_k < pos_target)

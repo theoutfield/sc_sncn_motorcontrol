@@ -137,8 +137,8 @@
 
 //Integrated Profiler
 #define ENABLE_PROFILER                         0
-#define MAX_ACCELERATION_PROFILER               1800000
-#define MAX_SPEED_PROFILER                      1800000
+#define MAX_ACCELERATION_PROFILER               10000    // [rpm/sec]
+#define MAX_SPEED_PROFILER                      2000     // [rpm]
 
 /*
 //PID parameters of the position PID controller

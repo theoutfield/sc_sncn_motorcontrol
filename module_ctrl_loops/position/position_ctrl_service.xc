@@ -122,9 +122,9 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
 
     //pos profiler
     posProfilerParam pos_profiler_param;
-    pos_profiler_param.delta_T = ((float)POSITION_CONTROL_LOOP_PERIOD)/1000000;
-    pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
-    pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
+    pos_profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
+    pos_profiler_param.v_max = (((double)(pos_velocity_ctrl_config.max_speed_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
+    pos_profiler_param.a_max = (((double)(pos_velocity_ctrl_config.max_acceleration_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
     float acceleration_monitor = 0;
 
     //position limiter
@@ -239,7 +239,12 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
                     //profiler enabled, set target position
                     else if (pos_velocity_ctrl_config.enable_profiler)
                     {
-                        position_ref_in_k = pos_profiler(((double) downstream_control_data.position_cmd), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
+                        position_ref_in_k = pos_profiler((
+                                (double) downstream_control_data.position_cmd),
+                                position_ref_in_k_1n,
+                                position_ref_in_k_2n,
+                                pos_profiler_param);
+
                         acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(POSITION_CONTROL_LOOP_PERIOD * POSITION_CONTROL_LOOP_PERIOD);
                         position_ref_in_k_2n = position_ref_in_k_1n;
                         position_ref_in_k_1n = position_ref_in_k;
@@ -507,8 +512,8 @@ break;
                         (double)pos_velocity_ctrl_config.D_pos, (double)pos_velocity_ctrl_config.integral_limit_pos,
                         POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
-                pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
-                pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
+                pos_profiler_param.a_max = (((double)(pos_velocity_ctrl_config.max_acceleration_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
+                pos_profiler_param.v_max = (((double)(pos_velocity_ctrl_config.max_speed_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
 
                 nl_position_control_reset(nl_pos_ctrl);
                 nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
