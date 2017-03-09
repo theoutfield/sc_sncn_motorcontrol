@@ -84,7 +84,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
-void position_velocity_control_service(int ifm_tile_usec, PosVelocityControlConfig &pos_velocity_ctrl_config,
+void position_velocity_control_service(int app_tile_usec, PosVelocityControlConfig &pos_velocity_ctrl_config,
         interface MotorcontrolInterface client i_motorcontrol,
         interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
 {
@@ -205,7 +205,7 @@ void position_velocity_control_service(int ifm_tile_usec, PosVelocityControlConf
 #pragma ordered
         select
         {
-        case t when timerafter(ts + ifm_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
+        case t when timerafter(ts + app_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
@@ -603,7 +603,7 @@ break;
                 i_motorcontrol.set_safe_torque_off_enabled();
 
                 t :> ts;
-                t when timerafter (ts + 200*1000*ifm_tile_usec) :> void;
+                t when timerafter (ts + 200*1000*app_tile_usec) :> void;
 
                 i_motorcontrol.set_brake_status(0);
 
