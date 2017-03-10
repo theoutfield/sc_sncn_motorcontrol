@@ -270,26 +270,26 @@ void adc_ad7265(
             {
                 if(( phaseB_out<(-current_limit) || current_limit<phaseB_out))
                 {
-                    i_watchdog.protect(OVER_CURRENT_PHASE_B);
-                    fault_code=OVER_CURRENT_PHASE_B;
+                    i_watchdog.protect(WD_OVER_CURRENT_PHASE_B);
+                    fault_code=DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1;
                 }
 
                 if(( phaseC_out<(-current_limit) || current_limit<phaseC_out))
                 {
-                    i_watchdog.protect(OVER_CURRENT_PHASE_C);
-                    fault_code=OVER_CURRENT_PHASE_C;
+                    i_watchdog.protect(WD_OVER_CURRENT_PHASE_C);
+                    fault_code=DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1;
                 }
 
                 if (OUT_A[AD_7265_VDC_IDC]<v_dc_min)
                 {
-                    i_watchdog.protect(UNDER_VOLTAGE);
-                    fault_code=UNDER_VOLTAGE;
+                    i_watchdog.protect(WD_UNDER_VOLTAGE);
+                    fault_code=UNDER_VOLTAGE_NO_1;
                 }
 
                 if (v_dc_max<OUT_A[AD_7265_VDC_IDC])
                 {
-                    i_watchdog.protect(OVER_VOLTAGE);
-                    fault_code=OVER_VOLTAGE;
+                    i_watchdog.protect(WD_OVER_VOLTAGE);
+                    fault_code=OVER_VOLTAGE_NO_1;
                 }
             }
 

@@ -81,6 +81,17 @@ typedef enum
 } Ad7265ChannelInputs;
 
 /**
+ * @brief Fault Codes for sending to watchdog service
+ */
+typedef enum {
+    WD_OVER_CURRENT_PHASE_A = 1,
+    WD_OVER_CURRENT_PHASE_B = 2,
+    WD_OVER_CURRENT_PHASE_C = 3,
+    WD_UNDER_VOLTAGE = 4,
+    WD_OVER_VOLTAGE = 5
+} WatchdogFaultCode;
+
+/**
  * Structure type to define the ports to manage the AD7949 ADC chip.
  */
 typedef struct
