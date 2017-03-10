@@ -68,11 +68,10 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     } while(computed_checksum != checksum && try_count <= REM_16MT_MAX_RETRY);
 
     if (computed_checksum == checksum) {
-        status = (count >> 12) + ((try_count-1) << 4);
+        status = (count >> 12);    //REM 16MT error code
     } else {
         status = SENSOR_CHECKSUM_ERROR;
     }
-    status = SENSOR_REM_16MT_FILTER_CONFIG_ERROR;
 
     count = (sext(count & 0xfff, 12) * (1 << 16)) + singleturn_filtered; //convert multiturn to signed absolute count
 
