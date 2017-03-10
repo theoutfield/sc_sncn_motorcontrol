@@ -28,7 +28,8 @@ typedef enum {
     QEI_SENSOR=2,
     BISS_SENSOR=4,
     REM_14_SENSOR=5,
-    REM_16MT_SENSOR=6
+    REM_16MT_SENSOR=6,
+    SSI_SENSOR=7
 } SensorType;
 
 /**
@@ -109,6 +110,7 @@ typedef struct {
     MotorPhasesConfiguration terminal_connection;   /**< Type of polarity of your motor. */
     int licence;                            /**< Licence number for using the library of module_advanced_foc  */
     SensorType commutation_sensor;          /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
+    int ifm_tile_usec;
     int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
     int hall_state[6];                       /**< Hall port state while being in sector [1-6] */
     int hall_state_angle[7];                 /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
@@ -163,8 +165,6 @@ typedef struct
 
     int computed_torque;
     int torque_set;
-
-    int sensor_torque;
 
     int V_dc;
 
