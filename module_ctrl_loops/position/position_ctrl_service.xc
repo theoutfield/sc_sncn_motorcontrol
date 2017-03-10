@@ -84,7 +84,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
-void position_velocity_control_service(int ifm_tile_usec, PosVelocityControlConfig &pos_velocity_ctrl_config,
+void position_velocity_control_service(int app_tile_usec, PosVelocityControlConfig &pos_velocity_ctrl_config,
         interface MotorcontrolInterface client i_motorcontrol,
         interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
 {
@@ -122,9 +122,9 @@ void position_velocity_control_service(int ifm_tile_usec, PosVelocityControlConf
 
     //pos profiler
     posProfilerParam pos_profiler_param;
-    pos_profiler_param.delta_T = ((float)POSITION_CONTROL_LOOP_PERIOD)/1000000;
-    pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
-    pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
+    pos_profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
+    pos_profiler_param.v_max = (((double)(pos_velocity_ctrl_config.max_speed_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
+    pos_profiler_param.a_max = (((double)(pos_velocity_ctrl_config.max_acceleration_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
     float acceleration_monitor = 0;
 
     //position limiter
@@ -205,7 +205,7 @@ void position_velocity_control_service(int ifm_tile_usec, PosVelocityControlConf
 #pragma ordered
         select
         {
-        case t when timerafter(ts + ifm_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
+        case t when timerafter(ts + app_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
 
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
@@ -239,7 +239,12 @@ void position_velocity_control_service(int ifm_tile_usec, PosVelocityControlConf
                     //profiler enabled, set target position
                     else if (pos_velocity_ctrl_config.enable_profiler)
                     {
-                        position_ref_in_k = pos_profiler(((double) downstream_control_data.position_cmd), position_ref_in_k_1n, position_ref_in_k_2n, pos_profiler_param);
+                        position_ref_in_k = pos_profiler((
+                                (double) downstream_control_data.position_cmd),
+                                position_ref_in_k_1n,
+                                position_ref_in_k_2n,
+                                pos_profiler_param);
+
                         acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(POSITION_CONTROL_LOOP_PERIOD * POSITION_CONTROL_LOOP_PERIOD);
                         position_ref_in_k_2n = position_ref_in_k_1n;
                         position_ref_in_k_1n = position_ref_in_k;
@@ -508,8 +513,8 @@ break;
                         (double)pos_velocity_ctrl_config.D_pos, (double)pos_velocity_ctrl_config.integral_limit_pos,
                         POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
-                pos_profiler_param.a_max = ((float) pos_velocity_ctrl_config.max_acceleration_profiler);
-                pos_profiler_param.v_max = ((float) pos_velocity_ctrl_config.max_speed_profiler);
+                pos_profiler_param.a_max = (((double)(pos_velocity_ctrl_config.max_acceleration_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
+                pos_profiler_param.v_max = (((double)(pos_velocity_ctrl_config.max_speed_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
 
                 nl_position_control_reset(nl_pos_ctrl);
                 nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
@@ -604,7 +609,7 @@ break;
                 i_motorcontrol.set_safe_torque_off_enabled();
 
                 t :> ts;
-                t when timerafter (ts + 200*1000*ifm_tile_usec) :> void;
+                t when timerafter (ts + 200*1000*app_tile_usec) :> void;
 
                 i_motorcontrol.set_brake_status(0);
 
@@ -656,19 +661,20 @@ break;
                     while(1);
                 }
 
-                if(ifm_tile_usec==250)
+                MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+                if(motorcontrol_config.ifm_tile_usec==250)
                 {
                     duty_min = 1500;
                     duty_max = 13000;
                     duty_divider = 16384;
                 }
-                else if(ifm_tile_usec==100)
+                else if(motorcontrol_config.ifm_tile_usec==100)
                 {
                     duty_min = 600;
                     duty_max = 7000;
                     duty_divider = 8192;
                 }
-                else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+                else if (motorcontrol_config.ifm_tile_usec!=100 && motorcontrol_config.ifm_tile_usec!=250)
                 {
                     error = 1;
                 }
@@ -681,7 +687,7 @@ break;
                 if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
                 if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
 
-                period_start_brake  = (pos_velocity_ctrl_config.time_pull_brake * 1000)/ifm_tile_usec;
+                period_start_brake  = (pos_velocity_ctrl_config.time_pull_brake * 1000)/(motorcontrol_config.ifm_tile_usec);
 
                 i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 

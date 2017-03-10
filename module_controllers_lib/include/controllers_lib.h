@@ -87,9 +87,9 @@ typedef struct {
  * @brief Structure type to set the parameters of position reference profiler.
  */
 typedef struct {
-    float delta_T;
-    float a_max;
-    float v_max;
+    double delta_T;
+    double a_max;
+    double v_max;
 } posProfilerParam;
 
 
