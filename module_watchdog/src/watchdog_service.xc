@@ -124,7 +124,7 @@
                         break;
                 }
 
-                fault=fault_id-NO_FAULT;
+                fault=fault_id;
                 wd_enabled = 0;
                 break;
 

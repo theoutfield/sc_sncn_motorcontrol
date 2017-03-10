@@ -14,7 +14,6 @@
 #include <tuning.h>
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
-#include <advanced_motorcontrol_licence.h>
 #include <position_feedback_service.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
@@ -131,7 +130,6 @@ int main(void) {
                 {
                     MotorcontrolConfig motorcontrol_config;
 
-                    motorcontrol_config.licence =  ADVANCED_MOTOR_CONTROL_LICENCE;
                     motorcontrol_config.v_dc =  VDC;
                     motorcontrol_config.terminal_connection = NORMAL_CONNECTION;
                     motorcontrol_config.current_P_gain =  TORQUE_Kp;
