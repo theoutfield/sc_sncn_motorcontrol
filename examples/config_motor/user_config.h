@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config.h>
+#include <motor_config_AMK_DT4.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -41,7 +41,7 @@
 ///////////////////////
 
 // SENSOR 2 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
-#define SENSOR_2_TYPE                     HALL_SENSOR
+#define SENSOR_2_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_2 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_ONLY,
@@ -71,7 +71,7 @@
 //////  IFM TILE FREQ CONFIGURATION
 //////////////////////////////////////////////
 
-#define IFM_TILE_USEC   USEC_FAST // Number of ticks in a microsecond for IFM Tile
+#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile
 #define APP_TILE_USEC       USEC_STD       // Number of ticks in a microsecond for APP Tile
 
 //////////////////////////////////////////////
@@ -83,7 +83,7 @@
 #define COMMUTATION_FRQ             24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_OFFSET_CLK      0
+#define COMMUTATION_OFFSET_CLK      300
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -182,11 +182,11 @@
 
 //nonlinear mode
 #define POSITION_Kp                             20000
-#define POSITION_Ki                             2000
-#define POSITION_Kd                             80000
+#define POSITION_Ki                             500
+#define POSITION_Kd                             41000
 
 
-#define MAX_SPEED                               3000    // prefered value 3000, maximum value 5000 [rpm]
+#define MAX_SPEED                               5000    // prefered value 3000, maximum value 5000 [rpm]
 
 /*
  * set "POSITION_INTEGRAL_LIMIT" equal to:
@@ -194,7 +194,7 @@
  *      "PEAK_SPEED"     in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
  *      "1000"           in case of using position controller in "NL_POSITION_CONTROLLER"               mode
  */
-#define POSITION_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
+#define POSITION_INTEGRAL_LIMIT                 1000 //MAXIMUM_TORQUE
 
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
