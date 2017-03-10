@@ -76,28 +76,16 @@ typedef enum {
  * @brief Fault Codes
  */
 typedef enum {
+    //having no fault:
+    NO_FAULT=0,
+
     //standard defined faults (IEC-61800)
     DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1 = 0X2221,
-    DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_2 = 0X2222,
-
-    CONTINOUS_OVER_CURRENT_NO_1 = 0X2311,
-    CONTINOUS_OVER_CURRENT_NO_2 = 0X2311,
-
-    OVER_VOLTAGE_NO_1=0X3211,
-    OVER_VOLTAGE_NO_2=0X3212,
-
-    UNDER_VOLTAGE_NO_1=0X3221,
-    UNDER_VOLTAGE_NO_2=0X3212,
+    OVER_VOLTAGE_NO_1                           = 0X3211,
+    UNDER_VOLTAGE_NO_1                          = 0X3221,
 
     //user specific faults
-    NO_FAULT=0XFF00,
-    OVER_CURRENT_PHASE_A = 0XFF01,
-    OVER_CURRENT_PHASE_B = 0XFF02,
-    OVER_CURRENT_PHASE_C = 0XFF03,
-    UNDER_VOLTAGE = 0XFF04,
-    OVER_VOLTAGE = 0XFF05,
-    WRONG_LICENCE=0XFF06,
-    WRONG_REF_CLK_FRQ=0XFF07
+    WRONG_REF_CLK_FRQ=0XFF01
 } FaultCode;
 
 /**
