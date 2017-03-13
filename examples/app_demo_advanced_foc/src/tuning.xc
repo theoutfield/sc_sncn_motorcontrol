@@ -294,15 +294,15 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
 
         case 'p':
             motorcontrol_config = i_motorcontrol.get_config();
-            printf("previous value: %d\n", motorcontrol_config.current_P_gain);
+            printf("previous value: %d\n", motorcontrol_config.torque_P_gain);
 
             i_motorcontrol.set_torque_control_disabled();
             printf("Torque control disabled\n");
             delay_milliseconds(100);
 
-            motorcontrol_config.current_P_gain =  value;
+            motorcontrol_config.torque_P_gain =  value;
             i_motorcontrol.set_config(motorcontrol_config);
-            printf("new value: %d\n", motorcontrol_config.current_P_gain);
+            printf("new value: %d\n", motorcontrol_config.torque_P_gain);
             delay_milliseconds(100);
 
             i_motorcontrol.set_torque_control_enabled();
@@ -314,15 +314,15 @@ void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
             //print offset
         case 'i':
             motorcontrol_config = i_motorcontrol.get_config();
-            printf("previous reversed_delay: %d\n", motorcontrol_config.current_I_gain);
+            printf("previous reversed_delay: %d\n", motorcontrol_config.torque_I_gain);
 
             i_motorcontrol.set_torque_control_disabled();
             printf("Torque control disabled\n");
             delay_milliseconds(100);
 
-            motorcontrol_config.current_I_gain =  value;
+            motorcontrol_config.torque_I_gain =  value;
             i_motorcontrol.set_config(motorcontrol_config);
-            printf("new reversed_delay: %d\n", motorcontrol_config.current_I_gain);
+            printf("new reversed_delay: %d\n", motorcontrol_config.torque_I_gain);
             delay_milliseconds(100);
 
             i_motorcontrol.set_torque_control_enabled();

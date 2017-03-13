@@ -134,13 +134,13 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
     //reverse position limits when polarity is inverted
     if (pos_velocity_ctrl_config.polarity == -1)
     {
-        min_position = -pos_velocity_ctrl_config.max_pos;
-        max_position = -pos_velocity_ctrl_config.min_pos;
+        min_position = -pos_velocity_ctrl_config.max_pos_range_limit;
+        max_position = -pos_velocity_ctrl_config.min_pos_range_limit;
     }
     else
     {
-        min_position = pos_velocity_ctrl_config.min_pos;
-        max_position = pos_velocity_ctrl_config.max_pos;
+        min_position = pos_velocity_ctrl_config.min_pos_range_limit;
+        max_position = pos_velocity_ctrl_config.max_pos_range_limit;
     }
 
     //brake
@@ -315,11 +315,11 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
                 else if (position_limit_reached == 1 && upstream_control_data.position < max_position_orig && upstream_control_data.position > min_position_orig)
                 {
                     if (pos_velocity_ctrl_config.polarity == -1) {
-                        min_position = -pos_velocity_ctrl_config.max_pos;
-                        max_position = -pos_velocity_ctrl_config.min_pos;
+                        min_position = -pos_velocity_ctrl_config.max_pos_range_limit;
+                        max_position = -pos_velocity_ctrl_config.min_pos_range_limit;
                     } else {
-                        min_position = pos_velocity_ctrl_config.min_pos;
-                        max_position = pos_velocity_ctrl_config.max_pos;
+                        min_position = pos_velocity_ctrl_config.min_pos_range_limit;
+                        max_position = pos_velocity_ctrl_config.max_pos_range_limit;
                     }
                     position_limit_reached = 0;
                 }
@@ -472,18 +472,18 @@ break;
 
         case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
                 //check if we need to update max/min pos limits
-                if (in_config.max_pos != pos_velocity_ctrl_config.max_pos || in_config.min_pos != pos_velocity_ctrl_config.min_pos || in_config.polarity != pos_velocity_ctrl_config.polarity)
+                if (in_config.max_pos_range_limit != pos_velocity_ctrl_config.max_pos_range_limit || in_config.min_pos_range_limit != pos_velocity_ctrl_config.min_pos_range_limit || in_config.polarity != pos_velocity_ctrl_config.polarity)
                 {
                     //reverse position limits when polarity is inverted
                     if (in_config.polarity == -1)
                     {
-                        min_position = -in_config.max_pos;
-                        max_position = -in_config.min_pos;
+                        min_position = -in_config.max_pos_range_limit;
+                        max_position = -in_config.min_pos_range_limit;
                     }
                     else
                     {
-                        min_position = in_config.min_pos;
-                        max_position = in_config.max_pos;
+                        min_position = in_config.min_pos_range_limit;
+                        max_position = in_config.max_pos_range_limit;
                     }
                 }
 

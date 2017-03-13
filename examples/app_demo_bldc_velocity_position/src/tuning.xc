@@ -271,14 +271,14 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                     switch(mode_3)
                     {
                     case 'u':
-                        pos_velocity_ctrl_config.max_pos = value;
+                        pos_velocity_ctrl_config.max_pos_range_limit = value;
                         break;
                     case 'l':
-                        pos_velocity_ctrl_config.min_pos = value;
+                        pos_velocity_ctrl_config.min_pos_range_limit = value;
                         break;
                     default:
-                        pos_velocity_ctrl_config.max_pos = value;
-                        pos_velocity_ctrl_config.min_pos = -value;
+                        pos_velocity_ctrl_config.max_pos_range_limit = value;
+                        pos_velocity_ctrl_config.min_pos_range_limit = -value;
                         break;
                     }
                     break;
@@ -297,7 +297,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         break;
                 }
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("pos_max:%d pos_min:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos, pos_velocity_ctrl_config.min_pos, pos_velocity_ctrl_config.max_speed,
+                printf("pos_max:%d pos_min:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos_range_limit, pos_velocity_ctrl_config.min_pos_range_limit, pos_velocity_ctrl_config.max_speed,
                         pos_velocity_ctrl_config.max_torque);
                 break;
 

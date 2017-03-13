@@ -224,10 +224,10 @@ int main(void)
                 MotorcontrolConfig motorcontrol_config;
 
                 motorcontrol_config.v_dc =  VDC;
-                motorcontrol_config.terminal_connection = NORMAL_CONNECTION;
-                motorcontrol_config.current_P_gain =  TORQUE_Kp;
-                motorcontrol_config.current_I_gain =  TORQUE_Ki;
-                motorcontrol_config.current_D_gain =  TORQUE_Kd;
+                motorcontrol_config.phases_inverted = MOTOR_PHASES_NORMAL;
+                motorcontrol_config.torque_P_gain =  TORQUE_P_VALUE;
+                motorcontrol_config.torque_I_gain =  TORQUE_I_VALUE;
+                motorcontrol_config.torque_D_gain =  TORQUE_D_VALUE;
                 motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                 motorcontrol_config.commutation_sensor=REM_16MT_SENSOR;
                 motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
@@ -237,18 +237,18 @@ int main(void)
                 motorcontrol_config.hall_state_angle[3]=0;
                 motorcontrol_config.hall_state_angle[4]=0;
                 motorcontrol_config.hall_state_angle[5]=0;
-                motorcontrol_config.max_torque =  MAXIMUM_TORQUE;
-                motorcontrol_config.phase_resistance =  PHASE_RESISTANCE;
-                motorcontrol_config.phase_inductance =  PHASE_INDUCTANCE;
+                motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
+                motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
+                motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
                 motorcontrol_config.torque_constant =  MOTOR_TORQUE_CONSTANT;
                 motorcontrol_config.current_ratio =  CURRENT_RATIO;
                 motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
-                motorcontrol_config.rated_current =  RATED_CURRENT;
-                motorcontrol_config.rated_torque  =  RATED_TORQUE;
+                motorcontrol_config.rated_current =  MOTOR_RATED_CURRENT;
+                motorcontrol_config.rated_torque  =  MOTOR_RATED_TORQUE;
                 motorcontrol_config.percent_offset_torque =  APPLIED_TUNING_TORQUE_PERCENT;
-                motorcontrol_config.protection_limit_over_current =  I_MAX;
-                motorcontrol_config.protection_limit_over_voltage =  V_DC_MAX;
-                motorcontrol_config.protection_limit_under_voltage = V_DC_MIN;
+                motorcontrol_config.protection_limit_over_current =  PRORECTION_MAXIMUM_CURRENT;
+                motorcontrol_config.protection_limit_over_voltage =  PRORECTION_MAXIMUM_VOLTAGE;
+                motorcontrol_config.protection_limit_under_voltage = PRORECTION_MINIMUM_VOLTAGE;
 
                 motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                         i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);

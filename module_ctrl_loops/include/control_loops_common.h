@@ -25,7 +25,7 @@ typedef struct {
 
 #define POS_PID_CONTROLLER                      101
 #define POS_PID_VELOCITY_CASCADED_CONTROLLER    102
-#define NL_POSITION_CONTROLLER         103
+#define NL_POSITION_CONTROLLER                  103
 #define VELOCITY_PID_CONTROLLER                 201
 
 
@@ -35,10 +35,10 @@ typedef struct {
  */
 typedef struct {
 
-    int control_mode;
+    int position_control_strategy;
 
-    int min_pos;
-    int max_pos;
+    int min_pos_range_limit;
+    int max_pos_range_limit;
     int max_speed;
     int max_torque;
 

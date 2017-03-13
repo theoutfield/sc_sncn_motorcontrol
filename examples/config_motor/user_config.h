@@ -61,9 +61,9 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define I_MAX           100     //maximum tolerable value of phase current (under abnormal conditions)
-#define V_DC_MAX        60      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
-#define V_DC_MIN        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+#define PRORECTION_MAXIMUM_CURRENT           100     //maximum tolerable value of phase current (under abnormal conditions)
+#define PRORECTION_MAXIMUM_VOLTAGE        60      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+#define PRORECTION_MINIMUM_VOLTAGE        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
 
 
@@ -94,8 +94,8 @@
 #define HALL_STATE_5_ANGLE     0
 #define HALL_STATE_6_ANGLE     0
 
-// MOTOR POLARITY [NORMAL_CONNECTION, FLIPPED_CONNECTION]
-#define MOTOR_PHASE_CONFIGURATION       NORMAL_CONNECTION
+// MOTOR POLARITY [MOTOR_PHASES_NORMAL, MOTOR_PHASES_INVERTED]
+#define MOTOR_PHASE_CONFIGURATION       MOTOR_PHASES_NORMAL
 
 
 ///////////////////////////////////////////////
@@ -106,9 +106,9 @@
 #define MOTOR_ID 0
 
 // PID FOR TORQUE CONTROL (if applicable) [will be divided by 10000]
-#define TORQUE_Kp         40
-#define TORQUE_Ki         40
-#define TORQUE_Kd         0
+#define TORQUE_P_VALUE         40
+#define TORQUE_I_VALUE         40
+#define TORQUE_D_VALUE          0
 
 // (maximum) generated torque while finding offset value as a percentage of rated torque
 #define APPLIED_TUNING_TORQUE_PERCENT 20
@@ -131,9 +131,9 @@
 /////////////////////////////////////////////////
 
 //Limits
-#define MIN_POSITION_LIMIT                     -0x7fffffff
-#define MAX_POSITION_LIMIT                      0x7fffffff
-#define TORQUE_CONTROL_LIMIT                    MAXIMUM_TORQUE
+#define MIN_POSITION_RANGE_LIMIT                     -0x7fffffff
+#define MAX_POSITION_RANGE_LIMIT                      0x7fffffff
+#define TORQUE_CONTROL_LIMIT                    MOTOR_MAXIMUM_TORQUE
 
 //Integrated Profiler
 #define ENABLE_PROFILER                         0
@@ -203,7 +203,7 @@
 #define VELOCITY_Kp                             700000
 #define VELOCITY_Ki                             20000
 #define VELOCITY_Kd                             0
-#define VELOCITY_INTEGRAL_LIMIT                 MAXIMUM_TORQUE
+#define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 
 
 //////////////////////////////////////////////
