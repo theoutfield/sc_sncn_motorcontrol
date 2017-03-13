@@ -16,7 +16,7 @@
 // FAULHABER motor (150W)
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
 #define POLE_PAIRS              2       //number of motor pole-pairs
-#define PERCENT_TORQUE_CONSTANT 3      //motor torque constant multiplied by 100
+#define TORQUE_CONSTANT         30000  //Torque constant [micro-Nm/Amp-RMS]
 #define RATED_CURRENT           4800   //rated phase current [milli-Amp-RMS]
 #define MAXIMUM_TORQUE          330   //maximum value of torque which can be produced by motor [milli-Nm]
 #define RATED_TORQUE            111    //rated motor torque [milli-Nm]. CAUTION: CAN DAMAGE THE MOTOR OR INVERTER IF SET TOO HIGH
