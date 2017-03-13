@@ -230,7 +230,7 @@ int main(void)
                 motorcontrol_config.current_D_gain =  TORQUE_Kd;
                 motorcontrol_config.pole_pair =  POLE_PAIRS;
                 motorcontrol_config.commutation_sensor=REM_16MT_SENSOR;
-                motorcontrol_config.commutation_angle_offset=COMMUTATION_OFFSET_CLK;
+                motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
                 motorcontrol_config.hall_state_angle[0]=0;
                 motorcontrol_config.hall_state_angle[1]=0;
                 motorcontrol_config.hall_state_angle[2]=0;
