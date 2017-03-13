@@ -5,10 +5,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.2076938316" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -231,6 +231,41 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC500}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs1b}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs2a}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_GPIO-A}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/doc/images}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1202934925" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -590,6 +625,41 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC500}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs1b}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs2a}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_GPIO-A}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/doc/images}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.467010517" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -954,6 +1024,41 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_DC500}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs1b}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_position_feedback/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_16mt/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_serial_encoder/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_qei}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs2a}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_adc/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_spi_master/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_rem_14/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/bsp/IFM_GPIO-A}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_hall/doc/images}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1522014148" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -970,10 +1075,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.614416343" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">

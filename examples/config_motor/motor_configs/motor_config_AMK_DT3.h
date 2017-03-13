@@ -9,8 +9,8 @@
  **************************************************/
 
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
-#define POLE_PAIRS              5       //number of motor pole-pairs
-#define TORQUE_CONSTANT         170000  //Torque constant [micro-Nm/Amp-RMS]
+#define MOTOR_POLE_PAIRS        5       //number of motor pole-pairs
+#define MOTOR_TORQUE_CONSTANT   170000  //Torque constant [micro-Nm/Amp-RMS]
 #define RATED_CURRENT           4100    //rated phase current [milli-Amp-RMS]
 #define MAXIMUM_TORQUE          5000    //maximum value of torque which can be produced by motor [milli-Nm]
 #define RATED_TORQUE            620     // rated motor torque [milli-Nm]

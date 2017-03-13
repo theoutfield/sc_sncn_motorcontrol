@@ -16,7 +16,7 @@
 #define MOTOR_TYPE  BLDC_MOTOR
 
 // NUMBER OF POLE PAIRS (if applicable)
-#define POLE_PAIRS  7
+#define MOTOR_POLE_PAIRS  7
 
 // WINDING TYPE (if applicable) [STAR_WINDING, DELTA_WINDING]
 #define BLDC_WINDING_TYPE   STAR_WINDING

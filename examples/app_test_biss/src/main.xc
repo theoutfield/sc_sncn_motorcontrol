@@ -139,7 +139,7 @@ int main() {
                 position_feedback_config.resolution  = BISS_SENSOR_RESOLUTION;
                 position_feedback_config.polarity    = NORMAL_POLARITY;
                 position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
-                position_feedback_config.pole_pairs  = POLE_PAIRS;
+                position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = 0;

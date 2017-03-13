@@ -213,6 +213,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs1b}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs2a}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1730892179" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -554,6 +564,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs1b}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs2a}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.707546184" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -900,6 +920,16 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_advanced_torquecontrol_lib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs1b}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/config_motor/sensor_configs}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib/xs2a}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_pwm/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control_lib/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.360632037" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
