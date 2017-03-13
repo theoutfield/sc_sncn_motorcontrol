@@ -5,7 +5,7 @@
 # Possible SOMANET targets:
 # SOMANET-C22
 # SOMANET-C21-DX
-TARGET = 
+TARGET = SOMANET-C22
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
