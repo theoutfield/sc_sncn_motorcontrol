@@ -60,8 +60,8 @@ typedef enum {
  * @brief Fixes matching of reference torque sign to position and velocity signs.
  */
 typedef enum {
-    NORMAL_CONNECTION  = 1,  /**< Normal connection  */
-    FLIPPED_CONNECTION =-1   /**< Flipped connection */
+    MOTOR_PHASES_NORMAL  = 1,  /**< Normal connection  */
+    MOTOR_PHASES_INVERTED =-1   /**< Flipped connection */
 } MotorPhasesConfiguration;
 
 /**
@@ -95,7 +95,7 @@ typedef struct {
     MotorType motor_type;                   /**< Type of motor to drive. */
     CommutationMethod commutation_method;   /**< Commutation method. */
     BLDCWindingType bldc_winding_type;      /**< Type of winding of your motor (if using a BLDC motor). */
-    MotorPhasesConfiguration terminal_connection;   /**< Type of polarity of your motor. */
+    MotorPhasesConfiguration phases_inverted;   /**< Type of polarity of your motor. */
     int licence;                            /**< Licence number for using the library of module_advanced_foc  */
     SensorType commutation_sensor;          /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
     int ifm_tile_usec;
@@ -104,16 +104,16 @@ typedef struct {
     int hall_state_angle[7];                 /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
 
     //variables added to be used in motor_control_service
-    int pole_pair;                          /**< motor pole pair*/
+    int pole_pairs;                          /**< motor pole pair*/
     int max_torque;                         /**< maximum motor torque*/
     int max_current;                        /**< maximum stator current*/
     int rated_current;                      /**< rated motor phase current*/
     int rated_torque;                       /**< rated motor torque*/
     int commutation_angle_offset;           /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
     int torque_constant;                    /**< motor torque constant*/
-    int current_P_gain;                     /**< proportional constant in torque controller*/
-    int current_I_gain;                     /**< integral constant in torque controller*/
-    int current_D_gain;                     /**< derivative constant in torque controller*/
+    int torque_P_gain;                     /**< proportional constant in torque controller*/
+    int torque_I_gain;                     /**< integral constant in torque controller*/
+    int torque_D_gain;                     /**< derivative constant in torque controller*/
     int current_ratio;                      // ratio between current recieved in control core, and real phase current
     int voltage_ratio;                      // ratio between adc measured value and real dc-bus voltage
     int percent_offset_torque;              // (maximum) generated torque while finding offset value as a percentage of rated torque
@@ -123,14 +123,14 @@ typedef struct {
     int v_dc;                               /**< dc bus voltage*/
 
     // regenerative mode variables
-    int recuperation;
+    int recuperation_enabled;
 
     int battery_e_max;  // maximum energy status of battery
     int battery_e_min;  // minimum energy status of battery
-    int regen_p_max;    // maximum regenerative power (in Watts)
-    int regen_p_min;    // minimum regenerative power (in Watts)
-    int regen_speed_max;
-    int regen_speed_min;
+    int recuperation_p_max;    // maximum regenerative power (in Watts)
+    int recuperation_p_min;    // minimum regenerative power (in Watts)
+    int recuperation_speed_max;
+    int recuperation_speed_min;
 
     // protection limits
     // comment: there are some definitions in standard dictionary (such as MAX_TORQUE, MAX_CURRENT, ...) but
