@@ -1,5 +1,4 @@
 SOMANET Motor Control Library
 ==============================
 
-`Please visit SOMANET Documentation for further information <https://doc.synapticon.com/software/sc_sncn_motorcontrol/index.html>`_
-
+This branch is in code preservation state. Please do not delete!
