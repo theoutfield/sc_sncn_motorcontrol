@@ -60,7 +60,7 @@ typedef struct {
     double w_max; // maximum speed [rad/sec]
     double t_max; // maximum motor torque [milli-Nm]
     double t_additive; // additive torque [milli-Nm]
-    double j; //moment of inertia
+    double moment_of_inertia; //moment of inertia
     double calculated_j;
 
     double torque_ref_k; // milli-Nm

@@ -36,26 +36,26 @@ typedef struct {
 typedef struct {
 
     int position_control_strategy;
+    int motion_profile_type;
 
     int min_pos_range_limit;
     int max_pos_range_limit;
-    int max_speed;
+    int max_motor_speed;
     int max_torque;
 
     int enable_profiler;
     int max_acceleration_profiler;
     int max_speed_profiler;
 
-    int P_pos;
-    int I_pos;
-    int D_pos;
-    int integral_limit_pos;
-    int pid_gain;
+    int position_kp;
+    int position_ki;
+    int position_kd;
+    int position_integral_limit;
 
-    int P_velocity;
-    int I_velocity;
-    int D_velocity;
-    int integral_limit_velocity;
+    int velocity_kp;
+    int velocity_ki;
+    int velocity_kd;
+    int velocity_integral_limit;
 
     int position_fc;
     int velocity_fc;
@@ -63,15 +63,15 @@ typedef struct {
     int k_fb; //position feedback gain [milli-ticks/rad]
     int resolution;
     int k_m;  //gain of torque actuator
-    int j;
+    int moment_of_inertia;
     int polarity; //polarity of the movement [-1/1]
     int special_brake_release;
     int brake_shutdown_delay;
 
-    int nominal_v_dc;       //in volts
-    int voltage_pull_brake; //in milli volts
-    int time_pull_brake;    //in milli seconds
-    int voltage_hold_brake; //in milli volts
+    int dc_bus_voltage;       //in volts
+    int pull_brake_voltage; //in milli volts
+    int pull_brake_time;    //in milli seconds
+    int hold_brake_voltage; //in milli volts
 
 } PosVelocityControlConfig;
 

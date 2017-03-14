@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT4.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -77,7 +77,7 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
-#define VDC             20
+#define DC_BUS_VOLTAGE             20
 
 // COMMUTATION FREQUENCY [kHz]
 #define COMMUTATION_FRQ             24
@@ -121,6 +121,8 @@
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [1,-1]
 #define POLARITY           1
 
+#define MOTION_PTOFILE_TYPE LINEAR
+
 // PROFILER LIMITS
 #define MAX_ACCELERATION        7000            // rpm/s
 #define MAX_DECELERATION        7000            // rpm/s
@@ -140,45 +142,6 @@
 #define MAX_ACCELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
 
-/*
-//PID parameters of the position PID controller
-#define POSITION_Kp                             30000
-#define POSITION_Ki                             10
-#define POSITION_Kd                             0
-#define POSITION_INTEGRAL_LIMIT                 400000 //in case of using non-linear position control,
-                                                       //set "POSITION_INTEGRAL_LIMIT" to 1000
-*/
-
-
-//PID parameters of non-linear position controller. In case non-linear position controller is selected, these three
-//constants "POSITION_Kp", "POSITION_Ki" and "POSITION_Kd" should be between 0 and 10^8. Inside the controller, these
-//constants will be divided by 10^6. In other words, the precision in this mode will be 6 floating point digits.
-
-/*
-//-----  default values  -----
-#define MAX_SPEED                               0    // prefered value 3000, maximum value 5000 [rpm]
-
-#define POSITION_INTEGRAL_LIMIT                 1000 //in case of using non-linear position control,
-                                                     //set "POSITION_INTEGRAL_LIMIT" to 1000
-
-#define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
-                                                     //otherwise set as 0
-*/
-
-/*
-//simple pid pos controller
-#define POSITION_Kp                             50000
-#define POSITION_Ki                             200
-#define POSITION_Kd                             0
-*/
-
-/*
-//cascade pos controller
-#define POSITION_Kp                             0
-#define POSITION_Ki                             0
-#define POSITION_Kd                             0
-*/
-
 
 //nonlinear mode
 #define POSITION_Kp                             20000
@@ -186,7 +149,7 @@
 #define POSITION_Kd                             41000
 
 
-#define MAX_SPEED                               5000    // prefered value 3000, maximum value 5000 [rpm]
+#define MAX_MOTOR_SPEED                         5000    // prefered value 3000, maximum value 5000 [rpm]
 
 /*
  * set "POSITION_INTEGRAL_LIMIT" equal to:
@@ -217,14 +180,14 @@
  * Define: Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
  * Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
  */
-#define VOLTAGE_PULL_BRAKE     13000    // [milli-Volts]
+#define PULL_BRAKE_VOLTAGE     13000    // [milli-Volts]
 
 /*
  * Define: Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
  * Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
  */
-#define VOLTAGE_HOLD_BRAKE     7000     // [milli-Volts]
+#define HOLD_BRAKE_VOLTAGE     7000     // [milli-Volts]
 
-#define TIME_PULL_BRAKE        10000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define PULL_BRAKE_TIME        10000    //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 
