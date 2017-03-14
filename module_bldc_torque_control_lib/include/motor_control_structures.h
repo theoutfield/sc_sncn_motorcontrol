@@ -68,6 +68,14 @@ typedef enum {
  * @brief Type for the polarity of the position sensor
  */
 typedef enum {
+    LINEAR  = 1 /**< Linear profiler */
+} MotionProfileType;
+
+
+/**
+ * @brief Type for the polarity of the position sensor
+ */
+typedef enum {
     NORMAL_POLARITY  = 1, /**< Normal polarity. */
     INVERTED_POLARITY=-1   /**< Inverted polarity. */
 } PolarityType;

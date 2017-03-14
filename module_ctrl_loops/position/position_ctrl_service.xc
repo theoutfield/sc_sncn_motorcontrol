@@ -160,26 +160,26 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
 
 
     pid_init(velocity_control_pid_param);
-    if(pos_velocity_ctrl_config.P_velocity<0)            pos_velocity_ctrl_config.P_velocity=0;
-    if(pos_velocity_ctrl_config.P_velocity>100000000)    pos_velocity_ctrl_config.P_velocity=100000000;
-    if(pos_velocity_ctrl_config.I_velocity<0)            pos_velocity_ctrl_config.I_velocity=0;
-    if(pos_velocity_ctrl_config.I_velocity>100000000)    pos_velocity_ctrl_config.I_velocity=100000000;
-    if(pos_velocity_ctrl_config.D_velocity<0)            pos_velocity_ctrl_config.D_velocity=0;
-    if(pos_velocity_ctrl_config.D_velocity>100000000)    pos_velocity_ctrl_config.D_velocity=100000000;
+    if(pos_velocity_ctrl_config.velocity_kp<0)            pos_velocity_ctrl_config.velocity_kp=0;
+    if(pos_velocity_ctrl_config.velocity_kp>100000000)    pos_velocity_ctrl_config.velocity_kp=100000000;
+    if(pos_velocity_ctrl_config.velocity_ki<0)            pos_velocity_ctrl_config.velocity_ki=0;
+    if(pos_velocity_ctrl_config.velocity_ki>100000000)    pos_velocity_ctrl_config.velocity_ki=100000000;
+    if(pos_velocity_ctrl_config.velocity_kd<0)            pos_velocity_ctrl_config.velocity_kd=0;
+    if(pos_velocity_ctrl_config.velocity_kd>100000000)    pos_velocity_ctrl_config.velocity_kd=100000000;
     pid_set_parameters(
-            (double)pos_velocity_ctrl_config.P_velocity, (double)pos_velocity_ctrl_config.I_velocity,
-            (double)pos_velocity_ctrl_config.D_velocity, (double)pos_velocity_ctrl_config.integral_limit_velocity,
+            (double)pos_velocity_ctrl_config.velocity_kp, (double)pos_velocity_ctrl_config.velocity_ki,
+            (double)pos_velocity_ctrl_config.velocity_kd, (double)pos_velocity_ctrl_config.velocity_integral_limit,
             POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
     pid_init(position_control_pid_param);
-    if(pos_velocity_ctrl_config.P_pos<0)            pos_velocity_ctrl_config.P_pos=0;
-    if(pos_velocity_ctrl_config.P_pos>100000000)    pos_velocity_ctrl_config.P_pos=100000000;
-    if(pos_velocity_ctrl_config.I_pos<0)            pos_velocity_ctrl_config.I_pos=0;
-    if(pos_velocity_ctrl_config.I_pos>100000000)    pos_velocity_ctrl_config.I_pos=100000000;
-    if(pos_velocity_ctrl_config.D_pos<0)            pos_velocity_ctrl_config.D_pos=0;
-    if(pos_velocity_ctrl_config.D_pos>100000000)    pos_velocity_ctrl_config.D_pos=100000000;
-    pid_set_parameters((double)pos_velocity_ctrl_config.P_pos, (double)pos_velocity_ctrl_config.I_pos,
-            (double)pos_velocity_ctrl_config.D_pos, (double)pos_velocity_ctrl_config.integral_limit_pos,
+    if(pos_velocity_ctrl_config.position_kp<0)            pos_velocity_ctrl_config.position_kp=0;
+    if(pos_velocity_ctrl_config.position_kp>100000000)    pos_velocity_ctrl_config.position_kp=100000000;
+    if(pos_velocity_ctrl_config.position_ki<0)            pos_velocity_ctrl_config.position_ki=0;
+    if(pos_velocity_ctrl_config.position_ki>100000000)    pos_velocity_ctrl_config.position_ki=100000000;
+    if(pos_velocity_ctrl_config.position_kd<0)            pos_velocity_ctrl_config.position_kd=0;
+    if(pos_velocity_ctrl_config.position_kd>100000000)    pos_velocity_ctrl_config.position_kd=100000000;
+    pid_set_parameters((double)pos_velocity_ctrl_config.position_kp, (double)pos_velocity_ctrl_config.position_ki,
+            (double)pos_velocity_ctrl_config.position_kd, (double)pos_velocity_ctrl_config.position_integral_limit,
             POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
 
@@ -264,8 +264,8 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
                         velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                        if(velocity_ref_k> pos_velocity_ctrl_config.max_speed) velocity_ref_k = pos_velocity_ctrl_config.max_speed;
-                        if(velocity_ref_k<-pos_velocity_ctrl_config.max_speed) velocity_ref_k =-pos_velocity_ctrl_config.max_speed;
+                        if(velocity_ref_k> pos_velocity_ctrl_config.max_motor_speed) velocity_ref_k = pos_velocity_ctrl_config.max_motor_speed;
+                        if(velocity_ref_k<-pos_velocity_ctrl_config.max_motor_speed) velocity_ref_k =-pos_velocity_ctrl_config.max_motor_speed;
                         torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                     }
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
@@ -490,27 +490,27 @@ break;
                 pos_velocity_ctrl_config = in_config;
 
                 pid_init(velocity_control_pid_param);
-                if(pos_velocity_ctrl_config.P_velocity<0)            pos_velocity_ctrl_config.P_velocity=0;
-                if(pos_velocity_ctrl_config.P_velocity>100000000)    pos_velocity_ctrl_config.P_velocity=100000000;
-                if(pos_velocity_ctrl_config.I_velocity<0)            pos_velocity_ctrl_config.I_velocity=0;
-                if(pos_velocity_ctrl_config.I_velocity>100000000)    pos_velocity_ctrl_config.I_velocity=100000000;
-                if(pos_velocity_ctrl_config.D_velocity<0)            pos_velocity_ctrl_config.D_velocity=0;
-                if(pos_velocity_ctrl_config.D_velocity>100000000)    pos_velocity_ctrl_config.D_velocity=100000000;
+                if(pos_velocity_ctrl_config.velocity_kp<0)            pos_velocity_ctrl_config.velocity_kp=0;
+                if(pos_velocity_ctrl_config.velocity_kp>100000000)    pos_velocity_ctrl_config.velocity_kp=100000000;
+                if(pos_velocity_ctrl_config.velocity_ki<0)            pos_velocity_ctrl_config.velocity_ki=0;
+                if(pos_velocity_ctrl_config.velocity_ki>100000000)    pos_velocity_ctrl_config.velocity_ki=100000000;
+                if(pos_velocity_ctrl_config.velocity_kd<0)            pos_velocity_ctrl_config.velocity_kd=0;
+                if(pos_velocity_ctrl_config.velocity_kd>100000000)    pos_velocity_ctrl_config.velocity_kd=100000000;
                 pid_set_parameters(
-                        (double)pos_velocity_ctrl_config.P_velocity, (double)pos_velocity_ctrl_config.I_velocity,
-                        (double)pos_velocity_ctrl_config.D_velocity, (double)pos_velocity_ctrl_config.integral_limit_velocity,
+                        (double)pos_velocity_ctrl_config.velocity_kp, (double)pos_velocity_ctrl_config.velocity_ki,
+                        (double)pos_velocity_ctrl_config.velocity_kd, (double)pos_velocity_ctrl_config.velocity_integral_limit,
                         POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
 
                 pid_init(position_control_pid_param);
-                if(pos_velocity_ctrl_config.P_pos<0)            pos_velocity_ctrl_config.P_pos=0;
-                if(pos_velocity_ctrl_config.P_pos>100000000)    pos_velocity_ctrl_config.P_pos=100000000;
-                if(pos_velocity_ctrl_config.I_pos<0)            pos_velocity_ctrl_config.I_pos=0;
-                if(pos_velocity_ctrl_config.I_pos>100000000)    pos_velocity_ctrl_config.I_pos=100000000;
-                if(pos_velocity_ctrl_config.D_pos<0)            pos_velocity_ctrl_config.D_pos=0;
-                if(pos_velocity_ctrl_config.D_pos>100000000)    pos_velocity_ctrl_config.D_pos=100000000;
-                pid_set_parameters((double)pos_velocity_ctrl_config.P_pos, (double)pos_velocity_ctrl_config.I_pos,
-                        (double)pos_velocity_ctrl_config.D_pos, (double)pos_velocity_ctrl_config.integral_limit_pos,
+                if(pos_velocity_ctrl_config.position_kp<0)            pos_velocity_ctrl_config.position_kp=0;
+                if(pos_velocity_ctrl_config.position_kp>100000000)    pos_velocity_ctrl_config.position_kp=100000000;
+                if(pos_velocity_ctrl_config.position_ki<0)            pos_velocity_ctrl_config.position_ki=0;
+                if(pos_velocity_ctrl_config.position_ki>100000000)    pos_velocity_ctrl_config.position_ki=100000000;
+                if(pos_velocity_ctrl_config.position_kd<0)            pos_velocity_ctrl_config.position_kd=0;
+                if(pos_velocity_ctrl_config.position_kd>100000000)    pos_velocity_ctrl_config.position_kd=100000000;
+                pid_set_parameters((double)pos_velocity_ctrl_config.position_kp, (double)pos_velocity_ctrl_config.position_ki,
+                        (double)pos_velocity_ctrl_config.position_kd, (double)pos_velocity_ctrl_config.position_integral_limit,
                         POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
                 pos_profiler_param.a_max = (((double)(pos_velocity_ctrl_config.max_acceleration_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
@@ -546,15 +546,15 @@ break;
                 else if (downstream_control_data.position_cmd < min_position)
                     downstream_control_data.position_cmd = min_position;
                 //velocity limit
-                if (downstream_control_data.velocity_cmd > pos_velocity_ctrl_config.max_speed)
-                    downstream_control_data.velocity_cmd = pos_velocity_ctrl_config.max_speed;
-                else if (downstream_control_data.velocity_cmd < -pos_velocity_ctrl_config.max_speed)
-                    downstream_control_data.velocity_cmd = -pos_velocity_ctrl_config.max_speed;
+                if (downstream_control_data.velocity_cmd > pos_velocity_ctrl_config.max_motor_speed)
+                    downstream_control_data.velocity_cmd = pos_velocity_ctrl_config.max_motor_speed;
+                else if (downstream_control_data.velocity_cmd < -pos_velocity_ctrl_config.max_motor_speed)
+                    downstream_control_data.velocity_cmd = -pos_velocity_ctrl_config.max_motor_speed;
 
                 break;
 
         case i_position_control[int i].set_j(int j):
-                pos_velocity_ctrl_config.j = j;
+                pos_velocity_ctrl_config.moment_of_inertia = j;
                 nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
@@ -607,61 +607,58 @@ break;
 
                 torque_ref_k = 0;
                 i_motorcontrol.set_safe_torque_off_enabled();
+                i_motorcontrol.set_brake_status(0);
 
                 t :> ts;
-                t when timerafter (ts + 200*1000*app_tile_usec) :> void;
+                t when timerafter (ts + 2000*1000*app_tile_usec) :> void;
 
-                i_motorcontrol.set_brake_status(0);
 
                 int error=0;
                 int duty_min=0, duty_max=0, duty_divider=0;
                 int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
 
 
-                //pos_velocity_ctrl_config.special_brake_release = value;
-                //pos_velocity_ctrl_config.nominal_v_dc=value;
-                //pos_velocity_ctrl_config.voltage_pull_brake=value;
-                //pos_velocity_ctrl_config.voltage_hold_brake=value;
-                //pos_velocity_ctrl_config.time_pull_brake=value;
-
-
-                if(pos_velocity_ctrl_config.nominal_v_dc <= 0)
+                if(pos_velocity_ctrl_config.dc_bus_voltage <= 0)
                 {
                     printstr("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
-                    while(1);
+                    break;
                 }
 
-                if(pos_velocity_ctrl_config.voltage_pull_brake > (pos_velocity_ctrl_config.nominal_v_dc*1000))
+                if(pos_velocity_ctrl_config.pull_brake_voltage > (pos_velocity_ctrl_config.dc_bus_voltage*1000))
                 {
                     printstr("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
-                    while(1);
+                    break;
                 }
 
-                if(pos_velocity_ctrl_config.voltage_pull_brake < 0)
+                if(pos_velocity_ctrl_config.pull_brake_voltage < 0)
                 {
                     printstr("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
-                    while(1);
+                    break;
                 }
 
-                if(pos_velocity_ctrl_config.voltage_hold_brake > (pos_velocity_ctrl_config.nominal_v_dc*1000))
+                if(pos_velocity_ctrl_config.hold_brake_voltage > (pos_velocity_ctrl_config.dc_bus_voltage*1000))
                 {
                     printstr("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
-                    while(1);
+                    break;
                 }
 
-                if(pos_velocity_ctrl_config.voltage_hold_brake < 0)
+                if(pos_velocity_ctrl_config.hold_brake_voltage < 0)
                 {
                     printstr("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
-                    while(1);
+                    break;
                 }
 
                 if(period_start_brake < 0)
                 {
                     printstr("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
-                    while(1);
+                    break;
                 }
 
+
                 MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+
+                printf("IFM_TILE_FREQUENCY IS : %d", motorcontrol_config.ifm_tile_usec);
+
                 if(motorcontrol_config.ifm_tile_usec==250)
                 {
                     duty_min = 1500;
@@ -679,15 +676,15 @@ break;
                     error = 1;
                 }
 
-                duty_start_brake    = (duty_divider * pos_velocity_ctrl_config.voltage_pull_brake)/(1000*pos_velocity_ctrl_config.nominal_v_dc);
+                duty_start_brake    = (duty_divider * pos_velocity_ctrl_config.pull_brake_voltage)/(1000*pos_velocity_ctrl_config.dc_bus_voltage);
                 if(duty_start_brake < duty_min) duty_start_brake = duty_min;
                 if(duty_start_brake > duty_max) duty_start_brake = duty_max;
 
-                duty_maintain_brake = (duty_divider * pos_velocity_ctrl_config.voltage_hold_brake)/(1000*pos_velocity_ctrl_config.nominal_v_dc);
+                duty_maintain_brake = (duty_divider * pos_velocity_ctrl_config.hold_brake_voltage)/(1000*pos_velocity_ctrl_config.dc_bus_voltage);
                 if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
                 if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
 
-                period_start_brake  = (pos_velocity_ctrl_config.time_pull_brake * 1000)/(motorcontrol_config.ifm_tile_usec);
+                period_start_brake  = (pos_velocity_ctrl_config.pull_brake_time * 1000)/(motorcontrol_config.ifm_tile_usec);
 
                 i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 
