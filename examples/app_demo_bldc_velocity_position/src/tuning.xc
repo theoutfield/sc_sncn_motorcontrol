@@ -144,13 +144,29 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
 
         //velocity commands
         case 'v':
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.velocity_cmd = value;
+                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
                 switch(mode_2)
                 {
                 //step command (forward and backward)
                 case 's':
-                        printf("velocity cmd: %d to %d\n", value, -value);
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.velocity_cmd = value;
+                        switch(mode_3)
+                        {
+                        //with profile
+                        case 'p':
+                                pos_velocity_ctrl_config.enable_profiler = 1;
+                                printf("velocity cmd: %d to %d with profile\n", value, -value);
+                                break;
+                        //without profile
+                        default:
+                                pos_velocity_ctrl_config.enable_profiler = 0;
+                                printf("velocity cmd: %d to %d\n", value, -value);
+                                break;
+                        }
+                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
                         i_position_control.update_control_data(downstream_control_data);
                         delay_milliseconds(1000);
                         downstream_control_data.velocity_cmd = -value;
@@ -185,13 +201,6 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
         //reverse torque
         case 'r':
                 downstream_control_data.torque_cmd = -downstream_control_data.torque_cmd;
-//                if(velocity_running)
-//                {
-//                    velocity = -velocity;
-//                    downstream_control_data.offset_torque = 0;
-//                    downstream_control_data.velocity_cmd = velocity;
-//                    i_position_control.update_control_data(downstream_control_data);
-//                }
                 i_position_control.update_control_data(downstream_control_data);
                 printf("torque command %d milli-Nm\n", downstream_control_data.torque_cmd);
                 break;
@@ -402,8 +411,8 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         break;
                 }
                 i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("                 [rpm/s]                [rpm]\n");
-                printf("acceleration_max: %d     velocity_max: %d \n",pos_velocity_ctrl_config.max_acceleration_profiler, pos_velocity_ctrl_config.max_speed_profiler);
+                printf("profiler settings: \n");
+                printf("acceleration: %d [rpm/s], velocity: %d [rpm], torque_rate: %d [mNm/s] \n",pos_velocity_ctrl_config.max_acceleration_profiler, pos_velocity_ctrl_config.max_speed_profiler, pos_velocity_ctrl_config.max_torque_rate_profiler);
                 break;
 
         //auto offset tuning
