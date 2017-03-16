@@ -112,6 +112,7 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
     int torque_ref_k = 0;
 
     double velocity_ref_k = 0;
+    double velocity_ref_in_k=0, velocity_ref_in_k_1n=0, velocity_ref_in_k_2n=0;
     double velocity_k = 0.00;
 
     double position_ref_in_k = 0.00;
@@ -121,10 +122,13 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
 
 
     //pos profiler
-    posProfilerParam pos_profiler_param;
-    pos_profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
-    pos_profiler_param.v_max = (((double)(pos_velocity_ctrl_config.max_speed_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
-    pos_profiler_param.a_max = (((double)(pos_velocity_ctrl_config.max_acceleration_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
+    posProfilerParam profiler_param;
+    profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
+    profiler_param.v_max = (double)(pos_velocity_ctrl_config.max_speed_profiler);
+    profiler_param.a_max = (double)(pos_velocity_ctrl_config.max_acceleration_profiler);
+    profiler_param.torque_rate_max = (double)(pos_velocity_ctrl_config.max_torque_rate_profiler);
+    profiler_param.resolution = (double)(pos_velocity_ctrl_config.resolution);
+
     float acceleration_monitor = 0;
 
     //position limiter
@@ -219,7 +223,17 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    torque_ref_k = pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                    if(pos_velocity_ctrl_config.enable_profiler==1)
+                    {
+                        velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
+                        velocity_ref_in_k_1n = velocity_ref_in_k;
+                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                    }
+                    else if(pos_velocity_ctrl_config.enable_profiler==0)
+                    {
+                        velocity_ref_in_k = velocity_ref_k;
+                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                    }
                 }
                 else if (position_enable_flag == 1)// position control
                 {
@@ -341,7 +355,7 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
                 xscope_int(POSITION_ADDITIONAL, upstream_control_data.position_additional);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);
                 xscope_int(POSITION_CMD, (int)position_ref_in_k);
-                xscope_int(VELOCITY_CMD, downstream_control_data.velocity_cmd);
+                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
 #endif
@@ -513,8 +527,9 @@ break;
                         (double)pos_velocity_ctrl_config.position_kd, (double)pos_velocity_ctrl_config.position_integral_limit,
                         POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
-                pos_profiler_param.a_max = (((double)(pos_velocity_ctrl_config.max_acceleration_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
-                pos_profiler_param.v_max = (((double)(pos_velocity_ctrl_config.max_speed_profiler)) * ((double)(pos_velocity_ctrl_config.resolution)))/60.00;
+                profiler_param.a_max = (double)(pos_velocity_ctrl_config.max_acceleration_profiler);
+                profiler_param.v_max = (double)(pos_velocity_ctrl_config.max_speed_profiler);
+                profiler_param.torque_rate_max = (double)(pos_velocity_ctrl_config.max_torque_rate_profiler);
 
                 nl_position_control_reset(nl_pos_ctrl);
                 nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);

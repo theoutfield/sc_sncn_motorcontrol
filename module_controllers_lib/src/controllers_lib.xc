@@ -357,3 +357,30 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
     return pos_k;
 }
 
+
+double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posProfilerParam profiler_param, int position_control_loop)
+{
+
+    double velocity_step=0.00, velocity_ref_in_k=0.00;
+    double velocity_error=0.00;
+
+    velocity_step = (((double)(position_control_loop)) * profiler_param.a_max )/1000000.00; //rpm/s
+    if(velocity_step<0) velocity_step=-velocity_step;
+
+    if(velocity_ref_in_k_1n<velocity_ref)
+    {
+        velocity_ref_in_k = velocity_ref_in_k_1n + velocity_step;
+    }
+    else if (velocity_ref_in_k_1n>velocity_ref)
+    {
+        velocity_ref_in_k = velocity_ref_in_k_1n - velocity_step;
+    }
+
+    velocity_error = velocity_ref - velocity_ref_in_k_1n;
+    if( (-velocity_step)<velocity_error  && velocity_error<velocity_step)
+        velocity_ref_in_k = velocity_ref;
+
+    return velocity_ref_in_k;
+}
+
+

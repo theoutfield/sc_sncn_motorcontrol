@@ -176,6 +176,7 @@ int update_nl_position_control(
 float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfilerParam pos_profiler_param);
 
 
+double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posProfilerParam profiler_param, int position_control_loop);
 
 
 
