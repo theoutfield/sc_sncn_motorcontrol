@@ -110,6 +110,7 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
     int pos_control_mode = 0;
 
     int torque_ref_k = 0;
+    double torque_ref_in_k=0, torque_ref_in_k_1n=0, torque_ref_in_k_2n=0;
 
     double velocity_ref_k = 0;
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0, velocity_ref_in_k_2n=0;
@@ -219,7 +220,17 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
                 // torque control
                 if(torque_enable_flag == 1)
                 {
-                    torque_ref_k = downstream_control_data.torque_cmd;
+                    if(pos_velocity_ctrl_config.enable_profiler==1)
+                    {
+                        torque_ref_in_k = torque_profiler(((double)(downstream_control_data.torque_cmd)), torque_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
+                        torque_ref_in_k_1n = torque_ref_in_k;
+                        torque_ref_k = ((int)(torque_ref_in_k));
+                    }
+                    else
+                    {
+                        torque_ref_k = downstream_control_data.torque_cmd;
+                    }
+
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
@@ -257,7 +268,7 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
                                 (double) downstream_control_data.position_cmd),
                                 position_ref_in_k_1n,
                                 position_ref_in_k_2n,
-                                pos_profiler_param);
+                                profiler_param);
 
                         acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(POSITION_CONTROL_LOOP_PERIOD * POSITION_CONTROL_LOOP_PERIOD);
                         position_ref_in_k_2n = position_ref_in_k_1n;

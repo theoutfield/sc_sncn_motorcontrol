@@ -285,9 +285,11 @@ int update_nl_position_control(
  */
 float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfilerParam pos_profiler_param)
 {
-    double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2;
+    double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2, v_max = 0.00, a_max = 0.00;
     int deceleration_flag = 0;
 
+    v_max = (((double)(pos_profiler_param.v_max)) * pos_profiler_param.resolution )/60.00;
+    a_max = (((double)(pos_profiler_param.a_max)) * pos_profiler_param.resolution )/60.00;
 
     if (pos_target == pos_k_1n)
         pos_k = pos_target;
@@ -298,15 +300,15 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
         else
         {
             velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
-            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * pos_profiler_param.a_max);
+            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * a_max);
             pos_deceleration = pos_target - deceleration_distance;
             if ((pos_k_1n >= pos_deceleration) && (pos_k_1n > pos_k_2n))
                 deceleration_flag = 1;
-            temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * pos_profiler_param.a_max;
+            temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * a_max;
             if (deceleration_flag == 0)
             {
                 pos_temp1 = temp + (2 * pos_k_1n) - pos_k_2n;
-                pos_temp2 = (pos_profiler_param.delta_T * pos_profiler_param.v_max) + pos_k_1n;
+                pos_temp2 = (pos_profiler_param.delta_T * v_max) + pos_k_1n;
                 if (pos_temp1 < pos_temp2)
                     pos_k = pos_temp1;
                 else
@@ -329,15 +331,15 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
         else
         {
             velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
-            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * pos_profiler_param.a_max);
+            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * a_max);
             pos_deceleration = pos_target + deceleration_distance;
             if ((pos_k_1n <= pos_deceleration) && (pos_k_1n < pos_k_2n))
                 deceleration_flag = 1;
-            temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * pos_profiler_param.a_max;
+            temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * a_max;
             if (deceleration_flag == 0)
             {
                 pos_temp1 = -temp + (2 * pos_k_1n) - pos_k_2n;
-                pos_temp2 = -(pos_profiler_param.delta_T * pos_profiler_param.v_max) + pos_k_1n;
+                pos_temp2 = -(pos_profiler_param.delta_T * v_max) + pos_k_1n;
                 if (pos_temp1 > pos_temp2)
                     pos_k = pos_temp1;
                 else
@@ -384,3 +386,28 @@ double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posPr
 }
 
 
+double torque_profiler(double torque_ref, double torque_ref_in_k_1n, posProfilerParam profiler_param, int position_control_loop)
+{
+
+    double torque_step=0.00, torque_ref_in_k=0.00;
+    double torque_error=0.00;
+
+    torque_step = (((double)(position_control_loop)) * profiler_param.torque_rate_max )/1000000.00;
+    //r_max [mNm/s] / 1000 [mNm/ms] * (position_control_loop/1000) mNm
+    if(torque_step<0) torque_step=-torque_step;
+
+    if(torque_ref_in_k_1n<torque_ref)
+    {
+        torque_ref_in_k = torque_ref_in_k_1n + torque_step;
+    }
+    else if (torque_ref_in_k_1n>torque_ref)
+    {
+        torque_ref_in_k = torque_ref_in_k_1n - torque_step;
+    }
+
+    torque_error = torque_ref - torque_ref_in_k_1n;
+    if( (-torque_step)<torque_error  && torque_error<torque_step)
+        torque_ref_in_k = torque_ref;
+
+    return torque_ref_in_k;
+}

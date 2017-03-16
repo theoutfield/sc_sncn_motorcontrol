@@ -46,6 +46,7 @@ typedef struct {
     int enable_profiler;
     int max_acceleration_profiler;
     int max_speed_profiler;
+    int max_torque_rate_profiler;
 
     int position_kp;
     int position_ki;
