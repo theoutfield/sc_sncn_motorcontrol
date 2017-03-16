@@ -88,8 +88,10 @@ typedef struct {
  */
 typedef struct {
     double delta_T;
-    double a_max;
-    double v_max;
+    double resolution;              //resolution    [ticks/mechanical_rotation]
+    double v_max;                   //velocity      [rpm]
+    double a_max;                   //acceleration  [rpm/s]
+    double torque_rate_max;         //torque rate   [mNm/s]
 } posProfilerParam;
 
 
