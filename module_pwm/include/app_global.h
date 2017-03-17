@@ -26,7 +26,7 @@
 #define _MOTOR_ID 0
 
 /**
- * @brief Define sync. mode for ADC sampling. Default 1 is 'ADC synchronised to PWM'
+ * @brief Define synchronisation mode for ADC sampling. Default 1 is 'ADC synchronised to PWM'
  */
 #define _LOCK_ADC_TO_PWM 1
 

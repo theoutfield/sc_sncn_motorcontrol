@@ -95,23 +95,43 @@ How to use
 API
 ===
 
-Definitions
------------
+Interface
+---------
 
-.. doxygendefine:: BISS_SENSOR
-
-Types
------
-
-.. doxygenstruct:: BISSConfig
-.. doxygenstruct:: BISSPorts
+.. doxygeninterface:: update_pwm
+.. doxygeninterface:: update_pwm_general
 
 Service
 --------
 
-.. doxygenfunction:: biss_service
+.. doxygenfunction:: pwm_service_task
+.. doxygenfunction:: pwm_service_general
 
-Interface
+
+Definitions
+-----------
+
+.. doxygendefine:: GENERAL_PWM_MAX_VALUE
+.. doxygendefine:: GENERAL_PWM_MIN_VALUE
+.. doxygendefine:: _LOCK_ADC_TO_PWM 
+.. doxygendefine:: _MOTOR_ID
+
+Types
+-----
+
+.. doxygenstruct:: PwmPorts
+.. doxygenstruct:: PwmPortsGeneral
+.. doxygenstruct:: FetDriverPorts
+.. doxygenstruct:: PWM_SERV_TAG
+.. doxygenenum:: PWM_PHASE_ETAG
+
+Functions
 ---------
 
-.. doxygeninterface:: BISSInterface
+.. doxygenfunction:: predriver
+.. doxygenfunction:: pwm_config
+.. doxygenfunction:: pwm_config_general
+.. doxygenfunction:: get_pwm_struct_address
+.. doxygenfunction:: convert_all_pulse_widths
+.. doxygenfunction:: convert_widths_in_shared_mem
+

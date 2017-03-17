@@ -29,6 +29,10 @@
  * @brief Define PWM port width in bits
  */
 #define _PWM_PORT_WID (1 << _PORT_RES_BITS) // PWM port width in bits
+
+/**
+ * @brief Define Half of PWM port width in bits
+ */
 #define _HALF_PORT_WID (_PWM_PORT_WID >> 1) // Half of PWM port width in bits
 
 /**
