@@ -205,7 +205,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                         }
                     }
 
-                    write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count, velocity, 0, 0);
+                    write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count, velocity, 0, 0, SENSOR_NO_ERROR);
                 }
 
                 break;

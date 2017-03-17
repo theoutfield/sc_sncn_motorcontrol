@@ -369,6 +369,7 @@ void position_velocity_control_service(int app_tile_usec, PosVelocityControlConf
                 xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
+                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT

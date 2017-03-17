@@ -344,7 +344,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 #endif
 
             //send data to shared memory
-            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count, velocity, pos_state.angle, 0);
+            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count, velocity, pos_state.angle, 0, pos_state.status);
 
             //gpio
             gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);

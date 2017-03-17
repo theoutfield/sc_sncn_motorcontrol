@@ -278,8 +278,9 @@ void multiturn(int &count, int last_position, int position, int ticks_per_turn);
  * @param velocity The velocity
  * @param angle The electrical angle
  * @param hall_state The Hall pin state if Hall sensor is used
+ * @param sensor_error the sensor error status
  */
-void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int velocity, int angle, int hall_state);
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int velocity, int angle, int hall_state, SensorError sensor_error);
 
 /**
  * @brief Compute the velocity in rpm
