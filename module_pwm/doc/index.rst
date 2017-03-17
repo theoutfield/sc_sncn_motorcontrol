@@ -27,6 +27,8 @@ How to use
 
 .. important:: It is assumed that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
 
+.. seealso:: You might find useful the :ref:`SOMANET General PWM Demo <app_demo_general_pwm>` app, which illustrates the use of some parts of this module. 
+
 1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
     ::
