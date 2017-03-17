@@ -32,6 +32,30 @@ typedef enum {
     SSI_SENSOR=7
 } SensorType;
 
+
+/**
+ * @brief Type for Sensor Error
+ *
+ */
+typedef enum {
+    SENSOR_NO_ERROR=0,
+    SENSOR_REM_16MT_WEAK_MAG_FIELD_ERROR       = 0x1,
+    SENSOR_REM_16MT_MT_COUNTER_ERROR           = 0x2,
+    SENSOR_REM_16MT_ST_CORDIC_ERROR            = 0x3,
+    SENSOR_REM_16MT_MT_SPEED_OVERLOW_ERROR     = 0x4,
+    SENSOR_REM_16MT_FILTER_CONFIG_ERROR        = 0xA,
+    SENSOR_REM_16MT_FILTER_SPEED_OVERLOW_ERROR = 0xB,
+    SENSOR_REM_16MT_UNKNOWN_CMD_ERROR          = 0xD,
+    SENSOR_REM_16MT_CONFIG_ERROR               = 0xE,
+    SENSOR_BISS_ERROR_BIT_ERROR                = 15,
+    SENSOR_BISS_WARNING_BIT_ERROR              = 16,
+    SENSOR_BISS_ERROR_AND_WARNING_BIT_ERROR    = 17,
+    SENSOR_BISS_NO_ACK_BIT_ERROR               = 18,
+    SENSOR_BISS_NO_START_BIT_ERROR             = 19,
+    SENSOR_CHECKSUM_ERROR                      = 20
+} SensorError;
+
+
 /**
  * @brief Type for motors.
  */
@@ -158,6 +182,8 @@ typedef struct {
 typedef struct
 {
     int error_status;
+
+    SensorError sensor_error;
 
     int computed_torque;
     int torque_set;

@@ -179,8 +179,9 @@ interface shared_memory_interface
     * @param Hall state (in case HALL sensor is used).
     * @param Position.
     * @param Velocity.
+    * @param sensor_error the sensor error status
     */
-    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity);
+    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error);
 
     /**
     * @brief Write electrical angle and secondary position feedback (display only) to shared memory.
@@ -189,24 +190,27 @@ interface shared_memory_interface
     * @param Hall state (in case HALL sensor is used).
     * @param Position.
     * @param Velocity.
+    * @param sensor_error the sensor error status
     */
-    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity);
+    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error);
 
     /**
     * @brief Write primary position feedback (used for motion control) to shared memory.
     *
     * @param Position.
     * @param Velocity.
+    * @param sensor_error the sensor error status
     */
-    void write_primary_feedback(int position, int velocity);
+    void write_primary_feedback(int position, int velocity, SensorError sensor_error);
 
     /**
     * @brief Write secondary position feedback (display only) to shared memory.
     *
     * @param Position.
     * @param Velocity.
+    * @param sensor_error the sensor error status
     */
-    void write_secondary_feedback(int position, int velocity);
+    void write_secondary_feedback(int position, int velocity, SensorError sensor_error);
 
     /**
      * @brief Write write gpio input data to shared memory, return the gpio output data.
