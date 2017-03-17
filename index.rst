@@ -1,9 +1,9 @@
 .. _somanet_motor_control:
 
-SOMANET Motor Control Library
+SOMANET Motion Control Library
 ==============================
 
-The **SOMANET Motor Control Library** provides services and utilities to perform BLDC Motor Control using SOMANET devices.
+The **SOMANET Motion Control Library** provides services and utilities to perform BLDC Motor and Motion Control using SOMANET devices.
 The library offers following functionalities:
 
 * BLDC motors control
@@ -11,18 +11,18 @@ The library offers following functionalities:
 * Position, Velocity, and Torque control loops
 * Feedback sensor support (Hall Sensor, Incremental Encoder, BiSS, Magnetic Rotary sensors via SPI)
 * Basic Motion Profile Generation
-* Fully featured ADC driver
+* Fully featured ADC drivers
 * Configurable software defined PWM module 
 * Watchdog
 * GPIO server (e.g. for homing-related functions)
 
 .. cssclass:: downloadable-button 
 
-  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/master.zip>`_
+  `Download Library (Develop) <https://github.com/synapticon/sc_sncn_motorcontrol/archive/develop.zip>`_
 
 .. cssclass:: github
 
-  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/>`_
+  `Visit Public Development Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop>`_
 
 .. _motor_control_hw_compatibility:
 
@@ -46,7 +46,7 @@ Hardware Compatibility
 +==========================================================================================================+
 | SOMANET Core: :ref:`C22 <core_c22>`, :ref:`C21 DX <core_c21_dx>`                                         |
 +----------------------------------------------------------------------------------------------------------+
-| SOMANET IFM:  :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 1000**, **DC 5000**             |
+| SOMANET IFM:  :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 500**, **DC 1000**, **DC 5000** |
 +----------------------------------------------------------------------------------------------------------+
 
 Modules
@@ -160,8 +160,8 @@ To run your **Motor Control library** it is necessary to include :ref:`SOMANET B
 
 .. cssclass:: downloadable-button 
 
-  `Download SOMANET Base Library <https://github.com/synapticon/sc_somanet-base/archive/master.zip>`_
+  `Download SOMANET Base Library (Develop) <https://github.com/synapticon/sc_somanet-base/archive/develop.zip>`_
 
 .. cssclass:: github
 
-  `Visit SOMANET Base Public Repository <https://github.com/synapticon/sc_somanet-base>`_
+  `Visit SOMANET Base Public Development Repository <https://github.com/synapticon/sc_somanet-base/tree/develop>`_
