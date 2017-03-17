@@ -25,8 +25,6 @@ How to use
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
-.. seealso:: You might find useful the :ref:`SOMANET Watchdog Driver Demo <watchdog_driver_demo>` example app, which illustrates the use of this module. 
-
 1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
     ::
@@ -88,3 +86,8 @@ Interface
 ---------
 
 .. doxygeninterface:: WatchdogInterface
+
+Functions
+---------
+
+.. doxygenfunction:: blink_red
