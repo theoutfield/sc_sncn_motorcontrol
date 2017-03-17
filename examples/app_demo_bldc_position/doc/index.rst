@@ -1,21 +1,21 @@
-.. _bldc_position_control_demo:
+.. _bldc_motion_control_demo:
 
-==================================
-BLDC Position Control Demo
-==================================
+========================
+BLDC Motion Control Demo
+========================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-The purpose of this app (app_demo_bldc_position) is showing the use of the :ref:`Control Loops Module <module_ctrl_loops>` and :ref:`Profile Module <module_profile>` for Position control of a BLDC motor. For that, it implements a simple app that will make your motor reach a desired target position. A Hall Effect Feedback sensor will be used for commutation and, additionally, an Encoder Interface can be used for accurate position feedback and control. The app also will display over **XScope** the current position of the motor respect to the target position.
+The purpose of this app (app_demo_motion_control) is to show the use of the :ref:`Motion Control Module <module_motion_control>` and :ref:`Profile Module <module_profile>` for Position/Velocity/Torque control of a BLDC motor. For that, it implements a simple app that will prompt you to select desired control mode and a reference value to execute the motion. The app will also display over **XScope** the current position, velocity, and torque of the motor in respect to the reference value.
 
-* **Minimum Number of Cores**: 8
-* **Minimum Number of Tiles**: 2
+* **Minimum Number of Cores**: X
+* **Minimum Number of Tiles**: X
 
 .. cssclass:: github
 
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_bldc_position/>`_
+  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_demo_motion_control/>`_
 
 Quick How-to
 ============
