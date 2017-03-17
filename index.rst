@@ -90,9 +90,9 @@ This is the complete list of modules currently included in the **SOMANET Motor C
 * `Watchdog Module <module_watchdog/doc/index.html>`_: Driver for the Watchdog on your IFM DC board.
 * `GPIO Server Module <module_gpio/doc/index.html>`_: Contains a service to handle the external digital input/outputs of your board.
 * `BLDC Torque Control Module <module_bldc_torque_control_lib/doc/index>`_: Provides a service to control torque of BLDC motors.
+* `Miscellaneous Module <module_misc/doc/index.html>`_: Contains constants and utilities used by the library.
 * `Control Loops Module <module_ctrl_loops/doc/index.html>`_: Provide services for position, velocity and control loops. 
 * `Profile Module <module_profile/doc/index.html>`_: Contains software for profile ramps generation.
-* `Miscellaneous Module <module_misc/doc/index.html>`_: Contains constants and utilities used by the library.
 * `Controllers Library <module_controllers_lib/doc/index>`_: Contains PID and NL controllers implementations.
 
 Examples
@@ -102,25 +102,20 @@ Examples
 	:hidden:
 	:maxdepth: 1
 
-	Incremental Encoder Feedback Test <examples/app_test_qei/doc/index>
-	Hall Sensor Feedback Test <examples/app_test_hall/doc/index>
-	BiSS Encoder Feedback Test <examples/app_test_biss/doc/index>
-	Watchdog Demo <examples/app_demo_watchdog/doc/index>
-	
 	PWM Demo <examples/app_demo_general_pwm/doc/index>
-	
-	BLDC Motor Control Demo <examples/app_demo_bldc_motorcontrol/doc/index>	
-	BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index>	
-	BLDC Velocity Control Demo <examples/app_demo_bldc_velocity/doc/index>
-	BLDC Torque Control Demo <examples/app_demo_bldc_torque/doc/index>
-	
-	Brushed DC Motor Control Demo <examples/app_demo_brushed_dc/doc/index>
-	Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index>
-	Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index>
-	Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index>
-	Brushed DC Velocity Control with a potentiometer <examples/app_demo_brushed_dc_ext_control/doc/index>
+	Watchdog Demo <examples/app_demo_watchdog/doc/index>
 
-	Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index> 
+	Hall Effect Latched Sensor Test <examples/app_test_hall/doc/index>
+	Incremental Encoder Test <examples/app_test_qei/doc/index>
+	BiSS Absolute Encoder Test <examples/app_test_biss/doc/index>
+	REM 14 Absolute Encoder Test <examples/app_test_rem_14/doc/index.html>
+	REM 16MT Absolute Encoder Test <examples/app_test_rem_16mt/doc/index.html>
+	Position Feedback Service Test <examples/app_test_position_feedback/doc/index.html>
+	
+	BLDC Torque Control Demo <examples/app_demo_advanced_foc/doc/index>	
+	BLDC Motion Control Demo <examples/app_demo_bldc_position/doc/index>	
+	BLDC Control Tuning Demo <examples/app_demo_bldc_velocity_position/doc/index>
+	
 
 * **Low level functionality tests:**
 
@@ -129,30 +124,19 @@ Examples
 
 * **Position Feedback Sensors tests:**
 
-	* `Incremental Encoder Interface Test <examples/app_test_qei/doc/index.html>`_: Shows data acquired from incremental Encoder.
-	* `Hall Sensor Feedback Test <examples/app_test_hall/doc/index.html>`_: Shows data acquired from Hall sensor.
-	* `BiSS Encoder Feedback Test <examples/app_test_biss/doc/index.html>`_: Shows data acquired from BiSS Encoder.
-	* `REM 14 Feedback Test <examples/app_test_rem_14/doc/index.html>`_: Shows data acquired from a REM 14 Encoder.
-	* `REM 16MT Feedback Test <examples/app_test_rem_16mt/doc/index.html>`_: Shows data acquired from REM 16MT Encoder.
-	* `Position Feedback Service Test <examples/app_test_position_feedback/doc/index.html>`_: Simple example of the usage of Position Feedback Service to acquire position from multiple sensors.
+	* `Hall Effect Latched Sensor Test <examples/app_test_hall/doc/index.html>`_: Shows data acquired from a latched Hall sensor served as a rotary encoder.	
+	* `Incremental Encoder Test <examples/app_test_qei/doc/index.html>`_: Shows data acquired from an incremental encoder.
+	* `BiSS Absolute Encoder Test <examples/app_test_biss/doc/index.html>`_: Shows data acquired from a BiSS interface encoder.
+	* `REM 14 Absolute Encoder Test <examples/app_test_rem_14/doc/index.html>`_: Shows data acquired from REM 14 absolute magnetic rotary encoder.
+	* `REM 16MT Absolute Encoder Test <examples/app_test_rem_16mt/doc/index.html>`_: Shows data acquired from REM 16MT absolute magnetic rotary encoder.
+	* `Position Feedback Service Test <examples/app_test_position_feedback/doc/index.html>`_: Simple example of the Position Feedback Service usage to acquire position from multiple sensors.
 
 * **BLDC Motor Control demos:**
 
-	* `BLDC Motor Control Demo <examples/app_demo_bldc_motorcontrol/doc/index.html>`_: Plain Sinusoidal commutation of your BLDC motor.
-	* `BLDC Position Control Demo <examples/app_demo_bldc_position/doc/index.html>`_: Simple example to make Position Control of your BLDC motor.
-	* `BLDC Velocity Control Demo <examples/app_demo_bldc_velocity/doc/index.html>`_: Simple example to make Velocity Control of your BLDC motor.
-	* `BLDC Torque Control Demo <examples/app_demo_bldc_torque/doc/index.html>`_: Simple example to make Torque Control of your BLDC motor.
-	* `Commutation Offsets Helper Demo <examples/app_demo_offset_commutation_tuning/doc/index.html>`_: Example to help you calibrating the commutation offsets of your Hall sensor.
+	* `BLDC Torque Control Demo <examples/app_demo_advanced_foc/doc/index>`_: FOC-based torque control of your BLDC motor.
+	* `BLDC Motion Control Demo <examples/app_demo_bldc_position/doc/index>`_: Simple example to make Position/Velocity/Torque Control of your BLDC motor.
+	* `BLDC Control Tuning Demo <examples/app_demo_bldc_velocity_position/doc/index>`_: Helper application to tune your motion controllers and find commutation angle offset.
 
-* **Brushed DC Motor Control demos:**
-
-	* `Brushed DC Motor Control Demo <examples/app_demo_brushed_dc/doc/index.html>`_: Simple example to drive your Brushed DC motor.
-	* `Brushed DC Position Control Demo <examples/app_demo_brushed_dc_position/doc/index.html>`_: Simple example to make Position Control of your Brushed DC motor.
-	* `Brushed DC Velocity Control Demo <examples/app_demo_brushed_dc_velocity/doc/index.html>`_: Simple example to make Velocity Control of your Brushed DC motor.
-	* `Brushed DC Torque Control Demo <examples/app_demo_brushed_dc_torque/doc/index.html>`_: Simple example to make Torque Control of your Brushed DC motor.
-	* `Brushed DC Control with a potentiometer <examples/app_demo_brushed_dc_ext_control/doc/index.html>`_: Simple example to drive Brushed DC motor by an analog input signal.
-	
-	
 
 Motor Control Quick Guides
 ---------------------------
@@ -162,12 +146,12 @@ Motor Control Quick Guides
 	:maxdepth: 1
 
 	Motor Control Library configuration <doc/motor_configuration> 
-	Commutation offsets adjustment <doc/motor_tuning>
+	Commutation Angle Offset Finding Guide <doc/motor_tuning>
 
 In order to learn how to proceed with the configuration of the motors we highly recommend to read the following tutorials:
 
 * `Motor Control Library configuration <doc/motor_configuration.html>`_ : Learn how to configure your Motor Control Library. 
-* `Commutation offsets adjustment <doc/motor_tuning.html>`_ : Learn how to adjust your feedback Hall sensor offsets for an optimal commutation.
+* `Commutation Angle Offset Finding Guide <doc/motor_tuning.html>`_ : Learn how to find your commutating feedback sensor offset for an efficient commutation.
 
 Dependencies
 ------------
