@@ -84,7 +84,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
-void motion_control_service(int app_tile_usec, PosVelocityControlConfig &pos_velocity_ctrl_config,
+void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_ctrl_config,
         interface MotorcontrolInterface client i_motorcontrol,
         interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
 {
@@ -496,7 +496,7 @@ break;
 
                 break;
 
-        case i_position_control[int i].set_position_velocity_control_config(PosVelocityControlConfig in_config):
+        case i_position_control[int i].set_position_velocity_control_config(MotionControlConfig in_config):
                 //check if we need to update max/min pos limits
                 if (in_config.max_pos_range_limit != pos_velocity_ctrl_config.max_pos_range_limit || in_config.min_pos_range_limit != pos_velocity_ctrl_config.min_pos_range_limit || in_config.polarity != pos_velocity_ctrl_config.polarity)
                 {
@@ -547,7 +547,7 @@ break;
                 nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
-        case i_position_control[int i].get_position_velocity_control_config() ->  PosVelocityControlConfig out_config:
+        case i_position_control[int i].get_position_velocity_control_config() ->  MotionControlConfig out_config:
                 out_config = pos_velocity_ctrl_config;
                 break;
 

@@ -34,7 +34,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
     DownstreamControlData downstream_control_data;
-    PosVelocityControlConfig pos_velocity_ctrl_config;
+    MotionControlConfig pos_velocity_ctrl_config;
 
     MotorcontrolConfig motorcontrol_config;
     int proper_sensor_polarity=0;

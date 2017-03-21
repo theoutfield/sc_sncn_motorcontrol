@@ -55,7 +55,7 @@ int main(void) {
         on tile[APP_TILE_2]:
         /* Position Control Loop */
         {
-            PosVelocityControlConfig pos_velocity_ctrl_config;
+            MotionControlConfig pos_velocity_ctrl_config;
 
             pos_velocity_ctrl_config.min_pos_range_limit =                  MIN_POSITION_RANGE_LIMIT;
             pos_velocity_ctrl_config.max_pos_range_limit =                  MAX_POSITION_RANGE_LIMIT;

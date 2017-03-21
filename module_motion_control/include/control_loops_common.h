@@ -74,7 +74,7 @@ typedef struct {
     int pull_brake_time;    //in milli seconds
     int hold_brake_voltage; //in milli volts
 
-} PosVelocityControlConfig;
+} MotionControlConfig;
 
 
 

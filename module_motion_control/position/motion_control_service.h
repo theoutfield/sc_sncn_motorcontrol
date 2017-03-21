@@ -49,14 +49,14 @@ interface PositionVelocityCtrlInterface{
      *
      * @return Current Service configuration.
      */
-    PosVelocityControlConfig get_position_velocity_control_config();
+    MotionControlConfig get_position_velocity_control_config();
 
     /**
      * @brief Setter for new configuration in the Service.
      *
      * @param in_config New Service configuration.
      */
-    void set_position_velocity_control_config(PosVelocityControlConfig in_config);
+    void set_position_velocity_control_config(MotionControlConfig in_config);
 
     /**
      * @brief Setter for new configuration in the Motorcontrol Service.
@@ -118,7 +118,7 @@ void init_position_velocity_control(interface PositionVelocityCtrlInterface clie
  * @param i_motorcontrol Communication interface to the Motor Control Service.
  * @param i_position_control Array of communication interfaces to handle up to 3 different clients.
  */
-void motion_control_service(int app_tile_usec, PosVelocityControlConfig &pos_velocity_control_config,
+void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_control_config,
                     interface MotorcontrolInterface client i_motorcontrol,
                     interface PositionVelocityCtrlInterface server i_position_control[3],
                     client interface update_brake i_update_brake);

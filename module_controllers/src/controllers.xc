@@ -128,7 +128,7 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
 }
 
 
-void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, PosVelocityControlConfig &pos_velocity_ctrl_config, int control_loop_period)
+void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, MotionControlConfig &pos_velocity_ctrl_config, int control_loop_period)
 {
     //************************************************
     // set parameters of position controller structure
