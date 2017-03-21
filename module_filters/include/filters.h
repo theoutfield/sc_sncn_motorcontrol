@@ -1,5 +1,5 @@
 /**
- * @file filters_lib.h
+ * @file filters.h
  * @author Synapticon GmbH <support@synapticon.com>
  */
 

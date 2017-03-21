@@ -4,7 +4,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <filters_lib.h>
+#include <filters.h>
 #include <stdio.h>
 
 

@@ -11,12 +11,11 @@
 #include <math.h>
 
 #include <controllers.h>
-#include <filters_lib.h>
+#include <filters.h>
 
 #include <motion_control_service.h>
 #include <refclk.h>
 #include <mc_internal_constants.h>
-#include <filters_lib.h>
 #include <stdio.h>
 
 
