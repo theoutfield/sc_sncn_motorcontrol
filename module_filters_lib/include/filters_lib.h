@@ -54,6 +54,35 @@ typedef struct
 
 
 /**
+ * @brief Initialize Moving Average Filter Configuration.
+ *
+ * @param filter_buffer Reference to the samples array to initialize.
+ * @param index Reference to the index variable to initialize.
+ * @param filter_length Defines the length of the filter.
+ *
+ */
+void init_filter(int filter_buffer[], int &index, int filter_length);
+
+/**
+ * @brief Get moving average filtered output.
+ *
+ * @param filter_buffer Samples to filter.
+ * @param index Index of the filter.
+ * @param filter_length Defines the length of the filter.
+ * @param input New sample.
+ *
+ * @return Filtered output.
+ */
+int filter(int filter_buffer[], int & index, int filter_length, int input);
+
+
+/* Internal function */
+int _modified_internal_filter(int filter_buffer[], int & index, int filter_length, int input);
+
+
+
+
+/**
  * @brief setting the cut-off frequency and intializing the parameters of the first-order-LP-filters.
  *
  * @param f_c   -> cut-off frequency in Hz.
@@ -111,6 +140,8 @@ void third_order_LP_filter_init(int f_c, int T_s_considered, ThirdOrderLPfilterP
  * @param param  ->  filter parameters.
  */
 double third_order_LP_filter_update(double *x_k, ThirdOrderLPfilterParam &param);
+
+
 
 
 

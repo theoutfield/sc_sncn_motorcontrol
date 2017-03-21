@@ -11,7 +11,7 @@
 #include <print.h>
 #include <xscope.h>
 #include <mc_internal_constants.h>
-#include <filter_blocks.h>
+#include <filters_lib.h>
 
 extern char start_message[];
 
