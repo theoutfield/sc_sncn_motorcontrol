@@ -12,7 +12,7 @@ TARGET =
 APP_NAME = app_test_rem_14
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor module_biss module_bldc_torque_control_lib module_board-support module_filters module_hall module_misc module_position_feedback module_qei module_rem_14 module_rem_16mt module_serial_encoder module_shared_memory module_spi_master
+USED_MODULES = config_motor lib_bldc_torque_control module_biss module_board-support module_filters module_hall module_misc module_position_feedback module_qei module_rem_14 module_rem_16mt module_serial_encoder module_shared_memory module_spi_master
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
