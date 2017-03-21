@@ -13,7 +13,7 @@
 #include <advanced_motor_control.h>
 #include <refclk.h>
 #include <adc_service.h>
-#include <position_ctrl_service.h>
+#include <motion_control_service.h>
 
 #include <xscope.h>
 #include <mc_internal_constants.h>

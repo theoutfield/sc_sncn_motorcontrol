@@ -13,7 +13,7 @@
 #include <controllers.h>
 #include <filters_lib.h>
 
-#include <position_ctrl_service.h>
+#include <motion_control_service.h>
 #include <refclk.h>
 #include <mc_internal_constants.h>
 #include <filters_lib.h>
@@ -84,7 +84,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
-void position_velocity_control_service(int app_tile_usec, PosVelocityControlConfig &pos_velocity_ctrl_config,
+void motion_control_service(int app_tile_usec, PosVelocityControlConfig &pos_velocity_ctrl_config,
         interface MotorcontrolInterface client i_motorcontrol,
         interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
 {

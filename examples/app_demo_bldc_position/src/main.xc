@@ -30,7 +30,7 @@ port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 
 //Position control + profile libs
-#include <position_ctrl_service.h>
+#include <motion_control_service.h>
 #include <profile_control.h>
 
 
@@ -190,7 +190,7 @@ int main(void)
             pos_velocity_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
             pos_velocity_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
 
-            position_velocity_control_service(APP_TILE_USEC, pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control, i_update_brake);
+            motion_control_service(APP_TILE_USEC, pos_velocity_ctrl_config, i_motorcontrol[0], i_position_control, i_update_brake);
         }
 
         /************************************************************

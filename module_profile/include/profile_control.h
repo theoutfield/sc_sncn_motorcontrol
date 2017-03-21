@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <position_ctrl_service.h>
+#include <motion_control_service.h>
 
 /**
  * @brief Structure definition for Profiler configuration.
