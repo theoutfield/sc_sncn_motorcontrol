@@ -1,10 +1,10 @@
 /**
- * @file controllers_lib.xc
+ * @file controllers.xc
  * @brief Controllers Libraries
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <controllers_lib.h>
+#include <controllers.h>
 #include <control_loops_common.h>
 #include <math.h>
 #include <xscope.h>

@@ -10,7 +10,7 @@
 
 #include <math.h>
 
-#include <controllers_lib.h>
+#include <controllers.h>
 #include <filters_lib.h>
 
 #include <position_ctrl_service.h>

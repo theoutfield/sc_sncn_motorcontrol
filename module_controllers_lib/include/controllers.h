@@ -1,5 +1,5 @@
 /**
- * @file controllers_lib.h
+ * @file controllers.h
  * @author Synapticon GmbH <support@synapticon.com>
  */
 

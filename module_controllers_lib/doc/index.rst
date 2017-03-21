@@ -1,4 +1,4 @@
-.. _module_controllers_lib:
+.. _module_controllers:
 
 =====================
 Controllers Library Module
