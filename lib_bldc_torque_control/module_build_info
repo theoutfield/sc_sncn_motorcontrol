@@ -13,7 +13,7 @@ LIB_ARCH = xs1b xs2a
 
 EXPORT_SOURCE_DIRS = include predriver
 
-LIBRARY = _bldc_torque_control
+LIBRARY = module_bldc_torque_control_lib
 
 MODULE_XCC_XC_FLAGS = $(XCC_XC_FLAGS)
 
