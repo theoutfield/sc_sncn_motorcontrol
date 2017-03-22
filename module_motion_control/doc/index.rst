@@ -1,4 +1,4 @@
-.. _module_ctrl_loops:
+.. _module_motion_control:
 
 =============================
 Control Loops Module 
@@ -8,31 +8,25 @@ Control Loops Module
     :backlinks: none
     :depth: 3
 
-This module provides a three Services to perform Position, Velocity and Torque
-PID control over a Motor Control Service. Up to 3 clients could control the Services
-through interfaces.
+This module provides a Service to perform Position and Velocity control cascaded with a Torque Control.
 
-The Position, Velocity and Torque Control Services are intended to run at a **100MHz Reference Frequency**,
+The Position and Velocity Control Service is intended to run at a **100MHz Reference Frequency**,
 therefore they must be instantiated in a different tile from the remaining Motor Control Services.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_ctrl_loops>`_
+  `See Module on Public Repository (Develop) <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_motion_control>`_
 
-How to use (e.g. Position Control Service)
-==========================================
+How to use Motion Control Service
+=================================
 
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
 .. seealso:: 
-    You might find useful the **BLDC/Brushed DC Position, Velocity and Torque Control Demo** example apps, which illustrate the use of this module: 
+    You might find useful the **BLDC Motion Control Demo** example apps, which illustrate the use of this module: 
     
-    * :ref:`BLDC Position Control Demo <bldc_position_control_demo>`
-    * :ref:`BLDC Position Control Demo <bldc_velocity_control_demo>`
-    * :ref:`BLDC Torque Control Demo <bldc_torque_control_demo>`
-    * :ref:`Brushed DC Position Control Demo <brushed_dc_position_control_demo>`
-    * :ref:`Brushed DC Velocity Control Demo <brushed_dc_velocity_control_demo>`
+    * :ref:`BLDC Motion Control Demo <app_demo_bldc_motion_control>`
 
 1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
