@@ -73,7 +73,6 @@ Modules
 	Controllers Implementation Module <module_controllers/doc/index>
 	Profile Module <module_profile/doc/index>
 	Motion Control Module <module_motion_control/doc/index>
-	Profile Module <module_profile/doc/index>
 	
 
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
@@ -95,7 +94,6 @@ This is the complete list of modules currently included in the **SOMANET Motor C
 * `Controllers Implementation Module <module_controllers/doc/index>`_: Contains PID and NL controllers implementations. 
 * `Profile Module <module_profile/doc/index.html>`_: Contains software for profile ramps generation.
 * `Motion Control Module <module_motion_control/doc/index>`_: Provides service for position and velocity control.
-* `Profile Module <module_profile/doc/index>`_: Provides implementations of simple motion profiles.
 
 Examples
 --------
