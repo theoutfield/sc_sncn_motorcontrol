@@ -68,11 +68,12 @@ Modules
 	ADC Module <module_adc/doc/index>
 	Watchdog Module <module_watchdog/doc/index>
 	GPIO Server Module <module_gpio/doc/index>
-	BLDC Torque Control Module <module_bldc_torque_control_lib/doc/index>
+	BLDC Torque Control Library <lib_bldc_torque_control/doc/index>
 	Miscellaneous Module <module_misc/doc/index>
-	Control Loops Module <module_ctrl_loops/doc/index>
+	Controllers Implementation Module <module_controllers/doc/index>
 	Profile Module <module_profile/doc/index>
-	Controllers Library <module_controllers_lib/doc/index>
+	Motion Control Module <module_motion_control/doc/index>
+	Profile Module <module_profile/doc/index>
 	
 
 This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
@@ -89,11 +90,12 @@ This is the complete list of modules currently included in the **SOMANET Motor C
 * `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC on your IFM Drive board.
 * `Watchdog Module <module_watchdog/doc/index.html>`_: Driver for the Watchdog on your IFM DC board.
 * `GPIO Server Module <module_gpio/doc/index.html>`_: Contains a service to handle the external digital input/outputs of your board.
-* `BLDC Torque Control Module <module_bldc_torque_control_lib/doc/index>`_: Provides a service to control torque of BLDC motors.
+* `BLDC Torque Control Library <lib_bldc_torque_control/doc/index>`_: Provides a service to control torque of BLDC motors.
 * `Miscellaneous Module <module_misc/doc/index.html>`_: Contains constants and utilities used by the library.
-* `Control Loops Module <module_ctrl_loops/doc/index.html>`_: Provide services for position, velocity and control loops. 
+* `Controllers Implementation Module <module_controllers/doc/index>`_: Contains PID and NL controllers implementations. 
 * `Profile Module <module_profile/doc/index.html>`_: Contains software for profile ramps generation.
-* `Controllers Library <module_controllers_lib/doc/index>`_: Contains PID and NL controllers implementations.
+* `Motion Control Module <module_motion_control/doc/index>`_: Provides service for position and velocity control.
+* `Profile Module <module_profile/doc/index>`_: Provides implementations of simple motion profiles.
 
 Examples
 --------
