@@ -121,4 +121,4 @@ void init_position_velocity_control(interface PositionVelocityCtrlInterface clie
 void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_control_config,
                     interface MotorControlInterface client i_motorcontrol,
                     interface PositionVelocityCtrlInterface server i_position_control[3],
-                    client interface update_brake i_update_brake);
+                    client interface UpdateBrake i_update_brake);

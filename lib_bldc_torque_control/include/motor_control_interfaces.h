@@ -88,18 +88,11 @@ interface MotorControlInterface
     int get_velocity_actual();
 
     /**
-     * @brief Getter for actual position.
-     *
-     * @return Position actual.
-     */
-    int get_position_actual();
-
-    /**
      * @brief Set calib flag in the Motorcontrol service so it will alway set 0 as electrical angle
      *
      * @param flag 1 to activate, 0 to deactivate calibration
      */
-    int set_calib(int flag);
+    int get_offset();
 
     /**
      * @brief resets the state of motor controller from faulty to normal so that
@@ -110,47 +103,71 @@ interface MotorControlInterface
     UpstreamControlData update_upstream_control_data ();
 };
 
-
-interface update_brake
+/**
+ * @brief Interface type to communicate with PWM service and update brake parameters
+ */
+interface UpdateBrake
 {
     /**
      * @brief send the brake settings to pwm server
+     *
+     * @param   duty_start_brake    pwm duty which will be used to pull the brake out (activate the brake at startup)
+     * @param   duty_maintain_brake pwm duty which will be used to hold the brake after it is released
+     * @param   period_start_brake  period (in milliseconds) in which the brake is pulled for being released
+     *
+     * @return  void
      */
     void update_brake_control_data(int duty_start_brake, int duty_maintain_brake, int period_start_brake);
 };
-
 
 /**
  * @brief Interface type to communicate with the ADC Service.
  */
 interface ADCInterface
 {
+
+    /**
+     * @brief sends the required channel (to be sampled by ADC), and recieves its corresponding analogue input values
+     *
+     * @param   adc channel (to be sampled by ADC)
+     *
+     * @return  two integer values corresponding to the voltage of selected channel
+     */
     {int, int}  get_channel(unsigned short);
 
     /**
      * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
+     *
+     * @return  integer value corresponding to ACTIVE/INACTIVE enumeration
      */
     int status(void);
 
     /**
-     * @brief Get all measured parameters at once
-     * The parameters include:
-     *  - Current on Phase B
-     *  - Current on Phase C
-     *  - Vdc
-     *  - Torque
+     * @brief gets all adc measured parameters at once. In its most complete form, these parameters will be:
+     *
+     * @return seven integer values including:
+     *  - phase current B
+     *  - phase current C
+     *  - v_dc
+     *  - i_dc
+     *  - temperature
+     *  - analogue input a1
+     *  - analogue input a2
+     *  - analogue input b1
+     *  - analogue input b2
      *  - fault code
      */
     {int, int, int, int, int, int, int, int, int, int} get_all_measurements();
 
-
     /**
      * @brief Sets the protection limits including:
+     *
+     * @param
      *      - I_max
      *      - V_dc_max
      *      - V_dc_min
      */
-    void set_protection_limits_and_analogue_input_configs(int, int, int, int, int);
+    void set_protection_limits(int, int, int, int, int);
 
     /**
      * @brief Resets the fault state in adc service

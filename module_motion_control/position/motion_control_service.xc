@@ -85,7 +85,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 
 void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_ctrl_config,
         interface MotorControlInterface client i_motorcontrol,
-        interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
+        interface PositionVelocityCtrlInterface server i_position_control[3],client interface UpdateBrake i_update_brake)
 {
 
     // structure definition
@@ -727,7 +727,7 @@ break;
                 while(out_motorcontrol_config.commutation_angle_offset == -1)
                 {
                     out_motorcontrol_config = i_motorcontrol.get_config();
-                    out_motorcontrol_config.commutation_angle_offset = i_motorcontrol.set_calib(0);
+                    out_motorcontrol_config.commutation_angle_offset = i_motorcontrol.get_offset();
                     delay_milliseconds(50);//wait until offset is detected
                 }
 

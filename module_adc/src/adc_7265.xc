@@ -137,7 +137,7 @@ void adc_ad7265_service_demo(
         case iADC[int i].status() -> {int status}:
                 break;
 
-        case iADC[int i].set_protection_limits_and_analogue_input_configs(
+        case iADC[int i].set_protection_limits(
                 int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 break;
 
@@ -223,7 +223,7 @@ void adc_ad7265(
                 status = ACTIVE;
                 break;
 
-        case iADC[int i].set_protection_limits_and_analogue_input_configs(
+        case iADC[int i].set_protection_limits(
                 int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
                 i_max=i_max_in;
                 v_dc_max=v_dc_max_in*v_ratio_in;
