@@ -246,7 +246,7 @@ interface shared_memory_interface
     void write_gpio_output(unsigned int out_gpio);
 };
 
-interface update_pwm
+interface UpdatePWM
 {
     /**
      * @brief send the status of adc service to the client (ACTIVE/INACTIVE)

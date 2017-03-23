@@ -15,7 +15,7 @@ void motor_control_service( MotorcontrolConfig &motorcontrol_config,
                             client interface shared_memory_interface ?i_shared_memory,
                             interface WatchdogInterface client i_watchdog,
                             interface MotorControlInterface server i_motorcontrol[2],
-                            client interface update_pwm i_update_pwm,
+                            client interface UpdatePWM i_update_pwm,
                             int ifm_tile_usec);
 
 

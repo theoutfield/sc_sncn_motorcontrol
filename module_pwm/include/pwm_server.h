@@ -118,7 +118,7 @@ void pwm_config(PwmPorts &ports);
 void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, PWM server, with ADC synchronization
         unsigned motor_id, // Motor identifier
         PwmPorts &ports,
-        server interface update_pwm i_update_pwm,
+        server interface UpdatePWM i_update_pwm,
         server interface UpdateBrake i_update_brake,
         int ifm_tile_usec
 );

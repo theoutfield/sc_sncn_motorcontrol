@@ -43,7 +43,7 @@ int main(void) {
     interface shared_memory_interface i_shared_memory[3];
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
-    interface update_pwm i_update_pwm;
+    interface UpdatePWM i_update_pwm;
     // interface TuningInterface i_tuning;
 
     par

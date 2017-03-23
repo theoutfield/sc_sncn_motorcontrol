@@ -183,7 +183,7 @@ int main(void)
     interface shared_memory_interface i_shared_memory[2];
     /*********** Motor Test ***********/
     interface WatchdogInterface i_watchdog[2];
-    interface update_pwm i_update_pwm;
+    interface UpdatePWM i_update_pwm;
     interface UpdateBrake i_update_brake;
     interface ADCInterface i_adc[2];
     interface MotorControlInterface i_motorcontrol[2];
