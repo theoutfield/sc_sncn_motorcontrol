@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config.h>
+#include <motor_config_AMK_DT4.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -61,10 +61,10 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT           100     //maximum tolerable value of phase current (under abnormal conditions)
-#define PROTECTION_MAXIMUM_VOLTAGE        60      //maximum tolerable value of dc-bus voltage (under abnormal conditions)
-#define PROTECTION_MINIMUM_VOLTAGE        10      //minimum tolerable value of dc-bus voltave (under abnormal conditions)
-#define TEMP_BOARD_MAX  100     //maximum tolerable value of board temperature (optional)
+#define PROTECTION_MAXIMUM_CURRENT        100       //maximum tolerable value of phase current (under abnormal conditions)
+#define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
+#define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+#define TEMP_BOARD_MAX                    100       //maximum tolerable value of board temperature (optional)
 
 
 //////////////////////////////////////////////
@@ -80,7 +80,7 @@
 #define DC_BUS_VOLTAGE             20
 
 // COMMUTATION FREQUENCY [kHz]
-#define COMMUTATION_FRQ             24
+#define COMMUTATION_FRQ            24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
 #define COMMUTATION_ANGLE_OFFSET    300
@@ -152,9 +152,9 @@
 
 /*
  * set "POSITION_INTEGRAL_LIMIT" equal to:
- *      "MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
- *      "PEAK_SPEED"     in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
- *      "1000"           in case of using position controller in "NL_POSITION_CONTROLLER"               mode
+ *      "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
+ *      "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
+ *      "1000"                 in case of using position controller in "NL_POSITION_CONTROLLER"               mode
  */
 #define POSITION_INTEGRAL_LIMIT                 1000 //MAXIMUM_TORQUE
 
