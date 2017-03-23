@@ -24,6 +24,6 @@ interface TuningInterface
     void set_limit(int limit);
 };
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol, client interface TuningInterface ?i_tuning);
-void position_limiter(interface TuningInterface server i_tuning, client interface MotorcontrolInterface i_motorcontrol);
-void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol);
+void run_offset_tuning(int position_limit, interface MotorControlInterface client i_motorcontrol, client interface TuningInterface ?i_tuning);
+void position_limiter(interface TuningInterface server i_tuning, client interface MotorControlInterface i_motorcontrol);
+void demo_torque_control(interface MotorControlInterface client i_motorcontrol);

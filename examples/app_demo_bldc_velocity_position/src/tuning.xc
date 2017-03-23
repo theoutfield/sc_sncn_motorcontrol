@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
+int auto_offset(interface MotorControlInterface client i_motorcontrol)
 {
     printf("Sending offset_detection command ...\n");
     i_motorcontrol.set_offset_detection_enabled();

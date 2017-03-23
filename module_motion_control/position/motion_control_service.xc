@@ -20,7 +20,7 @@
 
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque,\
-        interface MotorcontrolInterface client i_motorcontrol)
+        interface MotorControlInterface client i_motorcontrol)
 {
     int steps = 8;
     const int brake_pull_period = 800;
@@ -84,7 +84,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 
 
 void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_ctrl_config,
-        interface MotorcontrolInterface client i_motorcontrol,
+        interface MotorControlInterface client i_motorcontrol,
         interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
 {
 

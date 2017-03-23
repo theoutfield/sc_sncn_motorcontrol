@@ -17,7 +17,7 @@
 #include <xscope.h>
 
 
-int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
+int auto_offset(interface MotorControlInterface client i_motorcontrol)
 {
     printf("Sending offset_detection command ...\n");
     i_motorcontrol.set_offset_detection_enabled();
@@ -37,7 +37,7 @@ int auto_offset(interface MotorcontrolInterface client i_motorcontrol)
     return offset;
 }
 
-void run_offset_tuning(int position_limit, interface MotorcontrolInterface client i_motorcontrol, client interface TuningInterface ?i_tuning)
+void run_offset_tuning(int position_limit, interface MotorControlInterface client i_motorcontrol, client interface TuningInterface ?i_tuning)
 {
 
     int period_us;     // torque generation period in micro-seconds
@@ -173,7 +173,7 @@ void run_offset_tuning(int position_limit, interface MotorcontrolInterface clien
  *
  *  As a demo, the motor generates an oscilating torque with a frequency range between 10 Hz  and  3 kHz.
  */
-void demo_torque_control(interface MotorcontrolInterface client i_motorcontrol)
+void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
 {
     int period_us;     // torque generation period in micro-seconds
     int pulse_counter; // number of generated pulses

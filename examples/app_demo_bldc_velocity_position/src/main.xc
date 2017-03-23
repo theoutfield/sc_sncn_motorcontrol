@@ -36,7 +36,7 @@ int main(void) {
     interface update_pwm i_update_pwm;
     interface update_brake i_update_brake;
     interface ADCInterface i_adc[2];
-    interface MotorcontrolInterface i_motorcontrol[2];
+    interface MotorControlInterface i_motorcontrol[2];
     interface PositionVelocityCtrlInterface i_position_control[3];
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];

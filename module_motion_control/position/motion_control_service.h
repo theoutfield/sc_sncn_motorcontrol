@@ -119,6 +119,6 @@ void init_position_velocity_control(interface PositionVelocityCtrlInterface clie
  * @param i_position_control Array of communication interfaces to handle up to 3 different clients.
  */
 void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_control_config,
-                    interface MotorcontrolInterface client i_motorcontrol,
+                    interface MotorControlInterface client i_motorcontrol,
                     interface PositionVelocityCtrlInterface server i_position_control[3],
                     client interface update_brake i_update_brake);

@@ -34,7 +34,7 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
-void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorcontrolInterface client i_motorcontrol) {
+void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorControlInterface client i_motorcontrol) {
     char status;
     int multiturn;
     unsigned int singleturn_filtered;
@@ -186,7 +186,7 @@ int main(void)
     interface update_pwm i_update_pwm;
     interface update_brake i_update_brake;
     interface ADCInterface i_adc[2];
-    interface MotorcontrolInterface i_motorcontrol[2];
+    interface MotorControlInterface i_motorcontrol[2];
 
 
     par

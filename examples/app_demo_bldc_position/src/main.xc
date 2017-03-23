@@ -110,7 +110,7 @@ int main(void)
 
     interface WatchdogInterface i_watchdog[2];
     interface ADCInterface i_adc[2];
-    interface MotorcontrolInterface i_motorcontrol[2];
+    interface MotorControlInterface i_motorcontrol[2];
     interface update_pwm i_update_pwm;
     interface update_brake i_update_brake;
     interface shared_memory_interface i_shared_memory[3];

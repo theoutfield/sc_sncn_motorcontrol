@@ -19,7 +19,7 @@ interface BrakeInterface {
 /**
  * @brief Interface type to communicate with the Motor Control Service.
  */
-interface MotorcontrolInterface
+interface MotorControlInterface
 {
     /**
      * @brief Sets brake status to ON (no movement) or OFF (possible to move)
