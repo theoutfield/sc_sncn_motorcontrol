@@ -119,6 +119,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
+    MotorcontrolConfig motorcontrol_config;
 
 
     //pos profiler
@@ -162,6 +163,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
 
+    motorcontrol_config = i_motorcontrol.get_config();
+    pos_velocity_ctrl_config.max_torque =motorcontrol_config.max_torque;
 
     pid_init(velocity_control_pid_param);
     if(pos_velocity_ctrl_config.velocity_kp<0)            pos_velocity_ctrl_config.velocity_kp=0;
@@ -681,7 +684,7 @@ break;
                 }
 
 
-                MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+                motorcontrol_config = i_motorcontrol.get_config();
 
                 printf("IFM_TILE_FREQUENCY IS : %d", motorcontrol_config.ifm_tile_usec);
 

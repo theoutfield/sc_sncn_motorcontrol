@@ -121,7 +121,7 @@
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [1,-1]
 #define POLARITY           1
 
-#define MOTION_PTOFILE_TYPE LINEAR
+#define MOTION_PROFILE_TYPE LINEAR
 
 // PROFILER LIMITS
 #define MAX_ACCELERATION        7000            // rpm/s
@@ -135,7 +135,6 @@
 //Limits
 #define MIN_POSITION_RANGE_LIMIT                     -0x7fffffff
 #define MAX_POSITION_RANGE_LIMIT                      0x7fffffff
-#define TORQUE_CONTROL_LIMIT                    MOTOR_MAXIMUM_TORQUE
 
 //Integrated Profiler
 #define ENABLE_PROFILER                         0
