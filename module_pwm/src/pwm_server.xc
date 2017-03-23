@@ -179,7 +179,7 @@ void pwm_config_general(PwmPortsGeneral &ports)
  */
 void pwm_service_general(
         PwmPortsGeneral &ports,
-        server interface update_pwm_general i_update_pwm
+        server interface UpdatePWMGeneral i_update_pwm
 )
 {
     unsigned short phase_a_defined=0x0000, phase_b_defined=0x0000, phase_c_defined=0x0000;

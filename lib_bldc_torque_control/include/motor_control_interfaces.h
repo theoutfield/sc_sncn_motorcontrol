@@ -257,7 +257,7 @@ interface UpdatePWM
     void safe_torque_off_enabled();
 };
 
-interface update_pwm_general
+interface UpdatePWMGeneral
 {
     /**
      * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
