@@ -15,6 +15,8 @@
 // MOTOR TYPE [BLDC_MOTOR, BDC_MOTOR]
 #define MOTOR_TYPE  BLDC_MOTOR
 
+#define MOTOR_MAX_SPEED               3000    // please update from the motor datasheet [rpm]
+
 // NUMBER OF POLE PAIRS (if applicable)
 #define MOTOR_POLE_PAIRS  7
 

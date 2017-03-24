@@ -148,8 +148,6 @@
 #define POSITION_Kd                             41000
 
 
-#define MAX_MOTOR_SPEED                         5000    // prefered value 3000, maximum value 5000 [rpm]
-
 /*
  * set "POSITION_INTEGRAL_LIMIT" equal to:
  *      "MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode

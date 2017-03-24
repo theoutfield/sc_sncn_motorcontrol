@@ -55,7 +55,7 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
     } else {
         profiler_config.ticks_per_turn  =                          SENSOR_1_RESOLUTION;
     }
-    profiler_config.max_velocity = MAX_MOTOR_SPEED;
+    profiler_config.max_velocity = MOTOR_MAX_SPEED;
     profiler_config.max_acceleration = MAX_ACCELERATION;
     profiler_config.max_deceleration = MAX_DECELERATION;
 
@@ -153,7 +153,7 @@ int main(void)
 
             motion_ctrl_config.min_pos_range_limit =                  MIN_POSITION_RANGE_LIMIT;
             motion_ctrl_config.max_pos_range_limit =                  MAX_POSITION_RANGE_LIMIT;
-            motion_ctrl_config.max_motor_speed =                      MAX_MOTOR_SPEED;
+            motion_ctrl_config.max_motor_speed =                      MOTOR_MAX_SPEED;
             motion_ctrl_config.polarity =                             POLARITY;
 
             motion_ctrl_config.enable_profiler =                      ENABLE_PROFILER;

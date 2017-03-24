@@ -59,7 +59,7 @@ int main(void) {
 
             motion_ctrl_config.min_pos_range_limit =                  MIN_POSITION_RANGE_LIMIT;
             motion_ctrl_config.max_pos_range_limit =                  MAX_POSITION_RANGE_LIMIT;
-            motion_ctrl_config.max_motor_speed =                      MAX_MOTOR_SPEED;
+            motion_ctrl_config.max_motor_speed =                      MOTOR_MAX_SPEED;
             motion_ctrl_config.polarity =                             POLARITY;
 
             motion_ctrl_config.enable_profiler =                      ENABLE_PROFILER;

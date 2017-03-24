@@ -16,6 +16,7 @@
 #define MOTOR_RATED_CURRENT           2330    //rated phase current [milli-Amp-RMS]
 #define MOTOR_MAXIMUM_TORQUE          210    //maximum value of torque which can be produced by motor [milli-Nm]
 #define MOTOR_RATED_TORQUE            70    //rated motor torque [milli-Nm].
+#define MOTOR_MAX_SPEED               3000    // please update from the motor datasheet [rpm]
 
 // OTHER PARAMETERS (do not change if not having access to the following parameter values)
 #define RATED_POWER             50     // rated power [W]
