@@ -14,8 +14,6 @@
  * @brief Structure definition for Profiler configuration.
  */
 typedef struct{
-    int polarity;
-
     //Position
     int velocity;   /**< Default velocity for Position Profile ramps generation [RPM]. */
     int max_position;    /**< Max. reachable position. */

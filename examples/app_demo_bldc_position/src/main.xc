@@ -47,7 +47,6 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
     int actual_position = 0;
 
     ProfilerConfig profiler_config;
-    profiler_config.polarity = POLARITY;
     profiler_config.max_position = MAX_POSITION_RANGE_LIMIT;
     profiler_config.min_position = MIN_POSITION_RANGE_LIMIT;
     //select resolution of sensor used for motion control
