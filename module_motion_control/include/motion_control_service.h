@@ -90,35 +90,46 @@ typedef struct {
 } MotionControlConfig;
 
 /**
- * @brief Interface type to communicate with the Position Control Service.
+ * @brief Interface type to communicate with the Motion Control Service.
  */
-interface PositionVelocityCtrlInterface{
-
-    void disable();
-
-    void enable_position_ctrl(int pos_control_mode_);
-//    void set_position(int in_target_position);
-//    void set_position_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
-//    void set_position_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
-//    void set_position_limits(int position_min_limit, int position_max_limit);
-
-    void enable_velocity_ctrl(void);
-//    void set_velocity(int in_target_velocity);
-//    void set_offset_torque(int offset_torque_);
-//    void set_velocity_pid_coefficients(int int8_Kp, int int8_Ki, int int8_Kd);
-//    void set_velocity_pid_limits(int int16_P_error_limit, int int16_I_error_limit, int int16_itegral_limit, int int16_cmd_limit);
-//    void set_velocity_limits(int velocity_min_limit, int velocity_max_limit);
+interface PositionVelocityCtrlInterface
+{
 
     /**
-     * @brief (internal) Settings to suppress the overshoot
+     * @brief disables the motion control service
+     */
+    void disable();
+
+    /**
+     * @brief enables the position controler
      *
+     * @param mode-> position control mode
+     */
+    void enable_position_ctrl(int mode);
+
+    /**
+     * @brief enables the velocity controller
+     */
+    void enable_velocity_ctrl(void);
+
+    /**
+     * @brief sets the moment of inertia of the load
+     *
+     * @param j-> moment of intertia
      */
     void set_j(int j);
 
+    /**
+     * @brief enables the torque controller
+     */
     void enable_torque_ctrl();
-    void set_torque(int in_target_torque);
-//    void set_torque_limits(int torque_min_limit, int torque_max_limit);
 
+    /**
+     * @brief sets the reference value of torque in torque control mode
+     *
+     * @param target_torque -> torque reference in mNm
+     */
+    void set_torque(int target_torque);
 
     /**
      * @brief Getter for current configuration used by the Service.
@@ -150,10 +161,14 @@ interface PositionVelocityCtrlInterface{
 
     /**
      * @brief Sets brake status to ON (no movement) or OFF (possible to move)
+     *
+     * @param brake_status -> release if 1, block if 0
      */
     void set_brake_status(int brake_status);
 
-
+    /**
+     * @brief updates the new brake configuration in pwm service
+     */
     void update_brake_configuration();
 
     /**
@@ -166,11 +181,24 @@ interface PositionVelocityCtrlInterface{
      */
     void reset_motorcontrol_faults();
 
+    /**
+     * @brief getter of actual position
+     */
     int get_position();
 
+    /**
+     * @brief getter of actual velocity
+     */
     int get_velocity();
 
-    UpstreamControlData update_control_data(DownstreamControlData downstream_control_data_);
+    /**
+     * @brief responsible for data communication between torque controller and higher level controllers
+     *
+     * @param downstreamcontroldata -> structure including the commands for torque/velocity/position controller
+     *
+     * @return structure of type UpstreamControlData -> structure including the actual parameters (measurements, ...) from torque controller to higher controlling levels
+     */
+    UpstreamControlData update_control_data(DownstreamControlData downstreamcontroldata);
 };
 
 
@@ -180,20 +208,25 @@ interface PositionVelocityCtrlInterface{
  *        starting to perform position control.
  *
  * @param i_position_control Communication interface to the Position Control Service.
+ *
+ * @return void
  */
 void init_position_velocity_control(interface PositionVelocityCtrlInterface client i_position_control);
 
 /**
- * @brief Service to perform a Position PID Control Loop on top of a Motor Control Service.
+ * @brief Service to perform torque, velocity or position control.
  *        You will need a Motor Control Stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
- * @param position_ctrl_config Configuration for the Position Control Service.
- * @param i_motorcontrol Communication interface to the Motor Control Service.
- * @param i_position_control Array of communication interfaces to handle up to 3 different clients.
- */
+ * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
+ * @param i_motorcontrol Communication  interface to the Motor Control Service.
+ * @param i_position_control[3]         array of PositionVelocityCtrlInterfaces to communicate with upto 3 clients
+ * @param i_update_brake                Interface to update brake configuration in PWM service
+ *
+ * @return void
+ *  */
 void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_control_config,
                     interface MotorControlInterface client i_motorcontrol,
                     interface PositionVelocityCtrlInterface server i_position_control[3],
