@@ -83,7 +83,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
-void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_ctrl_config,
+void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_config,
         interface MotorcontrolInterface client i_motorcontrol,
         interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
 {
@@ -125,10 +125,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
     //pos profiler
     posProfilerParam profiler_param;
     profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
-    profiler_param.v_max = (double)(pos_velocity_ctrl_config.max_speed_profiler);
-    profiler_param.a_max = (double)(pos_velocity_ctrl_config.max_acceleration_profiler);
-    profiler_param.torque_rate_max = (double)(pos_velocity_ctrl_config.max_torque_rate_profiler);
-    profiler_param.resolution = (double)(pos_velocity_ctrl_config.resolution);
+    profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
+    profiler_param.a_max = (double)(motion_ctrl_config.max_acceleration_profiler);
+    profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
+    profiler_param.resolution = (double)(motion_ctrl_config.resolution);
 
     float acceleration_monitor = 0;
 
@@ -137,15 +137,15 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
     int max_position_orig, min_position_orig;
     int max_position, min_position;
     //reverse position limits when polarity is inverted
-    if (pos_velocity_ctrl_config.polarity == -1)
+    if (motion_ctrl_config.polarity == -1)
     {
-        min_position = -pos_velocity_ctrl_config.max_pos_range_limit;
-        max_position = -pos_velocity_ctrl_config.min_pos_range_limit;
+        min_position = -motion_ctrl_config.max_pos_range_limit;
+        max_position = -motion_ctrl_config.min_pos_range_limit;
     }
     else
     {
-        min_position = pos_velocity_ctrl_config.min_pos_range_limit;
-        max_position = pos_velocity_ctrl_config.max_pos_range_limit;
+        min_position = motion_ctrl_config.min_pos_range_limit;
+        max_position = motion_ctrl_config.max_pos_range_limit;
     }
 
     //brake
@@ -161,32 +161,32 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
 
     // initialization
     nl_position_control_reset(nl_pos_ctrl);
-    nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+    nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
 
     motorcontrol_config = i_motorcontrol.get_config();
-    pos_velocity_ctrl_config.max_torque =motorcontrol_config.max_torque;
+    motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
 
     pid_init(velocity_control_pid_param);
-    if(pos_velocity_ctrl_config.velocity_kp<0)            pos_velocity_ctrl_config.velocity_kp=0;
-    if(pos_velocity_ctrl_config.velocity_kp>100000000)    pos_velocity_ctrl_config.velocity_kp=100000000;
-    if(pos_velocity_ctrl_config.velocity_ki<0)            pos_velocity_ctrl_config.velocity_ki=0;
-    if(pos_velocity_ctrl_config.velocity_ki>100000000)    pos_velocity_ctrl_config.velocity_ki=100000000;
-    if(pos_velocity_ctrl_config.velocity_kd<0)            pos_velocity_ctrl_config.velocity_kd=0;
-    if(pos_velocity_ctrl_config.velocity_kd>100000000)    pos_velocity_ctrl_config.velocity_kd=100000000;
+    if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
+    if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+    if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
+    if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+    if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
+    if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
     pid_set_parameters(
-            (double)pos_velocity_ctrl_config.velocity_kp, (double)pos_velocity_ctrl_config.velocity_ki,
-            (double)pos_velocity_ctrl_config.velocity_kd, (double)pos_velocity_ctrl_config.velocity_integral_limit,
+            (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
+            (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
             POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
     pid_init(position_control_pid_param);
-    if(pos_velocity_ctrl_config.position_kp<0)            pos_velocity_ctrl_config.position_kp=0;
-    if(pos_velocity_ctrl_config.position_kp>100000000)    pos_velocity_ctrl_config.position_kp=100000000;
-    if(pos_velocity_ctrl_config.position_ki<0)            pos_velocity_ctrl_config.position_ki=0;
-    if(pos_velocity_ctrl_config.position_ki>100000000)    pos_velocity_ctrl_config.position_ki=100000000;
-    if(pos_velocity_ctrl_config.position_kd<0)            pos_velocity_ctrl_config.position_kd=0;
-    if(pos_velocity_ctrl_config.position_kd>100000000)    pos_velocity_ctrl_config.position_kd=100000000;
-    pid_set_parameters((double)pos_velocity_ctrl_config.position_kp, (double)pos_velocity_ctrl_config.position_ki,
-            (double)pos_velocity_ctrl_config.position_kd, (double)pos_velocity_ctrl_config.position_integral_limit,
+    if(motion_ctrl_config.position_kp<0)            motion_ctrl_config.position_kp=0;
+    if(motion_ctrl_config.position_kp>100000000)    motion_ctrl_config.position_kp=100000000;
+    if(motion_ctrl_config.position_ki<0)            motion_ctrl_config.position_ki=0;
+    if(motion_ctrl_config.position_ki>100000000)    motion_ctrl_config.position_ki=100000000;
+    if(motion_ctrl_config.position_kd<0)            motion_ctrl_config.position_kd=0;
+    if(motion_ctrl_config.position_kd>100000000)    motion_ctrl_config.position_kd=100000000;
+    pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki,
+            (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
             POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
 
@@ -222,7 +222,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
                 // torque control
                 if(torque_enable_flag == 1)
                 {
-                    if(pos_velocity_ctrl_config.enable_profiler==1)
+                    if(motion_ctrl_config.enable_profiler==1)
                     {
                         torque_ref_in_k = torque_profiler(((double)(downstream_control_data.torque_cmd)), torque_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
                         torque_ref_in_k_1n = torque_ref_in_k;
@@ -236,13 +236,13 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    if(pos_velocity_ctrl_config.enable_profiler==1)
+                    if(motion_ctrl_config.enable_profiler==1)
                     {
                         velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
                         velocity_ref_in_k_1n = velocity_ref_in_k;
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                     }
-                    else if(pos_velocity_ctrl_config.enable_profiler==0)
+                    else if(motion_ctrl_config.enable_profiler==0)
                     {
                         velocity_ref_in_k = velocity_ref_k;
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
@@ -264,7 +264,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
                         }
                     }
                     //profiler enabled, set target position
-                    else if (pos_velocity_ctrl_config.enable_profiler)
+                    else if (motion_ctrl_config.enable_profiler)
                     {
                         position_ref_in_k = pos_profiler((
                                 (double) downstream_control_data.position_cmd),
@@ -291,8 +291,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
                         velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                        if(velocity_ref_k> pos_velocity_ctrl_config.max_motor_speed) velocity_ref_k = pos_velocity_ctrl_config.max_motor_speed;
-                        if(velocity_ref_k<-pos_velocity_ctrl_config.max_motor_speed) velocity_ref_k =-pos_velocity_ctrl_config.max_motor_speed;
+                        if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
+                        if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
                         torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                     }
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
@@ -341,12 +341,12 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
                 //test if we moved back inside the original limits, then restore the position limits
                 else if (position_limit_reached == 1 && upstream_control_data.position < max_position_orig && upstream_control_data.position > min_position_orig)
                 {
-                    if (pos_velocity_ctrl_config.polarity == -1) {
-                        min_position = -pos_velocity_ctrl_config.max_pos_range_limit;
-                        max_position = -pos_velocity_ctrl_config.min_pos_range_limit;
+                    if (motion_ctrl_config.polarity == -1) {
+                        min_position = -motion_ctrl_config.max_pos_range_limit;
+                        max_position = -motion_ctrl_config.min_pos_range_limit;
                     } else {
-                        min_position = pos_velocity_ctrl_config.min_pos_range_limit;
-                        max_position = pos_velocity_ctrl_config.max_pos_range_limit;
+                        min_position = motion_ctrl_config.min_pos_range_limit;
+                        max_position = motion_ctrl_config.max_pos_range_limit;
                     }
                     position_limit_reached = 0;
                 }
@@ -354,10 +354,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity
                 torque_ref_k += (double)(downstream_control_data.offset_torque);
 
                 //torque limit check
-                if(torque_ref_k > pos_velocity_ctrl_config.max_torque)
-                    torque_ref_k = pos_velocity_ctrl_config.max_torque;
-                else if (torque_ref_k < (-pos_velocity_ctrl_config.max_torque))
-                    torque_ref_k = (-pos_velocity_ctrl_config.max_torque);
+                if(torque_ref_k > motion_ctrl_config.max_torque)
+                    torque_ref_k = motion_ctrl_config.max_torque;
+                else if (torque_ref_k < (-motion_ctrl_config.max_torque))
+                    torque_ref_k = (-motion_ctrl_config.max_torque);
 
                 i_motorcontrol.set_torque(((int)(torque_ref_k)));
 
@@ -390,9 +390,9 @@ break;
         case i_position_control[int i].disable():
 
                 i_motorcontrol.set_brake_status(0);
-                if (pos_velocity_ctrl_config.brake_shutdown_delay != 0 && position_enable_flag == 1)
+                if (motion_ctrl_config.brake_shutdown_delay != 0 && position_enable_flag == 1)
                 {
-                    brake_shutdown_counter = pos_velocity_ctrl_config.brake_shutdown_delay;
+                    brake_shutdown_counter = motion_ctrl_config.brake_shutdown_delay;
                 }
                 else
                 {
@@ -422,15 +422,15 @@ break;
 
                 //reset pid
                 nl_position_control_reset(nl_pos_ctrl);
-                nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                 pid_reset(position_control_pid_param);
 
                 //special brake release
-                if (pos_velocity_ctrl_config.special_brake_release != 0)
+                if (motion_ctrl_config.special_brake_release != 0)
                 {
                     special_brake_release_counter = 0;
                     special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
+                    special_brake_release_torque = (motion_ctrl_config.special_brake_release*motion_ctrl_config.max_torque)/100;
                 }
 
                 //enable motorcontrol and release brake
@@ -455,11 +455,11 @@ break;
                 pid_reset(velocity_control_pid_param);
 
                 //special brake release
-                if (pos_velocity_ctrl_config.special_brake_release != 0)
+                if (motion_ctrl_config.special_brake_release != 0)
                 {
                     special_brake_release_counter = 0;
                     special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
+                    special_brake_release_torque = (motion_ctrl_config.special_brake_release*motion_ctrl_config.max_torque)/100;
                 }
 
                 //enable motorcontrol and release brake
@@ -481,11 +481,11 @@ break;
                 downstream_control_data.offset_torque = 0;
 
                 //special brake release
-                if (pos_velocity_ctrl_config.special_brake_release != 0)
+                if (motion_ctrl_config.special_brake_release != 0)
                 {
                     special_brake_release_counter = 0;
                     special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (pos_velocity_ctrl_config.special_brake_release*pos_velocity_ctrl_config.max_torque)/100;
+                    special_brake_release_torque = (motion_ctrl_config.special_brake_release*motion_ctrl_config.max_torque)/100;
                 }
 
                 //enable motorcontrol and release brake
@@ -500,7 +500,7 @@ break;
 
         case i_position_control[int i].set_position_velocity_control_config(MotionControlConfig in_config):
                 //check if we need to update max/min pos limits
-                if (in_config.max_pos_range_limit != pos_velocity_ctrl_config.max_pos_range_limit || in_config.min_pos_range_limit != pos_velocity_ctrl_config.min_pos_range_limit || in_config.polarity != pos_velocity_ctrl_config.polarity)
+                if (in_config.max_pos_range_limit != motion_ctrl_config.max_pos_range_limit || in_config.min_pos_range_limit != motion_ctrl_config.min_pos_range_limit || in_config.polarity != motion_ctrl_config.polarity)
                 {
                     //reverse position limits when polarity is inverted
                     if (in_config.polarity == -1)
@@ -515,42 +515,42 @@ break;
                     }
                 }
 
-                pos_velocity_ctrl_config = in_config;
+                motion_ctrl_config = in_config;
 
                 pid_init(velocity_control_pid_param);
-                if(pos_velocity_ctrl_config.velocity_kp<0)            pos_velocity_ctrl_config.velocity_kp=0;
-                if(pos_velocity_ctrl_config.velocity_kp>100000000)    pos_velocity_ctrl_config.velocity_kp=100000000;
-                if(pos_velocity_ctrl_config.velocity_ki<0)            pos_velocity_ctrl_config.velocity_ki=0;
-                if(pos_velocity_ctrl_config.velocity_ki>100000000)    pos_velocity_ctrl_config.velocity_ki=100000000;
-                if(pos_velocity_ctrl_config.velocity_kd<0)            pos_velocity_ctrl_config.velocity_kd=0;
-                if(pos_velocity_ctrl_config.velocity_kd>100000000)    pos_velocity_ctrl_config.velocity_kd=100000000;
+                if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
+                if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+                if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
+                if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+                if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
+                if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
                 pid_set_parameters(
-                        (double)pos_velocity_ctrl_config.velocity_kp, (double)pos_velocity_ctrl_config.velocity_ki,
-                        (double)pos_velocity_ctrl_config.velocity_kd, (double)pos_velocity_ctrl_config.velocity_integral_limit,
+                        (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
+                        (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
                         POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
 
                 pid_init(position_control_pid_param);
-                if(pos_velocity_ctrl_config.position_kp<0)            pos_velocity_ctrl_config.position_kp=0;
-                if(pos_velocity_ctrl_config.position_kp>100000000)    pos_velocity_ctrl_config.position_kp=100000000;
-                if(pos_velocity_ctrl_config.position_ki<0)            pos_velocity_ctrl_config.position_ki=0;
-                if(pos_velocity_ctrl_config.position_ki>100000000)    pos_velocity_ctrl_config.position_ki=100000000;
-                if(pos_velocity_ctrl_config.position_kd<0)            pos_velocity_ctrl_config.position_kd=0;
-                if(pos_velocity_ctrl_config.position_kd>100000000)    pos_velocity_ctrl_config.position_kd=100000000;
-                pid_set_parameters((double)pos_velocity_ctrl_config.position_kp, (double)pos_velocity_ctrl_config.position_ki,
-                        (double)pos_velocity_ctrl_config.position_kd, (double)pos_velocity_ctrl_config.position_integral_limit,
+                if(motion_ctrl_config.position_kp<0)            motion_ctrl_config.position_kp=0;
+                if(motion_ctrl_config.position_kp>100000000)    motion_ctrl_config.position_kp=100000000;
+                if(motion_ctrl_config.position_ki<0)            motion_ctrl_config.position_ki=0;
+                if(motion_ctrl_config.position_ki>100000000)    motion_ctrl_config.position_ki=100000000;
+                if(motion_ctrl_config.position_kd<0)            motion_ctrl_config.position_kd=0;
+                if(motion_ctrl_config.position_kd>100000000)    motion_ctrl_config.position_kd=100000000;
+                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki,
+                        (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
                         POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
-                profiler_param.a_max = (double)(pos_velocity_ctrl_config.max_acceleration_profiler);
-                profiler_param.v_max = (double)(pos_velocity_ctrl_config.max_speed_profiler);
-                profiler_param.torque_rate_max = (double)(pos_velocity_ctrl_config.max_torque_rate_profiler);
+                profiler_param.a_max = (double)(motion_ctrl_config.max_acceleration_profiler);
+                profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
+                profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
 
                 nl_position_control_reset(nl_pos_ctrl);
-                nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
         case i_position_control[int i].get_position_velocity_control_config() ->  MotionControlConfig out_config:
-                out_config = pos_velocity_ctrl_config;
+                out_config = motion_ctrl_config;
                 break;
 
         case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
@@ -558,7 +558,7 @@ break;
                 downstream_control_data = downstream_control_data_in;
 
                 //reverse position/velocity feedback/commands when polarity is inverted
-                if (pos_velocity_ctrl_config.polarity == -1)
+                if (motion_ctrl_config.polarity == -1)
                 {
                     //feeedback
                     upstream_control_data_out.position = -upstream_control_data_out.position;
@@ -575,16 +575,16 @@ break;
                 else if (downstream_control_data.position_cmd < min_position)
                     downstream_control_data.position_cmd = min_position;
                 //velocity limit
-                if (downstream_control_data.velocity_cmd > pos_velocity_ctrl_config.max_motor_speed)
-                    downstream_control_data.velocity_cmd = pos_velocity_ctrl_config.max_motor_speed;
-                else if (downstream_control_data.velocity_cmd < -pos_velocity_ctrl_config.max_motor_speed)
-                    downstream_control_data.velocity_cmd = -pos_velocity_ctrl_config.max_motor_speed;
+                if (downstream_control_data.velocity_cmd > motion_ctrl_config.max_motor_speed)
+                    downstream_control_data.velocity_cmd = motion_ctrl_config.max_motor_speed;
+                else if (downstream_control_data.velocity_cmd < -motion_ctrl_config.max_motor_speed)
+                    downstream_control_data.velocity_cmd = -motion_ctrl_config.max_motor_speed;
 
                 break;
 
         case i_position_control[int i].set_j(int j):
-                pos_velocity_ctrl_config.moment_of_inertia = j;
-                nl_position_control_set_parameters(nl_pos_ctrl, pos_velocity_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                motion_ctrl_config.moment_of_inertia = j;
+                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
         case i_position_control[int i].set_torque(int in_target_torque):
@@ -592,14 +592,14 @@ break;
                 break;
 
         case i_position_control[int i].get_position() -> int out_position:
-                if (pos_velocity_ctrl_config.polarity == -1)
+                if (motion_ctrl_config.polarity == -1)
                     out_position = -upstream_control_data.position;
                 else
                     out_position = upstream_control_data.position;
                 break;
 
         case i_position_control[int i].get_velocity() -> int out_velocity:
-                if (pos_velocity_ctrl_config.polarity == -1)
+                if (motion_ctrl_config.polarity == -1)
                     out_velocity = -upstream_control_data.velocity;
                 else
                     out_velocity = upstream_control_data.velocity;
@@ -647,31 +647,31 @@ break;
                 int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
 
 
-                if(pos_velocity_ctrl_config.dc_bus_voltage <= 0)
+                if(motion_ctrl_config.dc_bus_voltage <= 0)
                 {
                     printstr("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
                     break;
                 }
 
-                if(pos_velocity_ctrl_config.pull_brake_voltage > (pos_velocity_ctrl_config.dc_bus_voltage*1000))
+                if(motion_ctrl_config.pull_brake_voltage > (motion_ctrl_config.dc_bus_voltage*1000))
                 {
                     printstr("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
                     break;
                 }
 
-                if(pos_velocity_ctrl_config.pull_brake_voltage < 0)
+                if(motion_ctrl_config.pull_brake_voltage < 0)
                 {
                     printstr("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
                     break;
                 }
 
-                if(pos_velocity_ctrl_config.hold_brake_voltage > (pos_velocity_ctrl_config.dc_bus_voltage*1000))
+                if(motion_ctrl_config.hold_brake_voltage > (motion_ctrl_config.dc_bus_voltage*1000))
                 {
                     printstr("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
                     break;
                 }
 
-                if(pos_velocity_ctrl_config.hold_brake_voltage < 0)
+                if(motion_ctrl_config.hold_brake_voltage < 0)
                 {
                     printstr("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
                     break;
@@ -705,15 +705,15 @@ break;
                     error = 1;
                 }
 
-                duty_start_brake    = (duty_divider * pos_velocity_ctrl_config.pull_brake_voltage)/(1000*pos_velocity_ctrl_config.dc_bus_voltage);
+                duty_start_brake    = (duty_divider * motion_ctrl_config.pull_brake_voltage)/(1000*motion_ctrl_config.dc_bus_voltage);
                 if(duty_start_brake < duty_min) duty_start_brake = duty_min;
                 if(duty_start_brake > duty_max) duty_start_brake = duty_max;
 
-                duty_maintain_brake = (duty_divider * pos_velocity_ctrl_config.hold_brake_voltage)/(1000*pos_velocity_ctrl_config.dc_bus_voltage);
+                duty_maintain_brake = (duty_divider * motion_ctrl_config.hold_brake_voltage)/(1000*motion_ctrl_config.dc_bus_voltage);
                 if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
                 if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
 
-                period_start_brake  = (pos_velocity_ctrl_config.pull_brake_time * 1000)/(motorcontrol_config.ifm_tile_usec);
+                period_start_brake  = (motion_ctrl_config.pull_brake_time * 1000)/(motorcontrol_config.ifm_tile_usec);
 
                 i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 

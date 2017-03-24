@@ -128,37 +128,37 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
 }
 
 
-void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, MotionControlConfig &pos_velocity_ctrl_config, int control_loop_period)
+void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, MotionControlConfig &motion_ctrl_config, int control_loop_period)
 {
     //************************************************
     // set parameters of position controller structure
-    nl_pos_ctrl.w_max= (((double)(pos_velocity_ctrl_config.max_motor_speed))*2.00*3.1415)/60;
-    nl_pos_ctrl.resolution = ((double)(pos_velocity_ctrl_config.resolution));
+    nl_pos_ctrl.w_max= (((double)(motion_ctrl_config.max_motor_speed))*2.00*3.1415)/60;
+    nl_pos_ctrl.resolution = ((double)(motion_ctrl_config.resolution));
     nl_pos_ctrl.k_fb = (nl_pos_ctrl.resolution)/(2.00*3.1416);
     nl_pos_ctrl.k_m  = ( (double)(1) )/1000.00;
-    nl_pos_ctrl.moment_of_inertia   = ((double)(pos_velocity_ctrl_config.moment_of_inertia));
+    nl_pos_ctrl.moment_of_inertia   = ((double)(motion_ctrl_config.moment_of_inertia));
     nl_pos_ctrl.ts_position = ((double)(control_loop_period))/1000000.00; //s
 
     //check if the PID parameters are in range
-    if(0<=pos_velocity_ctrl_config.position_kp && pos_velocity_ctrl_config.position_kp<=100000000)
-        nl_pos_ctrl.kp =  ((double)(pos_velocity_ctrl_config.position_kp));
-    if(0<=pos_velocity_ctrl_config.position_ki && pos_velocity_ctrl_config.position_ki<=100000000)
-        nl_pos_ctrl.ki =  ((double)(pos_velocity_ctrl_config.position_ki));
-    if(0<=pos_velocity_ctrl_config.position_kd && pos_velocity_ctrl_config.position_kd<=100000000)
-        nl_pos_ctrl.kd =  ((double)(pos_velocity_ctrl_config.position_kd));
+    if(0<=motion_ctrl_config.position_kp && motion_ctrl_config.position_kp<=100000000)
+        nl_pos_ctrl.kp =  ((double)(motion_ctrl_config.position_kp));
+    if(0<=motion_ctrl_config.position_ki && motion_ctrl_config.position_ki<=100000000)
+        nl_pos_ctrl.ki =  ((double)(motion_ctrl_config.position_ki));
+    if(0<=motion_ctrl_config.position_kd && motion_ctrl_config.position_kd<=100000000)
+        nl_pos_ctrl.kd =  ((double)(motion_ctrl_config.position_kd));
 
     nl_pos_ctrl.constant_gain = 2/nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/= nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/=(nl_pos_ctrl.k_fb * nl_pos_ctrl.k_m);
 
-    nl_pos_ctrl.integral_limit_pos = ((double)(pos_velocity_ctrl_config.position_integral_limit))/1000.00;
+    nl_pos_ctrl.integral_limit_pos = ((double)(motion_ctrl_config.position_integral_limit))/1000.00;
 
     nl_pos_ctrl.kd *= nl_pos_ctrl.integral_limit_pos;
     nl_pos_ctrl.kd /=100000.00;
 
     nl_pos_ctrl.calculated_j = (nl_pos_ctrl.kd*10000000)/(nl_pos_ctrl.constant_gain*0.216);
 
-    nl_pos_ctrl.t_max=((double)(pos_velocity_ctrl_config.max_torque));
+    nl_pos_ctrl.t_max=((double)(motion_ctrl_config.max_torque));
 }
 
 

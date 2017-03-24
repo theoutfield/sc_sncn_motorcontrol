@@ -34,7 +34,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
     DownstreamControlData downstream_control_data;
-    MotionControlConfig pos_velocity_ctrl_config;
+    MotionControlConfig motion_ctrl_config;
 
     MotorcontrolConfig motorcontrol_config;
     int proper_sensor_polarity=0;
@@ -95,14 +95,14 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
         case 'p':
                 downstream_control_data.offset_torque = 0;
                 downstream_control_data.position_cmd = value;
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                 switch(mode_2)
                 {
                 //direct command with profile
                 case 'p':
                         //bug: the first time after one p# command p0 doesn't use the profile; only the way back to zero
-                        pos_velocity_ctrl_config.enable_profiler = 1;
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        motion_ctrl_config.enable_profiler = 1;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         printf("Go to %d with profile\n", value);
                         i_position_control.update_control_data(downstream_control_data);
                         break;
@@ -112,16 +112,16 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         {
                         //with profile
                         case 'p':
-                                pos_velocity_ctrl_config.enable_profiler = 1;
+                                motion_ctrl_config.enable_profiler = 1;
                                 printf("position cmd: %d to %d with profile\n", value, -value);
                                 break;
                         //without profile
                         default:
-                                pos_velocity_ctrl_config.enable_profiler = 0;
+                                motion_ctrl_config.enable_profiler = 0;
                                 printf("position cmd: %d to %d\n", value, -value);
                                 break;
                         }
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = value;
                         i_position_control.update_control_data(downstream_control_data);
@@ -134,8 +134,8 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         break;
                 //direct command
                 default:
-                        pos_velocity_ctrl_config.enable_profiler = 0;
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        motion_ctrl_config.enable_profiler = 0;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         printf("Go to %d\n", value);
                         i_position_control.update_control_data(downstream_control_data);
                         break;
@@ -146,7 +146,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
         case 'v':
                 downstream_control_data.offset_torque = 0;
                 downstream_control_data.velocity_cmd = value;
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                 switch(mode_2)
                 {
                 //step command (forward and backward)
@@ -157,16 +157,16 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         {
                         //with profile
                         case 'p':
-                                pos_velocity_ctrl_config.enable_profiler = 1;
+                                motion_ctrl_config.enable_profiler = 1;
                                 printf("velocity cmd: %d to %d with profile\n", value, -value);
                                 break;
                         //without profile
                         default:
-                                pos_velocity_ctrl_config.enable_profiler = 0;
+                                motion_ctrl_config.enable_profiler = 0;
                                 printf("velocity cmd: %d to %d\n", value, -value);
                                 break;
                         }
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         i_position_control.update_control_data(downstream_control_data);
                         delay_milliseconds(1000);
                         downstream_control_data.velocity_cmd = -value;
@@ -194,7 +194,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
         case 't':
                 downstream_control_data.offset_torque = 0;
                 downstream_control_data.torque_cmd = value;
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                 switch(mode_2)
                 {
                 //step command (forward and backward)
@@ -204,16 +204,16 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         {
                         //with profile
                         case 'p':
-                                pos_velocity_ctrl_config.enable_profiler = 1;
+                                motion_ctrl_config.enable_profiler = 1;
                                 printf("torque cmd: %d to %d with profile\n", value, -value);
                                 break;
                         //without profile
                         default:
-                                pos_velocity_ctrl_config.enable_profiler = 0;
+                                motion_ctrl_config.enable_profiler = 0;
                                 printf("torque cmd: %d to %d\n", value, -value);
                                 break;
                         }
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         i_position_control.update_control_data(downstream_control_data);
                         delay_milliseconds(1000);
                         downstream_control_data.torque_cmd = -value;
@@ -224,16 +224,16 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         break;
                 case 'p':
                         downstream_control_data.torque_cmd = value;
-                        pos_velocity_ctrl_config.enable_profiler = 1;
+                        motion_ctrl_config.enable_profiler = 1;
                         printf("torque cmd: %d with profile\n", value);
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         i_position_control.update_control_data(downstream_control_data);
                         break;
                 //direct command
                 default:
-                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                        pos_velocity_ctrl_config.enable_profiler = 0;
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config.enable_profiler = 0;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.torque_cmd = value;
                         i_position_control.update_control_data(downstream_control_data);
@@ -251,59 +251,59 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
 
         //pid coefficients
         case 'k':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                 switch(mode_2)
                 {
                 case 'p': //position
                         switch(mode_3)
                         {
                         case 'p':
-                                pos_velocity_ctrl_config.position_kp = value;
+                                motion_ctrl_config.position_kp = value;
                                 break;
                         case 'i':
-                                pos_velocity_ctrl_config.position_ki = value;
+                                motion_ctrl_config.position_ki = value;
                                 break;
                         case 'd':
-                                pos_velocity_ctrl_config.position_kd = value;
+                                motion_ctrl_config.position_kd = value;
                                 break;
                         case 'l':
-                                pos_velocity_ctrl_config.position_integral_limit = value;
+                                motion_ctrl_config.position_integral_limit = value;
                                 break;
                         case 'j':
-                                pos_velocity_ctrl_config.moment_of_inertia = value;
+                                motion_ctrl_config.moment_of_inertia = value;
                                 break;
                         default:
                                 break;
                         }
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                         printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
-                                pos_velocity_ctrl_config.position_kp, pos_velocity_ctrl_config.position_ki, pos_velocity_ctrl_config.position_kd,
-                                pos_velocity_ctrl_config.moment_of_inertia, pos_velocity_ctrl_config.position_integral_limit);
+                                motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
+                                motion_ctrl_config.moment_of_inertia, motion_ctrl_config.position_integral_limit);
                         break;
 
                 case 'v': //velocity
                         switch(mode_3)
                         {
                         case 'p':
-                                pos_velocity_ctrl_config.velocity_kp = value;
+                                motion_ctrl_config.velocity_kp = value;
                                 break;
                         case 'i':
-                                pos_velocity_ctrl_config.velocity_ki = value;
+                                motion_ctrl_config.velocity_ki = value;
                                 break;
                         case 'd':
-                                pos_velocity_ctrl_config.velocity_kd = value;
+                                motion_ctrl_config.velocity_kd = value;
                                 break;
                         case 'l':
-                                pos_velocity_ctrl_config.velocity_integral_limit = value;
+                                motion_ctrl_config.velocity_integral_limit = value;
                                 break;
                         default:
                                 break;
                         }
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", pos_velocity_ctrl_config.velocity_kp, pos_velocity_ctrl_config.velocity_ki,
-                                pos_velocity_ctrl_config.velocity_kd, pos_velocity_ctrl_config.velocity_integral_limit);
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki,
+                                motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
                         break;
 
                 default:
@@ -311,12 +311,12 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         break;
                 }
 
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                 break;
 
         //limits
         case 'L':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                 switch(mode_2)
                 {
                 //max position limit
@@ -324,50 +324,50 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                     switch(mode_3)
                     {
                     case 'u':
-                        pos_velocity_ctrl_config.max_pos_range_limit = value;
+                        motion_ctrl_config.max_pos_range_limit = value;
                         break;
                     case 'l':
-                        pos_velocity_ctrl_config.min_pos_range_limit = value;
+                        motion_ctrl_config.min_pos_range_limit = value;
                         break;
                     default:
-                        pos_velocity_ctrl_config.max_pos_range_limit = value;
-                        pos_velocity_ctrl_config.min_pos_range_limit = -value;
+                        motion_ctrl_config.max_pos_range_limit = value;
+                        motion_ctrl_config.min_pos_range_limit = -value;
                         break;
                     }
                     break;
 
                 //max velocity limit
                 case 'v':
-                        pos_velocity_ctrl_config.max_motor_speed = value;
+                        motion_ctrl_config.max_motor_speed = value;
                         break;
 
                 //max torque limit
                 case 't':
-                        pos_velocity_ctrl_config.max_torque = value;
+                        motion_ctrl_config.max_torque = value;
                         break;
 
                 default:
                         break;
                 }
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
-                printf("pos_max:%d pos_min:%d v_max:%d torq_max:%d\n", pos_velocity_ctrl_config.max_pos_range_limit, pos_velocity_ctrl_config.min_pos_range_limit, pos_velocity_ctrl_config.max_motor_speed,
-                        pos_velocity_ctrl_config.max_torque);
+                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                printf("pos_max:%d pos_min:%d v_max:%d torq_max:%d\n", motion_ctrl_config.max_pos_range_limit, motion_ctrl_config.min_pos_range_limit, motion_ctrl_config.max_motor_speed,
+                        motion_ctrl_config.max_torque);
                 break;
 
         //change direction/polarity of the movement in position/velocity control
         case 'd':
-            pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-            if (pos_velocity_ctrl_config.polarity == -1)
+            motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+            if (motion_ctrl_config.polarity == -1)
             {
-                pos_velocity_ctrl_config.polarity = 1;
+                motion_ctrl_config.polarity = 1;
                 printf("normal movement polarity\n");
             }
             else
             {
-                pos_velocity_ctrl_config.polarity = -1;
+                motion_ctrl_config.polarity = -1;
                 printf("inverted movement polarity\n");
             }
-            i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+            i_position_control.set_position_velocity_control_config(motion_ctrl_config);
             break;
 
         //enable
@@ -442,25 +442,25 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
 
         //jerk limitation (profiler parameters)
         case 'j':
-                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                 switch(mode_2)
                 {
                 case 'a':
-                        pos_velocity_ctrl_config.max_acceleration_profiler = value;
+                        motion_ctrl_config.max_acceleration_profiler = value;
                         break;
                 case 'v':
-                        pos_velocity_ctrl_config.max_speed_profiler = value;
+                        motion_ctrl_config.max_speed_profiler = value;
                         break;
                 case 't':
-                        pos_velocity_ctrl_config.max_torque_rate_profiler = value;
+                        motion_ctrl_config.max_torque_rate_profiler = value;
                         break;
 
                 default:
                         break;
                 }
-                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                 printf("profiler settings: \n");
-                printf("acceleration: %d [rpm/s], velocity: %d [rpm], torque_rate: %d [mNm/s] \n",pos_velocity_ctrl_config.max_acceleration_profiler, pos_velocity_ctrl_config.max_speed_profiler, pos_velocity_ctrl_config.max_torque_rate_profiler);
+                printf("acceleration: %d [rpm/s], velocity: %d [rpm], torque_rate: %d [mNm/s] \n",motion_ctrl_config.max_acceleration_profiler, motion_ctrl_config.max_speed_profiler, motion_ctrl_config.max_torque_rate_profiler);
                 break;
 
         //auto offset tuning
@@ -495,44 +495,44 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 switch(mode_2)
                 {
                 case 's':
-                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                        pos_velocity_ctrl_config.special_brake_release = value;
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config.special_brake_release = value;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         break;
 
                 case 'v'://brake voltage configure
-                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                         switch(mode_3)
                         {
                         case 'n':// nominal voltage of dc-bus
                                 // set
-                                pos_velocity_ctrl_config.dc_bus_voltage=value;
-                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                                motion_ctrl_config.dc_bus_voltage=value;
+                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                                 // check
-                                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                                 i_position_control.update_brake_configuration();
-                                printf("nominal voltage of dc-bus is %d Volts \n", pos_velocity_ctrl_config.dc_bus_voltage);
+                                printf("nominal voltage of dc-bus is %d Volts \n", motion_ctrl_config.dc_bus_voltage);
                                 break;
 
                         case 'p':// pull voltage for releasing the brake at startup
                                 //set
-                                pos_velocity_ctrl_config.pull_brake_voltage=value;
-                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                                motion_ctrl_config.pull_brake_voltage=value;
+                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                                 // check
-                                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                                 i_position_control.update_brake_configuration();
-                                printf("brake pull voltage is %d milli-Volts \n", pos_velocity_ctrl_config.pull_brake_voltage);
+                                printf("brake pull voltage is %d milli-Volts \n", motion_ctrl_config.pull_brake_voltage);
                                 break;
 
                         case 'h':// hold voltage for holding the brake after it is pulled
                                 //set
-                                pos_velocity_ctrl_config.hold_brake_voltage=value;
-                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                                motion_ctrl_config.hold_brake_voltage=value;
+                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                                 // check
-                                pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
-                                i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                                 i_position_control.update_brake_configuration();
-                                printf("brake hold voltage is %d milli-Volts\n", pos_velocity_ctrl_config.hold_brake_voltage);
+                                printf("brake hold voltage is %d milli-Volts\n", motion_ctrl_config.hold_brake_voltage);
                                 break;
                         default:
                                 break;
@@ -541,12 +541,12 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
 
                 case 't'://set pull time
                         //set
-                        pos_velocity_ctrl_config.pull_brake_time=value;
-                        i_position_control.set_position_velocity_control_config(pos_velocity_ctrl_config);
+                        motion_ctrl_config.pull_brake_time=value;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                         // check
-                        pos_velocity_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
                         i_position_control.update_brake_configuration();
-                        printf("brake pull time is %d milli-seconds \n", pos_velocity_ctrl_config.pull_brake_time);
+                        printf("brake pull time is %d milli-seconds \n", motion_ctrl_config.pull_brake_time);
                         break;
 
                 default:
