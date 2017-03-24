@@ -3,10 +3,9 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <control_loops_common.h>
-
 #pragma once
 
+#include <motion_control_service.h>
 
 /**
  * @brief Structure type to set the parameters of the PID controller.

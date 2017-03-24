@@ -5,7 +5,7 @@
  */
 
 #include <controllers.h>
-#include <control_loops_common.h>
+#include <motion_control_service.h>
 #include <math.h>
 #include <xscope.h>
 
