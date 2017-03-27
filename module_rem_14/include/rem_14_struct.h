@@ -46,7 +46,7 @@ typedef enum {
 } REM_14_Noise;
 
 /**
- * @brief Type for .
+ * @brief Type for REM 14 Hysteresis.
  */
 typedef enum {
     REM_14_HYS_11BIT_3LSB = 0,  /**< Hysteresis for 11 Bit ABI Resolution: 3 LSB */
