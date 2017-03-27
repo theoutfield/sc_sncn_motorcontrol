@@ -33,7 +33,7 @@
  * which depend on how many slaves there are and how they're connected.
  *
  */
-typedef struct spi_master_interface
+typedef struct
 {
     clock ?blk1; /**< Clock block to generate the SPI clock on the clock port */
     clock ?blk2; /**< Second clock block, it's controlled by the SPI clock port and is to clock the mosi/miso ports */

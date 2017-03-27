@@ -10,7 +10,7 @@ SPI Master Module
 
 This module provides functions to read and write data using the SPI protocol.
 
-Those functions are used in the SPI encoders :ref:`REM 14 Encoder Module <module_rem_14>` itself used by :ref:`REM 16MT Encoder Module <module_spi_master` to read and write data from the encoders.
+Those functions are used in the SPI encoders :ref:`REM 14 Encoder Module <module_rem_14>` itself used by :ref:`REM 16MT Encoder Module <module_rem_16mt>` to read and write data from the encoders.
 
 The functions should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
