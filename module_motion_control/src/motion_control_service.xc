@@ -274,7 +274,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                             velocity_enable_flag =0;
                             position_enable_flag =0;
                             i_motorcontrol.set_torque_control_disabled();
-                            i_motorcontrol.set_safe_torque_off_enabled();
+//                            i_motorcontrol.set_safe_torque_off_enabled();
                         }
                     }
                     //profiler enabled, set target position
@@ -331,7 +331,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                     velocity_enable_flag = 0;
                     i_motorcontrol.set_brake_status(0);
                     i_motorcontrol.set_torque_control_disabled();
-                    i_motorcontrol.set_safe_torque_off_enabled();
+//                    i_motorcontrol.set_safe_torque_off_enabled();
                     printstr("*** Position Limit Reached ***\n");
                     //store original limits, with threshold if possible
                     if (position_limit_reached == 0)
@@ -414,7 +414,7 @@ break;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
                     i_motorcontrol.set_torque_control_disabled();
-                    i_motorcontrol.set_safe_torque_off_enabled();
+//                    i_motorcontrol.set_safe_torque_off_enabled(); //FIXME: check if we need to use safe_torque_off here
                 }
 
                 break;
