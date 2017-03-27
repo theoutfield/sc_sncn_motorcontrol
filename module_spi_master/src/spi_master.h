@@ -24,7 +24,7 @@
 #ifdef __XC__
 
 
-/** Structure containing the resources required for the SPI master interface.
+/** @brief Structure containing the resources required for the SPI master interface.
  *
  * It consists of two clock blocks, two 8bit buffered output ports for MOSI and SCLK,
  * and one 8bit input port for MISO.
@@ -35,11 +35,11 @@
  */
 typedef struct spi_master_interface
 {
-    clock ?blk1;
-    clock ?blk2;
-    out buffered port:8 * movable mosi;
-    out buffered port:8 * movable sclk;
-    in buffered port:8 * movable miso;
+    clock ?blk1; /**< Clock block to generate the SPI clock on the clock port */
+    clock ?blk2; /**< Second clock block, it's controlled by the SPI clock port and is to clock the mosi/miso ports */
+    out buffered port:8 * movable mosi; /**< Master out - Slave in port */
+    out buffered port:8 * movable sclk; /**< Master clock port */
+    in buffered port:8 * movable miso;  /**< Master in - Slave out port */
 } spi_master_interface;
 
 #ifdef __spi_conf_h_exists__
@@ -47,7 +47,7 @@ typedef struct spi_master_interface
 #endif
 
 #ifndef DEFAULT_SPI_CLOCK_DIV
-/** This constant defines the default clock divider, which the application can
+/** @brief This constant defines the default clock divider, which the application can
  * use when initializing the SPI master.
  *
  * See **spi_clock_div** parameter of spi_master_init() in
@@ -59,7 +59,7 @@ typedef struct spi_master_interface
 #endif
 
 #ifndef SPI_MASTER_MODE
-/** This constant defines the SPI mode that the master operates in.
+/** @brief This constant defines the SPI mode that the master operates in.
  *
  * See :ref:`sec_spi_modes` for the modes supported by this master, and
  * the clock polarity and phase used for each.
@@ -68,7 +68,7 @@ typedef struct spi_master_interface
 #endif
 
 #ifndef SPI_MASTER_SD_CARD_COMPAT
-/** This constant defines the behaviour of the SPI master while receiving data.
+/** @brief This constant defines the behaviour of the SPI master while receiving data.
  *
  * When defined as '1' the SPI master will drive the MOSI line high before
  * clocking data in from the slave on the MISO line, as required by SD cards.
@@ -76,12 +76,12 @@ typedef struct spi_master_interface
 #define SPI_MASTER_SD_CARD_COMPAT 0
 #endif
 
-/** Configure ports and clocks, clearing port buffers.
+/** @brief Configure ports and clocks, clearing port buffers.
  *
  * Must be called before any SPI data input or output functions are used.
  *
- * \param spi_if         Resources for the SPI interface being initialized
- * \param spi_clock_div  SPI clock frequency is fref/(2*spi_clock_div),
+ * @param spi_if         Resources for the SPI interface being initialized
+ * @param spi_clock_div  SPI clock frequency is fref/(2*spi_clock_div),
  *                       where freq defaults to 100MHz
  *
  * \note  Example: To achieve an sclk frequency of 25MHz, a divider of
@@ -92,102 +92,102 @@ typedef struct spi_master_interface
  */
 void spi_master_init(spi_master_interface &spi_if, unsigned spi_clock_div);
 
-/** Stops the clocks running.
+/** @brief Stops the clocks running.
  *
  * Should be called when all SPI input and output is completed.
  *
- * \param spi_if  Resources for the SPI interface being shutdown
+ * @param spi_if  Resources for the SPI interface being shutdown
  *
  */
 void spi_master_shutdown(spi_master_interface &spi_if);
 
-/** Receive one byte.
+/** @brief Receive one byte.
  *
  * Most significant bit first order.
  * Big endian byte order.
  *
- * \param spi_if  Resources for the SPI interface
- * \return        The received byte
+ * @param spi_if  Resources for the SPI interface
+ * @return        The received byte
  *
  */
 unsigned char spi_master_in_byte(spi_master_interface &spi_if);
 
-/** Receive one short.
+/** @brief Receive one short.
  *
  * Most significant bit first order.
  * Big endian byte order.
  *
- * \param spi_if  Resources for the SPI interface
- * \return        The received short
+ * @param spi_if  Resources for the SPI interface
+ * @return        The received short
  *
  */
 unsigned short spi_master_in_short(spi_master_interface &spi_if);
 
-/** Receive one word.
+/** @brief Receive one word.
  *
  * Most significant bit first order.
  * Big endian byte order.
  *
- * \param spi_if  Resources for the SPI interface
- * \return        The received word
+ * @param spi_if  Resources for the SPI interface
+ * @return        The received word
  *
  */
 unsigned int spi_master_in_word(spi_master_interface &spi_if);
 
-/** Receive specified number of bytes.
+/** @brief Receive specified number of bytes.
  *
  * Most significant bit first order.
  * Big endian byte order.
  *
- * \param spi_if     Resources for the SPI interface
- * \param buffer     The array the received data will be written to
- * \param num_bytes  The number of bytes to read from the SPI interface,
+ * @param spi_if     Resources for the SPI interface
+ * @param buffer     The array the received data will be written to
+ * @param num_bytes  The number of bytes to read from the SPI interface,
  *                   this must not be greater than the size of buffer
  *
  */
 void spi_master_in_buffer(spi_master_interface &spi_if, unsigned char buffer[], int num_bytes);
 
-/** Transmit one byte.
+/** @brief Transmit one byte.
  *
  * Most significant bit first order.
  * Big endian byte order.
  *
- * \param spi_if  Resources for the SPI interface
- * \param data    The byte to transmit
+ * @param spi_if  Resources for the SPI interface
+ * @param data    The byte to transmit
  *
  */
 void spi_master_out_byte(spi_master_interface &spi_if, unsigned char data);
 
-/** Transmit one short.
+/** @brief Transmit one short.
  *
  * Most significant bit first order.
  * Big endian byte order.
  *
- * \param spi_if  Resources for the SPI interface
- * \param data    The short to transmit
+ * @param spi_if  Resources for the SPI interface
+ * @param data    The short to transmit
  *
  */
 void spi_master_out_short(spi_master_interface &spi_if, unsigned short data);
 
-/** Transmit one word.
+/** @brief Transmit one word.
  *
  * Most significant bit first order.
  * Big endian byte order.
  *
- * \param spi_if  Resources for the SPI interface
- * \param data    The word to transmit
+ * @param spi_if  Resources for the SPI interface
+ * @param data    The word to transmit
  *
  */
 void spi_master_out_word(spi_master_interface &spi_if, unsigned int data);
 
-/** Transmit specified number of bytes.
+/** @brief Transmit specified number of bytes.
  *
  * Most significant bit first order.
  * Big endian byte order.
  *
- * \param spi_if     Resources for the SPI interface
- * \param buffer     The array of data to transmit
- * \param num_bytes  The number of bytes to write to the SPI interface,
+ * @param spi_if     Resources for the SPI interface
+ * @param buffer     The array of data to transmit
+ * @param num_bytes  The number of bytes to write to the SPI interface,
  *                   this must not be greater than the size of buffer
  *
  */
