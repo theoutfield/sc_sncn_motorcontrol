@@ -18,7 +18,7 @@ your SOMANET IFM device.
 
   `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_serial_encoder>`_
 
-.. image:: images/core-diagram-qe-interface.png
+.. image:: images/core-diagram-serial-encoder.png
    :width: 50%
 
 
