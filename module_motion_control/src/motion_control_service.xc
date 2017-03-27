@@ -20,7 +20,7 @@
 
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque,\
-        interface MotorcontrolInterface client i_motorcontrol)
+        interface MotorControlInterface client i_motorcontrol)
 {
     int steps = 8;
     const int brake_pull_period = 800;
@@ -83,9 +83,23 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
+/**
+ * @brief Service to perform torque, velocity or position control.
+ *        You will need a Motor Control Stack running parallel to this Service,
+ *        have a look at Motor Control Service for more information.
+ *
+ *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
+ *
+ * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
+ * @param i_motorcontrol Communication  interface to the Motor Control Service.
+ * @param i_position_control[3]         array of PositionVelocityCtrlInterfaces to communicate with upto 3 clients
+ * @param i_update_brake                Interface to update brake configuration in PWM service
+ *
+ * @return void
+ *  */
 void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_config,
-        interface MotorcontrolInterface client i_motorcontrol,
-        interface PositionVelocityCtrlInterface server i_position_control[3],client interface update_brake i_update_brake)
+        interface MotorControlInterface client i_motorcontrol,
+        interface PositionVelocityCtrlInterface server i_position_control[3],client interface UpdateBrake i_update_brake)
 {
 
     // structure definition
@@ -727,7 +741,7 @@ break;
                 while(out_motorcontrol_config.commutation_angle_offset == -1)
                 {
                     out_motorcontrol_config = i_motorcontrol.get_config();
-                    out_motorcontrol_config.commutation_angle_offset = i_motorcontrol.set_calib(0);
+                    out_motorcontrol_config.commutation_angle_offset = i_motorcontrol.get_offset();
                     delay_milliseconds(50);//wait until offset is detected
                 }
 

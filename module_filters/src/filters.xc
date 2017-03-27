@@ -7,8 +7,15 @@
 #include <filters.h>
 #include <stdio.h>
 
-
-/* initialization for fixed length digital filter (moving average filter) */
+/**
+ * @brief Initialize Moving Average Filter Configuration.
+ *
+ * @param filter_buffer Reference to the samples array to initialize.
+ * @param index Reference to the index variable to initialize.
+ * @param filter_length Defines the length of the filter.
+ *
+ *@return void
+ */
 void init_filter(int filter_buffer[], int &index, int filter_length)
 {
     int i;
@@ -18,7 +25,16 @@ void init_filter(int filter_buffer[], int &index, int filter_length)
     index = 0;
 }
 
-/* fixed length digital filter (moving average filter) */
+/**
+ * @brief Get moving average filtered output.
+ *
+ * @param filter_buffer Samples to filter.
+ * @param index Index of the filter.
+ * @param filter_length Defines the length of the filter.
+ * @param input New sample.
+ *
+ * @return Filtered output.
+ */
 int filter(int filter_buffer[], int &index, int filter_length, int input)
 {
     int filter_output = 0;
@@ -36,32 +52,14 @@ int filter(int filter_buffer[], int &index, int filter_length, int input)
     return filter_output;
 }
 
-
-int _modified_internal_filter(int filter_buffer[], int &index, int filter_length, int input)
-{
-    int i, j = 0, mod, filter_output =0;
-    filter_buffer[index] = input;
-    index = (index+1)%(filter_length);
-
-    for (i=0; i<filter_length; i++) {
-        mod = (index - 1 - j)%filter_length;
-        if (mod<0) {
-            mod = filter_length + mod;
-        }
-        filter_output += filter_buffer[mod];
-        j++;
-    }
-    return filter_output;
-}
-
-
-
 /**
- * @brief setting the cut-off frequency and intializing the parameters of the first-order-LP-filters.
+ * @brief Intializing the parameters of the first-order-LP-filters.
  *
  * @param f_c   -> cut-off frequency in Hz.
  * @param T_s   -> sampling-time in us (microseconds).
  * @param param -> filter parameters structure
+ *
+ * @return void
  */
 void first_order_LP_filter_init(int f_c, int T_s, FirstOrderLPfilterParam &param )
 {
@@ -76,14 +74,13 @@ void first_order_LP_filter_init(int f_c, int T_s, FirstOrderLPfilterParam &param
     param.b0 = omega_T/(1.00+omega_T);
 }
 
-
 /**
  * @brief filtering the signal x_k.
- * @time needed to be processed: 9us when the 100MHz teil is fully loaded.
  *
- * @param output ->  the filtered signal.
  * @param x_k    ->  the input signal.
  * @param param  ->  filter parameters.
+ *
+ * @return       ->  filtered value
  */
 double first_order_LP_filter_update(double *x_k, FirstOrderLPfilterParam &param)
 {
@@ -93,15 +90,14 @@ double first_order_LP_filter_update(double *x_k, FirstOrderLPfilterParam &param)
     return param.y_k;
 }
 
-
-
 /**
- * @brief setting the cut-off frequency and intializing the parameters of the second-order-LP-filters.
- * @time needed to be processed: 14us when the 100MHz teil is fully loaded.
+ * @brief Intializing the parameters of the second-order-LP-filters.
  *
  * @param f_c   -> cut-off frequency in Hz.
  * @param T_s   -> sampling-time in us (microseconds).
- * @param param -> filter parameters structure
+ * @param param -> filter parameters structure.
+ *
+ * @return      -> filtered value
  */
 void second_order_LP_filter_init(int f_c, int T_s, SecondOrderLPfilterParam &param )
 {
@@ -132,11 +128,11 @@ void second_order_LP_filter_init(int f_c, int T_s, SecondOrderLPfilterParam &par
 
 /**
  * @brief filtering the signal x_k.
- * @time needed to be processed: 20us when the 100MHz teil is fully loaded.
  *
- * @param output ->  the filtered signal.
  * @param x_k    ->  the input signal.
  * @param param  ->  filter parameters.
+ *
+ * @return       ->  filtered value
  */
 double second_order_LP_filter_update(double *x_k, SecondOrderLPfilterParam &param)
 {
@@ -148,11 +144,13 @@ double second_order_LP_filter_update(double *x_k, SecondOrderLPfilterParam &para
 }
 
 /**
- * @brief setting the cut-off frequency and intializing the parameters of the third-order-LP-filters.
+ * @brief Intializing the parameters of the third-order-LP-filters.
  *
  * @param f_c   -> cut-off frequency in Hz.
  * @param T_s   -> sampling-time in us (microseconds).
- * @param param -> filter parameters structure
+ * @param param -> filter parameters structure.
+ *
+ * @return      -> filtered value
  */
 void third_order_LP_filter_init(int f_c, int T_s, ThirdOrderLPfilterParam &param )
 {
@@ -187,11 +185,11 @@ void third_order_LP_filter_init(int f_c, int T_s, ThirdOrderLPfilterParam &param
 
 /**
  * @brief filtering the signal x_k.
- * @time needed to be processed: ?? us when the 100MHz teil is fully loaded.
  *
- * @param output ->  the filtered signal.
  * @param x_k    ->  the input signal.
  * @param param  ->  filter parameters.
+ *
+ * @return       ->  filtered value
  */
 double third_order_LP_filter_update(double *x_k, ThirdOrderLPfilterParam &param)
 {

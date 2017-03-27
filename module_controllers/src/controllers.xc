@@ -5,7 +5,7 @@
  */
 
 #include <controllers.h>
-#include <control_loops_common.h>
+#include <motion_control_service.h>
 #include <math.h>
 #include <xscope.h>
 
@@ -23,10 +23,12 @@ int sign_function(float a)
         return 1;
 }
 
-
 /**
  * @brief intializing the parameters of the PID controller.
+ *
  * @param the parameters of the controller
+ *
+ * @return void
  */
 void pid_init(PIDparam &param)
 {
@@ -46,7 +48,9 @@ void pid_init(PIDparam &param)
  * @param input, D parameter
  * @param input, Integral limit
  * @param input, sample-time in us (microseconds).
- * @param the parameters of the PID controller
+ * @param structure including the parameters of the PID controller
+ *
+ * @return void
  */
 void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDparam &param)
 {
@@ -59,11 +63,13 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
 
 /**
  * @brief updating the PID controller.
- * @param output, control command
- * @param input, setpoint
- * @param input, feedback
- * @param input, sample-time in us (microseconds).
- * @param the parameters of the PID controller
+ * @param desired_value, the reference set point
+ * @param actual_value, the actual value (measurement)
+ * @param T_s, sampling time
+ * @param param, the structure containing the pid controller parameters
+ *
+ *
+ * @return the output of pid controller
  */
 double pid_update(double desired_value, double actual_value, int T_s, PIDparam &param)
 {
@@ -82,10 +88,11 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
     return cmd;
 }
 
-
 /**
  * @brief resetting the parameters of the PID controller.
  * @param the parameters of the controller
+ *
+ * @return void
  */
 void pid_reset(PIDparam &param)
 {
@@ -93,6 +100,12 @@ void pid_reset(PIDparam &param)
     param.integral = 0;
 }
 
+/**
+ * @brief resetting the parameters of the nonlinear position controller
+ * @param the parameters of the controller
+ *
+ * @return void
+ */
 void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
 {
     //************************************
@@ -128,6 +141,15 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
 }
 
 
+/**
+ * @brief resetting the parameters of nonlinear position controller.
+ *
+ * @param nl_pos_ctrl, structure containing the parameters of the controller
+ * @param pos_velocity_ctrl_config, structure containing the parameters of non-linear position controller
+ * @param control_loop_period in us
+ *
+ * @return void
+ */
 void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, MotionControlConfig &motion_ctrl_config, int control_loop_period)
 {
     //************************************************
@@ -161,12 +183,15 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, M
     nl_pos_ctrl.t_max=((double)(motion_ctrl_config.max_torque));
 }
 
-
 /**
- * @brief updating the output of position controller with update.
- * @param output, torque reference in milli-Nm
- * @param input, setpoint
- * @param input, feedback
+ * @brief updating the output of position controller.
+ *
+ * @param nl_pos_ctrl, structure containing the parameters of position controller
+ * @param position_ref_k_, the reference value of position
+ * @param position_sens_k_1_, actual position value in previous sampling
+ * @param position_sens_k_, actual position value in current sampling
+ *
+ * @return the reference value of required torque (in milli-Nm)
  */
 int update_nl_position_control(
         NonlinearPositionControl &nl_pos_ctrl,
@@ -277,11 +302,12 @@ int update_nl_position_control(
 
 /**
  * @brief updating the position reference profiler
- * @param output, profiled position calculated for the next step
- * @param input, target position
- * @param input, profiled position calculated in one step ago
- * @param input, profiled position calculated in two steps ago
- * @param the parameters of the position reference profiler
+ * @param   pos_target, target position
+ * @param   pos_k_1n, profiled position calculated in one step ago
+ * @param   pos_k_2n, profiled position calculated in two steps ago
+ * @param   pos_profiler_param parameters of the position reference profiler
+ *
+ * @return  profiled position calculated for the next step
  */
 float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfilerParam pos_profiler_param)
 {
@@ -359,7 +385,16 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
     return pos_k;
 }
 
-
+/**
+ * @brief updating the velocity reference profiler
+ *
+ * @param   velocity_ref, target velocity
+ * @param   velocity_ref_in_k_1n, profiled velocity calculated in one step
+ * @param   profiler_param, structure containing the profiler parameters
+ * @param   velocity_control_loop, the execution cycle of velocity controller (us)
+ *
+ * @return  profiled velocity calculated for the next step
+ */
 double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posProfilerParam profiler_param, int position_control_loop)
 {
 
@@ -385,7 +420,16 @@ double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posPr
     return velocity_ref_in_k;
 }
 
-
+/**
+ * @brief updating the torque reference profiler
+ *
+ * @param   torque_ref, target torque
+ * @param   torque_ref_in_k_1n, profiled torque calculated in one step
+ * @param   profiler_param, structure containing the profiler parameters
+ * @param   torque_control_loop, the execution cycle of torque controller (us)
+ *
+ * @return  profiled torque calculated for the next step
+ */
 double torque_profiler(double torque_ref, double torque_ref_in_k_1n, posProfilerParam profiler_param, int position_control_loop)
 {
 

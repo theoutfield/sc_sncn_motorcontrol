@@ -27,7 +27,7 @@ FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
  *
  * @return void
  */
-void send_pwm_values(client interface update_pwm_general i_update_pwm)
+void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 {
     timer t;
     unsigned int time=0x00000000;
@@ -90,7 +90,7 @@ void send_pwm_values(client interface update_pwm_general i_update_pwm)
 int main(void) {
 
     interface WatchdogInterface i_watchdog[2];
-    interface update_pwm_general i_update_pwm;
+    interface UpdatePWMGeneral i_update_pwm;
 
     par
     {

@@ -1,8 +1,8 @@
 /*
  * motor_control_interfaces.h
  *
- *  Created on: Aug 2, 2016
- *      Author: ramin
+ *  Created on: March, 23, 2017
+ *      Author: Synapticon
  */
 
 
@@ -11,152 +11,185 @@
 
 #include <motor_control_structures.h>
 
-interface BrakeInterface {
-    void set_brake(int enable);
-    int get_brake();
-};
 
 /**
- * @brief Interface type to communicate with the Motor Control Service.
+ * @brief Interface type to communicate with Motor Control Service.
  */
-interface MotorcontrolInterface
+interface MotorControlInterface
 {
     /**
-     * @brief Sets brake status to ON (no movement) or OFF (possible to move)
+     * @brief Sets brake status to ON/OFF
+     *
+     * @param brake_status      integer value to activate/deactivate brake (0 => deactive, 1=> active)
+     *
+     * @return void
      */
     void set_brake_status(int brake_status);
 
     /**
      * @brief Enables the torque control
+     *
+     * @return void
      */
     void set_torque_control_enabled();
 
     /**
      * @brief Disables the torque control
+     *
+     * @return void
      */
     void set_torque_control_disabled();
 
     /**
      * @brief Enables the offset detection process
+     *
+     * @return void
      */
     void set_offset_detection_enabled();
 
     /**
      * @brief Enables the safe-torque-off mode
+     *
+     * @return void
      */
     void set_safe_torque_off_enabled();
 
     /**
      * @brief Shows if sensor polarity is true or wrong.
-     * If the returned value is 0, then sensor polarity is wrong (sensor polarity should be changed, or motor phases should be flipped)
-     * If the returned value is 1, then sensor polarity is true.
+     *
+     * @return Integer value (if 0, then sensor polarity is wrong)
      */
     int get_sensor_polarity_state();
 
     /**
      * @brief Sets offset value
+     *
+     * @param offset_value  integer value which will be used as commutation angle offset
+     *
+     * @return void
      */
     void set_offset_value(int offset_value);
 
     /**
-     * @brief Sets torque target value when FOC is used.
+     * @brief Sets torque target value.
      *
-     * @param torque_sp Torque [-4096:4096].
+     * @param integer value torque_sp in milli-Nm
+     *
+     * @return void
      */
     void set_torque(int torque_sp);
 
     /**
-     * @brief Setter for the configuration used by the Service.
-     *        Note that not all configuration parameters can be changed on runtime.
+     * @brief   Sets MotorcontrolConfig parameters which are used by motor_control_service.
+     *          Note that not all configuration parameters can be changed on runtime.
      *
-     * @param in_config New Service configuration.
+     * @param   in_config MotorcontroConfig structure which will be passed to motor_control_service
+     *
+     * @return  void
      */
     void set_config(MotorcontrolConfig in_config);
 
     /**
-     * @brief Getter for current configuration used by the Service.
+     * @brief Gets MotorcontrolConfig parameters which are used by motor_control_service.
      *
-     * @return Current configuration.
+     * @return MotorcontroConfig structure which will be passed to motor_control_service
      */
     MotorcontrolConfig get_config();
 
     /**
-     * @brief Getter for actual velocity.
+     * @brief   Gets the offset value from motor_control_service
      *
-     * @return Velocity actual.
+     * @return  calculated offset vlaue (in case offset value is not calculated yet, the returned value will be -1).
      */
-    int get_velocity_actual();
+    int get_offset();
 
     /**
-     * @brief Getter for actual position.
+     * @brief   resets the state of motor controller from faulty to normal so that the application can again be restarted.
      *
-     * @return Position actual.
-     */
-    int get_position_actual();
-
-    /**
-     * @brief Set calib flag in the Motorcontrol service so it will alway set 0 as electrical angle
-     *
-     * @param flag 1 to activate, 0 to deactivate calibration
-     */
-    int set_calib(int flag);
-
-    /**
-     * @brief resets the state of motor controller from faulty to normal so that
-     *        the application can again be restarted.
+     * @return  void
      */
     void reset_faults();
 
     UpstreamControlData update_upstream_control_data ();
 };
 
-
-interface update_brake
+/**
+ * @brief Interface type to communicate with PWM service and update brake parameters
+ */
+interface UpdateBrake
 {
     /**
      * @brief send the brake settings to pwm server
+     *
+     * @param   duty_start_brake    pwm duty which will be used to pull the brake out (activate the brake at startup)
+     * @param   duty_maintain_brake pwm duty which will be used to hold the brake after it is released
+     * @param   period_start_brake  period (in milliseconds) in which the brake is pulled for being released
+     *
+     * @return  void
      */
     void update_brake_control_data(int duty_start_brake, int duty_maintain_brake, int period_start_brake);
 };
-
 
 /**
  * @brief Interface type to communicate with the ADC Service.
  */
 interface ADCInterface
 {
+
+    /**
+     * @brief sends the required channel (to be sampled by ADC), and recieves its corresponding analogue input values
+     *
+     * @param   adc channel (to be sampled by ADC)
+     *
+     * @return  two integer values corresponding to the voltage of selected channel
+     */
     {int, int}  get_channel(unsigned short);
 
     /**
      * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
+     *
+     * @return  integer value corresponding to ACTIVE/INACTIVE enumeration
      */
     int status(void);
 
     /**
-     * @brief Get all measured parameters at once
-     * The parameters include:
-     *  - Current on Phase B
-     *  - Current on Phase C
-     *  - Vdc
-     *  - Torque
+     * @brief gets all adc measured parameters at once. In its most complete form, these parameters will be:
+     *
+     * @return seven integer values including:
+     *  - phase current B
+     *  - phase current C
+     *  - v_dc
+     *  - i_dc
+     *  - temperature
+     *  - analogue input a1
+     *  - analogue input a2
+     *  - analogue input b1
+     *  - analogue input b2
      *  - fault code
      */
     {int, int, int, int, int, int, int, int, int, int} get_all_measurements();
 
-
     /**
      * @brief Sets the protection limits including:
-     *      - I_max
-     *      - V_dc_max
-     *      - V_dc_min
+     *
+     * @param   i_max    maximum alowed phase current
+     * @param   i_ratio  current ratio constant (determined in board support package of IFM board)
+     * @param   v_ratio  voltage ratio constant (determined in board support package of IFM board)
+     * @param   v_dc_max maximum allowed v_dc
+     * @param   v_dc_min minimum allowed v_dc
+     *
+     * @return  void
      */
-    void set_protection_limits_and_analogue_input_configs(int, int, int, int, int);
+    void set_protection_limits(int i_max, int i_ratio, int v_ratio, int v_dc_max, int v_dc_min);
 
     /**
-     * @brief Resets the fault state in adc service
+     * @brief   Resets the fault state in adc service
+     *
+     * @return  void
      */
     void reset_faults();
 };
+
 
 interface shared_memory_interface
 {
@@ -229,25 +262,73 @@ interface shared_memory_interface
     void write_gpio_output(unsigned int out_gpio);
 };
 
-interface update_pwm
+/**
+ * @brief Interface type to communicate with the PWM Service
+ */
+interface UpdatePWM
 {
     /**
      * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
+     *
+     * @return state of PWM service ACTIVE/DEACTIVE
      */
     int status(void);
 
-    void update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int pwm_on, int brake_active, int recieved_safe_torque_off_mode);
+    /**
+     * @brief send the pwm values and pwm controling commands to pwm service
+     *
+     * @param   pwm_a pwm value for phase a
+     * @param   pwm_b pwm value for phase b
+     * @param   pwm_c pwm value for phase c
+     * @param   pwm_on determines whether pwm service generates the pulses or not
+     * @param   brake_active activates/deactivates the brake functionality
+     * @param   safe_torque_off_mode if set to 1 then pwm will not work in normal mode
+     *
+     * @return  void
+     */
+    void update_server_control_data(int pwm_a, int pwm_b, int pwm_c, int pwm_on, int brake_active, int safe_torque_off_mode);
+
+    /**
+     * @brief send safe_torque_off_mode command to pwm service
+     *
+     * @return  void
+     */
     void safe_torque_off_enabled();
 };
 
-interface update_pwm_general
+/**
+ * @brief Interface type to communicate with the general PWM Service.
+ */
+interface UpdatePWMGeneral
 {
     /**
      * @brief send the status of adc service to the client (ACTIVE/INACTIVE)
+     *
+     * @return state of PWM service ACTIVE/DEACTIVE
      */
     int status(void);
 
-    void update_server_control_data(unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c, unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w, int received_pwm_on, int recieved_safe_torque_off_mode);
+    /**
+     * @brief send the pwm values and pwm controling commands to pwm service
+     *
+     * @param   pwm_a pwm value for phase a
+     * @param   pwm_b pwm value for phase b
+     * @param   pwm_c pwm value for phase c
+     * @param   pwm_u pwm value for phase u
+     * @param   pwm_v pwm value for phase v
+     * @param   pwm_w pwm value for phase w
+     * @param   pwm_on determines whether pwm service generates the pulses or not
+     * @param   safe_torque_off_mode if set to 1 then pwm will not work in normal mode
+     *
+     * @return  void
+     */
+    void update_server_control_data(unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c, unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w, int pwm_on, int safe_torque_off_mode);
+
+    /**
+     * @brief send safe_torque_off_mode command to pwm service
+     *
+     * @return  void
+     */
     void safe_torque_off_enabled();
 };
 

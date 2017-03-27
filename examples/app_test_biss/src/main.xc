@@ -100,8 +100,8 @@ int main() {
     interface WatchdogInterface i_watchdog[2];
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
-    interface update_pwm i_update_pwm;
-    interface update_brake i_update_brake;
+    interface UpdatePWM i_update_pwm;
+    interface UpdateBrake i_update_brake;
 
     par {
         /************************************************************

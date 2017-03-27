@@ -1,10 +1,9 @@
 /*
  * lookup_tables.h
  *
- *  Created on: Sep 21, 2015
- *      Author: ramin
+ *  Created on: 23 March 2017
+ *      Author: Synapticon
  */
-
 
 #ifndef LOOKUP_TABLES_H_
 #define LOOKUP_TABLES_H_

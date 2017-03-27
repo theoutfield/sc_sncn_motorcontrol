@@ -34,7 +34,7 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
-void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorcontrolInterface client i_motorcontrol) {
+void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorControlInterface client i_motorcontrol) {
     char status;
     int multiturn;
     unsigned int singleturn_filtered;
@@ -69,13 +69,13 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
         case 'a':
             printf("Sending offset_detection command ...\n");
             i_motorcontrol.set_offset_detection_enabled();
-            while(i_motorcontrol.set_calib(0)==-1) delay_milliseconds(50);//wait until offset is detected
+            while(i_motorcontrol.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
 
             if(i_motorcontrol.get_sensor_polarity_state() != 1) {
                 printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
                 offset = -1;
             } else{
-                offset = i_motorcontrol.set_calib(0);
+                offset = i_motorcontrol.get_offset();
                 printf("Detected offset is: %i\n", offset);
 
                 //set offset to motorcontrol
@@ -183,10 +183,10 @@ int main(void)
     interface shared_memory_interface i_shared_memory[2];
     /*********** Motor Test ***********/
     interface WatchdogInterface i_watchdog[2];
-    interface update_pwm i_update_pwm;
-    interface update_brake i_update_brake;
+    interface UpdatePWM i_update_pwm;
+    interface UpdateBrake i_update_brake;
     interface ADCInterface i_adc[2];
-    interface MotorcontrolInterface i_motorcontrol[2];
+    interface MotorControlInterface i_motorcontrol[2];
 
 
     par

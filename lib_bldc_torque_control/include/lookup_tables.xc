@@ -1,8 +1,8 @@
 /*
  * lookup_tables.xc
  *
- *  Created on: Aug 31, 2015
- *      Author: ramin
+ *  Created on: 23 March 2017
+ *      Author: Synapticon
  */
 
 

@@ -10,7 +10,7 @@
 #define MOTOR_CONTROL_STRUCTURES_H_
 
 /**
- * @brief Status of motor control related task
+ * @brief Status of motor control related services
  * ACTIVE   -> the task is started and can be used as a server
  * INACTIVE -> the task is not started yet
  */
@@ -18,7 +18,6 @@ typedef enum {
     INACTIVE= 1,
     ACTIVE = 2
 } TaskStatus;
-
 
 /**
  * @brief Type for position sensors.
@@ -31,7 +30,6 @@ typedef enum {
     REM_16MT_SENSOR=6,
     SSI_SENSOR=7
 } SensorType;
-
 
 /**
  * @brief Type for Sensor Error
@@ -54,7 +52,6 @@ typedef enum {
     SENSOR_BISS_NO_START_BIT_ERROR             = 19,
     SENSOR_CHECKSUM_ERROR                      = 20
 } SensorError;
-
 
 /**
  * @brief Type for motors.
@@ -84,12 +81,12 @@ typedef enum {
  * @brief Fixes matching of reference torque sign to position and velocity signs.
  */
 typedef enum {
-    MOTOR_PHASES_NORMAL  = 1,  /**< Normal connection  */
+    MOTOR_PHASES_NORMAL   = 1,  /**< Normal connection  */
     MOTOR_PHASES_INVERTED =-1   /**< Flipped connection */
 } MotorPhasesConfiguration;
 
 /**
- * @brief Type for the polarity of the position sensor
+ * @brief Type of profiler
  */
 typedef enum {
     LINEAR  = 1 /**< Linear profiler */
@@ -174,7 +171,6 @@ typedef struct {
 
 } MotorcontrolConfig;
 
-
 /**
  * @brief Structure type to send the data from lower controlling levels
  * to higher controlling levels
@@ -222,6 +218,5 @@ typedef struct
     int torque_cmd;
     int offset_torque;
 }DownstreamControlData;
-
 
 #endif /* MOTOR_CONTROL_STRUCTURES_H_ */
