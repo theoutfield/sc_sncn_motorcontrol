@@ -35,6 +35,20 @@ typedef enum {
     VELOCITY_PID_CONTROLLER                 = 201
 } MotionControlStrategies;
 
+
+/**
+ * @brief Motion polarity
+ *
+ *  When set to INVERTED (1) the position/velocity commands will be inverted.
+ *  The position/velocity/torque feedback is also inverted to match the commands.
+ *  The position limits are also inverted to match the commands.
+ *  The internal position of the controller is not changed, only the feedback.
+ */
+typedef enum {
+    MOTION_POLARITY_NORMAL      = 0,
+    MOTION_POLARITY_INVERTED    = 1
+} MotionPolarity;
+
 /**
  * @brief Structure definition for a Control Loop Service configuration.
  */
@@ -79,7 +93,7 @@ typedef struct {
     int resolution;                     /**< Value for setting the resolution of position sensor [ticks/rotation] */
     int k_m;                            /**< Value for setting the gain of torque actuator */
     int moment_of_inertia;              /**< Value for setting the moment of inertia */
-    int polarity;                       /**< Value for setting the polarity of the movement */
+    MotionPolarity polarity;            /**< Value for setting the polarity of the movement */
     int special_brake_release;
     int brake_shutdown_delay;
 

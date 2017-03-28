@@ -151,7 +151,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     int max_position_orig, min_position_orig;
     int max_position, min_position;
     //reverse position limits when polarity is inverted
-    if (motion_ctrl_config.polarity == -1)
+    if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
     {
         min_position = -motion_ctrl_config.max_pos_range_limit;
         max_position = -motion_ctrl_config.min_pos_range_limit;
@@ -274,7 +274,6 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                             velocity_enable_flag =0;
                             position_enable_flag =0;
                             i_motorcontrol.set_torque_control_disabled();
-//                            i_motorcontrol.set_safe_torque_off_enabled();
                         }
                     }
                     //profiler enabled, set target position
@@ -331,7 +330,6 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                     velocity_enable_flag = 0;
                     i_motorcontrol.set_brake_status(0);
                     i_motorcontrol.set_torque_control_disabled();
-//                    i_motorcontrol.set_safe_torque_off_enabled();
                     printstr("*** Position Limit Reached ***\n");
                     //store original limits, with threshold if possible
                     if (position_limit_reached == 0)
@@ -355,7 +353,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                 //test if we moved back inside the original limits, then restore the position limits
                 else if (position_limit_reached == 1 && upstream_control_data.position < max_position_orig && upstream_control_data.position > min_position_orig)
                 {
-                    if (motion_ctrl_config.polarity == -1) {
+                    if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED) {
                         min_position = -motion_ctrl_config.max_pos_range_limit;
                         max_position = -motion_ctrl_config.min_pos_range_limit;
                     } else {
@@ -414,7 +412,6 @@ break;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
                     i_motorcontrol.set_torque_control_disabled();
-//                    i_motorcontrol.set_safe_torque_off_enabled(); //FIXME: check if we need to use safe_torque_off here
                 }
 
                 break;
@@ -517,7 +514,7 @@ break;
                 if (in_config.max_pos_range_limit != motion_ctrl_config.max_pos_range_limit || in_config.min_pos_range_limit != motion_ctrl_config.min_pos_range_limit || in_config.polarity != motion_ctrl_config.polarity)
                 {
                     //reverse position limits when polarity is inverted
-                    if (in_config.polarity == -1)
+                    if (in_config.polarity == MOTION_POLARITY_INVERTED)
                     {
                         min_position = -in_config.max_pos_range_limit;
                         max_position = -in_config.min_pos_range_limit;
@@ -572,14 +569,16 @@ break;
                 downstream_control_data = downstream_control_data_in;
 
                 //reverse position/velocity feedback/commands when polarity is inverted
-                if (motion_ctrl_config.polarity == -1)
+                if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                 {
                     //feeedback
-                    upstream_control_data_out.position = -upstream_control_data_out.position;
-                    upstream_control_data_out.velocity = -upstream_control_data_out.velocity;
+                    upstream_control_data_out.position          = -upstream_control_data_out.position;
+                    upstream_control_data_out.velocity          = -upstream_control_data_out.velocity;
+                    upstream_control_data_out.computed_torque   = -upstream_control_data_out.computed_torque;
                     //commands
                     downstream_control_data.position_cmd = -downstream_control_data.position_cmd;
                     downstream_control_data.velocity_cmd = -downstream_control_data.velocity_cmd;
+                    downstream_control_data.torque_cmd   = -downstream_control_data.torque_cmd;
                 }
 
                 //apply limits on commands
@@ -602,18 +601,21 @@ break;
                 break;
 
         case i_position_control[int i].set_torque(int in_target_torque):
-                downstream_control_data.torque_cmd = in_target_torque;
+                if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
+                    downstream_control_data.torque_cmd = -in_target_torque;
+                else
+                    downstream_control_data.torque_cmd = in_target_torque;
                 break;
 
         case i_position_control[int i].get_position() -> int out_position:
-                if (motion_ctrl_config.polarity == -1)
+                if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                     out_position = -upstream_control_data.position;
                 else
                     out_position = upstream_control_data.position;
                 break;
 
         case i_position_control[int i].get_velocity() -> int out_velocity:
-                if (motion_ctrl_config.polarity == -1)
+                if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                     out_velocity = -upstream_control_data.velocity;
                 else
                     out_velocity = upstream_control_data.velocity;
