@@ -96,7 +96,7 @@ ConsoleInputs get_user_command()
  */
 void demo_motion_control(client interface PositionVelocityCtrlInterface i_position_control)
 {
-    delay_milliseconds(500);
+    delay_milliseconds(1000);
     printf(">> SOMANET MOTION CONTROL SERVICE STARTING ...\n");
 
     DownstreamControlData downstream_control_data;
@@ -116,7 +116,120 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
     //read and adjust the offset.
     while (1)
     {
+
+        printf(">> please select your motion control mode ...\n");
+        printf(">> press t for torque   control mode\n");
+        printf(">> press v for velocity control mode\n");
+        printf(">> press p for position control mode\n");
+        printf(">> press q to quit\n");
+
         console_inputs = get_user_command();
+        while(console_inputs.first_char!='t' && console_inputs.first_char!='v' && console_inputs.first_char!='p' && console_inputs.first_char!='q')
+        {
+            printf("wrong input\n");
+            console_inputs = get_user_command();
+        }
+
+        switch(console_inputs.first_char)
+        {
+        case 't':
+                printf(" torque control mode selected\n");
+                break;
+
+        case 'v':
+                printf(" velocity control mode selected\n");
+                break;
+
+        case 'p':
+                printf(" position control mode selected\n");
+                break;
+
+        case 'q':
+                printf(" selected to quit\n");
+                break;
+
+        default:
+                break;
+        }
+
+        while(1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        while(1);
 
         switch(console_inputs.first_char)
         {
