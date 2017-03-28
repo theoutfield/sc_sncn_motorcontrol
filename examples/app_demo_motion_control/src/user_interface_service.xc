@@ -109,6 +109,8 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
     console_inputs.third_char  = '0';
     console_inputs.value       =  0 ;
 
+    char control_mode = 'q'; //'t' stands for torque control mode, 'v' stands for velocity control mode, 'p' stands for position control mode
+
 
     int brake_flag = 0;
 
@@ -120,20 +122,28 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
     while (1)
     {
 
-        printf("\n>> please select your motion control mode ...\n");
-        printf(">> press t for torque   control mode\n");
-        printf(">> press v for velocity control mode\n");
-        printf(">> press p for position control mode\n");
-        printf(">> press q to quit\n");
-
-        console_inputs = get_user_command();
-        while(console_inputs.first_char!='t' && console_inputs.first_char!='v' && console_inputs.first_char!='p' && console_inputs.first_char!='q')
+        if(control_mode == 'q')
         {
-            printf("wrong input\n");
+            printf("\n>> please select your motion control mode ...\n");
+            printf(">> press t for torque   control mode\n");
+            printf(">> press v for velocity control mode\n");
+            printf(">> press p for position control mode\n");
+
             console_inputs = get_user_command();
+            while(console_inputs.first_char!='t' && console_inputs.first_char!='v' && console_inputs.first_char!='p')
+            {
+                printf("wrong input\n");
+
+                printf(">> press t for torque   control mode\n");
+                printf(">> press v for velocity control mode\n");
+                printf(">> press p for position control mode\n");
+
+                console_inputs = get_user_command();
+            }
+            control_mode = console_inputs.first_char;
         }
 
-        switch(console_inputs.first_char)
+        switch(control_mode)
         {
         case 't':
                 i_position_control.enable_torque_ctrl();
@@ -161,40 +171,82 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 i_position_control.update_control_data(downstream_control_data);
                 delay_milliseconds(2000);
 
-                i_position_control.disable();
-                printf("torque controller disabled\n");
+                printf("press q if you want to quit this mode, else press any key\n");
+                console_inputs = get_user_command();
+                if(console_inputs.first_char=='q') control_mode='q';
 
                 break;
 
         case 'v':
                 i_position_control.enable_velocity_ctrl();
-                printf("velocity control mode with linear profil selected\n");
+                printf("velocity control mode with linear profile selected\n");
 
-                printf("please enter the reference velocity in rpm\n");
+                int command_type = 'd';// 's' stands for step response with profiler, and 'd' stands for direct command
+
+                printf("please select command type type\n");
+                printf("press s to send a step command \n");
+                printf("press d to send a direct command \n");
+
                 console_inputs = get_user_command();
+                while(console_inputs.first_char!='s' && console_inputs.first_char!='d')
+                {
+                    printf("wrong input\n");
+                    printf("press s to send a step command \n");
+                    printf("press d to send a direct command \n");
 
-                printf("velocity step command from 0 to %d to %d to 0 rpm\n", console_inputs.value, -console_inputs.value);
+                    console_inputs = get_user_command();
+                }
+                command_type = console_inputs.first_char;
 
-                downstream_control_data.offset_torque = 0;
-                downstream_control_data.velocity_cmd = console_inputs.value;
+                switch(command_type)
+                {
+                case 's':
+                        printf("step command selected\n");
+                        printf("please enter the reference velocity in rpm\n");
+                        console_inputs = get_user_command();
 
-                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-                motion_ctrl_config.enable_profiler = 1;
-                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        printf("velocity step command from 0 to %d to %d to 0 rpm\n", console_inputs.value, -console_inputs.value);
 
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(2000);
+                        downstream_control_data.offset_torque = 0;
+                        downstream_control_data.velocity_cmd = console_inputs.value;
 
-                downstream_control_data.velocity_cmd = -console_inputs.value;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(2000);
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config.enable_profiler = 1;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
 
-                downstream_control_data.velocity_cmd = 0;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(2000);
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(2000);
 
-                i_position_control.disable();
-                printf("velocity controller disabled\n");
+                        downstream_control_data.velocity_cmd = -console_inputs.value;
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(2000);
+
+                        downstream_control_data.velocity_cmd = 0;
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(2000);
+                        break;
+                case 'd':
+                        printf("direct command selected\n");
+                        printf("please enter the reference velocity in rpm\n");
+                        console_inputs = get_user_command();
+
+                        printf("velocity step command from 0 to %d to %d to 0 rpm\n", console_inputs.value, -console_inputs.value);
+
+                        downstream_control_data.offset_torque = 0;
+                        downstream_control_data.velocity_cmd = console_inputs.value;
+
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config.enable_profiler = 1;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+
+                        i_position_control.update_control_data(downstream_control_data);
+                        break;
+                }
+
+                printf("press q if you want to quit this mode, else press any key\n");
+                console_inputs = get_user_command();
+                if(console_inputs.first_char=='q') control_mode='q';
+
                 break;
 
         case 'p':
@@ -305,12 +357,17 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         break;
                 }
 
+                printf("press q if you want to quit this mode, else press any key\n");
+                console_inputs = get_user_command();
+                if(console_inputs.first_char=='q') control_mode='q';
+
                 break;
 
         case 'q':
                 i_position_control.disable();
-                printf(" selected to quit\n");
+                printf("controller disabled\n");
                 break;
+
 
         default:
                 break;
