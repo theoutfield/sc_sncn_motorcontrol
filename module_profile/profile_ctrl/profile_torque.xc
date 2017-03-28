@@ -46,3 +46,40 @@
 //    }
 //    t when timerafter(time + 30 * MSEC_STD) :> time;
 //}
+
+
+/**
+ * @brief updating the torque reference profiler
+ *
+ * @param   torque_ref, target torque
+ * @param   torque_ref_in_k_1n, profiled torque calculated in one step
+ * @param   profiler_param, structure containing the profiler parameters
+ * @param   torque_control_loop, the execution cycle of torque controller (us)
+ *
+ * @return  profiled torque calculated for the next step
+ */
+double torque_profiler(double torque_ref, double torque_ref_in_k_1n, ProfilerParam profiler_param, int position_control_loop)
+{
+
+    double torque_step=0.00, torque_ref_in_k=0.00;
+    double torque_error=0.00;
+
+    torque_step = (((double)(position_control_loop)) * profiler_param.torque_rate_max )/1000000.00;
+    //r_max [mNm/s] / 1000 [mNm/ms] * (position_control_loop/1000) mNm
+    if(torque_step<0) torque_step=-torque_step;
+
+    if(torque_ref_in_k_1n<torque_ref)
+    {
+        torque_ref_in_k = torque_ref_in_k_1n + torque_step;
+    }
+    else if (torque_ref_in_k_1n>torque_ref)
+    {
+        torque_ref_in_k = torque_ref_in_k_1n - torque_step;
+    }
+
+    torque_error = torque_ref - torque_ref_in_k_1n;
+    if( (-torque_step)<torque_error  && torque_error<torque_step)
+        torque_ref_in_k = torque_ref;
+
+    return torque_ref_in_k;
+}

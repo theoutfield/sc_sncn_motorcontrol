@@ -253,3 +253,55 @@ int __initialize_velocity_profile( int target_velocity, int actual_velocity, int
 int __velocity_profile_generate_in_steps( int step, REFERENCE_PARAM(profile_velocity_param, profile_velocity_params) );
 
 
+/**
+ * @brief Structure type to set the parameters of position reference profiler.
+ */
+typedef struct {
+    double delta_T;
+    double resolution;              //resolution    [ticks/mechanical_rotation]
+    double v_max;                   //velocity      [rpm]
+    double a_max;                   //acceleration  [rpm/s]
+    double torque_rate_max;         //torque rate   [mNm/s]
+} ProfilerParam;
+
+/**
+ * @brief sign function.
+ * @param output, sign of the number
+ * @param input, number
+ */
+int sign_function(float a);
+
+/**
+ * @brief updating the torque reference profiler
+ *
+ * @param   torque_ref, target torque
+ * @param   torque_ref_in_k_1n, profiled torque calculated in one step
+ * @param   profiler_param, structure containing the profiler parameters
+ * @param   torque_control_loop, the execution cycle of torque controller (us)
+ *
+ * @return  profiled torque calculated for the next step
+ */
+double torque_profiler(double torque_ref, double torque_ref_in_k_1n, ProfilerParam profiler_param, int torque_control_loop);
+
+/**
+ * @brief updating the velocity reference profiler
+ *
+ * @param   velocity_ref, target velocity
+ * @param   velocity_ref_in_k_1n, profiled velocity calculated in one step
+ * @param   profiler_param, structure containing the profiler parameters
+ * @param   velocity_control_loop, the execution cycle of velocity controller (us)
+ *
+ * @return  profiled velocity calculated for the next step
+ */
+double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, ProfilerParam profiler_param, int velocity_control_loop);
+
+/**
+ * @brief updating the position reference profiler
+ * @param   pos_target, target position
+ * @param   pos_k_1n, profiled position calculated in one step ago
+ * @param   pos_k_2n, profiled position calculated in two steps ago
+ * @param   pos_profiler_param parameters of the position reference profiler
+ *
+ * @return  profiled position calculated for the next step
+ */
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, ProfilerParam pos_profiler_param);
