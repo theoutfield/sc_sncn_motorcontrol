@@ -60,3 +60,101 @@ void set_profile_position(DownstreamControlData &downstream_control_data, int ve
     t when timerafter(time + 30 * MSEC_STD) :> time;
 
 }
+
+/**
+ * @brief sign function.
+ * @param output, sign of the number
+ * @param input, number
+ */
+int sign_function(float a)
+{
+    if (a < 0)
+        return -1;
+    else
+        return 1;
+}
+
+/**
+ * @brief updating the position reference profiler
+ * @param   pos_target, target position
+ * @param   pos_k_1n, profiled position calculated in one step ago
+ * @param   pos_k_2n, profiled position calculated in two steps ago
+ * @param   pos_profiler_param parameters of the position reference profiler
+ *
+ * @return  profiled position calculated for the next step
+ */
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, ProfilerParam pos_profiler_param)
+{
+    double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2, v_max = 0.00, a_max = 0.00;
+    int deceleration_flag = 0;
+
+    v_max = (((double)(pos_profiler_param.v_max)) * pos_profiler_param.resolution )/60.00;
+    a_max = (((double)(pos_profiler_param.a_max)) * pos_profiler_param.resolution )/60.00;
+
+    if (pos_target == pos_k_1n)
+        pos_k = pos_target;
+    else if (pos_target > pos_k_1n)
+    {
+        if (((pos_k_1n-pos_k_2n)==0) && (pos_target < (pos_k_1n+10)))
+            pos_k = pos_k_1n; //ignore the command
+        else
+        {
+            velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
+            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * a_max);
+            pos_deceleration = pos_target - deceleration_distance;
+            if ((pos_k_1n >= pos_deceleration) && (pos_k_1n > pos_k_2n))
+                deceleration_flag = 1;
+            temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * a_max;
+            if (deceleration_flag == 0)
+            {
+                pos_temp1 = temp + (2 * pos_k_1n) - pos_k_2n;
+                pos_temp2 = (pos_profiler_param.delta_T * v_max) + pos_k_1n;
+                if (pos_temp1 < pos_temp2)
+                    pos_k = pos_temp1;
+                else
+                    pos_k = pos_temp2;
+            }
+            else
+            {
+                pos_k = -temp + (2 * pos_k_1n) - pos_k_2n;
+            }
+            if (pos_k > pos_target)
+                pos_k = pos_target;
+            if ((pos_k < pos_target) && (sign_function(pos_k_1n-pos_k_2n) > sign_function(pos_k-pos_k_1n)))
+                pos_k = pos_target;
+        }
+    }
+    else
+    {
+        if (((pos_k_1n-pos_k_2n)==0) && (pos_target > (pos_k_1n-10)))
+            pos_k = pos_k_1n; //ignore the command
+        else
+        {
+            velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
+            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * a_max);
+            pos_deceleration = pos_target + deceleration_distance;
+            if ((pos_k_1n <= pos_deceleration) && (pos_k_1n < pos_k_2n))
+                deceleration_flag = 1;
+            temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * a_max;
+            if (deceleration_flag == 0)
+            {
+                pos_temp1 = -temp + (2 * pos_k_1n) - pos_k_2n;
+                pos_temp2 = -(pos_profiler_param.delta_T * v_max) + pos_k_1n;
+                if (pos_temp1 > pos_temp2)
+                    pos_k = pos_temp1;
+                else
+                    pos_k = pos_temp2;
+            }
+            else
+            {
+                pos_k = temp + (2 * pos_k_1n) - pos_k_2n;
+            }
+            if (pos_k < pos_target)
+                pos_k = pos_target;
+            if ((pos_k > pos_target) && (sign_function(pos_k_1n-pos_k_2n) < sign_function(pos_k-pos_k_1n)))
+                pos_k = pos_target;
+        }
+    }
+
+    return pos_k;
+}

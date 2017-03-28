@@ -60,3 +60,38 @@ void set_profile_velocity(int target_velocity, int acceleration, int deceleratio
 
 }
 #endif
+
+/**
+ * @brief updating the velocity reference profiler
+ *
+ * @param   velocity_ref, target velocity
+ * @param   velocity_ref_in_k_1n, profiled velocity calculated in one step
+ * @param   profiler_param, structure containing the profiler parameters
+ * @param   velocity_control_loop, the execution cycle of velocity controller (us)
+ *
+ * @return  profiled velocity calculated for the next step
+ */
+double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, ProfilerParam profiler_param, int position_control_loop)
+{
+
+    double velocity_step=0.00, velocity_ref_in_k=0.00;
+    double velocity_error=0.00;
+
+    velocity_step = (((double)(position_control_loop)) * profiler_param.a_max )/1000000.00; //rpm/s
+    if(velocity_step<0) velocity_step=-velocity_step;
+
+    if(velocity_ref_in_k_1n<velocity_ref)
+    {
+        velocity_ref_in_k = velocity_ref_in_k_1n + velocity_step;
+    }
+    else if (velocity_ref_in_k_1n>velocity_ref)
+    {
+        velocity_ref_in_k = velocity_ref_in_k_1n - velocity_step;
+    }
+
+    velocity_error = velocity_ref - velocity_ref_in_k_1n;
+    if( (-velocity_step)<velocity_error  && velocity_error<velocity_step)
+        velocity_ref_in_k = velocity_ref;
+
+    return velocity_ref_in_k;
+}

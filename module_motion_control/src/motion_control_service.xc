@@ -11,6 +11,7 @@
 #include <math.h>
 
 #include <controllers.h>
+#include <profile.h>
 #include <filters.h>
 
 #include <motion_control_service.h>
