@@ -120,7 +120,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
     while (1)
     {
 
-        printf(">> please select your motion control mode ...\n");
+        printf("\n>> please select your motion control mode ...\n");
         printf(">> press t for torque   control mode\n");
         printf(">> press v for velocity control mode\n");
         printf(">> press p for position control mode\n");
@@ -167,14 +167,100 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 break;
 
         case 'v':
-                printf(" velocity control mode selected\n");
+                i_position_control.enable_velocity_ctrl();
+                printf("velocity control mode with linear profil selected\n");
+
+                printf("please enter the reference velocity in rpm\n");
+                console_inputs = get_user_command();
+
+                printf("velocity step command from 0 to %d to %d to 0 rpm\n", console_inputs.value, -console_inputs.value);
+
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.velocity_cmd = console_inputs.value;
+
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config.enable_profiler = 1;
+                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(2000);
+
+                downstream_control_data.velocity_cmd = -console_inputs.value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(2000);
+
+                downstream_control_data.velocity_cmd = 0;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(2000);
+
+                i_position_control.disable();
+                printf("velocity controller disabled\n");
                 break;
 
         case 'p':
-                printf(" position control mode selected\n");
+                printf("please select position controller type\n");
+                printf("press 1 to use a position pid controller \n");
+                printf("press 2 to use a cascaded positon/velocity pid controller \n");
+                printf("press 3 to use a nonlinear position controller \n");
+
+                console_inputs = get_user_command();
+                while(console_inputs.value!=1 && console_inputs.value!=2 && console_inputs.value!=3)
+                {
+                    printf("wrong input\n");
+                    printf("press 1 to use a position pid controller \n");
+                    printf("press 2 to use a cascaded positon/velocity pid controller \n");
+                    printf("press 3 to use a nonlinear position controller \n");
+
+                    console_inputs = get_user_command();
+                }
+
+                switch(console_inputs.value)
+                {
+                case 1:
+                        i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                        printf("position pid controller with linear profiler selected\n");
+                        break;
+
+                case 2:
+                        i_position_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                        printf("cascaded position/velocity controller with linear profiler selected\n");
+                        break;
+
+                case 3:
+                        i_position_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
+                        printf("nonlinear position controller with linear profiler selected\n");
+                        break;
+
+                default:
+                        break;
+                }
+
+                printf("please enter the reference position\n");
+                console_inputs = get_user_command();
+
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.position_cmd = console_inputs.value;
+
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config.enable_profiler = 1;
+                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+
+                printf("position step command from 0 to %d to %d to 0\n", console_inputs.value, -console_inputs.value);
+
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.position_cmd = console_inputs.value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1500);
+                downstream_control_data.position_cmd = -console_inputs.value;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1500);
+                downstream_control_data.position_cmd = 0;
+                i_position_control.update_control_data(downstream_control_data);
+                delay_milliseconds(1500);
                 break;
 
         case 'q':
+                i_position_control.disable();
                 printf(" selected to quit\n");
                 break;
 
@@ -185,10 +271,6 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
     }
 
         while(1);
-
-
-
-
 
 
 
@@ -310,6 +392,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         break;
                 }
                 break;
+
 
         //velocity commands
         case 'v':
@@ -537,6 +620,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
             }
             i_position_control.set_position_velocity_control_config(motion_ctrl_config);
             break;
+
 
         //enable
         case 'e':
