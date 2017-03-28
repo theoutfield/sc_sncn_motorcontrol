@@ -117,6 +117,9 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
     while (1)
     {
 
+    while (1)
+    {
+
         printf(">> please select your motion control mode ...\n");
         printf(">> press t for torque   control mode\n");
         printf(">> press v for velocity control mode\n");
@@ -133,7 +136,42 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
         switch(console_inputs.first_char)
         {
         case 't':
+                i_position_control.enable_torque_ctrl();
                 printf(" torque control mode selected\n");
+
+                printf("please enter the reference torque in milli-Nm\n");
+                console_inputs = get_user_command();
+
+                printf("reference torque set to %d milli-Nm (with torque linear profile)\n", console_inputs.value);
+
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.torque_cmd = console_inputs.value;
+
+
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config.enable_profiler = 1;
+                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+
+                i_position_control.update_control_data(downstream_control_data);
+
+                printf(">> press q to quit\n");
+                console_inputs = get_user_command();
+                while(console_inputs.first_char!='q')
+                {
+                    printf("wrong input\n");
+                    console_inputs = get_user_command();
+                }
+
+                downstream_control_data.offset_torque = 0;
+                downstream_control_data.torque_cmd = 0;
+                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config.enable_profiler = 0;
+                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                i_position_control.update_control_data(downstream_control_data);
+
+                i_position_control.disable();
+                printf("torque controller disabled\n");
+
                 break;
 
         case 'v':
@@ -152,12 +190,9 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 break;
         }
 
+    }
+
         while(1);
-
-
-
-
-
 
 
 
@@ -326,6 +361,10 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         break;
                 }
                 break;
+
+
+
+
 
         //enable and disable torque controller
         case 't':
