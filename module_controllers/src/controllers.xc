@@ -309,7 +309,7 @@ int update_nl_position_control(
  *
  * @return  profiled position calculated for the next step
  */
-float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfilerParam pos_profiler_param)
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, ProfilerParam pos_profiler_param)
 {
     double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2, v_max = 0.00, a_max = 0.00;
     int deceleration_flag = 0;
@@ -395,7 +395,7 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfi
  *
  * @return  profiled velocity calculated for the next step
  */
-double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posProfilerParam profiler_param, int position_control_loop)
+double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, ProfilerParam profiler_param, int position_control_loop)
 {
 
     double velocity_step=0.00, velocity_ref_in_k=0.00;
@@ -430,7 +430,7 @@ double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posPr
  *
  * @return  profiled torque calculated for the next step
  */
-double torque_profiler(double torque_ref, double torque_ref_in_k_1n, posProfilerParam profiler_param, int position_control_loop)
+double torque_profiler(double torque_ref, double torque_ref_in_k_1n, ProfilerParam profiler_param, int position_control_loop)
 {
 
     double torque_step=0.00, torque_ref_in_k=0.00;

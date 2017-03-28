@@ -74,7 +74,7 @@ typedef struct {
     double v_max;                   //velocity      [rpm]
     double a_max;                   //acceleration  [rpm/s]
     double torque_rate_max;         //torque rate   [mNm/s]
-} posProfilerParam;
+} ProfilerParam;
 
 /**
  * @brief intializing the parameters of the PID controller.
@@ -166,7 +166,7 @@ int update_nl_position_control(
  *
  * @return  profiled velocity calculated for the next step
  */
-double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posProfilerParam profiler_param, int velocity_control_loop);
+double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, ProfilerParam profiler_param, int velocity_control_loop);
 
 /**
  * @brief updating the torque reference profiler
@@ -178,7 +178,7 @@ double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, posPr
  *
  * @return  profiled torque calculated for the next step
  */
-double torque_profiler(double torque_ref, double torque_ref_in_k_1n, posProfilerParam profiler_param, int torque_control_loop);
+double torque_profiler(double torque_ref, double torque_ref_in_k_1n, ProfilerParam profiler_param, int torque_control_loop);
 
 /**
  * @brief updating the position reference profiler
@@ -189,7 +189,7 @@ double torque_profiler(double torque_ref, double torque_ref_in_k_1n, posProfiler
  *
  * @return  profiled position calculated for the next step
  */
-float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, posProfilerParam pos_profiler_param);
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, ProfilerParam pos_profiler_param);
 
 
 

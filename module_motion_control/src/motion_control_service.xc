@@ -137,7 +137,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
 
     //pos profiler
-    posProfilerParam profiler_param;
+    ProfilerParam profiler_param;
     profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
     profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
     profiler_param.a_max = (double)(motion_ctrl_config.max_acceleration_profiler);
