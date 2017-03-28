@@ -31,23 +31,13 @@ int auto_offset(interface MotorControlInterface client i_motorcontrol)
 void demo_motion_control(client interface PositionVelocityCtrlInterface i_position_control)
 {
     delay_milliseconds(500);
-    printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
+    printf(">> SOMANET MOTION CONTROL SERVICE STARTING ...\n");
 
     DownstreamControlData downstream_control_data;
     MotionControlConfig motion_ctrl_config;
-
     MotorcontrolConfig motorcontrol_config;
-    int proper_sensor_polarity=0;
-    int offset=0;
 
-    int velocity_running = 0;
-    int velocity = 0;
-
-    int torque = 0;
     int brake_flag = 0;
-    int period_us;     // torque generation period in micro-seconds
-    int pulse_counter; // number of generated pulses
-    int torque_control_flag = 0;
 
     fflush(stdout);
     //read and adjust the offset.
@@ -177,13 +167,8 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         break;
                 //direct command
                 default:
-                        if(value==0)
-                            velocity_running = 0;
-                        else
-                            velocity_running = 1;
                         downstream_control_data.offset_torque = 0;
-                        velocity = value;
-                        downstream_control_data.velocity_cmd = velocity;
+                        downstream_control_data.velocity_cmd = value;
                         i_position_control.update_control_data(downstream_control_data);
                         printf("set velocity %d\n", downstream_control_data.velocity_cmd);
                         break;
@@ -411,13 +396,11 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 case 't':
                         if (value == 1)
                         {
-                            torque_control_flag = 1;
                             i_position_control.enable_torque_ctrl();
                             printf("torque ctrl enabled\n");
                         }
                         else
                         {
-                            torque_control_flag = 0;
                             i_position_control.disable();
                             printf("torque ctrl disabled\n");
                         }
