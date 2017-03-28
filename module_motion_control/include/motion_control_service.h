@@ -39,9 +39,9 @@ typedef enum {
 /**
  * @brief Motion polarity
  *
- *  When set to INVERTED (1) the position/velocity commands will be inverted.
+ *  When set to INVERTED (1) the position/velocity/torque commands will be inverted.
  *  The position/velocity/torque feedback is also inverted to match the commands.
- *  The position limits are also inverted to match the commands.
+ *  The position limits are also inverted to match the inverted position commands.
  *  The internal position of the controller is not changed, only the feedback.
  */
 typedef enum {

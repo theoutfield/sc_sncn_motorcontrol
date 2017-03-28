@@ -53,8 +53,8 @@ typedef enum {
  *        or by setting a register in the sensor (REM 16MT, REM 14)
  */
 typedef enum {
-    SENSOR_POLARITY_NORMAL  = 1,    /**< Normal polarity. */
-    SENSOR_POLARITY_INVERTED=-1     /**< Inverted polarity. */
+    SENSOR_POLARITY_NORMAL   = 0,   /**< Normal polarity. */
+    SENSOR_POLARITY_INVERTED = 1    /**< Inverted polarity. */
 } SensorPolarity;
 
 
