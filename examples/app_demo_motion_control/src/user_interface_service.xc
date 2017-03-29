@@ -173,7 +173,12 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
 
                 printf("press q if you want to quit this mode, else press any key\n");
                 console_inputs = get_user_command();
-                if(console_inputs.first_char=='q') control_mode='q';
+                if(console_inputs.first_char=='q')
+                {
+                    control_mode='q';
+                    i_position_control.disable();
+                    printf("controller disabled\n");
+                }
 
                 break;
 
@@ -245,7 +250,12 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
 
                 printf("press q if you want to quit this mode, else press any key\n");
                 console_inputs = get_user_command();
-                if(console_inputs.first_char=='q') control_mode='q';
+                if(console_inputs.first_char=='q')
+                {
+                    control_mode='q';
+                    i_position_control.disable();
+                    printf("controller disabled\n");
+                }
 
                 break;
 
@@ -359,15 +369,14 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
 
                 printf("press q if you want to quit this mode, else press any key\n");
                 console_inputs = get_user_command();
-                if(console_inputs.first_char=='q') control_mode='q';
+                if(console_inputs.first_char=='q')
+                {
+                    control_mode='q';
+                    i_position_control.disable();
+                    printf("controller disabled\n");
+                }
 
                 break;
-
-        case 'q':
-                i_position_control.disable();
-                printf("controller disabled\n");
-                break;
-
 
         default:
                 break;
