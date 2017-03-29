@@ -40,10 +40,7 @@ reference and real values of torque, velocity and position will be displayed on 
 
 .. image:: images/step_and_direct_commands_in_profiled_modes_001.jpg
    :width: 90%
-Fig. 1: Step and direct types of profiled reference values
-
-* **Minimum Number of Cores**: 7
-* **Minimum Number of Tiles**: 3
+**Fig. 1: Step and direct types of profiled reference values**
 
 .. cssclass:: github
 
