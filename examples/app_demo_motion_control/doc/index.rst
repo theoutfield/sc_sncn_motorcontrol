@@ -16,6 +16,7 @@ In all of these applications, it is usually preferred to limit the acceleration 
 The purpose of **app_demo_motion_control** is to demonstrate how to control the torque, velocity or position of a motor with profiled reference values. 
 
 In the prepared console interface, appropriate commands (and their functionality) are introduced to the user, and the user will be able to:
+
 - select between different motion control modes (torque/velocity/position modes)
 - send direct/step commands in each mode
 
@@ -37,31 +38,27 @@ The data displayed over XScope will be:
 - Minimum Number of Cores: 5
 - Minimum Number of Tiles: 3
 
-.. cssclass:: github
+`see app_demo_motion_control on public repository <http://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_motion_control>`_
 
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_motion_control/>`_
 
 Quick How-to
 ============
 **Important**
 
-It is assumed that before starting this application, the PID parameters for velocity and position control are tuned and set in the software. To do this, please check :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`
+It is assumed that before starting this application, the PID parameters for velocity and position control are tuned and set in the software. To do this, please check app_demo_tuning in `synapticon sc_sncn_motorcontrol repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples>`_
 
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
-2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your position sensor, motor terminals, dc power supply, and XTAG. Power up!
-**important**
-For safety please use a current limited power supply and check current consumption.
+2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your position sensor, motor terminals, power supply cable, and XTAG. Power up!
+    **important**
+    For safety please use a current limited power supply and check current consumption.
+
 3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
 4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
 5. Open the **main.xc** within  the **app_demo_motion_control**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropriate target in your Makefile <somanet_board_support_module>`.
-**important**
-Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
+
+    **important** Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
+
 6. :ref:`Set the configuration <motor_configuration_label>` for Motor Control, position sensor, and Motion Control Services. Moreover, set the initial parameters for your profile generators.
 7. :ref:`Run the application enabling XScope <running_an_application>`.
 
-.. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
-
-
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_motion_control/>`_
+Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com>`_
