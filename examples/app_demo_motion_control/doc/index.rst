@@ -10,12 +10,21 @@ Quick Start Guide for app_demo_motion_control
 
 Introduction
 ===============
-In many industrial applications, it is required to control torque, velocity or position of an electric motor. For example, torque control is used in electric vehicle applications, while velocity control is used in electric elevators, and position control is mostly used in robotic application.
-In all of these applications, it is usually preferred to limit the acceleration rate of motor shaft to avoid mechanical stresses. This aim can be achieved by using a profiled reference (with limited acceleration rate) instead of a step command for reference values.
+In many industrial applications, it is required to control torque, velocity or position of an electric motor. As an example, torque control is used in electric vehicle applications, velocity control is used in electric elevators, and position control is mostly used in robotic application.
+In all of these applications, it is usually preferred to limit the acceleration rate of motor shaft to avoid mechanical stresses/damages. This aim can be achieved by using a profiled reference (with limited acceleration) instead of a sharp step command.
 
 The purpose of **app_demo_motion_control** is to demonstrate how to control the torque, velocity or position of a motor with profiled reference values. 
 
-The data displayed over XScope is:
+In the prepared console interface, appropriate commands (and their functionality) are introduced to the user, and the user will be able to:
+- select between different motion control modes (torque/velocity/position modes)
+- send direct/step commands in each mode
+
+By default, profiled references will be used. Figure 1 shows the difference between a profiled "direct command", and a profiled "step command".
+.. image:: images/step_and_direct_commands_in_profiled_modes_001.jpg
+   :width: 90%
+**Fig. 1: Step and direct types of profiled reference values**
+
+The data displayed over XScope will be:
       - Torque Command: The reference value of torque (milli-Nm)
       - Torque: The actual value of motor torque (milli-Nm)
       - Velocity Command: The reference value for velocity (rpm)
@@ -23,17 +32,8 @@ The data displayed over XScope is:
       - Position Command: The reference value for position (ticks)
       - Position: The actual (measured) position value (ticks)
 
-Using the prepared console interface, the user will be able to:
-
-- select between different motion control modes (torque/velocity/position modes)
-- send direct/step commands in each mode
-
-In each step of the application, appropriate commands (and their functionality) are introduced to the user.
-
-This app has a console interface to send commands to demonstrate how to change sensors at run time.
-
-* **Minimum Number of Cores**: 5
-* **Minimum Number of Tiles**: 3
+- Minimum Number of Cores: 5
+- Minimum Number of Tiles: 3
 
 .. cssclass:: github
 
@@ -59,12 +59,6 @@ Make sure the SOMANET Motor Control Library supports your SOMANET device. For th
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
 
-The user will be asked for the preferred motion control mode (torque/velocity/position control). As shown in the next picture, it is also possible to switch between a step command and a direct command.
-reference and real values of torque, velocity and position will be displayed on Xscope.
-
-.. image:: images/step_and_direct_commands_in_profiled_modes_001.jpg
-   :width: 90%
-**Fig. 1: Step and direct types of profiled reference values**
 
 .. cssclass:: github
 
