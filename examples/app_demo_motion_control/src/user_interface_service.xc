@@ -110,6 +110,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
     console_inputs.value       =  0 ;
 
     char control_mode = 'q'; //'t' stands for torque control mode, 'v' stands for velocity control mode, 'p' stands for position control mode
+    int repeat_mode = 0;
 
 
     fflush(stdout);
@@ -140,9 +141,11 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
         switch(control_mode)
         {
         case 't':
-                i_position_control.enable_torque_ctrl();
-                printf("torque control mode with linear profil selected\n");
-
+                if(repeat_mode==0)
+                {
+                    i_position_control.enable_torque_ctrl();
+                    printf("torque control mode with linear profil selected\n");
+                }
 
                 int command_type = 'd';// 's' stands for step response with profiler, and 'd' stands for direct command
 
@@ -209,20 +212,24 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 }
 
                 printf("press q if you want to quit this mode, else press any key\n");
+                repeat_mode=1;
                 console_inputs = get_user_command();
                 if(console_inputs.first_char=='q')
                 {
                     control_mode='q';
                     i_position_control.disable();
+                    repeat_mode=0;
                     printf("controller disabled\n");
                 }
 
                 break;
 
         case 'v':
-                i_position_control.enable_velocity_ctrl();
-                printf("velocity control mode with linear profile selected\n");
-
+                if(repeat_mode==0)
+                {
+                    i_position_control.enable_velocity_ctrl();
+                    printf("velocity control mode with linear profile selected\n");
+                }
                 int command_type = 'd';// 's' stands for step response with profiler, and 'd' stands for direct command
 
                 printf("please select command type type\n");
@@ -286,11 +293,13 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 }
 
                 printf("press q if you want to quit this mode, else press any key\n");
+                repeat_mode=1;
                 console_inputs = get_user_command();
                 if(console_inputs.first_char=='q')
                 {
                     control_mode='q';
                     i_position_control.disable();
+                    repeat_mode=0;
                     printf("controller disabled\n");
                 }
 
@@ -299,7 +308,6 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
         case 'p':
 
                 int controller_type = 1;
-
                 printf("please select position controller type\n");
                 printf("press 1 to use a position pid controller \n");
                 printf("press 2 to use a cascaded positon/velocity pid controller \n");
@@ -405,11 +413,13 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 }
 
                 printf("press q if you want to quit this mode, else press any key\n");
+                repeat_mode=1;
                 console_inputs = get_user_command();
                 if(console_inputs.first_char=='q')
                 {
                     control_mode='q';
                     i_position_control.disable();
+                    repeat_mode=0;
                     printf("controller disabled\n");
                 }
 
