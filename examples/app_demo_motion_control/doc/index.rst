@@ -20,8 +20,10 @@ In the prepared console interface, appropriate commands (and their functionality
 - send direct/step commands in each mode
 
 By default, profiled references will be used. Figure 1 shows the difference between a profiled "direct command", and a profiled "step command".
+
 .. image:: images/step_and_direct_commands_in_profiled_modes_001.jpg
    :width: 90%
+
 **Fig. 1: Step and direct types of profiled reference values**
 
 The data displayed over XScope will be:
