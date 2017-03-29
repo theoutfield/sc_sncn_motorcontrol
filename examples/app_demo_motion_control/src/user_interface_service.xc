@@ -149,27 +149,71 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 i_position_control.enable_torque_ctrl();
                 printf("torque control mode with linear profil selected\n");
 
-                printf("please enter the reference torque in milli-Nm\n");
+
+                int command_type = 'd';// 's' stands for step response with profiler, and 'd' stands for direct command
+
+                printf("please select command type type\n");
+                printf("press s to send a step command \n");
+                printf("press d to send a direct command \n");
+
                 console_inputs = get_user_command();
+                while(console_inputs.first_char!='s' && console_inputs.first_char!='d')
+                {
+                    printf("wrong input\n");
+                    printf("press s to send a step command \n");
+                    printf("press d to send a direct command \n");
 
-                printf("torque step command from 0 to %d to %d to 0 milli-Nm\n", console_inputs.value, -console_inputs.value);
+                    console_inputs = get_user_command();
+                }
+                command_type = console_inputs.first_char;
 
-                downstream_control_data.offset_torque = 0;
-                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-                motion_ctrl_config.enable_profiler = 1;
-                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                switch(command_type)
+                {
+                case 's':
+                        printf("step command selected\n");
 
-                downstream_control_data.torque_cmd = console_inputs.value;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(2000);
+                        printf("please enter the reference torque in milli-Nm\n");
+                        console_inputs = get_user_command();
 
-                downstream_control_data.torque_cmd =-console_inputs.value;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(2000);
+                        printf("torque step command from 0 to %d to %d to 0 milli-Nm\n", console_inputs.value, -console_inputs.value);
 
-                downstream_control_data.torque_cmd =0;
-                i_position_control.update_control_data(downstream_control_data);
-                delay_milliseconds(2000);
+                        downstream_control_data.offset_torque = 0;
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config.enable_profiler = 1;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+
+                        downstream_control_data.torque_cmd = console_inputs.value;
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(2000);
+
+                        downstream_control_data.torque_cmd =-console_inputs.value;
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(2000);
+
+                        downstream_control_data.torque_cmd =0;
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(2000);
+                        break;
+
+                case 'd':
+
+                        printf("direct command selected\n");
+
+                        printf("please enter the reference torque in milli-Nm\n");
+                        console_inputs = get_user_command();
+
+                        printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
+
+                        downstream_control_data.offset_torque = 0;
+                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config.enable_profiler = 1;
+                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+
+                        downstream_control_data.torque_cmd = console_inputs.value;
+                        i_position_control.update_control_data(downstream_control_data);
+                        delay_milliseconds(2000);
+                        break;
+                }
 
                 printf("press q if you want to quit this mode, else press any key\n");
                 console_inputs = get_user_command();
