@@ -56,8 +56,8 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
         profiler_config.ticks_per_turn  =                          SENSOR_1_RESOLUTION;
     }
     profiler_config.max_velocity = MOTOR_MAX_SPEED;
-    profiler_config.max_acceleration = MAX_ACCELERATION;
-    profiler_config.max_deceleration = MAX_DECELERATION;
+    profiler_config.max_acceleration = MAX_ACCELERATION_PROFILER;
+    profiler_config.max_deceleration = MAX_DECELERATION_PROFILER;
 
     DownstreamControlData downstream_control_data;
     downstream_control_data.velocity_cmd = 0;
