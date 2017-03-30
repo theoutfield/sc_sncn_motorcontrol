@@ -133,9 +133,9 @@ Examples
 
 * **BLDC Motor Control demos:**
 
-	* `BLDC Torque Control Demo <examples/app_demo_advanced_foc/doc/index>`_: FOC-based torque control of your BLDC motor.
-	* `BLDC Motion Control Demo <examples/app_demo_bldc_position/doc/index>`_: Simple example to make Position/Velocity/Torque Control of your BLDC motor.
-	* `BLDC Control Tuning Demo <examples/app_demo_bldc_velocity_position/doc/index>`_: Helper application to tune your motion controllers and find commutation angle offset.
+	* `BLDC Torque Control Demo <examples/app_demo_advanced_foc/doc/index.html>`_: FOC-based torque control of your BLDC motor.
+	* `BLDC Motion Control Demo <examples/app_demo_motion_control/doc/index.html>`_: Simple example to make Position/Velocity/Torque Control of your BLDC motor.
+	* `BLDC Control Tuning Demo <examples/app_demo_bldc_velocity_position/doc/index.html>`_: Helper application to tune your motion controllers and find commutation angle offset.
 
 
 Motor Control Quick Guides
