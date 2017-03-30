@@ -158,6 +158,7 @@ int main(void)
 
             motion_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
             motion_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
+            motion_ctrl_config.max_deceleration_profiler =            MAX_DECELERATION_PROFILER;
             motion_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
 
             motion_ctrl_config.position_control_strategy =            NL_POSITION_CONTROLLER;
