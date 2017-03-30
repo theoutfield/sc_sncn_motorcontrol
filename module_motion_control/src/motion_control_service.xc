@@ -141,8 +141,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     ProfilerParam profiler_param;
     profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
     profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
-    profiler_param.acceleration_max = (double)(motion_ctrl_config.max_acceleration_profiler);
-    profiler_param.deceleration_max = (double)(motion_ctrl_config.max_deceleration_profiler);
+    profiler_param.a_max = (double)(motion_ctrl_config.max_acceleration_profiler);
     profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
     profiler_param.resolution = (double)(motion_ctrl_config.resolution);
 
@@ -254,7 +253,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                 {
                     if(motion_ctrl_config.enable_profiler==1)
                     {
-                        velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
+                        velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
                         velocity_ref_in_k_1n = velocity_ref_in_k;
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                     }
@@ -554,8 +553,7 @@ break;
                         (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
                         POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
-                profiler_param.acceleration_max = (double)(motion_ctrl_config.max_acceleration_profiler);
-                profiler_param.deceleration_max = (double)(motion_ctrl_config.max_deceleration_profiler);
+                profiler_param.a_max = (double)(motion_ctrl_config.max_acceleration_profiler);
                 profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
                 profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
 

@@ -123,6 +123,10 @@
 
 #define MOTION_PROFILE_TYPE LINEAR
 
+// PROFILER LIMITS
+#define MAX_ACCELERATION        7000            // rpm/s
+#define MAX_DECELERATION        7000            // rpm/s
+
 
 /////////////////////////////////////////////////
 //////  POSITION CONTROLLER
@@ -135,7 +139,6 @@
 //Integrated Profiler
 #define ENABLE_PROFILER                         0
 #define MAX_ACCELERATION_PROFILER               10000    // [rpm/sec]
-#define MAX_DECELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
 
 

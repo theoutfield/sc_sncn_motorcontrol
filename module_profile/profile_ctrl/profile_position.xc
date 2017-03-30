@@ -89,7 +89,7 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, Profiler
     int deceleration_flag = 0;
 
     v_max = (((double)(pos_profiler_param.v_max)) * pos_profiler_param.resolution )/60.00;
-    a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
+    a_max = (((double)(pos_profiler_param.a_max)) * pos_profiler_param.resolution )/60.00;
 
     if (pos_target == pos_k_1n)
         pos_k = pos_target;

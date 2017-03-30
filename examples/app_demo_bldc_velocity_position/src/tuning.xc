@@ -448,9 +448,6 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 case 'a':
                         motion_ctrl_config.max_acceleration_profiler = value;
                         break;
-                case 'd':
-                        motion_ctrl_config.max_deceleration_profiler = value;
-                        break;
                 case 'v':
                         motion_ctrl_config.max_speed_profiler = value;
                         break;
@@ -463,7 +460,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 }
                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
                 printf("profiler settings: \n");
-                printf("acceleration: %d [rpm/s], deceleration: %d \n velocity: %d [rpm], torque_rate: %d [mNm/s] \n", motion_ctrl_config.max_acceleration_profiler, motion_ctrl_config.max_deceleration_profiler, motion_ctrl_config.max_speed_profiler, motion_ctrl_config.max_torque_rate_profiler);
+                printf("acceleration: %d [rpm/s], velocity: %d [rpm], torque_rate: %d [mNm/s] \n",motion_ctrl_config.max_acceleration_profiler, motion_ctrl_config.max_speed_profiler, motion_ctrl_config.max_torque_rate_profiler);
                 break;
 
         //auto offset tuning
