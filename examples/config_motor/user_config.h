@@ -169,7 +169,7 @@
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
-#define ENABLE_SHAKE_BRAKE     0
+#define BRAKE_RELEASE_STRATEGY     0
 
 #define BRAKE_SHUTDOWN_DELAY   0     //delay in milliseconds between the brake blocking and the stop of the control
 

@@ -94,7 +94,7 @@ typedef struct {
     int k_m;                            /**< Value for setting the gain of torque actuator */
     int moment_of_inertia;              /**< Value for setting the moment of inertia */
     MotionPolarity polarity;            /**< Value for setting the polarity of the movement */
-    int special_brake_release;
+    int brake_release_strategy;
     int brake_shutdown_delay;
 
     int dc_bus_voltage;                 /**< Value for setting the nominal (rated) value of dc-link */

@@ -438,11 +438,11 @@ break;
                 pid_reset(position_control_pid_param);
 
                 //special brake release
-                if (motion_ctrl_config.special_brake_release != 0)
+                if (motion_ctrl_config.brake_release_strategy != 0)
                 {
                     special_brake_release_counter = 0;
                     special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (motion_ctrl_config.special_brake_release*motion_ctrl_config.max_torque)/100;
+                    special_brake_release_torque = (motion_ctrl_config.brake_release_strategy*motion_ctrl_config.max_torque)/100;
                 }
 
                 //enable motorcontrol and release brake
@@ -467,11 +467,11 @@ break;
                 pid_reset(velocity_control_pid_param);
 
                 //special brake release
-                if (motion_ctrl_config.special_brake_release != 0)
+                if (motion_ctrl_config.brake_release_strategy != 0)
                 {
                     special_brake_release_counter = 0;
                     special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (motion_ctrl_config.special_brake_release*motion_ctrl_config.max_torque)/100;
+                    special_brake_release_torque = (motion_ctrl_config.brake_release_strategy*motion_ctrl_config.max_torque)/100;
                 }
 
                 //enable motorcontrol and release brake
@@ -493,11 +493,11 @@ break;
                 downstream_control_data.offset_torque = 0;
 
                 //special brake release
-                if (motion_ctrl_config.special_brake_release != 0)
+                if (motion_ctrl_config.brake_release_strategy != 0)
                 {
                     special_brake_release_counter = 0;
                     special_brake_release_initial_position = upstream_control_data.position;
-                    special_brake_release_torque = (motion_ctrl_config.special_brake_release*motion_ctrl_config.max_torque)/100;
+                    special_brake_release_torque = (motion_ctrl_config.brake_release_strategy*motion_ctrl_config.max_torque)/100;
                 }
 
                 //enable motorcontrol and release brake
