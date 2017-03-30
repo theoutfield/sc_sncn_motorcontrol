@@ -403,9 +403,9 @@ break;
         case i_position_control[int i].disable():
 
                 i_motorcontrol.set_brake_status(0);
-                if (motion_ctrl_config.brake_shutdown_delay != 0 && position_enable_flag == 1)
+                if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                 {
-                    brake_shutdown_counter = motion_ctrl_config.brake_shutdown_delay;
+                    brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
                 }
                 else
                 {

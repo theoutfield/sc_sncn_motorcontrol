@@ -149,7 +149,7 @@ typedef struct {
 
     int phase_resistance;                   /**< uOhm*/
     int phase_inductance;                   /**< uH*/
-    int v_dc;                               /**< dc bus voltage*/
+    int dc_bus_voltage;                     /**< dc bus voltage*/
 
     // regenerative mode variables
     int recuperation_enabled;

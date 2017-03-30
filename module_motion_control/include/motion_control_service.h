@@ -95,7 +95,7 @@ typedef struct {
     int moment_of_inertia;              /**< Value for setting the moment of inertia */
     MotionPolarity polarity;            /**< Value for setting the polarity of the movement */
     int brake_release_strategy;
-    int brake_shutdown_delay;
+    int brake_release_delay;
 
     int dc_bus_voltage;                 /**< Value for setting the nominal (rated) value of dc-link */
     int pull_brake_voltage;             /**< Value for setting the voltage for pulling the brake out! */

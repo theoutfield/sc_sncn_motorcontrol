@@ -171,7 +171,7 @@
 //////////////////////////////////////////////
 #define BRAKE_RELEASE_STRATEGY     0
 
-#define BRAKE_SHUTDOWN_DELAY   0     //delay in milliseconds between the brake blocking and the stop of the control
+#define BRAKE_RELEASE_DELAY   0     //delay in milliseconds between the brake blocking and the stop of the control
 
 /*
  * Define: Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].

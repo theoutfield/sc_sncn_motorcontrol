@@ -174,7 +174,7 @@ int main(void)
             motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
 
             motion_ctrl_config.brake_release_strategy =                BRAKE_RELEASE_STRATEGY;
-            motion_ctrl_config.brake_shutdown_delay =                 BRAKE_SHUTDOWN_DELAY;
+            motion_ctrl_config.brake_release_delay =                    BRAKE_RELEASE_DELAY;
 
             //select resolution of sensor used for motion control
             if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
@@ -226,7 +226,7 @@ int main(void)
 
                     MotorcontrolConfig motorcontrol_config;
 
-                    motorcontrol_config.v_dc =  DC_BUS_VOLTAGE;
+                    motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
                     motorcontrol_config.phases_inverted = MOTOR_PHASES_NORMAL;
                     motorcontrol_config.torque_P_gain =  TORQUE_P_VALUE;
                     motorcontrol_config.torque_I_gain =  TORQUE_I_VALUE;
