@@ -260,7 +260,8 @@ typedef struct {
     double delta_T;
     double resolution;              //resolution    [ticks/mechanical_rotation]
     double v_max;                   //velocity      [rpm]
-    double a_max;                   //acceleration  [rpm/s]
+    double acceleration_max;        //maximum acceleration  [rpm/s]
+    double deceleration_max;        //maximum deceleration  [rpm/s]
     double torque_rate_max;         //torque rate   [mNm/s]
 } ProfilerParam;
 
@@ -293,7 +294,7 @@ double torque_profiler(double torque_ref, double torque_ref_in_k_1n, ProfilerPar
  *
  * @return  profiled velocity calculated for the next step
  */
-double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, ProfilerParam profiler_param, int velocity_control_loop);
+double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, double velocity_actual, ProfilerParam profiler_param, int position_control_loop);
 
 /**
  * @brief updating the position reference profiler

@@ -76,6 +76,7 @@ typedef struct {
 
     int enable_profiler;                /**< Value for enabling/disabling the profiler */
     int max_acceleration_profiler;      /**< Value for setting the maximum acceleration in profiler mode */
+    int max_deceleration_profiler;      /**< Value for setting the maximum deceleration in profiler mode */
     int max_speed_profiler;             /**< Value for setting the maximum speed in profiler mode */
     int max_torque_rate_profiler;       /**< Value for setting the maximum torque in profiler mode */
 

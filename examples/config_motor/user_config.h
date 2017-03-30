@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config.h>
+#include <motor_config_AMK_DT4.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -125,7 +125,7 @@
 
 // PROFILER LIMITS
 #define MAX_ACCELERATION        7000            // rpm/s
-#define MAX_DECELERATION        7000            // rpm/s
+#define MAX_DECELERATION        1000            // rpm/s
 
 
 /////////////////////////////////////////////////
@@ -139,6 +139,7 @@
 //Integrated Profiler
 #define ENABLE_PROFILER                         0
 #define MAX_ACCELERATION_PROFILER               10000    // [rpm/sec]
+#define MAX_DECELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
 
 

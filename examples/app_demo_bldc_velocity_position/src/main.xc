@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -64,6 +64,7 @@ int main(void) {
 
             motion_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
             motion_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
+            motion_ctrl_config.max_deceleration_profiler =            MAX_DECELERATION_PROFILER;
             motion_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
 
             motion_ctrl_config.position_control_strategy =            NL_POSITION_CONTROLLER;
