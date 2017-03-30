@@ -45,7 +45,7 @@ Quick How-to
 ============
 **Important**
 
-It is assumed that before starting this application, the PID parameters for velocity and position control are tuned and set in the software. To do this, please check app_demo_tuning in `synapticon sc_sncn_motorcontrol repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples>`_
+It is assumed that before starting this application, profiler parameters and PID parameters for velocity and position control are tuned and set in the software. To do this, please check app_demo_tuning in `synapticon sc_sncn_motorcontrol repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples>`_
 
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
 
