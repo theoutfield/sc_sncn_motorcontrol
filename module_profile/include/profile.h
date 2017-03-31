@@ -301,8 +301,9 @@ double velocity_profiler(double velocity_ref, double velocity_ref_in_k_1n, doubl
  * @param   pos_target, target position
  * @param   pos_k_1n, profiled position calculated in one step ago
  * @param   pos_k_2n, profiled position calculated in two steps ago
+ * @param   pos_k_3n, profiled position calculated in three steps ago
  * @param   pos_profiler_param parameters of the position reference profiler
  *
  * @return  profiled position calculated for the next step
  */
-float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, ProfilerParam pos_profiler_param);
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double pos_k_3n, ProfilerParam pos_profiler_param);

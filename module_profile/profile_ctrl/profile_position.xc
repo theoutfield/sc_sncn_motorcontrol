@@ -79,11 +79,12 @@ int sign_function(float a)
  * @param   pos_target, target position
  * @param   pos_k_1n, profiled position calculated in one step ago
  * @param   pos_k_2n, profiled position calculated in two steps ago
+ * @param   pos_k_3n, profiled position calculated in three steps ago
  * @param   pos_profiler_param parameters of the position reference profiler
  *
  * @return  profiled position calculated for the next step
  */
-float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, ProfilerParam pos_profiler_param)
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double pos_k_3n, ProfilerParam pos_profiler_param)
 {
     double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2, v_max = 0.00, a_max = 0.00;
     int deceleration_flag = 0;

@@ -133,6 +133,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
+    double position_ref_in_k_3n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
     MotorcontrolConfig motorcontrol_config;
 
@@ -285,9 +286,11 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                                 (double) downstream_control_data.position_cmd),
                                 position_ref_in_k_1n,
                                 position_ref_in_k_2n,
+                                position_ref_in_k_3n,
                                 profiler_param);
 
                         acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(POSITION_CONTROL_LOOP_PERIOD * POSITION_CONTROL_LOOP_PERIOD);
+                        position_ref_in_k_3n = position_ref_in_k_2n;
                         position_ref_in_k_2n = position_ref_in_k_1n;
                         position_ref_in_k_1n = position_ref_in_k;
                     }
