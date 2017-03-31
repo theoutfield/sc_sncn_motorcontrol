@@ -286,7 +286,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                                 (double) downstream_control_data.position_cmd),
                                 position_ref_in_k_1n,
                                 position_ref_in_k_2n,
-                                position_ref_in_k_3n,
+                                position_k,
                                 profiler_param);
 
                         acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(POSITION_CONTROL_LOOP_PERIOD * POSITION_CONTROL_LOOP_PERIOD);

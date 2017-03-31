@@ -79,18 +79,40 @@ int sign_function(float a)
  * @param   pos_target, target position
  * @param   pos_k_1n, profiled position calculated in one step ago
  * @param   pos_k_2n, profiled position calculated in two steps ago
- * @param   pos_k_3n, profiled position calculated in three steps ago
+ * @param   pos_actual, profiled position calculated in three steps ago
  * @param   pos_profiler_param parameters of the position reference profiler
  *
  * @return  profiled position calculated for the next step
  */
-float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double pos_k_3n, ProfilerParam pos_profiler_param)
+float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double pos_actual, ProfilerParam pos_profiler_param)
 {
     double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2, v_max = 0.00, a_max = 0.00;
+    double variable_velocity_distance=0.00;
     int deceleration_flag = 0;
 
     v_max = (((double)(pos_profiler_param.v_max)) * pos_profiler_param.resolution )/60.00;
-    a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
+
+    velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
+
+    if(pos_profiler_param.deceleration_max<pos_profiler_param.acceleration_max)
+    {
+        a_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
+        variable_velocity_distance = (velocity_k_1n*velocity_k_1n) / (4 * a_max);
+    }
+    else
+    {
+        a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
+        variable_velocity_distance = (velocity_k_1n*velocity_k_1n) / (4 * a_max);
+    }
+
+    if(pos_target>pos_actual  &&  (pos_target-pos_actual)<variable_velocity_distance)
+        a_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
+    else if(pos_target>pos_actual  &&  (pos_target-pos_actual)>variable_velocity_distance)
+        a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
+    else if(pos_target<pos_actual  &&  (pos_actual-pos_target)<variable_velocity_distance)
+        a_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
+    else if(pos_target<pos_actual  &&  (pos_actual-pos_target)>variable_velocity_distance)
+        a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
 
     if (pos_target == pos_k_1n)
         pos_k = pos_target;
