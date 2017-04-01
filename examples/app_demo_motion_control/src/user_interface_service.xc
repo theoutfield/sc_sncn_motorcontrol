@@ -211,7 +211,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         break;
                 }
 
-                printf("press q if you want to quit this mode, else press any key\n");
+                printf("press q if you want to quit this mode, else press Enter\n");
                 repeat_mode=1;
                 console_inputs = get_user_command();
                 if(console_inputs.first_char=='q')
@@ -292,7 +292,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         break;
                 }
 
-                printf("press q if you want to quit this mode, else press any key\n");
+                printf("press q if you want to quit this mode, else press Enter\n");
                 repeat_mode=1;
                 console_inputs = get_user_command();
                 if(console_inputs.first_char=='q')
@@ -412,7 +412,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         break;
                 }
 
-                printf("press q if you want to quit this mode, else press any key\n");
+                printf("press q if you want to quit this mode, else press Enter\n");
                 repeat_mode=1;
                 console_inputs = get_user_command();
                 if(console_inputs.first_char=='q')
