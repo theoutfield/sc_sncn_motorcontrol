@@ -190,6 +190,41 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         downstream_control_data.torque_cmd =0;
                         i_position_control.update_control_data(downstream_control_data);
                         delay_milliseconds(2000);
+
+                        char new_reference_char = 'n';
+                        while(new_reference_char=='n')
+                        {
+                            printf("press n for a new reference value, else press enter \n");
+                            console_inputs = get_user_command();
+                            new_reference_char=console_inputs.first_char;
+
+                            if(new_reference_char=='n')
+                            {
+                                printf("press new reference value \n");
+                                console_inputs = get_user_command();
+
+                                printf("torque step command from 0 to %d to %d to 0 milli-Nm\n", console_inputs.value, -console_inputs.value);
+
+                                downstream_control_data.offset_torque = 0;
+                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                motion_ctrl_config.enable_profiler = 1;
+                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+
+                                downstream_control_data.torque_cmd = console_inputs.value;
+                                i_position_control.update_control_data(downstream_control_data);
+                                delay_milliseconds(2000);
+
+                                downstream_control_data.torque_cmd =-console_inputs.value;
+                                i_position_control.update_control_data(downstream_control_data);
+                                delay_milliseconds(2000);
+
+                                downstream_control_data.torque_cmd =0;
+                                i_position_control.update_control_data(downstream_control_data);
+                                delay_milliseconds(2000);
+
+                            }
+
+                        }
                         break;
 
                 case 'd':
@@ -301,6 +336,31 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         downstream_control_data.velocity_cmd = 0;
                         i_position_control.update_control_data(downstream_control_data);
                         delay_milliseconds(2000);
+
+                        char new_reference_char = 'n';
+                        while(new_reference_char=='n')
+                        {
+                            printf("press n for a new reference value, else press enter \n");
+                            console_inputs = get_user_command();
+                            new_reference_char=console_inputs.first_char;
+
+                            if(new_reference_char=='n')
+                            {
+                                printf("press new reference value \n");
+                                console_inputs = get_user_command();
+
+                                //printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
+                                //downstream_control_data.offset_torque = 0;
+                                //motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                //motion_ctrl_config.enable_profiler = 1;
+                                //i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                //
+                                //downstream_control_data.torque_cmd = console_inputs.value;
+                                //i_position_control.update_control_data(downstream_control_data);
+
+                            }
+
+                        }
                         break;
                 case 'd':
                         printf("direct command selected\n");
@@ -317,6 +377,31 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         i_position_control.set_position_velocity_control_config(motion_ctrl_config);
 
                         i_position_control.update_control_data(downstream_control_data);
+
+                        char new_reference_char = 'n';
+                        while(new_reference_char=='n')
+                        {
+                            printf("press n for a new reference value, else press enter \n");
+                            console_inputs = get_user_command();
+                            new_reference_char=console_inputs.first_char;
+
+                            if(new_reference_char=='n')
+                            {
+                                printf("press new reference value \n");
+                                console_inputs = get_user_command();
+
+                                //printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
+                                //downstream_control_data.offset_torque = 0;
+                                //motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                //motion_ctrl_config.enable_profiler = 1;
+                                //i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                //
+                                //downstream_control_data.torque_cmd = console_inputs.value;
+                                //i_position_control.update_control_data(downstream_control_data);
+
+                            }
+
+                        }
                         break;
                 }
 
@@ -418,6 +503,31 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         downstream_control_data.position_cmd = 0;
                         i_position_control.update_control_data(downstream_control_data);
                         delay_milliseconds(1500);
+
+                        char new_reference_char = 'n';
+                        while(new_reference_char=='n')
+                        {
+                            printf("press n for a new reference value, else press enter \n");
+                            console_inputs = get_user_command();
+                            new_reference_char=console_inputs.first_char;
+
+                            if(new_reference_char=='n')
+                            {
+                                printf("press new reference value \n");
+                                console_inputs = get_user_command();
+
+                                //printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
+                                //downstream_control_data.offset_torque = 0;
+                                //motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                //motion_ctrl_config.enable_profiler = 1;
+                                //i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                //
+                                //downstream_control_data.torque_cmd = console_inputs.value;
+                                //i_position_control.update_control_data(downstream_control_data);
+
+                            }
+
+                        }
                         break;
 
                 case 'd':
@@ -437,6 +547,31 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = console_inputs.value;
                         i_position_control.update_control_data(downstream_control_data);
+
+                        char new_reference_char = 'n';
+                        while(new_reference_char=='n')
+                        {
+                            printf("press n for a new reference value, else press enter \n");
+                            console_inputs = get_user_command();
+                            new_reference_char=console_inputs.first_char;
+
+                            if(new_reference_char=='n')
+                            {
+                                printf("press new reference value \n");
+                                console_inputs = get_user_command();
+
+                                //printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
+                                //downstream_control_data.offset_torque = 0;
+                                //motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                //motion_ctrl_config.enable_profiler = 1;
+                                //i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                //
+                                //downstream_control_data.torque_cmd = console_inputs.value;
+                                //i_position_control.update_control_data(downstream_control_data);
+
+                            }
+
+                        }
                         break;
                 }
 
