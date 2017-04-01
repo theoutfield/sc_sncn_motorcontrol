@@ -9,6 +9,7 @@
 #include <profile.h>
 #include <profile_control.h>
 #include <xs1.h>
+#include <xscope.h>
 
 void init_position_profiler(ProfilerConfig profile_position_config) {
 
@@ -94,15 +95,19 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double p
 
     velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
 
-    if(pos_profiler_param.deceleration_max<pos_profiler_param.acceleration_max)
+    if(pos_profiler_param.acceleration_max>pos_profiler_param.deceleration_max)
     {
-        a_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
-        variable_velocity_distance = (velocity_k_1n*velocity_k_1n) / (4 * a_max);
+        a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
+        variable_velocity_distance = (v_max*v_max) / (4 * a_max);
+
+        xscope_int(VARIABLE_VELOCITY_DISTANCE_1, variable_velocity_distance);
     }
     else
     {
-        a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
-        variable_velocity_distance = (velocity_k_1n*velocity_k_1n) / (4 * a_max);
+        a_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
+        variable_velocity_distance = (v_max*v_max) / (4 * a_max);
+
+        xscope_int(VARIABLE_VELOCITY_DISTANCE_2, variable_velocity_distance);
     }
 
     if(pos_target>pos_actual  &&  (pos_target-pos_actual)<variable_velocity_distance)
