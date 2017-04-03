@@ -197,6 +197,14 @@ interface PositionVelocityCtrlInterface
     void reset_motorcontrol_faults();
 
     /**
+     * @brief Enables the safe-torque-off mode
+     *
+     * @return void
+     */
+    void set_safe_torque_off_enabled();
+
+
+    /**
      * @brief getter of actual position
      */
     int get_position();

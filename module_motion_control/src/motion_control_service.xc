@@ -769,6 +769,14 @@ break;
         case i_position_control[int i].reset_motorcontrol_faults():
                 i_motorcontrol.reset_faults();
                 break;
+
+        case i_position_control[int i].set_safe_torque_off_enabled():
+                i_motorcontrol.set_brake_status(0);
+                torque_enable_flag   = 0;
+                velocity_enable_flag = 0;
+                position_enable_flag = 0;
+                i_motorcontrol.set_safe_torque_off_enabled();
+                break;
         }
     }
 }

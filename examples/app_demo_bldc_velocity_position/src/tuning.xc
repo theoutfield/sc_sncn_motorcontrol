@@ -202,6 +202,12 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                         downstream_control_data.torque_cmd = value;
                         switch(mode_3)
                         {
+                        //torque safe mode
+                        case 's':
+                            i_position_control.set_safe_torque_off_enabled();
+                            printf("torque safe enabled\n");
+                            break;
+
                         //with profile
                         case 'p':
                                 motion_ctrl_config.enable_profiler = 1;
@@ -587,7 +593,7 @@ void demo_torque_position_velocity_control(client interface PositionVelocityCtrl
                 break;
 
         //check status and reset faults if any
-        case 'z':
+        case 'f':
             UpstreamControlData upstream_control_data = i_position_control.update_control_data(downstream_control_data);
 
             if (upstream_control_data.error_status == NO_FAULT)
