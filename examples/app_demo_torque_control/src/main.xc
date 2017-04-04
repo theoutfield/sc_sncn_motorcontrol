@@ -9,7 +9,7 @@
  * @date 17/06/2014
  */
 
-#include <tuning.h>
+#include <user_interface_service.h>
 #include <pwm_server.h>
 #include <pwm_ports.h>
 #include <adc_service.h>
