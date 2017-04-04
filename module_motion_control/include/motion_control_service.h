@@ -236,6 +236,39 @@ interface PositionVelocityCtrlInterface
  */
 void init_position_velocity_control(interface PositionVelocityCtrlInterface client i_position_control);
 
+
+/**
+ * @brief Update brake hold/pull voltages and pull time in the pwm service.
+ *
+ *        It take the DC, hold/pull voltages and pull time parameters
+ *        and compute the corresponding duty cycles which are then sent to the pwm service.
+ *
+ * @param app_tile_usec
+ * @param motion_ctrl_config config structure of the motion control
+ * @param i_motorcontrol client interface to get the ifm tile frequency from the motorcontrol service.
+ * @param i_update_brake client enterface to the pwm service to send the brake configuration
+ *
+ */
+void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_ctrl_config, client interface MotorControlInterface i_motorcontrol, client interface UpdateBrake i_update_brake);
+
+
+/**
+ * @brief Enable motorcontrol and brake
+ *
+ *        The brake_release_strategy parameter it checked to chose the brake mode (disable, normal, shaking)
+ *
+ * @param motion_ctrl_config config structure of the motion control
+ * @param i_motorcontrol client interface to enable motorcontrol and set the brake.
+ * @param position used for the starting position for the shaking brake release
+ * @param special_brake_release_counter used for the shaking brake release
+ * @param special_brake_release_initial_position used for the shaking brake release
+ * @param special_brake_release_torque used for the shaking brake release
+ *
+ */
+void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface MotorControlInterface i_motorcontrol, int position,
+        int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque);
+
+
 /**
  * @brief Service to perform torque, velocity or position control.
  *        You will need a Motor Control Stack running parallel to this Service,
