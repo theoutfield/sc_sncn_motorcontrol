@@ -22,9 +22,10 @@
 #define SENSOR_1_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
-//                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_ONLY,
-//                        SENSOR_FUNCTION_MOTION_CONTROL, SENSOR_FUNCTION_FEEDBACK_ONLY]
-// Only one sensor can be selected for commutation, motion control or feedback only
+//                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
+//                        SENSOR_FUNCTION_MOTION_CONTROL, SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY
+//                        SENSOR_FUNCTION_COMMUTATION_ONLY]
+// Only one sensor can be selected for commutation, motion control or feedback display only
 #define SENSOR_1_FUNCTION                 SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL
 
 // RESOLUTION (TICKS PER TURN) OF SENSOR_1
@@ -44,9 +45,10 @@
 #define SENSOR_2_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_2 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
-//                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_ONLY,
-//                        SENSOR_FUNCTION_MOTION_CONTROL, SENSOR_FUNCTION_FEEDBACK_ONLY]
-// Only one sensor can be selected for commutation, motion control or feedback only
+//                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
+//                        SENSOR_FUNCTION_MOTION_CONTROL, SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY
+//                        SENSOR_FUNCTION_COMMUTATION_ONLY]
+// Only one sensor can be selected for commutation, motion control or feedback display only
 #define SENSOR_2_FUNCTION                 SENSOR_FUNCTION_DISABLED
 
 // RESOLUTION (TICKS PER TURN) OF SENSOR_2

@@ -40,6 +40,12 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
                 data.sensor_error = sensor_error;
                 break;
 
+        case i_shared_memory[int j].write_angle(unsigned int angle, unsigned int hall_state, int velocity):
+                data.angle = angle;
+                data.hall_state = hall_state;
+                data.angle_velocity = velocity;
+                break;
+
         case i_shared_memory[int j].write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error):
                 data.angle = angle;
                 data.hall_state = hall_state;

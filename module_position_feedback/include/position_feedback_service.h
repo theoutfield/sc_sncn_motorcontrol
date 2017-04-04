@@ -36,11 +36,12 @@ typedef enum {
  * @brief Sensor function type to select which data to write to the shared memory
  */
 typedef enum {
-    SENSOR_FUNCTION_DISABLED=0,                     /**< Send nothing */
-    SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL, /**< Send the electrical angle for commutation and the absolute position/velocity for motion control */
-    SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_ONLY,  /**< Send the electrical angle for commutation and the absolute position/velocity for secondary feedback (for display only) */
-    SENSOR_FUNCTION_MOTION_CONTROL,                 /**< Send only the absolute position/velocity for motion control */
-    SENSOR_FUNCTION_FEEDBACK_ONLY                   /**< Send only the absolute position/velocity for secondary feedback (for display only) */
+    SENSOR_FUNCTION_DISABLED=0,                             /**< Send nothing */
+    SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,         /**< Send the electrical angle for commutation and the absolute position/velocity for motion control */
+    SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,  /**< Send the electrical angle for commutation and the absolute position/velocity for secondary feedback (for display only) */
+    SENSOR_FUNCTION_MOTION_CONTROL,                         /**< Send only the absolute position/velocity for motion control */
+    SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY,                  /**< Send only the absolute position/velocity for secondary feedback (for display only) */
+    SENSOR_FUNCTION_COMMUTATION_ONLY                        /**< Send only the absolute position/velocity for secondary feedback (for display only) */
 } SensorFunction;
 
 

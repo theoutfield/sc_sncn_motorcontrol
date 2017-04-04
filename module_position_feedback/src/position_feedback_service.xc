@@ -254,14 +254,17 @@ void write_shared_memory(client interface shared_memory_interface ?i_shared_memo
         case SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL:
             i_shared_memory.write_angle_and_primary_feedback(angle, hall_state, count, velocity, sensor_error);
             break;
-        case SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_ONLY:
+        case SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY:
             i_shared_memory.write_angle_and_secondary_feedback(angle, hall_state, count, velocity, sensor_error);
             break;
         case SENSOR_FUNCTION_MOTION_CONTROL:
             i_shared_memory.write_primary_feedback(count, velocity, sensor_error);
             break;
-        case SENSOR_FUNCTION_FEEDBACK_ONLY:
+        case SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY:
             i_shared_memory.write_secondary_feedback(count, velocity, sensor_error);
+            break;
+        case SENSOR_FUNCTION_COMMUTATION_ONLY:
+            i_shared_memory.write_angle(angle, hall_state, velocity);
             break;
         }
     }
