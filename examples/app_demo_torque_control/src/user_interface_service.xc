@@ -1,5 +1,5 @@
 /*
- * tuning.xc
+ * user_interface_service.xc
 
  *
  *  Created on: Jul 13, 2015
@@ -41,6 +41,7 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
     printf(" DEMO_TORQUE_CONTROL started...\n");
     i_motorcontrol.set_brake_status(1);
     i_motorcontrol.set_torque_control_enabled();
+    printf(" please enter torque reference in [milli-Nm]\n");
 
     upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
@@ -230,69 +231,69 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
                 i_motorcontrol.set_safe_torque_off_enabled();
                 break;
 
-            //show on xscope for 10 seconds!
+        //show on xscope for 10 seconds!
+        //this will block this service (demo_torque_control) for almost 10 seconds
         case 'x':
-            printf("activate xscope during 20 seconds ...\n");
-            for(int i=0; i<=20000;i++)
-            {
+                printf("activate xscope during 20 seconds ...\n");
+                for(int i=0; i<=10000;i++)
+                {
+                    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+
+                    xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
+                    xscope_int(V_DC, upstream_control_data.V_dc);
+                    xscope_int(ANGLE, upstream_control_data.angle);
+                    xscope_int(POSITION, upstream_control_data.position);
+                    xscope_int(VELOCITY, upstream_control_data.velocity);
+                    xscope_int(TEMPERATURE, upstream_control_data.temperature);
+                    xscope_int(FAULT_CODE, upstream_control_data.error_status);
+
+                    delay_milliseconds(1);
+                }
+                break;
+
+        //reset faults
+        case 'z':
+                printf("reset faults, and check status ...\n");
+                i_motorcontrol.reset_faults();
+
+                delay_milliseconds(500);
                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
-                xscope_int(V_DC, upstream_control_data.V_dc);
-                xscope_int(ANGLE, upstream_control_data.angle);
-                xscope_int(POSITION, upstream_control_data.position);
-                xscope_int(VELOCITY, upstream_control_data.velocity);
-                xscope_int(TEMPERATURE, upstream_control_data.temperature);
-                xscope_int(FAULT_CODE, upstream_control_data.error_status);
+                if(upstream_control_data.error_status != NO_FAULT)
+                    printf(">>system status: faulty (fault ID %x)\n", upstream_control_data.error_status);
+
+                if(upstream_control_data.error_status == NO_FAULT)
+                {
+                    printf(">>system status: no fault\n");
+
+                    torque_control_flag = 1;
+                    i_motorcontrol.set_torque_control_enabled();
+                    printf("torque control activated\n");
+
+                    brake_flag = 1;
+                    i_motorcontrol.set_brake_status(brake_flag);
+                    printf("Brake released\n");
+
+                    printf("set offset to %d\n", offset);
+                    i_motorcontrol.set_offset_value(offset);
+                }
+                break;
+
+        //directly set the torque
+        default:
+                torque_ref = value * sign;
+                i_motorcontrol.set_torque(torque_ref);
 
                 delay_milliseconds(1);
-            }
-            break;
-
-        case 'z':
-            printf("reset faults, and check status ...\n");
-            i_motorcontrol.reset_faults();
-
-            delay_milliseconds(500);
-            upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
-            if(upstream_control_data.error_status != NO_FAULT)
-                printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
-
-            if(upstream_control_data.error_status == NO_FAULT)
-            {
-                printf(">>  FAULT REMOVED ...\n");
-
-                torque_control_flag = 1;
-                i_motorcontrol.set_torque_control_enabled();
-                printf("Torque control activated\n");
-
-                brake_flag = 1;
-                i_motorcontrol.set_brake_status(brake_flag);
-                printf("Brake released\n");
-
-                printf("set offset to %d\n", offset);
-                i_motorcontrol.set_offset_value(offset);
-
-
-            }
-            break;
-
-            //set torque
-        default:
-            torque_ref = value * sign;
-            i_motorcontrol.set_torque(torque_ref);
-
-            delay_milliseconds(1);
-            motorcontrol_config = i_motorcontrol.get_config();
-            if(torque_ref>motorcontrol_config.max_torque || torque_ref<-motorcontrol_config.max_torque)
-            {
-                upstream_control_data = i_motorcontrol.update_upstream_control_data();
-                printf("above limits! torque %d [milli-Nm]\n", upstream_control_data.torque_set);
-            }
-            else
-                printf("torque %d [milli-Nm]\n", torque_ref);
-            break;
+                motorcontrol_config = i_motorcontrol.get_config();
+                if(torque_ref>motorcontrol_config.max_torque || torque_ref<-motorcontrol_config.max_torque)
+                {
+                    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+                    printf("above limits! torque %d [milli-Nm]\n", upstream_control_data.torque_set);
+                }
+                else
+                    printf("torque %d [milli-Nm]\n", torque_ref);
+                break;
         }
     }
 

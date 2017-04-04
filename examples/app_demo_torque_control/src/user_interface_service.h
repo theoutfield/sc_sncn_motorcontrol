@@ -1,5 +1,5 @@
 /*
- * tuning.h
+ * user_interface_service.h
  *
  *  Created on: Jul 13, 2015
  *      Author: Synapticon GmbH
