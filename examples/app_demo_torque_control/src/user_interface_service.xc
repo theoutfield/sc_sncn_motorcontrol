@@ -16,25 +16,18 @@
 #include <xscope.h>
 
 /*
- * The following function shows how to work with torque controller.
+ * The following service shows how to directly work with module_torque_control.
  * It is able to:
- *  - independently lock and unlock the brakes
- *  - automatically find the offset
- *  - read or set the offset
- *  - independently enable and disable the control
- *  - send the reference value of torque to torque controller
- *  - show the variables on xscope
+ *  - automatically find motor offset
+ *  - read/set motor offsett
+ *  - enable/disable torque controller
+ *  - send the reference value of the torque to motor_control_service
+ *  - lock/unlock the brakes
  *
- *  As a demo, the motor generates an oscilating torque with a frequency range between 10 Hz  and  3 kHz.
+ * @param i_motorcontrol -> interface of type MotorControlInterface to communicate with torque controller
  */
 void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
 {
-    int period_us;     // torque generation period in micro-seconds
-    int pulse_counter; // number of generated pulses
-
-
-//    int loop_counter=0;
-    int proper_sensor_polarity=0;
 
     int torque_ref = 0;
     int brake_flag = 0;
@@ -43,23 +36,12 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
     int offset=0;
 
     UpstreamControlData upstream_control_data;
-
     MotorcontrolConfig motorcontrol_config;
 
-//    printf("\n===================================================================\n");
-//    printf(">>  ADVANCED FOC DEMO STARTING ...\n");
-//    printf(">>   applicable commands:\n");
-//    printf(" a => auto offset detection,           |    b  => enable/disable the brake\n");
-//    printf(" t => enable/disable torque controller,|    ox => set offset to x \n");
-//    printf(" p => print the actual offset,         |    r  => reverse the torque\n");
-//    printf(" x => show on xscope for 20 seconds,   | Enter => set torque to 0\n");
-//    printf("===================================================================\n");
-
-
+    printf(" DEMO_TORQUE_CONTROL started.\n");
     i_motorcontrol.set_brake_status(1);
     i_motorcontrol.set_torque_control_enabled();
 
-    printf("check licence ...\n");
     upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
     fflush(stdout);
@@ -89,6 +71,8 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
         {
         //auto find offset
         case 'a':
+            int proper_sensor_polarity=0;
+
             printf("Sending offset_detection command ...\n");
             i_motorcontrol.set_offset_detection_enabled();
 
@@ -211,6 +195,9 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
 
             //play sound!
         case 'm':
+            int period_us;     // torque generation period in micro-seconds
+            int pulse_counter; // number of generated pulses
+
             torque_ref=value;
             for(period_us=400;period_us<=(5*400);(period_us+=400))
             {
