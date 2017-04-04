@@ -273,7 +273,7 @@ int main(void)
                 position_feedback_config_2.sensor_type = QEI_SENSOR;
                 position_feedback_config_2.resolution  = QEI_SENSOR_RESOLUTION;
                 position_feedback_config_2.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;
-                position_feedback_config_2.sensor_function = SENSOR_FUNCTION_FEEDBACK_ONLY;
+                position_feedback_config_2.sensor_function = SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config_1, i_shared_memory[0], i_position_feedback_1,
