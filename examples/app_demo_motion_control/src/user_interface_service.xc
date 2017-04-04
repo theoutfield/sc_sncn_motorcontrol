@@ -189,7 +189,6 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
 
                         downstream_control_data.torque_cmd =0;
                         i_position_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(2000);
 
                         char new_reference_char = 'n';
                         while(new_reference_char=='n')
