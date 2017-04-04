@@ -206,7 +206,6 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                         }
                     }
                     t_velocity :> timestamp;
-                    write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, velocity, 0, 0, SENSOR_NO_ERROR, timestamp/position_feedback_config.ifm_usec);
                 }
 
                 break;
@@ -283,6 +282,8 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                     velocity = velocity_compute(difference_velocity, 1000, position_feedback_config.resolution);
 
                 vel_previous_position = count;
+
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, velocity, 0, 0, SENSOR_NO_ERROR, timestamp/position_feedback_config.ifm_usec);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
