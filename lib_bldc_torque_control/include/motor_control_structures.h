@@ -179,8 +179,6 @@ typedef struct
 {
     int error_status;
 
-    SensorError sensor_error;
-
     int computed_torque;
     int torque_set;
 
@@ -192,9 +190,13 @@ typedef struct
 
     int position;
     int velocity;
+    SensorError  sensor_error;
+    unsigned int sensor_timestamp;
 
-    int position_additional;
-    int velocity_additional;
+    int secondary_position;
+    int secondary_velocity;
+    SensorError  secondary_sensor_error;
+    unsigned int secondary_sensor_timestamp;
 
     int temperature;
 
