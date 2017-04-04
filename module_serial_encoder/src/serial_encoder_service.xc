@@ -82,7 +82,6 @@ void init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
         timer t, unsigned int &last_read)
 {
     //init
-    position_feedback_config.offset &= (position_feedback_config.resolution-1);
     switch(sensor_type)
     {
     case REM_16MT_SENSOR:
