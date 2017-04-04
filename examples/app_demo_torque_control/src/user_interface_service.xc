@@ -186,64 +186,49 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
                 }
                 break;
 
-        //play sound!
+        //play music! it sends a square-wave reference signal (with audible frequency) to torque controller.
         case 'm':
-            int period_us;     // torque generation period in micro-seconds
-            int pulse_counter; // number of generated pulses
+                int period_us;     // torque period in micro-seconds
+                int pulse_counter; // number of generated pulses
+                torque_ref=value;
 
-            torque_ref=value;
-            for(period_us=400;period_us<=(5*400);(period_us+=400))
-            {
-                for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                for(period_us=400;period_us<=(5*400);(period_us+=400))
                 {
-                    i_motorcontrol.set_torque((torque_ref*110)/100);
-                    delay_microseconds((5*period_us)/100);
+                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                    {
+                        i_motorcontrol.set_torque(torque_ref);
+                        delay_microseconds(period_us);
 
-                    i_motorcontrol.set_torque(torque_ref);
-                    delay_microseconds(period_us);
-
-
-
-                    i_motorcontrol.set_torque((-torque_ref*110)/100);
-                    delay_microseconds((5*period_us)/100);
-
-                    i_motorcontrol.set_torque(-torque_ref);
-                    delay_microseconds(period_us);
+                        i_motorcontrol.set_torque(-torque_ref);
+                        delay_microseconds(period_us);
+                    }
                 }
-            }
 
-
-            for(period_us=(5*400);period_us>=400;(period_us-=400))
-            {
-                for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                for(period_us=(5*400);period_us>=400;(period_us-=400))
                 {
-                    i_motorcontrol.set_torque((torque_ref*110)/100);
-                    delay_microseconds((5*period_us)/100);
-
-                    i_motorcontrol.set_torque(torque_ref);
-                    delay_microseconds(period_us);
-
+                    for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
+                    {
+                        i_motorcontrol.set_torque(torque_ref);
+                        delay_microseconds(period_us);
 
 
-                    i_motorcontrol.set_torque((-torque_ref*110)/100);
-                    delay_microseconds((5*period_us)/100);
 
-                    i_motorcontrol.set_torque(-torque_ref);
-                    delay_microseconds(period_us);
+                        i_motorcontrol.set_torque((-torque_ref*110)/100);
+                        delay_microseconds((5*period_us)/100);
+
+                        i_motorcontrol.set_torque(-torque_ref);
+                        delay_microseconds(period_us);
+                    }
                 }
-            }
 
-            i_motorcontrol.set_torque(0);
-            break;
+                i_motorcontrol.set_torque(0);
+                break;
 
-            //go to safe mode torque
+        //safe mode torque (all inverter power swieches open)
         case 's':
-
-            printf(">>  GO TO SAFE_TORQUE_OFF MODE IN TWO SECONDS ...\n");
-            delay_milliseconds(2000);
-            i_motorcontrol.set_safe_torque_off_enabled();
-
-            break;
+                printf("safe torque off mode started\n");
+                i_motorcontrol.set_safe_torque_off_enabled();
+                break;
 
             //show on xscope for 10 seconds!
         case 'x':
