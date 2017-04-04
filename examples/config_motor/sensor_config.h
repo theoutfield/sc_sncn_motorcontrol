@@ -16,7 +16,7 @@
 #define BISS_CLOCK_FREQUENCY       4000         // BiSS output clock frequency in kHz
 #define BISS_SENSOR_VELOCITY_COMPUTE_PERIOD 50  // velocity loop time in microseconds
 #define BISS_TIMEOUT               20           // BiSS timeout in microseconds
-#define BISS_BUSY                  30
+#define BISS_BUSY                  30           // maximum number of bits to read before the start bit (= maximum duration of ACK bit in clock cycles)
 #define BISS_CLOCK_PORT            BISS_CLOCK_PORT_EXT_D5
 #define BISS_DATA_PORT_NUMBER      ENCODER_PORT_2 // [ENCODER_PORT_1, ENCODER_PORT_2]
 #endif
@@ -26,18 +26,18 @@
 #define REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD     53
 
 //REM 14 config
-#define REM_14_SENSOR_HYSTERESIS    REM_14_HYS_11BIT_2LSB;
-#define REM_14_SENSOR_NOISE         REM_14_NOISE_NORMAL;
-#define REM_14_SENSOR_DAE           REM_14_DAE_ON;
-#define REM_14_SENSOR_ABI_RES       REM_14_ABI_RES_11BIT;
+#define REM_14_SENSOR_HYSTERESIS            REM_14_HYS_11BIT_2LSB;
+#define REM_14_SENSOR_NOISE_SETTINGS        REM_14_NOISE_NORMAL;
+#define REM_14_DYN_ANGLE_ERROR_COMPENSATION REM_14_DAE_ON;
+#define REM_14_ABI_RESOLUTION_SETTINGS      REM_14_ABI_RES_11BIT;
 #define REM_14_SENSOR_VELOCITY_COMPUTE_PERIOD       30
 
 //QEI config
-#define QEI_SENSOR_INDEX_TYPE        QEI_WITH_INDEX     // [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
-#define QEI_SENSOR_SIGNAL_TYPE       QEI_RS422_SIGNAL   // [QEI_RS422_SIGNAL, QEI_TTL_SIGNAL]
-#define QEI_SENSOR_PORT_NUMBER       ENCODER_PORT_2     // [ENCODER_PORT_1, ENCODER_PORT_2]
+#define QEI_SENSOR_NUMBER_OF_CHANNELS   QEI_WITH_INDEX     // [QEI_WITH_INDEX, QEI_WITH_NO_INDEX]
+#define QEI_SENSOR_SIGNAL_TYPE          QEI_RS422_SIGNAL   // [QEI_RS422_SIGNAL, QEI_TTL_SIGNAL]
+#define QEI_SENSOR_PORT_NUMBER          ENCODER_PORT_2     // [ENCODER_PORT_1, ENCODER_PORT_2]
 #define QEI_SENSOR_VELOCITY_COMPUTE_PERIOD        1000
-#define QEI_SENSOR_RESOLUTION        4000               // ticks per turn = 4 * CPR (Cycles per revolution)
+#define QEI_SENSOR_RESOLUTION           4000               // ticks per turn = 4 * CPR (Cycles per revolution)
 
 //Hall config
 #define HALL_SENSOR_PORT_NUMBER      ENCODER_PORT_1     // [ENCODER_PORT_1, ENCODER_PORT_2]

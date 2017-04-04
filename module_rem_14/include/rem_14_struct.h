@@ -65,14 +65,14 @@ typedef enum {
  * @brief Structure type to define the REM 14 sensor configuration.
  */
 typedef struct {
-    REM_14_Noise noise_setting;          /**< Noise setting. In 3.3V operation, VDD and VREG must be tied together. In this
-                                             configuration, normal noise performance (ONL) is available at
-                                             reduced maximum temperature (125°C) by clearing NOISESET
-                                             to 0. When NOISESET is set to 1, the full temperature range is
-                                             available with reduced noise performance (ONH). */
-    REM_14_DynAngleComp dyn_angle_comp;  /**< Disable Dynamic Angle Error Compensation */
-    REM_14_Hysteresis hysteresis;        /**< Hysteresis for 11 Bit ABI Resolution */
-    REM_14_ABIResolution abi_resolution; /**< Resolution of ABI (0 = 11 bits, 1 = 10 bits) */
+    REM_14_Noise noise_settings;                    /**< Noise setting. In 3.3V operation, VDD and VREG must be tied together. In this
+                                                         configuration, normal noise performance (ONL) is available at
+                                                         reduced maximum temperature (125°C) by clearing NOISESET
+                                                         to 0. When NOISESET is set to 1, the full temperature range is
+                                                     available with reduced noise performance (ONH). */
+    REM_14_DynAngleComp dyn_angle_error_comp;       /**< Disable Dynamic Angle Error Compensation */
+    REM_14_Hysteresis hysteresis;                   /**< Hysteresis for 11 Bit ABI Resolution */
+    REM_14_ABIResolution abi_resolution_settings;   /**< Resolution of ABI (0 = 11 bits, 1 = 10 bits) */
 } REM_14Config;
 
 

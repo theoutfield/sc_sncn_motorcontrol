@@ -41,18 +41,18 @@ void initspi_ports(SPIPorts &spi_ports)
     #else
     settings1 = (REM_14_FACTORY_SETTINGS << 0);
     #endif
-    settings1 |= (config.rem_14_config.noise_setting << 1);
+    settings1 |= (config.rem_14_config.noise_settings << 1);
     if (config.polarity == SENSOR_POLARITY_INVERTED) {
         settings1 |= (1 << 2);
     }
     settings1 |= (REM_14_UVW_ABI << 3);
-    settings1 |= (config.rem_14_config.dyn_angle_comp << 4);
+    settings1 |= (config.rem_14_config.dyn_angle_error_comp << 4);
     settings1 |= (REM_14_DATA_SELECT << 6);
     settings1 |= (REM_14_PWM_CONFIG << 7);
 
     settings2 = (config.pole_pairs-1) << 0;
     settings2 |= (config.rem_14_config.hysteresis << 3);
-    settings2 |= (config.rem_14_config.abi_resolution << 5);
+    settings2 |= (config.rem_14_config.abi_resolution_settings << 5);
 
     return {settings1, settings2};
 }

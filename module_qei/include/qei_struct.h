@@ -53,7 +53,7 @@ typedef enum {
  * @brief Structure type to define the Encoder configuration.
  */
 typedef struct {
-    QEI_IndexType   index_type;     /**< Encoder index type. */
-    QEI_SignalType  signal_type;    /**< Encoder output signal type. */
-    EncoderPortNumber port_number;  /**< Configure which input port is used */
+    QEI_IndexType   number_of_channels; /**< Encoder index type. */
+    QEI_SignalType  signal_type;        /**< Encoder output signal type. */
+    EncoderPortNumber port_number;      /**< Configure which input port is used */
 } QEIConfig;

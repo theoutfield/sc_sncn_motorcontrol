@@ -37,7 +37,7 @@ extern char start_message[];
 
 int check_qei_config(PositionFeedbackConfig &position_feedback_config)
 {
-    if (position_feedback_config.qei_config.index_type != QEI_WITH_INDEX && position_feedback_config.qei_config.index_type != QEI_WITH_NO_INDEX) {
+    if (position_feedback_config.qei_config.number_of_channels != QEI_WITH_INDEX && position_feedback_config.qei_config.number_of_channels != QEI_WITH_NO_INDEX) {
         printstrln("qei_service: ERROR: Wrong QEI configuration: wrong index type");
         return QEI_ERROR;
     }
@@ -85,7 +85,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
     int const config_min_ticks = INT_MIN;
     int difference = 0;
     int direction = 0;
-    int qei_type = position_feedback_config.qei_config.index_type;            // TODO use to disable sync for no-index
+    int qei_type = position_feedback_config.qei_config.number_of_channels;            // TODO use to disable sync for no-index
 
     int qei_crossover = (position_feedback_config.resolution * 19) / 100;
     int qei_count_per_hall = position_feedback_config.resolution;   // / position_feedback_config.qei_config.poles;
@@ -244,7 +244,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 position_feedback_config.ifm_usec = ifm_usec;
                 qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
                 // max_count_actual = position_feedback_config.qei_config.max_ticks;
-                qei_type = position_feedback_config.qei_config.index_type;
+                qei_type = position_feedback_config.qei_config.number_of_channels;
                 qei_crossover = (position_feedback_config.resolution * 19) / 100;
                 qei_count_per_hall = position_feedback_config.resolution;// / position_feedback_config.qei_config.poles;
 
