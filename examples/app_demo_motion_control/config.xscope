@@ -22,8 +22,8 @@
 	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Position additional" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Velocity additional" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Position Secondary" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Velocity Secondary" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Fault Code" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
