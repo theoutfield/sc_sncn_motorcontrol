@@ -38,14 +38,13 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
     UpstreamControlData upstream_control_data;
     MotorcontrolConfig motorcontrol_config;
 
-    printf(" DEMO_TORQUE_CONTROL started.\n");
+    printf(" DEMO_TORQUE_CONTROL started...\n");
     i_motorcontrol.set_brake_status(1);
     i_motorcontrol.set_torque_control_enabled();
 
     upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
     fflush(stdout);
-    //read and adjust the offset.
     while (1)
     {
         char mode = 0;
@@ -69,131 +68,125 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
         }
         switch(mode)
         {
-        //auto find offset
+        //automatic offset detection
         case 'a':
-            int proper_sensor_polarity=0;
+                int proper_sensor_polarity=0;
 
-            printf("Sending offset_detection command ...\n");
-            i_motorcontrol.set_offset_detection_enabled();
+                printf("automatic offset detection started ...\n");
+                i_motorcontrol.set_offset_detection_enabled();
 
-            while(i_motorcontrol.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
+                while(i_motorcontrol.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
 
+                proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
 
-            proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
-
-            if(proper_sensor_polarity == 1)
-            {
-                printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
-
-                offset=i_motorcontrol.get_offset();
-                printf("Detected offset is: %i\n", offset);
-
-                printf("set offset to %d\n", offset);
-                i_motorcontrol.set_offset_value(offset);
-
-                motorcontrol_config = i_motorcontrol.get_config();
-                if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                if(proper_sensor_polarity == 1)
                 {
-                    for (int i=0;i<6;i++) {
-                        printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                    offset=i_motorcontrol.get_offset();
+                    printf("detected offset is: %i\n", offset);
+
+                    printf("offset is set to %d\n", offset);
+                    i_motorcontrol.set_offset_value(offset);
+
+                    motorcontrol_config = i_motorcontrol.get_config();
+                    if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                    {
+                        for (int i=0;i<6;i++)
+                        {
+                            printf("     hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                        }
                     }
+
+                    delay_milliseconds(2000);
+                    i_motorcontrol.set_torque_control_enabled();
                 }
+                else
+                {
+                    printf(">>  ERROR: wrong polarity for commutation position sensor\n");
+                }
+                break;
 
-                delay_milliseconds(2000);
-                i_motorcontrol.set_torque_control_enabled();
-            }
-            else
-            {
-                printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-            }
-            break;
-
-            //set brake
+        //enable/disable brake
         case 'b':
-            if (brake_flag)
-            {
-                brake_flag = 0;
-                printf("Brake blocking\n");
-            }
-            else
-            {
-                brake_flag = 1;
-                printf("Brake released\n");
-            }
-            i_motorcontrol.set_brake_status(brake_flag);
-            break;
+                if (brake_flag)
+                {
+                    brake_flag = 0;
+                    printf("brake enabled\n");
+                }
+                else
+                {
+                    brake_flag = 1;
+                    printf("brake disabled\n");
+                }
+                i_motorcontrol.set_brake_status(brake_flag);
+                break;
 
-            //set offset
+        //set offset
         case 'o':
-            offset = value;
-            printf("set offset to %d\n", offset);
-            i_motorcontrol.set_offset_value(offset);
-            break;
+                offset = value;
+                printf("offset set to %d\n", offset);
+                i_motorcontrol.set_offset_value(offset);
+                break;
 
+        //set kp for torque controller
         case 'p':
-            motorcontrol_config = i_motorcontrol.get_config();
-            printf("previous value: %d\n", motorcontrol_config.torque_P_gain);
+                motorcontrol_config = i_motorcontrol.get_config();
 
-            i_motorcontrol.set_torque_control_disabled();
-            printf("Torque control disabled\n");
-            delay_milliseconds(100);
-
-            motorcontrol_config.torque_P_gain =  value;
-            i_motorcontrol.set_config(motorcontrol_config);
-            printf("new value: %d\n", motorcontrol_config.torque_P_gain);
-            delay_milliseconds(100);
-
-            i_motorcontrol.set_torque_control_enabled();
-            printf("Torque control enabled\n");
-            delay_milliseconds(100);
-
-            break;
-
-            //print offset
-        case 'i':
-            motorcontrol_config = i_motorcontrol.get_config();
-            printf("previous reversed_delay: %d\n", motorcontrol_config.torque_I_gain);
-
-            i_motorcontrol.set_torque_control_disabled();
-            printf("Torque control disabled\n");
-            delay_milliseconds(100);
-
-            motorcontrol_config.torque_I_gain =  value;
-            i_motorcontrol.set_config(motorcontrol_config);
-            printf("new reversed_delay: %d\n", motorcontrol_config.torque_I_gain);
-            delay_milliseconds(100);
-
-            i_motorcontrol.set_torque_control_enabled();
-            printf("Torque control enabled\n");
-            delay_milliseconds(100);
-
-            break;
-
-
-            //reverse torque
-        case 'r':
-            torque_ref = -torque_ref;
-            i_motorcontrol.set_torque(torque_ref);
-            printf("torque %d [milli-Nm]\n", torque_ref);
-            break;
-
-            //enable and disable torque controller
-        case 't':
-            if (torque_control_flag == 0)
-            {
-                torque_control_flag = 1;
-                i_motorcontrol.set_torque_control_enabled();
-                printf("Torque control activated\n");
-            }
-            else
-            {
-                torque_control_flag = 0;
                 i_motorcontrol.set_torque_control_disabled();
-                printf("Torque control deactivated\n");
-            }
-            break;
+                printf("Torque control disabled\n");
+                delay_milliseconds(100);
 
-            //play sound!
+                motorcontrol_config.torque_P_gain =  value;
+                i_motorcontrol.set_config(motorcontrol_config);
+                printf("set kp to %d\n", motorcontrol_config.torque_P_gain);
+                delay_milliseconds(100);
+
+                i_motorcontrol.set_torque_control_enabled();
+                printf("Torque control enabled\n");
+                delay_milliseconds(100);
+                break;
+
+        //set ki for torque controller
+        case 'i':
+                motorcontrol_config = i_motorcontrol.get_config();
+
+                i_motorcontrol.set_torque_control_disabled();
+                printf("Torque control disabled\n");
+                delay_milliseconds(100);
+
+                motorcontrol_config.torque_I_gain =  value;
+                i_motorcontrol.set_config(motorcontrol_config);
+                printf("set ki to %d\n", motorcontrol_config.torque_I_gain);
+                delay_milliseconds(100);
+
+                i_motorcontrol.set_torque_control_enabled();
+                printf("Torque control enabled\n");
+                delay_milliseconds(100);
+                break;
+
+        //reverse the direction of reference torque
+        case 'r':
+                torque_ref = -torque_ref;
+                i_motorcontrol.set_torque(torque_ref);
+                printf("torque %d [milli-Nm]\n", torque_ref);
+                break;
+
+        //enable/disable torque controller
+        case 't':
+                if (torque_control_flag == 0)
+                {
+                    torque_control_flag = 1;
+                    i_motorcontrol.set_torque_control_enabled();
+                    printf("Torque control activated\n");
+                }
+                else
+                {
+                    torque_control_flag = 0;
+                    i_motorcontrol.set_torque_control_disabled();
+                    printf("Torque control deactivated\n");
+                }
+                break;
+
+        //play sound!
         case 'm':
             int period_us;     // torque generation period in micro-seconds
             int pulse_counter; // number of generated pulses
