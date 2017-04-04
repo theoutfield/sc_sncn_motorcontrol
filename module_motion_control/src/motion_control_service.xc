@@ -381,8 +381,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
-                xscope_int(VELOCITY_ADDITIONAL, upstream_control_data.velocity_additional);
-                xscope_int(POSITION_ADDITIONAL, upstream_control_data.position_additional);
+                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
+                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);
                 xscope_int(POSITION_CMD, (int)position_ref_in_k);
                 xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);

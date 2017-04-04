@@ -25,7 +25,7 @@
     <Probe name="Angle 2" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
     <Probe name="Velocity 2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Position Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Position additional Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Position secondary Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Angle Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Velocity Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="GPIO 0" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>

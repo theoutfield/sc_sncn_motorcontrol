@@ -42,7 +42,7 @@ void position_feedback_display(client interface PositionFeedbackInterface i_posi
             UpstreamControlData upstream_control_data = i_shared_memory.read();
             xscope_int(ANGLE_SHARED_MEMORY, upstream_control_data.angle);
             xscope_int(POSITION_SHARED_MEMORY, upstream_control_data.position);
-            xscope_int(POSITION_ADDITIONAL_SHARED_MEMORY, upstream_control_data.position_additional);
+            xscope_int(POSITION_SECONDARY_SHARED_MEMORY, upstream_control_data.secondary_position);
             xscope_int(VELOCITY_SHARED_MEMORY, upstream_control_data.velocity);
 
             //write gpio
