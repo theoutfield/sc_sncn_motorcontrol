@@ -213,7 +213,7 @@ interface shared_memory_interface
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status
-    * @param timestamp timestamp of when the position data was read
+    * @param timestamp timestamp in microseconds of when the position data was read
     */
     void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, unsigned int timestamp);
 
@@ -234,7 +234,7 @@ interface shared_memory_interface
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status
-    * @param timestamp timestamp of when the position data was read
+    * @param timestamp timestamp in microseconds of when the position data was read
     */
     void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, unsigned int timestamp);
 
@@ -244,7 +244,7 @@ interface shared_memory_interface
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status
-    * @param timestamp timestamp of when the position data was read
+    * @param timestamp timestamp in microseconds of when the position data was read
     */
     void write_primary_feedback(int position, int velocity, SensorError sensor_error, unsigned int timestamp);
 
@@ -254,7 +254,7 @@ interface shared_memory_interface
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status
-    * @param timestamp timestamp of when the position data was read
+    * @param timestamp timestamp in microseconds of when the position data was read
     */
     void write_secondary_feedback(int position, int velocity, SensorError sensor_error, unsigned int timestamp);
 
