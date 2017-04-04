@@ -1,14 +1,15 @@
-.. _offset_commutation_tuning_demo:
+.. _app_demo_torque_control:
 
 ======================================================
-Helper for finding your sensor and commutation offsets
+Torque Control Demo
 ======================================================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-It is common that sensors used for position feedback are not perfectly placed physically along the windings. This strongly affects the commutation efficiency of your motor. In order to avoid such loss of efficiency we can configure at the *Position Sensor Service* the sensor offset and at the :ref:`Motor Control Service <module_motorcontrol>` the commutation offsets to compensate the error on clock-wise and counter-clock-wise spin. The purpose of this app (app_demo_offset_commutation_tuning) is helping you to find such offsets.
+
+BLDC motors are used in many motion control applications. In all of these applications, the final duty of the electric motor is to generate the required torque. In speed controlled applications the reference value of torque is calculated by speed controller. A similar situation is existing in the case of position controlled application. It is also possible to directly set the The reference value of the torque by the user. The purpose of this application is to let the user directly working with torque controller.
 
 The motor will commutate at a certain voltage and the current at the phases will be displayed over XScope. At the same time, the user could set different offsets over the console and see the effect of it on the amplitude of the phase currents.
 
