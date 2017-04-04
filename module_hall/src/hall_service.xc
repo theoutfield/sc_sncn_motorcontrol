@@ -215,7 +215,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 break;
 
         case i_position_feedback[int i].set_position(int in_count):
-                count = in_count;
+                count = in_count + position_feedback_config.offset;
                 last_angle = angle_out;
                 break;
 
@@ -424,7 +424,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 }
                 last_angle = angle_out;
 
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count, speed_out, angle_out, hall_state_new, SENSOR_NO_ERROR);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, speed_out, angle_out, hall_state_new, SENSOR_NO_ERROR);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);

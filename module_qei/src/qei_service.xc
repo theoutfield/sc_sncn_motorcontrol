@@ -205,7 +205,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                         }
                     }
 
-                    write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count, velocity, 0, 0, SENSOR_NO_ERROR);
+                    write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, velocity, 0, 0, SENSOR_NO_ERROR);
                 }
 
                 break;
@@ -217,7 +217,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
             case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position, SensorError status }:
 
-                out_count = count;
+                out_count = count + position_feedback_config.offset;
                 out_position = position;
                 status = SENSOR_NO_ERROR;
                 break;

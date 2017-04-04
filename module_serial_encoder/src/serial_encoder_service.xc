@@ -204,7 +204,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
         //send multiturn count and position
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position , SensorError status }:
                 read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
-                out_count = pos_state.count;
+                out_count = pos_state.count + position_feedback_config.offset;
                 position = pos_state.position;
                 status = pos_state.status;
                 break;
@@ -344,7 +344,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 #endif
 
             //send data to shared memory
-            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count, velocity, pos_state.angle, 0, pos_state.status);
+            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, velocity, pos_state.angle, 0, pos_state.status);
 
             //gpio
             gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
