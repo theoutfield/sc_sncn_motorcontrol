@@ -217,6 +217,15 @@ interface shared_memory_interface
     void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error);
 
     /**
+    * @brief Write electrical angle to shared memory.
+    *
+    * @param Electrical angle.
+    * @param Hall state (in case HALL sensor is used).
+    * @param Velocity.
+    */
+    void write_angle(unsigned int angle, unsigned int hall_state, int velocity);
+
+    /**
     * @brief Write electrical angle and secondary position feedback (display only) to shared memory.
     *
     * @param Electrical angle.
