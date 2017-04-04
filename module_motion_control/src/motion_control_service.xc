@@ -571,7 +571,7 @@ break;
                 break;
 
         case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
-                upstream_control_data_out = upstream_control_data;
+                upstream_control_data_out = i_motorcontrol.update_upstream_control_data();
                 downstream_control_data = downstream_control_data_in;
 
                 //reverse position/velocity feedback/commands when polarity is inverted
