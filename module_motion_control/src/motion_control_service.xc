@@ -183,11 +183,13 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     int update_brake_configuration_flag = 1;
 
     // initialization
+    motorcontrol_config = i_motorcontrol.get_config();
+    motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
+
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
 
-    motorcontrol_config = i_motorcontrol.get_config();
-    motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
+
 
     pid_init(velocity_control_pid_param);
     if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
