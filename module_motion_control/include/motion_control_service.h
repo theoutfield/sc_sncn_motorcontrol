@@ -62,46 +62,46 @@ typedef struct {
 } ControlConfig;
 
 /**
- * @brief Structure definition for a Control Loop Service configuration.
+ * @brief Structure definition for a Motion Control Loop Service configuration.
  */
 typedef struct {
 
-    int position_control_strategy;      /**< Value for selecting between defferent types of position controllers or velocity controller. */
-    int motion_profile_type;            /**< Value for selecting between different types of profilers (including torque/velocity/posiiton controllers. */
+    int position_control_strategy;      /**< Parameter for selecting between defferent types of position or velocity controllers. */
+    int motion_profile_type;            /**< Parameter for selecting between different types of profilers (including torque/velocity/posiiton controllers. */
 
-    int min_pos_range_limit;            /**< Value for setting the minimum position range */
-    int max_pos_range_limit;            /**< Value for setting the maximum position range */
-    int max_motor_speed;                /**< Value for setting the maximum motor speed */
-    int max_torque;                     /**< Value for setting the maximum torque command which will be sent to torque controller */
+    int min_pos_range_limit;            /**< Parameter for setting the minimum position range */
+    int max_pos_range_limit;            /**< Parameter for setting the maximum position range */
+    int max_motor_speed;                /**< Parameter for setting the maximum motor speed */
+    int max_torque;                     /**< Parameter for setting the maximum torque command which will be sent to torque controller */
 
-    int enable_profiler;                /**< Value for enabling/disabling the profiler */
-    int max_acceleration_profiler;      /**< Value for setting the maximum acceleration in profiler mode */
-    int max_deceleration_profiler;      /**< Value for setting the maximum deceleration in profiler mode */
-    int max_speed_profiler;             /**< Value for setting the maximum speed in profiler mode */
-    int max_torque_rate_profiler;       /**< Value for setting the maximum torque in profiler mode */
+    int enable_profiler;                /**< Parameter for enabling/disabling the profiler */
+    int max_acceleration_profiler;      /**< Parameter for setting the maximum acceleration in profiler mode */
+    int max_deceleration_profiler;      /**< Parameter for setting the maximum deceleration in profiler mode */
+    int max_speed_profiler;             /**< Parameter for setting the maximum speed in profiler mode */
+    int max_torque_rate_profiler;       /**< Parameter for setting the maximum torque in profiler mode */
 
-    int position_kp;                    /**< Value for position controller p-constant */
-    int position_ki;                    /**< Value for position controller i-constant */
-    int position_kd;                    /**< Value for position controller d-constant */
-    int position_integral_limit;        /**< Value for integral limit of position pid controller */
+    int position_kp;                    /**< Parameter for position controller P-constant */
+    int position_ki;                    /**< Parameter for position controller I-constant */
+    int position_kd;                    /**< Parameter for position controller D-constant */
+    int position_integral_limit;        /**< Parameter for integral limit of position pid controller */
 
-    int velocity_kp;                    /**< Value for velocity controller p-constant */
-    int velocity_ki;                    /**< Value for velocity controller i-constant */
-    int velocity_kd;                    /**< Value for velocity controller d-constant */
-    int velocity_integral_limit;        /**< Value for integral limit of velocity pid controller */
+    int velocity_kp;                    /**< Parameter for velocity controller P-constant */
+    int velocity_ki;                    /**< Parameter for velocity controller I-constant */
+    int velocity_kd;                    /**< Parameter for velocity controller D-constant */
+    int velocity_integral_limit;        /**< Parameter for integral limit of velocity pid controller */
 
-    int k_fb;                           /**< Value for setting the feedback position sensor gain */
-    int resolution;                     /**< Value for setting the resolution of position sensor [ticks/rotation] */
-    int k_m;                            /**< Value for setting the gain of torque actuator */
-    int moment_of_inertia;              /**< Value for setting the moment of inertia */
-    MotionPolarity polarity;            /**< Value for setting the polarity of the movement */
-    int brake_release_strategy;
-    int brake_release_delay;
+    int k_fb;                           /**< Parameter for setting the feedback position sensor gain */
+    int resolution;                     /**< Parameter for setting the resolution of position sensor [ticks/rotation] */
+    int k_m;                            /**< Parameter for setting the gain of torque actuator */
+    int moment_of_inertia;              /**< Parameter for setting the moment of inertia */
+    MotionPolarity polarity;            /**< Parameter for setting the polarity of the movement */
+    int brake_release_strategy;         /**< Parameter for setting different brake release strategies, e.g., shaking */
+    int brake_release_delay;            /**< Parameter for setting the delay between removing voltage from the brake and disabling the control  */
 
-    int dc_bus_voltage;                 /**< Value for setting the nominal (rated) value of dc-link */
-    int pull_brake_voltage;             /**< Value for setting the voltage for pulling the brake out! */
-    int pull_brake_time;                /**< Value for setting the time of brake pulling */
-    int hold_brake_voltage;             /**< Value for setting the brake voltage after it is pulled */
+    int dc_bus_voltage;                 /**< Parameter for setting the nominal (rated) value of dc-link */
+    int pull_brake_voltage;             /**< Parameter for setting the voltage for pulling the brake out! */
+    int pull_brake_time;                /**< Parameter for setting the time of brake pulling */
+    int hold_brake_voltage;             /**< Parameter for setting the brake voltage after it is pulled */
 } MotionControlConfig;
 
 /**
@@ -235,6 +235,39 @@ interface PositionVelocityCtrlInterface
  * @return void
  */
 void init_position_velocity_control(interface PositionVelocityCtrlInterface client i_position_control);
+
+
+/**
+ * @brief Update brake hold/pull voltages and pull time in the pwm service.
+ *
+ *        It take the DC, hold/pull voltages and pull time parameters
+ *        and compute the corresponding duty cycles which are then sent to the pwm service.
+ *
+ * @param app_tile_usec
+ * @param motion_ctrl_config config structure of the motion control
+ * @param i_motorcontrol client interface to get the ifm tile frequency from the motorcontrol service.
+ * @param i_update_brake client enterface to the pwm service to send the brake configuration
+ *
+ */
+void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_ctrl_config, client interface MotorControlInterface i_motorcontrol, client interface UpdateBrake i_update_brake);
+
+
+/**
+ * @brief Enable motorcontrol and brake
+ *
+ *        The brake_release_strategy parameter it checked to chose the brake mode (disable, normal, shaking)
+ *
+ * @param motion_ctrl_config config structure of the motion control
+ * @param i_motorcontrol client interface to enable motorcontrol and set the brake.
+ * @param position used for the starting position for the shaking brake release
+ * @param special_brake_release_counter used for the shaking brake release
+ * @param special_brake_release_initial_position used for the shaking brake release
+ * @param special_brake_release_torque used for the shaking brake release
+ *
+ */
+void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface MotorControlInterface i_motorcontrol, int position,
+        int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque);
+
 
 /**
  * @brief Service to perform torque, velocity or position control.
