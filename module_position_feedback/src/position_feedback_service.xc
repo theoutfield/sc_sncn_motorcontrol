@@ -171,7 +171,7 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
             hall_enc_select_config |=  (1 << position_feedback_config.biss_config.data_port_number);  //RS422 (differential) mode
             //check and configure clock port
             if (position_feedback_config.biss_config.clock_port_config >= BISS_CLOCK_PORT_EXT_D4) { //hall_enc_select_port clock port
-                if (hall_enc_select_port == null) {
+                if (hall_enc_select_port == null || isnull(hall_enc_select_port->p_hall_enc_select)) {
                     position_feedback_config.sensor_type = 0;
                 } else {
                     configure_out_port(hall_enc_select_port->p_hall_enc_select, (*spi_ports).spi_interface.blk1, hall_enc_select_config);
