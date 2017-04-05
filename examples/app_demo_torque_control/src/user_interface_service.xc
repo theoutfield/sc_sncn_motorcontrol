@@ -43,6 +43,15 @@ void update_brake(
     int duty_min=0, duty_max=0, duty_divider=0;
     int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
 
+    timer t;
+    unsigned ts;
+
+    i_motorcontrol.set_safe_torque_off_enabled();
+    i_motorcontrol.set_brake_status(0);
+    t :> ts;
+    t when timerafter (ts + 2000*1000*app_tile_usec) :> void;
+
+
     if(dc_bus_voltage <= 0)
     {
         printstr("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
@@ -163,25 +172,42 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
     fflush(stdout);
     while (1)
     {
-        char mode = 0;
-        char c;
-        int value = 0;
-        int sign = 1;
-        //reading user input.
-        while((c = getchar ()) != '\n')
-        {
-            if(isdigit(c)>0)
-            {
-                value *= 10;
-                value += c - '0';
-            }
-            else if (c == '-')
-            {
-                sign = -1;
-            }
-            else if (c != ' ')
-                mode = c;
-        }
+        char mode = '@';
+         char mode_2 = '@';
+         char mode_3 = '@';
+         char c;
+         int value = 0;
+         int sign = 1;
+         //reading user input.
+         while((c = getchar ()) != '\n')
+         {
+             if(isdigit(c)>0)
+             {
+                 value *= 10;
+                 value += c - '0';
+             }
+             else if (c == '-')
+             {
+                 sign = -1;
+             }
+             else if (c != ' ')
+             {
+                 if (mode == '@')
+                 {
+                     mode = c;
+                 }
+                 else if (mode_2 == '@')
+                 {
+                     mode_2 = c;
+                 }
+                 else
+                 {
+                     mode_3 = c;
+                 }
+             }
+         }
+         value *= sign;
+
         switch(mode)
         {
         //automatic offset detection
@@ -223,52 +249,35 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
 
         //set brake
          case 'b':
-//                 switch(mode_2)
-//                 {
-//                 case 's':
-//                         motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-//                         motion_ctrl_config.brake_release_strategy = value;
-//                         i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-//                         break;
-//
-//                 case 'v'://brake voltage configure
-//                         motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-//                         switch(mode_3)
-//                         {
-//                         case 'n':// nominal voltage of dc-bus
-//                                 motion_ctrl_config.dc_bus_voltage=value;
-//                                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-//                                 // check
-//                                 motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-//                                 i_position_control.update_brake_configuration();
-//                                 printf("nominal voltage of dc-bus is %d Volts \n", motion_ctrl_config.dc_bus_voltage);
-//                                 break;
-//
-//                         case 'p':// pull voltage for releasing the brake at startup
-//                                 //set
-//                                 motion_ctrl_config.pull_brake_voltage=value;
-//                                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-//                                 // check
-//                                 motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-//                                 i_position_control.update_brake_configuration();
-//                                 printf("brake pull voltage is %d milli-Volts \n", motion_ctrl_config.pull_brake_voltage);
-//                                 break;
-//
-//                         case 'h':// hold voltage for holding the brake after it is pulled
-//                                 //set
-//                                 motion_ctrl_config.hold_brake_voltage=value;
-//                                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-//                                 // check
-//                                 motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-//                                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-//                                 i_position_control.update_brake_configuration();
-//                                 printf("brake hold voltage is %d milli-Volts\n", motion_ctrl_config.hold_brake_voltage);
-//                                 break;
-//                         default:
-//                                 break;
-//                         }
-//                         break;
-//
+                 switch(mode_2)
+                 {
+                 case 'v'://brake voltage configure
+                         motorcontrol_config = i_motorcontrol.get_config();
+                         switch(mode_3)
+                         {
+                         case 'n':// nominal voltage of dc-bus
+                                 dc_bus_voltage=value;
+                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+                                 printf("nominal voltage of dc-bus for brake set to %d Volts \n", dc_bus_voltage);
+                                 break;
+
+                         case 'p':// pull voltage for releasing the brake at startup
+                                 pull_brake_voltage=value;
+                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+                                 printf("brake pull voltage set to %d milli-Volts \n", pull_brake_voltage);
+                                 break;
+
+                         case 'h':// hold voltage for holding the brake after it is pulled
+                                 hold_brake_voltage=value;
+                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+                                 printf("brake hold voltage is %d milli-Volts\n", hold_brake_voltage);
+                                 break;
+
+                         default:
+                                 break;
+                         }
+                         break;
+
 //                 case 't'://set pull time
 //                         //set
 //                         motion_ctrl_config.pull_brake_time=value;
@@ -279,20 +288,20 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
 //                         printf("brake pull time is %d milli-seconds \n", motion_ctrl_config.pull_brake_time);
 //                         break;
 //
-//                 default:
-//                         if (brake_flag)
-//                         {
-//                             brake_flag = 0;
-//                             printf("Brake blocking\n");
-//                         }
-//                         else
-//                         {
-//                             brake_flag = 1;
-//                             printf("Brake released\n");
-//                         }
-//                         i_position_control.set_brake_status(brake_flag);
-//                         break;
-//                 }
+                 default:
+                         if (brake_flag)
+                         {
+                             brake_flag = 0;
+                             printf("Brake blocking\n");
+                         }
+                         else
+                         {
+                             brake_flag = 1;
+                             printf("Brake released\n");
+                         }
+                         i_motorcontrol.set_brake_status(brake_flag);
+                         break;
+                 }
                  break;
 
         //set offset

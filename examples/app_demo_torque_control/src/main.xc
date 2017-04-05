@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c3.bsp>
 
 
 
@@ -52,7 +52,7 @@ int main(void) {
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         //on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
 
-        on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0]);
+        on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0], i_update_brake);
 
         on tile[IFM_TILE]:
         {
