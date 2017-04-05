@@ -140,12 +140,17 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
     MotorcontrolConfig  motorcontrol_config;
 
     int brake_flag = 0;
-    int dc_bus_voltage    =    16;
-    int pull_brake_voltage= 16000; //milli-Volts
-    int hold_brake_voltage=  5000; //milli-Volts
-    int pull_brake_time   =  2000; //milli-Seconds
+    int dc_bus_voltage    = 0;
+    int pull_brake_voltage= 0; //milli-Volts
+    int hold_brake_voltage= 0; //milli-Volts
+    int pull_brake_time   = 0; //milli-Seconds
+
 
     motorcontrol_config = i_motorcontrol.get_config();
+    pull_brake_voltage= 16000; //milli-Volts
+    hold_brake_voltage=  5000; //milli-Volts
+    pull_brake_time   =  2000; //milli-Seconds
+    dc_bus_voltage = motorcontrol_config.dc_bus_voltage;
     update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
 
     printf(" DEMO_TORQUE_CONTROL started...\n");
