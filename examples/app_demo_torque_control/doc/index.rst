@@ -64,16 +64,16 @@ In the following, a brief explanation is brought about different command types a
     Enables/Disables the electric brake. 
 
 - "bvn" and then value "x"
-    Sets the nominal (rated) voltage of dc bus to the value "x". The value "x" should be entered in Volts (for example, writing "bvn20" will set the rated value of dc bus voltage to 20 Volts.)
+    bvn stands for "brake_voltage_nominal". This command sets the nominal (rated) voltage of dc bus to the value "x". The value "x" should be entered in Volts (for example, writing "bvn20" will set the rated value of dc bus voltage to 20 Volts.)
 
 - "bvp" and then value "x"
-    Sets the pulling voltage of brake to the value "x". The value "x" should be entered in milli-Volts. (for example, writing "bvp12000" will set the pulling voltage for the brake to 12 Volts.)
+    bvp stands for "brake_voltage_pull". This command sets the pulling voltage of brake to the value "x". The value "x" should be entered in milli-Volts. (for example, writing "bvp12000" will set the pulling voltage for the brake to 12 Volts.)
 
 - "bvh" and then value "x"
-    Sets the holding voltage of brake to the value "x". The value "x" should be entered in milli-Volts. (for example, writing "bvp12000" will set the rated value of dc bus voltage to 12 Volts.)
+    bvh stands for "brake_voltage_hold". This command sets the holding voltage of brake to the value "x". The value "x" should be entered in milli-Volts. (for example, writing "bvp12000" will set the rated value of dc bus voltage to 12 Volts.)
 
 - "bt" and then value "x"
-    Sets the pulling time of brake to the value "x". The value "x" should be entered in milli-seconds. (for example, writing "bt2000" will lead to 2 seconds of pulling time for electric brake.)
+    bt stands for "brake_pulling_time". This command sets the pulling time of brake to the value "x". The value "x" should be entered in milli-seconds. (for example, writing "bt2000" will lead to 2 seconds of pulling time for electric brake.)
 
 - "s"
     This command activates the "safe_torque_off" mode. In this mode, all inverter switches will be in open state, and motor terminals will be in floating state.
@@ -105,9 +105,17 @@ Quick How-to
 5. Open the **main.xc** within  the **app_demo_motion_control**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropriate target in your Makefile <somanet_board_support_module>`.
 
     **important** Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
+    
+6. If you are using an electric brake, update the settings of your electric brake in file **user_interface_service.xc** of your application. These settings can also be changed while the application is running.
 
-6. :ref:`Set the configuration <motor_configuration_label>` for Motor Control, position sensor, and Motion Control Services. 
+    .. code-block:: c
 
-7. :ref:`Run the application enabling XScope <running_an_application>`.
+		    pull_brake_voltage= 16000; //milli-Volts
+		    hold_brake_voltage=  1000; //milli-Volts
+		    pull_brake_time   =  2000; //milli-Seconds
+
+7. :ref:`Set the configuration <motor_configuration_label>` for Motor Control, position sensor, and Motion Control Services. 
+
+8. :ref:`Run the application enabling XScope <running_an_application>`.
 
 Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com>`_
