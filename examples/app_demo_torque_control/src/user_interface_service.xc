@@ -156,7 +156,7 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
 
     motorcontrol_config = i_motorcontrol.get_config();
     pull_brake_voltage= 16000; //milli-Volts
-    hold_brake_voltage=  5000; //milli-Volts
+    hold_brake_voltage=  1000; //milli-Volts
     pull_brake_time   =  2000; //milli-Seconds
     dc_bus_voltage = motorcontrol_config.dc_bus_voltage;
     update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);

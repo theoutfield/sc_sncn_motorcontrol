@@ -85,95 +85,29 @@ In the following, a brief explanation is brought about different command types a
     In case a fault is detected (such as over current/over voltage), pressing "z" will clean the fault error message. After this command, it is needed to reset the offset, and activate the torque controller.
 
 - "m" and then value "x"
-    This command is for fun! It generates a square-waveform signal and sends this signal as the reference value of torque to torque controller. The frequency and period of torque reference is changing between 2-10 kHz which will result to play a simple melody by your motor! The amplitude of the square waveform will be equal to the value "x" in milli-Nm which in practice can act as the volume of this melody.
+    This command generates a square-waveform signal and uses this signal as the reference value of torque. The frequency and period of torque reference is changing between 0.5-2.5 kHz which will result to play a simple melody by your motor! The amplitude of the square waveform will be equal to the value "x" in milli-Nm which in practice can act as the volume of this melody.
 
 Quick How-to
 ============
+**Important**
 
-#. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
-#. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your position sensor, motor phases, power supply cable, and XTAG. Power up!
+1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
 
-   .. important:: For safety please use a current limited power supply and always monitor the current consumption during the tuning procedure.
+2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your position sensor, motor terminals, power supply cable, and XTAG. Power up!
 
-#. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`.
-#. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
-#. Edit **user_config.h** in **config_motor** to set the motor parameters. The importants parameters are the number of poles pairs, the winding type, the commutation sensor and the commutation offsets. For the first start leave the offsets to their default values.
+    **important**
+    For safety please use a current limited power supply and check current consumption.
 
-   .. code-block:: C
+3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
 
-                #define POLE_PAIRS                11
-                #define BLDC_WINDING_TYPE         STAR_WINDING
-                #define MOTOR_COMMUTATION_SENSOR  AMS_SENSOR
-                #define COMMUTATION_OFFSET_CLK    0
-                #define COMMUTATION_OFFSET_CCLK   2048
+4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
 
-#. Set parameters for your position sensor. The most important parameters are the sensor offset and polarity. For the first start leave the default offset value. The sensor polarity will define the physical direction of your motor. You can use the test app of the position sensor to test which physical direction corresponds to a positive velocity.
+5. Open the **main.xc** within  the **app_demo_motion_control**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropriate target in your Makefile <somanet_board_support_module>`.
 
-   - For AMS sensor edit **ams_service.h** in **module_ams_rotary_sensor**:
+    **important** Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
-     .. code-block:: C
+6. :ref:`Set the configuration <motor_configuration_label>` for Motor Control, position sensor, and Motion Control Services. 
 
-                     #define AMS_OFFSET      0
-                     #define AMS_POLARITY    AMS_POLARITY_NORMAL
+7. :ref:`Run the application enabling XScope <running_an_application>`.
 
-   - For BiSS sensor edit **biss_service.h** in **module_biss**:
-
-     .. code-block:: C
-
-                     #define BISS_OFFSET_ELECTRICAL  0
-                     #define BISS_POLARITY           BISS_POLARITY_NORMAL
-
-   - For Hall sensor no parameters are needed.
-
-#. Open the **main.xc** within  the **app_demo_offset_commutation_tuning**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropiate target in your Makefile <somanet_board_support_module>`.
-
-   .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
-
-#. Set parameters for your :ref:`Motor Control Service <module_motorcontrol>` to use the values previously defined in **user_config.h**. The motor polarity depends on the wiring of the phases and the position sensor polarity.
-
-   .. code-block:: C
-
-                /* Motor Control Service */
-                {
-                    MotorcontrolConfig motorcontrol_config;
-                    motorcontrol_config.motor_type = BLDC_MOTOR;
-                    motorcontrol_config.polarity_type = NORMAL_POLARITY;
-                    motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
-                    motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
-                    motorcontrol_config.commutation_loop_period = COMMUTATION_LOOP_PERIOD;
-
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], null, i_biss[0], i_ams[0], i_watchdog[0], i_motorcontrol);
-                }
-
-#. Define a low voltage value to start with. The value depends on you motor, usually less than 1000. The value can be changed at run time in the app. Remember to use a current limited power supply and always monitor the current consumption.
-
-   .. code-block:: C
-
-                   #define VOLTAGE 1000
-
-#. :ref:`Run the application enabling XScope <running_an_application>`.
-
-#. The app start with ``0`` commutation voltage so the motor will not move and the current consumption should be low. Remember to use a current limited power supply and always monitor the current consumption.
-
-   First try to set the offset automatically with the ``a`` command. If the motor is not turning and the current consumption is high try to change the motor polarity with the ``d`` command and repeat the ``a`` command. This will find the sensor offset and set the clockwise or counterclockwise commutation offsets to 0 and 2048 (half a turn) and the motor should start turning.
-
-   With a positive voltage the motor should turn in the direction of positive velocity. If it is not the case you can change the direction by flipping the clockwise and counterclockwise commutation offsets with the ``f`` command.
-
-   Fine tune the sensor commutation offset for the current direction. You could use the ``c`` command for auto tuning or the ``VALUE`` command to manually minimize the phases current. The offset is a 12 bit positive value so it wraps around at 4096. It means that if you want an offset of ``-100`` you enter ``3996``.
-
-   Reverse the voltage with the ``r`` command, the motor should turn in the other direction. Fine tune the commutation offset for this direction with the ``c`` (auto tuning) or ``VALUE`` (manual tuning) command.
-
-   You can change the voltage with the ``v VALUE`` command (up to 4000) to test and tune the offsets at a different velocity and obtain finer results.
-
-   You can print all the current offsets with the ``p`` command.
-
-   .. important:: When you have found all the offsets save them in your configuration files for your app:
-
-                  - the motor configuration file **user_config.h**
-                  - the sensor configuration file **ams_service.h** or **biss_service.h**
-                  - the **main.c** of your app (for the motor polarity)
-
-.. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
+Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com>`_
