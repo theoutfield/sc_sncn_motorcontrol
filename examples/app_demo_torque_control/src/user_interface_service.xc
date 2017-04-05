@@ -8,12 +8,111 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <print.h>
 
 #include <user_interface_service.h>
 
 #include <position_feedback_service.h>
 #include <motor_control_interfaces.h>
 #include <xscope.h>
+
+/**
+ * @brief Update brake hold/pull voltages and pull time in the pwm service.
+ *
+ *        It take the DC, hold/pull voltages and pull time parameters
+ *        and compute the corresponding duty cycles which are then sent to the pwm service.
+ *
+ * @param app_tile_usec
+ * @param dc_bus_voltage,     the voltage of dc bus (in volts)
+ * @param pull_brake_voltage, the voltage of dc bus (in milli-volts)
+ * @param hold_brake_voltage, the voltage of dc bus (in milli-volts)
+ * @param pull_brake_time,    the time for pulling the brake (in milli-seconds)
+ * @param i_motorcontrol client interface to get the ifm tile frequency from the motorcontrol service.
+ * @param i_update_brake client enterface to the pwm service to send the brake configuration
+ *
+ */
+void update_brake(
+        int app_tile_usec,
+        int dc_bus_voltage,
+        int pull_brake_voltage,
+        int hold_brake_voltage,
+        int pull_brake_time,
+        client interface MotorControlInterface i_motorcontrol, client interface UpdateBrake i_update_brake)
+{
+    int error=0;
+    int duty_min=0, duty_max=0, duty_divider=0;
+    int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
+
+    if(dc_bus_voltage <= 0)
+    {
+        printstr("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
+        return;
+    }
+
+    if(pull_brake_voltage > (dc_bus_voltage*1000))
+    {
+        printstr("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
+        return;
+    }
+
+    if(pull_brake_voltage < 0)
+    {
+        printstr("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
+        return;
+    }
+
+    if(hold_brake_voltage > (dc_bus_voltage*1000))
+    {
+        printstr("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
+        return;
+    }
+
+    if(hold_brake_voltage < 0)
+    {
+        printstr("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
+        return;
+    }
+
+    if(period_start_brake < 0)
+    {
+        printstr("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
+        return;
+    }
+
+
+    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+
+    if(motorcontrol_config.ifm_tile_usec==250)
+    {
+        duty_min = 1500;
+        duty_max = 13000;
+        duty_divider = 16384;
+    }
+    else if(motorcontrol_config.ifm_tile_usec==100)
+    {
+        duty_min = 600;
+        duty_max = 7000;
+        duty_divider = 8192;
+    }
+    else if (motorcontrol_config.ifm_tile_usec!=100 && motorcontrol_config.ifm_tile_usec!=250)
+    {
+        error = 1;
+    }
+
+    duty_start_brake    = (duty_divider * pull_brake_voltage)/(1000*dc_bus_voltage);
+    if(duty_start_brake < duty_min) duty_start_brake = duty_min;
+    if(duty_start_brake > duty_max) duty_start_brake = duty_max;
+
+    duty_maintain_brake = (duty_divider * hold_brake_voltage)/(1000*dc_bus_voltage);
+    if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
+    if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
+
+    period_start_brake  = (pull_brake_time * 1000)/(motorcontrol_config.ifm_tile_usec);
+
+    i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
+}
+
+
 
 /*
  * The following service shows how to directly work with module_torque_control.
@@ -24,19 +123,30 @@
  *  - send the reference value of the torque to motor_control_service
  *  - lock/unlock the brakes
  *
- * @param i_motorcontrol -> interface of type MotorControlInterface to communicate with torque controller
+ * @param i_motorcontrol client interface of type MotorControlInterface to communicate with torque controller
+ * @param i_update_brake client enterface to the pwm service to send the brake configuration
  */
-void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
+void demo_torque_control(interface MotorControlInterface client i_motorcontrol, client interface UpdateBrake i_update_brake)
 {
 
-    int torque_ref = 0;
-    int brake_flag = 0;
-    int torque_control_flag = 0;
+    int app_tile_usec = 100; // reference clock frequency of tile where demo_torque_control() service is being executed (in MHz).
+                             // default value is 100
 
+    int torque_ref = 0;
+    int torque_control_flag = 0;
     int offset=0;
 
     UpstreamControlData upstream_control_data;
-    MotorcontrolConfig motorcontrol_config;
+    MotorcontrolConfig  motorcontrol_config;
+
+    int brake_flag = 0;
+    int dc_bus_voltage    =    16;
+    int pull_brake_voltage= 16000; //milli-Volts
+    int hold_brake_voltage=  5000; //milli-Volts
+    int pull_brake_time   =  2000; //milli-Seconds
+
+    motorcontrol_config = i_motorcontrol.get_config();
+    update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
 
     printf(" DEMO_TORQUE_CONTROL started...\n");
     i_motorcontrol.set_brake_status(1);
@@ -106,20 +216,79 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol)
                 }
                 break;
 
-        //enable/disable brake
-        case 'b':
-                if (brake_flag)
-                {
-                    brake_flag = 0;
-                    printf("brake enabled\n");
-                }
-                else
-                {
-                    brake_flag = 1;
-                    printf("brake disabled\n");
-                }
-                i_motorcontrol.set_brake_status(brake_flag);
-                break;
+        //set brake
+         case 'b':
+//                 switch(mode_2)
+//                 {
+//                 case 's':
+//                         motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                         motion_ctrl_config.brake_release_strategy = value;
+//                         i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+//                         break;
+//
+//                 case 'v'://brake voltage configure
+//                         motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                         switch(mode_3)
+//                         {
+//                         case 'n':// nominal voltage of dc-bus
+//                                 motion_ctrl_config.dc_bus_voltage=value;
+//                                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+//                                 // check
+//                                 motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                                 i_position_control.update_brake_configuration();
+//                                 printf("nominal voltage of dc-bus is %d Volts \n", motion_ctrl_config.dc_bus_voltage);
+//                                 break;
+//
+//                         case 'p':// pull voltage for releasing the brake at startup
+//                                 //set
+//                                 motion_ctrl_config.pull_brake_voltage=value;
+//                                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+//                                 // check
+//                                 motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                                 i_position_control.update_brake_configuration();
+//                                 printf("brake pull voltage is %d milli-Volts \n", motion_ctrl_config.pull_brake_voltage);
+//                                 break;
+//
+//                         case 'h':// hold voltage for holding the brake after it is pulled
+//                                 //set
+//                                 motion_ctrl_config.hold_brake_voltage=value;
+//                                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+//                                 // check
+//                                 motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                                 i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+//                                 i_position_control.update_brake_configuration();
+//                                 printf("brake hold voltage is %d milli-Volts\n", motion_ctrl_config.hold_brake_voltage);
+//                                 break;
+//                         default:
+//                                 break;
+//                         }
+//                         break;
+//
+//                 case 't'://set pull time
+//                         //set
+//                         motion_ctrl_config.pull_brake_time=value;
+//                         i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+//                         // check
+//                         motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                         i_position_control.update_brake_configuration();
+//                         printf("brake pull time is %d milli-seconds \n", motion_ctrl_config.pull_brake_time);
+//                         break;
+//
+//                 default:
+//                         if (brake_flag)
+//                         {
+//                             brake_flag = 0;
+//                             printf("Brake blocking\n");
+//                         }
+//                         else
+//                         {
+//                             brake_flag = 1;
+//                             printf("Brake released\n");
+//                         }
+//                         i_position_control.set_brake_status(brake_flag);
+//                         break;
+//                 }
+                 break;
 
         //set offset
         case 'o':
