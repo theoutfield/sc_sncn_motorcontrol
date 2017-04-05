@@ -154,7 +154,6 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
     int hold_brake_voltage= 0; //milli-Volts
     int pull_brake_time   = 0; //milli-Seconds
 
-
     motorcontrol_config = i_motorcontrol.get_config();
     pull_brake_voltage= 16000; //milli-Volts
     hold_brake_voltage=  5000; //milli-Volts
@@ -278,16 +277,13 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                          }
                          break;
 
-//                 case 't'://set pull time
-//                         //set
-//                         motion_ctrl_config.pull_brake_time=value;
-//                         i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-//                         // check
-//                         motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-//                         i_position_control.update_brake_configuration();
-//                         printf("brake pull time is %d milli-seconds \n", motion_ctrl_config.pull_brake_time);
-//                         break;
-//
+                 case 't'://set pull time
+                         //set
+                         pull_brake_time=value;
+                         update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+                         printf("brake pull time is %d milli-seconds \n", pull_brake_time);
+                         break;
+
                  default:
                          if (brake_flag)
                          {
