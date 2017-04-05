@@ -150,9 +150,9 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
 
     int brake_flag = 0;
     int dc_bus_voltage    = 0;
-    int pull_brake_voltage= 0; //milli-Volts
-    int hold_brake_voltage= 0; //milli-Volts
-    int pull_brake_time   = 0; //milli-Seconds
+    int pull_brake_voltage= 0;
+    int hold_brake_voltage= 0;
+    int pull_brake_time   = 0;
 
     motorcontrol_config = i_motorcontrol.get_config();
     pull_brake_voltage= 16000; //milli-Volts
@@ -246,6 +246,36 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                 }
                 break;
 
+        //set offset
+        case 'o':
+                offset = value;
+                printf("offset set to %d\n", offset);
+                i_motorcontrol.set_offset_value(offset);
+                break;
+
+        //enable/disable torque controller
+        case 't':
+                if (torque_control_flag == 0)
+                {
+                    torque_control_flag = 1;
+                    i_motorcontrol.set_torque_control_enabled();
+                    printf("Torque control activated\n");
+                }
+                else
+                {
+                    torque_control_flag = 0;
+                    i_motorcontrol.set_torque_control_disabled();
+                    printf("Torque control deactivated\n");
+                }
+                break;
+
+        //reverse the direction of reference torque
+        case 'r':
+                torque_ref = -torque_ref;
+                i_motorcontrol.set_torque(torque_ref);
+                printf("torque %d [milli-Nm]\n", torque_ref);
+                break;
+
         //set brake
          case 'b':
                  switch(mode_2)
@@ -300,71 +330,59 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                  }
                  break;
 
-        //set offset
-        case 'o':
-                offset = value;
-                printf("offset set to %d\n", offset);
-                i_motorcontrol.set_offset_value(offset);
-                break;
+         //safe mode torque (all inverter power swieches open)
+         case 's':
+                 printf("safe torque off mode started\n");
+                 i_motorcontrol.set_safe_torque_off_enabled();
+                 break;
 
-        //set kp for torque controller
-        case 'p':
-                motorcontrol_config = i_motorcontrol.get_config();
+         //show on xscope for 10 seconds!
+         //this will block this service (demo_torque_control) for almost 10 seconds
+         case 'x':
+                 printf("activate xscope during 20 seconds ...\n");
+                 for(int i=0; i<=10000;i++)
+                 {
+                     upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                i_motorcontrol.set_torque_control_disabled();
-                printf("Torque control disabled\n");
-                delay_milliseconds(100);
+                     xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
+                     xscope_int(V_DC, upstream_control_data.V_dc);
+                     xscope_int(ANGLE, upstream_control_data.angle);
+                     xscope_int(POSITION, upstream_control_data.position);
+                     xscope_int(VELOCITY, upstream_control_data.velocity);
+                     xscope_int(TEMPERATURE, upstream_control_data.temperature);
+                     xscope_int(FAULT_CODE, upstream_control_data.error_status);
 
-                motorcontrol_config.torque_P_gain =  value;
-                i_motorcontrol.set_config(motorcontrol_config);
-                printf("set kp to %d\n", motorcontrol_config.torque_P_gain);
-                delay_milliseconds(100);
+                     delay_milliseconds(1);
+                 }
+                 break;
 
-                i_motorcontrol.set_torque_control_enabled();
-                printf("Torque control enabled\n");
-                delay_milliseconds(100);
-                break;
+         //reset faults
+         case 'z':
+                 printf("reset faults, and check status ...\n");
+                 i_motorcontrol.reset_faults();
 
-        //set ki for torque controller
-        case 'i':
-                motorcontrol_config = i_motorcontrol.get_config();
+                 delay_milliseconds(500);
+                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
 
-                i_motorcontrol.set_torque_control_disabled();
-                printf("Torque control disabled\n");
-                delay_milliseconds(100);
+                 if(upstream_control_data.error_status != NO_FAULT)
+                     printf(">>system status: faulty (fault ID %x)\n", upstream_control_data.error_status);
 
-                motorcontrol_config.torque_I_gain =  value;
-                i_motorcontrol.set_config(motorcontrol_config);
-                printf("set ki to %d\n", motorcontrol_config.torque_I_gain);
-                delay_milliseconds(100);
+                 if(upstream_control_data.error_status == NO_FAULT)
+                 {
+                     printf(">>system status: no fault\n");
 
-                i_motorcontrol.set_torque_control_enabled();
-                printf("Torque control enabled\n");
-                delay_milliseconds(100);
-                break;
+                     torque_control_flag = 1;
+                     i_motorcontrol.set_torque_control_enabled();
+                     printf("torque control activated\n");
 
-        //reverse the direction of reference torque
-        case 'r':
-                torque_ref = -torque_ref;
-                i_motorcontrol.set_torque(torque_ref);
-                printf("torque %d [milli-Nm]\n", torque_ref);
-                break;
+                     brake_flag = 1;
+                     i_motorcontrol.set_brake_status(brake_flag);
+                     printf("Brake released\n");
 
-        //enable/disable torque controller
-        case 't':
-                if (torque_control_flag == 0)
-                {
-                    torque_control_flag = 1;
-                    i_motorcontrol.set_torque_control_enabled();
-                    printf("Torque control activated\n");
-                }
-                else
-                {
-                    torque_control_flag = 0;
-                    i_motorcontrol.set_torque_control_disabled();
-                    printf("Torque control deactivated\n");
-                }
-                break;
+                     printf("set offset to %d\n", offset);
+                     i_motorcontrol.set_offset_value(offset);
+                 }
+                 break;
 
         //play music! it sends a square-wave reference signal (with audible frequency) to torque controller.
         case 'm':
@@ -402,60 +420,6 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                 }
 
                 i_motorcontrol.set_torque(0);
-                break;
-
-        //safe mode torque (all inverter power swieches open)
-        case 's':
-                printf("safe torque off mode started\n");
-                i_motorcontrol.set_safe_torque_off_enabled();
-                break;
-
-        //show on xscope for 10 seconds!
-        //this will block this service (demo_torque_control) for almost 10 seconds
-        case 'x':
-                printf("activate xscope during 20 seconds ...\n");
-                for(int i=0; i<=10000;i++)
-                {
-                    upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
-                    xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
-                    xscope_int(V_DC, upstream_control_data.V_dc);
-                    xscope_int(ANGLE, upstream_control_data.angle);
-                    xscope_int(POSITION, upstream_control_data.position);
-                    xscope_int(VELOCITY, upstream_control_data.velocity);
-                    xscope_int(TEMPERATURE, upstream_control_data.temperature);
-                    xscope_int(FAULT_CODE, upstream_control_data.error_status);
-
-                    delay_milliseconds(1);
-                }
-                break;
-
-        //reset faults
-        case 'z':
-                printf("reset faults, and check status ...\n");
-                i_motorcontrol.reset_faults();
-
-                delay_milliseconds(500);
-                upstream_control_data = i_motorcontrol.update_upstream_control_data();
-
-                if(upstream_control_data.error_status != NO_FAULT)
-                    printf(">>system status: faulty (fault ID %x)\n", upstream_control_data.error_status);
-
-                if(upstream_control_data.error_status == NO_FAULT)
-                {
-                    printf(">>system status: no fault\n");
-
-                    torque_control_flag = 1;
-                    i_motorcontrol.set_torque_control_enabled();
-                    printf("torque control activated\n");
-
-                    brake_flag = 1;
-                    i_motorcontrol.set_brake_status(brake_flag);
-                    printf("Brake released\n");
-
-                    printf("set offset to %d\n", offset);
-                    i_motorcontrol.set_offset_value(offset);
-                }
                 break;
 
         //directly set the torque

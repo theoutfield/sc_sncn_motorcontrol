@@ -8,6 +8,8 @@ Torque Control Demo
     :backlinks: none
     :depth: 3
 
+Introduction
+================
 
 Electric motors are used in many motion control applications. In all of these applications, the final duty of the electric motor is to generate the required torque. In speed controlled applications the reference value of torque is calculated by speed controller. A similar situation is existing in the case of position controlled application. It is also possible to directly set the reference value of the torque by the user. The purpose of this application is to let the user directly work with torque controller.
 By running this application, the user will be able to:
@@ -28,50 +30,62 @@ Figure 1 gives a general view of torque controller application including differe
 
 **important**
 
-- before sending the reference torque it is recommended to find and set the commutation sensor offset
-- if you are using an electric brake, release the brake before applying a new torque command
-- it is recommended to start the application with lower voltages (such as 16V, and increase the voltage to its nominal value after your hardware is checked)
+- Before sending the reference torque it is recommended to find and set the commutation sensor offset
+- If you are using an electric brake, release the brake before applying a new torque command
+- It is recommended to start the application with lower voltages (such as 16V, and increase the voltage to its nominal value after your hardware is checked)
 
 * **Minimum Number of Cores**: 7
 * **Minimum Number of Tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_offset_commutation_tuning/>`_
-
+`See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_demo_torque_control/>`_
 
 Console commands
 ================
 
-The app uses commands to set the offsets and voltage over the console:
+It is able to communicate with the app_demo_torque_control through XTimeComposer console. Each command can be sent by entering a letter in XTimeComposer console. Sometimes, the combination of one letter and one value is needed to have a complete command (for example, writing letter "x" and after that number "100" in console command and then pressing Enter key).
+In the following, a brief explanation is brought about different command types and their functionality:
 
-- a
-    Automatically find the sensor offset and set the clockwise or counterclockwise commutation offsets. This is not very precise but should suffice to turn the motor. For Hall sensor, due to the low resolution, it can be needed to shift the offsets by +/- 682.
-- c
-    Automatically tune the sensor/commutation offsets (depending on the sensor used and the type of commutation). This works by searching the offset with minimum peak current consumption.
-- d
-    Reverse the motor direction. For FOC it is done by changing the winding type. For Sinusoidal commutation it is done by flipping the clockwise and counterclockwise commutation offsets.
-- f
-    For FOC only. Toggle the field controller.
-- l VALUE
-    Limit position to VALUE tick around the current position. The voltage will be set to ``0`` when the limit is reached and the motor will only be be able to move in the oposite direction. If VALUE is ``0`` this set the current position as the center position for the limiter. If VALUE is negative the position limiter is disabled.
-- m
-    Reverse motor polarity parameter, use this when the the motor is not moving. It happens when the phases wiring or the position sensor polarity is changed.
-- o VALUE
-    Set the commutation offset to VALUE (clockwise or counterclockwise offset depending on the voltage sign and winding type).
-- p
-    Print the offsets, sensor polarity and voltage.
-- r
-    Reverse the voltage
-- s VALUE
-    Set the sensor offset to VALUE.
-- t VALUE
-    Set the torque to VALUE, accept negative values. Currently only available for FOC.
-- z
-    Return to the zero position (can be set with the ``l`` command). This will work only if the direction of the motor is right. That means positive voltage corresponds to positive velocity.
-- VALUE
-    Set the voltage to VALUE, accept negative values.
+- "a"
+    Automatically find the sensor offset and sets the commutation offsets. If the sensor polarity is not set properly, the message "ERROR: wrong polarity for commutation position sensor" will be printed. In this case, the sensor polarity should be changed, and the application should be recompiled.
 
+- "o" and then value "x"
+    Sets the commutation offset to value "x". The value "x" should be a number between 0 and 4095 (corresponding to 0 to 360 degrees).
+
+- "t"
+    Enables/Disables the torque controller.
+
+- value "x"
+    If the torque controller is activated, Writing a number (and then Enter) will send the same value to the torque controller (as the reference value of torque).
+
+- "r"
+    This command changes the sign of reference torque.
+
+- "b"
+    Enables/Disables the electric brake. 
+
+- "bvn" and then value "x"
+    Sets the nominal (rated) voltage of dc bus to the value "x". The value "x" should be entered in Volts (for example, writing "bvn20" will set the rated value of dc bus voltage to 20 Volts.)
+
+- "bvp" and then value "x"
+    Sets the pulling voltage of brake to the value "x". The value "x" should be entered in milli-Volts. (for example, writing "bvp12000" will set the pulling voltage for the brake to 12 Volts.)
+
+- "bvh" and then value "x"
+    Sets the holding voltage of brake to the value "x". The value "x" should be entered in milli-Volts. (for example, writing "bvp12000" will set the rated value of dc bus voltage to 12 Volts.)
+
+- "bt" and then value "x"
+    Sets the pulling time of brake to the value "x". The value "x" should be entered in milli-seconds. (for example, writing "bt2000" will lead to 2 seconds of pulling time for electric brake.)
+
+- "s"
+    This command activates the "safe_torque_off" mode. In this mode, all inverter switches will be in open state, and motor terminals will be in floating state.
+
+- "x"
+    This command activates the xscope functionality for a certain period of time. The default value is 10 seconds. 
+
+- "z"
+    In case a fault is detected (such as over current/over voltage), pressing "z" will clean the fault error message. After this command, it is needed to reset the offset, and activate the torque controller.
+
+- "m" and then value "x"
+    This command is for fun! It generates a square-waveform signal and sends this signal as the reference value of torque to torque controller. The frequency and period of torque reference is changing between 2-10 kHz which will result to play a simple melody by your motor! The amplitude of the square waveform will be equal to the value "x" in milli-Nm which in practice can act as the volume of this melody.
 
 Quick How-to
 ============
