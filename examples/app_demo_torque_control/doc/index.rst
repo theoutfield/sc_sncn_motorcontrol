@@ -9,13 +9,31 @@ Torque Control Demo
     :depth: 3
 
 
-BLDC motors are used in many motion control applications. In all of these applications, the final duty of the electric motor is to generate the required torque. In speed controlled applications the reference value of torque is calculated by speed controller. A similar situation is existing in the case of position controlled application. It is also possible to directly set the The reference value of the torque by the user. The purpose of this application is to let the user directly working with torque controller.
+Electric motors are used in many motion control applications. In all of these applications, the final duty of the electric motor is to generate the required torque. In speed controlled applications the reference value of torque is calculated by speed controller. A similar situation is existing in the case of position controlled application. It is also possible to directly set the reference value of the torque by the user. The purpose of this application is to let the user directly work with torque controller.
+By running this application, the user will be able to:
 
-The motor will commutate at a certain voltage and the current at the phases will be displayed over XScope. At the same time, the user could set different offsets over the console and see the effect of it on the amplitude of the phase currents.
+- switch between different operational modes (enabled/disabled torque controller, safe torque off mode)
+- directly set the reference value of torque in [milli Nm]
+- automatically find, read and set the commutation offset for position sensor
+- observe different parameters of torque controller and position feedback on xscope
+ 
+After starting the application, the torque controller will be activated automatically (with reference torque equal to 0), and the user can directly send the required torque command in [milli-Nm].
 
+Figure 1 gives a general view of torque controller application including different blocks of your software and hardware modules.
+
+.. image:: images/photo.jpg
+   :width: 100%
+
+**Fig. 1: General structure of your software/hardware modules within torque control application**
+
+**important**
+
+- before sending the reference torque it is recommended to find and set the commutation sensor offset
+- if you are using an electric brake, release the brake before applying a new torque command
+- it is recommended to start the application with lower voltages (such as 16V, and increase the voltage to its nominal value after your hardware is checked)
 
 * **Minimum Number of Cores**: 7
-* **Minimum Number of Tiles**: 3
+* **Minimum Number of Tiles**: 2
 
 .. cssclass:: github
 
