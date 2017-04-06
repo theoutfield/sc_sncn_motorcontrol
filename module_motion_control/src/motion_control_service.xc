@@ -21,7 +21,7 @@
 
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque,\
-        interface MotorControlInterface client i_motorcontrol)
+        interface TorqueControlInterface client i_torque_control)
 {
     int steps = 8;
     const int brake_pull_period = 800;
@@ -31,7 +31,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
     // re pull the brake
     if ((counter) % brake_pull_period == 0)
     {
-        i_motorcontrol.set_brake_status(1);
+        i_torque_control.set_brake_status(1);
     }
 
     int target;
@@ -75,7 +75,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
     if ((counter+1) % brake_pull_period == 0 && counter < (duration-1))
     {
         // stop brake for 1ms to reset the brake pull counter
-        i_motorcontrol.set_brake_status(0);
+        i_torque_control.set_brake_status(0);
     }
 
     counter++;
@@ -92,14 +92,14 @@ int special_brake_release(int &counter, int start_position, int actual_position,
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
  * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
- * @param i_motorcontrol Communication  interface to the Motor Control Service.
+ * @param i_torque_control Communication  interface to the Motor Control Service.
  * @param i_position_control[3]         array of PositionVelocityCtrlInterfaces to communicate with upto 3 clients
  * @param i_update_brake                Interface to update brake configuration in PWM service
  *
  * @return void
  *  */
 void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_config,
-        interface MotorControlInterface client i_motorcontrol,
+        interface TorqueControlInterface client i_torque_control,
         interface PositionVelocityCtrlInterface server i_position_control[3],client interface UpdateBrake i_update_brake)
 {
     timer t;
@@ -176,14 +176,14 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     int brake_shutdown_counter = 0;
     unsigned int update_brake_configuration_time;
     const unsigned int update_brake_configuration_wait = 2000; //2000 ms wait for torque safe enable
-    i_motorcontrol.set_safe_torque_off_enabled();
-    i_motorcontrol.set_brake_status(0);
+    i_torque_control.set_safe_torque_off_enabled();
+    i_torque_control.set_brake_status(0);
     t :> update_brake_configuration_time;
     update_brake_configuration_time += update_brake_configuration_wait*1000*(unsigned int)app_tile_usec;
     int update_brake_configuration_flag = 1;
 
     // initialization
-    motorcontrol_config = i_motorcontrol.get_config();
+    motorcontrol_config = i_torque_control.get_config();
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
 
     nl_position_control_reset(nl_pos_ctrl);
@@ -220,7 +220,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     downstream_control_data.torque_cmd   = 0;
     downstream_control_data.offset_torque = 0;
 
-    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    upstream_control_data = i_torque_control.update_upstream_control_data();
 
     position_k  = ((double) upstream_control_data.position);
     position_k_1= position_k;
@@ -239,7 +239,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
         {
         case t when timerafter(ts + app_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
 
-                upstream_control_data = i_motorcontrol.update_upstream_control_data();
+                upstream_control_data = i_torque_control.update_upstream_control_data();
 
                 velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
                 velocity_k        = ((double) upstream_control_data.velocity);
@@ -284,7 +284,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                             torque_enable_flag   =0;
                             velocity_enable_flag =0;
                             position_enable_flag =0;
-                            i_motorcontrol.set_torque_control_disabled();
+                            i_torque_control.set_torque_control_disabled();
                         }
                     }
                     //profiler enabled, set target position
@@ -331,7 +331,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                 if (special_brake_release_counter <= special_brake_release_duration)
                 {
                     torque_ref_k = special_brake_release(special_brake_release_counter, special_brake_release_initial_position, upstream_control_data.position,\
-                            special_brake_release_range, special_brake_release_duration, special_brake_release_torque, i_motorcontrol);
+                            special_brake_release_range, special_brake_release_duration, special_brake_release_torque, i_torque_control);
                 }
 
                 //position limit check
@@ -341,8 +341,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                     torque_enable_flag = 0;
                     position_enable_flag = 0;
                     velocity_enable_flag = 0;
-                    i_motorcontrol.set_brake_status(0);
-                    i_motorcontrol.set_torque_control_disabled();
+                    i_torque_control.set_brake_status(0);
+                    i_torque_control.set_torque_control_disabled();
                     printstr("*** Position Limit Reached ***\n");
                     //store original limits, with threshold if possible
                     if (position_limit_reached == 0)
@@ -384,14 +384,14 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                 else if (torque_ref_k < (-motion_ctrl_config.max_torque))
                     torque_ref_k = (-motion_ctrl_config.max_torque);
 
-                i_motorcontrol.set_torque(((int)(torque_ref_k)));
+                i_torque_control.set_torque(((int)(torque_ref_k)));
 
                 //update brake config when ready
                 if (update_brake_configuration_flag && timeafter(ts, update_brake_configuration_time)) {
-                    update_brake_configuration(app_tile_usec, motion_ctrl_config, i_motorcontrol, i_update_brake);
+                    update_brake_configuration(app_tile_usec, motion_ctrl_config, i_torque_control, i_update_brake);
                     update_brake_configuration_flag = 0;
                     if (torque_enable_flag+velocity_enable_flag+position_enable_flag) { //one of the control is enabled, start motorcontrol and brake
-                        enable_motorcontrol(motion_ctrl_config, i_motorcontrol, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
+                        enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
                     }
                 }
 
@@ -423,7 +423,7 @@ break;
 
         case i_position_control[int i].disable():
 
-                i_motorcontrol.set_brake_status(0);
+                i_torque_control.set_brake_status(0);
                 if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                 {
                     brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -433,7 +433,7 @@ break;
                     torque_enable_flag   =0;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
-                    i_motorcontrol.set_torque_control_disabled();
+                    i_torque_control.set_torque_control_disabled();
                 }
 
                 break;
@@ -461,7 +461,7 @@ break;
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
-                    enable_motorcontrol(motion_ctrl_config, i_motorcontrol, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
+                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
                 }
 
                 //start control loop just after
@@ -483,7 +483,7 @@ break;
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
-                    enable_motorcontrol(motion_ctrl_config, i_motorcontrol, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
+                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
                 }
 
                 //start control loop just after
@@ -502,7 +502,7 @@ break;
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
-                    enable_motorcontrol(motion_ctrl_config, i_motorcontrol, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
+                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
                 }
 
                 //start control loop just after
@@ -540,8 +540,8 @@ break;
                     position_enable_flag =0;
                     torque_ref_k = 0;
 
-                    i_motorcontrol.set_safe_torque_off_enabled();
-                    i_motorcontrol.set_brake_status(0);
+                    i_torque_control.set_safe_torque_off_enabled();
+                    i_torque_control.set_brake_status(0);
 
                     t :> update_brake_configuration_time;
                     update_brake_configuration_time += update_brake_configuration_wait*1000*(unsigned int)app_tile_usec;
@@ -588,7 +588,7 @@ break;
                 break;
 
         case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
-                upstream_control_data_out = i_motorcontrol.update_upstream_control_data();
+                upstream_control_data_out = i_torque_control.update_upstream_control_data();
                 downstream_control_data = downstream_control_data_in;
 
                 //reverse position/velocity feedback/commands when polarity is inverted
@@ -645,24 +645,24 @@ break;
                 break;
 
         case i_position_control[int i].get_motorcontrol_config() -> MotorcontrolConfig out_motorcontrol_config:
-                out_motorcontrol_config = i_motorcontrol.get_config();
+                out_motorcontrol_config = i_torque_control.get_config();
                 break;
 
         case i_position_control[int i].set_motorcontrol_config(MotorcontrolConfig in_motorcontrol_config):
                 torque_enable_flag = 0;
                 position_enable_flag = 0;
                 velocity_enable_flag = 0;
-                i_motorcontrol.set_config(in_motorcontrol_config);
+                i_torque_control.set_config(in_motorcontrol_config);
                 break;
 
         case i_position_control[int i].set_brake_status(int in_brake_status):
                 if(in_brake_status==1)
                 {
-                    i_motorcontrol.set_brake_status(1);
+                    i_torque_control.set_brake_status(1);
                 }
                 else if (in_brake_status==0)
                 {
-                    i_motorcontrol.set_brake_status(in_brake_status);
+                    i_torque_control.set_brake_status(in_brake_status);
                 }
                 break;
 
@@ -673,8 +673,8 @@ break;
                 position_enable_flag =0;
                 torque_ref_k = 0;
 
-                i_motorcontrol.set_safe_torque_off_enabled();
-                i_motorcontrol.set_brake_status(0);
+                i_torque_control.set_safe_torque_off_enabled();
+                i_torque_control.set_brake_status(0);
 
                 t :> update_brake_configuration_time;
                 update_brake_configuration_time += update_brake_configuration_wait*1000*(unsigned int)app_tile_usec;
@@ -683,23 +683,23 @@ break;
 
         case i_position_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
                 //offset detection
-                out_motorcontrol_config = i_motorcontrol.get_config();
+                out_motorcontrol_config = i_torque_control.get_config();
                 out_motorcontrol_config.commutation_angle_offset = -1;
-                i_motorcontrol.set_offset_detection_enabled();
+                i_torque_control.set_offset_detection_enabled();
                 while(out_motorcontrol_config.commutation_angle_offset == -1)
                 {
-                    out_motorcontrol_config = i_motorcontrol.get_config();
-                    out_motorcontrol_config.commutation_angle_offset = i_motorcontrol.get_offset();
+                    out_motorcontrol_config = i_torque_control.get_config();
+                    out_motorcontrol_config.commutation_angle_offset = i_torque_control.get_offset();
                     delay_milliseconds(50);//wait until offset is detected
                 }
 
                 //check polarity state
-                if(i_motorcontrol.get_sensor_polarity_state() != 1)
+                if(i_torque_control.get_sensor_polarity_state() != 1)
                 {
                     out_motorcontrol_config.commutation_angle_offset = -1;
                 }
                 //write offset in config
-                i_motorcontrol.set_config(out_motorcontrol_config);
+                i_torque_control.set_config(out_motorcontrol_config);
 
                 torque_enable_flag   = 0;
                 position_enable_flag = 0;
@@ -707,22 +707,22 @@ break;
                 break;
 
         case i_position_control[int i].reset_motorcontrol_faults():
-                i_motorcontrol.reset_faults();
+                i_torque_control.reset_faults();
                 break;
 
         case i_position_control[int i].set_safe_torque_off_enabled():
-                i_motorcontrol.set_brake_status(0);
+                i_torque_control.set_brake_status(0);
                 torque_enable_flag   = 0;
                 velocity_enable_flag = 0;
                 position_enable_flag = 0;
-                i_motorcontrol.set_safe_torque_off_enabled();
+                i_torque_control.set_safe_torque_off_enabled();
                 break;
         }
     }
 }
 
 
-void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_ctrl_config, client interface MotorControlInterface i_motorcontrol, client interface UpdateBrake i_update_brake)
+void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake)
 {
     int error=0;
     int duty_min=0, duty_max=0, duty_divider=0;
@@ -766,7 +766,7 @@ void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_c
     }
 
 
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+    MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
 
     if(motorcontrol_config.ifm_tile_usec==250)
     {
@@ -799,7 +799,7 @@ void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_c
 }
 
 
-void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface MotorControlInterface i_motorcontrol, int position,
+void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, int position,
         int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque)
 {
 
@@ -811,9 +811,9 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
         special_brake_release_torque = (motion_ctrl_config.brake_release_strategy*motion_ctrl_config.max_torque)/100;
     }
     if (motion_ctrl_config.brake_release_strategy > 0) {
-        i_motorcontrol.set_brake_status(1);
+        i_torque_control.set_brake_status(1);
     }
 
     //enable motorcontrol and release brake
-    i_motorcontrol.set_torque_control_enabled();
+    i_torque_control.set_torque_control_enabled();
 }

@@ -37,7 +37,7 @@ int main(void) {
     interface WatchdogInterface i_watchdog[2];
     interface UpdateBrake i_update_brake;
     interface ADCInterface i_adc[2];
-    interface MotorControlInterface i_motorcontrol[2];
+    interface TorqueControlInterface i_torque_control[2];
     interface shared_memory_interface i_shared_memory[3];
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
@@ -48,7 +48,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0], i_update_brake);
+        on tile[APP_TILE]: demo_torque_control(i_torque_control[0], i_update_brake);
 
         on tile[IFM_TILE]:
         {
@@ -109,8 +109,8 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                     motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
 
-                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
+                    torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
                 }
 
                 /* Shared memory Service */

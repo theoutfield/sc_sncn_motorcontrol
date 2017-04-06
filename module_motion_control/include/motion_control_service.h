@@ -245,11 +245,11 @@ void init_position_velocity_control(interface PositionVelocityCtrlInterface clie
  *
  * @param app_tile_usec
  * @param motion_ctrl_config config structure of the motion control
- * @param i_motorcontrol client interface to get the ifm tile frequency from the motorcontrol service.
+ * @param i_torque_control client interface to get the ifm tile frequency from the motorcontrol service.
  * @param i_update_brake client enterface to the pwm service to send the brake configuration
  *
  */
-void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_ctrl_config, client interface MotorControlInterface i_motorcontrol, client interface UpdateBrake i_update_brake);
+void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake);
 
 
 /**
@@ -258,14 +258,14 @@ void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_c
  *        The brake_release_strategy parameter it checked to chose the brake mode (disable, normal, shaking)
  *
  * @param motion_ctrl_config config structure of the motion control
- * @param i_motorcontrol client interface to enable motorcontrol and set the brake.
+ * @param i_torque_control client interface to enable motorcontrol and set the brake.
  * @param position used for the starting position for the shaking brake release
  * @param special_brake_release_counter used for the shaking brake release
  * @param special_brake_release_initial_position used for the shaking brake release
  * @param special_brake_release_torque used for the shaking brake release
  *
  */
-void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface MotorControlInterface i_motorcontrol, int position,
+void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, int position,
         int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque);
 
 
@@ -277,13 +277,13 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
  * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
- * @param i_motorcontrol Communication  interface to the Motor Control Service.
+ * @param i_torque_control Communication  interface to the Motor Control Service.
  * @param i_position_control[3]         array of PositionVelocityCtrlInterfaces to communicate with upto 3 clients
  * @param i_update_brake                Interface to update brake configuration in PWM service
  *
  * @return void
  *  */
 void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_control_config,
-                    interface MotorControlInterface client i_motorcontrol,
+                    interface TorqueControlInterface client i_torque_control,
                     interface PositionVelocityCtrlInterface server i_position_control[3],
                     client interface UpdateBrake i_update_brake);

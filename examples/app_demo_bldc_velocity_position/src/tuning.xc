@@ -8,17 +8,17 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int auto_offset(interface MotorControlInterface client i_motorcontrol)
+int auto_offset(interface TorqueControlInterface client i_torque_control)
 {
     printf("Sending offset_detection command ...\n");
-    i_motorcontrol.set_offset_detection_enabled();
+    i_torque_control.set_offset_detection_enabled();
 
-    while(i_motorcontrol.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
+    while(i_torque_control.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
 
-    int offset=i_motorcontrol.get_offset();
+    int offset=i_torque_control.get_offset();
     printf("Detected offset is: %i\n", offset);
     //    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
-    int proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+    int proper_sensor_polarity=i_torque_control.get_sensor_polarity_state();
     if(proper_sensor_polarity == 1) {
         printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
     } else {
