@@ -114,19 +114,6 @@ SensorError rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
         rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 1, 8, config.ifm_usec);
     else
         rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 0, 8, config.ifm_usec);
-    //offset
-    config.offset &= (config.resolution-1);
-    if (config.offset != 0) {
-        int position, count, multiturn;
-        { void, count, position, void, void } = rem_16mt_read(spi_ports, config.ifm_usec); //read actual position
-        if (count < 0) {
-            multiturn = (count / config.resolution) - 1;
-        } else {
-            multiturn = (count / config.resolution);
-        }
-        delay_ticks(100*config.ifm_usec);
-        rem_16mt_write(spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + ((position + config.offset) & 65535), 32, config.ifm_usec); //write same multiturn and single + offset
-    }
     //filter
     if (config.rem_16mt_config.filter == 1) {
         config.rem_16mt_config.filter = 0x02;

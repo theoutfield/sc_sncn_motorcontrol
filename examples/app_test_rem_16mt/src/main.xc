@@ -267,7 +267,7 @@ int main(void)
                 position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                position_feedback_config.offset      = 0;
+                position_feedback_config.offset      = HOME_OFFSET;
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;

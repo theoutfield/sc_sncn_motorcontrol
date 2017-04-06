@@ -85,7 +85,7 @@
 #define COMMUTATION_FRQ            24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    300
+#define COMMUTATION_ANGLE_OFFSET    0
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -130,9 +130,12 @@
 //////  POSITION CONTROLLER
 /////////////////////////////////////////////////
 
+//home offset
+#define HOME_OFFSET                             0
+
 //Limits
-#define MIN_POSITION_RANGE_LIMIT                     -0x7fffffff
-#define MAX_POSITION_RANGE_LIMIT                      0x7fffffff
+#define MIN_POSITION_RANGE_LIMIT                -0x7fffffff
+#define MAX_POSITION_RANGE_LIMIT                 0x7fffffff
 
 //Integrated Profiler
 #define ENABLE_PROFILER                         0
@@ -168,9 +171,9 @@
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
-#define BRAKE_RELEASE_STRATEGY     0
+#define BRAKE_RELEASE_STRATEGY     0    // 0 disabled, 1 normal, 2-100 shaking
 
-#define BRAKE_RELEASE_DELAY   0     //delay in milliseconds between the brake blocking and the stop of the control
+#define BRAKE_RELEASE_DELAY        0    // delay in milliseconds between the brake blocking and the stop of the control
 
 /*
  * Define: Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
