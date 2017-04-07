@@ -161,6 +161,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
     //init variables
     int sensor_type = position_feedback_config.sensor_type;
+    SensorError last_sensor_error = SENSOR_NO_ERROR;
     //velocity
     int velocity = 0;
     int velocity_buffer[8] = {0};
@@ -215,6 +216,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
         //receive new config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
+                last_sensor_error = SENSOR_NO_ERROR;
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
@@ -342,8 +344,14 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
             }
 #endif
 
+
+            //store last error
+            if (pos_state.status != SENSOR_NO_ERROR) {
+                last_sensor_error = pos_state.status;
+            }
+
             //send data to shared memory
-            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, velocity, pos_state.angle, 0, pos_state.status, last_read/position_feedback_config.ifm_usec);
+            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, velocity, pos_state.angle, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
 
             //gpio
             gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
