@@ -11,12 +11,10 @@
 
 /**
  * @brief Status of motor control related services
- * ACTIVE   -> the task is started and can be used as a server
- * INACTIVE -> the task is not started yet
  */
 typedef enum {
-    INACTIVE= 1,
-    ACTIVE = 2
+    INACTIVE= 1,/**< the task is started and can be used as a server. */
+    ACTIVE = 2  /**< the task is not started yet. */
 } TaskStatus;
 
 /**

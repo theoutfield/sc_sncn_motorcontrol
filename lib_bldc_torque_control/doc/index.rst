@@ -75,9 +75,9 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
 
     - Define the required interfaces for communication between torque control service and other services (including pwm service, watchdog service, adc service, shared memory service, and position feedback service).
 
-    - On IFM tile, run the pwm service, adc service, watchdog service and shared memory
+    - On IFM tile, add the pwm service, adc service, watchdog service and shared memory
 
-    - Again on IFM tile initialize and run the torque control service 
+    - Again on IFM tile initialize and add the torque control service 
 
     .. code-block:: c
     
@@ -272,6 +272,6 @@ Service
 Interface
 ---------
 
-.. doxygeninterface:: MotorControlInterface
+.. doxygeninterface:: TorqueControlInterface
 
 
