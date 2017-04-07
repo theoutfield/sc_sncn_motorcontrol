@@ -88,38 +88,15 @@ int sign_function(float a)
  */
 float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double pos_actual, ProfilerParam pos_profiler_param)
 {
-    double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2, v_max = 0.00, a_max = 0.00;
+    double velocity_k_1n, temp, deceleration_distance, pos_deceleration, pos_k, pos_temp1, pos_temp2, v_max = 0.00, a_max = 0.00, d_max = 0.00;
     double variable_velocity_distance=0.00;
     int deceleration_flag = 0;
 
     v_max = (((double)(pos_profiler_param.v_max)) * pos_profiler_param.resolution )/60.00;
 
-
     velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
-
-//    if(pos_profiler_param.acceleration_max>pos_profiler_param.deceleration_max)
-//    {
-//        a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
-//        variable_velocity_distance = (v_max*v_max) / (4 * a_max);
-//    }
-//    else
-//    {
-//        a_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
-//        variable_velocity_distance = (v_max*v_max) / (4 * a_max);
-//    }
-
-    variable_velocity_distance = pos_profiler_param.resolution * 2;
-
     a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
-
-    if(pos_target>pos_actual  &&  (pos_target-pos_actual)<variable_velocity_distance)
-        a_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
-    else if(pos_target>pos_actual  &&  (pos_target-pos_actual)>variable_velocity_distance)
-        a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
-    else if(pos_target<pos_actual  &&  (pos_actual-pos_target)<variable_velocity_distance)
-        a_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
-    else if(pos_target<pos_actual  &&  (pos_actual-pos_target)>variable_velocity_distance)
-        a_max = (((double)(pos_profiler_param.acceleration_max)) * pos_profiler_param.resolution )/60.00;
+    d_max = (((double)(pos_profiler_param.deceleration_max)) * pos_profiler_param.resolution )/60.00;
 
     if (pos_target == pos_k_1n)
         pos_k = pos_target;
@@ -130,10 +107,10 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double p
         else
         {
             velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
-            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * a_max);
+            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * d_max);
             pos_deceleration = pos_target - deceleration_distance;
             if ((pos_k_1n >= pos_deceleration) && (pos_k_1n > pos_k_2n))
-                deceleration_flag = 1;
+                deceleration_flag = 1;//we are getting close to the target, and we should decelerate now
             temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * a_max;
             if (deceleration_flag == 0)
             {
@@ -146,6 +123,7 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double p
             }
             else
             {
+                temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * d_max;
                 pos_k = -temp + (2 * pos_k_1n) - pos_k_2n;
             }
             if (pos_k > pos_target)
@@ -161,7 +139,7 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double p
         else
         {
             velocity_k_1n = ((pos_k_1n - pos_k_2n) / pos_profiler_param.delta_T);
-            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * a_max);
+            deceleration_distance = (velocity_k_1n * velocity_k_1n) / (2 * d_max);
             pos_deceleration = pos_target + deceleration_distance;
             if ((pos_k_1n <= pos_deceleration) && (pos_k_1n < pos_k_2n))
                 deceleration_flag = 1;
@@ -177,6 +155,7 @@ float pos_profiler(double pos_target, double pos_k_1n, double pos_k_2n, double p
             }
             else
             {
+                temp = pos_profiler_param.delta_T * pos_profiler_param.delta_T * d_max;
                 pos_k = temp + (2 * pos_k_1n) - pos_k_2n;
             }
             if (pos_k < pos_target)
