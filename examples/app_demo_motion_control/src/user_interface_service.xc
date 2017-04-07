@@ -175,9 +175,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                         printf("torque step command from 0 to %d to %d to 0 milli-Nm\n", console_inputs.value, -console_inputs.value);
 
                         downstream_control_data.offset_torque = 0;
-                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                         downstream_control_data.torque_cmd = console_inputs.value;
                         i_motion_control.update_control_data(downstream_control_data);
@@ -205,9 +205,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                                 printf("torque step command from 0 to %d to %d to 0 milli-Nm\n", console_inputs.value, -console_inputs.value);
 
                                 downstream_control_data.offset_torque = 0;
-                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                                 downstream_control_data.torque_cmd = console_inputs.value;
                                 i_motion_control.update_control_data(downstream_control_data);
@@ -237,9 +237,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                         printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
 
                         downstream_control_data.offset_torque = 0;
-                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                         downstream_control_data.torque_cmd = console_inputs.value;
                         i_motion_control.update_control_data(downstream_control_data);
@@ -258,9 +258,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
 
                                 printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
                                 downstream_control_data.offset_torque = 0;
-                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                                 downstream_control_data.torque_cmd = console_inputs.value;
                                 i_motion_control.update_control_data(downstream_control_data);
@@ -318,9 +318,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.velocity_cmd = console_inputs.value;
 
-                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                         i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(2000);
@@ -350,9 +350,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                                 downstream_control_data.offset_torque = 0;
                                 downstream_control_data.velocity_cmd = console_inputs.value;
 
-                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                                 i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(2000);
@@ -377,9 +377,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.velocity_cmd = console_inputs.value;
 
-                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                         i_motion_control.update_control_data(downstream_control_data);
 
@@ -400,9 +400,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                                 downstream_control_data.offset_torque = 0;
                                 downstream_control_data.velocity_cmd = console_inputs.value;
 
-                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                                 i_motion_control.update_control_data(downstream_control_data);
                             }
@@ -492,9 +492,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = console_inputs.value;
 
-                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                         printf("position step command from 0 to %d to %d to 0\n", console_inputs.value, -console_inputs.value);
 
@@ -547,9 +547,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = console_inputs.value;
 
-                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                         printf("position step command from 0 to %d to %d to 0\n", console_inputs.value, -console_inputs.value);
 
@@ -572,9 +572,9 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                                 downstream_control_data.offset_torque = 0;
                                 downstream_control_data.position_cmd = console_inputs.value;
 
-                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                                 printf("position step command from 0 to %d to %d to 0\n", console_inputs.value, -console_inputs.value);
 

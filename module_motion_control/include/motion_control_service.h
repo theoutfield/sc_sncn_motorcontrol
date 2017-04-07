@@ -151,14 +151,14 @@ interface MotionControlInterface
      *
      * @return Current Service configuration.
      */
-    MotionControlConfig get_position_velocity_control_config();
+    MotionControlConfig get_motion_control_config();
 
     /**
      * @brief Setter for new configuration in the Service.
      *
      * @param in_config New Service configuration.
      */
-    void set_position_velocity_control_config(MotionControlConfig in_config);
+    void set_motion_control_config(MotionControlConfig in_config);
 
     /**
      * @brief Setter for new configuration in the Motorcontrol Service.
@@ -234,7 +234,7 @@ interface MotionControlInterface
  *
  * @return void
  */
-void init_position_velocity_control(interface MotionControlInterface client i_motion_control);
+void init_motion_control(interface MotionControlInterface client i_motion_control);
 
 
 /**
