@@ -38,7 +38,7 @@ typedef struct{
  *        It is required running this function once before start using the Profiler.
  *
  * @param profile_position_config Configuration for the Position Profiler.
- * @param i_position_control Communication interface to the Position Control Service.
+ * @param i_motion_control Communication interface to the Position Control Service.
  * @param i_hall Interface to hall Service
  * @param i_qei Interface to Incremental Encoder Service (QEI)
  * @param i_biss Interface to BiSS Encoder Service (QEI)
@@ -76,10 +76,10 @@ void init_position_profiler(ProfilerConfig profile_position_config);
  * @param velocity in [RPM].
  * @param acceleration in [RPM/s].
  * @param deceleration [RPM/s].
- * @param i_position_control Communication interface to the Position Control Service.
+ * @param i_motion_control Communication interface to the Position Control Service.
  */
 void set_profile_position( DownstreamControlData &downstream_control_data, int velocity, int acceleration, int deceleration,
-                           interface PositionVelocityCtrlInterface client i_position_control );
+                           interface MotionControlInterface client i_motion_control );
 
 /**
  * @brief Set profile velocity with Velocity Control loop

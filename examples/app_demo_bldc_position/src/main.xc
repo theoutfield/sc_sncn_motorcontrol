@@ -35,7 +35,7 @@ port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 
 /* Test Profile Position function */
-void position_profile_test(interface PositionVelocityCtrlInterface client i_position_control)
+void position_profile_test(interface MotionControlInterface client i_motion_control)
 {
     const int target = 16000;
     //    const int target = 2620000;
@@ -65,7 +65,7 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
     downstream_control_data.offset_torque = 0;
     downstream_control_data.position_cmd = 0;
 
-    int start_position = i_position_control.get_position();
+    int start_position = i_motion_control.get_position();
     target_position = start_position + target;
 
     /* Initialise the position profile generator */
@@ -75,12 +75,12 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
 
     downstream_control_data.position_cmd = target_position;
     /* Set new target position for profile position control */
-    set_profile_position(downstream_control_data, velocity, acceleration, deceleration, i_position_control);
+    set_profile_position(downstream_control_data, velocity, acceleration, deceleration, i_motion_control);
 
     while(1)
     {
         // Read actual position from the Position Control Server
-        actual_position = i_position_control.get_position();
+        actual_position = i_motion_control.get_position();
         follow_error = target_position - actual_position;
 
         /*
@@ -96,7 +96,7 @@ void position_profile_test(interface PositionVelocityCtrlInterface client i_posi
                 target_position = start_position + target;
             }
             downstream_control_data.position_cmd = target_position;
-            set_profile_position(downstream_control_data, velocity, acceleration, deceleration, i_position_control);
+            set_profile_position(downstream_control_data, velocity, acceleration, deceleration, i_motion_control);
         }
         delay_milliseconds(1);
     }
@@ -113,7 +113,7 @@ int main(void)
     interface UpdatePWM i_update_pwm;
     interface UpdateBrake i_update_brake;
     interface shared_memory_interface i_shared_memory[3];
-    interface PositionVelocityCtrlInterface i_position_control[3];
+    interface MotionControlInterface i_motion_control[3];
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
 
@@ -122,7 +122,7 @@ int main(void)
         /* Test Profile Position Client function*/
         on tile[APP_TILE]:
         {
-            position_profile_test(i_position_control[0]);      // test PPM on slave side
+            position_profile_test(i_motion_control[0]);      // test PPM on slave side
         }
 
         on tile[APP_TILE]:
@@ -133,9 +133,9 @@ int main(void)
             while(1)
             {
                 /* Read actual position from the Position Control Server */
-                actual_velocity = i_position_control[1].get_velocity();
-                actual_position = i_position_control[1].get_position();
-                //target_position = i_position_control[1].get_target_position();
+                actual_velocity = i_motion_control[1].get_velocity();
+                actual_position = i_motion_control[1].get_position();
+                //target_position = i_motion_control[1].get_target_position();
 
                 //xscope_int(TARGET_POSITION, target_position); //Divided by 10 for better displaying
                 xscope_int(ACTUAL_POSITION, actual_position); //Divided by 10 for better displaying
@@ -189,7 +189,7 @@ int main(void)
             motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
             motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
 
-            motion_control_service(APP_TILE_USEC, motion_ctrl_config, i_torque_control[0], i_position_control, i_update_brake);
+            motion_control_service(APP_TILE_USEC, motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
         }
 
         /************************************************************
@@ -254,7 +254,7 @@ int main(void)
                     motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                     motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
 
-                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                    torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
                             i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
                 }
 

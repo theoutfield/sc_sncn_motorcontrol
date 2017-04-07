@@ -107,7 +107,7 @@ typedef struct {
 /**
  * @brief Interface type to communicate with the Motion Control Service.
  */
-interface PositionVelocityCtrlInterface
+interface MotionControlInterface
 {
 
     /**
@@ -230,11 +230,11 @@ interface PositionVelocityCtrlInterface
  *        It is required the client to call this function before
  *        starting to perform position control.
  *
- * @param i_position_control Communication interface to the Position Control Service.
+ * @param i_motion_control Communication interface to the Position Control Service.
  *
  * @return void
  */
-void init_position_velocity_control(interface PositionVelocityCtrlInterface client i_position_control);
+void init_position_velocity_control(interface MotionControlInterface client i_motion_control);
 
 
 /**
@@ -278,12 +278,12 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
  *
  * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
  * @param i_torque_control Communication  interface to the Motor Control Service.
- * @param i_position_control[3]         array of PositionVelocityCtrlInterfaces to communicate with upto 3 clients
+ * @param i_motion_control[3]         array of MotionControlInterfaces to communicate with upto 3 clients
  * @param i_update_brake                Interface to update brake configuration in PWM service
  *
  * @return void
  *  */
 void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_control_config,
                     interface TorqueControlInterface client i_torque_control,
-                    interface PositionVelocityCtrlInterface server i_position_control[3],
+                    interface MotionControlInterface server i_motion_control[3],
                     client interface UpdateBrake i_update_brake);

@@ -93,14 +93,14 @@ int special_brake_release(int &counter, int start_position, int actual_position,
  *
  * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
  * @param i_torque_control Communication  interface to the Motor Control Service.
- * @param i_position_control[3]         array of PositionVelocityCtrlInterfaces to communicate with upto 3 clients
+ * @param i_motion_control[3]         array of MotionControlInterfaces to communicate with upto 3 clients
  * @param i_update_brake                Interface to update brake configuration in PWM service
  *
  * @return void
  *  */
 void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_config,
         interface TorqueControlInterface client i_torque_control,
-        interface PositionVelocityCtrlInterface server i_position_control[3],client interface UpdateBrake i_update_brake)
+        interface MotionControlInterface server i_motion_control[3],client interface UpdateBrake i_update_brake)
 {
     timer t;
     unsigned int ts;
@@ -421,7 +421,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
 break;
 
-        case i_position_control[int i].disable():
+        case i_motion_control[int i].disable():
 
                 i_torque_control.set_brake_status(0);
                 if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
@@ -438,7 +438,7 @@ break;
 
                 break;
 
-        case i_position_control[int i].enable_position_ctrl(int in_pos_control_mode):
+        case i_motion_control[int i].enable_position_ctrl(int in_pos_control_mode):
 
                 torque_enable_flag   =0;
                 velocity_enable_flag =0;
@@ -470,7 +470,7 @@ break;
 
                 break;
 
-        case i_position_control[int i].enable_velocity_ctrl(void):
+        case i_motion_control[int i].enable_velocity_ctrl(void):
 
                 torque_enable_flag   =0;
                 velocity_enable_flag =1;
@@ -492,7 +492,7 @@ break;
 
                 break;
 
-        case i_position_control[int i].enable_torque_ctrl():
+        case i_motion_control[int i].enable_torque_ctrl():
                 torque_enable_flag   =1;
                 velocity_enable_flag =0;
                 position_enable_flag =0;
@@ -511,7 +511,7 @@ break;
 
                 break;
 
-        case i_position_control[int i].set_position_velocity_control_config(MotionControlConfig in_config):
+        case i_motion_control[int i].set_position_velocity_control_config(MotionControlConfig in_config):
                 //check if we need to update max/min pos limits
                 if (in_config.max_pos_range_limit != motion_ctrl_config.max_pos_range_limit || in_config.min_pos_range_limit != motion_ctrl_config.min_pos_range_limit || in_config.polarity != motion_ctrl_config.polarity)
                 {
@@ -583,11 +583,11 @@ break;
                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
-        case i_position_control[int i].get_position_velocity_control_config() ->  MotionControlConfig out_config:
+        case i_motion_control[int i].get_position_velocity_control_config() ->  MotionControlConfig out_config:
                 out_config = motion_ctrl_config;
                 break;
 
-        case i_position_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
+        case i_motion_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
                 upstream_control_data_out = i_torque_control.update_upstream_control_data();
                 downstream_control_data = downstream_control_data_in;
 
@@ -618,44 +618,44 @@ break;
 
                 break;
 
-        case i_position_control[int i].set_j(int j):
+        case i_motion_control[int i].set_j(int j):
                 motion_ctrl_config.moment_of_inertia = j;
                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
-        case i_position_control[int i].set_torque(int in_target_torque):
+        case i_motion_control[int i].set_torque(int in_target_torque):
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                     downstream_control_data.torque_cmd = -in_target_torque;
                 else
                     downstream_control_data.torque_cmd = in_target_torque;
                 break;
 
-        case i_position_control[int i].get_position() -> int out_position:
+        case i_motion_control[int i].get_position() -> int out_position:
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                     out_position = -upstream_control_data.position;
                 else
                     out_position = upstream_control_data.position;
                 break;
 
-        case i_position_control[int i].get_velocity() -> int out_velocity:
+        case i_motion_control[int i].get_velocity() -> int out_velocity:
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                     out_velocity = -upstream_control_data.velocity;
                 else
                     out_velocity = upstream_control_data.velocity;
                 break;
 
-        case i_position_control[int i].get_motorcontrol_config() -> MotorcontrolConfig out_motorcontrol_config:
+        case i_motion_control[int i].get_motorcontrol_config() -> MotorcontrolConfig out_motorcontrol_config:
                 out_motorcontrol_config = i_torque_control.get_config();
                 break;
 
-        case i_position_control[int i].set_motorcontrol_config(MotorcontrolConfig in_motorcontrol_config):
+        case i_motion_control[int i].set_motorcontrol_config(MotorcontrolConfig in_motorcontrol_config):
                 torque_enable_flag = 0;
                 position_enable_flag = 0;
                 velocity_enable_flag = 0;
                 i_torque_control.set_config(in_motorcontrol_config);
                 break;
 
-        case i_position_control[int i].set_brake_status(int in_brake_status):
+        case i_motion_control[int i].set_brake_status(int in_brake_status):
                 if(in_brake_status==1)
                 {
                     i_torque_control.set_brake_status(1);
@@ -667,7 +667,7 @@ break;
                 break;
 
 
-        case i_position_control[int i].update_brake_configuration():
+        case i_motion_control[int i].update_brake_configuration():
                 torque_enable_flag   =0;
                 velocity_enable_flag =0;
                 position_enable_flag =0;
@@ -681,7 +681,7 @@ break;
                 update_brake_configuration_flag = 1;
                 break;
 
-        case i_position_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
+        case i_motion_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
                 //offset detection
                 out_motorcontrol_config = i_torque_control.get_config();
                 out_motorcontrol_config.commutation_angle_offset = -1;
@@ -706,11 +706,11 @@ break;
                 velocity_enable_flag = 0;
                 break;
 
-        case i_position_control[int i].reset_motorcontrol_faults():
+        case i_motion_control[int i].reset_motorcontrol_faults():
                 i_torque_control.reset_faults();
                 break;
 
-        case i_position_control[int i].set_safe_torque_off_enabled():
+        case i_motion_control[int i].set_safe_torque_off_enabled():
                 i_torque_control.set_brake_status(0);
                 torque_enable_flag   = 0;
                 velocity_enable_flag = 0;
