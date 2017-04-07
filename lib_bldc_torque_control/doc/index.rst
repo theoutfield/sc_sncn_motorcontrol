@@ -23,6 +23,7 @@ The service takes the following parameters as input:
 The service will wait until lower level services (such as watchdog, PWM and ADC) start to work. After that, it initializes the torque control parameters, and provides the user with torque control service. It also provides the interface for feedback services (such as ADC and position sensor services) and higher controlling loops (such as position/velocity controllers and also Ethercat communication). Figure 1 shows the structure of data flow among torque control service and other services. Torque control service should always run over an IFM Tile.
 
 .. image:: images/photo.jpg
+   :width: 90%
 
 **Fig. 1: Data flow structure between torque control service and other services**
 
