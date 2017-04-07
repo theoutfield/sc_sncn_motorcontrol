@@ -8,17 +8,17 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int auto_offset(interface MotorControlInterface client i_motorcontrol)
+int auto_offset(interface TorqueControlInterface client i_torque_control)
 {
     printf("Sending offset_detection command ...\n");
-    i_motorcontrol.set_offset_detection_enabled();
+    i_torque_control.set_offset_detection_enabled();
 
-    while(i_motorcontrol.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
+    while(i_torque_control.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
 
-    int offset=i_motorcontrol.get_offset();
+    int offset=i_torque_control.get_offset();
     printf("Detected offset is: %i\n", offset);
     //    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
-    int proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+    int proper_sensor_polarity=i_torque_control.get_sensor_polarity_state();
     if(proper_sensor_polarity == 1) {
         printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
     } else {
@@ -94,7 +94,7 @@ ConsoleInputs get_user_command()
  *
  * @return ConsoleInputs structure including the user inputs.
  */
-void demo_motion_control(client interface PositionVelocityCtrlInterface i_position_control)
+void demo_motion_control(client interface MotionControlInterface i_motion_control)
 {
     delay_milliseconds(1000);
     printf(">> SOMANET MOTION CONTROL SERVICE STARTING ...\n");
@@ -143,7 +143,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
         case 't':
                 if(repeat_mode==0)
                 {
-                    i_position_control.enable_torque_ctrl();
+                    i_motion_control.enable_torque_ctrl();
                     printf("torque control mode with linear profil selected\n");
                 }
 
@@ -175,20 +175,20 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         printf("torque step command from 0 to %d to %d to 0 milli-Nm\n", console_inputs.value, -console_inputs.value);
 
                         downstream_control_data.offset_torque = 0;
-                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
                         downstream_control_data.torque_cmd = console_inputs.value;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(2000);
 
                         downstream_control_data.torque_cmd =-console_inputs.value;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(2000);
 
                         downstream_control_data.torque_cmd =0;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
 
                         char new_reference_char = 'n';
                         while(new_reference_char=='n')
@@ -205,20 +205,20 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                                 printf("torque step command from 0 to %d to %d to 0 milli-Nm\n", console_inputs.value, -console_inputs.value);
 
                                 downstream_control_data.offset_torque = 0;
-                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
                                 downstream_control_data.torque_cmd = console_inputs.value;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(2000);
 
                                 downstream_control_data.torque_cmd =-console_inputs.value;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(2000);
 
                                 downstream_control_data.torque_cmd =0;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(2000);
 
                             }
@@ -237,12 +237,12 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
 
                         downstream_control_data.offset_torque = 0;
-                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
                         downstream_control_data.torque_cmd = console_inputs.value;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
 
                         char new_reference_char = 'n';
                         while(new_reference_char=='n')
@@ -258,12 +258,12 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
 
                                 printf("torque step command set to %d milli-Nm\n", console_inputs.value, -console_inputs.value);
                                 downstream_control_data.offset_torque = 0;
-                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
                                 downstream_control_data.torque_cmd = console_inputs.value;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                             }
                         }
 
@@ -276,7 +276,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 if(console_inputs.first_char=='q')
                 {
                     control_mode='q';
-                    i_position_control.disable();
+                    i_motion_control.disable();
                     repeat_mode=0;
                     printf("controller disabled\n");
                 }
@@ -286,7 +286,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
         case 'v':
                 if(repeat_mode==0)
                 {
-                    i_position_control.enable_velocity_ctrl();
+                    i_motion_control.enable_velocity_ctrl();
                     printf("velocity control mode with linear profile selected\n");
                 }
                 int command_type = 'd';// 's' stands for step response with profiler, and 'd' stands for direct command
@@ -318,19 +318,19 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.velocity_cmd = console_inputs.value;
 
-                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(2000);
 
                         downstream_control_data.velocity_cmd = -console_inputs.value;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(2000);
 
                         downstream_control_data.velocity_cmd = 0;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(2000);
 
                         char new_reference_char = 'n';
@@ -350,19 +350,19 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                                 downstream_control_data.offset_torque = 0;
                                 downstream_control_data.velocity_cmd = console_inputs.value;
 
-                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(2000);
 
                                 downstream_control_data.velocity_cmd = -console_inputs.value;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(2000);
 
                                 downstream_control_data.velocity_cmd = 0;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(2000);
                             }
                         }
@@ -377,11 +377,11 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.velocity_cmd = console_inputs.value;
 
-                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
 
                         char new_reference_char = 'n';
                         while(new_reference_char=='n')
@@ -400,11 +400,11 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                                 downstream_control_data.offset_torque = 0;
                                 downstream_control_data.velocity_cmd = console_inputs.value;
 
-                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                             }
                         }
                         break;
@@ -416,7 +416,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 if(console_inputs.first_char=='q')
                 {
                     control_mode='q';
-                    i_position_control.disable();
+                    i_motion_control.disable();
                     repeat_mode=0;
                     printf("controller disabled\n");
                 }
@@ -447,17 +447,17 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 switch(controller_type)
                 {
                 case 1:
-                        i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                        i_motion_control.enable_position_ctrl(POS_PID_CONTROLLER);
                         printf("position pid controller with linear profiler selected\n");
                         break;
 
                 case 2:
-                        i_position_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                        i_motion_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
                         printf("cascaded position/velocity controller with linear profiler selected\n");
                         break;
 
                 case 3:
-                        i_position_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
+                        i_motion_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
                         printf("nonlinear position controller with linear profiler selected\n");
                         break;
 
@@ -492,21 +492,21 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = console_inputs.value;
 
-                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
                         printf("position step command from 0 to %d to %d to 0\n", console_inputs.value, -console_inputs.value);
 
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = console_inputs.value;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(1500);
                         downstream_control_data.position_cmd = -console_inputs.value;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(1500);
                         downstream_control_data.position_cmd = 0;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
                         delay_milliseconds(1500);
 
                         char new_reference_char = 'n';
@@ -525,13 +525,13 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
 
                                 downstream_control_data.offset_torque = 0;
                                 downstream_control_data.position_cmd = console_inputs.value;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(1500);
                                 downstream_control_data.position_cmd = -console_inputs.value;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(1500);
                                 downstream_control_data.position_cmd = 0;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
                                 delay_milliseconds(1500);
 
                             }
@@ -547,15 +547,15 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = console_inputs.value;
 
-                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                        motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                         motion_ctrl_config.enable_profiler = 1;
-                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                        i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
                         printf("position step command from 0 to %d to %d to 0\n", console_inputs.value, -console_inputs.value);
 
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = console_inputs.value;
-                        i_position_control.update_control_data(downstream_control_data);
+                        i_motion_control.update_control_data(downstream_control_data);
 
                         char new_reference_char = 'n';
                         while(new_reference_char=='n')
@@ -572,15 +572,15 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                                 downstream_control_data.offset_torque = 0;
                                 downstream_control_data.position_cmd = console_inputs.value;
 
-                                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                                motion_ctrl_config = i_motion_control.get_position_velocity_control_config();
                                 motion_ctrl_config.enable_profiler = 1;
-                                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                                i_motion_control.set_position_velocity_control_config(motion_ctrl_config);
 
                                 printf("position step command from 0 to %d to %d to 0\n", console_inputs.value, -console_inputs.value);
 
                                 downstream_control_data.offset_torque = 0;
                                 downstream_control_data.position_cmd = console_inputs.value;
-                                i_position_control.update_control_data(downstream_control_data);
+                                i_motion_control.update_control_data(downstream_control_data);
 
                             }
 
@@ -594,7 +594,7 @@ void demo_motion_control(client interface PositionVelocityCtrlInterface i_positi
                 if(console_inputs.first_char=='q')
                 {
                     control_mode='q';
-                    i_position_control.disable();
+                    i_motion_control.disable();
                     repeat_mode=0;
                     printf("controller disabled\n");
                 }

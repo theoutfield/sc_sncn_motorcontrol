@@ -27,8 +27,9 @@ void init_position_profiler(ProfilerConfig profile_position_config) {
 }
 
 void set_profile_position(DownstreamControlData &downstream_control_data, int velocity, int acceleration, int deceleration,
-                          interface PositionVelocityCtrlInterface client i_position_control )
+                          interface MotionControlInterface client i_motion_control )
 {
+
     int i;
     timer t;
     unsigned int time;
@@ -37,16 +38,16 @@ void set_profile_position(DownstreamControlData &downstream_control_data, int ve
 
     int actual_position = 0;
     //FIXME check the state of the position control service
-//    int init_state = i_position_control.check_busy();
+//    int init_state = i_motion_control.check_busy();
 //
 //
 //    if (init_state == INIT_BUSY)
 //    {
-//        init_position_velocity_control(i_position_control);
+//        init_position_velocity_control(i_motion_control);
 //    }
-    i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
+    i_motion_control.enable_position_ctrl(POS_PID_CONTROLLER);
 
-    actual_position = i_position_control.get_position();
+    actual_position = i_motion_control.get_position();
 
     steps = init_position_profile(downstream_control_data.position_cmd, actual_position, velocity, acceleration, deceleration);
 
@@ -55,7 +56,7 @@ void set_profile_position(DownstreamControlData &downstream_control_data, int ve
     {
         position_ramp = position_profile_generate(i);
         downstream_control_data.position_cmd = position_ramp;
-        i_position_control.update_control_data(downstream_control_data);
+        i_motion_control.update_control_data(downstream_control_data);
         t when timerafter(time + MSEC_STD) :> time;
     }
     t when timerafter(time + 30 * MSEC_STD) :> time;

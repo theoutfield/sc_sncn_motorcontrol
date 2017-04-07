@@ -15,7 +15,7 @@
 /**
  * @brief Interface type to communicate with Motor Control Service.
  */
-interface MotorControlInterface
+interface TorqueControlInterface
 {
     /**
      * @brief Sets brake status to ON/OFF
