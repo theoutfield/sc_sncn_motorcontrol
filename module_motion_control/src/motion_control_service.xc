@@ -511,7 +511,7 @@ break;
 
                 break;
 
-        case i_motion_control[int i].set_position_velocity_control_config(MotionControlConfig in_config):
+        case i_motion_control[int i].set_motion_control_config(MotionControlConfig in_config):
                 //check if we need to update max/min pos limits
                 if (in_config.max_pos_range_limit != motion_ctrl_config.max_pos_range_limit || in_config.min_pos_range_limit != motion_ctrl_config.min_pos_range_limit || in_config.polarity != motion_ctrl_config.polarity)
                 {
@@ -583,7 +583,7 @@ break;
                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
-        case i_motion_control[int i].get_position_velocity_control_config() ->  MotionControlConfig out_config:
+        case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:
                 out_config = motion_ctrl_config;
                 break;
 

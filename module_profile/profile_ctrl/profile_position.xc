@@ -43,7 +43,7 @@ void set_profile_position(DownstreamControlData &downstream_control_data, int ve
 //
 //    if (init_state == INIT_BUSY)
 //    {
-//        init_position_velocity_control(i_motion_control);
+//        init_motion_control(i_motion_control);
 //    }
     i_motion_control.enable_position_ctrl(POS_PID_CONTROLLER);
 
