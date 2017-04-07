@@ -320,7 +320,7 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
                      xscope_int(ANGLE, upstream_control_data.angle);
                      xscope_int(POSITION, upstream_control_data.position);
                      xscope_int(VELOCITY, upstream_control_data.velocity);
-                     xscope_int(TEMPERATURE, upstream_control_data.temperature);
+                     xscope_int(TEMPERATURE_SENSOR_OUTPUT, upstream_control_data.temperature);
                      xscope_int(FAULT_CODE, upstream_control_data.error_status);
 
                      delay_milliseconds(1);

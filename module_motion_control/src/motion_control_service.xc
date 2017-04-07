@@ -411,7 +411,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
                 xscope_int(V_DC, upstream_control_data.V_dc);
                 xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
-                xscope_int(TEMPERATURE, upstream_control_data.analogue_input_b_2);
+                xscope_int(TEMPERATURE_SENSOR_OUTPUT, upstream_control_data.temperature);
                 xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
                 xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
