@@ -185,15 +185,19 @@ typedef struct
     unsigned int angle;
     unsigned int hall_state;
     int angle_velocity;
+    SensorError angle_sensor_error;
+    SensorError angle_last_sensor_error;
 
     int position;
     int velocity;
     SensorError  sensor_error;
+    SensorError  last_sensor_error;
     unsigned int sensor_timestamp;
 
     int secondary_position;
     int secondary_velocity;
     SensorError  secondary_sensor_error;
+    SensorError  secondary_last_sensor_error;
     unsigned int secondary_sensor_timestamp;
 
     int temperature;
