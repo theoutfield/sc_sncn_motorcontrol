@@ -162,6 +162,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     //init variables
     int sensor_type = position_feedback_config.sensor_type;
     SensorError last_sensor_error = SENSOR_NO_ERROR;
+    const int sensor_error_limit = 100;
+    int sensor_error_count = 0;
     //velocity
     int velocity = 0;
     int velocity_buffer[8] = {0};
@@ -180,6 +182,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     t :> last_read;
     unsigned int last_velocity_read = last_read;
     unsigned int next_velocity_read = last_read;
+    unsigned int sensor_error_check_time = last_read;
     unsigned int end_time = 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
@@ -217,6 +220,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
         //receive new config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 last_sensor_error = SENSOR_NO_ERROR;
+                sensor_error_count = 0;
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
@@ -347,7 +351,16 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
             //store last error
             if (pos_state.status != SENSOR_NO_ERROR) {
-                last_sensor_error = pos_state.status;
+                if (sensor_error_count < sensor_error_limit) {
+                    sensor_error_count++;
+                    //reset sensor error count
+                    if (timeafter(next_velocity_read, sensor_error_check_time)) {
+                        sensor_error_check_time = next_velocity_read + 10000*position_feedback_config.ifm_usec;//10 msec
+                        sensor_error_count = 0;
+                    }
+                } else {
+                    last_sensor_error = pos_state.status;
+                }
             }
 
             //send data to shared memory
