@@ -15,7 +15,7 @@
 /**
  * @brief Interface type to communicate with Motor Control Service.
  */
-interface MotorControlInterface
+interface TorqueControlInterface
 {
     /**
      * @brief Sets brake status to ON/OFF
@@ -212,10 +212,11 @@ interface shared_memory_interface
     * @param Hall state (in case HALL sensor is used).
     * @param Position.
     * @param Velocity.
-    * @param sensor_error the sensor error status
-    * @param timestamp timestamp in microseconds of when the position data was read
+    * @param sensor_error the sensor error status.
+    * @param last_sensor_error the last non zero sensor error status.
+    * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, unsigned int timestamp);
+    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write electrical angle to shared memory.
@@ -223,8 +224,10 @@ interface shared_memory_interface
     * @param Electrical angle.
     * @param Hall state (in case HALL sensor is used).
     * @param Velocity.
+    * @param sensor_error the sensor error status.
+    * @param last_sensor_error the last non zero sensor error status.
     */
-    void write_angle(unsigned int angle, unsigned int hall_state, int velocity);
+    void write_angle(unsigned int angle, unsigned int hall_state, int velocity, SensorError sensor_error, SensorError last_sensor_error);
 
     /**
     * @brief Write electrical angle and secondary position feedback (display only) to shared memory.
@@ -234,9 +237,10 @@ interface shared_memory_interface
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status
-    * @param timestamp timestamp in microseconds of when the position data was read
+    * @param last_sensor_error the last non zero sensor error status.
+    * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, unsigned int timestamp);
+    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write primary position feedback (used for motion control) to shared memory.
@@ -244,9 +248,10 @@ interface shared_memory_interface
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status
-    * @param timestamp timestamp in microseconds of when the position data was read
+    * @param last_sensor_error the last non zero sensor error status.
+    * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_primary_feedback(int position, int velocity, SensorError sensor_error, unsigned int timestamp);
+    void write_primary_feedback(int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write secondary position feedback (display only) to shared memory.
@@ -254,9 +259,10 @@ interface shared_memory_interface
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status
-    * @param timestamp timestamp in microseconds of when the position data was read
+    * @param last_sensor_error the last non zero sensor error status.
+    * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_secondary_feedback(int position, int velocity, SensorError sensor_error, unsigned int timestamp);
+    void write_secondary_feedback(int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
      * @brief Write write gpio input data to shared memory, return the gpio output data.

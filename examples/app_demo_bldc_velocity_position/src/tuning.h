@@ -23,4 +23,4 @@ interface PositionLimiterInterface {
     int get_limit();
 };
 
-void demo_torque_position_velocity_control(client interface PositionVelocityCtrlInterface i_position_control);
+void demo_torque_position_velocity_control(client interface MotionControlInterface i_motion_control);

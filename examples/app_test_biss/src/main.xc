@@ -142,7 +142,7 @@ int main() {
                 position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                position_feedback_config.offset      = 0;
+                position_feedback_config.offset      = HOME_OFFSET;
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;

@@ -11,12 +11,10 @@
 
 /**
  * @brief Status of motor control related services
- * ACTIVE   -> the task is started and can be used as a server
- * INACTIVE -> the task is not started yet
  */
 typedef enum {
-    INACTIVE= 1,
-    ACTIVE = 2
+    INACTIVE= 1,/**< the task is started and can be used as a server. */
+    ACTIVE = 2  /**< the task is not started yet. */
 } TaskStatus;
 
 /**
@@ -187,15 +185,19 @@ typedef struct
     unsigned int angle;
     unsigned int hall_state;
     int angle_velocity;
+    SensorError angle_sensor_error;
+    SensorError angle_last_sensor_error;
 
     int position;
     int velocity;
     SensorError  sensor_error;
+    SensorError  last_sensor_error;
     unsigned int sensor_timestamp;
 
     int secondary_position;
     int secondary_velocity;
     SensorError  secondary_sensor_error;
+    SensorError  secondary_last_sensor_error;
     unsigned int secondary_sensor_timestamp;
 
     int temperature;

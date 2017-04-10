@@ -34,7 +34,7 @@ WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 
-void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface MotorControlInterface client i_motorcontrol) {
+void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface TorqueControlInterface client i_torque_control) {
     char status;
     int multiturn;
     unsigned int singleturn_filtered;
@@ -45,8 +45,8 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
     delay_milliseconds(500);
     PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
     printstr(">>   SOMANET REM_16MT SENSOR COMMANDS SERVICE STARTING...\n");
-    i_motorcontrol.set_torque_control_enabled();
-    i_motorcontrol.set_brake_status(1);
+    i_torque_control.set_torque_control_enabled();
+    i_torque_control.set_brake_status(1);
 
     while(1) {
         char mode = 0;
@@ -68,25 +68,25 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
         //auto offset tuning
         case 'a':
             printf("Sending offset_detection command ...\n");
-            i_motorcontrol.set_offset_detection_enabled();
-            while(i_motorcontrol.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
+            i_torque_control.set_offset_detection_enabled();
+            while(i_torque_control.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
 
-            if(i_motorcontrol.get_sensor_polarity_state() != 1) {
+            if(i_torque_control.get_sensor_polarity_state() != 1) {
                 printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
                 offset = -1;
             } else{
-                offset = i_motorcontrol.get_offset();
+                offset = i_torque_control.get_offset();
                 printf("Detected offset is: %i\n", offset);
 
                 //set offset to motorcontrol
-                MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+                MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
                 motorcontrol_config.commutation_angle_offset = offset;
-                i_motorcontrol.set_config(motorcontrol_config);
+                i_torque_control.set_config(motorcontrol_config);
 
                 //start motorcontrol
                 delay_milliseconds(500);
-                i_motorcontrol.set_torque_control_enabled();
-                i_motorcontrol.set_brake_status(1);
+                i_torque_control.set_torque_control_enabled();
+                i_torque_control.set_brake_status(1);
             }
             break;
         //change direction
@@ -119,7 +119,7 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
         case 'q':
             if(offset != -1){
                 int torque = value*sign;
-                i_motorcontrol.set_torque(torque);
+                i_torque_control.set_torque(torque);
                 printf("Torque %d\n", torque);
             } else {
                 printf("Offset is not found or invalid, please type command 'a' first \n");
@@ -186,12 +186,12 @@ int main(void)
     interface UpdatePWM i_update_pwm;
     interface UpdateBrake i_update_brake;
     interface ADCInterface i_adc[2];
-    interface MotorControlInterface i_motorcontrol[2];
+    interface TorqueControlInterface i_torque_control[2];
 
 
     par
     {
-        on tile[APP_TILE]: rem_16mt_commands_test(i_position_feedback[1], i_motorcontrol[1]);
+        on tile[APP_TILE]: rem_16mt_commands_test(i_position_feedback[1], i_torque_control[1]);
 
         on tile[IFM_TILE]: par
         {
@@ -250,8 +250,8 @@ int main(void)
                 motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                 motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
 
-                motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
-                        i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
+                torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
+                        i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
             }
 
             /* Shared memory Service */
@@ -267,7 +267,7 @@ int main(void)
                 position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                position_feedback_config.offset      = 0;
+                position_feedback_config.offset      = HOME_OFFSET;
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;

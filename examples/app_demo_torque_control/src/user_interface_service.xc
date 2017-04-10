@@ -16,28 +16,13 @@
 #include <motor_control_interfaces.h>
 #include <xscope.h>
 
-/**
- * @brief Update brake hold/pull voltages and pull time in the pwm service.
- *
- *        It take the DC, hold/pull voltages and pull time parameters
- *        and compute the corresponding duty cycles which are then sent to the pwm service.
- *
- * @param app_tile_usec
- * @param dc_bus_voltage,     the voltage of dc bus (in volts)
- * @param pull_brake_voltage, the voltage of dc bus (in milli-volts)
- * @param hold_brake_voltage, the voltage of dc bus (in milli-volts)
- * @param pull_brake_time,    the time for pulling the brake (in milli-seconds)
- * @param i_motorcontrol client interface to get the ifm tile frequency from the motorcontrol service.
- * @param i_update_brake client enterface to the pwm service to send the brake configuration
- *
- */
 void update_brake(
         int app_tile_usec,
         int dc_bus_voltage,
         int pull_brake_voltage,
         int hold_brake_voltage,
         int pull_brake_time,
-        client interface MotorControlInterface i_motorcontrol, client interface UpdateBrake i_update_brake)
+        client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake)
 {
     int error=0;
     int duty_min=0, duty_max=0, duty_divider=0;
@@ -46,8 +31,8 @@ void update_brake(
     timer t;
     unsigned ts;
 
-    i_motorcontrol.set_safe_torque_off_enabled();
-    i_motorcontrol.set_brake_status(0);
+    i_torque_control.set_safe_torque_off_enabled();
+    i_torque_control.set_brake_status(0);
     t :> ts;
     t when timerafter (ts + 2000*1000*app_tile_usec) :> void;
 
@@ -89,7 +74,7 @@ void update_brake(
     }
 
 
-    MotorcontrolConfig motorcontrol_config = i_motorcontrol.get_config();
+    MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
 
     if(motorcontrol_config.ifm_tile_usec==250)
     {
@@ -121,21 +106,7 @@ void update_brake(
     i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 }
 
-
-
-/*
- * The following service shows how to directly work with module_torque_control.
- * It is able to:
- *  - automatically find motor offset
- *  - read/set motor offsett
- *  - enable/disable torque controller
- *  - send the reference value of the torque to motor_control_service
- *  - lock/unlock the brakes
- *
- * @param i_motorcontrol client interface of type MotorControlInterface to communicate with torque controller
- * @param i_update_brake client enterface to the pwm service to send the brake configuration
- */
-void demo_torque_control(interface MotorControlInterface client i_motorcontrol, client interface UpdateBrake i_update_brake)
+void demo_torque_control(interface TorqueControlInterface client i_torque_control, client interface UpdateBrake i_update_brake)
 {
 
     int app_tile_usec = 100; // reference clock frequency of tile where demo_torque_control() service is being executed (in MHz).
@@ -154,19 +125,19 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
     int hold_brake_voltage= 0;
     int pull_brake_time   = 0;
 
-    motorcontrol_config = i_motorcontrol.get_config();
+    motorcontrol_config = i_torque_control.get_config();
     pull_brake_voltage= 16000; //milli-Volts
     hold_brake_voltage=  1000; //milli-Volts
     pull_brake_time   =  2000; //milli-Seconds
     dc_bus_voltage = motorcontrol_config.dc_bus_voltage;
-    update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+    update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_torque_control, i_update_brake);
 
     printf(" DEMO_TORQUE_CONTROL started...\n");
-    i_motorcontrol.set_brake_status(1);
-    i_motorcontrol.set_torque_control_enabled();
+    i_torque_control.set_brake_status(1);
+    i_torque_control.set_torque_control_enabled();
     printf(" please enter torque reference in [milli-Nm]\n");
 
-    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+    upstream_control_data = i_torque_control.update_upstream_control_data();
 
     fflush(stdout);
     while (1)
@@ -214,21 +185,21 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                 int proper_sensor_polarity=0;
 
                 printf("automatic offset detection started ...\n");
-                i_motorcontrol.set_offset_detection_enabled();
+                i_torque_control.set_offset_detection_enabled();
 
-                while(i_motorcontrol.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
+                while(i_torque_control.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
 
-                proper_sensor_polarity=i_motorcontrol.get_sensor_polarity_state();
+                proper_sensor_polarity=i_torque_control.get_sensor_polarity_state();
 
                 if(proper_sensor_polarity == 1)
                 {
-                    offset=i_motorcontrol.get_offset();
+                    offset=i_torque_control.get_offset();
                     printf("detected offset is: %i\n", offset);
 
                     printf("offset is set to %d\n", offset);
-                    i_motorcontrol.set_offset_value(offset);
+                    i_torque_control.set_offset_value(offset);
 
-                    motorcontrol_config = i_motorcontrol.get_config();
+                    motorcontrol_config = i_torque_control.get_config();
                     if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
                     {
                         for (int i=0;i<6;i++)
@@ -238,7 +209,7 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                     }
 
                     delay_milliseconds(2000);
-                    i_motorcontrol.set_torque_control_enabled();
+                    i_torque_control.set_torque_control_enabled();
                 }
                 else
                 {
@@ -250,7 +221,7 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
         case 'o':
                 offset = value;
                 printf("offset set to %d\n", offset);
-                i_motorcontrol.set_offset_value(offset);
+                i_torque_control.set_offset_value(offset);
                 break;
 
         //enable/disable torque controller
@@ -258,13 +229,13 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                 if (torque_control_flag == 0)
                 {
                     torque_control_flag = 1;
-                    i_motorcontrol.set_torque_control_enabled();
+                    i_torque_control.set_torque_control_enabled();
                     printf("Torque control activated\n");
                 }
                 else
                 {
                     torque_control_flag = 0;
-                    i_motorcontrol.set_torque_control_disabled();
+                    i_torque_control.set_torque_control_disabled();
                     printf("Torque control deactivated\n");
                 }
                 break;
@@ -272,7 +243,7 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
         //reverse the direction of reference torque
         case 'r':
                 torque_ref = -torque_ref;
-                i_motorcontrol.set_torque(torque_ref);
+                i_torque_control.set_torque(torque_ref);
                 printf("torque %d [milli-Nm]\n", torque_ref);
                 break;
 
@@ -281,24 +252,24 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                  switch(mode_2)
                  {
                  case 'v'://brake voltage configure
-                         motorcontrol_config = i_motorcontrol.get_config();
+                         motorcontrol_config = i_torque_control.get_config();
                          switch(mode_3)
                          {
                          case 'n':// nominal voltage of dc-bus
                                  dc_bus_voltage=value;
-                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_torque_control, i_update_brake);
                                  printf("nominal voltage of dc-bus for brake set to %d Volts \n", dc_bus_voltage);
                                  break;
 
                          case 'p':// pull voltage for releasing the brake at startup
                                  pull_brake_voltage=value;
-                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_torque_control, i_update_brake);
                                  printf("brake pull voltage set to %d milli-Volts \n", pull_brake_voltage);
                                  break;
 
                          case 'h':// hold voltage for holding the brake after it is pulled
                                  hold_brake_voltage=value;
-                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+                                 update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_torque_control, i_update_brake);
                                  printf("brake hold voltage is %d milli-Volts\n", hold_brake_voltage);
                                  break;
 
@@ -310,7 +281,7 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                  case 't'://set pull time
                          //set
                          pull_brake_time=value;
-                         update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_motorcontrol, i_update_brake);
+                         update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_torque_control, i_update_brake);
                          printf("brake pull time is %d milli-seconds \n", pull_brake_time);
                          break;
 
@@ -325,7 +296,7 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                              brake_flag = 1;
                              printf("Brake released\n");
                          }
-                         i_motorcontrol.set_brake_status(brake_flag);
+                         i_torque_control.set_brake_status(brake_flag);
                          break;
                  }
                  break;
@@ -333,7 +304,7 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
          //safe mode torque (all inverter power swieches open)
          case 's':
                  printf("safe torque off mode started\n");
-                 i_motorcontrol.set_safe_torque_off_enabled();
+                 i_torque_control.set_safe_torque_off_enabled();
                  break;
 
          //show on xscope for 10 seconds!
@@ -342,14 +313,14 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                  printf("activate xscope during 20 seconds ...\n");
                  for(int i=0; i<=10000;i++)
                  {
-                     upstream_control_data = i_motorcontrol.update_upstream_control_data();
+                     upstream_control_data = i_torque_control.update_upstream_control_data();
 
                      xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
                      xscope_int(V_DC, upstream_control_data.V_dc);
                      xscope_int(ANGLE, upstream_control_data.angle);
                      xscope_int(POSITION, upstream_control_data.position);
                      xscope_int(VELOCITY, upstream_control_data.velocity);
-                     xscope_int(TEMPERATURE, upstream_control_data.temperature);
+                     xscope_int(TEMPERATURE_SENSOR_OUTPUT, upstream_control_data.temperature);
                      xscope_int(FAULT_CODE, upstream_control_data.error_status);
 
                      delay_milliseconds(1);
@@ -359,10 +330,10 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
          //reset faults
          case 'z':
                  printf("reset faults, and check status ...\n");
-                 i_motorcontrol.reset_faults();
+                 i_torque_control.reset_faults();
 
                  delay_milliseconds(500);
-                 upstream_control_data = i_motorcontrol.update_upstream_control_data();
+                 upstream_control_data = i_torque_control.update_upstream_control_data();
 
                  if(upstream_control_data.error_status != NO_FAULT)
                      printf(">>system status: faulty (fault ID %x)\n", upstream_control_data.error_status);
@@ -372,15 +343,15 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                      printf(">>system status: no fault\n");
 
                      torque_control_flag = 1;
-                     i_motorcontrol.set_torque_control_enabled();
+                     i_torque_control.set_torque_control_enabled();
                      printf("torque control activated\n");
 
                      brake_flag = 1;
-                     i_motorcontrol.set_brake_status(brake_flag);
+                     i_torque_control.set_brake_status(brake_flag);
                      printf("Brake released\n");
 
                      printf("set offset to %d\n", offset);
-                     i_motorcontrol.set_offset_value(offset);
+                     i_torque_control.set_offset_value(offset);
                  }
                  break;
 
@@ -394,10 +365,10 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                 {
                     for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
                     {
-                        i_motorcontrol.set_torque(torque_ref);
+                        i_torque_control.set_torque(torque_ref);
                         delay_microseconds(period_us);
 
-                        i_motorcontrol.set_torque(-torque_ref);
+                        i_torque_control.set_torque(-torque_ref);
                         delay_microseconds(period_us);
                     }
                 }
@@ -406,32 +377,32 @@ void demo_torque_control(interface MotorControlInterface client i_motorcontrol, 
                 {
                     for(pulse_counter=0;pulse_counter<=(50000/period_us);pulse_counter++)//total period = period * pulse_counter=1000000 us
                     {
-                        i_motorcontrol.set_torque(torque_ref);
+                        i_torque_control.set_torque(torque_ref);
                         delay_microseconds(period_us);
 
 
 
-                        i_motorcontrol.set_torque((-torque_ref*110)/100);
+                        i_torque_control.set_torque((-torque_ref*110)/100);
                         delay_microseconds((5*period_us)/100);
 
-                        i_motorcontrol.set_torque(-torque_ref);
+                        i_torque_control.set_torque(-torque_ref);
                         delay_microseconds(period_us);
                     }
                 }
 
-                i_motorcontrol.set_torque(0);
+                i_torque_control.set_torque(0);
                 break;
 
         //directly set the torque
         default:
                 torque_ref = value * sign;
-                i_motorcontrol.set_torque(torque_ref);
+                i_torque_control.set_torque(torque_ref);
 
                 delay_milliseconds(1);
-                motorcontrol_config = i_motorcontrol.get_config();
+                motorcontrol_config = i_torque_control.get_config();
                 if(torque_ref>motorcontrol_config.max_torque || torque_ref<-motorcontrol_config.max_torque)
                 {
-                    upstream_control_data = i_motorcontrol.update_upstream_control_data();
+                    upstream_control_data = i_torque_control.update_upstream_control_data();
                     printf("above limits! torque %d [milli-Nm]\n", upstream_control_data.torque_set);
                 }
                 else

@@ -2,8 +2,6 @@
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
-
-
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
@@ -39,7 +37,7 @@ int main(void) {
     interface WatchdogInterface i_watchdog[2];
     interface UpdateBrake i_update_brake;
     interface ADCInterface i_adc[2];
-    interface MotorControlInterface i_motorcontrol[2];
+    interface TorqueControlInterface i_torque_control[2];
     interface shared_memory_interface i_shared_memory[3];
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
@@ -50,9 +48,7 @@ int main(void) {
     {
         /* WARNING: only one blocking task is possible per tile. */
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        //on tile[APP_TILE]: run_offset_tuning(POSITION_LIMIT, i_motorcontrol[0],i_tuning);
-
-        on tile[APP_TILE]: demo_torque_control(i_motorcontrol[0], i_update_brake);
+        on tile[APP_TILE]: demo_torque_control(i_torque_control[0], i_update_brake);
 
         on tile[IFM_TILE]:
         {
@@ -113,8 +109,8 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                     motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
 
-                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
+                    torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
                 }
 
                 /* Shared memory Service */
@@ -130,7 +126,7 @@ int main(void) {
                     position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
                     position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                     position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                    position_feedback_config.offset      = 0;
+                    position_feedback_config.offset      = HOME_OFFSET;
                     position_feedback_config.sensor_function = SENSOR_1_FUNCTION;
 
                     position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;

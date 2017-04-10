@@ -36,8 +36,8 @@ int main(void) {
     interface UpdatePWM i_update_pwm;
     interface UpdateBrake i_update_brake;
     interface ADCInterface i_adc[2];
-    interface MotorControlInterface i_motorcontrol[2];
-    interface PositionVelocityCtrlInterface i_position_control[3];
+    interface TorqueControlInterface i_torque_control[2];
+    interface MotionControlInterface i_motion_control[3];
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
     interface shared_memory_interface i_shared_memory[3];
@@ -49,7 +49,7 @@ int main(void) {
         on tile[APP_TILE]:
         {
 
-            demo_torque_position_velocity_control(i_position_control[0]);
+            demo_torque_position_velocity_control(i_motion_control[0]);
         }
 
         on tile[APP_TILE_2]:
@@ -95,7 +95,7 @@ int main(void) {
             motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
             motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
 
-            motion_control_service(APP_TILE_USEC, motion_ctrl_config, i_motorcontrol[0], i_position_control, i_update_brake);
+            motion_control_service(APP_TILE_USEC, motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
         }
 
 
@@ -157,8 +157,8 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                     motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
 
-                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
+                    torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
                 }
 
                 /* Shared memory Service */
@@ -174,7 +174,7 @@ int main(void) {
                     position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
                     position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                     position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                    position_feedback_config.offset      = 0;
+                    position_feedback_config.offset      = HOME_OFFSET;
                     position_feedback_config.sensor_function = SENSOR_1_FUNCTION;
 
                     position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;

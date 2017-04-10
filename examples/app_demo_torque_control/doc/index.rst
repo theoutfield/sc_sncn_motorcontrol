@@ -34,13 +34,44 @@ Figure 1 gives a general view of torque controller application including differe
 - If you are using an electric brake, release the brake before applying a new torque command
 - It is recommended to start the application with lower voltages (such as 16V, and increase the voltage to its nominal value after your hardware is checked)
 
-* **Minimum Number of Cores**: 7
+* **Minimum Number of Cores**: 6
 * **Minimum Number of Tiles**: 2
 
 `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_demo_torque_control/>`_
 
-Console commands
-================
+Quick How-to
+============
+**Important**
+
+1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
+
+2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your position sensor, motor terminals, power supply cable, and XTAG. Power up!
+
+    **important**
+    For safety please use a current limited power supply and check current consumption.
+
+3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
+
+4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
+
+5. Open the **main.xc** within  the **app_demo_motion_control**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropriate target in your Makefile <somanet_board_support_module>`.
+
+    **important** Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
+    
+6. If you are using an electric brake, update the settings of your electric brake in file **user_interface_service.xc** of your application. These settings can also be changed while the application is running.
+
+    .. code-block:: c
+
+		    pull_brake_voltage= 16000; //milli-Volts
+		    hold_brake_voltage=  1000; //milli-Volts
+		    pull_brake_time   =  2000; //milli-Seconds
+
+7. :ref:`Set the configuration <motor_configuration_label>` for Motor Control, position sensor, and Motion Control Services. 
+
+8. :ref:`Run the application enabling XScope <running_an_application>`.
+
+
+**Console commands**
 
 It is able to communicate with the app_demo_torque_control through XTimeComposer console. Each command can be sent by entering a letter in XTimeComposer console. Sometimes, the combination of one letter and one value is needed to have a complete command (for example, writing letter "x" and after that number "100" in console command and then pressing Enter key).
 In the following, a brief explanation is brought about different command types and their functionality:
@@ -87,35 +118,9 @@ In the following, a brief explanation is brought about different command types a
 - "m" and then value "x"
     This command generates a square-waveform signal and uses this signal as the reference value of torque. The frequency and period of torque reference is changing between 0.5-2.5 kHz which will result to play a simple melody by your motor! The amplitude of the square waveform will be equal to the value "x" in milli-Nm which in practice can act as the volume of this melody.
 
-Quick How-to
-============
-**Important**
 
-1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
-
-2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your position sensor, motor terminals, power supply cable, and XTAG. Power up!
-
-    **important**
-    For safety please use a current limited power supply and check current consumption.
-
-3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
-
-4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
-
-5. Open the **main.xc** within  the **app_demo_motion_control**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropriate target in your Makefile <somanet_board_support_module>`.
-
-    **important** Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
-    
-6. If you are using an electric brake, update the settings of your electric brake in file **user_interface_service.xc** of your application. These settings can also be changed while the application is running.
-
-    .. code-block:: c
-
-		    pull_brake_voltage= 16000; //milli-Volts
-		    hold_brake_voltage=  1000; //milli-Volts
-		    pull_brake_time   =  2000; //milli-Seconds
-
-7. :ref:`Set the configuration <motor_configuration_label>` for Motor Control, position sensor, and Motion Control Services. 
-
-8. :ref:`Run the application enabling XScope <running_an_application>`.
 
 Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com>`_
+
+
+
