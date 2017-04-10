@@ -461,6 +461,7 @@ void adc_ad7949(
             analogue_input_b_1 = OUT_B[AD_7949_EXT_A0_N_EXT_A1_N];
             analogue_input_a_2 = OUT_A[AD_7949_EXT_A0_P_EXT_A1_P];
             analogue_input_b_2 = OUT_B[AD_7949_EXT_A0_P_EXT_A1_P];
+            Temperature_out=0;
             fault_code_out=fault_code;
             data_updated=1;
             break;
