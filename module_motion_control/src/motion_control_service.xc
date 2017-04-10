@@ -182,9 +182,12 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     update_brake_configuration_time += update_brake_configuration_wait*1000*(unsigned int)app_tile_usec;
     int update_brake_configuration_flag = 1;
 
+    int temperature_ratio=20;
+
     // initialization
     motorcontrol_config = i_torque_control.get_config();
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
+    temperature_ratio = motorcontrol_config.temperature_ratio;
 
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
@@ -411,7 +414,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
                 xscope_int(V_DC, upstream_control_data.V_dc);
                 xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
-                xscope_int(TEMPERATURE_SENSOR_OUTPUT, upstream_control_data.temperature);
+                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
                 xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
                 xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
