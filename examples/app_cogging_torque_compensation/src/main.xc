@@ -50,7 +50,7 @@ int main(void) {
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         on tile[APP_TILE]:
         {
-            for (int generation_number = 5; generation_number < 15; generation_number+=3)
+//            for (int generation_number = 5; generation_number < 15; generation_number+=3)
                 //            {
                 //                printf("///////////////////////////////\n"
                 //                        "//// Test : %d Generations ////\n"
@@ -157,7 +157,7 @@ int main(void) {
                         }
                         else energy_error_position = 0;
 
-                        upstream_control_data = i_motorcontrol[1].update_upstream_control_data();
+//                        upstream_control_data = i_motorcontrol[1].update_upstream_control_data();
                         //                        xscope_int(VELOCITY, velocity);
                         //                        xscope_int(VELOCITY_CMD, velocity_command);
                         //                        xscope_int(ERROR_VELOCITY, error_velocity);
