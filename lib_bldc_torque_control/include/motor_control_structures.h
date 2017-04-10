@@ -110,6 +110,7 @@ typedef enum {
     DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1 = 0X2221,
     OVER_VOLTAGE_NO_1                           = 0X3211,
     UNDER_VOLTAGE_NO_1                          = 0X3221,
+    EXCESS_TEMPERATURE_DRIVE                    = 0X4310,
 
     //user specific faults
     WRONG_REF_CLK_FRQ=0XFF01
@@ -131,18 +132,20 @@ typedef struct {
     int hall_state_angle[7];                 /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
 
     //variables added to be used in motor_control_service
-    int pole_pairs;                          /**< motor pole pair*/
-    int max_torque;                         /**< maximum motor torque*/
-    int max_current;                        /**< maximum stator current*/
-    int rated_current;                      /**< rated motor phase current*/
-    int rated_torque;                       /**< rated motor torque*/
-    int commutation_angle_offset;           /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
-    int torque_constant;                    /**< motor torque constant*/
+    int pole_pairs;                        /**< motor pole pair*/
+    int max_torque;                        /**< maximum motor torque*/
+    int max_current;                       /**< maximum stator current*/
+    int rated_current;                     /**< rated motor phase current*/
+    int rated_torque;                      /**< rated motor torque*/
+    int commutation_angle_offset;          /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
+    int torque_constant;                   /**< motor torque constant*/
     int torque_P_gain;                     /**< proportional constant in torque controller*/
     int torque_I_gain;                     /**< integral constant in torque controller*/
     int torque_D_gain;                     /**< derivative constant in torque controller*/
-    int current_ratio;                      // ratio between current recieved in control core, and real phase current
-    int voltage_ratio;                      // ratio between adc measured value and real dc-bus voltage
+    int current_ratio;                     /**<ratio between current recieved in control core, and real phase current*/
+    int voltage_ratio;                     /**<ratio between adc measured value and real dc-bus voltage*/
+    int temperature_ratio;                 /**<ratio between adc measured value and IFM board temperature*/
+
     int percent_offset_torque;              // (maximum) generated torque while finding offset value as a percentage of rated torque
 
     int phase_resistance;                   /**< uOhm*/
@@ -166,6 +169,7 @@ typedef struct {
     int protection_limit_over_current;  //maximum tolerable value of phase current (under abnormal conditions)
     int protection_limit_over_voltage;  //maximum tolerable value of dc-bus voltage (under abnormal conditions)
     int protection_limit_under_voltage; //minimum tolerable value of dc-bus voltave (under abnormal conditions)
+    int protection_limit_over_temperature; //maximum tolerable value of board temperature
 
 } MotorcontrolConfig;
 
