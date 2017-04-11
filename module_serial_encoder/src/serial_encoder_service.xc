@@ -297,41 +297,34 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
         //compute velocity
         case t when timerafter(next_velocity_read) :> next_velocity_read:
             next_velocity_read += velocity_loop;
-            int difference;
             read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
 
-            switch(sensor_type)
-            {
-            case REM_16MT_SENSOR:
-                velocity_count++;
+            if (sensor_type == REM_16MT_SENSOR) {
                 //timestamp difference
                 timediff = (char)pos_state.timestamp-old_timestamp;
-                old_timestamp = pos_state.timestamp;
-
-                //velocity 8 samples (424us), average filter 8
                 timediff_long += timediff;
-                if (velocity_count >= 8) {
-                    difference = pos_state.count - old_count;
-                    old_count = pos_state.count;
-                    if (timediff_long != 0 && difference < crossover && difference > -crossover) {
-                        velocity = velocity_compute(difference, timediff_long, position_feedback_config.resolution);
-                        velocity = filter(velocity_buffer, index, 8, velocity);
-                    }
-                    timediff_long = 0;
-                    velocity_count = 0;
-                }
-                break;
-            case REM_14_SENSOR:
-            case BISS_SENSOR:
-                difference = pos_state.count - old_count;
+                old_timestamp = pos_state.timestamp;
+            } else {
+                timediff_long = (last_read-last_velocity_read)/position_feedback_config.ifm_usec;
+            }
+            velocity_count++;
+            if (velocity_count >= 8) {
+                int difference = pos_state.count - old_count;
                 old_count = pos_state.count;
-                // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
-                //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-                if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
-                    velocity = velocity_compute(difference, (last_read-last_velocity_read)/position_feedback_config.ifm_usec, position_feedback_config.resolution);
+
+                if (timediff_long != 0 && difference < crossover && difference > -crossover) {
+                    // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
+                    //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
+                    velocity = velocity_compute(difference, timediff_long, position_feedback_config.resolution);
+
+                    //filter for REM_16MT_SENSOR
+                    if (sensor_type == REM_16MT_SENSOR) {
+                        velocity = filter(velocity_buffer, index, 8, velocity);
+                        timediff_long = 0;
+                    }
                 }
                 last_velocity_read = last_read;
-                break;
+                velocity_count = 0;
             }
 
 
