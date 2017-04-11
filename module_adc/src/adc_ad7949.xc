@@ -350,8 +350,6 @@ void adc_ad7949(
                 current_limit = limit_oc;
                 v_dc_max      = limit_ov;
                 v_dc_min      = limit_uv;
-                t_max         = limit_t
-                if(v_ratio_in==100) dc_value=800;
                 break;
 
         case iADC[int i].get_all_measurements() -> {

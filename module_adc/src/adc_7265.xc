@@ -184,6 +184,7 @@ void adc_ad7265(
     int v_dc_min=0   ;
     int i_max   =100 ;
     int current_limit = 2000;// i_max * 20
+    int t_max         = 2000;
     int protection_counter=0;
 
     int fault_code=NO_FAULT;
@@ -228,7 +229,7 @@ void adc_ad7265(
                 current_limit = limit_oc;
                 v_dc_max      = limit_ov;
                 v_dc_min      = limit_uv;
-                t_max         = limit_t
+                t_max         = limit_t ;
 
                 break;
 
