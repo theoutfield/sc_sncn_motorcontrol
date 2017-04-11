@@ -61,7 +61,7 @@ void interpolate_sensor_data (short int *array_in, short int * is_recorded, int 
         }
     }
 }
-void map_torque_ripples(client interface PositionVelocityCtrlInterface i_position_control, client interface PositionFeedbackInterface i_position_feedback
+void map_torque_ripples(client interface MotionControlInterface i_motion_control, client interface PositionFeedbackInterface i_position_feedback
         )
 {
     DownstreamControlData downstream_control_data;
@@ -75,11 +75,11 @@ void map_torque_ripples(client interface PositionVelocityCtrlInterface i_positio
     int count_start;
     downstream_control_data.offset_torque = 0;
     downstream_control_data.velocity_cmd = velocity_command;
-    i_position_control.enable_velocity_ctrl();
+    i_motion_control.enable_velocity_ctrl();
 
     motion_ctrl_config.enable_profiler = 1;
 
-    i_position_control.update_control_data(downstream_control_data);
+    i_motion_control.update_control_data(downstream_control_data);
 
     delay_milliseconds(500);
     {count_start, position, status} = i_position_feedback.get_position();
@@ -104,7 +104,7 @@ void map_torque_ripples(client interface PositionVelocityCtrlInterface i_positio
 //    }
 //    printf ("\n");
 //    downstream_control_data.velocity_cmd = 0;
-//    i_position_control.enable_velocity_ctrl();
-//    i_position_control.update_control_data(downstream_control_data);
+//    i_motion_control.enable_velocity_ctrl();
+//    i_motion_control.update_control_data(downstream_control_data);
 //    exit(1);
 }

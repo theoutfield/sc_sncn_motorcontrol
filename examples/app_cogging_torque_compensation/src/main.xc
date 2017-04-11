@@ -7,15 +7,13 @@
  * @date 17/06/2014
  */
 
-//#include <pwm_service.h>
+#include <torque_ripple_correction.h>
 #include <pwm_server.h>
 #include <adc_service.h>
 #include <user_config.h>
-#include <tuning.h>
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
 #include <position_feedback_service.h>
-#include <torque_ripple_correction.h>
 
 PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
@@ -30,18 +28,26 @@ port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
 port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
+
+//Position control + profile libs
+#include <motion_control_service.h>
+#include <profile_control.h>
+
+#include <tuning.h>
+
 int main(void) {
 
-    // Motor control interfaces
+    // Motor control channels
+
     interface WatchdogInterface i_watchdog[2];
+    interface ADCInterface i_adc[2];
+    interface TorqueControlInterface i_torque_control[2];
     interface UpdatePWM i_update_pwm;
     interface UpdateBrake i_update_brake;
-    interface ADCInterface i_adc[2];
-    interface MotorControlInterface i_motorcontrol[2];
-    interface PositionVelocityCtrlInterface i_position_control[3];
+    interface shared_memory_interface i_shared_memory[3];
+    interface MotionControlInterface i_motion_control[3];
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
-    interface shared_memory_interface i_shared_memory[3];
     interface TuningStepInterface i_tuning_step[3];
 
     par
@@ -61,7 +67,7 @@ int main(void) {
                 //                for (int x = 0; x < NUMBER_OF_TESTS; x++)
                 //                {
                 //                    printf("\n---Test N°%d---\n", x);
-                //                    tests[x] = autotune(i_position_control[0],generation_number,  i_tuning_step[1], i_position_feedback_1[0]);
+                //                    tests[x] = autotune(i_motion_control[0],generation_number,  i_tuning_step[1], i_position_feedback_1[0]);
                 //                    result_parameters[0][x] =  tests[x].kp;
                 //                    result_parameters[1][x] =  tests[x].ki;
                 //                    result_parameters[2][x] =  tests[x].criterion;
@@ -90,7 +96,7 @@ int main(void) {
                 //                {
                 //                    printf("test %d\n", i);
                 //                    int time = 0;
-                //                    compute_pid(tests, i, i_position_control[0]);
+                //                    compute_pid(tests, i, i_motion_control[0]);
                 //
                 //
                 //                    while (!i_tuning_step[1].get_reference_velocity_display());
@@ -115,11 +121,17 @@ int main(void) {
                 //
                 //            }
                 //             exit(1);
-                //                        autotune(i_position_control[0],10,  i_tuning_step[1], i_position_feedback_1[0]);
-                user_interface(i_position_control[0], i_tuning_step[1]);
+//            autotune(i_motion_control[0],5,  i_tuning_step[1], i_position_feedback_1[0]);
+//
+//            i_motion_control.enable_velocity_ctrl();
+//            downstream_control_data.offset_torque = 0;
+//            downstream_control_data.velocity_cmd = 5;
+//            i_motion_control.update_control_data(downstream_control_data);
+//            while(1);
+                user_interface(i_motion_control[0], i_tuning_step[1]);
 
-            //            map_torque_ripples(i_position_control[0], i_position_feedback_1[0]);
-            //            demo_torque_position_velocity_control(i_position_control[0]);
+            //            map_torque_ripples(i_motion_control[0], i_position_feedback_1[0]);
+            //            demo_torque_position_velocity_control(i_motion_control[0]);
         }
 
         on tile[APP_TILE_2]:
@@ -157,7 +169,7 @@ int main(void) {
                         }
                         else energy_error_position = 0;
 
-//                        upstream_control_data = i_motorcontrol[1].update_upstream_control_data();
+//                        upstream_control_data = i_torque_control[1].update_upstream_control_data();
                         //                        xscope_int(VELOCITY, velocity);
                         //                        xscope_int(VELOCITY_CMD, velocity_command);
                         //                        xscope_int(ERROR_VELOCITY, error_velocity);
@@ -176,7 +188,7 @@ int main(void) {
                     tuning_step_service(i_tuning_step);
                 }
                 {
-                    make_steps(i_position_control[1], i_tuning_step[0], i_position_feedback_1[2]);
+                    make_steps(i_motion_control[1], i_tuning_step[0], i_position_feedback_1[2]);
                 }
                 {
                     MotionControlConfig motion_ctrl_config;
@@ -219,7 +231,7 @@ int main(void) {
                     motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
                     motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
 
-                    motion_control_service(APP_TILE_USEC, motion_ctrl_config, i_motorcontrol[0], i_position_control, i_update_brake);
+                    motion_control_service(APP_TILE_USEC, motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
                 }
             }
         }
@@ -282,8 +294,8 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                     motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
 
-                    motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_motorcontrol, i_update_pwm, IFM_TILE_USEC);
+                    torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
                 }
 
                 /* Shared memory Service */

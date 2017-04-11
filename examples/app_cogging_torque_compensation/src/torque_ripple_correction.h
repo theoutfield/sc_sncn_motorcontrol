@@ -15,5 +15,5 @@
 #define SENSOR_RESOLUTION SENSOR_1_RESOLUTION
 
 void test_interpolate();
-void map_torque_ripples(client interface PositionVelocityCtrlInterface i_position_control, client interface PositionFeedbackInterface i_position_feedback
+void map_torque_ripples(client interface MotionControlInterface i_motion_control, client interface PositionFeedbackInterface i_position_feedback
         );

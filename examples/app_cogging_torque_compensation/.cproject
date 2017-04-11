@@ -5,10 +5,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.1392764330" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
-					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -282,6 +282,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/app_cogging_torque_compensation/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_bldc_torque_control/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/app_cogging_torque_compensation}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1516012523" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -692,6 +696,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/app_cogging_torque_compensation/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_bldc_torque_control/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/app_cogging_torque_compensation}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1068377423" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1107,6 +1115,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_random}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/app_cogging_torque_compensation/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_bldc_torque_control/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_watchdog/app_cogging_torque_compensation}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.526663402" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -1123,10 +1135,10 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.383969029" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
-					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">

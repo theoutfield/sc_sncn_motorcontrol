@@ -217,7 +217,7 @@ void test_crossover()
 void tuning_step_service(interface TuningStepInterface server i_tuning_step[3])
 
 {
-    int reference_velocity = 1000;
+    int reference_velocity = 100;
     int reference_position = 1000;
     int velocity_display = reference_velocity;
     int position_display = reference_position;
@@ -298,8 +298,25 @@ void tuning_step_service(interface TuningStepInterface server i_tuning_step[3])
     }
 }
 
+void make_steps2(client interface MotionControlInterface i_motion_control, client interface TuningStepInterface i_tuning_step,
+        client interface PositionFeedbackInterface i_position_feedback)
+{
+    DownstreamControlData downstream_control_data;
+        downstream_control_data.offset_torque = 0;
+    i_motion_control.enable_velocity_ctrl();
+    while(1)
+    {
+        downstream_control_data.velocity_cmd = 0;
+        i_motion_control.update_control_data(downstream_control_data);
+        delay_milliseconds(500);
+        downstream_control_data.velocity_cmd = 100;
+        i_motion_control.update_control_data(downstream_control_data);
+        delay_milliseconds(500);
 
-void make_steps(client interface PositionVelocityCtrlInterface i_position_control, client interface TuningStepInterface i_tuning_step,
+    }
+}
+
+void make_steps(client interface MotionControlInterface i_motion_control, client interface TuningStepInterface i_tuning_step,
         client interface PositionFeedbackInterface i_position_feedback)
 {
     unsigned int time_ms_zero, time_ms_reference;
@@ -308,7 +325,8 @@ void make_steps(client interface PositionVelocityCtrlInterface i_position_contro
     int count;
     int status, pos;
     DownstreamControlData downstream_control_data;
-    MotionControlConfig motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+    MotionControlConfig motion_ctrl_config = i_motion_control.get_motion_control_config();
+    i_tuning_step.set_ctrl_parameters(motion_ctrl_config);
     while(1)
     {
         time_ms_zero = i_tuning_step.get_time_zero();
@@ -319,21 +337,21 @@ void make_steps(client interface PositionVelocityCtrlInterface i_position_contro
         // and the reference speed is set to zero for a fraction of the time_zero
         if (flag == VELOCITY_CONTROL_ENABLE)
         {
-            motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+            motion_ctrl_config = i_motion_control.get_motion_control_config();
             motion_ctrl_config.velocity_kp = VELOCITY_Kp ;
             motion_ctrl_config.velocity_ki = VELOCITY_Ki ;
             motion_ctrl_config.velocity_kd = VELOCITY_Kd ;
-            i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-            i_position_control.enable_velocity_ctrl();
+            i_motion_control.set_motion_control_config(motion_ctrl_config);
+            i_motion_control.enable_velocity_ctrl();
             downstream_control_data.velocity_cmd = 0;
-            i_position_control.update_control_data(downstream_control_data);
+            i_motion_control.update_control_data(downstream_control_data);
             delay_milliseconds(time_ms_zero/4);
         }
-        i_position_control.enable_torque_ctrl();
+        i_motion_control.enable_torque_ctrl();
         downstream_control_data.offset_torque = 0;
         downstream_control_data.torque_cmd = 0;
 
-        i_position_control.update_control_data(downstream_control_data);
+        i_motion_control.update_control_data(downstream_control_data);
 
 
         flag = i_tuning_step.check_flag();
@@ -343,12 +361,12 @@ void make_steps(client interface PositionVelocityCtrlInterface i_position_contro
             if (flag == VELOCITY_CONTROL_ENABLE)
             {
                 delay_milliseconds(3*time_ms_zero/4);
+
                 motion_ctrl_config = i_tuning_step.get_ctrl_parameters();
-                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-                i_position_control.enable_velocity_ctrl();
+                i_motion_control.set_motion_control_config(motion_ctrl_config);
                 velocity = i_tuning_step.get_reference_velocity();
                 i_tuning_step.set_reference_velocity_display(velocity);
-                i_position_control.enable_velocity_ctrl();
+                i_motion_control.enable_velocity_ctrl();
                 downstream_control_data.velocity_cmd = velocity;
             }
             else if (flag == POSITION_CONTROL_ENABLE)
@@ -359,11 +377,11 @@ void make_steps(client interface PositionVelocityCtrlInterface i_position_contro
 //                printf("Count : %d\n", count);
                 position = i_tuning_step.get_reference_position();
                 i_tuning_step.set_reference_position_display(position);
-                i_position_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                i_motion_control.enable_position_ctrl(POS_PID_CONTROLLER);
                 downstream_control_data.position_cmd = position;
             }
 
-            i_position_control.update_control_data(downstream_control_data);
+            i_motion_control.update_control_data(downstream_control_data);
             time_ms_reference = i_tuning_step.get_time_reference();
             delay_milliseconds(time_ms_reference);
 
@@ -372,10 +390,10 @@ void make_steps(client interface PositionVelocityCtrlInterface i_position_contro
     }
 }
 
-void compute_pid(struct individual * generation, unsigned int index, client interface PositionVelocityCtrlInterface i_position_control,
+void compute_pid(struct individual * generation, unsigned int index, client interface MotionControlInterface i_motion_control,
         client interface TuningStepInterface i_tuning_step)
 {
-    MotionControlConfig motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+    MotionControlConfig motion_ctrl_config = i_motion_control.get_motion_control_config();
     motion_ctrl_config.velocity_kp = generation[index].kp;
     motion_ctrl_config.velocity_ki = generation[index].ki;
     motion_ctrl_config.velocity_kd = 0;
@@ -383,14 +401,14 @@ void compute_pid(struct individual * generation, unsigned int index, client inte
     motion_ctrl_config = i_tuning_step.get_ctrl_parameters();
 }
 
-struct individual autotune (client interface PositionVelocityCtrlInterface i_position_control, int number_of_generations,
+struct individual autotune (client interface MotionControlInterface i_motion_control, int number_of_generations,
         client interface TuningStepInterface i_tuning_step, client interface PositionFeedbackInterface i_position_feedback)
 {
     int velocity;
-    int velocity_command = 300;
+    int velocity_command = 10;
     int error_position = 0, error_velocity = 0;
     int energy_error_position = 0, energy_error_velocity = 0;
-    unsigned int time_reference = 400, time_zero = 300;
+    unsigned int time_reference = 500, time_zero = 500;
     int error_min = 0;
     int oscillation_number = 0, overshoot = 0;
     int sign = 0;
@@ -399,8 +417,8 @@ struct individual autotune (client interface PositionVelocityCtrlInterface i_pos
     int oscillation_average = 0;
 
     random_generator_t gen = random_create_generator_from_hw_seed();
-    MotionControlConfig motion_ctrl_config = i_position_control.get_position_velocity_control_config();
-
+    MotionControlConfig motion_ctrl_config = i_motion_control.get_motion_control_config();
+    DownstreamControlData downstream_control_data;
     struct individual generation [GENERATION_SIZE];
 
     init_generation(generation, gen);
@@ -416,7 +434,7 @@ struct individual autotune (client interface PositionVelocityCtrlInterface i_pos
             energy_error_velocity = 0;
             error_min = 0;
             oscillation_number = 0;
-            compute_pid(generation, i, i_position_control, i_tuning_step);
+            compute_pid(generation, i, i_motion_control, i_tuning_step);
             while (!i_tuning_step.get_reference_velocity_display());
 
             while (i_tuning_step.get_reference_velocity_display())
@@ -471,7 +489,7 @@ struct individual autotune (client interface PositionVelocityCtrlInterface i_pos
             if (generation[i].competitor)
             {
             printf("[%d] :Energy : %d ; Overshoot : %d ; Vibration : %d\n", i, generation[i].energy, generation[i].overshoot, generation[i].oscillation);
-                total_criterion = generation[i].energy*2.9 + (generation[i].overshoot) * /*200000*/0 + (generation[i].oscillation - oscillation_average) * /*200000*/0;
+                total_criterion = generation[i].energy*2.9 + (generation[i].overshoot) *000 + (generation[i].oscillation - oscillation_average) * /*200000*/0;
 //                total_criterion += (generation_number-generation[i].age)*250000;
 //                printf ("[%d] generation : %d, age : %d\n", i, generation_number, generation[i].age);
                 generation[i].age++;
@@ -495,16 +513,16 @@ struct individual autotune (client interface PositionVelocityCtrlInterface i_pos
     evaluate_fitness(generation);
     int index_best_fit = 0;
     int i = 0;
-    while(1){
-        while (!i_tuning_step.get_reference_velocity_display());
-
-        if(generation[i].status == WINNER)
-            compute_pid(generation, i, i_position_control, i_tuning_step);
-        while (i_tuning_step.get_reference_velocity_display());
-
-        i++;
-        if (i == NUMBER_OF_COMPETITORS) i=0;
-    }
+//    while(1){
+//        while (!i_tuning_step.get_reference_velocity_display());
+//
+//        if(generation[i].status == WINNER)
+//            compute_pid(generation, i, i_motion_control, i_tuning_step);
+//        while (i_tuning_step.get_reference_velocity_display());
+//
+//        i++;
+//        if (i == NUMBER_OF_COMPETITORS) i=0;
+//    }
 
     for (int i = 0 ; i < NUMBER_OF_COMPETITORS; i++ )
     {
@@ -522,19 +540,27 @@ struct individual autotune (client interface PositionVelocityCtrlInterface i_pos
         }
 
     }
-    compute_pid(generation, index_best_fit, i_position_control, i_tuning_step);
+    compute_pid(generation, index_best_fit, i_motion_control, i_tuning_step);
+    i_tuning_step.stop_steps();
+
+    i_motion_control.enable_velocity_ctrl();
+    downstream_control_data.offset_torque = 0;
+    downstream_control_data.velocity_cmd = 5;
+    i_motion_control.update_control_data(downstream_control_data);
+    while(1);
+
     return generation[index_best_fit];
 }
 
 
 
-void user_interface(client interface PositionVelocityCtrlInterface i_position_control, client interface TuningStepInterface i_tuning_step)
+void user_interface(client interface MotionControlInterface i_motion_control, client interface TuningStepInterface i_tuning_step)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
     DownstreamControlData downstream_control_data;
-    MotionControlConfig motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+    MotionControlConfig motion_ctrl_config = i_motion_control.get_motion_control_config();
 
     fflush(stdout);
     //read and adjust the offset.
@@ -633,15 +659,15 @@ void user_interface(client interface PositionVelocityCtrlInterface i_position_co
 //                    velocity = -velocity;
 //                    downstream_control_data.offset_torque = 0;
 //                    downstream_control_data.velocity_cmd = velocity;
-//                    i_position_control.update_control_data(downstream_control_data);
+//                    i_motion_control.update_control_data(downstream_control_data);
 //                }
-                i_position_control.update_control_data(downstream_control_data);
+                i_motion_control.update_control_data(downstream_control_data);
                 printf("torque command %d milli-Nm\n", downstream_control_data.torque_cmd);
                 break;
 
         //pid coefficients
         case 'k':
-                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_tuning_step.get_ctrl_parameters();
                 switch(mode_2)
                 {
                 case 'p': //position
@@ -667,8 +693,8 @@ void user_interface(client interface PositionVelocityCtrlInterface i_position_co
                         }
                         i_tuning_step.set_ctrl_parameters(motion_ctrl_config);
                         motion_ctrl_config = i_tuning_step.get_ctrl_parameters();
-//                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-//                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                        i_motion_control.set_motion_control_config(motion_ctrl_config);
+//                        motion_ctrl_config = i_motion_control.get_motion_control_config();
 
                         printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
                                 motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
@@ -695,8 +721,8 @@ void user_interface(client interface PositionVelocityCtrlInterface i_position_co
                         }
                         i_tuning_step.set_ctrl_parameters(motion_ctrl_config);
                         motion_ctrl_config = i_tuning_step.get_ctrl_parameters();
-//                        i_position_control.set_position_velocity_control_config(motion_ctrl_config);
-//                        motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+//                        i_motion_control.set_motion_control_config(motion_ctrl_config);
+//                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki,
                                 motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
                         break;
@@ -706,12 +732,12 @@ void user_interface(client interface PositionVelocityCtrlInterface i_position_co
                         break;
                 }
 
-                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                i_motion_control.set_motion_control_config(motion_ctrl_config);
                 break;
 
         //limits
         case 'L':
-                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
                 {
                 //max position limit
@@ -744,7 +770,7 @@ void user_interface(client interface PositionVelocityCtrlInterface i_position_co
                 default:
                         break;
                 }
-                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                i_motion_control.set_motion_control_config(motion_ctrl_config);
                 printf("pos_max:%d pos_min:%d v_max:%d torq_max:%d\n", motion_ctrl_config.max_pos_range_limit, motion_ctrl_config.min_pos_range_limit, motion_ctrl_config.max_motor_speed,
                         motion_ctrl_config.max_torque);
                 break;
@@ -761,7 +787,7 @@ void user_interface(client interface PositionVelocityCtrlInterface i_position_co
 
         //jerk limitation (profiler parameters)
         case 'j':
-                motion_ctrl_config = i_position_control.get_position_velocity_control_config();
+                motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
                 {
                 case 'a':
@@ -773,19 +799,19 @@ void user_interface(client interface PositionVelocityCtrlInterface i_position_co
                 default:
                         break;
                 }
-                i_position_control.set_position_velocity_control_config(motion_ctrl_config);
+                i_motion_control.set_motion_control_config(motion_ctrl_config);
                 printf("acceleration_max:%d velocity_max:%d\n",motion_ctrl_config.max_acceleration_profiler, motion_ctrl_config.max_speed_profiler);
                 break;
 
         //set offset
 //        case 'o':
-//                motorcontrol_config = i_position_control.get_motorcontrol_config();
+//                motorcontrol_config = i_motion_control.get_motorcontrol_config();
 //                switch(mode_2)
 //                {
 //                //set offset
 //                case 's':
 //                    motorcontrol_config.commutation_angle_offset = value;
-//                    i_position_control.set_motorcontrol_config(motorcontrol_config);
+//                    i_motion_control.set_motorcontrol_config(motorcontrol_config);
 //                    printf("set offset to %d\n", motorcontrol_config.commutation_angle_offset);
 //                    break;
 //                //print offset
@@ -797,7 +823,7 @@ void user_interface(client interface PositionVelocityCtrlInterface i_position_co
 
         //disable controllers
 //        default:
-//                i_position_control.disable();
+//                i_motion_control.disable();
 //                printf("controller disabled\n");
 //                break;
 

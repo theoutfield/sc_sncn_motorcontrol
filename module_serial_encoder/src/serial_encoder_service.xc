@@ -323,14 +323,19 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 break;
             case REM_14_SENSOR:
             case BISS_SENSOR:
-                difference = pos_state.count - old_count;
-                old_count = pos_state.count;
-                // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
-                //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
-                if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
-                    velocity = velocity_compute(difference, (last_read-last_velocity_read)/position_feedback_config.ifm_usec, position_feedback_config.resolution);
+                velocity_count++;
+                if (velocity_count >= 8) {
+                    difference = pos_state.count - old_count;
+                    old_count = pos_state.count;
+                    // velocity in rpm = ( difference ticks * (1 minute / velocity loop time) ) / ticks per turn
+                    //                 = ( difference ticks * (60,000,000 us / velocity loop time in us) ) / ticks per turn
+                    if (last_read != last_velocity_read && difference < crossover && difference > -crossover) {
+                        velocity = velocity_compute(difference, (last_read-last_velocity_read)/position_feedback_config.ifm_usec, position_feedback_config.resolution);
+                        velocity = filter(velocity_buffer, index, 8, velocity);
+                    }
+                    velocity_count = 0;
+                    last_velocity_read = last_read;
                 }
-                last_velocity_read = last_read;
                 break;
             }
 

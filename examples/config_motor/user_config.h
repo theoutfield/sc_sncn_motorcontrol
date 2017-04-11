@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config.h>
+#include <motor_config_qmot_qbl5704.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -86,7 +86,7 @@
 #define COMMUTATION_FRQ            24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    0
+#define COMMUTATION_ANGLE_OFFSET    1000
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0

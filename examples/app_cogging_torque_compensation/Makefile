@@ -17,6 +17,7 @@ APP_NAME = app_demo_bldc_velocity_position
 USED_MODULES = config_motor lib_bldc_torque_control module_adc module_biss module_board-support module_controllers module_filters module_hall module_misc module_motion_control module_position_feedback module_profile module_pwm module_qei module_random module_rem_14 module_rem_16mt module_serial_encoder module_shared_memory module_spi_master module_watchdog
 
 
+
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS

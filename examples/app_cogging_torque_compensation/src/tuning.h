@@ -11,12 +11,11 @@
 #include <platform.h>
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
+#include <motion_control_service.h>
 //#include <advanced_motorcontrol_licence.h>
 #include <refclk.h>
 #include <adc_service.h>
 #include <xscope.h>
-
-#include <motion_control_service.h>
 #include <position_feedback_service.h>
 
 #include <mc_internal_constants.h>
@@ -33,8 +32,8 @@
 typedef enum {NON_COMPETITOR, COMPETITOR} gender ;
 typedef enum {LOSER, WINNER, NEUTRAL} ;
 
-#define RANGE_KP 20000000
-#define RANGE_KI 1000000
+#define RANGE_KP 2000000
+#define RANGE_KI 200000
 
 #define NUMBER_OF_TESTS MAX_ROWS
 #define NUMBER_OF_GENERATIONS 5
@@ -95,10 +94,10 @@ interface TuningStepInterface {
 };
 
 void tuning_step_service ( interface TuningStepInterface server i_tuning_step[3]);
-void user_interface(client interface PositionVelocityCtrlInterface i_position_control, client interface TuningStepInterface i_tuning_step);
-void make_steps(client interface PositionVelocityCtrlInterface i_position_control, client interface TuningStepInterface i_tuning_step, client interface PositionFeedbackInterface i_position_feedback);
-struct individual autotune (client interface PositionVelocityCtrlInterface i_position_control, int number_of_generations, client interface TuningStepInterface i_tuning_step, client interface PositionFeedbackInterface i_position_feedback);
+void user_interface(client interface MotionControlInterface i_motion_control, client interface TuningStepInterface i_tuning_step);
+void make_steps(client interface MotionControlInterface i_motion_control, client interface TuningStepInterface i_tuning_step, client interface PositionFeedbackInterface i_position_feedback);
+struct individual autotune (client interface MotionControlInterface i_motion_control, int number_of_generations, client interface TuningStepInterface i_tuning_step, client interface PositionFeedbackInterface i_position_feedback);
 
-void compute_pid(struct individual * generation, unsigned int index, client interface PositionVelocityCtrlInterface i_position_control, client interface TuningStepInterface i_tuning_step);
+void compute_pid(struct individual * generation, unsigned int index, client interface MotionControlInterface i_motion_control, client interface TuningStepInterface i_tuning_step);
 void test_crossover();
 
