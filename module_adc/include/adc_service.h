@@ -88,7 +88,8 @@ typedef enum {
     WD_OVER_CURRENT_PHASE_B = 2,
     WD_OVER_CURRENT_PHASE_C = 3,
     WD_UNDER_VOLTAGE = 4,
-    WD_OVER_VOLTAGE = 5
+    WD_OVER_VOLTAGE = 5,
+    WD_OVER_TEMPERATURE = 6
 } WatchdogFaultCode;
 
 /**

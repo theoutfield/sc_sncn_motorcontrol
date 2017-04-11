@@ -138,7 +138,7 @@ void adc_ad7265_service_demo(
                 break;
 
         case iADC[int i].set_protection_limits(
-                int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
+                int limit_oc, int limit_ov, int limit_uv, int limit_t):
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -224,11 +224,12 @@ void adc_ad7265(
                 break;
 
         case iADC[int i].set_protection_limits(
-                int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
-                i_max=i_max_in;
-                v_dc_max=v_dc_max_in*v_ratio_in;
-                v_dc_min=v_dc_min_in*v_ratio_in;
-                current_limit = i_max * i_ratio_in;
+                int limit_oc, int limit_ov, int limit_uv, int limit_t):
+                current_limit = limit_oc;
+                v_dc_max      = limit_ov;
+                v_dc_min      = limit_uv;
+                t_max         = limit_t
+
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -290,6 +291,12 @@ void adc_ad7265(
                 {
                     i_watchdog.protect(WD_OVER_VOLTAGE);
                     fault_code=OVER_VOLTAGE_NO_1;
+                }
+
+                if (t_max<OUT_A[AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B])
+                {
+                    i_watchdog.protect(WD_OVER_TEMPERATURE);
+                    fault_code=EXCESS_TEMPERATURE_DRIVE;
                 }
             }
 
