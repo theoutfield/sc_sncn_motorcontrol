@@ -98,6 +98,7 @@ Definitions
 -----------
 
 .. doxygendefine:: DEFAULT_SPI_CLOCK_DIV
+.. doxygendefine:: REM_14_POLLING_TIME
 .. doxygendefine:: REM_14_EXECUTING_TIME
 .. doxygendefine:: REM_14_SAVING_TIME
 .. doxygendefine:: REM_14_WIDTH_INDEX_PULSE

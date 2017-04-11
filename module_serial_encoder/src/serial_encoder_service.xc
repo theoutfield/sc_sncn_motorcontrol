@@ -36,6 +36,7 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
     case REM_16MT_SENSOR:
         t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
         { state.status, state.count, state.position, state.angle, state.timestamp } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
+        t :> last_read;
 #ifdef XSCOPE_REM_16MT
             xscope_int(POSITION_RAW, state.angle);
 #endif
@@ -43,6 +44,7 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         break;
     case REM_14_SENSOR:
         { state.position,state.status } = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.ifm_usec);
+        t :> last_read;
         multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
         state.angle = (position_feedback_config.pole_pairs * (state.position >> 2) ) & 4095;
         break;
@@ -50,6 +52,7 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         unsigned int data[BISS_FRAME_BYTES];
         t when timerafter(last_read + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec) :> void;
         state.status = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, biss_clock_port, position_feedback_config.biss_config, data);
+        t :> last_read;
         int count;
         if(state.status == SENSOR_NO_ERROR) {
             { count, state.position, state.status } = biss_encoder(data, position_feedback_config.biss_config);
@@ -73,14 +76,15 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         break;
     }
     state.last_position = state.position;
-    t :> last_read;
     return;
 }
 
-void init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * biss_clock_port,
+int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * biss_clock_port,
         int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config, int sensor_type, PositionState &pos_state,
         timer t, unsigned int &last_read)
 {
+    int read_period = 0;
+
     //init
     switch(sensor_type)
     {
@@ -92,10 +96,12 @@ void init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
             delay_ticks(200000*position_feedback_config.ifm_usec);
             pos_state.status = rem_16mt_init(*spi_ports, position_feedback_config);
         }
+        read_period = position_feedback_config.ifm_usec*REM_16MT_POLLING_TIME;
         break;
     case REM_14_SENSOR:
         init_spi_ports(*spi_ports);
         pos_state.status = initRotarySensor(*spi_ports,  position_feedback_config);
+        read_period = position_feedback_config.ifm_usec*REM_14_POLLING_TIME;
         break;
     case BISS_SENSOR:
 #ifdef DEBUG_POSITION_FEEDBACK
@@ -152,7 +158,7 @@ void init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
 #endif
 
 
-    return;
+    return read_period;
 }
 
 
@@ -170,8 +176,6 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     int index = 0;
     int old_count = 0;
     int crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-    int velocity_count = 0;
-    int velocity_loop = position_feedback_config.velocity_compute_period*position_feedback_config.ifm_usec;
     char old_timestamp = 0, timediff;
     int timediff_long = 0;
     //position
@@ -181,13 +185,13 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     unsigned int last_read = 0;
     t :> last_read;
     unsigned int last_velocity_read = last_read;
-    unsigned int next_velocity_read = last_read;
+    unsigned int next_read = last_read;
     unsigned int sensor_error_check_time = last_read;
     unsigned int end_time = 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
 
-    init_sensor(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+    int read_period = init_sensor(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
 
 
     //main loop
@@ -224,9 +228,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
-                init_sensor(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+                read_period = init_sensor(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
                 crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
-                velocity_loop = position_feedback_config.velocity_compute_period*position_feedback_config.ifm_usec;
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {
@@ -295,10 +298,10 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 break;
 
         //compute velocity
-        case t when timerafter(next_velocity_read) :> next_velocity_read:
-            next_velocity_read += velocity_loop;
+        case t when timerafter(next_read) :> next_read:
             read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
 
+            //time between last velocity computation
             if (sensor_type == REM_16MT_SENSOR) {
                 //timestamp difference
                 timediff = (char)pos_state.timestamp-old_timestamp;
@@ -307,8 +310,9 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
             } else {
                 timediff_long = (last_read-last_velocity_read)/position_feedback_config.ifm_usec;
             }
-            velocity_count++;
-            if (velocity_count >= 8) {
+
+            //compute velocity every position_feedback_config.velocity_compute_period microseconds
+            if (timeafter(last_read, last_velocity_read+position_feedback_config.ifm_usec*position_feedback_config.velocity_compute_period)) {
                 int difference = pos_state.count - old_count;
                 old_count = pos_state.count;
 
@@ -324,7 +328,6 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     }
                 }
                 last_velocity_read = last_read;
-                velocity_count = 0;
             }
 
 
@@ -347,8 +350,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 if (sensor_error_count < sensor_error_limit) {
                     sensor_error_count++;
                     //reset sensor error count
-                    if (timeafter(next_velocity_read, sensor_error_check_time)) {
-                        sensor_error_check_time = next_velocity_read + 10000*position_feedback_config.ifm_usec;//10 msec
+                    if (timeafter(last_read, sensor_error_check_time)) {
+                        sensor_error_check_time = last_read + 10000*position_feedback_config.ifm_usec;//10 msec
                         sensor_error_count = 0;
                     }
                 } else {
@@ -362,10 +365,20 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
             //gpio
             gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
 
+
+            //compute next loop time
+            if (sensor_type == BISS_SENSOR) {
+                //for BiSS we read just after the timeout is finished
+                next_read = last_read + (position_feedback_config.biss_config.timeout+2)*position_feedback_config.ifm_usec;
+            } else {
+                //for others we read at a fixed frequency
+                next_read += read_period;
+            }
+
             //to prevent blocking
             t :> end_time;
-            if (timeafter(end_time, next_velocity_read)) {
-                next_velocity_read = end_time + position_feedback_config.ifm_usec;
+            if (timeafter(end_time, next_read)) {
+                next_read = end_time + position_feedback_config.ifm_usec;
             }
             break;
         }

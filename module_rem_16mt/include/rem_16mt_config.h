@@ -14,3 +14,4 @@
 #define REM_16MT_MAX_RETRY        3 /**< Max number of read retry when checksum error */
 
 #define REM_16MT_TIMEOUT           10   /**< Time to wait after read in micro seconds */
+#define REM_16MT_POLLING_TIME      53   /**< Time between reads in micro seconds */

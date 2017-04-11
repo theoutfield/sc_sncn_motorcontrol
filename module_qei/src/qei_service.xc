@@ -273,11 +273,11 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                     gpio_write(gpio_ports, position_feedback_config, gpio_number, in_value);
                     break;
 
-            case t_velocity when timerafter(ts_velocity + (1000*position_feedback_config.ifm_usec)) :> ts_velocity:
+            case t_velocity when timerafter(ts_velocity + (position_feedback_config.velocity_compute_period*position_feedback_config.ifm_usec)) :> ts_velocity:
 
                 int difference_velocity = count - vel_previous_position;
                 if (difference_velocity < qei_crossover_velocity && difference_velocity > -qei_crossover_velocity)
-                    velocity = velocity_compute(difference_velocity, 1000, position_feedback_config.resolution);
+                    velocity = velocity_compute(difference_velocity, position_feedback_config.velocity_compute_period, position_feedback_config.resolution);
 
                 vel_previous_position = count;
 

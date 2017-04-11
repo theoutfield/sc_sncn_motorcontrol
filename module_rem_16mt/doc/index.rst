@@ -107,6 +107,7 @@ Definitions
 .. doxygendefine:: SPI_MASTER_MODE
 .. doxygendefine:: SPI_MASTER_SD_CARD_COMPAT
 .. doxygendefine:: REM_16MT_TIMEOUT
+.. doxygendefine:: REM_16MT_POLLING_TIME
 .. doxygendefine:: REM_16MT_CTRL_RESET
 .. doxygendefine:: REM_16MT_CONF_DIR
 .. doxygendefine:: REM_16MT_CONF_NULL
