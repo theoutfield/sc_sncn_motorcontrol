@@ -224,7 +224,7 @@ void adc_ad7949_service_demo(
                 break;
 
         case iADC[int i].set_protection_limits(
-                int limit_oc, int limit_ov, int limit_uv, int limit_t):
+                int limit_oc, int limit_ov, int limit_uv, int limit_ot):
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -346,7 +346,7 @@ void adc_ad7949(
                 break;
 
         case iADC[int i].set_protection_limits(
-                int limit_oc, int limit_ov, int limit_uv, int limit_t):
+                int limit_oc, int limit_ov, int limit_uv, int limit_ot):
                 current_limit = limit_oc;
                 v_dc_max      = limit_ov;
                 v_dc_min      = limit_uv;
