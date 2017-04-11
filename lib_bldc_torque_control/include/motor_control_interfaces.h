@@ -175,7 +175,7 @@ interface ADCInterface
      * @param   limit_oc -> high limit for adc output value in adc channels which are connected to current sensors
      * @param   limit_ov -> high limit for adc output value in adc channels which are connected to dc link
      * @param   limit_uv -> low  limit for adc output value in adc channels which are connected to dc link
-     * @param   limit_t  -> high limit for adc output value in adc channels which are connected to temperature sensor
+     * @param   limit_ot -> high limit for adc output value in adc channels which are connected to temperature sensor
      *
      * @return  void
      */
