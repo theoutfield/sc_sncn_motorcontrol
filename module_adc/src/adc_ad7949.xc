@@ -224,7 +224,7 @@ void adc_ad7949_service_demo(
                 break;
 
         case iADC[int i].set_protection_limits(
-                int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
+                int limit_oc, int limit_ov, int limit_uv, int limit_t):
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -346,11 +346,10 @@ void adc_ad7949(
                 break;
 
         case iADC[int i].set_protection_limits(
-                int i_max_in, int i_ratio_in, int v_ratio_in, int v_dc_max_in, int v_dc_min_in):
-                v_dc_max=v_dc_max_in*v_ratio_in;
-                v_dc_min=v_dc_min_in*v_ratio_in;
-                current_limit = i_max_in * i_ratio_in;
-                if(v_ratio_in==100) dc_value=800;
+                int limit_oc, int limit_ov, int limit_uv, int limit_t):
+                current_limit = limit_oc;
+                v_dc_max      = limit_ov;
+                v_dc_min      = limit_uv;
                 break;
 
         case iADC[int i].get_all_measurements() -> {
